@@ -31,8 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 #include "mitkFiberBundleInteractor.h"
+#include "mitkPlanarFigureInteractor.h"
 
 #include "mitkGlobalInteraction.h"
+
+#include "mitkGeometry2D.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -657,6 +660,9 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_SetInteractor, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
+    connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(PFWidth(double)));
+    connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
+
   }
 }
 
@@ -1205,16 +1211,6 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     if (_PlanarFigure)
     {
 
-      m_SelectedNode->SetProperty("layer",mitk::IntProperty::New(1000));
-      m_SelectedNode->SetProperty("selected",mitk::BoolProperty::New(false));
-      m_SelectedNode->SetProperty("visible",mitk::BoolProperty::New(true));
-      m_SelectedNode->SetProperty("planarfigure.default.line.color",mitk::ColorProperty::New(1,1,1));
-      m_SelectedNode->SetProperty("planarfigure.default.line.color",mitk::ColorProperty::New(1,1,1));
-      m_SelectedNode->SetProperty("planarfigure.hover.line.color",mitk::ColorProperty::New(1,1,1));
-      m_SelectedNode->SetProperty("planarfigure.hover.line.color",mitk::ColorProperty::New(1,1,1));
-      m_SelectedNode->SetProperty("planarfigure.selected.line.color",mitk::ColorProperty::New(1,1,1));
-      m_SelectedNode->SetProperty("planarfigure.selected.line.color",mitk::ColorProperty::New(1,1,1));
-
       QmitkRenderWindow* selectedRenderWindow = 0;
 
       QmitkRenderWindow* RenderWindow1 =
@@ -1259,6 +1255,50 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       const mitk::PlaneGeometry
           * _PlaneGeometry =
           dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+      mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry1 =
+        RenderWindow1->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane1 =
+        dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
+      mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry2 =
+        RenderWindow2->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane2 =
+        dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
+      mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry3 =
+        RenderWindow3->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane3 =
+        dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );
+      mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
+
+      normal[0]  = fabs(normal[0]);  normal[1]  = fabs(normal[1]);  normal[2]  = fabs(normal[2]);
+      normal1[0] = fabs(normal1[0]); normal1[1] = fabs(normal1[1]); normal1[2] = fabs(normal1[2]);
+      normal2[0] = fabs(normal2[0]); normal2[1] = fabs(normal2[1]); normal2[2] = fabs(normal2[2]);
+      normal3[0] = fabs(normal3[0]); normal3[1] = fabs(normal3[1]); normal3[2] = fabs(normal3[2]);
+
+      double ang1 = angle(normal, normal1);
+      double ang2 = angle(normal, normal2);
+      double ang3 = angle(normal, normal3);
+
+      if(ang1 < ang2 && ang1 < ang3)
+      {
+        selectedRenderWindow = RenderWindow1;
+      }
+      else
+      {
+        if(ang2 < ang3)
+        {
+          selectedRenderWindow = RenderWindow2;
+        }
+        else
+        {
+          selectedRenderWindow = RenderWindow3;
+        }
+      }
 
       // make node visible
       if (selectedRenderWindow)
@@ -1270,6 +1310,17 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
             centerP);
       }
     }
+
+    // set interactor for new node (if not already set)
+    mitk::PlanarFigureInteractor::Pointer figureInteractor
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetInteractor());
+
+    if(figureInteractor.IsNull())
+      figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", m_SelectedNode);
+
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+
+    m_SelectedNode->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
 
   }
 }
@@ -1313,5 +1364,53 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
 
     }
   }
+
+}
+
+void QmitkControlVisualizationPropertiesView::PFWidth(double width)
+{
+
+  m_SelectedNode->SetProperty("planarfigure.line.width", mitk::FloatProperty::New(width) );
+  m_SelectedNode->SetProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(width) );
+  m_SelectedNode->SetProperty("planarfigure.outline.width", mitk::FloatProperty::New(width) );
+  m_SelectedNode->SetProperty("planarfigure.helperline.width", mitk::FloatProperty::New(width) );
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::PFColor()
+{
+
+  QColor color = QColorDialog::getColor();
+
+  m_Controls->m_PFColor->setAutoFillBackground(true);
+  QString styleSheet = "background-color:rgb(";
+  styleSheet.append(QString::number(color.red()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.green()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.blue()));
+  styleSheet.append(")");
+  m_Controls->m_PFColor->setStyleSheet(styleSheet);
+
+  m_SelectedNode->SetProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+  m_SelectedNode->SetProperty( "planarfigure.default.outline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+  m_SelectedNode->SetProperty( "planarfigure.default.helperline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+  m_SelectedNode->SetProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+  m_SelectedNode->SetProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+//  m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+
+//  m_SelectedNode->SetProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+//  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 
 }

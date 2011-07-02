@@ -143,6 +143,7 @@ protected:
 
   // for planarfigure and bundle handling:
   mitk::DataNode* m_SelectedNode;
+  mitk::DataNode* m_CurrentPickingNode;
 };
 
 

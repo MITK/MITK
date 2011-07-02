@@ -171,8 +171,14 @@ struct CvpSelListener : ISelectionListener
 
         if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
         {
+          MITK_INFO << "Node " << node;
+          MITK_INFO << "pick " << m_View->m_CurrentPickingNode;
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
+          if(m_View->m_CurrentPickingNode != 0 && node != m_View->m_CurrentPickingNode)
+          {
+            m_View->m_Controls->m_SetInteractor->setEnabled(false);
+          }
         }
       }
     }
@@ -347,7 +353,8 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
   m_IconGlyON_C(new QIcon(":/QmitkDiffusionImaging/glyphson_C.png")),
   m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
   m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png")),
-  m_CurrentSelection(0)
+  m_CurrentSelection(0),
+  m_CurrentPickingNode(0)
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;
@@ -1239,7 +1246,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
 void QmitkControlVisualizationPropertiesView::SetInteractor()
 {
-
+  MITK_INFO << "halo";
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
   mitk::DataNode* node = 0;
   mitk::FiberBundle* bundle = 0;
@@ -1256,10 +1263,25 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
     {
       bundleInteractor = dynamic_cast<mitk::FiberBundleInteractor*>(node->GetInteractor());
 
-      if(bundleInteractor.IsNull())
-        bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
+      if(bundleInteractor.IsNotNull())
+        mitk::GlobalInteraction::GetInstance()->RemoveInteractor(bundleInteractor);
 
-      mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
+      if(!m_Controls->m_SetInteractor->isChecked())
+      {
+        m_Controls->m_SetInteractor->setChecked(false);
+        this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::ArrowCursor);
+        m_CurrentPickingNode = 0;
+      }
+      else
+      {
+        m_Controls->m_SetInteractor->setChecked(true);
+        bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
+        mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
+        this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::CrossCursor);
+        m_CurrentPickingNode = node;
+      }
+
     }
   }
+
 }

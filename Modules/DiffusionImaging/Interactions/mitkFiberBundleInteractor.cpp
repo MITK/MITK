@@ -185,14 +185,11 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
     }
   }
 
-  MITK_INFO << "FiberBundleInteractor Got Action " << action->GetActionId();
   /*Each case must watch the type of the event!*/
   switch (action->GetActionId())
   {
   case AcCHECKHOVERING:
     {
-      MITK_INFO << "FiberBundleInteractor AcCHECKOBJECT";
-
       // Re-enable VTK interactor (may have been disabled previously)
       if ( renderWindowInteractor != NULL )
       {
@@ -210,7 +207,11 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         DataNode *pickedNode = dpe->GetPickedObjectNode();
         if ( pickedNode != m_DataNode )
         {
-          MITK_INFO << "NO Hovering";
+//          if(pickedNode == 0)
+//            MITK_INFO << "picked node is NULL, no hovering";
+//          else
+//            MITK_INFO << "wrong node: " << pickedNode;
+
           this->HandleEvent( new StateEvent( EIDNOFIGUREHOVER ) );
 
           ok = true;
@@ -220,7 +221,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         m_CurrentPickedPoint = dpe->GetWorldPosition();
         m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
 
-        MITK_INFO << "YES Hovering";
+//        MITK_INFO << "YES Hovering";
         this->HandleEvent( new StateEvent( EIDFIGUREHOVER ) );
 
       }

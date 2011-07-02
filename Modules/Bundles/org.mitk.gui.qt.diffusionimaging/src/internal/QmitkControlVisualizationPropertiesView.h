@@ -111,6 +111,9 @@ protected slots:
 
   void SetInteractor();
 
+  void PFWidth(double);
+  void PFColor();
+
 protected:
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;

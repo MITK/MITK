@@ -627,4 +627,49 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
 void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite )
 {
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
+
+  //node->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
+  //node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
+  //node->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
+  //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
+
+  node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
+  node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
+  node->AddProperty("planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
+  node->AddProperty("planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
+
+  node->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+  node->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.default.outline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+  node->AddProperty( "planarfigure.default.outline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.default.helperline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+  node->AddProperty( "planarfigure.default.helperline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+  node->AddProperty( "planarfigure.default.markerline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+  node->AddProperty( "planarfigure.default.marker.opacity",mitk::FloatProperty::New(1.0) );
+
+  node->AddProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  node->AddProperty( "planarfigure.hover.line.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  node->AddProperty( "planarfigure.hover.outline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  node->AddProperty( "planarfigure.hover.helperline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  node->AddProperty( "planarfigure.hover.markerline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  node->AddProperty( "planarfigure.hover.marker.opacity", mitk::FloatProperty::New(1.0) );
+
+  node->AddProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+  node->AddProperty( "planarfigure.selected.line.opacity",mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+  node->AddProperty( "planarfigure.selected.outline.opacity", mitk::FloatProperty::New(1.0));
+  node->AddProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+  node->AddProperty( "planarfigure.selected.helperline.opacity",mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+  node->AddProperty( "planarfigure.selected.markerline.opacity", mitk::FloatProperty::New(1.0) );
+  node->AddProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+  node->AddProperty( "planarfigure.selected.marker.opacity",mitk::FloatProperty::New(1.0));
 }

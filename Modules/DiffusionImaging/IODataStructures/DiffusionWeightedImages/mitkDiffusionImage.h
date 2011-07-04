@@ -100,6 +100,22 @@ namespace mitk
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 
+    float GetBValue(int i)
+    {
+      if(i > m_Directions->Size()-1)
+        return -1;
+
+      if(m_Directions->ElementAt(i).one_norm() <= 0.0)
+      {
+        return 0;
+      }
+      else
+      {
+        double twonorm = m_Directions->ElementAt(i).two_norm();
+        return m_B_Value*twonorm*twonorm ;
+      }
+    }
+
     bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
 
   protected:

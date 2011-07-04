@@ -31,5 +31,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.measurement:OFF
   org.mitk.gui.qt.simplemeasurement:OFF
   org.mitk.gui.qt.imagecropper:OFF
-  org.mitk.gui.qt.pointbasedregistration:ON
+  org.mitk.gui.qt.pointbasedregistration:OFF
+  org.mitk.gui.qt.viewinitialization:OFF
+  org.mitk.gui.qt.volumevisualization:OFF
   )

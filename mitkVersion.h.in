@@ -3,6 +3,6 @@
   this file is generated. Do not change!
 */
 
-#define MITK_REVISION "@MITK_WC_REVISION_HASH@"
-#define MITK_REVISION_NAME "@MITK_WC_REVISION_NAME@"
+#define MITK_REVISION "@MITK_REVISION_ID@"
+#define MITK_REVISION_NAME "@MITK_REVISION_NAME@"
 

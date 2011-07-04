@@ -107,17 +107,17 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
   IF(NOT _PLUGIN_TEST_PLUGIN)
     SET(install_directories "")
     IF(NOT MACOSX_BUNDLE_NAMES)
-      SET(install_directories bin)
+      SET(install_directories bin/plugins)
     ELSE(NOT MACOSX_BUNDLE_NAMES)
       FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
-        LIST(APPEND install_directories ${bundle_name}.app/Contents/MacOS)
+        LIST(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
       ENDFOREACH(bundle_name)
     ENDIF(NOT MACOSX_BUNDLE_NAMES)
 
     FOREACH(install_subdir ${install_directories})
 
       MACRO_INSTALL_CTK_PLUGIN(TARGETS ${PLUGIN_TARGET}
-                               DESTINATION bin/plugins)
+                               DESTINATION ${install_subdir})
 
     ENDFOREACH()
   ENDIF()

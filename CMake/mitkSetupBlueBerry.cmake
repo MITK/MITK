@@ -1,5 +1,3 @@
-set(BLUEBERRY_INSTALL_RPATH_RELATIVE ${MITK_INSTALL_RPATH_RELATIVE}
-    CACHE BOOL "Use relative rpath entries when installing" FORCE)
 
 set(BLUEBERRY_USE_QT ${MITK_USE_QT} CACHE BOOL "Use the Qt GUI toolkit" FORCE)
 mark_as_advanced(BLUEBERRY_USE_QT)

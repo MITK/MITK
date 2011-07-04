@@ -967,9 +967,13 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
           ++fIter, ++slice )
     {
       filesForSlices.SetTableValue( slice, *fIter );
-      sliceLocationForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagSliceLocation]);
-      instanceNumberForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagInstanceNumber]);
-      SOPInstanceNumberForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagSOPInstanceNumber]);
+      gdcm::Scanner::TagToValue tagValueMapForFile = tagValueMappings[fIter->c_str()];
+      if(tagValueMapForFile.find(tagSliceLocation) != tagValueMapForFile.end())
+        sliceLocationForSlices.SetTableValue(slice, tagValueMapForFile[tagSliceLocation]);
+      if(tagValueMapForFile.find(tagInstanceNumber) != tagValueMapForFile.end())
+        instanceNumberForSlices.SetTableValue(slice, tagValueMapForFile[tagInstanceNumber]);
+      if(tagValueMapForFile.find(tagSOPInstanceNumber) != tagValueMapForFile.end())
+        SOPInstanceNumberForSlices.SetTableValue(slice, tagValueMapForFile[tagSOPInstanceNumber]);
     }
 
     image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );

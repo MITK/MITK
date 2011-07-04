@@ -50,6 +50,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.imagecropper
     org.mitk.gui.qt.pointbasedregistration
     org.mitk.gui.qt.viewinitialization
+    org.mitk.gui.qt.volumevisualization
  )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

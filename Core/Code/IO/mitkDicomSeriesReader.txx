@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDicomSeriesReader.h>
 
 #include <itkImageSeriesReader.h>
+#include <mitkProperties.h>
 
 namespace mitk
 {
@@ -48,7 +49,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     {
       /* default case: assume "normal" image blocks, possibly 3D+t */
       bool canLoadAs4D(true);
-      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, ScanForSliceInformation(filenames).GetMappings(), sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
@@ -79,7 +80,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         image->InitializeByItk(reader->GetOutput(), 1, volume_count);
         image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
 
-        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks.front(), io, image );
+        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks, ScanForSliceInformation(filenames).GetMappings(), io, image);
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                             << image->GetDimension(1) << ", " 
@@ -151,6 +152,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   image->InitializeByItk(reader->GetOutput());
   image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
 
+  DicomSeriesReader::CopyMetaDataToImageProperties( filenames, ScanForSliceInformation(filenames).GetMappings(), io, image);
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                       << image->GetDimension(1) << ", " 
@@ -175,30 +177,56 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   return image;
 }
-  
+
+gdcm::Scanner
+DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames)
+{
+  gdcm::Scanner scanner;
+
+  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
+  scanner.AddTag(ippTag);
+
+  // TODO what if tags don't exist?
+  const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
+  scanner.AddTag( tagSliceLocation );
+
+  const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
+  scanner.AddTag( tagInstanceNumber );
+
+  const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
+  scanner.AddTag( tagSOPInstanceNumber );
+
+  scanner.Scan(filenames); // make available image position for each file
+
+  return scanner;
+
+}
+
 std::list<DicomSeriesReader::StringContainer> 
-DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D )
+DicomSeriesReader::SortIntoBlocksFor3DplusT( 
+    const StringContainer& presortedFilenames, 
+    const gdcm::Scanner::MappingType& tagValueMappings_,
+    bool sort, 
+    bool& canLoadAs4D )
 {
   std::list<StringContainer> imageBlocks;
 
   // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
   StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
 
-  gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
-  gdcm::Scanner scanner;
-
-  scanner.AddTag(ippTag);
-  scanner.Scan(sorted_filenames); // make available image position for each file
+  gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
 
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
+
+  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
 
   // loop files to determine number of image blocks
   for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
        fileIter != sorted_filenames.end();
        ++fileIter)
   {
-    std::string position = scanner.GetValue( fileIter->c_str(), ippTag);
+    std::string position = tagValueMappings[fileIter->c_str()][ippTag];
     MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
     {

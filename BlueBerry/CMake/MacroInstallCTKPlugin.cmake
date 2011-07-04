@@ -21,7 +21,7 @@ MACRO(MACRO_INSTALL_CTK_PLUGIN)
       INSTALL(FILES ${_import_loc_release}
               DESTINATION ${_INSTALL_DESTINATION}
               CONFIGURATIONS Release)
-      IF(UNIX)
+      IF(UNIX AND NOT APPLE)
         IF(_target_filename_debug)
           INSTALL(CODE "FILE(RPATH_REMOVE
                              FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")")

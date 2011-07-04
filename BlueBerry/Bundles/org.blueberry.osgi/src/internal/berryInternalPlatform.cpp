@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDebug>
 
@@ -131,7 +132,24 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_InstallPath.assign(m_InstancePath);
   }
 
-  m_UserPath.assign(QDesktopServices::storageLocation(QDesktopServices::DataLocation).toStdString() + '/');
+  if (this->GetConfiguration().hasProperty(Platform::ARG_STORAGE_DIR))
+  {
+    std::string dataLocation = this->GetConfiguration().getString(Platform::ARG_STORAGE_DIR, "");
+    if (dataLocation.at(dataLocation.size()-1) != '/')
+    {
+      dataLocation += '/';
+    }
+    m_UserPath.assign(dataLocation);
+  }
+  else
+  {
+    // Append a hash value of the absolute path of the executable to the data location.
+    // This allows to start the same application from different build or install trees.
+    QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
+    dataLocation += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
+    m_UserPath.assign(dataLocation.toStdString());
+  }
+
   Poco::File userFile(m_UserPath);
   
   try
@@ -461,6 +479,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option appOption(Platform::ARG_APPLICATION, "", "the id of the application extension to be executed");
   appOption.argument("<id>").binding(Platform::ARG_APPLICATION);
   options.addOption(appOption);
+
+  Poco::Util::Option storageDirOption(Platform::ARG_STORAGE_DIR, "", "the location for storing persistent application data");
+  storageDirOption.argument("<dir>").binding(Platform::ARG_STORAGE_DIR);
+  options.addOption(storageDirOption);
 
   Poco::Util::Option consoleLogOption(Platform::ARG_CONSOLELOG, "", "log messages to the console");
   consoleLogOption.binding(Platform::ARG_CONSOLELOG);

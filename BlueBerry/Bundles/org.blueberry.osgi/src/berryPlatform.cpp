@@ -56,6 +56,7 @@ int Platform::ARCH_ARM = BERRY_ARCH_ARM;
 std::string Platform::ARG_CLEAN = "BlueBerry.clean";
 std::string Platform::ARG_APPLICATION = "BlueBerry.application";
 std::string Platform::ARG_HOME = "BlueBerry.home";
+std::string Platform::ARG_STORAGE_DIR = "BlueBerry.storageDir";
 std::string Platform::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
 std::string Platform::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
 std::string Platform::ARG_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";

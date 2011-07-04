@@ -186,9 +186,9 @@ void mitk::PlanarFigureWriter::GenerateData()
     document.Accept(&printer);
 
     // Create memory buffer and print tinyxmldocument there...
-    m_MemoryBufferSize  = printer.Size();
+    m_MemoryBufferSize  = printer.Size() + 1;
     m_MemoryBuffer      = new char[m_MemoryBufferSize];
-    memcpy(m_MemoryBuffer,printer.CStr(),m_MemoryBufferSize);
+    strcpy(m_MemoryBuffer,printer.CStr());
   }
   else
   {  

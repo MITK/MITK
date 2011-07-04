@@ -100,7 +100,7 @@ namespace mitk
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 
-    float GetBValue(int i)
+    float GetB_Value(int i)
     {
       if(i > m_Directions->Size()-1)
         return -1;

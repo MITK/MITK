@@ -33,6 +33,13 @@ class MitkIGTUI_EXPORT QmitkUpdateTimerWidget : public QWidget
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public: 
 
+
+  enum WidgetButtons {
+      
+      StartButton,
+      StopButton
+  };
+
   /*!  
   \brief default constructor  
   */ 
@@ -73,10 +80,18 @@ public:
   */
   void SetPurposeLabelText( QString text );
 
-  /*
+  /*!
   \brief This method hides the framerate settings spinbox and her labels in the view.
   */
   void HideFramerateSettings( bool hidden );
+
+
+  /*!
+  \brief This method sets the icon for a specific button of the widget.
+  */
+  void SetIcon( WidgetButtons button, const QIcon& icon );
+
+
 
 
 signals:
@@ -86,22 +101,6 @@ signals:
 public slots:
     void EnableWidget();
     void DisableWidget();
-
-private:
-  /*!
-  \brief This object's update timer realized by a QTimer
-  */
-  QTimer* m_UpdateTimer;
-
-  /*!
-  \brief This method is used to set up the update rate spinbox, min and max range are set and also the step size
-  */
-  void SetupUpdateRateSB( int min, int max, int step );
-
-  /*!
-  \brief This method is used to set the actual framerate (in Hz) as the framerate label text
-  */
-  void SetFrameRateLabel();
 
   protected slots:
 
@@ -124,6 +123,23 @@ protected:
   void CreateConnections();
   void CreateQtPartControl( QWidget *parent );
   Ui::QmitkUpdateTimerWidgetControls* m_Controls;  ///< gui widgets
+  
+
+private:
+  /*!
+  \brief This object's update timer realized by a QTimer
+  */
+  QTimer* m_UpdateTimer;
+
+  /*!
+  \brief This method is used to set up the update rate spinbox, min and max range are set and also the step size
+  */
+  void SetupUpdateRateSB( int min, int max, int step );
+
+  /*!
+  \brief This method is used to set the actual framerate (in Hz) as the framerate label text
+  */
+  void SetFrameRateLabel();
 
 };
 #endif // _QmitkUpdateTimerWidget_H_INCLUDED

@@ -20,30 +20,25 @@ if(BUILD_TESTING)
       -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
   )
   
-  add_custom_target(MITK-ProjectTemplateBuildTest
-                    ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_CFG_INTDIR})
-
-  add_test(mitkProjectTemplateBuildTest
-           ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplateBuildTest)
+  add_test(NAME mitkProjectTemplateBuildTest
+           COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config $<CONFIGURATION>)
   set_tests_properties(mitkProjectTemplateBuildTest PROPERTIES
                        LABELS "MITK;BlueBerry")
 
-
-  add_custom_target(MITK-ProjectTemplatePackageTest
-                    ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --target package --config ${CMAKE_CFG_INTDIR})
-
+  set(package_test_configurations)
   if(WIN32)
     # Only test packaging if build type is "Release" on Windows
-    add_test(NAME mitkProjectTemplatePackageTest CONFIGURATIONS Release
-             COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplatePackageTest)
-  else()
-    add_test(mitkProjectTemplatePackageTest
-             ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplatePackageTest)
+    set(package_test_configurations CONFIGURATIONS Release)
   endif()
   
-  set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
-                       DEPENDS mitkProjectTemplateBuildTest
-                       LABELS "MITK;BlueBerry")
-
+  if(NOT MITK_DISABLE_LONG_RUNNING_TESTS)
+    add_test(NAME mitkProjectTemplatePackageTest ${package_test_configurations}
+             COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config $<CONFIGURATION> --target package)
+           
+    set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
+                         DEPENDS mitkProjectTemplateBuildTest
+                         TIMEOUT 1000
+                         LABELS "MITK;BlueBerry")
+  endif()
 
 endif()

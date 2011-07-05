@@ -1,6 +1,11 @@
 /**
 \page NewPluginPage How to create a new MITK Plug-in
 
+\attention The procedure described here will generate legacy BlueBerry bundles. MITK switched to using the
+CTK plugin framework and hence it is recommended to create CTK plug-ins instead of BlueBerry bundles. Until
+there is similar generator for CTK-based MITK projects available, please read 
+<a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">Set-up a MITK-based Project</a>.
+
 \section CmakePluginGen CMake-based plug-in generator
 The BundleGenerator is a tool to simplify the process of creating your own MITK project (optional) and plug-ins.
 

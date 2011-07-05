@@ -19,19 +19,31 @@ if(BUILD_TESTING)
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
   )
+  
+  add_custom_target(MITK-ProjectTemplateBuildTest
+                    ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_CFG_INTDIR})
 
   add_test(mitkProjectTemplateBuildTest
-           ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_CFG_INTDIR})
+           ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplateBuildTest)
   set_tests_properties(mitkProjectTemplateBuildTest PROPERTIES
-                       LABELS MITK)
+                       LABELS "MITK;BlueBerry")
 
-  if(CMAKE_CFG_INTDIR STREQUAL "." OR CMAKE_CFG_INTDIR STREQUAL "Release")
+
+  add_custom_target(MITK-ProjectTemplatePackageTest
+                    ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --target package --config ${CMAKE_CFG_INTDIR})
+
+  if(WIN32)
     # Only test packaging if build type is "Release" on Windows
+    add_test(NAME mitkProjectTemplatePackageTest CONFIGURATIONS Release
+             COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplatePackageTest)
+  else()
     add_test(mitkProjectTemplatePackageTest
-             ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --target package --config ${CMAKE_CFG_INTDIR})
-    set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
-                         DEPENDS mitkProjectTemplateBuildTest
-                         LABELS MITK)
+             ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplatePackageTest)
   endif()
+  
+  set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
+                       DEPENDS mitkProjectTemplateBuildTest
+                       LABELS "MITK;BlueBerry")
+
 
 endif()

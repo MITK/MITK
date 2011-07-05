@@ -26,7 +26,7 @@ if(BUILD_TESTING)
   add_test(mitkProjectTemplateBuildTest
            ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --target MITK-ProjectTemplateBuildTest)
   set_tests_properties(mitkProjectTemplateBuildTest PROPERTIES
-                       LABELS MITK)
+                       LABELS MITK BlueBerry)
 
 
   add_custom_target(MITK-ProjectTemplatePackageTest
@@ -43,7 +43,7 @@ if(BUILD_TESTING)
   
   set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                        DEPENDS mitkProjectTemplateBuildTest
-                       LABELS MITK)
+                       LABELS MITK BlueBerry)
 
 
 endif()

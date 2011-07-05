@@ -260,6 +260,11 @@ mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
 mark_as_advanced(USE_ITKZLIB)
 
+set(MITK_DISABLE_LONG_RUNNING_TESTS 0)
+if(DEFINED MITK_CTEST_SCRIPT_MODE AND MITK_CTEST_SCRIPT_MODE STREQUAL "continuous")
+  set(MITK_DISABLE_LONG_RUNNING_TESTS 1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Get MITK version info
 #-----------------------------------------------------------------------------

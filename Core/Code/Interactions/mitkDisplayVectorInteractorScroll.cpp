@@ -117,6 +117,11 @@ void mitk::DisplayVectorInteractorScroll::SetIndexToSliceModifier( int modifier 
   m_IndexToSliceModifier = modifier;
 }
 
+void mitk::DisplayVectorInteractorScroll::SetAutoRepeat( bool autoRepeat )
+{
+  m_AutoRepeat = autoRepeat;
+}
+
 mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * type, mitk::OperationActor* destination)
   : mitk::StateMachine(type)
   , m_Sender(NULL)
@@ -139,4 +144,5 @@ mitk::DisplayVectorInteractorScroll::~DisplayVectorInteractorScroll()
   if ( m_Destination != this )
     delete m_Destination;
 }
+
 

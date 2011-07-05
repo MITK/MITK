@@ -384,6 +384,9 @@ if(BUILD_TESTING)
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
+
+  # Test the external project template
+  include(mitkTestProjectTemplate)
 endif()
 
 configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)

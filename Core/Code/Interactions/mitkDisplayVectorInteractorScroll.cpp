@@ -58,6 +58,7 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       {
         int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
+        // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
         if ( delta>0 && delta<m_IndexToSliceModifier )
         {
           delta=m_IndexToSliceModifier;
@@ -68,21 +69,31 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         }
 
         delta /= m_IndexToSliceModifier;
-
         int newPos = sliceNaviController->GetSlice()->GetPos() - delta; 
 
+        // if auto repeat is on, start at first slice if you reach the last slice and vice versa
         int maxSlices = sliceNaviController->GetSlice()->GetSteps();
-
-        while(newPos<0)
+        if ( m_AutoRepeat )
         {
-          newPos += maxSlices;
+          while(newPos<0)
+          {
+            newPos += maxSlices;
+          }
+
+          while(newPos>=maxSlices)
+          {
+            newPos -= maxSlices;
+          }
+        }
+        else
+        {
+          // if the new slice is below 0 we still show slice 0
+          // due to the stepper using unsigned int we have to do this ourselves
+          if ( newPos < 1 )
+            newPos = 0;
         }
 
-        while(newPos>=maxSlices)
-        {
-          newPos -= maxSlices;
-        }
-
+        // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
       }
 
@@ -107,7 +118,11 @@ void mitk::DisplayVectorInteractorScroll::SetIndexToSliceModifier( int modifier 
 }
 
 mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * type, mitk::OperationActor* destination)
-  : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination), m_IndexToSliceModifier(4)
+  : mitk::StateMachine(type)
+  , m_Sender(NULL)
+  , m_Destination(destination)
+  , m_IndexToSliceModifier(4)
+  , m_AutoRepeat( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);

@@ -54,6 +54,8 @@ namespace mitk {
     */
     void SetIndexToSliceModifier( int modifier );
 
+    void SetAutoRepeat( bool autoRepeat );
+
   protected:
     /**
     * @brief Default Constructor
@@ -89,6 +91,13 @@ namespace mitk {
     * If the cursor has moved less than m_IndexToSliceModifier pixels the scene is scrolled by one slice.
     */
     int m_IndexToSliceModifier;
+
+    /**
+    * \brief Defines if it is possible to scroll endlessly
+    *
+    * If AutoRepeat is on, scrolling further than the last slice will restart at the first slice and vice versa
+    */
+    bool m_AutoRepeat;
   };
 
 } // namespace mitk

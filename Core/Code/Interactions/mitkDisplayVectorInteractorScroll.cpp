@@ -58,16 +58,18 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       {
         int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
-        if(delta>1)
+        if ( delta>0 && delta<m_IndexToSliceModifier )
         {
-          delta=-1;
+          delta=m_IndexToSliceModifier;
         }
-        else if(delta<-1)
+        else if(delta<0 && delta>-m_IndexToSliceModifier)
         {
-          delta=1;
+          delta=-m_IndexToSliceModifier;
         }
 
-        int newPos = sliceNaviController->GetSlice()->GetPos() + delta; 
+        delta /= m_IndexToSliceModifier;
+
+        int newPos = sliceNaviController->GetSlice()->GetPos() - delta; 
 
         int maxSlices = sliceNaviController->GetSlice()->GetSteps();
 
@@ -99,8 +101,13 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
   return ok;
 }
 
+void mitk::DisplayVectorInteractorScroll::SetIndexToSliceModifier( int modifier )
+{
+  m_IndexToSliceModifier = modifier;
+}
+
 mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * type, mitk::OperationActor* destination)
-  : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination)
+  : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination), m_IndexToSliceModifier(4)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);

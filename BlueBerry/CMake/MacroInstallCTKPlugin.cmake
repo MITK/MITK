@@ -27,7 +27,7 @@ MACRO(MACRO_INSTALL_CTK_PLUGIN)
                              FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")")
         ENDIF()
         IF(_target_filename_release)
-          INSTALL(CODE "FILE(RPATH_CHANGE
+          INSTALL(CODE "FILE(RPATH_REMOVE
                              FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\")")
         ENDIF()
       ENDIF()

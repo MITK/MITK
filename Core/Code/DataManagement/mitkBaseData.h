@@ -207,7 +207,7 @@ public:
   //## \warning Returns IsInitialized()==false by default for 
   //## compatibility reasons. Override in sub-classes that
   //## support distinction between empty/non-empty state.
-  virtual bool IsEmpty(unsigned int t) const;
+  virtual bool IsEmptyTimeStep(unsigned int t) const;
 
   //##Documentation
   //## @brief Check whether object contains data (at

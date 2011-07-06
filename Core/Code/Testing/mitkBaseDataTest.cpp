@@ -78,9 +78,9 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1)->GetOrigin() == geo3->GetOrigin(), "Testing Origin set");
 
-  MITK_TEST_CONDITION(!baseDataImpl->IsEmpty(1), "Is not empty before clear()!");
+  MITK_TEST_CONDITION(!baseDataImpl->IsEmptyTimeStep(1), "Is not empty before clear()!");
   baseDataImpl->Clear();
-  MITK_TEST_CONDITION(baseDataImpl->IsEmpty(1), "...but afterwards!");
+  MITK_TEST_CONDITION(baseDataImpl->IsEmptyTimeStep(1), "...but afterwards!");
   //test method Set-/GetProperty()
   baseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
   //baseDataImpl->SetProperty("visibility", mitk::BoolProperty::New());

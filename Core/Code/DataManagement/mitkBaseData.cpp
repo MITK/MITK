@@ -127,7 +127,7 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned i
   }
 }
 
-bool mitk::BaseData::IsEmpty(unsigned int) const
+bool mitk::BaseData::IsEmptyTimeStep(unsigned int) const
 {
   return IsInitialized() == false;
 }
@@ -142,7 +142,7 @@ bool mitk::BaseData::IsEmpty() const
   unsigned int timeSteps = timeGeometry->GetTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
   {
-    if(IsEmpty(t) == false)
+    if(IsEmptyTimeStep(t) == false)
       return false;
   }
   return true;

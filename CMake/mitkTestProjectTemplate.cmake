@@ -31,14 +31,12 @@ if(BUILD_TESTING)
     set(package_test_configurations CONFIGURATIONS Release)
   endif()
   
-  if(NOT MITK_DISABLE_LONG_RUNNING_TESTS AND 0) # temporarily disabled
-    add_test(NAME mitkProjectTemplatePackageTest ${package_test_configurations}
-             COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config $<CONFIGURATION> --target package)
+  add_test(NAME mitkProjectTemplatePackageTest ${package_test_configurations}
+           COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config $<CONFIGURATION> --target package)
            
-    set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
-                         DEPENDS mitkProjectTemplateBuildTest
-                         TIMEOUT 1000
-                         LABELS "MITK;BlueBerry")
-  endif()
-
+  set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
+                       DEPENDS mitkProjectTemplateBuildTest
+                       TIMEOUT 1200
+                       LABELS "MITK;BlueBerry;LongRunning")
+  
 endif()

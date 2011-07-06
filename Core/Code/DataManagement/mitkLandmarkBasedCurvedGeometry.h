@@ -43,12 +43,14 @@ public:
 
   virtual void ComputeGeometry() = 0;
 
+  virtual AffineGeometryFrame3D::Pointer Clone() const = 0;
+
 protected:
   LandmarkBasedCurvedGeometry();
 
+  LandmarkBasedCurvedGeometry(const LandmarkBasedCurvedGeometry& other);
+
   virtual ~LandmarkBasedCurvedGeometry();
-  
-  void InitializeGeometry(Self * newGeometry) const;
 
   mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 

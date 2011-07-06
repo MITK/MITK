@@ -114,15 +114,11 @@ function(func_test label build_dir)
   if (NOT TESTING_PARALLEL_LEVEL)
     set(TESTING_PARALLEL_LEVEL 8)
   endif()
-  set(exclude_label)
-  if(SCRIPT_MODE STREQUAL "continuous")
-    set(exclude_label EXCLUDE_LABEL LongRunning)
-  endif()
+  
   ctest_test(BUILD "${build_dir}"
              INCLUDE_LABEL ${label}
              PARALLEL_LEVEL ${TESTING_PARALLEL_LEVEL}
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
-             ${exclude_label}
              RETURN_VALUE res
             )
   ctest_submit(PARTS Test)

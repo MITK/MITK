@@ -50,6 +50,7 @@ SET(H_FILES
   Algorithms/mitkPPTupleEat.h
   Algorithms/mitkPPTupleElem.h
   Algorithms/mitkPPTupleRem.h
+  Algorithms/mitkClippedSurfaceBoundsCalculator.h
 
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
@@ -82,6 +83,7 @@ SET(CPP_FILES
   Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
+  Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

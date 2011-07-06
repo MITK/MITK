@@ -31,12 +31,14 @@ if(BUILD_TESTING)
     set(package_test_configurations CONFIGURATIONS Release)
   endif()
   
-  add_test(NAME mitkProjectTemplatePackageTest ${package_test_configurations}
-           COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config $<CONFIGURATION> --target package)
+  if(NOT MITK_FAST_TESTING)
+    add_test(NAME mitkProjectTemplatePackageTest ${package_test_configurations}
+             COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config $<CONFIGURATION> --target package)
            
-  set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
-                       DEPENDS mitkProjectTemplateBuildTest
-                       TIMEOUT 1200
-                       LABELS "MITK;BlueBerry;LongRunning")
+    set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
+                         DEPENDS mitkProjectTemplateBuildTest
+                         TIMEOUT 1200
+                         LABELS "MITK;BlueBerry")
+  endif()
   
 endif()

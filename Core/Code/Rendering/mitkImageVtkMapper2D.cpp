@@ -160,16 +160,7 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-//    vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
-    //set up the camera to view the transformed plane
-//      MITK_INFO << "######################### vor rendern";
-//      double* range = cam->GetClippingRange();
-//      cam->Print(std::cout);
-//      MITK_INFO << "range " << range[0] << " " << range[1];
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-//    MITK_INFO << "######################### nach rendern";
-//    MITK_INFO << "range " << range[0] << " " << range[1];
-//    cam->Print(std::cout);
   }
 }
 
@@ -181,17 +172,6 @@ void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* rendere
   //TODO is it possible to have a visible BaseRenderer AND an invisible VtkRenderer???
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    //        vtkSmartPointer<vtkRenderer> ren =
-    //          vtkSmartPointer<vtkRenderer>::New();
-    //        vtkSmartPointer<vtkRenderWindow> renderWindow =
-    //          vtkSmartPointer<vtkRenderWindow>::New();
-    //        renderWindow->AddRenderer(ren);
-    //        vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    //            vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    //        renderWindowInteractor->SetRenderWindow(renderWindow);
-    //        ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
-    //        renderWindow->Render();
-    //        renderWindowInteractor->Start();
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
   }
 }
@@ -208,7 +188,6 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  //  MITK_INFO << "GenerateData";
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111 => Error in class design?
@@ -558,66 +537,40 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  // Store the result in a VTK image
-  if ( localStorage->m_ReslicedImage == NULL )
-  {
-    localStorage->m_ReslicedImage = vtkImageData::New();
-  }
-
-  //TODO image is stored 2x. Do we still need that?
-  //set the current slice for the localStorage
+  //set the current slice for the localStorage //TODO pass the actor to the 3D mapper
   localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
   //set the current slice as texture for the plane
   localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
 
-  //set the size textured plane
+  //setup the textured plane
   this->GeneratePlane( renderer, sliceBounds );
 
   //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
   renderer->GetVtkRenderer()->RemoveAllLights();
 
-  //remove the VTK interaction
+  //remove the VTK interaction, because our own interaction does not work with VTK's interaction
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
-
   trans->SetMatrix(matrix);
 
   //apply the properties after the slice was set
   this->ApplyProperties( renderer, mmPerPixel );
 
-//  vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
-  //set up the camera to view the transformed plane
-//    MITK_INFO << "######################### vor";
-//    MITK_INFO << "######################### vor rendern";
-//    double* range = cam->GetClippingRange();
-//      cam->Print(std::cout);
-//    MITK_INFO << "range " << range[0] << " " << range[1];
-
-  this->AdjustCamera( renderer );
-
-//  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
-
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
 
+  this->AdjustCamera( renderer );
+
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
-  //(Without not all three planes would be visible).
+  //(Without transformation not all three planes would be visible).
   renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 
-  //  MITK_INFO << "pos Z:" << cam->GetPosition()[2];
-  //  MITK_INFO << "foc Z:" << cam->GetFocalPoint()[2];
-  //  MITK_INFO << "pla Z:" << localStorage->m_Plane->GetCenter()[2];
-
-  //  renderer->GetVtkRenderer()->ResetCameraClippingRange();
-
-  // We have been modified
-  //      cam->Print(std::cout);
-//      MITK_INFO << "range " << range[0] << " " << range[1];
+  // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
 }
 

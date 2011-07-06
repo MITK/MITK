@@ -24,6 +24,19 @@ mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL), m_
   Initialize();
 }
 
+mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransformGeometry& other) : Superclass(other)
+{
+  if(other.m_ParametricBoundingBox.IsNotNull())
+  {
+    this->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
+  }
+
+  this->SetPlane(other.m_Plane);
+
+  this->SetFrameGeometry(other.m_FrameGeometry);
+}
+
+
 mitk::AbstractTransformGeometry::~AbstractTransformGeometry()
 {
 }
@@ -244,20 +257,6 @@ void mitk::AbstractTransformGeometry::SetOversampling(float oversampling)
 
 mitk::AffineGeometryFrame3D::Pointer mitk::AbstractTransformGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new AbstractTransformGeometry(*this);
   return newGeometry.GetPointer();
-}
-
-void mitk::AbstractTransformGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-
-  if(m_ParametricBoundingBox.IsNotNull())
-    newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
-
-  newGeometry->SetPlane(m_Plane);
-
-  newGeometry->SetFrameGeometry(m_FrameGeometry);
 }

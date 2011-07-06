@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkPluginFramework.h>
 #include <ctkPluginContext.h>
 #include <ctkPlugin.h>
+#include <ctkPluginException.h>
 
 #include <iostream>
 
@@ -197,10 +198,17 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       {
         uninstallPugin(pluginUrl, pfwContext);
       }
-      QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
-      if (pluginsToStart.contains(pluginUrl))
+      try
       {
-        m_CTKPluginsToStart << plugin->getPluginId();
+        QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
+        if (pluginsToStart.contains(pluginUrl))
+        {
+          m_CTKPluginsToStart << plugin->getPluginId();
+        }
+      }
+      catch (const ctkPluginException& e)
+      {
+        BERRY_ERROR << "Failed to install: " << pluginUrl.toString().toStdString() << ",\n" << e.what();
       }
     }
   }

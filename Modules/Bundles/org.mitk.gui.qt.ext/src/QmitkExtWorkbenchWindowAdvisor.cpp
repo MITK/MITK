@@ -427,22 +427,26 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
- QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
- imageNavigatorAction->setCheckable(true);
-
- // add part listener for image navigator
- imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
- window->GetPartService()->AddPartListener(imageNavigatorPartListener);
- berry::IViewPart::Pointer imageNavigatorView =
- window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
- imageNavigatorAction->setChecked(false);
- if (imageNavigatorView)
+ bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+ if (imageNavigatorViewFound)
  {
-   bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
-   if (isImageNavigatorVisible)
-   imageNavigatorAction->setChecked(true);
+   QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
+   imageNavigatorAction->setCheckable(true);
+
+   // add part listener for image navigator
+   imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
+   window->GetPartService()->AddPartListener(imageNavigatorPartListener);
+   berry::IViewPart::Pointer imageNavigatorView =
+       window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+   imageNavigatorAction->setChecked(false);
+   if (imageNavigatorView)
+   {
+     bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
+     if (isImageNavigatorVisible)
+       imageNavigatorAction->setChecked(true);
+   }
+   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
  }
- imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 
  // toolbar for showing file open, undo, redo and other main actions
  QToolBar* mainActionsToolBar = new QToolBar;
@@ -458,7 +462,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
- mainActionsToolBar->addAction(imageNavigatorAction);
+ if (imageNavigatorViewFound)
+ {
+   mainActionsToolBar->addAction(imageNavigatorAction);
+ }
  mainWindow->addToolBar(mainActionsToolBar);
   
 #ifdef __APPLE__

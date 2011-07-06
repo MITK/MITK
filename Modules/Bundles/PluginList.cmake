@@ -19,7 +19,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.colourimageprocessing:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.toftutorial:OFF
-  org.mitk.gui.qt.imagenavigator:OFF
+  org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.deformableregistration:OFF
   org.mitk.gui.qt.rigidregistration:OFF

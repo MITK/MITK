@@ -103,7 +103,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = 1.0; //Reason for 500000000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = 900000.0; //Reason for 900000: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -112,12 +112,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
     camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
     camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
     camera->SetViewUp( cameraUp ); //set the view-up for the camera
+    camera->SetClippingRange(0.1, 1000000.0); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
   }
-  //reset the clipping range
-//  renderer->GetVtkRenderer()->ResetCameraClippingRange();
-//  renderer->GetVtkRenderer()->UseDepthPeelingOff();
-//  renderer->GetVtkRenderer()->ResetCamera();
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(0.5, 2.0);
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -164,15 +160,15 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
+//    vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
     //set up the camera to view the transformed plane
-      MITK_INFO << "######################### vor rendern";
-      double* range = cam->GetClippingRange();
+//      MITK_INFO << "######################### vor rendern";
+//      double* range = cam->GetClippingRange();
 //      cam->Print(std::cout);
-      MITK_INFO << "range " << range[0] << " " << range[1];
+//      MITK_INFO << "range " << range[0] << " " << range[1];
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-    MITK_INFO << "######################### nach rendern";
-    MITK_INFO << "range " << range[0] << " " << range[1];
+//    MITK_INFO << "######################### nach rendern";
+//    MITK_INFO << "range " << range[0] << " " << range[1];
 //    cam->Print(std::cout);
   }
 }
@@ -593,17 +589,17 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //apply the properties after the slice was set
   this->ApplyProperties( renderer, mmPerPixel );
 
-  vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
+//  vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
   //set up the camera to view the transformed plane
-    MITK_INFO << "######################### vor";
+//    MITK_INFO << "######################### vor";
 //    MITK_INFO << "######################### vor rendern";
-    double* range = cam->GetClippingRange();
+//    double* range = cam->GetClippingRange();
 //      cam->Print(std::cout);
-    MITK_INFO << "range " << range[0] << " " << range[1];
+//    MITK_INFO << "range " << range[0] << " " << range[1];
 
   this->AdjustCamera( renderer );
 
-  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+//  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
@@ -621,7 +617,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // We have been modified
   //      cam->Print(std::cout);
-      MITK_INFO << "range " << range[0] << " " << range[1];
+//      MITK_INFO << "range " << range[0] << " " << range[1];
   localStorage->m_LastUpdateTime.Modified();
 }
 

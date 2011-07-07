@@ -97,7 +97,7 @@ const mitk::Surface *mitk::SurfaceGLMapper2D::GetInput(void)
   return static_cast<const Surface * > ( GetData() );
 }
 
-void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode::Pointer node )
+void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
 {
   Superclass::SetDataNode( node );
 

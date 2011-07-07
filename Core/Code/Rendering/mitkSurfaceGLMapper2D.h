@@ -106,7 +106,7 @@ public:
   /**
    *\brief Overwritten to initialize lookup table for point scalar data
    */
-  void SetDataNode( DataNode::Pointer node );
+  void SetDataNode( DataNode* node );
 
   /**
    * \brief Generate OpenGL primitives for the VTK contour held in contour.

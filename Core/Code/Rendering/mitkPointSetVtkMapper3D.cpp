@@ -378,8 +378,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   this->CreateVTKRenderObjects();
 
   //apply props
-  Superclass::ApplyProperties( m_ContourActor, NULL );
-  this->ApplyProperties(NULL);
+  this->ApplyProperties(m_ContourActor,NULL);
 
 }
 
@@ -400,9 +399,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     }
   }
 
-
-  Superclass::ApplyProperties( m_ContourActor, renderer );
-  this->ApplyProperties(renderer);
+  this->ApplyProperties(m_ContourActor,renderer);
 
   if(IsVisible(renderer)==false)
   {
@@ -468,8 +465,9 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*render
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
-void mitk::PointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
+  Superclass::ApplyProperties(actor,renderer);
   //check for color props and use it for rendering of selected/unselected points and contour 
   //due to different params in VTK (double/float) we have to convert!
 

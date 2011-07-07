@@ -34,6 +34,8 @@ public:
   itkNewMacro(ResliceMethodProperty);
   mitkNewMacro1Param(ResliceMethodProperty, const IdType&); 
   mitkNewMacro1Param(ResliceMethodProperty, const std::string&);  
+
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   
 protected:
   

@@ -46,6 +46,8 @@ public:
 
     virtual ~LevelWindowProperty();
 
+    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
     virtual bool operator==(const BaseProperty& property) const;
 
     const mitk::LevelWindow & GetLevelWindow() const;

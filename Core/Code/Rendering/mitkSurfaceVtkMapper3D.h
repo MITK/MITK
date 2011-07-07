@@ -106,7 +106,7 @@ protected:
 
   virtual ~SurfaceVtkMapper3D();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
   
   virtual void ResetMapper( mitk::BaseRenderer* renderer );
 

@@ -200,7 +200,7 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   }
 }
 
-void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   SetVtkMapperImmediateModeRendering(m_BoundingBoxMapper);
 

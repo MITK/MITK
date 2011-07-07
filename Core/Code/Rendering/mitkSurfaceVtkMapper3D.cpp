@@ -55,7 +55,7 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
  // m_Prop3D->Delete();                                  
 }
 
-void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   

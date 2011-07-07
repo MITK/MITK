@@ -119,7 +119,7 @@ mitk::Point3D* mitk::ClippedSurfaceBoundsCalculator::GetIntersectionPoint(Point3
 
   m_Geometry2D->IntersectionPoint(line, *intersectionPoint);
 
-  if(m_Geometry2D->IsOnPlane(*intersectionPoint))
+  if(m_Image->GetGeometry()->IsInside(*intersectionPoint))
   {
     return intersectionPoint;
   }

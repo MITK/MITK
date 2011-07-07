@@ -392,7 +392,9 @@ if(BUILD_TESTING)
   endif()
 
   # Test the external project template
-  include(mitkTestProjectTemplate)
+  if(MITK_USE_BLUEBERRY)
+    include(mitkTestProjectTemplate)
+  endif()
 endif()
 
 configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)

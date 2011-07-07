@@ -468,15 +468,6 @@ const float* mitk::Geometry3D::GetFloatSpacing() const
   return m_FloatSpacing;
 }
 
-void mitk::Geometry3D::SetSpacing(const float aSpacing[3])
-{
-  mitk::Vector3D tmp;
-  tmp[0]= aSpacing[0];
-  tmp[1]= aSpacing[1];
-  tmp[2]= aSpacing[2];
-  SetSpacing(tmp);
-}
-
 void mitk::Geometry3D::SetSpacing(const mitk::Vector3D& aSpacing)
 {
   if(mitk::Equal(m_Spacing, aSpacing) == false)

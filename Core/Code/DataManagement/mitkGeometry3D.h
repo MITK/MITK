@@ -517,9 +517,6 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Set the spacing (m_Spacing)
   virtual void SetSpacing(const mitk::Vector3D& aSpacing);
-  //##Documentation
-  //## @brief Set the spacing (m_Spacing) via a float array
-  virtual void SetSpacing(const float aSpacing[3]);
 
   //##Documentation
   //## @brief Get the DICOM FrameOfReferenceID referring to the

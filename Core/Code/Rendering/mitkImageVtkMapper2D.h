@@ -1,9 +1,4 @@
 /*=========================================================================
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -17,8 +12,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
 #define MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
 
+//MITK
+#include <mitkCommon.h>
+
 //MITK Rendering
-#include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper2D.h"
 
@@ -29,7 +26,6 @@ class vtkActor;
 class vtkPolyDataMapper;
 class vtkPlaneSource;
 class vtkImageData;
-class vtkTransformPolyDataFilter;
 class vtkLookupTable;
 class vtkImageReslice;
 class vtkImageChangeInformation;
@@ -107,14 +103,18 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
+    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
     virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
 
+    //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
+    //### end of methods of MITK-VTK rendering pipeline
+
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
@@ -134,19 +134,21 @@ namespace mitk {
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
       vtkSmartPointer<vtkImageReslice> m_Reslicer;
-      /** \brief Thickslices post filtering */
+      /** \brief Thickslices post filtering.  */
       vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief Using unit spacing for resampling makes life easier TODO improve docu ...*/
       vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;      
-      /** \brief PolyData object containg all lines/points needed for outlining the contour.*/
+      /** \brief PolyData object containg all lines/points needed for outlining the contour.
+          This container is used to save a computed contour for the next rendering execution.
+          For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
-      /** \brief timestamp of last update of stored data */
+      /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
 
-      /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
+      /** \brief Default constructor of the local storage. */
       LocalStorage();
-
+      /** \brief Default deconstructor of the local storage. */
       ~LocalStorage()
       {
       }
@@ -155,27 +157,41 @@ namespace mitk {
     /** \brief This member holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 
+    /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   protected:
     //Generate a plane with size of the image in mm
     void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
-    //set the camera to view the textured plane
+    /** \brief This method sets up the camera on the actor/image.
+    The view is centralized, zooming and panning of VTK are called inside.
+    TODO: this method should be moved to VtkMitkRenderProp or to the mitkVtkPropRenderer. */
     void AdjustCamera(mitk::BaseRenderer* renderer);
 
+    /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
+      \param binarySlice - The binary image slice. (Volumes are not supported.)
+      \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
+      */
     vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
 
+    /** Default constructor */
     ImageVtkMapper2D();
-
+    /** Default deconstructor */
     virtual ~ImageVtkMapper2D();
 
-    /** Does the actual resampling, without rendering the image yet. */
+    /** \brief Does the actual resampling, without rendering the image yet.
+        All the data is generated inside this method. The vtkProp (or Actor)
+        is filled with content (i.e. the resliced image). */
     virtual void GenerateData(mitk::BaseRenderer *renderer);
 
+    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
                             vtkFloatingPointType *bounds );
 
+    /** \brief Calculate the bounding box of the resliced image. This is necessary for
+        arbitrary rotated planes in an image volume. A rotated plane (e.g. in swivil mode)
+        will have a new bounding box, which needs to be calculated. */
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
   };

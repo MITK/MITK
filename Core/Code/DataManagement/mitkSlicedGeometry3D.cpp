@@ -32,6 +32,44 @@ mitk::SlicedGeometry3D::SlicedGeometry3D()
   this->InitializeSlicedGeometry( m_Slices );
 }
 
+mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
+: Superclass(other),
+  m_EvenlySpaced( other.m_EvenlySpaced ),
+  m_Slices( other.m_Slices ),
+  m_ReferenceGeometry( other.m_ReferenceGeometry ),
+  m_SliceNavigationController( other.m_SliceNavigationController )
+{
+
+  SetSpacing( other.GetSpacing() );
+  SetDirectionVector( other.GetDirectionVector() );
+
+  if ( m_EvenlySpaced )
+  {
+    AffineGeometryFrame3D::Pointer geometry = other.m_Geometry2Ds[0]->Clone();
+    Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+    assert(geometry2D!=NULL);
+    SetGeometry2D(geometry2D, 0);
+  }
+  else
+  {
+    unsigned int s;
+    for ( s = 0; s < other.m_Slices; ++s )
+    {
+      if ( other.m_Geometry2Ds[s].IsNull() )
+      {
+        assert(other.m_EvenlySpaced);
+        m_Geometry2Ds[s] = NULL;
+      }
+      else
+      {
+        AffineGeometryFrame3D::Pointer geometry = other.m_Geometry2Ds[s]->Clone();
+        Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+        assert(geometry2D!=NULL);
+        SetGeometry2D(geometry2D, s);
+      }
+    }
+  }
+}
 
 mitk::SlicedGeometry3D::~SlicedGeometry3D()
 {
@@ -631,52 +669,9 @@ mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
 mitk::AffineGeometryFrame3D::Pointer
 mitk::SlicedGeometry3D::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize(m_Slices);
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new SlicedGeometry3D(*this);
   return newGeometry.GetPointer();
 }
-
-
-void
-mitk::SlicedGeometry3D::InitializeGeometry( Self *newGeometry ) const
-{
-  Superclass::InitializeGeometry( newGeometry );
-
-  newGeometry->SetEvenlySpaced( m_EvenlySpaced );
-  newGeometry->SetSpacing( this->GetSpacing() );
-  newGeometry->SetDirectionVector( this->GetDirectionVector() );
-
-  newGeometry->SetSliceNavigationController( m_SliceNavigationController );
-  newGeometry->m_ReferenceGeometry = m_ReferenceGeometry;
-
-  if ( m_EvenlySpaced )
-  {
-    AffineGeometryFrame3D::Pointer geometry = m_Geometry2Ds[0]->Clone();
-    Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
-    assert(geometry2D!=NULL);
-    newGeometry->SetGeometry2D(geometry2D, 0);
-  }
-  else
-  {
-    unsigned int s;
-    for ( s = 0; s < m_Slices; ++s )
-    {
-      if ( m_Geometry2Ds[s].IsNull() )
-      {
-        assert(m_EvenlySpaced);
-      }
-      else
-      {
-        AffineGeometryFrame3D::Pointer geometry = m_Geometry2Ds[s]->Clone();
-        Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
-        assert(geometry2D!=NULL);
-        newGeometry->SetGeometry2D(geometry2D, s);
-      }
-    }
-  }
-}
-
 
 void
 mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const

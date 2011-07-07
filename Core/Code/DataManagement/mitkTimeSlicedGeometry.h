@@ -157,8 +157,6 @@ protected:
 
   virtual ~TimeSlicedGeometry();
 
-  void InitializeGeometry(Self * newGeometry) const;
-
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   mutable std::vector<Geometry3D::Pointer> m_Geometry3Ds;

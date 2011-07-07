@@ -383,25 +383,7 @@ mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
   return newGeometry.GetPointer();
 }
 
-void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
 
-  newGeometry->SetEvenlyTimed(m_EvenlyTimed);
-
-  unsigned int t;
-  for(t=0; t<m_TimeSteps; ++t)
-  {
-    if(m_Geometry3Ds[t].IsNull())
-    {
-      assert(m_EvenlyTimed);
-    }
-    else
-    {
-      newGeometry->SetGeometry3D(dynamic_cast<Geometry3D*>(m_Geometry3Ds[t]->Clone().GetPointer()), t);
-    }
-  }
-}
 
 void mitk::TimeSlicedGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

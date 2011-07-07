@@ -48,7 +48,7 @@ namespace mitk {
         else
           return *(m_Value.GetPointer()) == *(other->m_Value.GetPointer());
       }
-
+      virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
       /**
        *
        */

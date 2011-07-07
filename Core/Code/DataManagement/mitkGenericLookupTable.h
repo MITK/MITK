@@ -132,6 +132,7 @@ typedef LookupTableName Self;                                   \
   virtual const char *GetNameOfClass() const                    \
   {return #LookupTableName;}                                    \
   LookupTableName() {}                                          \
+  virtual Superclass& operator=(const Superclass& other) { return Superclass::operator=(other); } \
   virtual ~LookupTableName() {}                                 \
 }; \
 std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);

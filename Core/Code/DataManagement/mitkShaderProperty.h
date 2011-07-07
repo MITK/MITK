@@ -38,6 +38,8 @@ public:
   mitkClassMacro( ShaderProperty, EnumerationProperty );
   
   itkNewMacro(ShaderProperty);
+
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   
   mitkNewMacro1Param(ShaderProperty, const IdType&);
   

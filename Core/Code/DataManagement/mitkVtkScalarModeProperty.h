@@ -43,7 +43,9 @@ public:
   mitkNewMacro1Param(VtkScalarModeProperty, const IdType&);
   
   mitkNewMacro1Param(VtkScalarModeProperty, const std::string&);
-  
+
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.

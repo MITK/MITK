@@ -1,7 +1,6 @@
 #ifndef ClippedSurfaceBoundsCalculator_h_included
 #define ClippedSurfaceBoundsCalculator_h_included
 
-#include "OverlaysExports.h"
 #include "mitkGeometry2DData.h"
 #include "mitkImage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
@@ -20,7 +19,7 @@
 namespace mitk
 {
 
-class Overlays_EXPORT ClippedSurfaceBoundsCalculator
+class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 {
 
   public:

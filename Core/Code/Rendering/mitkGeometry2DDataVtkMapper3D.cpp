@@ -226,7 +226,7 @@ namespace mitk
     }
   }
 
-  void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
+  void Geometry2DDataVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   {
     SetVtkMapperImmediateModeRendering(m_EdgeMapper);
     SetVtkMapperImmediateModeRendering(m_BackgroundMapper);

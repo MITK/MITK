@@ -337,7 +337,7 @@ mitk::ImageMapperGL2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 
 
 void
-mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
+mitk::ImageMapperGL2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   mitk::Image *input = const_cast< mitk::ImageMapperGL2D::InputImageType * >(
     this->GetInput()
@@ -1147,18 +1147,18 @@ mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
     || (rendererInfo.m_LastUpdateTime
     < renderer->GetDisplayGeometryUpdateTime()) )
   {
-    this->GenerateData( renderer );
+    this->GenerateDataForRenderer( renderer );
   }
   else if ( rendererInfo.m_LastUpdateTime
     < renderer->GetCurrentWorldGeometry2D()->GetMTime() )
   {
-    this->GenerateData( renderer );
+    this->GenerateDataForRenderer( renderer );
   }
   else if ( (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime())
     || (rendererInfo.m_LastUpdateTime
     < node->GetPropertyList(renderer)->GetMTime()) )
   {
-    this->GenerateData( renderer );
+    this->GenerateDataForRenderer( renderer );
 
     // since we have checked that nothing important has changed, we can set
     // m_LastUpdateTime to the current time

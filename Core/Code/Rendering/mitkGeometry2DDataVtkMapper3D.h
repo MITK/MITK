@@ -121,7 +121,7 @@ protected:
 
   virtual ~Geometry2DDataVtkMapper3D();
 
-  virtual void GenerateData(BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(BaseRenderer* renderer);
 
   void ProcessNode( DataNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors );
 

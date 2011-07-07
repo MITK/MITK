@@ -113,7 +113,7 @@ void mitk::Contour::Initialize()
   m_ContourPath->Initialize();
   m_BoundingBox = BoundingBoxType::New();
   m_Vertices = BoundingBoxType::PointsContainer::New();
-  GetTimeSlicedGeometry()->Initialize(1);
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
 }
 
 unsigned int mitk::Contour::GetNumberOfPoints() const

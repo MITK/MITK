@@ -27,7 +27,7 @@ mitk::BoundingObjectGroup::BoundingObjectGroup()
 m_Counter(0),
 m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
 {
-  GetTimeSlicedGeometry()->Initialize(1);
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
   SetVtkPolyData(NULL);
 }
@@ -48,7 +48,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   {
     mitk::BoundingBox::BoundsArrayType boundsArray;
     boundsArray.Fill(0);
-    GetTimeSlicedGeometry()->Initialize(1);
+    GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
     GetGeometry()->SetBounds(boundsArray);
     GetTimeSlicedGeometry()->UpdateInformation();
     return; 

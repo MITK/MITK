@@ -219,7 +219,7 @@ int mitk::TimeSlicedGeometry::TimeStepToTimeStep(
 }
 
 
-void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
+void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(unsigned int timeSteps)
 {
   Geometry3D::Pointer geometry3D = Geometry3D::New();
   geometry3D->Initialize();

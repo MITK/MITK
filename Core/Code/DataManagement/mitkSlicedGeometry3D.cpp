@@ -29,7 +29,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D()
   m_ReferenceGeometry( NULL ),
   m_SliceNavigationController( NULL )
 {
-  this->Initialize( m_Slices );
+  this->InitializeSlicedGeometry( m_Slices );
 }
 
 
@@ -111,7 +111,7 @@ mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
 
 
 void
-mitk::SlicedGeometry3D::Initialize( unsigned int slices )
+mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
 {
   Superclass::Initialize();
   m_Slices = slices;

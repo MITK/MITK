@@ -36,7 +36,7 @@ void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
   // create a SlicedGeometry3D
   mitk::SlicedGeometry3D::Pointer slicedGeo3D=mitk::SlicedGeometry3D::New();
   int num_slices = 5;
-  slicedGeo3D->Initialize(num_slices); // 5 slices
+  slicedGeo3D->InitializeSlicedGeometry(num_slices); // 5 slices
   mitk::Point3D newOrigin;
   newOrigin[0] = 91.3;
   newOrigin[1] = -13.3;

@@ -185,7 +185,7 @@ public:
    * \warning Bounding box and the 2D-geometries must be set additionally: use
    * SetBounds(), SetGeometry().
    */
-  virtual void Initialize( unsigned int slices );
+  virtual void InitializeSlicedGeometry( unsigned int slices );
 
   /**
    * \brief Completely initialize this instance as evenly-spaced with slices

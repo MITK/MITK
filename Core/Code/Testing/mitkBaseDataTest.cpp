@@ -62,7 +62,11 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   
   //test method GetUpdatedGeometry(int timeStep);
   mitk::Geometry3D::Pointer geo3 = mitk::Geometry3D::New();
-  baseDataImpl->SetGeometry(geo3, 1);
+  mitk::TimeSlicedGeometry::Pointer timeSlicedGeometry = baseDataImpl->GetTimeSlicedGeometry();
+  if (timeSlicedGeometry.IsNotNull() )
+  {
+    timeSlicedGeometry->SetGeometry3D(geo3, 1);
+  }
 
   MITK_TEST_CONDITION(baseDataImpl->GetUpdatedGeometry(1) == geo3, "Set Geometry for time step 1");
   MITK_TEST_CONDITION(baseDataImpl->GetMTime()!= 0, "Check if modified time is set");  

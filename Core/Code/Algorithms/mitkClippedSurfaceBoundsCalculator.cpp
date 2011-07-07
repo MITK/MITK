@@ -24,6 +24,7 @@ void mitk::ClippedSurfaceBoundsCalculator::SetInput(const mitk::PlaneGeometry* g
   {
     this->m_Geometry2D = geometry;
     this->m_Image = image;
+    this->m_MinMaxOutput.clear();
     for(int i = 0; i < 3; i++)
     {
       this->m_MinMaxOutput.push_back(outputType( std::numeric_limits<int>::max() , std::numeric_limits<int>::min() ));

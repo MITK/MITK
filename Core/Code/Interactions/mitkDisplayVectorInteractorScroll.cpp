@@ -58,29 +58,42 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       {
         int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
-        if(delta>1)
+        // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
+        if ( delta>0 && delta<m_IndexToSliceModifier )
         {
-          delta=-1;
+          delta=m_IndexToSliceModifier;
         }
-        else if(delta<-1)
+        else if(delta<0 && delta>-m_IndexToSliceModifier)
         {
-          delta=1;
+          delta=-m_IndexToSliceModifier;
         }
 
-        int newPos = sliceNaviController->GetSlice()->GetPos() + delta; 
+        delta /= m_IndexToSliceModifier;
+        int newPos = sliceNaviController->GetSlice()->GetPos() - delta; 
 
+        // if auto repeat is on, start at first slice if you reach the last slice and vice versa
         int maxSlices = sliceNaviController->GetSlice()->GetSteps();
-
-        while(newPos<0)
+        if ( m_AutoRepeat )
         {
-          newPos += maxSlices;
+          while(newPos<0)
+          {
+            newPos += maxSlices;
+          }
+
+          while(newPos>=maxSlices)
+          {
+            newPos -= maxSlices;
+          }
+        }
+        else
+        {
+          // if the new slice is below 0 we still show slice 0
+          // due to the stepper using unsigned int we have to do this ourselves
+          if ( newPos < 1 )
+            newPos = 0;
         }
 
-        while(newPos>=maxSlices)
-        {
-          newPos -= maxSlices;
-        }
-
+        // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
       }
 
@@ -99,8 +112,22 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
   return ok;
 }
 
+void mitk::DisplayVectorInteractorScroll::SetIndexToSliceModifier( int modifier )
+{
+  m_IndexToSliceModifier = modifier;
+}
+
+void mitk::DisplayVectorInteractorScroll::SetAutoRepeat( bool autoRepeat )
+{
+  m_AutoRepeat = autoRepeat;
+}
+
 mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * type, mitk::OperationActor* destination)
-  : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination)
+  : mitk::StateMachine(type)
+  , m_Sender(NULL)
+  , m_Destination(destination)
+  , m_IndexToSliceModifier(4)
+  , m_AutoRepeat( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -117,4 +144,5 @@ mitk::DisplayVectorInteractorScroll::~DisplayVectorInteractorScroll()
   if ( m_Destination != this )
     delete m_Destination;
 }
+
 

@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkLevelWindowWidgetContextMenu.h>
 #include <mitkRenderingManager.h>
 
+#include <math.h>
+
 /**
 * Constructor
 */
@@ -147,7 +149,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
     bool enoughSpace = false;
     bool enoughSpace2 = false;
 
-    double dStepSize = pow10(floor(log10(mr/100))+1);
+    double dStepSize = pow(10,floor(log10(mr/100))+1);
 
     for(int i = m_MoveHeight + (int)(minRange*fact); i < m_MoveHeight;)//negative
     {

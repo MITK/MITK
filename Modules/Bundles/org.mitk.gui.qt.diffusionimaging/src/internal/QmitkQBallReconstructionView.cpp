@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -56,7 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <boost/version.hpp>
 
-const std::string QmitkQBallReconstructionView::VIEW_ID = 
+const std::string QmitkQBallReconstructionView::VIEW_ID =
   "org.mitk.views.qballreconstruction";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
@@ -89,7 +89,7 @@ struct QbrSelListener : ISelectionListener
       bool foundDwiVolume = false;
 
       // iterate selection
-      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
         i != m_View->m_CurrentSelection->End(); ++i)
       {
 
@@ -97,7 +97,7 @@ struct QbrSelListener : ISelectionListener
         if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-          
+
           // only look at interesting types
           if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
           {
@@ -175,7 +175,7 @@ QmitkQBallReconstructionView::QmitkQBallReconstructionView(const QmitkQBallRecon
 //      }
 //    }
 //  }
-//    
+//
 //  MITK_INFO << "changed";
 //}
 
@@ -316,7 +316,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     m_Controls->m_Description->setText("Numerical recon. (Tuch2004)");
     break;
   case 1:
-    m_Controls->m_Description->setText("Spherical harmonics recon. (Desoteaux2007)");
+    m_Controls->m_Description->setText("Spherical harmonics recon. (Descoteaux2007)");
     break;
   case 2:
     m_Controls->m_Description->setText("SH recon. with solid angle consideration (Aganj2009)");
@@ -339,12 +339,12 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
 {
   bool check = m_Controls->
     m_AdvancedCheckbox->isChecked();
-  
+
   m_Controls->m_QBallReconstructionMaxLLevelTextLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionMaxLLevelComboBox->setVisible(check);
   m_Controls->m_QBallReconstructionLambdaTextLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionLambdaLineEdit->setVisible(check);
- 
+
   m_Controls->m_QBallReconstructionThresholdLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionThreasholdEdit->setVisible(check);
   m_Controls->m_OutputB0Image->setVisible(check);
@@ -355,7 +355,7 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
   //m_Controls->textLabel1_2->setVisible(check);
   //m_Controls->m_QBallReconstructionLambdaStepLineEdit->setVisible(check);
   //m_Controls->textLabel1_3->setVisible(check);
-  
+
   m_Controls->frame_2->setVisible(check);
 }
 
@@ -367,8 +367,8 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -407,7 +407,7 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
 }
 
 void QmitkQBallReconstructionView::NumericalQBallReconstruction
-  (mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization) 
+  (mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization)
 {
   try
   {
@@ -419,17 +419,17 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
     std::vector<mitk::DataNode::Pointer> nodes;
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionImage<DiffusionPixelType>* vols = 
+      mitk::DiffusionImage<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
         (*itemiter)->GetData());
-      
+
       std::string nodename;
       (*itemiter)->GetStringProperty("name", nodename);
       ++itemiter;
@@ -443,12 +443,12 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       typedef itk::DiffusionQballReconstructionImageFilter
         <DiffusionPixelType, DiffusionPixelType, TTensorPixelType, QBALL_ODFSIZE>
         QballReconstructionImageFilterType;
-      
-      QballReconstructionImageFilterType::Pointer filter = 
+
+      QballReconstructionImageFilterType::Pointer filter =
         QballReconstructionImageFilterType::New();
       filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsSpinbox->value() );
-      filter->SetBValue(vols->GetB_Value());  
+      filter->SetBValue(vols->GetB_Value());
       filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
 
       switch(normalization)
@@ -495,7 +495,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       newname = newname.append("_QN%1").arg(normalization);
       SetDefaultNodeProperties(node, newname.toStdString());
       nodes.push_back(node);
-      
+
       // B-Zero TO DATATREE
       if(m_Controls->m_OutputB0Image->isChecked())
       {
@@ -528,8 +528,8 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 }
 
 void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
-  mitk::DataStorage::SetOfObjects::Pointer inImages, 
-  int normalization) 
+  mitk::DataStorage::SetOfObjects::Pointer inImages,
+  int normalization)
 {
   try
   {
@@ -542,20 +542,20 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
     float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->text().toFloat();
     lambdas.push_back(minLambda);
     int nLambdas = lambdas.size();
-   
+
 
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles*nLambdas);
 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
     std::vector<mitk::DataNode::Pointer>* nodes
       = new std::vector<mitk::DataNode::Pointer>();
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionImage<DiffusionPixelType>* vols = 
+      mitk::DiffusionImage<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
         (*itemiter)->GetData());
 
@@ -624,15 +624,15 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
 template<int L>
 void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
   mitk::DiffusionImage<DiffusionPixelType>* vols, float lambda,
-  std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, 
-  int normalization) 
+  std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes,
+  int normalization)
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter
     <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
   filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsSpinbox->value() );
-  filter->SetBValue(vols->GetB_Value());  
+  filter->SetBValue(vols->GetB_Value());
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
   filter->SetLambda(lambda);
 
@@ -647,7 +647,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
     {
       filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO_B_VALUE);
       break;
-    }            
+    }
   case 2:
     {
       filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO);
@@ -707,7 +707,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
 //  node5->SetProperty( "name", mitk::StringProperty::New(
 //    QString(nodename.c_str()).append("_ODF").toStdString()) );
 //  nodes->push_back(node5);
-  
+
   // B-Zero TO DATATREE
   if(m_Controls->m_OutputB0Image->isChecked())
   {
@@ -719,7 +719,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
     node4->SetProperty( "name", mitk::StringProperty::New(
       QString(nodename.c_str()).append("_b0").toStdString()) );
     nodes->push_back(node4);
-  }  
+  }
 }
 
 
@@ -750,7 +750,7 @@ void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Poin
   //node->SetProperty( "layer", mitk::IntProperty::New(0));
   //node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   //node->SetOpacity(1.0f);
-  //node->SetColor(1.0,1.0,1.0);  
+  //node->SetColor(1.0,1.0,1.0);
   //node->SetVisibility(true);
   //node->SetProperty( "IsQBallVolume", mitk::BoolProperty::New( true ) );
 

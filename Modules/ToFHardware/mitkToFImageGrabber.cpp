@@ -77,20 +77,14 @@ namespace mitk
       intensityImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, 1);
     }
 
-    this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
-      requiredImageSequence, this->m_ImageSequence );
-    capturedImageSequence = this->m_ImageSequence;
+    if (m_DistanceArray&&m_AmplitudeArray&&m_IntensityArray)
+    {
+      this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
+        requiredImageSequence, this->m_ImageSequence );
+      capturedImageSequence = this->m_ImageSequence;
 
-    if (m_DistanceArray)
-    {
       distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
-    }
-    if (m_AmplitudeArray)
-    {
       amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
-    }
-    if (m_IntensityArray)
-    {
       intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
     }
   }

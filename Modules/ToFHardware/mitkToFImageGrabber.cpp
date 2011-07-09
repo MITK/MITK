@@ -81,8 +81,8 @@ namespace mitk
     {
       this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
         requiredImageSequence, this->m_ImageSequence );
-      capturedImageSequence = this->m_ImageSequence;
 
+      capturedImageSequence = this->m_ImageSequence;
       distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
       amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
       intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);

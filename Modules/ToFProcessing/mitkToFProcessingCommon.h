@@ -43,8 +43,10 @@ namespace mitk
   {
   public:
     typedef double ToFScalarType;
-    typedef itk::Point<double, 2> ToFPoint2D;
-    typedef itk::Point<double, 3> ToFPoint3D;
+    typedef itk::Point<ToFScalarType, 2> ToFPoint2D;
+    typedef itk::Point<ToFScalarType, 3> ToFPoint3D;
+    typedef itk::Vector<ToFScalarType, 2> ToFVector2D;
+    typedef itk::Vector<ToFScalarType, 3> ToFVector3D;
 
 
     /*!

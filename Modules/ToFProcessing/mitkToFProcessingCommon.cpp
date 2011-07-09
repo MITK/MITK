@@ -40,7 +40,7 @@ ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinates
 }
 
 ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinates(ToFPoint3D cartesianPoint, ToFScalarType focalLength,
-                                                                                 ToFPoint2D interPixelDistance, ToFPoint2D principalPoint)
+                                                                                 ToFPoint2D interPixelDistance, ToFPoint2D principalPoint, bool calculateDistance)
 {
   ToFPoint3D indexCoordinatesAndDistanceValue;
 
@@ -52,7 +52,14 @@ ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinates
 
   ToFScalarType d = sqrt(imageX*imageX + imageY*imageY + focalLength*focalLength);
 
-  indexCoordinatesAndDistanceValue[2] = d*(cartesianPoint[2]+focalLength) / focalLength;
+  if (calculateDistance)
+  {
+    indexCoordinatesAndDistanceValue[2] = d*(cartesianPoint[2]+focalLength) / focalLength;
+  }
+  else
+  {
+    indexCoordinatesAndDistanceValue[2] = 0.0;
+  }
   return indexCoordinatesAndDistanceValue;
 }
 

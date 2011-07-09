@@ -83,10 +83,11 @@ namespace mitk
   \param focalLength focal length of optical system in mm (mostly obtained from camera calibration)
   \param interPixelDistance distance between adjacent pixels in mm for x and y direction
   \param principalPoint coordinates of principal point on image plane in pixel
+  \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0
   \return a ToFPoint3D. (int)ToFPoint3D[0]+0.5 and (int)ToFPoint3D[0]+0.5 will return the x and y index coordinates. ToFPoint3D[2] contains the distance value
   */
     static ToFPoint3D CartesianToIndexCoordinates(ToFPoint3D cartesianPoint, ToFScalarType focalLength,
-                                                  ToFPoint2D interPixelDistance, ToFPoint2D principalPoint);
+                                                  ToFPoint2D interPixelDistance, ToFPoint2D principalPoint, bool calculateDistance=true);
   };
 }
 #endif

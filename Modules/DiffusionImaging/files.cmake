@@ -8,6 +8,7 @@ SET(CPP_FILES
   Algorithms/itkB0ImageExtractionImageFilter.h
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
+  Algorithms/itkTractsToProbabilityImageFilter.h
   
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp

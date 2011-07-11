@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>414</width>
-    <height>235</height>
+    <height>268</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -498,94 +498,116 @@
        <number>0</number>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="maximumSize">
-         <size>
-          <width>43</width>
-          <height>16777215</height>
-         </size>
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="text">
-         <string>Width</string>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="m_LineWidth">
-        <property name="maximumSize">
-         <size>
-          <width>43</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="value">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <widget class="QPushButton" name="m_Color">
-        <property name="text">
-         <string>Color</string>
-        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="maximumSize">
+            <size>
+             <width>43</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="m_LineWidth">
+           <property name="maximumSize">
+            <size>
+             <width>43</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QPushButton" name="m_Wire">
+           <property name="text">
+            <string>Wire</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QPushButton" name="m_Color">
+           <property name="text">
+            <string>Set Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="2">
+          <widget class="QPushButton" name="m_Tube">
+           <property name="text">
+            <string>Tube</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3">
+          <widget class="QToolButton" name="m_SetInteractor">
+           <property name="text">
+            <string>Position Crosshair 3D</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QDoubleSpinBox" name="m_TubeRadius">
+           <property name="maximumSize">
+            <size>
+             <width>59</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maximum">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.050000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.150000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="maximumSize">
+            <size>
+             <width>47</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Radius</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="maximumSize">
-         <size>
-          <width>47</width>
-          <height>16777215</height>
-         </size>
-        </property>
+       <widget class="QPushButton" name="m_2DHeatmap">
         <property name="text">
-         <string>Radius</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="m_TubeRadius">
-        <property name="maximumSize">
-         <size>
-          <width>59</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="maximum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.150000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="m_Tube">
-        <property name="text">
-         <string>Tube</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="m_Wire">
-        <property name="text">
-         <string>Wire</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="7">
-       <widget class="QToolButton" name="m_SetInteractor">
-        <property name="text">
-         <string>3D Cross Position</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
+         <string>Generate 2D Heatmap</string>
         </property>
        </widget>
       </item>

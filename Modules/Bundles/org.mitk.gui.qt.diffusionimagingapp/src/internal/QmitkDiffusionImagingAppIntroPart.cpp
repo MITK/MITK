@@ -40,7 +40,7 @@
 #include <QRegExp>
 #include <QChar>
 #include <QByteArray>
-
+#include <QDesktopServices>
 
 
 #include "QmitkStdMultiWidgetEditor.h"
@@ -259,7 +259,8 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   // shown it should be implemented below
   else if (scheme.contains(QString("http")) )
   {
-    m_view->load(showMeNext ) ;
+    QDesktopServices::openUrl(showMeNext);
+//    m_view->load( ) ;
   }
   else if(scheme.contains("qrc"))
   {

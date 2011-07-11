@@ -79,6 +79,17 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( std::string("org.mitk.views.diffusionquantification") );
   viewExcludeList.push_back( std::string("org.mitk.views.tensorreconstruction") );
   viewExcludeList.push_back( std::string("org.mitk.views.perspectiveswitcher") );
+  viewExcludeList.push_back( std::string("org.mitk.views.basicimageprocessing") );
+  viewExcludeList.push_back( std::string("org.mitk.views.fiberbundleoperations") );
+  viewExcludeList.push_back( std::string("org.mitk.views.measurement") );
+  viewExcludeList.push_back( std::string("org.mitk.views.moviemaker") );
+  viewExcludeList.push_back( std::string("org.mitk.views.odfdetails") );
+  viewExcludeList.push_back( std::string("org.mitk.views.propertylistview") );
+  viewExcludeList.push_back( std::string("org.mitk.views.screenshotmaker") );
+  viewExcludeList.push_back( std::string("org.mitk.views.segmentation") );
+  viewExcludeList.push_back( std::string("org.mitk.views.imagestatistics") );
+  viewExcludeList.push_back( std::string("org.mitk.views.controlvisualizationpropertiesview") );
+  viewExcludeList.push_back( std::string("org.mitk.views.volumevisualization") );
 
   configurer->SetShowPerspectiveBar(false);
   configurer->SetInitialSize(berry::Point(1000,770));

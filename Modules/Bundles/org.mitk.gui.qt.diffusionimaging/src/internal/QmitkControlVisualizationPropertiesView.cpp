@@ -44,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryPlatformUI.h"
 
 #include "itkRGBAPixel.h"
+#include "itkTractsToProbabilityImageFilter.h"
 
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
@@ -662,6 +663,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(PFWidth(double)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
+
+    connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
 
   }
 }
@@ -1413,4 +1416,48 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 //  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 
+}
+
+void QmitkControlVisualizationPropertiesView::Heatmap()
+{
+  if(m_SelectedNode)
+  {
+    mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
+    if(!bundle)
+      return;
+
+    ///////////////////////////////
+    // Generate unsigned char Image
+    typedef unsigned char OutPixType2;
+
+    // run generator
+    typedef itk::Image< float, 3 >            WMPImageType;
+    typedef itk::TractsToProbabilityImageFilter<WMPImageType,
+        OutPixType2> ImageGeneratorType2;
+    ImageGeneratorType2::Pointer generator = ImageGeneratorType2::New();
+    //generator->SetInput(NULL);
+    generator->SetFiberBundle(bundle);
+    generator->SetInvertImage(false);
+    generator->SetUpsamplingFactor(2);
+    generator->SetBinaryEnvelope(false);
+    generator->Update();
+
+    // get result
+    typedef itk::Image<OutPixType2,3> OutType2;
+    OutType2::Pointer outImg = generator->GetOutput();
+
+    mitk::Image::Pointer img2 = mitk::Image::New();
+    img2->InitializeByItk(outImg.GetPointer());
+    img2->SetVolume(outImg->GetBufferPointer());
+
+    // to datastorage
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(img2);
+    QString name(m_SelectedNode->GetName().c_str());
+    name += "_heatmap";
+    node->SetName(name.toStdString());
+    node->SetVisibility(true);
+
+    GetDataStorage()->Add(node);
+  }
 }

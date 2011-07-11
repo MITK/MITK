@@ -26,11 +26,11 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, .5f, "org.mitk.views.datamanager");
 
-  berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
-    berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");
+//  berry::IFolderLayout::Pointer left =
+//    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+//    berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");
 
 //  layout->AddStandaloneView("org.mitk.views.perspectiveswitcher",
 //    false, berry::IPageLayout::BOTTOM, 0.99f, "org.mitk.diffusionimaginginternal.leftcontrols");
@@ -38,9 +38,9 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
   ////////////////////////////////////////
   // public views go here
   ////////////////////////////////////////
-  left->AddView("org.mitk.views.fiberbundleoperations");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
-  lo->SetCloseable(false);
+//  left->AddView("org.mitk.views.fiberbundleoperations");
+//  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
+//  lo->SetCloseable(false);
 
 //  left->AddView("org.mitk.views.diffusionpreprocessing");
 //  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");

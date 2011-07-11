@@ -114,6 +114,8 @@ protected slots:
   void PFWidth(double);
   void PFColor();
 
+  void Heatmap();
+
 protected:
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;

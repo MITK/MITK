@@ -18,5 +18,6 @@
         <file>glyphson_C.png</file>
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
+        <file>FiberBundle.png</file>
     </qresource>
 </RCC>

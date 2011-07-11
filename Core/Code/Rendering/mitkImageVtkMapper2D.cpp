@@ -51,7 +51,7 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-//  this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
+  //  this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
 void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
@@ -1003,59 +1003,59 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 }
 
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, mitk::ScalarType mmPerPixel[2]){
-	int* dims = binarySlice->GetDimensions(); //dimensions of the image
-	int line = dims[0]; //how many pixels per line?
-	int x = 0; //pixel index x
-	int y = 0; //pixel index y
-	char* currentPixel;
-	int nn = dims[0]*dims[1]; //max pixel(n,n)
+  int* dims = binarySlice->GetDimensions(); //dimensions of the image
+  int line = dims[0]; //how many pixels per line?
+  int x = 0; //pixel index x
+  int y = 0; //pixel index y
+  char* currentPixel;
+  int nn = dims[0]*dims[1]; //max pixel(n,n)
 
-	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
-	vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
-	for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
-		currentPixel = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
-		//if the current pixel value is set to something
-		if (*currentPixel != 0) {
-			//check in which direction a line is necessary
-			if (ii >= line && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
-				//add the 2 points
-				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
-				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
-				//add the line between both points
-				lines->InsertNextCell(2);
-				lines->InsertCellPoint(p1);
-				lines->InsertCellPoint(p2);
-			}
-			if (ii <= nn-line && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
-				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
-				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
-				lines->InsertNextCell(2);
-				lines->InsertCellPoint(p1);
-				lines->InsertCellPoint(p2);
-			}
-			if (ii > 1 && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
-				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
-				vtkIdType p2 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
-				lines->InsertNextCell(2);
-				lines->InsertCellPoint(p1);
-				lines->InsertCellPoint(p2);
-			}
-			if (ii < nn-1 && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
-				vtkIdType p1 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
-				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
-				lines->InsertNextCell(2);
-				lines->InsertCellPoint(p1);
-				lines->InsertCellPoint(p2);
-			}
-		}
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
+  for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
+    currentPixel = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
+    //if the current pixel value is set to something
+    if (*currentPixel != 0) {
+      //check in which direction a line is necessary
+      if (ii >= line && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
+        //add the 2 points
+        vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
+        //add the line between both points
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+      if (ii <= nn-line && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+      if (ii > 1 && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
+        vtkIdType p2 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+      if (ii < nn-1 && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+    }
 
-		//reached end of line
-		x++;
-		if (x >= line) {
-			x = 0;
-			y++;
-		}
-	}
+    //reached end of line
+    x++;
+    if (x >= line) {
+      x = 0;
+      y++;
+    }
+  }
   // Create a polydata to store everything in
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   // Add the points to the dataset

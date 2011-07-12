@@ -174,7 +174,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ^^
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
-  CMAKE_ARGS
+  CMAKE_CACHE_ARGS
     ${ep_common_args}
     ${mitk_superbuild_boolean_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF

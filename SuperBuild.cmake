@@ -122,16 +122,6 @@ SET(mitk_cmake_boolean_args
   MITK_USE_DCMTK
   MITK_USE_OpenCV
   )
-  
-#-----------------------------------------------------------------------------
-# Generate cmake variable names for MITK bundles
-#-----------------------------------------------------------------------------
-
-INCLUDE(mitkSuperBuildPlugins)
-FOREACH(plugin ${MITK_SUPERBUILD_PLUGINS})
-  LIST(APPEND mitk_cmake_boolean_args MITK_BUILD_${plugin})
-  OPTION(MITK_BUILD_${plugin} "Build the MITK ${plugin} plugin" OFF)
-ENDFOREACH()
 
 #-----------------------------------------------------------------------------
 # Create the final variable containing superbuild boolean args
@@ -184,7 +174,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ^^
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
-  CMAKE_ARGS
+  CMAKE_CACHE_ARGS
     ${ep_common_args}
     ${mitk_superbuild_boolean_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF

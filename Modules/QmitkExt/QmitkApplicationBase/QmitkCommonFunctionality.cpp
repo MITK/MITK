@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
-  if (! fileWriter->CanWriteDataType(data) ) {
+  if (! fileWriter->CanWriteBaseDataType(data) ) {
     QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
     return;
   }
@@ -191,7 +191,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
 
             for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) 
             {
-              if ( (*it)->CanWriteDataType(data) ) {
+              if ( (*it)->CanWriteBaseDataType(data) ) {
                 writerFound = true;
                 SaveToFileWriter(*it, data, NULL, aFileName); 
                 fileNameUsed = (*it)->GetFileName();

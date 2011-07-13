@@ -101,7 +101,7 @@ public:
     virtual const char * GetDefaultExtension() { return ".dwi"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer()) != NULL); };  
     virtual void DoWrite(BaseData::Pointer data) { 
-      if (CanWriteDataType(data)) {
+      if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer())); 
         this->Update(); 
       }

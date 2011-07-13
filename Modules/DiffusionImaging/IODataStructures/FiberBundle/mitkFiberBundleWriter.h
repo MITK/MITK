@@ -120,7 +120,7 @@ public:
     virtual const char * GetDefaultExtension() { return ".fib"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {
-      if (CanWriteDataType(data)) {
+      if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
         this->Update();
       }

@@ -97,7 +97,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
-    void SetInput( InputType* input );
+    void SetInputFiberBundle( InputType* input );
 
     /**
      * @returns the 0'th input object of the filter.
@@ -118,10 +118,10 @@ public:
     virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
     virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.afib *.vtk)"; }
     virtual const char * GetDefaultExtension() { return ".fib"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {
-      if (CanWriteDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
+      if (CanWriteBaseDataType(data)) {
+        this->SetInputFiberBundle(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
         this->Update();
       }
     };

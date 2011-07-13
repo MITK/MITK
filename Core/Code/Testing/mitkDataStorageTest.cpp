@@ -109,7 +109,7 @@ struct ItkDeleteEventListener
     m_DeleteObserverTag = m_Node->AddObserver(itk::DeleteEvent(), onObjectDelete);
   }
 
-  void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
+  void OnObjectDelete( const itk::Object* /*caller*/, const itk::EventObject & )
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     m_DataStorage->Add( node ); // SHOULD NOT CAUSE A DEADLOCK!
@@ -165,6 +165,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   }
 
   MITK_TEST_OUTPUT( << "Testing StandaloneDataStorage: ");
+  MITK_TEST_CONDITION_REQUIRED(argc>1, "Testing correct test invocation");
   TestDataStorage(sds,argv[1]);
   // TODO: Add specific StandaloneDataStorage Tests here
   sds = NULL;

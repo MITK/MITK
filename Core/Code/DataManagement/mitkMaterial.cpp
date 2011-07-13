@@ -359,7 +359,7 @@ void mitk::Material::Update()
   this->SetRepresentation( this->GetRepresentation() );
 }
 
-void mitk::Material::PrintSelf ( std::ostream &os ) const
+void mitk::Material::PrintSelf ( std::ostream &os, itk::Indent /* unused */ ) const
 {
   os << "Name: " << GetName() << std::endl;
   os << "Color: " << GetColor() << std::endl;

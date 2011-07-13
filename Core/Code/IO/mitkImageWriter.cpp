@@ -215,7 +215,7 @@ void mitk::ImageWriter::GenerateData()
     {
       picWriter->SetFileName( m_FileName.c_str() );
     }
-    picWriter->SetInput( input );
+    picWriter->SetInputImage( input );
     picWriter->Write();
     }
 

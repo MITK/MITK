@@ -41,6 +41,7 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
 
     virtual bool operator==(const BaseProperty& property) const;
     virtual bool Assignable(const BaseProperty& other) const;
+    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
     
   protected:
     GroupTagProperty();

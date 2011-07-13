@@ -210,7 +210,7 @@ std::list<DicomSeriesReader::StringContainer>
 DicomSeriesReader::SortIntoBlocksFor3DplusT( 
     const StringContainer& presortedFilenames, 
     const gdcm::Scanner::MappingType& tagValueMappings,
-    bool sort, 
+    bool /*sort*/, 
     bool& canLoadAs4D )
 {
   std::list<StringContainer> imageBlocks;

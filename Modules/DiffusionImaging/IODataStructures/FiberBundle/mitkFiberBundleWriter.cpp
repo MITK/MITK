@@ -202,7 +202,7 @@ void mitk::FiberBundleWriter::GenerateData()
 }
 
 
-void mitk::FiberBundleWriter::SetInput( InputType* diffVolumes )
+void mitk::FiberBundleWriter::SetInputFiberBundle( InputType* diffVolumes )
 {
     this->ProcessObject::SetNthInput( 0, diffVolumes );
 }

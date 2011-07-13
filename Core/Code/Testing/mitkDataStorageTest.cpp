@@ -165,6 +165,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   }
 
   MITK_TEST_OUTPUT( << "Testing StandaloneDataStorage: ");
+  MITK_TEST_CONDITION_REQUIRED(argc>1, "Testing correct test invocation");
   TestDataStorage(sds,argv[1]);
   // TODO: Add specific StandaloneDataStorage Tests here
   sds = NULL;

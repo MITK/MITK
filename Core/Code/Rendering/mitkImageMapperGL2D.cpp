@@ -759,7 +759,7 @@ mitk::ImageMapperGL2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
   else if ( pic->bpe == 32 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGBA image
     m_iil4mitkMode = iil4mitkImage::RGBA;
 
-  image->setImage( pic, m_iil4mitkMode );
+  image->setPicImage( pic, m_iil4mitkMode );
   image->setInterpolation( false );
   image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 

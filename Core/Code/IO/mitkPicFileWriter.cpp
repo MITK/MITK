@@ -140,7 +140,7 @@ void mitk::PicFileWriter::GenerateData()
   PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
 }
 
-void mitk::PicFileWriter::SetInput( Image* image )
+void mitk::PicFileWriter::SetInputImage( Image* image )
 {
   this->ProcessObject::SetNthInput( 0, image );
 }

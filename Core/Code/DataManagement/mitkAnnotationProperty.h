@@ -58,6 +58,7 @@ public:
 
   virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 
 
 protected:

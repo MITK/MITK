@@ -58,7 +58,7 @@ std::string mitk::FiberBundleSerializer::Serialize()
   {
     FiberBundleWriter::Pointer writer = FiberBundleWriter::New();
     writer->SetFileName(fullname);
-    writer->SetInput(const_cast<FiberBundle*>(fb));
+    writer->SetInputFiberBundle(const_cast<FiberBundle*>(fb));
     writer->Write();
   }
   catch (std::exception& e)

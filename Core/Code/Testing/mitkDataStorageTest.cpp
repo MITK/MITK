@@ -109,7 +109,7 @@ struct ItkDeleteEventListener
     m_DeleteObserverTag = m_Node->AddObserver(itk::DeleteEvent(), onObjectDelete);
   }
 
-  void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
+  void OnObjectDelete( const itk::Object* /*caller*/, const itk::EventObject & )
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     m_DataStorage->Add( node ); // SHOULD NOT CAUSE A DEADLOCK!

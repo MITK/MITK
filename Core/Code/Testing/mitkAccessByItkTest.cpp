@@ -187,7 +187,7 @@ public:
 private:
 
   template<typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-  void AccessTwoItkImages(itk::Image<TPixel1,VDimension1>* itkImage1, itk::Image<TPixel2,VDimension2>* itkImage2)
+  void AccessTwoItkImages(itk::Image<TPixel1,VDimension1>* /*itkImage1*/, itk::Image<TPixel2,VDimension2>* /*itkImage2*/)
   {
     if (!(typeid(int) == typeid(TPixel1) && typeid(float) == typeid(TPixel2) &&
           VDimension1 == 2 && VDimension2 == 2))

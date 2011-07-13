@@ -177,7 +177,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 }
   
 std::list<DicomSeriesReader::StringContainer> 
-DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D )
+
+DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool /*sort*/, bool& canLoadAs4D )
 {
   std::list<StringContainer> imageBlocks;
 

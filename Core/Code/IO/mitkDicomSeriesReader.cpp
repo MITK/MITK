@@ -509,7 +509,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 }
   
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer& /*restrictions*/)
 {
   /**
     assumption about this method:

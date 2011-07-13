@@ -29,16 +29,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+
+//##Documentation
+//## @brief Abstract superclass for histograms with double values.
+//##        Classes which are deriving from this class can be cached
+//##        in the same way.
 class MitkExt_EXPORT SimpleHistogram
 {
 public:
 
+  /** @brief Returns the minimal value of the histogram. */
   virtual double GetMin() const = 0;
+  /** @brief Returns the maximum value of the histogram. */
   virtual double GetMax() const = 0;
-
+  /** @brief Creates a new histogram out the source. */
   virtual void ComputeFromBaseData( BaseData* source ) = 0;
+  /** @brief TODO: What should this method do?*/
   virtual float GetRelativeBin( double start, double end ) const = 0;
-
 };
 
 class MitkExt_EXPORT SimpleImageHistogram : public SimpleHistogram

@@ -44,7 +44,7 @@ public:
   virtual double GetMax() const = 0;
   /** @brief Creates a new histogram out the source. */
   virtual void ComputeFromBaseData( BaseData* source ) = 0;
-  /** @brief TODO: What should this method do?*/
+  /** @brief TODO: (What should this method do?)*/
   virtual float GetRelativeBin( double start, double end ) const = 0;
 };
 
@@ -63,6 +63,9 @@ class MitkExt_EXPORT SimpleImageHistogram : public SimpleHistogram
     if(histogram)
       delete histogram;
   }
+
+  /** @return Returns if the current histogram is valid, false if not. */
+  bool GetValid();
 
   typedef itk::Image<short, 3>          CTImage;
   typedef itk::ImageRegionIterator< CTImage  > CTIteratorType;
@@ -105,6 +108,7 @@ class MitkExt_EXPORT SimpleImageHistogram : public SimpleHistogram
     return max;
   }
 
+  /** @brief Creates a new histogram out the source which must be an image. Method does nothing if the image is invalid, NULL, etc.. */
   void ComputeFromBaseData( BaseData* source );
   float GetRelativeBin( double start, double end ) const;
 

@@ -41,9 +41,9 @@ namespace mitk {
  *
  * \image html imageVtkMapper2Darchitecture.png
  *
- * At first, the image is resliced by means of vtkImageReslice. The volume image
- * serves as input in addition to spatial placement of the slice and a few other
- * properties like thick slices. This code was already present in the old version
+ * First, the image is resliced by means of vtkImageReslice. The volume image
+ * serves as input to the mapper in addition to spatial placement of the slice and a few other
+ * properties such as thick slices. This code was already present in the old version
  * (mitkImageMapperGL2D).
  *
  * Next, the obtained slice (m_ReslicedImage) is used to create a texture
@@ -54,17 +54,16 @@ namespace mitk {
  * pipeline via the method GetVtkProp().
  *
  * In order to transform the textured plane to the correct position in space, the
- * same transformation as used for reslicing is applied to both, the camera and the
+ * same transformation as used for reslicing is applied to both the camera and the
  * vtkActor. The camera position is also influenced by the mitkDisplayGeometry
  * parameters to facilitate zooming and panning. All important steps are explained
- * in following more detailedly. The resulting 2D image (by reslicing the
+ * in more detail below. The resulting 2D image (by reslicing the
  * underlying 3D input image appropriately) can either be directly rendered
- * in a 2D view or just be calculated to be used later on by another
+ * in a 2D view or just be calculated to be used later by another
  * rendering entity, e.g. in texture mapping in a 3D view.
  *
  * Properties that can be set for images and influence the imageMapper2D are:
  *
- *   - \b "modality": (mitkModalityProperty) Modality of the image
  *   - \b "opacity": (FloatProperty) Opacity of the image
  *   - \b "color": (ColorProperty) Color of the image
  *   - \b "use color": (BoolProperty) Use the color of the image or not
@@ -75,9 +74,9 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry": (BoolProperty) Do it or not
  *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
  *   - \b "layer": (IntProperty) Layer of the image
- *   - \b "volume annotation color": (ColorProperty) color of the volume annotation
+ *   - \b "volume annotation color": (ColorProperty) color of the volume annotation, TODO has to be reimplemented
  *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!) 
-          unit is ml/cm3
+          unit is ml or cm3, TODO has to be reimplemented
 
  * The default properties are:
 
@@ -172,14 +171,14 @@ namespace mitk {
       }
     };
 
-    /** \brief This member holds all (three) LocalStorages for the three 2D render windows. */
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 
     /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   protected:
-    /** \brief Generates a plane according to the size of the resliced image in mm.
+    /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
     * \image html texturedPlane.png
     *
@@ -189,7 +188,7 @@ namespace mitk {
     * resliced image in space. The center of the plane (C) is also the center of
     * the view plane (cf. the image above).
     *
-    * \note: For the standard MITK view with three 2D render windows showing three
+    * \note For the standard MITK view with three 2D render windows showing three
     * different slices, three such planes are generated. All these planes are generated
     * in the XY-plane (even if they depict a YZ-slice of the volume).
     *
@@ -197,7 +196,7 @@ namespace mitk {
     void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
     /** \brief This method sets up the camera on the actor/image.
-    * The view is centralized, zooming and panning of VTK are called inside.
+    * The view is centered; zooming and panning of VTK are called inside.
     * TODO: this method should be moved to VtkMitkRenderProp or to the mitkVtkPropRenderer.
     *
     * \image html ImageMapperdisplayGeometry.png
@@ -212,32 +211,31 @@ namespace mitk {
     * \image html cameraPositioning.png
     *
     * The view plane center (VC) is the center of the textured plane (C) and the focal point
-    * (FP) at the same time. The FP defines into which direction the camera is viewing. Since
+    * (FP) at the same time. The FP defines which direction the camera faces. Since
     * the textured plane is always in the XY-plane and orthographic projection is applied, the
     * distance between camera and plane is theoretically irrelevant (because in the orthographic
     * projection the center of projection is at infinity and the size of objects depends only on
-    * a scaling parameter).As a consequence, the direction of projection (DOP) is (0; 0; -1).
+    * a scaling parameter). As a consequence, the direction of projection (DOP) is (0; 0; -1).
     * The camera up vector is always defined as (0; 1; 0).
     *
     * \warning Due to a VTK clipping bug the distance between textured plane and camera is really huge.
     * Otherwise, VTK would clip off some slices. Same applies for the clipping range size.
     *
-    * \note The camera position is defined through the mitkDisplayGeometry and not through
-    * the center of the textured plane. This facilitates zooming and panning, because the display
+    * \note The camera position is defined through the mitkDisplayGeometry. 
+    * This facilitates zooming and panning, because the display
     * geometry changes and the textured plane does not.
     *
     * \image html scaling.png
     *
     * The textured plane is scaled to fill the render window via
     * camera->SetParallelScale( imageHeightInMM / 2). In the orthographic projection all extends,
-    * angles and sizes should be preserved. Therefore, the image is scaled with one parameter in
-    * X and Y direction. This parameter defines the size of the rendered image. A higher value will
+    * angles and sizes should be preserved. Therefore, the image is scaled by one parameter which defines the size of the rendered image. A higher value will
     * result in smaller images. In order to render just the whole image, the scale is set to half of
-    * the image height in wolrdcoordinates (cf. the picture above).
+    * the image height in worldcoordinates (cf. the picture above).
     *
     * For zooming purposes, a factor is computed as follows:
     * factor = image height / display height (in worldcoordinates).
-    * When the display geometry gets smaller (zoom in), the factor becoomes bigger. When the display
+    * When the display geometry gets smaller (zoom in), the factor becomes bigger. When the display
     * geometry gets bigger (zoom out), the factor becoomes smaller. The used VTK method
     * camera->Zoom( factor ) also works with an inverse scale.
     */
@@ -275,7 +273,7 @@ namespace mitk {
                             vtkFloatingPointType *bounds );
 
     /** \brief Calculate the bounding box of the resliced image. This is necessary for
-        arbitrary rotated planes in an image volume. A rotated plane (e.g. in swivil mode)
+        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
         will have a new bounding box, which needs to be calculated. */
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );

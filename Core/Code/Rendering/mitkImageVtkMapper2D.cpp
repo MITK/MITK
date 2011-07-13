@@ -49,6 +49,8 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
 
+
+
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
   //  this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?

@@ -118,7 +118,7 @@ public:
     virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
     virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.afib *.vtk)"; }
     virtual const char * GetDefaultExtension() { return ".fib"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteDataType(data)) {
         this->SetInput(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));

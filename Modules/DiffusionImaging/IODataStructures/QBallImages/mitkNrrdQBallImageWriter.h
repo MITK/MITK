@@ -98,7 +98,7 @@ public:
     virtual const char * GetDefaultFilename() { return "QBalls.qbi"; }
     virtual const char * GetFileDialogPattern() { return "Q-Ball Images (*.qbi *.hqbi"; }
     virtual const char * GetDefaultExtension() { return ".qbi"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::QBallImage*>(data.GetPointer()) != NULL); };  
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::QBallImage*>(data.GetPointer()) != NULL); };  
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteDataType(data)) {
         this->SetInput(dynamic_cast<mitk::QBallImage*>(data.GetPointer())); 

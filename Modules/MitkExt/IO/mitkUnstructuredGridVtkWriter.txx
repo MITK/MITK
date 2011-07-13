@@ -162,7 +162,7 @@ const UnstructuredGrid* UnstructuredGridVtkWriter<VTKWRITER>::GetInput()
 }
 
 template<class VTKWRITER>
-bool UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType(BaseData::Pointer data)
+bool UnstructuredGridVtkWriter<VTKWRITER>::CanWriteBaseDataType(BaseData::Pointer data)
 {
   return (dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()) != 0);
 }
@@ -170,7 +170,7 @@ bool UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType(BaseData::Pointer da
 template<class VTKWRITER>
 void UnstructuredGridVtkWriter<VTKWRITER>::DoWrite(BaseData::Pointer data)
 {
-  if (CanWriteDataType(data))
+  if (CanWriteBaseDataType(data))
   {
     this->SetInput(dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()));
     this->Update();

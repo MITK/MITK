@@ -139,14 +139,14 @@ namespace mitk
     virtual const char * GetDefaultFilename() { return "PlanarFigure.pf"; }
     virtual const char * GetFileDialogPattern() { return "Planar Figure Files (*.pf)"; }
     virtual const char * GetDefaultExtension() { return ".pf"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data)
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
       mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(data);
       return CanWriteDataType(node);
     }
     virtual void DoWrite(BaseData::Pointer data) {
-      if (CanWriteDataType(data)) {
+      if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::PlanarFigure*>(data.GetPointer()));
         this->Update();
       }

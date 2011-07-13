@@ -98,7 +98,7 @@ public:
     virtual const char * GetDefaultFilename() { return "Tensors.dti"; }
     virtual const char * GetFileDialogPattern() { return "Tensor Images (*.dti *.hdti)"; }
     virtual const char * GetDefaultExtension() { return ".dti"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::TensorImage*>(data.GetPointer()) != NULL); };  
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::TensorImage*>(data.GetPointer()) != NULL); };  
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteDataType(data)) {
         this->SetInput(dynamic_cast<mitk::TensorImage*>(data.GetPointer())); 

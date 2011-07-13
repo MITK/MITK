@@ -109,7 +109,7 @@ public:
     virtual const char * GetDefaultFilename();
     virtual const char * GetFileDialogPattern();
     virtual const char * GetDefaultExtension();
-    virtual bool CanWriteDataType(BaseData::Pointer data);
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
     virtual void DoWrite(BaseData::Pointer data);
 
 protected:

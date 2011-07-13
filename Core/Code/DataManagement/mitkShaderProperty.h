@@ -39,7 +39,6 @@ public:
   
   itkNewMacro(ShaderProperty);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   
   mitkNewMacro1Param(ShaderProperty, const IdType&);
   
@@ -54,6 +53,12 @@ public:
   void SetShader(const IdType& i);
   void SetShader(const std::string& i);
   
+  virtual BaseProperty& operator=(const BaseProperty& other)
+  {
+    shaderList = dynamic_cast<const ShaderProperty&>(other).shaderList;
+    return Superclass::operator=(other);
+  }
+
 protected:
   
   std::list<Element> shaderList;
@@ -81,10 +86,10 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid scalar mode types.
    */
-  bool AddEnum( const std::string& name );
+  bool AddEnum( const std::string& name, const IdType& id = 0);
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
+   * Adds the enumeration types as defined by vtk to the list of known
    * enumeration values.
    */
   void AddShaderTypes();

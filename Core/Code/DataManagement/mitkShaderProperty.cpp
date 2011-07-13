@@ -84,7 +84,7 @@ void mitk::ShaderProperty::AddShaderTypes()
   }
 }
 
-bool mitk::ShaderProperty::AddEnum( const std::string& name )
+bool mitk::ShaderProperty::AddEnum( const std::string& name ,const IdType& /*id*/)
 {
   Element e;
   

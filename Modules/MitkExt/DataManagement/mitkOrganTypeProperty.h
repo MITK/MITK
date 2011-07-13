@@ -43,6 +43,7 @@ class MitkExt_EXPORT OrganTypeProperty : public EnumerationProperty
     itkNewMacro(OrganTypeProperty);
     mitkNewMacro1Param(OrganTypeProperty, const IdType&);
     mitkNewMacro1Param(OrganTypeProperty, const std::string&);
+    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
 
   protected:
     OrganTypeProperty();

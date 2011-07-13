@@ -35,6 +35,7 @@ namespace mitk
 
   ToFCameraDevice::~ToFCameraDevice()
   {
+    CleanupPixelArrays();
   }
 
   void ToFCameraDevice::SetBoolProperty( const char* propertyKey, bool boolValue )
@@ -102,5 +103,34 @@ namespace mitk
       integer = intProp->GetValue();
       return true;
     }
+  }
+
+  void ToFCameraDevice::CleanupPixelArrays()
+  {
+    if (m_IntensityArray)
+    {
+      delete [] m_IntensityArray;
+    }
+    if (m_DistanceArray)
+    {
+      delete [] m_DistanceArray;
+    }
+    if (m_AmplitudeArray)
+    {
+      delete [] m_AmplitudeArray;
+    }
+  }
+
+  void ToFCameraDevice::AllocatePixelArrays()
+  {
+    // free memory if it was already allocated
+    CleanupPixelArrays();
+    // allocate buffer
+    this->m_IntensityArray = new float[this->m_PixelNumber];
+    for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
+    this->m_DistanceArray = new float[this->m_PixelNumber];
+    for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
+    this->m_AmplitudeArray = new float[this->m_PixelNumber];
+    for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
   }
 }

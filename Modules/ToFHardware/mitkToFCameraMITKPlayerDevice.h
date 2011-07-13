@@ -126,6 +126,14 @@ namespace mitk
     \brief Thread method continuously acquiring images from the specified input file
     */
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    /*!
+    \brief Clean up memory (pixel buffers)
+    */
+    void CleanUpDataBuffers();
+    /*!
+    \brief Allocate pixel buffers
+    */
+    void AllocateDataBuffers();
 
     ToFCameraMITKPlayerController::Pointer m_Controller; ///< member holding the corresponding controller
     std::string m_InputFileName; ///< member holding the file name of the current input file

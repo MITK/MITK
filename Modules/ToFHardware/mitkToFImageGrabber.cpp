@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   ToFImageGrabber::ToFImageGrabber():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_ImageSequence(0),
-    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL)
+    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL)
   {
     // Create the output. We use static_cast<> here because we know the default
     // output must be of type TOutputImage
@@ -46,6 +46,7 @@ namespace mitk
         m_ToFCameraDevice->RemoveObserver(m_DeviceObserverTag);
       }
       this->DisconnectCamera();
+      this->CleanUpImageArrays();
     }
   }
 
@@ -98,12 +99,7 @@ namespace mitk
       m_CaptureHeight = m_ToFCameraDevice->GetCaptureHeight();
       m_PixelNumber = m_CaptureWidth * m_CaptureHeight;
       m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
-
-      // allocate buffer
-      m_IntensityArray = new float[m_PixelNumber];
-      m_DistanceArray = new float[m_PixelNumber];
-      m_AmplitudeArray = new float[m_PixelNumber];
-      m_SourceDataArray = new char[m_SourceDataSize];
+      AllocateImageArrays();
     }
     return ok;
   }
@@ -111,16 +107,6 @@ namespace mitk
   bool ToFImageGrabber::DisconnectCamera()
   {
     bool success = m_ToFCameraDevice->DisconnectCamera();
-    // free buffer
-    if (m_IntensityArray||m_DistanceArray||m_AmplitudeArray)
-    {
-      delete [] m_IntensityArray;
-      delete [] m_DistanceArray;
-      delete [] m_AmplitudeArray;
-      m_IntensityArray = NULL;
-      m_DistanceArray = NULL;
-      m_AmplitudeArray = NULL;
-    }
 
     return success;
   }
@@ -226,5 +212,41 @@ namespace mitk
   void ToFImageGrabber::OnToFCameraDeviceModified()
   {
     this->Modified();
+  }
+
+  void ToFImageGrabber::CleanUpImageArrays()
+  {
+    // free buffer
+    if (m_IntensityArray)
+    {
+      delete [] m_IntensityArray;
+      m_IntensityArray = NULL;
+    }
+    if (m_DistanceArray)
+    {
+      delete [] m_DistanceArray;
+      m_DistanceArray = NULL;
+    }
+    if (m_AmplitudeArray)
+    {
+      delete [] m_AmplitudeArray;
+      m_AmplitudeArray = NULL;
+    }
+    if (m_SourceDataArray)
+    {
+      delete [] m_SourceDataArray;
+      m_SourceDataArray = NULL;
+    }
+  }
+
+  void ToFImageGrabber::AllocateImageArrays()
+  {
+    // cleanup memory if necessary
+    this->CleanUpImageArrays();
+    // allocate buffer
+    m_IntensityArray = new float[m_PixelNumber];
+    m_DistanceArray = new float[m_PixelNumber];
+    m_AmplitudeArray = new float[m_PixelNumber];
+    m_SourceDataArray = new char[m_SourceDataSize];
   }
 }

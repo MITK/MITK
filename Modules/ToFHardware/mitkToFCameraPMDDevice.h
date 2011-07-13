@@ -127,6 +127,15 @@ namespace mitk
     ~ToFCameraPMDDevice();
 
     /*!
+    \brief method for allocating m_SourceDataArray and m_SourceDataBuffer
+    */
+    virtual void AllocateSourceData();
+    /*!
+    \brief method for cleaning up memory allocated for m_SourceDataArray and m_SourceDataBuffer
+    */
+    virtual void CleanUpSourceData();
+
+    /*!
     \brief Thread method continuously acquiring images from the ToF hardware
     */
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);

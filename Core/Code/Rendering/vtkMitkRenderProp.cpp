@@ -21,9 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLODProp3D.h>
 #include <vtkPropAssembly.h>
 
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
 #include "mitkVtkMapper3D.h"
-#endif
 
 vtkStandardNewMacro(vtkMitkRenderProp);
 
@@ -69,7 +67,6 @@ vtkAssemblyPath* vtkMitkRenderProp::GetNextPath()
   return m_VtkPropRenderer->GetNextPath();
 }
 //BUG (#1551) added method depth peeling
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
   typedef std::map<int,mitk::Mapper*> MappersMapType;
@@ -106,11 +103,4 @@ int vtkMitkRenderProp::RenderVolumetricGeometry( vtkViewport * )
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Volumetric);
 }
-#else
-int vtkMitkRenderProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
-{
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
-}
 
-
-#endif

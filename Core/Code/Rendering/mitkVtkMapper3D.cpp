@@ -90,17 +90,11 @@ void VtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   }*/
   
   if ( this->GetVtkProp(renderer)->GetVisibility() )
-//BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-#else
-    this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
-#endif
 
 }
 
-//for VTK 5.2 support
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+
 void VtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false) 
@@ -119,7 +113,7 @@ void VtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
     GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
 
 }
-#endif
+
 
 void VtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 {
@@ -153,15 +147,9 @@ void VtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
   // check for opacity prop and use it for rendering if it exists
   this->GetOpacity(rgba[3], renderer);
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
   actor->GetProperty()->SetColor(drgba);
   actor->GetProperty()->SetOpacity(drgba[3]);
-#else
-  actor->GetProperty()->SetColor(rgba);
-  actor->GetProperty()->SetOpacity(rgba[3]);
-#endif
-
 
   // Add annotations to assembly, if any (camera (renderer) must be present)
   if ( renderer != NULL )

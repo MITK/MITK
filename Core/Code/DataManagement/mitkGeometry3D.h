@@ -380,16 +380,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   void WorldToItkPhysicalPoint(const mitk::Point3D& pt_mm,
             itk::Point<TCoordRep, 3>& itkPhysicalPoint) const
   {
-    #if ((ITK_VERSION_MAJOR > 3) || (ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR > 8))
       mitk::vtk2itk(pt_mm, itkPhysicalPoint);
-    #else
-      mitk::Point3D index;
-      WorldToIndex(pt_mm, index);
-      for (unsigned int i = 0 ; i < 3 ; i++)
-      {
-        itkPhysicalPoint[i] = static_cast<TCoordRep>( this->m_Spacing[i] * index[i] + this->m_Origin[i] );
-      }
-    #endif
   }
 
   //##Documentation
@@ -402,16 +393,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3>& itkPhysicalPoint,
             mitk::Point3D& pt_mm) const
   {
-    #if ((ITK_VERSION_MAJOR > 3) || (ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR > 8))
       mitk::vtk2itk(itkPhysicalPoint, pt_mm);
-    #else
-      mitk::Point3D index;
-      for (unsigned int i = 0 ; i < 3 ; i++)
-      {
-        index[i] = static_cast<ScalarType>( (itkPhysicalPoint[i]- this->m_Origin[i]) / this->m_Spacing[i] );
-      }
-      IndexToWorld(index, pt_mm);
-    #endif
    }
 
   //##Documentation

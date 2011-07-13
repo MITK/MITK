@@ -199,9 +199,7 @@ void mitk::ManufacturerLogo::Enable()
       m_Actor->SetInput(m_VtkImageImport->GetOutput());
     }
 
-    #if ( VTK_MAJOR_VERSION >= 5 )
-      m_Actor->SetOpacity(m_Opacity);
-    #endif
+    m_Actor->SetOpacity(m_Opacity);
     
     m_Renderer->AddActor( m_Actor );
     m_Renderer->InteractiveOff();

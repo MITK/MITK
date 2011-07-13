@@ -274,15 +274,9 @@ void mitk::VtkLayerController::UpdateLayers()
   int currentLayerNumber;
   bool traverseUpwards;
 
-  #if ( VTK_MAJOR_VERSION >= 5 )
-    currentLayerNumber  = 0;
-    traverseUpwards     = true;
-  #else
-    currentLayerNumber  = numberOfLayers - 1;
-    traverseUpwards     = false;
-  #endif
-  
-  
+  currentLayerNumber  = 0;
+  traverseUpwards     = true;
+
   m_RenderWindow->SetNumberOfLayers(numberOfLayers);
   RendererVectorType::iterator it;
   // assign a layer number for the backround renderers
@@ -332,7 +326,6 @@ unsigned int mitk::VtkLayerController::GetNumberOfRenderers()
 
 void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
 {
-  #if ( VTK_MAJOR_VERSION >= 5 )
   
   this->m_RenderWindow->SetErase(i);
 
@@ -345,7 +338,6 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
 
   for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
    (*it)->SetErase(i);
-  
-  #endif
+
 }
 

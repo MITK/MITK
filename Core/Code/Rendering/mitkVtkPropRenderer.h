@@ -72,11 +72,7 @@ public:
   typedef std::map<int,Mapper*> MappersMapType;
 
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
-  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-    enum RenderType{Opaque,Translucent,Overlay,Volumetric};
-  #else
-    enum RenderType{Opaque,Translucent,Overlay};
-  #endif
+  enum RenderType{Opaque,Translucent,Overlay,Volumetric};
 
   int Render(RenderType type);
 
@@ -139,9 +135,7 @@ public:
   */
   virtual void ReleaseGraphicsResources(vtkWindow *renWin);
 
-  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   MappersMapType GetMappersMap() const;
-  #endif
 
   static bool useImmediateModeRendering();
 

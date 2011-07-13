@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?BlueBerry version="0.1"?>
 <plugin>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.qballreconstruction"
           name="Q-Balls"
@@ -22,7 +22,7 @@
           class="QmitkPreprocessingView"
           icon="resources/preprocessing.png" />
   </extension>
-  
+
     <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusionquantification"
           name="Quantification"
@@ -46,9 +46,16 @@
 
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.publicdiffusionimaging"
-                 name="Diffusion Imaging Public" 
-                 class="QmitkDiffusionImagingPublicPerspective" 
+                 name="Diffusion Imaging Public"
+                 class="QmitkDiffusionImagingPublicPerspective"
                  icon="resources/reconodf.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.odfdetails"
+          name="ODF Details"
+          class="QmitkODFDetailsView"
+          icon="resources/odf.png" />
   </extension>
 
 </plugin>

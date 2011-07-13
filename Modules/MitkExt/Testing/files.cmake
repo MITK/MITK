@@ -1,4 +1,4 @@
-SET(MODULE_TESTS 
+SET(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkBoundingObjectCutterTest.cpp
   mitkContourMapper2DTest.cpp
@@ -15,17 +15,18 @@ SET(MODULE_TESTS
   # mitkSegmentationInterpolationTest.cpp
   # mitkTestTemplate.cpp
   mitkToolManagerTest.cpp
+  mitkSimpleHistogramTest.cpp
 )
 SET(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
-  mitkCompressedImageContainerTest.cpp  
+  mitkCompressedImageContainerTest.cpp
   mitkCylindricToCartesianFilterTest.cpp
-  #mitkExtractImageFilterTest.cpp  
+  #mitkExtractImageFilterTest.cpp
   mitkManualSegmentationToSurfaceFilterTest.cpp
-  mitkOverwriteSliceImageFilterTest.cpp  
+  mitkOverwriteSliceImageFilterTest.cpp
   mitkSurfaceToImageFilterTest.cpp
 )
-SET(MODULE_CUSTOM_TESTS 
+SET(MODULE_CUSTOM_TESTS
   mitkLabeledImageToSurfaceFilterTest.cpp
 )
 SET(MODULE_TESTIMAGES

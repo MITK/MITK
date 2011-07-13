@@ -23,12 +23,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  ToFCameraPMDDevice::ToFCameraPMDDevice()
+  ToFCameraPMDDevice::ToFCameraPMDDevice() :
+  m_SourceDataArray(NULL), m_SourceDataBuffer(NULL)
   {
   }
 
   ToFCameraPMDDevice::~ToFCameraPMDDevice()
   {
+    this->CleanUpSourceData();
   }
 
   bool ToFCameraPMDDevice::ConnectCamera()
@@ -44,21 +46,9 @@ namespace mitk
         this->m_SourceDataSize = m_Controller->GetSourceDataStructSize();
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
 
-        // allocate buffer
-        this->m_IntensityArray = new float[this->m_PixelNumber];
-        for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
-        this->m_DistanceArray = new float[this->m_PixelNumber];
-        for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
-        this->m_AmplitudeArray = new float[this->m_PixelNumber];
-        for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
-        this->m_SourceDataArray = new char[this->m_SourceDataSize];
-        for(int i=0; i<this->m_SourceDataSize; i++) {this->m_SourceDataArray[i]=0;}
-
-        this->m_SourceDataBuffer = new char*[this->m_MaxBufferSize];
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          this->m_SourceDataBuffer[i] = new char[this->m_SourceDataSize];
-        }
+        // allocate buffers
+        AllocatePixelArrays();
+        this->AllocateSourceData();
 
         m_CameraConnected = true;
       }
@@ -73,20 +63,8 @@ namespace mitk
     {
       ok =  m_Controller->CloseCameraConnection();
 
-      // clean-up only if camera was connected
-      if (m_CameraConnected)
+      if (ok)
       {
-        MITK_INFO<<"free buffer";
-        // free buffer
-        delete [] m_IntensityArray;
-        delete [] m_DistanceArray;
-        delete [] m_AmplitudeArray;
-        delete [] m_SourceDataArray;
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          delete[] this->m_SourceDataBuffer[i];
-        }
-        delete[] this->m_SourceDataBuffer;
         m_CameraConnected = false;
       }
 
@@ -401,6 +379,37 @@ namespace mitk
       int integrationTime = 0;
       GetIntProperty(propertyValue, integrationTime);
       m_Controller->SetIntegrationTime(integrationTime);
+    }
+  }
+
+  void ToFCameraPMDDevice::AllocateSourceData()
+  {
+    // clean up if array and data have already been allocated
+    CleanUpSourceData();
+    // (re-) allocate memory
+    this->m_SourceDataArray = new char[this->m_SourceDataSize];
+    for(int i=0; i<this->m_SourceDataSize; i++) {this->m_SourceDataArray[i]=0;}
+
+    this->m_SourceDataBuffer = new char*[this->m_MaxBufferSize];
+    for(int i=0; i<this->m_MaxBufferSize; i++)
+    {
+      this->m_SourceDataBuffer[i] = new char[this->m_SourceDataSize];
+    }
+  }
+
+  void ToFCameraPMDDevice::CleanUpSourceData()
+  {
+    if (m_SourceDataArray)
+    {
+      delete[] m_SourceDataArray;
+    }
+    if (m_SourceDataBuffer)
+    {
+      for(int i=0; i<this->m_MaxBufferSize; i++)
+      {
+        delete[] this->m_SourceDataBuffer[i];
+      }
+      delete[] this->m_SourceDataBuffer;
     }
   }
 }

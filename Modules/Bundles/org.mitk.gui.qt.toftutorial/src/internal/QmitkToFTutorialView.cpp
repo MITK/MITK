@@ -126,7 +126,7 @@ void QmitkToFTutorialView::OnStep1()
     this->GetDefaultDataStorage()->Add(intensityNode);
     // stop camera (terminate internally used thread)
     tofImageGrabber->StopCamera();
-    // disconnect from camera
+    //// disconnect from camera
     tofImageGrabber->DisconnectCamera();
     // adjust views to new data in DataStorage
     mitk::RenderingManager::GetInstance()->InitializeViews(distanceImage->GetGeometry());

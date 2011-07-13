@@ -53,10 +53,10 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     QmitkMITKIGTTrackingToolboxView();
     QmitkMITKIGTTrackingToolboxView(const QmitkMITKIGTTrackingToolboxView& other)
-  	{
-    	Q_UNUSED(other)
-    	throw std::runtime_error("Copy constructor not implemented");
-  	}
+    {
+      Q_UNUSED(other)
+      throw std::runtime_error("Copy constructor not implemented");
+    }
     virtual ~QmitkMITKIGTTrackingToolboxView();
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -66,11 +66,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
   protected slots:
 
-	  void OnLoadTools();
+    void OnLoadTools();
 
-	  void OnStartTracking();
+    void OnStartTracking();
 
-	  void OnStopTracking();
+    void OnStopTracking();
 
     void OnChooseFileClicked();
 
@@ -94,7 +94,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     bool m_tracking;
 
-  	void MessageBox(std::string s);
+    void MessageBox(std::string s);
 
     bool m_logging;
 
@@ -104,15 +104,21 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     void GlobalReinit();
 
-	  //stores the loaded tools
-	  mitk::NavigationToolStorage::Pointer m_toolStorage;
+    //stores the loaded tools
+    mitk::NavigationToolStorage::Pointer m_toolStorage;
 
-	  //members for the filter pipeline
-	  mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
-	  mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
-	  mitk::NavigationDataRecorder::Pointer m_loggingFilter;
+   //members for the filter pipeline
+   mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
+   mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
+   mitk::NavigationDataRecorder::Pointer m_loggingFilter;
 
-    QTimer* m_TrackingTimer;
+   QTimer* m_TrackingTimer;
+
+   //help methods for enable/disable buttons
+   void DisableLoggingButtons();
+   void EnableLoggingButtons();
+   void DisableOptionsButtons();
+   void EnableOptionsButtons();
 
 };
 

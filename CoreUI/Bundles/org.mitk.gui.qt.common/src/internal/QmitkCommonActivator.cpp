@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonActivator.h"
 
 #include "../QmitkStdMultiWidgetEditor.h"
+#include "../QmitkStdMultiWidgetEditorPreferencePage.h"
 
 #include <mitkGlobalInteraction.h>
 #include <QmitkRegisterClasses.h>
@@ -31,6 +32,7 @@ QmitkCommonActivator::start(ctkPluginContext* context)
   Q_UNUSED(context)
   
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStdMultiWidgetEditor, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkStdMultiWidgetEditorPreferencePage, context)
   
   QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
   if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )

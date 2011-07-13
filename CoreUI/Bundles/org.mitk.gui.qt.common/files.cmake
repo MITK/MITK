@@ -10,6 +10,7 @@ SET(SRC_CPP_FILES
   QmitkStdMultiWidgetEditor.cpp
   QmitkPreferencesDialog.cpp
   QmitkFunctionalityCoordinator.cpp
+  QmitkStdMultiWidgetEditorPreferencePage.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -27,6 +28,8 @@ SET(MOC_H_FILES
   src/QmitkDnDFrameWidget.h
   
   src/internal/QmitkCommonActivator.h
+
+  src/QmitkStdMultiWidgetEditorPreferencePage.h
 )
 
 SET(CACHED_RESOURCE_FILES

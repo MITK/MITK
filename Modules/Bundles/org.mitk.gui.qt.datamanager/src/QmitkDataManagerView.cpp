@@ -427,11 +427,6 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
-  // Set preferences respecting zooming and padding
-  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
-
-  mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
-
   this->GlobalReinit();
 
 

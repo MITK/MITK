@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryQtEditorPart.h>
 #include <berryIPartListener.h>
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
 
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDnDFrameWidget.h>
@@ -32,7 +34,7 @@ class MITK_QT_COMMON QmitkStdMultiWidgetEditor :
   Q_OBJECT
 
 public:
-  berryObjectMacro(QmitkStdMultiWidgetEditor);
+  berryObjectMacro(QmitkStdMultiWidgetEditor)
 
   static const std::string EDITOR_ID;
 
@@ -50,6 +52,9 @@ public:
   void DoSaveAs() {}
   bool IsDirty() const { return false; }
   bool IsSaveAsAllowed() const { return false; }
+
+public slots:
+  void OnPreferencesChanged(const berry::IBerryPreferences*);
 
 protected:
 

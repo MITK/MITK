@@ -116,10 +116,45 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
     std::string departmentLogoLocation = logoPref->Get("DepartmentLogo","");
 
+
+    //# Preferences
+
+    berry::IBerryPreferences::Pointer prefs
+        = (prefService->GetSystemPreferences()->Node(EDITOR_ID))
+          .Cast<berry::IBerryPreferences>();
+    assert( prefs );
+
+    prefs->OnChanged.AddListener( berry::MessageDelegate1<QmitkStdMultiWidgetEditor
+      , const berry::IBerryPreferences*>( this
+        , &QmitkStdMultiWidgetEditor::OnPreferencesChanged ) );
+
+    bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+
+    mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
     m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
   }
+}
+
+void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+
+  // Set preferences respecting zooming and padding
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+
+  //prefs->Flush();
+
+  mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //this->GlobalReinit();
+
+
 }
 
 berry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const

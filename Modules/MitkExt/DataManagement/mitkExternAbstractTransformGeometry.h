@@ -62,9 +62,9 @@ public:
 protected:
 
   ExternAbstractTransformGeometry();
+  ExternAbstractTransformGeometry(const ExternAbstractTransformGeometry& other);
   virtual ~ExternAbstractTransformGeometry();
   
-  void InitializeGeometry(Self * newGeometry) const;
 };
 
 } // namespace mitk

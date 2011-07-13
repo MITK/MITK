@@ -139,7 +139,7 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
   if(planes.size()>0)
   {
     //initialize sliced-geometry for the number of created planes
-    m_CreatedGeometries->Initialize(planes.size()+1);
+    m_CreatedGeometries->InitializeSlicedGeometry(planes.size()+1);
 
     //set last plane at last point with same normal as the one before the last
     PlaneGeometry::Pointer plane = static_cast<PlaneGeometry*>((*planes.rbegin())->Clone().GetPointer());

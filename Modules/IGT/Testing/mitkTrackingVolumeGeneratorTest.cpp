@@ -36,7 +36,7 @@ public:
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemNotSpecified), "Tracking System not specified:");
         myTVGenerator->Update();
         mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-        MITK_TEST_CONDITION((volume->IsEmpty(0) == false),"Output contains data");
+        MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
     static void TestClaronTrackingVolume()
@@ -47,7 +47,7 @@ public:
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::ClaronMicron),"loading MicronTracker Volume data:");
         myTVGenerator->Update();
         mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-        MITK_TEST_CONDITION((volume->IsEmpty(0) == false),"Output contains data");
+        MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
     static void TestNDIAuroraTrackingVolume()
@@ -58,7 +58,7 @@ public:
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIAurora),"loading Aurora Volume data:");
         myTVGenerator->Update();
         mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-        MITK_TEST_CONDITION((volume->IsEmpty(0) == false),"Output contains data");
+        MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
     static void TestNDIPolarisTrackingVolume()
@@ -69,7 +69,7 @@ public:
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIPolaris),"loading Polaris Volume data:");
         myTVGenerator->Update();
         mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-        MITK_TEST_CONDITION((volume->IsEmpty(0) == false),"Output contains data");
+        MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
     static void TestIntuitiveDaVinciTrackingVolume()
@@ -80,7 +80,7 @@ public:
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:");
         myTVGenerator->Update();
         mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-        MITK_TEST_CONDITION((volume->IsEmpty(0) == false),"Output contains data");
+        MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
     static void TestInvalidInputBehaviour()

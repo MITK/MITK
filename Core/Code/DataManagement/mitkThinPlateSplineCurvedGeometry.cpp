@@ -29,6 +29,11 @@ mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
   m_ThinPlateSplineTransform->SetInverseIterations(5000);
 }
 
+mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other ) : Superclass(other)
+{
+  this->SetSigma(other.GetSigma());
+}
+
 mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
 {
   // don't need to delete m_ThinPlateSplineTransform, because it is
@@ -92,14 +97,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
 mitk::AffineGeometryFrame3D::Pointer mitk::ThinPlateSplineCurvedGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
-  return newGeometry.GetPointer();
-}
-
-void mitk::ThinPlateSplineCurvedGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  newGeometry->SetSigma(GetSigma());
-  Superclass::InitializeGeometry(newGeometry);
+ mitk::AffineGeometryFrame3D::Pointer newGeometry = new Self(*this);
+ newGeometry->UnRegister();
+ return newGeometry.GetPointer();
 }

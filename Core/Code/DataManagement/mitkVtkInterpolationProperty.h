@@ -40,6 +40,8 @@ public:
   mitkNewMacro1Param(VtkInterpolationProperty, const IdType&);
  
   mitkNewMacro1Param(VtkInterpolationProperty, const std::string&);
+
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   
   /**
    * Returns the current interpolation value as defined by VTK constants.

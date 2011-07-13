@@ -59,7 +59,7 @@ namespace mitk {
 
     virtual void CopyInformation(const itk::DataObject *data);
 
-    virtual bool IsEmpty(unsigned int t) const;
+    virtual bool IsEmptyTimeStep(unsigned int t) const;
 
     unsigned int GetSizeOfPolyDataSeries() const;
 

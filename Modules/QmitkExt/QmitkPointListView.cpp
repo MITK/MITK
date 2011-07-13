@@ -371,7 +371,7 @@ void QmitkPointListView::ClearPointList()
       //        break;
       mitk::PointSet::PointsIterator it;
       mitk::PointSet::PointsContainer *curPsPoints;
-      while( !curPS->IsEmpty(0))
+      while( !curPS->IsEmptyTimeStep(0))
       {
         curPsPoints = curPS->GetPointSet()->GetPoints();
         it = curPsPoints->Begin();

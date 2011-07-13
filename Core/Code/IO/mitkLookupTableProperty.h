@@ -47,6 +47,8 @@ namespace mitk {
     itkNewMacro(LookupTableProperty);
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
+    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
     virtual ~LookupTableProperty();
 
     virtual bool operator==(const BaseProperty& property) const;

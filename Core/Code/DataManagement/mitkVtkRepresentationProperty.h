@@ -61,6 +61,8 @@ public:
    * Sets the representation type to VTK_SURFACE.
    */
   virtual void SetRepresentationToSurface();
+
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   
 protected:
   

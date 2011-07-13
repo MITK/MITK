@@ -42,13 +42,16 @@ public:
   virtual void ComputeGeometry();
 
   itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform*);
+
+  mitk::AffineGeometryFrame3D::Pointer Clone() const;
+
 protected:
   LandmarkProjectorBasedCurvedGeometry();
 
+  LandmarkProjectorBasedCurvedGeometry(const LandmarkProjectorBasedCurvedGeometry& other);
+
   virtual ~LandmarkProjectorBasedCurvedGeometry();
   
-  void InitializeGeometry(Self * newGeometry) const;
-
   mitk::LandmarkProjector::Pointer m_LandmarkProjector;
 
   vtkAbstractTransform* m_InterpolatingAbstractTransform;

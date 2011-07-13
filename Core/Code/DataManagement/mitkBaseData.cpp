@@ -114,12 +114,6 @@ if(aGeometry3D!=NULL)
   return;
 }
 
-void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D, unsigned int time)
-{
-  if ( m_TimeSlicedGeometry )
-    m_TimeSlicedGeometry->SetGeometry3D(aGeometry3D, time);
-}
-
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 {
   SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
@@ -127,10 +121,13 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time)
 {
-  SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()), time);
+  if (m_TimeSlicedGeometry)
+  {
+    m_TimeSlicedGeometry->SetGeometry3D(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()), time);
+  }
 }
 
-bool mitk::BaseData::IsEmpty(unsigned int) const
+bool mitk::BaseData::IsEmptyTimeStep(unsigned int) const
 {
   return IsInitialized() == false;
 }
@@ -145,7 +142,7 @@ bool mitk::BaseData::IsEmpty() const
   unsigned int timeSteps = timeGeometry->GetTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
   {
-    if(IsEmpty(t) == false)
+    if(IsEmptyTimeStep(t) == false)
       return false;
   }
   return true;

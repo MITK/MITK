@@ -177,7 +177,7 @@ public:
   virtual bool IsValidEnumerationValue( const std::string& val ) const;
 
   virtual bool operator==( const BaseProperty& property ) const;
-
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   const EnumIdsContainerType& GetEnumIds() const;
   const EnumStringsContainerType& GetEnumStrings() const;
   

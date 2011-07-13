@@ -53,6 +53,8 @@ public:
 
 protected:
   ThinPlateSplineCurvedGeometry();
+  ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other );
+
   virtual ~ThinPlateSplineCurvedGeometry();
   
   vtkThinPlateSplineTransform* m_ThinPlateSplineTransform;
@@ -60,7 +62,6 @@ protected:
   vtkPoints* m_VtkTargetLandmarks;
   vtkPoints* m_VtkProjectedLandmarks;
 
-  void InitializeGeometry(Self * newGeometry) const;
 };
 
 } // namespace mitk

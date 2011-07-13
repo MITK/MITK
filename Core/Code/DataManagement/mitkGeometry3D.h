@@ -517,9 +517,6 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Set the spacing (m_Spacing)
   virtual void SetSpacing(const mitk::Vector3D& aSpacing);
-  //##Documentation
-  //## @brief Set the spacing (m_Spacing) via a float array
-  virtual void SetSpacing(const float aSpacing[3]);
 
   //##Documentation
   //## @brief Get the DICOM FrameOfReferenceID referring to the
@@ -600,12 +597,10 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## Overwrite in all sub-classes.
   //## Normally looks like:
   //## \code
-  //##  Self::Pointer newGeometry = Self::New();
-  //##  newGeometry->Initialize();
-  //##  InitializeGeometry(newGeometry);
+  //##  Self::Pointer newGeometry = new Self(*this);
+  //##  newGeometry->UnRegister();
   //##  return newGeometry.GetPointer();
   //## \endcode
-  //## \sa InitializeGeometry
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
   //##Documentation
@@ -614,18 +609,11 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
 protected:
   Geometry3D();
+  Geometry3D(const Geometry3D& other);
+
   static const char* GetTransformAsString( TransformType* transformType );
 
   virtual ~Geometry3D();
-
-  //##Documentation
-  //## @brief used in clone to initialize the newly created geometry
-  //##
-  //## Has to be overwritten in sub-classes, if they add members.
-  //## Do the following:
-  //## \li call Superclass::InitializeGeometry(newGeometry)
-  //## \li transfer all additional members of Self compared to Superclass
-  virtual void InitializeGeometry(Self * newGeometry) const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -674,7 +662,6 @@ protected:
 private:
   mutable TransformType::Pointer m_InvertedTransform;
   mutable unsigned long m_IndexToWorldTransformLastModified;
-  QuaternionTransformType::Pointer m_IndexToWorldRotationTransform;
 
   VnlQuaternionType m_RotationQuaternion;
 

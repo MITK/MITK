@@ -399,8 +399,6 @@ protected:
 
   virtual ~PlaneGeometry();
 
-  virtual void InitializeGeometry( Self *newGeometry ) const;
-
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
   
 private:

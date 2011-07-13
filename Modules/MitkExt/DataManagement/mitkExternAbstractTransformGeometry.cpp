@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ExternAbstractTransformGeometry::ExternAbstractTransformGeometry()
 {
 }
+mitk::ExternAbstractTransformGeometry::ExternAbstractTransformGeometry(const ExternAbstractTransformGeometry& other) : Superclass(other)
+{
+}
 
 mitk::ExternAbstractTransformGeometry::~ExternAbstractTransformGeometry()
 {
@@ -52,13 +55,8 @@ void mitk::ExternAbstractTransformGeometry::SetParametricBounds(const BoundingBo
 
 mitk::AffineGeometryFrame3D::Pointer mitk::ExternAbstractTransformGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new ExternAbstractTransformGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 
-void mitk::ExternAbstractTransformGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-}

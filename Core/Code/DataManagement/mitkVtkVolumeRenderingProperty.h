@@ -44,6 +44,8 @@ public:
 
   mitkNewMacro1Param(VtkVolumeRenderingProperty, const std::string&);
 
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
   /**
    * Returns the current volume rendering type
    */

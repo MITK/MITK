@@ -52,7 +52,7 @@ void mitk::PointSet::InitializeEmpty()
   m_Initialized = true;
 }
 
-bool mitk::PointSet::IsEmpty(unsigned int t) const
+bool mitk::PointSet::IsEmptyTimeStep(unsigned int t) const
 {
   return IsInitialized() && (GetSize(t) == 0);
 }

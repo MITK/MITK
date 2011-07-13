@@ -334,7 +334,7 @@ vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 }
 
 
-void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   if(!IsRenderable(renderer))
     return;

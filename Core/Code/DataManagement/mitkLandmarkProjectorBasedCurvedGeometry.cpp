@@ -24,6 +24,12 @@ mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry
 {
 }
 
+mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) : Superclass(other)
+{
+  this->SetLandmarkProjector(other.m_LandmarkProjector);
+  this->ComputeGeometry();
+}
+
 mitk::LandmarkProjectorBasedCurvedGeometry::~LandmarkProjectorBasedCurvedGeometry()
 {
   if(m_InterpolatingAbstractTransform!=NULL)
@@ -69,10 +75,9 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
   m_LandmarkProjector->ProjectLandmarks(m_TargetLandmarks);
   SetPlane(m_LandmarkProjector->GetParameterPlane());
 }
-
-void mitk::LandmarkProjectorBasedCurvedGeometry::InitializeGeometry(Self * newGeometry) const
+mitk::AffineGeometryFrame3D::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::Clone() const
 {
-  Superclass::InitializeGeometry(newGeometry);
-  newGeometry->SetLandmarkProjector(m_LandmarkProjector);
-  newGeometry->ComputeGeometry();
+  mitk::AffineGeometryFrame3D::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
+  newGeometry->UnRegister();
+  return newGeometry.GetPointer();
 }

@@ -97,7 +97,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
-    void SetInput( InputType* input );
+    void SetInputFiberBundle( InputType* input );
 
     /**
      * @returns the 0'th input object of the filter.
@@ -121,7 +121,7 @@ public:
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
+        this->SetInputFiberBundle(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
         this->Update();
       }
     };

@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$ 
- 
+Version:   $Revision$
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -48,7 +48,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
-  m_TrackingTimer = new QTimer(this);	
+  m_TrackingTimer = new QTimer(this);
   m_tracking = false;
   m_logging = false;
   m_loggedFrames = 0;
@@ -56,7 +56,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
-  
+
 }
 
 
@@ -68,7 +68,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkMITKIGTTrackingToolboxViewControls;
     m_Controls->setupUi( parent );
- 
+
     //create connections
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
@@ -92,6 +92,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //initialize buttons
     m_Controls->m_StopTracking->setEnabled(false);
+    m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
   }
 }
@@ -113,18 +114,18 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   //read in filename
   QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Toolfile"), "/", tr("All Files (*.*)")); //later perhaps: tr("Toolfile (*.tfl)"
   if (filename.isNull()) return;
-  
+
   //initialize tool storage
   m_toolStorage = mitk::NavigationToolStorage::New();
-  
+
   //read tool storage from disk
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
   m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
-  if (m_toolStorage.IsNull()) 
-	{
-	MessageBox(myDeserializer->GetErrorMessage());
-	m_toolStorage = NULL;
-	return;
+  if (m_toolStorage.IsNull())
+    {
+    MessageBox(myDeserializer->GetErrorMessage());
+    m_toolStorage = NULL;
+    return;
   }
 
   //update label
@@ -154,14 +155,14 @@ else if (this->m_toolStorage->GetToolCount() == 0)
 //build the IGT pipeline
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,this->m_Controls->m_configurationWidget->GetTrackingDevice());
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
-if (m_TrackingDeviceSource.IsNull()) 
+if (m_TrackingDeviceSource.IsNull())
   {
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
 
 //initialize tracking
-try 
+try
   {
   m_TrackingDeviceSource->Connect();
   m_TrackingDeviceSource->StartTracking();
@@ -175,7 +176,7 @@ m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
 m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
 //connect the tool visualization widget
-for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++) 
+for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
   {
     m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
   }
@@ -207,8 +208,11 @@ if (m_Controls->m_ShowTrackingVolume->isChecked())
   }
 
 m_tracking = true;
+
+//disable Buttons
 m_Controls->m_StopTracking->setEnabled(true);
 m_Controls->m_StartTracking->setEnabled(false);
+DisableOptionsButtons();
 
 this->GlobalReinit();
 }
@@ -228,8 +232,13 @@ m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 m_TrackingVolumeNode->SetData(NULL);
 m_tracking = false;
+
+//enable Buttons
 m_Controls->m_StopTracking->setEnabled(false);
 m_Controls->m_StartTracking->setEnabled(true);
+EnableOptionsButtons();
+
+this->GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
@@ -244,7 +253,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
 if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
     {
-    mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());  
+    mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     currentDevice->OpenConnection();
     currentDevice->StartTracking();
     mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New();
@@ -305,7 +314,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
         return;
         }
       }
-    }  
+    }
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
@@ -319,17 +328,13 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  if (m_logging) 
+  if (m_logging)
     {
     this->m_loggingFilter->Update();
     m_loggedFrames = this->m_loggingFilter->GetRecordCounter();
     this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: "+QString::number(m_loggedFrames));
     //check if logging stopped automatically
-    if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())) 
-      {
-      m_Controls->m_LoggingLabel->setText("Logging OFF");
-      m_logging = false;
-      }
+    if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())){StopLogging();}
     }
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
   }
@@ -342,34 +347,42 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
 
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
-  //initialize logging filter
-  m_loggingFilter = mitk::NavigationDataRecorder::New();
-  m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
-  if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
-  else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
-  m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
-  if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
-  
-  //connect filter
-  for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
- 
-  //start filter
-  m_loggingFilter->StartRecording();
+  if (!m_logging)
+    {
+    //initialize logging filter
+    m_loggingFilter = mitk::NavigationDataRecorder::New();
+    m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
+    if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
+    else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
+    m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
+    if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
 
-  //update labels / logging variables
-  this->m_Controls->m_LoggingLabel->setText("Logging ON");
-  this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: 0");
-  m_loggedFrames = 0;
-  m_logging = true;
+    //connect filter
+    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
+
+    //start filter
+    m_loggingFilter->StartRecording();
+
+    //update labels / logging variables
+    this->m_Controls->m_LoggingLabel->setText("Logging ON");
+    this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: 0");
+    m_loggedFrames = 0;
+    m_logging = true;
+    DisableLoggingButtons();
+    }
   }
 
 void QmitkMITKIGTTrackingToolboxView::StopLogging()
   {
-  //update label
-  this->m_Controls->m_LoggingLabel->setText("Logging OFF");
+  if (m_logging)
+    {
+    //update label
+    this->m_Controls->m_LoggingLabel->setText("Logging OFF");
 
-  m_loggingFilter->StopRecording();
-  m_logging = false;
+    m_loggingFilter->StopRecording();
+    m_logging = false;
+    EnableLoggingButtons();
+    }
   }
 
 void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
@@ -385,5 +398,44 @@ void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
+void QmitkMITKIGTTrackingToolboxView::DisableLoggingButtons()
+{
+    m_Controls->m_StartLogging->setEnabled(false);
+    m_Controls->m_LoggingFileName->setEnabled(false);
+    m_Controls->m_ChooseFile->setEnabled(false);
+    m_Controls->m_LoggingLimit->setEnabled(false);
+    m_Controls->m_LoggedFramesLimit->setEnabled(false);
+    m_Controls->m_csvFormat->setEnabled(false);
+    m_Controls->m_xmlFormat->setEnabled(false);
+    m_Controls->m_StopLogging->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
+{
+    m_Controls->m_StartLogging->setEnabled(true);
+    m_Controls->m_LoggingFileName->setEnabled(true);
+    m_Controls->m_ChooseFile->setEnabled(true);
+    m_Controls->m_LoggingLimit->setEnabled(true);
+    m_Controls->m_LoggedFramesLimit->setEnabled(true);
+    m_Controls->m_csvFormat->setEnabled(true);
+    m_Controls->m_xmlFormat->setEnabled(true);
+    m_Controls->m_StopLogging->setEnabled(false);
+}
+
+void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
+{
+    m_Controls->m_ShowTrackingVolume->setEnabled(false);
+    m_Controls->m_UpdateRate->setEnabled(false);
+    m_Controls->m_ShowToolQuaternions->setEnabled(false);
+    m_Controls->m_OptionsUpdateRateLabel->setEnabled(false);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
+{
+    m_Controls->m_ShowTrackingVolume->setEnabled(true);
+    m_Controls->m_UpdateRate->setEnabled(true);
+    m_Controls->m_ShowToolQuaternions->setEnabled(true);
+    m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
+}
 
 

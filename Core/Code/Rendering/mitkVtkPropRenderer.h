@@ -95,8 +95,8 @@ public:
 
   // Picking
   enum PickingMode{ WorldPointPicking, PointPicking };
-  itkSetMacro( PickingMode, PickingMode );
-  itkGetMacro( PickingMode, PickingMode );
+  itkSetEnumMacro( PickingMode, PickingMode );
+  itkGetEnumMacro( PickingMode, PickingMode );
 
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
   virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;

@@ -26,7 +26,13 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
 {
   valid = false;
 
+  //check if input is valid
+  if (src==NULL) return;
   Image* source = dynamic_cast<Image*>(src);
+  if (source==NULL) return;
+  else if (source->IsEmpty()) return;
+
+  
 
   // dummy histogram
   {
@@ -100,6 +106,10 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
   valid = true;
 }
 
+bool SimpleImageHistogram::GetValid()
+  {
+  return valid;
+  }
 
 float SimpleImageHistogram::GetRelativeBin( double left, double right ) const
 {

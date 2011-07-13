@@ -670,6 +670,7 @@ mitk::AffineGeometryFrame3D::Pointer
 mitk::SlicedGeometry3D::Clone() const
 {
   Self::Pointer newGeometry = new SlicedGeometry3D(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 

@@ -598,6 +598,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## Normally looks like:
   //## \code
   //##  Self::Pointer newGeometry = new Self(*this);
+  //##  newGeometry->UnRegister();
   //##  return newGeometry.GetPointer();
   //## \endcode
   virtual AffineGeometryFrame3D::Pointer Clone() const;

@@ -208,6 +208,7 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
 mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 {
   Self::Pointer newGeometry = new Self(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 /*

@@ -240,6 +240,7 @@ mitk::AffineGeometryFrame3D::Pointer
 mitk::Geometry2D::Clone() const
 {
   Self::Pointer newGeometry = new Geometry2D(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 

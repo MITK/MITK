@@ -78,5 +78,6 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
 mitk::AffineGeometryFrame3D::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::Clone() const
 {
   mitk::AffineGeometryFrame3D::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

@@ -692,6 +692,7 @@ AffineGeometryFrame3D::Pointer
 PlaneGeometry::Clone() const
 {
   Self::Pointer newGeometry = new PlaneGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 

@@ -258,5 +258,6 @@ void mitk::AbstractTransformGeometry::SetOversampling(float oversampling)
 mitk::AffineGeometryFrame3D::Pointer mitk::AbstractTransformGeometry::Clone() const
 {
   Self::Pointer newGeometry = new AbstractTransformGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

@@ -380,6 +380,7 @@ void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timesli
 mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
   Self::Pointer newGeometry = new TimeSlicedGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 

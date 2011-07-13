@@ -73,7 +73,7 @@ vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
   return m_Actor;
 }
 
-void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   if ( IsVisible(renderer)==false )
   {

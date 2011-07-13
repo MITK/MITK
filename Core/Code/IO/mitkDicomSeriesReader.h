@@ -382,7 +382,7 @@ protected:
   /**
    \brief Scan for slice image information
   */
-  static gdcm::Scanner ScanForSliceInformation( const StringContainer &filenames );
+  static void ScanForSliceInformation( const StringContainer &filenames, gdcm::Scanner& scanner );
 
   /**
    \brief Performs actual loading of a series and creates an image having the specified pixel type.

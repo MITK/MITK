@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkDiffusionImagingExports.h"
 
 #include "QmitkHistogram.h"
-#include "QmitkExtExports.h"
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 

@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkODFRenderWidget_H_
 
 #include <MitkDiffusionImagingExports.h>
-#include <QmitkExtExports.h>
 
 #include <QWidget>
 #include <QmitkRenderWindow.h>

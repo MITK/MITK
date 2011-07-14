@@ -1,15 +1,5 @@
-SET(CPP_FILES 
+SET(CPP_FILES
 
-  # Algorithms
-  Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
-  Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
-  Algorithms/itkTensorDerivedMeasurementsFilter.h
-  Algorithms/itkBrainMaskExtractionImageFilter.h
-  Algorithms/itkB0ImageExtractionImageFilter.h
-  Algorithms/itkTensorImageToDiffusionImageFilter.h
-  Algorithms/itkTensorToL2NormImageFilter.h
-  Algorithms/itkTractsToProbabilityImageFilter.h
-  
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
   DicomImport/mitkGroupDiffusionHeadersFilter.cpp
@@ -56,6 +46,7 @@ SET(CPP_FILES
   IODataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
   IODataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
   IODataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
+  IODataStructures/FiberBundle/mitkParticle.cpp
 
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
@@ -69,21 +60,39 @@ SET(CPP_FILES
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
-  
+
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 )
 
-SET(H_FILES 
+SET(H_FILES
+  # Rendering
   Rendering/mitkDiffusionImageMapper.h
+  Rendering/mitkOdfVtkMapper2D.h
+
+  # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/mitkTeemDiffusionTensor3DReconstructionImageFilter.h
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
+
+  # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h 
-  Rendering/mitkOdfVtkMapper2D.h
+  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
+
+  # Tractography
+  Tractography/itkGlobalTractographyFilter.h
+
+  # Algorithms
+  Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
+  Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
+  Algorithms/itkTensorDerivedMeasurementsFilter.h
+  Algorithms/itkBrainMaskExtractionImageFilter.h
+  Algorithms/itkB0ImageExtractionImageFilter.h
+  Algorithms/itkTensorImageToDiffusionImageFilter.h
+  Algorithms/itkTensorToL2NormImageFilter.h
+  Algorithms/itkTractsToProbabilityImageFilter.h
 )
 
 SET( TOOL_FILES
@@ -92,4 +101,4 @@ SET( TOOL_FILES
 IF(WIN32)
 ENDIF(WIN32)
 
-#MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp ) 
+#MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp )

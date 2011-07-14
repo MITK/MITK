@@ -55,7 +55,14 @@
     <view id="org.mitk.views.odfdetails"
           name="ODF Details"
           class="QmitkODFDetailsView"
-          icon="resources/odf.png" />
+          icon="resources/OdfDetails.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.globalfibertracking"
+          name="Global Tracking"
+          class="QmitkGlobalFiberTrackingView"
+          icon="resources/GlobalTracking.png" />
   </extension>
 
 </plugin>

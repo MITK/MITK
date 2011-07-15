@@ -517,6 +517,9 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
 
+    QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
+    m_Controls->m_2DHeatmap->setIcon(iconPaint);
+
     m_Controls->m_TextureIntON->setCheckable(true);
     m_Controls->m_VisibleOdfsON_T->setCheckable(true);
     m_Controls->m_VisibleOdfsON_S->setCheckable(true);

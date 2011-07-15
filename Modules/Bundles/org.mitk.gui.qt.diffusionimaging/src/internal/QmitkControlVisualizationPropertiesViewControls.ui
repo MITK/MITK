@@ -504,6 +504,16 @@
           <number>0</number>
          </property>
          <item>
+          <widget class="QToolButton" name="m_Color">
+           <property name="toolTip">
+            <string>Uniform Color for Bundle</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="m_Crosshair">
            <property name="toolTip">
             <string>Position Crosshair by 3D-Click</string>
@@ -519,16 +529,6 @@
            </property>
            <property name="checked">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_Color">
-           <property name="toolTip">
-            <string>Uniform Color for Bundle</string>
-           </property>
-           <property name="text">
-            <string/>
            </property>
           </widget>
          </item>
@@ -570,6 +570,9 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="margin">
           <number>0</number>
          </property>
@@ -600,16 +603,25 @@
             </item>
             <item>
              <widget class="QSlider" name="m_LineWidth">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>9</number>
+              </property>
+              <property name="value">
+               <number>1</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="label_linewidth">
               <property name="minimumSize">
                <size>
-                <width>70</width>
+                <width>65</width>
                 <height>0</height>
                </size>
               </property>
@@ -654,22 +666,25 @@
             </item>
             <item>
              <widget class="QSlider" name="m_TubeRadius">
+              <property name="value">
+               <number>15</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
+             <widget class="QLabel" name="label_tuberadius">
               <property name="minimumSize">
                <size>
-                <width>70</width>
+                <width>90</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>47</width>
+                <width>10000</width>
                 <height>16777215</height>
                </size>
               </property>

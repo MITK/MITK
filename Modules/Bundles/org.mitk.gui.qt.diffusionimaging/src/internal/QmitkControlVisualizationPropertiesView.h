@@ -114,6 +114,9 @@ protected slots:
   void PFWidth(int);
   void PFColor();
 
+  void LineWidthChanged(int);
+  void TubeRadiusChanged(int);
+
   void Heatmap();
 
 protected:

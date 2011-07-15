@@ -195,6 +195,22 @@ struct CvpSelListener : ISelectionListener
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
 
+          float val;
+          node->GetFloatProperty("TubeRadius", val);
+          m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
+
+          QString label = "Radius %1";
+          label = label.arg(val);
+          m_View->m_Controls->label_tuberadius->setText(label);
+
+          int width;
+          node->GetIntProperty("LineWidth", width);
+          m_View->m_Controls->m_LineWidth->setValue(width);
+
+          label = "Width %1";
+          label = label.arg(width);
+          m_View->m_Controls->label_linewidth->setText(label);
+
 //          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
 //          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
 //          m_View->m_Controls->m_Color->setAutoFillBackground(true);
@@ -687,6 +703,9 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
 
+    connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
+    connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
+
   }
 }
 
@@ -1163,11 +1182,10 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 {
-  MITK_INFO << " la";
   if(m_SelectedNode)
   {
-    MITK_INFO << " ljiosa";
-    m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(m_Controls->m_LineWidth->value()));
+    int width = m_Controls->m_LineWidth->value();
+    m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(width));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(15));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(18));
@@ -1187,12 +1205,10 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationTube()
 {
-  MITK_INFO << " baa";
-
   if(m_SelectedNode)
   {
-    MITK_INFO << "buh";
-    m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(m_Controls->m_TubeRadius->value()));
+    float radius = m_Controls->m_TubeRadius->value() / 100.0;
+    m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(radius));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(17));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(13));
@@ -1491,4 +1507,22 @@ void QmitkControlVisualizationPropertiesView::Heatmap()
 
     GetDataStorage()->Add(node);
   }
+}
+
+void QmitkControlVisualizationPropertiesView::LineWidthChanged(int w)
+{
+  m_SelectedNode->SetIntProperty("LineWidth", w);
+
+  QString label = "Width %1";
+  label = label.arg(w);
+  m_Controls->label_linewidth->setText(label);
+}
+
+void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
+{
+  m_SelectedNode->SetFloatProperty("TubeRadius", (float) r / 100.0);
+
+  QString label = "Radius %1";
+  label = label.arg(r / 100.0);
+  m_Controls->label_tuberadius->setText(label);
 }

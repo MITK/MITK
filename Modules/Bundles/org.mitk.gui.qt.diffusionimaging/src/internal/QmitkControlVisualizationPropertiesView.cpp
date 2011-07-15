@@ -171,35 +171,41 @@ struct CvpSelListener : ISelectionListener
         {
           m_View->m_Controls->m_PlanarFigureControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
+
+          float val;
+          node->GetFloatProperty("planarfigure.line.width", val);
+          m_View->m_Controls->m_PFWidth->setValue((int)(val*10.0));
+
+          QString label = "Width %1";
+          label = label.arg(val);
+          m_View->m_Controls->label_pfwidth->setText(label);
         }
 
         if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
         {
-          MITK_INFO << "Node " << node.GetPointer();
-          MITK_INFO << "pick " << m_View->m_CurrentPickingNode;
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
 
           if(m_View->m_CurrentPickingNode != 0 && node.GetPointer() != m_View->m_CurrentPickingNode)
           {
-            m_View->m_Controls->m_SetInteractor->setEnabled(false);
+            m_View->m_Controls->m_Crosshair->setEnabled(false);
           }
           else
           {
-            m_View->m_Controls->m_SetInteractor->setEnabled(true);
+            m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
 
-          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
-          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
-          m_View->m_Controls->m_Color->setAutoFillBackground(true);
-          QString styleSheet = "background-color:rgb(";
-          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
-          styleSheet.append(",");
-          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
-          styleSheet.append(",");
-          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
-          styleSheet.append(")");
-          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
+//          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
+//          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
+//          m_View->m_Controls->m_Color->setAutoFillBackground(true);
+//          QString styleSheet = "background-color:rgb(";
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
+//          styleSheet.append(",");
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
+//          styleSheet.append(",");
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
+//          styleSheet.append(")");
+//          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
 
 
         }
@@ -297,17 +303,6 @@ struct CvpSelListener : ISelectionListener
                 m_View->m_Controls->m_TextureIntON->setChecked(false);
                 m_View->m_TexIsOn = false;
               }
-            }
-
-            else if(QString("PlanarFigure").compare(node->GetData()->GetNameOfClass())==0)
-            {
-              float val;
-              node->GetFloatProperty("planarfigure.line.width", val);
-              m_View->m_Controls->m_PFWidth->setValue((int)(val*10.0));
-
-              QString label = "Width %1";
-              label = label.arg(val);
-              m_View->m_Controls->label_pfwidth->setText(label);
             }
           }
         }
@@ -514,6 +509,13 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     QIcon iconColor(":/QmitkDiffusionImaging/color24.gif");
     m_Controls->m_PFColor->setIcon(iconColor);
     m_Controls->m_PFColor3D->setIcon(iconColor);
+    m_Controls->m_Color->setIcon(iconColor);
+
+    m_Controls->m_PFColor->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_Controls->m_PFColor3D->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
+    m_Controls->m_Crosshair->setIcon(iconCrosshair);
 
     m_Controls->m_TextureIntON->setCheckable(true);
     m_Controls->m_VisibleOdfsON_T->setCheckable(true);
@@ -675,7 +677,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
 
-    connect((QObject*) m_Controls->m_SetInteractor, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
+    connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
     connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
@@ -1158,8 +1160,10 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 {
+  MITK_INFO << " la";
   if(m_SelectedNode)
   {
+    MITK_INFO << " ljiosa";
     m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(m_Controls->m_LineWidth->value()));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(15));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -1180,8 +1184,11 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationTube()
 {
+  MITK_INFO << " baa";
+
   if(m_SelectedNode)
   {
+    MITK_INFO << "buh";
     m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(m_Controls->m_TubeRadius->value()));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(17));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -1366,15 +1373,15 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
       if(bundleInteractor.IsNotNull())
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(bundleInteractor);
 
-      if(!m_Controls->m_SetInteractor->isChecked())
+      if(!m_Controls->m_Crosshair->isChecked())
       {
-        m_Controls->m_SetInteractor->setChecked(false);
+        m_Controls->m_Crosshair->setChecked(false);
         this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::ArrowCursor);
         m_CurrentPickingNode = 0;
       }
       else
       {
-        m_Controls->m_SetInteractor->setChecked(true);
+        m_Controls->m_Crosshair->setChecked(true);
         bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
         mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
         this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::CrossCursor);

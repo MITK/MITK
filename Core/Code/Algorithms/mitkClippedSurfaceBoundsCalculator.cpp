@@ -22,129 +22,170 @@ void mitk::ClippedSurfaceBoundsCalculator::SetInput(const mitk::PlaneGeometry* g
 {
   if(geometry != NULL && image.IsNotNull())
   {
-    this->m_Geometry2D = geometry;
+    this->m_PlaneGeometry = geometry;
     this->m_Image = image;
-    this->m_MinMaxOutput.clear();
-    for(int i = 0; i < 3; i++)
-    {
-      this->m_MinMaxOutput.push_back(outputType( std::numeric_limits<int>::max() , std::numeric_limits<int>::min() ));
-    }
   }
 }
 
-void mitk::ClippedSurfaceBoundsCalculator::CalculateSurfaceBounds()
-{
-
-  //Get the corner points of the geometry3D
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, false, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, false, false));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, false, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(false, true, false));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, false, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(false, false, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, true, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, true, false));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, true, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(false, true, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, false, true)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, false, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, false, true)
-                         , m_Image->GetGeometry()->GetCornerPoint(false, true, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(false, true, true)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, true, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(true, false, true)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, true, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(true, false, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, false, true));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(true, false, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, true, false));
-
-  CalculateSurfaceBounds(  m_Image->GetGeometry()->GetCornerPoint(true, true, false)
-                         , m_Image->GetGeometry()->GetCornerPoint(true, true, true));
-}
-
-void mitk::ClippedSurfaceBoundsCalculator::CalculateSurfaceBounds(Point3D startPoint, Point3D endPoint)
-{
-  if(this->GetIntersectionPoint(startPoint, endPoint) != NULL)
-  {
-    mitk::Point3D* point3D = this->GetIntersectionPoint(startPoint, endPoint);
-    mitk::Point3D indexPoint3D;
-    m_Image->GetGeometry()->WorldToIndex(*point3D, indexPoint3D);
-
-    for(int dim = 0; dim < 3; dim++)
-    {
-      // minimum
-      if(this->m_MinMaxOutput[dim].first > ROUND_P(indexPoint3D[dim]))
-      {
-        this->m_MinMaxOutput[dim].first = ROUND_P(indexPoint3D[dim]);
-      }
-
-      // maximum
-      if(this->m_MinMaxOutput[dim].second < ROUND_P(indexPoint3D[dim]))
-      {
-        this->m_MinMaxOutput[dim].second = ROUND_P(indexPoint3D[dim]);
-      }
-    }
-    delete point3D;
-  }
-
-//  }
-}
-
-mitk::Point3D* mitk::ClippedSurfaceBoundsCalculator::GetIntersectionPoint(Point3D startPoint, Point3D endPoint)
-{
-  Point3D* intersectionPoint = new Point3D();
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-  points->SetNumberOfPoints(1);
-
-  endPoint[0] =- startPoint[0];
-  endPoint[1] =- startPoint[1];
-  endPoint[2] =- startPoint[2];
-
-  Vector3D bottomVec;
-
-  FillVector3D(bottomVec, endPoint[0], endPoint[1], endPoint[2]);
-
-  mitk::Line3D line(startPoint, bottomVec);
-
-  m_Geometry2D->IntersectionPoint(line, *intersectionPoint);
-
-  if(m_Geometry2D->IsOnPlane(*intersectionPoint))
-  {
-    return intersectionPoint;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-mitk::ClippedSurfaceBoundsCalculator::outputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionX()
+mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionX()
 {
   return this->m_MinMaxOutput[0];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::outputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionY()
+mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionY()
 {
   return this->m_MinMaxOutput[1];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::outputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
+mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
 {
   return this->m_MinMaxOutput[2];
 }
 
 void mitk::ClippedSurfaceBoundsCalculator::Update()
 {
-  this->CalculateSurfaceBounds();
+  typedef std::vector< std::pair<mitk::Point3D, mitk::Point3D> > EdgesVector;
+
+  this->m_MinMaxOutput.clear();
+  for(int i = 0; i < 3; i++)
+  {
+    this->m_MinMaxOutput.push_back(OutputType( std::numeric_limits<int>::max() , std::numeric_limits<int>::min() ));
+  }
+
+  Point3D origin;
+  Vector3D xDirection, yDirection, zDirection;
+  const Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
+
+  origin = m_Image->GetGeometry()->GetOrigin();           //Left, bottom, front
+
+  //Get axis vector for the spatial directions
+  xDirection = m_Image->GetGeometry()->GetAxisVector(1);
+  yDirection = m_Image->GetGeometry()->GetAxisVector(0);
+  zDirection = m_Image->GetGeometry()->GetAxisVector(2);
+
+  /* For the calculation of the intersection points we need as corner points the center-based image coordinates.
+   * With the method GetCornerPoint() of the class Geometry3D we only get the corner-based coordinates.
+   * Therefore we need to calculate the center-based corner points here. For that we add/substract the corner-
+   * based coordinates with the spacing of the geometry3D.
+   */
+  for( int i = 0; i < 3; i++ )
+  {
+    if(xDirection[i] < 0)
+    {
+      xDirection[i] += spacing[i];
+    }
+    else if( xDirection[i] > 0 )
+    {
+      xDirection[i] -= spacing[i];
+    }
+
+    if(yDirection[i] < 0)
+    {
+      yDirection[i] += spacing[i];
+    }
+    else if( yDirection[i] > 0 )
+    {
+      yDirection[i] -= spacing[i];
+    }
+
+    if(zDirection[i] < 0)
+    {
+      zDirection[i] += spacing[i];
+    }
+    else if( zDirection[i] > 0 )
+    {
+      zDirection[i] -= spacing[i];
+    }
+  }
+
+  Point3D LeftTopFront, LeftBottomBack, LeftTopBack;
+  Point3D RightBottomFront, RightTopFront, RightBottomBack, RightTopBack;
+
+  LeftTopFront = origin + yDirection;
+  LeftBottomBack = origin + zDirection;
+  LeftTopBack = origin + yDirection + zDirection;
+  RightBottomFront = origin + xDirection;
+  RightTopFront = origin + xDirection + yDirection;
+  RightBottomBack = origin + xDirection + zDirection;
+  RightTopBack = origin + xDirection + yDirection + zDirection;
+
+  EdgesVector edgesOf3DBox;
+
+  // connections/edges from origin
+  edgesOf3DBox.push_back(std::make_pair(origin,             // x = left=xfront, y=bottom=yfront, z=front=zfront
+                                        LeftTopFront));     // left, top, front
+
+  edgesOf3DBox.push_back(std::make_pair(origin,             // left, bottom, front
+                                        LeftBottomBack));   // left, bottom, back
+
+  edgesOf3DBox.push_back(std::make_pair(origin,             // left, bottom, front
+                                        RightBottomFront)); // right, bottom, front
+
+  edgesOf3DBox.push_back(std::make_pair(LeftTopFront,       // left, top, front
+                                        RightTopFront));    // right, top, front
+
+  edgesOf3DBox.push_back(std::make_pair(LeftTopFront,       // left, top, front
+                                        LeftTopBack));      // left, top, back
+
+  edgesOf3DBox.push_back(std::make_pair(RightTopFront,      // right, top, front
+                                        RightTopBack));     // right, top, back
+
+  edgesOf3DBox.push_back(std::make_pair(RightTopFront,      // right, top, front
+                                        RightBottomFront)); // right, bottom, front
+
+  edgesOf3DBox.push_back(std::make_pair(RightBottomFront,   // right, bottom, front
+                                        RightBottomBack));  // right, bottom, back
+
+  edgesOf3DBox.push_back(std::make_pair(RightBottomBack,    // right, bottom, back
+                                        LeftBottomBack));   // left, bottom, back
+
+  edgesOf3DBox.push_back(std::make_pair(RightBottomBack,    // right, bottom, back
+                                        RightTopBack));     // right, top, back
+
+  edgesOf3DBox.push_back(std::make_pair(RightTopBack,       // right, top, back
+                                        LeftTopBack));      // left, top, back
+
+  edgesOf3DBox.push_back(std::make_pair(LeftTopBack,        // left, top, back
+                                        LeftBottomBack));   // left, bottom, back
+
+
+
+  for (EdgesVector::iterator iterator = edgesOf3DBox.begin(); iterator != edgesOf3DBox.end();iterator++)
+  {
+    Point3D startPoint = (*iterator).first;   // start point of the line
+    Point3D endPoint   = (*iterator).second;  // end point of the line
+    Vector3D lineDirection = endPoint - startPoint;
+
+    mitk::Line3D line(startPoint, lineDirection);
+
+    Point3D intersectionWorldPoint;
+    intersectionWorldPoint.Fill(std::numeric_limits<int>::min());
+
+    m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  // Get intersection point of line and plane geometry
+
+    double t = -1.0;
+    bool isIntersectionPointOnLine;
+    isIntersectionPointOnLine = m_PlaneGeometry->IntersectionPointParam(line, t);
+
+    mitk::Point3D intersectionIndexPoint;
+    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    //Get index point
+
+    if(0.0 <= t && t <= 1.0 && isIntersectionPointOnLine)
+    {
+      for(int dim = 0; dim < 3; dim++)
+      {
+        // minimum
+        if( this->m_MinMaxOutput[dim].first > ROUND_P(intersectionIndexPoint[dim]) )    //If new point value is lower than old
+        {
+            this->m_MinMaxOutput[dim].first = ROUND_P(intersectionIndexPoint[dim]);     //set new value
+        }
+
+        // maximum
+        if( this->m_MinMaxOutput[dim].second < ROUND_P(intersectionIndexPoint[dim]) ) //If new point value is higher than old
+        {
+            this->m_MinMaxOutput[dim].second = ROUND_P(intersectionIndexPoint[dim]);     //set new value
+        }
+      }
+    }
+  }
 }

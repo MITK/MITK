@@ -49,11 +49,17 @@ void mitk::NavigationDataEvaluationFilter::GenerateData()
         continue;
       }
 
-     
+      
 
-     // output->SetOrientation(quatOut);
+      output->Graft(input);
 
 
     }
-  }
+  
+}
+
+void mitk::NavigationDataEvaluationFilter::ResetStatistic()
+{
+m_SumPositions.Fill(0);
+m_NumberAnalysedNavigationDatas = 0;
 }

@@ -41,6 +41,12 @@ namespace mitk {
     mitkClassMacro(NavigationDataEvaluationFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
+    /** @brief Resets all statistics and starts again. */
+    void ResetStatistic();
+
+    /** @brief Resets the number of analysed navigation datas. */
+    itkGetMacro(NumberAnalysedNavigationDatas,int);
+
   
   protected:
 
@@ -53,6 +59,9 @@ namespace mitk {
     * transforms navigation data
     */
     virtual void GenerateData();
+
+    mitk::Point3D m_SumPositions; //todo: make a map here, to have one sum for every navigation data
+    int m_NumberAnalysedNavigationDatas;
 
   };
 } // namespace mitk

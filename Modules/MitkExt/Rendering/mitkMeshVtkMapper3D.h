@@ -71,7 +71,7 @@ protected:
 
   virtual void GenerateData();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
   
   virtual void ResetMapper( BaseRenderer* renderer );
 

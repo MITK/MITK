@@ -34,7 +34,7 @@ mitk::LineVtkMapper3D::~LineVtkMapper3D()
 {
 }
 
-void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {//from PointListVTKMapper3D and a little re-layouted!
   if(IsVisible(renderer)==false)
   {

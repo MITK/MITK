@@ -157,7 +157,7 @@ namespace mitk {
       m_ImgMapper->GenerateDataForRenderer(renderer);
       if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
       {
-        m_OdfMapper->GenerateData(renderer);
+        m_OdfMapper->GenerateDataForRenderer(renderer);
       }
     }
 

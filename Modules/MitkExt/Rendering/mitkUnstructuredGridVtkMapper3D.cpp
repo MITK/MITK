@@ -153,7 +153,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData()
   }
 }
 
-void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
 
   if(!IsVisible(renderer))

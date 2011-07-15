@@ -383,7 +383,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 }
 
 
-void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
   SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);

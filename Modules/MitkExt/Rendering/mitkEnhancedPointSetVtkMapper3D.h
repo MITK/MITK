@@ -97,7 +97,7 @@ namespace mitk {
     void UpdateVtkObjects();  
 
     virtual void GenerateData();
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);    
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;

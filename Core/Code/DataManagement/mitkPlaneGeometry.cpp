@@ -632,10 +632,8 @@ bool
 PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
 {
   Vector3D planeNormal = this->GetNormal();
-  planeNormal.Normalize();
 
   Vector3D lineDirection = line.GetDirection();
-  lineDirection.Normalize();
 
   t = planeNormal * lineDirection;
 

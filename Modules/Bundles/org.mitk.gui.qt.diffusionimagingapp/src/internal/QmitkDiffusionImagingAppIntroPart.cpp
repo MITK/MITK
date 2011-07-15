@@ -208,13 +208,13 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         }
         catch(...)
         {
-
+          MITK_INFO << "Could not open file!";
         }
       }
 
 
 
-      if(dsmodified)
+      if(dataStorage.IsNotNull() && dsmodified)
       {
         // get all nodes that have not set "includeInBoundingBox" to false
         mitk::NodePredicateNot::Pointer pred
@@ -222,10 +222,14 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
                                                                            , mitk::BoolProperty::New(false)));
 
         mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
-        // calculate bounding geometry of these nodes
-        mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
-        // initialize the views to the bounding geometry
-        mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+
+        if(rs->Size() > 0)
+        {
+          // calculate bounding geometry of these nodes
+          mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+          // initialize the views to the bounding geometry
+          mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+        }
       }
 
 

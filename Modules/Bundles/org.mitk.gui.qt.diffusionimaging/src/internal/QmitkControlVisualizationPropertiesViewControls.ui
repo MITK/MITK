@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>414</width>
-    <height>268</height>
+    <height>270</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -627,39 +627,75 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="m_Focus">
+       <widget class="QToolButton" name="m_Focus">
         <property name="text">
-         <string>Focus Planar Figure</string>
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>2D:</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="m_PFColor">
         <property name="text">
-         <string>Color</string>
+         <string>2D</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="label_9">
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>3D:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_PFColor3D">
+        <property name="text">
+         <string>3D</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="m_PFWidth">
+        <property name="value">
+         <number>20</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_pfwidth">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Width</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDoubleSpinBox" name="m_PFWidth">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.000000000000000</double>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>

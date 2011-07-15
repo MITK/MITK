@@ -298,6 +298,17 @@ struct CvpSelListener : ISelectionListener
                 m_View->m_TexIsOn = false;
               }
             }
+
+            else if(QString("PlanarFigure").compare(node->GetData()->GetNameOfClass())==0)
+            {
+              float val;
+              node->GetFloatProperty("planarfigure.line.width", val);
+              m_View->m_Controls->m_PFWidth->setValue((int)(val*10.0));
+
+              QString label = "Width %1";
+              label = label.arg(val);
+              m_View->m_Controls->label_pfwidth->setText(label);
+            }
           }
         }
       }
@@ -498,6 +509,11 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon icon5(":/QmitkDiffusionImaging/Refresh_48.png");
     m_Controls->m_Reinit->setIcon(icon5);
+    m_Controls->m_Focus->setIcon(icon5);
+
+    QIcon iconColor(":/QmitkDiffusionImaging/color24.gif");
+    m_Controls->m_PFColor->setIcon(iconColor);
+    m_Controls->m_PFColor3D->setIcon(iconColor);
 
     m_Controls->m_TextureIntON->setCheckable(true);
     m_Controls->m_VisibleOdfsON_T->setCheckable(true);
@@ -661,7 +677,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_SetInteractor, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
-    connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(PFWidth(double)));
+    connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
 
     connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
@@ -1370,15 +1386,21 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
 
 }
 
-void QmitkControlVisualizationPropertiesView::PFWidth(double width)
+void QmitkControlVisualizationPropertiesView::PFWidth(int w)
 {
 
+  double width = w/10.0;
   m_SelectedNode->SetProperty("planarfigure.line.width", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.outline.width", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.helperline.width", mitk::FloatProperty::New(width) );
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  QString label = "Width %1";
+  label = label.arg(width);
+  m_Controls->label_pfwidth->setText(label);
+
 }
 
 void QmitkControlVisualizationPropertiesView::PFColor()
@@ -1402,11 +1424,9 @@ void QmitkControlVisualizationPropertiesView::PFColor()
   m_SelectedNode->SetProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
   m_SelectedNode->SetProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-//  m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
 
@@ -1416,6 +1436,7 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 //  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkControlVisualizationPropertiesView::Heatmap()

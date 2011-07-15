@@ -111,7 +111,7 @@ protected slots:
 
   void SetInteractor();
 
-  void PFWidth(double);
+  void PFWidth(int);
   void PFColor();
 
   void Heatmap();

@@ -19,5 +19,8 @@
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
         <file>FiberBundle.png</file>
+        <file>color24.gif</file>
+        <file>color48.gif</file>
+        <file>color64.gif</file>
     </qresource>
 </RCC>

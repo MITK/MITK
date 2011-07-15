@@ -30,20 +30,16 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
     void SetInput(const mitk::PlaneGeometry* geometry, mitk::Image::Pointer image);
     void Update();
 
-    typedef std::pair<int, int> outputType;
+    typedef std::pair<int, int> OutputType;
 
-    outputType GetMinMaxSpatialDirectionX();
-    outputType GetMinMaxSpatialDirectionY();
-    outputType GetMinMaxSpatialDirectionZ();
+    OutputType GetMinMaxSpatialDirectionX();
+    OutputType GetMinMaxSpatialDirectionY();
+    OutputType GetMinMaxSpatialDirectionZ();
 
   protected:
-    void CalculateSurfaceBounds();
-    void CalculateSurfaceBounds(Point3D right, Point3D bottom);
-    mitk::Point3D* GetIntersectionPoint(Point3D right, Point3D bottom);
-
-    const mitk::PlaneGeometry* m_Geometry2D;
+    const mitk::PlaneGeometry* m_PlaneGeometry;
     mitk::Image::Pointer m_Image;
-    std::vector< outputType > m_MinMaxOutput;
+    std::vector< OutputType > m_MinMaxOutput;
 
 };
 

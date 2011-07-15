@@ -99,7 +99,7 @@ namespace mitk {
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     virtual void GenerateData();
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 
     virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return true; }
 

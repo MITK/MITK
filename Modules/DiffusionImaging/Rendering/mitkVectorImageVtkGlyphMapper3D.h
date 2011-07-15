@@ -73,7 +73,7 @@ protected:
     /**
      * This method is called, each time a specific renderer is updated.
      */
-    virtual void GenerateData( mitk::BaseRenderer* renderer );
+    virtual void GenerateDataForRenderer( mitk::BaseRenderer* renderer );
 
     /**
      * Returns the input data object of the given filter. In this

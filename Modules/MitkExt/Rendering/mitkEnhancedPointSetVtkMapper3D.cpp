@@ -361,7 +361,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * renderer )
+void mitk::EnhancedPointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer * renderer )
 {
   ApplyProperties(renderer);
 }

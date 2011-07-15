@@ -115,7 +115,7 @@ namespace mitk {
     virtual ~PointSetVtkMapper3D();
 
     virtual void GenerateData();
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void ResetMapper( BaseRenderer* renderer );
     virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
     virtual void CreateContour(mitk::BaseRenderer* renderer);

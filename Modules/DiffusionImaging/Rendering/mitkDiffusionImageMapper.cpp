@@ -34,7 +34,7 @@ mitk::DiffusionImageMapper<TPixelType>::~DiffusionImageMapper()
 
 template<class TPixelType>
 void
-mitk::DiffusionImageMapper<TPixelType>::GenerateData( mitk::BaseRenderer *renderer )
+mitk::DiffusionImageMapper<TPixelType>::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   int displayIndex(0);
   this->GetDataNode()->GetIntProperty( "DisplayChannel", displayIndex, renderer );
@@ -45,7 +45,7 @@ mitk::DiffusionImageMapper<TPixelType>::GenerateData( mitk::BaseRenderer *render
     input
     );
   input2->SetDisplayIndexForRendering(displayIndex);
-  Superclass::GenerateData(renderer);
+  Superclass::GenerateDataForRenderer(renderer);
 }
 
 template<class TPixelType>

@@ -185,7 +185,7 @@ m_MaximumNumberOfPoints = 80*80*80;
 /*
 * This method is called, each time a specific renderer is updated.
 */
-void mitk::VectorImageVtkGlyphMapper3D::GenerateData( mitk::BaseRenderer* renderer )
+void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
   if ( IsVisible( renderer ) == false )
   {

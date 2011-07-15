@@ -34,7 +34,7 @@ namespace mitk {
     mitkClassMacro(DiffusionImageMapper,ImageMapperGL2D);
     itkNewMacro(Self);
 
-    void GenerateData( mitk::BaseRenderer *renderer );
+    void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     

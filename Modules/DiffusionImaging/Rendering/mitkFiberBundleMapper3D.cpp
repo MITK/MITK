@@ -731,7 +731,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
 
 
 //template<class TPixelType>
-void mitk::FiberBundleMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   
   
@@ -1075,7 +1075,7 @@ void mitk::FiberBundleMapper3D::GenerateData( mitk::BaseRenderer *renderer )
    input
    );
    input2->SetDisplayIndexForRendering(displayIndex);
-   Superclass::GenerateData(renderer);
+   Superclass::GenerateDataForRenderer(renderer);
    */
 }
 

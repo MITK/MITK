@@ -59,6 +59,7 @@ mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(),  m_Paramet
   FillVector3D(m_FloatSpacing,other.m_FloatSpacing[0],other.m_FloatSpacing[1],other.m_FloatSpacing[2]);
   m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
   m_VtkIndexToWorldTransform->DeepCopy(other.m_VtkIndexToWorldTransform);
+  m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   other.InitializeGeometry(this);
 }
 

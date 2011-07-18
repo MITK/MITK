@@ -619,7 +619,7 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   //Notice to get typeid polymorph you have to use the *operator
   if(typeid(*oldFigure) != typeid(*this))
   {
-    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source and destination figure!" );
+    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source (" << typeid(*oldFigure).name() << ") and destination figure (" << typeid(*this).name() << ")!" );
     return;
   }
 

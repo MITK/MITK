@@ -35,6 +35,7 @@ class DataNode;
 class Geometry2D;
 class DisplayGeometry;
 class PlanarFigure;
+class PositionEvent;
 
 
 // Define events for PlanarFigure interaction notifications
@@ -90,6 +91,11 @@ protected:
 
   virtual bool ExecuteAction( Action *action, 
     mitk::StateEvent const *stateEvent );
+
+  /**
+    \brief Used when clicking to determine if a point is too close to the previous point.
+    */
+  bool IsMousePositionAcceptableAsNewControlPoint( const PositionEvent*, const PlanarFigure* );
 
   bool TransformPositionEventToPoint2D( const StateEvent *stateEvent,
     Point2D &point2D,

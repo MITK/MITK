@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "PlanarFigureExports.h"
 #include "mitkPlanarPolygon.h"
 
-namespace mitk 
+namespace mitk
 {
 
 class Geometry2D;
@@ -39,10 +39,10 @@ public:
 
   itkNewMacro( Self );
 
-  /** \brief Subdivision Polygon has 4 control points per definition. */
+  /** \brief Subdivision Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 4;
+    return 3;
   }
 
 

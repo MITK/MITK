@@ -46,9 +46,6 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   this->ClearPolyLines();
   ControlPointListType m_SubdivisionPoints = m_ControlPoints;
 
-  // Later, we have to know which points are control points
-  ControlPointListType m_ControlPointsCopy = m_ControlPoints;
-
   if( m_ControlPoints.size() >= GetMinimumNumberOfControlPoints() ){
 
       for( unsigned int i=0; i < GetSubdivisionRounds(); i++ )
@@ -56,19 +53,10 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
           // Indices
           unsigned int p_here, p_prev, p_next, p_nextnext;
 
-          // Just in case the poly isn't closed. It should be, but who knows...
-          if(this->IsClosed())
-          {
-              p_here = 0;
-              p_prev = m_SubdivisionPoints.size() - 1;
-              p_next = 1;
-              p_nextnext = 2;
-          }else{
-              p_prev = 0;
-              p_here = 1;
-              p_next = 2;
-              p_nextnext = 3;
-          }
+          p_prev = m_SubdivisionPoints.size() -1;
+          p_here = 0;
+          p_next = 1;
+          p_nextnext = 2;
 
           double distanceToSubPoint;
           double distanceToPointLeft;
@@ -76,26 +64,33 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 
           Point2D newPoint;
 
+          // Keep cycling our array indices forward until they wrap around at the end
           while(true)
           {
               // Get distance to neighbors
               distanceToSubPoint = m_SubdivisionPoints[p_here].EuclideanDistanceTo(m_SubdivisionPoints[p_next]);
 
-              // Only calculate distance to control points if we are the "major" / last control point being dragged around
+              /*
+               * Only calculate distance to left and right subdivisionPoints if we are the "major" / last control point being dragged around
+               *
+               * Cause: If any point is in a 20 pixel(?) radius to the point being dragged around,
+               * the PlanarFigureInteractor tries to insert the new point on this existing polyline (between subdivision points!!)
+               * rather than creating a new point at the end of the line.
+               */
               if (p_here == m_SubdivisionPoints.size() - 1)
               {
-                  unsigned int prev = 0;
-                  unsigned int next = ( m_SubdivisionPoints.size() > 1 ? p_here - 1 : 0 );
                   distanceToPointLeft = m_SubdivisionPoints[p_here].EuclideanDistanceTo(m_SubdivisionPoints[0]);
                   distanceToPointRight = m_SubdivisionPoints[p_here].EuclideanDistanceTo(m_SubdivisionPoints[p_here - 1]);
               }
 
               // distance to next subPoint has to be > 2
-              // distance from main control point has to be > 20
+              // distance from main control point has to be > 20 (see above comment)
               if( distanceToSubPoint > 2.0 && ( p_here != m_SubdivisionPoints.size() || distanceToPointRight > 20 && distanceToPointLeft > 20 ))
               {
                   double x,y;
 
+                  // Create new subdivision point according to formula
+                  // p_new = (0.5 + tension) * (p_here + p_next) - tension * (p_prev + p_nextnext)
                   x = (0.5 + GetTensionParameter()) * (double)( m_SubdivisionPoints[p_here][0] + m_SubdivisionPoints[p_next][0] )
                       - GetTensionParameter() * (double)( m_SubdivisionPoints[p_prev][0] + m_SubdivisionPoints[p_nextnext][0]);
                   y = (0.5 + GetTensionParameter()) * (double)( m_SubdivisionPoints[p_here][1] + m_SubdivisionPoints[p_next][1] )
@@ -112,7 +107,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
                   p_nextnext++;
               }
 
-              // Advance array indices and wrap around at the end
+              // Advance array indices and wrap them around at the end
               p_prev = p_here;
 
               if(p_here >= (m_SubdivisionPoints.size() -1 ))
@@ -151,19 +146,27 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   }
 
 
-  int lastControlPoint = m_SubdivisionPoints.size() - 1;
+  // The polyline needs to know between which control points each subdivision point is.
+  // The first point is generally on the line between the last and first control point
+  int lastControlPointIndex = m_SubdivisionPoints.size() - 1;
+
   for ( unsigned int i=0; i<m_SubdivisionPoints.size(); ++i )
   {
     Point2D pnt = m_SubdivisionPoints[i];
-    for ( unsigned int j=0; j<m_ControlPointsCopy.size(); j++ )
+
+    // Find out if this (subdivision)point is actually a control point
+    for ( unsigned int j=0; j<m_ControlPoints.size(); j++ )
     {
-        if( pnt == m_ControlPointsCopy[j])
+        // if so, every subdivision point following after this point belongs to this control point
+        if( pnt == m_ControlPoints[j])
         {
-            // It's j+1 because the insert() method of a vector inserts the new entry BEHIND the current one with index i
-            lastControlPoint = j+1;
+            // It's j+1 because the insert() method of a vector inserts the new subdivision point BEHIND the current one with index i
+            lastControlPointIndex = j+1;
         }
     }
-    PolyLineElement elem(pnt, lastControlPoint);
+    // the index of the last control point is needed to correctly insert points afterwards
+    PolyLineElement elem(pnt, lastControlPointIndex);
+    // Append to poly line number 0 (we only have one polyline, even if it has many polyline elements).
     this->AppendPointToPolyLine( 0, elem );
   }
 }
@@ -174,6 +177,7 @@ void mitk::PlanarSubdivisionPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i,j;
 
+  // We need to construct our subdivisionPoints-array out of the existing polyline, because subdivision points aren't stored in the class
   ControlPointListType m_SubdivisionPoints;
   m_SubdivisionPoints.clear();
   PolyLineType::iterator iter;

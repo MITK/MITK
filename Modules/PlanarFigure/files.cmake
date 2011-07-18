@@ -11,6 +11,7 @@ SET(CPP_FILES
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarArrow.cpp
   DataManagement/mitkPlanarPolygon.cpp
+  DataManagement/mitkPlanarSubdivisionPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
   IO/mitkPlanarFigureIOFactory.cpp

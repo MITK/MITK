@@ -272,24 +272,24 @@ void mitk::PlanarFigure::ClearPolyLines()
   {
     m_PolyLines.at( i ).clear();
   }
-  m_PolyLineUpToDate = false;  
+  m_PolyLineUpToDate = false;
 }
 
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( unsigned int index, 
-                                                                             double mmPerDisplayUnit, 
+const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( unsigned int index,
+                                                                             double mmPerDisplayUnit,
                                                                              unsigned int displayHeight )
 {
   mitk::PlanarFigure::PolyLineType helperPolyLine;
   if ( index < m_HelperPolyLines.size() )
   {
-    // m_HelperLinesUpToDate does not cover changes in zoom-level, so we have to check previous values of the 
+    // m_HelperLinesUpToDate does not cover changes in zoom-level, so we have to check previous values of the
     // two parameters as well
     if ( !m_HelperLinesUpToDate || m_DisplaySize.first != mmPerDisplayUnit || m_DisplaySize.second != displayHeight )
     {
       this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
       m_HelperLinesUpToDate = true;
-      
-      // store these parameters to be able to check next time if somebody zoomed in or out 
+
+      // store these parameters to be able to check next time if somebody zoomed in or out
       m_DisplaySize.first = mmPerDisplayUnit;
       m_DisplaySize.second = displayHeight;
     }
@@ -615,11 +615,11 @@ void mitk::PlanarFigure::RemoveLastControlPoint()
 
 void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
 {
-  //DeepCopy only same types of planar figures 
+  //DeepCopy only same types of planar figures
   //Notice to get typeid polymorph you have to use the *operator
   if(typeid(*oldFigure) != typeid(*this))
   {
-    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source and destination figure!" );
+    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source (" << typeid(*oldFigure).name() << ") and destination figure (" << typeid(*this).name() << ")!" );
     return;
   }
 
@@ -628,7 +628,7 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   this->ClearHelperPolyLines();
 
   // clone base data members
-  SetPropertyList(oldFigure->GetPropertyList()->Clone());  
+  SetPropertyList(oldFigure->GetPropertyList()->Clone());
 
   /// deep copy members
   m_FigurePlaced                = oldFigure->m_FigurePlaced;

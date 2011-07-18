@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarLine.h"
 #include "mitkPlanarPolygon.h"
+#include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlanarRectangle.h"
 
 #include "mitkPlanarFigureWriter.h"
@@ -34,7 +35,7 @@ public:
 
   typedef std::list< mitk::PlanarFigure::Pointer > PlanarFigureList;
   typedef std::vector< mitk::PlanarFigureWriter::Pointer > PlanarFigureToMemoryWriterList;
-  
+
   static PlanarFigureList CreatePlanarFigures()
   {
     PlanarFigureList planarFigures;
@@ -56,14 +57,14 @@ public:
     planarAngle->SetCurrentControlPoint( p1 );
     planarAngle->AddControlPoint( p2 );
     planarFigures.push_back( planarAngle.GetPointer() );
-    
+
     // Create PlanarCircle
     mitk::PlanarCircle::Pointer planarCircle = mitk::PlanarCircle::New();
     planarCircle->SetGeometry2D( planeGeometry );
     planarCircle->PlaceFigure( p0 );
     planarCircle->SetCurrentControlPoint( p1 );
     planarFigures.push_back( planarCircle.GetPointer() );
-    
+
     // Create PlanarCross
     mitk::PlanarCross::Pointer planarCross = mitk::PlanarCross::New();
     planarCross->SetSingleLineMode( false );
@@ -73,7 +74,7 @@ public:
     planarCross->AddControlPoint( p2 );
     planarCross->AddControlPoint( p3 );
     planarFigures.push_back( planarCross.GetPointer() );
-    
+
     // Create PlanarFourPointAngle
     mitk::PlanarFourPointAngle::Pointer planarFourPointAngle = mitk::PlanarFourPointAngle::New();
     planarFourPointAngle->SetGeometry2D( planeGeometry );
@@ -82,14 +83,14 @@ public:
     planarFourPointAngle->AddControlPoint( p2 );
     planarFourPointAngle->AddControlPoint( p3 );
     planarFigures.push_back( planarFourPointAngle.GetPointer() );
-    
+
     // Create PlanarLine
     mitk::PlanarLine::Pointer planarLine = mitk::PlanarLine::New();
     planarLine->SetGeometry2D( planeGeometry );
     planarLine->PlaceFigure( p0 );
     planarLine->SetCurrentControlPoint( p1 );
     planarFigures.push_back( planarLine.GetPointer() );
-    
+
     // Create PlanarPolygon
     mitk::PlanarPolygon::Pointer planarPolygon = mitk::PlanarPolygon::New();
     planarPolygon->SetClosed( false );
@@ -99,7 +100,17 @@ public:
     planarPolygon->AddControlPoint( p2 );
     planarPolygon->AddControlPoint( p3 );
     planarFigures.push_back( planarPolygon.GetPointer() );
-    
+
+    // Create PlanarSubdivisionPolygon
+    mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygon = mitk::PlanarSubdivisionPolygon::New();
+    planarSubdivisionPolygon->SetClosed( false );
+    planarSubdivisionPolygon->SetGeometry2D( planeGeometry );
+    planarSubdivisionPolygon->PlaceFigure( p0 );
+    planarSubdivisionPolygon->SetCurrentControlPoint( p1 );
+    planarSubdivisionPolygon->AddControlPoint( p2 );
+    planarSubdivisionPolygon->AddControlPoint( p3 );
+    planarFigures.push_back( planarSubdivisionPolygon.GetPointer() );
+
     // Create PlanarRectangle
     mitk::PlanarRectangle::Pointer planarRectangle = mitk::PlanarRectangle::New();
     planarRectangle->SetGeometry2D( planeGeometry );
@@ -183,6 +194,16 @@ public:
     planarPolygonPrecise->AddControlPoint( p3precise );
     planarFigures.push_back( planarPolygonPrecise.GetPointer() );
 
+    // Create PlanarSubdivisionPolygon
+    mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygonPrecise = mitk::PlanarSubdivisionPolygon::New();
+    planarSubdivisionPolygonPrecise->SetClosed( false );
+    planarSubdivisionPolygonPrecise->SetGeometry2D( preciseGeometry );
+    planarSubdivisionPolygonPrecise->PlaceFigure( p0precise );
+    planarSubdivisionPolygonPrecise->SetCurrentControlPoint( p1precise );
+    planarSubdivisionPolygonPrecise->AddControlPoint( p2precise );
+    planarSubdivisionPolygonPrecise->AddControlPoint( p3precise );
+    planarFigures.push_back( planarSubdivisionPolygonPrecise.GetPointer() );
+
     // Create PlanarRectangle
     mitk::PlanarRectangle::Pointer planarRectanglePrecise = mitk::PlanarRectangle::New();
     planarRectanglePrecise->SetGeometry2D( preciseGeometry );
@@ -196,39 +217,43 @@ public:
   static PlanarFigureList CreateDeepCopiedPlanarFigures(PlanarFigureList original)
   {
     PlanarFigureList copiedPlanarFigures;
-    
+
     PlanarFigureList::iterator it1;
 
     for ( it1 = original.begin(); it1 != original.end(); ++it1 )
     {
       mitk::PlanarFigure::Pointer copiedFigure;
       if(strcmp((*it1)->GetNameOfClass(), "PlanarAngle") == 0)
-      { 
-        copiedFigure    = mitk::PlanarAngle::New(); 
+      {
+        copiedFigure    = mitk::PlanarAngle::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarCircle") == 0)
-      { 
-        copiedFigure    = mitk::PlanarCircle::New(); 
+      {
+        copiedFigure    = mitk::PlanarCircle::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarLine") == 0)
-      { 
-        copiedFigure    = mitk::PlanarLine::New(); 
+      {
+        copiedFigure    = mitk::PlanarLine::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarPolygon") == 0)
-      { 
-        copiedFigure    = mitk::PlanarPolygon::New(); 
+      {
+        copiedFigure    = mitk::PlanarPolygon::New();
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarSubdivisionPolygon") == 0)
+      {
+        copiedFigure    = mitk::PlanarSubdivisionPolygon::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarCross") == 0)
-      { 
-        copiedFigure    = mitk::PlanarCross::New(); 
+      {
+        copiedFigure    = mitk::PlanarCross::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarRectangle") == 0)
-      { 
-        copiedFigure    = mitk::PlanarRectangle::New(); 
+      {
+        copiedFigure    = mitk::PlanarRectangle::New();
       }
       if(strcmp((*it1)->GetNameOfClass(), "PlanarFourPointAngle") == 0)
-      { 
-        copiedFigure    = mitk::PlanarFourPointAngle::New(); 
+      {
+        copiedFigure    = mitk::PlanarFourPointAngle::New();
       }
 
       copiedFigure->DeepCopy((*it1));
@@ -236,7 +261,7 @@ public:
     }
     return copiedPlanarFigures;
   }
-  
+
 
   static void VerifyPlanarFigures( PlanarFigureList &planarFigures1, PlanarFigureList &planarFigures2 )
   {
@@ -255,7 +280,7 @@ public:
       }
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list
-      MITK_TEST_CONDITION_REQUIRED( 
+      MITK_TEST_CONDITION_REQUIRED(
           planarFigureFound,
           "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
     }
@@ -366,7 +391,7 @@ public:
     return true;
   }
 
-  
+
   static void SerializePlanarFigures( PlanarFigureList &planarFigures, std::string& fileName )
   {
     //std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
@@ -386,11 +411,11 @@ public:
 
     writer->Update();
 
-    MITK_TEST_CONDITION_REQUIRED( 
+    MITK_TEST_CONDITION_REQUIRED(
         writer->GetSuccess(),
         "Testing if writing was successful");
   }
-  
+
 
   static PlanarFigureList DeserializePlanarFigures( std::string& fileName)
   {
@@ -399,7 +424,7 @@ public:
     reader->SetFileName( fileName.c_str() );
     reader->Update();
 
-    MITK_TEST_CONDITION_REQUIRED( 
+    MITK_TEST_CONDITION_REQUIRED(
         reader->GetSuccess(),
         "Testing if reading was successful");
 
@@ -416,7 +441,7 @@ public:
   }
 
 
-  
+
 
   static PlanarFigureToMemoryWriterList SerializePlanarFiguresToMemoryBuffers( PlanarFigureList &planarFigures )
   {
@@ -439,7 +464,7 @@ public:
       if(!writer->GetSuccess())
         success = false;
     }
-    
+
     MITK_TEST_CONDITION_REQUIRED(success, "Testing if writing to memory buffers was successful");
 
     return pfMemoryWriters;
@@ -483,7 +508,7 @@ private:
       return *(entry1.second) == *(entry2.second);
     }
   };
-  
+
 }; // end test helper class
 
 
@@ -551,10 +576,10 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
   // Test if original and memory retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures( originalPlanarFigures, retrievedPlanarFiguresFromMemory );
-  
+
   //empty the originalPlanarFigures
   originalPlanarFigures.empty();
-  
+
   // Test if deep-copied and retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures( copiedPlanarFigures, retrievedPlanarFigures );
 

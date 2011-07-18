@@ -67,7 +67,7 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();
-    
+
   for ( int i=0; i<m_ControlPoints.size(); i++ )
   {
     Point2D pnt = m_ControlPoints.at( i );
@@ -88,7 +88,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   unsigned int i,j;
   for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
   {
-    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
+    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo(
       this->GetWorldControlPoint( i + 1 ) );
   }
 
@@ -104,7 +104,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   // Calculate polygon area (if closed)
   double area       = 0.0;
   bool intersection = false;
-  
+
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
@@ -126,16 +126,16 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
           if (intersection) break;
         }
         if (intersection) break; // only because the inner loop might have changed "intersection"
-      
+
         // last line from p_x to p_0
         Point2D p2 = this->GetControlPoint(0);
         Point2D p3 = this->GetControlPoint(numberOfPoints - 1);
-       
+
         intersection = CheckForLineIntersection(p0,p1,p2,p3);
         if (intersection) break;
       }
    }
-      
+
     // calculate area
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {
@@ -146,7 +146,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     }
     area /= 2.0;
   }
-  
+
   // set area if appropiate (i.e. closed and not intersected)
   if(this->IsClosed() && !intersection)
   {
@@ -154,7 +154,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     this->ActivateFeature( FEATURE_ID_AREA );
   }
   else
-  {    
+  {
     SetQuantity( FEATURE_ID_AREA,  0  );
     this->DeactivateFeature( FEATURE_ID_AREA );
   }
@@ -180,18 +180,18 @@ bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, con
      p2 == p3 || p2 == p4 ||
      p3 == p4)
     return false;
-  
+
 
   // Store the values for fast access and easy
   // equations-to-code conversion
   double x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
   double y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
-   
+
   double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   // If d is zero, there is no intersection
   //if (d < mitk::eps) return false;
   if (d == 0) return false;
-   
+
   // Get the x and y
   double pre = (x1*y2 - y1*x2);
   double post = (x3*y4 - y3*x4);
@@ -204,7 +204,7 @@ bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, con
     || x > ( std::max(x1, x2) + tolerance )
     || x < ( std::min(x3, x4) - tolerance )
     || x > ( std::max(x3, x4) + tolerance )
-    ) 
+    )
   {
     return false;
   }
@@ -214,11 +214,11 @@ bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, con
     || y > ( std::max(y1, y2) + tolerance )
     || y < ( std::min(y3, y4) - tolerance )
     || y > ( std::max(y3, y4) + tolerance )
-    ) 
+    )
   {
     return false;
   }
-   
+
   // point of intersection
   Point2D ret; ret[0] = x; ret[1] = y;
   intersection = ret;

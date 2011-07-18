@@ -43,7 +43,7 @@ m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
   this->SetNthOutput(0, this->MakeOutput(0));
 
   m_CanReadFromMemory = true;
-  
+
 
   //this->Modified();
   //this->GetOutput()->Modified();
@@ -67,7 +67,7 @@ void mitk::PlanarFigureReader::GenerateData()
   this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
 
   TiXmlDocument document;
-  
+
   if(m_ReadFromMemory)
   {
     if(m_MemoryBuffer == NULL || m_MemorySize == 0)
@@ -110,7 +110,7 @@ void mitk::PlanarFigureReader::GenerateData()
       return;
     }
   }
-  
+
   int fileVersion = 1;
   TiXmlElement* versionObject = document.FirstChildElement("Version");
   if (versionObject != NULL)
@@ -177,7 +177,7 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       planarFigure = mitk::PlanarArrow::New();
     }
-    else 
+    else
     {
       // unknown type
       MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
@@ -293,7 +293,7 @@ void mitk::PlanarFigureReader::GenerateData()
     }
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
     bool first = true;
-    if (cpElement != NULL)      
+    if (cpElement != NULL)
       for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != NULL; vertElement = vertElement->NextSiblingElement("Vertex"))
       {
         if (vertElement == NULL)
@@ -374,7 +374,7 @@ mitk::PlanarFigureReader::GetDoubleAttributeListFromXMLNode(TiXmlElement* e, con
 
   if (e == NULL)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
-  
+
   for ( unsigned int i = 0; i < count; ++i )
   {
     mitk::ScalarType p(-1.0);
@@ -402,7 +402,7 @@ int mitk::PlanarFigureReader::CanReadFile ( const char *name )
   return (itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameLastExtension(name)) == ".pf");  //assume, we can read all .pf files
 
   //TiXmlDocument document(name);
-  //if (document.LoadFile() == false)  
+  //if (document.LoadFile() == false)
   //  return false;
   //return (document.FirstChildElement("PlanarFigure") != NULL);
 }
@@ -415,7 +415,7 @@ bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std
   return (itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameLastExtension(filename)) == ".pf");  //assume, we can read all .pf files
 
   //TiXmlDocument document(filename);
-  //if (document.LoadFile() == false)  
+  //if (document.LoadFile() == false)
   //  return false;
   //return (document.FirstChildElement("PlanarFigure") != NULL);
 }

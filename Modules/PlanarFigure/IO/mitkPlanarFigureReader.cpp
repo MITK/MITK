@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarPolygon.h"
+#include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 
@@ -163,6 +164,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarPolygon")
     {
       planarFigure = mitk::PlanarPolygon::New();
+    }
+    else if (type == "PlanarSubdivisionPolygon")
+    {
+      planarFigure = mitk::PlanarSubdivisionPolygon::New();
     }
     else if (type == "PlanarRectangle")
     {

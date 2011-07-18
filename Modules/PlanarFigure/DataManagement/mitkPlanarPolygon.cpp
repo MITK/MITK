@@ -34,6 +34,7 @@ mitk::PlanarPolygon::PlanarPolygon()
 
   // Polygon is closed by default
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
+  this->SetProperty( "subdivision", mitk::BoolProperty::New( false ) );
 }
 
 

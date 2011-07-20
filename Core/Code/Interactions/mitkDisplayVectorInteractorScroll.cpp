@@ -69,7 +69,11 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         }
 
         delta /= m_IndexToSliceModifier;
-        int newPos = sliceNaviController->GetSlice()->GetPos() - delta; 
+  
+        if ( m_InvertScrollingDirection )
+          delta *= -1;
+
+        int newPos = sliceNaviController->GetSlice()->GetPos() + delta; 
 
         // if auto repeat is on, start at first slice if you reach the last slice and vice versa
         int maxSlices = sliceNaviController->GetSlice()->GetSteps();
@@ -128,6 +132,7 @@ mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * 
   , m_Destination(destination)
   , m_IndexToSliceModifier(4)
   , m_AutoRepeat( false )
+  , m_InvertScrollingDirection( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -145,4 +150,8 @@ mitk::DisplayVectorInteractorScroll::~DisplayVectorInteractorScroll()
     delete m_Destination;
 }
 
+void mitk::DisplayVectorInteractorScroll::SetInvertScrollingDirection( bool invert )
+{
+  m_InvertScrollingDirection = invert;
+}
 

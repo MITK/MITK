@@ -143,7 +143,7 @@ bool mitk::ToolManager::ActivateTool(int id)
 
     if (m_ActiveTool)
     {
-      if (m_RegisteredClients)
+      if (m_RegisteredClients > 0)
       {
         m_ActiveTool->Activated();
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
@@ -451,7 +451,7 @@ mitk::Tool* mitk::ToolManager::GetActiveTool()
 
 void mitk::ToolManager::RegisterClient()
 {
-  if ( m_RegisteredClients == 0 )
+  if ( m_RegisteredClients < 1 )
   {
     if ( m_ActiveTool )
     {
@@ -459,15 +459,15 @@ void mitk::ToolManager::RegisterClient()
       GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
     }
   }
-
   ++m_RegisteredClients;
 }
 
 void mitk::ToolManager::UnregisterClient()
 {
-  --m_RegisteredClients;
+  if ( m_RegisteredClients < 1) return;
 
-  if ( m_RegisteredClients == 0 )
+  --m_RegisteredClients;
+  if ( m_RegisteredClients < 1 )
   {
     if ( m_ActiveTool )
     {

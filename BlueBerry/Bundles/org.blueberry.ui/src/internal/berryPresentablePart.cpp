@@ -36,16 +36,26 @@ void
 PresentablePart::
 PropertyListenerProxy::PropertyChange(PropertyChangeEvent::Pointer e)
 {
-  part->FirePropertyChange(e);
+  if (e->GetProperty() == IWorkbenchPartConstants::INTEGER_PROPERTY)
+  {
+    // these are "part" events
+    PropertyChangeEvent::Pointer event(new PropertyChangeEvent(Object::Pointer(part), e->GetProperty(),
+                                                               e->GetOldValue(), e->GetNewValue()));
+    part->FirePropertyChange(event);
+  }
+  else
+  {
+    part->FirePropertyChange(e);
+  }
 }
 
 IPropertyChangeListener::Pointer PresentablePart::GetPropertyListenerProxy()
 {
-  if (lazyPartPropertyChangeListener == 0)
+  if (lazyPropertyListenerProxy == 0)
   {
-    lazyPartPropertyChangeListener = new PropertyListenerProxy(this);
+    lazyPropertyListenerProxy = new PropertyListenerProxy(this);
   }
-  return lazyPartPropertyChangeListener;
+  return lazyPropertyListenerProxy;
 }
 
 WorkbenchPartReference::Pointer PresentablePart::GetPartReference() const

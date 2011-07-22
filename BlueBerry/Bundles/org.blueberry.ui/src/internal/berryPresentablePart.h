@@ -52,12 +52,12 @@ private:
   //List listeners = new ArrayList();
 
   // Lazily initialized. Use getPropertyListenerProxy() to access.
-  //IPropertyListener lazyPropertyListenerProxy;
+  IPropertyChangeListener::Pointer lazyPropertyListenerProxy;
 
   //ListenerList partPropertyChangeListeners = new ListenerList();
   IPropertyChangeListener::Events partPropertyChangeEvents;
 
-  IPropertyChangeListener::Pointer lazyPartPropertyChangeListener;
+  //IPropertyChangeListener::Pointer lazyPartPropertyChangeListener;
 
   // Lazily initialized. Use getMenu() to access
   //IPartMenu viewMenu;

@@ -45,7 +45,14 @@ WorkbenchPartReference::PropertyChangeListener::PropertyChangeListener(
 void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
     PropertyChangeEvent::Pointer event)
 {
-  partRef->PropertyChanged(event);
+  if (event->GetProperty() == IWorkbenchPartConstants::INTEGER_PROPERTY)
+  {
+    partRef->PropertyChanged(event->GetSource(), event->GetNewValue().Cast<ObjectInt>()->GetValue());
+  }
+  else
+  {
+    partRef->PropertyChanged(event);
+  }
 }
 
 WorkbenchPartReference::WorkbenchPartReference() :

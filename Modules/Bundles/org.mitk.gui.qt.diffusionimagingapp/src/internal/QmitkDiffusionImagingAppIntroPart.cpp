@@ -133,6 +133,7 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   QByteArray urlHostname  = showMeNext.encodedHost();
   QByteArray urlPath      = showMeNext.encodedPath();
   QByteArray dataset      = showMeNext.encodedQueryItemValue("dataset");
+  QByteArray clear        = showMeNext.encodedQueryItemValue("clear");
 
   if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;  
 
@@ -183,6 +184,12 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
         bool clearDataStorageFirst(false);
+        QString *sClear = new QString(clear.data());
+        if ( sClear->right(4) == "true" )
+        {
+          clearDataStorageFirst = true;
+        }
+
         mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
         dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
         dsmodified = true;

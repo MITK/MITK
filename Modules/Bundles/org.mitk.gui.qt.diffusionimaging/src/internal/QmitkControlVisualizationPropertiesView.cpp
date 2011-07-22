@@ -179,6 +179,8 @@ struct CvpSelListener : ISelectionListener
           QString label = "Width %1";
           label = label.arg(val);
           m_View->m_Controls->label_pfwidth->setText(label);
+
+          m_View->PlanarFigureFocus();
         }
 
         if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
@@ -700,6 +702,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
+    connect((QObject*) m_Controls->m_PFColor3D, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor3D()));
 
     connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
 
@@ -1257,24 +1260,19 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     {
 
       QmitkRenderWindow* selectedRenderWindow = 0;
+      bool PlanarFigureInitializedWindow = false;
 
       QmitkRenderWindow* RenderWindow1 =
           this->GetActiveStdMultiWidget()->GetRenderWindow1();
-      QmitkRenderWindow* RenderWindow2 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow2();
-      QmitkRenderWindow* RenderWindow3 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow3();
-      QmitkRenderWindow* RenderWindow4 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow4();
 
-      bool PlanarFigureInitializedWindow = false;
-
-      // find initialized renderwindow
       if (m_SelectedNode->GetBoolProperty("PlanarFigureInitializedWindow",
-                                          PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+        PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow1;
       }
+
+      QmitkRenderWindow* RenderWindow2 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow2();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
@@ -1283,12 +1281,18 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
         selectedRenderWindow = RenderWindow2;
       }
 
+      QmitkRenderWindow* RenderWindow3 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow3();
+
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
           RenderWindow3->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow3;
       }
+
+      QmitkRenderWindow* RenderWindow4 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow4();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
@@ -1461,6 +1465,26 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 //  m_SelectedNode->SetProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::PFColor3D()
+{
+
+  QColor color = QColorDialog::getColor();
+
+  m_Controls->m_PFColor3D->setAutoFillBackground(true);
+  QString styleSheet = "background-color:rgb(";
+  styleSheet.append(QString::number(color.red()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.green()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.blue()));
+  styleSheet.append(")");
+  m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
+
+  m_SelectedNode->SetProperty( "color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

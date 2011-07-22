@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class MitkDiffusionImaging_EXPORT QmitkODFDetailsWidget : public QmitkPlotWidget
+class QmitkODFDetailsWidget : public QmitkPlotWidget
 {
 Q_OBJECT
 

@@ -37,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 
 
-class MitkDiffusionImaging_EXPORT QmitkODFRenderWidget : public QWidget
+class QmitkODFRenderWidget : public QWidget
 {
   Q_OBJECT
 

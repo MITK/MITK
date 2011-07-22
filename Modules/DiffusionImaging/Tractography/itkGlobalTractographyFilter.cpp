@@ -438,6 +438,7 @@ namespace itk{
       MITK_INFO << "proposal acceptance: " << 100*m_ProposalAcceptance << "%";
       MITK_INFO << "particles: " << m_NumParticles;
       MITK_INFO << "connections: " << m_NumConnections;
+      MITK_INFO << "progress: " << 100*(float)step/m_Steps << "%";
 
       if (m_BuildFibers)
       {

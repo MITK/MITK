@@ -23,7 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkRenderer.h"
 
 
-mitk::RenderWindowBase::RenderWindowBase( ) : m_ProcessWheelEvents(true)
+mitk::RenderWindowBase::RenderWindowBase( ) 
+: m_ProcessWheelEvents(true),
+m_InvertScrollingDirection(false)
 {
 
 }
@@ -111,8 +113,12 @@ void mitk::RenderWindowBase::wheelMitkEvent(mitk::WheelEvent *we)
       stepper = GetSliceNavigationController()->GetTime();
     }
 
-    //if (we->orientation() * we->GetDelta()  > 0)
-    if (we->GetDelta()  > 0)
+    // get the desired delta
+    int delta = we->GetDelta();
+    if ( m_InvertScrollingDirection )
+      delta *= -1;  // If we want to invert the scrolling direction -> delta * -1
+
+    if ( delta < 0 )
     {
       stepper->Next();
     }
@@ -191,4 +197,9 @@ void mitk::RenderWindowBase::SetProcessWheelEvents( bool state )
 bool mitk::RenderWindowBase::GetProcessWheelEvents()
 {
   return m_ProcessWheelEvents;
+}
+
+void mitk::RenderWindowBase::SetInvertScrollingDirection( bool invert )
+{
+  m_InvertScrollingDirection = invert;
 }

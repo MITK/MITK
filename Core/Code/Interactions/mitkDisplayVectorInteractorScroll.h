@@ -56,6 +56,8 @@ namespace mitk {
 
     void SetAutoRepeat( bool autoRepeat );
 
+    void SetInvertScrollingDirection( bool );
+
   protected:
     /**
     * @brief Default Constructor
@@ -98,6 +100,9 @@ namespace mitk {
     * If AutoRepeat is on, scrolling further than the last slice will restart at the first slice and vice versa
     */
     bool m_AutoRepeat;
+
+    bool m_InvertScrollingDirection;
+
   };
 
 } // namespace mitk

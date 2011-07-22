@@ -66,6 +66,8 @@ public:
 
   bool GetProcessWheelEvents();
 
+  void SetInvertScrollingDirection( bool );
+
   virtual void mousePressMitkEvent(mitk::MouseEvent *me);
   virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me);
   virtual void mouseMoveMitkEvent(mitk::MouseEvent *me);
@@ -87,6 +89,8 @@ protected:
   bool                           m_InResize;
 
   bool                           m_ProcessWheelEvents;
+
+  bool                           m_InvertScrollingDirection;
 
   private:
 

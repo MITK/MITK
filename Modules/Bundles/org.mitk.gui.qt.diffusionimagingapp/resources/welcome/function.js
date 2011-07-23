@@ -16,16 +16,16 @@ var moduleNames = new Array("Colormap",
                             "Download MITK");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/0bref_colormap.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/0cref_t1.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/0aref_alltracts.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/01CING.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/02CORPUS.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/03CST.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/04FORNIX.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/05ILF+IFO+UNCUS.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./atlas-data/06SLF+SOFF+ARCUATE.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=true&dataset=./atlas-data/07PEDUNCLES.mitk",
+var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0bref_colormap.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0cref_t1.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0aref_alltracts.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/01CING.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/02CORPUS.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/03CST.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/04FORNIX.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/05ILF+IFO+UNCUS.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/06SLF+SOFF+ARCUATE.mitk",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=true&dataset=./bin/atlas-data/07PEDUNCLES.mitk",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".

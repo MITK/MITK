@@ -109,6 +109,7 @@ private:
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
   bool showVersionInfo;
+  bool showMitkVersionInfo;
   std::string productName;
   std::string windowIcon;
 

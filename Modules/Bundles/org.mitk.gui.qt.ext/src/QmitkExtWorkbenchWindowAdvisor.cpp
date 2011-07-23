@@ -321,7 +321,8 @@ QmitkCommonWorkbenchWindowAdvisor(configurer),
 lastInput(0),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
-showVersionInfo(true)
+showVersionInfo(true),
+showMitkVersionInfo(true)
 {
  productName = berry::Platform::GetConfiguration().getString("application.baseName");
 }
@@ -848,7 +849,12 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
  //      title = product.getName();
  //    }
  // instead of the product name, we use a custom variable for now
- title = productName + " " + MITK_VERSION_STRING;
+ title = productName;
+
+ if(showMitkVersionInfo)
+ {
+   title += " " + MITK_VERSION_STRING;
+ }
 
  if (showVersionInfo)
  {

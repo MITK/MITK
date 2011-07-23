@@ -357,6 +357,11 @@ void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
  showVersionInfo = show;
 }
 
+void QmitkExtWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
+{
+ showMitkVersionInfo = show;
+}
+
 void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
 {
  productName = product;
@@ -853,7 +858,7 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 
  if(showMitkVersionInfo)
  {
-   title += " " + MITK_VERSION_STRING;
+   title += std::string(" ") + MITK_VERSION_STRING;
  }
 
  if (showVersionInfo)

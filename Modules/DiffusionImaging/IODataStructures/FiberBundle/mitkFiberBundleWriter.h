@@ -116,7 +116,7 @@ public:
 
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
-    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.afib *.vtk)"; }
+    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.vfib *.vtk)"; }
     virtual const char * GetDefaultExtension() { return ".fib"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {

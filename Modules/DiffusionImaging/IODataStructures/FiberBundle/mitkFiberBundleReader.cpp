@@ -251,7 +251,7 @@ namespace mitk
         MITK_INFO << "Could not read file ";
       }
     }
-    else if (ext == ".afib")
+    else if (ext == ".vfib")
     {
       // generate tract container
       ContainerType::Pointer tractContainer = ContainerType::New();
@@ -378,7 +378,7 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib" || ext == ".afib")
+    if (ext == ".fib" || ext == ".vfib")
     {
       return true;
     }

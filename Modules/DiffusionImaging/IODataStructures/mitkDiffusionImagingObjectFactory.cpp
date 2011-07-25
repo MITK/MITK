@@ -207,7 +207,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.afib", "Fiber Bundle Polydata"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
@@ -220,6 +220,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
 }
 

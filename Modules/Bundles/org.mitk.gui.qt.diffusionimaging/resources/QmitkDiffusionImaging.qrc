@@ -19,5 +19,8 @@
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
         <file>FiberBundle.png</file>
+        <file>rectangle.png</file>
+        <file>circle.png</file>
+        <file>polygon.png</file>
     </qresource>
 </RCC>

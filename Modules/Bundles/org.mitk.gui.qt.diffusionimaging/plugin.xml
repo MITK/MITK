@@ -65,4 +65,11 @@
           icon="resources/GlobalTracking.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fiberbundleoperations"
+          name="Fiber Bundle Operations"
+          class="QmitkFiberBundleOperationsView"
+          icon="resources/FiberBundleOperations.png" />
+  </extension>
+
 </plugin>

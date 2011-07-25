@@ -188,7 +188,7 @@ void mitk::FiberBundleWriter::GenerateData()
 
     MITK_INFO << "Fiber bundle written";
 
-  }else if (ext == ".afib" || ext == ".vtk") {
+  }else if (ext == ".vfib" || ext == ".vtk") {
     vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
     writer->SetInput(input->GeneratePolydata());
     writer->SetFileName(m_FileName.c_str());
@@ -225,7 +225,7 @@ std::vector<std::string> mitk::FiberBundleWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".fib");
-  possibleFileExtensions.push_back(".afib");
+  possibleFileExtensions.push_back(".vfib");
   possibleFileExtensions.push_back(".vtk");
   return possibleFileExtensions;
 }

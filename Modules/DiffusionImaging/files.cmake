@@ -47,6 +47,7 @@ SET(CPP_FILES
   IODataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
   IODataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
   IODataStructures/FiberBundle/mitkParticle.cpp
+  IODataStructures/FiberBundle/mitkParticleGrid.cpp
 
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
@@ -63,6 +64,9 @@ SET(CPP_FILES
 
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
+
+  # Algorithms
+  Algorithms/itkTractsToDWIImageFilter.cpp
 )
 
 SET(H_FILES
@@ -93,6 +97,9 @@ SET(H_FILES
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
   Algorithms/itkTractsToProbabilityImageFilter.h
+  Algorithms/itkTractsToDWIImageFilter.h
+  Algorithms/itkTractsToFiberEndingsImageFilter.h
+  Algorithms/itkGaussianInterpolateImageFunction.h
 )
 
 SET( TOOL_FILES

@@ -24,16 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon()
-: FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
-  // Polygon has at least two control points
-  this->ResetNumberOfControlPoints( 2 );
-  this->SetNumberOfPolyLines( 1 );
-
-  // Polygon is closed by default
+  // Polygon is subdivision (in contrast to parent class PlanarPolygon
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
   this->SetProperty( "subdivision", mitk::BoolProperty::New( true ) );
+
+  // Other properties are inherited / already initialized by parent class PlanarPolygon
 }
 
 
@@ -169,133 +165,4 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
     // Append to poly line number 0 (we only have one polyline, even if it has many polyline elements).
     this->AppendPointToPolyLine( 0, elem );
   }
-}
-
-void mitk::PlanarSubdivisionPolygon::EvaluateFeaturesInternal()
-{
-  // Calculate circumference
-  double circumference = 0.0;
-  unsigned int i,j;
-
-  // We need to construct our subdivisionPoints-array out of the existing polyline, because subdivision points aren't stored in the class
-  ControlPointListType m_SubdivisionPoints;
-  m_SubdivisionPoints.clear();
-  PolyLineType::iterator iter;
-  for( iter = m_PolyLines[0].begin(); iter != m_PolyLines[0].end(); ++iter )
-  {
-    m_SubdivisionPoints.push_back((*iter).Point);
-  }
-
-  if(m_SubdivisionPoints.size() < 3){
-      return;
-  }
-
-  for ( i = 0; i < (m_SubdivisionPoints.size() - 1); ++i )
-  {
-    circumference += m_SubdivisionPoints[i].EuclideanDistanceTo(m_SubdivisionPoints[i + 1]);
-  }
-
-  if ( this->IsClosed() )
-  {
-    circumference += m_SubdivisionPoints.back().EuclideanDistanceTo( m_SubdivisionPoints.front() );
-  }
-
-  this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
-
-  // Calculate polygon area (if closed)
-  double area       = 0.0;
-  bool intersection = false;
-  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
-  {
-    // does PlanarPolygon overlap/intersect itself?
-    unsigned int numberOfPoints = m_SubdivisionPoints.size();
-    if( numberOfPoints >= GetMinimumNumberOfControlPoints())
-    {
-      for ( i=0; i<m_SubdivisionPoints.size() - 1; ++i )
-      {
-        // line 1
-        Point2D p0 = m_SubdivisionPoints[i];
-        Point2D p1 = m_SubdivisionPoints[i+1];
-
-        // check for intersection with all other lines
-        for ( j = i+1; j<m_SubdivisionPoints.size() - 1; ++j )
-        {
-          Point2D p2 = m_SubdivisionPoints[j];
-          Point2D p3 = m_SubdivisionPoints[j+1];
-          intersection = CheckForLineIntersection(p0,p1,p2,p3);
-          if (intersection) break;
-        }
-        if (intersection) break; // only because the inner loop might have changed "intersection"
-
-        // last line from p_x to p_0
-        Point2D p2 = m_SubdivisionPoints.front();
-        Point2D p3 = m_SubdivisionPoints.back();
-
-        intersection = CheckForLineIntersection(p0,p1,p2,p3);
-        if (intersection) break;
-      }
-   }
-
-    // calculate area
-    for ( i = 0; i < m_SubdivisionPoints.size(); ++i )
-    {
-      Point2D p0 = m_SubdivisionPoints[i];
-      Point2D p1 = m_SubdivisionPoints[ (i + 1) % m_SubdivisionPoints.size() ];
-
-      area += p0[0] * p1[1] - p1[0] * p0[1];
-    }
-    area /= 2.0;
-  }
-
-  // set area if appropiate (i.e. closed and not intersected)
-  if(this->IsClosed() && !intersection)
-  {
-    SetQuantity( FEATURE_ID_AREA, fabs( area ) );
-    this->ActivateFeature( FEATURE_ID_AREA );
-  }
-  else
-  {
-    SetQuantity( FEATURE_ID_AREA,  0  );
-    this->DeactivateFeature( FEATURE_ID_AREA );
-  }
-}
-
-std::vector<mitk::Point2D> mitk::PlanarSubdivisionPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2 ) const
-{
-  std::vector<mitk::Point2D> intersectionList;
-
-  ControlPointListType m_SubdivisionPoints;
-  PolyLineType tempList = m_PolyLines[0];
-  PolyLineType::iterator iter;
-  for( iter = tempList.begin(); iter != tempList.end(); ++iter )
-  {
-    m_SubdivisionPoints.push_back((*iter).Point);
-  }
-
-  for ( unsigned int i=0; i<m_SubdivisionPoints.size() - 1; i++ )
-  {
-    mitk::Point2D pnt1 = m_SubdivisionPoints[i];
-    mitk::Point2D pnt2 = m_SubdivisionPoints[i+1];
-    mitk::Point2D intersection;
-
-    if ( mitk::PlanarSubdivisionPolygon::CheckForLineIntersection( p1, p2, pnt1, pnt2, intersection ) )
-    {
-      intersectionList.push_back( intersection );
-    }
-  }
-
-  if ( this->IsClosed() )
-  {
-    mitk::Point2D intersection, lastControlPoint, firstControlPoint;
-    lastControlPoint = m_SubdivisionPoints.back();
-    firstControlPoint = m_SubdivisionPoints.front();
-
-    if ( mitk::PlanarSubdivisionPolygon::CheckForLineIntersection( lastControlPoint,
-      firstControlPoint, p1, p2, intersection ) )
-    {
-      intersectionList.push_back( intersection );
-    }
-  }
-
-  return intersectionList;
 }

@@ -97,9 +97,9 @@ SET(CPP_FILES
  QmitkPointListView.cpp
  QmitkPointListWidget.cpp
  QmitkPointListViewWidget.cpp
- QmitkCorrespondingPointSetsView.cpp
- QmitkCorrespondingPointSetsModel.cpp
- QmitkCorrespondingPointSetsWidget.cpp
+ #QmitkCorrespondingPointSetsView.cpp
+ #QmitkCorrespondingPointSetsModel.cpp
+ #QmitkCorrespondingPointSetsWidget.cpp
  QmitkVideoBackground.cpp
  QmitkHotkeyLineEdit.cpp
  QmitkErodeToolGUI.cpp
@@ -195,9 +195,9 @@ SET(MOC_H_FILES
  QmitkPointListView.h
  QmitkPointListWidget.h
  QmitkPointListViewWidget.h
- QmitkCorrespondingPointSetsView.h
- QmitkCorrespondingPointSetsModel.h
- QmitkCorrespondingPointSetsWidget.h
+ #QmitkCorrespondingPointSetsView.h
+ #QmitkCorrespondingPointSetsModel.h
+ #QmitkCorrespondingPointSetsWidget.h
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
  QmitkFileChooser.h

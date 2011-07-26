@@ -86,16 +86,28 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   // Calculate circumference
   double circumference = 0.0;
   unsigned int i,j;
-  for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
+
+  ControlPointListType polyLinePoints;
+  polyLinePoints.clear();
+  PolyLineType::iterator iter;
+  for( iter = m_PolyLines[0].begin(); iter != m_PolyLines[0].end(); ++iter )
   {
-    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo(
-      this->GetWorldControlPoint( i + 1 ) );
+    polyLinePoints.push_back((*iter).Point);
+  }
+
+  if(polyLinePoints.empty())
+    return;
+
+  for ( i = 0; i <(polyLinePoints.size()-1); ++i )
+  {
+    circumference += polyLinePoints[i].EuclideanDistanceTo(
+      polyLinePoints[i + 1] );
   }
 
   if ( this->IsClosed() )
   {
-    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo(
-      this->GetWorldControlPoint( 0 ) );
+    circumference += polyLinePoints[i].EuclideanDistanceTo(
+      polyLinePoints.front() );
   }
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
@@ -108,28 +120,28 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
-    unsigned int numberOfPoints = (unsigned int)GetNumberOfControlPoints();
+    unsigned int numberOfPoints = polyLinePoints.size();
     if( numberOfPoints >= 4)
     {
       for ( i = 0; i < (numberOfPoints - 1); ++i )
       {
         // line 1
-        Point2D p0 = this->GetControlPoint( i );
-        Point2D p1 = this->GetControlPoint(i + 1);
+        Point2D p0 = polyLinePoints[i];
+        Point2D p1 = polyLinePoints[i + 1];
 
         // check for intersection with all other lines
         for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
-          Point2D p2 = this->GetControlPoint(j);
-          Point2D p3 = this->GetControlPoint(j + 1);
+          Point2D p2 = polyLinePoints[j];
+          Point2D p3 = polyLinePoints[j + 1];
           intersection = CheckForLineIntersection(p0,p1,p2,p3);
           if (intersection) break;
         }
         if (intersection) break; // only because the inner loop might have changed "intersection"
 
         // last line from p_x to p_0
-        Point2D p2 = this->GetControlPoint(0);
-        Point2D p3 = this->GetControlPoint(numberOfPoints - 1);
+        Point2D p2 = polyLinePoints.front();
+        Point2D p3 = polyLinePoints.back();
 
         intersection = CheckForLineIntersection(p0,p1,p2,p3);
         if (intersection) break;
@@ -137,10 +149,10 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
    }
 
     // calculate area
-    for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
+    for ( i = 0; i < polyLinePoints.size(); ++i )
     {
-      Point2D p0 = this->GetControlPoint( i );
-      Point2D p1 = this->GetControlPoint( (i + 1) % this->GetNumberOfControlPoints() );
+      Point2D p0 = polyLinePoints[i];
+      Point2D p1 = polyLinePoints[ (i + 1) % polyLinePoints.size() ];
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }
@@ -236,11 +248,18 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
 {
   std::vector<mitk::Point2D> intersectionList;
 
-
-  for ( int i=0; i<this->GetNumberOfControlPoints()-1; i++ )
+  ControlPointListType polyLinePoints;
+  PolyLineType tempList = m_PolyLines[0];
+  PolyLineType::iterator iter;
+  for( iter = tempList.begin(); iter != tempList.end(); ++iter )
   {
-    mitk::Point2D pnt1 = this->GetControlPoint( i );
-    mitk::Point2D pnt2 = this->GetControlPoint( i+1 );
+    polyLinePoints.push_back((*iter).Point);
+  }
+
+  for ( int i=0; i<polyLinePoints.size()-1; i++ )
+  {
+    mitk::Point2D pnt1 = polyLinePoints[i];
+    mitk::Point2D pnt2 = polyLinePoints[i+1];
     mitk::Point2D intersection;
 
     if ( mitk::PlanarPolygon::CheckForLineIntersection( p1, p2, pnt1, pnt2, intersection ) )
@@ -252,8 +271,8 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   if ( this->IsClosed() )
   {
     mitk::Point2D intersection, lastControlPoint, firstControlPoint;
-    lastControlPoint = this->GetControlPoint(this->GetNumberOfControlPoints()-1);
-    firstControlPoint = this->GetControlPoint(0);
+    lastControlPoint = polyLinePoints.back();
+    firstControlPoint = polyLinePoints.front();
 
     if ( mitk::PlanarPolygon::CheckForLineIntersection( lastControlPoint,
       firstControlPoint, p1, p2, intersection ) )

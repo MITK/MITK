@@ -83,7 +83,7 @@ void mitk::UnstructuredGridMapper2D::GenerateData()
 
 }
 
-void mitk::UnstructuredGridMapper2D::GenerateData( mitk::BaseRenderer* renderer )
+void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
   mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetData() );
   assert( input );

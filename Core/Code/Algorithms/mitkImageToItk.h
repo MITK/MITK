@@ -38,7 +38,7 @@ namespace mitk
  * \todo Get clear about how to handle directed ITK 2D images in ITK
  */
 template <class TOutputImage>
-class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >
+class ImageToItk : public itk::ImageSource< TOutputImage >
 {
 protected:
   mitk::Image::Pointer m_MitkImage;

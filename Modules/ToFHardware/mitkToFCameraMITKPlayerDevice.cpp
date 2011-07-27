@@ -24,7 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice()
+  ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice() : 
+  m_DistanceDataBuffer(NULL), m_IntensityDataBuffer(NULL), m_AmplitudeDataBuffer(NULL)
   {
     m_Controller = ToFCameraMITKPlayerController::New();
   }
@@ -32,6 +33,7 @@ namespace mitk
   ToFCameraMITKPlayerDevice::~ToFCameraMITKPlayerDevice()
   {
     DisconnectCamera();
+    CleanUpDataBuffers();
   }
 
   bool ToFCameraMITKPlayerDevice::ConnectCamera()
@@ -43,29 +45,8 @@ namespace mitk
       this->m_CaptureHeight = m_Controller->GetCaptureHeight();
       this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
 
-      // allocate buffer
-      this->m_IntensityArray = new float[this->m_PixelNumber];
-      for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
-      this->m_DistanceArray = new float[this->m_PixelNumber];
-      for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
-      this->m_AmplitudeArray = new float[this->m_PixelNumber];
-      for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
-
-      this->m_DistanceDataBuffer = new float*[this->m_MaxBufferSize];
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        this->m_DistanceDataBuffer[i] = new float[this->m_PixelNumber];
-      }
-      this->m_AmplitudeDataBuffer = new float*[this->m_MaxBufferSize];
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        this->m_AmplitudeDataBuffer[i] = new float[this->m_PixelNumber];
-      }
-      this->m_IntensityDataBuffer = new float*[this->m_MaxBufferSize];
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
-      }
+      AllocatePixelArrays();
+      AllocateDataBuffers();
 
       m_CameraConnected = true;
     }
@@ -75,30 +56,8 @@ namespace mitk
   bool ToFCameraMITKPlayerDevice::DisconnectCamera()
   {
     bool ok =  m_Controller->CloseCameraConnection();
-
-    // free buffer if camera was connected
-    if (m_CameraConnected)
+    if (ok)
     {
-      delete [] m_IntensityArray;
-      delete [] m_DistanceArray;
-      delete [] m_AmplitudeArray;
-
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        delete[] this->m_DistanceDataBuffer[i];
-      }
-      delete[] this->m_DistanceDataBuffer;
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        delete[] this->m_AmplitudeDataBuffer[i];
-      }
-      delete[] this->m_AmplitudeDataBuffer;
-      for(int i=0; i<this->m_MaxBufferSize; i++)
-      {
-        delete[] this->m_IntensityDataBuffer[i];
-      }
-      delete[] this->m_IntensityDataBuffer;
-
       m_CameraConnected = false;
     }
     return ok;
@@ -359,4 +318,53 @@ namespace mitk
     }
   }
 
+  void ToFCameraMITKPlayerDevice::CleanUpDataBuffers()
+  {
+    if (m_DistanceDataBuffer)
+    {
+      for(int i=0; i<this->m_MaxBufferSize; i++)
+      {
+        delete[] this->m_DistanceDataBuffer[i];
+      }
+      delete[] this->m_DistanceDataBuffer;
+    }
+    if (m_AmplitudeDataBuffer)
+    {
+      for(int i=0; i<this->m_MaxBufferSize; i++)
+      {
+        delete[] this->m_AmplitudeDataBuffer[i];
+      }
+      delete[] this->m_AmplitudeDataBuffer;
+    }
+    if (m_IntensityDataBuffer)
+    {
+      for(int i=0; i<this->m_MaxBufferSize; i++)
+      {
+        delete[] this->m_IntensityDataBuffer[i];
+      }
+      delete[] this->m_IntensityDataBuffer;
+    }
+  }
+
+  void ToFCameraMITKPlayerDevice::AllocateDataBuffers()
+  {
+    // free memory if it was already allocated
+    this->CleanUpDataBuffers();
+    // allocate buffers
+    this->m_DistanceDataBuffer = new float*[this->m_MaxBufferSize];
+    for(int i=0; i<this->m_MaxBufferSize; i++)
+    {
+      this->m_DistanceDataBuffer[i] = new float[this->m_PixelNumber];
+    }
+    this->m_AmplitudeDataBuffer = new float*[this->m_MaxBufferSize];
+    for(int i=0; i<this->m_MaxBufferSize; i++)
+    {
+      this->m_AmplitudeDataBuffer[i] = new float[this->m_PixelNumber];
+    }
+    this->m_IntensityDataBuffer = new float*[this->m_MaxBufferSize];
+    for(int i=0; i<this->m_MaxBufferSize; i++)
+    {
+      this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
+    }
+  }
 }

@@ -65,8 +65,8 @@ set(CTEST_SOURCE_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK")
 set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-Superbuild-${CTEST_BUILD_CONFIGURATION}-${SCRIPT_MODE}")
 
 set(ADDITIONAL_CMAKECACHE_OPTION "
-MITK_USE_Boost:BOOL=ON
-MITK_USE_OpenCV:BOOL=ON
+# add entries like this
+# MITK_USE_OpenCV:BOOL=OFF
 ")
 
 # List of test that should be explicitly disabled on this machine

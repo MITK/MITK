@@ -229,7 +229,7 @@ protected:
   virtual ~ImageMapperGL2D();
 
   /** Does the actual resampling, without rendering the image yet. */
-  virtual void GenerateData(mitk::BaseRenderer *renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
   
   /** \brief Get the RendererInfo for @a renderer */
   inline RendererInfo & AccessRendererInfo( mitk::BaseRenderer* renderer )

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryService.h>
 
-#include "mitkCoreServicesPluginDll.h"
+#include <org_mitk_core_services_Export.h>
 #include "mitkIDataStorageReference.h"
 
 #include <string>

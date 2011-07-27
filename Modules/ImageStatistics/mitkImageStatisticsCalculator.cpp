@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
 #include "mitkExtractImageFilter.h"
 
 #include <itkScalarImageToHistogramGenerator.h>
@@ -142,7 +143,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 }
 
 
-void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
+void ImageStatisticsCalculator::SetPlanarFigure( mitk::PlanarFigure *planarFigure )
 {
   if ( m_Image.IsNull() )
   {
@@ -485,10 +486,17 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
       if(m_DoIgnorePixelValue)
       {
-        CastToItkImage( timeSliceImage, m_InternalImageMask3D );
-        m_InternalImageMask3D->FillBuffer(1);
+        if( m_InternalImage->GetDimension() == 3 )
+        {
+          CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          m_InternalImageMask3D->FillBuffer(1);
+        }
+        if( m_InternalImage->GetDimension() == 2 )
+        {
+          CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          m_InternalImageMask2D->FillBuffer(1);
+        }
       }
-
       break;
     }
 

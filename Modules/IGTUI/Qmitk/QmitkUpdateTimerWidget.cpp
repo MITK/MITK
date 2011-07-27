@@ -169,3 +169,15 @@ void QmitkUpdateTimerWidget::DisableWidget()
   this->StopTimer();
   this->setEnabled( false );
 }
+
+
+
+void QmitkUpdateTimerWidget::SetIcon( WidgetButtons button, const QIcon& icon )
+{
+  switch( button )
+  {
+  case StartButton: m_Controls->m_StartNavigationBtn->setIcon(icon);
+
+  case StopButton: m_Controls->m_StartNavigationBtn->setIcon(icon);    
+  }
+}

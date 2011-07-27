@@ -111,9 +111,13 @@ function(func_build_target target build_dir)
 endfunction()
 
 function(func_test label build_dir)
+  if (NOT TESTING_PARALLEL_LEVEL)
+    set(TESTING_PARALLEL_LEVEL 8)
+  endif()
+  
   ctest_test(BUILD "${build_dir}"
              INCLUDE_LABEL ${label}
-             PARALLEL_LEVEL 8
+             PARALLEL_LEVEL ${TESTING_PARALLEL_LEVEL}
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
              RETURN_VALUE res
             )
@@ -137,10 +141,19 @@ function(func_test label build_dir)
     ctest_submit(PARTS Coverage)
   endif ()
 
-  #if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-  #  ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL ${label})
-  #  ctest_submit(PARTS MemCheck)
-  #endif ()
+  if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+    if(NOT CTEST_MEMORYCHECK_SUPPRESSIONS_FILE)
+      if(EXISTS "${CTEST_SOURCE_DIRECTORY}/CMake/valgrind.supp")
+        set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE "${CTEST_SOURCE_DIRECTORY}/CMake/valgrind.supp")
+      endif()
+    endif()
+    if(NOT CTEST_MEMORYCHECK_COMMAND_OPTIONS)
+      set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "-q --tool=memcheck --leak-check=yes --show-reachable=no --show-possibly-lost=no --workaround-gcc296-bugs=yes --num-callers=50")
+    endif()
+    ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL ${label})
+    ctest_submit(PARTS MemCheck)
+  endif ()
+
 endfunction()
 
 #---------------------------------------------------------------------
@@ -190,11 +203,16 @@ MACRO(run_ctest)
     set(res 1)
 
     # Write initial cache.
+    if (NOT DEFINED BUILD_TESTING)
+      set(BUILD_TESTING ON)
+    endif()
+
+    # Write initial cache.
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
 CTEST_PROJECT_ADDITIONAL_TARGETS:INTERNAL=${CTEST_PROJECT_ADDITIONAL_TARGETS}
-BUILD_TESTING:BOOL=TRUE
-MITK_CTEST_SCRIPT_MODE:BOOL=TRUE
+BUILD_TESTING:BOOL=${BUILD_TESTING}
+MITK_CTEST_SCRIPT_MODE:STRING=${SCRIPT_MODE}
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
 QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 WITH_COVERAGE:BOOL=${WITH_COVERAGE}

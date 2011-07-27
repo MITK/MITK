@@ -427,22 +427,26 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
- QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
- imageNavigatorAction->setCheckable(true);
-
- // add part listener for image navigator
- imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
- window->GetPartService()->AddPartListener(imageNavigatorPartListener);
- berry::IViewPart::Pointer imageNavigatorView =
- window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
- imageNavigatorAction->setChecked(false);
- if (imageNavigatorView)
+ bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+ if (imageNavigatorViewFound)
  {
-   bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
-   if (isImageNavigatorVisible)
-   imageNavigatorAction->setChecked(true);
+   QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
+   imageNavigatorAction->setCheckable(true);
+
+   // add part listener for image navigator
+   imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
+   window->GetPartService()->AddPartListener(imageNavigatorPartListener);
+   berry::IViewPart::Pointer imageNavigatorView =
+       window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+   imageNavigatorAction->setChecked(false);
+   if (imageNavigatorView)
+   {
+     bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
+     if (isImageNavigatorVisible)
+       imageNavigatorAction->setChecked(true);
+   }
+   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
  }
- imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 
  // toolbar for showing file open, undo, redo and other main actions
  QToolBar* mainActionsToolBar = new QToolBar;
@@ -458,7 +462,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
- mainActionsToolBar->addAction(imageNavigatorAction);
+ if (imageNavigatorViewFound)
+ {
+   mainActionsToolBar->addAction(imageNavigatorAction);
+ }
  mainWindow->addToolBar(mainActionsToolBar);
   
 #ifdef __APPLE__
@@ -525,12 +532,34 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
  std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
 
+ skip = false;
  for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
  {
+
+   // if viewExcludeList is set, it contains the id-strings of view, which
+   // should not appear as an menu-entry in the menu
+   if (viewExcludeList.size() > 0)
+   {
+     for (unsigned int i=0; i<viewExcludeList.size(); i++)
+     {
+       if (viewExcludeList.at(i) == (*iter)->GetId())
+       {
+         skip = true;
+         break;
+       }
+     }
+     if (skip)
+     {
+       skip = false;
+       continue;
+     }
+   }
+
   if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
    continue;
   if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
    continue;
+
   std::pair<std::string, berry::IViewDescriptor::Pointer> p(
    (*iter)->GetLabel(), (*iter));
   VDMap.insert(p);
@@ -943,12 +972,22 @@ void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*sou
 
 void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(std::vector<std::string> v)
 {
-  this->perspectiveExcludeList = v;    
+  this->perspectiveExcludeList = v;
 }
 
 std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
 {
   return this->perspectiveExcludeList;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::SetViewExcludeList(std::vector<std::string> v)
+{
+  this->viewExcludeList = v;
+}
+
+std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetViewExcludeList()
+{
+  return this->viewExcludeList;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()

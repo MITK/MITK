@@ -15,8 +15,8 @@ MACRO(MITK_INSTALL_TARGETS)
   ENDIF()
   
   SET(DIRS 
-    ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
-    ${ITK_LIBRARY_DIRS}/${intermediate_dir}
+    ${MITK_VTK_LIBRARY_DIRS}/${intermediate_dir}
+    ${MITK_ITK_LIBRARY_DIRS}/${intermediate_dir}
     ${QT_LIBRARY_DIR} 
     ${QT_LIBRARY_DIR}/../bin
     ${MITK_BINARY_DIR}/bin/${intermediate_dir}

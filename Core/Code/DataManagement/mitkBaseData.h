@@ -207,7 +207,7 @@ public:
   //## \warning Returns IsInitialized()==false by default for 
   //## compatibility reasons. Override in sub-classes that
   //## support distinction between empty/non-empty state.
-  virtual bool IsEmpty(unsigned int t) const;
+  virtual bool IsEmptyTimeStep(unsigned int t) const;
 
   //##Documentation
   //## @brief Check whether object contains data (at
@@ -244,14 +244,6 @@ public:
   //## during initialization.
   //## \sa SetClonedGeometry
   virtual void SetGeometry(Geometry3D* aGeometry3D);
-
-  //##Documentation
-  //## @brief Set the Geometry3D of a given time step, which will be referenced (not copied!). 
-  //## 
-  //## @warning This method will normally be called internally by the sub-class of BaseData 
-  //## during initialization.
-  //## \sa SetClonedGeometry
-  virtual void SetGeometry(Geometry3D* aGeometry3D, unsigned int time);
 
   //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of the data. 

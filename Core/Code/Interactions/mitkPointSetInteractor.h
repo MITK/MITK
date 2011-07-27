@@ -54,8 +54,8 @@ namespace mitk
      */
     void Clear( unsigned int timeStep = 0, ScalarType timeInMS = 0.0 );
 
-    /** \brief Sets the amount of precision */
-    void SetPrecision( unsigned int precision );
+    itkGetMacro( Precision, unsigned int );
+    itkSetMacro( Precision, unsigned int );
 
     /**
      * \brief calculates how good the data, this statemachine handles, is hit
@@ -109,6 +109,8 @@ namespace mitk
     /** \brief summ-vector for Movement */
     Vector3D m_SumVec;
 
+    /** \brief to store the value of precision to pick a point */
+    unsigned int m_Precision;
   private:
 
     /**
@@ -117,9 +119,6 @@ namespace mitk
      * if -1, then no limit set
      */
     int m_N;
-
-    /** \brief to store the value of precision to pick a point */
-    unsigned int m_Precision;
 
     /**
     * @brief Init the StatateMachine according to the current number of points in case of a loaded pointset. 

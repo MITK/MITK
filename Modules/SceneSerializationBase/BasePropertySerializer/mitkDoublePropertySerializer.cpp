@@ -45,6 +45,21 @@ class SceneSerializationBase_EXPORT DoublePropertySerializer : public BaseProper
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      double d;
+      if ( element->QueryDoubleAttribute( "value", &d ) == TIXML_SUCCESS )
+      {
+        return DoubleProperty::New(d).GetPointer();
+      }
+      else
+      {
+        return NULL;
+      }
+    }
+
   protected:
 
     DoublePropertySerializer() {}

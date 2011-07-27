@@ -225,7 +225,7 @@ public:
    */
   int SearchPoint( Point3D point, float distance, int t = 0 ) const;
 
-  virtual bool IsEmpty(unsigned int t) const;
+  virtual bool IsEmptyTimeStep(unsigned int t) const;
 
   //virtual methods, that need to be implemented
   virtual void UpdateOutputInformation();

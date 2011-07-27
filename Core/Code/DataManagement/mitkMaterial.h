@@ -338,7 +338,7 @@ public:
     /**
      * Dumps the properties to the out stream out
      */
-    void PrintSelf ( std::ostream &os ) const;
+    void PrintSelf ( std::ostream &os, itk::Indent ) const;
 
     /**
      * Sets an optional name which may be associated with the material property

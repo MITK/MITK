@@ -38,6 +38,8 @@ namespace mitk {
 
     virtual bool operator==(const BaseProperty& property) const;
 
+    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
     virtual ~WeakPointerProperty();
 
     itk::Object::Pointer GetWeakPointer() const;

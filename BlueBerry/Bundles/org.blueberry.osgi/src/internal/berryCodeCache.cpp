@@ -34,7 +34,7 @@ CodeCache::CodeCache(const std::string& path) : m_CachePath(path)
   BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Creating CodeCache with path: " << path << std::endl;
   if (!m_CachePath.exists())
   {
-    m_CachePath.createDirectory();
+    m_CachePath.createDirectories();
   }
 
 }
@@ -47,12 +47,15 @@ CodeCache::~CodeCache()
 void
 CodeCache::Clear()
 {
-  BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Clearing code cache\n";
-  std::vector<Poco::File> files;
-  m_CachePath.list(files);
-  for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
+  if (m_CachePath.exists())
   {
-    iter->remove(true);
+    BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Clearing code cache\n";
+    std::vector<Poco::File> files;
+    m_CachePath.list(files);
+    for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
+    {
+      iter->remove(true);
+    }
   }
 }
 

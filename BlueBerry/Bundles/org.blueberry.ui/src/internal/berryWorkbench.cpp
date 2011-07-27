@@ -17,11 +17,11 @@
 
 #include "berryLog.h"
 
+#include "../tweaklets/berryWorkbenchTweaklet.h"
+
 #include "berryWorkbench.h"
 
 #include <berrySafeRunner.h>
-
-#include "../tweaklets/berryWorkbenchTweaklet.h"
 
 #include "berrySaveablesList.h"
 #include "berryViewRegistry.h"

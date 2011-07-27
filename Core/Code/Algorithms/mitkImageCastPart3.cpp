@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 
+#include <itkVector.h>
+#include <itkDiffusionTensor3D.h>
+
 namespace mitk 
 {
 #ifndef DOXYGEN_SKIP

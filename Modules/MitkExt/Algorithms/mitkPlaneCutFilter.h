@@ -52,8 +52,8 @@ public:
   itkSetMacro(BackgroundLevel, float);
   itkGetMacro(BackgroundLevel, float);
 
-  itkSetMacro(FillMode, FillMode);
-  itkGetMacro(FillMode, FillMode);
+  itkSetEnumMacro(FillMode, FillMode);
+  itkGetEnumMacro(FillMode, FillMode);
 
   itkSetObjectMacro(Plane, const PlaneGeometry);
   itkGetObjectMacro(Plane, const PlaneGeometry);

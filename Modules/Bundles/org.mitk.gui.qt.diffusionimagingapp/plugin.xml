@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  <extension point="org.blueberry.osgi.applications">
+    <application id="org.mitk.qt.diffusionimagingapp">
+      <run class="QmitkDiffusionImagingAppApplication"/>
+    </application>
+  </extension>
+  
+  <extension point="org.blueberry.ui.intro">
+    <intro id="org.mitk.qt.diffusionimagingappintro"
+      class="QmitkDiffusionImagingAppIntroPart"
+      role="editor"/>
+    <introProductBinding
+      productId=""
+      introId="org.mitk.qt.diffusionimagingappintro"/>
+  </extension>
+  
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" name="Diffusion Imaging" class="QmitkDiffusionImagingAppPerspective" icon="resources/diffusionimaging.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome" name="Welcome" class="QmitkWelcomePerspective" icon="resources/icon_home.png"/>
+  </extension>
+  
+</plugin>
+

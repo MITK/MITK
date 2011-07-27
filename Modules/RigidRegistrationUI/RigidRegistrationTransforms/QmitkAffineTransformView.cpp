@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkAffineTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkAffineTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

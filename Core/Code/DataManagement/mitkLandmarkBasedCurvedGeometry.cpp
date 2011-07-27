@@ -24,13 +24,13 @@ mitk::LandmarkBasedCurvedGeometry::LandmarkBasedCurvedGeometry()
 {
 }
 
+mitk::LandmarkBasedCurvedGeometry::LandmarkBasedCurvedGeometry(const LandmarkBasedCurvedGeometry& other)
+  : Superclass(other)
+{
+  SetTargetLandmarks(other.m_TargetLandmarks);
+}
+
 mitk::LandmarkBasedCurvedGeometry::~LandmarkBasedCurvedGeometry()
 {
 
-}
-
-void mitk::LandmarkBasedCurvedGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-  newGeometry->SetTargetLandmarks(m_TargetLandmarks);
 }

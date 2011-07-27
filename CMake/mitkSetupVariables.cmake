@@ -73,6 +73,10 @@ set(MITK_LIBRARIES
     ipSegmentation
     ann 
    )
+   
+# variables used in CMake macros which are called from external projects
+set(MITK_VTK_LIBRARY_DIRS ${VTK_LIBRARY_DIRS})
+set(MITK_ITK_LIBRARY_DIRS ${ITK_LIBRARY_DIRS})
 
 # variables containing link directories
 set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})                                                                                                              
@@ -101,4 +105,42 @@ if(MITK_BUILD_ALL_PLUGINS)
   set(MITK_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
 endif()
 
+# create a list of types for template instantiations of itk image access functions
+function(_create_type_seq TYPES seq_var seqdim_var)
+  set(_seq )
+  set(_seq_dim )
+  string(REPLACE "," ";" _pixeltypes "${TYPES}")
+  foreach(_pixeltype ${_pixeltypes})
+    set(_seq "${_seq}(${_pixeltype})")
+    set(_seq_dim "${_seq_dim}((${_pixeltype},dim))")
+  endforeach()
+  set(${seq_var} "${_seq}" PARENT_SCOPE)
+  set(${seqdim_var} "${_seq_dim}" PARENT_SCOPE)
+endfunction()
+
+set(MITK_ACCESSBYITK_PIXEL_TYPES )
+set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ )
+set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ )
+foreach(_type INTEGRAL FLOATING COMPOSITE)
+  set(_typelist "${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES}")
+  if(_typelist)
+    if(MITK_ACCESSBYITK_PIXEL_TYPES)
+      set(MITK_ACCESSBYITK_PIXEL_TYPES "${MITK_ACCESSBYITK_PIXEL_TYPES},${_typelist}")
+    else()
+      set(MITK_ACCESSBYITK_PIXEL_TYPES "${_typelist}")
+    endif()
+  endif()
+
+  _create_type_seq("${_typelist}"
+                   MITK_ACCESSBYITK_${_type}_PIXEL_TYPES_SEQ
+                   MITK_ACCESSBYITK_${_type}_TYPES_DIMN_SEQ)
+  set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ "${MITK_ACCESSBYITK_PIXEL_TYPES_SEQ}${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES_SEQ}")
+  set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ "${MITK_ACCESSBYITK_TYPES_DIMN_SEQ}${MITK_ACCESSBYITK_${_type}_TYPES_DIMN_SEQ}")
+endforeach()
+
+set(MITK_ACCESSBYITK_DIMENSIONS_SEQ )
+string(REPLACE "," ";" _dimensions "${MITK_ACCESSBYITK_DIMENSIONS}")
+foreach(_dimension ${_dimensions})
+  set(MITK_ACCESSBYITK_DIMENSIONS_SEQ "${MITK_ACCESSBYITK_DIMENSIONS_SEQ}(${_dimension})")
+endforeach()
 

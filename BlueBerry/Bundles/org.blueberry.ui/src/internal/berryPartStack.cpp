@@ -865,7 +865,7 @@ void PartStack::Reparent(void* newParent)
 {
 
   void* control = this->GetControl();
-  GuiWidgetsTweaklet::Pointer tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (tweaklet->GetParent(control) == newParent)
       || !tweaklet->IsReparentable(control))
   {
@@ -1241,7 +1241,7 @@ void PartStack::RefreshPresentationSelection()
     if (presentationCurrent != 0 && presentation != 0)
     {
       requestedCurrent->CreateControl(this->GetParent());
-      GuiWidgetsTweaklet::Pointer tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+      GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
       if (tweaklet->GetParent(requestedCurrent->GetControl()) !=
           tweaklet->GetParent(this->GetControl()))
       {

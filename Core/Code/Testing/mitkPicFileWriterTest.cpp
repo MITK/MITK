@@ -54,7 +54,7 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
     std::cout << "Testing handling of NULL image " << std::flush;
     MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
 
-    myPicFileWriter->SetInput(image);
+    myPicFileWriter->SetInputImage(image);
     myPicFileWriter->SetFileName("/usr/bin");
     myPicFileWriter->Update(); 
     MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
@@ -96,7 +96,7 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
     // test for exception handling
     MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
 
-    myPicFileWriter->SetInput(image);
+    myPicFileWriter->SetInputImage(image);
     myPicFileWriter->SetFileName("/usr/bin");
     myPicFileWriter->Update(); 
     MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)

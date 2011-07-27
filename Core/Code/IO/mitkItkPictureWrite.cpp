@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkItkPictureWrite.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkInstantiateAccessFunctions.h>
 
 #include <itkNumericSeriesFileNames.h>
 #include <itkImageSeriesWriter.h>
@@ -54,7 +54,10 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   writer->Update();
 }
 
-InstantiateAccessFunction_1(_mitkItkPictureWrite, const std::string&);
+#define InstantiateAccessFunction__mitkItkPictureWrite(pixelType, dim) \
+  template MITK_CORE_EXPORT void _mitkItkPictureWrite(itk::Image<pixelType,dim>*, const std::string&);
+
+InstantiateAccessFunction(_mitkItkPictureWrite)
 
 // typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)

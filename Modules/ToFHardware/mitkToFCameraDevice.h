@@ -180,6 +180,15 @@ namespace mitk
 
     ~ToFCameraDevice();
 
+    /*!
+    \brief method for allocating memory for pixel arrays m_IntensityArray, m_DistanceArray and m_AmplitudeArray
+    */
+    virtual void AllocatePixelArrays();
+    /*!
+    \brief method for cleanup memory allocated for pixel arrays m_IntensityArray, m_DistanceArray and m_AmplitudeArray
+    */
+    virtual void CleanupPixelArrays();
+
     float* m_IntensityArray; ///< float array holding the intensity image
     float* m_DistanceArray; ///< float array holding the distance image
     float* m_AmplitudeArray; ///< float array holding the amplitude image

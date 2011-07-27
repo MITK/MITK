@@ -632,10 +632,8 @@ bool
 PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
 {
   Vector3D planeNormal = this->GetNormal();
-  planeNormal.Normalize();
 
   Vector3D lineDirection = line.GetDirection();
-  lineDirection.Normalize();
 
   t = planeNormal * lineDirection;
 
@@ -691,12 +689,10 @@ PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 AffineGeometryFrame3D::Pointer
 PlaneGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new PlaneGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
-
 
 void 
 PlaneGeometry::ExecuteOperation( Operation *operation )
@@ -746,13 +742,6 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
   this->Modified();
   transform->Delete();
 }
-
-
-void PlaneGeometry::InitializeGeometry( Self *newGeometry ) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-}
-
 
 void PlaneGeometry::PrintSelf( std::ostream& os, itk::Indent indent ) const
 {

@@ -5,7 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.toftutorial"
           name="ToFTutorial"
-          class="::QmitkToFTutorialView" 
+          class="QmitkToFTutorialView" 
           icon="resources/icon.xpm" />
   </extension>
 

@@ -3,8 +3,8 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  mitkPluginActivator.cpp
   QmitkVolumeVisualizationView.cpp
-
 )
 
 SET(UI_FILES
@@ -12,19 +12,21 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
   src/internal/QmitkVolumeVisualizationView.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
   resources/icon.xpm
 )
 
-SET(RES_FILES
-  resources/QmitkVolumeVisualizationView.qrc
+SET(QRC_FILES
+
 )
 
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

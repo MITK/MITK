@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryImageDescriptor.h"
 
 #include <Poco/String.h>
+#include <QDebug>
 
 namespace berry
 {
@@ -320,7 +321,7 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
 bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
 {
   QFileInfo fileInfo = bundleContext->getDataFile("");
-  path.assign(fileInfo.absolutePath().toStdString());
+  path.assign(fileInfo.absolutePath().toStdString() + '/');
   return fileInfo.isWritable();
 }
 

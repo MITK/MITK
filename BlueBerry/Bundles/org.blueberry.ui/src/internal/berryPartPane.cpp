@@ -17,15 +17,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPartPane.h"
 
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "../tweaklets/berryWorkbenchPageTweaklet.h"
+
 #include "berryWorkbenchPage.h"
 #include "berryPartStack.h"
 #include "berryEditorAreaHelper.h"
 #include "berryPerspective.h"
 #include "berryPartStack.h"
 #include "berryDragUtil.h"
-
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
 
 namespace berry
 {
@@ -230,7 +230,7 @@ void PartPane::Reparent(void* newParent)
 {
   void* control = this->GetControl();
 
-  GuiWidgetsTweaklet::Pointer guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;

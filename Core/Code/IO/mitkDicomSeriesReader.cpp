@@ -509,7 +509,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 }
   
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer& /*restrictions*/)
 {
   /**
     assumption about this method:
@@ -926,23 +926,69 @@ std::string DicomSeriesReader::GetConfigurationString()
 
   return configuration.str();
 }
+
+void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, Image *image)
+{
+  std::list<StringContainer> imageBlock;
+  imageBlock.push_back(filenames);
+  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, image);
+}
   
-void DicomSeriesReader::CopyMetaDataToImageProperties( const StringContainer& files, DcmIoType* io, Image* image )
+void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, Image* image)
 {
   if (!io || !image) return;
 
   StringLookupTable filesForSlices;
+  StringLookupTable sliceLocationForSlices;
+  StringLookupTable instanceNumberForSlices;
+  StringLookupTable SOPInstanceNumberForSlices;
 
-  unsigned int slice(0);
-  for ( StringContainer::const_iterator fIter = files.begin();
-        fIter != files.end();
-        ++fIter, ++slice )
+  gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
+
+  //DICOM tags which should be added to the image properties
+  const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
+
+  const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
+
+  const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
+  unsigned int timeStep(0);
+
+  std::string propertyKeySliceLocation = "dicom.image.0020.1041";
+  std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
+  std::string propertyKeySOPInstanceNumber = "dicom.image.0008.0018";
+
+  for ( std::list<StringContainer>::iterator i = imageBlock.begin(); i != imageBlock.end(); i++, timeStep++ )
   {
-    filesForSlices.SetTableValue( slice, *fIter );
+
+    const StringContainer& files = (*i);
+    unsigned int slice(0);
+    for ( StringContainer::const_iterator fIter = files.begin();
+          fIter != files.end();
+          ++fIter, ++slice )
+    {
+      filesForSlices.SetTableValue( slice, *fIter );
+      gdcm::Scanner::TagToValue tagValueMapForFile = tagValueMappings[fIter->c_str()];
+      if(tagValueMapForFile.find(tagSliceLocation) != tagValueMapForFile.end())
+        sliceLocationForSlices.SetTableValue(slice, tagValueMapForFile[tagSliceLocation]);
+      if(tagValueMapForFile.find(tagInstanceNumber) != tagValueMapForFile.end())
+        instanceNumberForSlices.SetTableValue(slice, tagValueMapForFile[tagInstanceNumber]);
+      if(tagValueMapForFile.find(tagSOPInstanceNumber) != tagValueMapForFile.end())
+        SOPInstanceNumberForSlices.SetTableValue(slice, tagValueMapForFile[tagSOPInstanceNumber]);
+    }
+
+    image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );
+
+    //If more than one time step add postfix ".t" + timestep
+    if(timeStep != 0)
+    {
+      propertyKeySliceLocation.append(".t" + timeStep);
+      propertyKeyInstanceNumber.append(".t" + timeStep);
+      propertyKeySOPInstanceNumber.append(".t" + timeStep);
+    }
+    image->SetProperty( propertyKeySliceLocation.c_str(), StringLookupTableProperty::New( sliceLocationForSlices ) );
+    image->SetProperty( propertyKeyInstanceNumber.c_str(), StringLookupTableProperty::New( instanceNumberForSlices ) );
+    image->SetProperty( propertyKeySOPInstanceNumber.c_str(), StringLookupTableProperty::New( SOPInstanceNumberForSlices ) );
   }
-
-  image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );
-
   /*
      TODO
 
@@ -951,14 +997,6 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( const StringContainer& fi
 
      Keys should follow the format "dicom.patient.gggg.eeee", 
      values the raw strings from ITK initially, no type specific handling.
-
-     Image level attributes will cause an additional run of the files
-     through gdcm::Scanner probably. Tags of interest would be:
-
-     (0020,1041) Slice Location (for verification of loading)
-     (0020,0013) Instance Number (for display and visual reference against PACS for users)
-     (0008,0018) SOP Instance UID (for real reference to PACS in applications)
-
   */
 }
 

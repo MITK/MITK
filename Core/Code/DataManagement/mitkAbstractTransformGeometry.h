@@ -145,10 +145,10 @@ public:
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
   AbstractTransformGeometry();
+  AbstractTransformGeometry(const AbstractTransformGeometry& other);
+
   virtual ~AbstractTransformGeometry();
-  
-  void InitializeGeometry(Self * newGeometry) const;
-  
+    
   //##Documentation
   //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   //##

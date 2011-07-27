@@ -107,7 +107,7 @@ public:
   //## @brief Completely initialize this instance as evenly-timed with
   //## \a timeSteps geometries of type Geometry3D, each initialized by
   //## Geometry3D::Initialize().
-  virtual void Initialize(unsigned int timeSteps);
+  virtual void InitializeEvenlyTimed(unsigned int timeSteps);
 
   //##Documentation
   //## @brief Completely initialize this instance as evenly-timed with
@@ -153,10 +153,9 @@ public:
   virtual void ExecuteOperation(Operation* operation);
 protected:
   TimeSlicedGeometry();
+  TimeSlicedGeometry(const TimeSlicedGeometry& other);
 
   virtual ~TimeSlicedGeometry();
-
-  void InitializeGeometry(Self * newGeometry) const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

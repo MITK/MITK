@@ -22,7 +22,7 @@ mitk::ContourSet::ContourSet() :
   m_ContourVector( ContourVectorType() ),
   m_NumberOfContours (0)
 {
-  GetTimeSlicedGeometry()->Initialize(1);
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
 }
 
 mitk::ContourSet::~ContourSet()
@@ -107,7 +107,7 @@ void mitk::ContourSet::SetRequestedRegion(itk::DataObject*)
 void mitk::ContourSet::Initialize()
 {
   m_ContourVector = ContourVectorType();
-  GetTimeSlicedGeometry()->Initialize(1);
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
 }
 
 

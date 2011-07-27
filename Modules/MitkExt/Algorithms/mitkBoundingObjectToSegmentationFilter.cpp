@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBoundingObjectToSegmentationFilter.h"
 #include "mitkImageCast.h"
 
+#include <itkImageRegionIteratorWithIndex.h>
+
 mitk::BoundingObjectToSegmentationFilter::BoundingObjectToSegmentationFilter()
 {
   this->SetNumberOfRequiredInputs(1);

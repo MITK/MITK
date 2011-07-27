@@ -42,7 +42,7 @@ endforeach(file ${INTERNAL_CPP_FILES})
 
 IF (BLUEBERRY_USE_QT_HELP)
   SET(_plugin_qhcp_input "${CMAKE_CURRENT_SOURCE_DIR}/documentation/MitkExtQtHelpCollectionProject.qhcp")
-  SET(_plugin_qhcp_output "${CMAKE_CURRENT_BINARY_DIR}/MitkExtQtHelpCollection_${MITK_WC_REVISION_HASH}.qhc")
+  SET(_plugin_qhcp_output "${CMAKE_CURRENT_BINARY_DIR}/MitkExtQtHelpCollection_${MITK_REVISION_ID}.qhc")
   ADD_CUSTOM_COMMAND(OUTPUT ${_plugin_qhcp_output}
                      COMMAND ${QT_COLLECTIONGENERATOR_EXECUTABLE} ${_plugin_qhcp_input} -o ${_plugin_qhcp_output}
                      DEPENDS ${_plugin_qhcp_input}

@@ -49,10 +49,18 @@ void QmitkExtFileSaveProjectAction::Run()
 {
   try
   {
-    QString fileName = QFileDialog::getSaveFileName(NULL, "Save MITK scene", QString::null, "MITK scene files (*.mitk)", NULL );
+    /**
+    * @brief stores the last path of last opened file
+    */
+    static QString m_LastPath;
 
+    QString fileName = QFileDialog::getSaveFileName(NULL, "Save MITK scene", m_LastPath, "MITK scene files (*.mitk)", NULL );
+    
     if (fileName.isEmpty() ) 
       return;
+
+    m_LastPath = fileName;
+       
 
     if ( fileName.right(5) != ".mitk" ) 
       fileName += ".mitk";
@@ -126,7 +134,7 @@ void QmitkExtFileSaveProjectAction::Run()
         iter != propmap->end();
         ++iter )
       {
-        ss << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
+        ss << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
       }
 
       MITK_WARN << ss.str();

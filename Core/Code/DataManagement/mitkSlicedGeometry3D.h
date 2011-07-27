@@ -185,7 +185,7 @@ public:
    * \warning Bounding box and the 2D-geometries must be set additionally: use
    * SetBounds(), SetGeometry().
    */
-  virtual void Initialize( unsigned int slices );
+  virtual void InitializeSlicedGeometry( unsigned int slices );
 
   /**
    * \brief Completely initialize this instance as evenly-spaced with slices
@@ -241,6 +241,8 @@ public:
 protected:
   SlicedGeometry3D();
 
+  SlicedGeometry3D(const SlicedGeometry3D& other);
+
   virtual ~SlicedGeometry3D();
 
   
@@ -262,9 +264,6 @@ protected:
 
 
   ScalarType GetLargestExtent( const Geometry3D *geometry );
-
-
-  virtual void InitializeGeometry(Self * newGeometry) const;
 
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

@@ -163,7 +163,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
     for(mitk::PropertyList::PropertyMap::const_iterator it=SrcPL->GetMap()->begin(); it!=SrcPL->GetMap()->end(); it++)
     {
       std::string name=it->first;
-      mitk::BaseProperty *p=it->second.first;
+      mitk::BaseProperty *p=it->second;
 
       // MITK_INFO << "property '" << name << "' found";
       

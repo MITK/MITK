@@ -96,7 +96,7 @@ protected:
 
   virtual ~VolumeDataVtkMapper3D();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 
   void CreateDefaultTransferFunctions();
 

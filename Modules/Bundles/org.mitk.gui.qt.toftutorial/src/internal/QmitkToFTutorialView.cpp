@@ -126,7 +126,7 @@ void QmitkToFTutorialView::OnStep1()
     this->GetDefaultDataStorage()->Add(intensityNode);
     // stop camera (terminate internally used thread)
     tofImageGrabber->StopCamera();
-    // disconnect from camera
+    //// disconnect from camera
     tofImageGrabber->DisconnectCamera();
     // adjust views to new data in DataStorage
     mitk::RenderingManager::GetInstance()->InitializeViews(distanceImage->GetGeometry());
@@ -149,12 +149,19 @@ void QmitkToFTutorialView::OnStep2()
     {
       // create object of CameraIntrinsics that holds intrinsic parameters of the ToF camera
       mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      // change focal length and use defaults for other parameters such as inter pixel distance or principal point
-      cameraIntrinsics->SetFocalLength(13.3,13.3);
+      // set focal length in pixel
+      cameraIntrinsics->SetFocalLength(295.8,296.1);
+      // set principal point in pixel
+      cameraIntrinsics->SetPrincipalPoint(113.2,97.1);
       // set up filter for surface calculation
       mitk::ToFDistanceImageToSurfaceFilter::Pointer surfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
       // apply intrinsic parameters to filter
       surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
+      // set distance between pixels on chip in mm (in this example squared pixel)
+      mitk::ToFProcessingCommon::ToFPoint2D interPixelDistance;
+      interPixelDistance[0] = 0.045;
+      interPixelDistance[1] = 0.045;
+      surfaceFilter->SetInterPixelDistance(interPixelDistance);
       // set distance image as input
       surfaceFilter->SetInput(distanceImage);
       // update the filter

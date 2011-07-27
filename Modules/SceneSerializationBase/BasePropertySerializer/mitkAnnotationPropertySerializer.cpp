@@ -49,6 +49,20 @@ class SceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePr
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* label( element->Attribute("label") );
+      Point3D p;
+      if ( element->QueryFloatAttribute( "x", &p[0] ) != TIXML_SUCCESS ) 
+        return NULL;
+      if ( element->QueryFloatAttribute( "y", &p[1] ) != TIXML_SUCCESS ) 
+        return NULL;
+      if ( element->QueryFloatAttribute( "z", &p[2] ) != TIXML_SUCCESS ) 
+        return NULL;
+      return AnnotationProperty::New(label, p).GetPointer();
+    }
+
   protected:
 
     AnnotationPropertySerializer() {}

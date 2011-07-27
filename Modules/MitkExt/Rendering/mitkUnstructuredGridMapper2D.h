@@ -68,7 +68,7 @@ protected:
     virtual ~UnstructuredGridMapper2D();
 
     virtual void GenerateData();
-    virtual void GenerateData(BaseRenderer*);
+    virtual void GenerateDataForRenderer(BaseRenderer*);
     
     /**
      * Determines, if the associated BaseData is mapped three-dimensionally (mapper-slot id 2)

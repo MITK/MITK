@@ -66,11 +66,13 @@ namespace mitk
     ImageToOpenCVImageFilter(); // purposely hidden
     virtual ~ImageToOpenCVImageFilter();
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image, int depth );
+    int GetDepth(const std::type_info& typeInfo) const;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image, int depth );
+    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkImageProcessing( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image );
 
   protected:
     ///
@@ -81,7 +83,7 @@ namespace mitk
 };
 
   template<typename TPixel, unsigned int VImageDimension>
-  void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image, int depth )
+  void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
   {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
 
@@ -93,13 +95,13 @@ namespace mitk
     typename ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
     // create new opencv image
     m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] )
-      , depth, 1 );
+      , GetDepth(typeid(TPixel)), 1 );
 
     memcpy( m_OpenCVImage->imageData, itkBuffer, numberOfBytes );
   }
 
   template<typename TPixel, unsigned int VImageDimension>
-  void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image, int depth )
+  void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
   {
     typedef itk::RGBPixel<TPixel> RGBPixelType;
     typedef itk::Image<RGBPixelType, VImageDimension> RGBImageType;
@@ -109,7 +111,7 @@ namespace mitk
 
     typename RGBImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
     // create new opencv image
-    m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] ), depth, 3 );
+    m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] ), GetDepth(typeid(RGBPixelType)), 3 );
 
     unsigned int x = 0,y = 0;
     CvScalar s;

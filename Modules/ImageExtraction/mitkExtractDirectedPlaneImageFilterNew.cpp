@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "itkImageRegionIterator.h"
 
+#include <mitkImageAccessByItk.h>
+
 mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
 :m_CurrentWorldGeometry2D(NULL)
 {

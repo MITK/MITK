@@ -49,6 +49,19 @@ class SceneSerializationBase_EXPORT Point4dPropertySerializer : public BasePrope
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      Point4D v;
+      if ( element->QueryFloatAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "t", &v[3] ) != TIXML_SUCCESS ) return NULL;
+
+     return Point4dProperty::New( v ).GetPointer();
+    }
+
   protected:
 
     Point4dPropertySerializer() {}

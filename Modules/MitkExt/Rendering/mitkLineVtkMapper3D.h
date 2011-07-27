@@ -63,7 +63,7 @@ class MitkExt_EXPORT LineVtkMapper3D : public PointSetVtkMapper3D
     LineVtkMapper3D();
     virtual ~LineVtkMapper3D();
 
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 };
 
 } // namespace mitk

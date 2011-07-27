@@ -152,12 +152,12 @@ namespace mitk {
       m_OdfMapper->GenerateData();
     }
 
-    virtual void GenerateData(mitk::BaseRenderer* renderer)
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer)
     {
-      m_ImgMapper->GenerateData(renderer);
+      m_ImgMapper->GenerateDataForRenderer(renderer);
       if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
       {
-        m_OdfMapper->GenerateData(renderer);
+        m_OdfMapper->GenerateDataForRenderer(renderer);
       }
     }
 

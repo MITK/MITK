@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCenteredRigid2DTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkCenteredRigid2DTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

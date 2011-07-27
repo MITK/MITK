@@ -11,9 +11,9 @@ function(FunctionCreateProvisioningFile)
   endif()
   
   foreach(incl ${_PROV_INCLUDE})
-    string(REPLACE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "@EXECUTABLE_DIR" incl_install ${incl})
+    get_filename_component(incl_filename "${incl}" NAME)
     set(out_var "${out_var}READ ${file_url}${incl}\n")
-    set(out_var_install "${out_var_install}READ ${file_url}${incl_install}\n")
+    set(out_var_install "${out_var_install}READ ${file_url}@EXECUTABLE_DIR/${incl_filename}\n")
   endforeach()
   
   if(_PROV_INCLUDE)

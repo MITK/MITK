@@ -44,6 +44,17 @@ class SceneSerializationBase_EXPORT Point3iPropertySerializer : public BasePrope
       }
       else return NULL;
     }
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      Point3I v;
+      if ( element->QueryIntAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryIntAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryIntAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+     return Point3iProperty::New( v ).GetPointer();
+    }
   protected:
     Point3iPropertySerializer() {}
     virtual ~Point3iPropertySerializer() {}

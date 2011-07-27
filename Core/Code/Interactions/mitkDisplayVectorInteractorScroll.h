@@ -49,6 +49,13 @@ namespace mitk {
     **/
     virtual void ExecuteOperation(Operation* operation);
 
+    /**
+    * \brief Defines how many slices are scrolled per pixel that the mouse cursor has moved
+    */
+    void SetIndexToSliceModifier( int modifier );
+
+    void SetAutoRepeat( bool autoRepeat );
+
   protected:
     /**
     * @brief Default Constructor
@@ -64,7 +71,6 @@ namespace mitk {
     * @brief Method derived from StateMachine to implement the own actions
     **/
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
-
   private:
     BaseRenderer::Pointer m_Sender;
 
@@ -73,6 +79,25 @@ namespace mitk {
     mitk::Point2D m_CurrentDisplayCoordinate;
 
     OperationActor* m_Destination;
+
+    /**
+    * \brief Modifier that defines how many slices are scrolled per pixel that the mouse has moved
+    *
+    * This modifier defines how many slices the scene is scrolled per pixel that the mouse cursor has moved. 
+    * By default the modifier is 4. This means that when the user moves the cursor by 4 pixels in Y-direction 
+    * the scene is scrolled by one slice. If the user has moved the the cursor by 20 pixels, the scene is 
+    * scrolled by 5 slices.
+    *
+    * If the cursor has moved less than m_IndexToSliceModifier pixels the scene is scrolled by one slice.
+    */
+    int m_IndexToSliceModifier;
+
+    /**
+    * \brief Defines if it is possible to scroll endlessly
+    *
+    * If AutoRepeat is on, scrolling further than the last slice will restart at the first slice and vice versa
+    */
+    bool m_AutoRepeat;
   };
 
 } // namespace mitk

@@ -44,6 +44,13 @@ class SceneSerializationBase_EXPORT GroupTagPropertySerializer : public BaseProp
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement*)
+    {
+      //if (!element) 
+      //  return NULL;
+      return GroupTagProperty::New().GetPointer();
+    }
+
   protected:
 
     GroupTagPropertySerializer() {}

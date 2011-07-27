@@ -1084,7 +1084,7 @@ bool mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
-::GenerateData( mitk::BaseRenderer *renderer )
+::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   if(!m_VtkImage)
   {

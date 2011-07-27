@@ -43,7 +43,7 @@ static void TestGetSizeIsZero(mitk::PointSet *pointSet)
 
 static void TestIsEmpty(mitk::PointSet *pointSet) 
 {
-  MITK_TEST_CONDITION(pointSet->IsEmpty(0), "check if the PointSet is empty" )
+  MITK_TEST_CONDITION(pointSet->IsEmptyTimeStep(0), "check if the PointSet is empty" )
 }
 
 static void TestCreateOperationAndAddPoint(mitk::PointSet *pointSet) 
@@ -89,7 +89,7 @@ static void TestAddSecondPoint(mitk::PointSet *pointSet)
 static void TestIsNotEmpty(mitk::PointSet *pointSet)
 {
   //PointSet can not be empty!
-  MITK_TEST_CONDITION( !pointSet->IsEmpty(0), "check if the PointSet is not empty " )
+  MITK_TEST_CONDITION( !pointSet->IsEmptyTimeStep(0), "check if the PointSet is not empty " )
 
     /* 
     std::cout << "check if the PointSet is not empty ";

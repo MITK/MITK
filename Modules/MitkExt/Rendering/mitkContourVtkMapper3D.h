@@ -53,7 +53,7 @@ protected:
   ContourVtkMapper3D();
   virtual ~ContourVtkMapper3D();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 
   vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
   vtkSmartPointer<vtkTubeFilter>     m_TubeFilter;

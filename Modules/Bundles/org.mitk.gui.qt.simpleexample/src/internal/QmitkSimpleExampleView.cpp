@@ -50,6 +50,12 @@ QmitkSimpleExampleView::QmitkSimpleExampleView()
 {
 }
 
+QmitkSimpleExampleView::QmitkSimpleExampleView(const QmitkSimpleExampleView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkSimpleExampleView::~QmitkSimpleExampleView()
 {
 }

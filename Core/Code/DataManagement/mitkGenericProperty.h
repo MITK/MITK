@@ -139,6 +139,7 @@ public:                                                   \
   itkNewMacro(PropertyName);                              \
   mitkNewMacro1Param(PropertyName, Type);                 \
   virtual ~PropertyName() {}                              \
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 protected:                                                \
   PropertyName() { m_Value = DefaultValue; }              \
   PropertyName(Type x) : GenericProperty<Type>(x) {}      \

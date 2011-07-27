@@ -82,7 +82,7 @@ void mitk::PlanarFigureWriter::GenerateData()
     for ( it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); ++it )
     {
       // Create seralizer for this property
-      const mitk::BaseProperty* prop = it->second.first;
+      const mitk::BaseProperty* prop = it->second;
       std::string serializerName = std::string( prop->GetNameOfClass() ) + "Serializer";
       std::list< itk::LightObject::Pointer > allSerializers = itk::ObjectFactoryBase::CreateAllInstance(
         serializerName.c_str() );
@@ -186,9 +186,9 @@ void mitk::PlanarFigureWriter::GenerateData()
     document.Accept(&printer);
 
     // Create memory buffer and print tinyxmldocument there...
-    m_MemoryBufferSize  = printer.Size();
+    m_MemoryBufferSize  = printer.Size() + 1;
     m_MemoryBuffer      = new char[m_MemoryBufferSize];
-    memcpy(m_MemoryBuffer,printer.CStr(),m_MemoryBufferSize);
+    strcpy(m_MemoryBuffer,printer.CStr());
   }
   else
   {  

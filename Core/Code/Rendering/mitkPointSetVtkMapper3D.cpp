@@ -378,13 +378,12 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   this->CreateVTKRenderObjects();
 
   //apply props
-  Superclass::ApplyProperties( m_ContourActor, NULL );
-  this->ApplyProperties(NULL);
+  this->ApplyProperties(m_ContourActor,NULL);
 
 }
 
 
-void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
   SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
@@ -400,9 +399,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     }
   }
 
-
-  Superclass::ApplyProperties( m_ContourActor, renderer );
-  this->ApplyProperties(renderer);
+  this->ApplyProperties(m_ContourActor,renderer);
 
   if(IsVisible(renderer)==false)
   {
@@ -468,8 +465,9 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*render
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
-void mitk::PointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
+  Superclass::ApplyProperties(actor,renderer);
   //check for color props and use it for rendering of selected/unselected points and contour 
   //due to different params in VTK (double/float) we have to convert!
 
@@ -668,7 +666,6 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
-  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );  
   Superclass::SetDefaultProperties(node, renderer, overwrite);

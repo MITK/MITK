@@ -1,10 +1,10 @@
 SET(SRC_CPP_FILES
-  
+
 )
 
 SET(INTERNAL_CPP_FILES
   QmitkImageGuidedTherapyTutorialView.cpp
-
+  mitkPluginActivator.cpp
 )
 
 SET(UI_FILES
@@ -13,17 +13,21 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkImageGuidedTherapyTutorialView.h
+  src/internal/mitkPluginActivator.h
 )
 
-SET(RES_FILES
+SET(QRC_FILES
   #resources/QmitkImageGuidedTherapyTutorialView.qrc
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/ImageGuidedTherapyTutorial.png
+  plugin.xml
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES
+
+)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})
@@ -32,4 +36,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-

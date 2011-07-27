@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkQuaternionRigidTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkQuaternionRigidTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

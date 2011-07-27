@@ -171,8 +171,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetMacro(ViewDirection, ViewDirection);
-    itkGetMacro(ViewDirection, ViewDirection);
+    itkSetEnumMacro(ViewDirection, ViewDirection);
+    itkGetEnumMacro(ViewDirection, ViewDirection);
 
     /**
      * \brief Set the default view direction
@@ -184,8 +184,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetMacro(DefaultViewDirection, ViewDirection);
-    itkGetMacro(DefaultViewDirection, ViewDirection);
+    itkSetEnumMacro(DefaultViewDirection, ViewDirection);
+    itkGetEnumMacro(DefaultViewDirection, ViewDirection);
 
     virtual void SetViewDirectionToDefault();
 

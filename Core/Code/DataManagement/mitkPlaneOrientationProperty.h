@@ -48,6 +48,8 @@ public:
  
   mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
+  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+
   enum
   {
     PLANE_DECORATION_NONE,

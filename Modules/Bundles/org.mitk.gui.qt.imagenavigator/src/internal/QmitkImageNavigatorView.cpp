@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 17495 $
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -52,24 +46,24 @@ public:
 
   void PartClosed(berry::IWorkbenchPartReference::Pointer partRef)
   {
-    m_View->SetMultiWidget(0);
+    if((partRef->GetId() == QmitkImageNavigatorView::VIEW_ID) || (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID))
+    {
+      m_View->SetMultiWidget(0);
+    }
   }
 
   void PartOpened(berry::IWorkbenchPartReference::Pointer partRef)
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
-      if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+      if (QmitkStdMultiWidgetEditor::Pointer multiWidgetPart =
+          partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>())
       {
-        if (QmitkStdMultiWidgetEditor::Pointer multiWidgetPart =
-            partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>())
-        {
-          m_View->SetMultiWidget(multiWidgetPart->GetStdMultiWidget());
-        }
-        else
-        {
-          m_View->SetMultiWidget(0);
-        }
+        m_View->SetMultiWidget(multiWidgetPart->GetStdMultiWidget());
+      }
+      else
+      {
+        m_View->SetMultiWidget(0);
       }
     }
   }
@@ -81,7 +75,7 @@ private:
 
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-: m_MultiWidget(NULL)
+  : m_MultiWidget(NULL)
 {
   multiWidgetListener = new ImageNavigatorPartListener(this);
 }
@@ -89,10 +83,6 @@ QmitkImageNavigatorView::QmitkImageNavigatorView()
 QmitkImageNavigatorView::~QmitkImageNavigatorView()
 {
   this->GetSite()->GetPage()->RemovePartListener(multiWidgetListener);
-  //delete m_TransversalStepper;
-  //delete m_SagittalStepper;
-  //delete m_FrontalStepper;
-  //delete m_TimeStepper;
 }
 
 void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
@@ -120,10 +110,15 @@ void QmitkImageNavigatorView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   m_MultiWidget = multiWidget;
   if (m_MultiWidget)
   {
-    m_TransversalStepper->SetStepper(m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice());
-    m_SagittalStepper->SetStepper(m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice());
-    m_FrontalStepper->SetStepper(m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice());
-    m_TimeStepper->SetStepper(m_MultiWidget->GetTimeNavigationController()->GetTime());
+    m_TransversalStepper->deleteLater();
+    m_SagittalStepper->deleteLater();
+    m_FrontalStepper->deleteLater();
+    m_TimeStepper->deleteLater();
+
+    m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice() , "sliceNavigatorTransversalFromSimpleExample");
+    m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
+    m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
+    m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
   }
   else
   {
@@ -138,7 +133,7 @@ QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
 {
   QmitkStdMultiWidget* activeStdMultiWidget = 0;
   berry::IEditorPart::Pointer editor =
-    this->GetSite()->GetPage()->GetActiveEditor();
+      this->GetSite()->GetPage()->GetActiveEditor();
 
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {

@@ -20,6 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkEnumerationPropertySerializer.h"
 
+#include "mitkPlaneOrientationProperty.h"
+#include "mitkShaderProperty.h"
+#include "mitkVtkInterpolationProperty.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkVtkScalarModeProperty.h"
+#include "mitkVtkVolumeRenderingProperty.h"
+#include "mitkModalityProperty.h"
+
 #define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname) \
  \
 namespace mitk \
@@ -32,6 +41,18 @@ class SceneSerializationBase_EXPORT classname ## Serializer : public Enumeration
     mitkClassMacro( classname ## Serializer, EnumerationPropertySerializer ); \
     itkNewMacro(Self); \
  \
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) \
+    { \
+        if (!element) return NULL; \
+            const char* sa( element->Attribute("value") ); \
+         \
+        std::string s(sa?sa:""); \
+        classname::Pointer property = classname::New(); \
+        property->SetValue( s ); \
+         \
+        return property.GetPointer(); \
+    } \
+ \
   protected: \
  \
     classname ## Serializer () {} \
@@ -42,9 +63,6 @@ class SceneSerializationBase_EXPORT classname ## Serializer : public Enumeration
  \
 MITK_REGISTER_SERIALIZER( classname ## Serializer );
 
-MITK_REGISTER_ENUM_SUB_SERIALIZER(GridRepresentationProperty);
-MITK_REGISTER_ENUM_SUB_SERIALIZER(GridVolumeMapperProperty);
-MITK_REGISTER_ENUM_SUB_SERIALIZER(OrganTypeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PlaneOrientationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(ShaderProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkInterpolationProperty);

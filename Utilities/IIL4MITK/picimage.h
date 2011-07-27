@@ -28,7 +28,7 @@ public:
 
     \note Is the model needed here?
     */
-    void setImage (mitkIpPicDescriptor* pic, int model = INTENSITY);
+    void setPicImage (mitkIpPicDescriptor* pic, int model = INTENSITY);
 
     /*!
     \brief Gets the PIC image.

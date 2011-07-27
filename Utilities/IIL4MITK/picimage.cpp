@@ -13,7 +13,7 @@ iil4mitkPicImage::~iil4mitkPicImage ()
 }
 
 void
-iil4mitkPicImage::setImage (mitkIpPicDescriptor* pic, int model)
+iil4mitkPicImage::setPicImage (mitkIpPicDescriptor* pic, int model)
 {
     assert (pic);
     assert (pic->dim >= 2);

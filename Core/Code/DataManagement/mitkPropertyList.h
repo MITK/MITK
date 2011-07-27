@@ -76,14 +76,10 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     /**
      * Map structure to hold the properties: the map key is a string,
-     * the value consists of the actual property object (BaseProperty) and
-     * a bool flag (indicating whether a property is "enabled").
-     *
-     * The "enabled" flag is there to "keep a property without showing it", i.e.
-     * GetProperty will not tell that there such a thing. Is there any real world use for this? (bug #1052)
+     * the value consists of the actual property object (BaseProperty).
      */
-    typedef std::map< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMap;
-    typedef std::pair< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMapElementType;
+    typedef std::map< std::string, BaseProperty::Pointer> PropertyMap;
+    typedef std::pair< std::string, BaseProperty::Pointer> PropertyMapElementType;
 
     /**
      * @brief Get a property by its name. 
@@ -189,9 +185,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     virtual Pointer Clone();
 
     virtual void Clear();
-
-    virtual bool IsEnabled(const std::string& propertyKey);
-    virtual void SetEnabled(const std::string& propertyKey,bool enabled);
 
 
   protected:

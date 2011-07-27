@@ -93,7 +93,7 @@ mitk::SplineVtkMapper3D::GenerateData()
 }
 
 
-void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
+void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
   if ( IsVisible( renderer ) == false )
   {

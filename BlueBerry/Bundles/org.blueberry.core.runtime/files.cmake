@@ -9,7 +9,6 @@ SET(SRC_CPP_FILES
   berryIPreferencesService.cpp
   berryPlatformObject.cpp
   berryRuntime.cpp
-  berryRuntimePlugin.cpp
   berryBackingStoreException.cpp
 )
 

@@ -237,10 +237,10 @@ public:
 
 protected:
   Geometry2D();
+
+  Geometry2D(const Geometry2D& other);
   
   virtual ~Geometry2D();
-
-  virtual void InitializeGeometry(Self * newGeometry) const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

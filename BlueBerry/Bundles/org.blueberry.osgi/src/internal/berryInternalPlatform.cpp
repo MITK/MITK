@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkPluginFramework.h>
 #include <ctkPluginContext.h>
 #include <ctkPlugin.h>
+#include <ctkPluginException.h>
 
 #include <iostream>
 
@@ -47,6 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 
+#include <QCoreApplication>
+#include <QDesktopServices>
 #include <QDebug>
 
 namespace berry {
@@ -130,13 +133,29 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_InstallPath.assign(m_InstancePath);
   }
 
-  m_UserPath.assign(Poco::Path::home());
-  m_UserPath.pushDirectory("." + this->commandName());
-  Poco::File userFile(m_UserPath); 
+  if (this->GetConfiguration().hasProperty(Platform::ARG_STORAGE_DIR))
+  {
+    std::string dataLocation = this->GetConfiguration().getString(Platform::ARG_STORAGE_DIR, "");
+    if (dataLocation.at(dataLocation.size()-1) != '/')
+    {
+      dataLocation += '/';
+    }
+    m_UserPath.assign(dataLocation);
+  }
+  else
+  {
+    // Append a hash value of the absolute path of the executable to the data location.
+    // This allows to start the same application from different build or install trees.
+    QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
+    dataLocation += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
+    m_UserPath.assign(dataLocation.toStdString());
+  }
+
+  Poco::File userFile(m_UserPath);
   
   try
   {
-    userFile.createDirectory();
+    userFile.createDirectories();
     userFile.canWrite();
   }
   catch(const Poco::IOException& e)
@@ -146,31 +165,17 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_UserPath.pushDirectory("." + this->commandName());
     userFile = m_UserPath;
   }
-   
-  m_BaseStatePath = m_UserPath;
-  m_BaseStatePath.pushDirectory(".metadata");
-  m_BaseStatePath.pushDirectory(".plugins");
-
-  Poco::Path logPath(m_UserPath);
-  logPath.setFileName(this->commandName() + ".log");
-  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
-  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
-
-  try
-  {
-    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
-  }
-  catch (Poco::NotFoundException&)
-  {
-    Poco::Path cachePath(m_UserPath);
-    cachePath.pushDirectory("plugin_cache");
-    m_CodeCache = new CodeCache(cachePath.toString());
-  }
-  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
   fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
+#if defined(Q_CC_GNU) && ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
+  fwProps.insert(ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS, QVariant::fromValue<QLibrary::LoadHints>(QLibrary::ExportExternalSymbolsHint));
+#endif
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
+  {
+    fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
@@ -185,16 +190,49 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
     }
 
+    bool forcePluginOverwrite = this->GetConfiguration().hasOption(Platform::ARG_FORCE_PLUGIN_INSTALL);
     QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
     foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
     {
-      QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
-      if (pluginsToStart.contains(pluginUrl))
+      if (forcePluginOverwrite)
       {
-        m_CTKPluginsToStart << plugin->getPluginId();
+        uninstallPugin(pluginUrl, pfwContext);
+      }
+      try
+      {
+        QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
+        if (pluginsToStart.contains(pluginUrl))
+        {
+          m_CTKPluginsToStart << plugin->getPluginId();
+        }
+      }
+      catch (const ctkPluginException& e)
+      {
+        BERRY_ERROR << "Failed to install: " << pluginUrl.toString().toStdString() << ",\n" << e.what();
       }
     }
   }
+
+  m_BaseStatePath = m_UserPath;
+  m_BaseStatePath.pushDirectory("bb-metadata");
+  m_BaseStatePath.pushDirectory("bb-plugins");
+
+  Poco::Path logPath(m_UserPath);
+  logPath.setFileName(this->commandName() + ".log");
+  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
+  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
+
+  try
+  {
+    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
+  }
+  catch (Poco::NotFoundException&)
+  {
+    Poco::Path cachePath(m_UserPath);
+    cachePath.pushDirectory("bb-plugin_cache");
+    m_CodeCache = new CodeCache(cachePath.toString());
+  }
+  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // tell the BundleLoader about the installed CTK plug-ins
   QStringList installedCTKPlugins;
@@ -284,6 +322,29 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   DebugUtil::RestoreState();
 #endif
 
+}
+
+void InternalPlatform::uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext)
+{
+  QFileInfo libInfo(pluginUrl.toLocalFile());
+  QString libName = libInfo.baseName();
+  if (libName.startsWith("lib"))
+  {
+    libName = libName.mid(3);
+  }
+  QString symbolicName = libName.replace('_', '.');
+
+  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
+  {
+    if (plugin->getSymbolicName() == symbolicName &&
+        plugin->getLocation() != pluginUrl.toString())
+    {
+      BERRY_WARN << "A plug-in with the symbolic name " << symbolicName.toStdString() <<
+                    " but different location is already installed. Trying to uninstall " << plugin->getLocation().toStdString();
+      plugin->uninstall();
+      return;
+    }
+  }
 }
 
 void InternalPlatform::Launch()
@@ -427,9 +488,17 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   appOption.argument("<id>").binding(Platform::ARG_APPLICATION);
   options.addOption(appOption);
 
+  Poco::Util::Option storageDirOption(Platform::ARG_STORAGE_DIR, "", "the location for storing persistent application data");
+  storageDirOption.argument("<dir>").binding(Platform::ARG_STORAGE_DIR);
+  options.addOption(storageDirOption);
+
   Poco::Util::Option consoleLogOption(Platform::ARG_CONSOLELOG, "", "log messages to the console");
   consoleLogOption.binding(Platform::ARG_CONSOLELOG);
   options.addOption(consoleLogOption);
+
+  Poco::Util::Option forcePluginOption(Platform::ARG_FORCE_PLUGIN_INSTALL, "", "force installing plug-ins with same symbolic name");
+  forcePluginOption.binding(Platform::ARG_FORCE_PLUGIN_INSTALL);
+  options.addOption(forcePluginOption);
 
   Poco::Util::Option testPluginOption(Platform::ARG_TESTPLUGIN, "", "the plug-in to be tested");
   testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);

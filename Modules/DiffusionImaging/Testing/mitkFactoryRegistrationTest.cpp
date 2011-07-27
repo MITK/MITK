@@ -36,7 +36,7 @@ int mitkFactoryRegistrationTest(int /* argc */, char* /*argv*/[])
   mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
   for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) 
             {
-              if ( (*it)->CanWriteDataType(img.GetPointer()) ) {
+              if ( (*it)->CanWriteBaseDataType(img.GetPointer()) ) {
                 canWrite = true;
                 break;
               } 

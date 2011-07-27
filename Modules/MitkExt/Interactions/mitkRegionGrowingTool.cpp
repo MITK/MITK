@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
 
+#include "mitkImageDataItem.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkApplicationCursor.h"

@@ -30,9 +30,8 @@ namespace berry
 
 class WorkbenchWindow;
 
-struct BERRY_UI WorkbenchTweaklet : public Object
+struct BERRY_UI WorkbenchTweaklet
 {
-  berryInterfaceMacro(WorkbenchTweaklet, berry);
 
   static Tweaklets::TweakKey<WorkbenchTweaklet> KEY;
 

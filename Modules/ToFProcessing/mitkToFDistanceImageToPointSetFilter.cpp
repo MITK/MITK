@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToFDistanceImageToPointSetFilter.h"
 
+#include "mitkImageDataItem.h"
 #include "mitkPointSet.h"
 #include "mitkToFProcessingCommon.h"
 
@@ -117,6 +118,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   assert(output);
   mitk::Image::Pointer input = this->GetInput();
   assert(input);
+
   //compute subset of points if input PointSet is defined
   if (m_Subset.size()!=0)
   {
@@ -135,19 +137,21 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     unsigned int xDimension = input->GetDimension(0);
     unsigned int yDimension = input->GetDimension(1);
     int pointCount = 0;
-    for (int i=0; i<xDimension; i++)
+    for (int j=0; j<yDimension; j++)
     {
-      for (int j=0; j<yDimension; j++)
+      for (int i=0; i<xDimension; i++)
       {
         mitk::Index3D pixel;
         pixel[0] = i;
         pixel[1] = j;
         pixel[2] = 0;
+
         mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(pixel);
+
         mitk::Point3D currentPoint = 
           mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
 
-        if (distance!=0)
+        if (distance>mitk::eps)
         {
           output->InsertPoint( pointCount, currentPoint );
           pointCount++;

@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkPlanarFigureObjectFactory.h"
+#include "mitkPlanarFigureWriter.h"
 
 #include "mitkCoreObjectFactory.h"
 
@@ -37,6 +38,10 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( PlanarFigureIOFactory::New() );
 
     PlanarFigureWriterFactory::RegisterOneFactory();
+
+    m_FileWriters.push_back( PlanarFigureWriter::New().GetPointer() );
+
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
 
     CreateFileExtensionsMap();
 

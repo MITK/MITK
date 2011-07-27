@@ -186,7 +186,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
 }
 
 
-void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
+void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
   SetVtkMapperImmediateModeRendering(m_ContourMapper);
   SetVtkMapperImmediateModeRendering(m_SpheresMapper);

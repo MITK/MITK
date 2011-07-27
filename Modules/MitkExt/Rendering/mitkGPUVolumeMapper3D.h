@@ -106,7 +106,7 @@ protected:
 
   void InitVtkMapper(mitk::BaseRenderer* renderer);
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 
   void CreateDefaultTransferFunctions();
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );

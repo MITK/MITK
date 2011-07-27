@@ -219,7 +219,7 @@ int mitk::TimeSlicedGeometry::TimeStepToTimeStep(
 }
 
 
-void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
+void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(unsigned int timeSteps)
 {
   Geometry3D::Pointer geometry3D = Geometry3D::New();
   geometry3D->Initialize();
@@ -294,6 +294,24 @@ mitk::TimeSlicedGeometry::TimeSlicedGeometry() : m_TimeSteps(0), m_EvenlyTimed(f
 {
 }
 
+mitk::TimeSlicedGeometry::TimeSlicedGeometry(const TimeSlicedGeometry& other) : Geometry3D(other), m_TimeSteps(other.m_TimeSteps), m_EvenlyTimed(other.m_EvenlyTimed)
+{
+  m_Geometry3Ds.resize(m_TimeSteps);
+  unsigned int t;
+  for(t=0; t<m_TimeSteps; ++t)
+  {
+    if(other.m_Geometry3Ds[t].IsNull())
+    {
+      assert(other.m_EvenlyTimed);
+      SetGeometry3D(NULL,t);
+    }
+    else
+    {
+      SetGeometry3D(dynamic_cast<Geometry3D*>(other.m_Geometry3Ds[t]->Clone().GetPointer()), t);
+    }
+  }
+}
+
 mitk::TimeSlicedGeometry::~TimeSlicedGeometry()
 {
 
@@ -361,39 +379,12 @@ void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timesli
 
 mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize(m_TimeSteps);
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new TimeSlicedGeometry(*this);
+  newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
 
-mitk::TimeSlicedGeometry::Pointer mitk::TimeSlicedGeometry::CloneCopy() const
-{
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize(m_TimeSteps);
-  InitializeGeometry(newGeometry);
-  return newGeometry.GetPointer();
-}
 
-void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-
-  newGeometry->SetEvenlyTimed(m_EvenlyTimed);
-
-  unsigned int t;
-  for(t=0; t<m_TimeSteps; ++t)
-  {
-    if(m_Geometry3Ds[t].IsNull())
-    {
-      assert(m_EvenlyTimed);
-    }
-    else
-    {
-      newGeometry->SetGeometry3D(dynamic_cast<Geometry3D*>(m_Geometry3Ds[t]->Clone().GetPointer()), t);
-    }
-  }
-}
 
 void mitk::TimeSlicedGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

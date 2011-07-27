@@ -1,5 +1,6 @@
 SET(SRC_CPP_FILES
-  
+  QmitkODFDetailsWidget.cpp
+  QmitkODFRenderWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -10,7 +11,9 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
   QmitkDiffusionImagingPublicPerspective.cpp
-  QmitkControlVisualizationPropertiesView.cpp  
+  QmitkControlVisualizationPropertiesView.cpp
+  QmitkODFDetailsView.cpp
+  QmitkGlobalFiberTrackingView.cpp
 )
 
 SET(UI_FILES
@@ -19,7 +22,9 @@ SET(UI_FILES
   src/internal/QmitkDiffusionDicomImportViewControls.ui
   src/internal/QmitkDiffusionQuantificationViewControls.ui
   src/internal/QmitkTensorReconstructionViewControls.ui
-  src/internal/QmitkControlVisualizationPropertiesViewControls.ui  
+  src/internal/QmitkControlVisualizationPropertiesViewControls.ui
+  src/internal/QmitkODFDetailsViewControls.ui
+  src/internal/QmitkGlobalFiberTrackingViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -30,7 +35,11 @@ SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingPublicPerspective.h
   src/internal/QmitkDiffusionQuantificationView.h
   src/internal/QmitkTensorReconstructionView.h
-  src/internal/QmitkControlVisualizationPropertiesView.h  
+  src/internal/QmitkControlVisualizationPropertiesView.h
+  src/internal/QmitkODFDetailsView.h
+  src/QmitkODFRenderWidget.h
+  src/QmitkODFDetailsWidget.h
+  src/internal/QmitkGlobalFiberTrackingView.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -46,6 +55,8 @@ SET(CACHED_RESOURCE_FILES
   resources/reconodf.png
   resources/recontensor.png
   resources/vizControls.png
+  resources/OdfDetails.png
+  resources/GlobalTracking.png
 )
 
 SET(QRC_FILES

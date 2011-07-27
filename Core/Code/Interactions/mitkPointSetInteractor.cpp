@@ -39,7 +39,7 @@ const int PRECISION = 5;
 
 mitk::PointSetInteractor
 ::PointSetInteractor(const char * type, DataNode* dataNode, int n)
-:Interactor(type, dataNode), m_N(n), m_Precision(PRECISION)
+:Interactor(type, dataNode), m_Precision(PRECISION), m_N(n)
 {
   if (m_N==0)
   {
@@ -55,11 +55,6 @@ mitk::PointSetInteractor
 
 mitk::PointSetInteractor::~PointSetInteractor()
 {
-}
-
-void mitk::PointSetInteractor::SetPrecision(unsigned int precision)
-{
-  m_Precision = precision;
 }
 
 //##Documentation

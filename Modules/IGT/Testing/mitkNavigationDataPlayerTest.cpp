@@ -108,8 +108,8 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
   // Under these circumstances, it may be impossible to achieve a time-accuracy of 10ms
   for ( int i=0;i<5;i++ )
   {
-    if ((times[i]>refTimes[i]-50 && times[i]<refTimes[i]+50)) {MITK_TEST_OUTPUT(<< "ref: " << refTimes[i] << "  /  time elapsed: " << times[i]);}
-    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-50 && times[i]<refTimes[i]+50), "checking for more or less correct time-line"  );
+    if ((times[i]>refTimes[i]-150 && times[i]<refTimes[i]+150)) {MITK_TEST_OUTPUT(<< "ref: " << refTimes[i] << "  /  time elapsed: " << times[i]);}
+    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-150 && times[i]<refTimes[i]+150), "checking for more or less correct time-line"  );
     MITK_TEST_CONDITION_REQUIRED(points[i] == refPoints[i], "checking if the point coordinates are correct")
   }
 

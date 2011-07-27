@@ -100,7 +100,6 @@ if(MITK_USE_QT)
   find_package(Qt4 4.6.0 REQUIRED)
 endif()
 
-option(MITK_INSTALL_RPATH_RELATIVE "Use relative rpath entries for installation packages" OFF)
 option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
@@ -109,15 +108,54 @@ option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   
-mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
-                 MITK_BUILD_ALL_PLUGINS
+mark_as_advanced(MITK_BUILD_ALL_PLUGINS
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
-                 
+
+set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+    "int, unsigned int, short, unsigned short, char, unsigned char"
+    CACHE STRING "List of integral pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+    "double, float"
+    CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
+    ""
+    CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_DIMENSIONS
+    "2,3"
+    CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
+
+mark_as_advanced(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+                 MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+                 MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
+                 MITK_ACCESSBYITK_DIMENSIONS
+                )
+
 # consistency checks
 if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
   MESSAGE(FATAL_ERROR "BlueBerry depends on CTK. Please set MITK_USE_CTK to ON.")
+endif()
+
+if(NOT MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+      "int, unsigned int, short, unsigned short, char, unsigned char"
+      CACHE STRING "List of integral pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+      "double, float"
+      CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_DIMENSIONS)
+  set(MITK_ACCESSBYITK_DIMENSIONS
+      "2,3"
+      CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -222,6 +260,12 @@ mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
 mark_as_advanced(USE_ITKZLIB)
 
+if(NOT MITK_FAST_TESTING)
+  if(DEFINED MITK_CTEST_SCRIPT_MODE AND MITK_CTEST_SCRIPT_MODE STREQUAL "continuous")
+    set(MITK_FAST_TESTING 1)
+  endif()
+endif()
+
 #-----------------------------------------------------------------------------
 # Get MITK version info
 #-----------------------------------------------------------------------------
@@ -233,12 +277,6 @@ mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
 #
 # These should be set before any MITK install macros are used
 #-----------------------------------------------------------------------------
-
-if(MITK_INSTALL_RPATH_RELATIVE)
-  set(CMAKE_INSTALL_RPATH ".")
-else()
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-endif()
 
 # on Mac OSX all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here
@@ -351,6 +389,11 @@ if(BUILD_TESTING)
   set(MITK_TEST_OUTPUT_DIR "${MITK_BINARY_DIR}/test_output")
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
+  endif()
+
+  # Test the external project template
+  if(MITK_USE_BLUEBERRY)
+    include(mitkTestProjectTemplate)
   endif()
 endif()
 

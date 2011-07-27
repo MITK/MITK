@@ -32,7 +32,8 @@ int mitkStateMachineFactoryTest(int argc, char* argv[])
   //get the first state of the statemachine "global" (mitkGlobalInteraction)
   mitk::State::Pointer state = statemachineFactory->GetStartState("global");
   MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing GetStartState() of GlobalInteraction state machine pattern: ") 
-
+  
+  MITK_TEST_CONDITION_REQUIRED(argc>2, "Testing correct test invocation");
   std::string xmlFileName1 = argv[1];
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName1.empty(),"Getting xml file 1: ") 
   MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadBehavior(xmlFileName1),"Parsing xml file 1: ") 

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 #include "PlanarFigureExports.h"
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 #include <mitkPlanarFigure.h>
 
 class TiXmlElement;
@@ -34,7 +34,7 @@ namespace mitk
   * XML-based writer for mitk::PlanarFigures.
   * @ingroup Process
   */
-  class PlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriter
+  class PlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriterWithInformation
   {
   public:
 
@@ -134,6 +134,24 @@ namespace mitk
     * @returns whether the last write attempt was successful or not.
     */
     itkGetConstMacro(Success, bool);
+
+
+    virtual const char * GetDefaultFilename() { return "PlanarFigure.pf"; }
+    virtual const char * GetFileDialogPattern() { return "Planar Figure Files (*.pf)"; }
+    virtual const char * GetDefaultExtension() { return ".pf"; }
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data)
+    {
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData(data);
+      return CanWriteDataType(node);
+    }
+    virtual void DoWrite(BaseData::Pointer data) {
+      if (CanWriteBaseDataType(data)) {
+        this->SetInput(dynamic_cast<mitk::PlanarFigure*>(data.GetPointer()));
+        this->Update();
+      }
+    }
+
 
     /**
     @brief CAUTION: It's up to the user to call this function to release the 

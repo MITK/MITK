@@ -4,6 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkSimpleMeasurement.cpp
+  mitkPluginActivator.cpp
 )
 
 SET(UI_FILES
@@ -12,17 +13,19 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkSimpleMeasurement.h
+  src/internal/mitkPluginActivator.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/SimpleMeasurement.png
+  plugin.xml
 )
 
-SET(RES_FILES
+SET(QRC_FILES
 )
 
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

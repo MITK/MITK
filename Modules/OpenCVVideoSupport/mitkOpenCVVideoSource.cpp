@@ -148,6 +148,13 @@ void mitk::OpenCVVideoSource::FetchFrame()
           m_FrameCount = 0;
           m_CurrentImage = cvQueryFrame(m_VideoCapture);
         }
+        else
+        {
+          std::ostringstream s;
+          s << "End of video file " << m_VideoFileName;
+          std::logic_error err( s.str() );
+          throw err;
+        }
       }
       else
       {

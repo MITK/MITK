@@ -1309,11 +1309,12 @@ bool mitk::Image::IsValidTimeStep(int t) const
   return ( ( m_Dimension >= 4 && t <= (int)m_Dimensions[3] && t > 0 ) || (t == 0) ); 
 }
 
-void mitk::Image::Expand( int timeSteps ) const
+void mitk::Image::Expand( unsigned int timeSteps )
 {
   if(timeSteps < 1) itkExceptionMacro(<< "Invalid timestep in Image!");
   if(! IsValidTimeStep( timeSteps-1 ) ) return;
-  if(timeSteps > (int)m_ScalarMin.size() )
+  Superclass::Expand(timeSteps);
+  if(timeSteps > m_ScalarMin.size() )
   {
     m_ScalarMin.resize(timeSteps, itk::NumericTraits<ScalarType>::max());
     m_ScalarMax.resize(timeSteps, itk::NumericTraits<ScalarType>::NonpositiveMin());
@@ -1344,7 +1345,10 @@ void mitk::Image::ComputeImageStatistics(int t) const
     this->ResetImageStatistics();
 
   // adapt vector length
-  this->Expand(t+1);
+  // the const_cast is necessary since the whole statistics are provided
+  // with const-methods but are actually stored inside the object with mutable
+  // members. This should be resolved in a redesign of the image class.
+  const_cast<mitk::Image*>(this)->Expand(t+1);
 
   // do we have valid information already?
   if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 

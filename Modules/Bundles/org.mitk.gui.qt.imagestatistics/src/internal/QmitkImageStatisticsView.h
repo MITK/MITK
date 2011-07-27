@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkImageStatisticsView_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include "../ImageStatisticsDll.h"
+#include <org_mitk_gui_qt_imagestatistics_Export.h>
 #include "ui_QmitkImageStatisticsViewControls.h"
 
 #include "QmitkStepperAdapter.h"
@@ -57,6 +57,11 @@ public:
   \brief default constructor
   */
   QmitkImageStatistics(QObject *parent=0, const char *name=0);
+  QmitkImageStatistics(const QmitkImageStatistics& other)
+  {
+     Q_UNUSED(other)
+     throw std::runtime_error("Copy constructor not implemented");
+  }
 
   /*!
   \brief default destructor

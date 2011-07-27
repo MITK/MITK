@@ -39,34 +39,31 @@ MACRO(_fixup_target)
     MACRO(gp_item_default_embedded_path_override item default_embedded_path_var)
       GET_FILENAME_COMPONENT(_item_name \"\${item}\" NAME)
       GET_FILENAME_COMPONENT(_item_path \"\${item}\" PATH)
-      IF(_item_name MATCHES \"liborg\")
+
+      # We have to fix all path references to build trees for plugins
+
+      IF(NOT _item_path MATCHES \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}\")
+        # item with relative path or embedded path pointing to some build dir
+        SET(full_path \"full_path-NOTFOUND\")
+        FILE (GLOB_RECURSE full_path \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/\${_item_name} )
+        GET_FILENAME_COMPONENT(_item_path \"\${full_path}\" PATH)
+      ENDIF()
+      
+      IF(_item_path STREQUAL \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\"
+         OR _item_name MATCHES \"liborg\" # this is for legacy BlueBerry bundle support
+        )
+        # Only fix plugins
+        MESSAGE(\"override: \${item}\")
+        MESSAGE(\"found file: \${_item_path}/\${_item_name}\")
         IF(APPLE)
-          SET(full_path \"full_path-NOTFOUND\")
-          MESSAGE(\"override: \${item}\")        
-          FILE (GLOB_RECURSE full_path \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/\${_item_name} )
-          MESSAGE(\"find file: \${full_path}\")        
-           
-          GET_FILENAME_COMPONENT(_item_path \"\${full_path}\" PATH)
-          
           STRING(REPLACE 
-                 \${CMAKE_INSTALL_PREFIX} 
-                 @executable_path/../../../ \${default_embedded_path_var} \"\${_item_path}\" )
-          MESSAGE(\"override result: \${\${default_embedded_path_var}}\")        
+                 \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir} 
+                 @executable_path \${default_embedded_path_var} \"\${_item_path}\" )
         ELSE()
           SET(\${default_embedded_path_var} \"\${_item_path}\")
         ENDIF()
+        MESSAGE(\"override result: \${\${default_embedded_path_var}}\")        
       ENDIF()
-
-      #IF(_item_name MATCHES \"^liborg\")
-      #   IF(APPLE)
-      #     MESSAGE(\"override: \${item}\")        
-      #     STRING(REPLACE 
-      #        ${CMAKE_INSTALL_PREFIX} 
-      #        @loader_path/../ \${default_embedded_path_var} \"\${_item_path}\" ) 
-      #   ELSE(APPLE)
-      #        SET(\${default_embedded_path_var} \"\${_item_path}\")
-      #   ENDIF(APPLE)
-      #ENDIF()
     ENDMACRO(gp_item_default_embedded_path_override)
 
     MACRO(gp_resolved_file_type_override file type)
@@ -75,12 +72,6 @@ MACRO(_fixup_target)
         GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
         IF(_file_path MATCHES \"^\${CMAKE_INSTALL_PREFIX}\")
           SET(\${type} \"local\")
-          # On linux, rpaths are removed from the plugins
-          # if installing more than on application. This override
-          # should prevent this.
-          IF(_file_name MATCHES \"^liborg\")
-            SET(\${type} \"system\")
-          ENDIF()
         ENDIF()
         IF(_file_name MATCHES gdiplus)
             SET(\${type} \"system\")
@@ -88,8 +79,7 @@ MACRO(_fixup_target)
       ENDIF()
     ENDMACRO(gp_resolved_file_type_override)
 
-    SET(_rpath_relative ${MITK_INSTALL_RPATH_RELATIVE})
-    IF(_rpath_relative AND NOT APPLE)
+    IF(NOT APPLE)
       IF(UNIX OR MINGW)
         MACRO(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
           IF(\${item} MATCHES \"blueberry_osgi\")

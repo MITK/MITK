@@ -15,6 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkPyramidalRegistrationMethod.txx>
+#include <mitkPyramidalRegistrationMethodAccessFunctor.txx>
+#include <mitkInstantiateAccessFunctions.h>
 
-InstantiateAccessFunctionForFixedPixelType( mitk::PyramidalRegistrationMethod::GenerateData2, @TYPE@);
+#define InstantiateAccessFunction_PyramidalAccessItkImage(pixelType, dim) \
+  template void mitk::PyramidalRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<pixelType, dim>* itkImage1, mitk::PyramidalRegistrationMethod* method);
+
+InstantiateAccessFunctionForFixedPixelType(PyramidalAccessItkImage, (@TYPE@))
+

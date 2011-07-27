@@ -65,7 +65,7 @@ mitk::ToFSurfaceVtkMapper3D::~ToFSurfaceVtkMapper3D()
   // m_Prop3D->Delete();
 }
 
-void mitk::ToFSurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
@@ -404,12 +404,12 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
     PropertyList::PropertyMap::const_iterator it;
     for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
     {
-      this->CheckForClippingProperty( renderer,(*it).second.first.GetPointer() );
+      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
     }
 
     for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
     {
-      this->CheckForClippingProperty( renderer,(*it).second.first.GetPointer() );
+      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
     }
 
     if ( ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0 )

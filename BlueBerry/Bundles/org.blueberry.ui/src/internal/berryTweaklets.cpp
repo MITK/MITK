@@ -20,7 +20,43 @@
 namespace berry
 {
 
-std::map<Tweaklets::TweakKey_base, Object::Pointer> Tweaklets::defaults;
-std::map<Tweaklets::TweakKey_base, Object::Pointer> Tweaklets::tweaklets;
+QHash<TweakKey_base, QObject*> Tweaklets::defaults;
+QHash<TweakKey_base, QObject*> Tweaklets::tweaklets;
 
+
+TweakKey_base::TweakKey_base(const QString& _tweakClass) :
+  tweakClass(_tweakClass)
+{ }
+
+bool TweakKey_base::operator==(const TweakKey_base& obj) const
+{
+  if (this == &obj)
+    return true;
+
+  return tweakClass == obj.tweakClass;
+}
+
+bool TweakKey_base::operator<(const TweakKey_base& obj) const
+{
+  return tweakClass < obj.tweakClass;
+}
+
+void Tweaklets::SetDefault(const TweakKey_base& definition,
+                           QObject* implementation)
+{
+  defaults.insert(definition, implementation);
+}
+
+void Tweaklets::Clear()
+{
+  std::cout << "Clearing tweaklets\n";
+  tweaklets.clear();
+  defaults.clear();
+}
+
+}
+
+uint qHash(const berry::TweakKey_base& key)
+{
+  return qHash(key.tweakClass);
 }

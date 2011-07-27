@@ -568,7 +568,7 @@ protected:
 
   void ComputeOffsetTable();
 
-  virtual void Expand( int timeSteps ) const;
+  virtual void Expand( unsigned int timeSteps );
 
   virtual bool IsValidTimeStep(int t) const;
 

@@ -361,7 +361,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * renderer )
+void mitk::EnhancedPointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer * renderer )
 {
   ApplyProperties(renderer);
 }
@@ -390,7 +390,6 @@ void mitk::EnhancedPointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* nod
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
-  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "show label", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "label", mitk::StringProperty::New("P"), renderer, overwrite );

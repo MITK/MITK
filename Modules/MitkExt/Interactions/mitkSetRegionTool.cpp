@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipSegmentation.h"
 
 #include "mitkBaseRenderer.h"
+#include "mitkImageDataItem.h"
 
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 

@@ -78,8 +78,7 @@ namespace mitk
     ImageRegistrationMethod();
     virtual ~ImageRegistrationMethod();
 
-    template < typename TPixel, unsigned int VImageDimension >
-    void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
+    friend struct ImageRegistrationMethodAccessFunctor;
 
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;
@@ -96,8 +95,6 @@ namespace mitk
     itk::Array<double> m_OptimizerScales;
   };
 }
-
-//#include "mitkImageRegistrationMethod.txx"
 
 #endif // MITKIMAGEREGISTRATIONMETHOD_H
 

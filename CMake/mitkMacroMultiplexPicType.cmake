@@ -9,7 +9,7 @@
 # is generated and added to CPP_FILES_GENERATED. 
 #
 MACRO(MITK_MULTIPLEX_PICTYPE file)
-  SET(TYPES "double;float;int;unsigned int;short;unsigned short;char;unsigned char")
+  STRING(REPLACE "," ";" TYPES "${MITK_ACCESSBYITK_PIXEL_TYPES}")
   FOREACH(TYPE ${TYPES})
     # create filename for destination
     STRING(REPLACE " " "_" quoted_type "${TYPE}")

@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ExtrudedContour::ExtrudedContour() 
   : m_Contour(NULL), m_ClippingGeometry(NULL), m_AutomaticVectorGeneration(false)
 {
-  GetTimeSlicedGeometry()->Initialize(1);
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
 
   FillVector3D(m_Vector, 0.0, 0.0, 1.0);
   m_RightVector.Fill(0.0);

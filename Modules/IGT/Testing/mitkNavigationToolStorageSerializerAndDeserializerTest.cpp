@@ -200,6 +200,16 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of complex tool storage");
     MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==2," ..Testing number of tools in storage");
     }
+
+    static void TestReadInvalidStorage()
+    {
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
+    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
+    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of invalid data storage.");  
+    MITK_TEST_CONDITION_REQUIRED(myDeserializer->GetErrorMessage() == "Cannot open 'noStorage.tfl' for reading", "Checking Error Message");
+    }
+
   };
 
 /** This function is testing the TrackingVolume class. */
@@ -213,6 +223,7 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteComplexToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadComplexToolStorage();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();
 
   MITK_TEST_END();

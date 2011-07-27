@@ -75,7 +75,7 @@ public:
      * Sets the 0'th input object for the filter.
      * @param input the first input for the filter.
      */
-    void SetInput( mitk::Image* input );
+    void SetInputImage( mitk::Image* input );
 
     /**
      * @returns the 0'th input object of the filter.

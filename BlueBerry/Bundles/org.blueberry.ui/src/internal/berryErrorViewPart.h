@@ -19,8 +19,9 @@
 #ifndef BERRYERRORVIEWPART_H_
 #define BERRYERRORVIEWPART_H_
 
-#include "../berryViewPart.h"
 #include "../tweaklets/berryWorkbenchPageTweaklet.h"
+
+#include "../berryViewPart.h"
 
 namespace berry {
 

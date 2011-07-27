@@ -3,3 +3,6 @@ MITK_CREATE_MODULE(mitkCameraCalibration
   PACKAGE_DEPENDS OpenCV
   PROVIDES mitkCameraCalibration
 )
+
+# add testing dir
+ADD_SUBDIRECTORY(Testing)

@@ -153,7 +153,7 @@ int mitkTimeSlicedGeometryTest(int /*argc*/, char* /*argv*/[])
 
   unsigned int numOfTimeSteps = 5;
   std::cout << "Testing TimeSlicedGeometry::Initialize(timesteps = " << numOfTimeSteps << "): " <<std::endl;
-  timeSlicedGeometry->Initialize(numOfTimeSteps);
+  timeSlicedGeometry->InitializeEvenlyTimed(numOfTimeSteps);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing TimeSlicedGeometry::GetTimeSteps()==" << numOfTimeSteps << ": " <<std::endl;

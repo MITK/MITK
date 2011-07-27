@@ -45,6 +45,13 @@ class SceneSerializationBase_EXPORT StringPropertySerializer : public BaseProper
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* s( element->Attribute("value") );
+      return StringProperty::New( std::string(s?s:"") ).GetPointer();
+    }
+
   protected:
 
     StringPropertySerializer() {}

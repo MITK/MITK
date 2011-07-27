@@ -133,6 +133,15 @@ namespace mitk
     ///
     void OnToFCameraDeviceModified();
 
+    /*!
+    \brief clean up memory allocated for the image arrays m_IntensityArray, m_DistanceArray, m_AmplitudeArray and m_SourceDataArray
+    */
+    virtual void CleanUpImageArrays();
+    /*!
+    \brief Allocate memory for the image arrays m_IntensityArray, m_DistanceArray, m_AmplitudeArray and m_SourceDataArray
+    */
+    virtual void AllocateImageArrays();
+
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing acces to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image

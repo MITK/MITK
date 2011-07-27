@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFixedCenterOfRotationAffineTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkFixedCenterOfRotationAffineTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

@@ -67,6 +67,43 @@ class SceneSerializationBase_EXPORT LevelWindowPropertySerializer : public BaseP
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      bool isFixed(false);
+      if (element->Attribute("fixed"))
+        isFixed = std::string(element->Attribute("fixed")) == "true";
+
+      float level;
+      float window;
+      TiXmlElement* child = element->FirstChildElement("CurrentSettings");
+        if ( child->QueryFloatAttribute( "level", &level ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "window", &window ) != TIXML_SUCCESS ) return NULL;
+
+      float defaultLevel;
+      float defaultWindow;
+                    child = element->FirstChildElement("DefaultSettings");
+        if ( child->QueryFloatAttribute( "level", &defaultLevel ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "window", &defaultWindow ) != TIXML_SUCCESS ) return NULL;
+
+      float minRange;
+      float maxRange;
+                    child = element->FirstChildElement("CurrentRange");
+        if ( child->QueryFloatAttribute( "min", &minRange ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return NULL;
+
+
+        
+      LevelWindow lw;
+      lw.SetRangeMinMax( minRange, maxRange );
+      lw.SetDefaultLevelWindow( defaultLevel, defaultWindow );
+      lw.SetLevelWindow( level, window );
+      lw.SetFixed( isFixed );
+
+      return LevelWindowProperty::New( lw ).GetPointer();
+    }
+
   protected:
 
     LevelWindowPropertySerializer() {}

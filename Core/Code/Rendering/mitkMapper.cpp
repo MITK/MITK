@@ -91,7 +91,7 @@ void mitk::Mapper::GenerateData()
 {
 }
 
-void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
+void mitk::Mapper::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
 {
 }
 
@@ -147,7 +147,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
     m_LastUpdateTime.Modified();
   }
 
-  this->GenerateData(renderer);
+  this->GenerateDataForRenderer(renderer);
 }
 
 void mitk::Mapper::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

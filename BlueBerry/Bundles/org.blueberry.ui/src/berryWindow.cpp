@@ -346,7 +346,7 @@ Rectangle Window::GetConstrainedShellBounds(const Rectangle& preferredSize)
 {
   Rectangle result(preferredSize);
 
-  GuiWidgetsTweaklet::Pointer guiTweaklet(Tweaklets::Get(GuiWidgetsTweaklet::KEY));
+  GuiWidgetsTweaklet* guiTweaklet(Tweaklets::Get(GuiWidgetsTweaklet::KEY));
   int screenNum = guiTweaklet->GetClosestScreenNumber(result);
   Rectangle bounds(guiTweaklet->GetAvailableScreenSize(screenNum));
 

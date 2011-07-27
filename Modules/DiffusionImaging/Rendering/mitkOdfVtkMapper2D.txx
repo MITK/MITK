@@ -313,6 +313,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   p[0] /= spacing[0];
   p[1] /= spacing[1];
   p[2] /= spacing[2];
+  p[0] += 0.5;
+  p[1] += 0.5;
+  p[2] += 0.5;
 
   mitk::Point3D p2;
   pfilter->GetGeometry()->IndexToWorld( p, p2 );
@@ -604,6 +607,11 @@ void  mitk::OdfVtkMapper2D<T,N>
   vtkFloatArray* pointdata = NULL;
   vtkDelaunay2D *delaunay = NULL;
   vtkPolyData* cuttedPlane = NULL;
+
+  // the cutter only works if we do not have a 2D-image
+  // or if we have a 2D-image and want to see the whole image.
+  //
+  // for side views of 2D-images, we need some special treatment
   if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) || 
     (dims[1] == 1 && dispGeo->vnormal[1] != 0) ||
     (dims[2] == 1 && dispGeo->vnormal[2] != 0) ))
@@ -829,9 +837,9 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     // adapt cam pos
     OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
-    AdaptCameraPosition(renderer, dispGeo);
+    //AdaptCameraPosition(renderer, dispGeo);
 
-    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
+    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
     {
       glMatrixMode( GL_PROJECTION );  
       glPushMatrix();
@@ -875,7 +883,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
 
-    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
+    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
     {
       glMatrixMode( GL_PROJECTION );  
       glPopMatrix();
@@ -1115,7 +1123,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       AdaptOdfScalingToImageSpacing(index);
       SetRendererLightSources(renderer);
       ApplyPropertySettings();
-      AdaptCameraPosition(renderer, dispGeo);
+      //AdaptCameraPosition(renderer, dispGeo);
       Slice(renderer, dispGeo);
       m_LastDisplayGeometry = dispGeo;
     }

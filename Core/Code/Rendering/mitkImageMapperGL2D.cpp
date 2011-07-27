@@ -238,7 +238,10 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 
       // create text
       std::stringstream volumeString; 
-      volumeString << std::fixed << std::setprecision(1) << segmentationVolume;
+      int precision = 1;
+      if (segmentationVolume < 0.1)
+        precision = 4;
+      volumeString << std::fixed << std::setprecision(precision) << segmentationVolume;
 
       std::string unit;
       if (node->GetStringProperty("volume annotation unit", unit))

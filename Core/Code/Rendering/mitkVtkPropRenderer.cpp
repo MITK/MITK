@@ -58,6 +58,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAssemblyPath.h>
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
+#include <vtkSmartPointer.h>
 
 
 
@@ -816,4 +817,67 @@ void mitk::VtkPropRenderer::checkState()
       //MITK_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
     }
    }
+}
+
+void mitk::VtkPropRenderer::AdjustCameraToScene(){
+//  LocalStorage *localStorage = m_LSH.GetLocalStorage(this);
+
+  //activate parallel projection for 2D
+  this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
+
+  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
+
+  //TODO
+  double imageHeightInMM = 256.0;//localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
+  double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
+  double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
+
+  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
+  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
+
+  //Scale the rendered object:
+  //The image is scaled by a single factor, because in an orthographic projection sizes
+  //are preserved (so you cannot scale X and Y axis with different parameters). The
+  //parameter sets the size of the total display-volume. If you set this to the image
+  //height, the image plus a border with the size of the image will be rendered.
+  //Therefore, the size is imageHeightInMM / 2.
+  this->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
+  //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
+  this->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
+
+  //the center of the view-plane
+  double viewPlaneCenter[3];
+  viewPlaneCenter[0] = displayGeometryCenterInMM[0];
+  viewPlaneCenter[1] = displayGeometryCenterInMM[1];
+  viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
+
+  //define which direction is "up" for the ciamera (like default for vtk (0.0, 1.0, 0.0)
+  double cameraUp[3];
+  cameraUp[0] = 0.0;
+  cameraUp[1] = 1.0;
+  cameraUp[2] = 0.0;
+
+  //the position of the camera (center[0], center[1], 1000)
+  double cameraPosition[3];
+  cameraPosition[0] = viewPlaneCenter[0];
+  cameraPosition[1] = viewPlaneCenter[1];
+  cameraPosition[2] = 900000.0; //Reason for 900000: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+
+  //set the camera corresponding to the textured plane
+  vtkSmartPointer<vtkCamera> camera = this->GetVtkRenderer()->GetActiveCamera();
+  if (camera)
+  {
+    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
+    camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
+    camera->SetViewUp( cameraUp ); //set the view-up for the camera
+    camera->SetClippingRange(0.1, 1000000.0); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+  }
+
+  this->GetVtkRenderer()->RemoveAllLights();
+
+  //remove the VTK interaction
+  this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+
+  //TODO
+//  this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 }

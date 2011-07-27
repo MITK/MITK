@@ -159,6 +159,8 @@ private:
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();
 
+  void AdjustCameraToScene();
+
   bool m_InitNeeded;
   bool m_ResizeNeeded;
   bool m_VtkMapperPresent;

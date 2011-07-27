@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <MitkIGTExports.h>
 #include "mitkNavigationTool.h"
+#include <mitkDataStorage.h>
 
 namespace mitk {
   /**Documentation
@@ -39,7 +40,12 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationToolStorage,itk::Object);
+    /** @brief Constructs a NavigationToolStorage without reference to a DataStorage. The Data Nodes of tools have to be added and removed to a data storage outside this class.
+     *         Normaly the other constructor should be used.
+     */
     itkNewMacro(Self);
+    /** @brief Constructs a NavigationToolStorage with reference to a DataStorage. The Data Nodes of tools are added and removed automatically to this data storage. */
+    mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);
     
     /**
      * @brief  Adds a tool to the storage. Be sure that the tool has a unique 
@@ -94,9 +100,11 @@ namespace mitk {
     
   protected:
     NavigationToolStorage();
+    NavigationToolStorage(mitk::DataStorage::Pointer);
     ~NavigationToolStorage();
     
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
+    mitk::DataStorage::Pointer m_DataStorage;
 
   };
 } // namespace mitk

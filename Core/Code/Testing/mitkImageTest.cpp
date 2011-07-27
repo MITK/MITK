@@ -423,15 +423,15 @@ int mitkImageTest(int argc, char* argv[])
   mitk::DataNode::Pointer node;      
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
   MITK_TEST_CONDITION_REQUIRED(argc == 2, "Check if test image is accessible!"); 
+  const std::string filename = std::string(argv[1]);
   try
   {
-    const std::string filename = std::string(argv[1]);   
     nodeReader->SetFileName(filename);
     nodeReader->Update();
     node = nodeReader->GetOutput();      
   }
   catch(...) {
-    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << "brain.mhd");
+    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
     return NULL;
   }  
 
@@ -478,6 +478,15 @@ int mitkImageTest(int argc, char* argv[])
   float valByItk = itkimage->GetPixel(idx);
 
   MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk,94.456184387207031), "");
+
+  mitk::Image::Pointer cloneImage = image->Clone();
+  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
+  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetPixelType() == image->GetPixelType(), "Clone (testing pixel type)");
+
+  for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
+  {
+    MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
+  }
 
   MITK_TEST_END();
 

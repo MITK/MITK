@@ -48,12 +48,34 @@ m_TimeSelectorForExtremaObject(NULL)
   m_HistogramGeneratorObject = generator;
 }
 
-mitk::Image::Image(const Image &other ) : m_Dimension(other.m_Dimension), 
-m_Dimensions(other.m_Dimensions), m_OffsetTable(other.m_OffsetTable), m_CompleteData(NULL), m_PixelType(NULL),
-m_TimeSelectorForExtremaObject(NULL)
+mitk::Image::Image(const Image &other)
+  : m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
+  m_CompleteData(NULL), m_PixelType(NULL),
+  m_TimeSelectorForExtremaObject(NULL)
 {
-  
+  m_Initialized = false;
+
+  this->Initialize(&other);
+
+  if (this->GetDimension() > 3)
+  {
+    const unsigned int time_steps = this->GetDimension(3);
+
+    for (unsigned int i = 0u; i < time_steps; ++i)
+    {
+      ImageDataItemPointer volume = const_cast<Image&>(other).GetVolumeData(i);
+
+      this->SetVolume(volume->GetData(), i);
+    }
+  }
+  else
+  {
+    ImageDataItemPointer volume = const_cast<Image&>(other).GetVolumeData(0);
+
+    this->SetVolume(volume->GetData(), 0);
+  }
 }
+
 mitk::Image::~Image()
 {
   Clear();

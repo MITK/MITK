@@ -3,16 +3,18 @@
 
 \section PropertyConcept The Concept Behind MITK Properties
 
-TODO:
-What information to they contain?
-Why use them?
-How to use them?
-What should not be stored in there?
-Where can they be accessed?
+Properties belong to a datanode and contain information relevant to the handling of the node by MITK. They provide a place to store additional information which is not part of the actual data, and as such have no reason to be contained within the data/file itself, but might be needed for such things as rendering (e.g. transfer functions) or interaction (e.g. the name of the node).
+
+Propteries can be read an set:
+
+\code
+mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color"));
+
+node->SetProperty( "IsTensorVolume", mitk::BoolProperty::New( true ) );
+\endcode
 
 \section ListOfIndependentProperty A List Of Module Independent Properties
 
-TODO:
 \subsection FileManagement File Management
 path - The physical path the file was loaded from
 name - The node name in the datamanager
@@ -119,19 +121,18 @@ result->SetProperty( "LookupTable", LookupTableProp );
 result->SetBoolProperty("use color", false);
 result->Update();
 \endcode
-TODO Should be redone and renamed, this is counterintuitive
 
 visible - toggle node/image/surface being rendered at all
 
 \subsection SurfaceRenderingProperties Surface Rendering Properties
-..Surfacerendering:
+
 back color - in 2D, color of the normals outside the surface
-back normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
+back normal lenth (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the front color is shorter?)
-color mode - surface - ???
-draw normals 2d - Boolean: in 2D, toggles the presence of normals
+color mode -  (From VTK) Control how the scalar data is mapped to colors. By default (ColorModeToDefault), unsigned char scalars are treated as colors, and NOT mapped through the lookup table, while everything else is. Setting ColorModeToMapScalars means that all scalar data will be mapped through the lookup table.
+draw normals 2d -  in 2D, toggles the presence of normals
 front color - in 2D, color of the normals inside the surface
-front normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
+front normal lenth (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the back color is shorter?)
 invert normals - in 2D, switch front/back normals
 line width - in 2D, controls the thickness of the line where the surface
@@ -143,45 +144,41 @@ surface construction
 material.representation - Choose the representation to draw the mesh in
 (Surface, Wireframe, Point Cloud)
 material.specularCoefficient - in-/decrease non-scattered reflection
-material.specularPower - control percentage of non-scattered reflection - ???
-difference to specularCoefficient?
+material.specularPower - control percentage of non-scattered reflection 
 material.wireframeLineWidth - width of the wires if wireframe representation is
-scalar mode - surface - ???
-scalar visibility - surface - ???
-selected
+scalar mode - (From VTK) Control how the filter works with scalar point data and cell attribute data. By default (ScalarModeToDefault), the filter will use point data, and if no point data is available, then cell data is used. Alternatively you can explicitly set the filter to use point data (ScalarModeToUsePointData) or cell data (ScalarModeToUseCellData). You can also choose to get the scalars from an array in point field data (ScalarModeToUsePointFieldData) or cell field data (ScalarModeToUseCellFieldData). If scalars are coming from a field data array, you must call SelectColorArray before you call GetColors. When ScalarMode is set to use Field Data (ScalarModeToFieldData), you must call SelectColorArray to choose the field data array to be used to color cells. In this mode, if the poly data has triangle strips, the field data is treated as the celldata for each mini-cell formed by a triangle in the strip rather than the entire strip. 
+scalar visibility - (From VTK) Turn on/off flag to control whether scalar data is used to color objects. 
+selected - whether the node is selected
 shader - which shader to use for surface rendering, currently the options are
 "fixed" and "mitkShaderLightning"
 
 \subsection VolumeRenderingProperties Volume Rendering Properties
 TransferFunction - contains transfer function for use in coloring image
-volumerendering - Boolean: Should the volume be rendered or not
-volumerendering configuration - Choice between Composite und MIP - ???
+volumerendering -  Should the volume be rendered or not
+volumerendering configuration - Choice between Composite und MIP
 volumerendering.cpu.ambient - ambient lighting
 volumerendering.cpu.diffuse - in-/decrease light dispersion
 volumerendering.cpu.specular - in-/decrease non-scattered reflection
 volumerendering.cpu.specular.power - control percentage of non-scattered
-reflection - ??? difference to just specular?
+reflection 
 volumerendering.gpu.ambient - same as cpu with gpu
 volumerendering.gpu.diffuse - same as cpu with gpu
-volumerendering.gpu.reducesliceartifacts - presumably what the name suggests -
-???
+volumerendering.gpu.reducesliceartifacts - Reduce slice artifacts
 volumerendering.gpu.specular - same as cpu with gpu
 volumerendering.gpu.specular.power - same as cpu with gpu
-volumerendering.gpu.usetexturecompression - presumably what the name suggests -
-???
+volumerendering.gpu.usetexturecompression - use texture compression
 volumerendering.ray.ambient - same as cpu with ray
 volumerendering.ray.diffuse - same as cpu with ray
 volumerendering.ray.specular - same as cpu with ray
 volumerendering.ray.specular.power - same as cpu with ray
-volumerendering.usegpu - Boolean: Whether to use the GPU for rendering or not
-volumerendering.uselod - Boolean: Whether to use the Level Of Detail mechanism
-or not
-volumerendering.usemip - Boolean: Whether to utilize maximum intensity
-projection
-volumerendering.useray - Boolean: Whether to use raycasting or not
+volumerendering.usegpu -  Whether to use the GPU for rendering or not
+volumerendering.uselod -  Whether to use the Level Of Detail mechanism or not
+volumerendering.usemip -  Whether to utilize maximum intensity projection
+volumerendering.useray - Whether to use raycasting or not
 
-Additional comment:
-uselod can be active with usegpu, usemip, useray, but any of the latter can not
+\info
+Uselod can be active with usegpu, usemip, useray, but any of the latter can not
 be used with another one of them.
+\endinfo
 
 */

@@ -18,9 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUnstructuredGrid.h>
 #include <vtkDataReader.h>
 #include <vtkUnstructuredGridReader.h>
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkXMLUnstructuredGridReader.h>
-#endif
+
 #include <itksys/SystemTools.hxx>
 
 
@@ -64,9 +63,7 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
         reader->Delete();
       }
     }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    else
-    if (ext == ".vtu")
+    else if (ext == ".vtu")
     {
       vtkXMLUnstructuredGridReader *reader=vtkXMLUnstructuredGridReader::New();
       if( reader->CanReadFile(m_FileName.c_str()) )
@@ -85,7 +82,6 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
         reader->Delete();
       }
     }
-#endif
     if(!success)
     {
       itkExceptionMacro( << " ... sorry, this .vtk format is not supported yet." );
@@ -111,9 +107,7 @@ bool mitk::VtkUnstructuredGridReader::CanReadFile(const std::string filename, co
       return false;
     }
   }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  else
-    if (ext == ".vtu")
+  else if (ext == ".vtu")
     {
       vtkXMLUnstructuredGridReader *chooser=vtkXMLUnstructuredGridReader::New();
       if(!chooser->CanReadFile(filename.c_str()))
@@ -122,7 +116,6 @@ bool mitk::VtkUnstructuredGridReader::CanReadFile(const std::string filename, co
         return false;
       }
     }
-#endif
     else
       return false;
 

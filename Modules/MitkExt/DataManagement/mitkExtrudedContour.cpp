@@ -55,11 +55,8 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ExtrusionFilter->CappingOff();
   m_ExtrusionFilter->SetExtrusionTypeToVectorExtrusion();
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   double vtkvector[3]={0,0,1};
-#else
-  float vtkvector[3]={0,0,1};
-#endif
+
   // set extrusion vector
   m_ExtrusionFilter->SetVector(vtkvector);
 
@@ -93,12 +90,7 @@ mitk::ExtrudedContour::~ExtrudedContour()
 
 bool mitk::ExtrudedContour::IsInside(const Point3D& worldPoint) const
 {
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   static double polygonNormal[3]={0.0,0.0,1.0};
-#else
-  static float polygonNormal[3]={0.0,0.0,1.0};
-#endif
-
 
   // project point onto plane
   float xt[3];
@@ -113,17 +105,12 @@ bool mitk::ExtrudedContour::IsInside(const Point3D& worldPoint) const
   xt[1] -= dist*m_Normal[1];
   xt[2] -= dist*m_Normal[2];
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double x[3];
-#else
-   float x[3];
-#endif
+  double x[3];
 
   x[0] = xt[0]*m_Right[0]+xt[1]*m_Right[1]+xt[2]*m_Right[2];
   x[1] = xt[0]*m_Down[0] +xt[1]*m_Down[1] +xt[2]*m_Down[2];
   x[2] = 0;
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   // determine whether it's in the selection loop and then evaluate point
   // in polygon only if absolutely necessary.
   if ( x[0] >= this->m_ProjectedContourBounds[0] && x[0] <= this->m_ProjectedContourBounds[1] &&
@@ -134,18 +121,6 @@ bool mitk::ExtrudedContour::IsInside(const Point3D& worldPoint) const
     return true;
   else
     return false;
-#else
-  // determine whether it's in the selection loop and then evaluate point
-  // in polygon only if absolutely necessary.
-  if ( x[0] >= this->m_ProjectedContourBounds[0] && x[0] <= this->m_ProjectedContourBounds[1] &&
-    x[1] >= this->m_ProjectedContourBounds[2] && x[1] <= this->m_ProjectedContourBounds[3] &&
-    this->m_Polygon->PointInPolygon(x, m_Polygon->Points->GetNumberOfPoints(),
-    ((vtkFloatArray *)this->m_Polygon->Points->GetData())->GetPointer(0), 
-    const_cast<mitk::ExtrudedContour*>(this)->m_ProjectedContourBounds, polygonNormal) == 1 )
-    return true;
-  else
-    return false;
-#endif
 
 }
 
@@ -254,11 +229,8 @@ void mitk::ExtrudedContour::BuildGeometry()
 
     vtkPoints *loopPoints = vtkPoints::New();
     //mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     double vtkpoint[3];
-#else
-    float vtkpoint[3];
-#endif
+
     unsigned int i=0;
     for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
     {
@@ -338,11 +310,8 @@ void mitk::ExtrudedContour::BuildGeometry()
   // shift parametric origin to (0,0)
   for(i=0; i<numPts; ++i)
   {
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     double * pt = this->m_Polygon->Points->GetPoint(i);
-#else
-    float * pt = this->m_Polygon->Points->GetPoint(i);
-#endif
+
     pt[0]-=min[0]; pt[1]-=min[1];
     itkDebugMacro( << i << ": (" << pt[0] << "," << pt[1] << "," << pt[2] << ")" );
   }

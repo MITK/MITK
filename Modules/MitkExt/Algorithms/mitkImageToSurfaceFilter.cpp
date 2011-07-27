@@ -26,10 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 #include <vtkQuadricDecimation.h>
 
-#if (VTK_MAJOR_VERSION < 5)
-#include <vtkDecimate.h>
-#endif
-
 #include "mitkProgressBar.h"
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter(): 
@@ -83,15 +79,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
   ProgressBar::GetInstance()->Progress();
 
-//#if (VTK_MAJOR_VERSION >= 5)
-//  if (m_Decimate == Decimate )
-//  {
-//    MITK_ERROR << "vtkDecimate not available for VTK 5.0 and above.";
-//    MITK_ERROR << " Using vtkDecimatePro instead." << std::endl;
-//    m_Decimate = DecimatePro;
-//  }
-//#endif
-
   //decimate = to reduce number of polygons
   if(m_Decimate==DecimatePro)
   {
@@ -123,20 +110,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(NULL);
     decimate->Delete();
   }
-#if (VTK_MAJOR_VERSION < 5)
-  else if (m_Decimate==Decimate)
-  {
-    vtkDecimate *decimate = vtkDecimate::New();
-    decimate->SetInput( polydata );
-    decimate->PreserveTopologyOn();
-    decimate->BoundaryVertexDeletionOff();
-    decimate->SetTargetReduction( m_TargetReduction );
-    polydata->Delete();//RC--
-    polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
-    decimate->Delete();
-  }
-#endif
 
   polydata->Update();
   ProgressBar::GetInstance()->Progress();

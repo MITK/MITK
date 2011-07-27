@@ -57,7 +57,6 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
     }
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
-#if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
     int xp = (int)me->GetDisplayPosition()[0];
     int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
@@ -76,29 +75,6 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
     default:
       return;
     }
-#else
-    if(me->GetButton() & BS_LeftButton)
-    {
-      //    SetCapture(wnd);
-      m_VtkInteractor->InteractorStyle->OnLeftButtonDown(ctrl, shift,
-          me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-    }
-    else
-      if(me->button() & BS_MidButton)
-      {
-        //    SetCapture(wnd);
-        m_VtkInteractor->InteractorStyle->OnMiddleButtonDown(ctrl, shift,
-            me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-      }
-      else
-        if(me->button() & BS_RightButton)
-        {
-          //    SetCapture(wnd);
-          m_VtkInteractor->InteractorStyle->OnRightButtonDown(ctrl, shift,
-              me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-        }
-#endif
-
   }
 }
 
@@ -113,7 +89,6 @@ void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me
     }
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
-#if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
     int xp = (int)me->GetDisplayPosition()[0];
     int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
@@ -132,29 +107,6 @@ void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me
     default:
       return;
     }
-#else
-    if(me->button() & BS_LeftButton)
-    {
-      m_VtkInteractor->InteractorStyle->OnLeftButtonUp(ctrl, shift,
-          me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-      //ReleaseCapture( );
-    }
-    else
-      if(me->button() & BS_MidButton)
-      {
-        m_VtkInteractor->InteractorStyle->OnMiddleButtonUp(ctrl, shift,
-            me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-        //ReleaseCapture( );
-      }
-      else
-        if(me->button() & BS_RightButton)
-        {
-          m_VtkInteractor->InteractorStyle->OnRightButtonUp(ctrl, shift,
-              me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-          //ReleaseCapture( );
-        }
-#endif
-
   }
 }
 
@@ -169,32 +121,10 @@ void mitk::VtkInteractorCameraController::MouseMoveEvent(mitk::MouseEvent *me)
     }
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
-#if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
     int xp = (int)me->GetDisplayPosition()[0];
     int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
     m_VtkInteractor->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
-#else
-    if (!m_VtkInteractor->MouseInWindow &&
-        ((me->GetDisplayPosition().x >= 0) && (me->GetDisplayPosition().x < m_VtkInteractor->Size[0]) && (me->GetDisplayPosition().y >= 0) && (me->GetDisplayPosition().y < m_VtkInteractor->Size[1])))
-    {
-      m_VtkInteractor->InteractorStyle->OnEnter(ctrl, shift,
-          me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-      m_VtkInteractor->MouseInWindow = 1;
-    }
-
-    if (m_VtkInteractor->MouseInWindow &&
-        ((me->GetDisplayPosition().x < 0) || (me->GetDisplayPosition().x >= m_VtkInteractor->Size[0]) || (me->GetDisplayPosition().y < 0) || (me->GetDisplayPosition().y >= m_VtkInteractor->Size[1])))
-    {
-      m_VtkInteractor->InteractorStyle->OnLeave(ctrl, shift,
-          me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-      m_VtkInteractor->MouseInWindow = 0;
-    }
-
-    m_VtkInteractor->InteractorStyle->OnMouseMove(ctrl, shift,
-        me->GetDisplayPosition().x, m_VtkInteractor->Size[1] - me->GetDisplayPosition().y - 1);
-#endif
-
   }
 }
 
@@ -209,14 +139,10 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
     }
     int ctrl  = ke->GetButtonState() & BS_ControlButton;
     int shift = ke->GetButtonState() & BS_ShiftButton;
-#if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
     Point2D p(ke->GetDisplayPosition());
     m_VtkInteractor->SetEventInformationFlipY(p[0], p[1], ctrl, shift, tolower(ke->GetText()[0]), 1, ke->GetText());
     m_VtkInteractor->InvokeEvent(vtkCommand::KeyPressEvent, NULL);
     m_VtkInteractor->InvokeEvent(vtkCommand::CharEvent, NULL);
-#else
-    m_VtkInteractor->InteractorStyle->OnChar(ctrl, shift, (char)ke->ascii(), ke->count());
-#endif
   }
 }
 

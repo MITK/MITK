@@ -120,9 +120,7 @@ namespace mitk {
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
     
-    #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-      virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
-    #endif
+    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
 
     /** 
     * \brief Returns whether this is an vtk-based mapper

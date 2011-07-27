@@ -533,9 +533,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     m_PlaneWidget->SetPlaceFactor(1.0);
     m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput());
     m_PlaneWidget->OutlineTranslationOff(); //disables scaling of the bounding box
-#if (VTK_MAJOR_VERSION >= 5)
     m_PlaneWidget->ScaleEnabledOff(); //disables scaling of the bounding box
-#endif
     m_PlaneWidget->DrawPlaneOff(); //clipping plane is transparent
     mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
 

@@ -38,12 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVectorText.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
-
-#if (VTK_MAJOR_VERSION >= 5)
 #include <vtkPolyDataAlgorithm.h>
-#else
-#include <vtkPolyData.h>
-#endif
 
 #include <stdlib.h>
 
@@ -189,11 +184,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     else
       pointType = pointDataIter.Value().pointSpec;
 
-#if (VTK_MAJOR_VERSION >= 5)
     vtkPolyDataAlgorithm *source;
-#else
-    vtkPolyDataSource *source;
-#endif
 
     switch (pointType)
     {

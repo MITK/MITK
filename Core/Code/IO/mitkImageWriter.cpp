@@ -44,7 +44,6 @@ void mitk::ImageWriter::SetDefaultExtension()
 }
 
 #include <vtkConfigure.h>
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkImageData.h>
 #include <vtkXMLImageDataWriter.h>
 static void writeVti(const char * filename, mitk::Image* image, int t=0)
@@ -55,7 +54,6 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
   vtkwriter->Write();
   vtkwriter->Delete();
 }
-#endif
 
 void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileName)
 {
@@ -138,9 +136,7 @@ void mitk::ImageWriter::GenerateData()
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   bool vti = (m_Extension.find(".vti") != std::string::npos);
-#endif
 
   // If the extension is NOT .pic and NOT .nrrd the following block is entered
   if ( m_Extension.find(".pic") == std::string::npos
@@ -169,26 +165,22 @@ void mitk::ImageWriter::GenerateData()
           itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
           filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
         }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
         if ( vti )
         {
           writeVti(filename.str().c_str(), input, t);
         }
         else
-#endif
         {        
           WriteByITK(input, filename.str());
         }
       }
     }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     else if ( vti )
     {
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
       writeVti(filename.str().c_str(), input);
     }
-#endif
     else
     {
       ::itk::OStringStream filename;

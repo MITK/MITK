@@ -18,9 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 #include <vtkDataReader.h>
 #include <vtkPolyDataReader.h>
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkXMLPolyDataReader.h>
-#endif
 #include <itksys/SystemTools.hxx>
 
 
@@ -65,7 +63,6 @@ void mitk::VtkSurfaceReader::GenerateData()
       }
       chooser->Delete();
     }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     else
     if (ext == ".vtp")
     {
@@ -86,7 +83,6 @@ void mitk::VtkSurfaceReader::GenerateData()
         reader->Delete();
       }
     }
-#endif
     if(!success)
     {
       itkWarningMacro( << " ... sorry, this .vtk format is not supported yet." );
@@ -113,7 +109,6 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
     }
     chooser->Delete();
   }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   else
     if (ext == ".vtp")
     {
@@ -125,7 +120,6 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
       }
       chooser->Delete();
     }
-#endif
     else
       return false;
 

@@ -88,11 +88,7 @@ void mitk::RenderWindowFrame::Disable()
 {
   if ( this->IsEnabled())
   {
-    #if ( VTK_MAJOR_VERSION >= 5 )
-      m_RectangleRenderer->EraseOn();
-    #else
-      m_RenderWindow->SetErase(1);
-    #endif
+    m_RectangleRenderer->EraseOn();
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_RectangleRenderer);
     m_IsEnabled = false;
   }
@@ -114,11 +110,9 @@ void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 
   if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
   {
-    #if ( VTK_MAJOR_VERSION >= 5 )
-      m_RectangleRenderer->EraseOff();
-    #else
-      m_RenderWindow->SetErase(0); 
-    #endif
+
+    m_RectangleRenderer->EraseOff();
+
     m_RectangleRenderer->SetInteractive(0);
     
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);

@@ -52,9 +52,9 @@ public:
   virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
   virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
   
-  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
-  #endif
+
+  virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+
   //##Documentation
   //## @brief Set the vtkTransform of the m_Prop3D for
   //## the current time step of \a renderer

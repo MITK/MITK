@@ -38,12 +38,6 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   mitk::Surface::Pointer cloneSurface = surface->Clone();
   MITK_TEST_CONDITION_REQUIRED( cloneSurface.GetPointer(), "Testing clone surface initialization!" );
 
-  std::filebuf fb;
-//  std::ostream s = std::ostream(&fb);
-//  surface->PrintSelf( s, 0);
-//  MITK_INFO<<s;
-//  MITK_TEST_CONDITION_REQUIRED(s != "", "Testing PrintSelf method!");
-
   vtkSphereSource* sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);
   sphereSource->SetRadius(5.0);

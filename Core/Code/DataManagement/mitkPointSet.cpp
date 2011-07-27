@@ -28,13 +28,12 @@ mitk::PointSet::PointSet()
   this->InitializeEmpty();
 }
 
-mitk::PointSet::PointSet(const PointSet &other): m_PointSetSeries(other.m_PointSetSeries)
+mitk::PointSet::PointSet(const PointSet &other): BaseData(other), 
+m_PointSetSeries(other.m_PointSetSeries), 
+m_CalculateBoundingBox(other.m_CalculateBoundingBox)
 {
-  m_Initialized = other.m_Initialized;
-  m_CalculateBoundingBox = other.m_CalculateBoundingBox;
-  this->SetClonedGeometry(other.GetGeometry());
-
 }
+
 mitk::PointSet::~PointSet()
 {
   this->ClearData();

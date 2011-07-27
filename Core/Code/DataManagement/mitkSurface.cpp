@@ -33,7 +33,9 @@ m_CalculateBoundingBox( false )
   this->InitializeEmpty();
 }
 
-mitk::Surface::Surface(const mitk::Surface& other) : m_CalculateBoundingBox(other.m_CalculateBoundingBox), m_RequestedRegion(other.m_RequestedRegion),
+mitk::Surface::Surface(const mitk::Surface& other) : BaseData(other), 
+m_CalculateBoundingBox(other.m_CalculateBoundingBox), 
+m_RequestedRegion(other.m_RequestedRegion),
 m_LargestPossibleRegion(other.m_LargestPossibleRegion)
 {
   if(other.m_PolyDataSeries.at(0) != NULL)

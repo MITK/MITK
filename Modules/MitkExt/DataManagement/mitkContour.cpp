@@ -30,13 +30,17 @@ m_Width (3.0)
   Superclass::InitializeTimeSlicedGeometry();
 }
 
-mitk::Contour::Contour( const Contour & other ): m_ContourPath(other.m_ContourPath),
-m_CurrentWindow(other.m_CurrentWindow), m_BoundingBox(other.m_BoundingBox), 
-m_Vertices(other.m_Vertices), m_Closed(other.m_Closed), 
-m_Selected(other.m_Selected),m_Width(other.m_Width)
+mitk::Contour::Contour( const Contour & other ): BaseData(other), 
+m_ContourPath(other.m_ContourPath),
+m_CurrentWindow(other.m_CurrentWindow), 
+m_BoundingBox(other.m_BoundingBox), 
+m_Vertices(other.m_Vertices), 
+m_Closed(other.m_Closed), 
+m_Selected(other.m_Selected),
+m_Width(other.m_Width)
 {
-  this->SetClonedGeometry(other.GetGeometry());
 }
+
 mitk::Contour::~Contour()
 {
 }

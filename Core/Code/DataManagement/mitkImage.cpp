@@ -48,13 +48,10 @@ m_TimeSelectorForExtremaObject(NULL)
   m_HistogramGeneratorObject = generator;
 }
 
-mitk::Image::Image(const Image &other)
-  : m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL),
-  m_TimeSelectorForExtremaObject(NULL)
+mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), 
+m_Dimensions(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_PixelType(NULL), 
+m_TimeSelectorForExtremaObject(NULL)
 {
-  m_Initialized = false;
-
   this->Initialize(&other);
 
   if (this->GetDimension() > 3)

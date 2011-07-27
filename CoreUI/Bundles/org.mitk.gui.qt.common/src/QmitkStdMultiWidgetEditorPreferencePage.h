@@ -16,24 +16,24 @@
  =========================================================================*/
 
 
-#ifndef QMITKDATAMANAGERPREFERENCEPAGE_H_
-#define QMITKDATAMANAGERPREFERENCEPAGE_H_
+#ifndef QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
+#define QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
 
 #include "berryIQtPreferencePage.h"
-#include <org_mitk_gui_qt_datamanager_Export.h>
+#include <org_mitk_gui_qt_common_Export.h>
 #include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
 
-struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public QObject, public berry::IQtPreferencePage
+struct MITK_QT_COMMON QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  QmitkDataManagerPreferencePage();
-  QmitkDataManagerPreferencePage(const QmitkDataManagerPreferencePage& other);
+  QmitkStdMultiWidgetEditorPreferencePage();
+  QmitkStdMultiWidgetEditorPreferencePage(const QmitkStdMultiWidgetEditorPreferencePage& other);
 
   void Init(berry::IWorkbench::Pointer workbench);
 
@@ -57,12 +57,9 @@ public:
   virtual void Update();
 
 protected:
-  QWidget* m_MainControl;  
-  QCheckBox* m_EnableSingleEditing;
-  QCheckBox* m_PlaceNewNodesOnTop;
-  QCheckBox* m_ShowHelperObjects;
-  QCheckBox* m_UseSurfaceDecimation;
-  berry::IPreferences::Pointer m_DataManagerPreferencesNode;
+  QWidget* m_MainControl;
+  QCheckBox* m_EnableFlexibleZooming;  
+  berry::IPreferences::Pointer m_StdMultiWidgetEditorPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

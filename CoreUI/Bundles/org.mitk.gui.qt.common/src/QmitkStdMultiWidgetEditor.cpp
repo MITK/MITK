@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 
 #include <mitkDataStorageEditorInput.h>
+#include <mitkIDataStorageService.h>
+
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
 
 const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
@@ -116,11 +120,69 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
     std::string departmentLogoLocation = logoPref->Get("DepartmentLogo","");
 
+
+    //# Preferences
+
+    berry::IBerryPreferences::Pointer prefs
+        = (prefService->GetSystemPreferences()->Node(EDITOR_ID))
+          .Cast<berry::IBerryPreferences>();
+    assert( prefs );
+
+    prefs->OnChanged.AddListener( berry::MessageDelegate1<QmitkStdMultiWidgetEditor
+      , const berry::IBerryPreferences*>( this
+        , &QmitkStdMultiWidgetEditor::OnPreferencesChanged ) );
+
+    bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+
+    mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
     m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
   }
 }
+
+void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+
+  // Set preferences respecting zooming and padding
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+
+  mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+  mitk::NodePredicateNot::Pointer pred
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    , mitk::BoolProperty::New(false)));
+
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+  // calculate bounding geometry of these nodes
+
+  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+}
+
+
+mitk::DataStorage::Pointer QmitkStdMultiWidgetEditor::GetDataStorage() const
+{
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  if (service.IsNotNull())
+  {
+    return service->GetDefaultDataStorage()->GetDataStorage();
+  }
+
+  return 0;
+}
+
 
 berry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const
 {

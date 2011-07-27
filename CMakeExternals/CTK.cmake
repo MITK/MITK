@@ -16,7 +16,7 @@ IF(MITK_USE_CTK)
   IF(NOT DEFINED CTK_DIR)
     ExternalProject_Add(${proj}
       GIT_REPOSITORY git://github.com/commontk/CTK.git
-      GIT_TAG 1608ad8ac1e0e548e3cb
+      GIT_TAG f6c3e844ffedbac6f3139265fbdd19c979e44152
       BINARY_DIR ${proj}-build
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

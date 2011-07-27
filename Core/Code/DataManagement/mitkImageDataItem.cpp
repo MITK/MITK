@@ -106,6 +106,13 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   m_ReferenceCountLock.Unlock();
 }
 
+mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
+  : m_PixelType(other.m_PixelType), m_ManageMemory(other.m_ManageMemory), m_Offset(other.m_Offset),
+    m_IsComplete(other.m_IsComplete), m_Size(other.m_Size)
+{
+
+}
+
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
   vtkImageData *inData = vtkImageData::New();

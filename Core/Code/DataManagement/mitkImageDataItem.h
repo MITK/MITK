@@ -50,6 +50,7 @@ namespace mitk {
     ~ImageDataItem();
 
     ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory);
+    ImageDataItem(const ImageDataItem &other);
 
     void* GetData() const
     {

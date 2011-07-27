@@ -19,17 +19,24 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkContour.h"
 
 mitk::Contour::Contour() :
-  m_ContourPath (PathType::New()),
-  m_CurrentWindow ( NULL ),
-  m_BoundingBox (BoundingBoxType::New()),
-  m_Vertices ( BoundingBoxType::PointsContainer::New() ),
-  m_Closed ( true ),
-  m_Selected ( false ),
-  m_Width (3.0)
+m_ContourPath (PathType::New()),
+m_CurrentWindow ( NULL ),
+m_BoundingBox (BoundingBoxType::New()),
+m_Vertices ( BoundingBoxType::PointsContainer::New() ),
+m_Closed ( true ),
+m_Selected ( false ),
+m_Width (3.0)
 {
   Superclass::InitializeTimeSlicedGeometry();
 }
 
+mitk::Contour::Contour( const Contour & other ): m_ContourPath(other.m_ContourPath),
+m_CurrentWindow(other.m_CurrentWindow), m_BoundingBox(other.m_BoundingBox), 
+m_Vertices(other.m_Vertices), m_Closed(other.m_Closed), 
+m_Selected(other.m_Selected),m_Width(other.m_Width)
+{
+  this->SetClonedGeometry(other.GetGeometry());
+}
 mitk::Contour::~Contour()
 {
 }

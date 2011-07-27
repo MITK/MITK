@@ -40,6 +40,8 @@ public:
 
   itkNewMacro(Self);
 
+  mitkCloneMacro(Contour);
+
   typedef itk::PolyLineParametricPath<3>                        PathType;
   typedef PathType::Pointer                                     PathPointer;
   typedef PathType::ContinuousIndexType                         ContinuousIndexType;
@@ -139,6 +141,7 @@ public:
 
 protected:
   Contour();
+  Contour(const Contour & other);
   virtual ~Contour();
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;

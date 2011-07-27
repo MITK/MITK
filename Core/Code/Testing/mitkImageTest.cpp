@@ -482,12 +482,13 @@ int mitkImageTest(int argc, char* argv[])
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetPixelType() == image->GetPixelType(), "Clone (testing pixel type)");
-
+  
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {
     MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
   }
 
+  
   MITK_TEST_END();
 
   return EXIT_SUCCESS;

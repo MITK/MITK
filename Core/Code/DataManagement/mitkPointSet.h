@@ -86,7 +86,7 @@ public:
 
   itkNewMacro(Self);
 
-
+  mitkCloneMacro(PointSet);
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
 
@@ -239,6 +239,7 @@ public:
 
 protected:
   PointSet();
+  PointSet(const PointSet &other);
   virtual ~PointSet();
   
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const; ///< print content of the object to os

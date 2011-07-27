@@ -65,6 +65,10 @@ protected:
   virtual void PartHidden (berry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartVisible (berry::IWorkbenchPartReference::Pointer partRef);
 
+
+  mitk::DataStorage::Pointer GetDataStorage() const;
+
+
 private:
 
   QmitkStdMultiWidget* m_StdMultiWidget;

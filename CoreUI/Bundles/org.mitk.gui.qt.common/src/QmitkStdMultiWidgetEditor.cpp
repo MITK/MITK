@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 
 #include <mitkDataStorageEditorInput.h>
+#include <mitkIDataStorageService.h>
+
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
 
 const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
@@ -146,16 +150,39 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // Set preferences respecting zooming and padding
   bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
 
-  //prefs->Flush();
-
   mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+  mitk::NodePredicateNot::Pointer pred
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    , mitk::BoolProperty::New(false)));
+
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+  // calculate bounding geometry of these nodes
+
+  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  //this->GlobalReinit();
-
-
 }
+
+
+mitk::DataStorage::Pointer QmitkStdMultiWidgetEditor::GetDataStorage() const
+{
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  if (service.IsNotNull())
+  {
+    return service->GetDefaultDataStorage()->GetDataStorage();
+  }
+
+  return 0;
+}
+
 
 berry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const
 {

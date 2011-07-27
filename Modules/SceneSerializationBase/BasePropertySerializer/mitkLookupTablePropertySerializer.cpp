@@ -46,13 +46,8 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
 
         TiXmlElement* element = new TiXmlElement("LookupTable");
 
-#if ( (VTK_MAJOR_VERSION < 5) && (VTK_MINOR_VERSION < 4) )
-        float*  range;
-        float*  rgba;
-#else
         double*  range;
         double*  rgba;
-#endif
 
         element->SetAttribute("NumberOfColors", lut->GetNumberOfTableValues());
         element->SetAttribute("Scale", lut->GetScale());
@@ -109,15 +104,9 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
     {
       if (!element) return NULL;
 
-#if ( (VTK_MAJOR_VERSION < 5) && (VTK_MINOR_VERSION < 4) )
-      typedef float OUR_VTK_FLOAT_TYPE;
-      float range[2];
-      float  rgba[4];
-#else
       typedef double OUR_VTK_FLOAT_TYPE;
       double range[2];
       double  rgba[4];
-#endif
 
       double d;  // bec. of tinyXML's interface that takes a pointer to float or double...
 

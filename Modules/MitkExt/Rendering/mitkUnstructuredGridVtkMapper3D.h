@@ -33,10 +33,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkUnstructuredGridMapper.h"
 #include <vtkUnstructuredGridVolumeRayCastMapper.h>
 
-#if (VTK_MAJOR_VERSION >= 5)
-  #include <vtkProjectedTetrahedraMapper.h>
-  #include <vtkUnstructuredGridVolumeZSweepMapper.h>
-#endif
+#include <vtkProjectedTetrahedraMapper.h>
+#include <vtkUnstructuredGridVolumeZSweepMapper.h>
+
 
 
 namespace mitk {

@@ -75,7 +75,6 @@ namespace mitk {
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer)
     {
       Enable2DOpenGL();
@@ -83,7 +82,6 @@ namespace mitk {
       Disable2DOpenGL();
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
     }
-#endif
 
     void SetDataNode(DataNode* node)
     {

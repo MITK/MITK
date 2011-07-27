@@ -895,12 +895,8 @@ void  mitk::OdfVtkMapper2D<T,N>
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
-    //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     this->GetProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-#else
-    this->GetProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
-#endif
+
 }
 
 template<class T, int N>

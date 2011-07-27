@@ -89,13 +89,11 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
   if (m_VtkVolumeRayCastMapper != 0)
     m_VtkVolumeRayCastMapper->Delete();
 
-  #if (VTK_MAJOR_VERSION >= 5)
   if (m_VtkVolumeZSweepMapper != 0)
     m_VtkVolumeZSweepMapper->Delete();
 
   if (m_VtkPTMapper != 0)
     m_VtkPTMapper->Delete();
-  #endif
 
   if (m_VtkDataSetMapper != 0)
     m_VtkDataSetMapper->Delete();

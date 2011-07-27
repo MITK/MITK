@@ -1014,11 +1014,8 @@ public:
     // Create a vtkUnstructuredGrid
     vtkUnstructuredGrid* vgrid = vtkUnstructuredGrid::New();
     // Create the vtkPoints object and set the number of points
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     vtkPoints* vpoints = vtkPoints::New( VTK_DOUBLE );
-#else
-    vtkPoints* vpoints = vtkPoints::New();
-#endif
+
     vtkFloatArray* pointScalars = vtkFloatArray::New();
     vtkFloatArray* cellScalars = vtkFloatArray::New();
     pointScalars->SetNumberOfComponents(1);
@@ -1236,11 +1233,8 @@ public:
       polydata->Initialize();
 
     // Create the vtkPoints object and set the number of points
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     vtkPoints* vpoints = vtkPoints::New( VTK_DOUBLE );
-#else
-    vtkPoints* vpoints = vtkPoints::New();
-#endif
+
     vtkFloatArray * scalars = vtkFloatArray::New();
     scalars->SetNumberOfComponents(1);
 

@@ -97,14 +97,10 @@ bool mitk::ContourInteractor::ExecuteAction(mitk::Action* action, mitk::StateEve
     eventPoint[1] = displayPosEvent->GetDisplayPosition()[1];
     eventPoint[2] = 0;
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  typedef itk::Point<double,3> DoublePoint3D;
-  DoublePoint3D p;
-  p.CastFrom(eventPoint);
-  sender->GetVtkRenderer()->SetDisplayPoint(p.GetDataPointer());
-#else
-    sender->GetVtkRenderer()->SetDisplayPoint(eventPoint.GetDataPointer());
-#endif
+    typedef itk::Point<double,3> DoublePoint3D;
+    DoublePoint3D p;
+    p.CastFrom(eventPoint);
+    sender->GetVtkRenderer()->SetDisplayPoint(p.GetDataPointer());
 
     sender->GetVtkRenderer()->DisplayToWorld();
     vtkFloatingPointType *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();

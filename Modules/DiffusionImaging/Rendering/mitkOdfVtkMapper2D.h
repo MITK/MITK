@@ -83,9 +83,7 @@ namespace mitk {
     virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
     virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
 
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
-#endif
     
     OdfDisplayGeometry* MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
     void AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo );

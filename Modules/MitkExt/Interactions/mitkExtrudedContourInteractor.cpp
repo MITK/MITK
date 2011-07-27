@@ -108,22 +108,15 @@ bool mitk::ExtrudedContourInteractor::ExecuteAction(mitk::Action* action, mitk::
     eventPoint[1] = displayPosEvent->GetDisplayPosition()[1];
     eventPoint[2] = 0;
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     typedef itk::Point<double,3> DoublePoint3D;
     DoublePoint3D p;
     p.CastFrom(eventPoint);
     sender->GetVtkRenderer()->SetDisplayPoint(p.GetDataPointer());
-#else
-    sender->GetVtkRenderer()->SetDisplayPoint(eventPoint.GetDataPointer());
-#endif
+
     sender->GetVtkRenderer()->DisplayToWorld();
 
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     double *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
-#else
-    float *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
-#endif
+
     vtk2itk(vtkwp, eventPoint);
 
     double *vtkvpn = sender->GetVtkRenderer()->GetActiveCamera()->GetViewPlaneNormal();

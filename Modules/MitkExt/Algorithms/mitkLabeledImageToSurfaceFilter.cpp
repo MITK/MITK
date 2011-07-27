@@ -24,9 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkDecimatePro.h>
-#if (VTK_MAJOR_VERSION < 5)
-#include <vtkDecimate.h>
-#endif
 #include <vtkLinearTransform.h>
 #include <vtkMatrix4x4.h>
 
@@ -222,16 +219,6 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     smoother->Delete();
   }
 
-//
-//#if (VTK_MAJOR_VERSION >= 5)
-//  if (m_Decimate == Decimate )
-//  {
-//    MITK_ERROR << "vtkDecimate not available for VTK 5.0 and above.";
-//    MITK_ERROR << " Using vtkDecimatePro instead." << std::endl;
-//    m_Decimate = DecimatePro;
-//  }
-//#endif
-
   //decimate = to reduce number of polygons
   if(m_Decimate==DecimatePro)
   {
@@ -252,20 +239,6 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }
-#if (VTK_MAJOR_VERSION < 5)
-  else if (m_Decimate==Decimate)
-  {
-    vtkDecimate *decimate = vtkDecimate::New();
-    decimate->SetInput( polydata );
-    decimate->PreserveTopologyOn();
-    decimate->BoundaryVertexDeletionOff();
-    decimate->SetTargetReduction( m_TargetReduction );
-    polydata->Delete();//RC--
-    polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
-    decimate->Delete();
-  }
-#endif
 
   polydata->Update();
 

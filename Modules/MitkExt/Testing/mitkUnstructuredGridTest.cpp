@@ -52,6 +52,8 @@ int mitkUnstructuredGridTest(int /* argc */, char* /*argv*/[])
   size[0] = 100;
   size[1] = 100;
   size[2] = 100;
+  size[3] = 100;
+  size[4] = 100;
 
   mitk::UnstructuredGrid::RegionType::IndexType index;
   index[0] = 0;

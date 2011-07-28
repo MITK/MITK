@@ -16,47 +16,45 @@ node->SetProperty( "IsTensorVolume", mitk::BoolProperty::New( true ) );
 \section ListOfIndependentProperty A List Of Module Independent Properties
 
 \subsection FileManagement File Management
-path - The physical path the file was loaded from
-name - The node name in the datamanager
-selected - Whether the node is selected in the datamanager
+<ul>
+  <li> path - The physical path the file was loaded from
+  <li> name - The node name in the datamanager
+  <li> selected - Whether the node is selected in the datamanager
+</ul>
 
 \subsection GenericRenderingProperty Generic Rendering Properties
-color - Color the surface, grey value image, whatever should be rendered in
-(default is usually white). There is a special mitk::ColorProperty and you
-can use the Getter/Setter methods to access it. The color is defined with 
-three values (RGB) in the range between 0.0 and 1.0. 
-\info If you are inside a mapper you can use the following code to access 
+<ul>
+  <li> color - Color the surface, grey value image, whatever should be rendered in (default is usually white). There is a special mitk::ColorProperty and you can use the Getter/Setter methods to access it. The color is defined with three values (RGB) in the range between 0.0 and 1.0. 
+\remark If you are inside a mapper you can use the following code to access 
 the color:
 \code
 float rgb[3]={1.0f, 1.0f, 1.0f};
 GetColor( rgb, BaseRenderer );
 \endcode
 (The BaseRenderer is usually known inside a mapper).
-\endinfo
+
 \warning
 This property will not effect images if you set the property "use color" 
 to false. In that case a user-defined lookuptable will be used.
 
-in plane resample extent by geometry - Toggles:
+  <li> in plane resample extent by geometry - Toggles:
 Resampling grid corresponds to the current world geometry. This
 means that the spacing of the output 2D image depends on the
 currently selected world geometry, and *not* on the image itself.
-
-Resampling grid corresponds to the input geometry. This means that
+  <li> Resampling grid corresponds to the input geometry. This means that
 the spacing of the output 2D image is directly derived from the
 associated input image, regardless of the currently selected world
 geometry.
-
-layer - Controls which image is considered "on top" of another. In the case 
+  <li> layer - Controls which image is considered "on top" of another. In the case 
 that two should inhabit the same space, the higher layer occludes lower layer.
 So far it works for images and pointsets. The layer property applies only for similar datatypes. Pointsets are always rendered in front of images and the layer will not have any effect.
+  <li> levelwindow - In general, grayscale images contain values between 0 and 255. Therefore, the default window boundaries are set respectively. For displaying the image within a certain range, ie. 50 - 200, this property can be used to adjust the minimum and maximum boundary.
+  <li> LookupTable - This property contains a user defined lookuptable, which can be used to map scalar values to color values. Example: If an image contains a value of 128, in the resulting image the passed lookuptable could map this value to red (255, 0, 0).
 
-levelwindow - In general, grayscale images contain values between 0 and 255. Therefore, the default window boundaries are set respectively. For displaying the image within a certain range, ie. 50 - 200, this property can be used to adjust the minimum and maximum boundary.
-
-LookupTable - This property contains a user defined lookuptable, which can be used to map scalar values to color values. Example: If an image contains a value of 128, in the resulting image the passed lookuptable could map this value to red (255, 0, 0).
-\warning
+  \warning
 This property will not effect images if you set the property "use color" 
 to true. In that case color properties and a default lookuptable are used.
+
 Example for setting up a lookuptable in MITK:
 \code
 #include <vtkSmartPointer.h>
@@ -79,25 +77,22 @@ result->SetProperty( "LookupTable", LookupTableProp );
 result->SetBoolProperty("use color", false);
 result->Update();
 \endcode
-
-
-opacity - Alpha (or transparency) value of the node/image/surface etc.. The
+  <li> opacity - Alpha (or transparency) value of the node/image/surface etc.. The
 range of the opacity is between 0.0 and 1.0. 
-\info If you are inside a mapper you can use the following code to access 
+
+\remark 
+If you are inside a mapper you can use the following code to access 
 the opacity:
 \code
 float opacity=1.0f;
 GetOpacity( opacity, BaseRenderer );
 \endcode
 (The BaseRenderer is usually known inside a mapper).
-\endinfo
-
-reslice interpolation - This property takes effect in swivel mode or crosshair rotaiton  only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
-
-texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
 
 
-use color - This property toggles the use of a user-defined lookuptable 
+  <li> reslice interpolation - This property takes effect in swivel mode or crosshair rotaiton  only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
+  <li> texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
+  <li> use color - This property toggles the use of a user-defined lookuptable 
 for the rendering. True: use the LUT; False: use the color propery.
 Example for setting up a lookuptable in MITK:
 \code
@@ -121,65 +116,70 @@ result->SetProperty( "LookupTable", LookupTableProp );
 result->SetBoolProperty("use color", false);
 result->Update();
 \endcode
-
-visible - toggle node/image/surface being rendered at all
-
+  <li> visible - toggle node/image/surface being rendered at all
+</ul>
+  
 \subsection SurfaceRenderingProperties Surface Rendering Properties
 
-back color - in 2D, color of the normals outside the surface
-back normal lenth (px) - in 2D, length of the normals in pixels 
+<ul>
+  <li> back color - in 2D, color of the normals outside the surface
+  <li> back normal lenth (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the front color is shorter?)
-color mode -  (From VTK) Control how the scalar data is mapped to colors. By default (ColorModeToDefault), unsigned char scalars are treated as colors, and NOT mapped through the lookup table, while everything else is. Setting ColorModeToMapScalars means that all scalar data will be mapped through the lookup table.
-draw normals 2d -  in 2D, toggles the presence of normals
-front color - in 2D, color of the normals inside the surface
-front normal lenth (px) - in 2D, length of the normals in pixels 
+  <li> color mode -  (From VTK) Control how the scalar data is mapped to colors. By default (ColorModeToDefault), unsigned char scalars are treated as colors, and NOT mapped through the lookup table, while everything else is. Setting ColorModeToMapScalars means that all scalar data will be mapped through the lookup table.
+  <li> draw normals 2d -  in 2D, toggles the presence of normals
+  <li> front color - in 2D, color of the normals inside the surface
+  <li> front normal lenth (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the back color is shorter?)
-invert normals - in 2D, switch front/back normals
-line width - in 2D, controls the thickness of the line where the surface
+  <li> invert normals - in 2D, switch front/back normals
+  <li> line width - in 2D, controls the thickness of the line where the surface
 intersects the plane (and normals)
-material.ambientCoefficient - in 3D ambient lighting
-material.diffuseCoefficient - in 3D scattering of light
-material.interpolation - Choose which interpolation algorithm to use for
+  <li> material.ambientCoefficient - in 3D ambient lighting
+  <li> material.diffuseCoefficient - in 3D scattering of light
+  <li> material.interpolation - Choose which interpolation algorithm to use for
 surface construction
-material.representation - Choose the representation to draw the mesh in
+  <li> material.representation - Choose the representation to draw the mesh in
 (Surface, Wireframe, Point Cloud)
-material.specularCoefficient - in-/decrease non-scattered reflection
-material.specularPower - control percentage of non-scattered reflection 
-material.wireframeLineWidth - width of the wires if wireframe representation is
-scalar mode - (From VTK) Control how the filter works with scalar point data and cell attribute data. By default (ScalarModeToDefault), the filter will use point data, and if no point data is available, then cell data is used. Alternatively you can explicitly set the filter to use point data (ScalarModeToUsePointData) or cell data (ScalarModeToUseCellData). You can also choose to get the scalars from an array in point field data (ScalarModeToUsePointFieldData) or cell field data (ScalarModeToUseCellFieldData). If scalars are coming from a field data array, you must call SelectColorArray before you call GetColors. When ScalarMode is set to use Field Data (ScalarModeToFieldData), you must call SelectColorArray to choose the field data array to be used to color cells. In this mode, if the poly data has triangle strips, the field data is treated as the celldata for each mini-cell formed by a triangle in the strip rather than the entire strip. 
-scalar visibility - (From VTK) Turn on/off flag to control whether scalar data is used to color objects. 
-selected - whether the node is selected
-shader - which shader to use for surface rendering, currently the options are
+  <li> material.specularCoefficient - in-/decrease non-scattered reflection
+  <li> material.specularPower - control percentage of non-scattered reflection 
+  <li> material.wireframeLineWidth - width of the wires if wireframe representation is
+  <li> scalar mode - (From VTK) Control how the filter works with scalar point data and cell attribute data. By default (ScalarModeToDefault), the filter will use point data, and if no point data is available, then cell data is used. Alternatively you can explicitly set the filter to use point data (ScalarModeToUsePointData) or cell data (ScalarModeToUseCellData). You can also choose to get the scalars from an array in point field data (ScalarModeToUsePointFieldData) or cell field data (ScalarModeToUseCellFieldData). If scalars are coming from a field data array, you must call SelectColorArray before you call GetColors. When ScalarMode is set to use Field Data (ScalarModeToFieldData), you must call SelectColorArray to choose the field data array to be used to color cells. In this mode, if the poly data has triangle strips, the field data is treated as the celldata for each mini-cell formed by a triangle in the strip rather than the entire strip. 
+  <li> scalar visibility - (From VTK) Turn on/off flag to control whether scalar data is used to color objects. 
+  <li> selected - whether the node is selected
+  <li> shader - which shader to use for surface rendering, currently the options are
 "fixed" and "mitkShaderLightning"
+</ul>
 
 \subsection VolumeRenderingProperties Volume Rendering Properties
-TransferFunction - contains transfer function for use in coloring image
-volumerendering -  Should the volume be rendered or not
-volumerendering configuration - Choice between Composite und MIP
-volumerendering.cpu.ambient - ambient lighting
-volumerendering.cpu.diffuse - in-/decrease light dispersion
-volumerendering.cpu.specular - in-/decrease non-scattered reflection
-volumerendering.cpu.specular.power - control percentage of non-scattered
-reflection 
-volumerendering.gpu.ambient - same as cpu with gpu
-volumerendering.gpu.diffuse - same as cpu with gpu
-volumerendering.gpu.reducesliceartifacts - Reduce slice artifacts
-volumerendering.gpu.specular - same as cpu with gpu
-volumerendering.gpu.specular.power - same as cpu with gpu
-volumerendering.gpu.usetexturecompression - use texture compression
-volumerendering.ray.ambient - same as cpu with ray
-volumerendering.ray.diffuse - same as cpu with ray
-volumerendering.ray.specular - same as cpu with ray
-volumerendering.ray.specular.power - same as cpu with ray
-volumerendering.usegpu -  Whether to use the GPU for rendering or not
-volumerendering.uselod -  Whether to use the Level Of Detail mechanism or not
-volumerendering.usemip -  Whether to utilize maximum intensity projection
-volumerendering.useray - Whether to use raycasting or not
 
-\info
+<ul>
+  <li> TransferFunction - contains transfer function for use in coloring image
+  <li> volumerendering -  Should the volume be rendered or not
+  <li> volumerendering configuration - Choice between Composite und MIP
+  <li> volumerendering.cpu.ambient - ambient lighting
+  <li> volumerendering.cpu.diffuse - in-/decrease light dispersion
+  <li> volumerendering.cpu.specular - in-/decrease non-scattered reflection
+  <li> volumerendering.cpu.specular.power - control percentage of non-scattered
+reflection 
+  <li> volumerendering.gpu.ambient - same as cpu with gpu
+  <li> volumerendering.gpu.diffuse - same as cpu with gpu
+  <li> volumerendering.gpu.reducesliceartifacts - Reduce slice artifacts
+  <li> volumerendering.gpu.specular - same as cpu with gpu
+  <li> volumerendering.gpu.specular.power - same as cpu with gpu
+  <li> volumerendering.gpu.usetexturecompression - use texture compression
+  <li> volumerendering.ray.ambient - same as cpu with ray
+  <li> volumerendering.ray.diffuse - same as cpu with ray
+  <li> volumerendering.ray.specular - same as cpu with ray
+  <li> volumerendering.ray.specular.power - same as cpu with ray
+  <li> volumerendering.usegpu -  Whether to use the GPU for rendering or not
+  <li> volumerendering.uselod -  Whether to use the Level Of Detail mechanism or not
+  <li> volumerendering.usemip -  Whether to utilize maximum intensity projection
+  <li> volumerendering.useray - Whether to use raycasting or not
+</ul>
+  
+\remark
 Uselod can be active with usegpu, usemip, useray, but any of the latter can not
 be used with another one of them.
-\endinfo
+
 
 \subsection PointSetProperties Point Set Properties
 

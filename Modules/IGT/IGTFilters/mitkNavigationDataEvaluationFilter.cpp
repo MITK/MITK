@@ -87,3 +87,154 @@ for (int i = 0; i < m_LoggedPositions.size(); i++) m_LoggedPositions[i] = std::v
 for (int i = 0; i < m_LoggedQuaternions.size(); i++) m_LoggedQuaternions[i] = std::vector<mitk::Quaternion>();
 for (int i = 0; i < m_InavildSamples.size(); i++) m_InavildSamples[i] = 0;
 }
+
+int mitk::NavigationDataEvaluationFilter::GetNumberOfAnalysedNavigationData(int input)
+{
+return this->m_LoggedPositions[input].size();
+}
+
+
+mitk::Point3D mitk::NavigationDataEvaluationFilter::GetPositionMean(int input)
+{
+mitk::Point3D returnValue;
+returnValue.Fill(0);
+
+for (int i=0; i<m_LoggedPositions[input].size(); i++)
+  {
+  returnValue[0] += m_LoggedPositions[input].at(i)[0];
+  returnValue[1] += m_LoggedPositions[input].at(i)[1];
+  returnValue[2] += m_LoggedPositions[input].at(i)[2];
+  }
+
+returnValue[0] /= m_LoggedPositions[input].size();
+returnValue[1] /= m_LoggedPositions[input].size();
+returnValue[2] /= m_LoggedPositions[input].size();
+
+return returnValue;
+}
+
+mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetPositionStandardDerivation(int input)
+{
+mitk::Vector3D returnValue;
+//TODO
+return returnValue;
+}
+
+mitk::Quaternion mitk::NavigationDataEvaluationFilter::GetQuaternionMean(int input)
+{
+mitk::Quaternion returnValue;
+
+returnValue[0] = 0;
+returnValue[1] = 0;
+returnValue[2] = 0;
+returnValue[3] = 0;
+
+for (int i=0; i<m_LoggedQuaternions[input].size(); i++)
+  {
+  returnValue[0] += m_LoggedQuaternions[input].at(i)[0];
+  returnValue[1] += m_LoggedQuaternions[input].at(i)[1];
+  returnValue[2] += m_LoggedQuaternions[input].at(i)[2];
+  returnValue[3] += m_LoggedQuaternions[input].at(i)[3];
+  }
+
+returnValue[0] /= m_LoggedQuaternions[input].size();
+returnValue[1] /= m_LoggedQuaternions[input].size();
+returnValue[2] /= m_LoggedQuaternions[input].size();
+returnValue[3] /= m_LoggedQuaternions[input].size();
+
+return returnValue;
+}
+
+mitk::Quaternion mitk::NavigationDataEvaluationFilter::GetQuaternionStandardDerivation(int input)
+{
+mitk::Quaternion returnValue;
+//TODO
+return returnValue;
+}
+
+
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorMean(int input)
+{
+double returnValue = 0.0;
+mitk::Point3D mean = this->GetPositionMean(input);
+
+for(int i=0; i<m_LoggedPositions[input].size(); i++)
+  {
+  returnValue += mean.EuclideanDistanceTo(m_LoggedPositions[input].at(i));
+  }
+returnValue /= m_LoggedPositions[input].size();
+
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorStandardDerication(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorRMS(int input)
+{
+double returnValue = 0.0;
+
+mitk::Point3D mean = this->GetPositionMean(input);
+
+for(int i=0; i<m_LoggedPositions[input].size(); i++)
+  {
+  returnValue += pow(mean.EuclideanDistanceTo(m_LoggedPositions[input].at(i)),2);
+  }
+returnValue /= m_LoggedPositions[input].size();
+returnValue = sqrt(returnValue);
+
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorMedian(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetQuaternionErrorMean(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetQuaternionErrorStandardDerication(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetQuaternionErrorRMS(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetQuaternionErrorMedian(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}
+
+int GetNumberOfInvalidSamples(int input)
+{
+int returnValue = 0;
+//TODO
+return returnValue;
+}
+
+double GetPercentageOfInvalidSamples(int input)
+{
+double returnValue = 0.0;
+//TODO
+return returnValue;
+}

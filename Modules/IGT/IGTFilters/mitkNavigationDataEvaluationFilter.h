@@ -46,13 +46,15 @@ namespace mitk {
 
     /** @return returns the number of analysed navigation datas for the specified input. */
     int GetNumberOfAnalysedNavigationData(int input);
+    int GetNumberOfInvalidSamples(int input);
+    double GetPercentageOfInvalidSamples(int input);
 
 
-    double GetPositionMean(int input);
-    double GetPositionStandardDerivation(int input);
+    mitk::Point3D GetPositionMean(int input);
+    mitk::Vector3D GetPositionStandardDerivation(int input);
 
-    double GetQuaternionMean(int input);
-    double GetQuaternionStandardDerivation(int input);
+    mitk::Quaternion GetQuaternionMean(int input);
+    mitk::Quaternion GetQuaternionStandardDerivation(int input);
     
 
     /** @return Returns the mean distance to the mean postion. */

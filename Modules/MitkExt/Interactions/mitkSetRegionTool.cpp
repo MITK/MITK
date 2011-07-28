@@ -285,7 +285,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-    if ( m_ToolManager->GetRememberContourPosition() )
+    if ( m_RememberContourPositions )
     {
         this->AddContourmarker(positionEvent);
     }
@@ -300,7 +300,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
       slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
       slicewriter->Update();
 
-      if ( m_ToolManager->GetRememberContourPosition() )
+      if ( m_RememberContourPositions )
       {
           this->AddContourmarker(positionEvent);
       }

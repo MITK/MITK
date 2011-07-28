@@ -429,15 +429,28 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
 //to remember the contour positions
 void QmitkSegmentationView::CheckboxRememberContourPositionsStateChanged (int state)
 {
-    if(state == Qt::Checked)
+  mitk::SegTool2D::Pointer manualSegmentationTool;
+
+  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetTools().size();
+
+  for(unsigned int i = 0; i < numberOfExistingTools; i++)
+  {
+    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetToolById(i));
+
+    if (manualSegmentationTool)
     {
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( true );
+      if(state == Qt::Checked)
+      {
+        manualSegmentationTool->SetRememberContourPositions( true );
+      }
+      else
+      {
+        manualSegmentationTool->SetRememberContourPositions( false );
+      }
     }
-    else
-    {
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( false );
-    }
+  }
 }
+
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
   std::vector<mitk::DataNode*> nodes;

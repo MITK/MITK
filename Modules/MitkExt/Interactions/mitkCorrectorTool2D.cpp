@@ -150,6 +150,11 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
+
+    if( m_RememberContourPositions )
+    {
+      this->AddContourmarker( positionEvent );
+    }
   }
   else if ( affectedDimension == -1 )
   {
@@ -160,6 +165,11 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
       slicewriter->SetPlaneGeometry3D( m_WorkingSlice->GetGeometry() );
       slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
       slicewriter->Update();
+
+      if( m_RememberContourPositions )
+      {
+        this->AddContourmarker( positionEvent );
+      }
   }
   else
   {

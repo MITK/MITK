@@ -37,7 +37,8 @@ mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
- m_Contourmarkername ("Contourmarker")
+ m_Contourmarkername ("Contourmarker"),
+ m_RememberContourPositions (false)
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -230,9 +231,8 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
-    char* subtractToolIsActive = strstr( const_cast<char*>(m_ToolManager->GetActiveTool()->GetName()), "Subtract" );
     mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()));
-    if ( ( currentGeometry2D != NULL ) && ( !ContourmarkerAlreadyExists( currentGeometry2D ) && subtractToolIsActive == NULL ) )
+    if ( ( currentGeometry2D != NULL ) && ( !ContourmarkerAlreadyExists( currentGeometry2D )) )
     {
         //Creating PlanarFigure which serves as marker
         mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
@@ -258,7 +258,6 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         Point2D controlPoint2D;
         Point3D controlPoint3D = positionEvent->GetWorldPosition();
         currentGeometry2D->Map(controlPoint3D ,controlPoint2D);
-        contourMarker->PlaceFigure(controlPoint2D);
         DataNode::Pointer rotatedContourNode = DataNode::New();
         rotatedContourNode->SetData(contourMarker);
         rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );

@@ -26,8 +26,8 @@ SET_PROPERTY(TEST mitkPicFileReaderTest_emptyGzipFile PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkImageTest_brainImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 SET_PROPERTY(TEST mitkImageTest_brainImage PROPERTY LABELS MITK-Core)
-ADD_TEST(mitkImageTest_4DImageData ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/US4DCyl.pic.gz)
-SET_PROPERTY(TEST mitkImageTest_4DImageData PROPERTY LABELS MITK-Core)
+# ADD_TEST(mitkImageTest_4DImageData ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/US4DCyl.pic.gz)
+# SET_PROPERTY(TEST mitkImageTest_4DImageData PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 SET_PROPERTY(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)

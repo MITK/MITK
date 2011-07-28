@@ -100,7 +100,7 @@ mitk::Point3D mitk::NavigationDataEvaluationFilter::GetPositionMean(int input)
 return GetMean(m_LoggedPositions[input]);
 }
 
-mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetPositionStandardDerivation(int input)
+mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetPositionStandardDeviation(int input)
 {
 mitk::Vector3D returnValue;
 std::vector<double> listX = std::vector<double>();
@@ -118,12 +118,30 @@ returnValue[2] = GetStabw(listZ);
 return returnValue;
 }
 
+mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetPositionSampleStandardDeviation(int input)
+{
+mitk::Vector3D returnValue;
+std::vector<double> listX = std::vector<double>();
+std::vector<double> listY = std::vector<double>();
+std::vector<double> listZ = std::vector<double>();
+for (int i=0; i<m_LoggedPositions[input].size(); i++)
+  {
+  listX.push_back(m_LoggedPositions[input].at(i)[0]);
+  listY.push_back(m_LoggedPositions[input].at(i)[1]);
+  listZ.push_back(m_LoggedPositions[input].at(i)[2]);
+  }
+returnValue[0] = GetSampleStabw(listX);
+returnValue[1] = GetSampleStabw(listY);
+returnValue[2] = GetSampleStabw(listZ);
+return returnValue;
+}
+
 mitk::Quaternion mitk::NavigationDataEvaluationFilter::GetQuaternionMean(int input)
 {
 return GetMean(m_LoggedQuaternions[input]);
 }
 
-mitk::Quaternion mitk::NavigationDataEvaluationFilter::GetQuaternionStandardDerivation(int input)
+mitk::Quaternion mitk::NavigationDataEvaluationFilter::GetQuaternionStandardDeviation(int input)
 {
 mitk::Quaternion returnValue;
 std::vector<double> list1 = std::vector<double>();
@@ -159,10 +177,16 @@ returnValue /= m_LoggedPositions[input].size();
 return returnValue;
 }
 
-double mitk::NavigationDataEvaluationFilter::GetPositionErrorStandardDerication(int input)
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorStandardDeviation(int input)
 {
 return GetStabw(GetErrorList(m_LoggedPositions[input]));
 }
+
+double mitk::NavigationDataEvaluationFilter::GetPositionErrorSampleStandardDeviation(int input)
+{
+return GetSampleStabw(GetErrorList(m_LoggedPositions[input]));
+}
+
 
 double mitk::NavigationDataEvaluationFilter::GetPositionErrorRMS(int input)
 {
@@ -202,7 +226,7 @@ return m_InavildSamples[input];
 
 double mitk::NavigationDataEvaluationFilter::GetPercentageOfInvalidSamples(int input)
 {
-return (m_InavildSamples[input]/(m_InavildSamples[input]+((double)m_LoggedPositions.size())))*100.0;
+return (m_InavildSamples[input]/(m_InavildSamples[input]+((double)m_LoggedPositions[input].size())))*100.0;
 }
 
 double mitk::NavigationDataEvaluationFilter::GetMedian(std::vector<double> list)
@@ -272,7 +296,23 @@ for(int i=0; i<list.size(); i++)
   {
   returnValue += pow((list.at(i)-mean),2);
   }
+
 returnValue /= list.size();
+returnValue = sqrt(returnValue);
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetSampleStabw(std::vector<double> list)
+{
+double returnValue = 0;
+double mean = GetMean(list);
+for(int i=0; i<list.size(); i++)
+  {
+  returnValue += pow((list.at(i)-mean),2);
+  }
+
+returnValue /= (list.size()-1);
+returnValue = sqrt(returnValue);
 return returnValue;
 }
 

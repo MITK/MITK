@@ -53,18 +53,22 @@ namespace mitk {
     /** @return Returns the mean position of the specified input since the start of the statistic (last call of ResetStatistic()) */
     mitk::Point3D GetPositionMean(int input);
     /** @return Returns the standard derivation of each component (x, y and z) of the specified input since the start of the statistic (last call of ResetStatistic()) */
-    mitk::Vector3D GetPositionStandardDerivation(int input);
+    mitk::Vector3D GetPositionStandardDeviation(int input);
+    /** @return Returns the sample standard derivation of each component (x, y and z) of the specified input since the start of the statistic (last call of ResetStatistic()) */
+    mitk::Vector3D GetPositionSampleStandardDeviation(int input);
 
     /** @return Returns the mean quaternion of the specified input since the start of the statistic (last call of ResetStatistic()) */
     mitk::Quaternion GetQuaternionMean(int input);
     /** @return Returns the standard derivation of each component of the specified input since the start of the statistic (last call of ResetStatistic()) */
-    mitk::Quaternion GetQuaternionStandardDerivation(int input);
+    mitk::Quaternion GetQuaternionStandardDeviation(int input);
     
 
     /** @return Returns the mean distance to the mean postion (=mean error) to the specified input. */
     double GetPositionErrorMean(int input);
     /** @return Returns the standard derivation of the errors of all positions to the specified input. */
-    double GetPositionErrorStandardDerication(int input);
+    double GetPositionErrorStandardDeviation(int input);
+    /** @return Returns the sample standard derivation of the errors of all positions to the specified input. */
+    double GetPositionErrorSampleStandardDeviation(int input);
     /** @return Returns the RMS of the errors of all positions to the specified input. */
     double GetPositionErrorRMS(int input);
     /** @return Returns the median of the errors of all positions to the specified input. */
@@ -113,6 +117,9 @@ namespace mitk {
 
     /** @return returns the standard derivation of the list */
     double GetStabw(std::vector<double> list);
+
+    /** @return returns the sample standard derivation of the list */
+    double GetSampleStabw(std::vector<double> list);
   };
 } // namespace mitk
 

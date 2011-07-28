@@ -44,9 +44,29 @@ namespace mitk {
     /** @brief Resets all statistics and starts again. */
     void ResetStatistic();
 
-    /** @brief Resets the number of analysed navigation datas. */
-    itkGetMacro(NumberAnalysedNavigationDatas,int);
+    /** @return returns the number of analysed navigation datas for the specified input. */
+    int GetNumberOfAnalysedNavigationData(int input);
 
+
+    double GetPositionMean(int input);
+    double GetPositionStandardDerivation(int input);
+
+    double GetQuaternionMean(int input);
+    double GetQuaternionStandardDerivation(int input);
+    
+
+    /** @return Returns the mean distance to the mean postion. */
+    double GetPositionErrorMean(int input);
+    double GetPositionErrorStandardDerication(int input);
+    double GetPositionErrorRMS(int input);
+    double GetPositionErrorMedian(int input);
+    
+    double GetQuaternionErrorMean(int input);
+    double GetQuaternionErrorStandardDerication(int input);
+    double GetQuaternionErrorRMS(int input);
+    double GetQuaternionErrorMedian(int input);
+    
+    
   
   protected:
 
@@ -60,9 +80,13 @@ namespace mitk {
     */
     virtual void GenerateData();
 
-    mitk::Point3D m_SumPositions; //todo: make a map here, to have one sum for every navigation data
-    int m_NumberAnalysedNavigationDatas;
+    /** @brief Creates the member variables which store all the statistical data for every input. */
+    void CreateMembersForAllInputs();
 
+    
+    std::map<int,std::vector<mitk::Point3D>> m_LoggedPositions; //a map here, to have one list for every navigation data
+    std::map<int,std::vector<mitk::Quaternion>> m_LoggedQuaternions;
+    std::map<int,int> m_InavildSamples;
   };
 } // namespace mitk
 

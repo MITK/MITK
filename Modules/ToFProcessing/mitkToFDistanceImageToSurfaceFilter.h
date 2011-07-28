@@ -36,7 +36,7 @@ namespace mitk
   * measured distance for each pixel corresponds to the distance between the object point and the corresponding image point on the
   * image plane.
   *
-  * \image html ../Modules/ToFProcessing/Documentation/CameraIntrinsics.png "Pinhole camera model"
+  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png "Pinhole camera model"
   * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png "Image plane"
   *
   * @ingroup SurfaceFilters

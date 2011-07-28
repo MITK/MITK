@@ -208,6 +208,7 @@ public:
 protected:
 
   SlicedData();
+  SlicedData(const SlicedData &other);
   virtual ~SlicedData();
 
   RegionType m_LargestPossibleRegion;

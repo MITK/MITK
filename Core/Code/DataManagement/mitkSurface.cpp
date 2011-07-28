@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceOperation.h"
 
 #include <vtkPolyData.h>
+#include "vtkSmartPointer.h"
 
 #include <itkSmartPointerForwardReference.txx>
 
@@ -30,6 +31,27 @@ mitk::Surface::Surface() :
 m_CalculateBoundingBox( false )
 {
   this->InitializeEmpty();
+}
+
+mitk::Surface::Surface(const mitk::Surface& other) : BaseData(other), 
+m_CalculateBoundingBox(other.m_CalculateBoundingBox), 
+m_RequestedRegion(other.m_RequestedRegion),
+m_LargestPossibleRegion(other.m_LargestPossibleRegion)
+{
+  if(other.m_PolyDataSeries.at(0) != NULL)
+  {
+    m_PolyDataSeries = std::vector<vtkPolyData*>();
+    for ( VTKPolyDataSeries::const_iterator it = other.m_PolyDataSeries.begin(); it != other.m_PolyDataSeries.end(); ++it )
+    {
+      vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+      poly->DeepCopy(*it);
+      m_PolyDataSeries.push_back(poly.GetPointer());   
+    }
+  }
+  else
+  {
+    this->InitializeEmpty();
+  }
 }
 
 mitk::Surface::~Surface()

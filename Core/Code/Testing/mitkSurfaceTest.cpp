@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkCommon.h"
 #include "mitkVector.h"
+#include "mitkTestingMacros.h"
 #include "mitkTimeSlicedGeometry.h"
 
 #include "vtkPolyData.h"
@@ -28,20 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 {
-  mitk::Surface::Pointer surface;
-  std::cout << "Testing mitk::Surface::New(): ";
-  surface = mitk::Surface::New();
-  if (surface.IsNull()) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
 
-  std::cout << "Testing mitk::Surface::PrintSelf() for empty surface: ";
-  surface->PrintSelf(std::cout, 0);
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_BEGIN("Surface");
+
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  MITK_TEST_CONDITION_REQUIRED( surface.GetPointer(), "Testing initialization!" );
+
+  mitk::Surface::Pointer cloneSurface = surface->Clone();
+  MITK_TEST_CONDITION_REQUIRED( cloneSurface.GetPointer(), "Testing clone surface initialization!" );
 
   vtkSphereSource* sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);
@@ -51,71 +46,39 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Update();
 
   vtkPolyData* polys = sphereSource->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData() == NULL, "Testing initial state of vtkPolyData");
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
-  std::cout << "Testing mitk::Surface::SetVtkPolyData(): ";
-  if (surface->GetVtkPolyData() ==  NULL ) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData");
 
-  {
+  cloneSurface = surface->Clone();
+  MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData of cloned surface!");
+ 
     vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
     polys->ComputeBounds();
     polys->GetBounds( bounds );
 
-    std::cout << "Testing GetBoundingBox() ";
     surface->UpdateOutputInformation();
     surface->SetRequestedRegionToLargestPossibleRegion();
-    //  mitk::BoundingBox bb = const_cast<mitk::BoundingBox*>(
     mitk::BoundingBox* bb = const_cast<mitk::BoundingBox*>(surface->GetGeometry()->GetBoundingBox());
     mitk::BoundingBox::BoundsArrayType surfBounds = bb->GetBounds();
 
-    if ( bounds[0] != surfBounds[0] 
-    || bounds[1] != surfBounds[1] 
-    || bounds[2] != surfBounds[2] 
-    || bounds[3] != surfBounds[3] 
-    || bounds[4] != surfBounds[4] 
-    || bounds[5] != surfBounds[5] 
-    ) {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
+    bool passed = false;
+    if ( bounds[0] == surfBounds[0] && bounds[1] == surfBounds[1] 
+      && bounds[2] == surfBounds[2] && bounds[3] == surfBounds[3] 
+      && bounds[4] == surfBounds[4] && bounds[5] == surfBounds[5] ) 
+    {
+      passed = true;
     }
-    else {
-      std::cout<<"[PASSED]"<<std::endl;
-    } 
-  }
+    MITK_TEST_CONDITION_REQUIRED(passed, "Testing GetBoundingBox()!");
 
-
-  std::cout << "Testing mitk::Surface::Expand( timesteps ): ";
   surface->Expand(5);
   surface->Update();
   surface->SetRequestedRegionToLargestPossibleRegion();
   mitk::Surface::RegionType requestedRegion = surface->GetRequestedRegion();
+  MITK_TEST_CONDITION_REQUIRED(requestedRegion.GetSize(3) == 5, "Testing mitk::Surface::Expand( timesteps ): ");
 
-  if ( requestedRegion.GetSize(3) != 5 ) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
-
-  std::cout << "Testing mitk::Surface::Testing 4D surface data creation: ";
-
-//  surface = mitk::Surface::New();
-  //mitk::Geometry3D::Pointer geometry = surface->GetTimeSlicedGeometry()->GetGeometry3D(0);
-  //geometry->GetVtkTransform()->Identity();
-  //geometry->GetVtkTransform()->Translate(10,10,10);
-  //geometry->TransferVtkToItkTransform();
-  //mitk::TimeSlicedGeometry* timeSlicedGeometry = surface->GetTimeSlicedGeometry();
-  //timeSlicedGeometry->InitializeEvenlyTimed(geometry, 5);
-
-  vtkFloatingPointType bounds[5][6];
+  vtkFloatingPointType boundsMat[5][6];
 
   for (int i=0;i<5;i++) {
     vtkSphereSource* sphereSource = vtkSphereSource::New();
@@ -125,7 +88,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     sphereSource->SetPhiResolution(10);
     sphereSource->Update();
     sphereSource->GetOutput()->ComputeBounds();
-    sphereSource->GetOutput()->GetBounds( bounds[i] );
+    sphereSource->GetOutput()->GetBounds( boundsMat[i] );
     surface->SetVtkPolyData( sphereSource->GetOutput(),i );
     sphereSource->Delete();
   }
@@ -133,55 +96,31 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   surface->UpdateOutputInformation();
   surface->SetRequestedRegionToLargestPossibleRegion();
 
-  bool passed = true;
+  passed = true;
   for (int i=0;i<5;i++) 
   {
     mitk::BoundingBox::BoundsArrayType surfBounds = (const_cast<mitk::BoundingBox*>(surface->GetTimeSlicedGeometry()->GetGeometry3D(i)->GetBoundingBox()))->GetBounds();
 
-    if ( bounds[i][0] != surfBounds[0] 
-    || bounds[i][1] != surfBounds[1] 
-    || bounds[i][2] != surfBounds[2] 
-    || bounds[i][3] != surfBounds[3] 
-    || bounds[i][4] != surfBounds[4] 
-    || bounds[i][5] != surfBounds[5] )
+    if ( boundsMat[i][0] != surfBounds[0] 
+    || boundsMat[i][1] != surfBounds[1] 
+    || boundsMat[i][2] != surfBounds[2] 
+    || boundsMat[i][3] != surfBounds[3] 
+    || boundsMat[i][4] != surfBounds[4] 
+    || boundsMat[i][5] != surfBounds[5] )
     {
       passed = false;
       break;
     }
   }
+  MITK_TEST_CONDITION_REQUIRED(passed, "Testing mitk::Surface::Testing 4D surface data creation!" );
 
-  if (!passed)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else 
-  {
-    std::cout<<"[PASSED]"<<std::endl;
-  }
-  
-  std::cout << "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry(): \n";
   const mitk::TimeSlicedGeometry* inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
 
   int time = 3;
   int timestep=0;
   timestep = inputTimeGeometry->MSToTimeStep( time );
+  MITK_TEST_CONDITION_REQUIRED(time == timestep, "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry()!");
 
-  std::cout << "time: "<< time << std::endl;
-  std::cout << "timestep: "<<timestep << std::endl;
-
-  if (time != timestep)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else 
-  {
-    std::cout<<"[PASSED]"<<std::endl;
-  }
-
-  std::cout << "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again:\n";
-  
   sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);
   sphereSource->SetRadius( 100.0 );
@@ -194,40 +133,15 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
   time = 3;
   timestep=0;
+
   timestep = inputTimeGeometry->MSToTimeStep( time );
-
-  std::cout << "time: "<< time << std::endl;
-  std::cout << "timestep: "<<timestep << std::endl;
-
-  if (time != timestep)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else 
-  {
-    std::cout<<"[PASSED]"<<std::endl;
-  }
-
-  std::cout << "Testing copying a Surface with Graft()" << std::endl;
+  MITK_TEST_CONDITION_REQUIRED(time == timestep, "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again!");
 
   unsigned int numberoftimesteps = surface->GetTimeSteps();
   mitk::Surface::Pointer dummy = mitk::Surface::New();
   dummy->Graft(surface);
-  std::cout << "polyData != NULL ??" << std::endl;
-  if (dummy->GetVtkPolyData() == NULL)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  
-  std::cout << "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps() << std::endl;
-  if (dummy->GetTimeSteps() != numberoftimesteps)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  MITK_TEST_CONDITION_REQUIRED( dummy->GetVtkPolyData() != NULL, "Testing copying a Surface with Graft()!");
+  MITK_TEST_CONDITION_REQUIRED( dummy->GetTimeSteps() == numberoftimesteps, "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps());
+
+  MITK_TEST_END();
 }

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkImageDataItem.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -35,7 +36,7 @@ class vtkImageData;
 namespace mitk {
 
 class SubImageSelector;
-class ImageDataItem;
+//class ImageDataItem;
 class ImageTimeSelector;
 
 //##Documentation
@@ -67,6 +68,8 @@ public:
   mitkClassMacro(Image, SlicedData);    
 
   itkNewMacro(Self);
+
+  mitkCloneMacro(Image);
 
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointerForwardReference<ImageDataItem> ImageDataItemPointer;
@@ -580,6 +583,8 @@ protected:
   virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
   Image();
+
+  Image(const Image &other);
 
   virtual ~Image();
 

@@ -600,5 +600,11 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   pointSet->ExecuteOperation(&op5);  
   mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
+  mitk::PointSet::Pointer clonePS = pointSet->Clone();
+  mitkPointSetTestClass::TestIsNotEmpty(clonePS);
+  MITK_TEST_CONDITION_REQUIRED(clonePS->GetPointSetSeriesSize() == pointSet->GetPointSetSeriesSize(), "Testing cloned point set's size!");
+  MITK_TEST_CONDITION_REQUIRED(clonePS.GetPointer() != pointSet.GetPointer(), "Testing that the clone is not the source PS!");
+  MITK_TEST_CONDITION_REQUIRED(clonePS->GetGeometry()->GetCenter() == pointSet->GetGeometry()->GetCenter() , "Testing if the geometry is cloned correctly!");
+  MITK_TEST_CONDITION_REQUIRED(clonePS->GetPropertyList()->GetMap()->size() == pointSet->GetPropertyList()->GetMap()->size() , "Testing if the property list is cloned correctly!");
   MITK_TEST_END();
 }

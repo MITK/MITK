@@ -40,6 +40,8 @@ public:
   mitkClassMacro(UnstructuredGrid, BaseData);
   
   itkNewMacro(Self);
+
+  mitkCloneMacro(UnstructuredGrid);
   
   virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid* grid, unsigned int t = 0);
   
@@ -88,6 +90,8 @@ protected:
   virtual void Expand( unsigned int timeSteps = 1 );
  
   UnstructuredGrid();
+
+  UnstructuredGrid(const mitk::UnstructuredGrid & other);
   
   virtual ~UnstructuredGrid();
 

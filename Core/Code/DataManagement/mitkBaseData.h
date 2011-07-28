@@ -41,7 +41,7 @@ class BaseProcess;
 class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
-  mitkClassMacro(BaseData,itk::DataObject)
+  mitkClassMacro(BaseData,itk::DataObject);
 
   //##Documentation
   //## @brief Return the TimeSlicedGeometry of the data as const pointer. 
@@ -325,6 +325,7 @@ public:
 
 protected:
   BaseData();
+  BaseData(const BaseData &other);
   ~BaseData();
 
   //##Documentation

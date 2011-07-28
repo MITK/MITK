@@ -24,18 +24,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/mitkIpFunc.h"
 #include "mitkIpPicTypeMultiplex.h"
 
-#include <itkSmartPointerForwardReference.txx>
-
 #include <vtkImageData.h>
+#include <itkSmartPointerForwardReference.txx>
 
 
 template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::ImageDataItem>;
 
 
 mitk::Image::Image() : 
-  m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL),
-  m_TimeSelectorForExtremaObject(NULL)
+m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
+m_CompleteData(NULL), m_PixelType(NULL),
+m_TimeSelectorForExtremaObject(NULL)
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -47,6 +46,31 @@ mitk::Image::Image() :
   m_Initialized = false;
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
+}
+
+mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), 
+m_Dimensions(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_PixelType(NULL), 
+m_TimeSelectorForExtremaObject(NULL)
+{
+  this->Initialize(&other);
+
+  if (this->GetDimension() > 3)
+  {
+    const unsigned int time_steps = this->GetDimension(3);
+
+    for (unsigned int i = 0u; i < time_steps; ++i)
+    {
+      ImageDataItemPointer volume = const_cast<Image&>(other).GetVolumeData(i);
+
+      this->SetVolume(volume->GetData(), i);
+    }
+  }
+  else
+  {
+    ImageDataItemPointer volume = const_cast<Image&>(other).GetVolumeData(0);
+
+    this->SetVolume(volume->GetData(), 0);
+  }
 }
 
 mitk::Image::~Image()

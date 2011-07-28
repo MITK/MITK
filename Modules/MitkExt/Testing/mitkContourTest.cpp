@@ -15,25 +15,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkContour.h"
 #include "mitkCommon.h"
+#include "mitkTestingMacros.h"
 
 #include <fstream>
+
 int mitkContourTest(int /*argc*/, char* /*argv*/[])
 {
-  mitk::Contour::Pointer contour;
-  std::cout << "Testing mitk::Contour::New(): ";
-  contour = mitk::Contour::New();
-  if (contour.IsNull()) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
+  MITK_TEST_BEGIN("Contour");
+  mitk::Contour::Pointer contour = mitk::Contour::New();
+  MITK_TEST_CONDITION_REQUIRED(contour.IsNotNull(), "Testing initialization!");
 
-  std::cout << "Testing mitk::Contour::AddVertex(): ";
   mitk::Point3D p;
   p.Fill(0);
   contour->AddVertex(p);
@@ -41,64 +34,29 @@ int mitkContourTest(int /*argc*/, char* /*argv*/[])
   contour->AddVertex(p);
   p.Fill(2);
   contour->AddVertex(p);
-  
-  if (contour->GetNumberOfPoints() != 3)   
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-  else 
-    {
-    std::cout<<"[PASSED]"<<std::endl;
-    } 
+  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 3, "Testing AddVertex()");
 
-
-  std::cout << "Testing mitk::Contour::GetPoints()";
   mitk::Contour::PointsContainerPointer points = contour->GetPoints();
-  if ( points.IsNull() )   
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-  else 
-    {
-    std::cout<<"[PASSED]"<<std::endl;
-    } 
+  MITK_TEST_CONDITION_REQUIRED(points.IsNotNull(), "Testing GetPoints()");
 
-  std::cout << "Testing mitk::Contour::Initialize()";
   contour->Initialize();
-  if (contour->GetNumberOfPoints() != 0)   
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-  else 
-    {
-    std::cout<<"[PASSED]"<<std::endl;
-    } 
+  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 0, "Testing Initialize()!"); 
 
   contour->SetPoints(points);
-  if ( contour->GetNumberOfPoints() != 3)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;      
-    };
+  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 3, "Testimg SetPoints()!");
   
   mitk::Contour::PathPointer path =  contour->GetContourPath();
-  if ( path.IsNull() )
-    {
-    return EXIT_FAILURE;
-    }
+  MITK_TEST_CONDITION_REQUIRED(path.IsNotNull(), "Testing GetContourPath()!");
 
   contour->UpdateOutputInformation();
   contour->SetClosed(false);
+  MITK_TEST_CONDITION_REQUIRED(!contour->GetClosed(), "Testing GetClosed()!");
 
-  if (contour->GetClosed())
-    {
-    std::cout<<"[FAILED] "<<std::endl;
-      return EXIT_FAILURE;
-    }
+  mitk::Contour::Pointer cloneContour = contour->Clone();
+  MITK_TEST_CONDITION_REQUIRED(cloneContour.IsNotNull(), "Testing clone instantiation!");
+  MITK_TEST_CONDITION_REQUIRED(cloneContour.GetPointer() != contour.GetPointer(), "Testing cloned object is not original object!");
+  MITK_TEST_CONDITION_REQUIRED(cloneContour->GetGeometry()->GetCenter() == contour->GetGeometry()->GetCenter(), "Testing if Geometry is cloned!");
+  MITK_TEST_CONDITION_REQUIRED(cloneContour->GetPoints() == points, "Testing cloning of point data!");
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  MITK_TEST_END();
 }

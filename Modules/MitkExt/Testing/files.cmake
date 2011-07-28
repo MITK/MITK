@@ -15,6 +15,7 @@ SET(MODULE_TESTS
   # mitkSegmentationInterpolationTest.cpp
   # mitkTestTemplate.cpp
   mitkToolManagerTest.cpp
+  mitkUnstructuredGridTest.cpp
   mitkSimpleHistogramTest.cpp
 )
 SET(MODULE_IMAGE_TESTS

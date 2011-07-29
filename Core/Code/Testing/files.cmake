@@ -54,6 +54,7 @@ SET(MODULE_TESTS
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
+  mitkClippedSurfaceBoundsCalculatorTest.cpp
 )
 
 # test with image filename as an extra command line parameter

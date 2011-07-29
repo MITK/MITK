@@ -1,16 +1,22 @@
 #include "mitkClippedSurfaceBoundsCalculator.h"
-#include "vtkPolyData.h"
-#include "vtkPlaneSource.h"
-#include "vtkPPolyDataNormals.h"
-#include "mitkGeometry2D.h"
-#include "mitkSliceNavigationController.h"
 #include "mitkLine.h"
-#include "vtkSmartPointer.h"
 
 #define ROUND_P(x) ((int)((x)+0.5))
 
-mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry, mitk::Image::Pointer image)
+mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
+    const mitk::PlaneGeometry* geometry, 
+    mitk::Image::Pointer image)
 {
+  // initialize with meaningless slice indices
+  m_MinMaxOutput.clear();
+  for(int i = 0; i < 3; i++)
+  {
+    m_MinMaxOutput.push_back(
+        OutputType( std::numeric_limits<int>::max() , 
+                    std::numeric_limits<int>::min() ));
+  }
+
+
   this->SetInput(geometry, image);
 }
 
@@ -18,32 +24,40 @@ mitk::ClippedSurfaceBoundsCalculator::~ClippedSurfaceBoundsCalculator()
 {
 }
 
-void mitk::ClippedSurfaceBoundsCalculator::SetInput(const mitk::PlaneGeometry* geometry, mitk::Image::Pointer image)
+void 
+mitk::ClippedSurfaceBoundsCalculator::SetInput(
+    const mitk::PlaneGeometry* geometry, 
+    mitk::Image* image)
 {
-  if(geometry != NULL && image.IsNotNull())
+  if(geometry && image)
   {
     this->m_PlaneGeometry = geometry;
     this->m_Image = image;
   }
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionX()
+mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionX()
 {
   return this->m_MinMaxOutput[0];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionY()
+mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionY()
 {
   return this->m_MinMaxOutput[1];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
+mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
 {
   return this->m_MinMaxOutput[2];
 }
 
 void mitk::ClippedSurfaceBoundsCalculator::Update()
 {
+  // SEE HEADER DOCUMENTATION for explanation
+
   typedef std::vector< std::pair<mitk::Point3D, mitk::Point3D> > EdgesVector;
 
   this->m_MinMaxOutput.clear();
@@ -63,7 +77,8 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
   yDirection = m_Image->GetGeometry()->GetAxisVector(0);
   zDirection = m_Image->GetGeometry()->GetAxisVector(2);
 
-  /* For the calculation of the intersection points we need as corner points the center-based image coordinates.
+  /* 
+   *  For the calculation of the intersection points we need as corner points the center-based image coordinates.
    * With the method GetCornerPoint() of the class Geometry3D we only get the corner-based coordinates.
    * Therefore we need to calculate the center-based corner points here. For that we add/substract the corner-
    * based coordinates with the spacing of the geometry3D.
@@ -98,55 +113,55 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     }
   }
 
-  Point3D LeftTopFront, LeftBottomBack, LeftTopBack;
-  Point3D RightBottomFront, RightTopFront, RightBottomBack, RightTopBack;
+  Point3D leftBottomFront, leftTopFront, leftBottomBack, leftTopBack;
+  Point3D rightBottomFront, rightTopFront, rightBottomBack, rightTopBack;
 
-  LeftTopFront = origin + yDirection;
-  LeftBottomBack = origin + zDirection;
-  LeftTopBack = origin + yDirection + zDirection;
-  RightBottomFront = origin + xDirection;
-  RightTopFront = origin + xDirection + yDirection;
-  RightBottomBack = origin + xDirection + zDirection;
-  RightTopBack = origin + xDirection + yDirection + zDirection;
+  leftBottomFront = origin;
+  leftTopFront = origin + yDirection;
+  leftBottomBack = origin + zDirection;
+  leftTopBack = origin + yDirection + zDirection;
+  rightBottomFront = origin + xDirection;
+  rightTopFront = origin + xDirection + yDirection;
+  rightBottomBack = origin + xDirection + zDirection;
+  rightTopBack = origin + xDirection + yDirection + zDirection;
 
   EdgesVector edgesOf3DBox;
 
-  // connections/edges from origin
-  edgesOf3DBox.push_back(std::make_pair(origin,             // x = left=xfront, y=bottom=yfront, z=front=zfront
-                                        LeftTopFront));     // left, top, front
+  edgesOf3DBox.push_back(std::make_pair(leftBottomBack,     // x = left=xfront, y=bottom=yfront, z=front=zfront
+                                        leftTopFront));     // left, top, front
 
-  edgesOf3DBox.push_back(std::make_pair(origin,             // left, bottom, front
-                                        LeftBottomBack));   // left, bottom, back
+  edgesOf3DBox.push_back(std::make_pair(leftBottomFront,    // left, bottom, front
+                                        leftBottomBack));   // left, bottom, back
 
-  edgesOf3DBox.push_back(std::make_pair(origin,             // left, bottom, front
-                                        RightBottomFront)); // right, bottom, front
+  edgesOf3DBox.push_back(std::make_pair(leftBottomFront,    // left, bottom, front
+                                        rightBottomFront)); // right, bottom, front
 
-  edgesOf3DBox.push_back(std::make_pair(LeftTopFront,       // left, top, front
-                                        RightTopFront));    // right, top, front
+  edgesOf3DBox.push_back(std::make_pair(leftTopFront,       // left, top, front
+                                        rightTopFront));    // right, top, front
 
-  edgesOf3DBox.push_back(std::make_pair(LeftTopFront,       // left, top, front
-                                        LeftTopBack));      // left, top, back
+  edgesOf3DBox.push_back(std::make_pair(leftTopFront,       // left, top, front
+                                        leftTopBack));      // left, top, back
 
-  edgesOf3DBox.push_back(std::make_pair(RightTopFront,      // right, top, front
-                                        RightTopBack));     // right, top, back
+  edgesOf3DBox.push_back(std::make_pair(rightTopFront,      // right, top, front
+                                        rightTopBack));     // right, top, back
 
-  edgesOf3DBox.push_back(std::make_pair(RightTopFront,      // right, top, front
-                                        RightBottomFront)); // right, bottom, front
+  edgesOf3DBox.push_back(std::make_pair(rightTopFront,      // right, top, front
+                                        rightBottomFront)); // right, bottom, front
 
-  edgesOf3DBox.push_back(std::make_pair(RightBottomFront,   // right, bottom, front
-                                        RightBottomBack));  // right, bottom, back
+  edgesOf3DBox.push_back(std::make_pair(rightBottomFront,   // right, bottom, front
+                                        rightBottomBack));  // right, bottom, back
 
-  edgesOf3DBox.push_back(std::make_pair(RightBottomBack,    // right, bottom, back
-                                        LeftBottomBack));   // left, bottom, back
+  edgesOf3DBox.push_back(std::make_pair(rightBottomBack,    // right, bottom, back
+                                        leftBottomBack));   // left, bottom, back
 
-  edgesOf3DBox.push_back(std::make_pair(RightBottomBack,    // right, bottom, back
-                                        RightTopBack));     // right, top, back
+  edgesOf3DBox.push_back(std::make_pair(rightBottomBack,    // right, bottom, back
+                                        rightTopBack));     // right, top, back
 
-  edgesOf3DBox.push_back(std::make_pair(RightTopBack,       // right, top, back
-                                        LeftTopBack));      // left, top, back
+  edgesOf3DBox.push_back(std::make_pair(rightTopBack,       // right, top, back
+                                        leftTopBack));      // left, top, back
 
-  edgesOf3DBox.push_back(std::make_pair(LeftTopBack,        // left, top, back
-                                        LeftBottomBack));   // left, bottom, back
+  edgesOf3DBox.push_back(std::make_pair(leftTopBack,        // left, top, back
+                                        leftBottomBack));   // left, bottom, back
 
 
 
@@ -161,27 +176,31 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     Point3D intersectionWorldPoint;
     intersectionWorldPoint.Fill(std::numeric_limits<int>::min());
 
-    m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  // Get intersection point of line and plane geometry
+    // Get intersection point of line and plane geometry
+    m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  
 
     double t = -1.0;
     bool isIntersectionPointOnLine;
     isIntersectionPointOnLine = m_PlaneGeometry->IntersectionPointParam(line, t);
 
     mitk::Point3D intersectionIndexPoint;
-    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    //Get index point
+    //Get index point
+    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    
 
     if(0.0 <= t && t <= 1.0 && isIntersectionPointOnLine)
     {
       for(int dim = 0; dim < 3; dim++)
       {
         // minimum
-        if( this->m_MinMaxOutput[dim].first > ROUND_P(intersectionIndexPoint[dim]) )    //If new point value is lower than old
+        //If new point value is lower than old
+        if( this->m_MinMaxOutput[dim].first > ROUND_P(intersectionIndexPoint[dim]) )    
         {
             this->m_MinMaxOutput[dim].first = ROUND_P(intersectionIndexPoint[dim]);     //set new value
         }
 
         // maximum
-        if( this->m_MinMaxOutput[dim].second < ROUND_P(intersectionIndexPoint[dim]) ) //If new point value is higher than old
+        //If new point value is higher than old
+        if( this->m_MinMaxOutput[dim].second < ROUND_P(intersectionIndexPoint[dim]) ) 
         {
             this->m_MinMaxOutput[dim].second = ROUND_P(intersectionIndexPoint[dim]);     //set new value
         }
@@ -189,3 +208,4 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     }
   }
 }
+

@@ -183,34 +183,36 @@ be used with another one of them.
 
 \subsection PointSetProperties Point Set Properties
 
-close contour - Toggles whether the first and the last point of a contour
+<ul>
+  <li> close contour - Toggles whether the first and the last point of a contour
 (connecting pieces between following points of a pointset) are connected.
-contourcolor - Determines the color of the contour (connecting pieces between
+  <li> contourcolor - Determines the color of the contour (connecting pieces between
 following points of a pointset). Visible only if "show contour" is active.
-contoursize - Represents the diameter of the contour (which is kind of a tube
+  <li> contoursize - Represents the diameter of the contour (which is kind of a tube
 between the following points of a pointset). Visible only if "show contour" is
 active.
-distance decimal digits - Sets the number of decimal places for the euclidean
+  <li> distance decimal digits - Sets the number of decimal places for the euclidean
 point to point distance which can be displayed by activating "show distances". 
-point 2D size - The positions of points in the 2D view are represented by
+  <li> point 2D size - The positions of points in the 2D view are represented by
 crosses. "point 2D size" determines the size of this crosses.
-point line width - The positions of points in the 2D view are represented by
+  <li> point line width - The positions of points in the 2D view are represented by
 crosses. "point line width" determines the thickness of this crosses. 
-pointsize - The positions of points in the 3D view are represented by spheres.
+  <li> pointsize - The positions of points in the 3D view are represented by spheres.
 "pointsize" determines the diameter (size) of this spheres.
-selectedcolor - Sets the color for selected points from a pointset.
-show angles - If "show contour" is active the angles between two contour parts
+  <li> selectedcolor - Sets the color for selected points from a pointset.
+  <li> show angles - If "show contour" is active the angles between two contour parts
 can be shown.
-show contour - Connects following points of a pointset by drawing connecting
+  <li> show contour - Connects following points of a pointset by drawing connecting
 pieces between this points.
-show distance lines - Shows all angles and lines of the contour (in 2D views)
+  <li> show distance lines - Shows all angles and lines of the contour (in 2D views)
 even if they are not on the view's current slice.
-show distances - Draws lines between following points (in 2D views) and
+  <li> show distances - Draws lines between following points (in 2D views) and
 displays the euclidean distance between this points.
-show points - Toggles if the points are visible or not in the view.
-updateDataOnRender - If "true" the pointset is updated before rendering. If the
+  <li> show points - Toggles if the points are visible or not in the view.
+  <li> updateDataOnRender - If "true" the pointset is updated before rendering. If the
 pointset is part of a filter pipeline this also causes an update to the
 pipeline which sometimes may be not desired so it can be switched of by setting
 it to false.
+</ul>
 
 */

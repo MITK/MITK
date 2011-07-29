@@ -37,8 +37,11 @@ namespace mitk
   * If a subset of indizes of the image is defined via SetSubset(), the output PointSet will only contain the cartesian coordinates
   * of the corresponding 3D points.
   *
-  * <img src="PinholeCameraModel.png" alt="Pinhole camera model"> 
-  * <img src="ImagePlane.png" alt="Image plane"> 
+  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera 
+  * coordinate system (world coordinates) is at the pinhole
+  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
+  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   *
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing

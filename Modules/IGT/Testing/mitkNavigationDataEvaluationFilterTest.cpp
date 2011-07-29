@@ -26,6 +26,30 @@ PURPOSE.  See the above copyright notices for more information.
 */
 class NavigationDataEvaluationFilterTestClass : public mitk::NavigationDataEvaluationFilter
 {
+
+     /**************************** a few private help funktions ***********************************/
+     private:
+     /** @brief Rounds a double.
+      *  @param precision   number of tested decimal places */
+     static double round(double number, int precision)
+      {
+        double t = std::pow(10.,precision);
+        double returnValue = (int)(number*t+0.5)/t;
+        return returnValue;
+      }
+     /** @brief Tests two double values for equality.
+      *  @param precision   number of tested decimal places */
+    static bool equals(double a, double b, int precision = 5)
+      {
+      if (round(a,precision)==round(b,precision)) return true;
+      else 
+        {
+          std::cout << a << " is not " << b << std::endl;
+          return false;
+        }
+      }
+    /**********************************************************************************************/
+
 public:
 
 static void TestInstantiation()
@@ -53,9 +77,20 @@ static void TestSimpleCase()
     myNavigationDataEvaluationFilter->Update();
     MITK_TEST_CONDITION_REQUIRED(myNavigationDataEvaluationFilter->GetNumberOfAnalysedNavigationData(0)==2,".. Testing GetNumberOfAnalysedNavigationData (2nd test)");
     MITK_TEST_CONDITION_REQUIRED(myNavigationDataEvaluationFilter->GetNumberOfInvalidSamples(0)==1,".. Testing GetNumberOfInvalidSamples");
-    MITK_TEST_CONDITION_REQUIRED(((myNavigationDataEvaluationFilter->GetPercentageOfInvalidSamples(0)<33.34) && (myNavigationDataEvaluationFilter->GetPercentageOfInvalidSamples(0)>33.33)),".. Testing GetPercentageOfInvalidSamples");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPercentageOfInvalidSamples(0),33.33333333),".. Testing GetPercentageOfInvalidSamples");
     MITK_TEST_CONDITION_REQUIRED((myNavigationDataEvaluationFilter->GetPositionStandardDeviation(0)[0]==0.5),".. Testing GetPositionStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(((myNavigationDataEvaluationFilter->GetPositionSampleStandardDeviation(0)[0]<0.708)&&(myNavigationDataEvaluationFilter->GetPositionSampleStandardDeviation(0)[0]>0.707)),".. Testing GetPositionStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionSampleStandardDeviation(0)[0],0.70710672),".. Testing GetPositionStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorMean(0),0.8660254),".. Testing GetPositionErrorMean");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorRMS(0),0.8660254),".. Testing GetPositionErrorRMS");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorMax(0),0.8660254),".. Testing GetPositionErrorMax");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorMedian(0),0.8660254),".. Testing GetPositionErrorMedian");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorMin(0),0.8660254),".. Testing GetPositionErrorMin");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorSampleStandardDeviation(0),0),".. Testing GetPositionErrorSampleStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetPositionErrorStandardDeviation(0),0),".. Testing GetPositionErrorStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetQuaternionMean(0)[0],0),".. Testing GetQuaternionMean");
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetQuaternionStandardDeviation(0)[0],0),".. Testing GetQuaternionStandardDeviation");
+    myNavigationDataEvaluationFilter->ResetStatistic();
+    MITK_TEST_CONDITION_REQUIRED(equals(myNavigationDataEvaluationFilter->GetNumberOfAnalysedNavigationData(0),0),".. Testing ResetStatistic");
     }
 
 };

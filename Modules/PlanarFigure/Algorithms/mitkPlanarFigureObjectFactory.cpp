@@ -118,13 +118,22 @@ void mitk::PlanarFigureObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterPlanarFigureObjectFactory() 
-{
-  static bool oneObjectFactoryRegistered = false;
-  if ( !oneObjectFactoryRegistered ) 
+
+struct RegisterPlanarFigureObjectFactory{
+  RegisterPlanarFigureObjectFactory()
+    : m_Factory( mitk::PlanarFigureObjectFactory::New() )
   {
     MITK_INFO << "Registering PlanarFigureObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( mitk::PlanarFigureObjectFactory::New() );
-    oneObjectFactoryRegistered = true;
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterPlanarFigureObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::PlanarFigureObjectFactory::Pointer m_Factory;
+};
+
+static RegisterPlanarFigureObjectFactory registerPlanarFigureObjectFactory;
+

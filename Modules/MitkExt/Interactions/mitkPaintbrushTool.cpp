@@ -184,8 +184,10 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
   */
 bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const StateEvent* stateEvent)
 {
+
   bool leftMouseButtonPressed(
           stateEvent->GetId() == 530
+       || stateEvent->GetId() == 534
        || stateEvent->GetId() == 1
        || stateEvent->GetId() == 5
                              );
@@ -324,6 +326,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
 bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent* /*stateEvent*/)
 {
+
   //FeedbackContourTool::SetFeedbackContourVisible(false);
 
   return true;

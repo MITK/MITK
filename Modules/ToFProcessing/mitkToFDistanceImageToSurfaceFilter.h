@@ -36,8 +36,11 @@ namespace mitk
   * measured distance for each pixel corresponds to the distance between the object point and the corresponding image point on the
   * image plane.
   *
-  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png "Pinhole camera model"
-  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png "Image plane"
+  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera 
+  * coordinate system (world coordinates) is at the pinhole
+  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
+  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   *
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing

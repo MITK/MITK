@@ -35,8 +35,11 @@ namespace mitk
   * <li> Conversion from 2D image coordinates to 3D world coordinates (IndexToCartesianCoordinates())
   * <li> Conversion from 3D world coordinates to 2D image coordinates (CartesianToIndexCoordinates())
   * </ul>
-  *
-  *
+  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera 
+  * coordinate system (world coordinates) is at the pinhole
+  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
+  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   * @ingroup ToFProcessing
   */
   class mitkToFProcessing_EXPORT ToFProcessingCommon

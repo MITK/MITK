@@ -172,7 +172,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
       }
 
       // actually perform region growing. Here we have both an image and some seed points
-      AccessByItk_2( image, ItkImageProcessing, image->GetGeometry(), node ); // some magic to call the correctly templated function
+      AccessByItk_n( image, ItkImageProcessing, ( image->GetGeometry(), node, m_Controls->sliderOffsetValue->value() ) ); // some magic to call the correctly templated function
 
     }
   }
@@ -180,7 +180,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent )
+void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent, int thresholdOffset )
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
   typedef typename InputImageType::IndexType    IndexType;
@@ -223,8 +223,9 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
 
   std::cout << "Values between " << min << " and " << max << std::endl;
 
-  min -= 30;
-  max += 30;
+
+  min -= thresholdOffset;
+  max += thresholdOffset;
 
   // set thresholds and execute filter
   regionGrower->SetLower( min );
@@ -248,4 +249,3 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
   this->GetDefaultDataStorage()->Add( newNode, parent );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-

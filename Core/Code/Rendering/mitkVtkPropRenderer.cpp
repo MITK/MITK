@@ -1,18 +1,12 @@
 /*=========================================================================
- 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2007-09-22 11:55:20 +0200 (Sa, 22 Sep 2007) $
-Version:   $Revision: 12240 $
- 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 
@@ -59,6 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
 
 
@@ -89,9 +84,9 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
   m_TextRenderer = vtkRenderer::New();
   m_TextRenderer->SetRenderWindow(renWin);
   m_TextRenderer->SetInteractive(0);
-  #if ( VTK_MAJOR_VERSION >= 5 )
-    m_TextRenderer->SetErase(0);
-  #endif
+#if ( VTK_MAJOR_VERSION >= 5 )
+  m_TextRenderer->SetErase(0);
+#endif
 }
 
 /*!
@@ -172,8 +167,8 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
 
-//  MITK_INFO << "hier drin " << type;
-   // Do we have objects to render?
+  //  MITK_INFO << "hier drin " << type;
+  // Do we have objects to render?
   if ( this->GetEmptyWorldGeometry()) 
     return 0;
 
@@ -191,15 +186,15 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
-//    MITK_INFO << "name " << mapper->GetNameOfClass();
+    //    MITK_INFO << "name " << mapper->GetNameOfClass();
     if((mapper->IsVtkBased() == true) )
     {
       sthVtkBased = true;
       mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
       if(vtkMapper)
       {
-         vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
-         //vtkMapper->GetVtkProp(this)->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
+        vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
+        //vtkMapper->GetVtkProp(this)->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
       }
       if(lastVtkBased == false)
       {
@@ -208,8 +203,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       }
     }
     else
-    if((mapper->IsVtkBased() == false) && (lastVtkBased == true))
-    {
+      if((mapper->IsVtkBased() == false) && (lastVtkBased == true))
+      {
       Enable2DOpenGL();
       lastVtkBased = false;
     }
@@ -221,15 +216,17 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     glGetFloatv(GL_LINE_WIDTH, &lineWidth);
     glGetBooleanv(bit, &mode);
 
+    AdjustCameraToScene();
+
     switch(type)
     {
-      case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
-      case mitk::VtkPropRenderer::Translucent: mapper->MitkRenderTranslucentGeometry(this); break;
-      case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
-        //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
-      #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-      case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
-      #endif
+    case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
+    case mitk::VtkPropRenderer::Translucent: mapper->MitkRenderTranslucentGeometry(this); break;
+    case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
+      //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+    case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
+#endif
     }
     if(mode)
       glEnable(bit);
@@ -317,7 +314,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int layer = 1;
     node->GetIntProperty("layer", layer, this);
     int nr = (layer<<16) + mapperNo;
-//    MITK_INFO << "Layer Number " << nr << " Mapper type " << mapper->GetNameOfClass();
+    //    MITK_INFO << "Layer Number " << nr << " Mapper type " << mapper->GetNameOfClass();
     m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
   }  
@@ -331,26 +328,26 @@ Enable2DOpenGL() and Disable2DOpenGL() are used to switch between 2D rendering (
 void mitk::VtkPropRenderer::Enable2DOpenGL()
 {
   GLint iViewport[4];  
-   
+
   // Get a copy of the viewport  
   glGetIntegerv( GL_VIEWPORT, iViewport );  
-   
+
   // Save a copy of the projection matrix so that we can restore it  
   // when it's time to do 3D rendering again.  
   glMatrixMode( GL_PROJECTION );  
   glPushMatrix();
   glLoadIdentity();  
-   
+
   // Set up the orthographic projection  
   glOrtho( 
-    iViewport[0], iViewport[0]+iViewport[2],  
-    iViewport[1], iViewport[1]+iViewport[3],
-    -1.0, 1.0 
-  );
+      iViewport[0], iViewport[0]+iViewport[2],
+      iViewport[1], iViewport[1]+iViewport[3],
+      -1.0, 1.0
+      );
   glMatrixMode( GL_MODELVIEW );  
   glPushMatrix();  
   glLoadIdentity();
-   
+
   // Make sure depth testing and lighting are disabled for 2D rendering until  
   // we are finished rendering in 2D  
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );
@@ -454,7 +451,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
-   
+
   mitk::RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
 }
 
@@ -491,7 +488,7 @@ void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 void mitk::VtkPropRenderer::MakeCurrent()
 {
   if(m_RenderWindow!=NULL)
-     m_RenderWindow->MakeCurrent();
+    m_RenderWindow->MakeCurrent();
 }
 
 
@@ -502,23 +499,23 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
     //m_WorldPointPicker->SetTolerance (0.0001);
     switch ( m_PickingMode )
     {
-     case (WorldPointPicking) :
-     {
-       m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-       vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
-       break;
-     }
-     case (PointPicking) :
-     {
-       // create a new vtkRenderer
-       // give it all necessary information (camera position, etc.)
-       // get all surfaces from datastorage, get actors from them
-       // add all those actors to the new renderer
-       // give this new renderer to pointpicker
-       /*
+    case (WorldPointPicking) :
+      {
+        m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+        vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+        break;
+      }
+    case (PointPicking) :
+      {
+        // create a new vtkRenderer
+        // give it all necessary information (camera position, etc.)
+        // get all surfaces from datastorage, get actors from them
+        // add all those actors to the new renderer
+        // give this new renderer to pointpicker
+        /*
        vtkRenderer* pickingRenderer = vtkRenderer::New();
        pickingRenderer->SetActiveCamera( );
-      
+
        DataStorage* dataStorage = m_DataStorage;
        TNodePredicateDataType<Surface> isSurface;
 
@@ -544,10 +541,10 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
 
        MITK_INFO << ";" << std::endl;
        */
-       m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-       vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
-       break;
-     }
+        m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+        vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
+        break;
+      }
     }
   }
   else
@@ -557,7 +554,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
 }
 
 mitk::DataNode *
-mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const 
+    mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const
 {
   if ( m_VtkMapperPresent )
   {
@@ -567,8 +564,8 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
     // for picking
     DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
     for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-          it != allObjects->End(); 
-          ++it )
+    it != allObjects->End();
+    ++it )
     {
       DataNode *node = it->Value();
       if ( node == NULL )
@@ -580,7 +577,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
         continue;
 
       VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
-        ( node->GetMapper( m_MapperID ) );
+                            ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
 
@@ -599,7 +596,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
 
     vtk2itk( m_CellPicker->GetPickPosition(), worldPosition );
     vtkProp *prop = m_CellPicker->GetViewProp();
-  
+
     if ( prop == NULL )
     {
       return NULL;
@@ -608,8 +605,8 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
     // Iterate over all DataStorage objects to determine if the retrieved
     // vtkProp is owned by any associated mapper.
     for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-          it != allObjects->End(); 
-          ++it)
+    it != allObjects->End();
+    ++it)
     {
       DataNode::Pointer node = it->Value();
       if ( node.IsNull() )
@@ -641,7 +638,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
 */
 int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3)
 {
- if(text.size() > 0)
+  if(text.size() > 0)
   {
     vtkTextActor* textActor = vtkTextActor::New();
 
@@ -691,7 +688,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
   //returnPath->Register(NULL);
 
   bool success = false;
- 
+
   while (!success)
   {
     // loop until AddNode can be called successfully
@@ -797,7 +794,7 @@ void mitk::VtkPropRenderer::checkState()
       if (glWorkAroundGlobalCount == 2)
       {
         MITK_INFO << "Multiple 3D Renderwindows active...: turning Immediate Rendering ON for legacy mappers";
-//          vtkMapper::GlobalImmediateModeRenderingOn();
+        //          vtkMapper::GlobalImmediateModeRenderingOn();
       }
       //MITK_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
       
@@ -812,72 +809,120 @@ void mitk::VtkPropRenderer::checkState()
       if(glWorkAroundGlobalCount==1)
       {
         MITK_INFO << "Single 3D Renderwindow active...: turning Immediate Rendering OFF for legacy mappers";
-//        vtkMapper::GlobalImmediateModeRenderingOff();
+        //        vtkMapper::GlobalImmediateModeRenderingOff();
       }
       //MITK_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
     }
-   }
+  }
 }
 
 void mitk::VtkPropRenderer::AdjustCameraToScene(){
-//  LocalStorage *localStorage = m_LSH.GetLocalStorage(this);
-
-  //activate parallel projection for 2D
-  this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
-
-  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
-
-  //TODO
-  double imageHeightInMM = 256.0;//localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
-  double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-  double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
-
-  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
-  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
-
-  //Scale the rendered object:
-  //The image is scaled by a single factor, because in an orthographic projection sizes
-  //are preserved (so you cannot scale X and Y axis with different parameters). The
-  //parameter sets the size of the total display-volume. If you set this to the image
-  //height, the image plus a border with the size of the image will be rendered.
-  //Therefore, the size is imageHeightInMM / 2.
-  this->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
-  //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
-  this->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
-
-  //the center of the view-plane
-  double viewPlaneCenter[3];
-  viewPlaneCenter[0] = displayGeometryCenterInMM[0];
-  viewPlaneCenter[1] = displayGeometryCenterInMM[1];
-  viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
-
-  //define which direction is "up" for the ciamera (like default for vtk (0.0, 1.0, 0.0)
-  double cameraUp[3];
-  cameraUp[0] = 0.0;
-  cameraUp[1] = 1.0;
-  cameraUp[2] = 0.0;
-
-  //the position of the camera (center[0], center[1], 1000)
-  double cameraPosition[3];
-  cameraPosition[0] = viewPlaneCenter[0];
-  cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = 900000.0; //Reason for 900000: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
-
-  //set the camera corresponding to the textured plane
-  vtkSmartPointer<vtkCamera> camera = this->GetVtkRenderer()->GetActiveCamera();
-  if (camera)
+  if(this->GetMapperID() == 1)
   {
-    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
-    camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
-    camera->SetViewUp( cameraUp ); //set the view-up for the camera
-    camera->SetClippingRange(0.1, 1000000.0); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+    //activate parallel projection for 2D
+    this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
+
+    const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
+
+    //TODO
+    double imageHeightInMM = 256.0;//localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
+    double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
+    double zoomFactor = imageHeightInMM/displayHeightInMM; //displayGeometry->GetScaleFactorMMPerDisplayUnit()
+    //determine how much of the image can be displayed
+
+    Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
+    Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
+
+    //Scale the rendered object:
+    //The image is scaled by a single factor, because in an orthographic projection sizes
+    //are preserved (so you cannot scale X and Y axis with different parameters). The
+    //parameter sets the size of the total display-volume. If you set this to the image
+    //height, the image plus a border with the size of the image will be rendered.
+    //Therefore, the size is imageHeightInMM / 2.
+    this->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
+    //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
+    this->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
+
+    //the center of the view-plane
+    double viewPlaneCenter[3];
+    viewPlaneCenter[0] = displayGeometryCenterInMM[0];
+    viewPlaneCenter[1] = displayGeometryCenterInMM[1];
+    viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
+
+    //define which direction is "up" for the ciamera (like default for vtk (0.0, 1.0, 0.0)
+    double cameraUp[3];
+    cameraUp[0] = 0.0;
+    cameraUp[1] = 1.0;
+    cameraUp[2] = 0.0;
+
+    //the position of the camera (center[0], center[1], 1000)
+    double cameraPosition[3];
+    cameraPosition[0] = viewPlaneCenter[0];
+    cameraPosition[1] = viewPlaneCenter[1];
+    cameraPosition[2] = 900000.0; //Reason for 900000: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+
+    //set the camera corresponding to the textured plane
+    vtkSmartPointer<vtkCamera> camera = this->GetVtkRenderer()->GetActiveCamera();
+    if (camera)
+    {
+      camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
+      camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
+      camera->SetViewUp( cameraUp ); //set the view-up for the camera      
+      double distance = sqrt((cameraPosition[2]-viewPlaneCenter[2])*(cameraPosition[2]-viewPlaneCenter[2]));
+      camera->SetClippingRange(distance-1, distance+1); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+//      camera->SetClippingRange(0.1, 1000000); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+    }
+
+    this->GetVtkRenderer()->RemoveAllLights();
+
+    //remove the VTK interaction
+    this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+
+    //Transform the camera to the current position (transveral, coronal and saggital plane).
+    //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
+    //(Without not all three planes would be visible).
+
+//    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+
+//    vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+//    //    trans->SetMatrix(this->GetWorldGeometry()->GetVtkTransform()->GetMatrix());
+//        trans->SetMatrix( this->GetWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix());
+//        vtkSmartPointer<vtkTransform> trans2 = vtkSmartPointer<vtkTransform>::New();
+//        trans2->SetMatrix( this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetLinearInverse()->GetMatrix());
+//        trans->Concatenate(trans2);
+
+
+    if(this->GetRenderWindow() == this->GetRenderWindowByName("stdmulti.widget2"))
+    {
+//      MITK_INFO << "1 ";
+//      this->GetGetMatrixCurrentWorldGeometry2D()->GetReferenceGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+////      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//      MITK_INFO << "1 Inverse";
+//      this->GetCurrentWorldGeometry2D()->GetReferenceGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+
+//      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+//      MITK_INFO << "2";
+////      //    this->GetDisplayGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//          this->GetWorldGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//////      this->GetSliceNavigationController()->GetCurrentPlaneGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+////      MITK_INFO << "2 Inverse";
+//////      this->GetSliceNavigationController()->GetCurrentPlaneGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+////      //    this->GetDisplayGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+////          this->GetWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+//      MITK_INFO << "3";
+////      //    this->GetSliceNavigationController()->GetCurrentGeometry3D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//      MITK_INFO << "3 Inverse";
+//      //    this->GetSliceNavigationController()->GetCurrentGeometry3D()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+////      this->GetCurrentWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+
+//      MITK_INFO << "Ende";
+    }
+    //    trans->Print(std::cout);
+
+    //    const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+    //    const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
+
+//        this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
   }
-
-  this->GetVtkRenderer()->RemoveAllLights();
-
-  //remove the VTK interaction
-  this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
-
-  //TODO
-//  this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 }

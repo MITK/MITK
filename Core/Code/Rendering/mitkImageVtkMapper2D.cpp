@@ -9,6 +9,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include <mitkSurface.h>
+
 //MITK
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
@@ -575,16 +577,17 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->GeneratePlane( renderer, sliceBounds );
 
   //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
-  renderer->GetVtkRenderer()->RemoveAllLights();
+//  renderer->GetVtkRenderer()->RemoveAllLights();
 
   //remove the VTK interaction
-  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+//  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
 
   trans->SetMatrix(matrix);
+//trans->SetMatrix(worldGeometry->GetVtkTransform()->GetMatrix());
 
   //apply the properties after the slice was set
   this->ApplyProperties( renderer, mmPerPixel );
@@ -597,17 +600,38 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 //      cam->Print(std::cout);
 //    MITK_INFO << "range " << range[0] << " " << range[1];
 
-  this->AdjustCamera( renderer );
+//  this->AdjustCamera( renderer );
 
 //  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
-  localStorage->m_Actor->SetUserTransform(trans);
+//  localStorage->m_Actor->SetUserTransform(trans);
+
+//static int counter = 0;
+//if(counter < 6)
+//{
+//  mitk::Surface::Pointer surf = mitk::Surface::New();
+//  surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
+//  surf->Update();
+
+//  mitk::DataNode::Pointer node = mitk::DataNode::New();
+//  node->SetData(surf);
+//  renderer->GetDataStorage()->Add(node);
+//  counter++;
+//}
+
+  if(renderer->GetRenderWindow() == renderer->GetRenderWindowByName("stdmulti.widget2"))
+  {
+//  MITK_INFO << "Im Mapper";
+//  worldGeometry->GetVtkTransform()->GetMatrix()->Print(std::cout);
+//  trans->Print(std::cout);
+  }
+
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
   //(Without not all three planes would be visible).
-  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 
   //  MITK_INFO << "pos Z:" << cam->GetPosition()[2];
   //  MITK_INFO << "foc Z:" << cam->GetFocalPoint()[2];

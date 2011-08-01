@@ -125,7 +125,10 @@ namespace mitk {
 
     vtkProp* GetVtkProp(mitk::BaseRenderer* renderer)
     {
-      return m_OdfMapper->GetVtkProp(renderer);
+      vtkPropAssembly* assembly = vtkPropAssembly::New();
+      assembly->AddPart( m_OdfMapper->GetVtkProp(renderer));
+      assembly->AddPart( m_ImgMapper->GetVtkProp(renderer));
+      return assembly;
     }
 
     void SetGeometry3D(const mitk::Geometry3D* aGeometry3D)

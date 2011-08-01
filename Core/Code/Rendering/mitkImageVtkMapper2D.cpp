@@ -124,12 +124,17 @@ void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloa
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   //Set the origin to (xMin; yMin; 0) of the plane. This is necessary for obtaining the correct
   //plane size in crosshair rotation and swivel mode.
-  localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], 0.0);
+
+  float depthOffset = 0.0;
+  GetDataNode()->GetFloatProperty( "depthOffset", depthOffset, renderer );
+  depthOffset *= -1.0;
+  localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depthOffset);
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-  localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], 0.0); //P1: (xMax, yMin, 0)
-  localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], 0.0); //P2: (xMin, yMax, 0)
+  localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], depthOffset); //P1: (xMax, yMin, 0)
+  localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depthOffset); //P2: (xMin, yMax, 0)
+
 }
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
@@ -984,6 +989,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 
   // Properties common for both images and segmentations
   node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "depthOffset", mitk::FloatProperty::New( 0.0 ), renderer, overwrite );
   node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "outline width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );

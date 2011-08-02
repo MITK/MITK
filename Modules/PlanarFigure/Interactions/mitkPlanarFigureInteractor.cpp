@@ -906,31 +906,36 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
 
   // Check if a previous point has been set
-  int previousIndex = planarFigure->GetNumberOfControlPoints() - 2;
-  if ( previousIndex >= 0 )
+  bool tooClose = false;
+
+  for( int i=0; i<planarFigure->GetNumberOfControlPoints() - 1; i++ )
   {
-
-    // Try to convert previous point to current display coordinates
-    mitk::Geometry2D *planarFigureGeometry =
-      dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
-
-    const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
-
-    mitk::Point3D previousPoint3D;
-    planarFigureGeometry->Map( planarFigure->GetControlPoint( previousIndex ), previousPoint3D );
-    if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
+    if ( i != planarFigure->GetSelectedControlPoint()-1 )
     {
-      mitk::Point2D previousDisplayPosition;
-      projectionPlane->Map( previousPoint3D, previousDisplayPosition );
-      renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
+      // Try to convert previous point to current display coordinates
+      mitk::Geometry2D *planarFigureGeometry =
+        dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
 
-      double a = currentDisplayPosition[0] - previousDisplayPosition[0];
-      double b = currentDisplayPosition[1] - previousDisplayPosition[1];
+      const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
-      // If point is to close, do not set a new point
-      return a * a + b * b >= 25.0;
+      mitk::Point3D previousPoint3D;
+      planarFigureGeometry->Map( planarFigure->GetControlPoint( i ), previousPoint3D );
+      if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
+      {
+        mitk::Point2D previousDisplayPosition;
+        projectionPlane->Map( previousPoint3D, previousDisplayPosition );
+        renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
+
+        double a = currentDisplayPosition[0] - previousDisplayPosition[0];
+        double b = currentDisplayPosition[1] - previousDisplayPosition[1];
+
+        // If point is to close, do not set a new point
+        tooClose = (a * a + b * b < 25.0);
+      }
+      if ( tooClose )
+        return false; // abort loop early
     }
   }
 
-  return false; // default
+  return !tooClose; // default
 }

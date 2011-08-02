@@ -26,6 +26,7 @@ SET(MODULE_TESTS
    mitkNavigationDataPlayerTest.cpp
    mitkTrackingDeviceSourceTest.cpp
    mitkTrackingDeviceSourceConfiguratorTest.cpp
+   mitkNavigationDataEvaluationFilterTest.cpp
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp

@@ -65,12 +65,12 @@ void mitk::NavigationDataEvaluationFilter::CreateMembersForAllInputs()
 {
   while(this->m_LoggedPositions.size() < this->GetNumberOfInputs())
     {
-    std::pair<int,std::vector<mitk::Point3D>> newElement(m_LoggedPositions.size(),std::vector<mitk::Point3D>());
+    std::pair<int,std::vector<mitk::Point3D> > newElement(m_LoggedPositions.size(),std::vector<mitk::Point3D>());
     m_LoggedPositions.insert(newElement);
     }
   while(this->m_LoggedQuaternions.size() < this->GetNumberOfInputs())
     {
-    std::pair<int,std::vector<mitk::Quaternion>> newElement(m_LoggedQuaternions.size(),std::vector<mitk::Quaternion>());
+    std::pair<int,std::vector<mitk::Quaternion> > newElement(m_LoggedQuaternions.size(),std::vector<mitk::Quaternion>());
     m_LoggedQuaternions.insert(newElement);
     }
   while(this->m_InavildSamples.size() < this->GetNumberOfInputs())

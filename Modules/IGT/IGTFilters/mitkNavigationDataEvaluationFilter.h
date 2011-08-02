@@ -94,8 +94,8 @@ namespace mitk {
     void CreateMembersForAllInputs();
 
     
-    std::map<int,std::vector<mitk::Point3D>> m_LoggedPositions; //a map here, to have one list for every navigation data
-    std::map<int,std::vector<mitk::Quaternion>> m_LoggedQuaternions;
+    std::map<int,std::vector<mitk::Point3D> > m_LoggedPositions; //a map here, to have one list for every navigation data
+    std::map<int,std::vector<mitk::Quaternion> > m_LoggedQuaternions;
     std::map<int,int> m_InavildSamples;
 
 

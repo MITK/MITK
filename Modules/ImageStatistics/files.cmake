@@ -1,5 +1,6 @@
 SET(CPP_FILES
   mitkImageStatisticsCalculator.cpp
+  mitkPointSetStatisticsCalculator.cpp
 )
 
 IF ( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )

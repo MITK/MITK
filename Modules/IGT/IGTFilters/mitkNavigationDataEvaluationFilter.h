@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNavigationDataEvaluationFilter_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
-
+#include <mitkPointSet.h>
 #include <itkQuaternionRigidTransform.h>
 #include <itkTransform.h>
 
@@ -98,28 +98,10 @@ namespace mitk {
     std::map<int,std::vector<mitk::Quaternion> > m_LoggedQuaternions;
     std::map<int,int> m_InavildSamples;
 
-
-    /** @return returns a list with the distances to the mean of the list */
-    std::vector<double> GetErrorList(std::vector<mitk::Point3D> list);
-
-    mitk::Point3D GetMean(std::vector<mitk::Point3D> list);
-
     mitk::Quaternion GetMean(std::vector<mitk::Quaternion> list);
 
-
-    double GetMean(std::vector<double> list);
-
-    double GetMedian(std::vector<double> list);
-
-    double GetMax(std::vector<double> list);
-
-    double GetMin(std::vector<double> list);
-
-    /** @return returns the standard derivation of the list */
-    double GetStabw(std::vector<double> list);
-
-    /** @return returns the sample standard derivation of the list */
-    double GetSampleStabw(std::vector<double> list);
+    mitk::PointSet::Pointer VectorToPointSet(std::vector<mitk::Point3D> pSet);
+    
   };
 } // namespace mitk
 

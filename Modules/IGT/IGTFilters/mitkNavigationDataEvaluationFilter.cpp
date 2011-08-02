@@ -131,10 +131,11 @@ for (int i=0; i<m_LoggedQuaternions[input].size(); i++)
   list3.push_back(m_LoggedQuaternions[input].at(i)[2]);
   list4.push_back(m_LoggedQuaternions[input].at(i)[3]);
   }
-//returnValue[0] = GetStabw(list1);
-//returnValue[1] = GetStabw(list2);
-//returnValue[2] = GetStabw(list3);
-//returnValue[3] = GetStabw(list4);
+mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New();
+returnValue[0] = myCalculator->GetStabw(list1);
+returnValue[1] = myCalculator->GetStabw(list2);
+returnValue[2] = myCalculator->GetStabw(list3);
+returnValue[3] = myCalculator->GetStabw(list4);
 return returnValue;
 }
 

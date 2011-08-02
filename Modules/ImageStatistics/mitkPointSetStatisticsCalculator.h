@@ -71,7 +71,18 @@ public:
   /** @return Returns the minimum of the errors of all positions of the analysed point set. */
   double GetPositionErrorMin();
 
-  
+  //#####################################################################################################
+
+  //this both methods are used by another class an so they are public... perhaps we want to move them
+  //out of this class because they have nothing to do with point sets.
+
+  /** @return returns the standard derivation of the given list (NOT of the point set).*/
+  double GetStabw(std::vector<double> list);
+
+  /** @return returns the sample standard derivation of the given list (NOT of the point set).*/
+  double GetSampleStabw(std::vector<double> list);
+
+  //#####################################################################################################
 
  
 protected:
@@ -97,12 +108,7 @@ protected:
   double GetMax(std::vector<double> list);
 
   double GetMin(std::vector<double> list);
-
-  /** @return returns the standard derivation of the list */
-  double GetStabw(std::vector<double> list);
-
-  /** @return returns the sample standard derivation of the list */
-  double GetSampleStabw(std::vector<double> list);
+  
 };
 
 }

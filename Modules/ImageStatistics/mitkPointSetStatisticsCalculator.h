@@ -91,6 +91,8 @@ protected:
   PointSetStatisticsCalculator(mitk::PointSet::Pointer);
   virtual ~PointSetStatisticsCalculator();
 
+  // TODO: Remove the std::vector<mitk::Point3D> data structure and use mitk::PointSet everywhere
+  
   /** @return Returns a list with the distances to the mean of the list */
   std::vector<double> GetErrorList(std::vector<mitk::Point3D> list);
 

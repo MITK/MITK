@@ -1,3 +1,4 @@
-SET(MODULE_TESTS 
+SET(MODULE_TESTS
   mitkImageStatisticsCalculatorTest.cpp
+  mitkPointSetStatisticsCalculatorTest.cpp
 )

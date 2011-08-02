@@ -240,7 +240,7 @@ if (list.size() % 2 == 0.) //even
   }
 else //odd
   {
-  return list.at((list.size()+1)/2);
+  return list.at((list.size())/2);
   }
 }
 

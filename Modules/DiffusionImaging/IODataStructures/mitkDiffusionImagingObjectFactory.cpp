@@ -116,6 +116,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::DiffusionImageMapper<short>::New();
       newMapper->SetDataNode(node);
     }
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ImageMapperGL2D::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -144,7 +152,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
-    classname = "Image";
+    classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeDataVtkMapper3D::New();
@@ -185,12 +193,12 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::FiberBundleMapper3D::SetDefaultProperties(node);
   }
 
-  classname = "Image";
+  classname = "TbssImage";
   std::string n = node->GetData()->GetNameOfClass();
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-   // mitk::ImageMapperGL2D::SetDefaultProperties(node);
-    //mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+    mitk::ImageMapperGL2D::SetDefaultProperties(node);
+    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 }
 

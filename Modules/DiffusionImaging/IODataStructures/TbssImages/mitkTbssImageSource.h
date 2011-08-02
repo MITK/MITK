@@ -23,11 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 // Should be changed in a new type for TBSS
 #include "mitkImageSource.h"
 #include "MitkDiffusionImagingExports.h"
-#include "mitkTbssImage.h"
+
 
 namespace mitk {
 
   template<typename TPixelType>
+
   class TbssImage;
   /*class DiffusionImage<double>;
   class DiffusionImage<int>;
@@ -48,14 +49,15 @@ template<typename TPixelType>
 class MitkDiffusionImaging_EXPORT TbssImageSource : public ImageSource
 {
 public:
-  mitkClassMacro(TbssImageSource, BaseProcess);
-  itkNewMacro(Self);  
+  mitkClassMacro(TbssImageSource, BaseProcess)
+  itkNewMacro(Self)
 
   typedef TbssImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
 
+  //OutputType * GetOutput(unsigned int idx);
 
   //void SetOutput(OutputType* output);
 

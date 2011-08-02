@@ -56,15 +56,18 @@ namespace mitk
       this->m_Image = image;
     }
 
-    itkSetMacro(TbssType, std::string);
-    itkGetMacro(TbssType, std::string);
+    itkSetMacro(TbssType, std::string)
+    itkGetMacro(TbssType, std::string)
 
-    void InitializeFromImage();
-
+    void InitializeFromImage()
+    {
+        MITK_INFO << "make an mitk image that can be shown by mitk";
+        this->InitializeByItk(m_Image.GetPointer(),1,1);
+    }
 
   protected:
-    TbssImage();
-    virtual ~TbssImage();
+    TbssImage(){}
+    virtual ~TbssImage(){}
 
     typename ImageType::Pointer m_Image;
 

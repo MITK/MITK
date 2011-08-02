@@ -15,12 +15,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "mitkTbssImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "mitkImageCast.h"
-#include "mitkTbssImage.h"
-/*
 
+
+/*
 template<typename TPixelType>
 mitk::TbssImage<TPixelType>::TbssImage()
 {
@@ -33,14 +34,12 @@ mitk::TbssImage<TPixelType>::~TbssImage()
 
 }
 
+
 template<typename TPixelType>
 void mitk::TbssImage<TPixelType>::InitializeFromImage()
 {
 
 }
-
-
-
 
 
 */

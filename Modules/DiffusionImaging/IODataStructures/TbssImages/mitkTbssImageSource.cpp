@@ -19,15 +19,15 @@ PURPOSE.  See the above copyright notices for more information.
 #define __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_CPP__
 
 #include "mitkTbssImageSource.h"
-#include "mitkImage.h"
+#include "mitkTbssImage.h"
 
 template<typename TPixelType>
 mitk::TbssImageSource<TPixelType>::TbssImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type DiffusionImage
-  typename mitk::Image::Pointer output
-    = static_cast<typename mitk::Image*>(this->MakeOutput(0).GetPointer());
+  typename mitk::TbssImage<TPixelType>::Pointer output
+    = static_cast<typename mitk::TbssImage<TPixelType>*>(this->MakeOutput(0).GetPointer());
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
@@ -42,10 +42,17 @@ mitk::TbssImageSource<TPixelType>::~DiffusionImageSource()
 template<typename TPixelType>
 itk::DataObject::Pointer mitk::TbssImageSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::Image::New().GetPointer());
+  return static_cast<itk::DataObject*>(mitk::TbssImage<TPixelType>::New().GetPointer());
 }
 
+/*
+template<typename TPixelType>
+mitk::TbssImageSource<TPixelType>::OutputType* mitk::TbssImageSource::GetOutput(unsigned int idx)
+{
+  return static_cast<OutputType*>
+                     (this->ProcessObject::GetOutput(idx));
+}
 
-
+*/
 
 #endif //__MITK_NRRD_TBSS_VOULMES_IO_FACTORY_CPP__

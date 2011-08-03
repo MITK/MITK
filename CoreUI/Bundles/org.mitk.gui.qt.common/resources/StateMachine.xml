@@ -3578,30 +3578,6 @@
       <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003" />
     </state>
   </stateMachine>
-  <stateMachine NAME="BinaryImageInteractor">
-    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="138" Y_POS="318" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
-        <action ID="30" />
-      </transition>
-    </state>
-    <state NAME="IsOverImage" ID="2" X_POS="447" Y_POS="185" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
-      <transition NAME="isOverImage" EVENT_ID="1004" NEXT_STATE_ID="3" />
-    </state>
-    <state NAME="PickImage" ID="3" X_POS="803" Y_POS="350" WIDTH="100" HEIGHT="50">
-      <transition NAME="SelectingImage" EVENT_ID="1" NEXT_STATE_ID="4">
-        <action ID="60" />
-      </transition>
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
-        <action ID="30" />
-      </transition>
-    </state>
-    <state NAME="SelectImage" ID="4" X_POS="594" Y_POS="542" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="2">
-        <action ID="30" />
-      </transition>
-    </state>
-  </stateMachine>
   <stateMachine NAME="PlanarFigureInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="1368" Y_POS="736" WIDTH="100" HEIGHT="50">
@@ -3737,6 +3713,55 @@
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="123452">
         <!-- on EIDLEFTMOUSEBTN keep state and do AcREMOVE -->
         <action ID="101" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="BinaryImageInteractor">
+    <state START_STATE="TRUE" NAME="UndecidedState" ID="2" X_POS="374" Y_POS="98" WIDTH="139" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="11">
+        <action ID="60" />
+      </transition>
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="CorrectionMode" ID="6" X_POS="749" Y_POS="498" WIDTH="188" HEIGHT="51">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="7">
+        <action ID="8" />
+      </transition>
+      <transition NAME="name" EVENT_ID="14" NEXT_STATE_ID="2">
+        <action ID="40">
+          <!--End of correction mode - hide sphere-->
+        </action>
+      </transition>
+      <transition NAME="name" EVENT_ID="27" NEXT_STATE_ID="6">
+        <action ID="107" />
+      </transition>
+      <transition NAME="name" EVENT_ID="26" NEXT_STATE_ID="6">
+        <action ID="106" />
+      </transition>
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="6">
+        <action ID="49006" />
+      </transition>
+    </state>
+    <state NAME="DragSegmentationSurface" ID="7" X_POS="95" Y_POS="473" WIDTH="202" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="7">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="7">
+        <action ID="43" />
+      </transition>
+      <transition NAME="name" EVENT_ID="14" NEXT_STATE_ID="2">
+        <action ID="40" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1002" NEXT_STATE_ID="2" />
+    </state>
+    <state NAME="CheckIfImageIsSelected" ID="11" X_POS="771" Y_POS="201" WIDTH="255" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="2" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="6">
+        <action ID="6">
+          <!--Initialize correction mode, visualize a sphere-->
+        </action>
       </transition>
     </state>
   </stateMachine>

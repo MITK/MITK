@@ -264,6 +264,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
                                      QFileDialog::Options options
                                      )
 {
+  QString selectedFileName = "";
   QComboBox* combo = new QComboBox;
   combo->addItem("3D");
   combo->addItem("2D + t");
@@ -294,7 +295,8 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   QLayout* layout = fileDialog->layout();
   QGridLayout* gridbox = qobject_cast<QGridLayout*>(layout);
 
-  if (gridbox) {
+  if (gridbox) 
+  {
     gridbox->addWidget(new QLabel("ToF-Image type:"));
     gridbox->addWidget(combo);
     int lastRow = gridbox->rowCount();
@@ -302,31 +304,40 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   }
 
   fileDialog->setLayout(gridbox);
-
   fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+
   if (selectedFilter)
+  {
     fileDialog->selectNameFilter(*selectedFilter);
-  if (fileDialog->exec() == QDialog::Accepted) {
+  }
+
+  if (fileDialog->exec() == QDialog::Accepted) 
+  {
     if (selectedFilter)
     {
       *selectedFilter = fileDialog->selectedFilter();
     }
+
     if (combo->currentIndex() == 0)
     {
       tofImageType = mitk::ToFImageWriter::ToFImageType3D;
     }
+
     else
     {
       tofImageType = mitk::ToFImageWriter::ToFImageType2DPlusT;
     }
+
     distanceImageSelected = distanceImageCheckBox->isChecked();
     amplitudeImageSelected = amplitudeImageCheckBox->isChecked();
     intensityImageSelected = intensityImageCheckBox->isChecked();
     rawDataSelected = rawDataCheckBox->isChecked();
-    return fileDialog->selectedFiles().value(0);
+
+    selectedFileName = fileDialog->selectedFiles().value(0);
   }
 
-  return QString();
+  delete fileDialog;
+  return selectedFileName;
 }
 
 std::string QmitkToFRecorderWidget::prepareFilename(std::string dir, 

@@ -391,8 +391,13 @@ void mitk::PlanarFigure::SetFeatureVisible( unsigned int index, bool visible )
 
 void mitk::PlanarFigure::EvaluateFeatures()
 {
-  if ( !m_FeaturesUpToDate )
+  if ( !m_FeaturesUpToDate || !m_PolyLineUpToDate )
   {
+    if ( !m_PolyLineUpToDate )
+    {
+      this->GeneratePolyLine();
+    }
+
     this->EvaluateFeaturesInternal();
 
     m_FeaturesUpToDate = true;

@@ -27,9 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-mitk::NavigationToolReader::NavigationToolReader(mitk::DataStorage::Pointer dataStorage)
+mitk::NavigationToolReader::NavigationToolReader()
   {
-  m_DataStorage = dataStorage;
+
   }
 
 mitk::NavigationToolReader::~NavigationToolReader()
@@ -79,7 +79,6 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
-  m_DataStorage->Add(newNode);
   returnValue->SetDataNode(newNode);
 
   //Identifier

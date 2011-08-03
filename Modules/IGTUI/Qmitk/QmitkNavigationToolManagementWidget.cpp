@@ -69,8 +69,6 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_AddTool), SIGNAL(clicked()), this, SLOT(OnAddTool()) );
       connect( (QObject*)(m_Controls->m_DeleteTool), SIGNAL(clicked()), this, SLOT(OnDeleteTool()) );
       connect( (QObject*)(m_Controls->m_EditTool), SIGNAL(clicked()), this, SLOT(OnEditTool()) );
-      connect( (QObject*)(m_Controls->m_LoadSingleTool), SIGNAL(clicked()), this, SLOT(OnLoadSingleTool()) );
-      connect( (QObject*)(m_Controls->m_SaveSingleTool), SIGNAL(clicked()), this, SLOT(OnSaveSingleTool()) );
       connect( (QObject*)(m_Controls->m_LoadStorage), SIGNAL(clicked()), this, SLOT(OnLoadStorage()) );
       connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
           
@@ -159,32 +157,6 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
 
     m_Controls->m_SurfaceChooser->SetSelectedNode(selectedTool->GetDataNode());
     m_edit = true;
-  }
-
-void QmitkNavigationToolManagementWidget::OnLoadSingleTool()
-  {
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data());
-    if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
-    else 
-      { 
-      if (!m_NavigationToolStorage->AddTool(readTool))
-        {
-        MessageBox("Error: Can't add tool!");
-        m_DataStorage->Remove(readTool->GetDataNode());
-        }
-      UpdateToolTable();
-      }
-  }
-
-void QmitkNavigationToolManagementWidget::OnSaveSingleTool()
-  {
-    //if no item is selected, show error message:
-    if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
-
-    mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    if (!myWriter->DoWrite(QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data(),m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row()))) 
-      MessageBox("Error: "+ myWriter->GetErrorMessage());
   }
 
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
@@ -342,21 +314,4 @@ void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
   QMessageBox msgBox;
   msgBox.setText(s.c_str());
   msgBox.exec();
-  }
-
-void QmitkNavigationToolManagementWidget::EnableSingleToolSave(bool enable)
-  {
-  if (enable)
-    {
-    m_Controls->m_LoadSingleTool->setVisible(true);
-    m_Controls->m_SaveSingleTool->setVisible(true);
-    m_Controls->m_singleToolLabel->setVisible(true);
-    }
-  else
-    {
-    m_Controls->m_LoadSingleTool->setVisible(false);
-    m_Controls->m_SaveSingleTool->setVisible(false);
-    m_Controls->m_singleToolLabel->setVisible(false);
-    }
-
   }

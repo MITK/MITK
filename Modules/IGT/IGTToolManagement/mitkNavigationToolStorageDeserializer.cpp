@@ -47,12 +47,12 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
   decomressFiles(filename,m_tempDirectory);
   
   //now read all files and convert them to navigation tools
-  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New(m_DataStorage);
   bool cont = true;
   for (int i=0; cont==true; i++)
     {
     std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(fileName);
     if (readTool.IsNull()) cont = false;
     else returnValue->AddTool(readTool);

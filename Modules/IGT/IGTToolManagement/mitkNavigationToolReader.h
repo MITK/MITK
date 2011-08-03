@@ -41,7 +41,7 @@ namespace mitk {
   friend class mitk::NavigationToolStorageDeserializer;
   public:
     mitkClassMacro(NavigationToolReader,itk::Object);
-    mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);
+    itkNewMacro(Self);
 
     /**
      * @brief          This method reads a navigation tool from a file.
@@ -55,12 +55,10 @@ namespace mitk {
     itkGetMacro(ErrorMessage,std::string);
 
   protected:
-    NavigationToolReader(mitk::DataStorage::Pointer dataStorage);
+    NavigationToolReader();
     ~NavigationToolReader();
 
     std::string m_ErrorMessage;
-
-    mitk::DataStorage::Pointer m_DataStorage;
 
     mitk::NavigationTool::Pointer ConvertDataNodeToNavigationTool(mitk::DataNode::Pointer node, std::string toolPath);
 

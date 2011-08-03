@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNavigationToolStorage.h"
 #include "mitkNavigationTool.h"
+#include "mitkStandaloneDataStorage.h"
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 
@@ -28,7 +29,12 @@ class mitkNavigationToolStorageTestClass
     {
     // let's create an object of our class
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation")
+    MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation with constructor 1.")
+
+    mitk::DataStorage::Pointer myDataStorage = mitk::StandaloneDataStorage::New();    
+    mitk::NavigationToolStorage::Pointer myStorage2 = mitk::NavigationToolStorage::New(myDataStorage);
+    MITK_TEST_CONDITION_REQUIRED(myStorage2.IsNotNull(),"Testing instantiation with constructor 2.")
+    
     }
   
     static void TestAddAndDelete()
@@ -136,6 +142,40 @@ class mitkNavigationToolStorageTestClass
     myToolGet = myStorage->GetToolByName("quatsch");
     MITK_TEST_CONDITION_REQUIRED(myToolGet.IsNull(),"Testing GetTool() with wrong name.");
     }
+
+    static void TestStorageHandling()
+    {
+    mitk::DataStorage::Pointer myDataStorage = mitk::StandaloneDataStorage::New();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New(myDataStorage);
+    
+    //define first tool
+    mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
+    myTool1->SetIdentifier("001");
+    mitk::DataNode::Pointer node1 = mitk::DataNode::New();
+    node1->SetName("Tool1");
+    myTool1->SetDataNode(node1);
+
+    //define second tool
+    mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
+    myTool2->SetIdentifier("002");
+    mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+    node2->SetName("Tool2");
+    myTool2->SetDataNode(node2);
+
+    //execute tests
+    MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool1),"Testing: Add one tool.");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==node1,"Testing: Is data node in data storage?");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteAllTools(),"Deleting all tools.");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==NULL,"Testing: Was data node removed from storage?");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool1),"Testing: Add two tools (1).");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool2),"Testing: Add two tools (2).");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==node1,"Testing: Is data node in data storage (1)?");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool2")==node2,"Testing: Is data node in data storage (2)?");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteTool(0),"Deleting tool 1.");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==NULL,"Testing: Was data node 1 deleted?");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool2")==node2,"Testing: Is data node 2 still in data storage?");
+       
+    }
   };
 
 /** This function is testing the TrackingVolume class. */
@@ -148,6 +188,7 @@ int mitkNavigationToolStorageTest(int /* argc */, char* /*argv*/[])
   mitkNavigationToolStorageTestClass::TestAddAndDelete100Tools();
   mitkNavigationToolStorageTestClass::TestAddAndDelete100ToolsAtOnce();
   mitkNavigationToolStorageTestClass::TestGetTool();
+  mitkNavigationToolStorageTestClass::TestStorageHandling();
 
   MITK_TEST_END()
 }

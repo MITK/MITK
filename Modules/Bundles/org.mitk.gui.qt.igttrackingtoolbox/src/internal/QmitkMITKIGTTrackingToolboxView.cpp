@@ -115,9 +115,6 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Toolfile"), "/", tr("All Files (*.*)")); //later perhaps: tr("Toolfile (*.tfl)"
   if (filename.isNull()) return;
 
-  //initialize tool storage
-  m_toolStorage = mitk::NavigationToolStorage::New();
-
   //read tool storage from disk
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
   m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
@@ -256,7 +253,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     currentDevice->OpenConnection();
     currentDevice->StartTracking();
-    mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New();
+    mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(this->GetDataStorage());
     for (int i=0; i<currentDevice->GetToolCount(); i++)
       {
       //create a navigation tool with sphere as surface
@@ -277,8 +274,6 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       newNode->SetData(mySphere);
       newNode->SetName(toolname.str());
       newTool->SetDataNode(newNode);
-      this->GetDataStorage()->Add(newNode);
-      //add tool to navigation tool storage
       autoDetectedStorage->AddTool(newTool);
       }
     //save detected tools

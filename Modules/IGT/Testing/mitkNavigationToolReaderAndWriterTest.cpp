@@ -103,14 +103,10 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void TestRead()
     {
-    mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader with first test tool (claron tool) ----");
 
-    //Test if there was created a new tool
-    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode() == testStorage->GetNamedNode(readTool->GetDataNode()->GetName()),"Test if tool was added to storage...");
-    
     //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
     MITK_TEST_CONDITION_REQUIRED(dynamic_cast<mitk::Surface*>(readTool->GetDataNode()->GetData())->GetSizeOfPolyDataSeries()==testSurface->GetSizeOfPolyDataSeries(),"Test if surface was restored correctly ...");
 
@@ -173,14 +169,10 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void TestRead2()
     {
-    mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader  with second tool (aurora tool) ----");
 
-    //Test if there was created a new tool
-    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode() == testStorage->GetNamedNode(readTool->GetDataNode()->GetName()),"Test if tool was added to storage...");
-    
     //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
     MITK_TEST_CONDITION_REQUIRED(dynamic_cast<mitk::Surface*>(readTool->GetDataNode()->GetData())->GetSizeOfPolyDataSeries()==testSurface->GetSizeOfPolyDataSeries(),"Test if surface was restored correctly ...");
 
@@ -203,8 +195,7 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void TestReadInvalidData()
     {
-    mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
     mitk::NavigationTool::Pointer readTool = myReader->DoRead("invalidTool");
 
     MITK_TEST_CONDITION_REQUIRED(readTool.IsNull(), "Testing return value if filename is invalid");

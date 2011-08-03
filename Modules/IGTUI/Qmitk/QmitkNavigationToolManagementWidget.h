@@ -51,17 +51,12 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolManagementWidget();
 
-    /** @brief Enables/disables if single tools can be saved or loaded. Default is on.*/
-    void EnableSingleToolSave(bool enable);
-
   protected slots:
 
     //main widget page:
     void OnAddTool();
     void OnDeleteTool();
     void OnEditTool();
-    void OnLoadSingleTool();
-    void OnSaveSingleTool();
     void OnLoadStorage();
     void OnSaveStorage();
 

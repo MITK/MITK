@@ -161,7 +161,7 @@ static void CheckPlanesInsideBoundingBox(mitk::Geometry3D::Pointer geometry3D)
   minMax = calculator->GetMinMaxSpatialDirectionZ();
   MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 19, "Check if plane is from slice 0 to slice 19");
 
-  //Schraege flächen:
+  //Crooked planes:
   origin[0] = 0;
   origin[1] = 507;
   origin[2] = 0;
@@ -331,6 +331,19 @@ int mitkClippedSurfaceBoundsCalculatorTest(int argc, char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("ClippedSurfaceBoundsCalculator");
 
+  /** The class mitkClippedSurfaceBoundsCalculator calculates the intersection points of a PlaneGeometry and a Geometry3D.
+  *   This unittest checks if the correct min and max values for the three spatial directions (x, y, z)
+  *   are calculated. To test this we define artifical PlaneGeometries and Geometry3Ds and test different
+  *   scenarios:
+  *
+  *   1. planes which are inside the bounding box of a 3D geometry but only on one slice
+  *   2. planes which are outside of the bounding box
+  *   3. planes which are inside the bounding box but over more than one slice
+  *
+  *   Note: Currently rotated geometries are not tested!
+  */
+
+  /********************* Define Geometry3D ***********************/
   //Define origin:
   mitk::Point3D origin;
   origin[0] = 511;
@@ -360,6 +373,8 @@ int mitkClippedSurfaceBoundsCalculatorTest(int argc, char* argv[])
   slicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::Geometry2D*>(planeGeometry.GetPointer()), 20);
   mitk::Geometry3D::Pointer geometry3D = dynamic_cast< mitk::Geometry3D* > ( slicedGeometry3D.GetPointer() );
   geometry3D->SetImageGeometry(true);
+
+  /***************************************************************/
 
   CheckPlanesInsideBoundingBoxOnlyOnOneSlice(geometry3D);
   CheckPlanesOutsideOfBoundingBox(geometry3D);

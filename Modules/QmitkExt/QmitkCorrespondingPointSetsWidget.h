@@ -9,8 +9,7 @@
 #include <mitkPointSet.h>
 #include <mitkPointSetInteractor.h>
 #include <QmitkStdMultiWidget.h>
-
-
+#include <QToolButton>
 #include <QPushButton>
 
 /*!
@@ -25,21 +24,21 @@
  * \li clear all points in one time step of one set
  *
  * The user/application module of this widget needs to
- * assign two visible point sets to the widget 
- * (via SetPointSetNodes(std::vector<mitk::DataNode*> nodes)), 
- * preferrably by passing all visible data nodes contained 
- * in the data storage to the widget every time 
+ * assign two visible point sets to the widget
+ * (via SetPointSetNodes(std::vector<mitk::DataNode*> nodes)),
+ * preferrably by passing all visible data nodes contained
+ * in the data storage to the widget every time
  * DataStorageChanged() is called.
  *
  * The user/application module of this widget needs to
- * assign one selected point set to the widget 
- * (via UpdateSelection(mitk::DataNode* selectedNode)), 
- * preferrably by passing the selected data node contained 
- * in the data storage to the widget every time 
+ * assign one selected point set to the widget
+ * (via UpdateSelection(mitk::DataNode* selectedNode)),
+ * preferrably by passing the selected data node contained
+ * in the data storage to the widget every time
  * OnSelectionChanged() is called.
  *
  * The user/application module of this widget needs to
- * assign a QmitkStdMultiWidget and a mitk::DataStorage 
+ * assign a QmitkStdMultiWidget and a mitk::DataStorage
  * to the widget (via SetMultiWidget and SetDataStorage).
  */
 
@@ -81,17 +80,17 @@ protected slots:
 
   /// enables/disables buttons if a/no point is selected
   void OnPointSelectionChanged();
-  
+
   /// add new point set to data manager
   void AddPointSet();
 
   /// enable if new points should be a added
   void AddPointsMode(bool checked);
-  
+
   void RemoveSelectedPoint();
 
   void MoveSelectedPointDown();
-  
+
   void MoveSelectedPointUp();
 
   /// toggles m_AddPointsBtn checked state

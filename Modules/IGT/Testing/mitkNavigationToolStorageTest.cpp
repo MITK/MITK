@@ -31,7 +31,7 @@ class mitkNavigationToolStorageTestClass
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
     MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation with constructor 1.")
 
-    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New());    
+    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());    
     mitk::NavigationToolStorage::Pointer myStorage2 = mitk::NavigationToolStorage::New(myDataStorage);
     MITK_TEST_CONDITION_REQUIRED(myStorage2.IsNotNull(),"Testing instantiation with constructor 2.")
     
@@ -145,7 +145,7 @@ class mitkNavigationToolStorageTestClass
 
     static void TestStorageHandling()
     {
-    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New());    
+    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());   
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New(myDataStorage);
     
     //define first tool

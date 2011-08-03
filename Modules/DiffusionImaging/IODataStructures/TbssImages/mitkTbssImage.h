@@ -37,7 +37,8 @@ namespace mitk
   public:
     typedef TPixelType PixelType;
     typedef typename itk::Image<TPixelType, 3>  ImageType;
-
+    typedef itk::Index<3> IndexType;
+    typedef typename std::vector<IndexType> RoiType;
 
     mitkClassMacro( TbssImage, Image )
     itkNewMacro(Self)
@@ -58,20 +59,42 @@ namespace mitk
 
     itkSetMacro(TbssType, std::string)
     itkGetMacro(TbssType, std::string)
+    itkGetMacro(PreprocessedFA, bool)
+    itkSetMacro(PreprocessedFA, bool)
+    itkGetMacro(PreprocessedFAFile, std::string)
+    itkSetMacro(PreprocessedFAFile, std::string)
+
+    void SetRoi(RoiType roi)
+    {
+      m_Roi = roi;
+    }
+
+    RoiType GetRoi()
+    {
+      return m_Roi;
+    }
 
     void InitializeFromImage()
     {
-        MITK_INFO << "make an mitk image that can be shown by mitk";
-        this->InitializeByItk(m_Image.GetPointer(),1,1);
+      MITK_INFO << "make an mitk image that can be shown by mitk";
+      this->InitializeByItk(m_Image.GetPointer(),1,1);
     }
 
   protected:
-    TbssImage(){}
+    TbssImage():m_PreprocessedFA(false)
+    {
+
+    }
     virtual ~TbssImage(){}
 
     typename ImageType::Pointer m_Image;
 
     std::string m_TbssType;
+
+    RoiType m_Roi;
+
+    bool m_PreprocessedFA;
+    std::string m_PreprocessedFAFile;
 
   };
 

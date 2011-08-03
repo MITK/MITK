@@ -133,7 +133,7 @@ namespace mitk
       imageIO->SetIORegion( ioRegion );
       void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
       imageIO->Read( buffer );
-      //mitk::Image::Pointer image = mitk::Image::New();
+      //mitk::Image::Pointer static_cast<OutputType*>(this->GetOutput())image = mitk::Image::New();
       if((ndim==4) && (dimensions[3]<=1))
         ndim = 3;
       if((ndim==3) && (dimensions[2]<=1))
@@ -194,18 +194,18 @@ namespace mitk
         for (; itKey != imgMetaKeys.end(); itKey ++)
         {
 
-
           itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
           if (itKey->find("tbss") != std::string::npos)
           {
             MITK_INFO << *itKey << " ---> " << metaString;
-            static_cast<OutputType*>(this->GetOutput())->SetTbssType(metaString);
 
-            if(*itKey == "ROI")
+            if(metaString == "ROI")
             {
-              MITK_INFO < "Read the ROI info";
+              MITK_INFO << "Read the ROI info";
+              ReadRoiInfo(imgMetaDictionary); // move back into if statement
             }
 
+            static_cast<OutputType*>(this->GetOutput())->SetTbssType(metaString);
           }
 
         }
@@ -242,6 +242,38 @@ namespace mitk
   }
 
 
+  template <class TPixelType>
+      void NrrdTbssImageReader<TPixelType>
+      ::ReadRoiInfo(itk::MetaDataDictionary dict)
+  {
+    std::vector<std::string> imgMetaKeys = dict.GetKeys();
+    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+    std::string metaString;
+    std::vector< itk::Index<3> > roi;
+
+    for (; itKey != imgMetaKeys.end(); itKey ++)
+    {
+      double x,y,z;
+      itk::Index<3> ix;
+      itk::ExposeMetaData<std::string> (dict, *itKey, metaString);
+
+      if (itKey->find("ROI_index") != std::string::npos)
+      {
+        MITK_INFO << *itKey << " ---> " << metaString;
+        sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
+        ix[0] = x; ix[1] = y; ix[2] = z;
+        roi.push_back(ix);
+      }
+      else if(itKey->find("preprocessed FA") != std::string::npos)
+      {
+        MITK_INFO << *itKey << " ---> " << metaString;
+        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFA(true);
+        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFAFile(metaString);
+      }
+    }
+    static_cast<OutputType*>(this->GetOutput())->SetRoi(roi);
+
+  }
 
   template <class TPixelType>
       const char* NrrdTbssImageReader<TPixelType>

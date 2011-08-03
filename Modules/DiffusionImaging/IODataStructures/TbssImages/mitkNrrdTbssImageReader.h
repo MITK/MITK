@@ -57,6 +57,8 @@ namespace mitk
     /** Does the real work. */
     virtual void GenerateData();
 
+    void ReadRoiInfo(itk::MetaDataDictionary dict);
+
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;

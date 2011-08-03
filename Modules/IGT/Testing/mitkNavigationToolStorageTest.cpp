@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNavigationToolStorage.h"
 #include "mitkNavigationTool.h"
+#include "mitkStandaloneDataStorage.h"
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 
@@ -28,7 +29,12 @@ class mitkNavigationToolStorageTestClass
     {
     // let's create an object of our class
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation")
+    MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation with constructor 1.")
+
+    mitk::DataStorage::Pointer myDataStorage = mitk::StandaloneDataStorage::New();    
+    mitk::NavigationToolStorage::Pointer myStorage2 = mitk::NavigationToolStorage::New(myDataStorage);
+    MITK_TEST_CONDITION_REQUIRED(myStorage2.IsNotNull(),"Testing instantiation with constructor 2.")
+    
     }
   
     static void TestAddAndDelete()

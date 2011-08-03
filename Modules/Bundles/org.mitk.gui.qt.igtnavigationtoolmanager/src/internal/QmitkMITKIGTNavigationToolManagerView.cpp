@@ -52,8 +52,6 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl( QWidget *parent
     m_Controls->setupUi( parent );
   }
   m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
-  m_Controls->m_toolManagerWidget->EnableSingleToolSave(false);
-
 }
 
 

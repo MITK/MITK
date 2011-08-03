@@ -16,6 +16,29 @@ ENDMACRO()
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
+if(UNIX AND NOT APPLE)
+#----------------------------- libxt-dev --------------------
+INCLUDE(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+
+set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
+CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
+if(NOT STRING_DEFS_H)
+MESSAGE(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
+endif()
+
+set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
+CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
+if(NOT TIFF_H)
+MESSAGE(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
+endif()
+
+CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
+if(NOT LIB_WRAP)
+MESSAGE(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+endif()
+
+endif()
+
 #----------------------------- Qt ---------------------------
 if(MITK_USE_QT)
   find_package(Qt4 REQUIRED)
@@ -64,7 +87,7 @@ ELSE()
   SET(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
 ENDIF()
 
-SET(ep_common_args 
+SET(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DBUILD_SHARED_LIBS:BOOL=ON
@@ -85,7 +108,7 @@ SET(ep_common_args
 )
 
 #-----------------------------------------------------------------------------
-# ExternalProjects 
+# ExternalProjects
 #-----------------------------------------------------------------------------
 
 SET(external_projects
@@ -98,7 +121,7 @@ SET(external_projects
   OpenCV
   MITKData
   )
-  
+
 # Include external projects
 FOREACH(p ${external_projects})
   INCLUDE(CMakeExternals/${p}.cmake)
@@ -112,7 +135,7 @@ SET(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
-  
+
   MITK_USE_QT
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_TUTORIAL
@@ -187,7 +210,7 @@ ExternalProject_Add(${proj}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD_PARAM}
-    -DCTK_DIR:PATH=${CTK_DIR} 
+    -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR

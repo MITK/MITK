@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMenu>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QMetaObject.h>
 #include <QMetaProperty>
 #include <mitkStepper.h>
 #include <QTableWidget>
@@ -71,7 +70,7 @@ QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* paren
            this, SLOT(OnPointSelectionChanged(const QItemSelection& , const QItemSelection&)) );
 
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
-  
+
   connect(this->m_CorrespondingPointSetsModel, SIGNAL(SignalPointSetChanged()), this, SLOT(UpdateSelectionHighlighting()));
 }
 
@@ -143,7 +142,7 @@ void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelecti
             if (tempIndex == index)
             {
               pointSet->SetSelectInfo(it->Index(), true, m_CorrespondingPointSetsModel->GetTimeStep());
-              
+
               m_CorrespondingPointSetsModel->SetSelectedPointSetIndex(index.column());
               if ( this->GetMultiWidget() != NULL)
               {
@@ -264,7 +263,7 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   mitk::PointSet::PointsContainer::ElementIdentifier id;
   mitk::PointSet::PointType p;
   bool pointSelected = m_CorrespondingPointSetsModel->GetPointForModelIndex(row, col, p, id);
-  
+
   QAction *movePointUp = new QAction(this);
   movePointUp->setText("Move point up");
   connect(movePointUp, SIGNAL(triggered()), this, SLOT(MoveSelectedPointUp()));
@@ -304,7 +303,7 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   if(numNodes==0 || col!=0 && col!=1)
     clearList->setEnabled(false);
   menu->addAction(clearList);
-  
+
   menu->addSeparator();
 
   QAction *swapSets = new QAction(this);

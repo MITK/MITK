@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 
 mitk::Mapper::Mapper()
-  : m_VtkBased( true ), m_TimeStep( 0 )
+  :m_TimeStep( 0 )
 {
 
 }

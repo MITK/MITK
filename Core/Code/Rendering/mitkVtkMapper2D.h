@@ -37,6 +37,11 @@ namespace mitk {
     mitkClassMacro(VtkMapper2D,Mapper2D);
     virtual vtkProp* GetProp(mitk::BaseRenderer* renderer) = 0;
 
+    /** 
+     * \brief Returns whether this is an vtk-based mapper
+     */
+    virtual bool IsVtkBased() const { return true; }
+    
   protected:
     VtkMapper2D();
 

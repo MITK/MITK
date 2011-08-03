@@ -81,6 +81,10 @@ public:
    * Mapper subclasses. */
   virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
   
+  /** 
+   * \brief Returns whether this is an vtk-based mapper
+   */
+  virtual bool IsVtkBased() const { return true; }
 
 protected:
   VtkMapper3D();

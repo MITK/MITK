@@ -138,9 +138,6 @@ void mitk::PointSetWriter::GenerateData()
 void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& out )
 {
     WriteStartElement( XML_POINT_SET, out );
-    mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet()->GetPoints();
-    mitk::PointSet::PointsContainer::Iterator it;
-    
     unsigned int timecount = pointSet->GetTimeSteps();
 
     for(unsigned int i=0; i< timecount; i++)
@@ -150,6 +147,9 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
       WriteStartElement( XML_TIME_SERIES_ID, out );
       WriteCharacterData( ConvertToString( i ).c_str() , out );
       WriteEndElement( XML_TIME_SERIES_ID, out, false );
+
+      mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet(i)->GetPoints();
+      mitk::PointSet::PointsContainer::Iterator it;
 
       for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
       {

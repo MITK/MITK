@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTrackingDeviceSourceConfigurator.h>
 #include <mitkTrackingVolumeGenerator.h>
 #include <mitkNDITrackingDevice.h>
-#include <mitkEllipsoid.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
@@ -264,7 +263,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       newTool->SetIdentifier(toolname.str());
       newTool->SetTrackingDeviceType(mitk::NDIAurora);
       mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      mitk::Ellipsoid::Pointer mySphere = mitk::Ellipsoid::New();
+      mitk::Surface::Pointer mySphere = mitk::Surface::New();
       vtkSphereSource *vtkData = vtkSphereSource::New();
       vtkData->SetRadius(3.0f);
       vtkData->SetCenter(0.0, 0.0, 0.0);

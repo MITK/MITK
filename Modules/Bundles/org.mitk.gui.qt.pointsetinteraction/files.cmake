@@ -18,6 +18,7 @@ SET(MOC_H_FILES
 
 SET(CACHED_RESOURCE_FILES
   resources/pointset_interaction.png
+  plugin.xml
 )
 
 SET(QRC_FILES

@@ -647,7 +647,11 @@ SliceNavigationController
                 // find image with largest layer, that is the image shown on top in the render window 
                 for (unsigned int x = 0; x < nodes->size(); x++)
                 {
-                  if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition))
+                  //Just consider image data that is no helper object. E.g. do not consider nodes created for the slice interpolation
+                  bool isHelper (false);
+                  nodes->at(x)->GetBoolProperty("helper object", isHelper);
+
+                  if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
                   {
                     int layer = 0;
                     if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;

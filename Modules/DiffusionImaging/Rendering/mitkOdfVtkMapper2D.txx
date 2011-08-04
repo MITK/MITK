@@ -313,9 +313,6 @@ void  mitk::OdfVtkMapper2D<T,N>
   p[0] /= spacing[0];
   p[1] /= spacing[1];
   p[2] /= spacing[2];
-  p[0] += 0.5;
-  p[1] += 0.5;
-  p[2] += 0.5;
 
   mitk::Point3D p2;
   pfilter->GetGeometry()->IndexToWorld( p, p2 );

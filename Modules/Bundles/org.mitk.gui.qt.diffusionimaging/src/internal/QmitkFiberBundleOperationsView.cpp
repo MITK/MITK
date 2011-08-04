@@ -1627,7 +1627,7 @@ void QmitkFiberBundleOperationsView::GenerateFiberEndingsImage()
     return;
   }
 
-  typedef itk::RGBAPixel<unsigned char> OutPixType;
+  typedef unsigned char OutPixType;
 
   // run generator
   typedef itk::TractsToFiberEndingsImageFilter<FloatImageType,
@@ -1653,12 +1653,6 @@ void QmitkFiberBundleOperationsView::GenerateFiberEndingsImage()
   name += "_fiber_endings";
   node->SetName(name.toStdString());
   node->SetVisibility(true);
-
-  mitk::LevelWindow opaclevwin;
-  opaclevwin.SetRangeMinMax(0,255);
-  opaclevwin.SetWindowBounds(0,0);
-  mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(opaclevwin);
-  node->AddProperty( "opaclevelwindow", prop );
 
   GetDataStorage()->Add(node);
 }

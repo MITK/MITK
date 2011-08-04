@@ -72,6 +72,8 @@ endif()
 #message("empty_binary_directory:${empty_binary_directory}")
 #message("force_build:${initial_force_build}")
 
+set(CTEST_CONFIGURATION_TYPE ${CTEST_BUILD_CONFIGURATION})
+
 if(empty_binary_directory)
   message("Directory ${CTEST_BINARY_DIRECTORY} cleaned !")
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})

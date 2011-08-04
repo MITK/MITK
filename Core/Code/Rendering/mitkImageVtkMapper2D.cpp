@@ -956,7 +956,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSm
   for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
     currentPixel = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
     //if the current pixel value is set to something
-    if (*currentPixel != 0) {
+    if ((currentPixel) && (*currentPixel != 0)) {
       //check in which direction a line is necessary
       if (ii >= line && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
         //add the 2 points

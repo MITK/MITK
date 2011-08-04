@@ -1,4 +1,4 @@
-if(BUILD_TESTING)
+if(BUILD_TESTING AND 0)
 
   include(ExternalProject)
 

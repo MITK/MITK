@@ -6,7 +6,7 @@ if(BUILD_TESTING AND 0)
   set(MITK-ProjectTemplate_BINARY_DIR "${MITK_BINARY_DIR}/${proj}-build")
 
   ExternalProject_Add(${proj}
-    GIT_REPOSITORY git://github.com/MITK/MITK-ProjectTemplate.git
+    GIT_REPOSITORY http://git.mitk.org/MITK-ProjectTemplate.git
     GIT_TAG origin/master
     SOURCE_DIR "${MITK_BINARY_DIR}/${proj}"
     BINARY_DIR "${MITK-ProjectTemplate_BINARY_DIR}"

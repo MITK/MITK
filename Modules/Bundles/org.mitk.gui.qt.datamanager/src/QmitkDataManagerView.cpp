@@ -92,7 +92,6 @@ QmitkDataManagerView::QmitkDataManagerView()
 {
 }
 
-
 QmitkDataManagerView::~QmitkDataManagerView()
 {
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
@@ -646,9 +645,9 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
     {
       mitk::RenderingManager::GetInstance()->InitializeViews(
         basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::RemoveSelectedNodes( bool )

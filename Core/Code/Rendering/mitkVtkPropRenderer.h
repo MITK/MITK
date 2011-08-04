@@ -145,6 +145,51 @@ public:
 
   static bool useImmediateModeRendering();
 
+  /** \brief This method sets up the camera on the actor (e.g. an image) of all
+  * 2D vtkRenderWindows. The view is centered; zooming and panning of VTK are called inside.
+  *
+  * \image html ImageMapperdisplayGeometry.png
+  *
+  * Similar to the textured plane of an image
+  * (cf. void mitkImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer,
+  * vtkFloatingPointType planeBounds[6])), the mitkDisplayGeometry defines a view plane (or
+  * projection plane). This plane is used to set the camera parameters. The view plane
+  * center (VC) is important for camera positioning (cf. the image above).
+  *
+  * The following figure shows the combination of the textured plane and the view plane.
+  *
+  * \image html cameraPositioning.png
+  *
+  * The view plane center (VC) is the center of the textured plane (C) and the focal point
+  * (FP) at the same time. The FP defines which direction the camera faces. Since
+  * the textured plane is always in the XY-plane and orthographic projection is applied, the
+  * distance between camera and plane is theoretically irrelevant (because in the orthographic
+  * projection the center of projection is at infinity and the size of objects depends only on
+  * a scaling parameter). As a consequence, the direction of projection (DOP) is (0; 0; -1).
+  * The camera up vector is always defined as (0; 1; 0).
+  *
+  * \warning Due to a VTK clipping bug the distance between textured plane and camera is really huge.
+  * Otherwise, VTK would clip off some slices. Same applies for the clipping range size.
+  *
+  * \note The camera position is defined through the mitkDisplayGeometry.
+  * This facilitates zooming and panning, because the display
+  * geometry changes and the textured plane does not.
+  *
+  * \image html scaling.png
+  *
+  * The textured plane is scaled to fill the render window via
+  * camera->SetParallelScale( imageHeightInMM / 2). In the orthographic projection all extends,
+  * angles and sizes should be preserved. Therefore, the image is scaled by one parameter which defines
+  * the size of the rendered image. A higher value will result in smaller images. In order to render
+  * just the whole image, the scale is set to half of the image height in worldcoordinates (cf. the picture above).
+  *
+  * For zooming purposes, a factor is computed as follows:
+  * factor = image height / display height (in worldcoordinates).
+  * When the display geometry gets smaller (zoom in), the factor becomes bigger. When the display
+  * geometry gets bigger (zoom out), the factor becoomes smaller. The used VTK method
+  * camera->Zoom( factor ) also works with an inverse scale.
+  */
+  void AdjustCameraToScene();
 protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
   virtual ~VtkPropRenderer();
@@ -159,7 +204,6 @@ private:
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();
 
-  void AdjustCameraToScene();
 
   bool m_InitNeeded;
   bool m_ResizeNeeded;

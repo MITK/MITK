@@ -84,9 +84,7 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
   m_TextRenderer = vtkRenderer::New();
   m_TextRenderer->SetRenderWindow(renWin);
   m_TextRenderer->SetInteractive(0);
-#if ( VTK_MAJOR_VERSION >= 5 )
   m_TextRenderer->SetErase(0);
-#endif
 }
 
 /*!
@@ -134,7 +132,7 @@ void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
 
   static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataStorageForTexture( m_DataStorage.GetPointer() );
 
-  // Compute the geometry from the current data tree bounds and set it as world geometry  
+  // Compute the geometry from the current data tree bounds and set it as world geometry
   this->SetWorldGeometryToDataStorageBounds();
 }
 
@@ -223,10 +221,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
     case mitk::VtkPropRenderer::Translucent: mapper->MitkRenderTranslucentGeometry(this); break;
     case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
-      //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
-#endif
     }
     if(mode)
       glEnable(bit);
@@ -239,12 +234,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   
   if (lastVtkBased == false)
     Disable2DOpenGL();
-  
-  //fix for bug 1177. In 2D rendering the camera is not needed, but nevertheless it is used by 
-  //the vtk rendering mechanism to determine what is seen (and therefore has to be rendered)
-  //by using the bounds of the vtkMitkRenderProp
-  if (sthVtkBased == false)
-    this->GetVtkRenderer()->ResetCamera();
 
   // Render text
   if (type == VtkPropRenderer::Overlay)
@@ -451,8 +440,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
+  m_RenderingManager->RequestUpdate(this->GetRenderWindow());
 }
 
 
@@ -765,12 +753,10 @@ const vtkCellPicker *mitk::VtkPropRenderer::GetCellPicker() const
 }
 
 
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
 mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() const
 {
   return m_MappersMap;
 }
-#endif
 
 
 // Workaround for GL Displaylist bug
@@ -824,11 +810,10 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
 
     const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 
-    //TODO
-    double imageHeightInMM = 256.0;//localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
+    double objectHeightInMM = this->GetCurrentWorldGeometry2D()->GetExtentInMM(0);//the height of the current object slice in mm
     double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-    double zoomFactor = imageHeightInMM/displayHeightInMM; //displayGeometry->GetScaleFactorMMPerDisplayUnit()
-    //determine how much of the image can be displayed
+    double zoomFactor = objectHeightInMM/displayHeightInMM; //displayGeometry->GetScaleFactorMMPerDisplayUnit()
+    //determine how much of the object can be displayed
 
     Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
     Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
@@ -839,7 +824,7 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
     //parameter sets the size of the total display-volume. If you set this to the image
     //height, the image plus a border with the size of the image will be rendered.
     //Therefore, the size is imageHeightInMM / 2.
-    this->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
+    this->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(objectHeightInMM*0.5 );
     //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
     this->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
 
@@ -867,62 +852,59 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
     {
       camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
       camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
-      camera->SetViewUp( cameraUp ); //set the view-up for the camera      
-      double distance = sqrt((cameraPosition[2]-viewPlaneCenter[2])*(cameraPosition[2]-viewPlaneCenter[2]));
-      camera->SetClippingRange(distance-1, distance+1); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
-//      camera->SetClippingRange(0.1, 1000000); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+      camera->SetViewUp( cameraUp ); //set the view-up for the camera
+//      double distance = sqrt((cameraPosition[2]-viewPlaneCenter[2])*(cameraPosition[2]-viewPlaneCenter[2]));
+//      camera->SetClippingRange(distance-50, distance+50); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+      camera->SetClippingRange(0.1, 1000000); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
     }
 
+    //turn the light out in the scene in order to render correct grey values.
+    //TODO Implement a property for light in the 2D render windows
     this->GetVtkRenderer()->RemoveAllLights();
 
     //remove the VTK interaction
     this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
-    //Transform the camera to the current position (transveral, coronal and saggital plane).
-    //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
-    //(Without not all three planes would be visible).
-
-//    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
-
-//    vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-//    //    trans->SetMatrix(this->GetWorldGeometry()->GetVtkTransform()->GetMatrix());
-//        trans->SetMatrix( this->GetWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix());
-//        vtkSmartPointer<vtkTransform> trans2 = vtkSmartPointer<vtkTransform>::New();
-//        trans2->SetMatrix( this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetLinearInverse()->GetMatrix());
-//        trans->Concatenate(trans2);
-
-
-    if(this->GetRenderWindow() == this->GetRenderWindowByName("stdmulti.widget2"))
+    const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( this->GetCurrentWorldGeometry2D() );
+    if ( planeGeometry != NULL )
     {
-//      MITK_INFO << "1 ";
-//      this->GetGetMatrixCurrentWorldGeometry2D()->GetReferenceGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-////      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//      MITK_INFO << "1 Inverse";
-//      this->GetCurrentWorldGeometry2D()->GetReferenceGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+      //Transform the camera to the current position (transveral, coronal and saggital plane).
+      //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
+      //(Without not all three planes would be visible).
+      vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+      vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+      Point3D origin;
+      Vector3D right, bottom, normal;
 
-//      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
-//      MITK_INFO << "2";
-////      //    this->GetDisplayGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//          this->GetWorldGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//////      this->GetSliceNavigationController()->GetCurrentPlaneGeometry()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-////      MITK_INFO << "2 Inverse";
-//////      this->GetSliceNavigationController()->GetCurrentPlaneGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
-////      //    this->GetDisplayGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
-////          this->GetWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
-//      MITK_INFO << "3";
-////      //    this->GetSliceNavigationController()->GetCurrentGeometry3D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//      this->GetCurrentWorldGeometry2D()->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//      MITK_INFO << "3 Inverse";
-//      //    this->GetSliceNavigationController()->GetCurrentGeometry3D()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
-////      this->GetCurrentWorldGeometry()->GetVtkTransform()->GetLinearInverse()->GetMatrix()->Print(std::cout);
+      origin = planeGeometry->GetOrigin();
+      right  = planeGeometry->GetAxisVector( 0 ); // right = Extent of Image in mm (worldspace)
+      bottom = planeGeometry->GetAxisVector( 1 );
+      normal = planeGeometry->GetNormal();
 
-//      MITK_INFO << "Ende";
+      right.Normalize();
+      bottom.Normalize();
+      normal.Normalize();
+
+      matrix->SetElement(0, 0, right[0]);
+      matrix->SetElement(1, 0, right[1]);
+      matrix->SetElement(2, 0, right[2]);
+      matrix->SetElement(0, 1, bottom[0]);
+      matrix->SetElement(1, 1, bottom[1]);
+      matrix->SetElement(2, 1, bottom[2]);
+      matrix->SetElement(0, 2, normal[0]);
+      matrix->SetElement(1, 2, normal[1]);
+      matrix->SetElement(2, 2, normal[2]);
+      matrix->SetElement(0, 3, origin[0]);
+      matrix->SetElement(1, 3, origin[1]);
+      matrix->SetElement(2, 3, origin[2]);
+      matrix->SetElement(3, 0, 0.0);
+      matrix->SetElement(3, 1, 0.0);
+      matrix->SetElement(3, 2, 0.0);
+      matrix->SetElement(3, 3, 1.0);
+
+      trans->SetMatrix(matrix);
+      //Transform the camera to the current position (transveral, coronal and saggital plane).
+      this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
-    //    trans->Print(std::cout);
-
-    //    const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-    //    const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
-
-//        this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
   }
 }

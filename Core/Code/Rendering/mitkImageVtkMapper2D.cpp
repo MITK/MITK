@@ -9,8 +9,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkSurface.h>
-
 //MITK
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
@@ -41,7 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
-#include <vtkCamera.h>
 #include <vtkCellArray.h>
 
 //ITK
@@ -51,69 +48,9 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
 
-
-
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
   //  this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
-}
-
-void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
-{
-  //TODO move this camera code to an apropriate place (e.g. vtkMitkRenderProp?)
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  //activate parallel projection for 2D
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
-
-  //get the display geometry of the current renderer.
-  const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
-
-  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
-  double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-  double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
-
-  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
-  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
-
-  //Scale the rendered object:
-  //The image is scaled by a single factor, because in an orthographic projection sizes
-  //are preserved (so you cannot scale X and Y axis with different parameters). The
-  //parameter sets the size of the total display-volume. If you set this to the image
-  //height, the image plus a border with the size of the image will be rendered.
-  //Therefore, the size is imageHeightInMM / 2.
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
-  //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
-  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
-
-  //the center of the view-plane
-  double viewPlaneCenter[3];
-  viewPlaneCenter[0] = displayGeometryCenterInMM[0];
-  viewPlaneCenter[1] = displayGeometryCenterInMM[1];
-  viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
-
-  //define which direction is "up" for the ciamera (like default for vtk (0.0, 1.0, 0.0)
-  double cameraUp[3];
-  cameraUp[0] = 0.0;
-  cameraUp[1] = 1.0;
-  cameraUp[2] = 0.0;
-
-  //the position of the camera (center[0], center[1], 900000)
-  double cameraPosition[3];
-  cameraPosition[0] = viewPlaneCenter[0];
-  cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = 900000.0; //Reason for 900000: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
-
-  //set the camera corresponding to the textured plane
-  vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  if (camera)
-  {
-    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
-    camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
-    camera->SetViewUp( cameraUp ); //set the view-up for the camera
-    camera->SetClippingRange(0.1, 1000000.0);
-    //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
-  }
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -292,8 +229,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     bottom.Normalize();
     normal.Normalize();
 
-    //Translate the origin from center based to corner based
-    //by adding (mm per pixel)/2 in the corresponding direction (right/bottom).
+    //transform the origin to corner based coordinates, because VTK is corner based.
     origin += right * ( mmPerPixel[0] * 0.5 );
     origin += bottom * ( mmPerPixel[1] * 0.5 );
 
@@ -545,50 +481,26 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //setup the textured plane
   this->GeneratePlane( renderer, sliceBounds );
 
-  //TODO move this code to an apropriate global place
-  //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
-//  renderer->GetVtkRenderer()->RemoveAllLights();
-
-  //remove the VTK interaction
-//  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
-
-  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
-  vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-  vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
-  trans->SetMatrix(matrix);
-//trans->SetMatrix(worldGeometry->GetVtkTransform()->GetMatrix());
-
   //apply the properties after the slice was set
   this->ApplyProperties( renderer, mmPerPixel );
 
+  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
+  vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+  vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+  matrix = localStorage->m_Reslicer->GetResliceAxes();
+
+  //transform the origin to center based coordinates, because MITK is center based.
+  Point3D originCenterBased = origin;
+  originCenterBased -= right * ( mmPerPixel[0] * 0.5 );
+  originCenterBased -= bottom * ( mmPerPixel[1] * 0.5 );
+
+  matrix->SetElement(0, 3, originCenterBased[0]);
+  matrix->SetElement(1, 3, originCenterBased[1]);
+  matrix->SetElement(2, 3, originCenterBased[2]);
+  trans->SetMatrix(matrix);
+
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
-//  localStorage->m_Actor->SetUserTransform(trans);
-
-//static int counter = 0;
-//if(counter < 6)
-//{
-//  mitk::Surface::Pointer surf = mitk::Surface::New();
-//  surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
-//  surf->Update();
-
-//  mitk::DataNode::Pointer node = mitk::DataNode::New();
-//  node->SetData(surf);
-//  renderer->GetDataStorage()->Add(node);
-//  counter++;
-//}
-
-  if(renderer->GetRenderWindow() == renderer->GetRenderWindowByName("stdmulti.widget2"))
-  {
-//  MITK_INFO << "Im Mapper";
-//  worldGeometry->GetVtkTransform()->GetMatrix()->Print(std::cout);
-//  trans->Print(std::cout);
-  }
-
-
-  //Transform the camera to the current position (transveral, coronal and saggital plane).
-  //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
-  //(Without not all three planes would be visible).
-//  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+  localStorage->m_Actor->SetUserTransform(trans);
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
@@ -911,7 +823,6 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime()) // TODO this does not work
     || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
@@ -919,6 +830,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     {
     this->GenerateData( renderer );
   }
+
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();

@@ -13,9 +13,15 @@ SET(MITK-Data_DEPENDS ${proj})
 
 IF(BUILD_TESTING)
 
+  SET(revision_tag 4fa450c29ebd819419)
+  IF(${proj}_REVISION_TAG)
+    SET(revision_tag ${${proj}_REVISION_TAG})
+  ENDIF()
+
   ExternalProject_Add(${proj}
     GIT_REPOSITORY http://git.mitk.org/MITK-Data.git
-    GIT_TAG "origin/master"
+    GIT_TAG ${revision_tag}
+    UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""

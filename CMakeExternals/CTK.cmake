@@ -14,10 +14,17 @@ IF(MITK_USE_CTK)
   SET(CTK_DEPENDS ${proj})
 
   IF(NOT DEFINED CTK_DIR)
+    
+    SET(revision_tag e80497a32aadaf2099f7)
+    IF(${proj}_REVISION_TAG)
+      SET(revision_tag ${${proj}_REVISION_TAG})
+    ENDIF()
+  
     ExternalProject_Add(${proj}
       GIT_REPOSITORY git://github.com/commontk/CTK.git
-      GIT_TAG f6c3e844ffedbac6f3139265fbdd19c979e44152
+      GIT_TAG ${revision_tag}
       BINARY_DIR ${proj}-build
+      UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

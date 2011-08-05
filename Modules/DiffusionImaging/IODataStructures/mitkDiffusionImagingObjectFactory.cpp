@@ -116,6 +116,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::DiffusionImageMapper<short>::New();
       newMapper->SetDataNode(node);
     }
+    mitk::Mapper::Pointer newMapper=NULL;
 
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)

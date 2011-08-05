@@ -203,9 +203,10 @@ namespace mitk
             {
               MITK_INFO << "Read the ROI info";
               ReadRoiInfo(imgMetaDictionary); // move back into if statement
+              static_cast<OutputType*>(this->GetOutput())->SetTbssType(OutputType::ROI);
             }
 
-            static_cast<OutputType*>(this->GetOutput())->SetTbssType(metaString);
+
           }
 
         }

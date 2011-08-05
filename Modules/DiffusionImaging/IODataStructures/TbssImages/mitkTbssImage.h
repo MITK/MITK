@@ -43,6 +43,12 @@ namespace mitk
     mitkClassMacro( TbssImage, Image )
     itkNewMacro(Self)
 
+    enum Type{
+      ROI,
+      SKELETON
+    };
+
+
     //void SetRequestedRegionToLargestPossibleRegion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();
@@ -57,8 +63,8 @@ namespace mitk
       this->m_Image = image;
     }
 
-    itkSetMacro(TbssType, std::string)
-    itkGetMacro(TbssType, std::string)
+    itkSetMacro(TbssType, Type)
+    itkGetMacro(TbssType, Type)
     itkGetMacro(PreprocessedFA, bool)
     itkSetMacro(PreprocessedFA, bool)
     itkGetMacro(PreprocessedFAFile, std::string)
@@ -89,7 +95,7 @@ namespace mitk
 
     typename ImageType::Pointer m_Image;
 
-    std::string m_TbssType;
+    Type m_TbssType;
 
     RoiType m_Roi;
 
@@ -97,6 +103,19 @@ namespace mitk
     std::string m_PreprocessedFAFile;
 
   };
+
+
+  // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
+  template <typename ItkOutputImageType, typename PixelType>
+  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssImage<PixelType> >& tbssoutputimage)
+  {
+    if(tbssoutputimage.IsNull())
+    {
+      tbssoutputimage = mitk::TbssImage<PixelType>::New();
+    }
+    tbssoutputimage->InitializeByItk(itkimage);
+    tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
+  }
 
 } // namespace mitk
 

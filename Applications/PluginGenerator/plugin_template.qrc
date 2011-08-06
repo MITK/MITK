@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>PluginTemplate/CMakeLists.txt</file>
+        <file>PluginTemplate/files.cmake</file>
+        <file>PluginTemplate/manifest_headers.cmake</file>
+        <file>PluginTemplate/plugin.xml</file>
+        <file>PluginTemplate/documentation/doxygen/modules.dox</file>
+        <file>PluginTemplate/documentation/Manual/icon.png</file>
+        <file>PluginTemplate/documentation/Manual/Manual.dox</file>
+        <file>PluginTemplate/resources/icon.xpm</file>
+        <file>PluginTemplate/src/internal/mitkPluginActivator.cpp</file>
+        <file>PluginTemplate/src/internal/mitkPluginActivator.h</file>
+        <file>PluginTemplate/src/internal/QmitkTemplateView.cpp</file>
+        <file>PluginTemplate/src/internal/QmitkTemplateView.h</file>
+        <file>PluginTemplate/src/internal/QmitkTemplateViewControls.ui</file>
+        <file>MITKLicense.txt</file>
+    </qresource>
+</RCC>

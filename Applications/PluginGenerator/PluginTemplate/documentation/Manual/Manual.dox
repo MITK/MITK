@@ -1,0 +1,19 @@
+/**
+\bundlemainpage{$(plugin-symbolic-name)} $(plugin-name)
+
+\image html icon.png "Icon of $(plugin-name)"
+
+Available sections:
+  - \ref $(plugin-symbolic-name)Overview
+
+\section $(plugin-symbolic-name)Overview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/
+

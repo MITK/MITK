@@ -58,6 +58,8 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssImageReader.cpp 
   IODataStructures/TbssImages/mitkNrrdTbssImageIOFactory.cpp
   IODataStructures/TbssImages/mitkTbssImage.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
  
 
   # Rendering

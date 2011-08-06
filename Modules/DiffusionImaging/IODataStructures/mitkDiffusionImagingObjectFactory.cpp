@@ -47,10 +47,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundleWriter.h"
 
 #include "mitkNrrdTbssImageIOFactory.h"
-
+#include "mitkNrrdTbssImageWriterFactory.h"
+#include "mitkNrrdTbssImageWriter.h"
 
 
 typedef short DiffusionPixelType;
+typedef char TbssRoiPixelType;
+
+
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
@@ -75,11 +79,13 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleWriterFactory::RegisterOneFactory();
+    mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssImageWriter<TbssRoiPixelType>::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();

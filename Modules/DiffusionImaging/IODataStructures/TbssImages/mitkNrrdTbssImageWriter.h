@@ -15,13 +15,13 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef _MITK_NRRDDIFFVOL_WRITER__H_
-#define _MITK_NRRDDIFFVOL_WRITER__H_
+#ifndef _MITK_NRRDTBSSVOL_WRITER__H_
+#define _MITK_NRRDTBSSVOL_WRITER__H_
 
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
-#include <mitkDiffusionImage.h>
 #include <mitkTbssImage.h>
+#include <QString>
 
 namespace mitk
 {
@@ -31,21 +31,21 @@ namespace mitk
  * @ingroup Process
  */
 template < class TPixelType >
-class NrrdDiffusionImageWriter : public mitk::FileWriterWithInformation
+class NrrdTbssImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 
-    mitkClassMacro( NrrdDiffusionImageWriter, mitk::FileWriterWithInformation );
+    mitkClassMacro( NrrdTbssImageWriter, mitk::FileWriterWithInformation );
 
     mitkWriterMacro;
 
     itkNewMacro( Self );
     
-    typedef mitk::DiffusionImage<TPixelType> InputType;
+    typedef mitk::TbssImage<TPixelType> InputType;
     
     /**
      * Sets the filename of the file to write.
-     * @param FileName the name of the file to write.
+     * @param FileName the nameInputType of the file to write.
      */
     itkSetStringMacro( FileName );
 
@@ -74,7 +74,7 @@ public:
      */
     itkGetStringMacro( FilePattern );
 
-    /**
+    /**image
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
@@ -96,32 +96,39 @@ public:
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "DiffusionWeightedImages.dwi"; }
-    virtual const char * GetFileDialogPattern() { return "Diffusion Weighted Images (*.dwi *.hdwi *.fsl)"; }
-    virtual const char * GetDefaultExtension() { return ".dwi"; }
+    virtual const char * GetDefaultFilename() { return "TbssImage.tbss"; }
+    virtual const char * GetFileDialogPattern() { return "Tbss Images (*.tbss)"; }
+    virtual const char * GetDefaultExtension() { return ".tbss"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
 
-      mitk::TbssImage<char>* img = dynamic_cast<mitk::TbssImage<char>*>(data.GetPointer());
+     mitk::TbssImage<char>* image = static_cast<mitk::TbssImage<char>*>(data.GetPointer());
+     // mitk::TbssImage<TPixelType>* image2 = dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer());
+     // mitk::TbssImage<char>* image3 = dynamic_cast<mitk::TbssImage<char>*>(data.GetPointer());
+     // mitk::TbssImage<char>* image4 = static_cast<mitk::TbssImage<char>*>(data.GetPointer());
 
-      return (dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer()) != NULL);
+      if(QString("TbssImage").compare(data->GetNameOfClass())==0)
+      {
+        bool b = (static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
+        return b;
+      }
+
+      return false;
+    }
 
 
-    };
-
-
-    virtual void DoWrite(BaseData::Pointer data) {
+    virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer())); 
+        this->SetInput(static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()));
         this->Update(); 
       }
-    };
+    }
 
 protected:
         
-    NrrdDiffusionImageWriter();
+    NrrdTbssImageWriter();
 
-    virtual ~NrrdDiffusionImageWriter();
+    virtual ~NrrdTbssImageWriter();
 
     virtual void GenerateData();
     
@@ -138,6 +145,6 @@ protected:
 
 } // end of namespace mitk
 
-#include "mitkNrrdDiffusionImageWriter.cpp"
+#include "mitkNrrdTbssImageWriter.cpp"
 
 #endif

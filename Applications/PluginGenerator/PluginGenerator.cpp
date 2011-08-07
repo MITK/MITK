@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <ctkCommandLineParser.h>
+#include "ctkCommandLineParser.h"
 
 #include <QCoreApplication>
 #include <QTextStream>

@@ -29,7 +29,7 @@ if(BUILD_TESTING)
                            LABELS "MITK;BlueBerry")
                            
       add_test(NAME mitkPluginGeneratorBuildTest-${config} CONFIGURATIONS ${config}
-               COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${config})
+               COMMAND ${CMAKE_COMMAND} --build ${test_project_binary_dir} --config ${config})
       set_tests_properties(mitkPluginGeneratorBuildTest-${config} PROPERTIES
                            DEPENDS mitkPluginGeneratorConfigureTest-${config}
                            LABELS "MITK;BlueBerry")

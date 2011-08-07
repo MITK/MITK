@@ -649,6 +649,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Utilities/qxt/ \
                          @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
+                         @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
                          @MITK_SOURCE_DIR@/BlueBerry/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \

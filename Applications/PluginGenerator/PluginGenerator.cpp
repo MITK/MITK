@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cstdlib>
 #include <iostream>
 #include <limits>
-
+#include <cctype>
 
 bool readAnswer(char defaultAnswer)
 {

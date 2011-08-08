@@ -23,12 +23,12 @@ if(BUILD_TESTING)
   )
                          
   if(CMAKE_CONFIGURATION_TYPES)
-    foreach(config ${CMAKE_CONFIGURATION_TYPES})
-      add_test(NAME mitkProjectTemplateBuildTest-${config} CONFIGURATIONS ${config}
-               COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${config})
-      set_tests_properties(mitkProjectTemplateBuildTest-${config} PROPERTIES
-                           LABELS "MITK;BlueBerry")
-    endforeach()
+#    foreach(config ${CMAKE_CONFIGURATION_TYPES})
+#      add_test(NAME mitkProjectTemplateBuildTest-${config} CONFIGURATIONS ${config}
+#               COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${config})
+#      set_tests_properties(mitkProjectTemplateBuildTest-${config} PROPERTIES
+#                           LABELS "MITK;BlueBerry")
+#    endforeach()
   else()
     add_test(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
              ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})

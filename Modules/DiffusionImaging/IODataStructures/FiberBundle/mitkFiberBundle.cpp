@@ -29,7 +29,7 @@
 #include "mitkPlanarFigureComposite.h"
 
 #include <vtkPolygon.h>
-#include <vtkPoints.h>
+//#include <vtkPoints.h>
 
 
 /* statics values to define the position of a fiberTractPoint

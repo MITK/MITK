@@ -2,7 +2,7 @@
 # Installation
 #-----------------------------------------------------------------------------
 
-install(TARGETS PluginGenerator DESTINATION .)
+install(TARGETS ${exec_target} DESTINATION .)
 
 install(CODE "
   set(DIRS
@@ -13,7 +13,7 @@ install(CODE "
 
   include(BundleUtilities)
 
-  fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/PluginGenerator\" \"\" \"\${DIRS}\")
+  fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${exec_target}${CMAKE_EXECUTABLE_SUFFIX}\" \"\" \"\${DIRS}\")
 ")
 
 #-----------------------------------------------------------------------------

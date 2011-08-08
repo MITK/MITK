@@ -33,12 +33,13 @@ set(src_files
 qt4_wrap_cpp(src_files ctkCommandLineParser.h)
 qt4_add_resources(src_files plugin_template.qrc project_template.qrc)
 
-add_executable(PluginGenerator ${src_files})
-target_link_libraries(PluginGenerator ${QT_LIBRARIES})
+set(exec_target ${PROJECT_NAME})
+add_executable(${exec_target} ${src_files})
+target_link_libraries(${exec_target} ${QT_LIBRARIES})
 
 if(NOT standalone_build)
   # subproject support
-  add_dependencies(MITK-CoreUI PluginGenerator)
+  add_dependencies(MITK-CoreUI ${exec_target})
 endif()
 
 #-----------------------------------------------------------------------------
@@ -47,8 +48,8 @@ endif()
 
 if(WIN32 AND NOT standalone_build)
   file(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}" native_runtime_dir)
-  add_custom_target(NewPlugin start "MITK PluginGenerator" /D "${native_runtime_dir}" cmd /K PluginGenerator.exe -h
-                    DEPENDS PluginGenerator)
+  add_custom_target(NewPlugin start "MITK PluginGenerator" /D "${native_runtime_dir}" cmd /K ${exec_target}.exe -h
+                    DEPENDS ${exec_target})
 endif()
 
 #-----------------------------------------------------------------------------

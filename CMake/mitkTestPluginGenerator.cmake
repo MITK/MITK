@@ -10,7 +10,7 @@ if(BUILD_TESTING)
   endif()
   
   add_test(NAME mitkPluginGeneratorCreateTest
-           COMMAND PluginGenerator --project-name "${proj}" --project-app-name "TestApp"
+           COMMAND MITKPluginGenerator --project-name "${proj}" --project-app-name "TestApp"
                            -ps org.test.plugin -pn "Test Plugin" -vn "Test View"
                            -o ${test_project_out_dir} -y
           )

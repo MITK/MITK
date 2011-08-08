@@ -661,8 +661,10 @@ bool mitk::PlanarFigureInteractor
     //    break;
     //  }
 
-
-
+  case AcFINISHOBJECT:
+    {
+      planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+    }
 
   default:
     return Superclass::ExecuteAction( action, stateEvent );

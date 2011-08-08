@@ -32,7 +32,7 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMinimumNumberOfControlPoints() == 3, "Minimum number of control points" );
 
   // Test for correct maximum number of control points in cross-mode
-  MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMaximumNumberOfControlPoints() == 1000, "Maximum number of control points" );
+  MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMaximumNumberOfControlPoints() == 5000, "Maximum number of control points" );
 
   // Test for correct rounds of subdivisionPoints
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetSubdivisionRounds() == 5, "Subdivision point generation depth" );
@@ -77,7 +77,7 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   // Test if control points are in correct order between subdivision points
   bool correctPoint = true;
   iter = polyLine0.begin();
-  advance(iter, 31);
+
   if( iter->Point != p0 ){ correctPoint = false; }
   advance(iter, 32);
   if( iter->Point != p1 ){ correctPoint = false; }
@@ -87,24 +87,25 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   if( iter->Point != p3 ){ correctPoint = false; }
   MITK_TEST_CONDITION( correctPoint, "Test if control points are in correct order in polyline" );
 
+
   // Test if a picked point has the correct coordinates
   correctPoint = true;
 
   mitk::Point2D testPoint;
-  testPoint[0] = 50.000;
-  testPoint[1] = 18.750;
+  testPoint[0] = 81.25;
+  testPoint[1] = 48.243;
   iter = polyLine0.begin();
   advance(iter, 47);
   if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }
 
-  testPoint[0] = 20.96007347106933593750;
-  testPoint[1] = 58.74700927734375000000;
+  testPoint[0] = 39.624;
+  testPoint[1] = 19.3268;
   iter = polyLine0.begin();
   advance(iter, 10);
   if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }
 
-  testPoint[0] = 76.96900177001953125000;
-  testPoint[1] = 30.05101013183593750000;
+  testPoint[0] = 71.2887;
+  testPoint[1] = 77.5248;
   iter = polyLine0.begin();
   advance(iter, 67);
   if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }

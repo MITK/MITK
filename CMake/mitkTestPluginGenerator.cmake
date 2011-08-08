@@ -10,11 +10,12 @@ if(BUILD_TESTING)
   endif()
   
   add_test(NAME mitkPluginGeneratorCreateTest
-           COMMAND MITKPluginGenerator --project-name "${proj}" --project-app-name "TestApp"
-                           -ps org.test.plugin -pn "Test Plugin" -vn "Test View"
-                           -o ${test_project_out_dir} -y
+           COMMAND ${exec_target} --project-name "${proj}" --project-app-name "TestApp"
+                                  -ps org.test.plugin -pn "Test Plugin" -vn "Test View"
+                                  -o ${test_project_out_dir} -y
           )
   set_tests_properties(mitkPluginGeneratorCreateTest PROPERTIES
+                       DEPENDS ${exec_target}
                        LABELS "MITK;BlueBerry")
                          
   if(CMAKE_CONFIGURATION_TYPES)

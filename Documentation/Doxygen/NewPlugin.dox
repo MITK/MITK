@@ -1,99 +1,87 @@
 /**
 \page NewPluginPage How to create a new MITK Plug-in
 
-\attention The procedure described here will generate legacy BlueBerry bundles. MITK switched to using the
-CTK plugin framework and hence it is recommended to create CTK plug-ins instead of BlueBerry bundles. Until
-there is similar generator for CTK-based MITK projects available, please read 
-<a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">Set-up a MITK-based Project</a>.
+The MITK Plugin Generator is a command line tool to simplify the process of creating your own MITK project
+(optional) and plug-ins. It can either be downloaded <a href="http://www.mitk.org/wiki/Download">here</a>
+or used from an existing MITK build.
 
-\section CmakePluginGen CMake-based plug-in generator
-The BundleGenerator is a tool to simplify the process of creating your own MITK project (optional) and plug-ins.
+The Plugin Generator takes the following command line arguments:
 
-\par Introduction
-This how-to will show you how to create a new MITK project together with a new plug-in. You will not need to touch
-either the MITK source tree or any MITK binary tree. MITK will be used in the sense of a Software Development Kit (SDK), 
-providing only header files and binaries (shared objects). 
+\verbatim
+./MITKPluginGenerator -h
+A CTK plug-in generator for MITK
 
-\par Limitations
-The CMake based generator will generate only very few classes for you. It can generate an Activator class and a View class for GUI contributions. 
-Nevertheless, you are advised to use it because it generates the correct plug-in directory structure. In the future, there will be a more
-sophisticated generator available.
+  -h, --help                    Show this help text
+  -o, --out-dir                 Output directory (default: /tmp)
+  -l, --license                 Path to a file containing license information (default: :/MITKLicense.txt)
+  -v, --vendor                  The vendor of the generated code (default: DKFZ, Medical and Biological Informatics)
+  -q, --quiet                   Do not print additional information
+  -y, --confirm-all             Answer all questions with 'yes'
 
-\par Prerequisites
-We will use MITK as a SDK, which we have to set up first. Since there is no SDK package available 
-yet which you could download and install, we have to follow the steps in
- <a href="http://www.mitk.org/wiki/SetupMitkQt4BlueBerry">SetupMitkQt4BlueBerry</a>. 
-This will set up a binary MITK tree which we can be used later on to link our plug-ins to. 
+Plug-in View options
+  -vc, --view-class             The View's' class name
+  -vn, --view-name              The View's human readable name
 
-\par
-After you have build MITK, you have to think about a name and an id for your new plug-in and/or
-your new project. The generator uses the CMake GUI for configuration.
+Plug-in options
+  -ps, --plugin-symbolic-name   The plugin's symbolic name
+  -pn, --plugin-name            The plug-in's human readable name
 
-\par Windows
-\li Start the CMake GUI
-\li Choose \c \<MITK-SRC-DIR\>/Build/Tools/BundleGenerator as source directory
-\li Choose a directory for the source code of your project and/or plug-in (create it if it doesn't exist)
-\li Press "Configure" and don't care about the generator
-\li Follow the steps for "All"
+Project options
+  --project-copyright           Path to a file containing copyright information (default: :/MITKCopyright.txt)
+  --project-name                The project name
+  --project-app-name            The application name
+\endverbatim
 
-\par Linux
-\li Create a directory for the source code of your project and/or plug-in and cd into it. 
-\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>/Build/Tools/BundleGenerator</tt> as source directory
-\li Press "Configure" 
+If a project name is provided via the <tt>--project-name</tt> argument, the new plug-in will be generated
+as part of a new project.
 
-\par All
+\section NewPluginOnly Creating a new MITK plug-in
 
-\image html BundleGenerator1.png
-\n
-\li CUSTOM_PROJECT_NAME (optional): The name of your new project. If empty, only the source code for your plug-in is generated.
-    MBI members should not supply a value.
-\li GUI_SUPPORT: you usually want to contribute to the UI, so leave this ON
-\li PLUGIN_ID: Enter an id for the new plug-in. It must be a unique identifier, so the following form is recommended: \c my.domain.identifier.
-    MBI members should use an id similar to \c org.mitk.gui.qt.isosurface. 
-\li PLUGIN_NAME: The name of your plug-in in human-readable form. For example: MITK IsoSurface Plug-in
-\li PLUGIN_TEMPLATE: Leave this as it is, unless you really know what you are doing.
-\li Press "Configure" again and you will get the following screen:
-\n
-\n
-\image html BundleGenerator2.png
-\n
-\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plug-in. See berry::IBundleActivator .
-\li CUSTOM_PROJECT_EXECUTABLE (optional/required): If you supplied a CUSTOM_PROJECT_NAME, this variable will hold the name of your executable which will start an BlueBerry Workbench.
-\li PLUGIN_VENDOR: The person or institution from which this plug-in comes from. Change to your needs.
-\li PLUGIN_VERSION: The version number of your plug-in. This will be used by the platform for managing plug-in dependencies.
-\li REQUIRED_PLUGINS: The ids of plug-ins your plug-in directly depends on. Usually you won't need to change something.
-\li VIEW_BASE_CLASS: The class from which your new view inherits from. Usually not changed.
-\li VIEW_BASE_CLASS_H: The header file for the base class of your new view. Usually not changed.
-\li VIEW_CLASS: The name of your new view (i.e. functionality) class.
-\li VIEW_ID: A unique id for your new view. Again, it is recommended to use something like my.domain.views.id.
-    MBI members should use an id similar to \c org.mitk.views.isosurface
-\li VIEW_NAME: The name of your view in human-readable form. This name will be shown in the UI of your application.
-\li Press "Configure" again, which will give the following screen:
-\n
-\n
-\image html BundleGenerator3.png
-\n
-If everything looks okay, press "Generate" and CMake will create a directory named Generated/\<CUSTOM_PROJECT_NAME\> (if you set a value for it) or
-a directory named Generated/\<PLUGIN_ID\>. You can move or rename the \<CUSTOM_PROJECT_NAME\> directory (or the \<PLUGIN_ID\> directory if you did not create a project)
-somewhere else if you want to get rid of the parent directories.
+Here is an example call to the Plugin Generator, creating one plug-in with the symbolic name
+<tt>com.mycompany.myplugin</tt> and a View named <tt>My View</tt>:
 
-\par Integrating your new plug-in
-If you supplied a CUSTOM_PROJECT_NAME value, create a new directory outside of the \<CUSTOM_PROJECT_NAME\> directory for your project's
-binary tree. Start CMake again and use \<CUSTOM_PROJECT_NAME\> as source directory and your newly created directory as binary directory.
-Go through the configuration and generation process again (you will have to set the variable MITK_DIR to your MITK binary directory)
- and you will get project files for your chosen environment. On Windows, use
-the supplied \b startVS2008.bat file in your binary tree to start Visual Studio (this will correctly set your path environment variable).
+\verbatim
+./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View"
+\endverbatim
 
-\par
-If you did not want to create a new project (because you already have one), copy your new plug-in from the temporary directory
-in your project's source tree. (Hint for MBI members: put it in \c \<MITK-SRC-DIR\>/Modules/Bundles or \c \<MITK-MBI-SRC-DIR\>/mbi-sb/Bundles !)
-Switch back to the CMake configuration of your custom project (MBI: MITK). On Windows you can just switch the "Where to build the binaries" combobox back 
-to your projects (MBI: MITKs) binary directory. After pressing "Configure" a new build option for your plug-in should appear.
+If you did not already specify the final location of the plug-in via the <tt>--out-dir</tt> argument, move the
+directory (in our example <tt>/tmp/org.mycompany.myplugin</tt>) to your existing project. Do not forget to add the
+plug-in in your project's build system (usually in the file <tt>&lt;your-project&gt;/Plugins/Plugins.cmake</tt>).
+
+\section NewPluginWithProject Creating a new MITK project 
+
+\subsection NewPluginProjectPrerequisites Prerequisites
+
+You need:
+  -# Git from http://git-scm.com (there are also numerous third-party graphical clients available)
+  -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
+  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
+  (version 4.5 or above is recommended, we cannot guarantee compatibility with lower versions)
+
+Here is an example call to the Plugin Generator, creating the same plug-in as above but integrated in a new project:
+
+\verbatim
+./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View" --project-name "MyProject" --project-app-name "MyApp"
+\endverbatim
+
+The generated project is completely self-contained and can be configured via CMake immediately. When building the
+generated project, it will first download all required dependencies (like MITK itself). For an explanation of the
+project's build directory layout, see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">SetupAMITKBasedProject</a>.
+
+
+\section Limitations
+
+The Plugin Generator supports only a very limited set of possible configuration options. For more customizations of your
+project or plug-in, you must familiarize yourself with CMake and the generated build system.
+
+Further, the generator is not able to modify existing projects, it can only create new ones.
+
 
 \section BuildSystem Build system for plug-ins
 
 Just put new files in your plug-in's \c src or \c src/internal directory and edit the \c files.cmake file there.
 If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
+
 
 \section Troubleshooting Troubleshooting
 

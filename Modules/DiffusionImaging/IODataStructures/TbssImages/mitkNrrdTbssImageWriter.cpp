@@ -66,6 +66,10 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
   if(input->GetTbssType() == mitk::TbssImage<char>::ROI)
   {
+
+    itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(), "tbss", "ROI");
+
+
     mitk::TbssImage<char>::RoiType roi = input->GetRoi();
 
     mitk::TbssImage<char>::RoiType::iterator it = roi.begin();
@@ -76,13 +80,15 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
       itk::Index<3> ix = *it;
 
       sprintf( keybuffer, "ROI_index_%04d", i );
-      sprintf( valbuffer, "%1f %1f %1f", ix[0],ix[1],ix[2]);
+      sprintf( valbuffer, "%1d %1d %1d", ix[0],ix[1],ix[2]);
 
+      std::cout << valbuffer << std::endl;
 
       itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
       it++;
       ++i;
     }
+
 
 
   }

@@ -101,13 +101,13 @@ public:
     virtual const char * GetDefaultExtension() { return ".tbss"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
-      return (static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
     }
 
 
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()));
+        this->SetInput(dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()));
         this->Update(); 
       }
     }

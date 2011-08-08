@@ -59,7 +59,60 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
 
   itk::Image<char,3>::Pointer img = input->GetImage();
-  img->GetMetaDataDictionary();
+
+
+  char keybuffer[512];
+  char valbuffer[512];
+
+  if(input->GetTbssType() == mitk::TbssImage<char>::ROI)
+  {
+    mitk::TbssImage<char>::RoiType roi = input->GetRoi();
+
+    mitk::TbssImage<char>::RoiType::iterator it = roi.begin();
+
+    int i=0;
+    while(it != roi.end())
+    {
+      itk::Index<3> ix = *it;
+
+      sprintf( keybuffer, "ROI_index_%04d", i );
+      sprintf( valbuffer, "%1f %1f %1f", ix[0],ix[1],ix[2]);
+
+
+      itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      it++;
+      ++i;
+    }
+
+
+  }
+
+
+
+  typedef itk::Image<TPixelType,3> ImageType;
+
+
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  io->SetFileType( itk::ImageIOBase::Binary );
+  io->UseCompressionOn();
+
+
+  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typename WriterType::Pointer nrrdWriter = WriterType::New();
+  nrrdWriter->UseInputMetaDataDictionaryOn();
+  nrrdWriter->SetInput( img );
+  nrrdWriter->SetImageIO(io);
+  nrrdWriter->SetFileName(m_FileName);
+ // nrrdWriter->UseCompressionOn();
+  nrrdWriter->SetImageIO(io);
+  try
+  {
+    nrrdWriter->Update();
+  }
+  catch (itk::ExceptionObject e)
+  {
+    std::cout << e << std::endl;
+  }
 
 
 
@@ -101,33 +154,6 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
  // }
 
 
-
-  typedef itk::Image<TPixelType,3> ImageType;
-
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-  ext = itksys::SystemTools::LowerCase(ext);
-
-  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-  //io->SetNrrdVectorType( nrrdKindList );
-  io->SetFileType( itk::ImageIOBase::Binary );
-  io->UseCompressionOn();
-
-  typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer nrrdWriter = WriterType::New();
-  nrrdWriter->UseInputMetaDataDictionaryOn();
-  nrrdWriter->SetInput( input->GetImage() );
-  nrrdWriter->SetImageIO(io);
-  nrrdWriter->SetFileName(m_FileName);
-  nrrdWriter->UseCompressionOn();
-  nrrdWriter->SetImageIO(io);
-  try
-  {
-    nrrdWriter->Update();
-  }
-  catch (itk::ExceptionObject e)
-  {
-    std::cout << e << std::endl;
-  }
 
 
 

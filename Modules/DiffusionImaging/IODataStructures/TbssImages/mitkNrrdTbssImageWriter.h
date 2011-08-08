@@ -101,19 +101,7 @@ public:
     virtual const char * GetDefaultExtension() { return ".tbss"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
-
-     mitk::TbssImage<char>* image = static_cast<mitk::TbssImage<char>*>(data.GetPointer());
-     // mitk::TbssImage<TPixelType>* image2 = dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer());
-     // mitk::TbssImage<char>* image3 = dynamic_cast<mitk::TbssImage<char>*>(data.GetPointer());
-     // mitk::TbssImage<char>* image4 = static_cast<mitk::TbssImage<char>*>(data.GetPointer());
-
-      if(QString("TbssImage").compare(data->GetNameOfClass())==0)
-      {
-        bool b = (static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
-        return b;
-      }
-
-      return false;
+      return (static_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
     }
 
 

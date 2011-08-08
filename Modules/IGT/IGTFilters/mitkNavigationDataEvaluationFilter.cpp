@@ -139,6 +139,23 @@ returnValue[3] = myCalculator->GetStabw(list4);
 return returnValue;
 }
 
+mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetEulerAnglesMean(int input)
+{ 
+mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(QuaternionsToEulerAngles(m_LoggedQuaternions[input])));
+mitk::Vector3D returnValue;
+returnValue[0] = myCalculator->GetPositionMean()[0];
+returnValue[1] = myCalculator->GetPositionMean()[1];
+returnValue[2] = myCalculator->GetPositionMean()[2];
+return returnValue;
+}
+
+double mitk::NavigationDataEvaluationFilter::GetEulerAnglesRMS(int input)
+{
+mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(QuaternionsToEulerAngles(m_LoggedQuaternions[input])));
+return myCalculator->GetPositionErrorRMS();
+}
+
+
 
 double mitk::NavigationDataEvaluationFilter::GetPositionErrorMean(int input)
 {
@@ -222,5 +239,33 @@ mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(s
 {
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
   for (int i=0; i<pSet.size(); i++) returnValue->InsertPoint(i,pSet.at(i)); 
+  return returnValue;
+}
+
+mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(std::vector<mitk::Vector3D> pSet)
+{
+  mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
+  for (int i=0; i<pSet.size(); i++) 
+    {
+    mitk::Point3D thisPoint;
+    thisPoint[0] = pSet.at(i)[0];
+    thisPoint[1] = pSet.at(i)[1];
+    thisPoint[2] = pSet.at(i)[2];
+    returnValue->InsertPoint(i,thisPoint); 
+    }
+  return returnValue;
+}
+
+std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAngles(std::vector<mitk::Quaternion> quaterions)
+{
+  std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
+  for (int i=0; i<quaterions.size(); i++) 
+    {
+    mitk::Vector3D eulerAngles;
+    eulerAngles[0] = quaterions.at(i).rotation_euler_angles()[0];
+    eulerAngles[1] = quaterions.at(i).rotation_euler_angles()[1];
+    eulerAngles[2] = quaterions.at(i).rotation_euler_angles()[2];
+    returnValue.push_back(eulerAngles);
+    }
   return returnValue;
 }

@@ -1,0 +1,16 @@
+/**
+  \defgroup $(plugin-target) $(plugin-symbolic-name) Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup $(plugin-target)_internal Internal
+  \ingroup $(plugin-target)
+
+  \brief This subcategory includes the internal classes of the $(plugin-symbolic-name) plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

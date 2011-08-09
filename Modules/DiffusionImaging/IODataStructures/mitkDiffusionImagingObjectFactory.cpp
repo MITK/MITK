@@ -37,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCompositeMapper.h"
 #include "mitkDiffusionImageMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
+#include "mitkVolumeDataVtkMapper3D.h"
 
 #include "mitkFiberBundle.h"
 #include "mitkFiberBundleMapper3D.h"
@@ -45,7 +46,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundleWriterFactory.h"
 #include "mitkFiberBundleWriter.h"
 
+#include "mitkNrrdTbssImageIOFactory.h"
+#include "mitkNrrdTbssImageWriterFactory.h"
+#include "mitkNrrdTbssImageWriter.h"
+
+
 typedef short DiffusionPixelType;
+typedef char TbssRoiPixelType;
+
+
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
@@ -64,16 +73,19 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdQBallImageIOFactory::RegisterOneFactory();
     mitk::NrrdTensorImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleIOFactory::RegisterOneFactory();
+    mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
 
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleWriterFactory::RegisterOneFactory();
+    mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssImageWriter<TbssRoiPixelType>::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
@@ -103,12 +115,22 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
       node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
     }
+
     classname = "DiffusionImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::DiffusionImageMapper<short>::New();
       newMapper->SetDataNode(node);
     }
+    mitk::Mapper::Pointer newMapper=NULL;
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ImageMapperGL2D::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -136,6 +158,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::FiberBundleMapper3D::New();
       newMapper->SetDataNode(node);
     }
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::VolumeDataVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
 
   return newMapper;
@@ -168,6 +198,14 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::FiberBundleMapper3D::SetDefaultProperties(node);
+  }
+
+  classname = "TbssImage";
+  std::string n = node->GetData()->GetNameOfClass();
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::ImageMapperGL2D::SetDefaultProperties(node);
+    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 }
 
@@ -209,6 +247,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
@@ -222,6 +261,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
 }
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()

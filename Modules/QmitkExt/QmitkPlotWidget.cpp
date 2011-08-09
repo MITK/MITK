@@ -41,6 +41,10 @@ QwtPlot* QmitkPlotWidget::GetPlot()
   return m_Plot;
 }
 
+void QmitkPlotWidget::SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos, double ratio)
+{
+  m_Plot->insertLegend(legend, pos, ratio);
+}
 
 unsigned int QmitkPlotWidget::InsertCurve(const char* title)
 {

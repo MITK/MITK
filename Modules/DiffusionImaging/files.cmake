@@ -52,6 +52,16 @@ SET(CPP_FILES
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
+
+  # DataStructures -> Tbss  
+  IODataStructures/TbssImages/mitkTbssImageSource.cpp  
+  IODataStructures/TbssImages/mitkNrrdTbssImageReader.cpp 
+  IODataStructures/TbssImages/mitkNrrdTbssImageIOFactory.cpp
+  IODataStructures/TbssImages/mitkTbssImage.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
+ 
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -85,6 +95,7 @@ SET(H_FILES
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
 
+ 
   # Tractography
   Tractography/itkGlobalTractographyFilter.h
 

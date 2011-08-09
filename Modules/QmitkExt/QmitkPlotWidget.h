@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include "mitkCommon.h"
 #include <qwt_symbol.h>
+#include <qwt_legend.h>
 
 /** 
 * Provides a convenient interface for plotting curves using qwt.
@@ -168,6 +169,12 @@ public:
   * @param title the description of the curve that will be shown in the legend.
   */
   void SetCurveTitle( unsigned int curveId, const char* title );
+
+  /**
+  * Sets the legend of the plot
+  *
+  */
+  void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
 
   /** 
   * Triggers a replot of the curve. Replot should be called once after

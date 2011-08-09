@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkParticle.h>
 #include <mitkParticleGrid.h>
 #include <mitkFiberBundle.h>
+#include "MitkDiffusionImagingExports.h"
 
 // ITK
 #include <itkImage.h>
@@ -33,7 +34,7 @@ typedef itk::VectorImage< short, 3 > DWIImageType;
 
 namespace itk
 {
-  class TractsToDWIImageFilter :
+  class MitkDiffusionImaging_EXPORT TractsToDWIImageFilter :
       public ImageToImageFilter< DWIImageType, DWIImageType >{
 
   public:

@@ -72,6 +72,7 @@ SET(CPP_FILES ${CPP_FILES}
 )
 ELSE()
 SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraMESAController.cpp
   mitkToFCameraMESASR4000ControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_MESASR4000)

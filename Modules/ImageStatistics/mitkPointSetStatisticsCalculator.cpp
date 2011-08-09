@@ -47,18 +47,21 @@ std::vector<mitk::Point3D> mitk::PointSetStatisticsCalculator::PointSetToVector(
 
 double mitk::PointSetStatisticsCalculator::GetMax(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 return list.at(list.size()-1);
 }
 
 double mitk::PointSetStatisticsCalculator::GetMin(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 return list.at(0);
 }
 
 double mitk::PointSetStatisticsCalculator::GetStabw(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
 for(int i=0; i<list.size(); i++)
@@ -73,6 +76,7 @@ return returnValue;
 
 double mitk::PointSetStatisticsCalculator::GetSampleStabw(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
 for(int i=0; i<list.size(); i++)
@@ -87,6 +91,7 @@ return returnValue;
 
 double mitk::PointSetStatisticsCalculator::GetMean(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double mean = 0;
 for(int i=0; i<list.size(); i++)
   {
@@ -98,6 +103,7 @@ return mean;
 
 double mitk::PointSetStatisticsCalculator::GetMedian(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 if (list.size() % 2 == 0.) //even
   {
@@ -113,6 +119,8 @@ else //odd
 
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetMean(std::vector<mitk::Point3D> list)
 {
+if (list.empty()) return 0;
+
 //calculate mean
 mitk::Point3D mean;
 mean.Fill(0);
@@ -136,6 +144,8 @@ double mitk::PointSetStatisticsCalculator::GetPositionErrorMean()
 double returnValue = 0.0;
 
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
+
+if (pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 
@@ -164,6 +174,8 @@ double mitk::PointSetStatisticsCalculator::GetPositionErrorRMS()
 double returnValue = 0.0;
 
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
+
+if(pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 

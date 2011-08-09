@@ -118,26 +118,6 @@ namespace mitk
 	  return true;
   }
 
-  int ToFCameraMESAController::SetIntegrationTime(unsigned int integrationTime)
-  {
-	return 0;
-  }
-
-  int ToFCameraMESAController::GetIntegrationTime()
-  {
-	return 0;
-  }
-
-  int ToFCameraMESAController::SetModulationFrequency(unsigned int modulationFrequency)
-  {
-	return 0;
-  }
-
-  int ToFCameraMESAController::GetModulationFrequency()
-  {
-	return 0;
-  }
-
   void ToFCameraMESAController::SetInputFileName(std::string inputFileName)
   {
     this->m_InputFileName = inputFileName;

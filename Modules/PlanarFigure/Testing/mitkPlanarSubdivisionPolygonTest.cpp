@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlaneGeometry.h"
-
+#include "mitkProperties.h"
 
 class mitkPlanarSubdivisionPolygonTestClass
 {
@@ -32,13 +32,15 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMinimumNumberOfControlPoints() == 3, "Minimum number of control points" );
 
   // Test for correct maximum number of control points in cross-mode
-  MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMaximumNumberOfControlPoints() == 5000, "Maximum number of control points" );
+  MITK_TEST_CONDITION( planarSubdivisionPolygon->GetMaximumNumberOfControlPoints() == 1000, "Maximum number of control points" );
 
   // Test for correct rounds of subdivisionPoints
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetSubdivisionRounds() == 5, "Subdivision point generation depth" );
 
   // Test for correct tension parameter
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetTensionParameter() == 0.0625, "Tension parameter" );
+
+  planarSubdivisionPolygon->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
 
   // Initial placement of planarSubdivisionPolygon
   mitk::Point2D p0;

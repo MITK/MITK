@@ -73,7 +73,7 @@ public:
 protected:
   TbssImageSource();
 
-  virtual ~TbssImageSource();
+  virtual ~TbssImageSource(){}
 };
 
 } // namespace mitk

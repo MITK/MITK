@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFCameraPMDPlayerDevice.h"
 #include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
+#include "mitkToFCameraMESASR4000Device.h"
 
 namespace mitk
 {
@@ -88,4 +89,12 @@ namespace mitk
     m_ToFImageGrabber->SetCameraDevice(m_ToFCameraDevice);
     return m_ToFImageGrabber;
   }
+
+  ToFImageGrabber::Pointer ToFImageGrabberCreator::GetMESASR4000ImageGrabber()
+  {
+    m_ToFCameraDevice = mitk::ToFCameraMESASR4000Device::New();
+    m_ToFImageGrabber->SetCameraDevice(m_ToFCameraDevice);
+    return m_ToFImageGrabber;
+  }
+
 }

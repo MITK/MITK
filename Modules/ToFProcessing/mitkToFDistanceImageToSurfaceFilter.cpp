@@ -126,7 +126,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   }
 
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
-
   //calculate world coordinates
   mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
@@ -186,6 +185,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         if (scalarFloatData)
         {          
           scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
+          //scalarArray->InsertTuple1(pixelID, scalarFloatData[pixelID]);
         }
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {

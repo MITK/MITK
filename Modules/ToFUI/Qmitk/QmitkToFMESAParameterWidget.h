@@ -16,11 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
-#define _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#ifndef _QMITKTOFMESAPARAMETERWIDGET_H_INCLUDED
+#define _QMITKTOFMESAPARAMETERWIDGET_H_INCLUDED
 
 #include "mitkTOFUIExports.h"
-#include "ui_QmitkToFConnectionWidgetControls.h"
+#include "ui_QmitkToFMESAParameterWidgetControls.h"
 
 //QT headers
 #include <QWidget>
@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * @ingroup ToFUI
 */
-class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
+class mitkTOFUI_EXPORT QmitkToFMESAParameterWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -45,8 +45,8 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFConnectionWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFConnectionWidget();
+    QmitkToFMESAParameterWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+    virtual ~QmitkToFMESAParameterWidget();
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -58,7 +58,17 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     \return ToFImageGrabber currently used by the widget
     */
     mitk::ToFImageGrabber* GetToFImageGrabber();
+
+    /*!
+    \brief sets the ToFImageGrabber which was provided by the ToFImageGrabberCreator after selecting a camera / player
+    */
+    void SetToFImageGrabber(mitk::ToFImageGrabber* aToFImageGrabber);
   
+    /*!
+    \brief activate camera settings according to the parameters from GUI
+    */
+    void ActivateAllParameters();
+
   signals:
 
     /*!
@@ -86,27 +96,25 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
   protected slots:
   
     /*!
-    \brief slot called when the "Connect Camera" button was pressed
-    * According to the selection in the camera combo box, the ToFImageGrabberCreator provides
-    * the desired instance of the ToFImageGrabber
-    */
-    void OnConnectCamera();
-    /*!
-    \brief slot updating the GUI elements after the selection of the camera combo box has changed
-    */
-    void OnSelectCamera(int index);
-    /*!
     \brief slot updating the member m_IntegrationTime and the parameter "integration time" of the current ToFImageGrabber
     */
-    //void OnChangeIntegrationTimeSpinBox(int value);
+    void OnChangeIntegrationTimeSpinBox(int value);
     /*!
     \brief slot updating the member m_ModulationFrequency and the parameter "modulation frequency" of the current ToFImageGrabber
     */
-    //void OnChangeModulationFrequencySpinBox(int value);
+    void OnChangeModulationFrequencyComboBox(int index);
+
+    void OnChangeFPNCheckBox(bool checked);
+
+    void OnChangeConvGrayCheckBox(bool checked);
+
+    void OnChangeMedianCheckBox(bool checked);
+
+    void OnChangeANFCheckBox(bool checked);
 
   protected:
 
-    Ui::QmitkToFConnectionWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+    Ui::QmitkToFMESAParameterWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     mitk::ToFImageGrabber* m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
 
@@ -115,13 +123,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
   private:
 
-    void ShowParameterWidget();
-
-    void ShowPMDParameterWidget();
-
-    void ShowMESAParameterWidget();
-
-    void ShowPlayerParameterWidget();
 };
 
 #endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED

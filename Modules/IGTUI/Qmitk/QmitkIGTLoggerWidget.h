@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 //ui header
 #include "ui_QmitkIGTLoggerWidgetControls.h"
 
+
  /** Documentation:
   *   \brief GUI to access the IGT recorder. 
   *   User can specify the file name where the output shall be stored and
@@ -49,6 +50,10 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
 
     void SetDataStorage(mitk::DataStorage* dataStorage);
     void SetRecorder(mitk::NavigationDataRecorder::Pointer recorder);
+
+  signals:
+     void SignalRecordingStarted();
+     void SignalRecordingStopped();
 
   protected slots:    
     void OnChangePressed();

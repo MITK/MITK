@@ -21,8 +21,22 @@
 #ifndef _MITK_FiberBundle_H
 #define _MITK_FiberBundle_H
 
+//includes for MITK datastructure
 #include "mitkBaseData.h"
 #include "MitkDiffusionImagingExports.h"
+
+//=======modernized================
+//includes storing fiberdata
+#include <vtkSmartPointer.h> //may be replaced by class precompile argument
+#include <vtkPolydata.h> // may be replaced by class
+#include <vtkPoints.h> // my be replaced by class
+
+
+//includes processing of fibers
+//
+//=========modernized end===========
+
+
 #include "mitkPlanarFigure.h"
 
 /* This Class represents a bunch of FiberTracts as a Bundle.
@@ -37,7 +51,7 @@
 #include "itkPointSet.h"
 #include "itkVector.h"
 #include <vtkCell.h>
-#include <vtkPolyData.h>
+//#include <vtkPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkPolyLine.h>
@@ -152,6 +166,16 @@ namespace mitk {
     virtual ~FiberBundle();
 
   private:
+//      =========MODERNIZED==========
+//      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
+//      FiberPolyData stores all brain fibers using polylines (in world coordinates)
+      vtkSmartPointer<vtkPolyData> m_FiberPolyData;
+
+//      VertexPolyData stores all original points as vertices computed by tracking algorithms
+      vtkSmartPointer<vtkPolyData> m_VertexPolyData;
+      vtkSmartPointer<vtkPoints>   m_Particles;
+      
+//  ===============Moedernized end=====    
     FiberGroupType::Pointer m_GroupFiberBundle;
     ContainerType::Pointer m_TractContainer;
     itkStochTractContainerType::Pointer m_debugITKContainer;

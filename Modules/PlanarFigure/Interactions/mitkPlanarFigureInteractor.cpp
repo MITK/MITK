@@ -252,6 +252,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+        planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
@@ -282,15 +283,12 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      bool tooClose = !IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
-
       unsigned int numberOfControlPoints, minimumNumberOfControlPoints;
 
       numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
       minimumNumberOfControlPoints = planarFigure->GetMinimumNumberOfControlPoints();
 
-      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()
-        && !tooClose )
+      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints())
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners
@@ -302,6 +300,7 @@ bool mitk::PlanarFigureInteractor
         }
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+        planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
@@ -675,13 +674,6 @@ bool mitk::PlanarFigureInteractor
     //    ok = true;
     //    break;
     //  }
-
-  case AcFINISHOBJECT:
-    {
-      planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
-      ok = true;
-      break;
-    }
 
   default:
     return Superclass::ExecuteAction( action, stateEvent );

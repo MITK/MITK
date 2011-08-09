@@ -28,7 +28,7 @@
 //=======modernized================
 //includes storing fiberdata
 #include <vtkSmartPointer.h> //may be replaced by class precompile argument
-#include <vtkPolydata.h> // may be replaced by class
+#include <vtkPolyData.h> // may be replaced by class
 #include <vtkPoints.h> // my be replaced by class
 
 

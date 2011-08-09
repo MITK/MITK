@@ -43,38 +43,28 @@ namespace mitk
 
   void ToFCameraMESASR4000Device::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
   {
+    ToFCameraMESADevice::SetProperty(propertyKey,propertyValue);
     this->m_PropertyList->SetProperty(propertyKey, propertyValue);
 
     ToFCameraMESASR4000Controller::Pointer myController = dynamic_cast<mitk::ToFCameraMESASR4000Controller*>(this->m_Controller.GetPointer());
 
     bool boolValue = false;
     GetBoolProperty(propertyValue, boolValue);
-    if (strcmp(propertyKey, "SetFPNCalibration") == 0)
+    if (strcmp(propertyKey, "SetFPN") == 0)
     {
-      //myController->SetFPNCalibration(boolValue);
+      myController->SetFPN(boolValue);
     }
-    else if (strcmp(propertyKey, "SetFPPNCalibration") == 0)
+    else if (strcmp(propertyKey, "SetConvGray") == 0)
     {
-      //myController->SetFPPNCalibration(boolValue);
+      myController->SetConvGray(boolValue);
     }
-    else if (strcmp(propertyKey, "SetLinearityCalibration") == 0)
+    else if (strcmp(propertyKey, "SetMedian") == 0)
     {
-      //myController->SetLinearityCalibration(boolValue);
+      myController->SetMedian(boolValue);
     }
-    else if (strcmp(propertyKey, "SetLensCalibration") == 0)
+    else if (strcmp(propertyKey, "SetANF") == 0)
     {
-      //myController->SetLensCalibration(boolValue);
-    }
-    else if (strcmp(propertyKey, "SetExposureMode") == 0)
-    {
-      if (boolValue)
-      {
-        //myController->SetExposureMode(1);
-      }
-      else
-      {
-        //myController->SetExposureMode(0);
-      }
+      myController->SetANF(boolValue);
     }
   }
 

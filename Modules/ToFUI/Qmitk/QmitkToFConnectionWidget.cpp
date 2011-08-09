@@ -54,6 +54,8 @@ void QmitkToFConnectionWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkToFConnectionWidgetControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    ShowParameterWidget();
   }
 }
 
@@ -66,9 +68,43 @@ void QmitkToFConnectionWidget::CreateConnections()
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SLOT(OnSelectCamera(int)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SIGNAL(ToFCameraSelected(int)) );
 
-    connect( m_Controls->m_IntegrationTimeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeIntegrationTimeSpinBox(int)) );
-    connect( m_Controls->m_ModulationFrequencySpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeModulationFrequencySpinBox(int)) );
+    //connect( m_Controls->m_IntegrationTimeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeIntegrationTimeSpinBox(int)) );
+    //connect( m_Controls->m_ModulationFrequencySpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeModulationFrequencySpinBox(int)) );
   }
+}
+
+void QmitkToFConnectionWidget::ShowParameterWidget()
+{
+  int selectedCamera = m_Controls->m_SelectCameraCombobox->currentIndex();
+  switch (selectedCamera)
+  {
+  case 0:
+  case 1:
+  case 2:   ShowPMDParameterWidget();
+            break;
+  case 3:   ShowMESAParameterWidget();
+            break;
+  default:  this->m_Controls->m_PMDParameterWidget->hide();
+            this->m_Controls->m_MESAParameterWidget->hide();
+  }
+}
+
+void QmitkToFConnectionWidget::ShowPMDParameterWidget()
+{
+  this->m_Controls->m_PMDParameterWidget->show();
+  this->m_Controls->m_MESAParameterWidget->hide();
+}
+
+void QmitkToFConnectionWidget::ShowMESAParameterWidget()
+{
+  this->m_Controls->m_PMDParameterWidget->hide();
+  this->m_Controls->m_MESAParameterWidget->show();
+}
+
+void QmitkToFConnectionWidget::ShowPlayerParameterWidget()
+{
+  this->m_Controls->m_PMDParameterWidget->hide();
+  this->m_Controls->m_MESAParameterWidget->hide();
 }
 
 mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
@@ -80,39 +116,49 @@ void QmitkToFConnectionWidget::OnSelectCamera(int index)
 {
   if (index == 0) // PMD camcube 2
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+    ShowPMDParameterWidget();
   }
   else if (index == 1) // pmd camboard
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowPMDParameterWidget();
   }
   else if (index == 2) // pmd O3d
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowPMDParameterWidget();
   }
-  else if (index == 3) // pmd file player
+  else if (index == 3) // MESA 4000
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowMESAParameterWidget();
   }
-  else if (index == 4) // pmd raw data player
+  else if (index == 4) // pmd file player
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowPlayerParameterWidget();
   }
-  else if (index == 5) // mitk player
+  else if (index == 5) // pmd raw data player
   {
-    m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
-    m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowPlayerParameterWidget();
+  }
+  else if (index == 6) // mitk player
+  {
+    //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
+    //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
+    //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+    ShowPlayerParameterWidget();
   }
 }
 
@@ -125,7 +171,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
+//    m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
     //repaint the widget
     this->repaint();
 
@@ -178,7 +224,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         m_Controls->m_ConnectCameraButton->setChecked(false);
         m_Controls->m_ConnectCameraButton->setEnabled(true);
         m_Controls->m_SelectCameraCombobox->setEnabled(true);
-        m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+//        m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
         OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
@@ -250,7 +296,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           m_Controls->m_ConnectCameraButton->setChecked(false);
           m_Controls->m_ConnectCameraButton->setEnabled(true);
           m_Controls->m_SelectCameraCombobox->setEnabled(true);
-          m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+//          m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
           OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
           return;
         }
@@ -258,8 +304,23 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
     }
     //if a connection could be established
-    if (m_ToFImageGrabber->ConnectCamera())
+    if (this->m_ToFImageGrabber->ConnectCamera())
     {
+      this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+      this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+
+      switch (selectedCamera)
+      {
+      case 0:
+      case 1:
+      case 2: this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
+              break;
+      case 3: this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
+              break;
+      }
+
+      
+/*
       //get the integration time and modulation frequency
       this->m_IntegrationTime = m_Controls->m_IntegrationTimeSpinBox->value();
       this->m_ModulationFrequency = m_Controls->m_ModulationFrequencySpinBox->value();
@@ -284,7 +345,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       //reset the GUI elements
       m_Controls->m_IntegrationTimeSpinBox->setValue(this->m_IntegrationTime);
       m_Controls->m_ModulationFrequencySpinBox->setValue(this->m_ModulationFrequency);
-
+*/
       m_Controls->m_ConnectCameraButton->setText("Disconnect");
 
       // send connect signal to the caller functionality
@@ -296,7 +357,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       m_Controls->m_ConnectCameraButton->setChecked(false);
       m_Controls->m_ConnectCameraButton->setEnabled(true);
       m_Controls->m_SelectCameraCombobox->setEnabled(true);
-      m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+//      m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
       OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
       return;
 
@@ -313,7 +374,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     this->m_ToFImageGrabber->DisconnectCamera();
     m_Controls->m_ConnectCameraButton->setText("Connect");
     m_Controls->m_SelectCameraCombobox->setEnabled(true);
-    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
+//    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
     OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
 
     this->m_ToFImageGrabber = NULL;
@@ -322,7 +383,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
   }
 }
-
+/*
 void QmitkToFConnectionWidget::OnChangeIntegrationTimeSpinBox(int value)
 {
   if (this->m_ToFImageGrabber != NULL)
@@ -360,4 +421,4 @@ void QmitkToFConnectionWidget::OnChangeModulationFrequencySpinBox(int value)
     }
   }
 }
-
+*/

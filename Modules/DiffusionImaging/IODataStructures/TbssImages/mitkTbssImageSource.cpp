@@ -33,11 +33,6 @@ mitk::TbssImageSource<TPixelType>::TbssImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-template<typename TPixelType>
-mitk::TbssImageSource<TPixelType>::~DiffusionImageSource()
-{
-}
-
 
 template<typename TPixelType>
 itk::DataObject::Pointer mitk::TbssImageSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )

@@ -69,6 +69,8 @@ namespace mitk
     itkSetMacro(PreprocessedFA, bool)
     itkGetMacro(PreprocessedFAFile, std::string)
     itkSetMacro(PreprocessedFAFile, std::string)
+    itkGetMacro(Structure, std::string)
+    itkSetMacro(Structure, std::string)
 
     void SetRoi(RoiType roi)
     {
@@ -101,6 +103,8 @@ namespace mitk
 
     bool m_PreprocessedFA;
     std::string m_PreprocessedFAFile;
+
+    std::string m_Structure;
 
   };
 

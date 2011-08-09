@@ -271,6 +271,13 @@ namespace mitk
         static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFA(true);
         static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFAFile(metaString);
       }
+
+      // Name of structure
+      if (itKey->find("structure") != std::string::npos)
+      {
+        MITK_INFO << *itKey << " ---> " << metaString;
+        static_cast<OutputType*>(this->GetOutput())->SetStructure(metaString);
+      }
     }
     static_cast<OutputType*>(this->GetOutput())->SetRoi(roi);
 

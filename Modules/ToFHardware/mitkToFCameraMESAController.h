@@ -73,7 +73,7 @@ namespace mitk
     \brief Returns the currently set modulation frequency.
     \return modulation frequency
     */
-    virtual int GetModulationFrequency();
+    virtual int GetModulationFrequency() = 0;
     /*!
     \brief Sets the modulation frequency of the ToF device. 
     The method automatically calculates a valid value from the given frequency to 
@@ -81,12 +81,12 @@ namespace mitk
     \param modulationFrequency modulation frequency
     \return frequency set after validation step
     */
-    virtual int SetModulationFrequency(unsigned int modulationFrequency);
+    virtual int SetModulationFrequency(unsigned int modulationFrequency) = 0;
     /*!
     \brief Returns the currently set integration time.
     \return integration time
     */
-    virtual int GetIntegrationTime();
+    virtual int GetIntegrationTime() = 0;
     /*!
     \brief Sets the integration time of the ToF device. 
     The method automatically calculates a valid value from the given integration time to 
@@ -94,7 +94,7 @@ namespace mitk
     \param integrationTime integration time
     \return integration time set after validation step
     */
-    virtual int SetIntegrationTime(unsigned int integrationTime);
+    virtual int SetIntegrationTime(unsigned int integrationTime) = 0;
     /*!
     \brief set input file name used by MESA player classes
     */

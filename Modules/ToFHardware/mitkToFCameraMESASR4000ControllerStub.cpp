@@ -17,9 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "mitkToFCameraMESASR4000Controller.h"
 #include "mitkToFConfig.h"
-#include <libMesaSR.h>
-
-extern CMesaDevice* m_MESAHandle;
 
 namespace mitk
 {

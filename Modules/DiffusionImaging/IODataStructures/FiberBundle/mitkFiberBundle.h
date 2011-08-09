@@ -51,12 +51,13 @@ namespace mitk {
    * \brief Base Class for Fiber Bundles;   */
   class  MitkDiffusionImaging_EXPORT FiberBundle : public BaseData
   {
+  public:
 
     /* friend classes wanna access typedefs
-      ContainerPointType, ContainerTractType, ContainerType */
+    ContainerPointType, ContainerTractType, ContainerType */
     friend class FiberBundleWriter;
     friend class FiberBundleReader;
-//    friend class itkTractsToDWIImageFilter;
+    //    friend class itkTractsToDWIImageFilter;
 
     /** Types for the standardized TractContainer **/
     typedef itk::Point<float,3>                                                   ContainerPointType; //no need to init, is no smartpointer
@@ -76,9 +77,6 @@ namespace mitk {
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
     virtual void SetRequestedRegion( itk::DataObject *data );
-
-
-  public:
 
     static const int TRACTPOINT_BACKFACE;
     static const int TRACTPOINT_ON_PLANE;

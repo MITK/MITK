@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkDiffusionImage.h>
-#include <mitkTbssImage.h>
 
 namespace mitk
 {

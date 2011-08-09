@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkStatusBar.h>
 
+//itk headers
 #include <itksys/SystemTools.hxx>
 
 //qt headers
@@ -106,40 +107,42 @@ void QmitkIGTLoggerWidget::OnStartRecording(bool recording)
   if(recording)
   {
 
-  if (!m_RecordingActivated)
-  {   
-    m_Recorder->SetFileName(m_CmpFilename.toStdString());  
+    if (!m_RecordingActivated)
+    {   
+      m_Recorder->SetFileName(m_CmpFilename.toStdString());  
 
-    try
-    { /*start the recording mechanism */     
-      m_Recorder->StartRecording();  
-      m_RecordingTimer->start(50);    //now every update of the recorder stores one line into the file for each added NavigationData      
-      mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now"); // Display recording message for 75ms in status bar
-    }
-    catch (std::exception& e)
-    {
-      QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while recording tracking data: %1").arg(e.what()));
-      mitk::StatusBar::GetInstance()->DisplayText(""); // Display recording message for 75ms in status bar
-    }
-    m_Controls->m_pbStartRecording->setText("Stop recording");
-    m_Controls->m_leRecordingValue->setEnabled(false);
-    m_Controls->m_cbRecordingType->setEnabled(false);
+      try
+      { /*start the recording mechanism */     
+        m_Recorder->StartRecording();  
+        m_RecordingTimer->start(50);    //now every update of the recorder stores one line into the file for each added NavigationData      
+        mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now"); // Display recording message for 75ms in status bar
+      
+        emit SignalRecordingStarted();
+      }
+      catch (std::exception& e)
+      {
+        QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while recording tracking data: %1").arg(e.what()));
+        mitk::StatusBar::GetInstance()->DisplayText(""); // Display recording message for 75ms in status bar
+      }
+      m_Controls->m_pbStartRecording->setText("Stop recording");
+      m_Controls->m_leRecordingValue->setEnabled(false);
+      m_Controls->m_cbRecordingType->setEnabled(false);
 
-    m_RecordingActivated = true;
+      m_RecordingActivated = true;
 
-    if(m_Controls->m_cbRecordingType->currentIndex()==0)
-    {
-      bool success = false;
-      QString str_ms = m_Controls->m_leRecordingValue->text();
-      int int_ms = str_ms.toInt(&success);
-      if (success)
-        QTimer::singleShot(int_ms, this, SLOT(StopRecording()));
+      if(m_Controls->m_cbRecordingType->currentIndex()==0)
+      {
+        bool success = false;
+        QString str_ms = m_Controls->m_leRecordingValue->text();
+        int int_ms = str_ms.toInt(&success);
+        if (success)
+          QTimer::singleShot(int_ms, this, SLOT(StopRecording()));
+      }
     }
-  }
-  else
-  {  
-    this->StopRecording();   
-  }
+    else
+    {  
+      this->StopRecording();   
+    }
 
   }
   else
@@ -161,7 +164,7 @@ void QmitkIGTLoggerWidget::StopRecording()
   m_Controls->m_cbRecordingType->setEnabled(true);
   m_RecordingActivated = false;
 
- 
+  emit SignalRecordingStopped(); 
 }
 
 void QmitkIGTLoggerWidget::OnRecording()

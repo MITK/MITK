@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon():
   m_TensionParameter(0.0625),
-  m_MaximumNumberOfControlPoints(5000),
   m_SubdivisionRounds(5)
 {
   // Polygon is subdivision (in contrast to parent class PlanarPolygon
@@ -97,20 +96,38 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 
   bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
 
+  unsigned int i;
   ControlPointListType::iterator it;
-  for ( it = subdivisionPoints.begin(); it != subdivisionPoints.end(); ++it )
+  for ( it = subdivisionPoints.begin(), i = 0;
+        it != subdivisionPoints.end();
+        ++it, ++i )
   {
-
-    PolyLineElement elem( *it, 0 );
-    this->AppendPointToPolyLine( 0, elem );
-
-    if(!isInitiallyPlaced && *it == m_ControlPoints[m_ControlPoints.size()-2])
+    // Determine the index of the control point FOLLOWING this poly-line element
+    // (this is needed by PlanarFigureInteractor to insert new points at the correct position,
+    // namely BEFORE the next control point)
+    unsigned int nextIndex;
+    if ( i == 0 )
     {
-
-      PolyLineElement elem( m_ControlPoints[m_ControlPoints.size()-1], 0 );
-      this->AppendPointToPolyLine( 0, elem );
-      break;
+      // For the FIRST polyline point, use the index of the LAST control point
+      // (it will used to check if the mouse is near the very last polyline element)
+      nextIndex = m_ControlPoints.size() - 1;
     }
+    else
+    {
+      // For all other polyline points, use the index of the control point succeeding it
+      // (for polyline points lying on control points, the index of the previous control point
+      // is used)
+      nextIndex = (((i - 1) >> this->GetSubdivisionRounds()) + 1) % m_ControlPoints.size();
+      if(!isInitiallyPlaced && nextIndex > m_ControlPoints.size()-2)
+      {
+
+        PolyLineElement elem( m_ControlPoints[m_ControlPoints.size()-1], nextIndex );
+        this->AppendPointToPolyLine( 0, elem );
+        break;
+      }
+    }
+    PolyLineElement elem( *it, nextIndex );
+    this->AppendPointToPolyLine( 0, elem );
   }
   subdivisionPoints.clear();
 }

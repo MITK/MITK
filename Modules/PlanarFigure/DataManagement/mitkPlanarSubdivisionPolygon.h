@@ -49,12 +49,7 @@ public:
   /** \brief Polygon maximum number of control points is principally not limited. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return m_MaximumNumberOfControlPoints;
-  }
-
-  void SetMaximumNumberOfControlPoints( int maximumNumber )
-  {
-    m_MaximumNumberOfControlPoints = maximumNumber;
+    return 1000;
   }
 
   /** \brief How many times should we generate a round of subdivisions? */
@@ -98,7 +93,7 @@ protected:
   virtual void GeneratePolyLine();
 
   float m_TensionParameter;
-  int m_MaximumNumberOfControlPoints, m_SubdivisionRounds;
+  int m_SubdivisionRounds;
 
 
 private:

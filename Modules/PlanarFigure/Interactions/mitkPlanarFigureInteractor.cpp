@@ -274,8 +274,23 @@ bool mitk::PlanarFigureInteractor
       // the figure has already the minimum number of required points to
       // be finished.
 
-      if ( planarFigure->GetNumberOfControlPoints() >=
-        planarFigure->GetMinimumNumberOfControlPoints() )
+      const mitk::PositionEvent *positionEvent =
+        dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+      if ( positionEvent == NULL )
+      {
+        ok = false;
+        break;
+      }
+
+      bool tooClose = !IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
+
+      unsigned int numberOfControlPoints, minimumNumberOfControlPoints;
+
+      numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
+      minimumNumberOfControlPoints = planarFigure->GetMinimumNumberOfControlPoints();
+
+      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()
+        && !tooClose )
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners
@@ -378,7 +393,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // TODO: check segement of polyline we clicked in
-      int previousIndex = this->IsPositionOverFigure(
+      int nextIndex = this->IsPositionOverFigure(
         stateEvent, planarFigure,
         planarFigureGeometry,
         projectionPlane,
@@ -394,11 +409,11 @@ bool mitk::PlanarFigureInteractor
         point2D = planarFigure->GetPreviewControlPoint();
       }
 
-      planarFigure->AddControlPoint( point2D, previousIndex );
+      planarFigure->AddControlPoint( point2D, nextIndex );
 
       if ( planarFigure->IsPreviewControlPointVisible() )
       {
-        planarFigure->SelectControlPoint( previousIndex );
+        planarFigure->SelectControlPoint( nextIndex );
         planarFigure->ResetPreviewContolPoint();
       }
 
@@ -664,6 +679,8 @@ bool mitk::PlanarFigureInteractor
   case AcFINISHOBJECT:
     {
       planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+      ok = true;
+      break;
     }
 
   default:
@@ -788,8 +805,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   {
     const VertexContainerType polyLine = planarFigure->GetPolyLine( loop );
 
-    int tempControlPoint = -1;
-
     Point2D polyLinePoint;
     Point2D firstPolyLinePoint;
     Point2D previousPolyLinePoint;
@@ -804,8 +819,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
         break; // Poly line invalid (not on current 2D plane) --> skip it
       }
 
-      tempControlPoint = it->Index;
-
       if ( firstPoint )
       {
         firstPolyLinePoint = polyLinePoint;
@@ -813,9 +826,8 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
       }
       else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint, pointProjectedOntoLine ) )
       {
-        // Return true if the display position is close enough to this line segment
-        previousControlPoint = tempControlPoint;
-        return previousControlPoint;
+        // Point is close enough to line segment --> Return index of the segment
+        return it->Index;
       }
       previousPolyLinePoint = polyLinePoint;
     }
@@ -824,12 +836,11 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
     if ( planarFigure->IsClosed()
       && this->IsPointNearLine( displayPosition, polyLinePoint, firstPolyLinePoint, pointProjectedOntoLine ) )
     {
-      previousControlPoint = 0;
-      return previousControlPoint;
+      return 0; // Return index of first control point
     }
   }
 
-  return previousControlPoint;
+  return -1;
 }
 
 

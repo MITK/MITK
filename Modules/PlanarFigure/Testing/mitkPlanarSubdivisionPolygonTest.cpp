@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlaneGeometry.h"
-
+#include "mitkProperties.h"
 
 class mitkPlanarSubdivisionPolygonTestClass
 {
@@ -39,6 +39,8 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
 
   // Test for correct tension parameter
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetTensionParameter() == 0.0625, "Tension parameter" );
+
+  planarSubdivisionPolygon->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
 
   // Initial placement of planarSubdivisionPolygon
   mitk::Point2D p0;

@@ -19,6 +19,7 @@
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
@@ -35,6 +36,7 @@
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage
                                                       , bool _PlaceNewNodesOnTop
                                                       , bool _ShowHelperObjects
+                                                      , bool _ShowNodesContainingNoData
                                                       , QObject* parent )
 : QAbstractItemModel(parent)
 , m_DataStorage(0)
@@ -42,6 +44,7 @@ QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataSt
 , m_Root(0)
 {
   this->SetShowHelperObjects( _ShowHelperObjects );
+  this->SetShowNodesContainingNoData( _ShowNodesContainingNoData );
   this->SetDataStorage(_DataStorage);
 }
 
@@ -666,23 +669,53 @@ void QmitkDataStorageTreeModel::TreeItem::SetParent( TreeItem* _Parent )
 void QmitkDataStorageTreeModel::SetShowHelperObjects(bool _ShowHelperObjects)
 {
   m_ShowHelperObjects = _ShowHelperObjects;
+  this->UpdateNodeVisibility();
+}
 
+void QmitkDataStorageTreeModel::SetShowNodesContainingNoData(bool _ShowNodesContainingNoData)
+{
+  m_ShowNodesContainingNoData = _ShowNodesContainingNoData;
+  this->UpdateNodeVisibility();
+}
+
+void QmitkDataStorageTreeModel::UpdateNodeVisibility()
+{
   mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
   mitk::NodePredicateNot::Pointer dataIsNotNull = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain dat
   mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
   mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(isHelperObject);// Show only nodes that really contain dat
+  mitk::NodePredicateAnd::Pointer isNotHelperObjectAndContainsData = mitk::NodePredicateAnd::New(isNotHelperObject,dataIsNotNull);
+  mitk::NodePredicateAnd::Pointer isNotHelperObjectAndContainsNoData = mitk::NodePredicateAnd::New(isNotHelperObject,dataIsNull);
+  mitk::NodePredicateAnd::Pointer isHelperObjectAndContainsNoData = mitk::NodePredicateAnd::New(isHelperObject,dataIsNull);
+  mitk::NodePredicateAnd::Pointer isHelperObjectAndContainsData = mitk::NodePredicateAnd::New(isHelperObject,dataIsNotNull);
 
-  if (! m_ShowHelperObjects)
+  if (m_ShowHelperObjects)
   {
-    //hide helper objects    
-    m_Predicate = mitk::NodePredicateAnd::New(dataIsNotNull, isNotHelperObject);
+    if (m_ShowNodesContainingNoData)
+    {
+      // Show helper objects and nodes containing no data
+      mitk::NodePredicateOr::Pointer tempPredicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isHelperObjectAndContainsNoData);
+      m_Predicate = mitk::NodePredicateOr::New(tempPredicate,isHelperObjectAndContainsData);
+    }
+    else
+    {
+      // Show helper objects but not nodes containing no data
+      m_Predicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isHelperObjectAndContainsData);
+    }
   }
   else
   {
-    //show helper objects
-    m_Predicate = dataIsNotNull;
+    if (m_ShowNodesContainingNoData)
+    {
+      // Don't show helper objects but nodes containing no data
+      m_Predicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isNotHelperObjectAndContainsNoData);
+    }
+    else
+    {
+      // Don't show helper objects and nodes containing no data
+      m_Predicate = isNotHelperObjectAndContainsData;
+    }
   }
-
   this->Update();
 }
 

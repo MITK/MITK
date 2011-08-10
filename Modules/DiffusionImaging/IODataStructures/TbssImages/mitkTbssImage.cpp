@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef __mitkTbssImage__cpp
+#define __mitkTbssImage__cpp
+
+
 #include "mitkTbssImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
@@ -43,3 +47,4 @@ void mitk::TbssImage<TPixelType>::InitializeFromImage()
 
 
 */
+#endif /* __mitkTbssImage__cpp */

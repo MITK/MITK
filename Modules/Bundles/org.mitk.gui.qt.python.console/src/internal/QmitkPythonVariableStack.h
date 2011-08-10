@@ -50,7 +50,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkPythonVariableStack : public QObject, public berry::QtViewPart, public berry::ISizeProvider
+class QmitkPythonVariableStack : public berry::QtViewPart, public berry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

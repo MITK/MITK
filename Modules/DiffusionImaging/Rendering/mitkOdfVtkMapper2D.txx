@@ -434,7 +434,8 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  //vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+  // std::cout << "MeasureDisplayedGeometry(" << renderer->GetName() << ")" << std::endl;
+  // vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
   Geometry2D::ConstPointer worldGeometry = 
     renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry = 
@@ -474,15 +475,16 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N
   O[1] = origin[1] + size[1];
 
   mitk::Point2D point1;
-  point1[0] = M[0]; point1[1] = M[1]; point1[2] = M[2];
+  point1[0] = M[0]; point1[1] = M[1]; 
+  
   mitk::Point3D M3D;
   dispGeometry->Map(point1, M3D);
 
-  point1[0] = L[0]; point1[1] = L[1]; point1[2] = L[2];
+  point1[0] = L[0]; point1[1] = L[1]; 
   mitk::Point3D L3D;
   dispGeometry->Map(point1, L3D);
 
-  point1[0] = O[0]; point1[1] = O[1]; point1[2] = O[2];
+  point1[0] = O[0]; point1[1] = O[1];
   mitk::Point3D O3D;
   dispGeometry->Map(point1, O3D);
 
@@ -528,6 +530,7 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N
   retval->size[1] = size[1];
   retval->origin[0] = origin[0];
   retval->origin[1] = origin[1];
+
   return retval;
 
 }
@@ -799,6 +802,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     retval = this->IsVisible(renderer, "VisibleOdfs_C");
     break;
   }
+
   return retval;
 }
 
@@ -820,15 +824,15 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
-  //std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
+  // std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
   {
-
     // adapt cam pos
     OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
+
     AdaptCameraPosition(renderer, dispGeo);
 
     if(this->GetDataNode()->IsOn("DoRefresh",NULL))

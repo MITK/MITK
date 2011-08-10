@@ -102,4 +102,7 @@ namespace itk
     float m_ParticleWeight;
   };
 }
+
+#include "itkTractsToDWIImageFilter.cpp"
+
 #endif

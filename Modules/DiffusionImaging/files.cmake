@@ -76,7 +76,6 @@ SET(CPP_FILES
   Interactions/mitkFiberBundleInteractor.cpp
 
   # Algorithms
-  Algorithms/itkTractsToDWIImageFilter.cpp
 )
 
 SET(H_FILES

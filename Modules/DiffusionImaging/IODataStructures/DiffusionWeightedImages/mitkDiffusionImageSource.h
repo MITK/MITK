@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 
 #include "mitkImageSource.h"
-#include "MitkDiffusionImagingExports.h"
 
 namespace mitk {
 
@@ -42,7 +41,7 @@ namespace mitk {
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class MitkDiffusionImaging_EXPORT DiffusionImageSource : public ImageSource
+class DiffusionImageSource : public ImageSource
 {
 public:
   mitkClassMacro(DiffusionImageSource, BaseProcess);

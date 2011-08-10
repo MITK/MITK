@@ -50,7 +50,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkPythonVariableStack : public QObject, public berry::QtViewPart, public berry::ISizeProvider
+class QmitkPythonVariableStack : public berry::QtViewPart, public berry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -61,6 +61,11 @@ class QmitkPythonVariableStack : public QObject, public berry::QtViewPart, publi
   static const std::string VIEW_ID;
 
   QmitkPythonVariableStack();
+  QmitkPythonVariableStack(const QmitkPythonVariableStack& other)
+  {
+     Q_UNUSED(other)
+     throw std::runtime_error("Copy constructor not implemented");
+  }
   virtual ~QmitkPythonVariableStack();
 
   virtual void CreateQtPartControl(QWidget *parent);

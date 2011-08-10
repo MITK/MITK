@@ -33,12 +33,19 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkPythonEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
 
+  Q_OBJECT
+  
 public:
   berryObjectMacro(QmitkPythonEditor);
 
   static const std::string EDITOR_ID;
 
   QmitkPythonEditor();
+  QmitkPythonEditor(const QmitkPythonEditor& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
   ~QmitkPythonEditor();
 
   void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);

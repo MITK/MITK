@@ -52,6 +52,8 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.viewinitialization
     org.mitk.gui.qt.volumevisualization
     org.mitk.gui.qt.pointsetinteraction
+    org.mitk.gui.qt.videoplayer
+    org.mitk.gui.qt.python.console
  )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

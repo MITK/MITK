@@ -49,6 +49,11 @@ class QmitkPythonCommandHistory : public QmitkFunctionality, public QmitkPythonC
     static const std::string VIEW_ID;
 
     QmitkPythonCommandHistory();
+    QmitkPythonCommandHistory(const QmitkPythonCommandHistory& other)
+    {
+       Q_UNUSED(other)
+       throw std::runtime_error("Copy constructor not implemented");
+    }
     virtual ~QmitkPythonCommandHistory();
 
     virtual void CreateQtPartControl(QWidget *parent);

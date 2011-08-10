@@ -5,21 +5,21 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pythonconsole"
           name="PythonConsole"
-          class="::QmitkPythonConsoleView" 
+          class="QmitkPythonConsoleView" 
           icon="resources/py.png" />
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pythonvariablestack"
           name="Python Variable Stack"
-          class="::QmitkPythonVariableStack"
+          class="QmitkPythonVariableStack"
           icon="resources/py.png" />
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pythoncommandhistory"
           name="Python Command History"
-          class="::QmitkPythonCommandHistory"
+          class="QmitkPythonCommandHistory"
           icon="resources/py.png" />
   </extension>
 
@@ -27,7 +27,7 @@
     <editor
       id="org.mitk.editors.pythoneditor"
       name="Python Editor"
-      class="::QmitkPythonEditor"
+      class="QmitkPythonEditor"
       icon="resources/py.png" >
     </editor>
   </extension>

@@ -35,7 +35,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkPlaneOperation.h"
-#include "mitkAxisRotationOperation.h"
 #include "mitkUndoController.h"
 #include "mitkOperationEvent.h"
 #include "mitkNodePredicateDataType.h"
@@ -466,12 +465,9 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
 }
 
 void
-SliceNavigationController::ReorientSlicesByAxis(const mitk::Point3D center, const mitk::Vector3D xaxis, 
-const mitk::Vector3D yaxis, const float width, const float height, const mitk::Vector3D spacing)
+SliceNavigationController::RestorePlanePosition( RestorePlanePositionOperation* op )
 {
-  AxisRotationOperation op(OpROTATEAXIS, center, xaxis, yaxis, width, height, spacing);
-
-  m_CreatedWorldGeometry->ExecuteOperation( &op );
+    m_CreatedWorldGeometry->ExecuteOperation( op );
 
   this->SendCreatedWorldGeometryUpdate();
 }

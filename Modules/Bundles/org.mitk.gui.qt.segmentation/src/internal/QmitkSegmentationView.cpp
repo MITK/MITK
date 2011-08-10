@@ -87,6 +87,7 @@ void QmitkSegmentationView::Activated()
     itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
     command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
     m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
+    mitk::PlanePositionManager::GetInstance()->SetDataStorage(this->GetDataStorage());
   }
 }
 
@@ -103,6 +104,7 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
+    mitk::PlanePositionManager::GetInstance()->DeleteAllMarkers();
   }
 }
 
@@ -557,13 +559,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 //New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-    
-    const mitk::PlaneGeometry* markerGeometry =
-            dynamic_cast<const mitk::PlaneGeometry*> ( node->GetData()->GetGeometry() );
-
-   /* mitk::Geometry2D* markerGeometry =
-            dynamic_cast<mitk::Geometry2D*> ( node->GetData()->GetGeometry() );*/
-
     //TODO renderWindow anders bestimmen, siehe CheckAlignment
     QmitkRenderWindow* selectedRenderWindow = 0;
     QmitkRenderWindow* RenderWindow1 =
@@ -604,20 +599,48 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     // make node visible
     if (selectedRenderWindow)
     {
-      mitk::Point3D origin = markerGeometry->GetOrigin();
-      float width = markerGeometry->GetExtent(0);
-      float height = markerGeometry->GetExtent(1);
-      float xMM = markerGeometry->GetExtentInMM(0);
-      float yMM = markerGeometry->GetExtentInMM(1);
-      mitk::Vector3D xaxis = markerGeometry->GetAxisVector(0);
-      mitk::Vector3D yaxis = markerGeometry->GetAxisVector(1);
-      mitk::Vector3D spacing = markerGeometry->GetSpacing();
-       /*selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-          centerP);*/
-      mitk::Vector3D normal = markerGeometry->GetNormal();
-      //mitk::Point3D pointOfRotation = dynamic_cast<mitk::PlanarCircle*>(node->GetData())->
-      selectedRenderWindow->GetSliceNavigationController()->ReorientSlicesByAxis(
-          origin, xaxis, yaxis, width, height, spacing);           
+      std::string nodeName = node->GetName();
+      unsigned int t = nodeName.find_last_of("_");
+      unsigned int id = atof(nodeName.substr(t+1).c_str());
+
+      selectedRenderWindow->GetSliceNavigationController()->RestorePlanePosition(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+
+      MITK_INFO<<"\nID: "<<id<<"\nOffset: "<<mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id)->GetTransform()->GetOffset()<<
+        "\nMatrix: "<<mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id)->GetTransform()->GetMatrix()<<
+        "\nDirection: "<<mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id)->GetDirectionVector()<<"\nSpacing: "<<
+        mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id)->GetSpacing();
+
+
+      ofstream stream("C:/Users/fetzer/Desktop/equationSystem/ist.txt");
+
+      mitk::Geometry2D* currentGeo = dynamic_cast< mitk::SlicedGeometry3D*>(
+        const_cast<mitk::Geometry3D*>(selectedRenderWindow->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetGeometry2D(0);
+      mitk::Vector3D x = currentGeo->GetAxisVector(0);
+      mitk::Vector3D y = currentGeo->GetAxisVector(1);
+      mitk::Vector3D normal = currentGeo->GetAxisVector(2);
+      //unsigned int pos = selectedRenderWindow->GetSliceNavigationController()->GetSlice()->GetPos();
+      mitk::Point3D origin = currentGeo->GetOrigin();
+      mitk::Point3D center = currentGeo->GetCenter();
+      //stream<<setprecision(20)<<"First Plane\n\nX: "<<x<<"\nY:"<<y<<"\nN:"<<normal<<"\nORIGIN: "<<origin<<"\nCENTER: "<<center<<"\n\n";
+      unsigned int slices = dynamic_cast< mitk::SlicedGeometry3D*>(
+        const_cast<mitk::Geometry3D*>(selectedRenderWindow->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetSlices();
+      mitk::Vector3D direction= dynamic_cast< mitk::SlicedGeometry3D*>(
+        const_cast<mitk::Geometry3D*>(selectedRenderWindow->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetDirectionVector();
+      mitk::Vector3D spacing = dynamic_cast< mitk::SlicedGeometry3D*>(
+        const_cast<mitk::Geometry3D*>(selectedRenderWindow->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetSpacing();
+
+      stream<<setprecision(20)<<"First Plane\n\nX: "<<x<<"\nY:"<<y<<"\nN:"<<normal<<"\nORIGIN: "<<origin<<"\nCENTER: "<<center<<
+        "\nDirection: "<<direction<<"\nSpacing: "<<spacing<<"\n\n";
+
+      const mitk::Geometry2D* currentGeo2 = selectedRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::Vector3D x2 = currentGeo2->GetAxisVector(0);
+      mitk::Vector3D y2 = currentGeo2->GetAxisVector(1);
+      mitk::Vector3D normal2 = currentGeo2->GetAxisVector(2);
+      unsigned int pos = selectedRenderWindow->GetSliceNavigationController()->GetSlice()->GetPos();
+      mitk::Point3D origin2 = currentGeo2->GetOrigin();
+      mitk::Point3D center2 = currentGeo2->GetCenter();
+
+      stream<<setprecision(20)<<"Second Plane\n\nX: "<<x2<<"\nY:"<<y2<<"\nN:"<<normal2<<"\nORIGIN: "<<origin2<<"\nCENTER: "<<center2;
     }
 }
 

@@ -89,6 +89,7 @@ SET(CPP_FILES
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPlane.cpp
+  DataManagement/mitkPlanePositionManager.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkSeedsImage.cpp

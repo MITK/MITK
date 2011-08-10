@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkSegTool2D.h"
@@ -35,9 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
- m_LastEventSender(NULL),
- m_LastEventSlice(0),
- m_Contourmarkername ("Contourmarker")
+m_LastEventSender(NULL),
+m_LastEventSlice(0),
+m_Contourmarkername ("Contourmarker")
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -67,7 +67,6 @@ bool mitk::SegTool2D::OnMouseMoved   (Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-  
   if ( m_LastEventSender != positionEvent->GetSender() ) return false;
   if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
 
@@ -81,15 +80,15 @@ bool mitk::SegTool2D::OnMouseReleased(Action*, const StateEvent* stateEvent)
 
   if ( m_LastEventSender != positionEvent->GetSender() ) return false;
   if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-  
+
   return true;
 }
-    
+
 bool mitk::SegTool2D::OnInvertLogic(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-  
+
   if ( m_LastEventSender != positionEvent->GetSender() ) return false;
   if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
 
@@ -152,14 +151,14 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
 
   // check if this index is still within the image
   if ( affectedSlice < 0 || affectedSlice >= static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
- 
+
   return true;
 }
-    
+
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PositionEvent* positionEvent, const Image* image)
 {
   if (!positionEvent) return NULL;
-  
+
   assert( positionEvent->GetSender() ); // sure, right?
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image ); // get the timestep of the visible part (time-wise) of the image
 
@@ -185,7 +184,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
       // here we have a single slice that can be modified
       Image::Pointer slice = extractor->GetOutput();
-      
+
       return slice;
     }
     catch(...)
@@ -196,13 +195,13 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   }
   else
   {
-      ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
-      newExtractor->SetInput( image );
-      newExtractor->SetActualInputTimestep( timeStep );
-      newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
-      newExtractor->Update();
-      Image::Pointer slice = newExtractor->GetOutput();
-      return slice;
+    ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
+    newExtractor->SetInput( image );
+    newExtractor->SetActualInputTimestep( timeStep );
+    newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
+    newExtractor->Update();
+    Image::Pointer slice = newExtractor->GetOutput();
+    return slice;
   }
 }
 
@@ -210,10 +209,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if ( !workingNode ) return NULL;
-  
+
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
   if ( !workingImage ) return NULL;
-  
+
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
 
@@ -221,132 +220,88 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 {
   DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
   if ( !referenceNode ) return NULL;
-  
+
   Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
   if ( !referenceImage ) return NULL;
-  
+
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }
 
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
-    char* subtractToolIsActive = strstr( const_cast<char*>(m_ToolManager->GetActiveTool()->GetName()), "Subtract" );
-    mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()));
-    if ( ( currentGeometry2D != NULL ) && ( !ContourmarkerAlreadyExists( currentGeometry2D ) && subtractToolIsActive == NULL ) )
+
+  //ofstream stream("C:/Users/fetzer/Desktop/equationSystem/soll.txt");
+
+  mitk::Geometry2D* currentGeo = dynamic_cast< mitk::SlicedGeometry3D*>(
+    const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetGeometry2D(0);
+
+  mitk::SlicedGeometry3D* slicedGeo =  dynamic_cast< mitk::SlicedGeometry3D*>(const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->
+    GetSliceNavigationController()->GetCurrentGeometry3D()));
+
+  if (currentGeo && slicedGeo)
+  {
+    AffineTransform3D::Pointer transform = AffineTransform3D::New();
+    transform->SetMatrix(currentGeo->GetIndexToWorldTransform()->GetMatrix());
+    transform->SetOffset(currentGeo->GetIndexToWorldTransform()->GetOffset());
+
+    mitk::Vector3D direction= dynamic_cast< mitk::SlicedGeometry3D*>(const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->
+    GetSliceNavigationController()->GetCurrentGeometry3D()))->GetDirectionVector();
+    mitk::Vector3D spacing = positionEvent->GetSender()->GetCurrentWorldGeometry()->GetSpacing();
+
+    unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+
+    MITK_INFO<<"\nID: "<<id<<"\nOffset: "<<currentGeo->GetIndexToWorldTransform()->GetOffset()<<"\nMatrix: "<<
+      currentGeo->GetIndexToWorldTransform()->GetMatrix()<<"\nDirection: "<<direction<<"\nSpacing: "<<spacing;
+
+    /* stream<<setprecision(20)<<"First Plane\n\nX: "<<x<<"\nY:"<<y<<"\nN:"<<normal<<"\nORIGIN: "<<origin<<"\nCENTER: "<<center<<
+    "\nDirection: "<<direction<<"\nSpacing: "<<spacing<<"\n\n";*/
+
+    mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, currentGeo->GetExtent(0), currentGeo->GetExtent(1),
+      spacing, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos(), dynamic_cast< mitk::SlicedGeometry3D*>(
+      const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetDirectionVector(), transform);
+
+    if ( mitk::PlanePositionManager::GetInstance()->AddNewPosition(newOp) )
     {
-        //Creating PlanarFigure which serves as marker
-        mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
-        contourMarker->SetGeometry2D( currentGeometry2D );
-        //currentGeometry2D->SetOrigin(positionEvent->GetWorldPosition());
-        //contourMarker->SetGeometry(dynamic_cast<mitk::Geometry3D*>(currentGeometry2D->Clone().GetPointer()));
-        //contourMarker->GetGeometry()->SetOrigin(positionEvent->GetWorldPosition());
-        mitk::Contour::Pointer test = mitk::Contour::New();
-        const mitk::Geometry3D* tempGeo = positionEvent->GetSender()->GetSliceNavigationController()->GetCreatedWorldGeometry();
-        test->SetGeometry(const_cast<mitk::Geometry3D*>( tempGeo ));
+      //Creating PlanarFigure which serves as marker ---> HELPER NODE?
+      mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
+      contourMarker->SetGeometry2D( currentGeo );
 
-        //Here we check which consecutive number must be the suffix to the markers name
-        std::stringstream markerStream;
-        markerStream << m_Contourmarkername;
-        int markerCount = 0;
-        mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
-        while (m_ToolManager->GetDataStorage()->GetNamedDerivedNode(markerStream.str().c_str(), workingNode))
-        {
-            m_ToolManager->GetDataStorage()->GetNamedDerivedNode(markerStream.str().c_str(),workingNode)->SetProperty( "visible", mitk::BoolProperty::New(false) );
-            markerCount++;
-            markerStream.str("");
-            markerStream.clear();
-            markerStream << m_Contourmarkername ;
-            markerStream << " ";
-            markerStream << markerCount;
-        }
+      //Here we check which consecutive number must be the suffix to the markers name
+      std::stringstream markerStream;
 
-        //Now we place the figure in the image and the DataManager as a new Node
-        Point2D controlPoint2D;
-        Point3D controlPoint3D = positionEvent->GetWorldPosition();
-        currentGeometry2D->Map(controlPoint3D ,controlPoint2D);
-        contourMarker->PlaceFigure(controlPoint2D);
-        DataNode::Pointer rotatedContourNode = DataNode::New();
-        //rotatedContourNode->SetData(contourMarker);
-        rotatedContourNode->SetData(contourMarker);
-        rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
-        rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
-        rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
-        rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
-        m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
+
+      markerStream << m_Contourmarkername ;
+      markerStream << "_";
+      markerStream << id;
+
+      DataNode::Pointer rotatedContourNode = DataNode::New();
+
+      rotatedContourNode->SetData(contourMarker);
+      rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+      rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
+      rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
+      rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
+      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
+  }
 }
-
-bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* currentGeometry2D )
-{
-  //For debugging
-  std::ofstream file("C:/Users/fetzer/Desktop/equationSystem/rotationfile.txt");
-    itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0) );
-    mitk::DataNode* currentNode;
-    for( unsigned int i = 0; i < allNodes->Size(); i++ )
-    {
-        currentNode = allNodes->GetElement(i);
-        std::string nodeName = currentNode->GetName();
-        const mitk::PlaneGeometry* nodeGeometry = dynamic_cast<mitk::PlaneGeometry*>( currentNode->GetData()->GetGeometry() );
-        if ( !nodeGeometry ) continue;
-        Point3D nodeCenter = nodeGeometry->GetCenter();
-        Point3D currentCenter = currentGeometry2D->GetCenter();
-        /*mitk::ScalarType distance1 = currentGeometry2D->DistanceFromPlane(nodeCenter);
-        mitk::ScalarType distance2 = nodeGeometry->DistanceFromPlane(currentCenter);*/
-        Vector3D nodeNormal = nodeGeometry->GetNormal();
-        Vector3D currentNormal = currentGeometry2D->GetNormal();
-        //Timestep...
-
-        //Debugging
-        Vector3D cAxisX = currentGeometry2D->GetAxisVector(0);
-        Vector3D cAxisY = currentGeometry2D->GetAxisVector(1);
-        Vector3D cAxisZ = currentGeometry2D->GetAxisVector(2);
-        Vector3D cNormal = currentGeometry2D->GetNormal();
-        Point3D cOrigin = currentGeometry2D->GetOrigin();
-
-        Vector3D nAxisX = nodeGeometry->GetAxisVector(0);
-        Vector3D nAxisy = nodeGeometry->GetAxisVector(1);
-        Vector3D nAxisZ = nodeGeometry->GetAxisVector(2);
-        Vector3D nNormal = nodeGeometry->GetNormal();
-        Point3D nOrigin = nodeGeometry->GetOrigin();
-
-        file<<"Current Geometry: \n"<<"*************\n\n"<<"X= "<<cAxisX<<"\n"<<"Y= "<<cAxisY<<"\n"<<"Z= "<<cAxisZ<<"\n"<<"N= "<<cNormal<<"\n"<<"O= "<<cOrigin<<"\n";
-        file<<"Node Geometry: \n"<<"*************\n\n"<<"X= "<<nAxisX<<"\n"<<"Y= "<<nAxisy<<"\n"<<"Z= "<<nAxisZ<<"\n"<<"N= "<<nNormal<<"\n"<<"O= "<<nOrigin<<"\n";
-
-        bool isSameGeometry = ( (nodeCenter == currentCenter) && (nodeNormal == currentNormal));
-
-
-        /*bool isSameGeometry = ( ( nodeGeometry->GetOrigin() == currentGeometry2D->GetOrigin() ) && 
-            ( nodeGeometry->GetBounds() == currentGeometry2D->GetBounds() ) &&
-            ( nodeGeometry->GetIndexToWorldTransform()->GetMatrix() == currentGeometry2D->GetIndexToWorldTransform()->GetMatrix() ) && 
-            ( nodeGeometry->GetIndexToWorldTransform()->GetOffset() == currentGeometry2D->GetIndexToWorldTransform()->GetOffset() ) &&
-            ( nodeGeometry->GetSpacing() == currentGeometry2D->GetSpacing() ) &&
-            ( nodeGeometry->GetTimeBounds() ) == currentGeometry2D->GetTimeBounds() ) &&
-            ( nodeGeometry->GetImageGeometry() == currentGeometry2D->GetImageGeometry() );*/
-
-        int stringPosition = nodeName.find( m_Contourmarkername );
-        if ( ( stringPosition == 0 ) && ( isSameGeometry ) )
-            return true;
-    }
-
-    return false;
-}
-
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
 {
   MITK_ERROR << "********************************************************************************" << std::endl
-            << " " << message << std::endl
-            << "********************************************************************************" << std::endl
-            << "  " << std::endl
-            << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
-            << "  " << std::endl
-            << " Please file a BUG REPORT: " << std::endl
-            << " http://bugs.mitk.org" << std::endl
-            << " Contain the following information:" << std::endl
-            << "  - What image were you working on?" << std::endl
-            << "  - Which region of the image?" << std::endl
-            << "  - Which tool did you use?" << std::endl
-            << "  - What did you do?" << std::endl
-            << "  - What happened (not)? What did you expect?" << std::endl;
+    << " " << message << std::endl
+    << "********************************************************************************" << std::endl
+    << "  " << std::endl
+    << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
+    << "  " << std::endl
+    << " Please file a BUG REPORT: " << std::endl
+    << " http://bugs.mitk.org" << std::endl
+    << " Contain the following information:" << std::endl
+    << "  - What image were you working on?" << std::endl
+    << "  - Which region of the image?" << std::endl
+    << "  - Which tool did you use?" << std::endl
+    << "  - What did you do?" << std::endl
+    << "  - What happened (not)? What did you expect?" << std::endl;
 }
 

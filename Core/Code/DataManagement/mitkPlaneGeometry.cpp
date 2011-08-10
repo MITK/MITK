@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlaneGeometry.h"
 #include "mitkPlaneOperation.h"
-#include "mitkAxisRotationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkLine.h"
 
@@ -723,25 +722,20 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       transform->Translate( -center[0], -center[1], -center[2] );
       break;
     }
-  case OpROTATEAXIS:
+  case OpRESTOREPLANEPOSITION:
     {
-    AxisRotationOperation *op = dynamic_cast< mitk::AxisRotationOperation* >(operation);
-    if(op == NULL)
-    {
+      RestorePlanePositionOperation *op = dynamic_cast< mitk::RestorePlanePositionOperation* >(operation);
+      if(op == NULL)
+      {
+        return;
+      }
+      this->SetIndexToWorldTransform(op->GetTransform());
+      ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
+      this->SetBounds(bounds);
+      TransferItkToVtkTransform();
+      this->Modified();
+      transform->Delete();
       return;
-    }
-
-    const mitk::ScalarType width = op->GetWidth();
-    InitializeStandardPlane( width ,op->GetHeight(), op->GetXAxis().Get_vnl_vector(), op->GetYAxis().Get_vnl_vector(), &op->GetSpacing());
-   /* itk::Vector<double, 3> offset;
-    offset[0] = op->GetPoint()[0];
-    offset[1] = op->GetPoint()[1];
-    offset[2] = op->GetPoint()[2];
-    m_IndexToWorldTransform->SetOffset(offset);*/
-    TransferItkToVtkTransform();
-    this->Modified();
-    transform->Delete();
-    return;
 
     }
   default:

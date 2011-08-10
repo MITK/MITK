@@ -94,6 +94,7 @@ SET(H_FILES
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
+  IODataStructures/TbssImages/mitkTbssImage.h
 
  
   # Tractography

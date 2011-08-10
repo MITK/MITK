@@ -61,6 +61,11 @@ class QmitkPythonVariableStack : public QObject, public berry::QtViewPart, publi
   static const std::string VIEW_ID;
 
   QmitkPythonVariableStack();
+  QmitkPythonVariableStack(const QmitkPythonVariableStack& other)
+  {
+     Q_UNUSED(other)
+     throw std::runtime_error("Copy constructor not implemented");
+  }
   virtual ~QmitkPythonVariableStack();
 
   virtual void CreateQtPartControl(QWidget *parent);

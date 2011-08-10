@@ -1,14 +1,20 @@
-set(SWIG_PYTHON_WRAPPER _mitkCorePython SwigRuntimePython)
-IF(MITK_USE_PYTHON)
-  IF(MITK_USE_CTK)
-    #SET(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} "${MITK_WRAPPING_SOURCE_DIR}" "${MITK_WRAPPING_BINARY_DIR}/Core")
-    #message(status "MITK_WRAPPING_BINARY_DIR: ${MITK_WRAPPING_BINARY_DIR}")
-    #message(status "MITK_WRAPPING_SOURCE_DIR: ${MITK_WRAPPING_SOURCE_DIR}")
-    INCLUDE_DIRECTORIES("${MITK_WRAPPING_SOURCE_DIR}/CSwig" "${MITK_WRAPPING_BINARY_DIR}/CSwig/Core")
+# The project name must correspond to the directory name of your plug-in
+# and must not contain periods.
+#IF(MITK_USE_PYTHON)
+  PROJECT(org_mitk_gui_qt_python_console)
 
-    MACRO_CREATE_MITK_PLUGIN(QmitkExt CTK)
-    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${SWIG_PYTHON_WRAPPER})
-  ELSE()
-    MESSAGE("MITK Python support needs CTK. Enable MITK_USE_CTK")
-  ENDIF()
-ENDIF()
+  set(SWIG_PYTHON_WRAPPER _mitkCorePython SwigRuntimePython)
+
+  MACRO_CREATE_MITK_CTK_PLUGIN(
+    EXPORT_DIRECTIVE CONSOLE_EXPORT
+    EXPORTED_INCLUDE_SUFFIXES src
+    MODULE_DEPENDENCIES QmitkExt CTK
+  )
+
+#  INCLUDE_DIRECTORIES("${MITK_WRAPPING_SOURCE_DIR}/CSwig" "${MITK_WRAPPING_BINARY_DIR}/CSwig/Core")
+
+#  TARGET_LINK_LIBRARIES(org_mitk_gui_qt_python_console ${SWIG_PYTHON_WRAPPER})
+  
+#ELSE()
+#  MESSAGE("MITK Python Console needs Python. Enable MITK_USE_PYTHON")
+#ENDIF()

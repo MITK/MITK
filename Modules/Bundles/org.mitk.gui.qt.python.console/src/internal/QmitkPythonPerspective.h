@@ -20,11 +20,20 @@
 #define QMITKPYTHONPERSPECTIVE_H_
 
 #include <berryIPerspectiveFactory.h>
+#include <QObject>
 
-struct QmitkPythonPerspective : public berry::IPerspectiveFactory
+struct QmitkPythonPerspective : public QObject, public berry::IPerspectiveFactory
 {
+ 
+  Q_OBJECT
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  
+  QmitkPythonPerspective(const QmitkPythonPerspective& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
 
 };
 

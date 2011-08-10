@@ -62,6 +62,11 @@ class QmitkPythonConsoleView : public QmitkFunctionality, public QmitkPythonClie
     static const std::string VIEW_ID;
 
     QmitkPythonConsoleView();
+    QmitkPythonConsoleView(const QmitkPythonConsoleView& other)
+    {
+       Q_UNUSED(other)
+       throw std::runtime_error("Copy constructor not implemented");
+    }
     virtual ~QmitkPythonConsoleView();
 
     virtual void CreateQtPartControl(QWidget *parent);

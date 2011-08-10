@@ -3,6 +3,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  mitkPluginActivator.cpp
   QmitkPythonConsoleView.cpp
   QmitkPythonEditor.cpp
   QmitkPythonScriptEditor.cpp
@@ -24,9 +25,12 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
   src/internal/QmitkPythonCommandHistory.h
   src/internal/QmitkPythonCommandHistoryTreeWidget.h
   src/internal/QmitkPythonConsoleView.h
+  src/internal/QmitkPythonEditor.h
+  src/internal/QmitkPythonPerspective.h
   src/internal/QmitkPythonScriptEditor.h
   src/internal/QmitkPythonScriptEditorHighlighter.h
   src/internal/QmitkPythonTextEditor.h
@@ -34,15 +38,14 @@ SET(MOC_H_FILES
   src/internal/QmitkPythonVariableStackTreeWidget.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/py.png
+  plugin.xml
 )
 
-SET(RES_FILES
+SET(QRC_FILES
   resources/QmitkPythonConsoleView.qrc
 )
-
-SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

@@ -211,7 +211,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == 6)
     {//MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.pic)");
+      fileFilter.append("MITK Images (*.nrrd)");
+      //fileFilter.append("MITK Images (*.pic) (deprecated)");
+
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
     }
 
@@ -243,9 +245,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( tmpFileName.toStdString() );
           std::string extension = itksys::SystemTools::GetFilenameLastExtension( tmpFileName.toStdString() );
 
-          if (extension != ".pic")
+          if (extension != ".pic" && extension != ".nrrd")
           {
-            msg = msg + "Invalid file format, please select a \".pic\"-file";
+            msg = msg + "Invalid file format, please select a \".pic\" or \".nrrd\"-file";
             throw std::logic_error(msg.c_str());
           }
           int found = baseFilename.rfind("_DistanceImage");

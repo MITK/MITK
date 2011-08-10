@@ -175,15 +175,15 @@ template<class TOutputImage>
   // copy as much information as possible into size and spacing
   unsigned int i;
   for ( i=0; i < itkDimMax3; ++i)
-  {
-    size[i]    = input->GetDimension(i);
-    spacing[i] = input->GetGeometry()->GetSpacing()[i];
+  {             
+     size[i]    = input->GetDimension(i);
+     spacing[i] = input->GetGeometry()->GetSpacing()[i];
   }
   for ( ; i < TOutputImage::ImageDimension; ++i)
   {
-    origin[i]  = 0.0;
-    size[i]    = input->GetDimension(i);
-    spacing[i] = 1.0;
+     origin[i]  = 0.0;
+     size[i]    = input->GetDimension(i);
+     spacing[i] = 1.0;
   }
 
   // build region from size  
@@ -201,19 +201,47 @@ template<class TOutputImage>
   direction.SetIdentity();
   unsigned int j;
   const AffineTransform3D::MatrixType& matrix = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
-  
-  /// \warning 2D MITK images will get a 2D identity matrix in ITK
-  /// \todo Get clear about how to handle directed ITK 2D images in ITK
-  
+
+  /// \warning 2D MITK images could have a 3D rotation, since they have a 3x3 geometry matrix. 
+  /// If it is only a rotation around the transversal plane normal, it can be express with a 2x2 matrix. 
+  /// In this case, the ITK image conservs this information and is identical to the MITK image!
+  /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
+  /// Spacing is of course conserved in both cases.
+
+   
   // the following loop devides by spacing now to normalize columns.
   // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092. 
-  if ( itkDimMax3 >= 3)
-  {
-    for ( i=0; i < itkDimMax3; ++i)
-      for( j=0; j < itkDimMax3; ++j )
-        direction[i][j] = matrix[i][j]/spacing[j];
-  }
 
+  // Check if information is lost
+  if (  TOutputImage::ImageDimension <= 2)
+  {
+     if ( TOutputImage::ImageDimension == 2 &&
+        ( matrix[0][2] != 0) ||
+        ( matrix[1][2] != 0) ||
+        ( matrix[2][0] != 0) ||
+        ( matrix[2][1] != 0) ||
+        ( matrix[2][2] != 1) &&  ( matrix[2][2] != -1) )
+     {
+        // The 2D MITK image contains 3D rotation information.
+        // This cannot be expressed in a 2D ITK image, so the ITK image will have no rotation
+
+     }
+     else
+     {
+        // The 2D MITK image can be converted to an 2D ITK image without information loss!     
+        for ( i=0; i < itkDimMax3; ++i)
+           for( j=0; j < itkDimMax3; ++j )
+              direction[i][j] = matrix[i][j]/spacing[j];
+     }
+  }
+  else
+  {
+     // Normal 3D image. Conversion possible without problem!
+     for ( i=0; i < itkDimMax3; ++i)
+        for( j=0; j < itkDimMax3; ++j )
+           direction[i][j] = matrix[i][j]/spacing[j];
+  }
+  
   // set information into output image
   output->SetRegions( region );
   output->SetOrigin( origin );

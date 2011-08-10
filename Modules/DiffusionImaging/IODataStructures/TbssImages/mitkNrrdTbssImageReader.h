@@ -30,7 +30,7 @@ namespace mitk
   */
 
   template < class TPixelType >
-  class NrrdTbssImageReader : public mitk::TbssImageSource<TPixelType>, public FileReader
+  class MitkDiffusionImaging_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource<TPixelType>, public FileReader
   {
   public:
 

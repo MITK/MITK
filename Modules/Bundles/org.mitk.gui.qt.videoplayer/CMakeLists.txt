@@ -1,3 +1,9 @@
-IF(MITK_USE_OpenCV)
-MACRO_CREATE_MITK_PLUGIN(mitkOpenCVVideoSupportUI)
-ENDIF(MITK_USE_OpenCV)
+# The project name must correspond to the directory name of your plug-in
+# and must not contain periods.
+PROJECT(org_mitk_gui_qt_videoplayer)
+
+MACRO_CREATE_MITK_CTK_PLUGIN(
+  EXPORT_DIRECTIVE VIDEOPLAYER_EXPORTS
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDENCIES mitkOpenCVVideoSupportUI
+)

@@ -34,4 +34,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.pointbasedregistration:OFF
   org.mitk.gui.qt.viewinitialization:OFF
   org.mitk.gui.qt.volumevisualization:OFF
+  org.mitk.gui.qt.videoplayer:OFF
   )

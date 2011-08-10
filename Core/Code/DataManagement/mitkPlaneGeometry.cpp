@@ -316,24 +316,39 @@ PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
 
   Vector3D  originVector; 
   FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
-  if(geometry3D->GetImageGeometry())
-  {
-    FillVector3D( originVector,
-      originVector[0] - 0.5, 
-      originVector[1] - 0.5, 
-      originVector[2] - 0.5 );
-  }
+
   switch(planeorientation)
   {
-    case Transversal:
-      width  = geometry3D->GetExtent(0);
-      height = geometry3D->GetExtent(1);
-      break;
-    case Frontal:
-      width  = geometry3D->GetExtent(0);
-      height = geometry3D->GetExtent(2);
-      break;
-    case Sagittal:
+  case Transversal:
+    if(geometry3D->GetImageGeometry())
+    {
+      FillVector3D( originVector,
+        originVector[0] - 0.5,
+        originVector[1] - 0.5,
+        originVector[2]);
+    }
+    width  = geometry3D->GetExtent(0);
+    height = geometry3D->GetExtent(1);
+    break;
+  case Frontal:
+    if(geometry3D->GetImageGeometry())
+    {
+      FillVector3D( originVector,
+        originVector[0] - 0.5,
+        originVector[1],
+        originVector[2] - 0.5 );
+    }
+    width  = geometry3D->GetExtent(0);
+    height = geometry3D->GetExtent(2);
+    break;
+  case Sagittal:
+    if(geometry3D->GetImageGeometry())
+    {
+      FillVector3D( originVector,
+        originVector[0],
+        originVector[1] - 0.5,
+        originVector[2] - 0.5 );
+    }
       width  = geometry3D->GetExtent(1);
       height = geometry3D->GetExtent(2);
       break;

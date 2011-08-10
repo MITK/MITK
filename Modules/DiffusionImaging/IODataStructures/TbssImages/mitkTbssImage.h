@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "itkImage.h"
 #include "mitkImageCast.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk 
 {
@@ -31,7 +32,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
   template<class TPixelType>
-  class TbssImage : public Image
+  class MitkDiffusionImaging_EXPORT TbssImage : public Image
   {
 
   public:

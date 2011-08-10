@@ -133,7 +133,6 @@ template<class T, int N>
 mitk::OdfVtkMapper2D<T,N>
 ::OdfVtkMapper2D()
 {
-  m_VtkBased = true;
   m_LastDisplayGeometry = 0;
 
   m_PropAssemblies.push_back(vtkPropAssembly::New());

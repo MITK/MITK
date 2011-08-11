@@ -73,6 +73,19 @@ void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factor
   m_ExtraFactories.push_back(CoreObjectFactoryBase::Pointer(factory));  
 }
 
+void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
+{
+  MITK_INFO << "CoreObjectFactory: un-registering extra factory of type " << factory->GetNameOfClass();
+  try
+  {
+    m_ExtraFactories.remove(factory);
+  }
+  catch( std::exception const& e)
+  {
+    MITK_ERROR << "Caugt exception while unregistering: " << e.what();
+  }
+}
+
 mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
   if (instance.IsNull()) 

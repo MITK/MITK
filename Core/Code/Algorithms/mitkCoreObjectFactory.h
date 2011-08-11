@@ -41,6 +41,7 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual FileWriterList GetFileWriters();
     virtual void MapEvent(const mitk::Event* event, const int eventID);
     virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
+    virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 

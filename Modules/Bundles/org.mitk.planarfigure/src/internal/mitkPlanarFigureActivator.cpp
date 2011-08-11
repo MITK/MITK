@@ -28,8 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 void
 mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
 {
-  RegisterPlanarFigureObjectFactory();
-
   QmitkNodeDescriptorManager* descriptorManager = QmitkNodeDescriptorManager::GetInstance();
   
   // Adding "PlanarLine"

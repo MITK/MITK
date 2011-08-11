@@ -52,8 +52,5 @@ protected:
 };
 
 }
-// global declaration for simple call by
-// applications
-void PlanarFigure_EXPORT RegisterPlanarFigureObjectFactory();
 
 #endif // PLANARFIGUREOBJECTFACTORY_H_INCLUDED

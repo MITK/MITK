@@ -21,10 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkResliceMethodProperty.h>
 #include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkPixelType.h>
 
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
+#include "vtkMitkApplyLevelWindowToRGBFilter.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -40,6 +42,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
 #include <vtkCellArray.h>
+#include <vtkImageRGBToHSI.h>
+#include <vtkImageHSIToRGB.h>
+
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -671,7 +676,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
+//  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
 
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;
@@ -755,6 +760,26 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   } //END binary image handling
   else
   {
+
+    mitk::PixelType pixelType = this->GetInput()->GetPixelType();
+    if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() )
+    {
+      localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+    }
+    else
+    {
+      localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+      vtkMitkApplyLevelWindowToRGBFilter* levelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
+      levelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
+      vtkSmartPointer<vtkImageRGBToHSI> rgbToHSIFilter = vtkSmartPointer<vtkImageRGBToHSI>::New();
+      rgbToHSIFilter->SetInput( localStorage->m_ReslicedImage );
+      rgbToHSIFilter->Update();
+      levelWindowToRGBFilterObject->SetInputConnection(rgbToHSIFilter->GetOutputPort());
+      vtkSmartPointer<vtkImageHSIToRGB> hsiToRGBFilter = vtkSmartPointer<vtkImageHSIToRGB>::New();
+      hsiToRGBFilter->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
+      localStorage->m_Texture->SetInputConnection(hsiToRGBFilter->GetOutputPort());
+    }
+
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
 

@@ -24,7 +24,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -51,30 +51,33 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="2" column="0">
-           <widget class="QRadioButton" name="radioButton_directionZ">
-            <property name="text">
-             <string>along Z direction</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
            <widget class="QRadioButton" name="radioButton_directionX">
             <property name="text">
              <string>along X direction</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QRadioButton" name="radioButton_directionY">
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="radioButton_directionRandom">
             <property name="text">
-             <string>along Y direction</string>
+             <string>random</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QRadioButton" name="radioButton_directionRandom">
+           <widget class="QRadioButton" name="radioButton_directionZ">
             <property name="text">
-             <string>random</string>
+             <string>along Z direction</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QRadioButton" name="radioButton_directionY">
+            <property name="text">
+             <string>along Y direction</string>
             </property>
            </widget>
           </item>
@@ -103,15 +106,18 @@
              <string>FA Values</string>
             </property>
             <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QRadioButton" name="radioButton_FAconst">
                <property name="text">
                 <string>constant value</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="boxFAconst">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -119,15 +125,18 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QRadioButton" name="radioButton_6">
                <property name="text">
                 <string>random value range</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="boxFAlower">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -135,8 +144,11 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
+             <item row="2" column="2">
               <widget class="QDoubleSpinBox" name="boxFAupper">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -147,10 +159,13 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="0" column="0">
               <widget class="QRadioButton" name="radioButton_FAnoValue">
                <property name="text">
                 <string>no values</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -163,6 +178,16 @@
              <string>GA Values</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QRadioButton" name="radioButton_2">
+               <property name="text">
+                <string>no values</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QLabel" name="GAlabel">
                <property name="text">
@@ -204,7 +229,7 @@
         <x>0</x>
         <y>0</y>
         <width>367</width>
-        <height>495</height>
+        <height>497</height>
        </rect>
       </property>
       <attribute name="label">
@@ -308,6 +333,9 @@
                  </item>
                  <item row="1" column="1">
                   <widget class="QSpinBox" name="boxSMrelativeValue">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="font">
                     <font>
                      <pointsize>10</pointsize>
@@ -320,10 +348,16 @@
                    <property name="text">
                     <string>none</string>
                    </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item row="0" column="1">
                   <widget class="QSpinBox" name="boxSMstaticValue">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="font">
                     <font>
                      <pointsize>10</pointsize>

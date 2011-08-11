@@ -556,7 +556,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   ForceDisplayPreferencesUponAllImages();
 }
 
-//New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
     //TODO renderWindow anders bestimmen, siehe CheckAlignment

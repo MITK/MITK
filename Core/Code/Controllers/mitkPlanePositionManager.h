@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
- class MitkExt_EXPORT PlanePositionManager : public itk::Object
+ class MITK_CORE_EXPORT PlanePositionManager : public itk::Object
  {
 
   public:

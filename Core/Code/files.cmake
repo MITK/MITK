@@ -40,6 +40,7 @@ SET(CPP_FILES
   Controllers/mitkFocusManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
+  Controllers/mitkPlanePositionManager.cpp
   Controllers/mitkProgressBar.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp

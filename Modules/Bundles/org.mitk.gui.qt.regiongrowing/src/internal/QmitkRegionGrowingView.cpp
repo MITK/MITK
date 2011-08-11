@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkITKImageImport.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
+#include "mitkImageTimeSelector.h"
 
 // Qmitk
 #include "QmitkRegionGrowingView.h"
@@ -160,8 +161,10 @@ void QmitkRegionGrowingView::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      // So we have an image. Let's see if the user has set some seed points already
-      if ( m_PointSet->GetSize() == 0 )
+      // So we have an image. Get the current time step to see if the user has set some seed points already
+      unsigned int t = m_MultiWidget->GetTimeNavigationController()->GetTime()->GetPos();
+
+      if ( m_PointSet->GetSize(t) == 0 )
       {
         // no points there. Not good for region growing
         QMessageBox::information( NULL, "Region growing functionality", 
@@ -172,15 +175,27 @@ void QmitkRegionGrowingView::DoImageProcessing()
       }
 
       // actually perform region growing. Here we have both an image and some seed points
-      AccessByItk_n( image, ItkImageProcessing, ( image->GetGeometry(), node, m_Controls->sliderOffsetValue->value() ) ); // some magic to call the correctly templated function
 
+      if (image->GetDimension() == 4)
+      {
+        mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+        timeSelector->SetInput(image);
+        timeSelector->SetTimeNr(t);
+        timeSelector->UpdateLargestPossibleRegion();
+        mitk::Image::Pointer image3D = timeSelector->GetOutput();
+        AccessByItk_n(image3D, ItkImageProcessing, (image3D->GetGeometry(), node, m_Controls->sliderOffsetValue->value(), t));
+      }
+      else
+      {
+        AccessByItk_n(image, ItkImageProcessing, (image->GetGeometry(), node, m_Controls->sliderOffsetValue->value(), t)); // some magic to call the correctly templated function
+      }
     }
   }
 }
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent, int thresholdOffset )
+void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent, int thresholdOffset, unsigned int t)
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
   typedef typename InputImageType::IndexType    IndexType;
@@ -194,7 +209,7 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
   IndexType seedIndex;
   TPixel min( std::numeric_limits<TPixel>::max() );
   TPixel max( std::numeric_limits<TPixel>::min() );
-  mitk::PointSet::PointsContainer* points = m_PointSet->GetPointSet()->GetPoints();
+  mitk::PointSet::PointsContainer* points = m_PointSet->GetPointSet(t)->GetPoints();
   for ( mitk::PointSet::PointsConstIterator pointsIterator = points->Begin(); 
         pointsIterator != points->End();
         ++pointsIterator ) 

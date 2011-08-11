@@ -79,7 +79,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 {
   
 // GET SELECTED FIBER DIRECTION
-  QStringter fibDirection;
+  QString fibDirection;
   QVector<QRadioButton*>::const_iterator i;
   for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) {
     

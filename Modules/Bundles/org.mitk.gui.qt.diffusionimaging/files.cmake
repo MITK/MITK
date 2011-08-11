@@ -15,6 +15,8 @@ SET(INTERNAL_CPP_FILES
   QmitkODFDetailsView.cpp
   QmitkGlobalFiberTrackingView.cpp
   QmitkFiberBundleOperationsView.cpp
+  QmitkFiberBundleDeveloperView.cpp
+
 )
 
 SET(UI_FILES
@@ -27,6 +29,8 @@ SET(UI_FILES
   src/internal/QmitkODFDetailsViewControls.ui
   src/internal/QmitkGlobalFiberTrackingViewControls.ui
   src/internal/QmitkFiberBundleOperationsViewControls.ui
+  src/internal/QmitkFiberBundleDeveloperViewControls.ui
+
 )
 
 SET(MOC_H_FILES
@@ -43,6 +47,8 @@ SET(MOC_H_FILES
   src/QmitkODFDetailsWidget.h
   src/internal/QmitkGlobalFiberTrackingView.h
   src/internal/QmitkFiberBundleOperationsView.h
+  src/internal/QmitkFiberBundleDeveloperView.h
+
 )
 
 SET(CACHED_RESOURCE_FILES

@@ -44,13 +44,20 @@ public:
 protected:
   ~vtkMitkApplyLevelWindowToRGBFilter();
 
-  void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id)
+  /** \brief Method for threaded execution of the filter.
+   * \param *inData: The input.
+   * \param *outData: The output of the filter.
+   * \param extent[6]: Specefies the region of the image to be updated inside this thread.
+   * It is a six-component array of the form (xmin, xmax, ymin, ymax, zmin, zmax).
+   * \param id: The thread id.
+   */
+  void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id);
 
-  template <class T>
-      void vtkCalculateIntensityFromLookupTable(
-                                                vtkImageData *inData,
-                                                vtkImageData *outData,
-                                                int outExt[6], T *);
+//  template <class T>
+//      void vtkCalculateIntensityFromLookupTable(
+//                                                vtkImageData *inData,
+//                                                vtkImageData *outData,
+//                                                int outExt[6], T *);
 
   void ExecuteInformation();
 

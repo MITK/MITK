@@ -46,10 +46,10 @@ vtkScalarsToColors* vtkMitkApplyLevelWindowToRGBFilter::GetLookupTable()
 //----------------------------------------------------------------------------
 // This templated function executes the filter for any type of data.
 template <class T>
-    void vtkMitkApplyLevelWindowToRGBFilter::vtkCalculateIntensityFromLookupTable(
-                             vtkImageData *inData,
-                             vtkImageData *outData,
-                             int outExt[6], T *)
+    void vtkCalculateIntensityFromLookupTable(vtkMitkApplyLevelWindowToRGBFilter *self,
+                                              vtkImageData *inData,
+                                              vtkImageData *outData,
+                                              int outExt[6], T *)
 {
   vtkImageIterator<T> inIt(inData, outExt);
   vtkImageIterator<T> outIt(outData, outExt);
@@ -65,18 +65,18 @@ template <class T>
   Imax = 0;
   // Loop through ouput pixels
   while (!outIt.IsAtEnd())
-    {
+  {
     T* inSI = inIt.BeginSpan();
     T* outSI = outIt.BeginSpan();
     T* outSIEnd = outIt.EndSpan();
     while (outSI != outSIEnd)
-      {
+    {
       // Pixel operation
       H = static_cast<double>(*inSI); inSI++;
       S = static_cast<double>(*inSI); inSI++;
       I = static_cast<double>(*inSI); inSI++;
 
-      lookupTable = dynamic_cast<vtkLookupTable*>(this->GetLookupTable());
+      lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
 
       lookupTable->GetTableRange(tableRange);
       inData->GetScalarRange(imgRange);
@@ -91,13 +91,13 @@ template <class T>
       *outSI = static_cast<T>(I); outSI++;
 
       for (idxC = 3; idxC <= maxC; idxC++)
-        {
+      {
         *outSI++ = *inSI++;
-        }
       }
+    }
     inIt.NextSpan();
     outIt.NextSpan();
-    }
+  }
 }
 
 void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
@@ -120,18 +120,37 @@ void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
   output->AllocateScalars();
 
   switch (input->GetScalarType())
-    {
+  {
     vtkTemplateMacro(
-      vtkCalculateIntensityFromLookupTable( input,
-                               output, extent,
-                               static_cast<VTK_TT *>(0)));
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return;
-    }
+        vtkCalculateIntensityFromLookupTable( this,
+                                              input,
+                                              output, extent,
+                                              static_cast<VTK_TT *>(0)));
+  default:
+    vtkErrorMacro(<< "Execute: Unknown ScalarType");
+    return;
+  }
+}
+
+void vtkMitkApplyLevelWindowToRGBFilter::ThreadedExecute(vtkImageData *inData,
+                                                         vtkImageData *outData,
+                                                         int extent[6], int id)
+{
+  switch (inData->GetScalarType())
+  {
+    vtkTemplateMacro(
+        vtkCalculateIntensityFromLookupTable( this,
+                                              inData,
+                                              outData,
+                                              extent,
+                                              static_cast<VTK_TT *>(0)));
+  default:
+    vtkErrorMacro(<< "Execute: Unknown ScalarType");
+    return;
+  }
 }
 
 void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation(
-           vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
+    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
 {
 }

@@ -27,7 +27,11 @@
 #include <QmitkStdMultiWidget.h>
 
 // Qt
-#include <QString>
+
+// VTK
+#include <vtkSmartPointer.h>
+#include <vtkPointSource.h>
+
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -63,16 +67,15 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     
   }
   
+//  Checkpoint for fiber ORIENTATION
   if ( m_DirectionRadios.empty() )
   {
-   
-//    feed the vector with directionRadioButtons
     m_DirectionRadios.insert(0, m_Controls->radioButton_directionRandom);
     m_DirectionRadios.insert(1, m_Controls->radioButton_directionX);
     m_DirectionRadios.insert(2, m_Controls->radioButton_directionY);
     m_DirectionRadios.insert(3, m_Controls->radioButton_directionZ);
-    
   }
+  
 }
 
 void QmitkFiberBundleDeveloperView::DoGenerateFibers()
@@ -84,19 +87,57 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) {
     
     QRadioButton* rdbtn = *i;
-    if (rdbtn->isChecked()) {
+    if (rdbtn->isChecked())
       fibDirection = rdbtn->objectName();
-      MITK_INFO << fibDirection.toStdString() << " is checked, safe it :-)" ;
-    } else {
-      MITK_INFO << fibDirection.toStdString() << " is NOT checked" ;
-    }
+
   }
   
-
+  
+  vtkSmartPointer<vtkPolyData> fibersPD;
+  
+  if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
+//    build polydata with random lines and fibers
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
+//    build polydata with XDirection fibers
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
+//    build polydata with YDirection fibers
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
+//    build polydata with ZDirection fibers
+    
+  }
   
 }
 
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
+{
+  //Create a point cloud
+  vtkSmartPointer<vtkPointSource> pointSource =
+  vtkSmartPointer<vtkPointSource>::New();
+  pointSource->SetCenter(0.0, 0.0, 0.0);
+  pointSource->SetNumberOfPoints(m_Controls->boxFiberNumbers->value());
+  pointSource->SetRadius(100.0);
+  pointSource->Update();
+  
+  
+  
+}
 
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionX()
+{
+  
+}
+
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionY()
+{
+  
+}
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionZ()
+{
+  
+}
 
 
 

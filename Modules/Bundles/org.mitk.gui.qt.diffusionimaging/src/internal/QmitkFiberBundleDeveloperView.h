@@ -30,6 +30,19 @@ PURPOSE.  See the above copyright notices for more information.
 // Qt
 #include <QVector>
 #include <QRadioButton>
+#include <QString>
+
+// VTK
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+
+
+
+
+const QString FIB_RADIOBUTTON_DIRECTION_RANDOM = "radioButton_directionRandom";
+const QString FIB_RADIOBUTTON_DIRECTION_X      = "radioButton_directionX";
+const QString FIB_RADIOBUTTON_DIRECTION_Y      = "radioButton_directionY";
+const QString FIB_RADIOBUTTON_DIRECTION_Z      = "radioButton_directionZ";
 
 
 /*!
@@ -78,6 +91,12 @@ protected:
 
 
   private:
+  
+  vtkSmartPointer<vtkPolyData> GenerateVtkFibersRandom();
+  vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionX();
+  vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
+  vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
+  
   //contains the selected FiberBundle
   mitk::DataNode::Pointer m_FiberBundleNode;
 

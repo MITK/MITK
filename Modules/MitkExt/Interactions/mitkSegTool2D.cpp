@@ -67,6 +67,7 @@ bool mitk::SegTool2D::OnMouseMoved   (Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
   if ( m_LastEventSender != positionEvent->GetSender() ) return false;
   if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
 
@@ -229,9 +230,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
-
-  //ofstream stream("C:/Users/fetzer/Desktop/equationSystem/soll.txt");
-
   mitk::Geometry2D* currentGeo = dynamic_cast< mitk::SlicedGeometry3D*>(
     const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetGeometry2D(0);
 
@@ -244,31 +242,21 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
     transform->SetMatrix(currentGeo->GetIndexToWorldTransform()->GetMatrix());
     transform->SetOffset(currentGeo->GetIndexToWorldTransform()->GetOffset());
 
-    mitk::Vector3D direction= dynamic_cast< mitk::SlicedGeometry3D*>(const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->
-    GetSliceNavigationController()->GetCurrentGeometry3D()))->GetDirectionVector();
+    mitk::Vector3D direction= slicedGeo->GetDirectionVector();
     mitk::Vector3D spacing = positionEvent->GetSender()->GetCurrentWorldGeometry()->GetSpacing();
 
     unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
 
-    MITK_INFO<<"\nID: "<<id<<"\nOffset: "<<currentGeo->GetIndexToWorldTransform()->GetOffset()<<"\nMatrix: "<<
-      currentGeo->GetIndexToWorldTransform()->GetMatrix()<<"\nDirection: "<<direction<<"\nSpacing: "<<spacing;
-
-    /* stream<<setprecision(20)<<"First Plane\n\nX: "<<x<<"\nY:"<<y<<"\nN:"<<normal<<"\nORIGIN: "<<origin<<"\nCENTER: "<<center<<
-    "\nDirection: "<<direction<<"\nSpacing: "<<spacing<<"\n\n";*/
-
     mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, currentGeo->GetExtent(0), currentGeo->GetExtent(1),
-      spacing, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos(), dynamic_cast< mitk::SlicedGeometry3D*>(
-      const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetDirectionVector(), transform);
+      spacing, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos(), direction, transform);
 
     if ( mitk::PlanePositionManager::GetInstance()->AddNewPosition(newOp) )
     {
-      //Creating PlanarFigure which serves as marker ---> HELPER NODE?
+      //Creating PlanarFigure which currently serves as marker
       mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
       contourMarker->SetGeometry2D( currentGeo );
 
-      //Here we check which consecutive number must be the suffix to the markers name
       std::stringstream markerStream;
-
       mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
 
       markerStream << m_Contourmarkername ;

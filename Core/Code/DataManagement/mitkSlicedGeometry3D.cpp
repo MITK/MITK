@@ -348,6 +348,7 @@ mitk::SlicedGeometry3D
     m_Slices = 1;
   }
 
+
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's
   // center, and then shift the origin in the direction of the normal by the
@@ -859,11 +860,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         geometry2D->ExecuteOperation( restorePlaneOp ); 
 
         ////Parts of ReinitializePlanes()
-        vnl_vector<float> n = restorePlaneOp->GetTransform()->GetMatrix().GetVnlMatrix().get_column(0);
-        mitk::Vector3D normal; 
-          normal[0] = n[0];
-          normal[1] = n[1];
-          normal[2] = n[2];
+        m_DirectionVector = restorePlaneOp->GetDirectionVector();
 
         Vector3D spacing = restorePlaneOp->GetSpacing();
 
@@ -875,9 +872,9 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // distance inside the volume) and the normal, and dividing this value by
         // the directed spacing calculated above.*/
         ScalarType directedExtent =
-          fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
-          + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
-          + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
+          fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * m_DirectionVector[0] )
+          + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * m_DirectionVector[1] )
+          + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * m_DirectionVector[2] );
 
         if ( directedExtent >= spacing[2] )
         {
@@ -888,24 +885,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
           m_Slices = 1;
         }
 
-        //Point3D center = m_ReferenceGeometry->GetCenter();
-        //double centerOfRotationDistance =
-        // planeGeometry->SignedDistanceFromPlane( center );
-        //if (centerOfRotationDistance > 0)
-        //{
-        //  m_DirectionVector = normal;
-        //}
-        //else
-        //{
-        //  m_DirectionVector = -normal;
-        //}
-
-        m_DirectionVector = restorePlaneOp->GetDirectionVector();
          m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
 
          if ( m_Slices > 0 )
          {
-           m_Geometry2Ds[0] = /*planeGeometry*/geometry2D;
+           m_Geometry2Ds[0] = geometry2D;
          }
 
         m_SliceNavigationController->GetSlice()->SetSteps( m_Slices );

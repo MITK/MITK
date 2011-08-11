@@ -56,7 +56,7 @@ endif()
 # Testing
 #-----------------------------------------------------------------------------
 
-if(NOT standalone_build AND NOT WIN32)
+if(NOT standalone_build)
   # Test the plugin generator
   include(mitkTestPluginGenerator)
 endif()

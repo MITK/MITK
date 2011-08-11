@@ -27,7 +27,7 @@
 #include <QmitkStdMultiWidget.h>
 
 // Qt
-
+#include <QString>
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -60,18 +60,39 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
 
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
 
+    
+  }
+  
+  if ( m_DirectionRadios.empty() )
+  {
+   
+//    feed the vector with directionRadioButtons
+    m_DirectionRadios.insert(0, m_Controls->radioButton_directionRandom);
+    m_DirectionRadios.insert(1, m_Controls->radioButton_directionX);
+    m_DirectionRadios.insert(2, m_Controls->radioButton_directionY);
+    m_DirectionRadios.insert(3, m_Controls->radioButton_directionZ);
+    
   }
 }
 
 void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 {
-  MITK_INFO << "Generate Fibers";
   
-//  get selected item
-//  m_Controls->groupBox get selection of radioButtons
+// GET SELECTED FIBER DIRECTION
+  QStringter fibDirection;
+  QVector<QRadioButton*>::const_iterator i;
+  for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) {
+    
+    QRadioButton* rdbtn = *i;
+    if (rdbtn->isChecked()) {
+      fibDirection = rdbtn->objectName();
+      MITK_INFO << fibDirection.toStdString() << " is checked, safe it :-)" ;
+    } else {
+      MITK_INFO << fibDirection.toStdString() << " is NOT checked" ;
+    }
+  }
   
-  
-  
+
   
 }
 

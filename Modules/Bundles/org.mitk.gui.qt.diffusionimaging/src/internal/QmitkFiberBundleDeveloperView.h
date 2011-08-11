@@ -27,8 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorage.h>
 #include <mitkDataStorageSelection.h>
 
-
-
+// Qt
+#include <QVector>
+#include <QRadioButton>
 
 
 /*!
@@ -80,6 +81,10 @@ protected:
   //contains the selected FiberBundle
   mitk::DataNode::Pointer m_FiberBundleNode;
 
+//  radiobutton groups
+  QVector< QRadioButton* > m_DirectionRadios;
+  QVector< QRadioButton* > m_FARadios;
+  QVector< QRadioButton* > m_GARadios;
 
 };
 

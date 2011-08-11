@@ -70,7 +70,7 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
   MITK_INFO << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
-  m_ExtraFactories.push_back(CoreObjectFactoryBase::Pointer(factory));  
+  m_ExtraFactories.insert(CoreObjectFactoryBase::Pointer(factory));
 }
 
 void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
@@ -78,7 +78,7 @@ void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *fact
   MITK_INFO << "CoreObjectFactory: un-registering extra factory of type " << factory->GetNameOfClass();
   try
   {
-    m_ExtraFactories.remove(factory);
+    m_ExtraFactories.erase(factory);
   }
   catch( std::exception const& e)
   {
@@ -124,7 +124,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::PointSetGLMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
     (*it)->SetDefaultProperties(node);
   }
 }
@@ -161,7 +161,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
   mitk::Mapper::Pointer tmpMapper = NULL;
 
   // check whether extra factories provide mapper
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
     tmpMapper = (*it)->CreateMapper(node,id);
     if(tmpMapper.IsNotNull())
       newMapper = tmpMapper;
@@ -251,7 +251,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) 
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
   {
     aMap = (*it)->GetFileExtensionsMap();
     this->MergeFileExtensions(m_FileExtensionsMap, aMap);
@@ -369,7 +369,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
  */
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
   MultimapType aMap;
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) 
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
   {
     aMap = (*it)->GetSaveFileExtensionsMap();
     this->MergeFileExtensions(m_SaveFileExtensionsMap, aMap);
@@ -390,7 +390,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileEx
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
   FileWriterList allWriters = m_FileWriters;
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
     FileWriterList list2 = (*it)->GetFileWriters();
     allWriters.merge(list2);
   }

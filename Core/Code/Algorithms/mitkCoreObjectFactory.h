@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef COREOBJECTFACTORY_H_INCLUDED
 #define COREOBJECTFACTORY_H_INCLUDED
 
-#include <list>
+#include <set>
 
 #include "mitkCommon.h"
 #include "mitkCoreObjectFactoryBase.h"
@@ -48,8 +48,8 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
     void CreateFileExtensionsMap();
     void CreateSaveFileExtensions();
-    typedef std::list<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesList;
-    ExtraFactoriesList m_ExtraFactories;
+    typedef std::set<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesContainer;
+    ExtraFactoriesContainer m_ExtraFactories;
     static FileWriterList m_FileWriters;
     std::string m_FileExtensions;
     MultimapType m_FileExtensionsMap;

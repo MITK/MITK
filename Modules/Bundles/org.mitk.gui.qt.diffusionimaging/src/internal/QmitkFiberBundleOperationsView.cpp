@@ -798,7 +798,6 @@ void QmitkFiberBundleOperationsView::ActionDrawEllipseTriggered()
 
 
 
-
 }
 
 void QmitkFiberBundleOperationsView::Activated()

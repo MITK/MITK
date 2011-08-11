@@ -33,6 +33,8 @@ m_HelperLinesUpToDate(false),
 m_FeaturesUpToDate(false),
 m_FeaturesMTime( 0 )
 {
+
+
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   m_DisplaySize.first = 0.0;
@@ -52,8 +54,11 @@ mitk::PlanarFigure::~PlanarFigure()
 
 void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 {
-  this->SetGeometry( geometry );
-  m_Geometry2D = geometry;
+  if(m_Geometry2D != geometry)
+  {
+    this->SetGeometry( geometry );
+    m_Geometry2D = geometry;
+  }
 }
 
 
@@ -224,6 +229,7 @@ bool mitk::PlanarFigure::IsPreviewControlPointVisible()
 
 mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 {
+  int i = m_ControlPoints.size();
   if ( index < m_NumberOfControlPoints )
   {
     return m_ControlPoints.at( index );

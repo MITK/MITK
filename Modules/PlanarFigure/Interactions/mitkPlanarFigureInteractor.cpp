@@ -177,8 +177,10 @@ bool mitk::PlanarFigureInteractor
       }
       else
       {
-        ok = false;
-        break;
+        //ok = false;
+        //break;
+
+        planarFigure->SetGeometry2D(planarFigureGeometry);
       }
 
       // Extract point in 2D world coordinates (relative to Geometry2D of

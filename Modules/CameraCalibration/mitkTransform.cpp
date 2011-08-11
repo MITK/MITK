@@ -7,9 +7,19 @@
 #include <mitkCvMatFromVnlVector.h>
 namespace mitk
 {
+  // DO NOT CHANGE THE VALUES OF THESE CONSTANTS!!
+  const std::string Transform::UNKNOWN_TYPE = "UNKNOWN_TYPE";
+  const std::string Transform::CAMERA_EXTRINSICS = "CAMERA_EXTRINSICS";
+  const std::string Transform::ENDOSCOPE_SCOPE_TOOL = "ENDOSCOPE_SCOPE_TOOL";
+  const std::string Transform::ENDOSCOPE_CAM_TOOL = "ENDOSCOPE_CAM_TOOL";
+  const std::string Transform::CHESSBOARD_TOOL = "CHESSBOARD_TOOL";
+  const std::string Transform::POINTER_TOOL = "POINTER_TOOL";
+  const std::string Transform::POINTER_TO_CHESSBOARD_ORIGIN = "POINTER_TO_CHESSBOARD_ORIGIN";
+  const std::string Transform::POINTER_TO_CHESSBOARD_SUPPORTPOINT_X = "POINTER_TO_CHESSBOARD_SUPPORTPOINT_X";
+  const std::string Transform::POINTER_TO_CHESSBOARD_SUPPORTPOINT_Y = "POINTER_TO_CHESSBOARD_SUPPORTPOINT_Y";
 
   Transform::Transform()
-    : m_NavData(mitk::NavigationData::New())
+    : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )
   {
     vnl_matrix_fixed<mitk::ScalarType, 3, 3> rot;
     rot.set_identity();
@@ -17,7 +27,7 @@ namespace mitk
   }
 
   Transform::Transform(const mitk::NavigationData* nd)
-    : m_NavData(mitk::NavigationData::New())
+    : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )
   {
         m_NavData->Graft(nd);
   }
@@ -558,6 +568,7 @@ namespace mitk
     dataValid = m_NavData->IsDataValid();
     mitk::NavigationData::TimeStampType timestamp=0.0;
 
+    elem->SetAttribute("Type", m_Type);
     elem->SetDoubleAttribute("Time", timestamp);
     elem->SetDoubleAttribute("X", position[0]);
     elem->SetDoubleAttribute("Y", position[1]);
@@ -614,6 +625,8 @@ namespace mitk
     position.Fill(0.0);
     matrix.SetIdentity();
 
+    std::string type = Transform::UNKNOWN_TYPE;
+    elem->QueryStringAttribute("Type", &type);
     elem->QueryDoubleAttribute("Time",&timestamp);
 
     // position and orientation is mandatory!
@@ -676,6 +689,8 @@ namespace mitk
     nd->SetHasPosition(hasPosition);
 
     m_NavData = nd;
+    m_Type = type;
+
     this->Modified();
   }
 

@@ -116,9 +116,15 @@ function(func_test label build_dir)
   if (NOT TESTING_PARALLEL_LEVEL)
     set(TESTING_PARALLEL_LEVEL 8)
   endif()
+
+  if(label MATCHES "Unlabeled")
+    set(_include_label EXCLUDE_LABEL .*)
+  else()
+    set(_include_label INCLUDE_LABEL ${label})
+  endif()
   
   ctest_test(BUILD "${build_dir}"
-             INCLUDE_LABEL ${label}
+             ${_include_label}
              PARALLEL_LEVEL ${TESTING_PARALLEL_LEVEL}
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
              RETURN_VALUE res

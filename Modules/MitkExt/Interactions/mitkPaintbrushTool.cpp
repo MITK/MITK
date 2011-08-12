@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
@@ -211,12 +212,23 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( !SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) ) 
+  SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+
+  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+  if ( slice.IsNull() )
     return false;
     
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
-  image->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
+  if (affectedDimension != -1)
+  {
+    image->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
+  }
+  else
+  {
+    slice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
+  }
+
   MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
   MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
 
@@ -282,22 +294,40 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     contour->AddVertex( point );
   }
   
-  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
-  if ( slice.IsNull() ) 
-    return false;
 
   if (leftMouseButtonPressed)
   {
-
     FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
+
+    if (affectedDimension != -1) {
+      OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
+      slicewriter->SetInput( image );
+      slicewriter->SetCreateUndoInformation( true );
+      slicewriter->SetSliceImage( slice );
+      slicewriter->SetSliceDimension( affectedDimension );
+      slicewriter->SetSliceIndex( affectedSlice );
+      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+      slicewriter->Update();
+      if ( m_ToolManager->GetRememberContourPosition() )
+      {
+         this->AddContourmarker(positionEvent);
+      }
+    }
+    else {
+      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
+      slicewriter->SetInput( image );
+      slicewriter->SetCreateUndoInformation( false );
+      slicewriter->SetSliceImage( slice );
+      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
+      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+      slicewriter->Update();
+
+      if ( m_ToolManager->GetRememberContourPosition() )
+      {
+         this->AddContourmarker(positionEvent);
+      }
+
+    }
   }
 
   // visualize contour

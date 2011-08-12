@@ -51,7 +51,6 @@
          <property name="title">
           <string>Fiber Parameters</string>
          </property>
-<<<<<<< HEAD
          <layout class="QGridLayout" name="gridLayout_11">
           <item row="0" column="1">
            <widget class="QSpinBox" name="boxFiberNumbers">
@@ -74,27 +73,12 @@
              <font>
               <pointsize>11</pointsize>
              </font>
-=======
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="3" column="0">
-           <widget class="QRadioButton" name="radioButton_directionX">
-            <property name="text">
-             <string>along X direction</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QRadioButton" name="radioButton_directionRandom">
-            <property name="text">
-             <string>random</string>
->>>>>>> origin/bug-9031-helperbundle
             </property>
             <property name="text">
              <string>Points per Fiber</string>
             </property>
            </widget>
           </item>
-<<<<<<< HEAD
           <item row="0" column="0">
            <widget class="QLabel" name="labelFibersTotal">
             <property name="font">
@@ -102,16 +86,11 @@
               <pointsize>11</pointsize>
              </font>
             </property>
-=======
-          <item row="3" column="1">
-           <widget class="QRadioButton" name="radioButton_directionZ">
->>>>>>> origin/bug-9031-helperbundle
             <property name="text">
              <string>Number of Fibers</string>
             </property>
            </widget>
           </item>
-<<<<<<< HEAD
           <item row="1" column="1">
            <widget class="QSpinBox" name="boxPointsPerFiber">
             <property name="font">
@@ -142,29 +121,6 @@
              </size>
             </property>
            </spacer>
-=======
-          <item row="2" column="1">
-           <widget class="QRadioButton" name="radioButton_directionY">
-            <property name="text">
-             <string>along Y direction</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QSpinBox" name="boxFiberNumbers"/>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>#of FIbers</string>
-            </property>
-           </widget>
->>>>>>> origin/bug-9031-helperbundle
           </item>
          </layout>
          <zorder>groupBox</zorder>

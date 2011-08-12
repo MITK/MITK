@@ -90,10 +90,6 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     QRadioButton* rdbtn = *i;
     if (rdbtn->isChecked())
       fibDirection = rdbtn->objectName();
-    MITK_INFO << fibDirection.toStdString() << " is checked, safe it :-)" ;
-    
-    
-    
     
   }
   

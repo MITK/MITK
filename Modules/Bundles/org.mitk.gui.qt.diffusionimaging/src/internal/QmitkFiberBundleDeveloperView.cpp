@@ -29,7 +29,6 @@
 // Qt
 
 // VTK
-#include <vtkSmartPointer.h>
 #include <vtkPointSource.h>
 
 
@@ -94,6 +93,49 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   }
   
 } 
+
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
+{
+  vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
+  //todo
+  
+  
+  
+  return PDRandom;
+}
+
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionX()
+{
+  vtkSmartPointer<vtkPolyData> PDX = vtkSmartPointer<vtkPolyData>::New();
+  //todo
+  
+  
+  
+  return PDX;
+}
+
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionY()
+{
+  vtkSmartPointer<vtkPolyData> PDY = vtkSmartPointer<vtkPolyData>::New();
+  //todo
+  
+  
+  
+  return PDY;
+}
+
+
+vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionZ()
+{
+  vtkSmartPointer<vtkPolyData> PDZ = vtkSmartPointer<vtkPolyData>::New();
+  //todo
+  
+  
+  
+  return PDZ;
+}
+
+
 
 void QmitkFiberBundleDeveloperView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {

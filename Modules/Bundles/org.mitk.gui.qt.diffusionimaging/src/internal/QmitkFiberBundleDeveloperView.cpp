@@ -30,7 +30,8 @@
 
 // VTK
 #include <vtkPointSource.h>
-
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -115,18 +116,35 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
+  
+  int numOfFibers = m_Controls->boxFiberNumbers->value();
+  int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
+  int numOfPoints = numOfFibers * pntsPrFiber;
+  
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
   randomPoints->SetCenter(0.0, 0.0, 0.0);
-  randomPoints->SetNumberOfPoints(m_Controls->boxFiberNumbers->value() * m_Controls->boxPointsPerFiber->value());
-  randomPoints->SetRadius(m_Controls->boxPointsPerFiber->value());
+  randomPoints->SetNumberOfPoints(numOfPoints);
+  randomPoints->SetRadius(pntsPrFiber);
   randomPoints->Update();
   
   // Set vtkPolyLines
+  //create new cell
   // iterate through points
-  for (int i=0; i<randomPoints->GetNumberOfPoints(); ++i)
+  int lineId = 0;
+  for (int i=0; i<numOfPoints; i+=pntsPrFiber) // e.g. i eqals 0, 50, 100, etc.
   {
-    
+    if (i%m_Controls->boxFiberNumbers->value() == 0) 
+    {
+      MITK_INFO << "====== Start New LINE: =======" << ++lineId;
+      vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
+      
+      //fill the fiber with points
+      
+      
+    } else {
+      MITK_INFO << "LOGIC ERROR IN CREATING FIBERS...Check Values in QmitkFiberBundleDeveloperView.cpp";
+    }
     
   }
   

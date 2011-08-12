@@ -81,16 +81,35 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 {
   
   // GET SELECTED FIBER DIRECTION
-  QString fibDirection;
+  QString fibDirection; //stores the object_name of selected radiobutton 
   QVector<QRadioButton*>::const_iterator i;
   for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) 
   {
-    
     QRadioButton* rdbtn = *i;
     if (rdbtn->isChecked())
       fibDirection = rdbtn->objectName();
+  }
+  
+  vtkSmartPointer<vtkPolyData> FiberPD; // FiberPD stores the generated PolyData
+  if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
+    //    build polydata with random lines and fibers
+   FiberPD = GenerateVtkFibersRandom();
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
+    //    build polydata with XDirection fibers
+    FiberPD = GenerateVtkFibersDirectionX();
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
+    //    build polydata with YDirection fibers
+    FiberPD = GenerateVtkFibersDirectionY();
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
+    //    build polydata with ZDirection fibers
+    FiberPD = GenerateVtkFibersDirectionZ();
     
   }
+
+  
   
 } 
 

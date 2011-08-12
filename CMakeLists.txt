@@ -214,7 +214,7 @@ else()
 endif()
 
 # Generate Project.xml file expected by the CTest driver script
-mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${subproject_list}" ${MITK_USE_SUPERBUILD})
+mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} MITK "${subproject_list}" ${MITK_USE_SUPERBUILD})
 
 #-----------------------------------------------------------------------------
 # Superbuild script

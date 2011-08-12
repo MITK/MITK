@@ -121,6 +121,8 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
   int numOfPoints = numOfFibers * pntsPrFiber;
   
+  MITK_INFO << "Numer of Fibers: " << numOfFibers << "\nPoints per Fiber: " << pntsPrFiber << "\nPoints Total: " << numOfPoints; 
+  
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
   randomPoints->SetCenter(0.0, 0.0, 0.0);
@@ -132,20 +134,25 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   //create new cell
   // iterate through points
   int lineId = 0;
-  for (int i=0; i<numOfPoints; i+=pntsPrFiber) // e.g. i eqals 0, 50, 100, etc.
+  for (int i=0; i < numOfPoints; i+=pntsPrFiber) // e.g. i eqals 0, 50, 100, etc., I choose this cuz then its more easy to fill the lines with according points.
   {
-    if (i%m_Controls->boxFiberNumbers->value() == 0) 
+    if (i%pntsPrFiber == 0) 
     {
       MITK_INFO << "====== Start New LINE: =======" << ++lineId;
       vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
       
+      for (int pc = 0; pc < pntsPrFiber; ++pc) {
+        MITK_INFO << "feeding idx: " << pc << " with point id: " << pc+i;
+      }
+      
+      
       //fill the fiber with points
       
-      
+//    ================SHALL NEVER OCCUR=================
     } else {
       MITK_INFO << "LOGIC ERROR IN CREATING FIBERS...Check Values in QmitkFiberBundleDeveloperView.cpp";
     }
-    
+//    ===================================================     
   }
   
   

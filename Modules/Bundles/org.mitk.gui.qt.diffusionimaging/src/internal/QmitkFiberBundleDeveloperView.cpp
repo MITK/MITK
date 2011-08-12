@@ -116,8 +116,19 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
-  //todo
+  vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
+  randomPoints->SetCenter(0.0, 0.0, 0.0);
+  randomPoints->SetNumberOfPoints(m_Controls->boxFiberNumbers->value() * m_Controls->boxPointsPerFiber->value());
+  randomPoints->SetRadius(m_Controls->boxPointsPerFiber->value());
+  randomPoints->Update();
   
+  // Set vtkPolyLines
+  // iterate through points
+  for (int i=0; i<randomPoints->GetNumberOfPoints(); ++i)
+  {
+    
+    
+  }
   
   
   return PDRandom;

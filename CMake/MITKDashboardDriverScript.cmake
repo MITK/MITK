@@ -391,12 +391,13 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     
     if (WITH_DOCUMENTATION)
       message("----------- [ Build Documentation ] -----------")
+      set(ctest_use_launchers_orig ${CTEST_USE_LAUNCHERS})
       set(CTEST_USE_LAUNCHERS 0)
       # Build Documentation target
       set_property(GLOBAL PROPERTY SubProject Documentation)
       set_property(GLOBAL PROPERTY Label Documentation)
       func_build_target("doc" "${build_dir}")
-      set(CTEST_USE_LAUNCHERS 1)
+      set(CTEST_USE_LAUNCHERS ${ctest_use_launchers_orig})
     endif()
     
     set_property(GLOBAL PROPERTY SubProject SuperBuild)

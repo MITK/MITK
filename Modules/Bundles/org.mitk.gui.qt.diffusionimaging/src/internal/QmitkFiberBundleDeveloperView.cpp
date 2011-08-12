@@ -88,7 +88,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
       fibDirection = rdbtn->objectName();
       MITK_INFO << fibDirection.toStdString() << " is checked, safe it :-)" ;
     } else {
-      MITK_INFO << fibDirection.toStdString() << " is NOT checked" ;
+      MITK_INFO << fibDirection.toStdString() << " is NOT checked :(" ;
     }
   }
   

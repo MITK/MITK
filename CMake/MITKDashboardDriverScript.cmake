@@ -341,18 +341,18 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
       set_property(GLOBAL PROPERTY SubProject ${subproject})
       set_property(GLOBAL PROPERTY Label ${subproject})
-      message("----------- [ Build ${subproject} ] -----------")
-     
-      # Build target
-      func_build_target(${subproject} "${build_dir}")
+
+      if(subproject MATCHES "Unlabeled")
+        message("----------- [ Build All (Unlabeled) ] -----------")
+        # Build target
+        func_build_target("" "${build_dir}")
+      else()
+        message("----------- [ Build ${subproject} ] -----------")
+        # Build target
+        func_build_target(${subproject} "${build_dir}")
+      endif()
+
     endforeach()
-    
-    # Build the rest of the project
-    set_property(GLOBAL PROPERTY SubProject SuperBuild)
-    set_property(GLOBAL PROPERTY Label SuperBuild)
-    
-    message("----------- [ Build All ] -----------")
-    func_build_target("" "${build_dir}")
     
     # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
     file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)

@@ -199,6 +199,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
+  Unlabeled # special "subproject" catching all unlabeled targets and tests
   )
 
 # Configure CTestConfigSubProject.cmake that could be used by CTest scripts
@@ -449,7 +450,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-  if(NOT TARGET ${subproject})
+  if(NOT TARGET ${subproject} AND NOT subproject MATCHES "Unlabeled")
     add_custom_target(${subproject})
   endif()
 endforeach()

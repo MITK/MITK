@@ -116,9 +116,15 @@ function(func_test label build_dir)
   if (NOT TESTING_PARALLEL_LEVEL)
     set(TESTING_PARALLEL_LEVEL 8)
   endif()
+
+  if(label MATCHES "Unlabeled")
+    set(_include_label EXCLUDE_LABEL .*)
+  else()
+    set(_include_label INCLUDE_LABEL ${label})
+  endif()
   
   ctest_test(BUILD "${build_dir}"
-             INCLUDE_LABEL ${label}
+             ${_include_label}
              PARALLEL_LEVEL ${TESTING_PARALLEL_LEVEL}
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
              RETURN_VALUE res
@@ -341,18 +347,18 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
       set_property(GLOBAL PROPERTY SubProject ${subproject})
       set_property(GLOBAL PROPERTY Label ${subproject})
-      message("----------- [ Build ${subproject} ] -----------")
-     
-      # Build target
-      func_build_target(${subproject} "${build_dir}")
+
+      if(subproject MATCHES "Unlabeled")
+        message("----------- [ Build All (Unlabeled) ] -----------")
+        # Build target
+        func_build_target("" "${build_dir}")
+      else()
+        message("----------- [ Build ${subproject} ] -----------")
+        # Build target
+        func_build_target(${subproject} "${build_dir}")
+      endif()
+
     endforeach()
-    
-    # Build the rest of the project
-    set_property(GLOBAL PROPERTY SubProject SuperBuild)
-    set_property(GLOBAL PROPERTY Label SuperBuild)
-    
-    message("----------- [ Build All ] -----------")
-    func_build_target("" "${build_dir}")
     
     # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
     file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
@@ -385,12 +391,13 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     
     if (WITH_DOCUMENTATION)
       message("----------- [ Build Documentation ] -----------")
+      set(ctest_use_launchers_orig ${CTEST_USE_LAUNCHERS})
       set(CTEST_USE_LAUNCHERS 0)
       # Build Documentation target
       set_property(GLOBAL PROPERTY SubProject Documentation)
       set_property(GLOBAL PROPERTY Label Documentation)
       func_build_target("doc" "${build_dir}")
-      set(CTEST_USE_LAUNCHERS 1)
+      set(CTEST_USE_LAUNCHERS ${ctest_use_launchers_orig})
     endif()
     
     set_property(GLOBAL PROPERTY SubProject SuperBuild)

@@ -84,7 +84,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo( *(pixelType.GetTypeId()) );
+  imageIO->SetPixelTypeInfo( pixelType.GetTypeId() );
 
   if(pixelType.GetNumberOfComponents() > 1)
     imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());

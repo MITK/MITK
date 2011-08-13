@@ -60,7 +60,7 @@ BoundingObjectCutter::~BoundingObjectCutter()
 
 const std::type_info& BoundingObjectCutter::GetOutputPixelType() 
 {
-  return *this->GetInput()->GetPixelType().GetTypeId();
+  return this->GetInput()->GetPixelType().GetTypeId();
 }
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()

@@ -335,7 +335,7 @@ void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 
 const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType()
 {
-  return *this->GetInput()->GetPixelType().GetTypeId();
+  return this->GetInput()->GetPixelType().GetTypeId();
 }
 
 void mitk::AutoCropImageFilter::SetCroppingRegion(RegionType overrideRegion)

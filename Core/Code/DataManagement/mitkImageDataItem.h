@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGEDATAITEM_H
 
 #include "mitkCommon.h"
+#include <mitkIpPic.h>
 #include "mitkPixelType.h"
 
 class vtkImageData;

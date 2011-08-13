@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkSlicedData.h"
-#include "mitkPixelType.h"
+//#include "mitkPixelType.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
@@ -331,6 +331,9 @@ public:
       tmpDimensions[3]=tDim;
 
     // rough initialization of Image
+   // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
+
+
     Initialize(mitk::PixelType(typeid(typename itkImageType::PixelType)), 
       m_Dimension, 
       tmpDimensions,

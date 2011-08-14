@@ -33,12 +33,6 @@
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 
-//not needed
-//#include <vtkPolyDataMapper.h>
-//#include <vtkActor.h>
-//#include <vtkRenderer.h>
-//#include <vtkRenderWindowInteractor.h>
-//#include <vtkRenderWindow.h>
 
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
@@ -99,32 +93,33 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
       fibDirection = rdbtn->objectName();
   }
   
-  vtkSmartPointer<vtkPolyData> FiberPD; // FiberPD stores the generated PolyData
+  vtkSmartPointer<vtkPolyData> output; // FiberPD stores the generated PolyData
   if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
     //    build polydata with random lines and fibers
-    FiberPD = GenerateVtkFibersRandom();
+    output = GenerateVtkFibersRandom();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
     //    build polydata with XDirection fibers
-    FiberPD = GenerateVtkFibersDirectionX();
+    output = GenerateVtkFibersDirectionX();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
     //    build polydata with YDirection fibers
-    FiberPD = GenerateVtkFibersDirectionY();
+    output = GenerateVtkFibersDirectionY();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
     //    build polydata with ZDirection fibers
-    FiberPD = GenerateVtkFibersDirectionZ();
+    output = GenerateVtkFibersDirectionZ();
     
   }
   
+  //mitkFiberBundleX::New()
   
   
 } 
 
 
 /*
- * here we are using "dynamic" feeding of cell arrays
+ * Generate polydata of random fibers
  */
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
@@ -132,23 +127,23 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
   int numOfPoints = numOfFibers * pntsPrFiber;
   
-  MITK_INFO << "Numer of Fibers: " << numOfFibers << "\nPoints per Fiber: " << pntsPrFiber << "\nPoints Total: " << numOfPoints; 
-  
+  //  MITK_INFO << "Numer of Fibers: " << numOfFibers << "\nPoints per Fiber: " << pntsPrFiber << "\nPoints Total: " << numOfPoints; 
   
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
   randomPoints->SetCenter(0.0, 0.0, 0.0);
   randomPoints->SetNumberOfPoints(numOfPoints);
   randomPoints->SetRadius(pntsPrFiber);
   randomPoints->Update();
-
+  
   vtkPolyData* pntHost = randomPoints->GetOutput();
   vtkPoints* pnts = pntHost->GetPoints();
   
+  //===================================
   //checkpoint if requested amount of points equals generated amount
   if (numOfPoints != pnts->GetNumberOfPoints()) {
     MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS";
     return 0;
-  }  
+  }// ================================= 
   
   // Set Fibers
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
@@ -160,12 +155,12 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     {
       vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
       newFiber->GetPointIds()->SetNumberOfIds(pntsPrFiber);
-    
+      
       //      construct the fiber
       for (int pc = 0; pc < pntsPrFiber; ++pc) 
       {
         newFiber->GetPointIds()->SetId(pc, pc+i);
-        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
+//        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
       }
       
       linesCell->InsertNextCell(newFiber);
@@ -179,45 +174,62 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   }
   
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
+  PDRandom->SetPoints(pnts);
+  PDRandom->SetLines(linesCell);
   
   
-    PDRandom->SetPoints(pnts);
-    PDRandom->SetLines(linesCell);
-  
-//  // Setup actor and mapper
-//  vtkSmartPointer<vtkPolyDataMapper> mapper = 
-//  vtkSmartPointer<vtkPolyDataMapper>::New();
-//  mapper->SetInput(polyData);
-//  
-//  vtkSmartPointer<vtkActor> actor = 
-//  vtkSmartPointer<vtkActor>::New();
-//  actor->SetMapper(mapper);
-//  
-//  // Setup render window, renderer, and interactor
-//  vtkSmartPointer<vtkRenderer> renderer = 
-//  vtkSmartPointer<vtkRenderer>::New();
-//  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-//  vtkSmartPointer<vtkRenderWindow>::New();
-//  renderWindow->AddRenderer(renderer);
-//  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = 
-//  vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//  renderWindowInteractor->SetRenderWindow(renderWindow);
-//  renderer->AddActor(actor);
-//  
-//  renderWindow->Render();
-//  renderWindowInteractor->Start();
-//  
   return PDRandom;
 }
 
 
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionX()
 {
-  vtkSmartPointer<vtkPolyData> PDX = vtkSmartPointer<vtkPolyData>::New();
-  //todo
+  int numOfFibers = m_Controls->boxFiberNumbers->value();
+  int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
+  int numOfPoints = numOfFibers * pntsPrFiber;
+  
+  vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  
+  //insert Origin point, this point has index 0 in point array
+  double originX = 0.0;
+  double originY = 0.0;
+  double originZ = 0.0;
+  
+  //after each iteration the origin of the new fiber increases
+  //here you set which direction is affected
+  double increaseX = 0.0;
+  double increaseY = 1.0;
+  double increaseZ = 0.0;
+  
+  //walk along X axis
+  //length of fibers increases in each iteration
+  for (int i=0; i<numOfFibers; ++i) {
+    
+    //insert origin point of new fiber
+    points->InsertNextPoint(originX + (double)i * increaseX , originY + (double)i * increaseY, originZ + (double)i * increaseZ);
+    
+    MITK_INFO << i << ": OP " << points->GetPoint(points->GetNumberOfPoints()-1)[0] << " " << points->GetPoint(points->GetNumberOfPoints()-1)[1] << " " << points->GetPoint(points->GetNumberOfPoints()-1)[2];
+    
+    
+    //insert remaining points for fiber
+    for (int pj=0; pj<=i ; ++pj) 
+    { //generate next point
+      points->InsertNextPoint( originX + (double)pj+1 * increaseX , originY + (double)pj+1 * increaseY, originZ + (double)pj+1 * increaseZ );
+
+      
+    }
+        
+    vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
+    newFiber->GetPointIds()->SetNumberOfIds(i+2);
+    newFiber->GetPointIds()->SetId(0,0);
+    
+    
+    linesCell->InsertNextCell(newFiber);
+  }
   
   
-  
+  vtkSmartPointer<vtkPolyData> PDX = vtkSmartPointer<vtkPolyData>::New(); 
   return PDX;
 }
 

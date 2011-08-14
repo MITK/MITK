@@ -113,6 +113,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   }
   
   //mitkFiberBundleX::New()
+  //write to dataStorage
   
   
 } 
@@ -160,7 +161,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
       for (int pc = 0; pc < pntsPrFiber; ++pc) 
       {
         newFiber->GetPointIds()->SetId(pc, pc+i);
-//        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
+        //        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
       }
       
       linesCell->InsertNextCell(newFiber);
@@ -184,10 +185,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
 
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionX()
 {
-  int numOfFibers = m_Controls->boxFiberNumbers->value();
-  int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
-  int numOfPoints = numOfFibers * pntsPrFiber;
-  
+  int numOfFibers = m_Controls->boxFiberNumbers->value();  
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   
@@ -197,39 +195,38 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
   double originZ = 0.0;
   
   //after each iteration the origin of the new fiber increases
-  //here you set which direction is affected
+  //here you set which direction is affected.
   double increaseX = 0.0;
   double increaseY = 1.0;
   double increaseZ = 0.0;
+  
   
   //walk along X axis
   //length of fibers increases in each iteration
   for (int i=0; i<numOfFibers; ++i) {
     
-    //insert origin point of new fiber
-    points->InsertNextPoint(originX + (double)i * increaseX , originY + (double)i * increaseY, originZ + (double)i * increaseZ);
-    
-    MITK_INFO << i << ": OP " << points->GetPoint(points->GetNumberOfPoints()-1)[0] << " " << points->GetPoint(points->GetNumberOfPoints()-1)[1] << " " << points->GetPoint(points->GetNumberOfPoints()-1)[2];
-    
-    
-    //insert remaining points for fiber
-    for (int pj=0; pj<=i ; ++pj) 
-    { //generate next point
-      points->InsertNextPoint( originX + (double)pj+1 * increaseX , originY + (double)pj+1 * increaseY, originZ + (double)pj+1 * increaseZ );
-
-      
-    }
-        
     vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
     newFiber->GetPointIds()->SetNumberOfIds(i+2);
-    newFiber->GetPointIds()->SetId(0,0);
     
+    //create starting point and add it to pointset
+    points->InsertNextPoint(originX + (double)i * increaseX , originY + (double)i * increaseY, originZ + (double)i * increaseZ);
+    
+    //add starting point to fiber
+    newFiber->GetPointIds()->SetId(0,points->GetNumberOfPoints()-1);
+
+    //insert remaining points for fiber
+    for (int pj=0; pj<=i ; ++pj) 
+    { //generate next point on X axis
+      points->InsertNextPoint( originX + (double)pj+1 , originY + (double)i * increaseY, originZ + (double)i * increaseZ );
+      newFiber->GetPointIds()->SetId(pj+1,points->GetNumberOfPoints()-1);
+    }
     
     linesCell->InsertNextCell(newFiber);
   }
   
-  
   vtkSmartPointer<vtkPolyData> PDX = vtkSmartPointer<vtkPolyData>::New(); 
+  PDX->SetPoints(points);
+  PDX->SetLines(linesCell);
   return PDX;
 }
 

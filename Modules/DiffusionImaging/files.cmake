@@ -49,6 +49,15 @@ SET(CPP_FILES
   IODataStructures/FiberBundle/mitkParticle.cpp
   IODataStructures/FiberBundle/mitkParticleGrid.cpp
 
+# DataStructures -> FiberBundleX
+  IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
+
+
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 

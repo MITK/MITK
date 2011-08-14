@@ -34,11 +34,11 @@
 #include <vtkCellArray.h>
 
 //not needed
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRenderWindow.h>
+//#include <vtkPolyDataMapper.h>
+//#include <vtkActor.h>
+//#include <vtkRenderer.h>
+//#include <vtkRenderWindowInteractor.h>
+//#include <vtkRenderWindow.h>
 
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
@@ -142,18 +142,15 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   randomPoints->Update();
 
   vtkPolyData* pntHost = randomPoints->GetOutput();
-  //convert pointsourcce to vtkpoints
-//   BIG TO DO ... 
-  vtkSmartPointer<vtkPoints> pointArray = vtkSmartPointer<vtkPoints>::New();
-  pointArray->SetNumberOfPoints(numOfPoints);
+  vtkPoints* pnts = pntHost->GetPoints();
   
-//  for(int j=0; j<numOfPoints ;++j)
-//  {
-//    pointArray->SetPoint(j, randomPoints->)
-//  }
+  //checkpoint if requested amount of points equals generated amount
+  if (numOfPoints != pnts->GetNumberOfPoints()) {
+    MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS";
+    return 0;
+  }  
   
-  // Set vtkPolyLines
-  //create new cell
+  // Set Fibers
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
   
   // iterate through points
@@ -163,11 +160,12 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     {
       vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
       newFiber->GetPointIds()->SetNumberOfIds(pntsPrFiber);
-      
+    
       //      construct the fiber
       for (int pc = 0; pc < pntsPrFiber; ++pc) 
       {
-        newFiber->GetPointIds()->SetId(pc, pc+1);
+        newFiber->GetPointIds()->SetId(pc, pc+i);
+        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
       }
       
       linesCell->InsertNextCell(newFiber);
@@ -183,7 +181,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   
   
-//    PDRandom->SetPoints(randomPoints->GetOutputPort());
+    PDRandom->SetPoints(pnts);
     PDRandom->SetLines(linesCell);
   
 //  // Setup actor and mapper

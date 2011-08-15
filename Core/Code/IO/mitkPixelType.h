@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
 #include "mitkCommon.h"
-//#include <mitkIpPic.h>
+#include "mitkPixelTypeTraits.h"
 
 #include <typeinfo>
 #include <string>
@@ -188,10 +188,29 @@ PixelType MakePixelType()
                    );
 }
 
-template< typename ItkImageType >
+template< typename ItkImageType>
 PixelType MakePixelType()
 {
+  // define new type, since the ::PixelType is used to distinguish between simple and compound types
+  typedef typename ItkImageType::PixelType ImportPixelType;
 
+  // get the component type ( is either directly ImportPixelType or ImportPixelType::ValueType for compound types )
+  typedef typename GetComponentType<ImportPixelType>::ComponentType ComponentT;
+
+  // FIXME The PixelType is the same as the ComponentT for simple types
+  typedef typename ItkImageType::PixelType PixelT;
+
+  // Get the length of compound type ( initialized to 1 for simple types and variable-length vector images)
+  size_t numComp = ComponentsTrait<
+    (isPrimitiveType<PixelT>::value || isVectorImage<PixelT, ComponentT>::value), ItkImageType >::Size;
+
+  // call the constructor
+  return PixelType(
+            typeid(ComponentT), typeid(PixelT),
+            sizeof(ComponentT), numComp,
+            ComponentTypeToString<ComponentT>(),
+            PixelTypeToString<PixelT >()
+         );
 }
 
 

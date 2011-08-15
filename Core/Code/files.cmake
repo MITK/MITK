@@ -52,6 +52,8 @@ SET(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
 
+  IO/mitkPixelTypeTraits.h
+
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
 )

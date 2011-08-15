@@ -51,6 +51,7 @@ SET(CPP_FILES
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
+  Controllers/mitkSurfaceInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp

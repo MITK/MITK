@@ -277,6 +277,11 @@ void QmitkImageCropper::CropImage()
   cutter->SetInput( m_ImageToCrop );
   cutter->AutoOutsideValueOff();
 
+  if (m_Controls->m_EnableSurroundingCheckBox->isChecked())
+  {
+    cutter->SetOutsideValue(m_Controls->m_SurroundingSpin->value());
+  }
+
   // do the actual cutting
   try
   {
@@ -296,12 +301,6 @@ void QmitkImageCropper::CropImage()
   // cutting successful
   mitk::Image::Pointer resultImage = cutter->GetOutput();
   resultImage->DisconnectPipeline();
-
-  if(m_Controls->m_EnableSurroundingCheckBox->isChecked())
-  {
-    AccessByItk_1( resultImage, AddSurrounding, resultImage);
-    resultImage = m_surrImage;
-  }
 
   RemoveBoundingObjectFromNode();
 
@@ -325,70 +324,6 @@ void QmitkImageCropper::CropImage()
 
   m_Controls->m_NewBoxButton->setEnabled(true);
   m_Controls->btnCrop->setEnabled(false);
-}
-
-template < typename TPixel, unsigned int VImageDimension >
-void QmitkImageCropper::AddSurrounding( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image::Pointer image)
-{
-  typedef itk::Image< TPixel, VImageDimension > InputImageType;
-
-  typename InputImageType::Pointer extended = InputImageType::New();
-  typename InputImageType::IndexType start;
-  start[0]=0;
-  start[1]=0;
-  start[2]=0;
-
-  unsigned int *dims = image->GetDimensions();
-  typename InputImageType::SizeType size;
-
-  size[0]=dims[0];
-  size[1]=dims[1];
-  size[2]=dims[2];
-
-  typename InputImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
-
-  extended->SetRegions(region);
-  extended->SetDirection(itkImage->GetDirection());
-  extended->SetOrigin(itkImage->GetOrigin());
-  extended->Allocate();
-
-  extended->SetSpacing(itkImage->GetSpacing());
-
-  typename InputImageType::IndexType idx;
-
-  progress = new QProgressDialog( "Adding surrounding...", "Abort", 0, (size[0]-1), m_Parent);
-  progress->setLabelText("Image cropper");
-  progress->show();
-
-  for (unsigned int i=0;i<size[0];i++)
-  {
-    for (unsigned int j=0;j<size[1];j++)
-    {
-      for (unsigned int k=0;k<size[2];k++)
-      {
-        idx[0]=i;
-        idx[1]=j;
-        idx[2]=k;
-
-        if(i==0 || j==0 || k==0 || i==size[0]-1 || j==size[1]-1 || k==size[2]-1)
-        {
-          extended->SetPixel(idx, m_Controls->m_SurroundingSpin->value());
-        }
-        else
-        {
-          extended->SetPixel(idx, itkImage->GetPixel(idx));
-        }
-      }
-    }
-    progress->setValue(i);
-    if ( progress->wasCanceled() )
-      break;
-  }
-  m_surrImage = mitk::Image::New();
-  m_surrImage = mitk::ImportItkImage(extended);
-
 }
 
 void QmitkImageCropper::CreateBoundingObject()

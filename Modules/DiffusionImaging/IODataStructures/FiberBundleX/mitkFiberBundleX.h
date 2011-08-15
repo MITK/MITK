@@ -44,19 +44,32 @@ namespace mitk {
     ContainerPointType, ContainerTractType, ContainerType */
     friend class FiberBundleXWriter;
     friend class FiberBundleXReader;
-    //    friend class itkTractsToDWIImageFilter;
 
-
-
-    // virtual methods that need to be implemented
+    
+    // ======virtual methods must have======
     virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
     virtual void SetRequestedRegion( itk::DataObject *data );
-
+    //=======================================
+    
     mitkClassMacro( FiberBundleX, BaseData );
     itkNewMacro( Self );
+
+    //    import fiber result from tractography algorithms
+    void SetFibers(vtkSmartPointer<vtkPolyData>);
+    
+    //    return original computed fibers ... actually there is no smartpointer needed because original fibers are passed from the tractography filter
+    vtkPolyData* GetOriginalFibers();
+    
+    //    return processed fibers
+    vtkPolyData* GetFibers();
+    
+    //    return vertex polydata
+    vtkPolyData* GetVertices();
+    
+    void DoColorCodingOrientationbased();
 
 
   protected:
@@ -64,15 +77,18 @@ namespace mitk {
     virtual ~FiberBundleX();
 
   private:
-
-//      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
-//      FiberPolyData stores all brain fibers using polylines (in world coordinates)
-      vtkSmartPointer<vtkPolyData> m_FiberPolyData;
-
-//      VertexPolyData stores all original points as vertices computed by tracking algorithms
-      vtkSmartPointer<vtkPolyData> m_VertexPolyData;
-      vtkSmartPointer<vtkPoints>   m_Particles;
-
+    //      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
+    //      FiberPolyData stores all brain fibers using polylines (in world coordinates)
+    //    this variable hosts the original fiber data
+    vtkSmartPointer<vtkPolyData> m_FiberPolyData;  
+    
+    //    this variable hosts the smoothed fiber data, no smartpointer needed
+    vtkPolyData* m_OriginalFiberPolyData;
+    
+    //    VertexPolyData stores all original points as vertices computed by tracking algorithms
+    vtkSmartPointer<vtkPolyData> m_VertexPolyData;
+    
+    
   };
 
 } // namespace mitk

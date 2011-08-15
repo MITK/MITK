@@ -33,9 +33,59 @@ mitk::FiberBundleX::~FiberBundleX()
 
 }
 
+/* === main input method ====
+ * set computed fibers from tractography algorithms
+ */
+void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
+{
+  m_OriginalFiberPolyData = fiberPD;
+}
+
+ 
+/* === main output method ===
+ * return fiberbundle as vtkPolyData
+ * Depending on processing of input fibers, this method returns
+ * the latest processed fibers.
+ */
+vtkPolyData* mitk::FiberBundleX::GetFibers()
+{
+  vtkPolyData* returningFibers = m_FiberPolyData;
+  
+  if (returningFibers == NULL) {
+    returningFibers = m_OriginalFiberPolyData;
+  }
+  
+  return returningFibers;
+}
+
+/*
+ * return original set of fiberdata
+ */
+vtkPolyData* mitk::FiberBundleX::GetOriginalFibers()
+{
+  return m_OriginalFiberPolyData;
+}
 
 
-/* NECESSARY IMPLEMENTATION OF SUPERCLASS METHODS */
+/*=================================
+ *++++ PROCESSING OF FIBERS +++++++
+ ================================*/
+
+void mitk::FiberBundleX::DoColorCodingOrientationbased()
+{
+  vtkPolyData* fiberSource; //this variable provides the source where operations process on
+  if (m_FiberPolyData.GetPointer() == NULL) {
+    fiberSource = m_OriginalFiberPolyData;
+    vtkSmartPointer<vtkPolyData> m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+  } else {
+    fiberSource = m_FiberPolyData;
+  }
+  
+  
+}
+
+
+/* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()
 {
 

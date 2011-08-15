@@ -119,6 +119,7 @@ protected slots:
   void TubeRadiusChanged(int);
 
   void Heatmap();
+  void Welcome();
 
 protected:
 

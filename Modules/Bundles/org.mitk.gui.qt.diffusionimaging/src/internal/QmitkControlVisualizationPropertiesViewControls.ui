@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>432</width>
-    <height>300</height>
+    <height>375</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -791,6 +791,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QToolButton" name="m_Welcome">
+     <property name="text">
+      <string>Show Welcome Screen</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

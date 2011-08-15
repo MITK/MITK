@@ -709,6 +709,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
     connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
 
+    connect((QObject*) m_Controls->m_Welcome, SIGNAL(clicked()), (QObject*) this, SLOT(Welcome()));
+
   }
 }
 
@@ -1549,4 +1551,10 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
   QString label = "Radius %1";
   label = label.arg(r / 100.0);
   m_Controls->label_tuberadius->setText(label);
+}
+
+void QmitkControlVisualizationPropertiesView::Welcome()
+{
+  berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
+   GetSite()->GetWorkbenchWindow(), false);
 }

@@ -40,6 +40,10 @@ namespace mitk {
   {
   public:
 
+    // names of certain arrays (e.g colorcodings, etc.) 
+    static const char* COLORCODING_ORIENTATION_BASED;
+    static const char* COLORCODING_FA_BASED;
+    
     /* friend classes wanna access typedefs
     ContainerPointType, ContainerTractType, ContainerType */
     friend class FiberBundleXWriter;

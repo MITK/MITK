@@ -110,6 +110,7 @@ SET(CPP_FILES
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
+  DataManagement/mitkChannelDescriptor.cpp
   DataManagement/mitkColorProperty.cpp
   DataManagement/mitkDataStorage.cpp
   #DataManagement/mitkDataTree.cpp
@@ -124,6 +125,7 @@ SET(CPP_FILES
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
   DataManagement/mitkImageDataItem.cpp
+  DataManagement/mitkImageDescriptor.cpp
   DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp

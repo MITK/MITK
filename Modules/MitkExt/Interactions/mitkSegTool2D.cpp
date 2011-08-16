@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 //Include of the new ImageExtractor
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 #include "mitkPlanarCircle.h"
+#include "mitkOverwriteSliceImageFilter.h"
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
 
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
@@ -226,6 +228,49 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
   if ( !referenceImage ) return NULL;
   
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
+}
+
+void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* positionEvent, Image* slice)
+{
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+
+  int affectedDimension( -1 );
+  int affectedSlice( -1 );
+  DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+
+  //TODO hier die 3D Interpolation integrieren
+  if (affectedDimension != -1) {
+    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
+    slicewriter->SetInput( image );
+    slicewriter->SetCreateUndoInformation( true );
+    slicewriter->SetSliceImage( slice );
+    slicewriter->SetSliceDimension( affectedDimension );
+    slicewriter->SetSliceIndex( affectedSlice );
+    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+    slicewriter->Update();
+    if ( m_ToolManager->GetRememberContourPosition() )
+    {
+      this->AddContourmarker(positionEvent);
+    }
+  }
+  else {
+    OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
+    slicewriter->SetInput( image );
+    slicewriter->SetCreateUndoInformation( false );
+    slicewriter->SetSliceImage( slice );
+    slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
+    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+    slicewriter->Update();
+
+    if ( m_ToolManager->GetRememberContourPosition() )
+    {
+      this->AddContourmarker(positionEvent);
+    }
+
+  }
 }
 
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )

@@ -210,9 +210,9 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   if ( !image || !planeGeometry ) 
     return false;
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+  //int affectedDimension( -1 );
+  //int affectedSlice( -1 );
+  //SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
 
   Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
   if ( slice.IsNull() )
@@ -220,47 +220,47 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
-  if (affectedDimension != -1)
+ /* if (affectedDimension != -1)
   {
     image->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
   }
   else
-  {
+  {*/
     slice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
-  }
+  //}
 
   MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
   MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
 
-  unsigned int firstDimension(0);
-  unsigned int secondDimension(1);
-  switch( affectedDimension )
-  {
-    case 2: // transversal
-    default:
-      firstDimension = 0;
-      secondDimension = 1;
-      break;
-    case 1: // frontal
-      firstDimension = 0;
-      secondDimension = 2;
-      break;
-    case 0: // sagittal
-      firstDimension = 1;
-      secondDimension = 2;
-      break;
-  }
+  //unsigned int firstDimension(0);
+  //unsigned int secondDimension(1);
+  //switch( affectedDimension )
+  //{
+  //  case 2: // transversal
+  //  default:
+  //    firstDimension = 0;
+  //    secondDimension = 1;
+  //    break;
+  //  case 1: // frontal
+  //    firstDimension = 0;
+  //    secondDimension = 2;
+  //    break;
+  //  case 0: // sagittal
+  //    firstDimension = 1;
+  //    secondDimension = 2;
+  //    break;
+  //}
 
   // round to nearest voxel center (abort if this hasn't changed)
   if ( m_Size % 2 == 0 ) // even
   {
-    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension] + 0.5);
-    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] + 0.5 );
+    indexCoordinates[0] = ROUND( indexCoordinates[0] /*+ 0.5*/);
+    indexCoordinates[1] = ROUND( indexCoordinates[1] /*+ 0.5*/ );
   }
   else // odd
   {
-    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension]  ) ;
-    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] ) ;
+    indexCoordinates[0] = ROUND( indexCoordinates[0]  ) ;
+    indexCoordinates[1] = ROUND( indexCoordinates[1] ) ;
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
@@ -287,8 +287,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
   {
     Point3D point = m_MasterContour->GetPoints()->ElementAt(index);
-    point[0] += indexCoordinates[ firstDimension ];
-    point[1] += indexCoordinates[ secondDimension ];
+    point[0] += indexCoordinates[ 0 ];
+    point[1] += indexCoordinates[ 1 ];
 
     MITK_DEBUG << "Contour point [" << index << "] :" << point;
     contour->AddVertex( point );
@@ -299,7 +299,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   {
     FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
 
-    if (affectedDimension != -1) {
+    /*if (affectedDimension != -1) {
       OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
       slicewriter->SetInput( image );
       slicewriter->SetCreateUndoInformation( true );
@@ -325,9 +325,10 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
       if ( m_ToolManager->GetRememberContourPosition() )
       {
          this->AddContourmarker(positionEvent);
-      }
+      }*/
+    this->WriteBackSegmentationResult(positionEvent, slice);
 
-    }
+    //}
   }
 
   // visualize contour

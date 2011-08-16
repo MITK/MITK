@@ -33,23 +33,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnsignedLongArray.h>
 #include <vtkUnsignedShortArray.h>
 
-#include "ipFunc/mitkIpFunc.h"
 
-mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data, bool manageMemory, size_t offset) :
-  m_Data(NULL), m_ManageMemory(false), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
+mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc, unsigned int dimension, void *data, bool manageMemory, size_t offset) :
+  m_Data(NULL), m_ManageMemory(false), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
   m_Parent(&aParent)
 {
   m_PixelType = aParent.GetPixelType();
-  m_PicDescriptor=mitkIpPicNew();
-  m_PicDescriptor->bpe=m_PixelType.GetSize() * 8;
-  // FIXME
-  m_PicDescriptor->type=mitkIpPicUInt;
-  m_PicDescriptor->dim=dimension;
-  memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(mitkIpUInt4_t)*_mitkIpPicNDIM);
-  m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
-  mitkIpFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
+  m_Data = static_cast<unsigned char*>(aParent.GetData())+offset;
 
-  m_Size = _mitkIpPicSize(m_PicDescriptor);
+  // compute size
+  const unsigned int *dims = desc->GetDimensions();
+  m_Dimension = dimension;
+  for( unsigned int i=0; i<dimension; i++)
+    m_Dimensions[i] = dims[i];
+
+  this->ComputeItemSize(dims,dimension);
+
   if(data != NULL)
   {
     memcpy(m_Data, data, m_Size);
@@ -68,11 +67,6 @@ mitk::ImageDataItem::~ImageDataItem()
 {
   if(m_VtkImageData!=NULL)
     m_VtkImageData->Delete();
-  if(m_PicDescriptor!=NULL)
-  {
-    m_PicDescriptor->data=NULL;
-    mitkIpPicFree(m_PicDescriptor);
-  }
   if(m_Parent.IsNull())
   {
     if(m_ManageMemory)
@@ -80,28 +74,35 @@ mitk::ImageDataItem::~ImageDataItem()
   }
 }
 
+mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory)
+  : m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0)
+{
+  m_PixelType = desc->GetChannelDescriptor(0)->GetPixelType();
+
+  // compute size
+  const unsigned int *dimensions = desc->GetDimensions();
+
+  m_Dimension = desc->GetNumberOfDimensions();
+  for( unsigned int i=0; i<m_Dimension; i++)
+    m_Dimensions[i] = dimensions[i];
+
+  this->ComputeItemSize(dimensions, m_Dimension );
+
+}
+
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) :
-  m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0),
+  m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0),
   m_Parent(NULL)
 {
-  //const std::type_info & typeId=*type.GetTypeId();
   m_PixelType = type;
-  m_PicDescriptor=mitkIpPicNew();
-  m_PicDescriptor->bpe=m_PixelType.GetSize() * 8;
-  // FIXME
-  m_PicDescriptor->type=mitkIpPicUInt;
-  m_PicDescriptor->dim=dimension;
-  memcpy(m_PicDescriptor->n, dimensions, sizeof(mitkIpUInt4_t)*(dimension<=_mitkIpPicNDIM?dimension:_mitkIpPicNDIM));
-  unsigned char i;
-  for(i=dimension; i < _mitkIpPicNDIM; ++i)
-    m_PicDescriptor->n[i] = 1;
-  m_Size = _mitkIpPicSize(m_PicDescriptor);
+
+  this->ComputeItemSize(dimensions, dimension);
+
   if(m_Data == NULL)
   {
     m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
     m_ManageMemory = true;
   }
-  m_PicDescriptor->data=m_Data;
 
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
@@ -115,32 +116,44 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
 
 }
 
+void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
+{
+  m_Size = m_PixelType.GetSize();
+  for( unsigned int i=0; i<dimension; i++)
+  {
+    m_Size *= *(dimensions+i);
+  }
+}
+
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
   vtkImageData *inData = vtkImageData::New();
   vtkDataArray *scalars = NULL;
 
+  const unsigned int *dims = m_Dimensions;
+  const unsigned int dim = m_Dimension;
+
   unsigned long size = 0;
-  if ( m_PicDescriptor->dim == 1 )
+  if ( dim == 1 )
   {
-    inData->SetDimensions( m_PicDescriptor->n[0] -1, 1, 1);
-    size = m_PicDescriptor->n[0];
-    inData->SetOrigin( ((float) m_PicDescriptor->n[0]) / 2.0f, 0, 0 );
+    inData->SetDimensions( dims[0] -1, 1, 1);
+    size = dims[0];
+    inData->SetOrigin( ((float) dims[0]) / 2.0f, 0, 0 );
   }
   else
-  if ( m_PicDescriptor->dim == 2 )
+  if ( dim == 2 )
   {
-    inData->SetDimensions( m_PicDescriptor->n[0] , m_PicDescriptor->n[1] , 1 );
-    size = m_PicDescriptor->n[0] * m_PicDescriptor->n[1];
-    inData->SetOrigin( ((float) m_PicDescriptor->n[0]) / 2.0f, ((float) m_PicDescriptor->n[1]) / 2.0f, 0 );
+    inData->SetDimensions( dims[0] , dims[1] , 1 );
+    size = dims[0] * dims[1];
+    inData->SetOrigin( ((float) dims[0]) / 2.0f, ((float) dims[1]) / 2.0f, 0 );
   }
   else
-  if ( m_PicDescriptor->dim >= 3 )
+  if ( dim >= 3 )
   {
-    inData->SetDimensions( m_PicDescriptor->n[0], m_PicDescriptor->n[1], m_PicDescriptor->n[2] );
-    size = m_PicDescriptor->n[0] * m_PicDescriptor->n[1] * m_PicDescriptor->n[2];
+    inData->SetDimensions( dims[0], dims[1], dims[2] );
+    size = dims[0] * dims[1] * dims[2];
     // Test
-    //inData->SetOrigin( (float) m_PicDescriptor->n[0] / 2.0f, (float) m_PicDescriptor->n[1] / 2.0f, (float) m_PicDescriptor->n[2] / 2.0f );
+    //inData->SetOrigin( (float) dims[0] / 2.0f, (float) dims[1] / 2.0f, (float) dims[2] / 2.0f );
     inData->SetOrigin( 0, 0, 0 );
   }
   else
@@ -217,7 +230,7 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
   // allocate the new scalars
   scalars->SetNumberOfComponents(m_VtkImageData->GetNumberOfScalarComponents());
 
-  scalars->SetVoidArray(m_PicDescriptor->data, _mitkIpPicElements(m_PicDescriptor)*m_VtkImageData->GetNumberOfScalarComponents(), 1);
+  scalars->SetVoidArray(m_Data, size * m_VtkImageData->GetNumberOfScalarComponents(), 1);
 
   m_VtkImageData->GetPointData()->SetScalars(scalars);
   scalars->Delete();

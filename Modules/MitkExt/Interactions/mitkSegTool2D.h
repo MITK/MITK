@@ -102,6 +102,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
+    void WriteBackSegmentationResult (const PositionEvent*, Image*);
+
     /**
       \brief Adds a new node called @a contourmarker which holds a mitk::PlanarFigure. By selecting this node the slices will be oriented according to the planarGeometry
     */

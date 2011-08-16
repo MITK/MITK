@@ -79,6 +79,9 @@ class MitkExt_EXPORT PaintbrushTool : public FeedbackContourTool
     Contour::Pointer m_MasterContour;
 
     int m_LastContourSize;
+
+    Image::Pointer m_WorkingSlice;
+    PlaneGeometry::Pointer m_CurrentPlane;
 };
 
 } // namespace

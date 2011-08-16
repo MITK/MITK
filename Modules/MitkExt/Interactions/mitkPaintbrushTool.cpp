@@ -221,54 +221,14 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     MITK_INFO<<"Getting Workingslice";
 
   }
-  /*DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
-
-  Image* image = dynamic_cast<Image*>(workingNode->GetData());*/
-  //if ( !image || !planeGeometry ) 
-  //  return false;
-
-  //int affectedDimension( -1 );
-  //int affectedSlice( -1 );
-  //SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
-
-  /*Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
-  if ( slice.IsNull() )
-    return false;*/
     
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
- /* if (affectedDimension != -1)
-  {
-    image->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
-  }
-  else
-  {*/
-    //slice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
+
   m_WorkingSlice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
-  //}
 
   MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
   MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
-
-  //unsigned int firstDimension(0);
-  //unsigned int secondDimension(1);
-  //switch( affectedDimension )
-  //{
-  //  case 2: // transversal
-  //  default:
-  //    firstDimension = 0;
-  //    secondDimension = 1;
-  //    break;
-  //  case 1: // frontal
-  //    firstDimension = 0;
-  //    secondDimension = 2;
-  //    break;
-  //  case 0: // sagittal
-  //    firstDimension = 1;
-  //    secondDimension = 2;
-  //    break;
-  //}
 
   // round to nearest voxel center (abort if this hasn't changed)
   if ( m_Size % 2 == 0 ) // even
@@ -318,36 +278,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   {
     FeedbackContourTool::FillContourInSlice( contour, m_WorkingSlice, m_PaintingPixelValue );
 
-    /*if (affectedDimension != -1) {
-      OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( true );
-      slicewriter->SetSliceImage( slice );
-      slicewriter->SetSliceDimension( affectedDimension );
-      slicewriter->SetSliceIndex( affectedSlice );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-      if ( m_ToolManager->GetRememberContourPosition() )
-      {
-         this->AddContourmarker(positionEvent);
-      }
-    }
-    else {
-      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( false );
-      slicewriter->SetSliceImage( slice );
-      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-
-      if ( m_ToolManager->GetRememberContourPosition() )
-      {
-         this->AddContourmarker(positionEvent);
-      }*/
     this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
 
-    //}
   }
 
   // visualize contour

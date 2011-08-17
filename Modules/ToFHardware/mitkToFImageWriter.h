@@ -52,6 +52,7 @@ namespace mitk
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
+    itkGetMacro( Extension, std::string );
     itkGetMacro( CaptureWidth, int );
     itkGetMacro( CaptureHeight, int );
     itkGetMacro( DistanceImageSelected, bool );
@@ -61,6 +62,7 @@ namespace mitk
     itkSetMacro( DistanceImageFileName, std::string );
     itkSetMacro( AmplitudeImageFileName, std::string );
     itkSetMacro( IntensityImageFileName, std::string );
+    itkSetMacro( Extension, std::string );
     itkSetMacro( CaptureWidth, int );
     itkSetMacro( CaptureHeight, int );
     itkSetMacro( DistanceImageSelected, bool );

@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <mitkPicFileReader.h>
 
+// itk includes
+#include "itksys/SystemTools.hxx"
+
 extern "C" 
 {
 size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
@@ -27,10 +30,12 @@ size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicF
 
 namespace mitk
 {
-  ToFImageWriter::ToFImageWriter():m_Extension(".pic"),m_DistanceOutfile(NULL),m_AmplitudeOutfile(NULL),
-  m_IntensityOutfile(NULL),m_NumOfFrames(0),m_MitkImage(NULL),m_DistanceImageSelected(true),
-  m_AmplitudeImageSelected(true),m_IntensityImageSelected(true),m_CaptureWidth(200),m_CaptureHeight(200), 
-  m_PixelNumber(0), m_ImageSizeInBytes(0), m_ToFImageType(ToFImageWriter::ToFImageType3D)
+  ToFImageWriter::ToFImageWriter():m_Extension(".nrrd"),m_DistanceOutfile(NULL),
+    m_AmplitudeOutfile(NULL),  m_IntensityOutfile(NULL),m_NumOfFrames(0),
+    m_MitkImage(NULL),m_DistanceImageSelected(true), m_AmplitudeImageSelected(true),
+    m_IntensityImageSelected(true),m_CaptureWidth(200),m_CaptureHeight(200), 
+    m_PixelNumber(0), m_ImageSizeInBytes(0), 
+    m_ToFImageType(ToFImageWriter::ToFImageType3D)
   {
   }
 
@@ -60,15 +65,42 @@ namespace mitk
     {
       dimensions[2] = 1;
       dimensions[3] = 2;
-      this->m_MitkImage->Initialize(mitk::PixelType(typeid(float)), 4, dimensions, 1);
+      this->m_MitkImage->Initialize( PixelType(typeid(float)), 4, dimensions, 1);
     }
     else
     {
       dimensions[2] = 2;
       dimensions[3] = 1;
-      this->m_MitkImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
+      this->m_MitkImage->Initialize( PixelType(typeid(float)), 3, dimensions, 1);
     }
     this->m_MitkImage->SetSlice(floatData, 0, 0, 0);
+
+
+    //ImageWriter::Pointer imageWriter = ImageWriter::New();
+    //  if (this->m_DistanceImageSelected)
+    //  {
+    //    imageWriter->SetFileName(this->m_DistanceImageFileName);
+    //    imageWriter->SetInputImage();
+    //    imageWriter->SetExtension(this->m_Extension);
+    //    imageWriter->Modified();
+    //    imageWriter->Update();
+    //  }
+    //  if (this->m_AmplitudeImageSelected)
+    //  {
+    //    imageWriter->SetFileName(this->m_AmplitudeImageFileName);
+    //    imageWriter->SetInputImage();
+    //    imageWriter->SetExtension(this->m_Extension);
+    //    imageWriter->Modified();
+    //    imageWriter->Update();
+    //  }
+    //  if (this->m_IntensityImageSelected)
+    //  {
+    //    imageWriter->SetFileName(this->m_IntensityImageFileName);
+    //    imageWriter->SetInputImage();
+    //    imageWriter->SetExtension(this->m_Extension);
+    //    imageWriter->Modified();
+    //    imageWriter->Update();
+    //  }
 
     mitkIpPicDescriptor* pic = this->m_MitkImage->GetPic();
 
@@ -196,9 +228,17 @@ namespace mitk
 
   void ToFImageWriter::CheckForFileExtension(std::string& fileName)
   {
+    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
+    std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+
+    if( extension.length() != 0 && extension != this->m_Extension)
+    {
+      this->m_Extension = extension;
+    }
+
     size_t found;
     found = fileName.find( this->m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
-    if( fileName.length() > 3 && found != fileName.length() - 4 )
+    if( fileName.length() > 3 && found != fileName.length() - this->m_Extension.length() )
     {
       fileName.append(this->m_Extension);
     }

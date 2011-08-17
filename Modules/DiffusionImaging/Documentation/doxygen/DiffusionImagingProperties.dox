@@ -7,11 +7,11 @@ These properties govern the rendering of diffusion imaging data and the visualiz
   <li> opaclevelwindow - controls the maximal/minimal opacity value
   <li> DisplayChannel - selectes which channel is to be displayed
   <li> DoRefresh - Do GL/VTK Refresh
-  <li> IndexParam1
-  <li> IndexParam2
+  <li> IndexParam1 - These are used to safe parameters depending on the chosen method
+  <li> IndexParam2 - as IndexParam1
   <li> Normalization - stores the normalization for the mitkOdfVtkMapper2D
-  <li> ScaleBy
-  <li> Scaling
+  <li> ScaleBy - Toggles wether the ODFs should be scaled with the FA or GFA
+  <li> Scaling - Global scaling factor, eg for rendering all ODFs 1.23 as big
   <li> ShowMaxNumber - The maximum number of glyphs to render in a window
   <li> VisibleOdfs - are there visible glyphs
   <li> VisibleOdfs_C - Toggles coronally visible glyphs

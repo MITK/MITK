@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
+#include <qwt_plot_picker.h>
 
 /** 
 * Provides a convenient interface for plotting curves using qwt.
@@ -54,6 +55,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkExt_EXPORT QmitkPlotWidget: public QWidget 
 {
+
+  Q_OBJECT
 
 public:
   /** 
@@ -187,6 +190,9 @@ public:
   */
   void Clear();
 
+protected slots:
+  void Clicked(QwtDoublePoint&);
+
 protected:
   /** 
   * Converts the given values into a raw double* array. 
@@ -205,6 +211,8 @@ protected:
 
   QwtPlot*                    m_Plot;
   std::vector<QwtPlotCurve*>  m_PlotCurveVector;
+  QwtPlotPicker* m_PlotPicker;
+
 };
 
 #endif 

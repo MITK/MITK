@@ -191,6 +191,7 @@ SET(MOC_H_FILES
  QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
+ QmitkPlotWidget.h
  QmitkPointListModel.h
  QmitkPointListView.h
  QmitkPointListWidget.h

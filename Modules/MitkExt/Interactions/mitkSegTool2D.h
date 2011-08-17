@@ -70,7 +70,7 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
 
-    itkSetMacro(RememberContourPositions, bool);
+    void SetRememberContourPositions(bool);
 
 
   protected:

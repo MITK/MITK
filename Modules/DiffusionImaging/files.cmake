@@ -91,6 +91,7 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
+  Rendering/mitkFiberBundleMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -103,6 +104,15 @@ SET(H_FILES
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
   IODataStructures/TbssImages/mitkTbssImage.h
+
+  # DataStructures -> FiberBundleX
+  IODataStructures/FiberBundleX/mitkFiberBundleX.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXReader.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
+
 
  
   # Tractography

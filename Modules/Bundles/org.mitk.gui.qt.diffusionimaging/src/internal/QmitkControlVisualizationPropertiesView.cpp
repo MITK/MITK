@@ -180,6 +180,29 @@ struct CvpSelListener : ISelectionListener
           label = label.arg(val);
           m_View->m_Controls->label_pfwidth->setText(label);
 
+          float color[3];
+          node->GetColor( color, NULL, "planarfigure.default.line.color");
+          QString styleSheet = "background-color:rgb(";
+          styleSheet.append(QString::number(color[0]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[1]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[2]*255.0));
+          styleSheet.append(")");
+          m_View->m_Controls->m_PFColor->setAutoFillBackground(true);
+          m_View->m_Controls->m_PFColor->setStyleSheet(styleSheet);
+
+          node->GetColor( color, NULL, "color");
+          styleSheet = "background-color:rgb(";
+          styleSheet.append(QString::number(color[0]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[1]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[2]*255.0));
+          styleSheet.append(")");
+          m_View->m_Controls->m_PFColor3D->setAutoFillBackground(true);
+          m_View->m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
+
           m_View->PlanarFigureFocus();
         }
 

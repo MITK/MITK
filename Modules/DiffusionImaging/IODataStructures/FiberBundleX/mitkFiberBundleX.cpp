@@ -71,9 +71,9 @@ vtkPolyData* mitk::FiberBundleX::GetOriginalFibers()
 }
 
 
-/*=================================
- *++++ PROCESSING OF FIBERS +++++++
- ================================*/
+/*==============================================
+ *++++ PROCESSING WITH FIBER INFORMATION +++++++
+ =============================================*/
 
 void mitk::FiberBundleX::DoColorCodingOrientationbased()
 {
@@ -91,14 +91,18 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
    */
   vtkPolyData* fiberSource; //this variable provides the source where operations actually process on
   
-
   if ( m_FiberPolyData.GetPointer() == NULL ) 
   {
     fiberSource = m_OriginalFiberPolyData;
-    // if there exists already a colorarray with orientationbased colors...just use it, otherwise it is not original data anymore :-)
-    if (fiberSource->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)) 
-      return;
-    
+    // check if color array already exists
+    if (fiberSource->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED))
+    {
+      // validate input, number of items must match number of points
+      if (fiberSource->GetNumberOfPoints() == fiberSource->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples())
+      {
+        return; // looks like everything is fine, we have already defined a color for each fiberpoint
+      }
+    }
 
   } else if (m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) ) {
     fiberSource = m_FiberPolyData;

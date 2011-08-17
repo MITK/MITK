@@ -11,6 +11,7 @@ Available sections:
   - \ref QmitkDiffusionImagingUserManualQuantification
   - \ref QmitkDiffusionImagingUserManualVisualizationSettings
   - \ref QmitkDiffusionImagingUserManualReferences 
+  - \ref QmitkDiffusionImagingUserManualTechnicalDetail
   
 \image html overview.png The MITK Diffusion Imaging Module
 
@@ -97,4 +98,7 @@ This is how a visualization with activated glyphs should look like:
 
 8. Goh, A., Lenglet, C., Thompson, P.M., Vidal, R., 2009. Estimating Orientation Distribution Functions with Probability Density Constraints and Spatial Regularity. Med Image Comput Comput Assist Interv Int Conf Med Image Comput Comput Assist Interv LNCS 5761, 877 ff.
 
+\section QmitkDiffusionImagingUserManualTechnicalDetail Technical Information for Developers
+
+The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \subpage DiffusionImagingPropertiesPage .
 */

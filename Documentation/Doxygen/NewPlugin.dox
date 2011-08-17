@@ -69,7 +69,7 @@ generated project, it will first download all required dependencies (like MITK i
 project's build directory layout, see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">SetupAMITKBasedProject</a>.
 
 
-\section Limitations
+\section  NewPluginLimitations
 
 The Plugin Generator supports only a very limited set of possible configuration options. For more customizations of your
 project or plug-in, you must familiarize yourself with CMake and the generated build system.
@@ -77,13 +77,13 @@ project or plug-in, you must familiarize yourself with CMake and the generated b
 Further, the generator is not able to modify existing projects, it can only create new ones.
 
 
-\section BuildSystem Build system for plug-ins
+\section NewPluginBuildSystem Build system for plug-ins
 
 Just put new files in your plug-in's \c src or \c src/internal directory and edit the \c files.cmake file there.
 If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
 
 
-\section Troubleshooting Troubleshooting
+\section NewPluginTroubleshooting Troubleshooting
 
 \par I get "Could not find library" messages and similar stuff when I try to start my project's executable.
 This is mostly due to wrong environment settings. On Windows, make sure that you use the supplied batch files to start

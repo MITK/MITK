@@ -15,7 +15,7 @@ Methods for conversion are provided for both directions:
 
 Care has to be taken regarding the involved coordinate systems, see \ref ItkToMitkCoordinateSystems.
 
-For limitations on ITK-type conversion see the section \ref Limitations.
+For limitations on ITK-type conversion see the section \ref ModuleAdaptorLimitations.
 
 VTK-based access to MITK images is straightforward: simply ask your mitk::Image for a
 \a vtkImageData by calling Image:GetVtkImageData. Similarily, to get a \a vtkPolyData 
@@ -117,7 +117,7 @@ Converting coordinates from the ITK physical coordinate system (which does not s
 MITK world coordinate system should be performed via the Geometry3D of the Image,
 see mitk::Geometry3D::WorldToItkPhysicalPoint.
 
-\section Limitations Limitations
+\section ModuleAdaptorLimitations Limitations
 The \ref MitkToItk for unspecified types have to do type multiplexing at compile time. This is done for a
 limited number of pixel types and dimensions, defined during the CMake configuration process.
 

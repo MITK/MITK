@@ -106,10 +106,6 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     mitkClassMacro(ToolManager, itk::Object);
     mitkNewMacro1Param(ToolManager, DataStorage*);
 
-    itkSetMacro(RememberContourPosition, bool);
-
-    itkGetMacro(RememberContourPosition, bool);
-
     /**
       \brief Gives you a list of all tools.
       This is const on purpose.
@@ -281,9 +277,6 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     int m_RegisteredClients;
 
     WeakPointer<DataStorage> m_DataStorage;
-
-    //if the position of each contour shall be saved. Therefor for each contour a markernode is added to the datastorage
-    bool m_RememberContourPosition;
 };
 
 } // namespace

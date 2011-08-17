@@ -298,6 +298,11 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
+
+    if ( m_RememberContourPositions && m_PaintingPixelValue == 1)
+    {
+      this->AddContourmarker(positionEvent);
+    }
   }
 
   // visualize contour

@@ -70,6 +70,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
 
+    itkSetMacro(RememberContourPositions, bool);
+
 
   protected:
 
@@ -109,6 +111,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
     void AddContour ( const mitk::Contour::Pointer );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
+
+    bool m_RememberContourPositions;
  
   private:
 

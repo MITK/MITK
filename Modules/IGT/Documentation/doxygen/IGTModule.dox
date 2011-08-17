@@ -1,0 +1,15 @@
+/**
+\page IGTGeneralModulePage The IGT Modules
+
+\section IGTGeneralModulePageOverview Overview
+
+These modules for image guided therapy contain functionalities for the tracking for instruments and the subsequent rendering of these instruments within MITK.
+
+\section IGTGeneralModulePageModuleList List of IGT Modules
+
+  \li \subpage org.mitk.gui.qt.igtnavigationtoolmanager
+  \li \subpage org.toolpairnavigation
+  \li \subpage org.mitk.gui.qt.igttrackingtoolbox
+  \li \subpage org.igttutorial
+  
+*/

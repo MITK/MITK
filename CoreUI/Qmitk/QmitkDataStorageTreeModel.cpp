@@ -682,38 +682,33 @@ void QmitkDataStorageTreeModel::UpdateNodeVisibility()
 {
   mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
   mitk::NodePredicateNot::Pointer dataIsNotNull = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain dat
-  mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(isHelperObject);// Show only nodes that really contain dat
-  mitk::NodePredicateAnd::Pointer isNotHelperObjectAndContainsData = mitk::NodePredicateAnd::New(isNotHelperObject,dataIsNotNull);
-  mitk::NodePredicateAnd::Pointer isNotHelperObjectAndContainsNoData = mitk::NodePredicateAnd::New(isNotHelperObject,dataIsNull);
-  mitk::NodePredicateAnd::Pointer isHelperObjectAndContainsNoData = mitk::NodePredicateAnd::New(isHelperObject,dataIsNull);
-  mitk::NodePredicateAnd::Pointer isHelperObjectAndContainsData = mitk::NodePredicateAnd::New(isHelperObject,dataIsNotNull);
 
   if (m_ShowHelperObjects)
   {
     if (m_ShowNodesContainingNoData)
     {
-      // Show helper objects and nodes containing no data
-      mitk::NodePredicateOr::Pointer tempPredicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isHelperObjectAndContainsNoData);
-      m_Predicate = mitk::NodePredicateOr::New(tempPredicate,isHelperObjectAndContainsData);
+      // Show every node
+      m_Predicate = mitk::NodePredicateOr::New(dataIsNull, dataIsNotNull);
     }
     else
     {
       // Show helper objects but not nodes containing no data
-      m_Predicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isHelperObjectAndContainsData);
+      m_Predicate = dataIsNotNull;
     }
   }
   else
   {
+    mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+    mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(isHelperObject);// Show only nodes that are not helper objects
     if (m_ShowNodesContainingNoData)
     {
       // Don't show helper objects but nodes containing no data
-      m_Predicate = mitk::NodePredicateOr::New(isNotHelperObjectAndContainsData,isNotHelperObjectAndContainsNoData);
+      m_Predicate = isNotHelperObject;
     }
     else
     {
       // Don't show helper objects and nodes containing no data
-      m_Predicate = isNotHelperObjectAndContainsData;
+      m_Predicate = mitk::NodePredicateAnd::New(isNotHelperObject, dataIsNotNull);
     }
   }
   this->Update();

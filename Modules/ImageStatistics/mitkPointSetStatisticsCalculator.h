@@ -41,34 +41,34 @@ public:
   /** @brief Sets the point set which will be analysed. */
   void SetPointSet(mitk::PointSet::Pointer pSet);
 
-  /** @return Returns the mean position of the analysed point set.*/
+  /** @return Returns the mean position of the analysed point set (only valid navigation data). Returns [0;0;0] if there is no valid navigation data.*/
   mitk::Point3D GetPositionMean();
   
-  /** @return Returns the standard derivation of each component (x, y and z) of the analysed point set.*/
+  /** @return Returns the standard derivation of each component (x, y and z) of the analysed point set (only valid navigation data). Returns [0;0;0] if there is no valid navigation data.*/
   mitk::Vector3D GetPositionStandardDeviation();
   
-  /** @return Returns the sample standard derivation of each component (x, y and z) of the analysed point set.*/
+  /** @return Returns the sample standard derivation of each component (x, y and z) of the analysed point set (only valid navigation data). Returns [0;0;0] if there is no valid navigation data.*/
   mitk::Vector3D GetPositionSampleStandardDeviation();
 
-  /** @return Returns the mean distance to the mean postion (=mean error) of the analysed point set. */
+  /** @return Returns the mean distance to the mean postion (=mean error) of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorMean();
   
-  /** @return Returns the standard derivation of the errors of all positions of the analysed point set. */
+  /** @return Returns the standard derivation of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorStandardDeviation();
  
-  /** @return Returns the sample standard derivation of the errors of all positions of the analysed point set. */
+  /** @return Returns the sample standard derivation of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorSampleStandardDeviation();
 
-  /** @return Returns the RMS of the errors of all positions of the analysed point set. */
+  /** @return Returns the RMS of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorRMS();
  
-  /** @return Returns the median of the errors of all positions of the analysed point set. */
+  /** @return Returns the median of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorMedian();
  
-  /** @return Returns the maximum of the errors of all positions of the analysed point set. */
+  /** @return Returns the maximum of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorMax();
  
-  /** @return Returns the minimum of the errors of all positions of the analysed point set. */
+  /** @return Returns the minimum of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorMin();
 
   //#####################################################################################################

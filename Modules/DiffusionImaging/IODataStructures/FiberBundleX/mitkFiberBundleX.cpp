@@ -1,18 +1,18 @@
 /*=========================================================================
-
+ 
  Program:   Medical Imaging & Interaction Toolkit
  Language:  C++
  Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
  Version:   $Revision: 21975 $
-
+ 
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
-
+ 
  =========================================================================*/
 
 
@@ -27,14 +27,14 @@ const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
 mitk::FiberBundleX::FiberBundleX()
 {
- 
-
-
+  
+  
+  
 }
 
 mitk::FiberBundleX::~FiberBundleX()
 {
-
+  
 }
 
 /* === main input method ====
@@ -45,7 +45,7 @@ void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
   m_OriginalFiberPolyData = fiberPD;
 }
 
- 
+
 /* === main output method ===
  * return fiberbundle as vtkPolyData
  * Depending on processing of input fibers, this method returns
@@ -89,31 +89,53 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
    * care of ur incapability by checking if there already exists a color array for orientation based 
    * color information
    */
-  vtkPolyData* fiberSource; //this variable provides the source where operations actually process on
   
-  if ( m_FiberPolyData.GetPointer() == NULL ) 
+  //these variables are needed for some intelligence in handling colorarrays and already smoothed structures
+  bool isSmoothedFibOK = true; 
+  bool isOriginalFibOK = true;
+  
+  // if there already exists a smoothed fiberbundle, then check if color array is OK
+  if ( m_FiberPolyData.GetPointer() != NULL ) 
+  { 
+    if ( m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) ) 
+    { // validate if points match
+      if ( m_FiberPolyData->GetNumberOfPoints() != m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
+      {
+        isSmoothedFibOK = false;
+        MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_FiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED ; 
+      }
+    } 
+    /*else {
+     // there exists a smoothed datastructure but no orientationbased color information is given
+     // IT IS RECOMMENDED TO RECONSTRUCT THIS DATASTRUCTURE AGAIN
+    } */
+    
+  } //else there exists NO smoothed fibers, which means there exists also no color array which implies that fiber and color relation is OK :-)
+  
+  
+  //check if color array in original fiber dataset is valid
+  if ( m_OriginalFiberPolyData != NULL ) 
   {
-    fiberSource = m_OriginalFiberPolyData;
-    // check if color array already exists
-    if (fiberSource->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED))
+    if ( m_OriginalFiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) )
     {
       // validate input, number of items must match number of points
-      if (fiberSource->GetNumberOfPoints() == fiberSource->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples())
+      if ( m_OriginalFiberPolyData->GetNumberOfPoints() != m_OriginalFiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
       {
-        return; // looks like everything is fine, we have already defined a color for each fiberpoint
+        isOriginalFibOK = false;
+        MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_OriginalFiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED;
       }
     }
-
-  } else if (m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) ) {
-    fiberSource = m_FiberPolyData;
+    
+  } else {
+    MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
+    return;
   }
-  
   
   
   //colors and alpha value for each single point, RGBA = 4 components
   vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
   colorsT->SetNumberOfComponents(4);
-  colorsT->SetName("ColorcodingOrient");
+  colorsT->SetName(COLORCODING_ORIENTATION_BASED);
   
   
   
@@ -123,11 +145,11 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()
 {
-
+  
 }
 void mitk::FiberBundleX::SetRequestedRegionToLargestPossibleRegion()
 {
-
+  
 }
 bool mitk::FiberBundleX::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
@@ -139,5 +161,5 @@ bool mitk::FiberBundleX::VerifyRequestedRegion()
 }
 void mitk::FiberBundleX::SetRequestedRegion( itk::DataObject *data )
 {
-
+  
 }

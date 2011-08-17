@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCellArray.h>
 #include <vtkTriangleFilter.h>
 
+#include <Poco/Path.h>
+
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
   if (! fileWriter->CanWriteBaseDataType(data) ) {
@@ -56,7 +58,7 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     {
       proposedName.append(propFileName).append(fileWriter->GetDefaultExtension());
     }
-    fileName = QFileDialog::getSaveFileName(NULL, "Save file", proposedName,fileWriter->GetFileDialogPattern());
+    fileName = GetSaveFileNameStartingInLastDirectory("Save file", proposedName,fileWriter->GetFileDialogPattern());
 
     // Check if an extension exists already and if not, append the default extension
     if ( !fileName.contains( QRegExp("\\.\\w+$") ) )
@@ -126,15 +128,22 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             fileName = "PointSet";
           else
             fileName = aFileName;
+
+          
+          
           fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
-          // fileName += ".mps";
+                    
+          QString initialFileName = QString::fromStdString(fileName);
+
           QString selected_suffix("MITK Point-Sets (*.mps)");
           QString possible_suffixes("MITK Point-Sets (*.mps)");
-          QString initialFileName = QString::fromStdString(fileName);
+          
 
           /*QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
           */
-          QString qfileName = QFileDialog::getSaveFileName(NULL, "Save file", initialFileName, possible_suffixes, &selected_suffix);
+          QString qfileName = GetSaveFileNameStartingInLastDirectory("Save file", initialFileName, possible_suffixes, selected_suffix);
+          
+          
           MITK_INFO<<qfileName.toLocal8Bit().constData();
 
           mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
@@ -397,8 +406,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
   //selectedItemsName += ".stl"
   QString selected_suffix("STL File (*.stl)");
   QString possible_suffixes("STL File (*.stl);; VTK File (*.vtk);; VTP File (*.vtp)");
-  QString qfileName = QFileDialog::getSaveFileName(NULL, "Save surface object", QString::fromStdString(selectedItemsName), possible_suffixes,
-    &selected_suffix);
+  QString qfileName = GetSaveFileNameStartingInLastDirectory("Save surface object", QString::fromStdString(selectedItemsName), possible_suffixes,selected_suffix);
 
   if (qfileName.isEmpty())
     return "";
@@ -463,7 +471,6 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
-  static QString lastDirectory = "";
   QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
 
   std::string fileName;
@@ -472,9 +479,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     QString initialFilename(aFileName);
     if (initialFilename.isEmpty()) initialFilename = "NewImage.pic";
 
-    // prepend the last directory
-    initialFilename = lastDirectory + initialFilename;
-    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
+    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),selected_suffix);
     MITK_INFO<<qfileName.toLocal8Bit().constData();
     if (qfileName.isEmpty() )
       return "";
@@ -515,10 +520,10 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       QMessageBox::critical(NULL,"ERROR",message);
       return "";
     }
-    dir += "/";
-    lastDirectory = dir.c_str(); // remember path for next save dialog
-    dir += baseFilename;
 
+    dir += "/";
+    dir += baseFilename;
+   
     imageWriter->SetInput(image);
     imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());
@@ -603,7 +608,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
     //
     // show a file selector with the supported file formats
     //
-    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save screenshot", QString( "" ), QString( ".png" ).toLocal8Bit().constData() );
+    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save screenshot", QString( "" ), QString( ".png" ).toLocal8Bit().constData() );
     if ( qfileName.isEmpty() )
       return "";
     concreteFilename = qfileName.toLocal8Bit().constData();
@@ -650,5 +655,20 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   wti->Delete();
   pngWriter->Delete();
   return concreteFilename;  
+}
+
+QString CommonFunctionality::GetSaveFileNameStartingInLastDirectory(QString caption, QString defaultFilename, QString filter, QString selectedFilter)
+{
+QString returnValue = "";
+static QString lastDirectory = "";
+QString filename = lastDirectory + defaultFilename;
+returnValue = QFileDialog::getSaveFileName(NULL,caption,filename,filter,&selectedFilter);
+if (returnValue != "")
+  {
+  std::string dir = itksys::SystemTools::GetFilenamePath( returnValue.toStdString() );
+  dir += Poco::Path::separator();
+  lastDirectory = dir.c_str(); // remember path for next save dialog
+  }
+return returnValue;
 }
 

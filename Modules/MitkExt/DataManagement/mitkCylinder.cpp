@@ -29,7 +29,7 @@ mitk::Cylinder::Cylinder()
   cylinder->SetRadius(1.0);
   cylinder->SetHeight(2.0);
   cylinder->SetCenter(0.0, 0.0, 0.0);
-  cylinder->SetResolution(20);
+  cylinder->SetResolution(100);
   cylinder->CappingOn();
   cylinder->Update();
   SetVtkPolyData(cylinder->GetOutput());

@@ -1205,6 +1205,12 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 {
   m_Controls->m_ScalingFrame->setVisible(
       m_Controls->m_ScalingCheckbox->isChecked());
+
+  if(!m_Controls->m_ScalingCheckbox->isChecked())
+  {
+    m_Controls->m_AdditionalScaling->setCurrentIndex(0);
+    m_Controls->m_ScalingFactor->setValue(1.0);
+  }
 }
 
 

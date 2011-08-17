@@ -142,7 +142,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       pixel[1] = j;
       pixel[2] = 0;
 
-      unsigned int pixelID = pixel[0]+pixel[1]*yDimension;
+      unsigned int pixelID = pixel[0]+pixel[1]*xDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 

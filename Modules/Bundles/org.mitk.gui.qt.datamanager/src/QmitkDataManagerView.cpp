@@ -980,8 +980,8 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node )
       node->SetBoolProperty("selected", true);
   }
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //changing the selection does NOT require any rendering processes!
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ReinitMultiWidgetEditor()

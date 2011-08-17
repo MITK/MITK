@@ -1,4 +1,4 @@
 # CREATE MODULE HERE
 MITK_CREATE_MODULE(mitk3DSurfaceInterpolation
-  DEPENDS  QmitkExt
+DEPENDS Mitk
 )

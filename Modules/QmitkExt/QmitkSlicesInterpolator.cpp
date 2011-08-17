@@ -69,17 +69,49 @@ m_LastSliceDimension(2),
 m_LastSliceIndex(0),
 m_InterpolationEnabled(false)
 {
+  //Changes due to intergration of 3D interpolation
   QHBoxLayout* layout = new QHBoxLayout(this);
+
+  QGridLayout* grid = new QGridLayout(this);
+
+  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
+  m_RBtnEnable2DInterpolation->setChecked(true);
+  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
+  grid->addWidget(m_RBtnEnable2DInterpolation,0,0);
+  //connect
+
+  m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  grid->addWidget(m_RBtnEnable3DInterpolation,1,0);
+  //connect
+
+  m_CbRun3DInterpolationInBackGround = new QCheckBox("Run in Background", this);
+  m_CbRun3DInterpolationInBackGround->setChecked(true);
+  m_CbRun3DInterpolationInBackGround->setEnabled(false);
+  grid->addWidget(m_CbRun3DInterpolationInBackGround,1,2);
+  //connect
+
+  m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
+  m_BtnAccept3DInterpolation->setEnabled(false); 
+  grid->addWidget(m_BtnAccept3DInterpolation, 1,1);
+
+  grid->addWidget(m_RBtnEnable2DInterpolation,0,0);
   
   m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
-  layout->addWidget( m_BtnAcceptInterpolation, 1 );
+  //layout->addWidget( m_BtnAcceptInterpolation, 1 );
+  grid->addWidget(m_BtnAcceptInterpolation,0,1);
   
   m_BtnAcceptAllInterpolations = new QPushButton("... for all slices", this);
   m_BtnAcceptAllInterpolations->setEnabled( false );
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
-  layout->addWidget( m_BtnAcceptAllInterpolations );
+  //layout->addWidget( m_BtnAcceptAllInterpolations );
+  grid->addWidget(m_BtnAcceptAllInterpolations,0,2);
+
+  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
+  m_GroupBoxEnableExclusiveInterpolationMode->setLayout(grid);
+  layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);
   
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnInterpolationInfoChanged );
@@ -247,6 +279,32 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
       slicer->RemoveObserver( FSliceObserverTag );
       slicer->RemoveObserver( FTimeObserverTag );
     }
+  }
+}
+
+void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
+{
+  if(status == false)
+  {
+    m_BtnAcceptAllInterpolations->setEnabled(false);
+    m_BtnAcceptInterpolation->setEnabled(false);
+  }
+  else
+  {
+    m_BtnAcceptAllInterpolations->setEnabled(true);
+    m_BtnAcceptInterpolation->setEnabled(true);
+  }
+}
+
+void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
+{
+  if(status == false)
+  {
+    m_BtnAccept3DInterpolation->setEnabled(false); 
+  }
+  else
+  {
+    m_BtnAccept3DInterpolation->setEnabled(true); 
   }
 }
 

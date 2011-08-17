@@ -32,6 +32,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
+//Includes for 3DSurfaceInterpolation
+#include "mitkImageToContourFilter.h"
+//#include "mitkReduceContourSetFilter.h"
+//#include "mitkComputeContourSetNormalsFilter.h"
+#include "mitkSurfaceInterpolationController.h"
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -251,10 +257,10 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-    if ( m_ToolManager->GetRememberContourPosition() )
-    {
-      this->AddContourmarker(positionEvent);
-    }
+    //if ( m_ToolManager->GetRememberContourPosition() )
+    //{
+    //  this->AddContourmarker(positionEvent);
+    //}
   }
   else {
     OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
@@ -265,10 +271,19 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
 
-    if ( m_ToolManager->GetRememberContourPosition() )
-    {
-      this->AddContourmarker(positionEvent);
-    }
+    //if ( m_ToolManager->GetRememberContourPosition() )
+    //{
+    //  this->AddContourmarker(positionEvent);
+    //}
+
+  }
+  if ( m_ToolManager->GetRememberContourPosition() )
+  {
+    this->AddContourmarker(positionEvent);
+    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+    contourExtractor->SetInput(slice);
+    contourExtractor->Update();
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour(contourExtractor->GetOutput());
 
   }
 }

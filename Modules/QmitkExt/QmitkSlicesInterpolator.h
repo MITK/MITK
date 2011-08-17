@@ -28,6 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QWidget>
 #include <map>
 
+#include <QRadioButton>
+#include <QGroupBox>
+#include <QCheckBox>
+
 namespace mitk
 {
   class ToolManager;
@@ -36,6 +40,11 @@ namespace mitk
 
 class QmitkStdMultiWidget;
 class QPushButton;
+//Enhancement for 3D Interpolation
+//class QRadioButton;
+//class QGroupBox; 
+//class QCheckBox;
+
 
 /**
   \brief GUI for slices interpolation.
@@ -159,6 +168,10 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void OnMultiWidgetDeleted(QObject*);
 
+    //Enhancement for 3D interpolation
+    void On2DInterpolationEnabled(bool);
+    void On3DInterpolationEnabled(bool);
+
   protected:
 
     const std::map<QAction*, unsigned int> createActionToSliceDimension();
@@ -209,6 +222,13 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     QPushButton* m_BtnAcceptInterpolation;
     QPushButton* m_BtnAcceptAllInterpolations;
+
+    //Enhancement for 3D Surface Interpolation
+    QRadioButton* m_RBtnEnable2DInterpolation;
+    QRadioButton* m_RBtnEnable3DInterpolation;
+    QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
+    QPushButton* m_BtnAccept3DInterpolation;
+    QCheckBox* m_CbRun3DInterpolationInBackGround;
 
     mitk::DataNode::Pointer m_FeedbackNode;
 

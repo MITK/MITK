@@ -42,12 +42,12 @@ class PlaneGeometry;
   \sa QmitkToolReferenceDataSelectionBox
   \sa QmitkToolWorkingDataSelectionBox
   \sa Tool
-  \sa QmitkInteractiveSegmentation
+  \sa QmitkSegmentationView
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkSegmentationView: \ref QmitkSegmentationTechnicalPage
 
   This class creates and manages several instances of mitk::Tool.
 

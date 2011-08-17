@@ -96,6 +96,8 @@ public:
 
   void SetDataStorage( mitk::DataStorage* ds );
 
+  void HandleCrosshairPositionEvent();
+
   /// activate Menu Widget. true: activated, false: deactivated
   void ActivateMenuWidget( bool state );
   
@@ -106,6 +108,8 @@ protected:
   void HideAllWidgetToolbars();
 
 public slots:
+
+  void HandleCrosshairPositionEventDelayed();
 
   void changeLayoutTo2DImagesUp();
 
@@ -296,7 +300,7 @@ protected:
     vtkRenderer *ren;
   } m_CornerAnnotaions[3];
 
-  
+  bool m_PendingCrosshairPositionEvent;
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

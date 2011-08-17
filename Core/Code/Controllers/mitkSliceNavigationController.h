@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"
+#include "mitkMessage.h"
 #include <itkEventObject.h>
 #include <itkCommand.h>
 #include <mitkIpPicTypeMultiplex.h>
@@ -345,6 +346,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
       ConnectGeometrySliceEvent(receiver, false);
       ConnectGeometryTimeEvent(receiver);
     }
+
+    Message<> crosshairPositionEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can 

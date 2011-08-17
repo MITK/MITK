@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkStateEvent.h"
+#include "mitkCrosshairPositionEvent.h"
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
@@ -328,6 +329,9 @@ SliceNavigationController::SendSlice()
     {
       this->InvokeEvent(
         GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()) );
+
+      // send crosshair event
+      crosshairPositionEvent.Send();
 
       // Request rendering update for all views
       this->GetRenderingManager()->RequestUpdateAll();

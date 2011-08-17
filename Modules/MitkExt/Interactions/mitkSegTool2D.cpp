@@ -229,6 +229,11 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }
 
+void mitk::SegTool2D::SetRememberContourPositions(bool status)
+{
+  m_RememberContourPositions = status;
+}
+
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
     mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()));

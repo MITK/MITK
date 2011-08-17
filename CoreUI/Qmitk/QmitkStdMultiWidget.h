@@ -96,6 +96,10 @@ public:
 
   void SetDataStorage( mitk::DataStorage* ds );
 
+  /** \brief Listener to the CrosshairPositionEvent
+
+    Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
+  */
   void HandleCrosshairPositionEvent();
 
   /// activate Menu Widget. true: activated, false: deactivated
@@ -109,6 +113,7 @@ protected:
 
 public slots:
 
+  /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
   void HandleCrosshairPositionEventDelayed();
 
   void changeLayoutTo2DImagesUp();

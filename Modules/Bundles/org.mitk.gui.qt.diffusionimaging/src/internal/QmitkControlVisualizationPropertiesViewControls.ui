@@ -322,10 +322,13 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <property name="margin">
+            <property name="horizontalSpacing">
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing">
              <number>0</number>
             </property>
-            <property name="spacing">
+            <property name="margin">
              <number>0</number>
             </property>
             <item row="1" column="1">

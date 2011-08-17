@@ -28,6 +28,10 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
     false, berry::IPageLayout::BOTTOM, .5f, "org.mitk.views.datamanager");
 
+  layout->AddStandaloneView("org.mitk.views.imagenavigator",
+    false, berry::IPageLayout::BOTTOM, .8f, "org.mitk.views.controlvisualizationpropertiesview");
+
+
 //  berry::IFolderLayout::Pointer left =
 //    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
 //    berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");

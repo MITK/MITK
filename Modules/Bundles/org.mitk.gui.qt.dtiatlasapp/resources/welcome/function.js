@@ -78,9 +78,9 @@ var moduleDescriptions = new Array("This colormap represents the original diffus
                             "This dataset contains the Corpus Callosum fibers and most important regions of interest that were used to extract it.",
                             "This dataset contains the Corticospinal Tract fibers and most important regions of interest that were used to extract it.",
                             "This dataset contains the Fornix fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Inferior Longitudinal Fasciculus, Inferior Fronto-Occipital, and the Uncus fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Superior Longitudinal Fasciculus, Superior OFF, and Arcuate fibers and most important regions of interest that were used to extract it.",
-                            "This dataset is not in the same world coordinate system as the others and should not be opend in combination with any of the other datasets. It contains a 3D visualization of the cerebellum and the Inferior Cerebral Peduncles, Medial Cerebral Peduncle, Superior Cerebral Peduncles, and Medial Limnisci fibers and the and most important regions of interest that were used to extract it.",
+                            "This dataset contains the Inferior Longitudinal Fasciculus, Inferior Fronto-Occipital Fasciculus, and the Uncinate Fasciculus fibers and most important regions of interest that were used to extract it.",
+                            "This dataset contains the Superior Longitudinal Fasciculus, Superior Occipito-Frontal Fasciculus, and Arcuate Fasciculus fibers and most important regions of interest that were used to extract it.",
+                            "This dataset is not in the same world coordinate system as the others and should not be opened in combination with any of the other datasets. It contains a 3D visualization of the cerebellum and the Inferior Cerebellar Peduncles, Medial Cerebellar Peduncle, Superior Cerebellar Peduncles, and Medial Lemniscus fibers and the and most important regions of interest that were used to extract it.",
                             "Open the MITK website in an external browser.");
 
 var bttns = new Array();

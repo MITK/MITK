@@ -96,6 +96,7 @@ protected:
   /** @return Returns a list with the distances to the mean of the list */
   std::vector<double> GetErrorList(std::vector<mitk::Point3D> list);
 
+  /** @return Returns the mean of the point list. Returns [0;0;0] if the list is empty. */
   mitk::Point3D GetMean(std::vector<mitk::Point3D> list);
 
   /** @brief Converts a point set to a vector of Point3D. */

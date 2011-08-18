@@ -119,7 +119,12 @@ else //odd
 
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetMean(std::vector<mitk::Point3D> list)
 {
-if (list.empty()) return 0;
+if (list.empty()) 
+  {
+    mitk::Point3D emptyPoint;
+    emptyPoint.Fill(0);
+    return 0;
+  }
 
 //calculate mean
 mitk::Point3D mean;

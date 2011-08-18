@@ -171,13 +171,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
             polys->InsertNextCell(3);
-            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y);
+            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y_1);
 
             polys->InsertNextCell(3);
-            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y_1);
+            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(xy_1);
           }
         }

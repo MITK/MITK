@@ -42,7 +42,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRegionOfInterestImageFilter.h>
 #include <vtkSmartPointer.h>
 
+#include <berryISelectionListener.h>
+#include <berryIStructuredSelection.h>
 
+struct FboSelListener;
 
 /*!
 \brief QmitkFiberBundleView
@@ -55,6 +58,8 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkFiberBundleOperationsView : public QmitkFunctionality
 {
 
+
+  friend struct FboSelListener;
 
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -155,6 +160,9 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
           const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex );
+
+  berry::ISelectionListener::Pointer m_SelListener;
+  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
 private:
 

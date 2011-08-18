@@ -141,6 +141,7 @@ bool mitk::PlanarFigureInteractor
   // TODO: Check if display and PlanarFigure geometries are parallel (if they are PlaneGeometries)
 
 
+
   switch (action->GetActionId())
   {
   case AcDONOTHING:
@@ -162,7 +163,7 @@ bool mitk::PlanarFigureInteractor
     }
 
   case AcADD:
-    {         
+    {
       // Invoke event to notify listeners that placement of this PF starts now
       planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
 
@@ -177,10 +178,8 @@ bool mitk::PlanarFigureInteractor
       }
       else
       {
-        //ok = false;
-        //break;
-
-        planarFigure->SetGeometry2D(planarFigureGeometry);
+        ok = false;
+        break;
       }
 
       // Extract point in 2D world coordinates (relative to Geometry2D of
@@ -323,7 +322,7 @@ bool mitk::PlanarFigureInteractor
       // is sufficient (if a previous point exists)
 
       // Extract display position
-      const mitk::PositionEvent *positionEvent = 
+      const mitk::PositionEvent *positionEvent =
         dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
       if ( positionEvent == NULL )
       {
@@ -349,7 +348,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcADDPOINT:
     {
-      bool selected = false;      
+      bool selected = false;
       bool isEditable = true;
       m_DataNode->GetBoolProperty("selected", selected);
       m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
@@ -381,7 +380,7 @@ bool mitk::PlanarFigureInteractor
 
       // Add point as new control point
       renderer->GetDisplayGeometry()->DisplayToWorld( projectedPoint, projectedPoint );
-      
+
       if ( planarFigure->IsPreviewControlPointVisible() )
       {
         point2D = planarFigure->GetPreviewControlPoint();
@@ -443,7 +442,7 @@ bool mitk::PlanarFigureInteractor
       if ( pointIndex >= 0 )
       {
         // If mouse is above control point, mark it as selected
-        planarFigure->SelectControlPoint( pointIndex );     
+        planarFigure->SelectControlPoint( pointIndex );
 
         // If mouse is hovering above a marker, it is also hovering above the figure
         isHovering = true;
@@ -478,7 +477,7 @@ bool mitk::PlanarFigureInteractor
 
         if ( selected && isHovering && isExtendable && pointIndex == -1 && isEditable )
         {
-          const mitk::PositionEvent *positionEvent = 
+          const mitk::PositionEvent *positionEvent =
             dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
           if ( positionEvent != NULL )
           {
@@ -590,7 +589,7 @@ bool mitk::PlanarFigureInteractor
         ok = false;
       }
 
-      ok = true;  
+      ok = true;
       break;
     }
 
@@ -610,7 +609,7 @@ bool mitk::PlanarFigureInteractor
         this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
       }
 
-      ok = true;  
+      ok = true;
       break;
     }
 
@@ -618,7 +617,7 @@ bool mitk::PlanarFigureInteractor
     {
       bool isExtendable = false;
       m_DataNode->GetBoolProperty("planarfigure.isextendable", isExtendable);
-      
+
       if ( isExtendable )
       {
         int selectedControlPoint = planarFigure->GetSelectedControlPoint();
@@ -657,6 +656,9 @@ bool mitk::PlanarFigureInteractor
   default:
     return Superclass::ExecuteAction( action, stateEvent );
   }
+
+
+
 
   return ok;
 }

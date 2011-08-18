@@ -54,11 +54,8 @@ mitk::PlanarFigure::~PlanarFigure()
 
 void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 {
-  if(m_Geometry2D != geometry)
-  {
-    this->SetGeometry( geometry );
-    m_Geometry2D = geometry;
-  }
+  this->SetGeometry( geometry );
+  m_Geometry2D = geometry;
 }
 
 

@@ -91,8 +91,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
    */
   
   //these variables are needed for some intelligence in handling colorarrays and already smoothed structures
-  bool isSmoothedFibOK = true; 
-  bool isOriginalFibOK = true;
+  //both vars are sensing the "colorful" part of fiberbundles ;-)
+  bool hasSmoothedFibColors = true; 
+  bool hasOriginalFibColors = true;
   
   // if there already exists a smoothed fiberbundle, then check if color array is OK
   if ( m_FiberPolyData.GetPointer() != NULL ) 
@@ -101,14 +102,15 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     { // validate if points match
       if ( m_FiberPolyData->GetNumberOfPoints() != m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
       {
-        isSmoothedFibOK = false;
+        hasSmoothedFibColors = false;
         MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_FiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED ; 
       }
     } 
-    /*else {
+    else {
      // there exists a smoothed datastructure but no orientationbased color information is given
      // IT IS RECOMMENDED TO RECONSTRUCT THIS DATASTRUCTURE AGAIN
-    } */
+      hasSmoothedFibColors = false;
+    } 
     
   } //else there exists NO smoothed fibers, which means there exists also no color array which implies that fiber and color relation is OK :-)
   
@@ -120,16 +122,20 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     {
       // validate input, number of items must match number of points
       if ( m_OriginalFiberPolyData->GetNumberOfPoints() != m_OriginalFiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-      {
-        isOriginalFibOK = false;
+      { 
+        hasOriginalFibColors = false; //invalid color array
         MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_OriginalFiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED;
       }
+    } else {
+      //so far no color array exists
+      hasOriginalFibColors = false;
     }
     
   } else {
     MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
     return;
   }
+  
   
   
   //colors and alpha value for each single point, RGBA = 4 components

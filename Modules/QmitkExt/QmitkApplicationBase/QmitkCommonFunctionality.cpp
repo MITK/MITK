@@ -141,7 +141,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
 
           /*QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
           */
-          QString qfileName = GetSaveFileNameStartingInLastDirectory("Save file", initialFileName, possible_suffixes, selected_suffix);
+          QString qfileName = GetSaveFileNameStartingInLastDirectory("Save file", initialFileName, possible_suffixes, &selected_suffix);
           
           
           MITK_INFO<<qfileName.toLocal8Bit().constData();
@@ -406,7 +406,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
   //selectedItemsName += ".stl"
   QString selected_suffix("STL File (*.stl)");
   QString possible_suffixes("STL File (*.stl);; VTK File (*.vtk);; VTP File (*.vtp)");
-  QString qfileName = GetSaveFileNameStartingInLastDirectory("Save surface object", QString::fromStdString(selectedItemsName), possible_suffixes,selected_suffix);
+  QString qfileName = GetSaveFileNameStartingInLastDirectory("Save surface object", QString::fromStdString(selectedItemsName), possible_suffixes,&selected_suffix);
 
   if (qfileName.isEmpty())
     return "";
@@ -479,7 +479,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     QString initialFilename(aFileName);
     if (initialFilename.isEmpty()) initialFilename = "NewImage.pic";
 
-    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),selected_suffix);
+    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
     MITK_INFO<<qfileName.toLocal8Bit().constData();
     if (qfileName.isEmpty() )
       return "";
@@ -657,12 +657,12 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   return concreteFilename;  
 }
 
-QString CommonFunctionality::GetSaveFileNameStartingInLastDirectory(QString caption, QString defaultFilename, QString filter, QString selectedFilter)
+QString CommonFunctionality::GetSaveFileNameStartingInLastDirectory(QString caption, QString defaultFilename, QString filter, QString* selectedFilter)
 {
 QString returnValue = "";
 static QString lastDirectory = "";
 QString filename = lastDirectory + defaultFilename;
-returnValue = QFileDialog::getSaveFileName(NULL,caption,filename,filter,&selectedFilter);
+returnValue = QFileDialog::getSaveFileName(NULL,caption,filename,filter,selectedFilter);
 if (returnValue != "")
   {
   std::string dir = itksys::SystemTools::GetFilenamePath( returnValue.toStdString() );

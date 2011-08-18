@@ -5,6 +5,7 @@ SET(module_dirs
     PlanarFigure
     ImageExtraction
     ImageStatistics
+    LegacyAdaptors
     MitkExt
     SceneSerialization
     QmitkExt

@@ -144,6 +144,21 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   colorsT->SetNumberOfComponents(4);
   colorsT->SetName(COLORCODING_ORIENTATION_BASED);
   
+  //colorcoding orientation based
+  unsigned char rgba[4] = {0,0,0,0};
+  
+  int i=0;
+  if (i<m_OriginalFiberPolyData->GetPoints()->GetNumberOfPoints()-1 && i>0)
+  {// process all points except starting and endpoint
+    
+  } else if (i==0) {
+    // process startingpoint
+    
+  } else if (i==m_OriginalFiberPolyData->GetPoints()->GetNumberOfPoints()-1) {
+    // process endpoint
+    
+  }
+  
   
   
 }

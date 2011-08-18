@@ -81,6 +81,11 @@ namespace mitk {
     virtual ~FiberBundleX();
 
   private:
+    
+//  ====TODO====================================
+    bool doSelfHealingColorOrient( vtkPolyData* );
+//  ============================================
+    
     //      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
     //      FiberPolyData stores all brain fibers using polylines (in world coordinates)
     //    this variable hosts the smoothed fiber data, this data we generate, therefore a smartpointer structure is recommended
@@ -92,6 +97,7 @@ namespace mitk {
     
     //    VertexPolyData stores all original points as vertices computed by tracking algorithms
     vtkSmartPointer<vtkPolyData> m_VertexPolyData;
+    
     
     
   };

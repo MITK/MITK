@@ -25,6 +25,7 @@
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
+
 mitk::FiberBundleX::FiberBundleX()
 {
   
@@ -92,52 +93,52 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   
   //these variables are needed for some intelligence in handling colorarrays and already smoothed structures
   //both vars are sensing the "colorful" part of fiberbundles ;-)
-  bool hasSmoothedFibColors = true; 
+//  bool hasSmoothedFibColors = true; 
   bool hasOriginalFibColors = true;
-  
-  // if there already exists a smoothed fiberbundle, then check if color array is OK
-  if ( m_FiberPolyData.GetPointer() != NULL ) 
-  { 
-    if ( m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) ) 
-    { // validate if points match
-      if ( m_FiberPolyData->GetNumberOfPoints() != m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-      {
-        hasSmoothedFibColors = false;
-        MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_FiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED ; 
-      }
-    } 
-    else {
-     // there exists a smoothed datastructure but no orientationbased color information is given
-     // IT IS RECOMMENDED TO RECONSTRUCT THIS DATASTRUCTURE AGAIN
-      hasSmoothedFibColors = false;
-    } 
-    
-  } //else there exists NO smoothed fibers, which means there exists also no color array which implies that fiber and color relation is OK :-)
-  
-  
+  bool hasSmoothedFibColors = false;
+   
   //check if color array in original fiber dataset is valid
   if ( m_OriginalFiberPolyData != NULL ) 
   {
     if ( m_OriginalFiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) )
     {
       // validate input, number of items must match number of points
-      if ( m_OriginalFiberPolyData->GetNumberOfPoints() != m_OriginalFiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
+      if ( m_OriginalFiberPolyData->GetNumberOfPoints() != 
+           m_OriginalFiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
       { 
-        hasOriginalFibColors = false; //invalid color array
+        //invalid color array, try to heal
         MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_OriginalFiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED;
-      }
+        hasOriginalFibColors = doSelfHealingColorOrient(m_OriginalFiberPolyData); 
+        
+      }//no else, cuz pointset matches color set :-)
+      
     } else {
       //so far no color array exists
       hasOriginalFibColors = false;
     }
     
-  } else {
+  } else { // else of check (m_OriginalFiberPolyData != NULL)
     MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
-    return;
+// nothing to implement or return here because hasOriginalFibColors is set to true and the checking mechanism below will take care of this issue as well
+  }
+  
+  // make sure colorcoding in smoothed fibers are OK, otherwise do selfHealing
+  if (hasOriginalFibColors &&  
+      m_FiberPolyData.GetPointer() != NULL && 
+      m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
+      (m_FiberPolyData->GetNumberOfPoints() != m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples()) ) 
+  {
+    hasSmoothedFibColors = doSelfHealingColorOrient(m_FiberPolyData);
   }
   
   
+//  make sure that processing colorcoding is only called when necessary
+  if (hasOriginalFibColors)
+    return;
+  if (hasOriginalFibColors && hasSmoothedFibColors)
+    return;
   
+      
   //colors and alpha value for each single point, RGBA = 4 components
   vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
   colorsT->SetNumberOfComponents(4);
@@ -147,6 +148,23 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   
 }
 
+//private repairMechanism for orientationbased colorcoding
+bool mitk::FiberBundleX::doSelfHealingColorOrient(vtkPolyData* healMe)
+{
+  bool hasHealingSucceeded = false;
+  MITK_INFO << "FiberBundleX self repair mechanism is called, but not yet implemented";
+//  check type of healMe
+  if (healMe == m_FiberPolyData) 
+  {
+    //todo
+  
+  } else if (healMe ==  m_OriginalFiberPolyData)
+  {
+    //todo
+  }
+  
+  return hasHealingSucceeded;
+}
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

@@ -58,7 +58,7 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     {
       proposedName.append(propFileName).append(fileWriter->GetDefaultExtension());
     }
-    fileName = GetSaveFileNameStartingInLastDirectory("Save file", proposedName,QString(fileWriter->GetFileDialogPattern()));
+    fileName = GetSaveFileNameStartingInLastDirectory("Save file", proposedName,QString::fromAscii(fileWriter->GetFileDialogPattern()));
 
     // Check if an extension exists already and if not, append the default extension
     if ( !fileName.contains( QRegExp("\\.\\w+$") ) )
@@ -608,7 +608,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
     //
     // show a file selector with the supported file formats
     //
-    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save screenshot", QString( "" ), QString( ".png" ) );
+    QString qfileName = GetSaveFileNameStartingInLastDirectory("Save screenshot", QString::fromStdString(""), QString::fromStdString(".png") );
     if ( qfileName.isEmpty() )
       return "";
     concreteFilename = qfileName.toLocal8Bit().constData();

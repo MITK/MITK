@@ -43,7 +43,7 @@ mitk::FiberBundleX::~FiberBundleX()
  */
 void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
 {
-  m_OriginalFiberPolyData = fiberPD;
+  m_FiberStructureData = fiberPD;
 }
 
 
@@ -54,22 +54,10 @@ void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
  */
 vtkPolyData* mitk::FiberBundleX::GetFibers()
 {
-  vtkPolyData* returningFibers = m_FiberPolyData;
-  
-  if (returningFibers == NULL) {
-    returningFibers = m_OriginalFiberPolyData;
-  }
-  
-  return returningFibers;
+  return m_FiberStructureData;
 }
 
-/*
- * return original set of fiberdata
- */
-vtkPolyData* mitk::FiberBundleX::GetOriginalFibers()
-{
-  return m_OriginalFiberPolyData;
-}
+
 
 
 /*==============================================
@@ -78,108 +66,146 @@ vtkPolyData* mitk::FiberBundleX::GetOriginalFibers()
 
 void mitk::FiberBundleX::DoColorCodingOrientationbased()
 {
+  //===== FOR WRITING A TEST ========================
+  //  colorT size == tupelComponents * tupelElements
+  //  compare color results
+  //  to cover this code 100% also polydata needed, where colorarray already exists
+  //  + one fiber with exactly 1 point
+  //  + one fiber with 0 points
+  //=================================================
+  
   /* === decide which polydata to choose ===
-   * usually you call this method when u received fresh fibers from an tracking algorithm.
-   * In this case the variable m_OriginalFiberPolyData will act as source for creating color
-   * information for each point. However, if u process on fibers and forgot calling colorcoding 
-   * before calling any other method (e.g. linesmoothing), then - for performance reason - it makes
-   * sense not to process on the "original" pointset, but on the smoothed one (well, this might lack
-   * in performance anyway ;-) ).
-   *
-   * It might occur that u call this method again - u must be drunk then - but this algorithm takes
-   * care of ur incapability by checking if there already exists a color array for orientation based 
-   * color information
+   ** ALL REDESIGNED
    */
   
-  //these variables are needed for some intelligence in handling colorarrays and already smoothed structures
-  //both vars are sensing the "colorful" part of fiberbundles ;-)
-//  bool hasSmoothedFibColors = true; 
-  bool hasOriginalFibColors = true;
-  bool hasSmoothedFibColors = false;
-   
-  //check if color array in original fiber dataset is valid
-  if ( m_OriginalFiberPolyData != NULL ) 
+  bool hasFiberDataColor = false;
+  
+  // check if color array in original fiber dataset is valid
+  if ( m_FiberStructureData != NULL ) 
   {
-    if ( m_OriginalFiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) )
+    if ( m_FiberStructureData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
+        m_FiberStructureData->GetNumberOfPoints() == 
+        m_FiberStructureData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
     {
-      // validate input, number of items must match number of points
-      if ( m_OriginalFiberPolyData->GetNumberOfPoints() != 
-           m_OriginalFiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-      { 
-        //invalid color array, try to heal
-        MITK_INFO << "NUMBER OF POINTS DOES NOT MATCH COLOR INFORMATION in m_OriginalFiberPolyData, ARRAY: " << COLORCODING_ORIENTATION_BASED;
-        hasOriginalFibColors = doSelfHealingColorOrient(m_OriginalFiberPolyData); 
-        
-      }//no else, cuz pointset matches color set :-)
-      
-    } else {
-      //so far no color array exists
-      hasOriginalFibColors = false;
+      hasFiberDataColor = true; 
     }
     
-  } else { // else of check (m_OriginalFiberPolyData != NULL)
+  } else {
     MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
-// nothing to implement or return here because hasOriginalFibColors is set to true and the checking mechanism below will take care of this issue as well
+    hasFiberDataColor = true; // "true" will return later on
   }
   
-  // make sure colorcoding in smoothed fibers are OK, otherwise do selfHealing
-  if (hasOriginalFibColors &&  
-      m_FiberPolyData.GetPointer() != NULL && 
-      m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
-      (m_FiberPolyData->GetNumberOfPoints() != m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples()) ) 
-  {
-    hasSmoothedFibColors = doSelfHealingColorOrient(m_FiberPolyData);
-  }
-  
-  
-//  make sure that processing colorcoding is only called when necessary
-  if (hasOriginalFibColors)
-    return;
-  if (hasOriginalFibColors && hasSmoothedFibColors)
+  /*  make sure that processing colorcoding is only called when necessary */
+  if (hasFiberDataColor)
     return;
   
-      
+  /* Finally, execute color calculation */
+  vtkPoints* extrPoints = m_FiberStructureData->GetPoints();
+  int numOfPoints = extrPoints->GetNumberOfPoints();
+  
   //colors and alpha value for each single point, RGBA = 4 components
+  unsigned char rgba[4] = {0,0,0,0};
+  int componentSize = sizeof(rgba);
+  
   vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
-  colorsT->SetNumberOfComponents(4);
+  colorsT->Allocate(numOfPoints * componentSize);
+  colorsT->SetNumberOfComponents(componentSize);
   colorsT->SetName(COLORCODING_ORIENTATION_BASED);
   
-  //colorcoding orientation based
-  unsigned char rgba[4] = {0,0,0,0};
-  
-  int i=0;
-  if (i<m_OriginalFiberPolyData->GetPoints()->GetNumberOfPoints()-1 && i>0)
-  {// process all points except starting and endpoint
+  /* catch case: fiber consists of only 1 point */
+  if (numOfPoints > 1) 
+  {
     
-  } else if (i==0) {
-    // process startingpoint
+    for (int i=0; i <numOfPoints; ++i)
+    {
+      /* process all points except starting and endpoint
+       * for calculating color value take current point, previous point and next point */
+      if (i<numOfPoints-1 && i > 0)
+      {
+        /* The color value of the current point is influenced by the previous point and next point. */
+        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
+        vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(i+1)[0], extrPoints->GetPoint(i+1)[1], extrPoints->GetPoint(i+1)[2]);
+        vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(i-1)[0], extrPoints->GetPoint(i-1)[1], extrPoints->GetPoint(i-1)[2]);
+        
+        vnl_vector_fixed< double, 3 > diff1;
+        diff1 = currentPntvtk - nextPntvtk;
+        diff1.normalize();
+        
+        vnl_vector_fixed< double, 3 > diff2;
+        diff2 = currentPntvtk - prevPntvtk;
+        diff2.normalize();
+        
+        vnl_vector_fixed< double, 3 > diff;
+        diff = (diff1 - diff2) / 2.0;
+        
+        rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
+        rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
+        rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+        rgba[3] = (unsigned char) (255.0); 
+        
+        
+      } else if (i==0) {
+        /* First point has no previous point, therefore only diff1 is taken */
+        
+        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
+        vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(i+1)[0], extrPoints->GetPoint(i+1)[1], extrPoints->GetPoint(i+1)[2]);
+        
+        vnl_vector_fixed< double, 3 > diff1;
+        diff1 = currentPntvtk - nextPntvtk;
+        diff1.normalize();
+        
+        rgba[0] = (unsigned char) (255.0 * std::abs(diff1[0]));
+        rgba[1] = (unsigned char) (255.0 * std::abs(diff1[1]));
+        rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
+        rgba[3] = (unsigned char) (255.0); 
+        
+      } else if (i==numOfPoints-1) {
+        /* Last point has no next point, therefore only diff2 is taken */
+        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
+        vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(i-1)[0], extrPoints->GetPoint(i-1)[1], extrPoints->GetPoint(i-1)[2]);
+        
+        vnl_vector_fixed< double, 3 > diff2;
+        diff2 = currentPntvtk - prevPntvtk;
+        diff2.normalize();
+        
+        rgba[0] = (unsigned char) (255.0 * std::abs(diff2[0]));
+        rgba[1] = (unsigned char) (255.0 * std::abs(diff2[1]));
+        rgba[2] = (unsigned char) (255.0 * std::abs(diff2[2]));
+        rgba[3] = (unsigned char) (255.0); 
+        
+      }
+      
+      colorsT->InsertTupleValue(i, rgba);
+    } //end for loop
     
-  } else if (i==m_OriginalFiberPolyData->GetPoints()->GetNumberOfPoints()-1) {
-    // process endpoint
+  } else if (numOfPoints == 1) {
+    /* Fiber consists of 1 point only, color that point as you wish :) */
+    colorsT->InsertTupleValue(0, rgba);
     
+  } else {
+    MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ; 
   }
   
-  
+  //mini test, shall be ported to MITK TESTINGS!
+  if (colorsT->GetSize() != numOfPoints*componentSize) {
+    MITK_INFO << "ALLOCATION ERROR IN INITIATING COLOR ARRAY";
+  }
   
 }
 
-//private repairMechanism for orientationbased colorcoding
-bool mitk::FiberBundleX::doSelfHealingColorOrient(vtkPolyData* healMe)
-{
-  bool hasHealingSucceeded = false;
-  MITK_INFO << "FiberBundleX self repair mechanism is called, but not yet implemented";
-//  check type of healMe
-  if (healMe == m_FiberPolyData) 
-  {
-    //todo
-  
-  } else if (healMe ==  m_OriginalFiberPolyData)
-  {
-    //todo
-  }
-  
-  return hasHealingSucceeded;
-}
+////private repairMechanism for orientationbased colorcoding
+//bool mitk::FiberBundleX::doSelfHealingColorOrient(vtkPolyData* healMe)
+//{
+//  bool hasHealingSucceeded = false;
+//  MITK_INFO << "FiberBundleX self repair mechanism is called, but not yet implemented";
+////  check type of healMe
+//  if (healMe ==  m_ImportedFiberData)
+//  {
+//    //todo
+//  }
+//  
+//  return hasHealingSucceeded;
+//}
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

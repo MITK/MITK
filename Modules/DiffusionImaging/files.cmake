@@ -80,8 +80,9 @@ SET(CPP_FILES
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
-
-  # Interactions
+  Rendering/mitkFiberBundleXMapper3D.cpp
+  
+# Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
   # Algorithms
@@ -92,6 +93,7 @@ SET(H_FILES
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
+  Rendering/mitkFiberBundleXMapper3D.cpp
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

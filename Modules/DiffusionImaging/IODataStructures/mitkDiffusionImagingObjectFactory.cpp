@@ -39,18 +39,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 
+//====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
 #include "mitkFiberBundleMapper3D.h"
-
 #include "mitkFiberBundleIOFactory.h"
 #include "mitkFiberBundleWriterFactory.h"
 #include "mitkFiberBundleWriter.h"
+//==================================
 
 //modernized fiberbundle datastrucutre
 #include "mitkFiberBundleX.h" 
 #include "mitkFiberBundleXIOFactory.h"
 #include "mitkFiberBundleXWriterFactory.h"
 #include "mitkFiberBundleXWriter.h"
+#include "mitkFiberBundleXMapper3D.h"
 
 #include "mitkNrrdTbssImageIOFactory.h"
 #include "mitkNrrdTbssImageWriterFactory.h"
@@ -172,7 +174,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "FiberBundleX";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::FiberBundleMapper3D::New();
+      newMapper = mitk::FiberBundleXMapper3D::New();
       newMapper->SetDataNode(node);
     }
 

@@ -25,10 +25,20 @@
 
 
 #include <vtkPropAssembly.h>
+#include <vtkPointData.h>
+#include <vtkProperty.h>
 
-mitk::FiberBundleXMapper3D::FiberBundleXMapper3D() 
+//not essential for mapper
+#include <QTime>
+
+mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
+: m_FiberMapperGLSP(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New()),
+  m_FiberMapperGLWP(vtkOpenGLPolyDataMapper::New()),
+  m_FiberActorSP(vtkSmartPointer<vtkActor>::New()),
+  m_FiberActorWP(vtkActor::New()),
+  m_FiberAssembly(vtkPropAssembly::New())
 {
-  m_FiberAssembly = vtkPropAssembly::New();
+
 }
 
 
@@ -50,10 +60,50 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::GenerateData()
 {
+  //=====timer measurement====
+  QTime myTimer;
+  myTimer.start();
+  //==========================
+  
   mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
   vtkPolyData* FiberData = FBX->GetFibers();
   
+  m_FiberMapperGLSP->SetInput(FiberData); 
+//  m_FiberMapperGLWP->SetInput(FiberData);
   
+  
+  if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
+  {
+    if ( FiberData->GetPointData()->HasArray(FiberBundleX::COLORCODING_ORIENTATION_BASED) ) 
+    {
+      m_FiberMapperGLSP->SelectColorArray(FiberBundleX::COLORCODING_ORIENTATION_BASED);
+//      m_FiberMapperGLWP->SelectColorArray(FiberBundleX::COLORCODING_ORIENTATION_BASED);
+    } else {
+//      iterate through polydata array and take the first best -but valid- array
+      
+      //===ToDo===
+      //check of componentsize as well, if it is not RGB or RGBA (ie. size 3 or 4), then check if it is a scalar
+      // if scalar then create lookuptable for that.
+    }
+    
+    m_FiberMapperGLSP->ScalarVisibilityOn();
+//    m_FiberMapperGLWP->ScalarVisibilityOn();
+    m_FiberMapperGLSP->SetScalarModeToUsePointFieldData();
+//    m_FiberMapperGLWP->SetScalarModeToUsePointFieldData();
+  }
+    
+  
+  m_FiberActorSP->SetMapper(m_FiberMapperGLSP);
+//  m_FiberActorWP->SetMapper(m_FiberMapperGLWP);
+  
+  m_FiberActorSP->GetProperty()->SetOpacity(1.0);
+//  m_FiberActorWP->GetProperty()->SetOpacity(1.0);
+
+  m_FiberAssembly->AddPart(m_FiberActorSP);
+  
+  //====timer measurement========
+  MITK_INFO << "Execution Time GenerateData() (nmiliseconds): " << myTimer.elapsed();
+  //=============================
   
 }
 
@@ -61,7 +111,7 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  
+  //ToDo do update checks
 }
 
 

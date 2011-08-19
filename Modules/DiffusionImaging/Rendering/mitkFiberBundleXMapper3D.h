@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVtkMapper3D.h>
 #include <mitkFiberBundleX.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkActor.h>
+
 
 
 class vtkPropAssembly;
@@ -61,8 +65,14 @@ namespace mitk {
 
     void UpdateVtkObjects(); //??
 
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_FiberMapperGLSP;
+    vtkOpenGLPolyDataMapper* m_FiberMapperGLWP;
+    
+    vtkSmartPointer<vtkActor> m_FiberActorSP;
+    vtkActor* m_FiberActorWP;
+    
     vtkPropAssembly* m_FiberAssembly;
-
+    
 
   };
 

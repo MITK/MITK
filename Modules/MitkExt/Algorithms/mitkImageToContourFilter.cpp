@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notices for more information.
 #include "vtkLinearTransform.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "vtkProperty.h"
-#include <mitkImageAccessByItk.h>
+#include "mitkImageAccessByItk.h"
 
 
 mitk::ImageToContourFilter::ImageToContourFilter()

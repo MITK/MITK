@@ -1,4 +1,8 @@
 SET(CPP_FILES
+  Algorithms/mitkImageToContourFilter.cpp
+  Algorithms/mitkReduceContourSetFilter.cpp
+  Algorithms/mitkComputeContourSetNormalsFilter.cpp
+  Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
   Algorithms/mitkMaskAndCutRoiImageFilter.cpp
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx

@@ -49,6 +49,10 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     normals->SetNumberOfComponents(3);
     normals->SetNumberOfTuples(polyData->GetNumberOfPoints());
 
+    //If the current contour is an inner contour then the direction is -1
+    //A contour lies inside another one if the pixel values in the direction of the normal is 1
+    int normalDirection (1);
+
     //Iterating over each polygon
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {
@@ -122,6 +126,22 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
         finalNormal[0] = (vertexNormal[0] + vertexNormalTemp[0])*0.5;
         finalNormal[1] = (vertexNormal[1] + vertexNormalTemp[1])*0.5;
         finalNormal[2] = (vertexNormal[2] + vertexNormalTemp[2])*0.5;
+
+        //Here we determine the direction of the normal
+        if (j == 0 && m_SegmentationBinaryImage)
+        {
+          Point3D worldCoord;
+          worldCoord[0] = p1[0]+finalNormal[0];
+          worldCoord[1] = p1[1]+finalNormal[1];
+          worldCoord[2] = p1[2]+finalNormal[2];
+
+          double val = m_SegmentationBinaryImage->GetPixelValueByWorldCoordinate(worldCoord);
+          if (val == 1.0) normalDirection = -1;
+        }
+
+        finalNormal[0] = finalNormal[0]*normalDirection;
+        finalNormal[1] = finalNormal[1]*normalDirection;
+        finalNormal[2] = finalNormal[2]*normalDirection;
 
         vertexNormalTemp[0] = vertexNormal[0];
         vertexNormalTemp[1] = vertexNormal[1];

@@ -15,7 +15,7 @@ PURPOSE. See the above copyright notices for more information.
 #ifndef mitkComputeContourSetNormalsFilter_h_Included
 #define mitkComputeContourSetNormalsFilter_h_Included
 
-#include <mitk3DSurfaceInterpolationExports.h>
+#include "MitkExtExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
@@ -25,6 +25,8 @@ PURPOSE. See the above copyright notices for more information.
 #include "vtkMath.h"
 #include "vtkCellData.h"
 #include "vtkLine.h"
+
+#include "mitkImage.h"
 
 namespace mitk {
 
@@ -40,12 +42,14 @@ namespace mitk {
 
    $Author: fetzer$
 */
-class mitk3DSurfaceInterpolation_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
+class MitkExt_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
 {
 public:
 
   mitkClassMacro(ComputeContourSetNormalsFilter,SurfaceToSurfaceFilter);
   itkNewMacro(Self);
+
+  itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
 
    /*
       \brief Returns the computed normals as a surface 
@@ -57,6 +61,11 @@ protected:
   virtual ~ComputeContourSetNormalsFilter();
   virtual void GenerateData();
   virtual void GenerateOutputInformation();
+
+private:
+
+  //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
+  mitk::Image::Pointer m_SegmentationBinaryImage;
 
 };//class
 

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
+#include "mitkSurfaceInterpolationController.h"
 
 #include <QWidget>
 #include <map>
@@ -130,6 +131,11 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnInterpolationInfoChanged(const itk::EventObject&);
 
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
+    void OnSurfaceInterpolationInfoChanged(const itk::EventObject&);
+
   signals:
 
   public slots:
@@ -138,6 +144,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
       Call this from the outside to enable/disable interpolation
     */
    void EnableInterpolation(bool);
+
+   void Enable3DInterpolation(bool);
 
     /**
       Call this from the outside to accept all interpolations
@@ -166,6 +174,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnInterpolationActivated(bool);
 
+    void On3DInterpolationActivated(bool);
+
     void OnMultiWidgetDeleted(QObject*);
 
     //Enhancement for 3D interpolation
@@ -193,6 +203,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
       should be interpolated. The actual work is then done by our SegmentationInterpolation object.
      */
     void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep );
+
+    void InterpolateSurface();
     
     /**
       Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
@@ -207,6 +219,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     bool GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex);
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
+    mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     QmitkStdMultiWidget* m_MultiWidget;
     mitk::ToolManager* m_ToolManager;
@@ -219,6 +232,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     unsigned int STimeObserverTag;
     unsigned int FTimeObserverTag;
     unsigned int InterpolationInfoChangedObserverTag;
+    unsigned int SurfaceInterpolationInfoChangedObserverTag;
 
     QPushButton* m_BtnAcceptInterpolation;
     QPushButton* m_BtnAcceptAllInterpolations;
@@ -228,9 +242,10 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     QRadioButton* m_RBtnEnable3DInterpolation;
     QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
     QPushButton* m_BtnAccept3DInterpolation;
-    QCheckBox* m_CbRun3DInterpolationInBackGround;
+    QCheckBox* m_CbHideMarkers;
 
     mitk::DataNode::Pointer m_FeedbackNode;
+    mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
 
     mitk::Image* m_Segmentation;
     unsigned int m_LastSliceDimension;
@@ -238,7 +253,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     
     std::vector<unsigned int> m_TimeStep; // current time step of the render windows
 
-    bool m_InterpolationEnabled;
+    bool m_2DInterpolationEnabled;
+    bool m_3DInterpolationEnabled;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };

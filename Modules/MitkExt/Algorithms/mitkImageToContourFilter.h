@@ -16,7 +16,7 @@ PURPOSE. See the above copyright notices for more information.
 #define mitkImageToContourFilter_h_Included
 
 //#include "MitkSBExports.h"
-#include <mitk3DSurfaceInterpolationExports.h>
+#include "MitkExtExports.h"
 #include "itkImage.h"
 #include "mitkImage.h"
 #include "itkContourExtractor2DImageFilter.h"
@@ -36,7 +36,7 @@ namespace mitk {
   
   The output is a mitk::Surface.
 */
-class mitk3DSurfaceInterpolation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
+class MitkExt_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {
  public:
 

@@ -15,7 +15,7 @@ PURPOSE. See the above copyright notices for more information.
 #ifndef mitkCreateDistanceImageFromSurfaceFilter_h_Included
 #define mitkCreateDistanceImageFromSurfaceFilter_h_Included
 
-#include <mitk3DSurfaceInterpolationExports.h>
+#include "MitkExtExports.h"
 
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
@@ -65,7 +65,7 @@ namespace mitk {
 
   $Author: fetzer$
   */
-  class mitk3DSurfaceInterpolation_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
+  class MitkExt_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
 
   public:

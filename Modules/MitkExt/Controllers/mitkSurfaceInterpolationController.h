@@ -56,6 +56,12 @@ namespace mitk
      */
     Surface::Pointer Interpolate ();
 
+    itkSetMacro(MinSpacing, double);
+    itkSetMacro(MaxSpacing, double);
+    itkSetMacro(WorkingImage, Image*);
+
+   /* bool DataSetHasChanged();*/
+
 
 
  protected:
@@ -78,6 +84,14 @@ namespace mitk
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
+    CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
+
+    double m_MinSpacing;
+    double m_MaxSpacing;
+
+    const Image* m_WorkingImage;
+
+   /* bool m_Modified;*/
 
  };
 }

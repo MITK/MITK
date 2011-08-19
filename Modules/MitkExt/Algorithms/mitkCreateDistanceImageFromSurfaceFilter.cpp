@@ -36,6 +36,11 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 
   //The last step is to create the distance map with the interpolated distance function
   this->CreateDistanceImage();
+  m_Centers.clear();
+  m_FunctionValues.clear();
+  m_Normals.clear();
+  m_Weights.clear();
+  m_SolutionMatrix.clear();
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()

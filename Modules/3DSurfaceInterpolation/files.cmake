@@ -1,9 +1,0 @@
-SET(CPP_FILES
-  itkContourExtractor2DImageFilter.txx
-  itkImageToPathFilter.txx
-  mitkImageToContourFilter.cpp
-  mitkReduceContourSetFilter.cpp
-  mitkComputeContourSetNormalsFilter.cpp
-  mitkCreateDistanceImageFromSurfaceFilter.cpp
-  mitkSurfaceToImageFilter.cpp
-)

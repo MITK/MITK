@@ -19,7 +19,7 @@ void mitk::ImageDescriptor::AddNewChannel(mitk::PixelType ptype, const char *nam
   this->m_ChannelDesc.push_back( desc );
 
   if( name == 0)
-    m_ChannelNames.push_back( "Unnamed");
+    m_ChannelNames.push_back( "Unnamed ["+ptype.GetItkTypeAsString()+"]");
   else
     m_ChannelNames.push_back(name);
 

@@ -93,7 +93,7 @@ SET(H_FILES
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
-  Rendering/mitkFiberBundleXMapper3D.cpp
+  Rendering/mitkFiberBundleXMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

@@ -49,6 +49,15 @@ SET(CPP_FILES
   IODataStructures/FiberBundle/mitkParticle.cpp
   IODataStructures/FiberBundle/mitkParticleGrid.cpp
 
+# DataStructures -> FiberBundleX
+  IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
+
+
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
@@ -71,8 +80,9 @@ SET(CPP_FILES
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
-
-  # Interactions
+  Rendering/mitkFiberBundleXMapper3D.cpp
+  
+# Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
   # Algorithms
@@ -82,6 +92,8 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
+  Rendering/mitkFiberBundleMapper3D.h
+  Rendering/mitkFiberBundleXMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -94,6 +106,15 @@ SET(H_FILES
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
   IODataStructures/TbssImages/mitkTbssImage.h
+
+  # DataStructures -> FiberBundleX
+  IODataStructures/FiberBundleX/mitkFiberBundleX.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXReader.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
+
 
  
   # Tractography

@@ -88,8 +88,9 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( std::string("org.mitk.views.screenshotmaker") );
   viewExcludeList.push_back( std::string("org.mitk.views.segmentation") );
   viewExcludeList.push_back( std::string("org.mitk.views.imagestatistics") );
-  viewExcludeList.push_back( std::string("org.mitk.views.controlvisualizationpropertiesview") );
+//  viewExcludeList.push_back( std::string("org.mitk.views.controlvisualizationpropertiesview") );
   viewExcludeList.push_back( std::string("org.mitk.views.volumevisualization") );
+  viewExcludeList.push_back( std::string("org.mitk.views.simplemeasurement") );
 
   configurer->SetShowPerspectiveBar(false);
   configurer->SetInitialSize(berry::Point(1000,770));
@@ -99,7 +100,8 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->SetViewExcludeList(viewExcludeList);
   advisor->ShowViewToolbar(false);
   advisor->ShowVersionInfo(false);
-  advisor->SetProductName("MITK Diffusioin Imaging App");
+  advisor->ShowMitkVersionInfo(false);
+  advisor->SetProductName("MITK Diffusion Imaging App");
   advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");
   return advisor;
 }

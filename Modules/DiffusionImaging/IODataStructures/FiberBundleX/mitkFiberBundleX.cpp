@@ -186,11 +186,19 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ; 
   }
   
+  
+  m_FiberStructureData->GetPointData()->AddArray(colorsT);
+  
   //mini test, shall be ported to MITK TESTINGS!
   if (colorsT->GetSize() != numOfPoints*componentSize) {
     MITK_INFO << "ALLOCATION ERROR IN INITIATING COLOR ARRAY";
   }
   
+  
+//===== clean memory =====
+  colorsT->Delete();
+
+//========================
 }
 
 ////private repairMechanism for orientationbased colorcoding

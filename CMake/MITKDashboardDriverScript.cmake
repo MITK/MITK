@@ -287,24 +287,29 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       
         string(REPLACE "^^" ";" external_project_with_build_dir_list "${external_project_with_build_dir}")
         list(GET external_project_with_build_dir_list 0 external_project)
-        list(GET external_project_with_build_dir_list 1 external_project_build_dir)
+        list(GET external_project_with_build_dir_list 1 external_project_test_dir)
+        list(GET external_project_with_build_dir_list 2 external_project_build_dir)
+        
+        if (NOT external_project_build_dir)
+          set(external_project_build_dir ${external_project_test_dir})
+        endif()
                 
         set_property(GLOBAL PROPERTY SubProject ${external_project})
         set_property(GLOBAL PROPERTY Label ${external_project})
         
         message("----------- [ Build ${external_project} ] -----------")
        
-        # Build target
-        func_build_target(${external_project} "${CTEST_BINARY_DIRECTORY}")
+        # Build the "all" target for the external project
+        func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}")
         
         # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-        file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
+        file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_test_dir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
         file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
         
         message("----------- [ Test ${external_project} ] -----------")
 
         # runs only tests that have a LABELS property matching "${external_project}"
-        func_test(${external_project} "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}")
+        func_test(${external_project} "${CTEST_BINARY_DIRECTORY}/${external_project_test_dir}")
         
         # restore old coverage dirs
         file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")

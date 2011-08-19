@@ -17,7 +17,7 @@
   </extension>
   
   <extension point="org.blueberry.ui.perspectives">
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" name="Springer DTI Atlas" class="QmitkDiffusionImagingAppPerspective" icon="resources/diffusionimaging.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" name="Diffusion Imaging App" class="QmitkDiffusionImagingAppPerspective" icon="resources/diffusionimaging.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome" name="Welcome" class="QmitkWelcomePerspective" icon="resources/icon_home.png"/>
   </extension>
   

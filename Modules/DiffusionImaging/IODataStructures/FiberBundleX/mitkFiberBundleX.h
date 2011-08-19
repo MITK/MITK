@@ -64,8 +64,6 @@ namespace mitk {
     //    import fiber result from tractography algorithms
     void SetFibers(vtkSmartPointer<vtkPolyData>);
     
-    //    return original computed fibers ... actually there is no smartpointer needed because original fibers are passed from the tractography filter
-    vtkPolyData* GetOriginalFibers();
     
     //    return processed fibers
     vtkPolyData* GetFibers();

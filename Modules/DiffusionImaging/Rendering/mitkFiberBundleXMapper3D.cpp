@@ -50,8 +50,11 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::GenerateData()
 {
-  mitk::FiberBundleX::Pointer PFiberBundleX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
-
+  mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
+  vtkPolyData* FiberData = FBX->GetFibers();
+  
+  
+  
 }
 
 

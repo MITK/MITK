@@ -289,6 +289,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         list(GET external_project_with_build_dir_list 0 external_project)
         list(GET external_project_with_build_dir_list 1 external_project_test_dir)
         list(GET external_project_with_build_dir_list 2 external_project_build_dir)
+        list(GET external_project_with_build_dir_list 3 external_project_extra_target)
         
         if (NOT external_project_build_dir)
           set(external_project_build_dir ${external_project_test_dir})
@@ -301,6 +302,9 @@ ${INITIAL_CMAKECACHE_OPTIONS}
        
         # Build the "all" target for the external project
         func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}")
+        if(external_project_extra_target)
+          func_build_target("${external_project_extra_target}" "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}")
+        endif()
         
         # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
         file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_test_dir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)

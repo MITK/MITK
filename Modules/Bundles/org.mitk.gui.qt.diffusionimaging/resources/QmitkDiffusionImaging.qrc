@@ -22,5 +22,10 @@
         <file>rectangle.png</file>
         <file>circle.png</file>
         <file>polygon.png</file>
+        <file>color24.gif</file>
+        <file>color48.gif</file>
+        <file>color64.gif</file>
+        <file>crosshair.png</file>
+        <file>paint2.png</file>
     </qresource>
 </RCC>

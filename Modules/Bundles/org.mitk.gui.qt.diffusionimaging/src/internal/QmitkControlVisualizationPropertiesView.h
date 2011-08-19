@@ -111,10 +111,15 @@ protected slots:
 
   void SetInteractor();
 
-  void PFWidth(double);
+  void PFWidth(int);
   void PFColor();
+  void PFColor3D();
+
+  void LineWidthChanged(int);
+  void TubeRadiusChanged(int);
 
   void Heatmap();
+  void Welcome();
 
 protected:
 

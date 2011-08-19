@@ -53,6 +53,8 @@ public:
 
     void ShowVersionInfo(bool show);
 
+    void ShowMitkVersionInfo(bool show);
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -109,6 +111,7 @@ private:
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
   bool showVersionInfo;
+  bool showMitkVersionInfo;
   std::string productName;
   std::string windowIcon;
 

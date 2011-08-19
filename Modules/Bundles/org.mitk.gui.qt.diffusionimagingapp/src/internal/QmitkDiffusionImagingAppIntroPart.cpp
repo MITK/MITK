@@ -133,6 +133,7 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   QByteArray urlHostname  = showMeNext.encodedHost();
   QByteArray urlPath      = showMeNext.encodedPath();
   QByteArray dataset      = showMeNext.encodedQueryItemValue("dataset");
+  QByteArray clear        = showMeNext.encodedQueryItemValue("clear");
 
   if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;  
 
@@ -183,6 +184,12 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
         bool clearDataStorageFirst(false);
+        QString *sClear = new QString(clear.data());
+        if ( sClear->right(4) == "true" )
+        {
+          clearDataStorageFirst = true;
+        }
+
         mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
         dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
         dsmodified = true;
@@ -208,13 +215,13 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         }
         catch(...)
         {
-
+          MITK_INFO << "Could not open file!";
         }
       }
 
 
 
-      if(dsmodified)
+      if(dataStorage.IsNotNull() && dsmodified)
       {
         // get all nodes that have not set "includeInBoundingBox" to false
         mitk::NodePredicateNot::Pointer pred
@@ -222,10 +229,14 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
                                                                            , mitk::BoolProperty::New(false)));
 
         mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
-        // calculate bounding geometry of these nodes
-        mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
-        // initialize the views to the bounding geometry
-        mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+
+        if(rs->Size() > 0)
+        {
+          // calculate bounding geometry of these nodes
+          mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+          // initialize the views to the bounding geometry
+          mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+        }
       }
 
 

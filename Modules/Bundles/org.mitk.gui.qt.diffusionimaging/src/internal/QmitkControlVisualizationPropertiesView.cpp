@@ -171,35 +171,82 @@ struct CvpSelListener : ISelectionListener
         {
           m_View->m_Controls->m_PlanarFigureControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
+
+          float val;
+          node->GetFloatProperty("planarfigure.line.width", val);
+          m_View->m_Controls->m_PFWidth->setValue((int)(val*10.0));
+
+          QString label = "Width %1";
+          label = label.arg(val);
+          m_View->m_Controls->label_pfwidth->setText(label);
+
+          float color[3];
+          node->GetColor( color, NULL, "planarfigure.default.line.color");
+          QString styleSheet = "background-color:rgb(";
+          styleSheet.append(QString::number(color[0]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[1]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[2]*255.0));
+          styleSheet.append(")");
+          m_View->m_Controls->m_PFColor->setAutoFillBackground(true);
+          m_View->m_Controls->m_PFColor->setStyleSheet(styleSheet);
+
+          node->GetColor( color, NULL, "color");
+          styleSheet = "background-color:rgb(";
+          styleSheet.append(QString::number(color[0]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[1]*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(color[2]*255.0));
+          styleSheet.append(")");
+          m_View->m_Controls->m_PFColor3D->setAutoFillBackground(true);
+          m_View->m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
+
+          m_View->PlanarFigureFocus();
         }
 
         if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
         {
-          MITK_INFO << "Node " << node.GetPointer();
-          MITK_INFO << "pick " << m_View->m_CurrentPickingNode;
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
 
           if(m_View->m_CurrentPickingNode != 0 && node.GetPointer() != m_View->m_CurrentPickingNode)
           {
-            m_View->m_Controls->m_SetInteractor->setEnabled(false);
+            m_View->m_Controls->m_Crosshair->setEnabled(false);
           }
           else
           {
-            m_View->m_Controls->m_SetInteractor->setEnabled(true);
+            m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
 
-          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
-          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
-          m_View->m_Controls->m_Color->setAutoFillBackground(true);
-          QString styleSheet = "background-color:rgb(";
-          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
-          styleSheet.append(",");
-          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
-          styleSheet.append(",");
-          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
-          styleSheet.append(")");
-          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
+          float val;
+          node->GetFloatProperty("TubeRadius", val);
+          m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
+
+          QString label = "Radius %1";
+          label = label.arg(val);
+          m_View->m_Controls->label_tuberadius->setText(label);
+
+          int width;
+          node->GetIntProperty("LineWidth", width);
+          m_View->m_Controls->m_LineWidth->setValue(width);
+
+          label = "Width %1";
+          label = label.arg(width);
+          m_View->m_Controls->label_linewidth->setText(label);
+
+//          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
+//          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
+//          m_View->m_Controls->m_Color->setAutoFillBackground(true);
+//          QString styleSheet = "background-color:rgb(";
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
+//          styleSheet.append(",");
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
+//          styleSheet.append(",");
+//          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
+//          styleSheet.append(")");
+//          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
 
 
         }
@@ -498,6 +545,21 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon icon5(":/QmitkDiffusionImaging/Refresh_48.png");
     m_Controls->m_Reinit->setIcon(icon5);
+    m_Controls->m_Focus->setIcon(icon5);
+
+    QIcon iconColor(":/QmitkDiffusionImaging/color24.gif");
+    m_Controls->m_PFColor->setIcon(iconColor);
+    m_Controls->m_PFColor3D->setIcon(iconColor);
+    m_Controls->m_Color->setIcon(iconColor);
+
+    m_Controls->m_PFColor->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_Controls->m_PFColor3D->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
+    m_Controls->m_Crosshair->setIcon(iconCrosshair);
+
+    QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
+    m_Controls->m_2DHeatmap->setIcon(iconPaint);
 
     m_Controls->m_TextureIntON->setCheckable(true);
     m_Controls->m_VisibleOdfsON_T->setCheckable(true);
@@ -659,12 +721,18 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
 
-    connect((QObject*) m_Controls->m_SetInteractor, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
+    connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
-    connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(PFWidth(double)));
+    connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
+    connect((QObject*) m_Controls->m_PFColor3D, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor3D()));
 
     connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
+
+    connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
+    connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
+
+    connect((QObject*) m_Controls->m_Welcome, SIGNAL(clicked()), (QObject*) this, SLOT(Welcome()));
 
   }
 }
@@ -1137,6 +1205,12 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 {
   m_Controls->m_ScalingFrame->setVisible(
       m_Controls->m_ScalingCheckbox->isChecked());
+
+  if(!m_Controls->m_ScalingCheckbox->isChecked())
+  {
+    m_Controls->m_AdditionalScaling->setCurrentIndex(0);
+    m_Controls->m_ScalingFactor->setValue(1.0);
+  }
 }
 
 
@@ -1144,7 +1218,8 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 {
   if(m_SelectedNode)
   {
-    m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(m_Controls->m_LineWidth->value()));
+    int width = m_Controls->m_LineWidth->value();
+    m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(width));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(15));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(18));
@@ -1166,7 +1241,8 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationTube()
 {
   if(m_SelectedNode)
   {
-    m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(m_Controls->m_TubeRadius->value()));
+    float radius = m_Controls->m_TubeRadius->value() / 100.0;
+    m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(radius));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(17));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(13));
@@ -1215,24 +1291,19 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     {
 
       QmitkRenderWindow* selectedRenderWindow = 0;
+      bool PlanarFigureInitializedWindow = false;
 
       QmitkRenderWindow* RenderWindow1 =
           this->GetActiveStdMultiWidget()->GetRenderWindow1();
-      QmitkRenderWindow* RenderWindow2 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow2();
-      QmitkRenderWindow* RenderWindow3 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow3();
-      QmitkRenderWindow* RenderWindow4 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow4();
 
-      bool PlanarFigureInitializedWindow = false;
-
-      // find initialized renderwindow
       if (m_SelectedNode->GetBoolProperty("PlanarFigureInitializedWindow",
-                                          PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+        PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow1;
       }
+
+      QmitkRenderWindow* RenderWindow2 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow2();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
@@ -1241,12 +1312,18 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
         selectedRenderWindow = RenderWindow2;
       }
 
+      QmitkRenderWindow* RenderWindow3 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow3();
+
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
           RenderWindow3->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow3;
       }
+
+      QmitkRenderWindow* RenderWindow4 =
+          this->GetActiveStdMultiWidget()->GetRenderWindow4();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
           "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
@@ -1350,15 +1427,15 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
       if(bundleInteractor.IsNotNull())
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(bundleInteractor);
 
-      if(!m_Controls->m_SetInteractor->isChecked())
+      if(!m_Controls->m_Crosshair->isChecked())
       {
-        m_Controls->m_SetInteractor->setChecked(false);
+        m_Controls->m_Crosshair->setChecked(false);
         this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::ArrowCursor);
         m_CurrentPickingNode = 0;
       }
       else
       {
-        m_Controls->m_SetInteractor->setChecked(true);
+        m_Controls->m_Crosshair->setChecked(true);
         bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
         mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
         this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::CrossCursor);
@@ -1370,15 +1447,21 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
 
 }
 
-void QmitkControlVisualizationPropertiesView::PFWidth(double width)
+void QmitkControlVisualizationPropertiesView::PFWidth(int w)
 {
 
+  double width = w/10.0;
   m_SelectedNode->SetProperty("planarfigure.line.width", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.outline.width", mitk::FloatProperty::New(width) );
   m_SelectedNode->SetProperty("planarfigure.helperline.width", mitk::FloatProperty::New(width) );
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  QString label = "Width %1";
+  label = label.arg(width);
+  m_Controls->label_pfwidth->setText(label);
+
 }
 
 void QmitkControlVisualizationPropertiesView::PFColor()
@@ -1402,11 +1485,9 @@ void QmitkControlVisualizationPropertiesView::PFColor()
   m_SelectedNode->SetProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
   m_SelectedNode->SetProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-//  m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
+  m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
 
@@ -1416,6 +1497,27 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 //  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 //  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::PFColor3D()
+{
+
+  QColor color = QColorDialog::getColor();
+
+  m_Controls->m_PFColor3D->setAutoFillBackground(true);
+  QString styleSheet = "background-color:rgb(";
+  styleSheet.append(QString::number(color.red()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.green()));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color.blue()));
+  styleSheet.append(")");
+  m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
+
+  m_SelectedNode->SetProperty( "color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkControlVisualizationPropertiesView::Heatmap()
@@ -1460,4 +1562,28 @@ void QmitkControlVisualizationPropertiesView::Heatmap()
 
     GetDataStorage()->Add(node);
   }
+}
+
+void QmitkControlVisualizationPropertiesView::LineWidthChanged(int w)
+{
+  m_SelectedNode->SetIntProperty("LineWidth", w);
+
+  QString label = "Width %1";
+  label = label.arg(w);
+  m_Controls->label_linewidth->setText(label);
+}
+
+void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
+{
+  m_SelectedNode->SetFloatProperty("TubeRadius", (float) r / 100.0);
+
+  QString label = "Radius %1";
+  label = label.arg(r / 100.0);
+  m_Controls->label_tuberadius->setText(label);
+}
+
+void QmitkControlVisualizationPropertiesView::Welcome()
+{
+  berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
+   GetSite()->GetWorkbenchWindow(), false);
 }

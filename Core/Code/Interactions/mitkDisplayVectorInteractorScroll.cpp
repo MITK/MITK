@@ -56,6 +56,8 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
 
       if(sliceNaviController)
       {
+        this->InvokeEvent( StartInteractionEvent() );
+
         int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
         // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
@@ -99,6 +101,8 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
 
         // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
+
+        this->InvokeEvent( EndInteractionEvent() );
       }
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;

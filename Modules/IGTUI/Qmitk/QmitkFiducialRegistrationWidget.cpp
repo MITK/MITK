@@ -44,6 +44,9 @@ void QmitkFiducialRegistrationWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkFiducialRegistrationWidget;
     m_Controls->setupUi(parent);
 
+    // hide additional image fiducial button
+    m_Controls->m_AddImageFiducialBtn->setHidden(true);
+
     this->CreateConnections();
   }
 }
@@ -52,6 +55,7 @@ void QmitkFiducialRegistrationWidget::CreateQtPartControl(QWidget *parent)
 void QmitkFiducialRegistrationWidget::CreateConnections()
 {     
   connect( (QObject*)(m_Controls->m_AddTrackingFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedTrackingFiducial()) );
+  connect( (QObject*)(m_Controls->m_AddImageFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedImageFiducial()) );
   connect( (QObject*)(m_Controls->m_RegisterFiducialsBtn), SIGNAL(clicked()), this, SIGNAL(PerformFiducialRegistration()) );
   connect( (QObject*)(m_Controls->m_UseICPRegistration), SIGNAL(toggled(bool)), this, SIGNAL(FindFiducialCorrespondences(bool)) );
 }
@@ -134,4 +138,9 @@ void QmitkFiducialRegistrationWidget::HideContinousRegistrationRadioButton( bool
 void QmitkFiducialRegistrationWidget::HideUseICPRegistrationCheckbox( bool on )
 {
   m_Controls->m_UseICPRegistration->setHidden(on);
+}
+
+void QmitkFiducialRegistrationWidget::HideImageFiducialButton( bool on )
+{
+  m_Controls->m_AddImageFiducialBtn->setHidden(on);
 }

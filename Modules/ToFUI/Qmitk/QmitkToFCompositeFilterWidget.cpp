@@ -70,6 +70,7 @@ void QmitkToFCompositeFilterWidget::CreateConnections()
     connect(m_Controls->m_ThresholdFilterMaxValueSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnThresholdFilterMaxValueChanged(int)));
 
     connect( (QObject*)(m_Controls->m_TemporalMedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTemporalMedianFilterCheckBoxChecked(bool)) );
+    connect( (QObject*)(m_Controls->m_AverageFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnAverageFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_ThresholdFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnThresholdFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_BilateralFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnBilateralFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_MedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMedianFilterCheckBoxChecked(bool)) );
@@ -99,6 +100,7 @@ mitk::ToFCompositeFilter* QmitkToFCompositeFilterWidget::GetToFCompositeFilter()
 void QmitkToFCompositeFilterWidget::UpdateFilterParameter()
 {
   OnTemporalMedianFilterCheckBoxChecked(m_Controls->m_TemporalMedianFilterCheckBox->isChecked());
+  OnAverageFilterCheckBoxChecked(m_Controls->m_AverageFilterCheckBox->isChecked());
   OnMedianFilterCheckBoxChecked(m_Controls->m_MedianFilterCheckBox->isChecked());
   OnThresholdFilterCheckBoxChecked(m_Controls->m_ThresholdFilterCheckBox->isChecked());
   OnBilateralFilterCheckBoxChecked(m_Controls->m_BilateralFilterCheckBox->isChecked());
@@ -107,6 +109,23 @@ void QmitkToFCompositeFilterWidget::UpdateFilterParameter()
 void QmitkToFCompositeFilterWidget::OnTemporalMedianFilterCheckBoxChecked(bool checked)
 {
   this->m_ToFCompositeFilter->SetApplyTemporalMedianFilter(checked);
+  // disable average filter if temporal median filter is enabled
+  if (checked)
+  {
+    m_Controls->m_AverageFilterCheckBox->setChecked(false);
+    this->m_ToFCompositeFilter->SetApplyAverageFilter(false);
+  }
+}
+
+void QmitkToFCompositeFilterWidget::OnAverageFilterCheckBoxChecked(bool checked)
+{
+  this->m_ToFCompositeFilter->SetApplyAverageFilter(checked);
+  // disable temporal median filter if average filter is enabled
+  if (checked)
+  {
+    m_Controls->m_TemporalMedianFilterCheckBox->setChecked(false);
+    this->m_ToFCompositeFilter->SetApplyTemporalMedianFilter(false);
+  }
 }
 
 void QmitkToFCompositeFilterWidget::OnThresholdFilterCheckBoxChecked(bool checked)

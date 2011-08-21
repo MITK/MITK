@@ -78,6 +78,11 @@ namespace mitk
     */
     bool GetApplyTemporalMedianFilter();
     /*!
+    \brief Returns if the average filter is currently selected for application to the distance image
+    \return flag m_ApplyAverageFilter
+    */
+    bool GetApplyAverageFilter();
+    /*!
     \brief Returns if the  median filter is currently selected for application to the distance image
     \return flag m_ApplyMedianFilter
     */
@@ -97,6 +102,11 @@ namespace mitk
     \param flag flag m_ApplyTemporalMedianFilter will be set to
     */
     void SetApplyTemporalMedianFilter(bool flag);
+    /*!
+    \brief Set if the average filter should be applied to the distance image
+    \param flag flag m_ApplyAverageFilter will be set to
+    */
+    void SetApplyAverageFilter(bool flag);
     /*!
     \brief Set if the median filter should be applied to the distance image
     \param flag flag m_ApplyMedianFilter will be set to
@@ -210,6 +220,7 @@ namespace mitk
     ItkImageType2D::Pointer m_ItkInputImage; ///< ITK representation of the distance image
 
     bool m_ApplyTemporalMedianFilter; ///< Flag indicating if the temporal median filter is currently active for processing the distance image
+    bool m_ApplyAverageFilter; ///< Flag indicating if the average filter is currently active for processing the distance image
     bool m_ApplyMedianFilter; ///< Flag indicating if the spatial median filter is currently active for processing the distance image
     bool m_ApplyThresholdFilter; ///< Flag indicating if the threshold filter is currently active for processing the distance image
     bool m_ApplyBilateralFilter; ///< Flag indicating if the bilateral filter is currently active for processing the distance image

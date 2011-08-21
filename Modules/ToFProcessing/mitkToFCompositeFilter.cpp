@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 
 mitk::ToFCompositeFilter::ToFCompositeFilter() : m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
-m_IplDistanceImage(NULL), m_IplOutputImage(NULL), m_ItkInputImage(NULL), m_ApplyTemporalMedianFilter(false),
+m_IplDistanceImage(NULL), m_IplOutputImage(NULL), m_ItkInputImage(NULL), m_ApplyTemporalMedianFilter(false), m_ApplyAverageFilter(false),
 m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyBilateralFilter(false), m_DataBuffer(NULL),
 m_DataBufferCurrentIndex(0), m_DataBufferMaxSize(0), m_TemporalMedianFilterNumOfFrames(10), m_ThresholdFilterMin(1),
 m_ThresholdFilterMax(7000), m_BilateralFilterDomainSigma(2), m_BilateralFilterRangeSigma(60), m_BilateralFilterKernelRadius(0)
@@ -122,7 +122,7 @@ void mitk::ToFCompositeFilter::GenerateData()
   {
     ProcessThresholdFilter(this->m_IplDistanceImage, this->m_ThresholdFilterMin, this->m_ThresholdFilterMax);
   }
-  if (this->m_ApplyTemporalMedianFilter)
+  if (this->m_ApplyTemporalMedianFilter||this->m_ApplyAverageFilter)
   {
     ProcessStreamedQuickSelectMedianImageFilter(this->m_IplDistanceImage, this->m_TemporalMedianFilterNumOfFrames);
   }
@@ -262,13 +262,26 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
     this->m_DataBuffer[this->m_DataBufferCurrentIndex][j] = data[j];
   }
 
+  float tmpValue = 0.0f;
   for(int i=0; i<imageSize; i++) 
   {
-    for(int j=0; j<currentBufferSize; j++)
+    if (m_ApplyAverageFilter)
     {
-      tmpArray[j] = this->m_DataBuffer[j][i];
+      tmpValue = 0.0f;
+      for(int j=0; j<currentBufferSize; j++)
+      {
+          tmpValue+=this->m_DataBuffer[j][i];
+      }
+      data[i] = tmpValue/numOfImages;
     }
-    data[i] = quick_select(tmpArray, currentBufferSize);
+    else if (m_ApplyTemporalMedianFilter)
+    {
+      for(int j=0; j<currentBufferSize; j++)
+      {
+        tmpArray[j] = this->m_DataBuffer[j][i];
+      }
+      data[i] = quick_select(tmpArray, currentBufferSize);
+    }
   }
 
   this->m_DataBufferCurrentIndex = (this->m_DataBufferCurrentIndex + 1) % this->m_DataBufferMaxSize;
@@ -344,6 +357,11 @@ bool mitk::ToFCompositeFilter::GetApplyBilateralFilter()
 void mitk::ToFCompositeFilter::SetApplyTemporalMedianFilter(bool flag)
 {
   this->m_ApplyTemporalMedianFilter = flag;
+}
+
+void mitk::ToFCompositeFilter::SetApplyAverageFilter(bool flag)
+{
+  this->m_ApplyAverageFilter = flag;
 }
 
 void mitk::ToFCompositeFilter::SetApplyMedianFilter(bool flag)

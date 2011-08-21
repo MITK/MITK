@@ -45,8 +45,8 @@ namespace mitk
   {
     ToFPoint3D indexCoordinatesAndDistanceValue;
 
-    ToFScalarType imageX = focalLength/cartesianPointZ * cartesianPointX;
-    ToFScalarType imageY = focalLength/cartesianPointZ * cartesianPointY;
+    ToFScalarType imageX = cartesianPointX*focalLength/cartesianPointZ;
+    ToFScalarType imageY = cartesianPointY*focalLength/cartesianPointZ;
 
     indexCoordinatesAndDistanceValue[0] = imageX/interPixelDistanceX + principalPointX;
     indexCoordinatesAndDistanceValue[1] = imageY/interPixelDistanceY + principalPointY;

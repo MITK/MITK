@@ -20,6 +20,9 @@
 
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
+
 
 // baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
@@ -112,6 +115,28 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   colorsT->SetNumberOfComponents(componentSize);
   colorsT->SetName(COLORCODING_ORIENTATION_BASED);
   
+  
+  
+  /* extract single fibers of fiberBundle */
+  int numOfFibers = m_FiberStructureData->GetNumberOfLines();
+  if (numOfFibers < 1) {
+    MITK_INFO << "\n ========= Number of Fibers is not valid ========= \n";
+    return;
+  }
+  
+  vtkCellArray* fiberList = m_FiberStructureData->GetLines();
+  //safe downcast essential??
+  for (int fi=0; fi<numOfFibers; ++fi) {
+    vtkIdType* idList;
+    vtkIdType npts;
+    
+    fiberList->GetCell(fi,npts, idList);
+
+    
+  }
+  
+  
+  
   /* catch case: fiber consists of only 1 point */
   if (numOfPoints > 1) 
   {
@@ -183,7 +208,8 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     colorsT->InsertTupleValue(0, rgba);
     
   } else {
-    MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ; 
+    MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ;
+    
   }
   
   

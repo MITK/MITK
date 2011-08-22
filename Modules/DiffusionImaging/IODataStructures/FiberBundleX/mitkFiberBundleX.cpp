@@ -131,7 +131,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     vtkIdType npts;
     
     fiberList->GetCell(fi,npts, idList);
-
+//to be continued
     
   }
   

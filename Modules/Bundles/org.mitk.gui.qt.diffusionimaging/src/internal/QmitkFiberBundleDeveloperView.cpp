@@ -259,16 +259,16 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     return 0;
   }// ================================= 
   
-  // iterate through points 
+  // iterate through points
+  srand((unsigned)time(0)); // init randomizer
   for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
     
     //generate random number between 0 and numOfFibers-1
-    srand((unsigned)time(0)); 
     int random_integer; 
-    int lowest=1, highest=numOfFibers; 
-    int range=(highest-lowest)+1; 
-    random_integer = lowest+int(range*rand()/(RAND_MAX + 1.0));
+    random_integer = (rand()%numOfFibers); 
     MITK_INFO << "RandNR: " << random_integer;
+    
+    
     
   } 
   

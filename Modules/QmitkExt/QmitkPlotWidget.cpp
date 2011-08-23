@@ -25,25 +25,8 @@ QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
   m_Plot->setCanvasBackground(Qt::white);
-  boxLayout->addWidget( m_Plot );
-
-
-  m_PlotPicker = new QwtPlotPicker(m_Plot->canvas());
-  m_PlotPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::ClickSelection);
-  m_PlotPicker->setTrackerMode(QwtPicker::ActiveOnly);
-
-  connect(m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), this, SLOT( Clicked(const QwtDoublePoint&) ) );
-  connect(m_PlotPicker, SIGNAL(appended(QwtDoublePoint&)), this, SLOT( Clicked() ) );
-  connect(m_PlotPicker, SIGNAL(moved(QwtDoublePoint&)), this, SLOT( Clicked() ) );
+  boxLayout->addWidget( m_Plot );  
 } 
-
-void QmitkPlotWidget::Clicked(const QwtDoublePoint&)
-{
-  std::cout << "click";
-}
-
-
-
 
 QmitkPlotWidget::~QmitkPlotWidget()
 {

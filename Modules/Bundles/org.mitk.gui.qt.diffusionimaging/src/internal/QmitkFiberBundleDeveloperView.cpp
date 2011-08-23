@@ -65,7 +65,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
     
     
-        
+    
     
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
     connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
@@ -87,7 +87,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
   
   // set GUI elements of FiberGenerator to according configuration
   DoUpdateGenerateFibersWidget();
-
+  
   
 }
 
@@ -123,10 +123,10 @@ void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
     
     if (!m_Controls->boxFiberNumbers->isEnabled())
       m_Controls->boxFiberNumbers->setEnabled(true);
-
+    
     if (!m_Controls->labelDistrRadius->isEnabled())
       m_Controls->labelDistrRadius->setEnabled(true);
-
+    
     if (!m_Controls->boxDistributionRadius->isEnabled())
       m_Controls->boxDistributionRadius->setEnabled(true);
     
@@ -138,8 +138,8 @@ void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
     
     if (m_Controls->boxDistributionRadius->isEnabled())
       m_Controls->boxDistributionRadius->setEnabled(false);
-
-
+    
+    
     //enable radiobuttons
     if (!m_Controls->labelFibersTotal->isEnabled())
       m_Controls->labelFibersTotal->setEnabled(true);
@@ -158,9 +158,9 @@ void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
     
     if (!m_Controls->labelFiberMaxLength->isEnabled())
       m_Controls->labelFiberMaxLength->setEnabled(true);
-
+    
   }   
-
+  
 }
 
 void QmitkFiberBundleDeveloperView::DoGenerateFibers()
@@ -244,17 +244,13 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   }
   
   /* Generate Point Cloud */
-  
-  
-  
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
   randomPoints->SetCenter(0.0, 0.0, 0.0);
   randomPoints->SetNumberOfPoints(numOfPoints);
   randomPoints->SetRadius(distrRadius);
   randomPoints->Update();
   
-  vtkPolyData* pntHost = randomPoints->GetOutput();
-  vtkPoints* pnts = pntHost->GetPoints();
+  vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
   
   //===================================
   //checkpoint if requested amount of points equals generated amount
@@ -263,10 +259,28 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     return 0;
   }// ================================= 
   
+  // iterate through points 
+  for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
+    
+    //generate random number between 0 and numOfFibers-1
+    srand((unsigned)time(0)); 
+    int random_integer; 
+    int lowest=1, highest=numOfFibers; 
+    int range=(highest-lowest)+1; 
+    random_integer = lowest+int(range*rand()/(RAND_MAX + 1.0));
+    MITK_INFO << "RandNR: " << random_integer;
+    
+  } 
+  
+  
+  
+  
+  
+  
   // Set Fibers
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
   
-  // iterate through points
+  
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);

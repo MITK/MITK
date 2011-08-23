@@ -64,6 +64,9 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkFiberBundleDeveloperViewControls;
     m_Controls->setupUi( parent );
     
+    
+        
+    
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
     connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->radioButton_directionX, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
@@ -82,11 +85,14 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_DirectionRadios.insert(3, m_Controls->radioButton_directionZ);
   }
   
+  // set GUI elements of FiberGenerator to according configuration
+  DoUpdateGenerateFibersWidget();
+
+  
 }
 
 void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
 {
-  MITK_INFO << "DO_UPDATE_GENERATE_FIBERS_WIDGET :-) ";
   //get selected radioButton
   QString fibDirection; //stores the object_name of selected radiobutton 
   QVector<QRadioButton*>::const_iterator i;
@@ -125,20 +131,36 @@ void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
       m_Controls->boxDistributionRadius->setEnabled(true);
     
     
-  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
+  } else {
     // disable radiobuttons    
+    if (m_Controls->labelDistrRadius->isEnabled())
+      m_Controls->labelDistrRadius->setEnabled(false);
     
-    
-    
-    
-  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
-     // disable radiobuttons
-    
-  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
-     // disable radiobuttons    
-  }
+    if (m_Controls->boxDistributionRadius->isEnabled())
+      m_Controls->boxDistributionRadius->setEnabled(false);
 
-  
+
+    //enable radiobuttons
+    if (!m_Controls->labelFibersTotal->isEnabled())
+      m_Controls->labelFibersTotal->setEnabled(true);
+    
+    if (!m_Controls->boxFiberNumbers->isEnabled())
+      m_Controls->boxFiberNumbers->setEnabled(true);
+    
+    if (!m_Controls->boxFiberMinLength->isEnabled())
+      m_Controls->boxFiberMinLength->setEnabled(true);
+    
+    if (!m_Controls->labelFiberMinLength->isEnabled())
+      m_Controls->labelFiberMinLength->setEnabled(true);
+    
+    if (!m_Controls->boxFiberMaxLength->isEnabled())
+      m_Controls->boxFiberMaxLength->setEnabled(true);
+    
+    if (!m_Controls->labelFiberMaxLength->isEnabled())
+      m_Controls->labelFiberMaxLength->setEnabled(true);
+
+  }   
+
 }
 
 void QmitkFiberBundleDeveloperView::DoGenerateFibers()
@@ -220,6 +242,9 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     
     
   }
+  
+  /* Generate Point Cloud */
+  
   
   
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();

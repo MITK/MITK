@@ -65,6 +65,10 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
     
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
+    connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
+    connect( m_Controls->radioButton_directionX, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
+    connect( m_Controls->radioButton_directionY, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
+    connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     
     
   }
@@ -77,6 +81,63 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_DirectionRadios.insert(2, m_Controls->radioButton_directionY);
     m_DirectionRadios.insert(3, m_Controls->radioButton_directionZ);
   }
+  
+}
+
+void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
+{
+  MITK_INFO << "DO_UPDATE_GENERATE_FIBERS_WIDGET :-) ";
+  //get selected radioButton
+  QString fibDirection; //stores the object_name of selected radiobutton 
+  QVector<QRadioButton*>::const_iterator i;
+  for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) 
+  {
+    QRadioButton* rdbtn = *i;
+    if (rdbtn->isChecked())
+      fibDirection = rdbtn->objectName();
+  }
+  
+  if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
+    // disable radiobuttons
+    if (m_Controls->boxFiberMinLength->isEnabled())
+      m_Controls->boxFiberMinLength->setEnabled(false);
+    
+    if (m_Controls->labelFiberMinLength->isEnabled())
+      m_Controls->labelFiberMinLength->setEnabled(false);
+    
+    if (m_Controls->boxFiberMaxLength->isEnabled())
+      m_Controls->boxFiberMaxLength->setEnabled(false);
+    
+    if (m_Controls->labelFiberMaxLength->isEnabled())
+      m_Controls->labelFiberMaxLength->setEnabled(false);
+    
+    //enable radiobuttons
+    if (!m_Controls->labelFibersTotal->isEnabled())
+      m_Controls->labelFibersTotal->setEnabled(true);
+    
+    if (!m_Controls->boxFiberNumbers->isEnabled())
+      m_Controls->boxFiberNumbers->setEnabled(true);
+
+    if (!m_Controls->labelDistrRadius->isEnabled())
+      m_Controls->labelDistrRadius->setEnabled(true);
+
+    if (!m_Controls->boxDistributionRadius->isEnabled())
+      m_Controls->boxDistributionRadius->setEnabled(true);
+    
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
+    // disable radiobuttons    
+    
+    
+    
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
+     // disable radiobuttons
+    
+  } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
+     // disable radiobuttons    
+  }
+
   
 }
 
@@ -125,15 +186,46 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
   int numOfFibers = m_Controls->boxFiberNumbers->value();
-  int pntsPrFiber = m_Controls->boxPointsPerFiber->value();
-  int numOfPoints = numOfFibers * pntsPrFiber;
+  int distrRadius = m_Controls->boxDistributionRadius->value();
+  int numOfPoints = numOfFibers * distrRadius;
   
-  //  MITK_INFO << "Numer of Fibers: " << numOfFibers << "\nPoints per Fiber: " << pntsPrFiber << "\nPoints Total: " << numOfPoints; 
+  
+  std::vector< std::vector<int> > fiberStorage;
+  for (int i=0; i<numOfFibers; ++i) {
+    std::vector<int> a;
+    fiberStorage.push_back( a );
+    
+  }
+  
+  //get number of items in fiberStorage
+  MITK_INFO << "Fibers in fiberstorage: " << fiberStorage.size();
+  
+  for (unsigned long i=0; i<fiberStorage.size(); ++i)
+  {
+    //add dummy points to storageentries
+    fiberStorage.at(i).push_back(222);
+    fiberStorage.at(i).push_back((int)i);
+    
+  }
+  
+  for (unsigned long i=0; i<fiberStorage.size(); ++i)
+  {
+    std::vector<int> singleFiber = fiberStorage.at(i);
+    MITK_INFO << "====FIBER_" << i << "_=====";
+    
+    for (unsigned long si=0; si<singleFiber.size(); ++si) {
+      MITK_INFO << singleFiber.at(si);
+    }
+    
+    
+    
+  }
+  
   
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
   randomPoints->SetCenter(0.0, 0.0, 0.0);
   randomPoints->SetNumberOfPoints(numOfPoints);
-  randomPoints->SetRadius(pntsPrFiber);
+  randomPoints->SetRadius(distrRadius);
   randomPoints->Update();
   
   vtkPolyData* pntHost = randomPoints->GetOutput();
@@ -150,30 +242,6 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
   
   // iterate through points
-  for (int i=0; i < numOfPoints; i+=pntsPrFiber) // e.g. i eqals 0, 50, 100, etc., I choose this cuz then its more easy to fill the lines with according points.
-  {
-    if (i%pntsPrFiber == 0) 
-    {
-      vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
-      newFiber->GetPointIds()->SetNumberOfIds(pntsPrFiber);
-      
-      //      construct the fiber
-      for (int pc = 0; pc < pntsPrFiber; ++pc) 
-      {
-        newFiber->GetPointIds()->SetId(pc, pc+i);
-        //        MITK_INFO << linesCell->GetNumberOfCells() << ": " << pnts->GetPoint(pc+i)[0] << " " << pnts->GetPoint(pc+i)[1] << " " << pnts->GetPoint(pc+i)[2];
-      }
-      
-      linesCell->InsertNextCell(newFiber);
-      
-      
-      //    ================SHALL NEVER OCCUR=================
-    } else {
-      MITK_INFO << "LOGIC ERROR IN CREATING FIBERS...Check Values in QmitkFiberBundleDeveloperView.cpp";
-    }
-    //    ===================================================     
-  }
-  
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
@@ -213,7 +281,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
     
     //add starting point to fiber
     newFiber->GetPointIds()->SetId(0,points->GetNumberOfPoints()-1);
-
+    
     //insert remaining points for fiber
     for (int pj=0; pj<=i ; ++pj) 
     { //generate next point on X axis

@@ -31,8 +31,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>357</width>
-        <height>474</height>
+        <width>355</width>
+        <height>395</height>
        </rect>
       </property>
       <attribute name="label">
@@ -62,15 +62,15 @@
               <string>Fiber Parameters</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_11">
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="boxDistributionRadius">
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelFibersTotal">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
-                <property name="value">
-                 <number>99</number>
+                <property name="text">
+                 <string>Total number of Fibers</string>
                 </property>
                </widget>
               </item>
@@ -89,48 +89,6 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="labelPntsPerFiber">
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Points per Fiber</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelFibersTotal">
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Total number of Fibers</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QSpinBox" name="boxPointsPerFiber">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="minimum">
-                 <number>2</number>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-                <property name="value">
-                 <number>50</number>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="4">
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
@@ -144,31 +102,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="7" column="1">
-               <widget class="QSpinBox" name="boxFiberMaxLength">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="value">
-                 <number>50</number>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="labelFiberMaxLength">
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Fiber Length Max (points)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="labelDistrRadius">
                 <property name="font">
                  <font>
@@ -180,7 +114,43 @@
                 </property>
                </widget>
               </item>
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="boxDistributionRadius">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="value">
+                 <number>99</number>
+                </property>
+               </widget>
+              </item>
               <item row="6" column="0">
+               <widget class="QLabel" name="labelFiberMaxLength">
+                <property name="font">
+                 <font>
+                  <pointsize>11</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Fiber Length Max (points)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QSpinBox" name="boxFiberMaxLength">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
                <widget class="QLabel" name="labelFiberMinLength">
                 <property name="font">
                  <font>
@@ -192,7 +162,7 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="5" column="1">
                <widget class="QSpinBox" name="boxFiberMinLength">
                 <property name="font">
                  <font>
@@ -206,8 +176,6 @@
               </item>
              </layout>
              <zorder>labelFibersTotal</zorder>
-             <zorder>labelPntsPerFiber</zorder>
-             <zorder>boxPointsPerFiber</zorder>
              <zorder>boxFiberNumbers</zorder>
              <zorder>horizontalSpacer_3</zorder>
              <zorder>labelDistrRadius</zorder>
@@ -469,7 +437,7 @@
         <x>0</x>
         <y>0</y>
         <width>343</width>
-        <height>409</height>
+        <height>403</height>
        </rect>
       </property>
       <attribute name="label">

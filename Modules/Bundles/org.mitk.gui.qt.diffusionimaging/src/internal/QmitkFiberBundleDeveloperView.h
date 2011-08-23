@@ -76,7 +76,7 @@ public:
 
   protected slots:
   void DoGenerateFibers();
-  
+  void DoUpdateGenerateFibersWidget();
   
   
 protected:

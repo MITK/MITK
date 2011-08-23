@@ -43,6 +43,8 @@ void QmitkPlotWidget::Clicked(const QwtDoublePoint&)
 }
 
 
+
+
 QmitkPlotWidget::~QmitkPlotWidget()
 {
   this->Clear();

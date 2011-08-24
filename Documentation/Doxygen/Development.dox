@@ -5,13 +5,24 @@ The following items are concerned with the practical use of the MITK library for
 
 Some abstract concepts of MITK are described in \ref Concepts
 
+\section DevelopmentSetup Setting Up MITK
+
 \li \subpage BuildInstructionsPage
-\li \subpage DICOMTesting
-\li \subpage DirectoryStructurePage
-\li \subpage KnownProblemsPage
-\li \subpage NewPluginPage
-\li \subpage StylesAndNotesPage
 \li \subpage thirdpartylibs
+
+\section DevelopmentGettingToKnow Getting To Know MITK
+
+\li \subpage DirectoryStructurePage
 \li \subpage TutorialPage
+
+\section DevelopmentWith Developing With MITK
+
+\li \subpage DICOMTesting
+\li \subpage NewPluginPage
+\li \subpage KnownProblemsPage
+
+\section DevelopmentContributing Contributing To MITK
+
+\li \subpage StylesAndNotesPage
 
 */

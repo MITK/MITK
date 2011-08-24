@@ -222,26 +222,8 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   //get number of items in fiberStorage
   MITK_INFO << "Fibers in fiberstorage: " << fiberStorage.size();
   
-  for (unsigned long i=0; i<fiberStorage.size(); ++i)
-  {
-    //add dummy points to storageentries
-    fiberStorage.at(i).push_back(222);
-    fiberStorage.at(i).push_back((int)i);
-    
-  }
   
-  for (unsigned long i=0; i<fiberStorage.size(); ++i)
-  {
-    std::vector<int> singleFiber = fiberStorage.at(i);
-    MITK_INFO << "====FIBER_" << i << "_=====";
-    
-    for (unsigned long si=0; si<singleFiber.size(); ++si) {
-      MITK_INFO << singleFiber.at(si);
-    }
-    
-    
-    
-  }
+  
   
   /* Generate Point Cloud */
   vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
@@ -255,30 +237,46 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   //===================================
   //checkpoint if requested amount of points equals generated amount
   if (numOfPoints != pnts->GetNumberOfPoints()) {
-    MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS";
-    return 0;
+    MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS... COULD BE VTK BUG OR BITFLIP DUE TO COSMIC RADIATION!";
+    return NULL;
   }// ================================= 
   
-  // iterate through points
+  /* ASSIGN EACH POINT TO A RANDOM FIBER */
   srand((unsigned)time(0)); // init randomizer
   for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
     
     //generate random number between 0 and numOfFibers-1
     int random_integer; 
     random_integer = (rand()%numOfFibers); 
-    MITK_INFO << "RandNR: " << random_integer;
     
-    
-    
+    //add current point to random fiber
+    fiberStorage.at(random_integer).push_back(i); 
+    MITK_INFO << "point" << i << "into fiber" << random_integer;
   } 
   
   
+  /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
+  vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
+  
+  
+  for (unsigned long i=0; i<fiberStorage.size(); ++i)
+  {
+    
+    std::vector<int> singleFiber = fiberStorage.at(i);
+    vtkSmartPointer<vtkPolyLine> fiber = vtkSmartPointer<vtkPolyLine>::New();
+    fiber->GetPointIds()->SetNumberOfIds((int)singleFiber.size());
+    
+    for (unsigned long si=0; si<singleFiber.size(); ++si) 
+    {  //hopefully unsigned long to double works fine in VTK ;-)
+      fiber->GetPointIds()->SetId( si, singleFiber.at(si) );
+    }
+    
+  }  
   
   
   
   
-  // Set Fibers
-  vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New();
+  
   
   
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();

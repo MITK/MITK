@@ -316,6 +316,8 @@ PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
 
   Vector3D  originVector; 
   FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
+  MITK_INFO<<originVector;
+
   if(geometry3D->GetImageGeometry())
   {
     FillVector3D( originVector,

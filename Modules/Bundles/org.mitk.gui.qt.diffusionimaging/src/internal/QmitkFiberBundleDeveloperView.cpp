@@ -26,7 +26,9 @@
 #include "QmitkFiberBundleDeveloperView.h"
 #include <QmitkStdMultiWidget.h>
 
-// Qt
+// MITK
+#include <mitkFiberBundleX.h>
+
 
 // VTK
 #include <vtkPointSource.h>
@@ -195,7 +197,8 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     
   }
   
-  //mitkFiberBundleX::New()
+  //mitkFiberBundleX::Pointer FB = mitkFiberBundleX::New();
+  
   //write to dataStorage
   
   
@@ -234,12 +237,11 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   
   vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
   
-  //===================================
-  //checkpoint if requested amount of points equals generated amount
+  /*====== checkpoint: compare initialized and required points =============================*/
   if (numOfPoints != pnts->GetNumberOfPoints()) {
     MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS... COULD BE VTK BUG OR BITFLIP DUE TO COSMIC RADIATION!";
     return NULL;
-  }// ================================= 
+  }/* ================================= */
   
   /* ASSIGN EACH POINT TO A RANDOM FIBER */
   srand((unsigned)time(0)); // init randomizer
@@ -257,8 +259,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   
   /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
-  
-  
+  linesCell->Allocate(pnts->GetNumberOfPoints()*2); //allocate for each cellindex also space for the pointId, e.g. [idx | pntID]
   for (unsigned long i=0; i<fiberStorage.size(); ++i)
   {
     
@@ -271,14 +272,19 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
       fiber->GetPointIds()->SetId( si, singleFiber.at(si) );
     }
     
+    linesCell->InsertNextCell(fiber);
   }  
   
+  /* =======checkpoint for cellarray allocation ==========*/
+  if ( (linesCell->GetSize()/pnts->GetNumberOfPoints()) != 2 ) 
+  {
+    MITK_INFO << "RANDOM FIBER ALLOCATION CAN NOT BE TRUSTED ANYMORE! Correct leak or remove command: linesCell->Allocate(pnts->GetNumberOfPoints()*2) but be aware of possible loss in performance.";
+  }/* ====================================================*/
   
   
-  
-  
-  
-  
+//  MITK_INFO << "CellSize: " << linesCell->GetSize() << " NumberOfCells: " << linesCell->GetNumberOfCells();
+
+  /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);

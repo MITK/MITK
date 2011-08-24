@@ -29,6 +29,11 @@ const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
 
+mitk::FiberBundleX::FiberBundleX(vtkSmartPointer<vtkPolyData> FiberBundle)
+{
+  this->SetFibers(FiberBundle);
+}
+
 mitk::FiberBundleX::FiberBundleX()
 {
   
@@ -45,7 +50,12 @@ mitk::FiberBundleX::~FiberBundleX()
  * set computed fibers from tractography algorithms
  */
 void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
-{
+{ 
+  if (fiberPD.GetPointer() == NULL){ 
+    MITK_INFO << "passed FiberBundleX is NULL, exit!";
+    return;
+  }
+  
   m_FiberStructureData = fiberPD;
 }
 
@@ -77,31 +87,18 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   //  + one fiber with 0 points
   //=================================================
   
-  /* === decide which polydata to choose ===
-   ** ALL REDESIGNED
-   */
-  
-  bool hasFiberDataColor = false;
-  
-  // check if color array in original fiber dataset is valid
-  if ( m_FiberStructureData != NULL ) 
+
+  /*  make sure that processing colorcoding is only called when necessary */
+  if ( m_FiberStructureData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
+      m_FiberStructureData->GetNumberOfPoints() == 
+      m_FiberStructureData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
   {
-    if ( m_FiberStructureData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
-        m_FiberStructureData->GetNumberOfPoints() == 
-        m_FiberStructureData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-    {
-      hasFiberDataColor = true; 
-    }
-    
-  } else {
-    MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
-    hasFiberDataColor = true; // "true" will return later on
+    // fiberstructure is already colorcoded
+    MITK_INFO << " NO NEED TO REGENERATE COLORCODING!";
+    return;
   }
   
-  /*  make sure that processing colorcoding is only called when necessary */
-  if (hasFiberDataColor)
-    return;
-  
+
   /* Finally, execute color calculation */
   vtkPoints* extrPoints = m_FiberStructureData->GetPoints();
   int numOfPoints = extrPoints->GetNumberOfPoints();
@@ -202,7 +199,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     } else if (numOfPoints == 1) {
       /* a single point does not define a fiber (use vertex mechanisms instead */
       continue;
-//      colorsT->InsertTupleValue(0, rgba);
+      //      colorsT->InsertTupleValue(0, rgba);
       
     } else {
       MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ;
@@ -213,7 +210,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     
   }//end for loop
   
-
+  
   
   m_FiberStructureData->GetPointData()->AddArray(colorsT);
   

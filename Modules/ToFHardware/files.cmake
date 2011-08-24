@@ -24,6 +24,7 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDMITKPlayerController.cpp
   mitkToFCameraPMDCamCubeController.cpp
   mitkToFCameraPMDController.cpp
+  mitkToFCameraPMDPlayerController.cpp
 )
 IF(WIN32)
   IF(CMAKE_CL_64)
@@ -35,13 +36,25 @@ ELSE(WIN32)
     SET(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
 ENDIF(WIN32)
 ELSE()
-SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraPMDPlayerControllerStub.cpp
+SET(CPP_FILES ${CPP_FILES}	
   mitkToFCameraPMDMITKPlayerControllerStub.cpp
   mitkToFCameraPMDCamCubeControllerStub.cpp
-  mitkToFCameraPMDControllerStub.cpp
+  mitkToFCameraPMDPlayerControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)
+
+IF(MITK_USE_TOF_PMDCAMBOARD)
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraPMDCamBoardController.cpp
+  mitkToFCameraPMDController.cpp
+)
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraPMDCamBoardControllerStub.cpp
+  mitkToFCameraPMDControllerStub.cpp
+)
+ENDIF(MITK_USE_TOF_PMDCAMBOARD)
+
 
 IF(MITK_USE_TOF_PMDO3)
 SET(CPP_FILES ${CPP_FILES}

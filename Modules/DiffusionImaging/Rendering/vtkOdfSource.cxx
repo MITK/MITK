@@ -32,7 +32,7 @@ int vtkOdfSource::RequestData(
   vtkPolyData *output = vtkPolyData::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkPoints *newPoints; 
+  vtkPoints *newPoints;
   newPoints = vtkPoints::New();
   int numPoints = TemplateOdf->GetPoints()->GetNumberOfPoints();
   newPoints->Allocate(numPoints);
@@ -44,9 +44,9 @@ int vtkOdfSource::RequestData(
       double val = OdfVals->GetComponent(0,j);
       //if(val >= 0.2)
       //  val = 0.4;
-      p[0] *= val*Scale;
-      p[1] *= val*Scale;
-      p[2] *= val*Scale;
+      p[0] *= val*Scale*AdditionalScale;
+      p[1] *= val*Scale*AdditionalScale;
+      p[2] *= val*Scale*AdditionalScale;
       //double tmp = p[0];
       //p[0] = p[1] * val;
       //p[1] = tmp  * -val;
@@ -109,11 +109,11 @@ int vtkOdfSource::RequestInformation(
 {
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  
+
   outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
                -1);
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),1,1,1,1,1,1);
-  
+
   return 1;
 }

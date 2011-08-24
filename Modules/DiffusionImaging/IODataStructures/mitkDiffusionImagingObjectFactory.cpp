@@ -146,7 +146,10 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    std::string classname("QBallImage");
+    if(node->GetData()){
+      MITK_INFO << node->GetData()->GetNameOfClass();
+    }
+        std::string classname("QBallImage");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();

@@ -39,8 +39,7 @@ namespace mitk {
   class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
   {
   public:
-    FiberBundleX(vtkSmartPointer<vtkPolyData>);
-
+  
     // names of certain arrays (e.g colorcodings, etc.) 
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;

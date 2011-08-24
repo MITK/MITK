@@ -29,10 +29,6 @@ const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
 
-mitk::FiberBundleX::FiberBundleX(vtkSmartPointer<vtkPolyData> FiberBundle)
-{
-  this->SetFibers(FiberBundle);
-}
 
 mitk::FiberBundleX::FiberBundleX()
 {

@@ -197,9 +197,22 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     
   }
   
-  //mitkFiberBundleX::Pointer FB = mitkFiberBundleX::New();
+  mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New();
+  FB->SetFibers(output);
+  MITK_INFO <<  output->GetNumberOfPoints();
+  MITK_INFO <<  output->GetNumberOfLines();
+  vtkPolyData* retFibers = FB->GetFibers();
+  MITK_INFO << retFibers->GetNumberOfPoints();
+  MITK_INFO <<  retFibers->GetNumberOfLines();
+  mitk::DataNode::Pointer FBNode;
+  FBNode = mitk::DataNode::New();
+  FBNode->SetName("FiberBundleX");
+  FBNode->SetData(FB);
+  FBNode->SetVisibility(true);
   
-  //write to dataStorage
+  GetDataStorage()->Add(FBNode);
+  GetDataStorage()->Modified();
+  m_MultiWidget->RequestUpdate();
   
   
 } 
@@ -282,14 +295,15 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   }/* ====================================================*/
   
   
-//  MITK_INFO << "CellSize: " << linesCell->GetSize() << " NumberOfCells: " << linesCell->GetNumberOfCells();
-
+  //  MITK_INFO << "CellSize: " << linesCell->GetSize() << " NumberOfCells: " << linesCell->GetNumberOfCells();
+  
   /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
   
-  
+  MITK_INFO << PDRandom->GetNumberOfPoints();
+  MITK_INFO << PDRandom->GetNumberOfLines();
   return PDRandom;
 }
 
@@ -379,15 +393,34 @@ void QmitkFiberBundleDeveloperView::StdMultiWidgetNotAvailable()
  implement SelectionService Listener explicitly */
 
 void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{
+{ 
   
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end(); ++it )
+  {
+    //flags needed for algorithm execution logic
+    
+    mitk::DataNode::Pointer node = *it;
+    if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+    {
+      MITK_INFO << "FBX";
+      mitk::FiberBundleX::Pointer serwas = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+      vtkPolyData* pdfb = serwas->GetFibers();
+      MITK_INFO << pdfb->GetNumberOfPoints();
+      MITK_INFO << pdfb->GetNumberOfLines();
+                                                                            
+    } else {
+      MITK_INFO << node->GetData()->GetNameOfClass();
+    }
+    
+  }
   
 }
 
 void QmitkFiberBundleDeveloperView::Activated()
 {
   
-  MITK_INFO << "FB OPerations ACTIVATED()";
+  MITK_INFO << "FB DevelopersV ACTIVATED()";
   
   
 }

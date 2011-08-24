@@ -38,7 +38,7 @@ mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
   m_FiberActorWP(vtkActor::New()),
   m_FiberAssembly(vtkPropAssembly::New())
 {
-
+  MITK_INFO << "FiberBundleXxXXMapper3D()";
 }
 
 
@@ -50,6 +50,7 @@ mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 
 const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 {
+  MITK_INFO << "FiberBundleXxXXMapper3D() GetInput()";
   return static_cast<const mitk::FiberBundleX * > ( GetData() );
 }
 
@@ -60,6 +61,7 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::GenerateData()
 {
+  MITK_INFO << "GENERATE DATA FOR FBX :)";
   //=====timer measurement====
   QTime myTimer;
   myTimer.start();
@@ -67,6 +69,9 @@ void mitk::FiberBundleXMapper3D::GenerateData()
   
   mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
   vtkPolyData* FiberData = FBX->GetFibers();
+MITK_INFO << "NumOfFibs: " << FiberData->GetNumberOfLines();
+  MITK_INFO << "NumOfPoints: " << FiberData->GetNumberOfPoints();
+  
   
   m_FiberMapperGLSP->SetInput(FiberData); 
 //  m_FiberMapperGLWP->SetInput(FiberData);
@@ -111,12 +116,17 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
+  MITK_INFO << "FiberBundleXxXXMapper3D()DataForRenderer";
   //ToDo do update checks
 }
 
 
 void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+  
+  MITK_INFO << "FiberBundleXxXXMapper3D()SetDefaultProperties";
+  
+  
   //MITK_INFO << "FiberBundleMapper3D SetDefault Properties(...)";
 //  node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
 //  node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
@@ -143,19 +153,20 @@ void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
 
 vtkProp* mitk::FiberBundleXMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-
+//MITK_INFO << "FiberBundleXxXXMapper3D()GetVTKProp";
+  //this->GenerateData();
   return m_FiberAssembly;
   
 }
 
 void mitk::FiberBundleXMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-  // MITK_INFO << "FiberBundleMapper3D ApplyProperties(renderer)";
+   MITK_INFO << "FiberBundleXXXXMapper3D ApplyProperties(renderer)";
 }
 
 void mitk::FiberBundleXMapper3D::UpdateVtkObjects()
 {
-  // MITK_INFO << "FiberBundleMapper3D UpdateVtkObjects()";
+   MITK_INFO << "FiberBundleXxxXMapper3D UpdateVtkObjects()";
   
   
 }

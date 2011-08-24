@@ -47,10 +47,11 @@ namespace itk{
     geometry->IndexToWorld(indexOrigin, newOrigin);
 
     outImage->SetOrigin( newOrigin );     // Set the image origin
+
     itk::Matrix<double, 3, 3> matrix;
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
-        matrix[j][i] = geometry->GetMatrixColumn(i)[j];
+        matrix[j][i] = geometry->GetMatrixColumn(i)[j]/geometry->GetSpacing().GetElement(i);
     outImage->SetDirection( matrix );  // Set the image direction
 
     float* bounds = m_FiberBundle->GetBounds();

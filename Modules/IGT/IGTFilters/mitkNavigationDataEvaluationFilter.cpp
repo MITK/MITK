@@ -155,6 +155,12 @@ mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatist
 return myCalculator->GetPositionErrorRMS();
 }
 
+double mitk::NavigationDataEvaluationFilter::GetEulerAnglesRMSDegree(int input)
+{
+mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(QuaternionsToEulerAnglesGrad(m_LoggedQuaternions[input])));
+return myCalculator->GetPositionErrorRMS();
+}
+
 
 
 double mitk::NavigationDataEvaluationFilter::GetPositionErrorMean(int input)
@@ -262,10 +268,28 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
   for (int i=0; i<quaterions.size(); i++) 
     {
     mitk::Vector3D eulerAngles;
-    eulerAngles[0] = quaterions.at(i).rotation_euler_angles()[0];
-    eulerAngles[1] = quaterions.at(i).rotation_euler_angles()[1];
-    eulerAngles[2] = quaterions.at(i).rotation_euler_angles()[2];
+    mitk::Quaternion currentQuaternion = quaterions.at(i);
+    currentQuaternion.normalize(); //must be normalized due to the documentation of the vnl method rotation_euler_angles()
+    eulerAngles[0] = currentQuaternion.rotation_euler_angles()[0];
+    eulerAngles[1] = currentQuaternion.rotation_euler_angles()[1];
+    eulerAngles[2] = currentQuaternion.rotation_euler_angles()[2];
     returnValue.push_back(eulerAngles);
+    }
+  return returnValue;
+}
+
+std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAnglesGrad(std::vector<mitk::Quaternion> quaterions)
+{
+  double PI = 3.1415926535897932384626433832795028841971;
+  std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
+  std::vector<mitk::Vector3D> eulerAnglesRadians = QuaternionsToEulerAngles(quaterions);
+  for (int i=0; i<eulerAnglesRadians.size(); i++)
+    {
+    mitk::Vector3D currentAngles;
+    currentAngles[0] = (eulerAnglesRadians.at(i)[0]/PI)*180;
+    currentAngles[1] = (eulerAnglesRadians.at(i)[1]/PI)*180;
+    currentAngles[2] = (eulerAnglesRadians.at(i)[2]/PI)*180;
+    returnValue.push_back(currentAngles);
     }
   return returnValue;
 }

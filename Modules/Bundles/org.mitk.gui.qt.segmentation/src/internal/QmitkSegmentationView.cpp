@@ -467,7 +467,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
     // if the selected node is a contourmarker
     if ( !nodes.empty() )
     {
-        std::string markerName = "Contourmarker";
+        std::string markerName = "Position";
         unsigned int numberOfNodes = nodes.size();
         std::string nodeName = nodes.at( 0 )->GetName();
         if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
@@ -599,10 +599,13 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     if (selectedRenderWindow)
     {
       std::string nodeName = node->GetName();
-      unsigned int t = nodeName.find_last_of("_");
-      unsigned int id = atof(nodeName.substr(t+1).c_str());
+      unsigned int t = nodeName.find_last_of(" ");
+      unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
 
-      selectedRenderWindow->GetSliceNavigationController()->RestorePlanePosition(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+      //selectedRenderWindow->GetSliceNavigationController()->RestorePlanePosition(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+      selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+      selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 

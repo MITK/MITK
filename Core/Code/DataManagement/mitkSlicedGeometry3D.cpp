@@ -748,6 +748,8 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // ReinitializePlanes)
         this->ReinitializePlanes( center, rotOp->GetCenterOfRotation() );
 
+        geometry2D->SetSpacing(this->GetSpacing());
+
         if ( m_SliceNavigationController )
         {
           m_SliceNavigationController->SelectSliceByPoint(
@@ -859,8 +861,19 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // Rotate first slice
         geometry2D->ExecuteOperation( restorePlaneOp ); 
 
-        ////Parts of ReinitializePlanes()
         m_DirectionVector = restorePlaneOp->GetDirectionVector();
+
+        double centerOfRotationDistance =
+          planeGeometry->SignedDistanceFromPlane( m_ReferenceGeometry->GetCenter() );
+
+        if ( centerOfRotationDistance > 0 )
+        {
+          m_DirectionVector = m_DirectionVector;
+        }
+        else
+        {
+          m_DirectionVector = -m_DirectionVector;
+        }
 
         Vector3D spacing = restorePlaneOp->GetSpacing();
 

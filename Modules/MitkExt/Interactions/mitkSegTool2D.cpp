@@ -37,7 +37,7 @@ mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
 m_LastEventSender(NULL),
 m_LastEventSlice(0),
-m_Contourmarkername ("Contourmarker")
+m_Contourmarkername ("Position")
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -230,38 +230,25 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
-  mitk::Geometry2D* currentGeo = dynamic_cast< mitk::SlicedGeometry3D*>(
-    const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D()))->GetGeometry2D(0);
+  const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
+    positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
-  mitk::SlicedGeometry3D* slicedGeo =  dynamic_cast< mitk::SlicedGeometry3D*>(const_cast<mitk::Geometry3D*>(positionEvent->GetSender()->
-    GetSliceNavigationController()->GetCurrentGeometry3D()));
-
-  if (currentGeo && slicedGeo)
+  if (plane)
   {
-    AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    transform->SetMatrix(currentGeo->GetIndexToWorldTransform()->GetMatrix());
-    transform->SetOffset(currentGeo->GetIndexToWorldTransform()->GetOffset());
-
-    mitk::Vector3D direction= slicedGeo->GetDirectionVector();
-    mitk::Vector3D spacing = positionEvent->GetSender()->GetCurrentWorldGeometry()->GetSpacing();
-
     unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
 
-    mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, currentGeo->GetExtent(0), currentGeo->GetExtent(1),
-      spacing, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos(), direction, transform);
-
-    if ( mitk::PlanePositionManager::GetInstance()->AddNewPosition(newOp) )
+    if ( mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos()) )
     {
       //Creating PlanarFigure which currently serves as marker
       mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
-      contourMarker->SetGeometry2D( currentGeo );
+      contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
 
       std::stringstream markerStream;
       mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
 
       markerStream << m_Contourmarkername ;
-      markerStream << "_";
-      markerStream << id;
+      markerStream << " ";
+      markerStream << id+1;
 
       DataNode::Pointer rotatedContourNode = DataNode::New();
 

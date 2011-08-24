@@ -22,9 +22,10 @@ namespace mitk
 {
 
 RestorePlanePositionOperation
-::RestorePlanePositionOperation( OperationType operationType, float width, float height, Vector3D spacing , unsigned int pos, Vector3D direction, AffineTransform3D::Pointer transform)
-: Operation(operationType), m_Width( width ), m_Height( height ), m_Spacing( spacing ), m_Pos(pos), m_DirectionVector(direction), m_Transform(transform)
+::RestorePlanePositionOperation( OperationType operationType, float width, float height, Vector3D spacing , unsigned int pos, Vector3D direction, AffineTransform3D::Pointer transform/*, PlaneOrientation orientation*/)
+: Operation(operationType), m_Width( width ), m_Height( height ), m_Spacing( spacing ), m_Pos(pos), m_DirectionVector(direction), m_Transform(transform)/*, m_Orientation(orientation)*/
 {
+  //MITK_INFO<<"Width: "<<width<<"height: "<<height<<"spacing: "<<spacing<<"direction: "<<direction<<"transform: "<<transform;
 }
 
 RestorePlanePositionOperation

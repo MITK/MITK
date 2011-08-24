@@ -729,7 +729,17 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       {
         return;
       }
-      this->SetIndexToWorldTransform(op->GetTransform());
+
+      AffineTransform3D::Pointer transform2 = AffineTransform3D::New();
+      Matrix3D matrix;
+      matrix.GetVnlMatrix().set_column(0, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+      matrix.GetVnlMatrix().set_column(1, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+      matrix.GetVnlMatrix().set_column(2, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+      transform2->SetMatrix(matrix);
+      Vector3D offset = op->GetTransform()->GetOffset();
+      transform2->SetOffset(offset);
+
+      this->SetIndexToWorldTransform(transform2);
       ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
       this->SetBounds(bounds);
       TransferItkToVtkTransform();

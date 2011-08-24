@@ -1,4 +1,5 @@
 #include "mitkPlanePositionManager.h"
+#include "mitkInteractionConst.h"
 
 
 mitk::PlanePositionManager::PlanePositionManager()
@@ -26,19 +27,47 @@ mitk::PlanePositionManager* mitk::PlanePositionManager::GetInstance()
   return m_Instance;
 }
 
-bool mitk::PlanePositionManager::AddNewPosition ( RestorePlanePositionOperation *op )
+bool mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
 {
-  //std::ofstream file("C:/Users/fetzer/Desktop/equationSystem/geometryfile.txt");
-  ///*MITK_INFO*/file <<"X = "<<op->GetXAxis()<<" Y = "<< op->GetYAxis()<<" Pos = "<<op->GetPos()<<" Origin = "<<op->GetOrigin();
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  Matrix3D matrix;
+  matrix.GetVnlMatrix().set_column(0, plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+  matrix.GetVnlMatrix().set_column(1, plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+  matrix.GetVnlMatrix().set_column(2, plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+  transform->SetMatrix(matrix);
+  transform->SetOffset(plane->GetIndexToWorldTransform()->GetOffset());
+
+  mitk::Vector3D direction;
+  direction[0] = plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2)[0];
+  direction[1] = plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2)[1];
+  direction[2] = plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2)[2];
+  direction.Normalize();
 
   for (unsigned int i = 0; i < m_PositionList.size(); i++)
   {
-    ///*MITK_INFO*/file <<"X = "<<m_PositionList.at(i)->GetXAxis()<<" Y = "<< m_PositionList.at(i)->GetYAxis()<<" Pos = "<<m_PositionList.at(i)->GetPos()<<" Origin = "<<m_PositionList.at(i)->GetOrigin();
-    if ( m_PositionList.at(i) != 0 && m_PositionList.at(i)->GetPos() == op->GetPos() && m_PositionList.at(i)->GetTransform()->GetMatrix() == op->GetTransform()->GetMatrix()
-        &&  m_PositionList.at(i)->GetTransform()->GetOffset() == op->GetTransform()->GetOffset() )
-      return false;
+    if (m_PositionList.at(i) != 0)
+    {
+      itk::Matrix<float> diffM = plane->GetIndexToWorldTransform()->GetMatrix()-m_PositionList.at(i)->GetTransform()->GetMatrix();
+      bool isSameMatrix(true);
+      for (unsigned int j = 0; j < 3; j++)
+      {
+        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
+        {
+          isSameMatrix = false;
+          break;
+        }
+      }
+      itk::Vector<float> diffV = m_PositionList.at(i)->GetTransform()->GetOffset()-transform->GetOffset();
+      if ( isSameMatrix && m_PositionList.at(i)->GetPos() == sliceIndex && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
+        return false;
+    }
+    
   }
-  m_PositionList.push_back( op );
+
+  mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, plane->GetExtent(0), 
+    plane->GetExtent(1), plane->GetSpacing(), sliceIndex, direction, transform);
+
+  m_PositionList.push_back( newOp );
   return true;
 }
 
@@ -98,9 +127,9 @@ void mitk::PlanePositionManager::DataStorageRemovedNode(const mitk::DataNode* re
   bool isContourMarker (false);
   if (removedNode->GetBoolProperty("isContourMarker", isContourMarker))
   {
-    unsigned int t = removedNode->GetName().find_last_of("_");
+    unsigned int t = removedNode->GetName().find_last_of(" ");
     unsigned int id = atof(removedNode->GetName().substr(t+1).c_str());
-    this->DeletePlanePosition(id);
+    this->DeletePlanePosition(id-1);
   }
 }
 

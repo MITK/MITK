@@ -401,9 +401,6 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     void ReorientSlices( 
       const mitk::Point3D &point, const mitk::Vector3D &normal );
 
-    void RestorePlanePosition( RestorePlanePositionOperation* op );
-
-
     virtual bool ExecuteAction( 
       Action* action, mitk::StateEvent const* stateEvent);
 

@@ -464,14 +464,6 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
   this->SendCreatedWorldGeometryUpdate();
 }
 
-void
-SliceNavigationController::RestorePlanePosition( RestorePlanePositionOperation* op )
-{
-    m_CreatedWorldGeometry->ExecuteOperation( op );
-
-  this->SendCreatedWorldGeometryUpdate();
-}
-
 
 const mitk::TimeSlicedGeometry *
 SliceNavigationController::GetCreatedWorldGeometry()
@@ -591,6 +583,14 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
       }
       break;
     }
+    case OpRESTOREPLANEPOSITION:
+      {
+        m_CreatedWorldGeometry->ExecuteOperation( operation );
+
+        this->SendCreatedWorldGeometryUpdate();
+
+        break;
+      }
     default:
     {
       // do nothing

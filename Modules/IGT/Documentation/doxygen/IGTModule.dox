@@ -11,5 +11,5 @@ These modules for image guided therapy contain functionalities for the tracking 
   \li \subpage org.toolpairnavigation
   \li \subpage org.mitk.gui.qt.igttrackingtoolbox
   \li \subpage org.igttutorial
-  
+  \li \subpage org.mitk.gui.qt.navigationdataplayer
 */

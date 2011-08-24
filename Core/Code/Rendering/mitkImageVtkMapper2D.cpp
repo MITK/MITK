@@ -771,13 +771,20 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
       vtkMitkApplyLevelWindowToRGBFilter* levelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
       levelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
-      vtkSmartPointer<vtkImageRGBToHSI> rgbToHSIFilter = vtkSmartPointer<vtkImageRGBToHSI>::New();
-      rgbToHSIFilter->SetInput( localStorage->m_ReslicedImage );
-      rgbToHSIFilter->Update();
-      levelWindowToRGBFilterObject->SetInputConnection(rgbToHSIFilter->GetOutputPort());
-      vtkSmartPointer<vtkImageHSIToRGB> hsiToRGBFilter = vtkSmartPointer<vtkImageHSIToRGB>::New();
-      hsiToRGBFilter->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
-      localStorage->m_Texture->SetInputConnection(hsiToRGBFilter->GetOutputPort());
+      // obtain and apply opacity level window
+      mitk::LevelWindow opacLevelWindow;
+      if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+      {
+        levelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+        levelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+      }
+      else
+      {
+        levelWindowToRGBFilterObject->SetMinOpacity(0.0);
+        levelWindowToRGBFilterObject->SetMaxOpacity(255.0);
+      }
+      levelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
+      localStorage->m_Texture->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
     }
 
     LevelWindow levelWindow;
@@ -786,16 +793,16 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
 
-    // obtain and apply opacity level window
-    mitk::LevelWindow opacLevelWindow;
-    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-    {
-      finalLookuptable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
-    }
-    else
-    {
-      finalLookuptable->SetAlphaRange(0.0, 1.0);
-    }
+//    // obtain and apply opacity level window
+//    mitk::LevelWindow opacLevelWindow;
+//    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+//    {
+//      finalLookuptable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
+//    }
+//    else
+//    {
+//      finalLookuptable->SetAlphaRange(0.0, 1.0);
+//    }
   }
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );

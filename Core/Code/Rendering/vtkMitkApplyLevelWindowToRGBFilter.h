@@ -19,19 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define __vtkMitkApplyLevelWindowToRGBFilter_h
 
 class vtkScalarsToColors;
-//class vtkImageToImageFilter;
-//#include <vtkImageRGBToHSI.h>
 #include <vtkImageData.h>
-//#include <vtkImageRGBToHSI.h>
-//#include <vtkImageIterator.h>
-//#include <vtkImageProgressIterator.h>
-//#include <vtkLookupTable.h>
 #include <vtkImageToImageFilter.h>
-//#include <vtkThreadedImageAlgorithm.h>
 
 #include "mitkCommon.h"
-
-//#include "vtkThreadedImageAlgorithm.h"
 
 class MITK_CORE_EXPORT vtkMitkApplyLevelWindowToRGBFilter : public vtkImageToImageFilter
 {
@@ -39,6 +30,12 @@ public:
   vtkScalarsToColors* GetLookupTable();
 
   void SetLookupTable(vtkScalarsToColors *lookupTable);
+
+  void SetMinOpacity(double minOpacity);
+  inline double GetMinOpacity() const;
+
+  void SetMaxOpacity(double maxOpacity);
+  inline double GetMaxOpacity() const;
 
   vtkMitkApplyLevelWindowToRGBFilter();
 protected:
@@ -53,18 +50,14 @@ protected:
    */
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id);
 
-//  template <class T>
-//      void vtkCalculateIntensityFromLookupTable(
-//                                                vtkImageData *inData,
-//                                                vtkImageData *outData,
-//                                                int outExt[6], T *);
-
   void ExecuteInformation();
 
   void ExecuteInformation(vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData));
 
 private:
   vtkScalarsToColors* m_LookupTable;
+  double m_MinOqacity;
+  double m_MaxOpacity;
 };
 
 #endif

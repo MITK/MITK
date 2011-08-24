@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcombobox.h>
 
 //mitk headers
+#include "mitkToFConfig.h"
 #include <mitkToFImageGrabberCreator.h>
 
 //itk headers
@@ -54,6 +55,11 @@ void QmitkToFConnectionWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkToFConnectionWidgetControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+    // set available cameras to combo box
+    QString string(MITK_TOF_CAMERAS);
+    string.replace(";"," ");
+    QStringList list = string.split(",");
+    m_Controls->m_SelectCameraCombobox->addItems(list);
 
     ShowParameterWidget();
   }
@@ -64,7 +70,7 @@ void QmitkToFConnectionWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
-    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSelectCamera(int)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SLOT(OnSelectCamera(int)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SIGNAL(ToFCameraSelected(int)) );
 
@@ -112,48 +118,48 @@ mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
   return m_ToFImageGrabber;
 }
 
-void QmitkToFConnectionWidget::OnSelectCamera(int index)
+void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedText)
 {
-  if (index == 0) // PMD camcube 2
+  if (selectedText == "PMD CamCube 2.0/3.0") // PMD camcube 2
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
     ShowPMDParameterWidget();
   }
-  else if (index == 1) // pmd camboard
+  else if (selectedText == "PMD CamBoard") // pmd camboard
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
     ShowPMDParameterWidget();
   }
-  else if (index == 2) // pmd O3d
+  else if (selectedText == "PMD O3D") // pmd O3d
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
     ShowPMDParameterWidget();
   }
-  else if (index == 3) // MESA 4000
+  else if (selectedText == "MESA Swissranger 4000") // MESA 4000
   {
     ShowMESAParameterWidget();
   }
-  else if (index == 4) // pmd file player
+  else if (selectedText == "PMD Player") // pmd file player
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
     ShowPlayerParameterWidget();
   }
-  else if (index == 5) // pmd raw data player
+  else if (selectedText == "PMD Raw Data Player") // pmd raw data player
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(false);
     ShowPlayerParameterWidget();
   }
-  else if (index == 6) // mitk player
+  else if (selectedText == "MITK Player") // mitk player
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(false);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(false);
@@ -179,36 +185,36 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     QString fileFilter("");
 
     //select the camera to connect with
-    int selectedCamera = m_Controls->m_SelectCameraCombobox->currentIndex();
-    if (selectedCamera == 0)
+    QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+    if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamCubeImageGrabber();
     }
-    else if (selectedCamera == 1)
+    else if (selectedCamera == "PMD CamBoard")
     { //PMD CamBoard
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamBoardImageGrabber();
     }
-    else if (selectedCamera == 2)
+    else if (selectedCamera == "PMD O3D")
     {//PMD O3
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDO3ImageGrabber();
     }
-    else if (selectedCamera == 3)
+    else if (selectedCamera == "MESA Swissranger 4000")
     {//MESA SR4000
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMESASR4000ImageGrabber();
     }
-    else if (selectedCamera == 4)
+    else if (selectedCamera == "PMD Player")
     {//PMD player
       playerMode = true;
       fileFilter.append("PMD Files (*.pmd)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDPlayerImageGrabber();
     }
-    else if (selectedCamera == 5)
+    else if (selectedCamera == "PMD Raw Data Player")
     {//PMD MITK player
       playerMode = true;
       fileFilter.append("MITK Images (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
     }
-    else if (selectedCamera == 6)
+    else if (selectedCamera == "MITK Player")
     {//MITK player
       playerMode = true;
       fileFilter.append("MITK Images (*.pic)");
@@ -225,15 +231,15 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         m_Controls->m_ConnectCameraButton->setEnabled(true);
         m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //        m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-        OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+        OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
-      if(selectedCamera == 4)
+      if(selectedCamera == "PMD Player")
       { //set the PMD file name
         this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
       }
-      if (selectedCamera == 5 || selectedCamera == 6)
+      if (selectedCamera == "PMD Raw Data Player" || selectedCamera == "MITK Player")
       {
         std::string msg = "";
         try
@@ -297,7 +303,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           m_Controls->m_ConnectCameraButton->setEnabled(true);
           m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //          m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-          OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+          OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
           return;
         }
       }
@@ -309,14 +315,13 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-      switch (selectedCamera)
+      if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D"))
       {
-      case 0:
-      case 1:
-      case 2: this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
-              break;
-      case 3: this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
-              break;
+        this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
+      }
+      else if (selectedCamera=="MESA Swissranger 4000")
+      {
+        this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
       }
 
       
@@ -358,7 +363,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       m_Controls->m_ConnectCameraButton->setEnabled(true);
       m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //      m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-      OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+      OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
       return;
 
     }
@@ -375,7 +380,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     m_Controls->m_ConnectCameraButton->setText("Connect");
     m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-    OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+    OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
 
     this->m_ToFImageGrabber = NULL;
     // send disconnect signal to the caller functionality

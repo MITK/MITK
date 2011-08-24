@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
+Version:   $Revision: 17495 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -48,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
+#include <mitkQBallImage.h>
 
 const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.views.controlvisualizationpropertiesview";
 
@@ -65,49 +66,6 @@ struct CvpSelListener : ISelectionListener
 
   void ApplySettings(mitk::DataNode::Pointer node)
   {
-    bool do_vis;
-    node->GetBoolProperty("VisibleOdfs_T", do_vis);
-    if(do_vis)
-    {
-      m_View->m_Controls->m_VisibleOdfsON_T->setIcon(*m_View->m_IconGlyON_T);
-      m_View->m_Controls->m_VisibleOdfsON_T->setChecked(true);
-      m_View->m_GlyIsOn_T = true;
-    }
-    else
-    {
-      m_View->m_Controls->m_VisibleOdfsON_T->setIcon(*m_View->m_IconGlyOFF_T);
-      m_View->m_Controls->m_VisibleOdfsON_T->setChecked(false);
-      m_View->m_GlyIsOn_T = false;
-    }
-
-    node->GetBoolProperty("VisibleOdfs_C", do_vis);
-    if(do_vis)
-    {
-      m_View->m_Controls->m_VisibleOdfsON_C->setIcon(*m_View->m_IconGlyON_C);
-      m_View->m_Controls->m_VisibleOdfsON_C->setChecked(true);
-      m_View->m_GlyIsOn_C = true;
-    }
-    else
-    {
-      m_View->m_Controls->m_VisibleOdfsON_C->setIcon(*m_View->m_IconGlyOFF_C);
-      m_View->m_Controls->m_VisibleOdfsON_C->setChecked(false);
-      m_View->m_GlyIsOn_C = false;
-    }
-
-    node->GetBoolProperty("VisibleOdfs_S", do_vis);
-    if(do_vis)
-    {
-      m_View->m_Controls->m_VisibleOdfsON_S->setIcon(*m_View->m_IconGlyON_S);
-      m_View->m_Controls->m_VisibleOdfsON_S->setChecked(true);
-      m_View->m_GlyIsOn_S = true;
-    }
-    else
-    {
-      m_View->m_Controls->m_VisibleOdfsON_S->setIcon(*m_View->m_IconGlyOFF_S);
-      m_View->m_Controls->m_VisibleOdfsON_S->setChecked(false);
-      m_View->m_GlyIsOn_S = false;
-    }
-
     bool tex_int;
     node->GetBoolProperty("texture interpolation", tex_int);
     if(tex_int)
@@ -415,6 +373,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
   : QmitkFunctionality(),
   m_Controls(NULL),
   m_MultiWidget(NULL),
+  m_NodeUsedForOdfVisualization(NULL),
   m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
   m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
   m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
@@ -562,9 +521,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_2DHeatmap->setIcon(iconPaint);
 
     m_Controls->m_TextureIntON->setCheckable(true);
-    m_Controls->m_VisibleOdfsON_T->setCheckable(true);
-    m_Controls->m_VisibleOdfsON_S->setCheckable(true);
-    m_Controls->m_VisibleOdfsON_C->setCheckable(true);
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
     int size = m_Controls->m_AdditionalScaling->count();
@@ -586,7 +542,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
   }
 
-  
+
 
   m_IsInitialized = false;
   m_SelListener = berry::ISelectionListener::Pointer(new CvpSelListener(this));
@@ -775,6 +731,38 @@ int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, in
   }
 }
 
+/* OnSelectionChanged is registered to SelectionService, therefore no need to
+ implement SelectionService Listener explicitly */
+void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+  if ( !this->IsVisible() )
+  {
+    // do nothing if nobody wants to see me :-(
+    return;
+  }
+
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+    if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
+    {
+      if(m_NodeUsedForOdfVisualization.IsNotNull())
+      {
+        m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", false);
+        m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", false);
+        m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", false);
+      }
+      m_NodeUsedForOdfVisualization = node;
+      m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", m_GlyIsOn_S);
+      m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
+      m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
+      if(m_MultiWidget)
+        m_MultiWidget->RequestUpdate();
+      break;
+    }
+  }
+}
+
 mitk::DataStorage::SetOfObjects::Pointer
     QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
 {
@@ -784,7 +772,7 @@ mitk::DataStorage::SetOfObjects::Pointer
         mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
     i != m_CurrentSelection->End();
     ++i)
     {
@@ -921,7 +909,7 @@ void QmitkControlVisualizationPropertiesView::Reinit()
 {
   if (m_CurrentSelection)
   {
-    mitk::DataNodeObject::Pointer nodeObj = 
+    mitk::DataNodeObject::Pointer nodeObj =
         m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
     mitk::DataNode::Pointer node = nodeObj->GetDataNode();
     mitk::BaseData::Pointer basedata = node->GetData();
@@ -967,73 +955,23 @@ void QmitkControlVisualizationPropertiesView::TextIntON()
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 {
-  if(m_GlyIsOn_S)
-  {
-    m_Controls->m_VisibleOdfsON_S->setIcon(*m_IconGlyOFF_S);
-  }
-  else
-  {
-    m_Controls->m_VisibleOdfsON_S->setIcon(*m_IconGlyON_S);
-  }
-
-  mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
-  SetBoolProp(set,"VisibleOdfs_S", !m_GlyIsOn_S);
-
-  set = ActiveSet("TensorImage");
-  SetBoolProp(set,"VisibleOdfs_S", !m_GlyIsOn_S);
-
-  m_GlyIsOn_S = !m_GlyIsOn_S;
-
+  m_GlyIsOn_S = m_Controls->m_VisibleOdfsON_S->isChecked();
+  m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", m_GlyIsOn_S);
   VisibleOdfsON(0);
 }
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
 {
-  if(m_GlyIsOn_T)
-  {
-    m_Controls->m_VisibleOdfsON_T->setIcon(*m_IconGlyOFF_T);
-  }
-  else
-  {
-    m_Controls->m_VisibleOdfsON_T->setIcon(*m_IconGlyON_T);
-  }
-
-  mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
-  SetBoolProp(set,"VisibleOdfs_T", !m_GlyIsOn_T);
-
-  set = ActiveSet("TensorImage");
-  SetBoolProp(set,"VisibleOdfs_T", !m_GlyIsOn_T);
-
-  m_GlyIsOn_T = !m_GlyIsOn_T;
-
+  m_GlyIsOn_T = m_Controls->m_VisibleOdfsON_T->isChecked();
+  m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
   VisibleOdfsON(1);
-
 }
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
 {
-  if(m_GlyIsOn_C)
-  {
-    m_Controls->m_VisibleOdfsON_C->setIcon(*m_IconGlyOFF_C);
-  }
-  else
-  {
-    m_Controls->m_VisibleOdfsON_C->setIcon(*m_IconGlyON_C);
-  }
-
-  mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
-  SetBoolProp(set,"VisibleOdfs_C", !m_GlyIsOn_C);
-
-  set = ActiveSet("TensorImage");
-  SetBoolProp(set,"VisibleOdfs_C", !m_GlyIsOn_C);
-
-  m_GlyIsOn_C = !m_GlyIsOn_C;
-
+  m_GlyIsOn_C = m_Controls->m_VisibleOdfsON_C->isChecked();
+  m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
   VisibleOdfsON(2);
-
 }
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON(int view)

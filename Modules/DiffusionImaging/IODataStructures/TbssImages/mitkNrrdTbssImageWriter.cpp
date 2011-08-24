@@ -70,9 +70,9 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
     itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(), "tbss", "ROI");
 
 
-    mitk::TbssImage<char>::RoiType roi = input->GetRoi();
+    std::vector< itk::Index<3> > roi = input->GetRoi();
 
-    mitk::TbssImage<char>::RoiType::iterator it = roi.begin();
+    std::vector< itk::Index<3> >::iterator it = roi.begin();
 
     int i=0;
     while(it != roi.end())

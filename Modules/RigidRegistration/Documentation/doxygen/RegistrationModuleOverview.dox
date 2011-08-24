@@ -7,8 +7,8 @@ MITK provides several modules for the registration of images.
 
 \section RegistrationModuleOverviewPageList List of Modules
 
-  \li \subpage org.deform.registration
-  \li \subpage org.pointbased.reg
-  \li \subpage org.rigid.regis
+  \li \subpage org_deform_registration
+  \li \subpage org_pointbased_reg
+  \li \subpage org_rigid_regis
 
 */

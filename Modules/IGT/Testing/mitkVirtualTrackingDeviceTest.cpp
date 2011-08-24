@@ -84,8 +84,10 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   //StartTracking
   mitk::Point3D posBefore0;
   tool->GetPosition(posBefore0);
+  unsigned long tmpMTimeBefore0 = tool->GetMTime();
   mitk::Point3D posBefore1;
   tracker->GetToolByName("Tool1")->GetPosition(posBefore1);
+  unsigned long tmpMTimeBefore1 = tracker->GetToolByName("Tool1")->GetMTime();
 
   mitk::Point3D posAfter0;
   tool->GetPosition(posAfter0);
@@ -96,11 +98,25 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   itksys::SystemTools::Delay(500); // wait for tracking thread to start generating positions
   
   tool->GetPosition(posAfter0);
-  MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values in tool 0.");
+  if(tracker->GetToolByName("Tool0")->GetMTime() == tmpMTimeBefore0) //tool not modified yet
+  {
+    MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == true, "Testing if tracking is producing new position values in tool 0.");
+  }
+  else
+  {
+    MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values in tool 0.");
+  }
   
   mitk::Point3D posAfter1;
   tracker->GetToolByName("Tool1")->GetPosition(posAfter1);
-  MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == false, "Testing if tracking is producing new position values in tool 1.");
+  if(tracker->GetToolByName("Tool1")->GetMTime() == tmpMTimeBefore1) //tool not modified yet
+  {
+    MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == true, "Testing if tracking is producing new position values in tool 1.");
+  }
+  else
+  {
+    MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == false, "Testing if tracking is producing new position values in tool 1.");
+  }
 
   // add tool while tracking is in progress
   tracker->AddTool("while Running");

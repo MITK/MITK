@@ -5,8 +5,9 @@ The following items describe some issues about MITK on a more abstract level.
 
 If you want to start using MITK, you also want to see \ref Development
 
-\li \subpage OverviewPage
+\li \subpage GeometryOverviewPage
 \li \subpage InteractionPage
-\li \subpage Rendering
+\li \subpage OverviewPage
 \li \subpage PropertiesPage
+\li \subpage Rendering
 */

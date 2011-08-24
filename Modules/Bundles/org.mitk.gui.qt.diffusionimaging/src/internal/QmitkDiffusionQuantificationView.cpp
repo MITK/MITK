@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
+Version:   $Revision: 17495 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -46,7 +46,7 @@ const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.di
 
 using namespace berry;
 
-const float QmitkDiffusionQuantificationView::m_ScaleDAIValues = 100.0;
+const float QmitkDiffusionQuantificationView::m_ScaleDAIValues = 1.0;
 
 struct DqSelListener : ISelectionListener
 {
@@ -70,7 +70,7 @@ struct DqSelListener : ISelectionListener
       bool foundTensorVolume = false;
 
       // iterate selection
-      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
         i != m_View->m_CurrentSelection->End(); ++i)
       {
 
@@ -267,8 +267,8 @@ void QmitkDiffusionQuantificationView::QBIQuantify(int method)
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -281,7 +281,7 @@ void QmitkDiffusionQuantificationView::QBIQuantify(int method)
         }
       }
     }
- 
+
     QBIQuantification(set, method);
 
   }
@@ -295,8 +295,8 @@ void QmitkDiffusionQuantificationView::TensorQuantify(int method)
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -309,14 +309,14 @@ void QmitkDiffusionQuantificationView::TensorQuantify(int method)
         }
       }
     }
- 
+
     TensorQuantification(set, method);
 
   }
 }
 
 void QmitkDiffusionQuantificationView::QBIQuantification(
-  mitk::DataStorage::SetOfObjects::Pointer inImages, int method) 
+  mitk::DataStorage::SetOfObjects::Pointer inImages, int method)
 {
   itk::TimeProbe clock;
   QString status;
@@ -324,8 +324,8 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
   int nrFiles = inImages->size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
@@ -335,7 +335,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     const int odfsize = QBALL_ODFSIZE;
     typedef itk::Vector<TOdfPixelType,odfsize> OdfVectorType;
     typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-    mitk::Image* vol = 
+    mitk::Image* vol =
       static_cast<mitk::Image*>((*itemiter)->GetData());
     OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
     mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -406,7 +406,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         newname.append("05");
         scale = m_ScaleDAIValues;
         break;
-      }    
+      }
     case 6:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_NORMALIZED_ENTROPY);
@@ -493,7 +493,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     img->Allocate();
     itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
     ot = ot.Begin();
-    itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it 
+    itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
       (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
     it = it.Begin();
 
@@ -511,9 +511,9 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     image->SetVolume( img->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
-    node->SetProperty( "name", mitk::StringProperty::New(newname) );    
+    node->SetProperty( "name", mitk::StringProperty::New(newname) );
     nodes.push_back(node);
- 
+
     mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
 
   }
@@ -527,7 +527,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
 }
 
 void QmitkDiffusionQuantificationView::TensorQuantification(
-  mitk::DataStorage::SetOfObjects::Pointer inImages, int method) 
+  mitk::DataStorage::SetOfObjects::Pointer inImages, int method)
 {
   itk::TimeProbe clock;
   QString status;
@@ -535,8 +535,8 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
   int nrFiles = inImages->size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
@@ -546,7 +546,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
     typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
 
-    mitk::Image* vol = 
+    mitk::Image* vol =
       static_cast<mitk::Image*>((*itemiter)->GetData());
     TensorImageType::Pointer itkvol = TensorImageType::New();
     mitk::CastToItkImage<TensorImageType>(vol, itkvol);
@@ -562,7 +562,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       "Computing FA for %s", nodename.c_str()).toAscii());
     typedef itk::Image< TTensorPixelType, 3 >              FAImageType;
 
-    typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType> 
+    typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType>
       ShiftScaleFilterType;
     ShiftScaleFilterType::Pointer multi =
       ShiftScaleFilterType::New();
@@ -573,15 +573,15 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
 
     if(method == 0) //FA
     {
-     /* typedef itk::TensorFractionalAnisotropyImageFilter< 
-        TensorImageType, FAImageType >                       FilterType;    
+     /* typedef itk::TensorFractionalAnisotropyImageFilter<
+        TensorImageType, FAImageType >                       FilterType;
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
       multi->SetInput(anisotropyFilter->GetOutput());
       nodename = QString(nodename.c_str()).append("_FA").toStdString();*/
 
-      
+
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
       measurementsCalculator->SetMeasure(MeasurementsType::FA);
@@ -592,14 +592,14 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     }
     else if(method == 1) //RA
     {
-      /*typedef itk::TensorRelativeAnisotropyImageFilter< 
+      /*typedef itk::TensorRelativeAnisotropyImageFilter<
         TensorImageType, FAImageType >                       FilterType;
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
       multi->SetInput(anisotropyFilter->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();*/
-      
+
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
       measurementsCalculator->SetMeasure(MeasurementsType::RA);
@@ -607,7 +607,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();
 
-    }  
+    }
     else if(method == 2) // AD (Axial diffusivity)
     {
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
@@ -657,7 +657,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     node->SetData( image );
     node->SetProperty( "name", mitk::StringProperty::New(nodename) );
     nodes.push_back(node);
- 
+
     mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
 
   }

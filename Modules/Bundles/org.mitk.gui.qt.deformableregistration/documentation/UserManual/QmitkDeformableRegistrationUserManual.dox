@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.deform.registration} The Deformable Image Registration Module
+\bundlemainpage{org_deform_registration} The Deformable Image Registration Module
 
 Available sections:
   - \ref DeformableRegistrationUserManualOverview

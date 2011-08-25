@@ -31,7 +31,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_regiongrowing
   \li \subpage org_simpleexample
   \li \subpage org_surfacematerialeditor
-  \li \subpage org_mitk_gui_qt_toftutorial
+  \li \subpage org_toftutorial
   \li \subpage org_videoplayer
   \li \subpage org_viewinitialitzation
 

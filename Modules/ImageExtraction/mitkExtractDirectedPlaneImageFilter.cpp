@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkExtractDirectedPlaneImageFilter.h"
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkImageMapperGL2D.h"
+//#include "mitkImageMapperGL2D.h"
 
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>

@@ -139,7 +139,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::ImageMapperGL2D::New();
+      newMapper = mitk::ImageVtkMapper2D::New();
       newMapper->SetDataNode(node);
     }
 
@@ -229,7 +229,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   std::string n = node->GetData()->GetNameOfClass();
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::ImageMapperGL2D::SetDefaultProperties(node);
+    mitk::ImageVtkMapper2D::SetDefaultProperties(node);
     mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 }

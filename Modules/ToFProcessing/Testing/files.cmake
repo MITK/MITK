@@ -4,4 +4,5 @@ SET(MODULE_TESTS
   mitkToFCompositeFilterTest.cpp
   mitkToFVisualizationFilterTest.cpp
   mitkToFProcessingCommonTest.cpp
+  mitkToFImageDownsamplingFilterTest.cpp
 )

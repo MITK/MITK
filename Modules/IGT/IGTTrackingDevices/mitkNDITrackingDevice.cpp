@@ -838,6 +838,8 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
     this->m_StopTrackingMutex->Lock();
     localStopTracking = m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
+
+    itksys::SystemTools::Delay(1);
   }
   /* StopTracking was called, thus the mode should be changed back to Ready now that the tracking loop has ended. */
   returnvalue = m_DeviceProtocol->DSTOP();

@@ -762,16 +762,16 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   {
 
     mitk::PixelType pixelType = this->GetInput()->GetPixelType();
-    if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() )
+    if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() ) //gray images with just one component
     {
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
     }
-    else
+    else //RGB, RBGA or other images tpyes with more components
     {
+      // obtain and apply opacity level window if possible
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
       vtkMitkApplyLevelWindowToRGBFilter* levelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
       levelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
-      // obtain and apply opacity level window
       mitk::LevelWindow opacLevelWindow;
       if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
       {
@@ -786,23 +786,11 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
       levelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
       localStorage->m_Texture->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
     }
-
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
 
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-
-//    // obtain and apply opacity level window
-//    mitk::LevelWindow opacLevelWindow;
-//    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-//    {
-//      finalLookuptable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
-//    }
-//    else
-//    {
-//      finalLookuptable->SetAlphaRange(0.0, 1.0);
-//    }
   }
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );

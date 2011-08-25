@@ -16,11 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "vtkMitkApplyLevelWindowToRGBFilter.h"
-#include <vtkImageRGBToHSI.h>
 #include <vtkImageData.h>
-#include <vtkImageRGBToHSI.h>
 #include <vtkImageIterator.h>
-#include <vtkImageProgressIterator.h>
 #include <vtkLookupTable.h>
 
 //used for acos etc.
@@ -44,6 +41,8 @@ vtkScalarsToColors* vtkMitkApplyLevelWindowToRGBFilter::GetLookupTable()
   return m_LookupTable;
 }
 
+//This code was copied from the iil. The template works only for float and double.
+//Internal method which should never be used anywhere else and should not be in th header.
 // Convert color pixels from (R,G,B) to (H,S,I).
 // Reference: "Digital Image Processing, 2nd. edition", R. Gonzalez and R. Woods. Prentice Hall, 2002.
 template<class T>
@@ -67,6 +66,8 @@ void RGBtoHSI(T* RGB, T* HSI)
   HSI[2] = (T)I;
 }
 
+//This code was copied from the iil. The template works only for float and double.
+//Internal method which should never be used anywhere else and should not be in th header.
 // Convert color pixels from (H,S,I) to (R,G,B).
 template<class T>
 void HSItoRGB(T* HSI, T* RGB)
@@ -97,6 +98,7 @@ void HSItoRGB(T* HSI, T* RGB)
   RGB[2] = (T)(B<0?0:(B>255?255:B));
 }
 
+//Internal method which should never be used anywhere else and should not be in th header.
 //----------------------------------------------------------------------------
 // This templated function executes the filter for any type of data.
 template <class T>
@@ -214,6 +216,7 @@ void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
   }
 }
 
+//Method to run the filter in different threads.
 void vtkMitkApplyLevelWindowToRGBFilter::ThreadedExecute(vtkImageData *inData,
                                                          vtkImageData *outData,
                                                          int extent[6], int id)

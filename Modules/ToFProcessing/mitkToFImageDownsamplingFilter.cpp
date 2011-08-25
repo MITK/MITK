@@ -85,32 +85,32 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VImageDimension>* itkImage )
 {
   // declare typdef for itk image from input mitk image  
-  typedef itk::Image< TPixel, VImageDimension >   ItkImageType;
+ typedef itk::Image< TPixel, VImageDimension >   ItkImageType;
 
   //declare itk filter related typedefs (transform type, interpolater, and size type)
   typedef itk::ResampleImageFilter<ItkImageType,ItkImageType>    ResamplerFilterType;
   typedef itk::IdentityTransform<double, VImageDimension> TransformType;
   typedef itk::NearestNeighborInterpolateImageFunction<ItkImageType, double > InterpolatorType;
-  typedef ItkImageType::SizeType::SizeValueType SizeValueType;
+  typedef typename ItkImageType::SizeType::SizeValueType SizeValueType;
 
   //instantiate filter related parameters
-  ResamplerFilterType::Pointer resampler = ResamplerFilterType::New(); 
-  TransformType::Pointer transform = TransformType::New(); 
-  InterpolatorType::Pointer interpolator = InterpolatorType::New(); 
+  typename ResamplerFilterType::Pointer resampler = ResamplerFilterType::New();
+  typename TransformType::Pointer transform = TransformType::New();
+  typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
 
   // establish size for downsampled image ( the result of this filter) 
-  ItkImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
-  ItkImageType::SizeType size;
+  typename ItkImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
+  typename ItkImageType::SizeType size;
 
   size[0] = static_cast< SizeValueType >( m_ResampledX );
   size[1] = static_cast< SizeValueType >( m_ResampledY );
   size[2] = static_cast< SizeValueType >( m_ResampledZ );
 
-  //establish spacing for new downsampled image ( resulting image) 		
-  const ItkImageType::SpacingType& inputSpacing = itkImage->GetSpacing();
-  ItkImageType::SpacingType spacing; 
+  //establish spacing for new downsampled image ( resulting image)                    
+  const typename ItkImageType::SpacingType& inputSpacing = itkImage->GetSpacing();
+  typename ItkImageType::SpacingType spacing;
 
-  spacing[0] = inputSpacing[0] * ( inputSize[0]/ m_ResampledX ); 
+  spacing[0] = inputSpacing[0] * ( inputSize[0]/ m_ResampledX );
   spacing[1] = inputSpacing[1] * ( inputSize[1]/ m_ResampledY );
   spacing[2] = inputSpacing[2] * ( inputSize[2]/ m_ResampledZ );
 

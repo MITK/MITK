@@ -49,6 +49,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkLayerController.h"
 
+//vtk
+#include <vtkSmartPointer.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkRenderWindowInteractor.h>
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f), 
 mitkWidget1(NULL),
@@ -237,6 +243,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   planeNode->SetProperty("layer",layer);
 
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
+//  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Extended2D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 

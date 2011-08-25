@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 10185 $
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -88,6 +82,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkAndImageFilter.h>
 #include <itkXorImageFilter.h>
 
+//vtk
+#include <vtkInteractorStyle.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <vtkCamera.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
@@ -125,7 +126,7 @@ typedef itk::XorImageFilter< ImageType, ImageType >                             
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
-: QmitkFunctionality(),
+  : QmitkFunctionality(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
   m_TimeStepperAdapter(NULL),
@@ -173,10 +174,16 @@ void QmitkBasicImageProcessing::CreateConnections()
 
     connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
+
+
+    connect( (QObject*)(m_Controls->m_testButton), SIGNAL( clicked() ), this, SLOT( TestButtonClicked() ) );
+    connect( (QObject*)(m_Controls->viewX), SIGNAL( clicked() ), this, SLOT( ViewXClicked() ) );
+    connect( (QObject*)(m_Controls->viewY), SIGNAL( clicked() ), this, SLOT( ViewYClicked() ) );
+    connect( (QObject*)(m_Controls->viewZ), SIGNAL( clicked() ), this, SLOT( ViewZClicked() ) );
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, 
-    GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
+                                                 GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
 }
 
 void QmitkBasicImageProcessing::Activated()
@@ -223,21 +230,21 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   //any nodes there?
   if (!nodes.empty())
   {
-  // reset GUI
-  this->ResetOneImageOpPanel();
-  m_Controls->sliceNavigatorTime->setEnabled(false);
-  m_Controls->leImage1->setText("Select an Image in Data Manager");
-  m_Controls->tlWhat1->setEnabled(false);
-  m_Controls->cbWhat1->setEnabled(false);
-  m_Controls->tlWhat2->setEnabled(false);
-  m_Controls->cbWhat2->setEnabled(false);
+    // reset GUI
+    this->ResetOneImageOpPanel();
+    m_Controls->sliceNavigatorTime->setEnabled(false);
+    m_Controls->leImage1->setText("Select an Image in Data Manager");
+    m_Controls->tlWhat1->setEnabled(false);
+    m_Controls->cbWhat1->setEnabled(false);
+    m_Controls->tlWhat2->setEnabled(false);
+    m_Controls->cbWhat2->setEnabled(false);
 
-  m_SelectedImageNode->RemoveAllNodes();
-  //get the selected Node
-  mitk::DataNode* _DataNode = nodes.front();
-  *m_SelectedImageNode = _DataNode;
-  //try to cast to image
-  mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
+    m_SelectedImageNode->RemoveAllNodes();
+    //get the selected Node
+    mitk::DataNode* _DataNode = nodes.front();
+    *m_SelectedImageNode = _DataNode;
+    //try to cast to image
+    mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
 
     //no image
     if( tempImage.IsNull() || (tempImage->IsInitialized() == false) ) 
@@ -511,8 +518,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   }
   catch ( std::exception &e )
   {
-  QString exceptionString = "An error occured during image loading:\n";
-  exceptionString.append( e.what() );
+    QString exceptionString = "An error occured during image loading:\n";
+    exceptionString.append( e.what() );
     QMessageBox::warning( NULL, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();
     return;
@@ -522,7 +529,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   if ( (! newImage) || (newImage->IsInitialized() == false) ) 
   {
     this->BusyCursorOff();
-   
+
     QMessageBox::warning( NULL, "Basic Image Processing", "Input image is broken or not initialized. Returning.", QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
@@ -561,234 +568,234 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   try{
 
-  switch (m_SelectedAction)
-  {
-
-  case GAUSSIAN:
+    switch (m_SelectedAction)
     {
-      GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
-      gaussianFilter->SetInput( itkImage );
-      gaussianFilter->SetVariance( param1 );
-      gaussianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(gaussianFilter->GetOutput());
-      nameAddition << "_Gaussian_var_" << param1;
-      std::cout << "Gaussian filtering successful." << std::endl;
-      break;
-    }
 
-  case MEDIAN:
-    {
-      MedianFilterType::Pointer medianFilter = MedianFilterType::New();
-      MedianFilterType::InputSizeType size;
-      size.Fill(param1);
-      medianFilter->SetRadius( size );
-      medianFilter->SetInput(itkImage);
-      medianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(medianFilter->GetOutput());
-      nameAddition << "_Median_radius_" << param1;
-      std::cout << "Median Filtering successful." << std::endl;
-      break;
-    }
-
-  case TOTALVARIATION:
-    {
-      if(isVectorImage > 1)
+    case GAUSSIAN:
       {
-        VectorTotalVariationFilterType::Pointer TVFilter
-          = VectorTotalVariationFilterType::New();
-        TVFilter->SetInput( itkVecImage.GetPointer() );
-        TVFilter->SetNumberIterations(param1);
-        TVFilter->SetLambda(double(param2)/1000.);
-        TVFilter->UpdateLargestPossibleRegion();
-
-        newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
+        gaussianFilter->SetInput( itkImage );
+        gaussianFilter->SetVariance( param1 );
+        gaussianFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(gaussianFilter->GetOutput());
+        nameAddition << "_Gaussian_var_" << param1;
+        std::cout << "Gaussian filtering successful." << std::endl;
+        break;
       }
-      else
+
+    case MEDIAN:
+      {
+        MedianFilterType::Pointer medianFilter = MedianFilterType::New();
+        MedianFilterType::InputSizeType size;
+        size.Fill(param1);
+        medianFilter->SetRadius( size );
+        medianFilter->SetInput(itkImage);
+        medianFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(medianFilter->GetOutput());
+        nameAddition << "_Median_radius_" << param1;
+        std::cout << "Median Filtering successful." << std::endl;
+        break;
+      }
+
+    case TOTALVARIATION:
+      {
+        if(isVectorImage > 1)
+        {
+          VectorTotalVariationFilterType::Pointer TVFilter
+              = VectorTotalVariationFilterType::New();
+          TVFilter->SetInput( itkVecImage.GetPointer() );
+          TVFilter->SetNumberIterations(param1);
+          TVFilter->SetLambda(double(param2)/1000.);
+          TVFilter->UpdateLargestPossibleRegion();
+
+          newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        }
+        else
+        {
+          FloatImageType::Pointer fImage = FloatImageType::New();
+          CastToItkImage( newImage, fImage );
+          TotalVariationFilterType::Pointer TVFilter
+              = TotalVariationFilterType::New();
+          TVFilter->SetInput( fImage.GetPointer() );
+          TVFilter->SetNumberIterations(param1);
+          TVFilter->SetLambda(double(param2)/1000.);
+          TVFilter->UpdateLargestPossibleRegion();
+
+          newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        }
+
+        nameAddition << "_TV_Iter_" << param1 << "_L_" << param2;
+        std::cout << "Total Variation Filtering successful." << std::endl;
+        break;
+      }
+
+    case DILATION:
+      {
+        BallType binaryBall;
+        binaryBall.SetRadius( param1 );
+        binaryBall.CreateStructuringElement();
+
+        DilationFilterType::Pointer dilationFilter = DilationFilterType::New();
+        dilationFilter->SetInput( itkImage );
+        dilationFilter->SetKernel( binaryBall );
+        dilationFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(dilationFilter->GetOutput());
+        nameAddition << "_Dilated_by_" << param1;
+        std::cout << "Dilation successful." << std::endl;
+        break;
+      }
+
+    case EROSION:
+      {
+        BallType binaryBall;
+        binaryBall.SetRadius( param1 );
+        binaryBall.CreateStructuringElement();
+
+        ErosionFilterType::Pointer erosionFilter = ErosionFilterType::New();
+        erosionFilter->SetInput( itkImage );
+        erosionFilter->SetKernel( binaryBall );
+        erosionFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(erosionFilter->GetOutput());
+        nameAddition << "_Eroded_by_" << param1;
+        std::cout << "Erosion successful." << std::endl;
+        break;
+      }
+
+    case OPENING:
+      {
+        BallType binaryBall;
+        binaryBall.SetRadius( param1 );
+        binaryBall.CreateStructuringElement();
+
+        OpeningFilterType::Pointer openFilter = OpeningFilterType::New();
+        openFilter->SetInput( itkImage );
+        openFilter->SetKernel( binaryBall );
+        openFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(openFilter->GetOutput());
+        nameAddition << "_Opened_by_" << param1;
+        std::cout << "Opening successful." << std::endl;
+        break;
+      }
+
+    case CLOSING:
+      {
+        BallType binaryBall;
+        binaryBall.SetRadius( param1 );
+        binaryBall.CreateStructuringElement();
+
+        ClosingFilterType::Pointer closeFilter = ClosingFilterType::New();
+        closeFilter->SetInput( itkImage );
+        closeFilter->SetKernel( binaryBall );
+        closeFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(closeFilter->GetOutput());
+        nameAddition << "_Closed_by_" << param1;
+        std::cout << "Closing successful." << std::endl;
+        break;
+      }
+
+    case GRADIENT:
+      {
+        GradientFilterType::Pointer gradientFilter = GradientFilterType::New();
+        gradientFilter->SetInput( itkImage );
+        gradientFilter->SetSigma( param1 );
+        gradientFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(gradientFilter->GetOutput());
+        nameAddition << "_Gradient_sigma_" << param1;
+        std::cout << "Gradient calculation successful." << std::endl;
+        break;
+      }
+
+    case LAPLACIAN:
       {
         FloatImageType::Pointer fImage = FloatImageType::New();
         CastToItkImage( newImage, fImage );
-        TotalVariationFilterType::Pointer TVFilter
-          = TotalVariationFilterType::New();
-        TVFilter->SetInput( fImage.GetPointer() );
-        TVFilter->SetNumberIterations(param1);
-        TVFilter->SetLambda(double(param2)/1000.);
-        TVFilter->UpdateLargestPossibleRegion();
-
-        newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
+        laplacianFilter->SetInput( fImage );
+        laplacianFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(laplacianFilter->GetOutput());
+        nameAddition << "_Second_Derivative";
+        std::cout << "Laplacian filtering successful." << std::endl;
+        break;
       }
 
-      nameAddition << "_TV_Iter_" << param1 << "_L_" << param2;
-      std::cout << "Total Variation Filtering successful." << std::endl;
-      break;
-    }
-
-  case DILATION:
-    {
-      BallType binaryBall;
-      binaryBall.SetRadius( param1 );
-      binaryBall.CreateStructuringElement();
-
-      DilationFilterType::Pointer dilationFilter = DilationFilterType::New();
-      dilationFilter->SetInput( itkImage );
-      dilationFilter->SetKernel( binaryBall );
-      dilationFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(dilationFilter->GetOutput());
-      nameAddition << "_Dilated_by_" << param1;
-      std::cout << "Dilation successful." << std::endl;
-      break;
-    }
-
-  case EROSION:
-    {
-      BallType binaryBall;
-      binaryBall.SetRadius( param1 );
-      binaryBall.CreateStructuringElement();
-
-      ErosionFilterType::Pointer erosionFilter = ErosionFilterType::New();
-      erosionFilter->SetInput( itkImage );
-      erosionFilter->SetKernel( binaryBall );
-      erosionFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(erosionFilter->GetOutput());
-      nameAddition << "_Eroded_by_" << param1;
-      std::cout << "Erosion successful." << std::endl;
-      break;
-    }
-
-  case OPENING:
-    {
-      BallType binaryBall;
-      binaryBall.SetRadius( param1 );
-      binaryBall.CreateStructuringElement();
-
-      OpeningFilterType::Pointer openFilter = OpeningFilterType::New();
-      openFilter->SetInput( itkImage );
-      openFilter->SetKernel( binaryBall );
-      openFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(openFilter->GetOutput());
-      nameAddition << "_Opened_by_" << param1;
-      std::cout << "Opening successful." << std::endl;
-      break;
-    }
-
-  case CLOSING:
-    {
-      BallType binaryBall;
-      binaryBall.SetRadius( param1 );
-      binaryBall.CreateStructuringElement();
-
-      ClosingFilterType::Pointer closeFilter = ClosingFilterType::New();
-      closeFilter->SetInput( itkImage );
-      closeFilter->SetKernel( binaryBall );
-      closeFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(closeFilter->GetOutput());
-      nameAddition << "_Closed_by_" << param1;
-      std::cout << "Closing successful." << std::endl;
-      break;
-    }
-
-  case GRADIENT:
-    {
-      GradientFilterType::Pointer gradientFilter = GradientFilterType::New();
-      gradientFilter->SetInput( itkImage );
-      gradientFilter->SetSigma( param1 );
-      gradientFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(gradientFilter->GetOutput());
-      nameAddition << "_Gradient_sigma_" << param1;
-      std::cout << "Gradient calculation successful." << std::endl;
-      break;
-    }
-
-  case LAPLACIAN:
-    {
-      FloatImageType::Pointer fImage = FloatImageType::New();
-      CastToItkImage( newImage, fImage );
-      LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
-      laplacianFilter->SetInput( fImage );
-      laplacianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(laplacianFilter->GetOutput());
-      nameAddition << "_Second_Derivative";
-      std::cout << "Laplacian filtering successful." << std::endl;
-      break;
-    }
-
-  case SOBEL:
-    {
-      FloatImageType::Pointer fImage = FloatImageType::New();
-      CastToItkImage( newImage, fImage );
-      SobelFilterType::Pointer sobelFilter = SobelFilterType::New();
-      sobelFilter->SetInput( fImage );
-      sobelFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(sobelFilter->GetOutput());
-      nameAddition << "_Sobel";
-      std::cout << "Edge Detection successful." << std::endl;
-      break;
-    }
-
-  case THRESHOLD:
-    {
-      ThresholdFilterType::Pointer thFilter = ThresholdFilterType::New();
-      thFilter->SetLowerThreshold(param1 < param2 ? param1 : param2);
-      thFilter->SetUpperThreshold(param2 > param1 ? param2 : param1);
-      thFilter->SetInsideValue(1);
-      thFilter->SetOutsideValue(0);
-      thFilter->SetInput(itkImage);
-      thFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(thFilter->GetOutput());
-      nameAddition << "_Threshold";
-      std::cout << "Thresholding successful." << std::endl;
-      break;
-    }
-
-  case INVERSION:
-    {
-      InversionFilterType::Pointer invFilter = InversionFilterType::New();
-      mitk::ScalarType min = newImage->GetScalarValueMin();
-      mitk::ScalarType max = newImage->GetScalarValueMax();
-      invFilter->SetMaximum( max + min );
-      invFilter->SetInput(itkImage);
-      invFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(invFilter->GetOutput());
-      nameAddition << "_Inverted";
-      std::cout << "Image inversion successful." << std::endl;
-      break;
-    }
-
-  case DOWNSAMPLING:
-    {
-      ResampleImageFilterType::Pointer downsampler = ResampleImageFilterType::New();
-      downsampler->SetInput( itkImage );
-
-      typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
-      InterpolatorType::Pointer interpolator = InterpolatorType::New();
-      downsampler->SetInterpolator( interpolator );
-
-      downsampler->SetDefaultPixelValue( 0 );
-
-      ResampleImageFilterType::SpacingType spacing = itkImage->GetSpacing();
-      spacing *= (double) param1;
-      downsampler->SetOutputSpacing( spacing );
-
-      downsampler->SetOutputOrigin( itkImage->GetOrigin() );
-      downsampler->SetOutputDirection( itkImage->GetDirection() );
-
-      ResampleImageFilterType::SizeType size = itkImage->GetLargestPossibleRegion().GetSize();
-      for ( int i = 0; i < 3; ++i )
+    case SOBEL:
       {
-        size[i] /= param1;
+        FloatImageType::Pointer fImage = FloatImageType::New();
+        CastToItkImage( newImage, fImage );
+        SobelFilterType::Pointer sobelFilter = SobelFilterType::New();
+        sobelFilter->SetInput( fImage );
+        sobelFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(sobelFilter->GetOutput());
+        nameAddition << "_Sobel";
+        std::cout << "Edge Detection successful." << std::endl;
+        break;
       }
-      downsampler->SetSize( size );
-      downsampler->UpdateLargestPossibleRegion();
 
-      newImage = mitk::ImportItkImage(downsampler->GetOutput());
-      nameAddition << "_Downsampled_by_" << param1;
-      std::cout << "Downsampling successful." << std::endl;
-      break;
+    case THRESHOLD:
+      {
+        ThresholdFilterType::Pointer thFilter = ThresholdFilterType::New();
+        thFilter->SetLowerThreshold(param1 < param2 ? param1 : param2);
+        thFilter->SetUpperThreshold(param2 > param1 ? param2 : param1);
+        thFilter->SetInsideValue(1);
+        thFilter->SetOutsideValue(0);
+        thFilter->SetInput(itkImage);
+        thFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(thFilter->GetOutput());
+        nameAddition << "_Threshold";
+        std::cout << "Thresholding successful." << std::endl;
+        break;
+      }
+
+    case INVERSION:
+      {
+        InversionFilterType::Pointer invFilter = InversionFilterType::New();
+        mitk::ScalarType min = newImage->GetScalarValueMin();
+        mitk::ScalarType max = newImage->GetScalarValueMax();
+        invFilter->SetMaximum( max + min );
+        invFilter->SetInput(itkImage);
+        invFilter->UpdateLargestPossibleRegion();
+        newImage = mitk::ImportItkImage(invFilter->GetOutput());
+        nameAddition << "_Inverted";
+        std::cout << "Image inversion successful." << std::endl;
+        break;
+      }
+
+    case DOWNSAMPLING:
+      {
+        ResampleImageFilterType::Pointer downsampler = ResampleImageFilterType::New();
+        downsampler->SetInput( itkImage );
+
+        typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
+        InterpolatorType::Pointer interpolator = InterpolatorType::New();
+        downsampler->SetInterpolator( interpolator );
+
+        downsampler->SetDefaultPixelValue( 0 );
+
+        ResampleImageFilterType::SpacingType spacing = itkImage->GetSpacing();
+        spacing *= (double) param1;
+        downsampler->SetOutputSpacing( spacing );
+
+        downsampler->SetOutputOrigin( itkImage->GetOrigin() );
+        downsampler->SetOutputDirection( itkImage->GetDirection() );
+
+        ResampleImageFilterType::SizeType size = itkImage->GetLargestPossibleRegion().GetSize();
+        for ( int i = 0; i < 3; ++i )
+        {
+          size[i] /= param1;
+        }
+        downsampler->SetSize( size );
+        downsampler->UpdateLargestPossibleRegion();
+
+        newImage = mitk::ImportItkImage(downsampler->GetOutput());
+        nameAddition << "_Downsampled_by_" << param1;
+        std::cout << "Downsampling successful." << std::endl;
+        break;
+      }
+
+    default:
+      this->BusyCursorOff();
+      return;
     }
-
-  default:
-    this->BusyCursorOff();
-    return;
-  }
   }
   catch (...)
   {
@@ -823,7 +830,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   if(isVectorImage > 1)
   {
     mitk::VectorImageMapper2D::Pointer mapper = 
-      mitk::VectorImageMapper2D::New();
+        mitk::VectorImageMapper2D::New();
     result->SetMapper(1,mapper);
   }
 
@@ -876,12 +883,77 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   m_Controls->btnDoIt2->setEnabled(true);
 }
 
+
+void QmitkBasicImageProcessing::TestButtonClicked()
+{
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(-10.0, -10.0, 1);
+  vtkCam->SetPosition(-10.0, -10.0, 0);
+  vtkCam->SetViewUp(0.0, 1.0, 0.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+
+  for(int i = 0; i <= 25; i++)
+  {
+    vtkCam->SetDistance(900+i*3);
+    vtkCam->Modified();
+    GetActiveStdMultiWidget()->ForceImmediateUpdate();
+    sleep(1);
+  }
+  QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective could not be opened.\nSee the log for details."));
+}
+
+void QmitkBasicImageProcessing::ViewZClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(0.0, 0.0, 1.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(0.0, -1.0, 0.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
+void QmitkBasicImageProcessing::ViewXClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(-1.0, 0.0, 0.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(0.0, 0.0, 1.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
+void QmitkBasicImageProcessing::ViewYClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(0.0, 1.0, 0.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(-1.0, 0.0, 0.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
+
 void QmitkBasicImageProcessing::StartButton2Clicked() 
 {
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
-    (m_SelectedImageNode->GetNode()->GetData());
+                                   (m_SelectedImageNode->GetNode()->GetData());
   mitk::Image::Pointer newImage2 = dynamic_cast<mitk::Image*>
-    (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
+                                   (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
 
   // check if images are valid
   if( (!newImage1) || (!newImage2) || (newImage1->IsInitialized() == false) || (newImage2->IsInitialized() == false) ) 
@@ -928,90 +1000,90 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   try
   {
-  switch (m_SelectedOperation)
-  {
-  case ADD:
+    switch (m_SelectedOperation)
     {
-      AddFilterType::Pointer addFilter = AddFilterType::New();
-      addFilter->SetInput1( itkImage1 );
-      addFilter->SetInput2( itkImage2 );
-      addFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(addFilter->GetOutput());
-      nameAddition = "_Added";
-    }
-    break;
-
-  case SUBTRACT:
-    {
-      SubtractFilterType::Pointer subFilter = SubtractFilterType::New();
-      subFilter->SetInput1( itkImage1 );
-      subFilter->SetInput2( itkImage2 );
-      subFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(subFilter->GetOutput());
-      nameAddition = "_Subtracted";
-    }
-    break;
-
-  case MULTIPLY:
-    {
-      MultiplyFilterType::Pointer multFilter = MultiplyFilterType::New();
-      multFilter->SetInput1( itkImage1 );
-      multFilter->SetInput2( itkImage2 );
-      multFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(multFilter->GetOutput());
-      nameAddition = "_Multiplied";
-    }
-    break;
-
-  case DIVIDE:
-    {
-      DivideFilterType::Pointer divFilter = DivideFilterType::New();
-      divFilter->SetInput1( itkImage1 );
-      divFilter->SetInput2( itkImage2 );
-      divFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage<FloatImageType>(divFilter->GetOutput());
-      nameAddition = "_Divided";
-    }
-    break;
-
-  case AND:
-    {
-      AndImageFilterType::Pointer andFilter = AndImageFilterType::New();
-      andFilter->SetInput1( itkImage1 );
-      andFilter->SetInput2( itkImage2 );
-      andFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(andFilter->GetOutput());
-      nameAddition = "_AND";
+    case ADD:
+      {
+        AddFilterType::Pointer addFilter = AddFilterType::New();
+        addFilter->SetInput1( itkImage1 );
+        addFilter->SetInput2( itkImage2 );
+        addFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(addFilter->GetOutput());
+        nameAddition = "_Added";
+      }
       break;
-    }
 
-  case OR:
-    {
-      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
-      orFilter->SetInput1( itkImage1 );
-      orFilter->SetInput2( itkImage2 );
-      orFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(orFilter->GetOutput());
-      nameAddition = "_OR";
+    case SUBTRACT:
+      {
+        SubtractFilterType::Pointer subFilter = SubtractFilterType::New();
+        subFilter->SetInput1( itkImage1 );
+        subFilter->SetInput2( itkImage2 );
+        subFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(subFilter->GetOutput());
+        nameAddition = "_Subtracted";
+      }
       break;
-    }
 
-  case XOR:
-    {
-      XorImageFilterType::Pointer xorFilter = XorImageFilterType::New();
-      xorFilter->SetInput1( itkImage1 );
-      xorFilter->SetInput2( itkImage2 );
-      xorFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(xorFilter->GetOutput());
-      nameAddition = "_XOR";
+    case MULTIPLY:
+      {
+        MultiplyFilterType::Pointer multFilter = MultiplyFilterType::New();
+        multFilter->SetInput1( itkImage1 );
+        multFilter->SetInput2( itkImage2 );
+        multFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(multFilter->GetOutput());
+        nameAddition = "_Multiplied";
+      }
       break;
-    }
 
-  default: 
-    std::cout << "Something went wrong..." << std::endl;
-    this->BusyCursorOff();
-    return;
-  }
+    case DIVIDE:
+      {
+        DivideFilterType::Pointer divFilter = DivideFilterType::New();
+        divFilter->SetInput1( itkImage1 );
+        divFilter->SetInput2( itkImage2 );
+        divFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage<FloatImageType>(divFilter->GetOutput());
+        nameAddition = "_Divided";
+      }
+      break;
+
+    case AND:
+      {
+        AndImageFilterType::Pointer andFilter = AndImageFilterType::New();
+        andFilter->SetInput1( itkImage1 );
+        andFilter->SetInput2( itkImage2 );
+        andFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(andFilter->GetOutput());
+        nameAddition = "_AND";
+        break;
+      }
+
+    case OR:
+      {
+        OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+        orFilter->SetInput1( itkImage1 );
+        orFilter->SetInput2( itkImage2 );
+        orFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(orFilter->GetOutput());
+        nameAddition = "_OR";
+        break;
+      }
+
+    case XOR:
+      {
+        XorImageFilterType::Pointer xorFilter = XorImageFilterType::New();
+        xorFilter->SetInput1( itkImage1 );
+        xorFilter->SetInput2( itkImage2 );
+        xorFilter->UpdateLargestPossibleRegion();
+        newImage1 = mitk::ImportItkImage(xorFilter->GetOutput());
+        nameAddition = "_XOR";
+        break;
+      }
+
+    default:
+      std::cout << "Something went wrong..." << std::endl;
+      this->BusyCursorOff();
+      return;
+    }
   }
   catch (...)
   {

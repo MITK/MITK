@@ -21,10 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkResliceMethodProperty.h>
 #include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkPixelType.h>
 
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
+#include "vtkMitkApplyLevelWindowToRGBFilter.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -40,6 +42,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
 #include <vtkCellArray.h>
+#include <vtkImageRGBToHSI.h>
+#include <vtkImageHSIToRGB.h>
+
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -671,7 +676,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
+//  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
 
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;
@@ -755,22 +760,37 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   } //END binary image handling
   else
   {
+
+    mitk::PixelType pixelType = this->GetInput()->GetPixelType();
+    if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() ) //gray images with just one component
+    {
+      localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+    }
+    else //RGB, RBGA or other images tpyes with more components
+    {
+      // obtain and apply opacity level window if possible
+      localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+      vtkMitkApplyLevelWindowToRGBFilter* levelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
+      levelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
+      mitk::LevelWindow opacLevelWindow;
+      if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+      {
+        levelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+        levelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+      }
+      else
+      {
+        levelWindowToRGBFilterObject->SetMinOpacity(0.0);
+        levelWindowToRGBFilterObject->SetMaxOpacity(255.0);
+      }
+      levelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
+      localStorage->m_Texture->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
+    }
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
 
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-
-    // obtain and apply opacity level window
-    mitk::LevelWindow opacLevelWindow;
-    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-    {
-      finalLookuptable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
-    }
-    else
-    {
-      finalLookuptable->SetAlphaRange(0.0, 1.0);
-    }
   }
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );

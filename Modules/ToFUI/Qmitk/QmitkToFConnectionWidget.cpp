@@ -81,17 +81,20 @@ void QmitkToFConnectionWidget::CreateConnections()
 
 void QmitkToFConnectionWidget::ShowParameterWidget()
 {
-  int selectedCamera = m_Controls->m_SelectCameraCombobox->currentIndex();
-  switch (selectedCamera)
+  QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+
+  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D"))
   {
-  case 0:
-  case 1:
-  case 2:   ShowPMDParameterWidget();
-            break;
-  case 3:   ShowMESAParameterWidget();
-            break;
-  default:  this->m_Controls->m_PMDParameterWidget->hide();
-            this->m_Controls->m_MESAParameterWidget->hide();
+    ShowPMDParameterWidget();
+  }
+  else if (selectedCamera=="MESA Swissranger 4000")
+  {
+    ShowMESAParameterWidget();
+  }
+  else
+  {
+    this->m_Controls->m_PMDParameterWidget->hide();
+    this->m_Controls->m_MESAParameterWidget->hide();
   }
 }
 

@@ -146,10 +146,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    if(node->GetData()){
-      MITK_INFO << node->GetData()->GetNameOfClass();
-    }
-        std::string classname("QBallImage");
+    std::string classname("QBallImage");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
@@ -225,7 +222,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   classname = "FiberBundleX";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::FiberBundleMapper3D::SetDefaultProperties(node);
+    mitk::FiberBundleXMapper3D::SetDefaultProperties(node);
   }
 
   classname = "TbssImage";

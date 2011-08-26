@@ -61,17 +61,24 @@ namespace mitk {
     mitkClassMacro( FiberBundleX, BaseData );
     itkNewMacro( Self );
 
-    //    import fiber result from tractography algorithms
-    void SetFibers(vtkSmartPointer<vtkPolyData>);
+
     
     
-    //    return processed fibers
-    vtkPolyData* GetFibers();
     
-    //    return vertex polydata
-    vtkPolyData* GetVertices();
+    /*====FIBERBUNDLE I/O METHODS====*/
+    void SetFibers(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
+    vtkSmartPointer<vtkPolyData> GetFibers();
+    vtkSmartPointer<vtkPolyData> GetVertices();
     
+    
+    /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
+
+    
+    /*===FIBERBUNDLE ASSESSMENT METHODS====*/
+    // Compute Bounding Box for FiberStructure; needed for MITK Geometry
+    double* DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData>);
+
 
 
   protected:
@@ -80,6 +87,7 @@ namespace mitk {
 
   private:
     
+        
 ////  ====TODO====================================
 //    bool doSelfHealingColorOrient( vtkPolyData* );
 ////  ============================================
@@ -91,7 +99,7 @@ namespace mitk {
 //    
     //    this variable hosts the original fiber data, no smartpointer needed because who or whatever passes this data to FiberBundleX should use vtkSmartPointer structure
   
-    vtkPolyData* m_FiberStructureData;
+    vtkSmartPointer<vtkPolyData> m_FiberStructureData;
     
     //    VertexPolyData stores all original points as vertices computed by tracking algorithms
     vtkSmartPointer<vtkPolyData> m_VertexPolyData;

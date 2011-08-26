@@ -45,7 +45,8 @@
 //template<class TPixelType>
 mitk::FiberBundleMapper3D::FiberBundleMapper3D() 
 : m_vtkFiberList(NULL),
-m_VtkFiberDataMapperGL(NULL),
+//m_VtkFiberDataMapperGL(NULL),
+ m_VtkFiberDataMapperGL(vtkOpenGLPolyDataMapper::New()),
 m_vtkTubeMapper(NULL)
 
 {
@@ -701,7 +702,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
   lut->Build();
   
   
-  m_VtkFiberDataMapperGL = vtkOpenGLPolyDataMapper::New();
+ // m_VtkFiberDataMapperGL = vtkOpenGLPolyDataMapper::New();
   m_VtkFiberDataMapperGL->SetInput(polyData);
   m_VtkFiberDataMapperGL->ScalarVisibilityOn();
   
@@ -738,7 +739,6 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 {
   
   
-  //MITK_INFO << "FiberBundleMapper3D GenerateData(BaseRenderer)" ;
   
   // nodeCC = 1 ... ROI colorcoding
   //   2 ... orientation colorcoding
@@ -1085,7 +1085,7 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 //template<class TPixelType>
 void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  //MITK_INFO << "FiberBundleMapper3D SetDefault Properties(...)";
+//  MITK_INFO << "FiberBundleMapper3D SetDefault Properties(...)";
   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
   node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
   node->AddProperty( "ColorCoding", mitk::IntProperty::New( 0 ), renderer, overwrite);

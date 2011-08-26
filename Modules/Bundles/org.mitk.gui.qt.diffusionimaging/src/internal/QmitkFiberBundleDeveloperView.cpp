@@ -16,25 +16,28 @@
  =========================================================================*/
 
 
-// Blueberry
+// Blueberry application and interaction service
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
-
-
 // Qmitk
 #include "QmitkFiberBundleDeveloperView.h"
-#include <QmitkStdMultiWidget.h>
+#include <QmitkStdMultiWidget.h> 
+
 
 // MITK
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundleX.h> //for fiberStructure
+
+//===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 
 // VTK
-#include <vtkPointSource.h>
-#include <vtkPolyLine.h>
-#include <vtkCellArray.h>
-
+#include <vtkPointSource.h> //for randomized FiberStructure
+#include <vtkPolyLine.h>  //for fiberStructure
+#include <vtkCellArray.h> //for fiberStructure
+#include <vtkMatrix4x4.h> //for geometry
 
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
@@ -199,11 +202,8 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   
   mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New();
   FB->SetFibers(output);
-  MITK_INFO <<  output->GetNumberOfPoints();
-  MITK_INFO <<  output->GetNumberOfLines();
-  vtkPolyData* retFibers = FB->GetFibers();
-  MITK_INFO << retFibers->GetNumberOfPoints();
-  MITK_INFO <<  retFibers->GetNumberOfLines();
+  FB->SetGeometry(this->GenerateStandardGeometryForMITK());
+  
   mitk::DataNode::Pointer FBNode;
   FBNode = mitk::DataNode::New();
   FBNode->SetName("FiberBundleX");
@@ -211,10 +211,24 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   FBNode->SetVisibility(true);
   
   GetDataStorage()->Add(FBNode);
-  GetDataStorage()->Modified();
-  m_MultiWidget->RequestUpdate();
   
-  
+  const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
+  if (tsgeo == NULL) {
+    /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
+    // get all nodes that have not set "includeInBoundingBox" to false
+    mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+                                                                                                        , mitk::BoolProperty::New(false)));
+    
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  } else {
+    
+    GetDataStorage()->Modified(); //necessary??
+    m_MultiWidget->RequestUpdate(); //necessary??
+  }
 } 
 
 
@@ -266,7 +280,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     
     //add current point to random fiber
     fiberStorage.at(random_integer).push_back(i); 
-    MITK_INFO << "point" << i << "into fiber" << random_integer;
+    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
   } 
   
   
@@ -302,8 +316,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
   
-  MITK_INFO << PDRandom->GetNumberOfPoints();
-  MITK_INFO << PDRandom->GetNumberOfLines();
+  
   return PDRandom;
 }
 
@@ -376,6 +389,73 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
   return PDZ;
 }
 
+/* === THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===
+ * WITHOUT, the rendering mechanism will ignore objects without valid Geometry 
+ * for each object, MITK requires: ORIGIN, SPACING, TRANSFORM MATRIX, BOUNDING-BOX */
+mitk::Geometry3D::Pointer QmitkFiberBundleDeveloperView::GenerateStandardGeometryForMITK()
+{
+  mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+  
+  // generate origin
+  mitk::Point3D origin;
+  origin[0] = 0;
+  origin[1] = 0;
+  origin[2] = 0;
+  geometry->SetOrigin(origin);
+  
+  // generate spacing
+  float spacing[3] = {1,1,1};
+  geometry->SetSpacing(spacing);
+  
+  
+  // generate identity transform-matrix
+  vtkMatrix4x4* m = vtkMatrix4x4::New();
+  geometry->SetIndexToWorldTransformByVtkMatrix(m);
+  
+  // generate boundingbox
+  // for an usable bounding-box use gui parameters to estimate the boundingbox
+  float bounds[] = {500, 500, 500, -500, -500, -500};
+  
+  // GET SELECTED FIBER DIRECTION
+  QString fibDirection; //stores the object_name of selected radiobutton 
+  QVector<QRadioButton*>::const_iterator i;
+  for (i = m_DirectionRadios.begin(); i != m_DirectionRadios.end(); ++i) 
+  {
+    QRadioButton* rdbtn = *i;
+    if (rdbtn->isChecked())
+      fibDirection = rdbtn->objectName();
+  }
+  
+  if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
+    // use information about distribution parameter to calculate bounding box
+    int distrRadius = m_Controls->boxDistributionRadius->value();
+    bounds[0] = distrRadius; 
+    bounds[1] = distrRadius;
+    bounds[2] = distrRadius;
+    bounds[3] = -distrRadius;
+    bounds[4] = -distrRadius;
+    bounds[5] = -distrRadius;
+    
+  } else {
+    // so far only X,Y,Z directions are available
+    MITK_INFO << "_______GEOMETRY ISSUE_____\n***BoundingBox for X, Y, Z fiber directions are not optimized yet!***";
+    
+    int maxFibLength = m_Controls->boxFiberMaxLength->value();
+    bounds[0] = maxFibLength;
+    bounds[1] = maxFibLength;
+    bounds[2] = maxFibLength;
+    bounds[3] = -maxFibLength;
+    bounds[4] = -maxFibLength;
+    bounds[5] = -maxFibLength;
+  }
+  
+  geometry->SetFloatBounds(bounds);
+  geometry->SetImageGeometry(true); //??
+  
+  return geometry;
+  
+  
+}
 
 
 void QmitkFiberBundleDeveloperView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -403,12 +483,21 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
     mitk::DataNode::Pointer node = *it;
     if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
     {
+      MITK_INFO << node->GetData()->GetNameOfClass();
+      
       MITK_INFO << "FBX";
       mitk::FiberBundleX::Pointer serwas = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-      vtkPolyData* pdfb = serwas->GetFibers();
-      MITK_INFO << pdfb->GetNumberOfPoints();
-      MITK_INFO << pdfb->GetNumberOfLines();
-                                                                            
+      if (serwas.GetPointer() != NULL){
+        vtkSmartPointer<vtkPolyData> pdfb = serwas->GetFibers();
+        
+        MITK_INFO << pdfb->GetNumberOfLines();
+        MITK_INFO << pdfb->GetNumberOfPoints();
+      }else{
+        MITK_INFO << "what happend in datastorage?";
+        MITK_INFO << node->GetData()->GetNameOfClass();
+      }
+      
+      
     } else {
       MITK_INFO << node->GetData()->GetNameOfClass();
     }

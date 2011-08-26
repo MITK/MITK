@@ -18,6 +18,9 @@
 
 #include "mitkFiberBundleX.h"
 
+/* musthave */
+#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
+
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyLine.h>
@@ -32,8 +35,14 @@ const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
 mitk::FiberBundleX::FiberBundleX()
 {
+  /* ====== GEOMETRY IS ESSENTIAL =======
+   * by default set a standard geometry, usually geometry is 
+   * set by the user on initializing a mitkFiberBundle Object */
   
-  
+//  mitk::Geometry3D::Pointer fbgeometry = mitk::Geometry3D::New();
+//  fbgeometry->SetIdentity();
+//  this->SetGeometry(fbgeometry);
+  /* ==================================== */
   
 }
 
@@ -61,7 +70,7 @@ void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
  * Depending on processing of input fibers, this method returns
  * the latest processed fibers.
  */
-vtkPolyData* mitk::FiberBundleX::GetFibers()
+  vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFibers()
 {
   return m_FiberStructureData;
 }
@@ -222,6 +231,14 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   //========================
 }
 
+
+double* mitk::FiberBundleX::DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData> fiberStructure)
+{
+  fiberStructure->ComputeBounds();
+  double* bounds = fiberStructure->GetBounds();
+  return bounds;
+}
+
 ////private repairMechanism for orientationbased colorcoding
 //bool mitk::FiberBundleX::doSelfHealingColorOrient(vtkPolyData* healMe)
 //{
@@ -235,6 +252,13 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 //  
 //  return hasHealingSucceeded;
 //}
+
+
+
+
+
+
+
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

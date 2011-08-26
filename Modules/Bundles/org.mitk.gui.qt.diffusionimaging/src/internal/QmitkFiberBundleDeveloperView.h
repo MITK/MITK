@@ -92,10 +92,14 @@ protected:
 
   private:
   
+  /* METHODS GENERATING FIBERSTRUCTURES */
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersRandom();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionX();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
+  
+  /* MITK RELEVANT HELPERMETHODS */
+  mitk::Geometry3D::Pointer GenerateStandardGeometryForMITK();
   
   //contains the selected FiberBundle
   mitk::DataNode::Pointer m_FiberBundleNode;

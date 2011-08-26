@@ -22,7 +22,8 @@ SET(MODULE_TESTS
    mitkTrackingVolumeGeneratorTest.cpp
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
-   mitkVirtualTrackingDeviceTest.cpp
+# This test fails randomly, see bug #8033
+#   mitkVirtualTrackingDeviceTest.cpp
    mitkNavigationDataPlayerTest.cpp
    mitkTrackingDeviceSourceTest.cpp
    mitkTrackingDeviceSourceConfiguratorTest.cpp

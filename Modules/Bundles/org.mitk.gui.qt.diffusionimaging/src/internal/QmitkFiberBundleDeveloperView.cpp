@@ -39,6 +39,9 @@
 #include <vtkCellArray.h> //for fiberStructure
 #include <vtkMatrix4x4.h> //for geometry
 
+//ITK
+#include <itkTimeProbe.h>
+
 
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -69,7 +72,10 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkFiberBundleDeveloperViewControls;
     m_Controls->setupUi( parent );
     
-    
+    //disabled due to incomplete implementation of these options
+    m_Controls->radioButton_directionX->setEnabled(false);
+    m_Controls->radioButton_directionY->setEnabled(false);
+    m_Controls->radioButton_directionZ->setEnabled(false);
     
     
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
@@ -218,7 +224,6 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     // get all nodes that have not set "includeInBoundingBox" to false
     mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
                                                                                                         , mitk::BoolProperty::New(false)));
-    
     mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
     // calculate bounding geometry of these nodes
     mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
@@ -280,9 +285,14 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     
     //add current point to random fiber
     fiberStorage.at(random_integer).push_back(i); 
-    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
+//    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
   } 
   
+  //=====timer measurement====
+  itk::TimeProbe clock;
+  clock.Start();
+  //==========================
+
   
   /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
@@ -315,6 +325,12 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
+  
+  //====timer measurement========
+  clock.Stop();
+  MITK_INFO << "=====Assambling random Fibers to Polydata======\nMean: " << clock.GetMean() << std::endl;
+  MITK_INFO << "Total: " << clock.GetTotal() << std::endl;  
+  //=============================
   
   
   return PDRandom;

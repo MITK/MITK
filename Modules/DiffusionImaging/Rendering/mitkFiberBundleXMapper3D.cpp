@@ -61,7 +61,7 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::GenerateData()
 {
-  MITK_INFO << "GENERATE DATA FOR FBX :)";
+  //MITK_INFO << "GENERATE DATA FOR FBX :)";
   //=====timer measurement====
   QTime myTimer;
   myTimer.start();
@@ -121,7 +121,7 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  MITK_INFO << "FiberBundleXxXXMapper3D()DataForRenderer";
+  //MITK_INFO << "FiberBundleXxXXMapper3D()DataForRenderer";
   //ToDo do update checks
 }
 

@@ -24,7 +24,6 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDMITKPlayerController.cpp
   mitkToFCameraPMDCamCubeController.cpp
   mitkToFCameraPMDController.cpp
-  mitkToFCameraPMDPlayerController.cpp
 )
 IF(WIN32)
   IF(CMAKE_CL_64)

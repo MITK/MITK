@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSmartPointer.h>
 #include "mitkVtkMapper3D.h"
 #include "MitkDiffusionImagingExports.h"
-#include "mitkBaseData.h"
+//#include "mitkBaseData.h"
 #include "vtkAppendPolyData.h"
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLActor.h"

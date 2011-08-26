@@ -222,7 +222,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   classname = "FiberBundleX";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::FiberBundleMapper3D::SetDefaultProperties(node);
+    mitk::FiberBundleXMapper3D::SetDefaultProperties(node);
   }
 
   classname = "TbssImage";

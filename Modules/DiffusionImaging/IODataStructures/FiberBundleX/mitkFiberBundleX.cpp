@@ -18,18 +18,31 @@
 
 #include "mitkFiberBundleX.h"
 
+/* musthave */
+#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
+
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
+
 
 // baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 
 
+
 mitk::FiberBundleX::FiberBundleX()
 {
+  /* ====== GEOMETRY IS ESSENTIAL =======
+   * by default set a standard geometry, usually geometry is 
+   * set by the user on initializing a mitkFiberBundle Object */
   
-  
+//  mitk::Geometry3D::Pointer fbgeometry = mitk::Geometry3D::New();
+//  fbgeometry->SetIdentity();
+//  this->SetGeometry(fbgeometry);
+  /* ==================================== */
   
 }
 
@@ -42,7 +55,12 @@ mitk::FiberBundleX::~FiberBundleX()
  * set computed fibers from tractography algorithms
  */
 void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
-{
+{ 
+  if (fiberPD.GetPointer() == NULL){ 
+    MITK_INFO << "passed FiberBundleX is NULL, exit!";
+    return;
+  }
+  
   m_FiberStructureData = fiberPD;
 }
 
@@ -52,7 +70,7 @@ void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
  * Depending on processing of input fibers, this method returns
  * the latest processed fibers.
  */
-vtkPolyData* mitk::FiberBundleX::GetFibers()
+  vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFibers()
 {
   return m_FiberStructureData;
 }
@@ -74,31 +92,18 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   //  + one fiber with 0 points
   //=================================================
   
-  /* === decide which polydata to choose ===
-   ** ALL REDESIGNED
-   */
-  
-  bool hasFiberDataColor = false;
-  
-  // check if color array in original fiber dataset is valid
-  if ( m_FiberStructureData != NULL ) 
+
+  /*  make sure that processing colorcoding is only called when necessary */
+  if ( m_FiberStructureData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
+      m_FiberStructureData->GetNumberOfPoints() == 
+      m_FiberStructureData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
   {
-    if ( m_FiberStructureData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) && 
-        m_FiberStructureData->GetNumberOfPoints() == 
-        m_FiberStructureData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-    {
-      hasFiberDataColor = true; 
-    }
-    
-  } else {
-    MITK_INFO << "NO FIBERS FROM TRACTOGRAPHY PASSED TO mitkFiberBundleX yet!! no colorcoding can be processed!";
-    hasFiberDataColor = true; // "true" will return later on
+    // fiberstructure is already colorcoded
+    MITK_INFO << " NO NEED TO REGENERATE COLORCODING!";
+    return;
   }
   
-  /*  make sure that processing colorcoding is only called when necessary */
-  if (hasFiberDataColor)
-    return;
-  
+
   /* Finally, execute color calculation */
   vtkPoints* extrPoints = m_FiberStructureData->GetPoints();
   int numOfPoints = extrPoints->GetNumberOfPoints();
@@ -112,79 +117,104 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   colorsT->SetNumberOfComponents(componentSize);
   colorsT->SetName(COLORCODING_ORIENTATION_BASED);
   
-  /* catch case: fiber consists of only 1 point */
-  if (numOfPoints > 1) 
-  {
-    
-    for (int i=0; i <numOfPoints; ++i)
-    {
-      /* process all points except starting and endpoint
-       * for calculating color value take current point, previous point and next point */
-      if (i<numOfPoints-1 && i > 0)
-      {
-        /* The color value of the current point is influenced by the previous point and next point. */
-        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
-        vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(i+1)[0], extrPoints->GetPoint(i+1)[1], extrPoints->GetPoint(i+1)[2]);
-        vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(i-1)[0], extrPoints->GetPoint(i-1)[1], extrPoints->GetPoint(i-1)[2]);
-        
-        vnl_vector_fixed< double, 3 > diff1;
-        diff1 = currentPntvtk - nextPntvtk;
-        diff1.normalize();
-        
-        vnl_vector_fixed< double, 3 > diff2;
-        diff2 = currentPntvtk - prevPntvtk;
-        diff2.normalize();
-        
-        vnl_vector_fixed< double, 3 > diff;
-        diff = (diff1 - diff2) / 2.0;
-        
-        rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
-        rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
-        rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
-        rgba[3] = (unsigned char) (255.0); 
-        
-        
-      } else if (i==0) {
-        /* First point has no previous point, therefore only diff1 is taken */
-        
-        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
-        vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(i+1)[0], extrPoints->GetPoint(i+1)[1], extrPoints->GetPoint(i+1)[2]);
-        
-        vnl_vector_fixed< double, 3 > diff1;
-        diff1 = currentPntvtk - nextPntvtk;
-        diff1.normalize();
-        
-        rgba[0] = (unsigned char) (255.0 * std::abs(diff1[0]));
-        rgba[1] = (unsigned char) (255.0 * std::abs(diff1[1]));
-        rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
-        rgba[3] = (unsigned char) (255.0); 
-        
-      } else if (i==numOfPoints-1) {
-        /* Last point has no next point, therefore only diff2 is taken */
-        vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(i)[0], extrPoints->GetPoint(i)[1],extrPoints->GetPoint(i)[2]);
-        vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(i-1)[0], extrPoints->GetPoint(i-1)[1], extrPoints->GetPoint(i-1)[2]);
-        
-        vnl_vector_fixed< double, 3 > diff2;
-        diff2 = currentPntvtk - prevPntvtk;
-        diff2.normalize();
-        
-        rgba[0] = (unsigned char) (255.0 * std::abs(diff2[0]));
-        rgba[1] = (unsigned char) (255.0 * std::abs(diff2[1]));
-        rgba[2] = (unsigned char) (255.0 * std::abs(diff2[2]));
-        rgba[3] = (unsigned char) (255.0); 
-        
-      }
-      
-      colorsT->InsertTupleValue(i, rgba);
-    } //end for loop
-    
-  } else if (numOfPoints == 1) {
-    /* Fiber consists of 1 point only, color that point as you wish :) */
-    colorsT->InsertTupleValue(0, rgba);
-    
-  } else {
-    MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ; 
+  
+  
+  /* checkpoint: does polydata contain any fibers */
+  int numOfFibers = m_FiberStructureData->GetNumberOfLines();
+  if (numOfFibers < 1) {
+    MITK_INFO << "\n ========= Number of Fibers is below 1 ========= \n";
+    return;
   }
+  
+  
+  /* extract single fibers of fiberBundle */
+  vtkCellArray* fiberList = m_FiberStructureData->GetLines();
+  for (int fi=0; fi<numOfFibers; ++fi) {
+    
+    vtkIdType* idList; // contains the point id's of the line 
+    vtkIdType numOfPoints; // number of points for current line
+    fiberList->GetNextCell(numOfPoints, idList);
+    
+    /* single fiber checkpoints: is number of points valid */
+    if (numOfPoints > 1) 
+    {
+      /* operate on points of single fiber */
+      for (int i=0; i <numOfPoints; ++i)
+      {
+        /* process all points except starting and endpoint
+         * for calculating color value take current point, previous point and next point */
+        if (i<numOfPoints-1 && i > 0)
+        {
+          /* The color value of the current point is influenced by the previous point and next point. */
+          vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(idList[i])[0], extrPoints->GetPoint(idList[i])[1],extrPoints->GetPoint(idList[i])[2]);
+          vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(idList[i+1])[0], extrPoints->GetPoint(idList[i+1])[1], extrPoints->GetPoint(idList[i+1])[2]);
+          vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(idList[i-1])[0], extrPoints->GetPoint(idList[i-1])[1], extrPoints->GetPoint(idList[i-1])[2]);
+          
+          vnl_vector_fixed< double, 3 > diff1;
+          diff1 = currentPntvtk - nextPntvtk;
+          diff1.normalize();
+          
+          vnl_vector_fixed< double, 3 > diff2;
+          diff2 = currentPntvtk - prevPntvtk;
+          diff2.normalize();
+          
+          vnl_vector_fixed< double, 3 > diff;
+          diff = (diff1 - diff2) / 2.0;
+          
+          rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
+          rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
+          rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+          rgba[3] = (unsigned char) (255.0); 
+          
+          
+        } else if (i==0) {
+          /* First point has no previous point, therefore only diff1 is taken */
+          
+          vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(idList[i])[0], extrPoints->GetPoint(idList[i])[1],extrPoints->GetPoint(idList[i])[2]);
+          vnl_vector_fixed< double, 3 > nextPntvtk(extrPoints->GetPoint(idList[i+1])[0], extrPoints->GetPoint(idList[i+1])[1], extrPoints->GetPoint(idList[i+1])[2]);
+          
+          vnl_vector_fixed< double, 3 > diff1;
+          diff1 = currentPntvtk - nextPntvtk;
+          diff1.normalize();
+          
+          rgba[0] = (unsigned char) (255.0 * std::abs(diff1[0]));
+          rgba[1] = (unsigned char) (255.0 * std::abs(diff1[1]));
+          rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
+          rgba[3] = (unsigned char) (255.0); 
+          
+        } else if (i==numOfPoints-1) {
+          /* Last point has no next point, therefore only diff2 is taken */
+          vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(idList[i])[0], extrPoints->GetPoint(idList[i])[1],extrPoints->GetPoint(idList[i])[2]);
+          vnl_vector_fixed< double, 3 > prevPntvtk(extrPoints->GetPoint(idList[i-1])[0], extrPoints->GetPoint(idList[i-1])[1], extrPoints->GetPoint(idList[i-1])[2]);
+          
+          vnl_vector_fixed< double, 3 > diff2;
+          diff2 = currentPntvtk - prevPntvtk;
+          diff2.normalize();
+          
+          rgba[0] = (unsigned char) (255.0 * std::abs(diff2[0]));
+          rgba[1] = (unsigned char) (255.0 * std::abs(diff2[1]));
+          rgba[2] = (unsigned char) (255.0 * std::abs(diff2[2]));
+          rgba[3] = (unsigned char) (255.0); 
+          
+        }
+        
+        colorsT->InsertTupleValue(idList[i], rgba);
+      } //end for loop
+      
+    } else if (numOfPoints == 1) {
+      /* a single point does not define a fiber (use vertex mechanisms instead */
+      continue;
+      //      colorsT->InsertTupleValue(0, rgba);
+      
+    } else {
+      MITK_INFO << "Fiber with 0 points detected... please check your tractography algorithm!" ;
+      continue;
+      
+    }
+    
+    
+  }//end for loop
+  
   
   
   m_FiberStructureData->GetPointData()->AddArray(colorsT);
@@ -195,10 +225,18 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   }
   
   
-//===== clean memory =====
+  //===== clean memory =====
   colorsT->Delete();
+  
+  //========================
+}
 
-//========================
+
+double* mitk::FiberBundleX::DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData> fiberStructure)
+{
+  fiberStructure->ComputeBounds();
+  double* bounds = fiberStructure->GetBounds();
+  return bounds;
 }
 
 ////private repairMechanism for orientationbased colorcoding
@@ -214,6 +252,13 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 //  
 //  return hasHealingSucceeded;
 //}
+
+
+
+
+
+
+
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

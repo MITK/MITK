@@ -19,14 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef FiberBundleXMapper3D_H_HEADER_INCLUDED
 #define FiberBundleXMapper3D_H_HEADER_INCLUDED
 
-#include <mitkBaseData.h> //?? necessary
+//#include <mitkBaseData.h> //?? necessary
 #include <MitkDiffusionImagingExports.h>
 #include <mitkVtkMapper3D.h>
 #include <mitkFiberBundleX.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkOpenGLPolyDataMapper.h>
-#include <vtkActor.h>
+#include <vtkOpenGLActor.h>
 
 
 
@@ -69,7 +69,7 @@ namespace mitk {
     vtkOpenGLPolyDataMapper* m_FiberMapperGLWP;
     
     vtkSmartPointer<vtkActor> m_FiberActorSP;
-    vtkActor* m_FiberActorWP;
+    vtkOpenGLActor* m_FiberActorWP;
     
     vtkPropAssembly* m_FiberAssembly;
     

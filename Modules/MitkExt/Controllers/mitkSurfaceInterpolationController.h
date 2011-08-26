@@ -27,6 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkReduceContourSetFilter.h"
 #include "mitkComputeContourSetNormalsFilter.h"
 
+#include "vtkPolygon.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
+#include "vtkPolyData.h"
+#include "vtkSmartPointer.h"
+#include "vtkAppendPolyData.h"
+
 namespace mitk
 {
 
@@ -62,6 +69,8 @@ namespace mitk
 
    /* bool DataSetHasChanged();*/
 
+    Surface* GetContoursAsSurface();
+
 
 
  protected:
@@ -90,6 +99,11 @@ namespace mitk
     double m_MaxSpacing;
 
     const Image* m_WorkingImage;
+
+    Surface::Pointer m_Contours;
+
+    vtkSmartPointer<vtkPolyData> m_PolyData;
+    vtkSmartPointer<vtkAppendPolyData> m_PolyDataAppender;
 
    /* bool m_Modified;*/
 

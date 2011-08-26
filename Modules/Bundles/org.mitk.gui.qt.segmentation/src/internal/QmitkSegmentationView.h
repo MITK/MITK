@@ -92,7 +92,7 @@ protected slots:
   void OnSurfaceSelectionChanged();
   
   //called when the checkbox Remember Contour Positions is selected/deselected
-  void CheckboxRememberContourPositionsStateChanged(int state);
+  void OnRememberContourPositions(bool state);
   
 protected:
   

@@ -45,7 +45,7 @@ mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
- m_Contourmarkername ("Contourmarker")
+ m_Contourmarkername ("Position")
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -322,8 +322,10 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         DataNode::Pointer rotatedContourNode = DataNode::New();
         rotatedContourNode->SetData(contourMarker);
         rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+        rotatedContourNode->SetBoolProperty( "isContourMarker", BoolProperty::New(true));
         rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
         rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
+        rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
         m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
 }

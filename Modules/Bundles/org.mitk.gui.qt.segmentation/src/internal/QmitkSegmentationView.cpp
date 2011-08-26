@@ -427,16 +427,9 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
 }
 
 //to remember the contour positions
-void QmitkSegmentationView::CheckboxRememberContourPositionsStateChanged (int state)
+void QmitkSegmentationView::OnRememberContourPositions (bool state)
 {
-    if(state == Qt::Checked)
-    {
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( true );
-    }
-    else
-    {
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( false );
-    }
+    m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( state );
 }
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
@@ -883,12 +876,11 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
-  //To remember the position of each contour
-  connect( m_Controls->cbRememberContourPositions, SIGNAL(stateChanged(int)), this, SLOT(CheckboxRememberContourPositionsStateChanged(int)));
-
 
   connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
            this, SLOT( OnSurfaceSelectionChanged( ) ) );
+
+  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalRememberContourPositions(bool)), this, SLOT(OnRememberContourPositions(bool)));
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

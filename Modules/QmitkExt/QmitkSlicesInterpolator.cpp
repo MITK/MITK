@@ -46,6 +46,7 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 
+
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSliceDimension()
@@ -83,14 +84,15 @@ m_3DInterpolationEnabled(false)
   //connect
 
   m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
-  m_RBtnEnable3DInterpolation->setChecked(true);
   connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(SignalRememberContourPositions(bool)));
+  m_RBtnEnable3DInterpolation->setChecked(true);
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
   //connect
 
-  m_CbHideMarkers = new QCheckBox("Hide Markers", this);
+  m_CbHideMarkers = new QCheckBox("Show Position-Nodes", this);
   m_CbHideMarkers->setChecked(true);
-  m_CbHideMarkers->setEnabled(false);
+  connect(m_CbHideMarkers, SIGNAL(stateChanged(int)), this, SLOT(OnHideMarkers(int)));
   grid->addWidget(m_CbHideMarkers,0,2);
   //connect
 
@@ -111,6 +113,10 @@ m_3DInterpolationEnabled(false)
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
   //layout->addWidget( m_BtnAcceptAllInterpolations );
   grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
+
+  m_RBtnDisableInterpolation = new QRadioButton("Disable Interpolation", this);
+  m_RBtnDisableInterpolation->setEnabled(true);
+  grid->addWidget(m_RBtnDisableInterpolation, 2,0,1,2);
 
   m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
   m_GroupBoxEnableExclusiveInterpolationMode->setLayout(grid);
@@ -145,7 +151,7 @@ m_3DInterpolationEnabled(false)
   //m_FeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
   //m_FeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
   m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
-  m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
+  m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   
   QWidget::setContentsMargins(0, 0, 0, 0);
@@ -301,43 +307,78 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
 void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 {
-  //if(status == false)
-  //{
-    //m_2DInterpolationEnabled = false;
+
     OnInterpolationActivated(status);
-  //  m_BtnAcceptAllInterpolations->setEnabled(false);
-  //  m_BtnAcceptInterpolation->setEnabled(false);
-  //}
-  //else
-  //{
-  //  //m_2DInterpolationEnabled = false;
-  //  OnInterpolationActivated(true);
-  //  m_BtnAcceptAllInterpolations->setEnabled(true);
-  //  m_BtnAcceptInterpolation->setEnabled(true);
-  //}
+
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
 {
-  /*if(status == false)
-  {
-    m_BtnAccept3DInterpolation->setEnabled(false); 
-  }
-  else
-  {
-    m_BtnAccept3DInterpolation->setEnabled(true); 
-  }*/
+
   On3DInterpolationActivated(status);
+}
+
+void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
+{
+  OnInterpolationActivated(status);
+  On3DInterpolationActivated(status);
+}
+
+void QmitkSlicesInterpolator::OnHideMarkers(int state)
+{
+  bool hide (!m_CbHideMarkers->isChecked());
+
+  mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("isContourMarker"
+    , mitk::BoolProperty::New(true)));
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
+  {
+    m_DataStorage->Remove(it->Value());
+    it->Value()->SetProperty("helper object", mitk::BoolProperty::New(hide));
+    m_DataStorage->Add( it->Value(), m_ToolManager->GetWorkingData(0));
+  }
+
+   mitk::DataStorage::SetOfObjects::ConstPointer contours3D = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("3DContourContainer"
+    , mitk::BoolProperty::New(true)));
+
+  if(!hide)
+  {
+    if(contours3D->empty())
+    {
+      mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
+      contourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+      contourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
+      contourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+      contourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+      contourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+      contourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+      contourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
+      m_DataStorage->Add(contourNode, m_ToolManager->GetWorkingData(0));
+    }
+    else
+    {
+      contours3D->at(0)->SetVisibility(true);
+    }    
+  }
+  else if(!contours3D->empty())
+  {
+    contours3D->at(0)->SetVisibility(false);
+  }
+
+  //Perhaps think of a way to just hide markers instead of removing them
+  //m_CbHideMarkers->setEnabled(false);
 }
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   OnInterpolationActivated( m_2DInterpolationEnabled ); // re-initialize if needed
+  On3DInterpolationActivated( m_3DInterpolationEnabled);
 }
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
   OnInterpolationActivated( m_2DInterpolationEnabled ); // re-initialize if needed
+  On3DInterpolationActivated( m_3DInterpolationEnabled);
 }
 
 
@@ -470,9 +511,10 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 void QmitkSlicesInterpolator::InterpolateSurface()
 {
   m_InterpolatedSurfaceNode->SetData(m_SurfaceInterpolator->Interpolate());
+  OnHideMarkers(m_CbHideMarkers->checkState());
   if (m_MultiWidget)
   {
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
@@ -628,14 +670,14 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   {
     if ( m_DataStorage.IsNotNull() )
     {
-      if (on)
+      if (on && !m_DataStorage->Exists(m_FeedbackNode))
       {
         m_DataStorage->Add( m_FeedbackNode );
       }
-      else
-      {
-        m_DataStorage->Remove( m_FeedbackNode );
-      }
+      //else
+      //{
+      //  m_DataStorage->Remove( m_FeedbackNode );
+      //}
     }
   }
   catch(...)
@@ -687,14 +729,14 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   {
     if ( m_DataStorage.IsNotNull() )
     {
-      if (on)
+      if (on && !m_DataStorage->Exists(m_InterpolatedSurfaceNode))
       {
         m_DataStorage->Add( m_InterpolatedSurfaceNode );
       }
-      else
-      {
-        m_DataStorage->Remove( m_InterpolatedSurfaceNode );
-      }
+      //else
+      //{
+      //  m_DataStorage->Remove( m_InterpolatedSurfaceNode );
+      //}
     }
   }
   catch(...)
@@ -710,6 +752,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
     
     m_BtnAccept3DInterpolation->setEnabled( on );
     m_InterpolatedSurfaceNode->SetVisibility( on );
+    m_CbHideMarkers->setEnabled(on);
     
     if (!on)
     {
@@ -741,7 +784,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
       m_SurfaceInterpolator->SetMinSpacing(minSpacing);
 
       //if (m_SurfaceInterpolator->DataSetHasChanged())
-        InterpolateSurface();
+      //InterpolateSurface();
       //m_InterpolatedSurfaceNode->ReplaceProperty( "color", workingNode->GetProperty("color") ); // use the same color as the original image (but outline - see constructor)
       //mitk::Image* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
       //if (segmentation)

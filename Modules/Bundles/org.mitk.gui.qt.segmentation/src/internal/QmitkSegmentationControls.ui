@@ -506,13 +506,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="cbRememberContourPositions">
-         <property name="text">
-          <string>Remember Contour Positions</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QmitkSlicesInterpolator" name="m_SlicesInterpolator" native="true">
          <property name="font">
           <font>

@@ -17,7 +17,6 @@
 
 #include "MitkExtExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
-#include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 

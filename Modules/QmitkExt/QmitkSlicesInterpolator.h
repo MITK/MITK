@@ -33,6 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QGroupBox>
 #include <QCheckBox>
 
+#include "mitkVtkRepresentationProperty.h"
+#include "vtkProperty.h"
+
+
 namespace mitk
 {
   class ToolManager;
@@ -138,6 +142,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
   signals:
 
+    void SignalRememberContourPositions(bool);
+
   public slots:
 
     /**
@@ -181,6 +187,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     //Enhancement for 3D interpolation
     void On2DInterpolationEnabled(bool);
     void On3DInterpolationEnabled(bool);
+    void OnInterpolationDisabled(bool);
+    void OnHideMarkers(int state);
 
   protected:
 
@@ -240,6 +248,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     //Enhancement for 3D Surface Interpolation
     QRadioButton* m_RBtnEnable2DInterpolation;
     QRadioButton* m_RBtnEnable3DInterpolation;
+    QRadioButton* m_RBtnDisableInterpolation;
     QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
     QPushButton* m_BtnAccept3DInterpolation;
     QCheckBox* m_CbHideMarkers;

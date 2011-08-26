@@ -135,7 +135,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraStop()), this, SLOT(OnToFCameraStop()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(int)), this, SLOT(OnToFCameraSelected(int)) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckBoxChecked(bool)) );
@@ -504,9 +504,9 @@ void QmitkToFUtilView::OnToFCameraStopped()
   //this->m_FilterWorkerThread.SetAbort(true);
 }
 
-void QmitkToFUtilView::OnToFCameraSelected(int index)
+void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
-  if ((index==1)||(index==2))
+  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);

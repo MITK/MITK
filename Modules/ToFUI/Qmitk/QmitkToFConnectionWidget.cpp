@@ -71,8 +71,8 @@ void QmitkToFConnectionWidget::CreateConnections()
   {
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
-    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SLOT(OnSelectCamera(int)) );
-    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(int)), this, SIGNAL(ToFCameraSelected(int)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
 
     //connect( m_Controls->m_IntegrationTimeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeIntegrationTimeSpinBox(int)) );
     //connect( m_Controls->m_ModulationFrequencySpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeModulationFrequencySpinBox(int)) );

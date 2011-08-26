@@ -12,8 +12,10 @@ of MITK Plugins:
 
 <h3>Input Devices</h3>
 <ul>
-<li><a href="extension-points/html/org_mitk_core_ext_inputdevices.html">org.mitk.core.ext.inputdevices</a></li>
+<li>\subpage xp_org_mitk_core_ext_inputdevices
 </ul>
 
+\page xp_org_mitk_core_ext_inputdevices org.mitk.core.ext.inputdevices
+\htmlinclude org_mitk_core_ext_inputdevices.html
 
 */

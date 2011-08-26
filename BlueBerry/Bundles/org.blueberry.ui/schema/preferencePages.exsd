@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.ui" id="preferencePages" name="Preference Pages"/>
+         <meta.schema plugin="org.blueberry.ui" id="preferencePages" name="Preference Pages"/>
       </appinfo>
       <documentation>
          The workbench provides one common dialog box for preferences.
@@ -88,7 +88,7 @@ the root level.
             <annotation>
                <documentation>
                   a name of the fully qualified class that implements 
-&lt;samp&gt;org.eclipse.ui.IWorkbenchPreferencePage&lt;/samp&gt;.
+&lt;samp&gt;berry::IWorkbenchPreferencePage&lt;/samp&gt;.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.jface.preference.PreferencePage:org.eclipse.ui.IWorkbenchPreferencePage"/>
@@ -138,17 +138,17 @@ the root level.
 &lt;p&gt;
 &lt;pre&gt;
    &lt;extension 
-       point=&quot;org.eclipse.ui.preferencePages&quot;&gt; 
+       point=&quot;org.blueberry.ui.preferencePages&quot;&gt; 
       &lt;page 
          id=&quot;com.xyz.prefpage1&quot; 
          name=&quot;XYZ&quot; 
-         class=&quot;com.xyz.prefpages.PrefPage1&quot;&gt; 
+         class=&quot;xyz::PrefPage1&quot;&gt; 
          &lt;keywordReference id=&quot;xyz.Keyword&quot;/&gt;
       &lt;/page&gt; 
       &lt;page 
          id=&quot;com.xyz.prefpage2&quot; 
          name=&quot;Keyboard Settings&quot; 
-         class=&quot;com.xyz.prefpages.PrefPage2&quot; 
+         class=&quot;xyz::PrefPage2&quot; 
          category=&quot;com.xyz.prefpage1&quot;&gt; 
       &lt;/page&gt; 
    &lt;/extension&gt; 
@@ -163,7 +163,7 @@ the root level.
       </appinfo>
       <documentation>
          The value of the attribute class must represent a fully qualified name of the class that implements
-&lt;samp&gt;org.eclipse.ui.IWorkbenchPreferencePage&lt;/samp&gt;.
+&lt;samp&gt;berry::IWorkbenchPreferencePage&lt;/samp&gt;.
       </documentation>
    </annotation>
 

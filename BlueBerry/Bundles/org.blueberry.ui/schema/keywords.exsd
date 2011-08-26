@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui">
+<schema targetNamespace="org.blueberry.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ui" id="keywords" name="Keywords"/>
+         <meta.schema plugin="org.blueberry.ui" id="keywords" name="Keywords"/>
       </appInfo>
       <documentation>
          The keywords extension point defines keywords and a unique id for reference by other schemas.
@@ -76,15 +76,6 @@ See propertyPages and preferencePages.
 
    <annotation>
       <appInfo>
-         <meta.section type="since"/>
-      </appInfo>
-      <documentation>
-         3.1
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
@@ -92,7 +83,7 @@ See propertyPages and preferencePages.
 &lt;p&gt;
 &lt;pre&gt;
    &lt;extension
-     point=&quot;org.eclipse.ui.keywords&quot;&gt;
+     point=&quot;org.blueberry.ui.keywords&quot;&gt;
     &lt;keyword
             label=&quot;presentation tab themes&quot;
             id=&quot;com.xyz.AppearanceKeywords&quot;/&gt;
@@ -116,7 +107,7 @@ See propertyPages and preferencePages.
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         Keywords are used only with preference and property pages.  See the &lt;samp&gt;keywordReference&lt;/samp&gt; element of the org.eclipse.ui.propertyPages and org.eclipse.ui.preferencePages extension points.
+         Keywords are used only with preference and property pages.  See the &lt;samp&gt;keywordReference&lt;/samp&gt; element of the org.blueberry.ui.propertyPages and org.blueberry.ui.preferencePages extension points.
       </documentation>
    </annotation>
 

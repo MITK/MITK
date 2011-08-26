@@ -3,7 +3,7 @@
 <schema targetNamespace="org.blueberry.test" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.blueberry.test" id="org.blueberry.test" name="Unit Tests"/>
+         <meta.schema plugin="org.blueberry.test" id="org.blueberry.tests" name="Unit Tests"/>
       </appinfo>
       <documentation>
          The test extension point allows plugins to contribute unit tests to the BlueBerry Platform. The tests should be written with the help of the Poco CppUnit library.
@@ -87,22 +87,13 @@
 
    <annotation>
       <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         1.0
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
          Following is an example of a test declaration.
 &lt;p&gt;
    &lt;pre&gt;
-      &lt;extension id=&quot;SampleTestSuite&quot; point=&quot;org.blueberry.test&quot;&gt;
+      &lt;extension id=&quot;SampleTestSuite&quot; point=&quot;org.blueberry.tests&quot;&gt;
          &lt;test id=&quot;SampleTest&quot; class=&quot;xyz::SampleTest&quot;/&gt;
       &lt;/extension&gt;
    &lt;/pre&gt;

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui.workbench">
+<schema targetNamespace="org.blueberry.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ui.workbench" id="presentationFactories" name="Presentation Factories"/>
+         <meta.schema plugin="org.blueberry.ui" id="presentationFactories" name="Presentation Factories"/>
       </appInfo>
       <documentation>
          This extension point is used to add presentation factories to the workbench.
@@ -49,7 +49,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  Specify the fully qualified class to be used for the presentation factory.  The specified value must be a subclass of &lt;code&gt;org.eclipse.ui.presentations.AbstractPresentationFactory&lt;/code&gt;.
+                  Specify the fully qualified class to be used for the presentation factory.  The specified value must implement the interface &lt;code&gt;berry::IPresentationFactory&lt;/code&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.ui.presentations.AbstractPresentationFactory"/>
@@ -78,23 +78,14 @@
 
    <annotation>
       <appInfo>
-         <meta.section type="since"/>
-      </appInfo>
-      <documentation>
-         3.0
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
          The following is an example of a presentationFactory extension:
 &lt;pre&gt;
-  &lt;extension point=&quot;org.eclipse.ui.presentationFactories&quot;&gt;
+  &lt;extension point=&quot;org.blueberry.ui.presentationFactories&quot;&gt;
      &lt;factory
-        class=&quot;org.eclipse.ui.workbench.ExampleWorkbenchPresentationFactory&quot;/&gt;
+        class=&quot;berry::ExampleWorkbenchPresentationFactory&quot;/&gt;
   &lt;/extension&gt;
   &lt;/pre&gt;
       </documentation>
@@ -114,7 +105,7 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         If a presentation factory is not specified or is missing then the implementation in &lt;code&gt;org.eclipse.ui.presentations.WorkbenchPresentationFactory&lt;/code&gt; will be used.
+         If a presentation factory is not specified or is missing then the implementation in &lt;code&gt;berry::QtWorkbenchPresentationFactory&lt;/code&gt; will be used.
       </documentation>
    </annotation>
 

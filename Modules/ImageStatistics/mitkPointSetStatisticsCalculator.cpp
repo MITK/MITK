@@ -123,7 +123,7 @@ if (list.empty())
   {
     mitk::Point3D emptyPoint;
     emptyPoint.Fill(0);
-    return 0;
+    return emptyPoint;
   }
 
 //calculate mean
@@ -147,6 +147,8 @@ return mean;
 double mitk::PointSetStatisticsCalculator::GetPositionErrorMean()
 {
 double returnValue = 0.0;
+
+if (CheckIfAllPositionsAreEqual()) return returnValue;
 
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 
@@ -177,6 +179,8 @@ return GetSampleStabw(GetErrorList(PointSetToVector(m_PointSet)));
 double mitk::PointSetStatisticsCalculator::GetPositionErrorRMS()
 {
 double returnValue = 0.0;
+
+if (CheckIfAllPositionsAreEqual()) return returnValue;
 
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 
@@ -213,16 +217,23 @@ std::vector<double> mitk::PointSetStatisticsCalculator::GetErrorList(std::vector
 {
 std::vector<double> errorList = std::vector<double>();
 mitk::Point3D mean = GetMean(list);
-for(int i=0; i<list.size(); i++)
-  {
-  errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));
-  }
+if (CheckIfAllPositionsAreEqual()) for(int i=0; i<list.size(); i++) {errorList.push_back(0.0);}
+else for(int i=0; i<list.size(); i++) {errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));}
 return errorList;
 }
 
 mitk::Vector3D mitk::PointSetStatisticsCalculator::GetPositionStandardDeviation()
 {
 mitk::Vector3D returnValue;
+
+if (CheckIfAllPositionsAreEqual())
+  {
+  returnValue[0]=0;
+  returnValue[1]=0;
+  returnValue[2]=0;
+  return returnValue;
+  }
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
@@ -242,6 +253,15 @@ return returnValue;
 mitk::Vector3D mitk::PointSetStatisticsCalculator::GetPositionSampleStandardDeviation()
 {
 mitk::Vector3D returnValue;
+
+if (CheckIfAllPositionsAreEqual())
+  {
+  returnValue[0]=0;
+  returnValue[1]=0;
+  returnValue[2]=0;
+  return returnValue;
+  }
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
@@ -261,4 +281,19 @@ return returnValue;
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetPositionMean()
 {
 return GetMean(PointSetToVector(m_PointSet));
+}
+
+bool mitk::PointSetStatisticsCalculator::CheckIfAllPositionsAreEqual()
+{
+if (m_PointSet->GetSize()==0) return false;
+if (m_PointSet->GetSize()==1) return true;
+
+mitk::Point3D lastPoint = m_PointSet->GetPoint(0);
+for(int i=1; i<m_PointSet->GetSize(); i++)
+  {
+  if((m_PointSet->GetPoint(i)[0]!=lastPoint[0])||(m_PointSet->GetPoint(i)[1]!=lastPoint[1])||(m_PointSet->GetPoint(i)[2]!=lastPoint[2])) return false;
+  lastPoint = m_PointSet->GetPoint(i);
+  }
+
+return true;
 }

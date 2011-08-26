@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui">
+<schema targetNamespace="org.blueberry.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ui" id="perspective" name="Perspectives"/>
+         <meta.schema plugin="org.blueberry.ui" id="perspective" name="Perspectives"/>
       </appInfo>
       <documentation>
          This extension point is used to add perspective factories to the workbench.  A perspective factory is used to define the initial layout and visible action sets for a perspective.  The user can select a perspective by invoking the &quot;Open Perspective&quot; submenu of the &quot;Window&quot; menu.
@@ -76,7 +76,7 @@
 &lt;samp&gt;berry::IPerspectiveFactory&lt;/samp&gt; interface.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IPerspectiveFactory"/>
+                  <meta.attribute kind="java" basedOn="berry::IPerspectiveFactory"/>
                </appInfo>
             </annotation>
          </attribute>

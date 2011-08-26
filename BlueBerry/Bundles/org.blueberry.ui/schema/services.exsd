@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.ui" id="services" name="Services"/>
+         <meta.schema plugin="org.blueberry.ui" id="services" name="Services"/>
       </appinfo>
       <documentation>
-         Define service factories so that services can be contributed declaratively and will be available through &lt;code&gt;IServiceLocator#getService(Class)&lt;/code&gt;.  The implementation of &lt;code&gt;AbstractServiceFactory&lt;/code&gt; must be able to return a global service and multiple child services (if applicable).
+         Define service factories so that services can be contributed declaratively and will be available through &lt;code&gt;berry::IServiceLocator::GetService(Class)&lt;/code&gt;.  The implementation of &lt;code&gt;AbstractServiceFactory&lt;/code&gt; must be able to return a global service and multiple child services (if applicable).
 &lt;p&gt;
 Services must follow a general contract:
 &lt;ul&gt;
 &lt;li&gt;The top level service has no parent.&lt;/li&gt;
 &lt;li&gt;The child service may use the supplied parent, which can be cast to the service interface.&lt;/li&gt;
-&lt;li&gt;Any other services needed for initialization should be retrieved from the &lt;code&gt;IServiceLocator&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;If the service needs to clean up any state (like listeners) it should implement &lt;code&gt;IDisposable&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Any other services needed for initialization should be retrieved from the &lt;code&gt;berry::IServiceLocator&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;If the service needs to clean up any state (like listeners) it should implement &lt;code&gt;berry::IDisposable&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;Services should clearly specify when they perform cleanup for clients, such as removing listeners automatically on disposal.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/p&gt;
@@ -168,15 +168,6 @@ Services must follow a general contract:
 
    <annotation>
       <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         3.4
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
@@ -184,11 +175,11 @@ Services must follow a general contract:
 Here is a basic definition:
 &lt;pre&gt;
    &lt;extension
-         point=&quot;org.eclipse.ui.services&quot;&gt;
+         point=&quot;org.blueberry.ui.services&quot;&gt;
       &lt;serviceFactory
-            factoryClass=&quot;org.eclipse.ui.tests.services.LevelServiceFactory&quot;&gt;
+            factoryClass=&quot;my::LevelServiceFactory&quot;&gt;
          &lt;service
-               serviceClass=&quot;org.eclipse.ui.tests.services.ILevelService&quot;&gt;
+               serviceClass=&quot;my::ILevelService&quot;&gt;
          &lt;/service&gt;
       &lt;/serviceFactory&gt;
    &lt;/extension&gt;
@@ -196,12 +187,12 @@ Here is a basic definition:
 &lt;p&gt;
 The &lt;code&gt;LevelServiceFactory&lt;/code&gt; can return an &lt;code&gt;ILevelService&lt;/code&gt; when it is requested from the &lt;code&gt;IServiceLocator&lt;/code&gt;:
 &lt;pre&gt;
-   ILevelService s = (ILevelService) getSite().getService(ILevelService.class);
-   System.out.println(s.getLevel());
+   berry::ILevelService::Pointer s = GetSite()-&gt;GetService(my::ILevelService::GetStaticClassName());
+   std::cout &lt;&lt; s-&gt;GetLevel();
 &lt;/pre&gt;
 &lt;/p&gt;
 &lt;p&gt;
-In this test example, the factory would instantiate three &lt;code&gt;ILevelService&lt;/code&gt; implementations during the first call to &lt;code&gt;getSite().getService(*)&lt;/code&gt;.  The global one in the workbench, one for the workbench window, and one for the site.
+In this test example, the factory would instantiate three &lt;code&gt;ILevelService&lt;/code&gt; implementations during the first call to &lt;code&gt;GetSite()-&gt;GetService(*)&lt;/code&gt;.  The global one in the workbench, one for the workbench window, and one for the site.
 &lt;/p&gt;
       </documentation>
    </annotation>

@@ -24,6 +24,7 @@ SET(MOC_H_FILES
   src/QmitkExtFileSaveProjectAction.h
   src/QmitkExtDnDFrameWidget.h
   src/QmitkExtPreferencePage.h
+  src/QmitkExtWorkbenchWindowAdvisor.h
   src/QmitkInputDevicesPrefPage.h
 )
 

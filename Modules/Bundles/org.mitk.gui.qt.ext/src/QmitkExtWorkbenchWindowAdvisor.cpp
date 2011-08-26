@@ -604,9 +604,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  // ===== Help menu ====================================
  QMenu* helpMenu = menuBar->addMenu("Help");
- helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
-  helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()),  QKeySequence("F1"));
- helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
+ helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
+  helpMenu->addAction("&Help Contents",this, SLOT(onHelp()),  QKeySequence("F1"));
+ helpMenu->addAction("&About",this, SLOT(onAbout()));
  // =====================================================
 
 
@@ -655,6 +655,21 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  menuPerspectiveListener = new PerspectiveListenerForMenu(this);
  configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onIntro()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onIntro();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onHelp()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onAbout()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onAbout();
 }
 
 //--------------------------------------------------------------------------------

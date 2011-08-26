@@ -102,6 +102,9 @@ protected:
   /** @brief Converts a point set to a vector of Point3D. */
   std::vector<mitk::Point3D> PointSetToVector(mitk::PointSet::Pointer pSet);
 
+  /** @return Returns true if all positions in the evaluated points set are equal. False if not. */
+  bool CheckIfAllPositionsAreEqual();
+
   mitk::PointSet::Pointer m_PointSet;
 
   double GetMean(std::vector<double> list);

@@ -304,13 +304,13 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         if(NOT build_errors AND external_project_superbuilddir)
           func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_superbuilddir}")
         endif()
+        
+        if(NOT build_errors AND external_project_buildtarget)
+          func_build_target("${external_project_buildtarget}" "${CTEST_BINARY_DIRECTORY}/${external_project_superbuilddir}")
+        endif()
        
         if(NOT build_errors)
           func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
-        endif()
-        
-        if(NOT build_errors AND external_project_buildtarget)
-          func_build_target("${external_project_buildtarget}" "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
         endif()
         
         # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...

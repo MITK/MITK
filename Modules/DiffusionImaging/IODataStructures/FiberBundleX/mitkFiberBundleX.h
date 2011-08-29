@@ -30,7 +30,7 @@
 #include <vtkSmartPointer.h> //may be replaced by class precompile argument
 #include <vtkPolyData.h> // may be replaced by class
 #include <vtkPoints.h> // my be replaced by class
-
+#include <vtkDataSet.h>
 
 namespace mitk {
 
@@ -43,6 +43,7 @@ namespace mitk {
     // names of certain arrays (e.g colorcodings, etc.) 
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
+    static const char* FIBER_ID_ARRAY;
     
     /* friend classes wanna access typedefs
     ContainerPointType, ContainerTractType, ContainerType */
@@ -73,11 +74,11 @@ namespace mitk {
     
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
-
+    void DoGenerateFiberIds();
     
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
-    // Compute Bounding Box for FiberStructure; needed for MITK Geometry
-    double* DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData>);
+    // Compute Bounding Box of FiberStructure; needed for MITK Geometry
+    double* DoComputeFiberStructureBoundingBox();
 
 
 
@@ -104,6 +105,10 @@ namespace mitk {
     //    VertexPolyData stores all original points as vertices computed by tracking algorithms
     vtkSmartPointer<vtkPolyData> m_VertexPolyData;
     
+    // this variable contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
+    vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
+    
+
     
     
   };

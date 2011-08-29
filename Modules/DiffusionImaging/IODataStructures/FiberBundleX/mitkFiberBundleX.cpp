@@ -25,11 +25,12 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
-
+#include <vtkIdFilter.h>
 
 // baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
+const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
 
 
@@ -231,11 +232,31 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   //========================
 }
 
-
-double* mitk::FiberBundleX::DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData> fiberStructure)
+void mitk::FiberBundleX::DoGenerateFiberIds()
 {
-  fiberStructure->ComputeBounds();
-  double* bounds = fiberStructure->GetBounds();
+  if (m_FiberStructureData.GetPointer() == NULL)
+    return;
+  while(true)
+  {
+    MITK_INFO << "*gg*";
+  }
+  vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
+  idFiberFilter->SetInput(m_FiberStructureData);
+  idFiberFilter->CellIdsOn();
+//  idFiberFilter->PointIdsOn(); // point id's are not needed
+  idFiberFilter->SetIdsArrayName(FIBER_ID_ARRAY);
+  idFiberFilter->FieldDataOn();
+  idFiberFilter->Update();
+  
+  m_FiberIdDataSet = idFiberFilter->GetOutput();
+
+}
+
+/* COMPUTE BOUND OF FiberBundle */
+double* mitk::FiberBundleX::DoComputeFiberStructureBoundingBox()
+{
+  m_FiberStructureData->ComputeBounds();
+  double* bounds = m_FiberStructureData->GetBounds();
   return bounds;
 }
 

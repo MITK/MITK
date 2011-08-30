@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>691</height>
+    <width>405</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,15 +24,15 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_FiberGenerator">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>355</width>
-        <height>395</height>
+        <y>-35</y>
+        <width>366</width>
+        <height>449</height>
        </rect>
       </property>
       <attribute name="label">
@@ -244,7 +244,7 @@
              </layout>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="6" column="0">
             <spacer name="verticalSpacer_4">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -256,6 +256,42 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="5" column="0">
+            <widget class="QFrame" name="frame_3">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelTimerGenerateFiberBundle">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Time:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="infoTimerGenerateFiberBundle">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -436,7 +472,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>343</width>
+        <width>366</width>
         <height>403</height>
        </rect>
       </property>
@@ -709,8 +745,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>185</width>
-        <height>116</height>
+        <width>381</width>
+        <height>261</height>
        </rect>
       </property>
       <attribute name="label">

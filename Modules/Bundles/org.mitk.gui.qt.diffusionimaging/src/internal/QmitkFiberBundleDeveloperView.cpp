@@ -57,17 +57,16 @@ m_hostingThread(hostingThread)
 }
 void QmitkFiberIDWorker::run()
 {
-  MITK_INFO << "WmitkFiberIDWORKER....RUN()";
-  
+
+  //accurate time measurement using ITK timeProbe
   itk::TimeProbe clock;
   clock.Start();
   
   m_itemPackage.st_FBX->DoGenerateFiberIds();
-  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy timer
+  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
     
-  
   clock.Stop();
-  m_itemPackage.st_Controls->
+  m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
   MITK_INFO << "==== Generate idSet ====\n Mean: " << clock.GetMean() << "\n Total: " << clock.GetTotal() ;
   //  m_hostingThread->quit();
 

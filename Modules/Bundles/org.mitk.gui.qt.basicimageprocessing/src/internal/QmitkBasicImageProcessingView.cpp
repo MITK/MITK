@@ -900,7 +900,7 @@ void QmitkBasicImageProcessing::TestButtonClicked()
     vtkCam->SetDistance(900+i*3);
     vtkCam->Modified();
     GetActiveStdMultiWidget()->ForceImmediateUpdate();
-    sleep(1);
+//    sleep(1);
   }
   QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective could not be opened.\nSee the log for details."));
 }

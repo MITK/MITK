@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkRotationOperation.h"
 #include "mitkPlaneOperation.h"
+#include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
 
@@ -385,6 +386,7 @@ mitk::SlicedGeometry3D
     m_Slices = 1;
   }
 
+
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's
   // center, and then shift the origin in the direction of the normal by the
@@ -740,6 +742,8 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // ReinitializePlanes)
         this->ReinitializePlanes( center, rotOp->GetCenterOfRotation() );
 
+        geometry2D->SetSpacing(this->GetSpacing());
+
         if ( m_SliceNavigationController )
         {
           m_SliceNavigationController->SelectSliceByPoint(
@@ -829,6 +833,97 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       }
     }
     break;
+
+  case OpRESTOREPLANEPOSITION:
+    if ( m_EvenlySpaced )
+    {
+      // Save first slice
+      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+
+      PlaneGeometry* planeGeometry = dynamic_cast< PlaneGeometry * >(
+        geometry2D.GetPointer() );
+
+      RestorePlanePositionOperation *restorePlaneOp = dynamic_cast< RestorePlanePositionOperation* >( operation );
+
+      // Need a PlaneGeometry, a PlaneOperation and a reference frame to
+      // carry out the re-orientation
+      if ( m_ReferenceGeometry && planeGeometry && restorePlaneOp )
+      {
+        // Clear all generated geometries and then rotate only the first slice.
+        // The other slices will be re-generated on demand
+
+        // Rotate first slice
+        geometry2D->ExecuteOperation( restorePlaneOp ); 
+
+        m_DirectionVector = restorePlaneOp->GetDirectionVector();
+
+        double centerOfRotationDistance =
+          planeGeometry->SignedDistanceFromPlane( m_ReferenceGeometry->GetCenter() );
+
+        if ( centerOfRotationDistance > 0 )
+        {
+          m_DirectionVector = m_DirectionVector;
+        }
+        else
+        {
+          m_DirectionVector = -m_DirectionVector;
+        }
+
+        Vector3D spacing = restorePlaneOp->GetSpacing();
+
+        Superclass::SetSpacing( spacing );
+
+        // /*Now we need to calculate the number of slices in the plane's normal
+        // direction, so that the entire volume is covered. This is done by first
+        // calculating the dot product between the volume diagonal (the maximum
+        // distance inside the volume) and the normal, and dividing this value by
+        // the directed spacing calculated above.*/
+        ScalarType directedExtent =
+          fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * m_DirectionVector[0] )
+          + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * m_DirectionVector[1] )
+          + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * m_DirectionVector[2] );
+
+        if ( directedExtent >= spacing[2] )
+        {
+          m_Slices = static_cast< unsigned int >(directedExtent / spacing[2] + 0.5);
+        }
+        else
+        {
+          m_Slices = 1;
+        }
+
+         m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
+
+         if ( m_Slices > 0 )
+         {
+           m_Geometry2Ds[0] = geometry2D;
+         }
+
+        m_SliceNavigationController->GetSlice()->SetSteps( m_Slices );
+
+        this->Modified();
+
+        //End Reinitialization
+
+        if ( m_SliceNavigationController )
+        {
+          m_SliceNavigationController->GetSlice()->SetPos( restorePlaneOp->GetPos() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
+        }
+      }
+    }
+    else
+    {
+      // Reach through to all slices
+      for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+          iter != m_Geometry2Ds.end();
+          ++iter)
+      {
+        (*iter)->ExecuteOperation(operation);
+      }
+    }
+    break;
+
   }
 
   this->Modified();

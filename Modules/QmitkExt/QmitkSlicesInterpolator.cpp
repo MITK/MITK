@@ -444,7 +444,8 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       if (slicedGeometry)
       {
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
-        Interpolate( plane, m_TimeStep[windowID] );
+        if (plane)
+          Interpolate( plane, m_TimeStep[windowID] );
         return true;
       }    
     }

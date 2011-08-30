@@ -34,7 +34,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurfaceToImageFilter.h>
 #include <vtkPolyData.h>
 
+//For Segmentation in rotated slices
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkPlanarCircle.h"
 
 // public methods
 
@@ -84,6 +86,7 @@ void QmitkSegmentationView::Activated()
     itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
     command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
     m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
+    mitk::PlanePositionManager::GetInstance()->SetDataStorage(this->GetDataStorage());
   }
 }
 
@@ -100,6 +103,7 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
+    mitk::PlanePositionManager::GetInstance()->DeleteAllMarkers();
   }
 }
 
@@ -459,7 +463,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
     // if the selected node is a contourmarker
     if ( !nodes.empty() )
     {
-        std::string markerName = "Contourmarker";
+        std::string markerName = "Position";
         unsigned int numberOfNodes = nodes.size();
         std::string nodeName = nodes.at( 0 )->GetName();
         if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
@@ -548,13 +552,9 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   ForceDisplayPreferencesUponAllImages();
 }
 
-//New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-    
-    const mitk::PlaneGeometry* markerGeometry =
-            dynamic_cast<const mitk::PlaneGeometry*> ( node->GetData()->GetGeometry() );
-
+    //TODO renderWindow anders bestimmen, siehe CheckAlignment
     QmitkRenderWindow* selectedRenderWindow = 0;
     QmitkRenderWindow* RenderWindow1 =
         this->GetActiveStdMultiWidget()->GetRenderWindow1();
@@ -582,24 +582,26 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
         "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
         RenderWindow3->GetRenderer()))
     {
-        selectedRenderWindow = RenderWindow3;
+      selectedRenderWindow = RenderWindow3;
     }
     if (!selectedRenderWindow && node->GetBoolProperty(
-        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-        RenderWindow4->GetRenderer()))
+      "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+      RenderWindow4->GetRenderer()))
     {
-        selectedRenderWindow = RenderWindow4;
+      selectedRenderWindow = RenderWindow4;
     }
 
     // make node visible
     if (selectedRenderWindow)
     {
-      mitk::Point3D centerP = markerGeometry->GetOrigin();
-       selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-          centerP);
-      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-          centerP, markerGeometry->GetNormal());
-     
+      std::string nodeName = node->GetName();
+      unsigned int t = nodeName.find_last_of(" ");
+      unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
+
+      //selectedRenderWindow->GetSliceNavigationController()->RestorePlanePosition(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+      selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+      selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 

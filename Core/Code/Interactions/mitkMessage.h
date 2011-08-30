@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkMessageHIncluded
 
 #include <vector>
+#include <functional>
 #include <itkSimpleFastMutexLock.h>
 
 /**
@@ -71,11 +72,10 @@ class MessageAbstractDelegate
     {
     }
 
-    virtual A Execute() = 0;
-    virtual bool operator==(const MessageAbstractDelegate* cmd) = 0;
+    virtual A Execute() const = 0;
+    virtual bool operator==(const MessageAbstractDelegate* cmd) const = 0;
     virtual MessageAbstractDelegate* Clone() const = 0;
 };
-
 
 template <typename T, typename A = void>
 class MessageAbstractDelegate1
@@ -86,8 +86,8 @@ class MessageAbstractDelegate1
     {
     }
 
-    virtual A Execute(T t) = 0;
-    virtual bool operator==(const MessageAbstractDelegate1* cmd) = 0;
+    virtual A Execute(T t) const = 0;
+    virtual bool operator==(const MessageAbstractDelegate1* cmd) const = 0;
     virtual MessageAbstractDelegate1* Clone() const = 0;
 };
 
@@ -101,7 +101,7 @@ class MessageAbstractDelegate2
     }
 
     virtual A Execute(T t, U u) const = 0;
-    virtual bool operator==(const MessageAbstractDelegate2* cmd) = 0;
+    virtual bool operator==(const MessageAbstractDelegate2* cmd) const = 0;
     virtual MessageAbstractDelegate2* Clone() const = 0;
 };
 
@@ -115,7 +115,7 @@ class MessageAbstractDelegate3
     }
 
     virtual A Execute(T t, U u, V v) const = 0;
-    virtual bool operator==(const MessageAbstractDelegate3* cmd) = 0;
+    virtual bool operator==(const MessageAbstractDelegate3* cmd) const = 0;
     virtual MessageAbstractDelegate3* Clone() const = 0;
 };
 
@@ -129,7 +129,7 @@ class MessageAbstractDelegate4
     }
 
     virtual A Execute(T t, U u, V v, W w) const = 0;
-    virtual bool operator==(const MessageAbstractDelegate4* cmd) = 0;
+    virtual bool operator==(const MessageAbstractDelegate4* cmd) const = 0;
     virtual MessageAbstractDelegate4* Clone() const = 0;
 };
 
@@ -159,12 +159,12 @@ class MessageDelegate : public MessageAbstractDelegate<A>
     }
 
     // override function "Call"
-    virtual A Execute()
+    virtual A Execute() const
     {
       return (m_Object->*m_MemberFunctionPointer)();    // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate<A>* c)
+    bool operator==(const MessageAbstractDelegate<A>* c) const
     {
       const MessageDelegate<R,A>* cmd = dynamic_cast<const MessageDelegate<R,A>* >(c);
       if (!cmd) return false;
@@ -214,12 +214,12 @@ class MessageDelegate1 : public MessageAbstractDelegate1<T,A>
     }
 
     // override function "Call"
-    virtual A Execute(T t)
+    virtual A Execute(T t) const
     {
       return (m_Object->*m_MemberFunctionPointer)(t);    // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate1<T,A>* c)
+    bool operator==(const MessageAbstractDelegate1<T,A>* c) const
     {
       const MessageDelegate1<R,T,A>* cmd = dynamic_cast<const MessageDelegate1<R,T,A>* >(c);
       if (!cmd) return false;
@@ -263,7 +263,7 @@ class MessageDelegate2 : public MessageAbstractDelegate2<T,U,A>
       return (m_Object->*m_MemberFunctionPointer)(t,u);             // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate2<T,U,A>* c)
+    bool operator==(const MessageAbstractDelegate2<T,U,A>* c) const
     {
       const MessageDelegate2<R,T,U,A>* cmd = dynamic_cast<const MessageDelegate2<R,T,U,A>* >(c);
       if (!cmd) return false;
@@ -306,7 +306,7 @@ class MessageDelegate3 : public MessageAbstractDelegate3<T,U,V,A>
       return (m_Object->*m_MemberFunctionPointer)(t,u,v);             // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate3<T,U,V,A>* c)
+    bool operator==(const MessageAbstractDelegate3<T,U,V,A>* c) const
     {
       const MessageDelegate3<R,T,U,V,A>* cmd = dynamic_cast<const MessageDelegate3<R,T,U,V,A>* >(c);
       if (!cmd) return false;
@@ -349,7 +349,7 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
       return (m_Object->*m_MemberFunctionPointer)(t,u,v,w);             // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate4<T,U,V,W,A>* c)
+    bool operator==(const MessageAbstractDelegate4<T,U,V,W,A>* c) const
     {
       const MessageDelegate4<R,T,U,V,W,A>* cmd = dynamic_cast<const MessageDelegate4<R,T,U,V,W,A>* >(c);
       if (!cmd) return false;
@@ -367,6 +367,125 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
   private:
     R* m_Object;                            // pointer to object
     A (R::*m_MemberFunctionPointer)(T, U, V, W);   // pointer to member function
+};
+
+
+template<typename AbstractDelegate>
+class MessageBase
+{
+  public:
+
+    typedef std::vector<AbstractDelegate* > ListenerList;
+
+    virtual ~MessageBase() {
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
+           iter != m_Listeners.end(); ++iter )
+      {
+        delete *iter;
+      }
+    }
+
+    MessageBase() {}
+
+    MessageBase(const MessageBase& o)
+    {
+      for (typename ListenerList::iterator iter = o.m_Listeners.begin();
+           iter != o.m_Listeners.end(); ++iter )
+      {
+        m_Listeners.push_back((*iter)->Clone());
+      }
+    }
+
+    MessageBase& operator=(const MessageBase& o)
+    {
+      MessageBase tmp(o);
+      std::swap(tmp.m_Listeners, this->m_Listeners);
+    }
+
+    void AddListener( const AbstractDelegate& delegate ) const
+    {
+      AbstractDelegate* msgCmd = delegate.Clone();
+
+      m_Mutex.Lock();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
+           iter != m_Listeners.end();
+           ++iter )
+      {
+        if ((*iter)->operator==(msgCmd)) {
+          delete msgCmd;
+          m_Mutex.Unlock();
+          return;
+        }
+      }
+      m_Listeners.push_back(msgCmd);
+      m_Mutex.Unlock();
+    }
+
+    void operator += ( const AbstractDelegate& delegate ) const
+    {
+      this->AddListener(delegate);
+    }
+
+    void RemoveListener( const AbstractDelegate& delegate ) const
+    {
+      m_Mutex.Lock();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
+           iter != m_Listeners.end();
+           ++iter )
+      {
+        if ((*iter)->operator==(&delegate))
+        {
+          delete *iter;
+          m_Listeners.erase( iter );
+          m_Mutex.Unlock();
+          return;
+        }
+      }
+      m_Mutex.Unlock();
+    }
+
+    void operator -= ( const AbstractDelegate& delegate) const
+    {
+      this->RemoveListener(delegate);
+    }
+
+    const ListenerList& GetListeners() const
+    {
+      return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
+    }
+
+  protected:
+
+    /**
+     * \brief List of listeners.
+     *
+     * This is declared mutable for a reason: Imagine an object that sends out notifications, e.g.
+     *
+     * \code
+class Database {
+  public:
+    Message Modified;
+};
+     * \endcode
+     *
+     * Now imaginge someone gets a <tt>const Database</tt> object, because he/she should not write to the
+     * database. He/she should anyway be able to register for notifications about changes in the database
+     * -- this is why AddListener and RemoveListener are declared <tt>const</tt>. m_Listeners must be
+     *  mutable so that AddListener and RemoveListener can modify it regardless of the object's constness.
+     */
+    mutable ListenerList m_Listeners;
+    mutable itk::SimpleFastMutexLock m_Mutex;
+
 };
 
 /**
@@ -501,577 +620,180 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
  *
  */
 template<typename A = void>
-class Message
+class Message : public MessageBase< MessageAbstractDelegate<A> >
 {
-  public:
 
-    typedef Message Self;
-    typedef MessageAbstractDelegate<A> AbstractDelegate;
-    typedef std::vector<AbstractDelegate* > ListenerList;
+public:
 
-    ~Message() {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end(); ++iter )
-      {
-        delete *iter;
-      }
-    }
+  typedef MessageBase< MessageAbstractDelegate<A> > Super;
+  typedef typename Super::ListenerList ListenerList;
 
-    void AddListener( const AbstractDelegate& delegate ) const
+  void Send()
+  {
+    ListenerList listeners;
+
     {
-      AbstractDelegate* msgCmd = delegate.Clone();
-
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(msgCmd)) {
-          delete msgCmd;
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      this->m_Mutex.Lock();
+      listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
+      this->m_Mutex.Unlock();
     }
-
-    void operator += ( const AbstractDelegate& delegate ) const
-    {
-      this->AddListener(delegate);
-    }
-
-    void RemoveListener( const AbstractDelegate& delegate ) const
-    {
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(&delegate))
-        {
-          delete *iter;
-          m_Listeners.erase( iter );
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Mutex.Unlock();
-    }
-
-    void operator -= ( const AbstractDelegate& delegate) const
-    {
-      this->RemoveListener(delegate);
-    }
-
-    void Send()
-    {
-      ListenerList listeners;
-
-      {
-        m_Mutex.Lock();
-        listeners.assign(m_Listeners.begin(), m_Listeners.end());
-        m_Mutex.Unlock();
-      }
 
       for (typename ListenerList::iterator iter = listeners.begin();
-            iter != listeners.end();
-            ++iter )
+           iter != listeners.end();
+           ++iter )
       {
         // notify each listener
         (*iter)->Execute();
       }
-    }
+  }
 
-    void operator()()
-    {
-      this->Send();
-    }
-
-    const ListenerList& GetListeners() const
-    {
-      return m_Listeners;
-    }
-
-    bool HasListeners() const
-    {
-      return !m_Listeners.empty();
-    }
-
-    bool IsEmpty() const
-    {
-      return m_Listeners.empty();
-    }
-
-  protected:
-
-    /**
-     * \brief List of listeners.
-     *
-     * This is declared mutable for a reason: Imagine an object that sends out notifications, e.g.
-     *
-     * \code
-class Database {
-  public:
-    Message Modified;
-};
-     * \endcode
-     *
-     * Now imaginge someone gets a <tt>const Database</tt> object, because he/she should not write to the
-     * database. He/she should anyway be able to register for notifications about changes in the database
-     * -- this is why AddListener and RemoveListener are declared <tt>const</tt>. m_Listeners must be
-     *  mutable so that AddListener and RemoveListener can modify it regardless of the object's constness.
-     */
-    mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
-
+  void operator()()
+  {
+    this->Send();
+  }
 };
 
 
 // message with 1 parameter and return type
 template <typename T, typename A = void>
-class Message1
+class Message1 : public MessageBase< MessageAbstractDelegate1<T,A> >
 {
-  public:
 
-    typedef Message1 Self;
-    typedef MessageAbstractDelegate1<T,A> AbstractDelegate;
-    typedef std::vector<AbstractDelegate*> ListenerList;
 
-    ~Message1()
+public:
+
+  typedef MessageBase< MessageAbstractDelegate1<T,A> > Super;
+  typedef typename Super::ListenerList ListenerList;
+
+  void Send(T t)
+  {
+    ListenerList listeners;
+
     {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end(); ++iter )
-      {
-        delete *iter;
-      }
+      this->m_Mutex.Lock();
+      listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
+      this->m_Mutex.Unlock();
     }
 
-    void AddListener( const AbstractDelegate& delegate ) const
+    for ( typename ListenerList::iterator iter = listeners.begin();
+          iter != listeners.end();
+          ++iter )
     {
-      AbstractDelegate* msgCmd = delegate.Clone();
-
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(msgCmd)) {
-          delete msgCmd;
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      // notify each listener
+      (*iter)->Execute(t);
     }
+  }
 
-    void operator += ( const AbstractDelegate& delegate ) const
-    {
-      this->AddListener(delegate);
-    }
-
-    void RemoveListener( const AbstractDelegate& delegate ) const
-    {
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(&delegate))
-        {
-          delete *iter;
-          m_Listeners.erase( iter );
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Mutex.Unlock();
-    }
-
-    void operator -= ( const AbstractDelegate& delegate) const
-    {
-      this->RemoveListener(delegate);
-    }
-
-    void Send(T t)
-    {
-      ListenerList listeners;
-
-      {
-        m_Mutex.Lock();
-        listeners.assign(m_Listeners.begin(), m_Listeners.end());
-        m_Mutex.Unlock();
-      }
-
-      for ( typename ListenerList::iterator iter = listeners.begin();
-            iter != listeners.end();
-            ++iter )
-      {
-        // notify each listener
-        (*iter)->Execute(t);
-      }
-    }
-
-    void operator()(T t)
-    {
-      this->Send(t);
-    }
-
-    const ListenerList& GetListeners() const
-    {
-      return m_Listeners;
-    }
-
-    bool HasListeners() const
-    {
-      return !m_Listeners.empty();
-    }
-
-    bool IsEmpty() const
-    {
-      return m_Listeners.empty();
-    }
-
-  protected:
-
-    mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
-
+  void operator()(T t)
+  {
+    this->Send(t);
+  }
 };
 
 
 // message with 2 parameters and return type
 template <typename T, typename U, typename A = void>
-class Message2
+class Message2 : public MessageBase< MessageAbstractDelegate2<T,U,A> >
 {
-  public:
 
-    typedef Message2 Self;
-    typedef MessageAbstractDelegate2<T,U,A> AbstractDelegate;
-    typedef std::vector<AbstractDelegate* > ListenerList;
+public:
 
-    ~Message2() {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end(); ++iter )
-      {
-        delete *iter;
-      }
-    }
+  typedef MessageBase< MessageAbstractDelegate2<T,U,A> > Super;
+  typedef typename Super::ListenerList ListenerList;
 
-    void AddListener( const AbstractDelegate& delegate ) const
+  void Send(T t, U u)
+  {
+    ListenerList listeners;
+
     {
-      AbstractDelegate* msgCmd = delegate.Clone();
-
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(msgCmd)) {
-          delete msgCmd;
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      this->m_Mutex.Lock();
+      listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
+      this->m_Mutex.Unlock();
     }
 
-    void operator += ( const AbstractDelegate& delegate ) const
+    for ( typename ListenerList::iterator iter = listeners.begin();
+          iter != listeners.end();
+          ++iter )
     {
-      this->AddListener(delegate);
+      // notify each listener
+      (*iter)->Execute(t,u);
     }
+  }
 
-    void RemoveListener( const AbstractDelegate& delegate ) const
-    {
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(&delegate))
-        {
-          delete *iter;
-          m_Listeners.erase( iter );
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Mutex.Unlock();
-    }
-
-    void operator -= ( const AbstractDelegate& delegate) const
-    {
-      this->RemoveListener(delegate);
-    }
-
-    void Send(T t, U u)
-    {
-      ListenerList listeners;
-
-      {
-        m_Mutex.Lock();
-        listeners.assign(m_Listeners.begin(), m_Listeners.end());
-        m_Mutex.Unlock();
-      }
-
-      for ( typename ListenerList::iterator iter = listeners.begin();
-            iter != listeners.end();
-            ++iter )
-      {
-        // notify each listener
-        (*iter)->Execute(t,u);
-      }
-    }
-
-    void operator()(T t, U u)
-    {
-      this->Send(t, u);
-    }
-
-    const ListenerList& GetListeners() const
-    {
-      return m_Listeners;
-    }
-
-    bool HasListeners() const
-    {
-      return !m_Listeners.empty();
-    }
-
-    bool IsEmpty() const
-    {
-      return m_Listeners.empty();
-    }
-
-  protected:
-
-    mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
-
+  void operator()(T t, U u)
+  {
+    this->Send(t, u);
+  }
 };
 
 // message with 3 parameters and return type
 template <typename T, typename U, typename V, typename A = void>
-class Message3
+class Message3 : public MessageBase< MessageAbstractDelegate3<T,U,V,A> >
 {
-  public:
 
-    typedef Message3 Self;
-    typedef MessageAbstractDelegate3<T,U,V,A> AbstractDelegate;
-    typedef std::vector<AbstractDelegate* > ListenerList;
+public:
 
-    ~Message3() {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end(); ++iter )
-      {
-        delete *iter;
-      }
-    }
+  typedef MessageBase< MessageAbstractDelegate3<T,U,V,A> > Super;
+  typedef typename Super::ListenerList ListenerList;
 
-    void AddListener( const AbstractDelegate& delegate ) const
+  void Send(T t, U u, V v)
+  {
+    ListenerList listeners;
+
     {
-      AbstractDelegate* msgCmd = delegate.Clone();
-
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(msgCmd)) {
-          delete msgCmd;
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      this->m_Mutex.Lock();
+      listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
+      this->m_Mutex.Unlock();
     }
 
-    void operator += ( const AbstractDelegate& delegate ) const
+    for ( typename ListenerList::iterator iter = listeners.begin();
+          iter != listeners.end();
+          ++iter )
     {
-      this->AddListener(delegate);
+      // notify each listener
+      (*iter)->Execute(t,u,v);
     }
+  }
 
-    void RemoveListener(const AbstractDelegate& delegate ) const
-    {
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(&delegate))
-        {
-          delete *iter;
-          m_Listeners.erase( iter );
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Mutex.Unlock();
-    }
-
-    void operator -= ( const AbstractDelegate& delegate) const
-    {
-      this->RemoveListener(delegate);
-    }
-
-    void Send(T t, U u, V v)
-    {
-      ListenerList listeners;
-
-      {
-        m_Mutex.Lock();
-        listeners.assign(m_Listeners.begin(), m_Listeners.end());
-        m_Mutex.Unlock();
-      }
-
-      for ( typename ListenerList::iterator iter = listeners.begin();
-            iter != listeners.end();
-            ++iter )
-      {
-        // notify each listener
-        (*iter)->Execute(t,u,v);
-      }
-    }
-
-    void operator()(T t, U u, V v)
-    {
-      this->Send(t, u, v);
-    }
-
-    const ListenerList& GetListeners() const
-    {
-      return m_Listeners;
-    }
-
-    bool HasListeners() const
-    {
-      return !m_Listeners.empty();
-    }
-
-    bool IsEmpty() const
-    {
-      return m_Listeners.empty();
-    }
-
-  protected:
-
-    mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
-
+  void operator()(T t, U u, V v)
+  {
+    this->Send(t, u, v);
+  }
 };
 
 // message with 4 parameters and return type
 template <typename T, typename U, typename V, typename W, typename A = void>
-class Message4
+class Message4 : public MessageBase< MessageAbstractDelegate4<T,U,V,W> >
 {
-  public:
 
-    typedef Message4 Self;
-    typedef MessageAbstractDelegate4<T,U,V,W,A> AbstractDelegate;
-    typedef std::vector<AbstractDelegate* > ListenerList;
+public:
 
-    ~Message4() {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end(); ++iter )
-      {
-        delete *iter;
-      }
-    }
+  typedef MessageBase< MessageAbstractDelegate4<T,U,V,W,A> > Super;
+  typedef typename Super::ListenerList ListenerList;
 
-    void AddListener( const AbstractDelegate& delegate ) const
+  void Send(T t, U u, V v, W w)
+  {
+    ListenerList listeners;
+
     {
-      AbstractDelegate* msgCmd = delegate.Clone();
-
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(msgCmd)) {
-          delete msgCmd;
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      this->m_Mutex.Lock();
+      listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
+      this->m_Mutex.Unlock();
     }
 
-    void operator += ( const AbstractDelegate& delegate ) const
+    for ( typename ListenerList::iterator iter = listeners.begin();
+          iter != listeners.end();
+          ++iter )
     {
-      this->AddListener(delegate);
+      // notify each listener
+      (*iter)->Execute(t,u,v,w);
     }
+  }
 
-    void RemoveListener( const AbstractDelegate& delegate ) const
-    {
-      m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
-           iter != m_Listeners.end();
-           ++iter )
-      {
-        if ((*iter)->operator==(&delegate))
-        {
-          delete *iter;
-          m_Listeners.erase( iter );
-          m_Mutex.Unlock();
-          return;
-        }
-      }
-      m_Mutex.Unlock();
-    }
-
-    void operator -= ( const AbstractDelegate& delegate) const
-    {
-      this->RemoveListener(delegate);
-    }
-
-    void Send(T t, U u, V v, W w)
-    {
-      ListenerList listeners;
-
-      {
-        m_Mutex.Lock();
-        listeners.assign(m_Listeners.begin(), m_Listeners.end());
-        m_Mutex.Unlock();
-      }
-
-      for ( typename ListenerList::iterator iter = listeners.begin();
-            iter != listeners.end();
-            ++iter )
-      {
-        // notify each listener
-        (*iter)->Execute(t,u,v,w);
-      }
-    }
-
-    void operator()(T t, U u, V v, W w)
-    {
-      this->Send(t, u, v, w);
-    }
-
-    const ListenerList& GetListeners() const
-    {
-      return this->m_Listeners;
-    }
-
-    bool HasListeners() const
-    {
-      return !m_Listeners.empty();
-    }
-
-    bool IsEmpty() const
-    {
-      return m_Listeners.empty();
-    }
-
-  protected:
-
-    mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
-
+  void operator()(T t, U u, V v, W w)
+  {
+    this->Send(t, u, v, w);
+  }
 };
 
 } // namespace

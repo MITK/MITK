@@ -1,4 +1,10 @@
 /**
+  \defgroup Core Core Classes
+  
+  \brief This category includes classes of the MITK Core library.
+*/
+
+/**
   \defgroup Data Data Classes
   \ingroup DataManagement
 
@@ -24,7 +30,8 @@
 */
 
 /**
-  \defgroup ProcessAdaptor Process and Adaptor Classes 
+  \defgroup ProcessAdaptor Process and Adaptor Classes
+  \ingroup Core
   \anchor ProcessAndAdaptorClasses
 
   \brief This category includes process (algorithm) classes developed specifically for mitk and 
@@ -43,6 +50,7 @@
 
 /**
   \defgroup InteractionUndo Interaction and Undo Classes
+  \ingroup Core
 
   \brief This category includes classes that support the developer to create 
   software that allows the user to interact with the data. 

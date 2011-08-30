@@ -431,6 +431,10 @@ void QmitkSegmentationView::OnRememberContourPositions (bool state)
 {
     m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( state );
 }
+
+void QmitkSegmentationView::OnHideMarkerNodes(bool state)
+{
+}
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
   std::vector<mitk::DataNode*> nodes;
@@ -881,6 +885,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
            this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalRememberContourPositions(bool)), this, SLOT(OnRememberContourPositions(bool)));
+  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalHideMarkerNodes(int)), this, SLOT(OnHideMarkerNodes(int)));
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

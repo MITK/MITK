@@ -93,6 +93,8 @@ protected slots:
   
   //called when the checkbox Remember Contour Positions is selected/deselected
   void OnRememberContourPositions(bool state);
+
+  void OnHideMarkerNodes(bool);
   
 protected:
   

@@ -78,21 +78,21 @@ m_3DInterpolationEnabled(false)
 
   QGridLayout* grid = new QGridLayout(this);
 
-  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
-  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
-  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
-  //connect
-
   m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
   connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
   connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(SignalRememberContourPositions(bool)));
   m_RBtnEnable3DInterpolation->setChecked(true);
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
+
+  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
+  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
+  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
   //connect
 
   m_CbHideMarkers = new QCheckBox("Show Position-Nodes", this);
   m_CbHideMarkers->setChecked(true);
-  connect(m_CbHideMarkers, SIGNAL(stateChanged(int)), this, SLOT(OnHideMarkers(int)));
+  connect(m_CbHideMarkers, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_CbHideMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalHideMarkerNodes(bool)));
   grid->addWidget(m_CbHideMarkers,0,2);
   //connect
 
@@ -324,49 +324,23 @@ void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
   On3DInterpolationActivated(status);
 }
 
-void QmitkSlicesInterpolator::OnHideMarkers(int state)
+void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 {
-  bool hide (!m_CbHideMarkers->isChecked());
-
   mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("isContourMarker"
     , mitk::BoolProperty::New(true)));
 
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
   {
     m_DataStorage->Remove(it->Value());
-    it->Value()->SetProperty("helper object", mitk::BoolProperty::New(hide));
+    it->Value()->SetProperty("helper object", mitk::BoolProperty::New(!state));
     m_DataStorage->Add( it->Value(), m_ToolManager->GetWorkingData(0));
   }
 
    mitk::DataStorage::SetOfObjects::ConstPointer contours3D = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("3DContourContainer"
     , mitk::BoolProperty::New(true)));
 
-  if(!hide)
-  {
-    if(contours3D->empty())
-    {
-      mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
-      contourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
-      contourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-      contourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-      contourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
-      contourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-      contourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-      contourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
-      m_DataStorage->Add(contourNode, m_ToolManager->GetWorkingData(0));
-    }
-    else
-    {
-      contours3D->at(0)->SetVisibility(true);
-    }    
-  }
-  else if(!contours3D->empty())
-  {
-    contours3D->at(0)->SetVisibility(false);
-  }
-
-  //Perhaps think of a way to just hide markers instead of removing them
-  //m_CbHideMarkers->setEnabled(false);
+   if(!contours3D->empty())
+     contours3D->at(0)->SetVisibility(state);
 }
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
@@ -511,10 +485,29 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 void QmitkSlicesInterpolator::InterpolateSurface()
 {
   m_InterpolatedSurfaceNode->SetData(m_SurfaceInterpolator->Interpolate());
-  OnHideMarkers(m_CbHideMarkers->checkState());
+  OnShowMarkers(m_CbHideMarkers->checkState());
   if (m_MultiWidget)
   {
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  mitk::DataStorage::SetOfObjects::ConstPointer contours3D = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("3DContourContainer"
+    , mitk::BoolProperty::New(true)));
+
+  if(contours3D->empty())
+  {
+    mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
+    contourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+    contourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
+    contourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+    contourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+    contourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+    contourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+    contourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
+    contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+    contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+    contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+    contourNode->SetVisibility(m_CbHideMarkers->isChecked());
+    m_DataStorage->Add(contourNode, m_ToolManager->GetWorkingData(0));
   }
 }
 

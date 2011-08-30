@@ -23,6 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 //used for acos etc.
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI             3.14159265358979323846
+#endif
+
 vtkMitkApplyLevelWindowToRGBFilter::vtkMitkApplyLevelWindowToRGBFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
 {
 }

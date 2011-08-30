@@ -26,8 +26,9 @@ endforeach()
 #    )
      
 foreach(d Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
-  list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
+  list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
+list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/mbilog)
 
 if(WIN32)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipPic/win32)
@@ -80,7 +81,11 @@ set(MITK_ITK_LIBRARY_DIRS ${ITK_LIBRARY_DIRS})
 
 # variables containing link directories
 set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})                                                                                                              
-set(MITK_LINK_DIRECTORIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${ITK_LIBRARY_DIRS} ${VTK_LIBRARY_DIRS})
+set(MITK_LINK_DIRECTORIES
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    ${ITK_LIBRARY_DIRS}
+    ${VTK_LIBRARY_DIRS}
+    ${GDCM_LIBRARY_DIRS})
 
 # Qt support
 if(MITK_USE_QT)

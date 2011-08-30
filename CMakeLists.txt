@@ -262,6 +262,10 @@ include(mitkMacroGetLinuxDistribution)
 find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
 
+if(ITK_USE_SYSTEM_GDCM)
+  find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
+endif()
+
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------

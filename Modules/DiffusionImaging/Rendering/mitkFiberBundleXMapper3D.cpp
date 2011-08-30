@@ -69,11 +69,11 @@ void mitk::FiberBundleXMapper3D::GenerateData()
   
 //  mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
 
-  mitk::FiberBundleX::Pointer FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
-  if (FBX.GetPointer() == NULL) {
-    MITK_INFO << "FBX==NULL";
-  }
-  vtkSmartPointer<vtkPolyData> FiberData = FBX->GetFibers();
+  mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
+//  if (FBX == NULL) {
+//    MITK_INFO << "FBX==NULL"; not allowed to be null ;-)
+//  }
+  vtkPolyData* FiberData = FBX->GetFibers();
   MITK_INFO << "NumOfFibs: " << FiberData->GetNumberOfLines();
   MITK_INFO << "NumOfPoints: " << FiberData->GetNumberOfPoints();
   

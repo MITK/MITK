@@ -17,6 +17,9 @@
 
  =========================================================================*/
 
+/* =============== IMPORTANT TODO ===================
+ * ==== USE vtkSmartPointer<> when necessary ONLY!!!!
+ */
 
 #ifndef _MITK_FiberBundleX_H
 #define _MITK_FiberBundleX_H
@@ -67,8 +70,8 @@ namespace mitk {
     
     
     /*====FIBERBUNDLE I/O METHODS====*/
-    void SetFibers(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
-    vtkSmartPointer<vtkPolyData> GetFibers();
+    void SetFibers(vtkPolyData*); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
+    vtkPolyData* GetFibers();
     vtkSmartPointer<vtkPolyData> GetVertices();
     
     
@@ -100,7 +103,7 @@ namespace mitk {
 //    
     //    this variable hosts the original fiber data, no smartpointer needed because who or whatever passes this data to FiberBundleX should use vtkSmartPointer structure
   
-    vtkSmartPointer<vtkPolyData> m_FiberStructureData;
+    vtkPolyData* m_FiberStructureData; //this is a common pointer because fiberDataStructure gets passed to this class. m_FiberStructureData is destroyed in the destructor then.
     
     //    VertexPolyData stores all original points as vertices computed by tracking algorithms
     vtkSmartPointer<vtkPolyData> m_VertexPolyData;

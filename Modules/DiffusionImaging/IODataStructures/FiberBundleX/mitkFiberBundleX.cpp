@@ -49,15 +49,16 @@ mitk::FiberBundleX::FiberBundleX()
 
 mitk::FiberBundleX::~FiberBundleX()
 {
-  
+  // Memory Management
+  m_FiberStructureData->Delete();
 }
 
 /* === main input method ====
  * set computed fibers from tractography algorithms
  */
-void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
+void mitk::FiberBundleX::SetFibers(vtkPolyData* fiberPD)
 { 
-  if (fiberPD.GetPointer() == NULL){ 
+  if (fiberPD == NULL){ 
     MITK_INFO << "passed FiberBundleX is NULL, exit!";
     return;
   }
@@ -71,7 +72,7 @@ void mitk::FiberBundleX::SetFibers(vtkSmartPointer<vtkPolyData> fiberPD)
  * Depending on processing of input fibers, this method returns
  * the latest processed fibers.
  */
-  vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFibers()
+  vtkPolyData* mitk::FiberBundleX::GetFibers()
 {
   return m_FiberStructureData;
 }
@@ -234,12 +235,15 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
 void mitk::FiberBundleX::DoGenerateFiberIds()
 {
-  if (m_FiberStructureData.GetPointer() == NULL)
+  if (m_FiberStructureData == NULL)
     return;
-  while(true)
-  {
-    MITK_INFO << "*gg*";
-  }
+  
+//  for (int i=0; i<10000000; ++i) 
+//  {
+//   if(i%500 == 0)
+//     MITK_INFO << i;
+//  }
+  
   vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
   idFiberFilter->SetInput(m_FiberStructureData);
   idFiberFilter->CellIdsOn();

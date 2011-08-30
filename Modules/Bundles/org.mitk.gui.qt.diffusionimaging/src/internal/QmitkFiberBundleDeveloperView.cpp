@@ -24,9 +24,11 @@
 #include "QmitkFiberBundleDeveloperView.h"
 #include <QmitkStdMultiWidget.h> 
 
+// Qt
+#include <QTimer>
 
 // MITK
-#include <mitkFiberBundleX.h> //for fiberStructure
+//#include <mitkFiberBundleX.h> //for fiberStructure
 
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
@@ -43,6 +45,43 @@
 #include <itkTimeProbe.h>
 
 
+
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ */
+QmitkFiberIDWorker::QmitkFiberIDWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+: m_itemPackage(itemPackage),
+m_hostingThread(hostingThread)
+{
+  
+}
+void QmitkFiberIDWorker::run()
+{
+  MITK_INFO << "WmitkFiberIDWORKER....RUN()";
+  
+  itk::TimeProbe clock;
+  clock.Start();
+  
+  m_itemPackage.st_FBX->DoGenerateFiberIds();
+  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy timer
+    
+  
+  clock.Stop();
+  m_itemPackage.st_Controls->
+  MITK_INFO << "==== Generate idSet ====\n Mean: " << clock.GetMean() << "\n Total: " << clock.GetTotal() ;
+  //  m_hostingThread->quit();
+
+}
+
+
+
+
+
+
+
+
+// ========= HERE STARTS THE ACTUAL FIBERBUNDLE DEVELOPER VIEW IMPLEMENTATION ======
+
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
@@ -53,12 +92,19 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
+  m_hostThread = new QThread;
+  m_threadInProgress = false;
   
 }
 
 // Destructor
 QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
+  m_FiberBundleX->Delete();
+  delete m_hostThread;
+  delete m_FiberIDGenerator;
+  
+  // m_idGenerateTimer no need to delete, is not initialized using "new"
   
 }
 
@@ -72,17 +118,22 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkFiberBundleDeveloperViewControls;
     m_Controls->setupUi( parent );
     
-    //disabled due to incomplete implementation of these options
+    /*=========INITIALIZE BUTTON CONFIGURATION ================*/
     m_Controls->radioButton_directionX->setEnabled(false);
     m_Controls->radioButton_directionY->setEnabled(false);
     m_Controls->radioButton_directionZ->setEnabled(false);
-    
+    m_Controls->buttonGenerateFiberIds->setEnabled(false);
+    m_Controls->buttonGenerateFibers->setEnabled(true);
     
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
+    connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
+    
     connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->radioButton_directionX, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->radioButton_directionY, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
+    connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
+    
     
     
   }
@@ -101,7 +152,9 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
   
   
 }
-
+/* THIS METHOD UPDATES ALL GUI ELEMENTS OF QGroupBox DEPENDING ON CURRENTLY SELECTED
+ * RADIO BUTTONS 
+ */
 void QmitkFiberBundleDeveloperView::DoUpdateGenerateFibersWidget()
 {
   //get selected radioButton
@@ -187,22 +240,22 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
       fibDirection = rdbtn->objectName();
   }
   
-  vtkSmartPointer<vtkPolyData> output; // FiberPD stores the generated PolyData
+  vtkPolyData* output; // FiberPD stores the generated PolyData
   if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
     //    build polydata with random lines and fibers
     output = GenerateVtkFibersRandom();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
     //    build polydata with XDirection fibers
-    output = GenerateVtkFibersDirectionX();
+    //output = GenerateVtkFibersDirectionX();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Y ) {
     //    build polydata with YDirection fibers
-    output = GenerateVtkFibersDirectionY();
+    // output = GenerateVtkFibersDirectionY();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_Z ) {
     //    build polydata with ZDirection fibers
-    output = GenerateVtkFibersDirectionZ();
+    //  output = GenerateVtkFibersDirectionZ();
     
   }
   
@@ -217,6 +270,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   FBNode->SetVisibility(true);
   
   GetDataStorage()->Add(FBNode);
+  //output->Delete();
   
   const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
   if (tsgeo == NULL) {
@@ -240,7 +294,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 /*
  * Generate polydata of random fibers
  */
-vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
+vtkPolyData* QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
   int numOfFibers = m_Controls->boxFiberNumbers->value();
   int distrRadius = m_Controls->boxDistributionRadius->value();
@@ -285,14 +339,14 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
     
     //add current point to random fiber
     fiberStorage.at(random_integer).push_back(i); 
-//    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
+    //    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
   } 
   
   //=====timer measurement====
   itk::TimeProbe clock;
   clock.Start();
   //==========================
-
+  
   
   /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
   vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
@@ -322,7 +376,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersRan
   //  MITK_INFO << "CellSize: " << linesCell->GetSize() << " NumberOfCells: " << linesCell->GetNumberOfCells();
   
   /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
-  vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New();
+  vtkPolyData* PDRandom = vtkPolyData::New();
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
   
@@ -405,7 +459,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
   return PDZ;
 }
 
-/* === THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===
+/* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===
  * WITHOUT, the rendering mechanism will ignore objects without valid Geometry 
  * for each object, MITK requires: ORIGIN, SPACING, TRANSFORM MATRIX, BOUNDING-BOX */
 mitk::Geometry3D::Pointer QmitkFiberBundleDeveloperView::GenerateStandardGeometryForMITK()
@@ -473,6 +527,113 @@ mitk::Geometry3D::Pointer QmitkFiberBundleDeveloperView::GenerateStandardGeometr
   
 }
 
+void QmitkFiberBundleDeveloperView::UpdateFiberIDTimer()
+{
+  //MAKE SURE by yourself THAT NOTHING ELSE THAN A NUMBER IS SET IN THAT LABEL
+  QString crntValue = m_Controls->infoTimerGenerateFiberIds->text();
+  int tmpVal = crntValue.toInt();
+  m_Controls->infoTimerGenerateFiberIds->setText(QString::number(++tmpVal));  
+  m_Controls->infoTimerGenerateFiberIds->update();
+  
+}
+
+/* Initialie ID dataset in FiberBundleX */
+void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
+{
+  
+  struct Package4WorkingThread FiberIdPackage;
+  FiberIdPackage.st_FBX = m_FiberBundleX;
+  FiberIdPackage.st_idGenerateTimer = &m_idGenerateTimer;
+  FiberIdPackage.st_Controls = m_Controls;
+  
+  /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread pre- and postprocessing methods */
+  m_idGenerateTimer.setInterval( 10 );
+  connect( &m_idGenerateTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
+  
+  // THREAD CONFIGURATION
+  m_FiberIDGenerator = new QmitkFiberIDWorker(m_hostThread, FiberIdPackage);
+  m_FiberIDGenerator->moveToThread(m_hostThread);
+  connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_IdGenerate()) );
+  connect(m_hostThread, SIGNAL(started()), m_FiberIDGenerator, SLOT(run()));
+  connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_IdGenerate()));
+  connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_IdGenerate()));
+  m_hostThread->start(QThread::LowestPriority);
+  
+  
+  
+  // m_Controls->infoTimerGenerateFiberIds->setText(QString::number(clock.GetTotal()));
+  
+}
+
+void QmitkFiberBundleDeveloperView::BeforeThread_IdGenerate()
+{
+  m_Controls->infoTimerGenerateFiberIds->setText(QString::number(0)); //set GUI representation of timer to 0
+  m_threadInProgress = true;
+  m_idGenerateTimer.start();
+  
+}
+
+void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
+{
+  //  m_idGenerateTimer.stop(); //not smart to set timer.stop here, cuz this will override the actual measurements of ITK:PROBE in GUI 
+  m_threadInProgress = false;
+  
+  
+}
+
+void  QmitkFiberBundleDeveloperView::ResetFiberInfoWidget()
+{
+  if (m_Controls->infoAnalyseNumOfFibers->isEnabled()) {
+    m_Controls->infoAnalyseNumOfFibers->setText("-");
+    m_Controls->infoAnalyseNumOfPoints->setText("-");
+    m_Controls->infoAnalyseNumOfFibers->setEnabled(false);
+  }
+}
+
+void  QmitkFiberBundleDeveloperView::FeedFiberInfoWidget()
+{
+  if (!m_Controls->infoAnalyseNumOfFibers->isEnabled())
+    m_Controls->infoAnalyseNumOfFibers->setEnabled(true);
+  
+  QString numOfFibers;
+  numOfFibers.setNum( m_FiberBundleX->GetFibers()->GetNumberOfLines() );
+  QString numOfPoints;
+  numOfPoints.setNum( m_FiberBundleX->GetFibers()->GetNumberOfPoints() );
+  
+  m_Controls->infoAnalyseNumOfFibers->setText( numOfFibers );
+  m_Controls->infoAnalyseNumOfPoints->setText( numOfPoints );
+}
+
+void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
+{
+  MITK_INFO << "printtoolbox: " << idx;
+  if (m_Controls->page_FiberInfo->isVisible() && m_FiberBundleX != NULL)
+  {
+    FeedFiberInfoWidget();
+    
+  } else {
+    //if infolables are disabled: return
+    //else set info back to - and set label and info to disabled
+    
+    if (!m_Controls->page_FiberInfo->isVisible()) {
+      return;
+    } else {
+      ResetFiberInfoWidget();
+    }
+  }
+  
+}
+
+void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator(bool isVisible)
+{
+  // ==== FIBER PROCESSING ELEMENTS ======
+  m_Controls->buttonGenerateFiberIds->setEnabled(isVisible);
+  
+  
+}
+
+
 
 void QmitkFiberBundleDeveloperView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
@@ -487,41 +648,50 @@ void QmitkFiberBundleDeveloperView::StdMultiWidgetNotAvailable()
 
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
  implement SelectionService Listener explicitly */
-
 void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 { 
   
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-      it != nodes.end(); ++it )
+  /* ==== reset everyhing related to FiberBundleX ======
+   * - variable m_FiberBundleX
+   * - visualization of analysed fiberbundle
+   */
+  m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
+  ResetFiberInfoWidget();
+  FBXDependendGUIElementsConfigurator(false);
+  m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
+  //====================================================
+  
+  
+  if (nodes.empty())
+    return;
+  
+  
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
-    //flags needed for algorithm execution logic
-    
     mitk::DataNode::Pointer node = *it;
+    
+    /* CHECKPOINT: FIBERBUNDLE*/
     if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
     {
-      MITK_INFO << node->GetData()->GetNameOfClass();
+      m_FiberBundleX = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+      if (m_FiberBundleX == NULL)
+        MITK_INFO << "========ATTENTION=========\n unable to load selected FiberBundleX to FiberBundleDeveloper-plugin \n";
       
-      MITK_INFO << "FBX";
-      mitk::FiberBundleX::Pointer serwas = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-      if (serwas.GetPointer() != NULL){
-        vtkSmartPointer<vtkPolyData> pdfb = serwas->GetFibers();
-        
-        MITK_INFO << pdfb->GetNumberOfLines();
-        MITK_INFO << pdfb->GetNumberOfPoints();
-      }else{
-        MITK_INFO << "what happend in datastorage?";
-        MITK_INFO << node->GetData()->GetNameOfClass();
-      }
+      // ==== FIBERBUNDLE_INFO ELEMENTS ====
+      if ( m_Controls->page_FiberInfo->isVisible() )
+        FeedFiberInfoWidget(); 
       
       
-    } else {
-      MITK_INFO << node->GetData()->GetNameOfClass();
+      // enable FiberBundleX related Gui Elements, such as buttons etc.
+      FBXDependendGUIElementsConfigurator(true);
+      
     }
     
+    
+    
+    
   }
-  
 }
-
 void QmitkFiberBundleDeveloperView::Activated()
 {
   

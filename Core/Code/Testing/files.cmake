@@ -21,9 +21,11 @@ SET(MODULE_TESTS
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp
+  mitkLDAPFilterTest.cpp
   # mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
+  mitkModuleTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
@@ -33,6 +35,7 @@ SET(MODULE_TESTS
   mitkPropertyListTest.cpp
   #mitkRegistrationBaseTest.cpp
   #mitkSegmentationInterpolationTest.cpp
+  mitkServiceListenerTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
@@ -91,5 +94,24 @@ SET(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
-	mitkImageWriterTest.cpp
+    mitkImageWriterTest.cpp
 )
+
+# Create an artificial module initializing class for
+# the mitkServiceListenerTest.cpp
+
+SET(module_name_orig ${MODULE_NAME})
+SET(module_libname_orig ${MODULE_LIBNAME})
+SET(MODULE_NAME "${MODULE_NAME}TestDriver")
+SET(MODULE_LIBNAME "")
+SET(MODULE_DEPENDS_STR "Mitk")
+SET(MODULE_PACKAGE_DEPENDS_STR "")
+SET(MODULE_VERSION "0.1.0")
+SET(MODULE_QT_BOOL "false")
+
+SET(testdriver_init_file "${CMAKE_CURRENT_BINARY_DIR}/MitkTestDriver_init.cpp")
+CONFIGURE_FILE("${MITK_SOURCE_DIR}/CMake/mitkModuleInit.cpp" ${testdriver_init_file} @ONLY)
+SET(TEST_CPP_FILES ${testdriver_init_file})
+
+SET(MODULE_NAME ${module_name_orig})
+SET(MODULE_LIBNAME ${module_libname_orig})

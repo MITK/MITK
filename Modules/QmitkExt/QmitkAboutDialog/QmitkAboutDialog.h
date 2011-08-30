@@ -27,7 +27,11 @@ class QmitkExt_EXPORT QmitkAboutDialog : public QDialog
 
   public:
 
-    QmitkAboutDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkAboutDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
     virtual ~QmitkAboutDialog();
+
+protected slots:
+
+    void ShowModules();
 
 };

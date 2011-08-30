@@ -17,8 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkAboutDialog.h"
 
+#include <QPushButton>
 #include <ui_QmitkAboutDialogGUI.h>
 
+#include "QmitkModulesDialog.h"
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
@@ -38,10 +40,12 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   vtkVersion = vtkVersion.arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION);
 
   gui.m_PropsLabel->setText(gui.m_PropsLabel->text().arg(itkVersion, QT_VERSION_STR, vtkVersion, mitkRevision));
-      
-  //general
-  //connect( m_GUI->btnQuitApplication,SIGNAL(clicked()), qApp, SLOT(closeAllWindows()) );
 
+  QPushButton* btnModules = new QPushButton(QIcon(":/qmitk/ModuleView.png"), "Modules");
+  gui.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
+
+  connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
+  connect(gui.m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 QmitkAboutDialog::~QmitkAboutDialog()
@@ -49,11 +53,8 @@ QmitkAboutDialog::~QmitkAboutDialog()
 
 }
 
-
-
-
-
-
-
-
-
+void QmitkAboutDialog::ShowModules()
+{
+  QmitkModulesDialog dialog(this);
+  dialog.exec();
+}

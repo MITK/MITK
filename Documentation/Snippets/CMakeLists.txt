@@ -1,0 +1,5 @@
+if(BUILD_TESTING)
+  include_directories(${MITK_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
+  link_directories(${MITK_LINK_DIRECTORIES})
+  mitkFunctionCompileSnippets("${CMAKE_CURRENT_SOURCE_DIR}" ${MITK_LIBRARIES})
+endif()

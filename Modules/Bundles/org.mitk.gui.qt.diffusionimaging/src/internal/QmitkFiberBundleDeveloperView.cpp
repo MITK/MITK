@@ -63,10 +63,11 @@ void QmitkFiberIDWorker::run()
   clock.Start();
   
   m_itemPackage.st_FBX->DoGenerateFiberIds();
-  m_itemPackage.st_idGenerateTimer->stop();
+  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy timer
     
   
   clock.Stop();
+  m_itemPackage.st_Controls->
   MITK_INFO << "==== Generate idSet ====\n Mean: " << clock.GetMean() << "\n Total: " << clock.GetTotal() ;
   //  m_hostingThread->quit();
 
@@ -650,15 +651,15 @@ void QmitkFiberBundleDeveloperView::StdMultiWidgetNotAvailable()
 void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 { 
   
-  /* reset everyhing related to FiberBundleX
+  /* ==== reset everyhing related to FiberBundleX ======
    * - variable m_FiberBundleX
    * - visualization of analysed fiberbundle
    */
   m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
   ResetFiberInfoWidget();
   FBXDependendGUIElementsConfigurator(false);
-  m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to 0
-  
+  m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
+  //====================================================
   
   
   if (nodes.empty())

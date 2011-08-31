@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 //==================================
 
 //modernized fiberbundle datastrucutre
-#include "mitkFiberBundleX.h" 
+#include "mitkFiberBundleX.h"
 #include "mitkFiberBundleXIOFactory.h"
 #include "mitkFiberBundleXWriterFactory.h"
 #include "mitkFiberBundleXWriter.h"
@@ -83,8 +83,8 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::FiberBundleIOFactory::RegisterOneFactory();
     mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
-    
-    
+
+
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
@@ -98,7 +98,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssImageWriter<TbssRoiPixelType>::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
-    
+
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
@@ -170,7 +170,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::FiberBundleMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname = "FiberBundleX";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
@@ -218,7 +218,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::FiberBundleMapper3D::SetDefaultProperties(node);
   }
-  
+
   classname = "FiberBundleX";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
@@ -226,7 +226,6 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   }
 
   classname = "TbssImage";
-  std::string n = node->GetData()->GetNameOfClass();
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::ImageMapperGL2D::SetDefaultProperties(node);

@@ -32,6 +32,7 @@ class vtkImageChangeInformation;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
+class vtkMitkApplyLevelWindowToRGBFilter;
 
 namespace mitk {
 
@@ -162,6 +163,9 @@ namespace mitk {
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
+
+      //TODO Docu
+      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

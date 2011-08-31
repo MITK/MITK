@@ -487,8 +487,12 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->GeneratePlane( renderer, sliceBounds );
 
   //apply the properties after the slice was set
-  this->ApplyProperties( renderer, mmPerPixel );
-
+  const mitk::DataNode::Pointer node = this->GetDataNode();
+  if((localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+    {
+    this->ApplyProperties( renderer, mmPerPixel );
+  }
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -621,6 +625,7 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
 
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk::ScalarType mmPerPixel[2])
 {
+  MITK_INFO << "Apply Props";
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -676,7 +681,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-//  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
+  //  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
 
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;
@@ -770,21 +775,21 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     {
       // obtain and apply opacity level window if possible
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
-      vtkMitkApplyLevelWindowToRGBFilter* levelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
-      levelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
+      //      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
+      localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
       mitk::LevelWindow opacLevelWindow;
       if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
       {
-        levelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
-        levelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+        localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+        localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
       }
       else
       {
-        levelWindowToRGBFilterObject->SetMinOpacity(0.0);
-        levelWindowToRGBFilterObject->SetMaxOpacity(255.0);
+        localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(0.0);
+        localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(255.0);
       }
-      levelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
-      localStorage->m_Texture->SetInputConnection(levelWindowToRGBFilterObject->GetOutputPort());
+      localStorage->m_LevelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
+      localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowToRGBFilterObject->GetOutputPort());
     }
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
@@ -1058,4 +1063,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //set the mapper for the actor
   m_Actor->SetMapper(m_Mapper);
+
+  //filter for RGB(A) images
+  m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
 }

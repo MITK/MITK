@@ -53,10 +53,9 @@ public:
 
   /** Default constructor. */
   vtkMitkApplyLevelWindowToRGBFilter();
-protected:
   /** Default deconstructor. */
   ~vtkMitkApplyLevelWindowToRGBFilter();
-
+protected:
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
    * \param *outData: The output of the filter.

@@ -108,10 +108,16 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     }
     else
     {
-      // insert the point at the given position
+      // insert the point at the given position and set it as selected point
       ControlPointListType::iterator iter = m_ControlPoints.begin() + position;
       m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( position, point ) );
-      m_SelectedControlPoint = m_NumberOfControlPoints;
+      for( unsigned int i = 0; i < m_ControlPoints.size(); ++i )
+      {
+        if( point == m_ControlPoints.at(i) )
+        {
+          m_SelectedControlPoint = i;
+        }
+      }
     }
 
     // polylines & helperpolylines need to be repainted

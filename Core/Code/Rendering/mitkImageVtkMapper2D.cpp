@@ -625,7 +625,6 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
 
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk::ScalarType mmPerPixel[2])
 {
-  MITK_INFO << "Apply Props";
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 

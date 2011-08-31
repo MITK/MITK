@@ -220,7 +220,7 @@ namespace mitk {
     * \image html cameraPositioning3D.png
     *
     */
-    virtual void GenerateData(mitk::BaseRenderer *renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
     /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,

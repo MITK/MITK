@@ -132,7 +132,7 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
     this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
 }
 
-void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -848,7 +848,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
-    this->GenerateData( renderer );
+    this->GenerateDataForRenderer( renderer );
   }
 
   // since we have checked that nothing important has changed, we can set

@@ -432,7 +432,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
           gdcm::IPPSorter ippsorter;
           gdcm::Directory::FilenamesType ipplist((j)*filesPerAcqu+subfiles.begin(),(j+1)*filesPerAcqu+subfiles.begin());
-          ippsorter.SetComputeZSpacing( false );
+          ippsorter.SetComputeZSpacing( true );
           if( !ippsorter.Sort( ipplist ) )
           {
             Error(QString("Failed to sort acquisition %1, ABORTING").arg(identifier.c_str()));

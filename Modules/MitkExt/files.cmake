@@ -41,6 +41,7 @@ SET(CPP_FILES
   Algorithms/mitkProbeFilter.cpp
   Algorithms/mitkSegmentationSink.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
+  Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSimpleHistogram.cpp
   Algorithms/mitkSimpleUnstructuredGridHistogram.cpp

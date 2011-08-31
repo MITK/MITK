@@ -63,9 +63,9 @@ void QmitkFiberIDWorker::run()
   clock.Start();
   
   m_itemPackage.st_FBX->DoGenerateFiberIds();
-  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
-    
+  
   clock.Stop();
+  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
   m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
   m_hostingThread->quit();
 
@@ -550,6 +550,9 @@ void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
   m_idGenerateTimer.setInterval( 10 );
   connect( &m_idGenerateTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
   
+  if (m_threadInProgress)
+    return; //maybe popup window saying, working thread still in progress...pls wait
+  
   // THREAD CONFIGURATION
   m_FiberIDGenerator = new QmitkFiberIDWorker(m_hostThread, FiberIdPackage);
   m_FiberIDGenerator->moveToThread(m_hostThread);
@@ -575,7 +578,8 @@ void QmitkFiberBundleDeveloperView::BeforeThread_IdGenerate()
 
 void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
 {
-  //  m_idGenerateTimer.stop(); //not smart to set timer.stop here, cuz this will override the actual measurements of ITK:PROBE in GUI 
+  if (m_idGenerateTimer.isActive())
+      m_idGenerateTimer.stop(); 
   m_threadInProgress = false;
   
   

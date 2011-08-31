@@ -19,6 +19,8 @@
 #ifndef QmitkPropertiesTableModel_h
 #define QmitkPropertiesTableModel_h
 
+#include <QmitkExports.h>
+
 //# Own includes
 #include "mitkDataNode.h"
 #include "mitkWeakPointer.h"

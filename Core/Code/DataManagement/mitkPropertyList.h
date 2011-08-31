@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkGenericProperty.h"
 #include "mitkUIDGenerator.h"

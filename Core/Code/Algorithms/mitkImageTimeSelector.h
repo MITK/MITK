@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
 #define IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

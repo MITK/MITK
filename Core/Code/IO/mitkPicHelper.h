@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 #define MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkVector.h"
 #include <mitkIpPic.h>
 

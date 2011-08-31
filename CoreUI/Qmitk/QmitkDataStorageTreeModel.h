@@ -19,6 +19,8 @@
 #ifndef QMITKDATASTORAGETREEMODEL_H_
 #define QMITKDATASTORAGETREEMODEL_H_
 
+#include <QmitkExports.h>
+
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
 #include <mitkWeakPointer.h>

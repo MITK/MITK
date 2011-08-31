@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef FILEWRITER_H_HEADER_INCLUDED
 #define FILEWRITER_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <itkProcessObject.h>
 #include <mitkDataNode.h>
 

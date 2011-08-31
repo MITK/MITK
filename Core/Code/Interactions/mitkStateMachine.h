@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 #define STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <itkObject.h>
 #include "mitkOperationActor.h"
 #include <string>

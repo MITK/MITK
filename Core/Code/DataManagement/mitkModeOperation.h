@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MODEOPERATION_H_HEADER_INCLUDED
 #define MODEOPERATION_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperation.h"
 #include <mitkInteractor.h>
 

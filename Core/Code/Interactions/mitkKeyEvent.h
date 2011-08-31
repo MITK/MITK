@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef KeyEvent_H_HEADER_INCLUDED_C184F366
 #define KeyEvent_H_HEADER_INCLUDED_C184F366
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkEvent.h"
 #include "mitkVector.h"
 

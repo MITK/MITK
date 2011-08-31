@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 #define QMITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
+#include <QmitkExports.h>
+
 #include "mitkRenderingManager.h"
 #include <QObject>
 #include <QEvent>

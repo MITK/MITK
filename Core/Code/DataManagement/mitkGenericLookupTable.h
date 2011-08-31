@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDataObject.h>
 
 #include "mitkVector.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 
 namespace mitk {

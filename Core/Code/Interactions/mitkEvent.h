@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef EVENT_H_HEADER_INCLUDED_C1889CEE
 #define EVENT_H_HEADER_INCLUDED_C1889CEE
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 

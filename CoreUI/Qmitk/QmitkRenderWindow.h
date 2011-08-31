@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 #define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 
+#include <QmitkExports.h>
 
-#include "mitkCommon.h"
 #include "mitkRenderWindowBase.h"
 
 #include "QVTKWidget.h"

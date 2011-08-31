@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
 #define MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkVector.h"
 
 namespace mitk

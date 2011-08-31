@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkActor2D.h"
 #include "vtkRenderWindow.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {

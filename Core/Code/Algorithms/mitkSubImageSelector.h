@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
 #define SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkImageToImageFilter.h"
 #include "mitkImageDataItem.h"
 #include "mitkBaseData.h"

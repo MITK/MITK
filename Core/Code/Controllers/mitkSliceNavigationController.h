@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 #define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"

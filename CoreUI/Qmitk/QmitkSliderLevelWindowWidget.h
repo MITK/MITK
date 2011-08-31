@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSLIDERLEVELWINDOW_WIDGET
 #define QMITKSLIDERLEVELWINDOW_WIDGET
 
+#include <QmitkExports.h>
+
 #include <QWidget>
 #include <mitkLevelWindowManager.h>
 

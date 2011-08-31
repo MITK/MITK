@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SLICEDDATA_H_HEADER_INCLUDED
 #define SLICEDDATA_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseData.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"

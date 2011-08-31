@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATETRANSITIONOPERATION_H_HEADER_INCLUDED_C1695462
 #define STATETRANSITIONOPERATION_H_HEADER_INCLUDED_C1695462
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperation.h"
 #include "mitkState.h"
 

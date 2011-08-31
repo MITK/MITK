@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __vtkMitkThickSlicesFilter_h
 #define __vtkMitkThickSlicesFilter_h
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 #include "vtkThreadedImageAlgorithm.h"
 

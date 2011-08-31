@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKLINEEDITLEVELWINDOWWIDGET
 #define QMITKLINEEDITLEVELWINDOWWIDGET
 
+#include <QmitkExports.h>
+
 #include <QWidget>
 
 #include <mitkLevelWindowManager.h>

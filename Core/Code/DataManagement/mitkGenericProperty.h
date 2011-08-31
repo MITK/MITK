@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdlib.h>
 
 #include "mitkVector.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 
 namespace mitk {

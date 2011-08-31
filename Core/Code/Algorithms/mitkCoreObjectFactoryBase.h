@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 // be available to all classes implementing this interface.
 #include "mitkLog.h"
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMapper.h"
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>

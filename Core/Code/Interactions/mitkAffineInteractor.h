@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 #define MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkInteractor.h"
 #include "mitkVector.h"
 

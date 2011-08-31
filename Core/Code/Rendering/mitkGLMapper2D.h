@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMapper2D.h"
 #include "mitkBaseRenderer.h"
 

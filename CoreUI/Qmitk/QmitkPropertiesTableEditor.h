@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkPropertiesTableEditor_h
 #define QmitkPropertiesTableEditor_h
 
+#include <QmitkExports.h>
+
 /// Own includes.
 #include "mitkDataNode.h"
 

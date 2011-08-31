@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0
 #define MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkVector.h"
 #include "mitkOperation.h"

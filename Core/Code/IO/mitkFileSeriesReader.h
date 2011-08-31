@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __MITK_FILE_SERIES_READER__H_
 #define __MITK_FILE_SERIES_READER__H_
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include <mitkFileReader.h>
 #include <vector>
 #include <string> 

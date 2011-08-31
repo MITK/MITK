@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkCrosshairPositionEvent_h
 #define mitkCrosshairPositionEvent_h
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkEvent.h"
 
 namespace mitk {

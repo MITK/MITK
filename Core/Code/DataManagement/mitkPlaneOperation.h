@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPlaneOperation_H
 #define MITKPlaneOperation_H
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkPointOperation.h"
 #include "mitkVector.h"
 

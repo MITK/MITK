@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MAPPER_H_HEADER_INCLUDED_C1E6EA08
 #define MAPPER_H_HEADER_INCLUDED_C1E6EA08
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkLevelWindow.h"
 

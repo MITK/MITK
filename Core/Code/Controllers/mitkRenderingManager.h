@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 #include <vtkCallbackCommand.h>
 

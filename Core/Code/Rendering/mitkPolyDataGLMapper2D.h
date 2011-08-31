@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MitkPolyDataGLMapper2D_H
 #define MitkPolyDataGLMapper2D_H
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkGLMapper2D.h"
 
 class vtkCutter;

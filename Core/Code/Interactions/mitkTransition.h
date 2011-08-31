@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef TRANSITION_H_HEADER_INCLUDED_C19AE06B
 #define TRANSITION_H_HEADER_INCLUDED_C19AE06B
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <string>
 #include <vector>
 #include <itkWeakPointer.h>

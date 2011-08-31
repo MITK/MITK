@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
 #define QMITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
 
+#include <QmitkExports.h>
+
 #include "mitkRenderingManagerFactory.h"
 
 /**

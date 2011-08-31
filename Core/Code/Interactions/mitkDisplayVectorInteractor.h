@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
 #define MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkStateMachine.h"
 

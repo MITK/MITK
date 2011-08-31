@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASEVTKMAPPER3D_H_HEADER_INCLUDED
 #define BASEVTKMAPPER3D_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMapper.h"
 #include "mitkMapper3D.h"
 #include "mitkBaseRenderer.h"

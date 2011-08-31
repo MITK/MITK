@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATE_H_HEADER_INCLUDED_C19A8A5D
 #define STATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <string>
 #include <map>
 #include <set>

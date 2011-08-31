@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 
 // MITK header
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoModel.h"
 // STL header

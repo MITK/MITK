@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <set>
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkCoreObjectFactoryBase.h"
 #include "mitkFileWriterWithInformation.h"
 namespace mitk {

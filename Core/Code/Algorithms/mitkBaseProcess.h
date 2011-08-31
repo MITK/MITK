@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkFixedArray.h>
 #endif
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <itkProcessObject.h>
 
 namespace mitk {

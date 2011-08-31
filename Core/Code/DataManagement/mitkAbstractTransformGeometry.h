@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkGeometry2D.h"
 #include "mitkPlaneGeometry.h"
 #include "itkVtkAbstractTransform.h"

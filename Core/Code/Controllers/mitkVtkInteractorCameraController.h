@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKVTKINTERACTORCAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 #define MITKVTKINTERACTORCAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkCameraController.h"
 #include "vtkRenderWindowInteractor.h"
 

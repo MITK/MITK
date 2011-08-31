@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPositionTracker_H
 #define MITKPositionTracker_H
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkStateMachine.h"
 
 

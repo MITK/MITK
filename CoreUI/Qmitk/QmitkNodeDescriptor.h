@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkNodeDescriptor_h
 #define QmitkNodeDescriptor_h
 
+#include <QmitkExports.h>
+
 #include <map>
 #include "mitkDataNode.h"
 #include <QList>

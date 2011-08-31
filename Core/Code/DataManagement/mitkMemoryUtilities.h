@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkMacro.h>
 #include <itkExceptionObject.h>
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk
 {

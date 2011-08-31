@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_LOG_H
 #define _MITK_LOG_H
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 
 namespace mitk
 {

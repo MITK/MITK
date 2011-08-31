@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKFOCUSMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKFOCUSMANAGER_H_HEADER_INCLUDED_C135A197
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include <vector>
 #include <itkEventObject.h>

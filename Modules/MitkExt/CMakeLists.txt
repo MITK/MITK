@@ -10,7 +10,6 @@ MITK_CREATE_MODULE( MitkExt
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
                DEPENDS Mitk ipSegmentation PlanarFigure ImageStatistics
                DEPENDS_INTERNAL pic2vtk IIL4MITK
-               PROVIDES mitkCoreExt
 )
 
 # this is needed for libraries which link to mitkCoreExt and need

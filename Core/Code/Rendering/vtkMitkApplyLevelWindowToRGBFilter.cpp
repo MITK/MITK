@@ -130,7 +130,7 @@ template <class T>
   double bias = tableRange[0] * scale;
 
   // find the region to loop over
-  maxC = inData->GetNumberOfScalarComponents()-1;
+  maxC = inData->GetNumberOfScalarComponents();
 
   //parameters for opaque level window
   double scaleOpac = (self->GetMaxOpacity() -self->GetMinOpacity() > 0 ? 255.0 / (self->GetMaxOpacity() - self->GetMinOpacity()) : 0.0);

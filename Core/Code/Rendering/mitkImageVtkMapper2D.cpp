@@ -847,7 +847,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
+//    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )

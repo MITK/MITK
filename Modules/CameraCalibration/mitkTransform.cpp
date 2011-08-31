@@ -8,15 +8,12 @@
 namespace mitk
 {
   // DO NOT CHANGE THE VALUES OF THESE CONSTANTS!!
-  const std::string Transform::UNKNOWN_TYPE = "UNKNOWN_TYPE";
-  const std::string Transform::CAMERA_EXTRINSICS = "CAMERA_EXTRINSICS";
-  const std::string Transform::ENDOSCOPE_SCOPE_TOOL = "ENDOSCOPE_SCOPE_TOOL";
-  const std::string Transform::ENDOSCOPE_CAM_TOOL = "ENDOSCOPE_CAM_TOOL";
-  const std::string Transform::CHESSBOARD_TOOL = "CHESSBOARD_TOOL";
-  const std::string Transform::POINTER_TOOL = "POINTER_TOOL";
-  const std::string Transform::POINTER_TO_CHESSBOARD_ORIGIN = "POINTER_TO_CHESSBOARD_ORIGIN";
-  const std::string Transform::POINTER_TO_CHESSBOARD_SUPPORTPOINT_X = "POINTER_TO_CHESSBOARD_SUPPORTPOINT_X";
-  const std::string Transform::POINTER_TO_CHESSBOARD_SUPPORTPOINT_Y = "POINTER_TO_CHESSBOARD_SUPPORTPOINT_Y";
+  const std::string Transform::UNKNOWN_TYPE = "Unknown type";
+  const std::string Transform::ENDOSCOPE_SCOPE_TOOL = "Endoscope scope tool";
+  const std::string Transform::ENDOSCOPE_CAM_TOOL = "Endoscope camera tool";
+  const std::string Transform::CHESSBOARD_TOOL = "Chessboard tool";
+  const std::string Transform::POINTER_TOOL = "Pointer tool";
+  const std::string Transform::BOARD_TO_BOARD_TOOL = "Board to board tool";
 
   Transform::Transform()
     : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )

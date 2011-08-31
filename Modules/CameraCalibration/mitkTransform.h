@@ -35,14 +35,11 @@ namespace mitk {
     /// represented here
     ///
     static const std::string UNKNOWN_TYPE;
-    static const std::string CAMERA_EXTRINSICS;
     static const std::string ENDOSCOPE_SCOPE_TOOL;
     static const std::string ENDOSCOPE_CAM_TOOL;
     static const std::string CHESSBOARD_TOOL;
     static const std::string POINTER_TOOL;
-    static const std::string POINTER_TO_CHESSBOARD_ORIGIN;
-    static const std::string POINTER_TO_CHESSBOARD_SUPPORTPOINT_X;
-    static const std::string POINTER_TO_CHESSBOARD_SUPPORTPOINT_Y;
+    static const std::string BOARD_TO_BOARD_TOOL;
 
 
     itkGetConstMacro(Type, std::string);

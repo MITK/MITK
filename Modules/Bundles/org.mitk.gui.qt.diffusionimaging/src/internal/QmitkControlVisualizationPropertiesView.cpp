@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
 #include <mitkQBallImage.h>
+#include <mitkTensorImage.h>
 
 const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.views.controlvisualizationpropertiesview";
 
@@ -741,10 +742,11 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     return;
   }
 
+
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
+    if( node.IsNotNull() && (dynamic_cast<mitk::QBallImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
     {
       if(m_NodeUsedForOdfVisualization.IsNotNull())
       {
@@ -956,6 +958,11 @@ void QmitkControlVisualizationPropertiesView::TextIntON()
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 {
   m_GlyIsOn_S = m_Controls->m_VisibleOdfsON_S->isChecked();
+  if (m_NodeUsedForOdfVisualization.IsNull())
+  {
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    return;
+  }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", m_GlyIsOn_S);
   VisibleOdfsON(0);
 }
@@ -963,6 +970,11 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
 {
   m_GlyIsOn_T = m_Controls->m_VisibleOdfsON_T->isChecked();
+  if (m_NodeUsedForOdfVisualization.IsNull())
+  {
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    return;
+  }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
   VisibleOdfsON(1);
 }
@@ -970,6 +982,11 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
 {
   m_GlyIsOn_C = m_Controls->m_VisibleOdfsON_C->isChecked();
+  if (m_NodeUsedForOdfVisualization.IsNull())
+  {
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    return;
+  }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
   VisibleOdfsON(2);
 }

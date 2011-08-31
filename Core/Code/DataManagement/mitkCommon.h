@@ -111,7 +111,7 @@ calling object*/
  *    class MITK_EXPORT ClassName : public SomeClass {};
  */
 #if defined(WIN32)
-  #ifdef mitkCore_EXPORTS
+  #ifdef Mitk_EXPORTS
     #define MITK_CORE_EXPORT __declspec(dllexport)
   #else
     #define MITK_CORE_EXPORT __declspec(dllimport)

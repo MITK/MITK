@@ -132,7 +132,7 @@ class GenericProperty : public BaseProperty
  * @param Type the value type of the GenericProperty
  */
 #define mitkSpecializeGenericProperty(PropertyName,Type,DefaultValue)  \
-class MITK_CORE_EXPORT PropertyName: public GenericProperty< Type >        \
+class MITK_EXPORT PropertyName: public GenericProperty< Type >        \
 {                                                         \
 public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \

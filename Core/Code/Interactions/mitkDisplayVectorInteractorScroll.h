@@ -44,9 +44,11 @@ namespace mitk {
     mitkClassMacro(DisplayVectorInteractorScroll, StateMachine);
     mitkNewMacro2Param(Self, const char*, OperationActor*);
 
+    #pragma GCC visibility push(default)
     itkEventMacro( InteractionEvent, itk::AnyEvent );
     itkEventMacro( StartInteractionEvent, InteractionEvent );
     itkEventMacro( EndInteractionEvent, InteractionEvent );
+    #pragma GCC visibility pop
 
     /**
     * @brief Method derived from OperationActor to recieve and execute operations

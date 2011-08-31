@@ -244,7 +244,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkSetObjectMacro(RenderingManager, RenderingManager);
     mitk::RenderingManager* GetRenderingManager() const;
 
+    #pragma GCC visibility push(default)
     itkEventMacro( UpdateEvent, itk::AnyEvent );
+    #pragma GCC visibility pop
 
     class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent 
     { 

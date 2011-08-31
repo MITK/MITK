@@ -37,6 +37,7 @@ class DisplayGeometry;
 class PlanarFigure;
 class PositionEvent;
 
+#pragma GCC visibility push(default)
 
 // Define events for PlanarFigure interaction notifications
 itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
@@ -48,7 +49,7 @@ itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
 
-
+#pragma GCC visibility pop
 
 
 /**

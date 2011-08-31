@@ -386,9 +386,12 @@ private:
 
 };
 
+#pragma GCC visibility push(default)
+
 itkEventMacro( RenderingManagerEvent, itk::AnyEvent );
 itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
+#pragma GCC visibility pop
 
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",

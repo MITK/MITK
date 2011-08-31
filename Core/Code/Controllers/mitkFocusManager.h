@@ -133,9 +133,13 @@ private:
   bool m_Loop;
 };
 
+#pragma GCC visibility push(default)
+
 //##Documentation
 //## @brief connect to this Event to get noticed when the focus changes
 itkEventMacro( FocusEvent , itk::AnyEvent ); 
+
+#pragma GCC visibility pop
 
 } // namespace mitk
 

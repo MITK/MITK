@@ -51,7 +51,9 @@ class MyTool : public Tool
 \endcode
 */
 
+#pragma GCC visibility push(default)
 itkEventMacro( ToolEvent, itk::ModifiedEvent );
+#pragma GCC visibility pop
 
 /**
   \brief Tool event with 1 parameter

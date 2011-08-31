@@ -83,7 +83,9 @@ public:
   static BaseRenderer* GetByName( const std::string& name );
   static vtkRenderWindow* GetRenderWindowByName( const std::string& name );
 
+  #pragma GCC visibility push(default)
   itkEventMacro( RendererResetEvent, itk::AnyEvent );
+  #pragma GCC visibility pop
 
   /** Standard class typedefs. */
   mitkClassMacro(BaseRenderer, itk::Object);

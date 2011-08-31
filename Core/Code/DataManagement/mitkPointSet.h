@@ -261,13 +261,14 @@ protected:
   bool m_CalculateBoundingBox;
 };
 
+#pragma GCC visibility push(default)
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );
 itkEventMacro( PointSetSizeChangeEvent, PointSetEvent );
 itkEventMacro( PointSetAddEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetRemoveEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetExtendTimeRangeEvent, PointSetEvent );
-
+#pragma GCC visibility pop
 
 } // namespace mitk
 

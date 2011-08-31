@@ -34,10 +34,12 @@ class DisplayPositionEvent;
 //## @ingroup Interaction
 
 //create events for interactions
+#pragma GCC visibility push(default)
 itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
 itkEventMacro(ScaleEvent, AffineInteractionEvent);
 itkEventMacro(RotateEvent, AffineInteractionEvent);
 itkEventMacro(TranslateEvent, AffineInteractionEvent);
+#pragma GCC visibility pop
 
 class MITK_CORE_EXPORT AffineInteractor : public Interactor
 {

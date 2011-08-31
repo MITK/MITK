@@ -331,9 +331,9 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
   {
-    m_DataStorage->Remove(it->Value());
+    //m_DataStorage->Remove(it->Value());
     it->Value()->SetProperty("helper object", mitk::BoolProperty::New(!state));
-    m_DataStorage->Add( it->Value(), m_ToolManager->GetWorkingData(0));
+    //m_DataStorage->Add( it->Value(), m_ToolManager->GetWorkingData(0));
   }
 
    mitk::DataStorage::SetOfObjects::ConstPointer contours3D = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("3DContourContainer"

@@ -272,7 +272,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
       {
           tmpValue+=this->m_DataBuffer[j][i];
       }
-      data[i] = tmpValue/numOfImages;
+      data[i] = tmpValue/currentBufferSize;
     }
     else if (m_ApplyTemporalMedianFilter)
     {

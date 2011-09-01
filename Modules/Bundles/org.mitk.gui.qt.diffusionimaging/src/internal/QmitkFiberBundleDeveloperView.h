@@ -51,6 +51,9 @@ struct Package4WorkingThread
   mitk::FiberBundleX* st_FBX;
   QTimer* st_idGenerateTimer;
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
+  
+  //functors to outdoor methods
+  
 };
 
 
@@ -72,6 +75,30 @@ public:
 private:
   //mitk::FiberBundleX* m_FBX;
 
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+  
+  
+};
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
+class QmitkFiberGenerateRandomWorker : public QObject
+{
+  Q_OBJECT
+  
+public:
+  
+  QmitkFiberGenerateRandomWorker( QThread*, Package4WorkingThread );
+  
+  public slots:
+  
+  void run();
+  
+private:
+  //mitk::FiberBundleX* m_FBX;
+  
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   
@@ -159,6 +186,9 @@ protected:
   void ResetFiberInfoWidget();
   void FeedFiberInfoWidget();
   void FBXDependendGUIElementsConfigurator(bool);
+  
+  void SetGeneratedFBX();
+  
   
   //contains the selected FiberBundle
   mitk::FiberBundleX* m_FiberBundleX;

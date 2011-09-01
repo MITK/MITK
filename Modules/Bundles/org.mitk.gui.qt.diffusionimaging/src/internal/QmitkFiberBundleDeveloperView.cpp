@@ -48,7 +48,7 @@
 
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
- */
+ * --generate FiberIDs--*/
 QmitkFiberIDWorker::QmitkFiberIDWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
 : m_itemPackage(itemPackage),
 m_hostingThread(hostingThread)
@@ -70,8 +70,37 @@ void QmitkFiberIDWorker::run()
   m_hostingThread->quit();
 
 }
+//===================================================================================
 
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ */
+QmitkFiberGenerateRandomWorker::QmitkFiberGenerateRandomWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+: m_itemPackage(itemPackage),
+m_hostingThread(hostingThread)
+{
+  
+}
+void QmitkFiberGenerateRandomWorker::run()
+{
+  
+  //accurate time measurement using ITK timeProbe
+  itk::TimeProbe clock;
+  clock.Start();
+  
 
+//  generateRandomFibers
+  
+  
+  //  m_itemPackage.st_setFibersToDS(generated stuff)->DoGenerateFiberIds();
+  
+  clock.Stop();
+//  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
+//  m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
+  m_hostingThread->quit();
+  
+}
+//===================================================================================
 
 
 
@@ -587,6 +616,15 @@ void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
   if (m_idGenerateTimer.isActive())
       m_idGenerateTimer.stop(); 
   m_threadInProgress = false;
+  
+  
+}
+
+/* THE WORKER ACCESS THIS METHOD TO PASS GENERATED FIBERBUNDLE
+ * TO DATASTORAGE */
+void QmitkFiberBundleDeveloperView::SetGeneratedFBX()
+{
+  
   
   
 }

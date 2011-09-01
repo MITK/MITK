@@ -19,6 +19,7 @@ SET(MODULE_TESTS
   mitkToFImageRecorderTest.cpp
   mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
+  mitkToFNrrdImageWriterTest.cpp
   mitkToFOpenCVImageGrabberTest.cpp
 )
 

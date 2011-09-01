@@ -236,26 +236,30 @@ ExternalProject_Add(${proj}
 # MITK
 #-----------------------------------------------------------------------------
 
-#MESSAGE(STATUS SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:${SUPERBUILD_EXCLUDE_MITKBUILD_TARGET})
-IF(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
-  SET(proj MITK-build)
-  ExternalProject_Add(${proj}
-    DOWNLOAD_COMMAND ""
-    CMAKE_GENERATOR ${gen}
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    BINARY_DIR MITK-build
-    INSTALL_COMMAND ""
-    DEPENDS
-      "MITK-Configure"
-    )
+IF(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
+  SET(mitk_build_cmd "$(MAKE)")
+ELSE()
+  SET(mitk_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build --config ${CMAKE_CFG_INTDIR})
 ENDIF()
 
+IF(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
+  SET(MITKBUILD_TARGET_ALL_OPTION "ALL")
+ELSE()
+  SET(MITKBUILD_TARGET_ALL_OPTION "")
+ENDIF()
+
+ADD_CUSTOM_TARGET(MITK-build ${MITKBUILD_TARGET_ALL_OPTION}
+  COMMAND ${mitk_build_cmd}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
+  DEPENDS MITK-Configure
+  )
+
 #-----------------------------------------------------------------------------
-# Custom target allowing to drive the build of MITK project itself
+# Custom target allowing to drive the build of the MITK project itself
 #-----------------------------------------------------------------------------
 
 ADD_CUSTOM_TARGET(MITK
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
+  COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
 )
 

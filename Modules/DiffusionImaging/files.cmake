@@ -62,14 +62,14 @@ SET(CPP_FILES
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
 
-  # DataStructures -> Tbss  
-  IODataStructures/TbssImages/mitkTbssImageSource.cpp  
-  IODataStructures/TbssImages/mitkNrrdTbssImageReader.cpp 
+  # DataStructures -> Tbss
+  IODataStructures/TbssImages/mitkTbssImageSource.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageReader.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageIOFactory.cpp
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
- 
+
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
@@ -81,11 +81,13 @@ SET(CPP_FILES
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
-  
+
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
   # Algorithms
+  Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
+  Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
 )
 
 SET(H_FILES
@@ -116,7 +118,7 @@ SET(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
 
 
- 
+
   # Tractography
   Tractography/itkGlobalTractographyFilter.h
 
@@ -132,6 +134,11 @@ SET(H_FILES
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
   Algorithms/itkGaussianInterpolateImageFunction.h
+  Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
+  Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h
+  Algorithms/itkDiffusionTensorPrincipleDirectionImageFilter.h
+  Algorithms/itkCartesianToPolarVectorImageFilter.h
+  Algorithms/itkPolarToCartesianVectorImageFilter.h
 )
 
 SET( TOOL_FILES

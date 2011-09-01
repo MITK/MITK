@@ -1,6 +1,7 @@
 SET(SRC_CPP_FILES
   QmitkODFDetailsWidget.cpp
   QmitkODFRenderWidget.cpp
+  QmitkPartialVolumeAnalysisWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -16,6 +17,7 @@ SET(INTERNAL_CPP_FILES
   QmitkGlobalFiberTrackingView.cpp
   QmitkFiberBundleOperationsView.cpp
   QmitkFiberBundleDeveloperView.cpp
+  QmitkPartialVolumeAnalysisView.cpp
 
 )
 
@@ -30,6 +32,7 @@ SET(UI_FILES
   src/internal/QmitkGlobalFiberTrackingViewControls.ui
   src/internal/QmitkFiberBundleOperationsViewControls.ui
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
+  src/internal/QmitkPartialVolumeAnalysisViewControls.ui
 
 )
 
@@ -48,6 +51,8 @@ SET(MOC_H_FILES
   src/internal/QmitkGlobalFiberTrackingView.h
   src/internal/QmitkFiberBundleOperationsView.h
   src/internal/QmitkFiberBundleDeveloperView.h
+  src/internal/QmitkPartialVolumeAnalysisView.h
+  src/QmitkPartialVolumeAnalysisWidget.h
 
 )
 
@@ -67,6 +72,7 @@ SET(CACHED_RESOURCE_FILES
   resources/OdfDetails.png
   resources/GlobalTracking.png
   resources/FiberBundleOperations.png
+  resources/PartialVolumeAnalysis_24.png
 )
 
 SET(QRC_FILES

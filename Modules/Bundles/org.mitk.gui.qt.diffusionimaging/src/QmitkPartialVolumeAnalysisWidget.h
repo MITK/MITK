@@ -15,15 +15,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkODFDetailsWidget_H_
-#define QmitkODFDetailsWidget_H_
+#ifndef QmitkPartialVolumeAnalysisWidget_H_
+#define QmitkPartialVolumeAnalysisWidget_H_
 
 #include "QmitkPlotWidget.h"
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
 #include "QmitkHistogram.h"
+#include "QmitkExtExports.h"
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
+#include "mitkPartialVolumeAnalysisClusteringCalculator.h"
 
 #include <qlayout.h>
 #include <qtextedit.h>
@@ -37,30 +39,36 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStandardItemModel>
 
 
+
+
 /**
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class DIFFUSIONIMAGING_EXPORT QmitkODFDetailsWidget : public QmitkPlotWidget
+class DIFFUSIONIMAGING_EXPORT QmitkPartialVolumeAnalysisWidget : public QmitkPlotWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-
   typedef mitk::Image::HistogramType HistogramType;
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
 
-  void SetParameters( std::vector<double> odfVals );
+  typedef mitk::PartialVolumeAnalysisClusteringCalculator ClusteringType;
+  typedef ClusteringType::ParamsType ParamsType;
+  typedef ClusteringType::ClusterResultType ResultsType;
+  typedef ClusteringType::HistType HistType;
 
-  QmitkODFDetailsWidget( QWidget * /*parent = 0 */);
-  virtual ~QmitkODFDetailsWidget();
+  /** \brief Set histogram to be displayed directly. */
+  void SetParameters( ParamsType *params, ResultsType *results, HistType *hist );
 
-  std::vector<double> m_Vals;
+  QmitkPartialVolumeAnalysisWidget( QWidget * /*parent = 0 */);
+  virtual ~QmitkPartialVolumeAnalysisWidget();
 
-private:
+  void DrawGauss();
 
-  std::vector<double> vec(vnl_vector<double> vector);
+  void ClearItemModel();
 
+  std::vector< std::vector<double>* > m_Vals;
 };
 
-#endif /* QmitkODFDetailsWidget_H_ */
+#endif /* QmitkPartialVolumeAnalysisWidget_H_ */

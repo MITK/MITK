@@ -15,6 +15,7 @@
 #include "src/internal/QmitkGlobalFiberTrackingView.h"
 #include "src/internal/QmitkFiberBundleOperationsView.h"
 #include "src/internal/QmitkFiberBundleDeveloperView.h"
+#include "src/internal/QmitkPartialVolumeAnalysisView.h"
 
 namespace mitk {
 
@@ -32,6 +33,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGlobalFiberTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleOperationsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

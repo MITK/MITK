@@ -237,7 +237,7 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
   {
     unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
 
-    if ( mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos()) )
+    if ( id == mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos()) )
     {
       //Creating PlanarFigure which currently serves as marker
       mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();

@@ -27,7 +27,7 @@ mitk::PlanePositionManager* mitk::PlanePositionManager::GetInstance()
   return m_Instance;
 }
 
-bool mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
+unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
 {
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
   Matrix3D matrix;
@@ -59,7 +59,7 @@ bool mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, 
       }
       itk::Vector<float> diffV = m_PositionList.at(i)->GetTransform()->GetOffset()-transform->GetOffset();
       if ( isSameMatrix && m_PositionList.at(i)->GetPos() == sliceIndex && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
-        return false;
+        return i;
     }
     
   }
@@ -68,7 +68,7 @@ bool mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, 
     plane->GetExtent(1), plane->GetSpacing(), sliceIndex, direction, transform);
 
   m_PositionList.push_back( newOp );
-  return true;
+  return GetNumberOfPlanePositions()-1;
 }
 
 bool mitk::PlanePositionManager::DeletePlanePosition( unsigned int ID )

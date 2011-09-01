@@ -36,7 +36,7 @@ namespace mitk
 
     static PlanePositionManager* GetInstance();
 
-    bool AddNewPlanePosition(const Geometry2D* plane, unsigned int sliceIndex = 0);
+    unsigned int AddNewPlanePosition(const Geometry2D* plane, unsigned int sliceIndex = 0);
 
     bool DeletePlanePosition(unsigned int ID);
 

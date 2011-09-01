@@ -87,6 +87,8 @@ public:
 
   mitk::SlicesSwiveller * GetSlicesSwiveller() const;
 
+  bool GetGradientBackgroundFlag() const;
+
   void InitializeWidget();
 
   /// called when the StdMultiWidget is closed to remove the 3 widget planes and the helper node from the DataStorage
@@ -272,6 +274,7 @@ protected:
   mitk::GradientBackground::Pointer m_GradientBackground2;
   mitk::GradientBackground::Pointer m_GradientBackground4;
   mitk::GradientBackground::Pointer m_GradientBackground3;
+  bool m_GradientBackgroundFlag;
   
   mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;

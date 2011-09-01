@@ -25,6 +25,8 @@
 
 class QWidget;
 class QCheckBox;
+class QPushButton;
+class QWidgetAction;
 
 struct MITK_QT_COMMON QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -56,9 +58,28 @@ public:
   ///
   virtual void Update();
 
+public slots:
+  void FirstColorChanged();
+
+  void SecondColorChanged();
+
+  void UseGradientBackgroundSelected();
+
+  void ColorActionChanged();
+
+  void ResetColors();
+
 protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableFlexibleZooming;  
+  QCheckBox* m_UseGradientBackground;
+  QCheckBox* m_ChangeBackgroundColors;
+  QPushButton* m_ColorButton1;
+  QPushButton* m_ColorButton2;
+  std::string m_FirstColor;
+  std::string m_SecondColor;
+  QString m_FirstColorStyleSheet;
+  QString m_SecondColorStyleSheet;
   berry::IPreferences::Pointer m_StdMultiWidgetEditorPreferencesNode;
 };
 

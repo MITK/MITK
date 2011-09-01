@@ -269,7 +269,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
 
     # Build top level (either all or the supplied targets at
     # superbuild level
-    if(SUPERBUILD_TARGETS)
+    if(SUPERBUILD_TARGETS AND NOT build_errors)
       foreach(superbuild_target ${SUPERBUILD_TARGETS})
         
         message("----------- [ Build ${superbuild_target} - SuperBuild ] -----------")
@@ -288,8 +288,6 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         string(REPLACE "^^" ";" external_project_with_build_dir_list "${external_project_with_build_dir}")
         list(GET external_project_with_build_dir_list 0 external_project_name)
         list(GET external_project_with_build_dir_list 1 external_project_builddir)
-        list(GET external_project_with_build_dir_list 2 external_project_superbuilddir)
-        list(GET external_project_with_build_dir_list 3 external_project_buildtarget)
                         
         set_property(GLOBAL PROPERTY SubProject ${external_project_name})
         set_property(GLOBAL PROPERTY Label ${external_project_name})
@@ -297,33 +295,20 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         message("----------- [ Build ${external_project_name} ] -----------")
         
         func_build_target("${external_project_name}" "${CTEST_BINARY_DIRECTORY}")
-       
-        # The next func_build_target calls are for continuous clients, to make sure
-        # the external project is completely build (targets added with ExternalProject_Add
-        # are not rebuild automatically if their sources changed
-        if(NOT build_errors AND external_project_superbuilddir)
-          func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_superbuilddir}")
-        endif()
         
-        if(NOT build_errors AND external_project_buildtarget)
-          func_build_target("${external_project_buildtarget}" "${CTEST_BINARY_DIRECTORY}/${external_project_superbuilddir}")
-        endif()
-       
-        if(NOT build_errors)
-          func_build_target("" "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
-        endif()
+        if (NOT build_errors)
+          # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+          file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
+          file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
         
-        # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-        file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
-        file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
-        
-        message("----------- [ Test ${external_project_name} ] -----------")
+          message("----------- [ Test ${external_project_name} ] -----------")
 
-        # runs only tests that have a LABELS property matching "${external_project_name}"
-        func_test(${external_project_name} "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
+          # runs only tests that have a LABELS property matching "${external_project_name}"
+          func_test(${external_project_name} "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
         
-        # restore old coverage dirs
-        file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
+          # restore old coverage dirs
+          file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
+        endif()
       
       endforeach()
 
@@ -336,8 +321,10 @@ ${INITIAL_CMAKECACHE_OPTIONS}
        message("----------- [ Build SuperBuild ] -----------")
     endif()
     
-    # build everything at superbuild level which has not yet been built
-    func_build_target("" "${CTEST_BINARY_DIRECTORY}")
+    if(NOT build_errors)
+      # build everything at superbuild level which has not yet been built
+      func_build_target("" "${CTEST_BINARY_DIRECTORY}")
+    endif()
     
     # runs only tests that have a LABELS property matching "SuperBuild" 
     #func_test("SuperBuild" "${CTEST_BINARY_DIRECTORY}")
@@ -360,38 +347,42 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       math(EXPR build_errors "${build_errors} + 1") 
     endif()
     
+    
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-      set_property(GLOBAL PROPERTY SubProject ${subproject})
-      set_property(GLOBAL PROPERTY Label ${subproject})
+      if(NOT build_errors)
+        set_property(GLOBAL PROPERTY SubProject ${subproject})
+        set_property(GLOBAL PROPERTY Label ${subproject})
 
-      if(subproject MATCHES "Unlabeled")
-        message("----------- [ Build All (Unlabeled) ] -----------")
-        # Build target
-        func_build_target("" "${build_dir}")
-      else()
-        message("----------- [ Build ${subproject} ] -----------")
-        # Build target
-        func_build_target(${subproject} "${build_dir}")
+        if(subproject MATCHES "Unlabeled")
+          message("----------- [ Build All (Unlabeled) ] -----------")
+          # Build target
+          func_build_target("" "${build_dir}")
+        else()
+          message("----------- [ Build ${subproject} ] -----------")
+          # Build target
+          func_build_target(${subproject} "${build_dir}")
+        endif()
       endif()
-
     endforeach()
     
-    # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-    file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
-    file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
-    
-    foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-      set_property(GLOBAL PROPERTY SubProject ${subproject})
-      set_property(GLOBAL PROPERTY Label ${subproject})
-      message("----------- [ Test ${subproject} ] -----------")
+    if(NOT build_errors)
+      # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+      file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
+      file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
+      
+      foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
+        set_property(GLOBAL PROPERTY SubProject ${subproject})
+        set_property(GLOBAL PROPERTY Label ${subproject})
+        message("----------- [ Test ${subproject} ] -----------")
 
-      # runs only tests that have a LABELS property matching "${subproject}"
-      func_test(${subproject} "${build_dir}")
-    endforeach()
+        # runs only tests that have a LABELS property matching "${subproject}"
+        func_test(${subproject} "${build_dir}")
+      endforeach()
+    endif()
     
     # Build any additional target which is not build by "all"
     # i.e. the "package" target
-    if(CTEST_PROJECT_ADDITIONAL_TARGETS)
+    if(CTEST_PROJECT_ADDITIONAL_TARGETS AND NOT build_errors)
       foreach(additional_target ${CTEST_PROJECT_ADDITIONAL_TARGETS})
         set_property(GLOBAL PROPERTY SubProject ${additional_target})
         set_property(GLOBAL PROPERTY Label ${additional_target})

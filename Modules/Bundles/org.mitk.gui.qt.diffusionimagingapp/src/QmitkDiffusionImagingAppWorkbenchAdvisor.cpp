@@ -1,23 +1,23 @@
 /*=========================================================================
- 
+
  Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-10-23 02:59:36 +0200 (Fri, 23 Oct 2009) $
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "QmitkDiffusionImagingAppWorkbenchAdvisor.h"
 
-#include "internal/QmitkDiffusionImagingAppApplicationPlugin.h"
+#include "internal/mitkPluginActivator.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>
@@ -43,7 +43,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer
   berry::IPreferencesService::Pointer prefService = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
   prefService->GetSystemPreferences()->Put(berry::WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT, berry::WorkbenchPreferenceConstants::RIGHT);
 
-  QString collectionFile = QmitkDiffusionImagingAppApplicationPlugin::GetDefault()->GetQtHelpCollectionFile();
+  QString collectionFile = mitkPluginActivator::GetDefault()->GetQtHelpCollectionFile();
   if (!collectionFile.isEmpty())
   {
 //    berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);

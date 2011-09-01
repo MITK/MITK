@@ -4,10 +4,11 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkDiffusionImagingAppApplicationPlugin.cpp
+  mitkPluginActivator.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
+  QmitkReconstructionPerspective.cpp
 )
 
 SET(UI_FILES
@@ -16,10 +17,11 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
-  src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
+  src/internal/mitkPluginActivator.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h
+  src/internal/QmitkReconstructionPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -29,6 +31,7 @@ SET(CACHED_RESOURCE_FILES
 # plug-in views in the workbench
   plugin.xml
   resources/diffusionimaging.png
+  resources/preprocessing.png
 )
 
 SET(QRC_FILES

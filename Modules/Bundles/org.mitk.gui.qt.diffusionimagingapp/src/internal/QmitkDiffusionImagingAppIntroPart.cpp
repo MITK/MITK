@@ -8,11 +8,11 @@
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "QmitkDiffusionImagingAppIntroPart.h"
@@ -33,7 +33,7 @@
 #include <QtCore/qconfig.h>
 #ifdef QT_WEBKIT
 #include <QWebView>
-#include <QWebPage> 
+#include <QWebPage>
 #endif
 #include <QString>
 #include <QStringList>
@@ -44,7 +44,7 @@
 
 
 #include "QmitkStdMultiWidgetEditor.h"
-#include "QmitkDiffusionImagingAppApplicationPlugin.h"
+#include "mitkPluginActivator.h"
 #include "mitkDataStorageEditorInput.h"
 
 #include "mitkBaseDataIOFactory.h"
@@ -57,7 +57,7 @@
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
   : m_Controls(NULL)
 {
-  berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionImagingAppApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
   workbenchPrefs->Flush();
 }
@@ -67,13 +67,13 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
   // if the workbench is not closing (that means, welcome screen was closed explicitly), set "Show_intro" false
   if (!this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
   {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionImagingAppApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
     workbenchPrefs->Flush();
   }
   else
   {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionImagingAppApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
     workbenchPrefs->Flush();
   }
@@ -101,10 +101,10 @@ void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
     m_Controls->setupUi(parent);
 #ifdef QT_WEBKIT
 
-    // create a QWebView as well as a QWebPage and QWebFrame within the QWebview 
+    // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
     m_view = new QWebView(parent);
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    
+
     QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/mitkdiffusionimagingappwelcomeview.html"),  QUrl::TolerantMode );
     m_view->load( urlQtResource );
 
@@ -135,9 +135,9 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   QByteArray dataset      = showMeNext.encodedQueryItemValue("dataset");
   QByteArray clear        = showMeNext.encodedQueryItemValue("clear");
 
-  if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;  
+  if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;
 
-  // if the scheme is set to mitk, it is to be tested which action should be applied 
+  // if the scheme is set to mitk, it is to be tested which action should be applied
   if (scheme.contains(QString("mitk")) )
   {
     if(urlPath.isEmpty() ) MITK_INFO << " mitk path is empty " ;

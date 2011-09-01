@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
 #define QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
 
+#include <QmitkExports.h>
+
 #include "ui_QmitkLevelWindowRangeChange.h"
 
 #include <QDialog>
-
-#include <mitkCommon.h>
 
 class QMITK_EXPORT QmitkLevelWindowRangeChangeDialog : public QDialog, public Ui::QmitkLevelWindowRangeChange
 {

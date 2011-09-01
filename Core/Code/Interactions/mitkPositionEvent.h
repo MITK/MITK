@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef POSITIONEVENT_H_HEADER_INCLUDED_C184F366
 #define POSITIONEVENT_H_HEADER_INCLUDED_C184F366
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkDisplayPositionEvent.h"
 #include "mitkVector.h"
 

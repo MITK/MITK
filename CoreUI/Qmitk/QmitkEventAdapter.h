@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKEVENTADAPTER_H_
 #define QMITKEVENTADAPTER_H_
 
+#include <QmitkExports.h>
+
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <mitkKeyEvent.h>

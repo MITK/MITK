@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObjectFactory.h"
 #include "itkImage.h"
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
 

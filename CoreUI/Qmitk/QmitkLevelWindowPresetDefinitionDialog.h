@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKLEVELWINDOWPRESETDEFINITIONDIALOG_H_
 #define QMITKLEVELWINDOWPRESETDEFINITIONDIALOG_H_
 
+#include <QmitkExports.h>
+
 #include "ui_QmitkLevelWindowPresetDefinition.h"
 
 #include <QDialog>
@@ -25,8 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <map>
 #include <string>
-
-#include <mitkCommon.h>
 
 class QMITK_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog, public Ui::QmitkLevelWindowPresetDefinition
 {

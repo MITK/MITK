@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 #define MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include <itkRGBPixel.h>
 

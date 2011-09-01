@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_TESTMANAGER_H_INCLUDED
 #define MITK_TESTMANAGER_H_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
   class MITK_CORE_EXPORT TestManager {

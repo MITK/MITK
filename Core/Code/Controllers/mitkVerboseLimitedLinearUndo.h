@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define VERBOSELIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E96
 
 // MITK header
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkLimitedLinearUndo.h"
 // STL header
 #include <vector>

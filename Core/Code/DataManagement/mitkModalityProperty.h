@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkModalityProperty_h_Included
 #define mitkModalityProperty_h_Included
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkEnumerationProperty.h"
 #include <itkObjectFactory.h>
 

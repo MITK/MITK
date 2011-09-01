@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef FILEREADER_H_HEADER_INCLUDED_C1E7E521
 #define FILEREADER_H_HEADER_INCLUDED_C1E7E521
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 

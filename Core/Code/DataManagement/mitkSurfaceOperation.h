@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #pragma once
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperation.h"
 
 #include <vtkPolyData.h>

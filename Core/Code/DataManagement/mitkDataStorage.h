@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDATASTORAGE_H_HEADER_INCLUDED_
 
 #include "itkObject.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMessage.h"
 #include "itkVectorContainer.h"
 #include "mitkDataNode.h"

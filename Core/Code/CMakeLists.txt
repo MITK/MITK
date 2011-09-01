@@ -12,6 +12,7 @@ MITK_CREATE_MODULE( Mitk
   DEPENDS mitkIpFunc mbilog tinyxml 
   DEPENDS_INTERNAL IIL4MITK pic2vtk
   PACKAGE_DEPENDS ITK VTK
+  EXPORT_DEFINE MITK_CORE_EXPORT
 )
 
 # this is needed for libraries which link to mitkCore and need

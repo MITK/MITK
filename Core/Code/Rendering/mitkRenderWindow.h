@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 #include "mitkRenderWindowBase.h"
 

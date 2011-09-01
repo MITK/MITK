@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 #define STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkState.h"
 #include "mitkTransition.h"
 #include "mitkAction.h"

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKDISPLAYVECTORINTERACTORSCROLL_H_HEADER_INCLUDED_C10DC4EB
 #define MITKDISPLAYVECTORINTERACTORSCROLL_H_HEADER_INCLUDED_C10DC4EB
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkStateMachine.h"
 
@@ -44,9 +44,11 @@ namespace mitk {
     mitkClassMacro(DisplayVectorInteractorScroll, StateMachine);
     mitkNewMacro2Param(Self, const char*, OperationActor*);
 
+    #pragma GCC visibility push(default)
     itkEventMacro( InteractionEvent, itk::AnyEvent );
     itkEventMacro( StartInteractionEvent, InteractionEvent );
     itkEventMacro( EndInteractionEvent, InteractionEvent );
+    #pragma GCC visibility pop
 
     /**
     * @brief Method derived from OperationActor to recieve and execute operations

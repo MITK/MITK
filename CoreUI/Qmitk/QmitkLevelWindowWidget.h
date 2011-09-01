@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKLEVELWINDOWWIDGET_H_
 #define QMITKLEVELWINDOWWIDGET_H_
 
+#include <QmitkExports.h>
+
 #include "ui_QmitkLevelWindowWidget.h"
 
 #include <QWidget>

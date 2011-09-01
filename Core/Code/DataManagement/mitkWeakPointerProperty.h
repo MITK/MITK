@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 #define MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include "itkWeakPointer.h"
 

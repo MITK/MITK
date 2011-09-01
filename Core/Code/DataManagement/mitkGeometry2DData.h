@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
 #define MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseData.h"
 #include "mitkGeometryData.h"
 #include "mitkGeometry2D.h"

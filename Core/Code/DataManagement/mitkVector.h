@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 #ifndef DOXYGEN_SKIP
 

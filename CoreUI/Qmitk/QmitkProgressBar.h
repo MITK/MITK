@@ -18,8 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef QMITKPROGRESSBAR_H
 #define QMITKPROGRESSBAR_H
+
+#include <QmitkExports.h>
+
 #include <mitkProgressBarImplementation.h>
-#include <mitkCommon.h>
 #include <QProgressBar>
 
 //##Documentation

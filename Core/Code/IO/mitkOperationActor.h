@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD
 #define OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk 
 {

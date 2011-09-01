@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKLEVELWINDOWWIDGETCONTEXTMENU_H
 #define QMITKLEVELWINDOWWIDGETCONTEXTMENU_H
 
+#include <QmitkExports.h>
+
 #include <mitkLevelWindowPreset.h>
 #include <mitkLevelWindowManager.h>
 #include <QMenu>

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 

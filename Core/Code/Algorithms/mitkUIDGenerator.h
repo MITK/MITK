@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include<string>
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 

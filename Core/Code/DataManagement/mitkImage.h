@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkSlicedData.h"
 #include "mitkPixelType.h"
 #include "mitkBaseData.h"

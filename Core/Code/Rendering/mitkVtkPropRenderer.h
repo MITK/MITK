@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 #define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"

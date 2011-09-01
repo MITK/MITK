@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
 #define MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkImageSource.h"
 #include "itkImageToImageFilterDetail.h"
 

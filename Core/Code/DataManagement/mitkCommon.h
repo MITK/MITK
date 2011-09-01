@@ -104,29 +104,23 @@ calling object*/
   return smartPtr;  \
 }
 
-/** provide a macro for adding MS specific __declspec(dllexport/-import)
- *  to classes.
- *  This is needed for the export of symbols, when you build a DLL. Then write
- *
- *    class MITK_EXPORT ClassName : public SomeClass {};
- */
+/**
+  * Macros for import/export declarations
+  */
 #if defined(WIN32)
-  #ifdef mitkCore_EXPORTS
-    #define MITK_CORE_EXPORT __declspec(dllexport)
-  #else
-    #define MITK_CORE_EXPORT __declspec(dllimport)
-  #endif
-  #ifdef Qmitk_EXPORTS
-    #define QMITK_EXPORT __declspec(dllexport)
-  #else
-    #define QMITK_EXPORT __declspec(dllimport)
-  #endif
+  #define MITK_EXPORT __declspec(dllexport)
+  #define MITK_IMPORT __declspec(dllimport)
+  #define MITK_LOCAL
 #else
-  #define MITK_CORE_EXPORT
-  #define QMITK_EXPORT
+  #if __GNUC__ >= 4
+    #define MITK_EXPORT __attribute__ ((visibility ("default")))
+    #define MITK_IMPORT __attribute__ ((visibility ("default")))
+    #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
+  #else
+    #define MITK_EXPORT
+    #define MITK_IMPORT
+    #define MITK_LOCAL
+  #endif
 #endif
 
-// legacy support for designer plugin
-#define MITK_EXPORT
-
-#endif
+#endif // MITK_COMMON_H_DEFINED

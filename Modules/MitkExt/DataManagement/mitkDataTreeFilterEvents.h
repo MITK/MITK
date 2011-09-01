@@ -25,8 +25,10 @@ namespace mitk {
 
 //------ TreeFilterUpdateAllEvent --------------------------------------------------------
 
+#pragma GCC visibility push(default)
 itkEventMacro( TreeFilterUpdateAllEvent, itk::ModifiedEvent );
 itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
+#pragma GCC visibility pop
 
 //------ TreeFilterItemEvent -------------------------------------------------------------
   class MitkExt_EXPORT TreeFilterItemEvent : public itk::ModifiedEvent

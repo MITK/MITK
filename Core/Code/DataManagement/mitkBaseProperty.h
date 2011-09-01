@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 #include <itkObjectFactory.h>
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 

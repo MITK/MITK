@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 
 // MITK header
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoModel.h"
 // STL header
@@ -123,6 +123,8 @@ private:
 
 };
 
+#pragma GCC visibility push(default)
+
 /// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (diable undo button)
 /// or when there are items in the stack (enable button)
 itkEventMacro( UndoStackEvent,     itk::ModifiedEvent );
@@ -133,6 +135,8 @@ itkEventMacro( RedoNotEmptyEvent,  UndoStackEvent );
 /// Additional unused events, if anybody wants to put an artificial limit to the possible number of items in the stack
 itkEventMacro( UndoFullEvent,      UndoStackEvent );
 itkEventMacro( RedoFullEvent,      UndoStackEvent );
+
+#pragma GCC visibility pop
 
 } //namespace mitk
 

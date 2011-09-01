@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGET_H_
 #define QMITKSTDMULTIWIDGET_H_
 
+#include <QmitkExports.h>
+
 #include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"

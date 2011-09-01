@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkODFRenderWidget_H_
 #define QmitkODFRenderWidget_H_
 
-#include <MitkDiffusionImagingExports.h>
+
+#include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
 #include <QWidget>
 #include <QmitkRenderWindow.h>
@@ -37,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 
 
-class QmitkODFRenderWidget : public QWidget
+class DIFFUSIONIMAGING_EXPORT QmitkODFRenderWidget : public QWidget
 {
   Q_OBJECT
 

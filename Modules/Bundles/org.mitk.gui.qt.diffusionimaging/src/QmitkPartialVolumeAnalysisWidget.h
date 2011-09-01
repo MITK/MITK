@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkPartialVolumeAnalysisWidget_H_
 
 #include "QmitkPlotWidget.h"
-#include <MitkDiffusionImagingExports.h>
+#include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
 #include "QmitkHistogram.h"
 #include "QmitkExtExports.h"
@@ -45,8 +45,9 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class MitkDiffusionImaging_EXPORT QmitkPartialVolumeAnalysisWidget : public QmitkPlotWidget
+class DIFFUSIONIMAGING_EXPORT QmitkPartialVolumeAnalysisWidget : public QmitkPlotWidget
 {
+  Q_OBJECT
 
 public:
   typedef mitk::Image::HistogramType HistogramType;

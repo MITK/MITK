@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkODFDetailsWidget_H_
 
 #include "QmitkPlotWidget.h"
-#include "MitkDiffusionImagingExports.h"
+#include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
 #include "QmitkHistogram.h"
 #include "mitkImage.h"
@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class QmitkODFDetailsWidget : public QmitkPlotWidget
+class DIFFUSIONIMAGING_EXPORT QmitkODFDetailsWidget : public QmitkPlotWidget
 {
 Q_OBJECT
 

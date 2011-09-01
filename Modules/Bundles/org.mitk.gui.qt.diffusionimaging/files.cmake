@@ -52,6 +52,7 @@ SET(MOC_H_FILES
   src/internal/QmitkFiberBundleOperationsView.h
   src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
+  src/QmitkPartialVolumeAnalysisWidget.h
 
 )
 

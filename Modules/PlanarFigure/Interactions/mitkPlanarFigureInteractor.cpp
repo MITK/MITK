@@ -273,7 +273,7 @@ bool mitk::PlanarFigureInteractor
     {
       // NOTE: Action name is a bit misleading; this action checks whether
       // the figure has already the minimum number of required points to
-      // be finished.
+      // be finished (by double-click)
 
       const mitk::PositionEvent *positionEvent =
         dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
@@ -283,10 +283,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      bool tooClose = !IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
-
-      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()
-        && !tooClose )
+      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints() )
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners
@@ -901,9 +898,9 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   // Check if a previous point has been set
   bool tooClose = false;
 
-  for( int i=0; i<planarFigure->GetNumberOfControlPoints() - 1; i++ )
+  for( int i=0; i<planarFigure->GetNumberOfControlPoints(); i++ )
   {
-    if ( i != planarFigure->GetSelectedControlPoint()-1 )
+    if ( i != planarFigure->GetSelectedControlPoint() )
     {
       // Try to convert previous point to current display coordinates
       mitk::Geometry2D *planarFigureGeometry =

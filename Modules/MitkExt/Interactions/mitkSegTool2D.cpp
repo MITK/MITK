@@ -288,14 +288,15 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   }
 }
 
-void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
+unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
+  unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+
   if (plane)
   {
-    unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
 
     if ( mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos()) )
     {

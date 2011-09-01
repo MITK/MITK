@@ -58,7 +58,7 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour /*,PlanePositionOperation*/)
+void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour ,RestorePlanePositionOperation* op)
 {
 
 
@@ -70,6 +70,11 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     }
     */
 
+  m_Iterator = m_ContourList.find(op);
+  int pos = std::distance(m_ContourList.begin(), m_Iterator);
+
+
+  //*(m_Iterator).second = newContour;
   if(m_PolyData->GetPoints()->GetNumberOfPoints() == 0)
   {
     //Hier noch überprüfen, ob contour schon existiert
@@ -90,7 +95,7 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
   //m_Contours->SetVtkPolyData(newContour->GetVtkPolyData(),m_ContourList.size());
     ContourPositionPair newData;
     newData.contour = newContour;
-    m_ContourList.push_back(newData);
+    //m_ContourList.push_back(newData);
     this->Modified();
   /*  m_Modified = true;*/
 
@@ -106,13 +111,22 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate()
   m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
   m_InterpolateSurfaceFilter->SetDistanceImageVolume(50000);
 
-  for (unsigned int i = 0; i < m_ContourList.size(); i++)
-  {
-    m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
-    m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
-    m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
-  }
+  //for (unsigned int i = 0; i < m_ContourList.size(); i++)
+  //{
+  //  m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
+  //  m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
+  //  m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
+  //}
 
+  unsigned int index(0);
+  for (m_Iterator = m_ContourList.begin(); m_Iterator != m_ContourList.end(); m_Iterator++)
+  {
+    
+    m_ReduceFilter->SetInput(index,(*m_Iterator).second);
+    m_NormalsFilter->SetInput(index,m_ReduceFilter->GetOutput(index));
+    m_InterpolateSurfaceFilter->SetInput(index,m_NormalsFilter->GetOutput(index));
+    index++;
+  }
   //m_ReduceFilter->SetMinSpacing(m_MinSpacing);
   //m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
   //m_ReduceFilter->SetReductionType(mitk::ReduceContourSetFilter::NTH_POINT);

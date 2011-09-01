@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-//#include "mitkRestorePlanePositionOperation.h"
+#include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
@@ -50,7 +50,7 @@ namespace mitk
     /*
      * Adds a new extracted contour to the list 
      */
-    void AddNewContour(Surface::Pointer newContour/*, RestorePlanePostionOperation &op*/);
+    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
 
     /*
      * If a contour at the position represented by the RestorePlaneOperation already exists
@@ -83,13 +83,14 @@ namespace mitk
 
    struct ContourPositionPair {
      Surface::Pointer contour;
-     //RestorePlanePosition* position;
+     RestorePlanePositionOperation* position;
    };
 
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    //typedef std::map< const RestorePlanePositionOperation*, Surface* > ContourPositionList;
+    //typedef std::vector<ContourPositionPair> ContourPositionPairList;
+    typedef std::map< RestorePlanePositionOperation*, Surface* > ContourPositionPairList;
 
     ContourPositionPairList m_ContourList;
+    ContourPositionPairList::iterator m_Iterator;
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;

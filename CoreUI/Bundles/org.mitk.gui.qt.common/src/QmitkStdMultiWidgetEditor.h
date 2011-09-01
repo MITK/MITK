@@ -22,6 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPartListener.h>
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
+	
+#include <berryISelection.h>
+#include <berryISelectionProvider.h>
+#include <berryISelectionListener.h>
 
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDnDFrameWidget.h>
@@ -73,6 +77,8 @@ private:
 
   QmitkStdMultiWidget* m_StdMultiWidget;
   QmitkDnDFrameWidget* m_DndFrameWidget;
+  std::string m_FirstBackgroundColor;
+  std::string m_SecondBackgroundColor;
 };
 
 #endif /*QMITKSTDMULTIWIDGETEDITOR_H_*/

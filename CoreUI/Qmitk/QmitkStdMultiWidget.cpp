@@ -59,6 +59,7 @@ m_PlaneNode1(NULL),
 m_PlaneNode2(NULL), 
 m_PlaneNode3(NULL), 
 m_Node(NULL),
+m_GradientBackgroundFlag(true),
 m_PendingCrosshairPositionEvent(false)
 {
   /*******************************/
@@ -1716,6 +1717,10 @@ int QmitkStdMultiWidget::GetLayout() const
   return m_Layout;
 }
 
+bool QmitkStdMultiWidget::GetGradientBackgroundFlag() const
+{
+  return m_GradientBackgroundFlag;
+}
 
 void QmitkStdMultiWidget::EnableGradientBackground()
 {
@@ -1725,6 +1730,7 @@ void QmitkStdMultiWidget::EnableGradientBackground()
   //m_GradientBackground2->Enable();
   //m_GradientBackground3->Enable();
   m_GradientBackground4->Enable();
+  m_GradientBackgroundFlag = true;
 }
 
 
@@ -1734,6 +1740,7 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   //m_GradientBackground2->Disable();
   //m_GradientBackground3->Disable();
   m_GradientBackground4->Disable();
+  m_GradientBackgroundFlag = false;
 }
 
 
@@ -1930,6 +1937,7 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
   m_GradientBackground2->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
   m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
   m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+  m_GradientBackgroundFlag = true;
 }
 
 

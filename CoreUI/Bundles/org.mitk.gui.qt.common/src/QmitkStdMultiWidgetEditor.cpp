@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QWidget>
 
+#include <mitkColorProperty.h>
 #include <mitkGlobalInteraction.h>
 
 #include <mitkDataStorageEditorInput.h>
@@ -120,7 +121,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
     std::string departmentLogoLocation = logoPref->Get("DepartmentLogo","");
 
-
     //# Preferences
 
     berry::IBerryPreferences::Pointer prefs
@@ -141,11 +141,30 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
+
+    this->OnPreferencesChanged(prefs.GetPointer());
   }
 }
 
 void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  // preferences for gradient background
+  float color = 255.0;
+  QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));
+  QColor firstColor(firstColorName);
+  mitk::Color upper;
+  upper[0] = firstColor.red() / color;
+  upper [1] = firstColor.green() / color;
+  upper[2] = firstColor.blue() / color;
+
+  QString secondColorName = QString::fromStdString (prefs->GetByteArray("second background color", ""));
+  QColor secondColor(secondColorName);
+  mitk::Color lower;
+  lower[0] = secondColor.red() / color;
+  lower[1] = secondColor.green() / color;
+  lower[2] = secondColor.blue() / color;
+  m_StdMultiWidget->SetGradientBackgroundColors(upper, lower);
+  m_StdMultiWidget->EnableGradientBackground();
 
   // Set preferences respecting zooming and padding
   bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);

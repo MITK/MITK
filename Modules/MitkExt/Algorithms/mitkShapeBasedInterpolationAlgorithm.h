@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkShapeBasedInterpolationAlgorithm_h_Included
 
 #include "mitkSegmentationInterpolationAlgorithm.h"
+#include "mitkLegacyAdaptors.h"
 #include "MitkExtExports.h"
 
 namespace mitk

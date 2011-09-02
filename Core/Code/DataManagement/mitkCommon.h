@@ -104,6 +104,20 @@ calling object*/
   return smartPtr;  \
 }
 
+/** cross-platform deprecation macro
+
+  \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
+*/
+#ifdef __GNUC__
+  #define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+  #define DEPRECATED(func) __declspec(deprecated) func
+#else
+  #pragma message("WARNING: You need to implement DEPRECATED for your compiler!")
+  #define DEPRECATED(func) func
+#endif
+
+
 /** provide a macro for adding MS specific __declspec(dllexport/-import)
  *  to classes.
  *  This is needed for the export of symbols, when you build a DLL. Then write

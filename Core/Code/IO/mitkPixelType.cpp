@@ -93,8 +93,12 @@ mitk::PixelType& mitk::PixelType::operator =( const mitk::PixelType& other)
 }
 
 mitk::PixelType::PixelType( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType )
-  : m_ComponentType( aTypeId ), m_PixelType( typeid(anItkIoPixelType) ), m_NumberOfComponents( numberOfComponents )
+  : m_ComponentType( aTypeId ), m_PixelType( typeid(anItkIoPixelType) ), m_NumberOfComponents( numberOfComponents ),
+    m_PixelTypeName( m_PixelType.name() ), m_ComponentTypeName( m_ComponentType.name() ),
+    m_BytesPerComponent(0)
 {
+  m_BytesPerComponent = sizeof( m_ComponentType );
+
   Initialize( aTypeId, numberOfComponents, anItkIoPixelType );
 }
 

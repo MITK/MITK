@@ -188,7 +188,8 @@ PixelType MakePixelType()
                    );
 }
 
-template< typename ItkImageType>
+/*
+template< typename ItkImageType >
 PixelType MakePixelType()
 {
   // define new type, since the ::PixelType is used to distinguish between simple and compound types
@@ -212,7 +213,7 @@ PixelType MakePixelType()
             PixelTypeToString<PixelT >()
          );
 }
-
+*/
 
 } // namespace mitk
 

@@ -69,7 +69,10 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
 
   if(params != 0 && results != 0)
   {
+    hist->Print();
     params->Print();
+    results->Print();
+
 
     for(unsigned int i=0; i<m_Vals.size(); i++)
     {

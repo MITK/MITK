@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>327</width>
-    <height>427</height>
+    <width>343</width>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -160,8 +160,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../../resources/QmitkDiffusionImagingInternal.qrc">
-                <normaloff>:/QmitkPartialVolumeAnalysisView/circle.png</normaloff>:/QmitkPartialVolumeAnalysisView/circle.png</iconset>
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -189,8 +189,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../../resources/QmitkDiffusionImagingInternal.qrc">
-                <normaloff>:/QmitkPartialVolumeAnalysisView/rectangle.png</normaloff>:/QmitkPartialVolumeAnalysisView/rectangle.png</iconset>
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/rectangle.png</normaloff>:/QmitkDiffusionImaging/rectangle.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -218,8 +218,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../../resources/QmitkDiffusionImagingInternal.qrc">
-                <normaloff>:/QmitkPartialVolumeAnalysisView/polygon.png</normaloff>:/QmitkPartialVolumeAnalysisView/polygon.png</iconset>
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>:/QmitkDiffusionImaging/polygon.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -756,7 +756,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../resources/QmitkDiffusionImagingInternal.qrc"/>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
  </resources>
  <connections/>
 </ui>

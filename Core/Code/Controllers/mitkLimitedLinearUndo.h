@@ -26,7 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 // STL header
 #include <vector>
 // ITK header
-#include<itkEventObject.h>
+#pragma GCC visibility push(default)
+#include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk {
 

@@ -7,7 +7,9 @@
 #include "itkProcessObject.h"
 #include "itkLightObject.h"
 #include "itkObjectFactoryBase.h"
-#include "itkEventObject.h"
+#pragma GCC visibility push(default)
+#include <itkEventObject.h>
+#pragma GCC visibility pop
 #include "itkSmartPointerForwardReference.h"
 #include "itkAffineTransform.h"
 #include "itkMatrixOffsetTransformBase.h"

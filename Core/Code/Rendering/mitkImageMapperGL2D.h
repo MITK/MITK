@@ -27,7 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <assert.h>
 
 #include <itkCommand.h>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 #include <vtkSystemIncludes.h>
 

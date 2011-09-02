@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_NON_BLOCKING_ALGORHITHMS_ENVETS_H_INCLDUED
 #define MITK_NON_BLOCKING_ALGORHITHMS_ENVETS_H_INCLDUED
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include "MitkExtExports.h"
 
 namespace mitk {

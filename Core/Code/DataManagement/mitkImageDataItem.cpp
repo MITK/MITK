@@ -38,7 +38,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   m_Data(NULL), m_ManageMemory(false), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
   m_Parent(&aParent)
 {
-  m_PixelType = aParent.GetPixelType();
+  m_PixelType = new mitk::PixelType(aParent.GetPixelType());
   m_Data = static_cast<unsigned char*>(aParent.GetData())+offset;
 
   // compute size
@@ -77,7 +77,7 @@ mitk::ImageDataItem::~ImageDataItem()
 mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory)
   : m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0)
 {
-  m_PixelType = desc->GetChannelDescriptor(0)->GetPixelType();
+  m_PixelType = new mitk::PixelType(desc->GetChannelDescriptor(0)->GetPixelType());
 
   // compute size
   const unsigned int *dimensions = desc->GetDimensions();
@@ -94,7 +94,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0),
   m_Parent(NULL)
 {
-  m_PixelType = type;
+  m_PixelType = new mitk::PixelType(type);
 
   this->ComputeItemSize(dimensions, dimension);
 
@@ -118,7 +118,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
 
 void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
 {
-  m_Size = m_PixelType.GetSize();
+  m_Size = m_PixelType->GetSize();
   for( unsigned int i=0; i<dimension; i++)
   {
     m_Size *= *(dimensions+i);
@@ -127,6 +127,10 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
 
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
+  std::cout << m_PixelType->GetSize() << ",typeid "
+            << m_PixelType->GetItkTypeAsString() << ",name "
+            << m_PixelType->GetTypeId().name() << std::endl;
+
   vtkImageData *inData = vtkImageData::New();
   vtkDataArray *scalars = NULL;
 
@@ -162,59 +166,59 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
     return;
   }
 
-  inData->SetNumberOfScalarComponents(m_PixelType.GetNumberOfComponents());
+  inData->SetNumberOfScalarComponents(m_PixelType->GetNumberOfComponents());
 
 /*  if ( ( m_PixelType.GetType() == mitkIpPicInt || m_PixelType.GetType() == mitkIpPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
   {
     inData->SetScalarType( VTK_BIT );
     scalars = vtkBitArray::New();
   }
-  else*/ if ( m_PixelType == typeid(char) )
+  else*/ if ( m_PixelType->GetTypeId() == typeid(char) )
   {
     inData->SetScalarType( VTK_CHAR );
     scalars = vtkCharArray::New();
   }
-  else if (  m_PixelType == typeid(unsigned char))
+  else if (   m_PixelType->GetTypeId() == typeid(unsigned char))
   {
     inData->SetScalarType( VTK_UNSIGNED_CHAR );
     scalars = vtkUnsignedCharArray::New();
   }
-  else if ( m_PixelType == typeid(short) )
+  else if (  m_PixelType->GetTypeId() == typeid(short) )
   {
     inData->SetScalarType( VTK_SHORT );
     scalars = vtkShortArray::New();
   }
-  else if (  m_PixelType == typeid(unsigned short) )
+  else if (   m_PixelType->GetTypeId() == typeid(unsigned short) )
   {
     inData->SetScalarType( VTK_UNSIGNED_SHORT );
     scalars = vtkUnsignedShortArray::New();
   }
-  else if ( m_PixelType == typeid(int) )
+  else if (  m_PixelType->GetTypeId() == typeid(int) )
   {
     inData->SetScalarType( VTK_INT );
     scalars = vtkIntArray::New();
   }
-  else if (  m_PixelType == typeid(unsigned int) )
+  else if (   m_PixelType->GetTypeId() == typeid(unsigned int) )
   {
     inData->SetScalarType( VTK_UNSIGNED_INT );
     scalars = vtkUnsignedIntArray::New();
   }
-  else if (m_PixelType == typeid(long int) )
+  else if ( m_PixelType->GetTypeId() == typeid(long int) )
   {
     inData->SetScalarType( VTK_LONG );
     scalars = vtkLongArray::New();
   }
-  else if ( m_PixelType == typeid(unsigned long int) )
+  else if (  m_PixelType->GetTypeId() == typeid(unsigned long int) )
   {
     inData->SetScalarType( VTK_UNSIGNED_LONG );
     scalars = vtkUnsignedLongArray::New();
   }
-  else if ( m_PixelType == typeid(float)  )
+  else if (  m_PixelType->GetTypeId() == typeid(float)  )
   {
     inData->SetScalarType( VTK_FLOAT );
     scalars = vtkFloatArray::New();
   }
-  else if ( m_PixelType == typeid(double)  )
+  else if (  m_PixelType->GetTypeId() == typeid(double)  )
   {
     inData->SetScalarType( VTK_DOUBLE );
     scalars = vtkDoubleArray::New();

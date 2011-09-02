@@ -1,53 +1,54 @@
 /*=========================================================================
- 
+
  Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
-#include "QmitkDiffusionImagingAppApplicationPlugin.h"
+#include "mitkPluginActivator.h"
 #include <QtPlugin>
 #include <mitkVersion.h>
 #include <berryQtAssistantUtil.h>
 
 #include "src/QmitkDiffusionImagingAppApplication.h"
 
-#include "src/internal/QmitkDiffusionImagingAppIntroPart.h"
-#include "src/internal/QmitkDiffusionImagingAppPerspective.h"
-#include "src/internal/QmitkWelcomePerspective.h"
+#include "QmitkDiffusionImagingAppIntroPart.h"
+#include "QmitkDiffusionImagingAppPerspective.h"
+#include "QmitkWelcomePerspective.h"
+#include "QmitkReconstructionPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>
 
-QmitkDiffusionImagingAppApplicationPlugin* QmitkDiffusionImagingAppApplicationPlugin::inst = 0;
+mitkPluginActivator* mitkPluginActivator::inst = 0;
 
-QmitkDiffusionImagingAppApplicationPlugin::QmitkDiffusionImagingAppApplicationPlugin()
+mitkPluginActivator::mitkPluginActivator()
     : pluginListener(0)
 {
   inst = this;
 }
 
-QmitkDiffusionImagingAppApplicationPlugin::~QmitkDiffusionImagingAppApplicationPlugin()
+mitkPluginActivator::~mitkPluginActivator()
 {
   delete pluginListener;
 }
 
-QmitkDiffusionImagingAppApplicationPlugin* QmitkDiffusionImagingAppApplicationPlugin::GetDefault()
+mitkPluginActivator* mitkPluginActivator::GetDefault()
 {
   return inst;
 }
 
-void QmitkDiffusionImagingAppApplicationPlugin::start(ctkPluginContext* context)
+void mitkPluginActivator::start(ctkPluginContext* context)
 {
   berry::AbstractUICTKPlugin::start(context);
 
@@ -57,6 +58,7 @@ void QmitkDiffusionImagingAppApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)
 
 //  QString collectionFile = GetQtHelpCollectionFile();
 
@@ -73,7 +75,7 @@ void QmitkDiffusionImagingAppApplicationPlugin::start(ctkPluginContext* context)
 
 }
 
-QString QmitkDiffusionImagingAppApplicationPlugin::GetQtHelpCollectionFile() const
+QString mitkPluginActivator::GetQtHelpCollectionFile() const
 {
 
     if (!helpCollectionFile.isEmpty())
@@ -117,6 +119,6 @@ QString QmitkDiffusionImagingAppApplicationPlugin::GetQtHelpCollectionFile() con
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_diffusionimagingapp, QmitkDiffusionImagingAppApplicationPlugin)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_diffusionimagingapp, mitkPluginActivator)
 
 

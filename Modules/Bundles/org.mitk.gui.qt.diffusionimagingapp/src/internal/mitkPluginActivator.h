@@ -24,7 +24,7 @@
 
 #include <berryQCHPluginListener.h>
 
-class QmitkDiffusionImagingAppApplicationPlugin :
+class mitkPluginActivator :
     public QObject, public berry::AbstractUICTKPlugin
 {
   Q_OBJECT
@@ -32,10 +32,10 @@ class QmitkDiffusionImagingAppApplicationPlugin :
 
 public:
 
-      QmitkDiffusionImagingAppApplicationPlugin();
-      ~QmitkDiffusionImagingAppApplicationPlugin();
+      mitkPluginActivator();
+      ~mitkPluginActivator();
 
-      static QmitkDiffusionImagingAppApplicationPlugin* GetDefault();
+      static mitkPluginActivator* GetDefault();
 
       ctkPluginContext* GetPluginContext() const;
 
@@ -45,7 +45,7 @@ public:
 
     private:
 
-      static QmitkDiffusionImagingAppApplicationPlugin* inst;
+      static mitkPluginActivator* inst;
 
       ctkPluginContext* context;
       berry::QCHPluginListener* pluginListener;

@@ -1629,15 +1629,22 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   std::stringstream stream;
 
-  // get the position and gray value from the image and build up status bar text
   mitk::Index3D p;
   if(image3D.IsNotNull())
   {
     image3D->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
-    stream<<"Position: <"<<crosshairPos[0] << ", " << crosshairPos[1] << ", " << crosshairPos[2] << "> mm";
+    stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+    mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
+    if (fabs(pixelValue)>1000000)
+    {
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+    }
+    else
+    {
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+    }
   }
   else
   {

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <MitkExports.h>
+#include <mitkCommon.h>
 #include <itkProcessObject.h>
 
 namespace mitk {

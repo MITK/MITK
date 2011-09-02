@@ -41,7 +41,7 @@ namespace mitk {
     //## @brief Constructor
     //## @param id: mitk internal EventID
     //## @param event: the information about the appeared event
-    StateEvent(int id, Event const* event = NULL );
+    StateEvent(int id, Event const* event = 0 );
 
     ~StateEvent();
 

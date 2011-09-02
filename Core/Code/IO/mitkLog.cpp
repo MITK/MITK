@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLog.h"
+#include "mitkLogMacros.h"
 
 #include "itkSimpleFastMutexLock.h"
 #include <itkOutputWindow.h>

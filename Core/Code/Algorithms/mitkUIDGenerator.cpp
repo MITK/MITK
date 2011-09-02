@@ -16,7 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkUIDGenerator.h>
+#include <mitkLogMacros.h>
+
 #include <ctime>
+#include <cstdlib>
 #include <sstream>
 #include <math.h>
 #include <stdexcept>
@@ -34,7 +37,7 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
     throw std::invalid_argument("To few digits requested");
   }
 
-  srand((unsigned int) time( (time_t *)0 ));
+  std::srand((unsigned int) time( (time_t *)0 ));
 }
 
 std::string UIDGenerator::GetUID()

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 
 #include <MitkExports.h>
+#include <mitkCommon.h>
 #include "itkObject.h"
 
 namespace mitk {

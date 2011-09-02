@@ -26,7 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractor.h"
 #include "mitkBaseRenderer.h"
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk
 {

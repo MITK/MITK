@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_DATATREEFILTEREVENTS_H_INCLUDED
 #define MITK_DATATREEFILTEREVENTS_H_INCLUDED
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include "MitkExtExports.h"
 
 namespace mitk {

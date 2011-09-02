@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define SLICESROTATOR_H_HEADER_INCLUDED_C1C55A2F
 
 #include <mitkSlicesCoordinator.h>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include <mitkVector.h>
 
 namespace mitk {

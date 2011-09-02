@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkCallbackFromGUIThread.h"
+#include <mitkLogMacros.h>
 
 mitk::CallbackFromGUIThread* mitk::CallbackFromGUIThread::m_Instance = NULL;
 mitk::CallbackFromGUIThreadImplementation* mitk::CallbackFromGUIThread::m_Implementation = NULL;

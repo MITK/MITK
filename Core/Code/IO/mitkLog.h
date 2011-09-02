@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_LOG_H
 
 #include <MitkExports.h>
+#include <mbilog.h>
 
 namespace mitk
 {

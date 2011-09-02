@@ -24,7 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkMessage.h"
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include <itkCommand.h>
 #include <mitkIpPicTypeMultiplex.h>
 #include <sstream>

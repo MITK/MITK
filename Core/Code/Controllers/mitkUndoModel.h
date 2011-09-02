@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef UNDOMODEL_H_HEADER_INCLUDED_C16ED098
 #define UNDOMODEL_H_HEADER_INCLUDED_C16ED098
 
+#include "mitkCommon.h"
 #include "mitkOperation.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>

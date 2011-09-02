@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkObject.h>
 #include <MitkIGTExports.h>
+#include <mitkCommon.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 

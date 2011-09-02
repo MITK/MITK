@@ -24,6 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
 
+#include <itkSmartPointer.h>
+
+#include <vector>
+#include <map>
+
 namespace mitk {
   struct ltstr
   {

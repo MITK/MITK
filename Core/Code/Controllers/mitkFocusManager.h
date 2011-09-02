@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include <vector>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk {
 

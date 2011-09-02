@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRealTimeClock.h"
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk
 {

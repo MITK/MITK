@@ -104,23 +104,4 @@ calling object*/
   return smartPtr;  \
 }
 
-/**
-  * Macros for import/export declarations
-  */
-#if defined(WIN32)
-  #define MITK_EXPORT __declspec(dllexport)
-  #define MITK_IMPORT __declspec(dllimport)
-  #define MITK_LOCAL
-#else
-  #if __GNUC__ >= 4
-    #define MITK_EXPORT __attribute__ ((visibility ("default")))
-    #define MITK_IMPORT __attribute__ ((visibility ("default")))
-    #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
-  #else
-    #define MITK_EXPORT
-    #define MITK_IMPORT
-    #define MITK_LOCAL
-  #endif
-#endif
-
 #endif // MITK_COMMON_H_DEFINED

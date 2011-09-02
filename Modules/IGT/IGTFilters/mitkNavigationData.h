@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNAVIGATIONDATA_H_HEADER_INCLUDED_
 #include <itkDataObject.h>
 #include <MitkIGTExports.h>
+#include <mitkCommon.h>
 #include <mitkVector.h>
 
 namespace mitk {

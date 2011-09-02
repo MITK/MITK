@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __MITK_FILE_SERIES_READER__H_
 
 #include <MitkExports.h>
+#include <mitkCommon.h>
 #include <mitkFileReader.h>
 #include <vector>
 #include <string> 

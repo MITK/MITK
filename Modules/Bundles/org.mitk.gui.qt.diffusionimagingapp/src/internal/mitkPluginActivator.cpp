@@ -27,6 +27,7 @@
 #include "QmitkWelcomePerspective.h"
 #include "QmitkReconstructionPerspective.h"
 #include "QmitkTrackingPerspective.h"
+#include "QmitkFileImportPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -59,6 +60,7 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
   //BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFileImportPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTrackingPerspective,  context)
 

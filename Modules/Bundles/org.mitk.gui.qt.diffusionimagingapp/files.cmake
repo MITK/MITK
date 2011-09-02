@@ -10,6 +10,7 @@ SET(INTERNAL_CPP_FILES
   QmitkWelcomePerspective.cpp
   QmitkReconstructionPerspective.cpp
   QmitkTrackingPerspective.cpp
+  QmitkFileImportPerspective.cpp
 )
 
 SET(UI_FILES
@@ -24,6 +25,7 @@ SET(MOC_H_FILES
   src/internal/QmitkWelcomePerspective.h
   src/internal/QmitkReconstructionPerspective.h
   src/internal/QmitkTrackingPerspective.h
+  src/internal/QmitkFileImportPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -32,6 +34,7 @@ SET(CACHED_RESOURCE_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
   plugin.xml
+  resources/icon_dicom.xpm
   resources/diffusionimaging.png
   resources/preprocessing.png
 )

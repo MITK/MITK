@@ -15,7 +15,6 @@ MITK_CREATE_MODULE(MitkIGT
   INCLUDE_DIRS IGTFilters IGTTrackingDevices IGTToolManagement
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS Mitk tinyxml SceneSerialization
-  PROVIDES mitkIGT
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 
@@ -29,8 +28,7 @@ CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
 # add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)TARGET_LINK_LIBRARIES(SerialCommunicationTest mitkIGT mitkCore tinyxml PocoXML)
 
-ADD_EXECUTABLE (IGTTutorialStep1 IGTTutorial/IGTTutorialStep1.cpp)
-TARGET_LINK_LIBRARIES(IGTTutorialStep1 mitkIGT mitkCore tinyxml PocoXML)
+ADD_SUBDIRECTORY(IGTTutorial)
 
 ADD_SUBDIRECTORY(Testing)
 ENDIF(_RESULT)

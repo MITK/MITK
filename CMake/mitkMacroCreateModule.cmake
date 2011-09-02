@@ -12,7 +12,6 @@
 #!     [INCLUDE_DIRS <include directories>]
 #!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
 #!     [DEPENDS <modules we need>]
-#!     [PROVIDES <library name which is built>]
 #!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
 #!     [TARGET_DEPENDS <list of additional dependencies>
 #!     [EXPORT_DEFINE <declspec macro name for dll exports>]
@@ -24,12 +23,14 @@
 ##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE
-                        "SUBPROJECTS;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PROVIDES;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
+                        "SUBPROJECTS;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
                         "QT_MODULE;FORCE_STATIC;HEADERS_ONLY"
                         ${ARGN})
                         
   SET(MODULE_NAME ${MODULE_NAME_IN})
-  
+ 
+  SET(MODULE_PROVIDES ${MODULE_NAME})
+
   IF(NOT MODULE_SUBPROJECTS)
     IF(MITK_DEFAULT_SUBPROJECTS)
       SET(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})

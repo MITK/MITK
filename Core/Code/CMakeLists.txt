@@ -14,7 +14,7 @@ MITK_CREATE_MODULE( Mitk
   EXPORT_DEFINE MITK_CORE_EXPORT
 )
 
-# this is needed for libraries which link to mitkCore and need
+# this is needed for libraries which link to Mitk and need
 # symbols from explicitly instantiated templates like
 # mitk::SurfaceVtkWriter<vtkSTLWriter> which is referenced in
 # QmitkCommonFunctionality in the QmitkExt library.
@@ -26,12 +26,12 @@ IF(MINGW)
   SET_TARGET_PROPERTIES(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
 ENDIF(MINGW)
 
-# replacing mitkCore by Mitk [due to removing the PROVIDES macro
+# replacing Mitk by Mitk [due to removing the PROVIDES macro
 TARGET_LINK_LIBRARIES(Mitk ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
 TARGET_LINK_LIBRARIES(Mitk ${OPENGL_LIBRARIES} )
 
 IF(MSVC_IDE OR MSVC_VERSION OR MINGW)
-  TARGET_LINK_LIBRARIES(mitkCore psapi.lib)
+  TARGET_LINK_LIBRARIES(Mitk psapi.lib)
 ENDIF(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 
@@ -39,9 +39,9 @@ ENDIF(MSVC_IDE OR MSVC_VERSION OR MINGW)
 set(GDCM_FULL_VERSION "${GDCM_MAJOR_VERSION}.${GDCM_MINOR_VERSION}.${GDCM_BUILD_VERSION}")
 set(MITK_REQUIRED_GDCM_VERSION "2.0.14")
 if(GDCM_FULL_VERSION VERSION_LESS MITK_REQUIRED_GDCM_VERSION)
-  message(SEND_ERROR "mitkCore: MITK requires ITK with at least GDCM version ${MITK_REQUIRED_GDCM_VERSION}.\nFound version ${GDCM_FULL_VERSION} (GDCM NOT found if you don't see a version here)")
+  message(SEND_ERROR "Mitk: MITK requires ITK with at least GDCM version ${MITK_REQUIRED_GDCM_VERSION}.\nFound version ${GDCM_FULL_VERSION} (GDCM NOT found if you don't see a version here)")
 else(GDCM_FULL_VERSION VERSION_LESS MITK_REQUIRED_GDCM_VERSION)
-  message(STATUS "mitkCore: Found GDCM version ${GDCM_FULL_VERSION}")
+  message(STATUS "Mitk: Found GDCM version ${GDCM_FULL_VERSION}")
 endif(GDCM_FULL_VERSION VERSION_LESS MITK_REQUIRED_GDCM_VERSION)
 
 

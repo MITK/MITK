@@ -1,12 +1,12 @@
 # create the mitkCorePython libraries
 INCLUDE(wrapSources.cmake)
 
-SET(MASTER_INDEX_FILES "${CMAKE_CURRENT_BINARY_DIR}/mitkCore.mdx"
+SET(MASTER_INDEX_FILES "${CMAKE_CURRENT_BINARY_DIR}/Mitk.mdx"
 )
 
-SET(mitkCorePythonDependencies mitkCore debug vtkCommonPythonD optimized vtkCommonPython)
+SET(mitkCorePythonDependencies Mitk debug vtkCommonPythonD optimized vtkCommonPython)
 
 
-MITK_WRAP_LIBRARY("${WRAP_SOURCES_TEST}" mitkCore Core
+MITK_WRAP_LIBRARY("${WRAP_SOURCES_TEST}" Mitk Core
   "" "" "${mitkCorePythonDependencies}")
 

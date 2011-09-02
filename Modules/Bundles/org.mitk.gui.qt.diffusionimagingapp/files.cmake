@@ -9,6 +9,7 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
   QmitkReconstructionPerspective.cpp
+  QmitkTrackingPerspective.cpp
 )
 
 SET(UI_FILES
@@ -22,6 +23,7 @@ SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h
   src/internal/QmitkReconstructionPerspective.h
+  src/internal/QmitkTrackingPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES

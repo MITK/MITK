@@ -453,6 +453,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="m_UpsamplingSpinBox">
+        <property name="toolTip">
+         <string>Upsampling Factor</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>

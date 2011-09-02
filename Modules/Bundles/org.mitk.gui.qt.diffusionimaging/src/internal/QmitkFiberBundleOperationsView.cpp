@@ -53,7 +53,7 @@
 #include <mitkDataNodeObject.h>
 
 
-const std::string QmitkFiberBundleOperationsView::VIEW_ID = "org.mitk.views.fiberBundleOperations";
+const std::string QmitkFiberBundleOperationsView::VIEW_ID = "org.mitk.views.fiberbundleoperations";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
 using namespace mitk;

@@ -153,16 +153,34 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));
   QColor firstColor(firstColorName);
   mitk::Color upper;
-  upper[0] = firstColor.red() / color;
-  upper [1] = firstColor.green() / color;
-  upper[2] = firstColor.blue() / color;
+  if (firstColorName=="") // default values
+  {
+    upper[0] = 0.1;
+    upper[1] = 0.1;
+    upper[2] = 0.1;
+  }
+  else
+  {
+    upper[0] = firstColor.red() / color;
+    upper[1] = firstColor.green() / color;
+    upper[2] = firstColor.blue() / color;
+  }
 
   QString secondColorName = QString::fromStdString (prefs->GetByteArray("second background color", ""));
   QColor secondColor(secondColorName);
   mitk::Color lower;
-  lower[0] = secondColor.red() / color;
-  lower[1] = secondColor.green() / color;
-  lower[2] = secondColor.blue() / color;
+  if (secondColorName=="") // default values
+  {
+    lower[0] = 0.5;
+    lower[1] = 0.5;
+    lower[2] = 0.5;
+  }
+  else
+  {
+    lower[0] = secondColor.red() / color;
+    lower[1] = secondColor.green() / color;
+    lower[2] = secondColor.blue() / color;
+  }
   m_StdMultiWidget->SetGradientBackgroundColors(upper, lower);
   m_StdMultiWidget->EnableGradientBackground();
 

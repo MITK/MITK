@@ -257,10 +257,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-    //if ( m_ToolManager->GetRememberContourPosition() )
-    //{
-    //  this->AddContourmarker(positionEvent);
-    //}
   }
   else {
     OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
@@ -270,21 +266,17 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-
-    //if ( m_ToolManager->GetRememberContourPosition() )
-    //{
-    //  this->AddContourmarker(positionEvent);
-    //}
-
   }
+  slice->DisconnectPipeline();
   if ( m_ToolManager->GetRememberContourPosition() )
   {
     unsigned int pos = this->AddContourmarker(positionEvent);
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);
     contourExtractor->Update();
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour(contourExtractor->GetOutput(), mitk::PlanePositionManager::GetInstance()->GetPlanePosition(pos));
-
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, mitk::PlanePositionManager::GetInstance()->GetPlanePosition(pos));
+    contour->DisconnectPipeline();
   }
 }
 

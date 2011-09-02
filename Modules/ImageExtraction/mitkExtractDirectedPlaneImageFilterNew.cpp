@@ -23,7 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageAccessByItk.h>
 
 mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
-:m_CurrentWorldGeometry2D(NULL)
+:m_CurrentWorldGeometry2D(NULL),
+m_ActualInputTimestep(-1)
 {
 }
 
@@ -46,7 +47,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 
     //If no timestep is set, the lowest given will be selected
     const mitk::TimeSlicedGeometry* inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
-    if ( !m_ActualInputTimestep )
+    if ( m_ActualInputTimestep == -1)
     {
         ScalarType time = m_CurrentWorldGeometry2D->GetTimeBounds()[0];
         if ( time > ScalarTypeNumericTraits::NonpositiveMin() )

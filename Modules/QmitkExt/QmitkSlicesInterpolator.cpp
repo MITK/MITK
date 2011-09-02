@@ -342,6 +342,7 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
    if(!contours3D->empty())
      contours3D->at(0)->SetVisibility(state);
+   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()

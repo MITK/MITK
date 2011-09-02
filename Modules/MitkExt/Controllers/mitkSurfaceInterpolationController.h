@@ -110,7 +110,6 @@ namespace mitk
     Surface::Pointer m_Contours;
 
     vtkSmartPointer<vtkPolyData> m_PolyData;
-    vtkSmartPointer<vtkAppendPolyData> m_PolyDataAppender;
 
    /* bool m_Modified;*/
 

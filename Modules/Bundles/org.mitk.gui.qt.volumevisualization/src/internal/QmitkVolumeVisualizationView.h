@@ -51,11 +51,13 @@ public:
   virtual ~QmitkVolumeVisualizationView();
 
   virtual void CreateQtPartControl(QWidget *parent);
-  
+
   ///
   /// Invoked when the DataManager selection changed
   ///
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
+  static const std::string VIEW_ID;
 
 
 protected slots:
@@ -79,7 +81,7 @@ protected:
 private:
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
-  
+
   void UpdateInterface();
 
 };

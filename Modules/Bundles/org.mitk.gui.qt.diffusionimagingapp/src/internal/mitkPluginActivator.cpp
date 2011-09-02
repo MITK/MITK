@@ -29,6 +29,7 @@
 #include "QmitkTrackingPerspective.h"
 #include "QmitkFileImportPerspective.h"
 #include "QmitkQuantificationPerspective.h"
+#include "QmitkVolumeVisualizationPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -64,6 +65,7 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFileImportPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkQuantificationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkVolumeVisualizationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTrackingPerspective,  context)
 
 //  QString collectionFile = GetQtHelpCollectionFile();

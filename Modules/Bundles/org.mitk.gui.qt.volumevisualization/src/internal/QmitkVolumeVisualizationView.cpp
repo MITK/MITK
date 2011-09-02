@@ -43,6 +43,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QToolTip>
 #include <qxtspanslider.h>
 
+const std::string QmitkVolumeVisualizationView::VIEW_ID =
+"org.mitk.views.volumevisualization";
+
 enum RenderMode
 {
   RM_CPU_COMPOSITE_RAYCAST = 0,
@@ -53,7 +56,7 @@ enum RenderMode
 };
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
-: QmitkFunctionality(), 
+: QmitkFunctionality(),
   m_Controls(NULL)
 {
 }
@@ -64,7 +67,7 @@ QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 {
-   
+
   if (!m_Controls)
   {
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
@@ -102,10 +105,10 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_RenderMode->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
-    
+
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
-    
+
   }
 }
 
@@ -131,7 +134,7 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset( int mode )
 
 
 void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{ 
+{
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
 
   mitk::DataNode::Pointer node;
@@ -141,7 +144,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
        ++iter)
   {
     mitk::DataNode::Pointer currentNode = *iter;
-  
+
     if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {
       if( dynamic_cast<mitk::Image*>(currentNode->GetData())->GetDimension()>=3 )
@@ -154,7 +157,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
       else
       {
         weHadAnImageButItsNotThreeDeeOrFourDee = true;
-      } 
+      }
     }
   }
 
@@ -163,16 +166,16 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
     m_Controls->m_NoSelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     m_Controls->m_SelectedImageLabel->show();
-    
+
     std::string  infoText;
-    
+
     if (node->GetName().empty())
       infoText = std::string("Selected Image: [currently selected image has no name]");
     else
       infoText = std::string("Selected Image: ") + node->GetName();
-    
+
     m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
-    
+
     m_SelectedNode = node;
   }
   else
@@ -183,7 +186,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
       m_Controls->m_ErrorImageLabel->show();
       std::string  infoText;
       infoText = std::string("only 3D or 4D images are supported");
-      m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
+      m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) );
     }
     else
     {
@@ -191,7 +194,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
       m_Controls->m_ErrorImageLabel->hide();
       m_Controls->m_NoSelectedImageLabel->show();
     }
-    
+
     m_SelectedNode = 0;
   }
 
@@ -220,9 +223,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
-  
+
   bool enabled = false;
-      
+
   m_SelectedNode->GetBoolProperty("volumerendering",enabled);
   m_Controls->m_EnableRenderingCB->setEnabled(true);
   m_Controls->m_EnableRenderingCB->setChecked(enabled);
@@ -249,9 +252,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_SelectedNode->GetBoolProperty("volumerendering.uselod",enabled);
   m_Controls->m_EnableLOD->setEnabled(true);
   m_Controls->m_EnableLOD->setChecked(enabled);
-    
+
   m_Controls->m_RenderMode->setEnabled(true);
-  
+
   // Determine Combo Box mode
   {
     bool usegpu=false;
@@ -263,9 +266,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_SelectedNode->GetBoolProperty("volumerendering.useray",useray);
 #endif
     m_SelectedNode->GetBoolProperty("volumerendering.usemip",usemip);
-    
+
     int mode = 0;
-    
+
     if(useray)
     {
       if(usemip)
@@ -282,10 +285,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
       else
         mode=RM_CPU_COMPOSITE_RAYCAST;
     }
-    
+
     m_Controls->m_RenderMode->setCurrentIndex(mode);
-  } 
-    
+  }
+
   m_Controls->m_TransferFunctionWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionWidget->setEnabled(true);
   m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(m_SelectedNode);
@@ -293,7 +296,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
 }
 
 
-void QmitkVolumeVisualizationView::OnEnableRendering(bool state) 
+void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
 {
   if(m_SelectedNode.IsNull())
     return;
@@ -303,7 +306,7 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkVolumeVisualizationView::OnEnableLOD(bool state) 
+void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
 {
   if(m_SelectedNode.IsNull())
     return;
@@ -312,7 +315,7 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkVolumeVisualizationView::OnRenderMode(int mode) 
+void QmitkVolumeVisualizationView::OnRenderMode(int mode)
 {
   if(m_SelectedNode.IsNull())
     return;
@@ -323,14 +326,14 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
   bool useray=(mode==RM_GPU_COMPOSITE_RAYCAST)||(mode==RM_GPU_MIP_RAYCAST);
 #endif
   bool usemip=(mode==RM_GPU_MIP_RAYCAST)||(mode==RM_CPU_MIP_RAYCAST);
-      
+
   m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(usegpu));
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
   m_SelectedNode->SetProperty("volumerendering.useray",mitk::BoolProperty::New(useray));
 #endif
   m_SelectedNode->SetProperty("volumerendering.usemip",mitk::BoolProperty::New(usemip));
-  
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

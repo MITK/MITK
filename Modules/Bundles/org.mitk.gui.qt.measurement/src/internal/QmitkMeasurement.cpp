@@ -62,6 +62,9 @@
 #include <vtkCornerAnnotation.h>
 #include <mitkVtkLayerController.h>
 
+const std::string QmitkMeasurement::VIEW_ID =
+"org.mitk.views.measurement";
+
 QmitkMeasurement::QmitkMeasurement() :
   m_Layout(0), m_DrawActionsToolBar(0),
       m_DrawActionsGroup(0), m_MeasurementInfoRenderer(0),
@@ -498,7 +501,7 @@ void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::Eve
   if ( figure != NULL )
   {
     // Get node corresponding to PlanarFigure
-    mitk::DataNode* figureNode = this->GetDefaultDataStorage()->GetNode( 
+    mitk::DataNode* figureNode = this->GetDefaultDataStorage()->GetNode(
       mitk::NodePredicateData::New( figure ) );
 
     // Select this node (and deselect all others)

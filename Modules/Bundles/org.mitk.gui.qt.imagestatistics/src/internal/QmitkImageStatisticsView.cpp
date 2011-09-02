@@ -53,6 +53,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkVectorImage.h>
 
+const std::string QmitkImageStatistics::VIEW_ID =
+"org.mitk.views.imagestatistics";
+
 class QmitkRequestStatisticsUpdateEvent : public QEvent
 {
 public:
@@ -314,7 +317,7 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
     }
 
     if ( ( numberPlanarFigures + numberSegmentations + numberImages ) == nodes.size() && //No invalid nodes
-      ( numberPlanarFigures + numberSegmentations ) < 2 && numberImages < 2 
+      ( numberPlanarFigures + numberSegmentations ) < 2 && numberImages < 2
       // maximum of one image and/or one of either planar figure or segmentation
       )
     {
@@ -675,7 +678,7 @@ void QmitkImageStatistics::UpdateStatistics()
           return;
         }
         // TODO: enable line profile widget
-        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );       
+        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
         m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
         m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
         m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();

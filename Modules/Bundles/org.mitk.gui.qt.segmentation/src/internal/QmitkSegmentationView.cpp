@@ -36,6 +36,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkResliceInterpolationProperty.h"
 
+const std::string QmitkSegmentationView::VIEW_ID =
+"org.mitk.views.segmentation";
+
 // public methods
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -309,7 +312,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()
-{ 
+{
   mitk::DataNode::Pointer surfaceNode =
       m_Controls->MaskSurfaces->GetSelectedNode();
   mitk::Surface::Pointer surface(0);
@@ -461,7 +464,7 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 
 
 void QmitkSegmentationView::OnSurfaceSelectionChanged()
-{   
+{
   // if Image and Surface are selected, enable button
   if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
        (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
@@ -543,12 +546,12 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   }
 
   //set comboBox to reference image
-  disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
   m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(referenceData) );
 
-  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
     this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
 
@@ -567,7 +570,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 //New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-    
+
     const mitk::PlaneGeometry* markerGeometry =
             dynamic_cast<const mitk::PlaneGeometry*> ( node->GetData()->GetGeometry() );
 
@@ -615,7 +618,7 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
           centerP);
       selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
           centerP, markerGeometry->GetNormal());
-     
+
     }
 }
 
@@ -662,7 +665,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vecto
       nodes.at(i)->GetBoolProperty("binary", isSegmentation);
 
       // return first proper binary mitk::Image
-      if (isImage && isSegmentation) 
+      if (isImage && isSegmentation)
       {
         return nodes.at(i);
       }
@@ -680,7 +683,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
   toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
   toolManager->SetWorkingData(  const_cast<mitk::DataNode*>(workingData));
 
-  
+
   // check original image
   m_Controls->btnNewSegmentation->setEnabled(referenceData != NULL);
   if (referenceData)
@@ -700,7 +703,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
 
   // check segmentation
   if (referenceData)
-  { 
+  {
     if (!workingData)
     {
       m_Controls->lblWorkingImageSelectionWarning->show();
@@ -844,7 +847,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->lblAlignmentWarning->hide();
   m_Controls->lblSegImage->hide();
   m_Controls->lblSegmentation->hide();
-  
+
   m_Controls->refImageSelector->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->refImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
 
@@ -890,7 +893,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::NewNodeObjectsGenerated );          // update the list of segmentations
 
   // create signal/slot connections
-  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
@@ -900,7 +903,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->cbRememberContourPositions, SIGNAL(stateChanged(int)), this, SLOT(CheckboxRememberContourPositionsStateChanged(int)));
 
 
-  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());

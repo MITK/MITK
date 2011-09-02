@@ -84,6 +84,8 @@ public:
 
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
+  static const std::string VIEW_ID;
+
 protected slots:
   void ClipboardHistogramButtonClicked();
 

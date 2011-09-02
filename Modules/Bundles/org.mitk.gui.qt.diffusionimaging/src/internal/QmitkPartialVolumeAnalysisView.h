@@ -115,6 +115,9 @@ public:
   void PlanarFigureFocus(mitk::DataNode* node);
 
   void ShowClusteringResults();
+
+  static const std::string VIEW_ID;
+
 protected slots:
 
   void EstimateCircle();

@@ -11,6 +11,7 @@ SET(INTERNAL_CPP_FILES
   QmitkReconstructionPerspective.cpp
   QmitkTrackingPerspective.cpp
   QmitkFileImportPerspective.cpp
+  QmitkQuantificationPerspective.cpp
 )
 
 SET(UI_FILES
@@ -26,6 +27,7 @@ SET(MOC_H_FILES
   src/internal/QmitkReconstructionPerspective.h
   src/internal/QmitkTrackingPerspective.h
   src/internal/QmitkFileImportPerspective.h
+  src/internal/QmitkQuantificationPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -37,6 +39,7 @@ SET(CACHED_RESOURCE_FILES
   resources/icon_dicom.xpm
   resources/diffusionimaging.png
   resources/preprocessing.png
+  resources/Measurement_48.png
 )
 
 SET(QRC_FILES

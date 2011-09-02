@@ -69,16 +69,18 @@ class QmitkMeasurement : public QmitkFunctionality
     ///
     QmitkMeasurement();
 
-	QmitkMeasurement(const QmitkMeasurement& other)
-	{
-		Q_UNUSED(other)
-		throw std::runtime_error("Copy constructor not implemented");
-	}
+  QmitkMeasurement(const QmitkMeasurement& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
 
     ///
     /// Remove all event listener from DataStorage, DataStorageSelection, Selection Service
     ///
     virtual ~QmitkMeasurement();
+
+    static const std::string VIEW_ID;
 
   public:
     ///
@@ -118,7 +120,7 @@ class QmitkMeasurement : public QmitkFunctionality
     /// Then PlanarFigureSelectionChanged is called
     ///
     virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
-  
+
   public slots:
     ///
     /// Called when the renderwindow gets deleted
@@ -149,8 +151,8 @@ class QmitkMeasurement : public QmitkFunctionality
     void ActionDrawRectangleTriggered( bool checked = false );
     void ActionDrawPolygonTriggered( bool checked = false );
     void ActionDrawArrowTriggered( bool checked = false );
-    void ActionDrawTextTriggered( bool checked = false ); 
-    void CopyToClipboard( bool checked = false ); 
+    void ActionDrawTextTriggered( bool checked = false );
+    void CopyToClipboard( bool checked = false );
     // fields
   // widgets
 protected:
@@ -199,7 +201,7 @@ protected:
   /// Saves the last renderwindow any info data was inserted
   ///
   QmitkRenderWindow* m_LastRenderWindow;
-  
+
   private:
  mitk::DataNode::Pointer DetectTopMostVisibleImage();
 

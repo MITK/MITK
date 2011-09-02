@@ -43,6 +43,13 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.perspectives.volumevisualization"
+                 name="Volume Visualization"
+                 class="QmitkVolumeVisualizationPerspective"
+                 icon="resources/volvis.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.diffusiontracking"
                  name="Neuronal Tractography"
                  class="QmitkTrackingPerspective"

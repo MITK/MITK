@@ -8,6 +8,15 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionImagingAppIntroPart.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
+  QmitkDIAppConnectomicsPerspective.cpp
+  QmitkDIAppDicomImportPerspective.cpp
+  QmitkDIAppFiberTractographyPerspective.cpp
+  QmitkDIAppIVIMPerspective.cpp
+  QmitkDIAppPreprocessingReconstructionPerspective.cpp
+  QmitkDIAppQuantificationPerspective.cpp
+  QmitkDIAppScreenshotsMoviesPerspective.cpp
+  QmitkDIAppTBSSPerspective.cpp
+  QmitkDIAppVolumeVisualizationPerspective.cpp
 )
 
 SET(UI_FILES
@@ -20,6 +29,15 @@ SET(MOC_H_FILES
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h
+  src/internal/QmitkDIAppConnectomicsPerspective.h
+  src/internal/QmitkDIAppDicomImportPerspective.h
+  src/internal/QmitkDIAppFiberTractographyPerspective.h
+  src/internal/QmitkDIAppIVIMPerspective.h
+  src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h
+  src/internal/QmitkDIAppQuantificationPerspective.h
+  src/internal/QmitkDIAppScreenshotsMoviesPerspective.h
+  src/internal/QmitkDIAppTBSSPerspective.h
+  src/internal/QmitkDIAppVolumeVisualizationPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES

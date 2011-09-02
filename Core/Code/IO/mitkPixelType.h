@@ -188,12 +188,13 @@ PixelType MakePixelType()
                    );
 }
 
+/*
 template< typename ItkImageType >
 PixelType MakePixelType()
 {
 
 }
-
+*/
 
 } // namespace mitk
 

@@ -78,7 +78,7 @@ namespace mitk {
 
     PixelType GetPixelType() const
     {
-      return m_PixelType;    
+      return *m_PixelType;
     }
 
     ImageDataItem::ConstPointer GetParent() const
@@ -112,7 +112,7 @@ namespace mitk {
   protected:
     unsigned char* m_Data;
 
-    PixelType m_PixelType;
+    PixelType *m_PixelType;
 
     bool m_ManageMemory;
 

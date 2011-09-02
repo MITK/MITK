@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkImageDataItem.h"
+#include "mitkImageDescriptor.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -214,44 +215,11 @@ public:
   //## The data is managed according to the parameter \a importMemoryManagement.
   //## @sa SetPicChannel
   virtual bool SetImportChannel(void *data, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-/*
-  //##Documentation
-  //## @brief Set @a pic as slice @a s at time @a t in channel @a n. 
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  //virtual bool SetPicSlice(const mitkIpPicDescriptor *pic, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
-  //##Documentation
-  //## @brief Set @a pic as volume at time @a t in channel @a n.
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  //virtual bool SetPicVolume(const mitkIpPicDescriptor *pic, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-
-  //##Documentation
-  //## @brief Set @a pic in channel @a n. 
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  //virtual bool SetPicChannel(const mitkIpPicDescriptor *pic, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-*/
   //##Documentation
   //## initialize new (or re-initialize) image information
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-  virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
+  virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry3D
@@ -275,6 +243,8 @@ public:
   //## Only the header is used, not the data vector!
   //##
   virtual void Initialize(const mitk::Image* image);
+
+  virtual void Initialize(const mitk::ImageDescriptor::Pointer inDesc);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a pic. 
@@ -464,6 +434,12 @@ public:
   //## @sa GetDimension(int i);
   unsigned int* GetDimensions() const;
 
+  ImageDescriptor::Pointer GetImageDescriptor() const
+  { return m_ImageDescriptor; }
+
+  ChannelDescriptor::Pointer GetChannelDescriptor( int id = 0 ) const
+  { return m_ImageDescriptor->GetChannelDescriptor(id); }
+
   //##Documentation
   //## @brief Sets a geometry to an image.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
@@ -606,13 +582,13 @@ protected:
 
   unsigned int m_Dimension;
 
-  unsigned int *m_Dimensions;
+  unsigned int* m_Dimensions;
 
   ImageDescriptor::Pointer m_ImageDescriptor;
 
   size_t *m_OffsetTable;
   ImageDataItemPointer m_CompleteData;
-  PixelType m_PixelType;
+  PixelType *m_PixelType;
 
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
 

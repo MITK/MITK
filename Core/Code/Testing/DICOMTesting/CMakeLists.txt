@@ -11,7 +11,7 @@ set(CPP_FILES)
 
 # now create a new module only for testing purposes
 MITK_CREATE_MODULE( mitkDICOMTesting
-  DEPENDS Mitk # mitkCore.so
+  DEPENDS Mitk # Mitk.so
 )
 
 MITK_CHECK_MODULE(_RESULT mitkDICOMTesting)

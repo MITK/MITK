@@ -38,7 +38,7 @@ set(ANN_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ann/include)
 set(IPSEGMENTATION_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipSegmentation)
 
 # variables containing librariy names
-set(MITK_CORE_LIBRARIES mitkCore)
+set(MITK_CORE_LIBRARIES Mitk)
 set(VTK_FOR_MITK_LIBRARIES
     vtkGraphics
     vtkCommon

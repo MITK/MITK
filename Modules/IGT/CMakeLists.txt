@@ -26,7 +26,7 @@ ELSE(_RESULT)
 ## create IGT config
 CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
-# add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)TARGET_LINK_LIBRARIES(SerialCommunicationTest mitkIGT mitkCore tinyxml PocoXML)
+# add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)TARGET_LINK_LIBRARIES(SerialCommunicationTest mitkIGT Mitk tinyxml PocoXML)
 
 ADD_SUBDIRECTORY(IGTTutorial)
 

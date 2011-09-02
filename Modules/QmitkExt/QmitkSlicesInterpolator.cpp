@@ -164,6 +164,7 @@ m_3DInterpolationEnabled(false)
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage& storage )
 {
   m_DataStorage = &storage;
+  m_SurfaceInterpolator->SetDataStorage(storage);
 }
 
 mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()

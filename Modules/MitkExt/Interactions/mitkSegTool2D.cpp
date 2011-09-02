@@ -279,11 +279,11 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   }
   if ( m_ToolManager->GetRememberContourPosition() )
   {
-    this->AddContourmarker(positionEvent);
+    unsigned int pos = this->AddContourmarker(positionEvent);
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);
     contourExtractor->Update();
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour(contourExtractor->GetOutput());
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour(contourExtractor->GetOutput(), mitk::PlanePositionManager::GetInstance()->GetPlanePosition(pos));
 
   }
 }
@@ -293,12 +293,13 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
-  unsigned int id = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+  unsigned int size = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+  unsigned int id = mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
   if (plane)
   {
 
-    if ( id == mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos()) )
+    if ( id ==  size )
     {
       //Creating PlanarFigure which currently serves as marker
       mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
@@ -321,6 +322,7 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
       m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }
+  return id;
 }
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )

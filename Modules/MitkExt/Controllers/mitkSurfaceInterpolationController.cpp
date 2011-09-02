@@ -20,6 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkImageData.h"
+#include "mitkInteractionConst.h"
+
+#include "mitkVtkRepresentationProperty.h"
+#include "vtkProperty.h"
+#include "mitkColorProperty.h"
+#include "mitkProperties.h"
 
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
@@ -70,122 +76,155 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     }
     */
 
-  m_Iterator = m_ContourList.find(op);
-  int pos = std::distance(m_ContourList.begin(), m_Iterator);
+  //m_Iterator = m_ContourList.find(op);
+  //int pos = std::distance(m_ContourList.begin(), m_Iterator);
+  //MITK_INFO<<"Contourpostion: "<<pos;
 
+  //if(pos == m_ContourList.size())
+  //{
+  //  m_ReduceFilter->SetInput(pos, newContour);
+  //  //m_ReduceFilter->CreateOutputsForAllInputs();
+  //  m_NormalsFilter->SetInput(pos, m_ReduceFilter->GetOutput(pos));
+  //  m_InterpolateSurfaceFilter->SetInput(pos, m_NormalsFilter->GetOutput(pos));
+  //}
+  //else
+  //{
+  //  m_ReduceFilter->SetInput(pos, newContour);
+  //  m_ReduceFilter->Modified();
+  //  m_NormalsFilter->Modified();
+  //}
 
-  //*(m_Iterator).second = newContour;
-  if(m_PolyData->GetPoints()->GetNumberOfPoints() == 0)
-  {
-    //Hier noch überprüfen, ob contour schon existiert
-    m_PolyData = newContour->GetVtkPolyData();
-    m_PolyDataAppender->AddInput(newContour->GetVtkPolyData());
-  }
-  else
-  {
-    //Hier noch überprüfen, ob contour schon existiert
-    m_PolyDataAppender->AddInput(newContour->GetVtkPolyData());
-    m_PolyDataAppender->Update();
-    m_PolyData = m_PolyDataAppender->GetOutput();
-  }
-  m_Contours->SetVtkPolyData(m_PolyData);
+  //MITK_INFO<<"Ports: "<<m_PolyDataAppender->GetNumberOfInputConnections(0);
+  //MITK_INFO<<"Ports: "<<m_PolyDataAppender->GetNumberOfInputPorts();
+  //vtkPolyData *temp = vtkPolyData::New();
+  //temp->DeepCopy(newContour->GetVtkPolyData());
+  //m_PolyDataAppender->SetUserManagedInputs(m_ContourList.size());
+  //m_PolyDataAppender->Update();
+  //m_Contours->SetVtkPolyData(m_PolyDataAppender->GetOutput());
 
 
 
   //m_Contours->SetVtkPolyData(newContour->GetVtkPolyData(),m_ContourList.size());
+
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  transform = op->GetTransform();
+
+  mitk::Vector3D direction = op->GetDirectionVector();
+  int pos (-1);
+
+  for (unsigned int i = 0; i < m_ContourList.size(); i++)
+  {
+      itk::Matrix<float> diffM = transform->GetMatrix()-m_ContourList.at(i).position->GetTransform()->GetMatrix();
+      bool isSameMatrix(true);
+      for (unsigned int j = 0; j < 3; j++)
+      {
+        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
+        {
+          isSameMatrix = false;
+          break;
+        }
+      }
+      itk::Vector<float> diffV = m_ContourList.at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
+      if ( isSameMatrix && m_ContourList.at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
+      {
+        pos = i;
+        break;
+      }
+    
+  }
+
+  if (pos == -1)
+  {
+    MITK_INFO<<"New";
+    mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, op->GetWidth(), 
+      op->GetHeight(), op->GetSpacing(), op->GetPos(), direction, transform);
     ContourPositionPair newData;
     newData.contour = newContour;
-    //m_ContourList.push_back(newData);
-    this->Modified();
-  /*  m_Modified = true;*/
+    newData.position = op;
+    m_ContourList.push_back(newData);
+  }
+  else
+  {
+    MITK_INFO<<"Replace";
+    m_ContourList.at(pos).contour = newContour;
+  }
 
+    MITK_INFO<<"New size: "<<m_ContourList.size();
+    this->Modified();
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate()
 {
-  //MITK_INFO<<"Modified: "<<m_Modified;
-  if (m_ContourList.size() < 2 /*|| !m_Modified*/)
+  if (m_ContourList.size() < 2)
     return 0;  
+
+  ReduceContourSetFilter::Pointer m_ReduceFilter = ReduceContourSetFilter::New();
+  ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = ComputeContourSetNormalsFilter::New();
+  CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
   
   m_ReduceFilter->SetMinSpacing(m_MinSpacing);
   m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
   m_InterpolateSurfaceFilter->SetDistanceImageVolume(50000);
 
-  //for (unsigned int i = 0; i < m_ContourList.size(); i++)
-  //{
-  //  m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
-  //  m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
-  //  m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
-  //}
-
-  unsigned int index(0);
-  for (m_Iterator = m_ContourList.begin(); m_Iterator != m_ContourList.end(); m_Iterator++)
+  for (unsigned int i = 0; i < m_ContourList.size(); i++)
   {
-    
-    m_ReduceFilter->SetInput(index,(*m_Iterator).second);
-    m_NormalsFilter->SetInput(index,m_ReduceFilter->GetOutput(index));
-    m_InterpolateSurfaceFilter->SetInput(index,m_NormalsFilter->GetOutput(index));
-    index++;
+    m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
   }
-  //m_ReduceFilter->SetMinSpacing(m_MinSpacing);
-  //m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
-  //m_ReduceFilter->SetReductionType(mitk::ReduceContourSetFilter::NTH_POINT);
-  //m_ReduceFilter->Modified();
-  //m_ReduceFilter->Update();
+  m_ReduceFilter->Update();
 
-  //MITK_INFO<<"Inputs "<<m_ReduceFilter->GetNumberOfInputs();
+  for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
+  {
+    mitk::DataNode::Pointer n = mitk::DataNode::New();
+    n->SetData(m_ReduceFilter->GetOutput(i));
+    n->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
+    n->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+    n->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+    n->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+    m_DataStorage->Add(n);
+    m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
+  }
 
-  //for (unsigned int i = 0; i < m_ContourList.size(); i++)
-  //{
-  //  //m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
-  //  m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
-  //  //m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
-  //}
+  m_NormalsFilter->Update();
 
-  //m_NormalsFilter->Update();
+  for (unsigned int i = 0; i < m_NormalsFilter->GetNumberOfOutputs(); i++)
+  {
+    mitk::DataNode::Pointer n = mitk::DataNode::New();
+    n->SetData(m_NormalsFilter->GetNormalsAsSurface());
+    n->SetProperty( "color", mitk::ColorProperty::New(255.0, 0.0, 0.0) );
+    n->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+    n->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+    n->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+    m_DataStorage->Add(n);
+    m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
+  }
 
-  //for (unsigned int i = 0; i < m_ContourList.size(); i++)
-  //{
-  //  //m_ReduceFilter->SetInput(i,m_ContourList.at(i).contour);
-  //  //m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
-  //  m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
-  //}
-
-//  m_InterpolateSurfaceFilter->SetDistanceImageVolume(50000);
   m_InterpolateSurfaceFilter->Update();
-  //Surface::Pointer interpolatedSurface = m_InterpolateSurfaceFilter->GetOutput();
 
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
+  //mitk::DataNode::Pointer n = mitk::DataNode::New();
+  //n->SetData(distanceImage);
+  //m_DataStorage->Add(n);
   vtkSmartPointer<vtkMarchingCubes> mcFilter = vtkMarchingCubes::New();
   mcFilter->SetInput(distanceImage->GetVtkImageData());
   mcFilter->SetValue(0,0);
-  vtkSmartPointer<vtkPolyData> pd = mcFilter->GetOutput();
+  mcFilter->Update();
+  vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
+  //pd->DeepCopy(mcFilter->GetOutput());
 
   mitk::Surface::Pointer surface = mitk::Surface::New();
-  surface->SetVtkPolyData(pd);
+  surface->SetVtkPolyData(mcFilter->GetOutput());
   Point3D origin = distanceImage->GetGeometry()->GetOrigin();
-  distanceImage->GetGeometry()->ChangeImageGeometryConsideringOriginOffset(false);
-  //MITK_INFO<<"ImageGeometry: "<<distanceImage->GetGeometry()->GetImageGeometry();
-  //MITK_INFO<<"Origin: "<<origin;
   surface->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
-  //for (unsigned int i = 0; i < m_ContourList.size(); i++)
-  //{
-  //  m_ReduceFilter->RemoveOutput(i);
-  //  m_NormalsFilter->RemoveOutput(i);
-  //  m_InterpolateSurfaceFilter->RemoveOutput(i);
-  //}
 
-  //m_Modified = false;
   return surface;
-  
 }
-
-//bool mitk::SurfaceInterpolationController::DataSetHasChanged()
-//{
-// /* return m_Modified;*/
-//}
 
 mitk::Surface* mitk::SurfaceInterpolationController::GetContoursAsSurface()
 {
   return m_Contours;
+}
+
+void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage &ds)
+{
+  m_DataStorage = &ds;
 }

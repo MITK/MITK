@@ -34,6 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkSmartPointer.h"
 #include "vtkAppendPolyData.h"
 
+#include "mitkDataNode.h"
+#include "mitkDataStorage.h"
+#include "mitkWeakPointer.h"
+
 namespace mitk
 {
 
@@ -71,6 +75,8 @@ namespace mitk
 
     Surface* GetContoursAsSurface();
 
+    void SetDataStorage(DataStorage &ds);
+
 
 
  protected:
@@ -86,8 +92,8 @@ namespace mitk
      RestorePlanePositionOperation* position;
    };
 
-    //typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map< RestorePlanePositionOperation*, Surface* > ContourPositionPairList;
+    typedef std::vector<ContourPositionPair> ContourPositionPairList;
+   //typedef std::map< RestorePlanePositionOperation*, Surface::Pointer > ContourPositionPairList;
 
     ContourPositionPairList m_ContourList;
     ContourPositionPairList::iterator m_Iterator;
@@ -107,6 +113,8 @@ namespace mitk
     vtkSmartPointer<vtkAppendPolyData> m_PolyDataAppender;
 
    /* bool m_Modified;*/
+
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
  };
 }

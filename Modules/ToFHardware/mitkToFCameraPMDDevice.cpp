@@ -155,6 +155,7 @@ namespace mitk
       {
         // update the ToF camera
         toFCameraDevice->UpdateCamera();
+        toFCameraDevice->m_ImageMutex->Lock();
         // get the source data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);
         // call modified to indicate that cameraDevice was modified
@@ -163,7 +164,6 @@ namespace mitk
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1
          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        toFCameraDevice->m_ImageMutex->Lock();
         //toFCameraDevice->m_ImageSequence++;
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -331,8 +331,6 @@ namespace mitk
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
 
-      m_ImageMutex->Unlock();
-
       this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], this->m_DistanceArray);
       this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[pos], this->m_AmplitudeArray);
       this->m_Controller->GetIntensities(this->m_SourceDataBuffer[pos], this->m_IntensityArray);
@@ -352,6 +350,7 @@ namespace mitk
       }
 
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
+      m_ImageMutex->Unlock();
     }
     else
     {

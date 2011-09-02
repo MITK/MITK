@@ -36,6 +36,13 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.perspectives.diffusionquantification"
+                 name="Quantification"
+                 class="QmitkQuantificationPerspective"
+                 icon="resources/Measurement_48.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.diffusiontracking"
                  name="Neuronal Tractography"
                  class="QmitkTrackingPerspective"

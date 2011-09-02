@@ -74,6 +74,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define PVA_PI 3.141592653589793238462643383
 
+const std::string QmitkPartialVolumeAnalysisView::VIEW_ID =
+"org.mitk.views.partialvolumeanalysisview";
+
 class QmitkRequestStatisticsUpdateEvent : public QEvent
 {
 public:

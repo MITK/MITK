@@ -38,7 +38,7 @@ SET(MOC_H_FILES
   src/internal/QmitkFileImportPerspective.h
   src/internal/QmitkQuantificationPerspective.h
   src/internal/QmitkVolumeVisualizationPerspective.h
-  src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
+  #src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
   src/internal/QmitkMasterView.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h

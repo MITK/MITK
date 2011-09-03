@@ -73,14 +73,11 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMasterView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
-<<<<<<< HEAD
-  //BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFileImportPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkQuantificationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkVolumeVisualizationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTrackingPerspective,  context)
-=======
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
@@ -91,7 +88,6 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
->>>>>>> bug-9122-diffusion-imaging-executable-and-OS
 
 //  QString collectionFile = GetQtHelpCollectionFile();
 

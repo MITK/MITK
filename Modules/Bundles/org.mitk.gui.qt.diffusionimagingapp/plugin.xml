@@ -29,7 +29,7 @@
   </extension>
   
   <extension point="org.blueberry.ui.perspectives">
-    <perspective id="org.mitk.perspectives.diffusionfileimport"
+    <!--<perspective id="org.mitk.perspectives.diffusionfileimport"
                  name="File Import"
                  class="QmitkFileImportPerspective"
                  icon="resources/icon_dicom.xpm"/>
@@ -45,6 +45,11 @@
                  name="Volume Visualization"
                  class="QmitkVolumeVisualizationPerspective"
                  icon="resources/volvis.png"/>
+    <perspective id="org.mitk.perspectives.diffusiontracking"
+                              name="Neuronal Tractography"
+                              class="QmitkTrackingPerspective"
+                              icon="resources/diffusionimaging.png"/>
+     -->
     <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" 
       name="Diffusion Imaging App" 
       class="QmitkDiffusionImagingAppPerspective" 
@@ -89,13 +94,6 @@
       name="DI-App Volume Visualization" 
       class="QmitkDIAppVolumeVisualizationPerspective" 
       icon="resources/volumevizualization.png"/>
-  </extension>
-
-  <extension point="org.blueberry.ui.perspectives">
-    <perspective id="org.mitk.perspectives.diffusiontracking"
-                 name="Neuronal Tractography"
-                 class="QmitkTrackingPerspective"
-                 icon="resources/diffusionimaging.png"/>
   </extension>
 
 </plugin>

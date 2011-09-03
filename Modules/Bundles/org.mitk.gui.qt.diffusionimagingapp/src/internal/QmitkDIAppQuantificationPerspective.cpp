@@ -54,8 +54,8 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.partialvolumeanalysis");
-  lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysis");
+  right->AddView("org.mitk.views.partialvolumeanalysisview");
+  lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
   lo->SetCloseable(false);
 
   right->AddView("org.mitk.views.diffusionquantification");

@@ -61,11 +61,12 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
         berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
   std::vector<std::string> perspExcludeList;
-//  perspExcludeList.push_back( std::string("org.mitk.diffusionimagingapp.perspectives.welcome") );
-//  perspExcludeList.push_back( std::string("org.mitk.perspectives.diffusionimaginginternal") );
-//  perspExcludeList.push_back( std::string("org.mitk.perspectives.publicdiffusionimaging") );
-//  perspExcludeList.push_back( std::string("org.mitk.extapp.defaultperspective") );
-//  perspExcludeList.push_back( std::string("org.mitk.coreapp.defaultperspective") );
+  perspExcludeList.push_back( std::string("org.blueberry.uitest.util.EmptyPerspective") );
+  perspExcludeList.push_back( std::string("org.blueberry.uitest.util.EmptyPerspective2") );
+  perspExcludeList.push_back( std::string("org.mitk.coreapp.defaultperspective") );
+  perspExcludeList.push_back( std::string("org.mitk.extapp.defaultperspective") );
+  perspExcludeList.push_back( std::string("org.mitk.perspectives.publicdiffusionimaging") );
+  perspExcludeList.push_back( std::string("org.mitk.perspectives.diffusionimaginginternal") );
 
   std::vector<std::string> viewExcludeList;
 //  viewExcludeList.push_back( std::string("org.mitk.views.partialvolumeanalysis") );

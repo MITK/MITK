@@ -226,7 +226,6 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   }
 
   classname = "TbssImage";
-  std::string n = node->GetData()->GetNameOfClass();
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::ImageMapperGL2D::SetDefaultProperties(node);

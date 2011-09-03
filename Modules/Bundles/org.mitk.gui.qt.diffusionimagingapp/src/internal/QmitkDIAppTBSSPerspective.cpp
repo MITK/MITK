@@ -20,71 +20,38 @@
 
 void QmitkDIAppTBSSPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
+  /////////////////////////////////////////////////////
+  // all di-app perspectives should have the following:
+  /////////////////////////////////////////////////////
+
   std::string editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .5f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+
+  berry::IFolderLayout::Pointer left =
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+    berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .8f, "org.mitk.views.controlvisualizationpropertiesview");
+    false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
+  left->AddView("org.mitk.views.masterview");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
+  lo->SetCloseable(false);
 
-//  berry::IFolderLayout::Pointer left =
-//    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
-//    berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");
+  berry::IFolderLayout::Pointer right =
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
 
-//  layout->AddStandaloneView("org.mitk.views.perspectiveswitcher",
-//    false, berry::IPageLayout::BOTTOM, 0.99f, "org.mitk.diffusionimaginginternal.leftcontrols");
+  /////////////////////////////////////////////
+  // here goes the perspective specific stuff
+  /////////////////////////////////////////////
 
-  ////////////////////////////////////////
-  // public views go here
-  ////////////////////////////////////////
-//  left->AddView("org.mitk.views.fiberbundleoperations");
-//  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
-//  lo->SetCloseable(false);
-
-//  left->AddView("org.mitk.views.diffusionpreprocessing");
-//  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");
-//  lo->SetCloseable(true);
-
-//  left->AddView("org.mitk.views.tensorreconstruction");
-//  lo = layout->GetViewLayout("org.mitk.views.tensorreconstruction");
-//  lo->SetCloseable(true);
-
-//  left->AddView("org.mitk.views.qballreconstruction");
-//  lo = layout->GetViewLayout("org.mitk.views.qballreconstruction");
-//  lo->SetCloseable(true);
-
-//  left->AddView("org.mitk.views.diffusionquantification");
-//  lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
-//  lo->SetCloseable(true);
-
-//  left->AddView("org.mitk.views.diffusiondicomimport");
-//  lo = layout->GetViewLayout("org.mitk.views.diffusiondicomimport");
-//  lo->SetCloseable(true);
-
-  ////////////////////////////////////////
-  // end public views
-  ////////////////////////////////////////
-
-
-//  berry::IFolderLayout::Pointer right =
-//    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
-  ////////////////////////////////////////
-  // internal views go here
-  ////////////////////////////////////////
-//  right->AddView("org.mitk.views.globalfibertracking");
-//  right->AddView("org.mitk.views.partialvolumeanalysis");
-//  right->AddView("org.mitk.views.ivim");
-//  right->AddView("org.mitk.views.tractbasedspatialstatistics");
-//  right->AddView("org.mitk.views.fibertracking");
-
-  ////////////////////////////////////////
-  // end internal views
-  ////////////////////////////////////////
+  right->AddView("org.mitk.views.tractbasedspatialstatistics");
+  lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
+  lo->SetCloseable(false);
 
 }

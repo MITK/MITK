@@ -24,7 +24,19 @@
 
 #include "src/internal/QmitkDiffusionImagingAppIntroPart.h"
 #include "src/internal/QmitkDiffusionImagingAppPerspective.h"
+#include "src/internal/QmitkMasterView.h"
+
 #include "src/internal/QmitkWelcomePerspective.h"
+
+#include "src/internal/QmitkDIAppConnectomicsPerspective.h"
+#include "src/internal/QmitkDIAppDicomImportPerspective.h"
+#include "src/internal/QmitkDIAppFiberTractographyPerspective.h"
+#include "src/internal/QmitkDIAppIVIMPerspective.h"
+#include "src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h"
+#include "src/internal/QmitkDIAppQuantificationPerspective.h"
+#include "src/internal/QmitkDIAppScreenshotsMoviesPerspective.h"
+#include "src/internal/QmitkDIAppTBSSPerspective.h"
+#include "src/internal/QmitkDIAppVolumeVisualizationPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -55,8 +67,18 @@ void QmitkDiffusionImagingAppApplicationPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMasterView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppFiberTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppPreprocessingReconstructionPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppQuantificationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
 
 //  QString collectionFile = GetQtHelpCollectionFile();
 

@@ -16,6 +16,13 @@
       introId="org.mitk.qt.diffusionimagingappintro"/>
   </extension>
   
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.masterview"
+          name="Master View"
+          class="QmitkMasterView"
+          icon="resources/master.xpm" />
+  </extension>
+  
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" 
       name="Diffusion Imaging App" 

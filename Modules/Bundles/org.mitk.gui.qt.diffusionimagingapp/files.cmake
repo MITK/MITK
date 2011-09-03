@@ -6,6 +6,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkDiffusionImagingAppApplicationPlugin.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
+  QmitkMasterView.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
   QmitkDIAppConnectomicsPerspective.cpp
@@ -20,12 +21,14 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(UI_FILES
- src/internal/QmitkWelcomeScreenViewControls.ui
+  src/internal/QmitkWelcomeScreenViewControls.ui
+  src/internal/QmitkMasterViewControls.ui
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
   src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
+  src/internal/QmitkMasterView.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h

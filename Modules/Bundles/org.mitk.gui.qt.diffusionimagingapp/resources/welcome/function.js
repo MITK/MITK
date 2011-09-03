@@ -12,7 +12,7 @@ var moduleNames = new Array("Dicom Import",
                             "IVIM",
                             "Volume Visualization",
                             "Screenshots & Movies",
-                            "MITK Downloads & News);
+                            "MITK Downloads & News");
 
 // add the MITK-link to your module
 var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.dicomimport?clear=false",
@@ -33,7 +33,7 @@ var picFilenames = new Array("01dicomimport.png",
                              "03quantification.png",
                              "04tractography.png",
                              "05tbss.png",
-                             "06conncectomics.png",
+                             "06connectomics.png",
                              "07ivim.png",
                              "08volumevisualization.png",
                              "09screenshotsmovies.png",
@@ -46,7 +46,7 @@ var aniFilenames = new Array("01adicomimport.png",
                              "03aquantification.png",
                              "04atractography.png",
                              "05atbss.png",
-                             "06aconncectomics.png",
+                             "06aconnectomics.png",
                              "07aivim.png",
                              "08avolumevisualization.png",
                              "09ascreenshotsmovies.png",
@@ -232,7 +232,7 @@ function showPopUpWindow(){
   moduleLink = document.createElement("a");
   moduleLink.href = moduleLinks[modulePos] ;
   moduleLink.className = 'moduleLink';
-  moduleLinkTxt = document.createTextNode("Click here to open the " + moduleNames[modulePos].toLowerCase() + " dataset");
+  moduleLinkTxt = document.createTextNode("Click here to open '" + moduleNames[modulePos].toLowerCase() + "'");
   moduleLink.appendChild(moduleLinkTxt);
   
   // append text-elements to their container

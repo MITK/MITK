@@ -15,10 +15,10 @@
  
  =========================================================================*/
 
-#include "QmitkDiffusionImagingAppPerspective.h"
+#include "QmitkDIAppPreprocessingReconstructionPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -43,12 +43,27 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
   lo->SetCloseable(false);
 
+  berry::IFolderLayout::Pointer right =
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
+
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
+  right->AddView("org.mitk.views.diffusionpreprocessing");
+  lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.tensorreconstruction");
+  lo = layout->GetViewLayout("org.mitk.views.tensorreconstruction");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.qballreconstruction");
+  lo = layout->GetViewLayout("org.mitk.views.qballreconstruction");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.odfdetails");
+  lo = layout->GetViewLayout("org.mitk.views.odfdetails");
+  lo->SetCloseable(false);
 
 }

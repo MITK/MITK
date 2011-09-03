@@ -15,10 +15,10 @@
  
  =========================================================================*/
 
-#include "QmitkDiffusionImagingAppPerspective.h"
+#include "QmitkDIAppFiberTractographyPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -43,12 +43,27 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
   lo->SetCloseable(false);
 
+  berry::IFolderLayout::Pointer right =
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
+
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
+  right->AddView("org.mitk.views.globalfibertracking");
+  lo = layout->GetViewLayout("org.mitk.views.globalfibertracking");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.fibertracking");
+  lo = layout->GetViewLayout("org.mitk.views.fibertracking");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.fiberbundleoperations");
+  lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
+  lo->SetCloseable(false);
 
+  right->AddView("org.mitk.views.trackingevaluation");
+  lo = layout->GetViewLayout("org.mitk.views.trackingevaluation");
+  lo->SetCloseable(false);
 
 }

@@ -6,6 +6,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
+  QmitkMasterView.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
   QmitkReconstructionPerspective.cpp
@@ -13,23 +14,44 @@ SET(INTERNAL_CPP_FILES
   QmitkFileImportPerspective.cpp
   QmitkQuantificationPerspective.cpp
   QmitkVolumeVisualizationPerspective.cpp
+  QmitkDIAppConnectomicsPerspective.cpp
+  QmitkDIAppDicomImportPerspective.cpp
+  QmitkDIAppFiberTractographyPerspective.cpp
+  QmitkDIAppIVIMPerspective.cpp
+  QmitkDIAppPreprocessingReconstructionPerspective.cpp
+  QmitkDIAppQuantificationPerspective.cpp
+  QmitkDIAppScreenshotsMoviesPerspective.cpp
+  QmitkDIAppTBSSPerspective.cpp
+  QmitkDIAppVolumeVisualizationPerspective.cpp
 )
 
 SET(UI_FILES
- src/internal/QmitkWelcomeScreenViewControls.ui
+  src/internal/QmitkWelcomeScreenViewControls.ui
+  src/internal/QmitkMasterViewControls.ui
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
   src/internal/mitkPluginActivator.h
-  src/QmitkDiffusionImagingAppApplication.h
-  src/internal/QmitkDiffusionImagingAppPerspective.h
-  src/internal/QmitkWelcomePerspective.h
   src/internal/QmitkReconstructionPerspective.h
   src/internal/QmitkTrackingPerspective.h
   src/internal/QmitkFileImportPerspective.h
   src/internal/QmitkQuantificationPerspective.h
   src/internal/QmitkVolumeVisualizationPerspective.h
+  src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
+  src/internal/QmitkMasterView.h
+  src/QmitkDiffusionImagingAppApplication.h
+  src/internal/QmitkDiffusionImagingAppPerspective.h
+  src/internal/QmitkWelcomePerspective.h
+  src/internal/QmitkDIAppConnectomicsPerspective.h
+  src/internal/QmitkDIAppDicomImportPerspective.h
+  src/internal/QmitkDIAppFiberTractographyPerspective.h
+  src/internal/QmitkDIAppIVIMPerspective.h
+  src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h
+  src/internal/QmitkDIAppQuantificationPerspective.h
+  src/internal/QmitkDIAppScreenshotsMoviesPerspective.h
+  src/internal/QmitkDIAppTBSSPerspective.h
+  src/internal/QmitkDIAppVolumeVisualizationPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES

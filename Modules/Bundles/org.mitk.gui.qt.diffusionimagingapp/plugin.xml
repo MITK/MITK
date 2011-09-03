@@ -20,33 +20,75 @@
     <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" name="Diffusion App" class="QmitkDiffusionImagingAppPerspective" icon="resources/diffusionimaging.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome" name="Welcome" class="QmitkWelcomePerspective" icon="resources/icon_home.png"/>
   </extension> -->
-
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.masterview"
+          name="Master View"
+          class="QmitkMasterView"
+          icon="resources/master.xpm" />
+  </extension>
+  
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.diffusionfileimport"
                  name="File Import"
                  class="QmitkFileImportPerspective"
                  icon="resources/icon_dicom.xpm"/>
-  </extension>
-
-  <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.diffusionreconstruction"
                  name="Preprocessing and Reconstruction"
                  class="QmitkReconstructionPerspective"
                  icon="resources/preprocessing.png"/>
-  </extension>
-
-  <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.diffusionquantification"
                  name="Quantification"
                  class="QmitkQuantificationPerspective"
                  icon="resources/Measurement_48.png"/>
-  </extension>
-
-  <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.volumevisualization"
                  name="Volume Visualization"
                  class="QmitkVolumeVisualizationPerspective"
                  icon="resources/volvis.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp" 
+      name="Diffusion Imaging App" 
+      class="QmitkDiffusionImagingAppPerspective" 
+      icon="resources/diffusionimaging.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome" 
+      name="Welcome" 
+      class="QmitkWelcomePerspective" 
+      icon="resources/icon_home.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics" 
+      name="DI-App Connectomics" 
+      class="QmitkDIAppConnectomicsPerspective" 
+      icon="resources/connectomics.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.dicomimport" 
+      name="DI-App DICOM Import" 
+      class="QmitkDIAppDicomImportPerspective" 
+      icon="resources/dicomimport.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography" 
+      name="DI-App Tractography" 
+      class="QmitkDIAppFiberTractographyPerspective" 
+      icon="resources/tractography.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.ivim" 
+      name="DI-App IVIM" 
+      class="QmitkDIAppIVIMPerspective" 
+      icon="resources/ivim.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction" 
+      name="DI-App Preprocessing Reconstruction" 
+      class="QmitkDIAppPreprocessingReconstructionPerspective" 
+      icon="resources/preprocessingreconstruction.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.quantification" 
+      name="DI-App Quantification" 
+      class="QmitkDIAppQuantificationPerspective" 
+      icon="resources/quantification.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.screenshotsmovies" 
+      name="DI-App Screenshots Movies" 
+      class="QmitkDIAppScreenshotsMoviesPerspective" 
+      icon="resources/screenshotsmovies.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tbss" 
+      name="DI-App TBSS" 
+      class="QmitkDIAppTBSSPerspective" 
+      icon="resources/tbss.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.volumevisualization" 
+      name="DI-App Volume Visualization" 
+      class="QmitkDIAppVolumeVisualizationPerspective" 
+      icon="resources/volumevizualization.png"/>
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">

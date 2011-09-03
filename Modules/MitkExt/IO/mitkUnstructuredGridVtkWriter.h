@@ -43,7 +43,7 @@ namespace mitk
  * @ingroup Process
 */
 template<class VTKWRITER>
-class UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
+class MitkExt_EXPORT UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
 {
 public:
 
@@ -127,7 +127,7 @@ protected:
     void ExecuteWrite(VTKWRITER* vtkWriter);
 
     virtual void GenerateData();
-      
+
     std::string m_FileName;
 
     std::string m_FilePrefix;
@@ -139,6 +139,5 @@ protected:
 
 }
 
-#include "mitkUnstructuredGridVtkWriter.txx"
 
 #endif // _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_

@@ -22,6 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkUnstructuredGridVtkWriter.h>
 
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
+
 namespace mitk
 {
 

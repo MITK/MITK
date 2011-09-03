@@ -16,7 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkUnstructuredGridVtkWriter.h"
+#include "mitkUnstructuredGridVtkWriter.txx"
 
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
 
 namespace mitk {
 
@@ -97,6 +101,12 @@ const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaul
 {
   return ".pvtu";
 }
+
+
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+
 
 }
 

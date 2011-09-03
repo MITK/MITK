@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSlicedData.h"
 #include "mitkBaseProcess.h"
-#include <itkSmartPointerForwardReference.txx>
 
 
 mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
@@ -47,7 +46,7 @@ void mitk::SlicedData::UpdateOutputInformation()
 {
   Superclass::UpdateOutputInformation();
 
-  if (this->GetSource() == false)
+  if (this->GetSource().IsNull())
   // If we don't have a source, then let's make our Image
   // span our buffer
   {

@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLookupTable.h"
 #include <itkProcessObject.h>
-#include <itkSmartPointerForwardReference.txx>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>

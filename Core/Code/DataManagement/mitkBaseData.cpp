@@ -18,9 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseData.h"
 #include <itkObjectFactoryBase.h>
-#include <itkSmartPointerForwardReference.txx>
 
-template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::BaseProcess>;
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
@@ -160,7 +158,7 @@ bool mitk::BaseData::IsEmpty() const
   return true;
 }
 
-itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource() const
+itk::SmartPointer<mitk::BaseProcess> mitk::BaseData::GetSource() const
 {
   return static_cast<mitk::BaseProcess*>(Superclass::GetSource().GetPointer());
 }
@@ -175,7 +173,7 @@ int mitk::BaseData::GetExternalReferenceCount() const
 
     int realReferenceCount = GetReferenceCount();
 
-    if(GetSource()==NULL) 
+    if(GetSource().IsNull())
     {
       m_ExternalReferenceCount = realReferenceCount;
       m_CalculatingExternalReferenceCount = false;
@@ -211,12 +209,12 @@ void mitk::BaseData::UnRegister() const
     {
       m_Unregistering=true;
       // the order of the following boolean statement is important:
-      // this->GetSource() returns a SmartPointerForwardReference,
+      // this->GetSource() returns a SmartPointer,
       // which increases and afterwards decreases the reference count,
       // which may result in an ExternalReferenceCount of 0, causing
       // BaseProcess::UnRegister() to destroy us (also we already
       // about to do that).
-      if((this->m_SmartSourcePointer->GetExternalReferenceCount()==0) || (this->GetSource()==NULL))
+      if((this->m_SmartSourcePointer->GetExternalReferenceCount()==0) || (this->GetSource().IsNull()))
         m_SmartSourcePointer=NULL; // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
       else
         m_Unregistering=false;
@@ -233,7 +231,7 @@ void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) co
   itkDebugMacro( "connecting source  " << arg
     << ", source output index " << idx);
 
-  if ( GetSource() != arg || m_SourceOutputIndexDuplicate != idx)
+  if ( GetSource().GetPointer() != arg || m_SourceOutputIndexDuplicate != idx)
   {
     m_SmartSourcePointer = dynamic_cast<mitk::BaseProcess*>(arg);
     m_SourceOutputIndexDuplicate = idx;

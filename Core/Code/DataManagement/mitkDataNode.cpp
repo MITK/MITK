@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
 #include <vtkTransform.h>
-#include <itkSmartPointerForwardReference.txx>
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
@@ -454,7 +453,7 @@ unsigned long mitk::DataNode::GetMTime() const
   if(m_Data.IsNotNull())
   {
     if((time < m_Data->GetMTime()) ||
-      ((m_Data->GetSource() != NULL) && (time < m_Data->GetSource()->GetMTime()))
+       ((m_Data->GetSource().IsNotNull()) && (time < m_Data->GetSource()->GetMTime()))
     )
     {
       Modified();

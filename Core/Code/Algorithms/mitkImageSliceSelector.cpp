@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageSliceSelector.h"
-#include <itkSmartPointerForwardReference.txx>
 
 
 void mitk::ImageSliceSelector::GenerateOutputInformation()

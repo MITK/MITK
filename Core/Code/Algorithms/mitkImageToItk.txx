@@ -139,7 +139,7 @@ template<class TOutputImage>
   ::UpdateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  if(input.IsNotNull() && (input->GetSource()!=NULL) && input->GetSource()->Updating())
+  if(input.IsNotNull() && (input->GetSource().IsNotNull()) && input->GetSource()->Updating())
   {
     typename Superclass::OutputImageType::Pointer output = this->GetOutput();
     unsigned long t1 = input->GetUpdateMTime()+1;

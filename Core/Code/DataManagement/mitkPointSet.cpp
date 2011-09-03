@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
-#include <itkSmartPointerForwardReference.txx>
-
 
 mitk::PointSet::PointSet()
 {

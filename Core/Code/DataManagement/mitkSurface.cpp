@@ -23,9 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include "vtkSmartPointer.h"
 
-#include <itkSmartPointerForwardReference.txx>
-
-
 
 mitk::Surface::Surface() : 
 m_CalculateBoundingBox( false )
@@ -269,7 +266,7 @@ void mitk::Surface::CopyInformation( const itk::DataObject * data)
 
 void mitk::Surface::Update()
 {
-  if ( GetSource() == NULL )
+  if ( GetSource().IsNull() )
   {
     for ( VTKPolyDataSeries::iterator it = m_PolyDataSeries.begin() ; it != m_PolyDataSeries.end() ; ++it )
     {

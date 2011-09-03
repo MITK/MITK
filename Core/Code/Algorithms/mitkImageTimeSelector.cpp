@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageTimeSelector.h"
-#include <itkSmartPointerForwardReference.txx>
 
 
 mitk::ImageTimeSelector::ImageTimeSelector() : m_TimeNr(0), m_ChannelNr(0)

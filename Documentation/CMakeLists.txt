@@ -19,7 +19,10 @@ ENDIF()
 SET(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 SET(MITK_DOXYGEN_TAGFILE_NAME ${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag CACHE INTERNAL "MITK Doxygen tag file")
 
-SET(MITK_DOXYGEN_STYLESHEET Documentation/doxygen.css)
+# This is relative to the working directory of the doxygen command
+SET(MITK_DOXYGEN_STYLESHEET mitk_doxygen.css)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${MITK_DOXYGEN_STYLESHEET}
+               ${CMAKE_CURRENT_BINARY_DIR}/${MITK_DOXYGEN_STYLESHEET} @COPYONLY)
 
 # Create QCH files for MITK and external projects
 SET(MITK_DOXYGEN_GENERATE_QHP "NO")
@@ -102,8 +105,8 @@ ELSE()
 ENDIF()
 
 ADD_CUSTOM_TARGET(doc ${_doc_in_all}
-                  ${DOXYGEN} 
-                  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
+                  ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   )
 
 IF (MITK_USE_BLUEBERRY)  

@@ -48,7 +48,7 @@ namespace mitk
  * @ingroup Process
 */
 template <class VTKWRITER>
-class SurfaceVtkWriter : public mitk::FileWriter
+class MITK_CORE_EXPORT SurfaceVtkWriter : public mitk::FileWriter
 {
 public:
 

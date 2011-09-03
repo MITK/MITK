@@ -21,17 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <GL/glew.h>
 
-
-#if defined(_WIN32)
-  #ifdef mitkGPGPU_EXPORTS
-    #define GPGPU_DLL_API __declspec(dllexport)
-  #else
-    #define GPGPU_DLL_API __declspec(dllimport)
-  #endif
-#else
-  #define GPGPU_DLL_API
-#endif
-
+#include <mitkGPGPUExports.h>
 
 #ifdef _WIN32
 #include <windows.h>

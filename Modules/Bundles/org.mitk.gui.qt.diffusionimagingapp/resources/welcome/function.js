@@ -3,57 +3,53 @@
 // The buttons will be generated in order to the array's index. e.g. data at array's index '0' will generate the first button.
 
 // enter the name of your module here
-var moduleNames = new Array("Colormap",
-                            "T1 Image",
-                            "3D Background",
-                            "Cingulum",
-                            "Corpus Callosum",
-                            "Corticospinal Tract",
-                            "Fornix",
-                            "ILF, IFO, Uncus",
-                            "SLF, SOFF, Arcuate",
-                            "ICP, MCP, SCP, ML",
-                            "Download MITK");
+var moduleNames = new Array("Dicom Import",
+                            "Preprocessing & Reconstruction",
+                            "Quantification",
+                            "Tractography",
+                            "TBSS",
+                            "Connectomics",
+                            "IVIM",
+                            "Volume Visualization",
+                            "Screenshots & Movies",
+                            "MITK Downloads & News");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0bref_colormap.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0cref_t1.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/0aref_alltracts.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/01CING.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/02CORPUS.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/03CST.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/04FORNIX.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/05ILF+IFO+UNCUS.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=false&dataset=./bin/atlas-data/06SLF+SOFF+ARCUATE.mitk",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp?clear=true&dataset=./bin/atlas-data/07PEDUNCLES.mitk",
+var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.dicomimport?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.quantification?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.tractography?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.tbss?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.connectomics?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.ivim?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.volumevisualization?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.screenshotsmovies?clear=false",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
 // The picture's width should be 136 pixel; the height 123 pixel.
-var picFilenames = new Array("0bref_colormap.png",
-                             "0cref_t1.png",
-                             "0aref_alltracts.png",
-                             "01CING.png",
-                             "02CORPUS.png",
-                             "03CST.png",
-                             "04FORNIX.png",
-                             "05ILF+IFO+UNCUS.png",
-                             "06SLF+SOFF+ARCUATE.png",
-                             "07PEDUNCLES.png",
+var picFilenames = new Array("01dicomimport.png",
+                             "02preprocessingreconstruction.png",
+                             "03quantification.png",
+                             "04tractography.png",
+                             "05tbss.png",
+                             "06connectomics.png",
+                             "07ivim.png",
+                             "08volumevisualization.png",
+                             "09screenshotsmovies.png",
                              "button_mitk.png");
 
 // if you want to create an animated icon, add the name of your animated gif (placed in subdirectory "pics"). Otherwise enter an empty string "".
 // The animation's width should be 136 pixel; the height 123 pixel.
-var aniFilenames = new Array("0bref_colormap.gif",
-                             "0cref_t1.gif",
-                             "0aaref_alltracts.png",
-                             "01aCING.png",
-                             "02aCORPUS.png",
-                             "03aCST.png",
-                             "04aFORNIX.png",
-                             "05aILF+IFO+UNCUS.png",
-                             "06aSLF+SOFF+ARCUATE.png",
-                             "07aPEDUNCLES.png",
+var aniFilenames = new Array("01adicomimport.png",
+                             "02apreprocessingreconstruction.png",
+                             "03aquantification.png",
+                             "04atractography.png",
+                             "05atbss.png",
+                             "06aconnectomics.png",
+                             "07aivim.png",
+                             "08avolumevisualization.png",
+                             "09ascreenshotsmovies.png",
                              "button_mitka.png");
 
 // if your module is not stable, you can mark it as experimental.
@@ -67,20 +63,18 @@ var experimental = new Array(false,
                              false,
                              false,
                              false,
-                             false,
                              false);
 
 // add the description for your module. The description is displayed in a PopUp-window.
-var moduleDescriptions = new Array("This colormap represents the original diffusion acquisition that was used as input for tractography.",
-                            "This T1-weighted image was aquired during the same imaging session as the diffusion image. It is roughly aligned with the diffusion image and provides additional, complementary information.",
-                            "This dataset contains all fibers that were found by the global tractography approach. It can serve as a background for better orientation in the 3D view.",
-                            "This dataset contains the Cingulum fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Corpus Callosum fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Corticospinal Tract fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Fornix fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Inferior Longitudinal Fasciculus, Inferior Fronto-Occipital Fasciculus, and the Uncinate Fasciculus fibers and most important regions of interest that were used to extract it.",
-                            "This dataset contains the Superior Longitudinal Fasciculus, Superior Occipito-Frontal Fasciculus, and Arcuate Fasciculus fibers and most important regions of interest that were used to extract it.",
-                            "This dataset is not in the same world coordinate system as the others and should not be opened in combination with any of the other datasets. It contains a 3D visualization of the cerebellum and the Inferior Cerebellar Peduncles, Medial Cerebellar Peduncle, Superior Cerebellar Peduncles, and Medial Lemniscus fibers and the and most important regions of interest that were used to extract it.",
+var moduleDescriptions = new Array("'Dicom Import' supports direct import of Siemens diffusion weighted DICOM files.",
+                            "'Preprocessing & Reconstruction' lets you estimate diffusion tensors or q-balls using different reconstruction methods. It also includes an ODF-details view and preprocessing steps like gradient avaraging, baseline image extraction, and binary mask estimation.",
+                            "'Quantification' calculates scalar indices (FA, GFA, ...) and allows ROI-analysis in 2D or 3D. The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
+                            "'Tractography' implements a global yet computationally efficient tracking algorithm (gibbs-tracking). In addition it provides a stochastic tractography method. The fiber bundle operations view allows for extraction, join, and substraction of bundles. It also generates a variety of images from given fiber tracts.",
+                            "'TBSS' does *not* reimplement the original Tract Based Spatial Statistics method available in FLS. Aim of this module is to read TBSS output and provides means to interactively explore and evaluate the datasets.",
+                            "'Connectomics' aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis. fMRI-data might be incorporated in future.",
+                            "'IVIM' stands for Intravoxel Incoherent Motion. The technique allows for the estimation of tissue perfusion on basis of diffusion measurements. Several models are supported by this module. Interactive exploration of the data is supported.",
+                            "'Volume Visualization' provides easy to use and fast volume rendering of images. Transfer-functions can be loaded, saved, and adapted interactively.",
+                            "'Screenshots & Movies' provides means to capture high resolution screenshots as well as movies of the 3D sceen.",
                             "Open the MITK website in an external browser.");
 
 var bttns = new Array();
@@ -238,7 +232,7 @@ function showPopUpWindow(){
   moduleLink = document.createElement("a");
   moduleLink.href = moduleLinks[modulePos] ;
   moduleLink.className = 'moduleLink';
-  moduleLinkTxt = document.createTextNode("Click here to open the " + moduleNames[modulePos].toLowerCase() + " dataset");
+  moduleLinkTxt = document.createTextNode("Click here to open '" + moduleNames[modulePos].toLowerCase() + "'");
   moduleLink.appendChild(moduleLinkTxt);
   
   // append text-elements to their container

@@ -23,6 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
+
 #include "mitkUnstructuredGrid.h"
 
 namespace mitk
@@ -84,11 +88,13 @@ public:
      */
     itkGetStringMacro( FilePattern );
 
+    using FileWriter::SetInput;
+
     /**
      * Sets the 0'th input object for the filter.
      * @param input the first input for the filter.
      */
-    void SetInput( mitk::UnstructuredGrid* input );
+    void SetInput( BaseData* input );
 
     /**
      * @returns the 0'th input object of the filter.
@@ -136,6 +142,12 @@ protected:
 
     bool m_Success;
 };
+
+#ifndef MitkExt_EXPORTS
+extern template class UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+extern template class UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+extern template class UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+#endif
 
 }
 

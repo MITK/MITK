@@ -143,7 +143,7 @@ void UnstructuredGridVtkWriter<VTKWRITER>::ExecuteWrite( VTKWRITER* vtkWriter )
 }
 
 template<class VTKWRITER>
-void UnstructuredGridVtkWriter<VTKWRITER>::SetInput(UnstructuredGrid *input)
+void UnstructuredGridVtkWriter<VTKWRITER>::SetInput(BaseData *input)
 {
   this->ProcessObject::SetNthInput(0, input);
 }
@@ -200,52 +200,6 @@ const char* UnstructuredGridVtkWriter<VTKWRITER>::GetDefaultExtension()
 {
   throw std::exception(); // no specialization available!
 }
-
-template<>
-std::vector<std::string> UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetPossibleFileExtensions();
-
-template<>
-std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetPossibleFileExtensions();
-
-template<>
-std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetPossibleFileExtensions();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultFilename();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultFilename();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultFilename();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetFileDialogPattern();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetFileDialogPattern();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetFileDialogPattern();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultExtension();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultExtension();
-
-template<>
-const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension();
-
-#ifndef __APPLE__
-// On MacOS, we get duplicate symbol errors during linking of mitkCoreExt.
-// It looks like the linker does not coalesce the two instantiations in
-// mitkUnstructuredGridVtkWriter.cpp and mitkCoreExtObjectFactory.cpp
-// (which both include this file)
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
-#endif
 
 }
 

@@ -17,9 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSubImageSelector.h"
-#include <itkSmartPointerForwardReference.txx>
 
-//template class itk::SmartPointerForwardReference<ImageDataItem>;
 
 void mitk::SubImageSelector::SetPosNr(int /*p*/)
 {

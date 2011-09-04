@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iomanip>
 
+#include <vtkSTLWriter.h>
+#include <vtkPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
+
 #include <itkProcessObject.h>
 #include <mitkFileWriter.h>
 #include <mitkPointSet.h>
@@ -48,7 +52,7 @@ namespace mitk
  * @ingroup Process
 */
 template <class VTKWRITER>
-class SurfaceVtkWriter : public mitk::FileWriter
+class MITK_CORE_EXPORT SurfaceVtkWriter : public mitk::FileWriter
 {
 public:
 
@@ -187,6 +191,12 @@ protected:
   
     bool m_WriterWriteHasReturnValue;
 };
+
+#ifndef Mitk_EXPORTS
+extern template class SurfaceVtkWriter<vtkSTLWriter>;
+extern template class SurfaceVtkWriter<vtkPolyDataWriter>;
+extern template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
+#endif
 
 }
 

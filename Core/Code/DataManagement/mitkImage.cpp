@@ -25,10 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkIpPicTypeMultiplex.h"
 
 #include <vtkImageData.h>
-#include <itkSmartPointerForwardReference.txx>
-
-
-template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::ImageDataItem>;
 
 
 mitk::Image::Image() : 
@@ -108,7 +104,7 @@ void* mitk::Image::GetData()
 {
   if(m_Initialized==false)
   {
-    if(GetSource()==NULL)
+    if(GetSource().IsNull())
       return NULL;
     if(GetSource()->Updating()==false)
       GetSource()->UpdateOutputInformation();
@@ -172,7 +168,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
 {
   if(m_Initialized==false)
   {
-    if(GetSource()==NULL)
+    if(GetSource().IsNull())
       return NULL;
     if(GetSource()->Updating()==false)
       GetSource()->UpdateOutputInformation();
@@ -193,7 +189,7 @@ mitkIpPicDescriptor* mitk::Image::GetPic()
 {
   if(m_Initialized==false)
   {
-    if(GetSource()==NULL)
+    if(GetSource().IsNull())
       return NULL;
     if(GetSource()->Updating()==false)
       GetSource()->UpdateOutputInformation();
@@ -233,7 +229,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n,
   }
 
   // slice is unavailable. Can we calculate it?
-  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
+  if((GetSource().IsNotNull()) && (GetSource()->Updating()==false))
   {
     // ... wir mussen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
@@ -341,7 +337,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
   }
 
   // volume is unavailable. Can we calculate it?
-  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
+  if((GetSource().IsNotNull()) && (GetSource()->Updating()==false))
   {
     // ... wir muessen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
@@ -437,7 +433,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
   }
 
   // channel is unavailable. Can we calculate it?
-  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
+  if((GetSource().IsNotNull()) && (GetSource()->Updating()==false))
   {
     // ... wir muessen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);

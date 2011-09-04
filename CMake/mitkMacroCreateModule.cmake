@@ -24,7 +24,7 @@
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE
                         "SUBPROJECTS;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
-                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY"
+                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY"
                         ${ARGN})
                         
   SET(MODULE_NAME ${MODULE_NAME_IN})
@@ -101,6 +101,12 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 	  # ok, now create the module itself 
 	  INCLUDE_DIRECTORIES(. ${ALL_INCLUDE_DIRECTORIES})
 	  INCLUDE(files.cmake)
+  
+    SET(module_compile_flags )
+    # MinGW does not export all symbols automatically, so no need to set flags
+    IF(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW AND NOT MODULE_GCC_DEFAULT_VISIBILITY)
+      SET(module_compile_flags "${module_compile_flags} -fvisibility=hidden -fvisibility-inlines-hidden")
+    ENDIF()
 	
 	  IF(NOT MODULE_QT_MODULE)
 	    ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
@@ -110,7 +116,9 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 			     )
 
 	    IF(MODULE_FORCE_STATIC)
-	      SET(_STATIC ${MITK_WIN32_FORCE_STATIC})
+              SET(_STATIC STATIC)
+            ELSE()
+              SET(_STATIC )
 	    ENDIF(MODULE_FORCE_STATIC)
 	    
 	    SET(coverage_sources ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES} ${TOOL_CPPS}) 
@@ -123,7 +131,7 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 		# LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
 		LINK_DIRECTORIES(${ALL_LIBRARY_DIRS})
 	      ENDIF(ALL_LIBRARY_DIRS)
-	      ADD_LIBRARY(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${DOX_FILES} ${UI_FILES})
+              ADD_LIBRARY(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${DOX_FILES} ${UI_FILES})
         IF(MODULE_TARGET_DEPENDS)
           ADD_DEPENDENCIES(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
         ENDIF()
@@ -198,9 +206,12 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 	
 	  ENDIF(NOT MODULE_QT_MODULE) 
 
-	  #IF(NOT MODULE_HEADERS_ONLY AND TARGET EP_MITK)
-	  #  ADD_DEPENDENCIES(${MODULE_PROVIDES} EP_MITK)
-	  #ENDIF()
+    IF(NOT MODULE_HEADERS_ONLY)
+      # Apply properties to the module target.
+      SET_TARGET_PROPERTIES(${MODULE_PROVIDES} PROPERTIES
+        COMPILE_FLAGS "${module_compile_flags}"
+      )
+    ENDIF()
 
 	  # install only if shared lib (for now)
 	  IF(NOT _STATIC OR MINGW)

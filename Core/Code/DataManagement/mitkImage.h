@@ -36,7 +36,6 @@ class vtkImageData;
 namespace mitk {
 
 class SubImageSelector;
-//class ImageDataItem;
 class ImageTimeSelector;
 
 //##Documentation
@@ -72,7 +71,7 @@ public:
   mitkCloneMacro(Image);
 
   /** Smart Pointer type to a ImageDataItem. */
-  typedef itk::SmartPointerForwardReference<ImageDataItem> ImageDataItemPointer;
+  typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
 
   //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.
   //## The different options are: 

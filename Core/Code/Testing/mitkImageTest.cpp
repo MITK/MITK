@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 
 #include <fstream>
-#include <itkSmartPointerForwardReference.txx>
+
 #include <mitkDataNodeFactory.h>
 
 #include <vtkImageData.h>

@@ -27,9 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
 
+
 namespace mitk {
 
-class BaseProcess;
+//class BaseProcess;
 
 //##Documentation
 //## @brief Base of all data objects
@@ -302,10 +303,10 @@ public:
    * a forward reference smart pointer is returned, not a smart pointer, 
    * because of the circular dependency between the process and data object.)
    *
-   * GetSource() returns a SmartPointerForwardReference and not a WeakPointer
+   * GetSource() returns a SmartPointer and not a WeakPointer
    * because it is assumed the code calling GetSource() wants to hold a
    * long term reference to the source. */
-  itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
+  itk::SmartPointer<mitk::BaseProcess> GetSource() const;
 
   //##Documentation
   //## @brief Get the number of time steps from the Timeslicedgeometry

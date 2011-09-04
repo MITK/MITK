@@ -15,13 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include <vtkErrorCode.h>
+
 #include "mitkSurfaceVtkWriter.h"
 #include "mitkSurfaceVtkWriter.txx"
 
-#include <vtkSTLWriter.h>
-#include <vtkPolyDataWriter.h>
-#include <vtkXMLPolyDataWriter.h>
-#include <vtkErrorCode.h>
 
 namespace mitk {
 
@@ -82,11 +80,9 @@ std::vector<std::string> SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetPossibleFile
   return possibleFileExtensions;
 }
 
-template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkSTLWriter>;
-
-template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkPolyDataWriter>;
-
-template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkXMLPolyDataWriter>;
+template class SurfaceVtkWriter<vtkSTLWriter>;
+template class SurfaceVtkWriter<vtkPolyDataWriter>;
+template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
 
 }
 

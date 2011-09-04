@@ -239,7 +239,7 @@ void mitk::UnstructuredGrid::CopyInformation( const itk::DataObject * data )
 
 void mitk::UnstructuredGrid::Update()
 {
-  if ( GetSource() == 0 )
+  if ( GetSource().IsNull() )
   {
     for ( VTKUnstructuredGridSeries::iterator it = m_GridSeries.begin() ; it != m_GridSeries.end() ; ++it )
     {

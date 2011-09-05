@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkServiceException.h"
 #include "mitkModuleContext.h"
 
+#include <mitkLogMacros.h>
+
 #include <stdexcept>
 #include <limits>
 

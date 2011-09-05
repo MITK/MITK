@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkFooService.h>
 
+#include <mitkLogMacros.h>
+
 namespace mitk {
 
 class ActivatorSL4 :

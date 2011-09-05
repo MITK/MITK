@@ -5,6 +5,9 @@
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
 
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
 QmitkCreatePolygonModelAction::QmitkCreatePolygonModelAction()
 {
 }
@@ -89,7 +92,33 @@ void QmitkCreatePolygonModelAction::Run(const std::vector<mitk::DataNode*>& sele
           filter->SetPointerParameter("Group node", nodepointer);
           filter->SetDataStorage(*m_DataStorage);
 
-          // TODO: Set up progress bar and status bar text
+          berry::IPreferencesService::Pointer prefService = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+          berry::IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+
+          bool smoothingHint = segPref->GetBool("smoothing hint", true);
+          float smoothing = (float)segPref->GetDouble("smoothing value", 1.0);
+          float decimation = (float)segPref->GetDouble("decimation rate", 0.5);
+          
+          if (smoothingHint)
+          {
+            smoothing = 0.0;
+            mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
+            
+            for (mitk::Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
+              smoothing = std::max(smoothing, *iter);
+
+            filter->SetParameter("Smoothing", smoothing);
+          }
+          else
+          {
+            filter->SetParameter("Smoothing", smoothing);
+          }
+
+          filter->SetParameter("Decimation", decimation);
+
+          mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+          mitk::ProgressBar::GetInstance()->Progress(1);
+          mitk::StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background (this may take a while)...");
 
           filter->StartAlgorithm();
         }

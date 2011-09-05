@@ -24,6 +24,7 @@
 #include <QGroupBox>
 #include <QRadioButton>
 #include <QMessageBox>
+#include <QDoubleSpinBox>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -63,11 +64,35 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   displayOptionsLayout->addWidget( m_RadioOverlay );
 
   QFormLayout *formLayout = new QFormLayout;
+  formLayout->setHorizontalSpacing(8);
+  formLayout->setVerticalSpacing(24);
   formLayout->addRow( "2D display", displayOptionsLayout );
 
   m_VolumeRenderingCheckBox = new QCheckBox( "Show as volume rendering", m_MainControl );
   formLayout->addRow( "3D display", m_VolumeRenderingCheckBox );
   connect( m_VolumeRenderingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnVolumeRenderingCheckboxChecked(int)) );
+
+  QFormLayout* surfaceLayout = new QFormLayout;
+  surfaceLayout->setSpacing(8);
+
+  m_SmoothingCheckBox = new QCheckBox("Use image spacing as smoothing value hint", m_MainControl);
+  surfaceLayout->addRow(m_SmoothingCheckBox);
+  connect(m_SmoothingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSmoothingCheckboxChecked(int)));
+
+  m_SmoothingSpinBox = new QDoubleSpinBox(m_MainControl);
+  m_SmoothingSpinBox->setMinimum(0.0);
+  m_SmoothingSpinBox->setSingleStep(0.5);
+  m_SmoothingSpinBox->setValue(1.0);
+  surfaceLayout->addRow("Smoothing value", m_SmoothingSpinBox);
+
+  m_DecimationSpinBox = new QDoubleSpinBox(m_MainControl);
+  m_DecimationSpinBox->setMinimum(0.0);
+  m_DecimationSpinBox->setMaximum(0.99);
+  m_DecimationSpinBox->setSingleStep(0.1);
+  m_DecimationSpinBox->setValue(0.5);
+  surfaceLayout->addRow("Decimation rate", m_DecimationSpinBox);
+
+  formLayout->addRow("Smoothed surface creation", surfaceLayout);
   
   m_MainControl->setLayout(formLayout);
   this->Update();
@@ -83,6 +108,9 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 {
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
   m_SegmentationPreferencesNode->PutBool("volume rendering", m_VolumeRenderingCheckBox->isChecked());
+  m_SegmentationPreferencesNode->PutBool("smoothing hint", m_SmoothingCheckBox->isChecked());
+  m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
+  m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
   return true;
 }
 
@@ -104,6 +132,20 @@ void QmitkSegmentationPreferencePage::Update()
   }
 
   m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", false) );
+
+  if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
+  {
+    m_SmoothingCheckBox->setChecked(true);
+    m_SmoothingSpinBox->setDisabled(true);
+  }
+  else
+  {
+    m_SmoothingCheckBox->setChecked(false);
+    m_SmoothingSpinBox->setEnabled(true);
+  }
+
+  m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
+  m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
 }
 
 void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)
@@ -117,4 +159,12 @@ void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state
                              "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
                              "If you encounter out-of-memory problems, try turning off volume rendering again.");
   }
+}
+
+void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)
+{
+  if (state != Qt::Unchecked)
+    m_SmoothingSpinBox->setDisabled(true);
+  else
+    m_SmoothingSpinBox->setEnabled(true);
 }

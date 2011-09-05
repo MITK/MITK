@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SHOW_SEGMENTATION_AS_SMOOTHED_SURFACE_H
 
 #include "mitkSegmentationSink.h"
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 
 namespace mitk
 {

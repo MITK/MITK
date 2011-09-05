@@ -2,6 +2,7 @@
 /**
 
 \defgroup Visualization Visualization and Visualization Organization Classes
+\ingroup Core
 
 \brief This category includes renderwindows (currently one for OpenGL), renderers (currently only one, 
 for OpenGL-based renderwindows), mappers  and classes for navigating in the data.

@@ -54,6 +54,27 @@ SET(H_FILES
 
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
+
+  Service/mitkAny.h
+  Service/mitkGetModuleContext.h
+  Service/mitkItkHashMap.h
+  Service/mitkItkHashSet.h
+  Service/mitkItkHashTable.h
+  Service/mitkModuleAbstractTracked.h
+  Service/mitkModuleAbstractTracked.tpp
+  Service/mitkModuleActivator.h
+  Service/mitkServiceFactory.h
+  Service/mitkServiceTracker.h
+  Service/mitkServiceTracker.tpp
+  Service/mitkServiceTrackerCustomizer.h
+  Service/mitkServiceTrackerPrivate.h
+  Service/mitkServiceTrackerPrivate.tpp
+  Service/mitkServiceUtils.h
+  Service/mitkSharedData.h
+  Service/mitkStaticInit.h
+  Service/mitkTrackedService.h
+  Service/mitkTrackedService.tpp
+  Service/mitkTrackedServiceListener.h
 )
 
 SET(CPP_FILES
@@ -274,5 +295,30 @@ SET(CPP_FILES
 
   Rendering/mitkImageMapperGL2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
+  
+  Service/mitkAny.cpp
+  Service/mitkAtomicInt.cpp
+  Service/mitkCoreActivator.cpp
+  Service/mitkCoreModuleContext.cpp
+  Service/mitkModule.cpp
+  Service/mitkModuleContext.cpp
+  Service/mitkModuleEvent.cpp
+  Service/mitkModuleInfo.cpp
+  Service/mitkModulePrivate.cpp
+  Service/mitkModuleRegistry.cpp
+  Service/mitkModuleUtils.cpp
+  Service/mitkModuleVersion.cpp
+  Service/mitkLDAPExpr.cpp
+  Service/mitkLDAPFilter.cpp
+  Service/mitkServiceEvent.cpp
+  Service/mitkServiceException.cpp
+  Service/mitkServiceListenerEntry.cpp
+  Service/mitkServiceListeners.cpp
+  Service/mitkServiceProperties.cpp
+  Service/mitkServiceReference.cpp
+  Service/mitkServiceReferencePrivate.cpp
+  Service/mitkServiceRegistration.cpp
+  Service/mitkServiceRegistrationPrivate.cpp
+  Service/mitkServiceRegistry.cpp
 )
 

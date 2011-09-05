@@ -1,0 +1,10 @@
+
+/**
+
+\defgroup MicroServices Micro Services Classes
+\ingroup Core
+
+\brief This category includes classes related to the MITK Micro Services component.
+
+
+*/

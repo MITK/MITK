@@ -2,6 +2,9 @@
 # Variables:
 #  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
 
+# Compile source code snippets
+add_subdirectory(Snippets)
+
 FIND_PACKAGE(Doxygen)
 
 IF(DOXYGEN_FOUND)
@@ -69,6 +72,15 @@ INCLUDE(mitkFunctionCMakeDoxygenFilterCompile)
 mitkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
 
 # Configure some doxygen options
+IF(NOT MITK_DOXYGEN_INTERNAL_DOCS)
+  SET(MITK_DOXYGEN_INTERNAL_DOCS "NO")
+  SET(MITK_DOXYGEN_HIDE_FRIEND_COMPOUNDS "YES")
+  SET(MITK_DOXYGEN_EXCLUDE_PATTERNS "*_p.* *Private.h */internal/*")
+ELSE()
+  SET(MITK_DOXYGEN_HIDE_FRIEND_COMPOUNDS "NO")
+  SET(MITK_DOXYGEN_EXCLUDE_PATTERNS "")
+ENDIF()
+
 IF(NOT MITK_DOXYGEN_GENERATE_TODOLIST)
   SET(MITK_DOXYGEN_GENERATE_TODOLIST "NO")
 ENDIF()

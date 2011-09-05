@@ -1,3 +1,4 @@
+
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 
@@ -34,3 +35,4 @@ SET_PROPERTY(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 
 add_subdirectory(DICOMTesting)
 
+add_subdirectory(TestModules)

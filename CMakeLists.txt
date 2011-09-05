@@ -234,6 +234,7 @@ endif()
 # CMake Function(s) and Macro(s)
 #-----------------------------------------------------------------------------
 
+include(CheckCXXSourceCompiles)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
 include(MacroParseArguments)
@@ -242,6 +243,7 @@ include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionCompileSnippets)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -261,6 +263,10 @@ include(mitkMacroGetLinuxDistribution)
 
 find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
+
+if(ITK_USE_SYSTEM_GDCM)
+  find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
+endif()
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -331,11 +337,17 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
 set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
+include(mitkSetupC++0xVariables)
+
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
 
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
+
+  if(MITK_USE_C++0x)
+    mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
+  endif()
 
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so

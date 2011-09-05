@@ -42,9 +42,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTimer>
 #include <QThread>
 
+class QmitkFiberBundleDeveloperView; //this include is needed for the struct element, especially for functors to QmitkFiberBundleDeveloperView
 
 /* ==== THIS STRUCT CONTAINS ALL NECESSARY VARIABLES 
  * TO EXECUTE AND UPDATE GUI ELEMENTS DURING PROCESSING OF A THREAD 
+ * why? either you add tons of friendclasses (e.g. FiberWorker objects), or you create a package containing all items needed. Otherwise you have to set all members etc. to public!
  */
 struct Package4WorkingThread
 {
@@ -53,6 +55,9 @@ struct Package4WorkingThread
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
   
   //functors to outdoor methods
+  QmitkFiberBundleDeveloperView* st_host;
+  void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) ();
+  
   
 };
 
@@ -157,7 +162,7 @@ public:
   void BeforeThread_IdGenerate();
   void AfterThread_IdGenerate();
   
-  
+    
   
 protected:
 
@@ -173,10 +178,12 @@ protected:
   private:
   
   /* METHODS GENERATING FIBERSTRUCTURES */
-  vtkPolyData* GenerateVtkFibersRandom();
+  void GenerateVtkFibersRandom();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionX();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
+
+  void PutFibersToDataStorage( /*vtkPolyData*/ );
   
   /* METHODS FOR FIBER PROCESSING OR PREPROCESSING  */
 
@@ -202,6 +209,8 @@ protected:
   QTimer m_idGenerateTimer;
   
   QmitkFiberIDWorker * m_FiberIDGenerator;
+  QmitkFiberGenerateRandomWorker * m_GeneratorFibersRandom;
+  
   QThread * m_hostThread;
   bool m_threadInProgress;
   

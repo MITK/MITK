@@ -238,13 +238,13 @@ namespace mitk
 
       std::vector<double> GetFiberVals()
       {
-        if(vals.size()==2 && vals[0].data_block())
+        if(vals.size()==2 && vals[1].data_block())
         {
-          int s = vals[0].size();
+          int s = vals[1].size();
           std::vector<double> retval(s);
           for(int i=0; i<s; i++)
           {
-            retval[i] = vals[0](i);
+            retval[i] = vals[1](i);
           }
           return retval;
         }
@@ -257,13 +257,13 @@ namespace mitk
 
       std::vector<double> GetNonFiberVals()
       {
-        if(vals.size()==2 && vals[1].data_block())
+        if(vals.size()==2 && vals[0].data_block())
         {
-          int s = vals[1].size();
+          int s = vals[0].size();
           std::vector<double> retval(s);
           for(int i=0; i<s; i++)
           {
-            retval[i] = vals[1](i);
+            retval[i] = vals[0](i);
           }
           return retval;
         }

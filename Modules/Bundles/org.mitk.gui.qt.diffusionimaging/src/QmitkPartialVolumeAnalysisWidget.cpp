@@ -83,6 +83,33 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
     m_Vals.push_back(hist->GetXVals());
     m_Vals.push_back(hist->GetHVals());
 
+
+    std::vector<double> *xVals = hist->GetXVals();
+    std::vector<double> *yVals = hist->GetHVals();
+    std::vector<double> *fiberVals = new std::vector<double>(results->GetFiberVals());
+    std::vector<double> *nonFiberVals = new std::vector<double>(results->GetNonFiberVals());
+    std::vector<double> *mixedVals = new std::vector<double>(results->GetMixedVals());
+    std::vector<double> *combiVals = new std::vector<double>(results->GetCombiVals());
+
+
+    double fiberFA = 0.0;
+    double weights = 0.0;
+
+    std::cout << "x, y, fiber, nonFiber, mixed, combi" << std::endl;
+    for(int i=0; i<xVals->size(); ++i)
+    {
+
+      fiberFA += xVals->at(i) * fiberVals->at(i);
+      weights += fiberVals->at(i);
+
+      std::cout << xVals->at(i) << " " << yVals->at(i) << " " << fiberVals->at(i)
+          << " " << nonFiberVals->at(i) << " " << mixedVals->at(i) << " " << combiVals->at(i) << std::endl;
+
+    }
+
+    fiberFA = fiberFA / weights;
+
+
     QPen pen( Qt::SolidLine );
     pen.setWidth(2);
 
@@ -92,21 +119,21 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
     this->SetCurvePen( curveId, pen );
     //  this->SetCurveTitle( curveId, "Image Histogram" );
 
-    std::vector<double> *fiberVals = new std::vector<double>(results->GetFiberVals());
+
     curveId = this->InsertCurve( "fiber" );
-    this->SetCurveData( curveId, (*hist->GetXVals()), (*fiberVals) );
+    this->SetCurveData(curveId, (*hist->GetXVals()), (*fiberVals));
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
     this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(0,1,0,.5), Qt::SolidPattern));
     m_Vals.push_back(fiberVals);
 
-    std::vector<double> *nonFiberVals = new std::vector<double>(results->GetNonFiberVals());
+
     curveId = this->InsertCurve( "nonfiber" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*nonFiberVals) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
     this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(1,0,0,.5), Qt::SolidPattern));
     m_Vals.push_back(nonFiberVals);
 
-    std::vector<double> *mixedVals = new std::vector<double>(results->GetMixedVals());
+
     curveId = this->InsertCurve( "mixed" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*mixedVals) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
@@ -114,7 +141,6 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
     m_Vals.push_back(mixedVals);
 
     pen.setColor(Qt::blue);
-    std::vector<double> *combiVals = new std::vector<double>(results->GetCombiVals());
     curveId = this->InsertCurve( "combi" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*combiVals) );
     this->SetCurvePen( curveId, pen );

@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSERVICETRACKER_H
 #define MITKSERVICETRACKER_H
 
-#include "mitkCommon.h"
-
 #include "mitkServiceReference.h"
 #include "mitkServiceTrackerCustomizer.h"
 #include "mitkLDAPFilter.h"

@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLDAPFILTER_H
 #define MITKLDAPFILTER_H
 
-#include "mitkCommon.h"
-
 #include "mitkServiceReference.h"
 #include "mitkServiceProperties.h"
 

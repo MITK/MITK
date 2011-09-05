@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkItkHashMap.h"
 #endif
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include "mitkAny.h"
 
 namespace mitk {

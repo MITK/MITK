@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKMODULECONTEXT_H_
 #define MITKMODULECONTEXT_H_
 
-#include <mitkCommon.h>
-
 #include "mitkServiceInterface.h"
 #include "mitkMessage.h"
 #include "mitkServiceEvent.h"

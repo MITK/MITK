@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkModulePrivate.h"
 #include "mitkCoreModuleContext_p.h"
 
+#include <mitkLogMacros.h>
+
 #include <itkMutexLockHolder.h>
 
 namespace mitk {

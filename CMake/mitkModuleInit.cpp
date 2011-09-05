@@ -31,11 +31,7 @@ namespace mitk {
 
 MITK_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, ("@MODULE_NAME@", "@MODULE_LIBNAME@", "@MODULE_DEPENDS_STR@", "@MODULE_PACKAGE_DEPENDS_STR@", "@MODULE_VERSION@", @MODULE_QT_BOOL@))
 
-#if defined(__GNUC__)
-class __attribute__ ((visibility ("hidden"))) ModuleInitializer {
-#else
-class ModuleInitializer {
-#endif
+class MITK_LOCAL ModuleInitializer {
 
 public:
 

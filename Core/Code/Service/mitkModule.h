@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKMODULE_H
 #define MITKMODULE_H
 
-#include <mitkCommon.h>
-
 #include "mitkModuleVersion.h"
 
 namespace mitk {

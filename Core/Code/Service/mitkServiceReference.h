@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSERVICEREFERENCE_H
 #define MITKSERVICEREFERENCE_H
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include <mitkAny.h>
 
 #ifdef MITK_HAS_UNORDERED_MAP_H

@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkModule.h"
 
+#include <mitkLogMacros.h>
+
 namespace mitk {
 
 const int ServiceListeners::OBJECTCLASS_IX = 0;

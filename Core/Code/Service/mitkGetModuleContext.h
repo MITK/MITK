@@ -37,11 +37,7 @@ class ModuleContext;
  * Consequently, the GetModuleContext function is not exported, since each
  * module gets its "own version".
  */
-#if defined(__GNUC__)
-__attribute__ ((visibility ("hidden"))) ModuleContext* GetModuleContext();
-#else
-ModuleContext* GetModuleContext();
-#endif
+MITK_LOCAL ModuleContext* GetModuleContext();
 
 }
 

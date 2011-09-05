@@ -27,7 +27,7 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 #include <algorithm>
 #include <utility>
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include "mitkAtomicInt.h"
 
 namespace mitk {

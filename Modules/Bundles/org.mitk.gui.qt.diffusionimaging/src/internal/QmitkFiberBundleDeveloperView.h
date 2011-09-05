@@ -56,7 +56,7 @@ struct Package4WorkingThread
   
   //functors to outdoor methods
   QmitkFiberBundleDeveloperView* st_host;
-  void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) ();
+  void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) (vtkPolyData*);
   
   
 };
@@ -161,6 +161,8 @@ public:
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();
   void AfterThread_IdGenerate();
+  void BeforeThread_GenerateFibersRandom();
+  void AfterThread_GenerateFibersRandom();
   
     
   
@@ -183,7 +185,7 @@ protected:
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
 
-  void PutFibersToDataStorage( /*vtkPolyData*/ );
+  void PutFibersToDataStorage( vtkPolyData* );
   
   /* METHODS FOR FIBER PROCESSING OR PREPROCESSING  */
 

@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkModuleActivator.h>
 #include <mitkModuleContext.h>
 
+#include <mitkLogMacros.h>
+
 namespace mitk {
 
 struct TestModuleA : public itk::LightObject, public TestModuleAService

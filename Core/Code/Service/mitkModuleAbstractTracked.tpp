@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkMutexLockHolder.h>
 
+#include <mitkLogMacros.h>
+
 namespace mitk {
 
 typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexLocker;

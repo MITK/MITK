@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestUtilSharedLibrary.cpp"
 
 #include <mitkTestingMacros.h>
+#include <mitkLogMacros.h>
 
 class ModuleListener {
 

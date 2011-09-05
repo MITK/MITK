@@ -22,7 +22,7 @@ function(mitkFunctionCompileSnippets snippet_path)
     # Uset the top-level directory name as the executable name
     string(REPLACE "/" ";" main_cpp_dir_tokens "${main_cpp_dir}")
     list(GET main_cpp_dir_tokens -1 snippet_exec_name)
-    set(snippet_target_name "Snippet/${snippet_exec_name}")
+    set(snippet_target_name "Snippet-${snippet_exec_name}")
     add_executable(${snippet_target_name} ${snippet_src_files})
     if(ARGN)
       target_link_libraries(${snippet_target_name} ${ARGN})
@@ -30,6 +30,8 @@ function(mitkFunctionCompileSnippets snippet_path)
     set_target_properties(${snippet_target_name} PROPERTIES
       LABELS Documentation
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/snippets"
+      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/snippets"
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/snippets"
       OUTPUT_NAME ${snippet_exec_name}
     )
     

@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkModuleUtils.h"
+#include <mitkLogMacros.h>
 
 namespace mitk {
 
@@ -49,6 +50,7 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
 
 #elif _WIN32
 
+#include <windows.h>
 #include <strsafe.h>
 
 void PrintLastError_impl(const std::string& context)

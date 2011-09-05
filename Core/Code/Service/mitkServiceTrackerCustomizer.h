@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkServiceReference.h"
 
+namespace itk { class LightObject; }
+
 namespace mitk {
 
 /**

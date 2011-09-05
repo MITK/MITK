@@ -92,4 +92,19 @@ public:
 
 } // end namespace mitk
 
+#define MITK_EXPORT_MODULE_ACTIVATOR(moduleName, type)                                  \
+  extern "C" MITK_EXPORT mitk::ModuleActivator* _mitk_module_activator_instance_ ## moduleName () \
+  {                                                                                     \
+    struct ScopedPointer                                                                \
+    {                                                                                   \
+      ScopedPointer(mitk::ModuleActivator* activator = 0) : m_Activator(activator) {}   \
+      ~ScopedPointer() { delete m_Activator; }                                          \
+      mitk::ModuleActivator* m_Activator;                                               \
+    };                                                                                  \
+                                                                                        \
+    static ScopedPointer activatorPtr;                                                  \
+    if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new type;             \
+    return activatorPtr.m_Activator;                                                    \
+  }
+
 #endif /* MITKMODULEACTIVATOR_H_ */

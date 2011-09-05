@@ -101,7 +101,14 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
     SET(module_compile_flags )
     # MinGW does not export all symbols automatically, so no need to set flags
     IF(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW AND NOT MODULE_GCC_DEFAULT_VISIBILITY)
-      SET(module_compile_flags "${module_compile_flags} -fvisibility=hidden -fvisibility-inlines-hidden")
+      IF(${GCC_VERSION} VERSION_GREATER "4.5.0")
+        # With gcc < 4.5, type_info objects need special care. Especially exceptions
+        # and inline definitions of classes from 3rd party libraries would need
+        # to be wrapped with pragma GCC visibility statements if the library is not
+        # prepared to handle hidden visibility. This would need too many changes in
+        # MITK and would be too fragile.
+        SET(module_compile_flags "${module_compile_flags} -fvisibility=hidden -fvisibility-inlines-hidden")
+      ENDIF()
     ENDIF()
 	
 	  IF(NOT MODULE_QT_MODULE)

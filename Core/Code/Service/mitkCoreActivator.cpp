@@ -43,5 +43,5 @@ private:
   mitk::RenderingManager::Pointer m_RenderingManager;
 };
 
-MITK_EXPORT_MODULE_ACTIVATOR(MitkCoreActivator)
+MITK_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
 

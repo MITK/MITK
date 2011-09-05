@@ -96,7 +96,7 @@ class ImageDescriptor : public itk::Object
     PixelType GetChannelTypeById( unsigned int id) const;
 
     /** \brief Get the ChannelDescriptor for a channel specified by its id      */
-    ChannelDescriptor::Pointer GetChannelDescriptor( unsigned int id) const;
+    ChannelDescriptor GetChannelDescriptor( unsigned int id) const;
 
     /** \brief Get the count of channels used */
     unsigned int GetNumberOfChannels()
@@ -111,7 +111,7 @@ class ImageDescriptor : public itk::Object
 
   private:
     /** A std::vector holding a pointer to a ChannelDescriptor for each active channel of the image */
-    std::vector<ChannelDescriptor::Pointer> m_ChannelDesc;
+    std::vector<ChannelDescriptor> m_ChannelDesc;
 
     /** A vector holding the names of corresponding channels */
     std::vector<std::string> m_ChannelNames;
@@ -120,7 +120,7 @@ class ImageDescriptor : public itk::Object
     typedef std::vector<std::string>::const_iterator ConstChannelNamesIter;
 
     /** Constant iterator for traversing the vector of ChannelDescriptors */
-    typedef std::vector<ChannelDescriptor::Pointer>::const_iterator ConstChannelsIter;
+    typedef std::vector<ChannelDescriptor>::const_iterator ConstChannelsIter;
 
 
     unsigned int m_NumberOfChannels;

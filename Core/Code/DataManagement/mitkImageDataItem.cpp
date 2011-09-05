@@ -77,7 +77,7 @@ mitk::ImageDataItem::~ImageDataItem()
 mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory)
   : m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0)
 {
-  m_PixelType = new mitk::PixelType(desc->GetChannelDescriptor(0)->GetPixelType());
+  m_PixelType = new mitk::PixelType(desc->GetChannelDescriptor(0).GetPixelType());
 
   // compute size
   const unsigned int *dimensions = desc->GetDimensions();

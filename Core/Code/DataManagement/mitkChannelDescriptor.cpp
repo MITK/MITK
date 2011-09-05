@@ -1,12 +1,12 @@
 #include "mitkChannelDescriptor.h"
 #include "mitkMemoryUtilities.h"
 
-mitk::ChannelDescriptor::ChannelDescriptor()
-  : m_Data(NULL), m_Name(NULL)
+mitk::ChannelDescriptor::ChannelDescriptor( mitk::PixelType& type, size_t numOfElements, bool allocate)
+  : m_PixelType(type), m_Size(numOfElements), m_Data(NULL)
 {
-  this->m_Size = 0;
+  MITK_INFO << "Entering ChannelDescriptor constructor.";
 }
-
+/*
 void mitk::ChannelDescriptor::Initialize(mitk::PixelType &type, size_t numOfElements, bool allocate)
 {
   if( m_PixelType.GetPixelTypeId() != type.GetPixelTypeId() )
@@ -25,6 +25,7 @@ void mitk::ChannelDescriptor::Initialize(mitk::PixelType &type, size_t numOfElem
     this->AllocateData();
   }
 }
+*/
 
 void mitk::ChannelDescriptor::AllocateData()
 {

@@ -329,7 +329,7 @@ public:
     if(m_Dimension>=3)
       origin[2]=itkorigin[2];
 
-    // access direction of itk::Image and include spacing
+    // access direction of itk::Imagm_PixelType = new mitk::PixelType(type);e and include spacing
     const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();  
     MITK_DEBUG << "ITK direction " << itkdirection;
     mitk::Matrix3D matrix;
@@ -437,7 +437,7 @@ public:
   ImageDescriptor::Pointer GetImageDescriptor() const
   { return m_ImageDescriptor; }
 
-  ChannelDescriptor::Pointer GetChannelDescriptor( int id = 0 ) const
+  ChannelDescriptor GetChannelDescriptor( int id = 0 ) const
   { return m_ImageDescriptor->GetChannelDescriptor(id); }
 
   //##Documentation
@@ -588,7 +588,6 @@ protected:
 
   size_t *m_OffsetTable;
   ImageDataItemPointer m_CompleteData;
-  PixelType *m_PixelType;
 
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
 

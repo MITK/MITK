@@ -19,9 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHANNELDESCRIPTOR_H
 #define MITKCHANNELDESCRIPTOR_H
 
-#include <itkObjectFactory.h>
 #include "mitkPixelType.h"
-
 #include <string>
 
 
@@ -34,19 +32,19 @@ namespace mitk
 to this is that the ChannelDescriptor does not hold the geometry information, only the PixelType.
 The pixel type is the single information that can differ among an image with multiple channels.
 */
-class ChannelDescriptor : public itk::Object
+class ChannelDescriptor
 {
 public:
-    mitkClassMacro(ChannelDescriptor, itk::Object)
+    ChannelDescriptor(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
 
-    itkNewMacro(Self)
+    ~ChannelDescriptor(){}
 
     /** \brief Initialize method for the channel descriptor
 
       \param numOfElements the size of the channel described in elements
       \param allocate if set to true, the channel descriptor allocates numOfElements * type.GetSize() bytes
     */
-    void Initialize(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
+    //void Initialize(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
 
     /** \brief Get the type of channel's elements */
     PixelType GetPixelType() const
@@ -66,10 +64,6 @@ public:
 
 protected:
     void AllocateData();
-
-    ChannelDescriptor();
-
-    ~ChannelDescriptor(){}
 
     /** Name of the channel */
     std::string m_Name;

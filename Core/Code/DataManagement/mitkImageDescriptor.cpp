@@ -13,8 +13,7 @@ void mitk::ImageDescriptor::AddNewChannel(mitk::PixelType ptype, const char *nam
   for( unsigned int i=0; i<this->m_NumberOfDimensions; i++)
     elems *= this->m_Dimensions[i];
 
-  mitk::ChannelDescriptor::Pointer desc = mitk::ChannelDescriptor::New();
-  desc->Initialize( ptype, elems, false);
+  mitk::ChannelDescriptor desc(ptype, elems);
 
   this->m_ChannelDesc.push_back( desc );
 
@@ -42,7 +41,7 @@ void mitk::ImageDescriptor::Initialize(const ImageDescriptor::Pointer refDescrip
   }
 
   // get the channel descriptor and store them and so the name of the channel
-  mitk::ChannelDescriptor::Pointer desc = refDescriptor->GetChannelDescriptor(channel);
+  mitk::ChannelDescriptor desc = refDescriptor->GetChannelDescriptor(channel);
   this->m_ChannelDesc.push_back( desc );
   this->m_ChannelNames.push_back( refDescriptor->GetChannelName(channel) );
 }
@@ -58,7 +57,7 @@ void mitk::ImageDescriptor::Initialize(const unsigned int *dims, const unsigned 
   }
 }
 
-mitk::ChannelDescriptor::Pointer mitk::ImageDescriptor::GetChannelDescriptor(unsigned int id) const
+mitk::ChannelDescriptor mitk::ImageDescriptor::GetChannelDescriptor(unsigned int id) const
 {
   return this->m_ChannelDesc[id];
 }
@@ -74,7 +73,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) co
     if( search_str.compare( *iter ) ) idFound = iter - this->m_ChannelNames.begin();
   }
 
-  return (m_ChannelDesc[idFound])->GetPixelType();
+  return (m_ChannelDesc[idFound]).GetPixelType();
 }
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id) const
@@ -85,7 +84,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id)
   }
   else
   {
-    return (this->m_ChannelDesc[id])->GetPixelType();
+    return (this->m_ChannelDesc[id]).GetPixelType();
   }
 }
 

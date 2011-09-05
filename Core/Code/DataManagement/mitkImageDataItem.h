@@ -21,12 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 //#include <mitkIpPic.h>
-#include "mitkPixelType.h"
+//#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"
 
 class vtkImageData;
 
 namespace mitk {
+
+  class PixelType;
 
   //##Documentation
   //## @brief Internal class for managing references on sub-images

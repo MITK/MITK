@@ -106,6 +106,13 @@ namespace mitk
     return ErrorText(this->m_PMDRes);
   }
 
+  bool ToFCameraPMDController::GetShortSourceData( short* sourceData)
+  {
+     this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle,&m_DataDescription);
+    ErrorText( this->m_PMDRes);
+     this->m_PMDRes = pmdGetSourceData(m_PMDHandle,sourceData,m_DataDescription.size);
+    return ErrorText( this->m_PMDRes);
+  }
 
   bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
   {

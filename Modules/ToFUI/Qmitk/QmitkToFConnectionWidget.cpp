@@ -123,7 +123,7 @@ mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
 
 void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedText)
 {
-  if (selectedText == "PMD CamCube 2.0/3.0") // PMD camcube 2
+  if (selectedText == "PMD CamCube 2.0/3.0" || selectedText == "PMD CamCubeRaw 2.0/3.0" ) // PMD camcube 2
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
@@ -192,6 +192,10 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamCubeImageGrabber();
+    }
+    else if (selectedCamera == "PMD CamCubeRaw 2.0/3.0")
+    { //PMD CamCube
+      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamCubeImageGrabber();
     }
     else if (selectedCamera == "PMD CamBoard")
     { //PMD CamBoard

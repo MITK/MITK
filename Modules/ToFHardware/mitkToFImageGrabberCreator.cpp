@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFImageGrabberCreator.h"
 #include "mitkToFImageGrabber.h"
 #include "mitkToFCameraPMDCamCubeDevice.h"
+#include "mitkToFCameraPMDRawDataCamCubeDevice.h"
 #include "mitkToFCameraPMDCamBoardDevice.h"
 #include "mitkToFCameraPMDO3Device.h"
 #include "mitkToFCameraPMDPlayerDevice.h"
@@ -51,6 +52,13 @@ namespace mitk
   ToFImageGrabber::Pointer ToFImageGrabberCreator::GetPMDCamCubeImageGrabber()
   {
     m_ToFCameraDevice = mitk::ToFCameraPMDCamCubeDevice::New();
+    m_ToFImageGrabber->SetCameraDevice(m_ToFCameraDevice);
+    return m_ToFImageGrabber;
+  }
+
+  ToFImageGrabber::Pointer ToFImageGrabberCreator::GetPMDRawDataCamCubeImageGrabber()
+  {
+    m_ToFCameraDevice = mitk::ToFCameraPMDRawDataCamCubeDevice::New();
     m_ToFImageGrabber->SetCameraDevice(m_ToFCameraDevice);
     return m_ToFImageGrabber;
   }

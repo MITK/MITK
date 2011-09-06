@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
 
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkSurface.h"
@@ -210,7 +210,7 @@ namespace mitk
   void Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
       itk::Object *caller, const itk::EventObject& /*event*/ )
   {
-    ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( caller );
+    ImageVtkMapper2D *imageMapper = dynamic_cast< ImageVtkMapper2D * >( caller );
     if ( (imageMapper != NULL) )
     {
       if ( m_ImageActors.count( imageMapper ) > 0)
@@ -468,7 +468,7 @@ namespace mitk
     if ( node != NULL )
     {
       //we need to get the information from the 2D mapper to render the texture on the 3D plane
-      ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( node->GetMapper(1) ); //GetMapper(1) provides the 2D mapper for the data node
+      ImageVtkMapper2D *imageMapper = dynamic_cast< ImageVtkMapper2D * >( node->GetMapper(1) ); //GetMapper(1) provides the 2D mapper for the data node
 
       //if there is a 2D mapper, which is not the standard image mapper...
       if(!imageMapper && node->GetMapper(1))
@@ -478,7 +478,7 @@ namespace mitk
         {
           //get the standard image mapper.
           //This is a special case in MITK and does only work for the CompositeMapper.
-          imageMapper = dynamic_cast<ImageMapperGL2D* >( node->GetMapper(3) );
+          imageMapper = dynamic_cast<ImageVtkMapper2D* >( node->GetMapper(3) );
         }
       }
 
@@ -549,25 +549,16 @@ namespace mitk
             imageActor->GetMapper()->GetInput()->Update();
             imageActor->GetMapper()->Update();
 
-            // We have to do this before GenerateAllData() is called
-            // since there may be no RendererInfo for renderer yet,
-            // thus GenerateAllData won't update the (non-existing)
-            // RendererInfo for renderer. By calling GetRendererInfo
-            // a RendererInfo will be created for renderer (if it does not
-            // exist yet).
-            imageMapper->GetRendererInfo( planeRenderer );
-            imageMapper->GenerateAllData();
-
             // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
             renderer->GetRenderWindow()->MakeCurrent();
 
             // Retrieve and update image to be mapped
-            const ImageMapperGL2D::RendererInfo *rit = imageMapper->GetRendererInfo( planeRenderer );
-            if(rit->m_Image != NULL)
-            {              
-              rit->m_Image->Update();
-              //set the 2D image as texture for the 3D plane
-              texture->SetInput( rit->m_Image );
+            const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->m_LSH.GetLocalStorage(planeRenderer);
+
+            if(localStorage->m_ReslicedImage != NULL)
+            {
+              localStorage->m_ReslicedImage->Update();
+              texture->SetInput( localStorage->m_ReslicedImage );
 
               //default level window
               ScalarType windowMin = 0.0;

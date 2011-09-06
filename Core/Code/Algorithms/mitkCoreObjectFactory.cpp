@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry3D.h"
 #include "mitkGeometryData.h"
 #include "mitkImage.h"
-#include "mitkImageMapperGL2D.h"
+#include <mitkImageVtkMapper2D.h>
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -107,7 +107,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
-    mitk::ImageMapperGL2D::SetDefaultProperties(node);
+    mitk::ImageVtkMapper2D::SetDefaultProperties(node);
     mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 
@@ -176,8 +176,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     {
       if((dynamic_cast<Image*>(data)!=NULL))
       {
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
-        newMapper = mitk::ImageMapperGL2D::New();
+        newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
@@ -218,7 +217,6 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
-        //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
         newMapper->SetDataNode(node);
       }
     }

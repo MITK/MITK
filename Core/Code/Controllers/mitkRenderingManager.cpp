@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include <itkAffineGeometryFrame.h>
 #include <itkScalableAffineTransform.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <algorithm>
 
@@ -156,6 +157,7 @@ RenderingManager
     if ( m_DataStorage.IsNotNull() )
       mitk::BaseRenderer::GetInstance( renderWindow )->SetDataStorage( m_DataStorage.GetPointer() );
 
+
     // Register vtkRenderWindow instance
     renderWindow->Register( NULL );
 
@@ -270,6 +272,7 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
+      dynamic_cast<mitk::VtkPropRenderer*>(BaseRenderer::GetInstance(it->first))->AdjustCameraToScene();
       this->RequestUpdate( it->first );
     }
   }
@@ -288,13 +291,12 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
-      //it->second = RENDERING_INPROGRESS;
-
       // Immediately repaint this window (implementation platform specific)
       // If the size is 0, it crashes
       int *size = it->first->GetSize();
       if ( 0 != size[0] && 0 != size[1] )
       {
+        dynamic_cast<mitk::VtkPropRenderer*>(BaseRenderer::GetInstance(it->first))->AdjustCameraToScene();
         // Execute rendering
         it->first->Render();
       }

@@ -98,6 +98,7 @@ void mitk::CameraVisualization::GenerateData()
   m_Renderer->GetVtkRenderer()->ResetCameraClippingRange();
 
   m_Renderer->RequestUpdate();
+  MITK_INFO << "mitkCameraVisualization.cpp";
 }
 
 

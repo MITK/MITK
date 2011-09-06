@@ -246,6 +246,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         p1 = line.GetPoint( p1Param );
         displayGeometry->WorldToDisplay( p1, p1 );
 
+        float depthPosition = 1.0f;
+
         // Iterate over all line segments and display each, with a gap
         // inbetween.
         unsigned int i, preLastLineParam = lineParams.size() - 1;
@@ -261,9 +263,10 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             displayGeometry->WorldToDisplay( p2, p2 );
 
             // draw
+            glEnable(GL_DEPTH_TEST);
             glBegin (GL_LINES);
-            glVertex2f(p1[0],p1[1]);
-            glVertex2f(p2[0],p2[1]);
+            glVertex3f(p1[0],p1[1], depthPosition);
+            glVertex3f(p2[0],p2[1], depthPosition);
             glEnd ();
 
             if ( (i == 1) && (m_RenderOrientationArrows) )
@@ -285,8 +288,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         p2 = line.GetPoint( p2Param );
         displayGeometry->WorldToDisplay( p2, p2 );
         glBegin( GL_LINES );
-        glVertex2f( p1[0], p1[1] );
-        glVertex2f( p2[0], p2[1] );
+        glVertex3f( p1[0], p1[1], depthPosition);
+        glVertex3f( p2[0], p2[1], depthPosition);
         glEnd();
 
 

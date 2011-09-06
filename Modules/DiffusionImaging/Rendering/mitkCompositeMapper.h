@@ -22,16 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGLMapper2D.h"
 #include "mitkVtkMapper2D.h"
 #include "mitkQBallImage.h"
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
 
 namespace mitk {
 
-  class CopyImageMapper2D : public ImageMapperGL2D
+  class CopyImageMapper2D : public ImageVtkMapper2D
   {
   public:
-    mitkClassMacro(CopyImageMapper2D,ImageMapperGL2D);
+    mitkClassMacro(CopyImageMapper2D,ImageVtkMapper2D);
     itkNewMacro(Self);
 
     friend class CompositeMapper;
@@ -49,17 +49,13 @@ namespace mitk {
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOverlay(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
       if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
       {
@@ -69,17 +65,13 @@ namespace mitk {
 
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
     }
 
@@ -90,9 +82,9 @@ namespace mitk {
       m_OdfMapper->SetDataNode(node);
     }
 
-    mitk::ImageMapperGL2D::Pointer GetImageMapper()
+    mitk::ImageVtkMapper2D::Pointer GetImageMapper()
     {
-      ImageMapperGL2D* retval = m_ImgMapper;
+      ImageVtkMapper2D* retval = m_ImgMapper;
       return retval;
     }
 
@@ -129,9 +121,12 @@ namespace mitk {
       return m_ImgMapper->IsLODEnabled(renderer) || m_OdfMapper->IsLODEnabled(renderer);
     }
 
-    vtkProp* GetProp(mitk::BaseRenderer* renderer)
+    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer)
     {
-      return m_OdfMapper->GetProp(renderer);
+      vtkPropAssembly* assembly = vtkPropAssembly::New();
+      assembly->AddPart( m_OdfMapper->GetVtkProp(renderer));
+      assembly->AddPart( m_ImgMapper->GetVtkProp(renderer));
+      return assembly;
     }
 
     void SetGeometry3D(const mitk::Geometry3D* aGeometry3D)
@@ -139,9 +134,6 @@ namespace mitk {
       m_ImgMapper->SetGeometry3D(aGeometry3D);
       m_OdfMapper->SetGeometry3D(aGeometry3D);
     }
-
-    void Enable2DOpenGL();
-    void Disable2DOpenGL();
 
   protected:
 

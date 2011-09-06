@@ -197,11 +197,12 @@ void QmitkRegionGrowingView::DoImageProcessing()
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent, int thresholdOffset, unsigned int t)
 {
-  typedef itk::Image< TPixel, VImageDimension > InputImageType;
-  typedef typename InputImageType::IndexType    IndexType;
+  typedef itk::Image< TPixel, VImageDimension >        InputImageType;
+  typedef typename InputImageType::IndexType           IndexType;
+  typedef itk::Image< unsigned char, VImageDimension > OutputImageType;
   
   // instantiate an ITK region growing filter, set its parameters
-  typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
+  typedef itk::ConnectedThresholdImageFilter<InputImageType, OutputImageType> RegionGrowingFilterType;
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
   regionGrower->SetInput( itkImage ); // don't forget this
 

@@ -26,6 +26,7 @@
 class QWidget;
 class QCheckBox;
 class QRadioButton;
+class QDoubleSpinBox;
 
 class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -66,6 +67,7 @@ public:
 protected slots:
 
   void OnVolumeRenderingCheckboxChecked(int);
+  void OnSmoothingCheckboxChecked(int);
 
 protected:
 
@@ -73,6 +75,9 @@ protected:
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
   QCheckBox* m_VolumeRenderingCheckBox;
+  QCheckBox* m_SmoothingCheckBox;
+  QDoubleSpinBox* m_SmoothingSpinBox;
+  QDoubleSpinBox* m_DecimationSpinBox;
 
   bool m_Initializing;
 

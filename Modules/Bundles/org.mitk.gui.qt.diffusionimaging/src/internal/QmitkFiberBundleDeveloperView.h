@@ -207,9 +207,8 @@ protected:
   QVector< QRadioButton* > m_FARadios;
   QVector< QRadioButton* > m_GARadios;
   
-  // timer for updating fiber id generation
-  QTimer m_idGenerateTimer;
   
+  // Thread based Workers which do some processing of fibers
   QmitkFiberIDWorker * m_FiberIDGenerator;
   QmitkFiberGenerateRandomWorker * m_GeneratorFibersRandom;
   

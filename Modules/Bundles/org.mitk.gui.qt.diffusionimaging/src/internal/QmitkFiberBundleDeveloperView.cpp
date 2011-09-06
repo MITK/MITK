@@ -64,12 +64,15 @@ void QmitkFiberIDWorker::run()
   //accurate time measurement using ITK timeProbe
   itk::TimeProbe clock;
   clock.Start();
+  m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText(QString::number(0)); //set GUI representation of timer to 0
+  m_itemPackage.st_idGenerateTimer->start();
   
   m_itemPackage.st_FBX->DoGenerateFiberIds();
   
   clock.Stop();
   m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
   m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
+  delete m_itemPackage.st_idGenerateTimer; // fancy timer is not needed anymore
   m_hostingThread->quit();
   
 }
@@ -219,9 +222,7 @@ QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
   m_FiberBundleX->Delete();
   delete m_hostThread;
   delete m_FiberIDGenerator;
-  
-  // m_idGenerateTimer: no need to delete, is not initialized using "new"
-  
+    
 }
 
 
@@ -433,7 +434,6 @@ void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
   
   struct Package4WorkingThread ItemPackageForRandomGenerator;
   ItemPackageForRandomGenerator.st_FBX = m_FiberBundleX;
-  //ItemPackageForRandomGenerator.st_idGenerateTimer = &m_idGenerateTimer; set to randomTimer
   ItemPackageForRandomGenerator.st_Controls = m_Controls;
   ItemPackageForRandomGenerator.st_host = this;
   ItemPackageForRandomGenerator.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage;
@@ -618,16 +618,20 @@ void QmitkFiberBundleDeveloperView::UpdateFiberIDTimer()
 void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 {
   
+  /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread */
+  QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+  localTimer->setInterval( 10 );
+  connect( localTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
+  
+  
+  // pack items which are needed by thread processing
   struct Package4WorkingThread FiberIdPackage;
   FiberIdPackage.st_FBX = m_FiberBundleX;
-  FiberIdPackage.st_idGenerateTimer = &m_idGenerateTimer;
+  FiberIdPackage.st_idGenerateTimer = localTimer;
   FiberIdPackage.st_Controls = m_Controls;
   
-  /* ===== TIMER CONFIGURATIONS for visual effect ======
-   * start and stop is called in Thread pre- and postprocessing methods */
-  m_idGenerateTimer.setInterval( 10 );
-  connect( &m_idGenerateTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
-  
+
   if (m_threadInProgress)
     return; //maybe popup window saying, working thread still in progress...pls wait
   
@@ -648,16 +652,13 @@ void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 
 void QmitkFiberBundleDeveloperView::BeforeThread_IdGenerate()
 {
-  m_Controls->infoTimerGenerateFiberIds->setText(QString::number(0)); //set GUI representation of timer to 0
   m_threadInProgress = true;
-  m_idGenerateTimer.start();
   
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
 {
-  if (m_idGenerateTimer.isActive())
-    m_idGenerateTimer.stop();
+
   
   m_threadInProgress = false;
   disconnect(m_hostThread, 0, 0, 0);

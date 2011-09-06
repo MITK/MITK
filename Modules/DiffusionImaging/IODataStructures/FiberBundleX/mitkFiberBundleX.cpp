@@ -238,11 +238,11 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
   if (m_FiberStructureData == NULL)
     return;
   
-//  for (int i=0; i<10000000; ++i) 
-//  {
-//   if(i%500 == 0)
-//     MITK_INFO << i;
-//  }
+  for (int i=0; i<10000000; ++i) 
+  {
+   if(i%500 == 0)
+     MITK_INFO << i;
+  }
   MITK_INFO << "Generating Fiber Ids";
   vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
   idFiberFilter->SetInput(m_FiberStructureData);

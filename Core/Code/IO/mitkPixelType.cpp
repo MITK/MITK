@@ -67,65 +67,65 @@ PURPOSE.  See the above copyright notices for more information.
   }                                                                                     \
 
 
-mitk::PixelType::PixelType() : m_TypeId( NULL ), m_Type( mitkIpPicUnknown ), m_Bpe( 0 ), m_NumberOfComponents( 1 )
-{
 
+mitk::PixelType::PixelType(void)
+ : m_ComponentType(typeid(void)),
+   m_PixelType(typeid(void)),
+   m_ComponentTypeName(0)
+{
+  m_BytesPerComponent = 0;
+  m_NumberOfComponents = 0;
 }
 
-mitk::PixelType::PixelType( const mitk::PixelType& aPixelType )
+mitk::PixelType::PixelType( const mitk::PixelType& other )
+  : m_ComponentType( other.m_ComponentType ),
+    m_PixelType( other.m_PixelType),
+    m_ComponentTypeName( other.m_ComponentTypeName ),
+    m_PixelTypeName( other.m_PixelTypeName )
 {
-  Initialize( *aPixelType.GetTypeId(), aPixelType.GetNumberOfComponents() );
+  m_BytesPerComponent = other.m_BytesPerComponent;
+  m_NumberOfComponents = other.m_NumberOfComponents;
 }
 
-mitk::PixelType::PixelType( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType ) : m_TypeId( &aTypeId ), m_NumberOfComponents( numberOfComponents )
+mitk::PixelType& mitk::PixelType::operator =( const mitk::PixelType& other)
 {
+  *this = other;
+  return *this;
+}
+
+mitk::PixelType::PixelType( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType )
+  : m_ComponentType( aTypeId ), m_PixelType( typeid(anItkIoPixelType) ), m_NumberOfComponents( numberOfComponents ),
+    m_PixelTypeName( m_PixelType.name() ), m_ComponentTypeName( m_ComponentType.name() ),
+    m_BytesPerComponent(0)
+{
+  m_BytesPerComponent = sizeof( m_ComponentType );
+
   Initialize( aTypeId, numberOfComponents, anItkIoPixelType );
-}
-
-mitk::PixelType::PixelType( mitkIpPicType_t type, int bpe, int numberOfComponents ) : m_Type( type ), m_Bpe( bpe ), m_NumberOfComponents( numberOfComponents )
-{
-  Initialize( type, bpe, numberOfComponents );
-}
-
-mitk::PixelType::PixelType( const mitkIpPicDescriptor* pic ) : m_NumberOfComponents( 1 )
-{
-   if ( pic != NULL )
-      Initialize( pic->type, pic->bpe );
-   else
-   {
-      m_TypeId = NULL;
-      //  itkExceptionMacro("pic.IsNull() has no pixel type.");
-   }
 }
 
 bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
 {
   MITK_DEBUG << "operator==" << std::endl;
 
-  MITK_DEBUG << "m_Type = " << m_Type << " " << rhs.m_Type << std::endl;
-  MITK_DEBUG << "m_Bpe = " << m_Bpe << " " << rhs.m_Bpe << std::endl;
   MITK_DEBUG << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
-  MITK_DEBUG << "m_BitsPerComponent = " << m_BitsPerComponent << " " << rhs.m_BitsPerComponent << std::endl;
+  MITK_DEBUG << "m_BytesPerComponent = " << m_BytesPerComponent << " " << rhs.m_BytesPerComponent << std::endl;
 
-   return (
-     *(this->m_TypeId) == *(rhs.m_TypeId)
-    && this->m_Type == rhs.m_Type
-    && this->m_Bpe == rhs.m_Bpe
+  return ( this->m_PixelType == rhs.m_PixelType
+    && this->m_ComponentType == rhs.m_ComponentType
     && this->m_NumberOfComponents == rhs.m_NumberOfComponents
-    && this->m_BitsPerComponent == rhs.m_BitsPerComponent
+    && this->m_BytesPerComponent == rhs.m_BytesPerComponent
     );
+}
+
+bool mitk::PixelType::operator ==(const std::type_info& typeId) const
+{
+  return (m_NumberOfComponents == 1
+       && m_ComponentType == typeId);
 }
 
 bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
 {
   return !(this->operator==(rhs));
-}
-
-bool mitk::PixelType::operator==(const std::type_info& typeId) const
-{
-  if (GetItkTypeId() == NULL)
-    return false;
-  return (*GetItkTypeId() == typeId);
 }
 
 bool mitk::PixelType::operator!=(const std::type_info& typeId) const
@@ -137,7 +137,7 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
   if ( (itk::ImageIOBase::anItkIoPixelType_test == anItkIoPixelType ) &&              \
        (numberOfComponents_test == m_NumberOfComponents)                              \
      )                                                                                \
-  {                                                                                   \
+  {          *                                                                         \
     m_ItkTypeId = &typeid(ITK_TYPE);                                                  \
   }
 
@@ -175,13 +175,13 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
 
 void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType )
 {
-   m_TypeId = &aTypeId;
+  /* //m_TypeId = &aTypeId;
    m_NumberOfComponents = numberOfComponents;
    if(m_NumberOfComponents == 1)
      m_ItkTypeId = &aTypeId;
    else
      m_ItkTypeId = NULL;
-   SET_TYPE(double, mitkIpPicFloat)
+   /*SET_TYPE(double, mitkIpPicFloat)
    SET_TYPE(float, mitkIpPicFloat)
    SET_TYPE(long, mitkIpPicInt)
    SET_TYPE(unsigned long, mitkIpPicUInt)
@@ -260,112 +260,6 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      if(!found)
        itkExceptionMacro( "Pixel type currently not supported." );
    }
-   m_BitsPerComponent = m_Bpe / m_NumberOfComponents;
+   m_BitsPerComponent = m_Bpe / m_NumberOfComponents;*/
 }
 
-void mitk::PixelType::Initialize( mitkIpPicType_t type, int bpe, int numberOfComponents )
-{
-   m_Type = type;
-   m_Bpe = bpe;
-   m_NumberOfComponents = numberOfComponents;
-   switch ( type )
-   {
-   case mitkIpPicUnknown:
-      m_TypeId = &typeid( void* );
-      break;
-   case mitkIpPicBool:
-      m_TypeId = &typeid( bool );
-      m_Bpe = sizeof(bool) * 8 * numberOfComponents;
-      break;
-   case mitkIpPicASCII:
-      m_TypeId = &typeid( char );
-      m_Bpe = sizeof(char) * 8 * numberOfComponents;
-      break;
-   case mitkIpPicInt:
-      switch ( bpe / numberOfComponents )
-      {
-      case 8:
-         m_TypeId = &typeid( char );
-         break;
-      case 16:
-         m_TypeId = &typeid( short );
-         break;
-      case 32:
-         m_TypeId = &typeid( int );
-         break;
-      case 64:
-         m_TypeId = &typeid( long );
-         break;
-      default:
-         m_TypeId = NULL;
-         itkExceptionMacro( "Pixel type currently not supported." );
-      }
-      break;
-   case mitkIpPicUInt:
-      switch ( bpe / numberOfComponents )
-      {
-      case 8:
-         m_TypeId = &typeid( unsigned char );
-         break;
-      case 16:
-         m_TypeId = &typeid( unsigned short );
-         break;
-      case 24:
-         m_TypeId = &typeid( unsigned char );
-         m_NumberOfComponents = numberOfComponents = 3;
-         break;
-      case 32:
-         m_TypeId = &typeid( unsigned int );
-         break;
-      case 64:
-         m_TypeId = &typeid( unsigned long );
-         break;
-      default:
-         m_TypeId = NULL;
-         itkExceptionMacro( "Pixel type currently not supported." );
-      }
-      break;
-   case mitkIpPicFloat:
-      switch ( bpe / numberOfComponents )
-      {
-      case 32:
-         m_TypeId = &typeid( float );
-         break;
-      case 64:
-         m_TypeId = &typeid( double );
-         break;
-      default:
-         m_TypeId = NULL;
-         itkExceptionMacro( "Pixel type currently not supported." );
-      }
-      break;
-   case mitkIpPicNonUniform:
-      m_TypeId = &typeid( void* );
-      break;
-   case mitkIpPicTSV:
-      m_TypeId = &typeid( void* );
-      break;
-   default:
-      m_TypeId = NULL;
-      itkExceptionMacro( "Pixel type currently not supported." );
-      break;
-   }
-   m_BitsPerComponent = m_Bpe / numberOfComponents;
-
-   if(m_NumberOfComponents == 1)
-     m_ItkTypeId = m_TypeId;
-   else
-     m_ItkTypeId = NULL;
-}
-
-std::string mitk::PixelType::GetItkTypeAsString() const
-{
-  if (GetItkTypeId()==NULL)
-  {
-    return "unknown";
-  }
-  else
-  {
-    return GetItkTypeId()->name();
-  }
-}

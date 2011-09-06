@@ -287,9 +287,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType().GetType() == mitkIpPicInt && image->GetPixelType().GetBpe() >= 8)
+  if (image->GetPixelType()== typeid(int)  && image->GetPixelType().GetBpe() >= 8)
   {
-    if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
+    if (minValue == -(pow((double)2.0, image->GetPixelType().GetBpe())/2))
     {
       minValue = min2ndValue;
     }
@@ -303,7 +303,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
-
+/*
   if ( tryPicTags ) // level and window will be set by informations provided directly by the mitkIpPicDescriptor
   {
     if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
@@ -311,7 +311,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
       return;
     }
   }
-   
+ */
    
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
@@ -361,45 +361,6 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
   SetWindowBounds(minValue, maxValue);
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
-}
-
-bool mitk::LevelWindow::SetAutoByPicTags(const mitkIpPicDescriptor* aPic)
-{
-  if ( IsFixed() )
-    return false;
-  
-  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
-  if ( pic == NULL )
-  {
-    return false;
-  }
-  mitkIpPicTSV_t *tsv = mitkIpPicQueryTag( pic, "LEVEL/WINDOW" );
-  if( tsv != NULL )
-  {
-    double level = 0;
-    double window = 0;
-    #define GET_C_W( type, tsv, C, W )    \
-      level = ((type *)tsv->value)[0];    \
-      window = ((type *)tsv->value)[1];
-
-    mitkIpPicFORALL_2( GET_C_W, tsv, level, window );
-    
-    ScalarType min = GetRangeMin();
-    ScalarType max = GetRangeMax();
-    if ((double)(GetRangeMin()) > (level - window/2))
-    {
-      min = level - window/2;
-    }
-    if ((double)(GetRangeMax()) < (level + window/2))
-    {
-      max = level + window/2;
-    }
-    SetRangeMinMax(min, max);
-    SetDefaultBoundaries(min, max);
-    SetLevelWindow( level, window );
-    return true;
-  }
-  return false;
 }
 
 void mitk::LevelWindow::SetFixed( bool fixed )

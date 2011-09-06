@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
+#include "mitkIpPic.h"
+
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format

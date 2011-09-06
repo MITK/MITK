@@ -52,6 +52,8 @@ SET(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
 
+  IO/mitkPixelTypeTraits.h
+
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
 
@@ -131,6 +133,7 @@ SET(CPP_FILES
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
+  DataManagement/mitkChannelDescriptor.cpp
   DataManagement/mitkColorProperty.cpp
   DataManagement/mitkDataStorage.cpp
   #DataManagement/mitkDataTree.cpp
@@ -145,6 +148,7 @@ SET(CPP_FILES
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
   DataManagement/mitkImageDataItem.cpp
+  DataManagement/mitkImageDescriptor.cpp
   DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
@@ -241,12 +245,12 @@ SET(CPP_FILES
   IO/mitkItkPictureWrite.cpp
   IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
-  IO/mitkPicFileIOFactory.cpp
-  IO/mitkPicFileReader.cpp
-  IO/mitkPicFileWriter.cpp
-  IO/mitkPicHelper.cpp
-  IO/mitkPicVolumeTimeSeriesIOFactory.cpp
-  IO/mitkPicVolumeTimeSeriesReader.cpp
+  #IO/mitkPicFileIOFactory.cpp
+  #IO/mitkPicFileReader.cpp
+  #IO/mitkPicFileWriter.cpp
+  #IO/mitkPicHelper.cpp
+  #IO/mitkPicVolumeTimeSeriesIOFactory.cpp
+  #IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
   IO/mitkPointSetIOFactory.cpp
   IO/mitkPointSetReader.cpp

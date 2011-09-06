@@ -3,16 +3,16 @@ SET(CPP_FILES
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
-  Algorithms/mitkAngleCorrectByPointFilter.cpp
+  # Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
-  Algorithms/mitkCylindricToCartesianFilter.cpp
+  # Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDiffImageApplier.cpp
-  Algorithms/mitkDopplerToStrainRateFilter.cpp
+  # Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp

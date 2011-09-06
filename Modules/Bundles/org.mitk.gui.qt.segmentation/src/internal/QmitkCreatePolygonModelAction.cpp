@@ -116,9 +116,8 @@ void QmitkCreatePolygonModelAction::Run(const std::vector<mitk::DataNode*>& sele
 
           filter->SetParameter("Decimation", decimation);
 
-          mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-          mitk::ProgressBar::GetInstance()->Progress(1);
-          mitk::StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background (this may take a while)...");
+          mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+          mitk::StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
 
           filter->StartAlgorithm();
         }

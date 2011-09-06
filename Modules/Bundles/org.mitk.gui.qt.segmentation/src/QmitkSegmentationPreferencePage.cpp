@@ -83,13 +83,15 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_SmoothingSpinBox->setMinimum(0.0);
   m_SmoothingSpinBox->setSingleStep(0.5);
   m_SmoothingSpinBox->setValue(1.0);
-  surfaceLayout->addRow("Smoothing value", m_SmoothingSpinBox);
+  m_SmoothingSpinBox->setToolTip("The Smoothing value is used as variance for a gaussian blur.");
+  surfaceLayout->addRow("Smoothing value (mm)", m_SmoothingSpinBox);
 
   m_DecimationSpinBox = new QDoubleSpinBox(m_MainControl);
   m_DecimationSpinBox->setMinimum(0.0);
   m_DecimationSpinBox->setMaximum(0.99);
   m_DecimationSpinBox->setSingleStep(0.1);
   m_DecimationSpinBox->setValue(0.5);
+  m_DecimationSpinBox->setToolTip("Valid range is [0, 1). High values increase decimation, especially when very close to 1. A value of 0 disables decimation.");
   surfaceLayout->addRow("Decimation rate", m_DecimationSpinBox);
 
   formLayout->addRow("Smoothed surface creation", surfaceLayout);

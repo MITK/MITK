@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkAddImageFilter.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkCleanPolyData.h>
+#include <vtkPolyDataNormals.h>
 
 using namespace mitk;
 using namespace std;
@@ -63,8 +64,9 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
   // A reasonable default value equals the image spacing in mm.
   SetParameter("Smoothing", 1.0f);
 
-  // Valid range for dacimation value is ]0, 1[. High values
+  // Valid range for decimation value is [0, 1). High values
   // increase decimation, especially when very close to 1.
+  // A value of 0 disables decimation.
   SetParameter("Decimation", 0.5f);
 }
 
@@ -107,7 +109,19 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   typedef itk::Image<float, 3> FloatImageType;
 
   ImageToItk<CharImageType>::Pointer imageToItkFilter = ImageToItk<CharImageType>::New();
-  imageToItkFilter->SetInput(image);
+  
+  try
+  {
+    imageToItkFilter->SetInput(image);
+  }
+  catch (const itk::ExceptionObject &e)
+  {
+    // Most probably the input image type is wrong. Binary images are expected to be
+    // >unsigned< char images.
+    MITK_ERROR << e.GetDescription() << endl;
+    return false;
+  }
+
   imageToItkFilter->Update();
 
   CharImageType::Pointer itkImage = imageToItkFilter->GetOutput();
@@ -283,9 +297,21 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   gaussFilter->SetVariance(smoothing);
   gaussFilter->ReleaseDataFlagOn();
   gaussFilter->ReleaseDataBeforeUpdateFlagOn();
-  gaussFilter->Update();
 
-  FloatImageType::Pointer blurredImage = gaussFilter->GetOutput();
+  typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> BinaryThresholdFromFloatFilterType;
+
+  BinaryThresholdFromFloatFilterType::Pointer binThresFromFloatFilter = BinaryThresholdFromFloatFilterType::New();
+
+  binThresFromFloatFilter->SetInput(gaussFilter->GetOutput());
+  binThresFromFloatFilter->SetLowerThreshold(50);
+  binThresFromFloatFilter->SetUpperThreshold(255);
+  binThresFromFloatFilter->SetInsideValue(1);
+  binThresFromFloatFilter->SetOutsideValue(0);
+  binThresFromFloatFilter->ReleaseDataFlagOn();
+  binThresFromFloatFilter->ReleaseDataBeforeUpdateFlagOn();
+  binThresFromFloatFilter->Update();
+
+  CharImageType::Pointer blurredImage = binThresFromFloatFilter->GetOutput();
   
   blurredImage->DisconnectPipeline();
   closedImage = 0;
@@ -294,87 +320,9 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   ProgressBar::GetInstance()->Progress(1);
 
-  // Isolate largest component
-
-  MITK_INFO << "Isolate largest component..." << endl;
-
-  typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> BinaryThresholdFromFloatFilterType;
-
-  BinaryThresholdFromFloatFilterType::Pointer binThresFromFloatFilter = BinaryThresholdFromFloatFilterType::New();
-
-  binThresFromFloatFilter->SetInput(blurredImage);
-  binThresFromFloatFilter->SetLowerThreshold(50);
-  binThresFromFloatFilter->SetUpperThreshold(255);
-  binThresFromFloatFilter->SetInsideValue(1);
-  binThresFromFloatFilter->SetOutsideValue(0);
-  binThresFromFloatFilter->ReleaseDataFlagOn();
-  binThresFromFloatFilter->ReleaseDataBeforeUpdateFlagOn();
-
-  typedef itk::ConnectedComponentImageFilter<CharImageType, ShortImageType> ConnectedComponentFilterType;
-
-  ConnectedComponentFilterType::Pointer connectedComponentFilter = ConnectedComponentFilterType::New();
-
-  connectedComponentFilter->SetInput(binThresFromFloatFilter->GetOutput());
-
-  typedef itk::RelabelComponentImageFilter<ShortImageType, CharImageType> RelabelComponentFilterType;
-
-  RelabelComponentFilterType::Pointer relabelComponentFilter = RelabelComponentFilterType::New();
-
-  relabelComponentFilter->SetInput(connectedComponentFilter->GetOutput());
-  relabelComponentFilter->ReleaseDataFlagOn();
-  relabelComponentFilter->ReleaseDataBeforeUpdateFlagOn();
-  relabelComponentFilter->Update();
-
-  MITK_INFO << "  " << relabelComponentFilter->GetNumberOfObjects() << " components found" << endl;
-
-  typedef itk::BinaryThresholdImageFilter<CharImageType, CharImageType> BinaryThresholdFilterType;
-
-  BinaryThresholdFilterType::Pointer binThresFilter = BinaryThresholdFilterType::New();
-
-  binThresFilter->SetInput(relabelComponentFilter->GetOutput());
-  binThresFilter->SetLowerThreshold(2);
-  binThresFilter->SetUpperThreshold(255);
-  binThresFilter->SetInsideValue(0);
-  binThresFilter->SetOutsideValue(1);
-  binThresFilter->ReleaseDataFlagOn();
-  binThresFilter->ReleaseDataBeforeUpdateFlagOn();
-  binThresFilter->Update();
-
-  typedef itk::MultiplyImageFilter<FloatImageType, CharImageType, CharImageType> MultiplyFilterType;
-
-  MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
-
-  multiplyFilter->SetInput1(blurredImage);
-  multiplyFilter->SetInput2(binThresFilter->GetOutput());
-  multiplyFilter->ReleaseDataFlagOn();
-  multiplyFilter->ReleaseDataBeforeUpdateFlagOn();
-  multiplyFilter->Update();
-
-  CharImageType::Pointer singleComponentImage = multiplyFilter->GetOutput();
-  
-  singleComponentImage->DisconnectPipeline();
-  blurredImage = 0;
-  binThresFromFloatFilter = 0;
-  connectedComponentFilter = 0;
-  relabelComponentFilter = 0;
-  binThresFilter = 0;
-  multiplyFilter = 0;
-
   // Fill holes
 
-  ProgressBar::GetInstance()->Progress(1);
-  
   MITK_INFO << "Filling cavities..." << endl;
-
-  binThresFilter = BinaryThresholdFilterType::New();
-
-  binThresFilter->SetInput(singleComponentImage);
-  binThresFilter->SetLowerThreshold(50);
-  binThresFilter->SetUpperThreshold(255);
-  binThresFilter->SetInsideValue(1);
-  binThresFilter->SetOutsideValue(0);
-  binThresFilter->ReleaseDataFlagOn();
-  binThresFilter->ReleaseDataBeforeUpdateFlagOn();
 
   typedef itk::ConnectedThresholdImageFilter<CharImageType, CharImageType> ConnectedThresholdFilterType;
 
@@ -386,7 +334,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   corner[1] = 0;
   corner[2] = 0;
 
-  connectedThresFilter->SetInput(binThresFilter->GetOutput());
+  connectedThresFilter->SetInput(blurredImage);
   connectedThresFilter->SetSeed(corner);
   connectedThresFilter->SetLower(0);
   connectedThresFilter->SetUpper(0);
@@ -394,22 +342,24 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   connectedThresFilter->ReleaseDataFlagOn();
   connectedThresFilter->ReleaseDataBeforeUpdateFlagOn();
 
-  BinaryThresholdFilterType::Pointer binThresFilter2 = BinaryThresholdFilterType::New();
+  typedef itk::BinaryThresholdImageFilter<CharImageType, CharImageType> BinaryThresholdFilterType;
 
-  binThresFilter2->SetInput(connectedThresFilter->GetOutput());
-  binThresFilter2->SetLowerThreshold(0);
-  binThresFilter2->SetUpperThreshold(0);
-  binThresFilter2->SetInsideValue(50);
-  binThresFilter2->SetOutsideValue(0);
-  binThresFilter2->ReleaseDataFlagOn();
-  binThresFilter2->ReleaseDataBeforeUpdateFlagOn();
+  BinaryThresholdFilterType::Pointer binThresFilter = BinaryThresholdFilterType::New();
+
+  binThresFilter->SetInput(connectedThresFilter->GetOutput());
+  binThresFilter->SetLowerThreshold(0);
+  binThresFilter->SetUpperThreshold(0);
+  binThresFilter->SetInsideValue(50);
+  binThresFilter->SetOutsideValue(0);
+  binThresFilter->ReleaseDataFlagOn();
+  binThresFilter->ReleaseDataBeforeUpdateFlagOn();
 
   typedef itk::AddImageFilter<CharImageType, CharImageType, CharImageType> AddFilterType;
 
   AddFilterType::Pointer addFilter = AddFilterType::New();
 
-  addFilter->SetInput1(singleComponentImage);
-  addFilter->SetInput2(binThresFilter2->GetOutput());
+  addFilter->SetInput1(blurredImage);
+  addFilter->SetInput2(binThresFilter->GetOutput());
   addFilter->ReleaseDataFlagOn();
   addFilter->ReleaseDataBeforeUpdateFlagOn();
   addFilter->Update();
@@ -460,6 +410,16 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   }
 
   ProgressBar::GetInstance()->Progress(1);
+
+  // Compute Normals
+
+  vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
+  computeNormals->SetInput(m_Surface->GetVtkPolyData());
+  computeNormals->SetFeatureAngle(360.0f);
+  computeNormals->FlipNormalsOff();
+  computeNormals->Update();
+
+  m_Surface->SetVtkPolyData(computeNormals->GetOutput());
 
   return true;
 }

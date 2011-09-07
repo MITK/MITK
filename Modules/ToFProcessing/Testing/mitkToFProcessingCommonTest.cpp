@@ -37,9 +37,9 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
   principalPoint[1] = 100;
   // expected coordinate
   mitk::ToFProcessingCommon::ToFPoint3D expectedCoordinate;
-  expectedCoordinate[0] = -395.5988;
-  expectedCoordinate[1] = -219.7771;
-  expectedCoordinate[2] =  879.1084;
+  expectedCoordinate[0] = -400.0988;
+  expectedCoordinate[1] = -222.2771;
+  expectedCoordinate[2] =  889.1084;
   // resulting coordinate
   mitk::ToFProcessingCommon::ToFPoint3D resultingCoordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,interPixelDistance,principalPoint);
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedCoordinate,resultingCoordinate),"Testing IndexToCartesianCoordinates()");

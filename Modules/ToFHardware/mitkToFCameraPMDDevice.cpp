@@ -155,7 +155,6 @@ namespace mitk
       {
         // update the ToF camera
         toFCameraDevice->UpdateCamera();
-        toFCameraDevice->m_ImageMutex->Lock();
         // get the source data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);

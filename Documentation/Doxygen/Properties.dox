@@ -219,6 +219,8 @@ Information on properties not in this list can be found in the appropriate modul
 
 \subsection PropertiesPageSeeAlso See Also
 
-\subpage PlanarPropertiesPage
-
+<ul>
+ <li> \subpage PlanarPropertiesPage
+ <li> \subpage SegmentationPropertiesPage
+</ul>
 */

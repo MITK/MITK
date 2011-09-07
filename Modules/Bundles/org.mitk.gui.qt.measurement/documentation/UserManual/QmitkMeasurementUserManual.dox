@@ -43,7 +43,7 @@ The first information is the selected image's name (here: DICOM-MRI-Image) follo
 Draws a line between two set points and returns the distance between these points.
 
 \subsection SubTwo Draw Path
-Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. Add the final point by right click.
+Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. Add the final point by double left click.
 
 \subsection SubThree Draw Angle
 Draws two lines from three set points connected in the second set point and returns the inner angle at the second point. 
@@ -58,7 +58,7 @@ Draws a circle by setting two points, whereas the first set point is the center 
 Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
 
 \subsection SubSeven Draw Polygon
-Draws a polygon by setting three or more points. The measured values are the circumference and the included area. Add the final point by right click.
+Draws a polygon by setting three or more points. The measured values are the circumference and the included area. Add the final point by double left click.
 
 Below the buttonline the statistics window is situated, it displays the results of the actual measurements from the selected measurement figures. The content of the statistics window can be copied to the clipboard with the correspondig button for further use in a table calculation programm (e.g. Open Office Calc etc.). 
 

@@ -42,9 +42,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
 #include <vtkCellArray.h>
-#include <vtkImageRGBToHSI.h>
-#include <vtkImageHSIToRGB.h>
-
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -55,7 +52,7 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-  //  this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
+    this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -83,8 +80,8 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
-{
-  this->Update(renderer);
+{  
+  this->Update(renderer); //Workarround for bug #8261
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -93,7 +90,6 @@ void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
 {
   if ( this->IsVisible(renderer)==false )
     return;
-
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
@@ -104,7 +100,6 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
   if ( this->IsVisible( renderer )==false )
     return;
-
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
@@ -115,8 +110,6 @@ void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* rendere
 {
   if ( this->IsVisible(renderer)==false )
     return;
-
-  //TODO is it possible to have a visible BaseRenderer AND an invisible VtkRenderer???
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
@@ -127,30 +120,31 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 {
   if(IsVisible(renderer)==false)
     return;
-
   if ( GetVtkProp(renderer)->GetVisibility() )
+  {
     this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
+  }
 }
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111 => Error in class design?
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //const_cast is bad bad bad...
 
   if ( input == NULL )
   {
     return;
   }
 
-  //check if there is a valid worldGeometry TODO: Move to Update()?
+  //check if there is a valid worldGeometry
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
   }
 
-  // check if there is something to display. TODO: Move to Update()?
+  // check if there is something to display
   if ( !input->IsVolumeSet( this->GetTimestep() ) ) return;
 
   input->Update();
@@ -214,7 +208,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // the spacing of the output 2D image is directly derived from the
       // associated input image, regardless of the currently selected world
       // geometry.
-      //TODO use new method instead of deprecated
       Vector3D rightInIndex, bottomInIndex;
       inputGeometry->WorldToIndex( origin, right, rightInIndex );
       inputGeometry->WorldToIndex( origin, bottom, bottomInIndex );
@@ -243,13 +236,13 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
         inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
-    localStorage->m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
+    localStorage->m_Reslicer->SetBackgroundLevel( -32768 );
 
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the
     // correct position during 3D mapping.
     boundsInitialized = this->CalculateClippedPlaneBounds(
-        worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds ); //TODO braucht man nicht immer
+        worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
   }
   else
   {
@@ -487,12 +480,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->GeneratePlane( renderer, sliceBounds );
 
   //apply the properties after the slice was set
-  const mitk::DataNode::Pointer node = this->GetDataNode();
-  if((localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
-    {
-    this->ApplyProperties( renderer, mmPerPixel );
-  }
+  this->ApplyProperties( renderer, mmPerPixel );
+
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -657,19 +646,26 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.hoveringcolor", renderer));
     if(colorprop.IsNotNull())
+    {
       memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    }
     else
+    {
       GetColor( rgb, renderer );
+    }
 
   }
   if(selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.selectedcolor", renderer));
-    if(colorprop.IsNotNull())
+    if(colorprop.IsNotNull()) {
       memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    }
     else
+    {
       GetColor( rgb, renderer );
+    }
 
   }
   if(!hover && !selected)
@@ -680,7 +676,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-  //  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
 
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;
@@ -737,7 +732,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
 
   if ( binary )
   {
-    finalLookuptable->SetAlphaRange(0.0, 1.0);
     finalLookuptable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
     //1 is now mapped to the current color and alpha
@@ -773,7 +767,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     {
       // obtain and apply opacity level window if possible
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
-      //      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
       localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
       mitk::LevelWindow opacLevelWindow;
       if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
@@ -795,20 +788,18 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
-//  //use the finalLookuptable for mapping the colors
-//  finalLookuptable->SetRampToLinear();
-//  finalLookuptable->ForceBuild();
+  //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );
 
   if(binaryOutline && binary)
   {
     //We need the contour for the binary oultine property as actor
     localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
-    localStorage->m_Actor->SetTexture(NULL); //no texture
+    localStorage->m_Actor->SetTexture(NULL); //no texture for contours
   }
   else
   {
-    //transform the plane to the corresponding view (transversal, coronal or saggital)
+    //set the plane as input for the mapper
     localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
     //set the texture for the actor
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
@@ -848,7 +839,6 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-//    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
@@ -1058,7 +1048,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable->SetSaturationRange( 0.0, 0.0 );
   m_LookupTable->SetHueRange( 0.0, 0.0 );
   m_LookupTable->SetValueRange( 0.0, 1.0 );
-  m_LookupTable->SetRampToLinear();
   m_LookupTable->Build();
   //map all black values to transparent
   m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);

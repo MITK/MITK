@@ -56,11 +56,9 @@ namespace mitk {
  *
  * In order to transform the textured plane to the correct position in space, the
  * same transformation as used for reslicing is applied to both the camera and the
- * vtkActor. The camera position is also influenced by the mitkDisplayGeometry
- * parameters to facilitate zooming and panning. All important steps are explained
- * in more detail below. The resulting 2D image (by reslicing the
- * underlying 3D input image appropriately) can either be directly rendered
- * in a 2D view or just be calculated to be used later by another
+ * vtkActor. All important steps are explained in more detail below. The resulting
+ * 2D image (by reslicing the underlying 3D input image appropriately) can either
+ * be directly rendered in a 2D view or just be calculated to be used later by another
  * rendering entity, e.g. in texture mapping in a 3D view.
  *
  * Properties that can be set for images and influence the imageMapper2D are:
@@ -164,7 +162,7 @@ namespace mitk {
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
 
-      //TODO Docu
+      /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
 
       /** \brief Default constructor of the local storage. */
@@ -217,8 +215,7 @@ namespace mitk {
     *
     * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
     * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
-    * applied to each camera (cam->ApplyTransformation(t)) and to each textured
-    * plane (actor->SetUserTransform(t)) to transform everything
+    * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
     * to the actual 3D position (cf. the following image).
     *
     * \image html cameraPositioning3D.png

@@ -10,8 +10,7 @@ DicomSeriesReader brings DICOM and MITK as close together as possible by offerin
 into mitk::Images, optionally grouping slices to 3D+t images.
 
 Since there are so many possible sources for mistakes with any change to this loading process, testing the many 
-assumptions implemented in DicomSeriesReader is worthwhile. This document describes what kind of tests are implemented 
-and what how.
+assumptions implemented in DicomSeriesReader is worthwhile. This document describes what and how theses kind of tests are implemented.
 
 \section DICOMTesting_problem Problem description
 
@@ -27,7 +26,7 @@ in the way that DICOM and MITK represent images:
    - have a concept of a fourth dimension (time steps)
 
 Because image processing applications based on MITK still need a way to load DICOM images into 
-mitk::Image objects, MITK needs to put a lot of effort into building image stacks as best as it can. And this needs to be well tested.
+mitk::Image objects, MITK needs a way to build image stacks and this needs to be well tested.
 
 For more background information, see David Clunie's most valuable posts on comp.protocols.dicom, e.g.:
 

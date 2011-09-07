@@ -3,22 +3,26 @@
 \page OverviewPage Overview on the Medical Imaging Interaction Toolkit (MITK)
  
 Four issues are important for advanced interactive medical imaging software:
-\li the data, not only the original images, but also other data like segmentation results, 
+<ul>
+ <li> the data, not only the original images, but also other data like segmentation results, 
 surfaces, vessel-trees, etc.,
-\li the algorithms to extract information from the data or to generate new data,
-\li the visualization of the data, which requires information about the position of the data 
+ <li> the algorithms to extract information from the data or to generate new data,
+ <li> the visualization of the data, which requires information about the position of the data 
 in space and time and 
-\li to allow the user to conveniently interact with the data.
+ <li> to allow the user to conveniently interact with the data.
+</ul>
 
 Today, there are two major open-source toolkits for visualization and image processing:
-\li the <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides "a wide variety 
+<ul>
+ <li> the <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides "a wide variety 
 of visualization algorithms including scalar, vector, tensor, texture, and volumetric methods; 
 and advanced modeling techniques such as implicit modelling, polygon reduction, mesh smoothing, 
 cutting, contouring, and Delaunay triangulation. In addition, dozens of imaging algorithms have 
 been directly integrated to allow the user to mix 2D imaging / 3D graphics algorithms and data."
 (from the <a href="http://www.vtk.org">vtk homepage</a>).
-\li the <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and 
+ <li> the <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and 
 segmentation algorithms.
+</ul>
 
 ITK provides powerful algorithms, but is not designed for visualization or interaction. VTK has 
 powerful visualization capabilities, but only low-level support for interaction such as picking 
@@ -40,7 +44,9 @@ out-of-date, it is useful in this case (and also we do not really use pure MVC):
 (\em model), on which we want to have different @em views and we want to interact with the data 
 (\em controller), which should result in a simultaneous and consistent update of all views.
 
-\li data management classes
-\li 
+<ul>
+ <li> data management classes
+ <li>
+</ul> 
 ...
  */

@@ -30,6 +30,7 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
 
   // let's create an object of our class  
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
+  tracker->SetRefreshRate(10);
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

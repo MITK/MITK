@@ -1,13 +1,20 @@
 #include "QmitkThresholdAction.h"
 
-#include "mitkBinaryThresholdTool.h"
-#include "mitkRenderingManager.h"
+// MITK
+#include <mitkBinaryThresholdTool.h>
+#include <mitkRenderingManager.h>
+#include <QmitkToolGUI.h>
 
-#include "QmitkToolGUI.h"
-#include <QtGui>
+// Qt
+#include <QDialog>
+#include <QVBoxLayout>
 
+using namespace itk;
+using namespace mitk;
+using namespace std;
 
 QmitkThresholdAction::QmitkThresholdAction()
+  : m_ThresholdingDialog(NULL)
 { 
 }
 
@@ -15,90 +22,78 @@ QmitkThresholdAction::~QmitkThresholdAction()
 {
 }
 
-void QmitkThresholdAction::Run(const std::vector<mitk::DataNode*> &selectedNodes)
+void QmitkThresholdAction::Run(const vector<DataNode *> &selectedNodes)
 {
-  m_ThresholdingToolManager = mitk::ToolManager::New( m_DataStorage );
+  m_ThresholdingToolManager = mitk::ToolManager::New(m_DataStorage);
+
   m_ThresholdingToolManager->RegisterClient();
-  m_ThresholdingToolManager->ActiveToolChanged +=
-  mitk::MessageDelegate<QmitkThresholdAction>( this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified );
+  m_ThresholdingToolManager->ActiveToolChanged += MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
 
-  m_ThresholdingDialog = new QDialog(NULL);
-  connect( m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)) );
+  m_ThresholdingDialog = new QDialog;
+  connect(m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)));
 
-  QVBoxLayout* layout = new QVBoxLayout;
+  QVBoxLayout *layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mitk::Tool* tool = m_ThresholdingToolManager->GetToolById( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
-  if (tool)
+  mitk::Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
+  
+  if (binaryThresholdTool != NULL)
   {
-    itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI");
-    QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
-    if (gui)
+    QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer());
+    
+    if (gui != NULL)
     {
-      gui->SetTool(tool);
+      gui->SetTool(binaryThresholdTool);
       gui->setParent(m_ThresholdingDialog);
+
       layout->addWidget(gui);
+
       m_ThresholdingDialog->setLayout(layout);
-      layout->activate();
-      m_ThresholdingDialog->setFixedSize(300,80);
+      m_ThresholdingDialog->setFixedSize(300, 80);
+
       m_ThresholdingDialog->open();
     }
-  }
 
-  for ( NodeList::const_iterator iter = selectedNodes.begin(); iter != selectedNodes.end(); ++iter )
-  {
-    mitk::DataNode* node = *iter;
-
-    if (node)
-    {
-      m_ThresholdingToolManager->SetReferenceData( node );
-      m_ThresholdingToolManager->ActivateTool( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
-    }
+    m_ThresholdingToolManager->SetReferenceData(selectedNodes[0]);
+    m_ThresholdingToolManager->ActivateTool(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
   }
 }
 
 void QmitkThresholdAction::ThresholdingDone(int result)
 {
   if (result == QDialog::Rejected)
-  m_ThresholdingToolManager->ActivateTool(-1);
-  MITK_INFO << "Thresholding done, cleaning up";
+    m_ThresholdingToolManager->ActivateTool(-1);
+
   m_ThresholdingDialog->deleteLater();
   m_ThresholdingDialog = NULL;
-  m_ThresholdingToolManager->SetReferenceData( NULL );
-  m_ThresholdingToolManager->SetWorkingData( NULL );
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ThresholdingToolManager->SetReferenceData(NULL);
+  m_ThresholdingToolManager->SetWorkingData(NULL);
+
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkThresholdAction::OnThresholdingToolManagerToolModified()
 {
-  if ( m_ThresholdingToolManager.IsNull() ) return;
-
-  //MITK_INFO << "Now got tool " << m_ThresholdingToolManager->GetActiveToolID();
-
-  if ( m_ThresholdingToolManager->GetActiveToolID() < 0)
-  {
-    if (m_ThresholdingDialog)
-      m_ThresholdingDialog->accept();
-  }
+  if (m_ThresholdingToolManager.IsNotNull())
+    if (m_ThresholdingToolManager->GetActiveToolID() < 0)
+      if (m_ThresholdingDialog != NULL)
+        m_ThresholdingDialog->accept();
 }
 
-void QmitkThresholdAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkThresholdAction::SetDataStorage(mitk::DataStorage *dataStorage)
 {
   this->m_DataStorage = dataStorage;
 }
 
-void QmitkThresholdAction::SetSmoothed(bool smoothed)
+void QmitkThresholdAction::SetSmoothed(bool)
 {
-  //not needed
 }
 
-void QmitkThresholdAction::SetDecimated(bool decimated)
+void QmitkThresholdAction::SetDecimated(bool)
 {
-  //not needed
 }
 
-void QmitkThresholdAction::SetFunctionality(berry::QtViewPart* functionality)
+void QmitkThresholdAction::SetFunctionality(berry::QtViewPart *functionality)
 {
-  //not needed 
 }

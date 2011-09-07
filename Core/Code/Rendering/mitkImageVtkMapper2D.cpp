@@ -687,7 +687,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
 
   //the finalLookuptable will be used for the rendering and can either be a user-defined table or the default lut
-  vtkSmartPointer<vtkLookupTable> finalLookuptable = vtkSmartPointer<vtkLookupTable>::New();
+  vtkSmartPointer<vtkLookupTable> finalLookuptable = localStorage->m_LookupTable;
 
   //BEGIN PROPERTY user-defined lut
   //currently we do not allow a lookuptable if it is a binary image
@@ -723,7 +723,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //check if we need the default table
   if( useDefaultLut )
   {
-    finalLookuptable = localStorage->m_LookupTable;
     double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
     localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
   }
@@ -1055,6 +1054,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   //built a default lookuptable
+  m_LookupTable->SetRampToLinear();
   m_LookupTable->SetSaturationRange( 0.0, 0.0 );
   m_LookupTable->SetHueRange( 0.0, 0.0 );
   m_LookupTable->SetValueRange( 0.0, 1.0 );

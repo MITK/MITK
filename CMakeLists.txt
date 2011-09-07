@@ -421,6 +421,9 @@ if(BUILD_TESTING)
   if(MITK_USE_BLUEBERRY)
     include(mitkTestProjectTemplate)
   endif()
+
+  # Test the package target
+  include(mitkPackageTest)
 endif()
 
 configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)

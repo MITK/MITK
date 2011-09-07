@@ -8,14 +8,14 @@ if(BUILD_TESTING)
       add_test(NAME mitkPackageTest CONFIGURATIONS Release
                COMMAND ${CMAKE_COMMANDS} --build ${MITK_BINARY_DIR} --config Release --target package)
 
-      set_tests_properties( mitkPackageest PROPERTIES
+      set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 1800
                           LABELS "MITK")
     elseif(CMAKE_BUILD_TYPE)
-      add_test( NAME mitkPackageTargetTest
+      add_test( NAME mitkPackageTest
                 COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${CMAKE_BUILD_TYPE} --target package)
 
-      set_tests_properties( mitkPackageTargetTest PROPERTIES
+      set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 1800
                           LABELS "MITK")
     endif()

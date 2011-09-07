@@ -1,0 +1,45 @@
+/**
+\page PlanarPropertiesPage The Planar Figure Properties
+
+The planar figures use several properties to create a more userfriendly handling:
+<ul>
+ <li> planarfigure.default.helperline.color controls the colour of the helperline, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.helperline.opacity controls the opacity of the helperline, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.line.color controls the colour of the line, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.line.opacity controls the opacity of the line, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.marker.color controls the colour of the markers, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.marker.opacity controls the opacity of the markers, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.markerline.color controls the colour of the outline of the markers, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.markerline.opacity controls the opacity of the outline of the markers, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.outline.color controls the colour of the outline, if the figure is neither selected nor hovered over
+ <li> planarfigure.default.outline.opacity controls the opacity of the outline, if the figure is neither selected nor hovered over
+ <li> planarfigure.drawoutline controls whether to draw the outline
+ <li> planarfigure.drawshadow controls whether to draw the shadow
+ <li> planarfigure.helperline.width controls the width of the helperline
+ <li> planarfigure.hover.helperline.color controls the colour of the helperline, if the figure is hovered over but not selected
+ <li> planarfigure.hover.helperline.opacity controls the opacity of the helperline, if the figure is hovered over but not selected
+ <li> planarfigure.hover.line.color controls the colour of the line, if the figure is hovered over but not selected
+ <li> planarfigure.hover.line.opacity controls the opacity of the line, if the figure is hovered over but not selected
+ <li> planarfigure.hover.marker.color controls the colour of the markers, if the figure is hovered over but not selected
+ <li> planarfigure.hover.marker.opacity controls the opacity of the markers, if the figure is hovered over but not selected
+ <li> planarfigure.hover.markerline.color controls the colour of the outline of the markers, if the figure is hovered over but not selected
+ <li> planarfigure.hover.markerline.opacity controls the opacity of the outline of the markers, if the figure is hovered over but not selected
+ <li> planarfigure.hover.outline.color controls the colour of the outline, if the figure is hovered over but not selected
+ <li> planarfigure.hover.outline.opacity controls the opacity of the outline, if the figure is hovered over but not selected
+ <li> planarfigure.ishovering is set to true if the figure is hovered over, controls if hover settings are used
+ <li> planarfigure.line.width controls the width of the lines
+ <li> planarfigure.outline.width controls the width of the outlines
+ <li> planarfigure.selected.helperline.color controls the colour of the helperline, if the figure is selected
+ <li> planarfigure.selected.helperline.opacity controls the opacity of the helperline, if the figure is selected
+ <li> planarfigure.selected.line.color controls the colour of the line, if the figure is selected
+ <li> planarfigure.selected.line.opacity controls the opacity of the line, if the figure is selected
+ <li> planarfigure.selected.marker.color controls the colour of the markers, if the figure is selected
+ <li> planarfigure.selected.marker.opacity controls the opacity of the markers, if the figure is selected
+ <li> planarfigure.selected.markerline.color controls the colour of the outline of the markers, if the figure is selected
+ <li> planarfigure.selected.markerline.opacity controls the opacity of the outline of the markers, if the figure is selected
+ <li> planarfigure.selected.outline.color controls the colour of the outline, if the figure is selected
+ <li> planarfigure.selected.outline.opacity controls the opacity of the outline, if the figure is selected
+ <li> planarfigure.shadow.widthmodifier controls the width of the shadow
+</ul>
+
+*/

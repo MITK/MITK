@@ -14,7 +14,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "QmitkGlobalFiberTrackingView.h"
+#include "QmitkGibbsTrackingView.h"
 #include <QmitkStdMultiWidget.h>
 
 // Qt
@@ -29,14 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProgressBar.h>
 
 // ITK
-#include <itkGlobalTractographyFilter.h>
+#include <itkGibbsTrackingFilter.h>
 #include <itkResampleImageFilter.h>
 
 // MISC
 #include <tinyxml.h>
 
 
-QmitkTrackingWorker::QmitkTrackingWorker(QmitkGlobalFiberTrackingView* view)
+QmitkTrackingWorker::QmitkTrackingWorker(QmitkGibbsTrackingView* view)
   : m_View(view)
 {
 
@@ -46,7 +46,7 @@ void QmitkTrackingWorker::run()
 {
   MITK_INFO << "Resampling mask images";
   // setup resampler
-  typedef itk::ResampleImageFilter<QmitkGlobalFiberTrackingView::MaskImgType, QmitkGlobalFiberTrackingView::MaskImgType, float> ResamplerType;
+  typedef itk::ResampleImageFilter<QmitkGibbsTrackingView::MaskImgType, QmitkGibbsTrackingView::MaskImgType, float> ResamplerType;
   ResamplerType::Pointer resampler = ResamplerType::New();
   resampler->SetOutputSpacing( m_View->m_ItkQBallImage->GetSpacing() );
   resampler->SetOutputOrigin( m_View->m_ItkQBallImage->GetOrigin() );
@@ -59,7 +59,7 @@ void QmitkTrackingWorker::run()
   resampler->Update();
   m_View->m_MaskImage = resampler->GetOutput();
 
-  m_View->m_GlobalTracker = QmitkGlobalFiberTrackingView::GlobalTrackingFilterType::New();
+  m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
   m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
   m_View->m_GlobalTracker->SetTempStart((float)m_View->m_Controls->m_StartTempSlider->value()/100);
@@ -76,10 +76,10 @@ void QmitkTrackingWorker::run()
   m_View->m_TrackingThread.quit();
 }
 
-const std::string QmitkGlobalFiberTrackingView::VIEW_ID =
-"org.mitk.views.globalfibertracking";
+const std::string QmitkGibbsTrackingView::VIEW_ID =
+"org.mitk.views.gibbstracking";
 
-QmitkGlobalFiberTrackingView::QmitkGlobalFiberTrackingView()
+QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   : QmitkFunctionality()
   , m_Controls( 0 )
   , m_MultiWidget( NULL )
@@ -104,13 +104,13 @@ QmitkGlobalFiberTrackingView::QmitkGlobalFiberTrackingView()
   m_TrackingTimer = new QTimer(this);
 }
 
-QmitkGlobalFiberTrackingView::~QmitkGlobalFiberTrackingView()
+QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 {
   delete m_TrackingTimer;
 }
 
 // update tracking status and generate fiber bundle
-void QmitkGlobalFiberTrackingView::TimerUpdate()
+void QmitkGibbsTrackingView::TimerUpdate()
 {
   mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetCurrentStep()-m_LastStep);
   m_LastStep = m_GlobalTracker->GetCurrentStep();
@@ -119,17 +119,17 @@ void QmitkGlobalFiberTrackingView::TimerUpdate()
 }
 
 // tell global tractography filter to stop after current step
-void QmitkGlobalFiberTrackingView::StopGlobalTracking()
+void QmitkGibbsTrackingView::StopGibbsTracking()
 {
   if (m_GlobalTracker.IsNull())
     return;
   m_GlobalTracker->SetAbortTracking(true);
-  m_Controls->m_GlobalTrackingStop->setEnabled(false);
-  m_Controls->m_GlobalTrackingStop->setText("Stopping Tractography ...");
+  m_Controls->m_TrackingStop->setEnabled(false);
+  m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
 }
 
 // update gui elements and generate fiber bundle after tracking is finished
-void QmitkGlobalFiberTrackingView::AfterThread()
+void QmitkGibbsTrackingView::AfterThread()
 {
   m_ThreadIsRunning = false;
   m_TrackingTimer->stop();
@@ -140,7 +140,7 @@ void QmitkGlobalFiberTrackingView::AfterThread()
 }
 
 // start tracking timer and update gui elements before tracking is started
-void QmitkGlobalFiberTrackingView::BeforeThread()
+void QmitkGibbsTrackingView::BeforeThread()
 {
   m_ThreadIsRunning = true;
   m_TrackingTime = QTime::currentTime();
@@ -151,20 +151,20 @@ void QmitkGlobalFiberTrackingView::BeforeThread()
 }
 
 // setup gui elements and signal/slot connections
-void QmitkGlobalFiberTrackingView::CreateQtPartControl( QWidget *parent )
+void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
   {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkGlobalFiberTrackingViewControls;
+    m_Controls = new Ui::QmitkGibbsTrackingViewControls;
     m_Controls->setupUi( parent );
 
     AdvancedSettings();
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
-    connect( m_Controls->m_GlobalTrackingStop, SIGNAL(clicked()), this, SLOT(StopGlobalTracking()) );
-    connect( m_Controls->m_GlobalTrackingStart, SIGNAL(clicked()), this, SLOT(StartGlobalTracking()) );
+    connect( m_Controls->m_TrackingStop, SIGNAL(clicked()), this, SLOT(StopGibbsTracking()) );
+    connect( m_Controls->m_TrackingStart, SIGNAL(clicked()), this, SLOT(StartGibbsTracking()) );
     connect( m_Controls->m_SetMaskButton, SIGNAL(clicked()), this, SLOT(SetMask()) );
     connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
     connect( m_Controls->m_SaveTrackingParameters, SIGNAL(clicked()), this, SLOT(SaveTrackingParameters()) );
@@ -180,32 +180,32 @@ void QmitkGlobalFiberTrackingView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkGlobalFiberTrackingView::SetInExBalance(int value)
+void QmitkGibbsTrackingView::SetInExBalance(int value)
 {
   m_Controls->m_InExBalanceLabel->setText(QString::number((float)value/10));
 }
 
-void QmitkGlobalFiberTrackingView::SetFiberLength(int value)
+void QmitkGibbsTrackingView::SetFiberLength(int value)
 {
   m_Controls->m_FiberLengthLabel->setText(QString::number(value));
 }
 
-void QmitkGlobalFiberTrackingView::SetParticleWeight(int value)
+void QmitkGibbsTrackingView::SetParticleWeight(int value)
 {
   m_Controls->m_ParticleWeightLabel->setText(QString::number((float)value/10000));
 }
 
-void QmitkGlobalFiberTrackingView::SetStartTemp(int value)
+void QmitkGibbsTrackingView::SetStartTemp(int value)
 {
   m_Controls->m_StartTempLabel->setText(QString::number((float)value/100));
 }
 
-void QmitkGlobalFiberTrackingView::SetEndTemp(int value)
+void QmitkGibbsTrackingView::SetEndTemp(int value)
 {
   m_Controls->m_EndTempLabel->setText(QString::number((float)value/10000));
 }
 
-void QmitkGlobalFiberTrackingView::SetParticleWidth(int value)
+void QmitkGibbsTrackingView::SetParticleWidth(int value)
 {
   if (value>0)
     m_Controls->m_ParticleWidthLabel->setText(QString::number((float)value/10)+" mm");
@@ -213,7 +213,7 @@ void QmitkGlobalFiberTrackingView::SetParticleWidth(int value)
     m_Controls->m_ParticleWidthLabel->setText("auto");
 }
 
-void QmitkGlobalFiberTrackingView::SetParticleLength(int value)
+void QmitkGibbsTrackingView::SetParticleLength(int value)
 {
   if (value>0)
     m_Controls->m_ParticleLengthLabel->setText(QString::number((float)value/10)+" mm");
@@ -221,7 +221,7 @@ void QmitkGlobalFiberTrackingView::SetParticleLength(int value)
     m_Controls->m_ParticleLengthLabel->setText("auto");
 }
 
-void QmitkGlobalFiberTrackingView::SetIterations(int value)
+void QmitkGibbsTrackingView::SetIterations(int value)
 {
   switch(value)
   {
@@ -277,18 +277,18 @@ void QmitkGlobalFiberTrackingView::SetIterations(int value)
 
 }
 
-void QmitkGlobalFiberTrackingView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
+void QmitkGibbsTrackingView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
 }
 
-void QmitkGlobalFiberTrackingView::StdMultiWidgetNotAvailable()
+void QmitkGibbsTrackingView::StdMultiWidgetNotAvailable()
 {
   m_MultiWidget = NULL;
 }
 
 // called if datamanager selection changes
-void QmitkGlobalFiberTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   m_QBallSelected = false;
   m_FibSelected = false;
@@ -314,7 +314,7 @@ void QmitkGlobalFiberTrackingView::OnSelectionChanged( std::vector<mitk::DataNod
 }
 
 // update gui elements displaying trackings status
-void QmitkGlobalFiberTrackingView::UpdateTrackingStatus()
+void QmitkGibbsTrackingView::UpdateTrackingStatus()
 {
   if (m_GlobalTracker.IsNull())
     return;
@@ -335,55 +335,55 @@ void QmitkGlobalFiberTrackingView::UpdateTrackingStatus()
 }
 
 // update gui elements (enable/disable elements and set tooltips)
-void QmitkGlobalFiberTrackingView::UpdateGUI()
+void QmitkGibbsTrackingView::UpdateGUI()
 {
   if (!m_ThreadIsRunning && m_QBallSelected)
   {
-    m_Controls->m_GlobalTrackingStop->setEnabled(false);
-    m_Controls->m_GlobalTrackingStart->setEnabled(true);
+    m_Controls->m_TrackingStop->setEnabled(false);
+    m_Controls->m_TrackingStart->setEnabled(true);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
-    m_Controls->m_GlobalTrackingStop->setText("Stop Tractography");
-    m_Controls->m_GlobalTrackingStart->setToolTip("Start tractography. No further change of parameters possible.");
-    m_Controls->m_GlobalTrackingStop->setToolTip("");
+    m_Controls->m_TrackingStop->setText("Stop Tractography");
+    m_Controls->m_TrackingStart->setToolTip("Start tractography. No further change of parameters possible.");
+    m_Controls->m_TrackingStop->setToolTip("");
   }
   else if (!m_ThreadIsRunning)
   {
-    m_Controls->m_GlobalTrackingStop->setEnabled(false);
-    m_Controls->m_GlobalTrackingStart->setEnabled(false);
+    m_Controls->m_TrackingStop->setEnabled(false);
+    m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
-    m_Controls->m_GlobalTrackingStop->setText("Stop Tractography");
-    m_Controls->m_GlobalTrackingStart->setToolTip("No Q-Ball image selected.");
-    m_Controls->m_GlobalTrackingStop->setToolTip("");
+    m_Controls->m_TrackingStop->setText("Stop Tractography");
+    m_Controls->m_TrackingStart->setToolTip("No Q-Ball image selected.");
+    m_Controls->m_TrackingStop->setToolTip("");
   }
   else
   {
-    m_Controls->m_GlobalTrackingStop->setEnabled(true);
-    m_Controls->m_GlobalTrackingStart->setEnabled(false);
+    m_Controls->m_TrackingStop->setEnabled(true);
+    m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(false);
     m_Controls->m_MaskFrame->setEnabled(false);
     m_Controls->m_IterationsSlider->setEnabled(false);
     m_Controls->m_AdvancedFrame->setEnabled(false);
     m_Controls->m_AdvancedFrame->setVisible(false);
     m_Controls->m_AdvancedSettingsCheckbox->setChecked(false);
-    m_Controls->m_GlobalTrackingStart->setToolTip("Tracking in progress.");
-    m_Controls->m_GlobalTrackingStop->setToolTip("Stop tracking and display results.");
+    m_Controls->m_TrackingStart->setToolTip("Tracking in progress.");
+    m_Controls->m_TrackingStop->setToolTip("Stop tracking and display results.");
   }
 }
 
 // show/hide advanced settings frame
-void QmitkGlobalFiberTrackingView::AdvancedSettings()
+void QmitkGibbsTrackingView::AdvancedSettings()
 {
   m_Controls->m_AdvancedFrame->setVisible(m_Controls->m_AdvancedSettingsCheckbox->isChecked());
 }
 
 // set mask image data node
-void QmitkGlobalFiberTrackingView::SetMask()
+void QmitkGibbsTrackingView::SetMask()
 {
   std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
   if (nodes.empty())
@@ -410,7 +410,7 @@ void QmitkGlobalFiberTrackingView::SetMask()
 
 // cast image to float
 template<class InputImageType>
-void QmitkGlobalFiberTrackingView::CastToFloat(InputImageType* image, mitk::Image::Pointer outImage)
+void QmitkGibbsTrackingView::CastToFloat(InputImageType* image, mitk::Image::Pointer outImage)
 {
   typedef itk::CastImageFilter<InputImageType, MaskImgType> ItkCastFilter;
   typename ItkCastFilter::Pointer itkCaster = ItkCastFilter::New();
@@ -421,11 +421,11 @@ void QmitkGlobalFiberTrackingView::CastToFloat(InputImageType* image, mitk::Imag
 }
 
 // check for mask and qbi and start tracking thread
-void QmitkGlobalFiberTrackingView::StartGlobalTracking()
+void QmitkGibbsTrackingView::StartGibbsTracking()
 {
   if(m_ThreadIsRunning)
   {
-    MITK_WARN("QmitkGlobalFiberTrackingView")<<"Thread already running!";
+    MITK_WARN("QmitkGibbsTrackingView")<<"Thread already running!";
     return;
   }
 
@@ -502,7 +502,7 @@ void QmitkGlobalFiberTrackingView::StartGlobalTracking()
 }
 
 // generate mitkFiberBundle from tracking filter output
-void QmitkGlobalFiberTrackingView::GenerateFiberBundle()
+void QmitkGibbsTrackingView::GenerateFiberBundle()
 {
   if (m_GlobalTracker.IsNull() || m_ItkQBallImage.IsNull() || m_QBallImage.IsNull() || (!m_Controls->m_VisualizationCheckbox->isChecked() && m_ThreadIsRunning))
     return;
@@ -548,7 +548,7 @@ void QmitkGlobalFiberTrackingView::GenerateFiberBundle()
 }
 
 // save current tracking paramters as xml file (.gtp)
-void QmitkGlobalFiberTrackingView::SaveTrackingParameters()
+void QmitkGibbsTrackingView::SaveTrackingParameters()
 {
   TiXmlDocument documentXML;
   TiXmlDeclaration* declXML = new TiXmlDeclaration( "1.0", "", "" );
@@ -581,7 +581,7 @@ void QmitkGlobalFiberTrackingView::SaveTrackingParameters()
   documentXML.SaveFile( filename.toStdString() );
 }
 
-void QmitkGlobalFiberTrackingView::UpdateIteraionsGUI(unsigned long iterations)
+void QmitkGibbsTrackingView::UpdateIteraionsGUI(unsigned long iterations)
 {
   switch(iterations)
   {
@@ -637,7 +637,7 @@ void QmitkGlobalFiberTrackingView::UpdateIteraionsGUI(unsigned long iterations)
 }
 
 // load current tracking paramters from xml file (.gtp)
-void QmitkGlobalFiberTrackingView::LoadTrackingParameters()
+void QmitkGibbsTrackingView::LoadTrackingParameters()
 {
   QString filename = QFileDialog::getOpenFileName(0, tr("Load Parameters"), QDir::currentPath(), tr("Global Tracking Parameters (*.gtp)") );
   if(filename.isEmpty() || filename.isNull())

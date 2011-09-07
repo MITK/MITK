@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkGlobalFiberTrackingViewControls</class>
- <widget class="QWidget" name="QmitkGlobalFiberTrackingViewControls">
+ <class>QmitkGibbsTrackingViewControls</class>
+ <widget class="QWidget" name="QmitkGibbsTrackingViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -607,7 +607,7 @@
             <string>Save Parameters</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../QmitkExt/resources/QmitkResources.qrc">
              <normaloff>:/qmitk/btnMoveDown.png</normaloff>:/qmitk/btnMoveDown.png</iconset>
            </property>
           </widget>
@@ -627,7 +627,7 @@
             <string>Load Parameters</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../QmitkExt/resources/QmitkResources.qrc">
              <normaloff>:/qmitk/btnMoveUp.png</normaloff>:/qmitk/btnMoveUp.png</iconset>
            </property>
           </widget>
@@ -652,7 +652,7 @@
           </widget>
          </item>
          <item row="8" column="0">
-          <widget class="QCommandLinkButton" name="m_GlobalTrackingStart">
+          <widget class="QCommandLinkButton" name="m_TrackingStart">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -666,13 +666,13 @@
             <string>Start Tractography</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../QmitkExt/resources/QmitkResources.qrc">
              <normaloff>:/qmitk/play.xpm</normaloff>:/qmitk/play.xpm</iconset>
            </property>
           </widget>
          </item>
          <item row="8" column="1">
-          <widget class="QCommandLinkButton" name="m_GlobalTrackingStop">
+          <widget class="QCommandLinkButton" name="m_TrackingStop">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -686,7 +686,7 @@
             <string>Stop Tractography</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../QmitkExt/resources/QmitkResources.qrc">
              <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
            </property>
           </widget>
@@ -941,6 +941,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../../../QmitkExt/resources/QmitkResources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -30,11 +30,11 @@ void QmitkTrackingPerspective::CreateInitialLayout(berry::IPageLayout::Pointer l
     layout->CreateFolder("org.mitk.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  left->AddView("org.mitk.views.globalfibertracking");
+  left->AddView("org.mitk.views.gibbstracking");
   left->AddView("org.mitk.views.fiberbundleoperations");
 
 
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.globalfibertracking");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.gibbstracking");
   lo->SetCloseable(false);
   lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
   lo->SetCloseable(false);

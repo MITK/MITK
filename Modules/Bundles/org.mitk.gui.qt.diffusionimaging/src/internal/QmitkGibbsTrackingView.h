@@ -14,14 +14,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkGlobalFiberTrackingView_h
-#define QmitkGlobalFiberTrackingView_h
+#ifndef QmitkGibbsTrackingView_h
+#define QmitkGibbsTrackingView_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
 
-#include "ui_QmitkGlobalFiberTrackingViewControls.h"
+#include "ui_QmitkGibbsTrackingViewControls.h"
 
 #include <mitkQBallImage.h>
 #include <QThread>
@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTime>
 #include <itkImage.h>
 
-class QmitkGlobalFiberTrackingView;
+class QmitkGibbsTrackingView;
 
 class QmitkTrackingWorker : public QObject
 {
@@ -37,7 +37,7 @@ class QmitkTrackingWorker : public QObject
 
 public:
 
-  QmitkTrackingWorker(QmitkGlobalFiberTrackingView* view);
+  QmitkTrackingWorker(QmitkGibbsTrackingView* view);
 
 public slots:
 
@@ -45,11 +45,11 @@ public slots:
 
 private:
 
-  QmitkGlobalFiberTrackingView* m_View;
+  QmitkGibbsTrackingView* m_View;
 };
 
 /*!
-  \brief QmitkGlobalFiberTrackingView
+  \brief QmitkGibbsTrackingView
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -61,10 +61,10 @@ typedef itk::Image< float, 3 >            FloatImageType;
 namespace itk
 {
 template<class X, class Y>
-class GlobalTractographyFilter;
+class GibbsTrackingFilter;
 }
 
-class QmitkGlobalFiberTrackingView : public QmitkFunctionality
+class QmitkGibbsTrackingView : public QmitkFunctionality
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -77,12 +77,12 @@ public:
   typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
   typedef itk::Image<OdfVectorType, 3> ItkQBallImgType;
 
-  typedef itk::GlobalTractographyFilter<ItkQBallImgType, MaskImgType> GlobalTrackingFilterType;
+  typedef itk::GibbsTrackingFilter<ItkQBallImgType, MaskImgType> GibbsTrackingFilterType;
 
   static const std::string VIEW_ID;
 
-  QmitkGlobalFiberTrackingView();
-  virtual ~QmitkGlobalFiberTrackingView();
+  QmitkGibbsTrackingView();
+  virtual ~QmitkGibbsTrackingView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -93,8 +93,8 @@ signals:
 
 protected slots:
 
-  void StartGlobalTracking();
-  void StopGlobalTracking();
+  void StartGibbsTracking();
+  void StopGibbsTracking();
   void AfterThread();
   void BeforeThread();
   void TimerUpdate();
@@ -126,7 +126,7 @@ private:
 
   void UpdateIteraionsGUI(unsigned long iterations);
 
-  Ui::QmitkGlobalFiberTrackingViewControls* m_Controls;
+  Ui::QmitkGibbsTrackingViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
   // data objects
@@ -151,12 +151,12 @@ private:
   int             m_LastStep;
 
   // global tracker and friends
-  itk::SmartPointer<GlobalTrackingFilterType> m_GlobalTracker;
+  itk::SmartPointer<GibbsTrackingFilterType> m_GlobalTracker;
   QmitkTrackingWorker m_TrackingWorker;
   QThread m_TrackingThread;
 
   friend class QmitkTrackingWorker;
 };
 
-#endif // _QMITKGLOBALFIBERTRACKINGVIEW_H_INCLUDED
+#endif // _QMITKGibbsTrackingVIEW_H_INCLUDED
 

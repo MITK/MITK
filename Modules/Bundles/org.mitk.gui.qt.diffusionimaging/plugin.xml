@@ -59,10 +59,10 @@
   </extension>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.globalfibertracking"
-          name="Global Tracking"
-          class="QmitkGlobalFiberTrackingView"
-          icon="resources/GlobalTracking.png" />
+    <view id="org.mitk.views.gibbstracking"
+          name="Gibbs Tracking"
+          class="QmitkGibbsTrackingView"
+          icon="resources/GibbsTracking.png" />
   </extension>
 
   <extension point="org.blueberry.ui.views">

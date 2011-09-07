@@ -1,11 +1,11 @@
-#include "itkGlobalTractographyFilter.h"
+#include "itkGibbsTrackingFilter.h"
 
 #include <itkProgressReporter.h>
 
 #include <mitkQBallImage.h>
 #include "itkPointShell.h"
 
-#include "GlobalTracking/BuildFibres.cpp"
+#include "GibbsTracking/BuildFibres.cpp"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -18,7 +18,7 @@
 #include <vnl/vnl_vector_fixed.h>
 #include <itkzlib/zlib.h>
 
-#include "GlobalTracking/reparametrize_arclen2.cpp"
+#include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
 
 struct LessDereference {
@@ -31,8 +31,8 @@ struct LessDereference {
 namespace itk{
 
   template< class TInputOdfImage, class TInputROIImage >
-  GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
-      ::GlobalTractographyFilter():
+  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+      ::GibbsTrackingFilter():
       m_TempStart(0.1),
       m_TempEnd(0.001),
       m_NumIt(500000),
@@ -61,8 +61,8 @@ namespace itk{
   }
 
   template< class TInputOdfImage, class TInputROIImage >
-  GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
-      ::~GlobalTractographyFilter(){
+  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+      ::~GibbsTrackingFilter(){
     delete BESSEL_APPROXCOEFF;
     if (m_Sampler!=NULL)
       delete m_Sampler;
@@ -70,7 +70,7 @@ namespace itk{
 
   template< class TInputOdfImage, class TInputROIImage >
   void
-      GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::ComputeFiberCorrelation(){
 
 //    float bD = 15;
@@ -170,7 +170,7 @@ namespace itk{
   // build fibers from tracking result
   template< class TInputOdfImage, class TInputROIImage >
   void
-      GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::BuildFibers(float* points, int numPoints)
   {
     MITK_INFO << "Building fibers ...";
@@ -219,13 +219,13 @@ namespace itk{
       delete(pCon);
     }
     m_NumAcceptedFibers = numFibers;
-    MITK_INFO << "itkGlobalTractographyFilter: "  << numFibers << " fibers accepted";
+    MITK_INFO << "itkGibbsTrackingFilter: "  << numFibers << " fibers accepted";
   }
 
   // fill output fiber bundle datastructure
   template< class TInputOdfImage, class TInputROIImage >
-  typename GlobalTractographyFilter< TInputOdfImage, TInputROIImage >::FiberBundleType*
-      GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
+  typename GibbsTrackingFilter< TInputOdfImage, TInputROIImage >::FiberBundleType*
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::GetFiberBundle()
   {
     if (!m_AbortTracking)
@@ -240,7 +240,7 @@ namespace itk{
   // get memory allocated for particle grid
   template< class TInputOdfImage, class TInputROIImage >
   float
-      GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::GetMemoryUsage()
   {
     if (m_Sampler!=NULL)
@@ -251,7 +251,7 @@ namespace itk{
   // perform global tracking
   template< class TInputOdfImage, class TInputROIImage >
   void
-      GlobalTractographyFilter< TInputOdfImage, TInputROIImage >
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::GenerateData(){
 
     // input qball image
@@ -412,13 +412,13 @@ namespace itk{
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
     // setup metropolis hastings sampler
-    MITK_INFO << "itkGlobalTractographyFilter: setting up MH-sampler";
+    MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
     if (m_Sampler!=NULL)
       delete m_Sampler;
     m_Sampler = new RJMCMC(NULL, 0, workingQballImage, qBallImageSize, qBallImageSpacing, cellsize);
 
     // setup energy computer
-    MITK_INFO << "itkGlobalTractographyFilter: setting up Energy-computer";
+    MITK_INFO << "itkGibbsTrackingFilter: setting up Energy-computer";
     EnergyComputer encomp(workingQballImage,qBallImageSize,qBallImageSpacing,sinterp,&(m_Sampler->m_ParticleGrid),mask,mask_oversamp_mult, directionMatrix);
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,curvatureHardThreshold,m_InexBalance,m_Chempot2);
     m_Sampler->SetEnergyComputer(&encomp);

@@ -52,11 +52,6 @@ namespace mitk {
     itkSetMacro(FocalLength, float);
     
     /**
-    * \brief sets the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
-    */
-    itkSetMacro(ViewAngle, float);
-
-    /**
     * \brief returns the direction of projection of the camera of the renderer in tool coordinates
     */
     itkGetConstMacro(DirectionOfProjectionInToolCoordinates, mitk::Vector3D);
@@ -70,11 +65,6 @@ namespace mitk {
     * \brief returns the focal length of the camera
     */
     itkGetConstMacro(FocalLength, float);
-    
-    /**
-    * \brief returns the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
-    */
-    itkGetConstMacro(ViewAngle, float);
     
     /**
     * \brief sets renderer that visualizes the navigation data
@@ -129,7 +119,6 @@ namespace mitk {
     Vector3D m_DirectionOfProjection; ///< vector of the current direction of view of the camera in world coordinates
     Point3D m_CameraPosition; ///< current position of the camera
     float m_FocalLength; ///< focal length of the camera: distance between camera position and focal point.
-    float m_ViewAngle; ///< view angle of the camera: angular height of the camera view measured in degrees.
   };
 } // namespace mitk
 #endif

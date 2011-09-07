@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::CameraVisualization::CameraVisualization(): NavigationDataToNavigationDataFilter(),
-m_Renderer(NULL), m_FocalLength(10.0), m_ViewAngle(30.0)
+m_Renderer(NULL), m_FocalLength(10.0)
 {
   // initialize members
   m_DirectionOfProjectionInToolCoordinates[0] = 0;
@@ -104,10 +104,6 @@ void mitk::CameraVisualization::GenerateData()
 void mitk::CameraVisualization::SetRenderer(mitk::BaseRenderer*  renderer)
 {
   m_Renderer = renderer;
-//   if (m_Renderer)
-//   {
-//     m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
-//   }
 }
 
 
@@ -142,6 +138,5 @@ mitk::PropertyList::ConstPointer mitk::CameraVisualization::GetParameters() cons
   p->SetProperty("CameraVisualization_DirectionOfProjectionInToolCoordinates", mitk::Vector3DProperty::New(this->GetDirectionOfProjectionInToolCoordinates()));  // store DirectionOfProjectionInToolCoordinates parameter
   p->SetProperty("CameraVisualization_ViewUpInToolCoordinates", mitk::Vector3DProperty::New(this->GetViewUpInToolCoordinates()));  // store ViewUpInToolCoordinates parameter
   p->SetProperty("CameraVisualization_FocalLength", mitk::Vector3DProperty::New(this->GetFocalLength()));  // store FocalLength parameter
-  p->SetProperty("CameraVisualization_ViewAngle", mitk::Vector3DProperty::New(this->GetViewAngle()));  // store ViewAngle parameter
   return mitk::PropertyList::ConstPointer(p);
 }

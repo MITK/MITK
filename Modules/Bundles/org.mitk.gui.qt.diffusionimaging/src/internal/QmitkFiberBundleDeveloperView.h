@@ -51,7 +51,7 @@ class QmitkFiberBundleDeveloperView; //this include is needed for the struct ele
 struct Package4WorkingThread
 {
   mitk::FiberBundleX* st_FBX;
-  QTimer* st_idGenerateTimer;
+  QTimer* st_FancyGUITimer1;
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
   
   //functors to outdoor methods
@@ -65,6 +65,8 @@ struct Package4WorkingThread
 // ====================================================================
 // ============= WORKER WHICH IS PASSED TO THREAD =====================
 // ====================================================================
+//## Documentation
+//## This class does the actual work for generating fiber ids.
 class QmitkFiberIDWorker : public QObject
 {
   Q_OBJECT

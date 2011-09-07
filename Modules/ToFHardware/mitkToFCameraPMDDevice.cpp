@@ -157,7 +157,9 @@ namespace mitk
         toFCameraDevice->UpdateCamera();
         toFCameraDevice->m_ImageMutex->Lock();
         // get the source data from the camera and write it at the next free position in the buffer
+        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_ImageMutex->Unlock();
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
 
@@ -180,7 +182,6 @@ namespace mitk
         {
           printStatus = true;
         }
-        toFCameraDevice->m_ImageMutex->Unlock();
         if (overflow)
         {
           //itksys::SystemTools::Delay(10);

@@ -44,6 +44,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_FOR_EXCEPTION(std::invalid_argument, mySource->StartTracking());
   
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
+  tracker->SetRefreshRate(10);
   
 
   mySource->SetTrackingDevice(tracker);

@@ -32,9 +32,9 @@ namespace mitk
     //distance from pinhole to pixel
     ToFScalarType d = sqrt(imageX*imageX + imageY*imageY + focalLength*focalLength);
 
-    cartesianCoordinates[0] = (distance-d)*imageX / d; //Strahlensatz: x / imageX = (distance-d) / d
-    cartesianCoordinates[1] = (distance-d)*imageY / d; //Strahlensatz: y / imageY = (distance-d) / d
-    cartesianCoordinates[2] = ((distance*focalLength) / d) - focalLength; //Strahlensatz: z+f / f = distance / d.
+    cartesianCoordinates[0] = (distance)*imageX / d; //Strahlensatz: x / imageX = (distance) / d
+    cartesianCoordinates[1] = (distance)*imageY / d; //Strahlensatz: y / imageY = (distance) / d
+    cartesianCoordinates[2] = ((distance*focalLength) / d); //Strahlensatz: z / f = distance / d.
 
     return cartesianCoordinates;
   }
@@ -55,7 +55,7 @@ namespace mitk
 
     if (calculateDistance)
     {
-      indexCoordinatesAndDistanceValue[2] = d*(cartesianPointZ+focalLength) / focalLength;
+      indexCoordinatesAndDistanceValue[2] = d*(cartesianPointZ) / focalLength;
     }
     else
     {

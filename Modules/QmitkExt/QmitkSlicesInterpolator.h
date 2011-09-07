@@ -256,6 +256,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     mitk::DataNode::Pointer m_FeedbackNode;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
+    mitk::DataNode::Pointer m_3DContourNode;
 
     mitk::Image* m_Segmentation;
     unsigned int m_LastSliceDimension;
@@ -265,6 +266,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     bool m_2DInterpolationEnabled;
     bool m_3DInterpolationEnabled;
+    //unsigned int m_CurrentListID;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };

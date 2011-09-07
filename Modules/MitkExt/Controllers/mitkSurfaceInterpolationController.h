@@ -69,6 +69,7 @@ namespace mitk
 
     itkSetMacro(MinSpacing, double);
     itkSetMacro(MaxSpacing, double);
+    itkSetMacro(DistImageVolume, unsigned int);
     itkSetMacro(WorkingImage, Image*);
 
    /* bool DataSetHasChanged();*/
@@ -76,6 +77,10 @@ namespace mitk
     Surface* GetContoursAsSurface();
 
     void SetDataStorage(DataStorage &ds);
+
+    unsigned int GetNewListID();
+
+    void SetCurrentListID (int ID);
 
 
 
@@ -95,7 +100,7 @@ namespace mitk
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
    //typedef std::map< RestorePlanePositionOperation*, Surface::Pointer > ContourPositionPairList;
 
-    ContourPositionPairList m_ContourList;
+    //ContourPositionPairList m_ContourList;
     ContourPositionPairList::iterator m_Iterator;
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
@@ -111,9 +116,14 @@ namespace mitk
 
     vtkSmartPointer<vtkPolyData> m_PolyData;
 
+    unsigned int m_DistImageVolume;
+
    /* bool m_Modified;*/
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    std::vector<ContourPositionPairList> m_ListOfContourLists;
+    unsigned int m_CurrentContourListID;
 
  };
 }

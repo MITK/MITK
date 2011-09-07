@@ -17,7 +17,7 @@ PURPOSE. See the above copyright notices for more information.
 
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
-  m_DistanceImageVolume = 500000;
+  m_DistanceImageVolume = 50000;
 }
 
 

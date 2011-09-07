@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-10-23 02:59:36 +0200 (Fr, 23 Okt 2009) $
  Version:   $Revision: 19652 $
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "QmitkDIAppFiberTractographyPerspective.h"
@@ -50,8 +50,8 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.globalfibertracking");
-  lo = layout->GetViewLayout("org.mitk.views.globalfibertracking");
+  right->AddView("org.mitk.views.gibbstracking");
+  lo = layout->GetViewLayout("org.mitk.views.gibbstracking");
   lo->SetCloseable(false);
 
   right->AddView("org.mitk.views.fibertracking");

@@ -120,7 +120,7 @@ SET(H_FILES
 
 
   # Tractography
-  Tractography/itkGlobalTractographyFilter.h
+  Tractography/itkGibbsTrackingFilter.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h

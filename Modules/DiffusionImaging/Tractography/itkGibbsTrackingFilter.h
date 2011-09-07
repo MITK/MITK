@@ -1,28 +1,28 @@
-#ifndef itkGlobalTractographyFilter_h
-#define itkGlobalTractographyFilter_h
+#ifndef itkGibbsTrackingFilter_h
+#define itkGibbsTrackingFilter_h
 
 #include "itkProcessObject.h"
 #include "itkVectorContainer.h"
 #include "itkImage.h"
 
-#include "GlobalTracking/pcRJMCMC.cpp"
-#include "GlobalTracking/auxilary_classes.cpp"
+#include "GibbsTracking/pcRJMCMC.cpp"
+#include "GibbsTracking/auxilary_classes.cpp"
 
 #include <fstream>
 
 namespace itk{
 
   template< class TInputQBallImage, class TInputROIImage >
-  class GlobalTractographyFilter :
+  class GibbsTrackingFilter :
   public ProcessObject{
   public:
-    typedef GlobalTractographyFilter Self;
+    typedef GibbsTrackingFilter Self;
     typedef ProcessObject Superclass;
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
 
     itkNewMacro(Self);
-    itkTypeMacro( GlobalTractographyFilter, ProcessObject );
+    itkTypeMacro( GibbsTrackingFilter, ProcessObject );
 
     /** Types for the DWI Input Image **/
     typedef TInputQBallImage InputQBallImageType;
@@ -116,8 +116,8 @@ namespace itk{
 
   protected:
 
-    GlobalTractographyFilter();
-    virtual ~GlobalTractographyFilter();
+    GibbsTrackingFilter();
+    virtual ~GibbsTrackingFilter();
 
     void ComputeFiberCorrelation();
 
@@ -158,7 +158,7 @@ namespace itk{
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkGlobalTractographyFilter.cpp"
+#include "itkGibbsTrackingFilter.cpp"
 #endif
 
 #endif

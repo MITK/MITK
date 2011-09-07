@@ -14,7 +14,7 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionImagingPublicPerspective.cpp
   QmitkControlVisualizationPropertiesView.cpp
   QmitkODFDetailsView.cpp
-  QmitkGlobalFiberTrackingView.cpp
+  QmitkGibbsTrackingView.cpp
   QmitkFiberBundleOperationsView.cpp
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
@@ -29,7 +29,7 @@ SET(UI_FILES
   src/internal/QmitkTensorReconstructionViewControls.ui
   src/internal/QmitkControlVisualizationPropertiesViewControls.ui
   src/internal/QmitkODFDetailsViewControls.ui
-  src/internal/QmitkGlobalFiberTrackingViewControls.ui
+  src/internal/QmitkGibbsTrackingViewControls.ui
   src/internal/QmitkFiberBundleOperationsViewControls.ui
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
@@ -48,7 +48,7 @@ SET(MOC_H_FILES
   src/internal/QmitkODFDetailsView.h
   src/QmitkODFRenderWidget.h
   src/QmitkODFDetailsWidget.h
-  src/internal/QmitkGlobalFiberTrackingView.h
+  src/internal/QmitkGibbsTrackingView.h
   src/internal/QmitkFiberBundleOperationsView.h
   src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
@@ -70,7 +70,7 @@ SET(CACHED_RESOURCE_FILES
   resources/recontensor.png
   resources/vizControls.png
   resources/OdfDetails.png
-  resources/GlobalTracking.png
+  resources/GibbsTracking.png
   resources/FiberBundleOperations.png
   resources/PartialVolumeAnalysis_24.png
 )

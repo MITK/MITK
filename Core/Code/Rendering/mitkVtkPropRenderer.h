@@ -81,6 +81,8 @@ public:
   int Render(RenderType type);
 
   // Active current renderwindow
+  virtual void PrepareRender();
+
   virtual void MakeCurrent();
 
   virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering

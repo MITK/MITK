@@ -796,7 +796,9 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
-  //use the finalLookuptable for mapping the colors
+//  //use the finalLookuptable for mapping the colors
+//  finalLookuptable->SetRampToLinear();
+//  finalLookuptable->ForceBuild();
   localStorage->m_Texture->SetLookupTable( finalLookuptable );
 
   if(binaryOutline && binary)
@@ -1056,6 +1058,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable->SetSaturationRange( 0.0, 0.0 );
   m_LookupTable->SetHueRange( 0.0, 0.0 );
   m_LookupTable->SetValueRange( 0.0, 1.0 );
+  m_LookupTable->SetRampToLinear();
   m_LookupTable->Build();
   //map all black values to transparent
   m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);

@@ -85,17 +85,14 @@ public:
   void FullScreenMode( bool state );
 
 protected:
-
     // overloaded move handler
     virtual void moveEvent( QMoveEvent* event );
-
     // overloaded show handler
     void showEvent( QShowEvent* event );
-
-
     // overloaded resize handler
     virtual void resizeEvent(QResizeEvent* event);
-
+    // overloaded paint handler
+    virtual void paintEvent(QPaintEvent* event);
     // overloaded mouse press handler
     virtual void mousePressEvent(QMouseEvent* event);
     // overloaded mouse move handler
@@ -104,7 +101,6 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event);
     // overloaded key press handler
     virtual void keyPressEvent(QKeyEvent* event);
-
     // overloaded enter handler
     virtual void enterEvent(QEvent*);
     // overloaded leave handler

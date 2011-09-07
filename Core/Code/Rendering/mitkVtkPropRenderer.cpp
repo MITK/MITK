@@ -802,6 +802,11 @@ void mitk::VtkPropRenderer::checkState()
   }
 }
 
+void mitk::VtkPropRenderer::PrepareRender()
+{
+  AdjustCameraToScene();
+}
+
 void mitk::VtkPropRenderer::AdjustCameraToScene(){
   if(this->GetMapperID() == 1)
   {
@@ -810,7 +815,9 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
 
     const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 
-    double objectHeightInMM = this->GetCurrentWorldGeometry2D()->GetExtentInMM(0);//the height of the current object slice in mm
+//    MITK_INFO << "Display Geo MTime " << displayGeometry->GetMTime();
+
+    double objectHeightInMM = this->GetCurrentWorldGeometry2D()->GetExtentInMM(1);//the height of the current object slice in mm
     double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
     double zoomFactor = objectHeightInMM/displayHeightInMM; //displayGeometry->GetScaleFactorMMPerDisplayUnit()
     //determine how much of the object can be displayed

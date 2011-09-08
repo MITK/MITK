@@ -32,7 +32,7 @@
 
 // MITK
 //#include <mitkFiberBundleX.h> //for fiberStructure
-
+#include <mitkFiberBundleXThreadMonitor.h>
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -237,7 +237,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->buttonVtkSmoothPD->setEnabled(false);//not yet implemented
     m_Controls->buttonGenerateTubes->setEnabled(false);//not yet implemented
     
-    
+
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
     connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
     
@@ -247,6 +247,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
     
+    connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
     
     
   }
@@ -461,7 +462,7 @@ void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
 
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 {
-  
+    m_threadInProgress = true;
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
@@ -736,6 +737,54 @@ void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator(bool isV
 }
 
 
+void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
+{
+  //check if in datanode exists already a node of type mitkFiberBundleXThreadMonitor
+  //if not then put node to datastorage
+  
+  //if checkStatus is 1 then start qtimer using fading in starting text in datanode
+  //if checkStatus is 0 then fade out dataNode using qtimer
+  
+  if (checkStatus)
+  {
+  mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
+    FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
+  m_MonitorNode = mitk::DataNode::New();
+  m_MonitorNode->SetName("FBX_threadMonitor");
+  m_MonitorNode->SetData(FBXThreadMonitor);
+  m_MonitorNode->SetVisibility(true);
+  m_MonitorNode->SetOpacity(1.0);
+  
+  GetDataStorage()->Add(m_MonitorNode);
+
+  const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
+  if (tsgeo == NULL) {
+    /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
+    // get all nodes that have not set "includeInBoundingBox" to false
+    mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New( "includeInBoundingBox"
+                                                                                                        , mitk::BoolProperty::New(false)));
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  } else {
+    
+    GetDataStorage()->Modified();
+    m_MultiWidget->RequestUpdate(); //necessary??
+  }
+  
+
+  } else {
+    GetDataStorage()->Remove(m_MonitorNode);
+    GetDataStorage()->Modified();
+    m_MultiWidget->RequestUpdate(); //necessary??
+  }
+  
+  
+}
+
+
 
 void QmitkFiberBundleDeveloperView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
@@ -795,6 +844,7 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
     
   }
 }
+
 void QmitkFiberBundleDeveloperView::Activated()
 {
   

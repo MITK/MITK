@@ -54,6 +54,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundleXWriter.h"
 #include "mitkFiberBundleXMapper3D.h"
 
+#include "mitkFiberBundleXThreadMonitorMapper3D.h"
+#include "mitkFiberBundleXThreadMonitor.h"
+
 #include "mitkNrrdTbssImageIOFactory.h"
 #include "mitkNrrdTbssImageWriterFactory.h"
 #include "mitkNrrdTbssImageWriter.h"
@@ -177,6 +180,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::FiberBundleXMapper3D::New();
       newMapper->SetDataNode(node);
     }
+    
+    classname = "FiberBundleXThreadMonitor";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::FiberBundleXThreadMonitorMapper3D::New();
+      newMapper->SetDataNode(node); 
+    }
 
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -225,6 +235,12 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::FiberBundleXMapper3D::SetDefaultProperties(node);
   }
 
+  classname = "FiberBundleXThreadMonitor";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(node);
+  }
+  
   classname = "TbssImage";
   std::string n = node->GetData()->GetNameOfClass();
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)

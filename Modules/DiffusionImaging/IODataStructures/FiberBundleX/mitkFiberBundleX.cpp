@@ -19,7 +19,7 @@
 #include "mitkFiberBundleX.h"
 
 /* musthave */
-#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
+//#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
 
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>

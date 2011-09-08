@@ -159,6 +159,7 @@ public:
   void DoGenerateFiberIDs();
   void DoUpdateGenerateFibersWidget();
   void SelectionChangedToolBox(int);
+  void DoMonitorFiberThreads(int);
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();
@@ -221,6 +222,7 @@ protected:
   
   QThread * m_hostThread;
   bool m_threadInProgress;
+  mitk::DataNode::Pointer m_MonitorNode;
   
 
 };

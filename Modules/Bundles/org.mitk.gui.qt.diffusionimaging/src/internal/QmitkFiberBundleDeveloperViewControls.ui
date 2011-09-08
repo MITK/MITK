@@ -30,7 +30,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-35</y>
+        <y>0</y>
         <width>366</width>
         <height>449</height>
        </rect>
@@ -746,7 +746,7 @@
         <x>0</x>
         <y>0</y>
         <width>381</width>
-        <height>261</height>
+        <height>249</height>
        </rect>
       </property>
       <attribute name="label">
@@ -805,6 +805,20 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxMonitorFiberThreads">
+     <property name="text">
+      <string>Monitor Fiber Threading in mitkRenderWindow4</string>
+     </property>
     </widget>
    </item>
    <item>

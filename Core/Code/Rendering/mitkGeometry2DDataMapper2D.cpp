@@ -246,6 +246,9 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         p1 = line.GetPoint( p1Param );
         displayGeometry->WorldToDisplay( p1, p1 );
 
+        //Work arround to show the crosshair always on top of a 2D render window
+        //The image is usually located at depth = 0 or negative depth values, and thus,
+        //the crosshair with depth = 1 is always on top.
         float depthPosition = 1.0f;
 
         // Iterate over all line segments and display each, with a gap

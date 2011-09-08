@@ -92,7 +92,7 @@ namespace mitk
 
       this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
       // wait a little to make sure that the thread is started
-      itksys::SystemTools::Delay(10);
+      itksys::SystemTools::Delay(100);
     }
     else
     {
@@ -158,10 +158,12 @@ namespace mitk
         // update the ToF camera
         toFCameraDevice->UpdateCamera();
         // get the source data from the camera and write it at the next free position in the buffer
+        vtkShortArray* channelData = vtkShortArray::New();
+        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
         toFCameraDevice->m_Controller->GetShortSourceData(toFCameraDevice->m_ShortSourceData);
-        vtkShortArray* channelData = vtkShortArray::New();
         toFCameraDevice->GetChannelSourceData( toFCameraDevice->m_ShortSourceData, channelData );
+        toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
@@ -177,11 +179,12 @@ namespace mitk
         }
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
         toFCameraDevice->m_RawDataSource->Update();
+        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_RawDataSource->GetAmplitudes(toFCameraDevice->m_AmplitudeArray);
         toFCameraDevice->m_RawDataSource->GetIntensities(toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_RawDataSource->GetDistances(toFCameraDevice->m_DistanceArray);
+        toFCameraDevice->m_ImageMutex->Unlock();
 
-        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_ImageSequence++;
@@ -193,7 +196,6 @@ namespace mitk
         {
           printStatus = true;
         }
-        toFCameraDevice->m_ImageMutex->Unlock();
         channelData->Delete();
 
         if (overflow)

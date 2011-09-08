@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataStorage.h>
 #include <mitkDataStorageSelection.h>
+#include <mitkWeakPointer.h>
 
 // Qt
 #include <QVector>
@@ -42,21 +43,31 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTimer>
 #include <QThread>
 
+class QmitkFiberBundleDeveloperView; //this include is needed for the struct element, especially for functors to QmitkFiberBundleDeveloperView
 
 /* ==== THIS STRUCT CONTAINS ALL NECESSARY VARIABLES 
  * TO EXECUTE AND UPDATE GUI ELEMENTS DURING PROCESSING OF A THREAD 
+ * why? either you add tons of friendclasses (e.g. FiberWorker objects), or you create a package containing all items needed. Otherwise you have to set all members etc. to public!
  */
 struct Package4WorkingThread
 {
   mitk::FiberBundleX* st_FBX;
-  QTimer* st_idGenerateTimer;
+  QTimer* st_FancyGUITimer1;
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
+  
+  //functors to outdoor methods
+  QmitkFiberBundleDeveloperView* st_host;
+  void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) (vtkPolyData*);
+  
+  
 };
 
 
 // ====================================================================
 // ============= WORKER WHICH IS PASSED TO THREAD =====================
 // ====================================================================
+//## Documentation
+//## This class does the actual work for generating fiber ids.
 class QmitkFiberIDWorker : public QObject
 {
   Q_OBJECT
@@ -72,6 +83,30 @@ public:
 private:
   //mitk::FiberBundleX* m_FBX;
 
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+  
+  
+};
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
+class QmitkFiberGenerateRandomWorker : public QObject
+{
+  Q_OBJECT
+  
+public:
+  
+  QmitkFiberGenerateRandomWorker( QThread*, Package4WorkingThread );
+  
+  public slots:
+  
+  void run();
+  
+private:
+  //mitk::FiberBundleX* m_FBX;
+  
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   
@@ -123,14 +158,20 @@ public:
   void DoGenerateFibers();
   void DoGenerateFiberIDs();
   void DoUpdateGenerateFibersWidget();
-  void UpdateFiberIDTimer();
   void SelectionChangedToolBox(int);
+  void DoMonitorFiberThreads(int);
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();
   void AfterThread_IdGenerate();
+  void BeforeThread_GenerateFibersRandom();
+  void AfterThread_GenerateFibersRandom();
   
+  //SLOTS FOR TIMERS
+  void UpdateFiberIDTimer();
+  void UpdateGenerateRandomFibersTimer();
   
+    
   
 protected:
 
@@ -146,10 +187,12 @@ protected:
   private:
   
   /* METHODS GENERATING FIBERSTRUCTURES */
-  vtkPolyData* GenerateVtkFibersRandom();
+  void GenerateVtkFibersRandom();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionX();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
+
+  void PutFibersToDataStorage( vtkPolyData* );
   
   /* METHODS FOR FIBER PROCESSING OR PREPROCESSING  */
 
@@ -160,20 +203,26 @@ protected:
   void FeedFiberInfoWidget();
   void FBXDependendGUIElementsConfigurator(bool);
   
+  void SetGeneratedFBX();
+  
+  
   //contains the selected FiberBundle
-  mitk::FiberBundleX* m_FiberBundleX;
-
+  //mitk::FiberBundleX* m_FiberBundleX;
+  mitk::WeakPointer<mitk::FiberBundleX> m_FiberBundleX;
+  
 //  radiobutton groups
   QVector< QRadioButton* > m_DirectionRadios;
   QVector< QRadioButton* > m_FARadios;
   QVector< QRadioButton* > m_GARadios;
   
-  // timer for updating fiber id generation
-  QTimer m_idGenerateTimer;
   
+  // Thread based Workers which do some processing of fibers
   QmitkFiberIDWorker * m_FiberIDGenerator;
+  QmitkFiberGenerateRandomWorker * m_GeneratorFibersRandom;
+  
   QThread * m_hostThread;
   bool m_threadInProgress;
+  mitk::DataNode::Pointer m_MonitorNode;
   
 
 };

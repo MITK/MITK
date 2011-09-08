@@ -56,6 +56,7 @@ SET(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
+  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
 
   # DataStructures -> PlanarFigureComposite
@@ -81,7 +82,8 @@ SET(CPP_FILES
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
-
+  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
+  
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -96,6 +98,7 @@ SET(H_FILES
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
+  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -116,6 +119,7 @@ SET(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
+  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
 
 
 

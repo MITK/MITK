@@ -19,7 +19,7 @@
 #include "mitkFiberBundleX.h"
 
 /* musthave */
-#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
+//#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
 
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
@@ -243,7 +243,7 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 //   if(i%500 == 0)
 //     MITK_INFO << i;
 //  }
-  
+//  MITK_INFO << "Generating Fiber Ids";
   vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
   idFiberFilter->SetInput(m_FiberStructureData);
   idFiberFilter->CellIdsOn();
@@ -253,6 +253,8 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
   idFiberFilter->Update();
   
   m_FiberIdDataSet = idFiberFilter->GetOutput();
+  
+  MITK_INFO << "Generating Fiber Ids...[done] | " << m_FiberIdDataSet->GetNumberOfCells();
 
 }
 

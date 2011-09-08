@@ -14,6 +14,9 @@
  PURPOSE.  See the above copyright notices for more information.
  
  =========================================================================*/
+//=========FOR TESTING==========
+//random generation, number of points equal requested points
+
 
 
 // Blueberry application and interaction service
@@ -29,7 +32,7 @@
 
 // MITK
 //#include <mitkFiberBundleX.h> //for fiberStructure
-
+#include <mitkFiberBundleXThreadMonitor.h>
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -44,11 +47,12 @@
 //ITK
 #include <itkTimeProbe.h>
 
-
-
+//==============================================
+//======== W O R K E R S ____ S T A R T ========
+//==============================================
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
- */
+ * --generate FiberIDs--*/
 QmitkFiberIDWorker::QmitkFiberIDWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
 : m_itemPackage(itemPackage),
 m_hostingThread(hostingThread)
@@ -57,30 +61,131 @@ m_hostingThread(hostingThread)
 }
 void QmitkFiberIDWorker::run()
 {
-
-  //accurate time measurement using ITK timeProbe
+  
+  /* MEASUREMENTS AND FANCY GUI EFFECTS
+   * accurate time measurement using ITK timeProbe*/
   itk::TimeProbe clock;
   clock.Start();
+  //set GUI representation of timer to 0, is essential for correct timer incrementation
+  m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText(QString::number(0)); 
+  m_itemPackage.st_FancyGUITimer1->start();
   
+  //do processing
   m_itemPackage.st_FBX->DoGenerateFiberIds();
-  m_itemPackage.st_idGenerateTimer->stop(); //stop fancy Qt-timer in GUI
-    
+  
+  /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
   clock.Stop();
+  m_itemPackage.st_FancyGUITimer1->stop();
   m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
-  MITK_INFO << "==== Generate idSet ====\n Mean: " << clock.GetMean() << "\n Total: " << clock.GetTotal() ;
-  //  m_hostingThread->quit();
-
+  delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
+  m_hostingThread->quit();
+  
 }
 
 
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ * --generate random fibers--*/
+QmitkFiberGenerateRandomWorker::QmitkFiberGenerateRandomWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+: m_itemPackage(itemPackage),
+m_hostingThread(hostingThread)
+{
+  
+}
+void QmitkFiberGenerateRandomWorker::run()
+{
+  
+  /* MEASUREMENTS AND FANCY GUI EFFECTS */
+  m_itemPackage.st_Controls->infoTimerGenerateFiberBundle->setText(QString::number(0)); 
+  m_itemPackage.st_FancyGUITimer1->start();
+  
+  //do processing, generateRandomFibers
+  int numOfFibers = m_itemPackage.st_Controls->boxFiberNumbers->value();
+  int distrRadius = m_itemPackage.st_Controls->boxDistributionRadius->value();
+  int numOfPoints = numOfFibers * distrRadius;
+  
+  std::vector< std::vector<int> > fiberStorage;
+  for (int i=0; i<numOfFibers; ++i) {
+    std::vector<int> a;
+    fiberStorage.push_back( a );
+  }
+  
+  /* Generate Point Cloud */
+  vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
+  randomPoints->SetCenter(0.0, 0.0, 0.0);
+  randomPoints->SetNumberOfPoints(numOfPoints);
+  randomPoints->SetRadius(distrRadius);
+  randomPoints->Update();
+  vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
+  
+  /* ASSIGN EACH POINT TO A RANDOM FIBER */
+  srand((unsigned)time(0)); // init randomizer
+  for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
+    
+    //generate random number between 0 and numOfFibers-1
+    int random_integer; 
+    random_integer = (rand()%numOfFibers); 
+    
+    //add current point to random fiber
+    fiberStorage.at(random_integer).push_back(i); 
+    //    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
+  } 
+  
+  // initialize accurate time measurement
+  itk::TimeProbe clock;
+  clock.Start();
+  
+  /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
+  vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
+  linesCell->Allocate(pnts->GetNumberOfPoints()*2); //allocate for each cellindex also space for the pointId, e.g. [idx | pntID]
+  for (unsigned long i=0; i<fiberStorage.size(); ++i)
+  {
+    std::vector<int> singleFiber = fiberStorage.at(i);
+    vtkSmartPointer<vtkPolyLine> fiber = vtkSmartPointer<vtkPolyLine>::New();
+    fiber->GetPointIds()->SetNumberOfIds((int)singleFiber.size());
+    
+    for (unsigned long si=0; si<singleFiber.size(); ++si) 
+    {  //hopefully unsigned long to double works fine in VTK ;-)
+      fiber->GetPointIds()->SetId( si, singleFiber.at(si) );
+    }
+    
+    linesCell->InsertNextCell(fiber);
+  }  
+  
+  /* checkpoint for cellarray allocation */
+  if ( (linesCell->GetSize()/pnts->GetNumberOfPoints()) != 2 ) //e.g. size: 12, number of points:6 .... each cell hosts point ids (6 ids) + cell index for each idPoint. 6 * 2 = 12
+  {
+    MITK_INFO << "RANDOM FIBER ALLOCATION CAN NOT BE TRUSTED ANYMORE! Correct leak or remove command: linesCell->Allocate(pnts->GetNumberOfPoints()*2) but be aware of possible loss in performance.";
+  }
+  
+  /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
+  vtkPolyData* PDRandom = vtkPolyData::New(); //no need to delete because data is needed in datastorage.
+  PDRandom->SetPoints(pnts);
+  PDRandom->SetLines(linesCell);
+  
+  // accurate timer measurement stop
+  clock.Stop();
+  //MITK_INFO << "=====Assambling random Fibers to Polydata======\nMean: " << clock.GetMean() << " Total: " << clock.GetTotal() << std::endl;  
+  
+  // call function to convert fiberstructure into fiberbundleX and pass it to datastorage
+  (m_itemPackage.st_host->*m_itemPackage.st_pntr_to_Method_PutFibersToDataStorage)(PDRandom);
+  
+  /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
+  m_itemPackage.st_FancyGUITimer1->stop();
+  m_itemPackage.st_Controls->infoTimerGenerateFiberBundle->setText( QString::number(clock.GetTotal()) );
+  delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
+  m_hostingThread->quit();
+  
+}
 
-
+//==============================================
+//======== W O R K E R S ________ E N D ========
+//==============================================
 
 
 
 
 // ========= HERE STARTS THE ACTUAL FIBERBUNDLE DEVELOPER VIEW IMPLEMENTATION ======
-
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
@@ -99,11 +204,13 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
 // Destructor
 QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
-  m_FiberBundleX->Delete();
+  //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
   delete m_hostThread;
-  delete m_FiberIDGenerator;
+  if (m_FiberIDGenerator != NULL)
+    delete m_FiberIDGenerator;
   
-  // m_idGenerateTimer no need to delete, is not initialized using "new"
+  if (m_GeneratorFibersRandom != NULL)
+    delete m_GeneratorFibersRandom;
   
 }
 
@@ -124,6 +231,13 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->buttonGenerateFiberIds->setEnabled(false);
     m_Controls->buttonGenerateFibers->setEnabled(true);
     
+    m_Controls->buttonColorFibers->setEnabled(false);//not yet implemented
+    m_Controls->buttonSMFibers->setEnabled(false);//not yet implemented
+    m_Controls->buttonVtkDecimatePro->setEnabled(false);//not yet implemented
+    m_Controls->buttonVtkSmoothPD->setEnabled(false);//not yet implemented
+    m_Controls->buttonGenerateTubes->setEnabled(false);//not yet implemented
+    
+
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
     connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
     
@@ -133,6 +247,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
     
+    connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
     
     
   }
@@ -239,10 +354,11 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
       fibDirection = rdbtn->objectName();
   }
   
-  vtkPolyData* output; // FiberPD stores the generated PolyData
+  //  vtkPolyData* output; // FiberPD stores the generated PolyData... going to be generated in thread
   if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_RANDOM ) {
     //    build polydata with random lines and fibers
-    output = GenerateVtkFibersRandom();
+    //    output = 
+    GenerateVtkFibersRandom();
     
   } else if ( fibDirection == FIB_RADIOBUTTON_DIRECTION_X ) {
     //    build polydata with XDirection fibers
@@ -258,8 +374,17 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     
   }
   
+  
+} 
+
+void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadOutput)
+{
+  
+  MITK_INFO << "YEHAAAAAAAAA WHAT A GREAT DAY!!!!!!";
+  MITK_INFO << "lines: " << threadOutput->GetNumberOfLines() << "pnts: " << threadOutput->GetNumberOfPoints();
+  //qthread mutex lock
   mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New();
-  FB->SetFibers(output);
+  FB->SetFibers(threadOutput);
   FB->SetGeometry(this->GenerateStandardGeometryForMITK());
   
   mitk::DataNode::Pointer FBNode;
@@ -284,111 +409,68 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   } else {
     
-    GetDataStorage()->Modified(); //necessary??
+    GetDataStorage()->Modified();
     m_MultiWidget->RequestUpdate(); //necessary??
   }
-} 
-
+  
+  //qthread mutex unlock
+}
 
 /*
  * Generate polydata of random fibers
  */
-vtkPolyData* QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
+void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
-  int numOfFibers = m_Controls->boxFiberNumbers->value();
-  int distrRadius = m_Controls->boxDistributionRadius->value();
-  int numOfPoints = numOfFibers * distrRadius;
   
+  /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread */
+  QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+  localTimer->setInterval( 10 );
+  connect( localTimer, SIGNAL(timeout()), this, SLOT(UpdateGenerateRandomFibersTimer()) );
   
-  std::vector< std::vector<int> > fiberStorage;
-  for (int i=0; i<numOfFibers; ++i) {
-    std::vector<int> a;
-    fiberStorage.push_back( a );
-    
-  }
+  struct Package4WorkingThread ItemPackageForRandomGenerator;
+  ItemPackageForRandomGenerator.st_FBX = m_FiberBundleX;
+  ItemPackageForRandomGenerator.st_Controls = m_Controls;
+  ItemPackageForRandomGenerator.st_FancyGUITimer1 = localTimer;
+  ItemPackageForRandomGenerator.st_host = this;
+  ItemPackageForRandomGenerator.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage;
   
-  //get number of items in fiberStorage
-  MITK_INFO << "Fibers in fiberstorage: " << fiberStorage.size();
+  if (m_threadInProgress)
+    return; //maybe popup window saying, working thread still in progress...pls wait
   
+  m_GeneratorFibersRandom = new QmitkFiberGenerateRandomWorker(m_hostThread, ItemPackageForRandomGenerator);
+  m_GeneratorFibersRandom->moveToThread(m_hostThread);
   
+  connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_GenerateFibersRandom()) );
+  connect(m_hostThread, SIGNAL(started()), m_GeneratorFibersRandom, SLOT(run()) );
+  connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_GenerateFibersRandom()) );
+  connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_GenerateFibersRandom()) );
   
+  m_hostThread->start(QThread::LowestPriority);
   
-  /* Generate Point Cloud */
-  vtkSmartPointer<vtkPointSource> randomPoints = vtkSmartPointer<vtkPointSource>::New();
-  randomPoints->SetCenter(0.0, 0.0, 0.0);
-  randomPoints->SetNumberOfPoints(numOfPoints);
-  randomPoints->SetRadius(distrRadius);
-  randomPoints->Update();
-  
-  vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
-  
-  /*====== checkpoint: compare initialized and required points =============================*/
-  if (numOfPoints != pnts->GetNumberOfPoints()) {
-    MITK_INFO << "VTK POINT ERROR, WRONG AMOUNT OF GENRERATED POINTS... COULD BE VTK BUG OR BITFLIP DUE TO COSMIC RADIATION!";
-    return NULL;
-  }/* ================================= */
-  
-  /* ASSIGN EACH POINT TO A RANDOM FIBER */
-  srand((unsigned)time(0)); // init randomizer
-  for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
-    
-    //generate random number between 0 and numOfFibers-1
-    int random_integer; 
-    random_integer = (rand()%numOfFibers); 
-    
-    //add current point to random fiber
-    fiberStorage.at(random_integer).push_back(i); 
-    //    MITK_INFO << "point" << i << " |" << pnts->GetPoint(random_integer)[0] << "|" << pnts->GetPoint(random_integer)[1]<< "|" << pnts->GetPoint(random_integer)[2] << "| into fiber" << random_integer;
-  } 
-  
-  //=====timer measurement====
-  itk::TimeProbe clock;
-  clock.Start();
-  //==========================
-  
-  
-  /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
-  vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
-  linesCell->Allocate(pnts->GetNumberOfPoints()*2); //allocate for each cellindex also space for the pointId, e.g. [idx | pntID]
-  for (unsigned long i=0; i<fiberStorage.size(); ++i)
-  {
-    
-    std::vector<int> singleFiber = fiberStorage.at(i);
-    vtkSmartPointer<vtkPolyLine> fiber = vtkSmartPointer<vtkPolyLine>::New();
-    fiber->GetPointIds()->SetNumberOfIds((int)singleFiber.size());
-    
-    for (unsigned long si=0; si<singleFiber.size(); ++si) 
-    {  //hopefully unsigned long to double works fine in VTK ;-)
-      fiber->GetPointIds()->SetId( si, singleFiber.at(si) );
-    }
-    
-    linesCell->InsertNextCell(fiber);
-  }  
-  
-  /* =======checkpoint for cellarray allocation ==========*/
-  if ( (linesCell->GetSize()/pnts->GetNumberOfPoints()) != 2 ) 
-  {
-    MITK_INFO << "RANDOM FIBER ALLOCATION CAN NOT BE TRUSTED ANYMORE! Correct leak or remove command: linesCell->Allocate(pnts->GetNumberOfPoints()*2) but be aware of possible loss in performance.";
-  }/* ====================================================*/
-  
-  
-  //  MITK_INFO << "CellSize: " << linesCell->GetSize() << " NumberOfCells: " << linesCell->GetNumberOfCells();
-  
-  /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
-  vtkPolyData* PDRandom = vtkPolyData::New();
-  PDRandom->SetPoints(pnts);
-  PDRandom->SetLines(linesCell);
-  
-  //====timer measurement========
-  clock.Stop();
-  MITK_INFO << "=====Assambling random Fibers to Polydata======\nMean: " << clock.GetMean() << std::endl;
-  MITK_INFO << "Total: " << clock.GetTotal() << std::endl;  
-  //=============================
-  
-  
-  return PDRandom;
 }
 
+void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
+{
+  //MAKE SURE by yourself THAT NOTHING ELSE THAN A NUMBER IS SET IN THAT LABEL
+  QString crntValue = m_Controls->infoTimerGenerateFiberBundle->text();
+  int tmpVal = crntValue.toInt();
+  m_Controls->infoTimerGenerateFiberBundle->setText(QString::number(++tmpVal));  
+  m_Controls->infoTimerGenerateFiberBundle->update();
+
+}
+
+void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
+{
+    m_threadInProgress = true;
+}
+
+void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
+{
+  m_threadInProgress = false;
+  disconnect(m_hostThread, 0, 0, 0);
+  m_hostThread->disconnect();
+}
 
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionX()
 {
@@ -457,6 +539,12 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
   
   return PDZ;
 }
+
+
+
+
+
+
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===
  * WITHOUT, the rendering mechanism will ignore objects without valid Geometry 
@@ -540,15 +628,22 @@ void QmitkFiberBundleDeveloperView::UpdateFiberIDTimer()
 void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 {
   
+  /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread */
+  QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+  localTimer->setInterval( 10 );
+  connect( localTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
+  
+  
+  // pack items which are needed by thread processing
   struct Package4WorkingThread FiberIdPackage;
   FiberIdPackage.st_FBX = m_FiberBundleX;
-  FiberIdPackage.st_idGenerateTimer = &m_idGenerateTimer;
+  FiberIdPackage.st_FancyGUITimer1 = localTimer;
   FiberIdPackage.st_Controls = m_Controls;
   
-  /* ===== TIMER CONFIGURATIONS for visual effect ======
-   * start and stop is called in Thread pre- and postprocessing methods */
-  m_idGenerateTimer.setInterval( 10 );
-  connect( &m_idGenerateTimer, SIGNAL(timeout()), this, SLOT(UpdateFiberIDTimer()) );
+  
+  if (m_threadInProgress)
+    return; //maybe popup window saying, working thread still in progress...pls wait
   
   // THREAD CONFIGURATION
   m_FiberIDGenerator = new QmitkFiberIDWorker(m_hostThread, FiberIdPackage);
@@ -567,16 +662,25 @@ void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 
 void QmitkFiberBundleDeveloperView::BeforeThread_IdGenerate()
 {
-  m_Controls->infoTimerGenerateFiberIds->setText(QString::number(0)); //set GUI representation of timer to 0
   m_threadInProgress = true;
-  m_idGenerateTimer.start();
   
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
 {
-  //  m_idGenerateTimer.stop(); //not smart to set timer.stop here, cuz this will override the actual measurements of ITK:PROBE in GUI 
+  
+  
   m_threadInProgress = false;
+  disconnect(m_hostThread, 0, 0, 0);
+  m_hostThread->disconnect();
+  
+}
+
+/* THE WORKER ACCESS THIS METHOD TO PASS GENERATED FIBERBUNDLE
+ * TO DATASTORAGE */
+void QmitkFiberBundleDeveloperView::SetGeneratedFBX()
+{
+  
   
   
 }
@@ -633,6 +737,54 @@ void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator(bool isV
 }
 
 
+void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
+{
+  //check if in datanode exists already a node of type mitkFiberBundleXThreadMonitor
+  //if not then put node to datastorage
+  
+  //if checkStatus is 1 then start qtimer using fading in starting text in datanode
+  //if checkStatus is 0 then fade out dataNode using qtimer
+  
+  if (checkStatus)
+  {
+  mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
+    FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
+  m_MonitorNode = mitk::DataNode::New();
+  m_MonitorNode->SetName("FBX_threadMonitor");
+  m_MonitorNode->SetData(FBXThreadMonitor);
+  m_MonitorNode->SetVisibility(true);
+  m_MonitorNode->SetOpacity(1.0);
+  
+  GetDataStorage()->Add(m_MonitorNode);
+
+  const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
+  if (tsgeo == NULL) {
+    /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
+    // get all nodes that have not set "includeInBoundingBox" to false
+    mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New( "includeInBoundingBox"
+                                                                                                        , mitk::BoolProperty::New(false)));
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  } else {
+    
+    GetDataStorage()->Modified();
+    m_MultiWidget->RequestUpdate(); //necessary??
+  }
+  
+
+  } else {
+    GetDataStorage()->Remove(m_MonitorNode);
+    GetDataStorage()->Modified();
+    m_MultiWidget->RequestUpdate(); //necessary??
+  }
+  
+  
+}
+
+
 
 void QmitkFiberBundleDeveloperView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
@@ -658,6 +810,7 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
   ResetFiberInfoWidget();
   FBXDependendGUIElementsConfigurator(false);
   m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
+  m_Controls->infoTimerGenerateFiberBundle->setText( "-" );
   //====================================================
   
   
@@ -691,6 +844,7 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
     
   }
 }
+
 void QmitkFiberBundleDeveloperView::Activated()
 {
   

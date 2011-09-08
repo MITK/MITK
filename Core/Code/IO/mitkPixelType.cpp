@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkIpPic.h"
 #include "mitkPixelType.h"
 #include <mitkLogMacros.h>
 #include <itkVector.h>

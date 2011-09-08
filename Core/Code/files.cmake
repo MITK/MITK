@@ -236,7 +236,7 @@ SET(CPP_FILES
   IO/mitkFileReader.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
-  IO/mitkIpPicGet.c 
+  #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkImageWriter.cpp
   IO/mitkImageWriterFactory.cpp

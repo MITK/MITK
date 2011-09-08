@@ -12,8 +12,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkPropRenderer.h"
 
-#include "picimage.h"
-
 // MAPPERS
 #include "mitkMapper.h"
 #include "mitkImageVtkMapper2D.h"

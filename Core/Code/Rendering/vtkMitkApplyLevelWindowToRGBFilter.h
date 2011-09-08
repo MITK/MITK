@@ -22,7 +22,7 @@ class vtkScalarsToColors;
 #include <vtkImageData.h>
 #include <vtkImageToImageFilter.h>
 
-#include <mitkCommon.h>
+#include <MitkExports.h>
 /** Documentation
 * \brief Applies the color and opacity level window to RGB(A) images.
 *

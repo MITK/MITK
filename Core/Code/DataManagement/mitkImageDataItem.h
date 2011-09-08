@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGEDATAITEM_H
 
 #include "mitkCommon.h"
+#include <MitkExports.h>
 //#include <mitkIpPic.h>
 //#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"

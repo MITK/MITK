@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindow.h"
 #include "mitkImageSliceSelector.h"
 
-#include <ipFunc/mitkIpFunc.h>
-#include <mitkIpPic.h>
 #include <algorithm>
 
 void mitk::LevelWindow::EnsureConsistency()

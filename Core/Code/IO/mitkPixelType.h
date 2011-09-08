@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
+#include <MitkExports.h>
 #include "mitkCommon.h"
 #include "mitkPixelTypeTraits.h"
 

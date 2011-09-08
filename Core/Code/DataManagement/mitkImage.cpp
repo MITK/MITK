@@ -18,11 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 
 #include "mitkHistogramGenerator.h"
-//#include "mitkPicHelper.h"
 #include "mitkImageTimeSelector.h"
-
-//#include "ipFunc/mitkIpFunc.h"
-//#include "mitkIpPicTypeMultiplex.h"
 
 #include <vtkImageData.h>
 

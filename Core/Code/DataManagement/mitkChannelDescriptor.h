@@ -32,7 +32,7 @@ namespace mitk
 to this is that the ChannelDescriptor does not hold the geometry information, only the PixelType.
 The pixel type is the single information that can differ among an image with multiple channels.
 */
-class ChannelDescriptor
+class MITK_CORE_EXPORT ChannelDescriptor
 {
 public:
     ChannelDescriptor(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
@@ -51,7 +51,7 @@ public:
     { return m_PixelType; }
 
     /** \brief Get the size in bytes of the channel */
-    const size_t GetSize() const
+    size_t GetSize() const
     { return m_Size; }
 
     /** \brief Get the pointer to the actual data of the channel

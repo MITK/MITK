@@ -41,7 +41,7 @@ namespace mitk
 
   \sa Image, ChannelDescriptor
   */
-class ImageDescriptor : public itk::Object
+class MITK_CORE_EXPORT ImageDescriptor : public itk::Object
 {
   public:
     mitkClassMacro(ImageDescriptor, itk::Object);
@@ -66,14 +66,14 @@ class ImageDescriptor : public itk::Object
       The C-array has allways lenght of MAX_IMAGE_DIMENSIONS
       */
     const unsigned int* GetDimensions() const
-    { return this->m_Dimensions; }
+    { return m_Dimensions; }
 
     /** \brief Get the number dimensions used (e.g. non-zero size)
 
       The return value does not exceed MAX_IMAGE_DIMENSIONS
       */
-    const unsigned int GetNumberOfDimensions() const
-    { return this->m_NumberOfDimensions; }
+    unsigned int GetNumberOfDimensions() const
+    { return m_NumberOfDimensions; }
 
     /** \brief Get the name of selected channel
 
@@ -99,8 +99,8 @@ class ImageDescriptor : public itk::Object
     ChannelDescriptor GetChannelDescriptor( unsigned int id) const;
 
     /** \brief Get the count of channels used */
-    unsigned int GetNumberOfChannels()
-    { return this->m_NumberOfChannels; }
+    unsigned int GetNumberOfChannels() const
+    { return m_NumberOfChannels; }
 
   protected:
     /** Protected constructor */

@@ -288,6 +288,10 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
     {
       maxThreadNr = 5;
     }
+    else if(m_Threader->GetGlobalMaximumNumberOfThreads()>5)
+    {
+      maxThreadNr = 5;
+    }
     else
     {
       maxThreadNr = m_Threader->GetGlobalMaximumNumberOfThreads();

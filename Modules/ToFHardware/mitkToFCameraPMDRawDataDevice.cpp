@@ -176,14 +176,12 @@ namespace mitk
             toFCameraDevice->m_Controller->GetModulationFrequency(), toFCameraDevice->GetChannelSize());
         }
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
-
-        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_RawDataSource->Update();
         toFCameraDevice->m_RawDataSource->GetAmplitudes(toFCameraDevice->m_AmplitudeArray);
         toFCameraDevice->m_RawDataSource->GetIntensities(toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_RawDataSource->GetDistances(toFCameraDevice->m_DistanceArray);
-        channelData->Delete();
 
+        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_ImageSequence++;
@@ -196,6 +194,8 @@ namespace mitk
           printStatus = true;
         }
         toFCameraDevice->m_ImageMutex->Unlock();
+        channelData->Delete();
+
         if (overflow)
         {
           overflow = false;
@@ -233,7 +233,7 @@ namespace mitk
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
-      this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 0, 1 );
+      this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 1, 0 );
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -249,7 +249,7 @@ namespace mitk
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
-      this->XYAxisFlipImage(this->m_IntensityArray, intensityArray,0,1);
+      this->XYAxisFlipImage(this->m_IntensityArray, intensityArray, 0, 1);
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -265,7 +265,7 @@ namespace mitk
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
-      this->XYAxisFlipImage(this->m_DistanceArray,distanceArray,0,1);
+      this->XYAxisFlipImage(this->m_DistanceArray,distanceArray, 1, 1);
       imageSequence = this->m_ImageSequence;
     }
     else

@@ -72,6 +72,11 @@ namespace mitk
     ToFImageGrabber::Pointer GetPMDCamBoardImageGrabber();
 
     /*!
+    \brief Create a ImageGrabber object with a PMD raw data CamBoard Camera 
+    */
+    ToFImageGrabber::Pointer GetPMDRawDataCamBoardImageGrabber();
+
+    /*!
     \brief Create a ImageGrabber object with a PMD Player Camera 
     */
     ToFImageGrabber::Pointer GetPMDPlayerImageGrabber();

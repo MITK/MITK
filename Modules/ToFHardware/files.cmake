@@ -13,6 +13,7 @@ SET(CPP_FILES
   mitkToFCameraPMDCamCubeDevice.cpp
   mitkToFCameraPMDRawDataCamCubeDevice.cpp
   mitkToFCameraPMDCamBoardDevice.cpp
+  mitkToFCameraPMDRawDataCamBoardDevice.cpp
   mitkToFCameraMESADevice.cpp
   mitkToFCameraMESASR4000Device.cpp
   mitkToFImageRecorder.cpp

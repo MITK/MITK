@@ -237,7 +237,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->buttonVtkSmoothPD->setEnabled(false);//not yet implemented
     m_Controls->buttonGenerateTubes->setEnabled(false);//not yet implemented
     
-
+    
     connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
     connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
     
@@ -457,12 +457,12 @@ void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
   int tmpVal = crntValue.toInt();
   m_Controls->infoTimerGenerateFiberBundle->setText(QString::number(++tmpVal));  
   m_Controls->infoTimerGenerateFiberBundle->update();
-
+  
 }
 
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 {
-    m_threadInProgress = true;
+  m_threadInProgress = true;
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
@@ -747,34 +747,57 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
   
   if (checkStatus)
   {
-  mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
+    mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
     FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
-  m_MonitorNode = mitk::DataNode::New();
-  m_MonitorNode->SetName("FBX_threadMonitor");
-  m_MonitorNode->SetData(FBXThreadMonitor);
-  m_MonitorNode->SetVisibility(true);
-  m_MonitorNode->SetOpacity(1.0);
-  
-  GetDataStorage()->Add(m_MonitorNode);
-
-  const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
-  if (tsgeo == NULL) {
-    /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
-    // get all nodes that have not set "includeInBoundingBox" to false
-    mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New( "includeInBoundingBox"
-                                                                                                        , mitk::BoolProperty::New(false)));
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
-    // calculate bounding geometry of these nodes
-    mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
-    // initialize the views to the bounding geometry
-    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  } else {
+    QString str = "Aloha";
+    FBXThreadMonitor->setTextL1(str);
     
-    GetDataStorage()->Modified();
-    m_MultiWidget->RequestUpdate(); //necessary??
-  }
-  
+    m_MonitorNode = mitk::DataNode::New();
+    m_MonitorNode->SetName("FBX_threadMonitor");
+    m_MonitorNode->SetData(FBXThreadMonitor);
+    m_MonitorNode->SetVisibility(true);
+    m_MonitorNode->SetOpacity(1.0);
+    
+    GetDataStorage()->Add(m_MonitorNode);
+    
+    const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
+    if (tsgeo == NULL) {
+      /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
+      // get all nodes that have not set "includeInBoundingBox" to false
+      mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New( "includeInBoundingBox"
+                                                                                                          , mitk::BoolProperty::New(false)));
+      mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
+      // calculate bounding geometry of these nodes
+      mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+      // initialize the views to the bounding geometry
+      mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+    } else {
+      
+      GetDataStorage()->Modified();
+      m_MultiWidget->RequestUpdate(); //necessary??
+    }
+    
+    for (int i=0 ; i<1000000; ++i)
+    {
+      MITK_INFO << i;
+    }
+    
+    QString str2 = "Alohaaaaaaaaa";
+    FBXThreadMonitor->setTextL1(str2);
+    m_MonitorNode->Modified();
+    m_MultiWidget->RequestUpdate();
+    
+    for (int i=0 ; i<1000000; ++i)
+    {
+      MITK_INFO << i;
+    }
+    QString str3 = "Alooooooooooooooooohaaaaaaaaa";
+    FBXThreadMonitor->setTextL1(str3);
+    m_MonitorNode->Modified();
+    m_MultiWidget->RequestUpdate();
+    
 
+    
   } else {
     GetDataStorage()->Remove(m_MonitorNode);
     GetDataStorage()->Modified();
@@ -782,6 +805,7 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
   }
   
   
+   
 }
 
 

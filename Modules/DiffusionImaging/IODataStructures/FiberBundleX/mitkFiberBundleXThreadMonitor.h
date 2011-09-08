@@ -23,6 +23,7 @@
 //includes for MITK datastructure
 #include "mitkBaseData.h"
 #include "MitkDiffusionImagingExports.h"
+#include <QString>
 
 
 
@@ -33,7 +34,6 @@ namespace mitk {
   class  MitkDiffusionImaging_EXPORT FiberBundleXThreadMonitor : public BaseData
   {
   public:
-  
 
     // ======virtual methods must have======
     virtual void UpdateOutputInformation();
@@ -47,13 +47,15 @@ namespace mitk {
     itkNewMacro( Self );
 
 
-
+    void setTextL1(QString);
+    QString getTextL1();
+    
   protected:
     FiberBundleXThreadMonitor();
     virtual ~FiberBundleXThreadMonitor();
 
   private:
-    
+    QString m_Label1;
         
 
     

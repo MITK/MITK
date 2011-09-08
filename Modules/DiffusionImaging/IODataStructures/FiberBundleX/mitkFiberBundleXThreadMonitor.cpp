@@ -17,7 +17,6 @@
 
 
 #include "mitkFiberBundleXThreadMonitor.h"
-#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
 
 
 mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
@@ -31,7 +30,15 @@ mitk::FiberBundleXThreadMonitor::~FiberBundleXThreadMonitor()
 
 }
 
+void mitk::FiberBundleXThreadMonitor::setTextL1(QString txt)
+{
+  m_Label1 = txt;
+}
 
+QString mitk::FiberBundleXThreadMonitor::getTextL1()
+{
+  return m_Label1;
+}
 //setter textproperty opacity etc....
 //setter color
 //setter text

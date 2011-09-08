@@ -55,7 +55,7 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
 {
   FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetData() );
 
-	m_TextActor->SetInput("FIBER MONITOR\n[activated]");
+	m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
   vtkTextProperty* tprop = m_TextActor->GetTextProperty();
   tprop->SetFontFamilyToArial ();
   tprop->SetLineSpacing(1.0);

@@ -1026,7 +1026,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
   //Do as much actions as possible in here to avoid double executions.
   //TODO initialize everything with NULL in the list ???
-//  m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
@@ -1034,8 +1033,9 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
-  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();  
-  m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
+  m_OutlinePolyData = NULL;
+  m_ReslicedImage = NULL;
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)

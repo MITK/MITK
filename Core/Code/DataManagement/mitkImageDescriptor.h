@@ -96,7 +96,7 @@ class MITK_CORE_EXPORT ImageDescriptor : public itk::Object
     PixelType GetChannelTypeById( unsigned int id) const;
 
     /** \brief Get the ChannelDescriptor for a channel specified by its id      */
-    ChannelDescriptor GetChannelDescriptor( unsigned int id) const;
+    ChannelDescriptor GetChannelDescriptor( unsigned int id = 0) const;
 
     /** \brief Get the count of channels used */
     unsigned int GetNumberOfChannels() const

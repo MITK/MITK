@@ -15,7 +15,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg)
   picDesc->type = CastToIpPicType( refImg->GetPixelType() );
 
   // FIXME:
-  picDesc->data = imDesc->GetChannelDescriptor(0)->GetData();
+  picDesc->data = imDesc->GetChannelDescriptor().GetData();
 
   return picDesc;
 }

@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkItkPictureWrite.h"
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkPicFileWriter.h"
 #include "mitkImageAccessByItk.h"
 
 #include <itkImageIOBase.h>

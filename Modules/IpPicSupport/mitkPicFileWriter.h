@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriter.h>
 #include <mitkIpPic.h>
 
+#include "mitkLegacyAdaptors.h"
+
 
 namespace mitk
 {

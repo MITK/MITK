@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSource.h"
 
 #include "mitkIpPic.h"
+#include "mitkLegacyAdaptors.h"
+
 
 namespace mitk {
 //##Documentation

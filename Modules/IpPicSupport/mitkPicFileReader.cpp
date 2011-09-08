@@ -87,7 +87,8 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
-        output->Initialize(header, channels);
+        // FIXME
+        output->Initialize( CastToImageDescriptor(header));//, channels);
         mitkIpPicFree ( header );
     }
     else
@@ -146,7 +147,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         }
 
         printf(" \ninitialisize output\n");
-        output->Initialize(header);
+        output->Initialize( CastToImageDescriptor(header) );
         mitkIpPicFree ( header );
     }
 
@@ -198,7 +199,8 @@ void mitk::PicFileReader::GenerateData()
 
     if( m_FileName != "")
     {
-        mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
+        mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()),
+                                              CastToIpPicDescriptor(output));
         // comes upside-down (in MITK coordinates) from PIC file
         ConvertHandedness(pic);
 
@@ -272,11 +274,11 @@ void mitk::PicFileReader::GenerateData()
             {
                 itkDebugMacro("Pic file '" << fullName << "' does not exist."); 
             }
-            else
+            /* FIXME else
             if(output->SetPicSlice(pic, position)==false)
             {
                 itkDebugMacro("Image '" << fullName << "' could not be added to Image."); 
-            }
+            }*/
        }
        if(pic!=NULL)
          mitkIpPicFree(pic);

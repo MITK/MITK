@@ -1,4 +1,4 @@
 MITK_CREATE_MODULE(
   IpPicSupport 
-  DEPENDS Mitk mitkIpPic
+  DEPENDS Mitk LegacyAdaptors mitkIpPic
   )

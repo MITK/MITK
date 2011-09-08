@@ -57,7 +57,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm), 
   m_VtkMapperPresent(false), 
-  m_NewRenderer(true)
+  m_NewRenderer(true),
+  m_2DCameraInitialized(false)
 {
   didCount=false;
 
@@ -252,9 +253,10 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   m_NumberOfVisibleLODEnabledMappers = 0;
 
   // Do we have to update the mappers ?
-  if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
+  if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() ) {
     Update();
-  else if (m_MapperID>=2 && m_MapperID < 6)
+  }
+  else if (m_MapperID>=1 && m_MapperID < 6)
     Update();
 
   // remove all text properties before mappers will add new ones
@@ -797,12 +799,15 @@ void mitk::VtkPropRenderer::checkState()
 //### Contains all methods which are neceassry before each VTK Render() call
 void mitk::VtkPropRenderer::PrepareRender()
 {
-  Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
+  if(!m_2DCameraInitialized)
+  {
+    m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
+  }
   AdjustCameraToScene(); //Prepare camera for 2D render windows
 }
 
 bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
-  if(this->GetMapperID() == 1) //check if it is a 2D Mapper
+  if(this->GetMapperID() == Standard2D)
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
@@ -811,13 +816,12 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
     this->GetVtkRenderer()->RemoveAllLights();
     //remove the VTK interaction
     this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
-    return true;
   }
-  return false;
+  return true;
 }
 
 void mitk::VtkPropRenderer::AdjustCameraToScene(){
-  if(this->GetMapperID() == 1) //check if it is a 2D Mapper
+  if(this->GetMapperID() == Standard2D)
   {
     const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 

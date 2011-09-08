@@ -185,7 +185,9 @@ void QmitkRenderWindow::leaveEvent( QEvent *e )
 void QmitkRenderWindow::paintEvent(QPaintEvent* event)
 {
   //Before the paint event is passed to Qt the VTK camera etc. has to be prepared.
-  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderWindow());
+//  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderWindow());
+  GetRenderer()->PrepareRender();
+  QVTKWidget::paintEvent(event);
 }
 
 void QmitkRenderWindow::resizeEvent(QResizeEvent* event)

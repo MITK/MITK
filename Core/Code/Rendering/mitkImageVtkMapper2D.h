@@ -113,9 +113,6 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
-    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
-
     //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
@@ -180,6 +177,9 @@ namespace mitk {
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   protected:
+    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
+
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
     * \image html texturedPlane.png

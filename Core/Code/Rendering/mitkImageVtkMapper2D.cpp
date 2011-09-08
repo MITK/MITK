@@ -52,7 +52,9 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-    this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
+  //The 3D RW Mapper (Geometry2DDataVtkMapper3D) is listening to this event,
+  //in order to delete the images from the 3D RW.
+  this->InvokeEvent( itk::DeleteEvent() );
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -62,16 +64,19 @@ void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloa
   //Set the origin to (xMin; yMin; 0) of the plane. This is necessary for obtaining the correct
   //plane size in crosshair rotation and swivel mode.
 
-  float depthOffset = 0.0;
-  GetDataNode()->GetFloatProperty( "depthOffset", depthOffset, renderer );
-  depthOffset *= -1.0;
+//  renderer->GetVtkRenderer()->GetActiveCamera()->GetClipping
+
+  float depthOffset = -1000.0f;
+  int layer = 0;
+  GetDataNode()->GetIntProperty( "layer", layer, renderer);
+  //  GetDataNode()->GetFloatProperty( "depthOffset", depthOffset, renderer );
+  depthOffset += layer;
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depthOffset);
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
   localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], depthOffset); //P1: (xMax, yMin, 0)
   localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depthOffset); //P2: (xMin, yMax, 0)
-
 }
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
@@ -81,7 +86,6 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {  
-  this->Update(renderer); //Workarround for bug #8261
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -130,7 +134,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //const_cast is bad bad bad...
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
 
   if ( input == NULL )
   {
@@ -470,8 +474,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  //set the current slice for the localStorage //TODO pass the actor to the 3D mapper
-  localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
+  //set the current slice for the localStorage
+  localStorage->m_ReslicedImage = reslicedImage;
 
   //set the current slice as texture for the plane
   localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
@@ -484,8 +488,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-  vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
-  matrix = localStorage->m_Reslicer->GetResliceAxes();
+  vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
 
   //transform the origin to center based coordinates, because MITK is center based.
   Point3D originCenterBased = origin;
@@ -729,7 +732,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
 
   bool binaryOutline = false;
   this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
-
   if ( binary )
   {
     finalLookuptable->SetRange(0.0, 1.0);
@@ -757,7 +759,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   } //END binary image handling
   else
   {
-
     mitk::PixelType pixelType = this->GetInput()->GetPixelType();
     if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() ) //gray images with just one component
     {
@@ -843,7 +844,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
-    this->GenerateData( renderer );
+        this->GenerateData( renderer );
   }
 
   // since we have checked that nothing important has changed, we can set
@@ -1025,7 +1026,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
   //Do as much actions as possible in here to avoid double executions.
   //TODO initialize everything with NULL in the list ???
-  m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
+//  m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();

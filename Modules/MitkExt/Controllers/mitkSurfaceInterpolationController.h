@@ -67,10 +67,15 @@ namespace mitk
      */
     Surface::Pointer Interpolate ();
 
-    itkSetMacro(MinSpacing, double);
-    itkSetMacro(MaxSpacing, double);
-    itkSetMacro(DistImageVolume, unsigned int);
-    itkSetMacro(WorkingImage, Image*);
+    //itkSetMacro(MinSpacing, double);
+    //itkSetMacro(MaxSpacing, double);
+    //itkSetMacro(DistImageVolume, unsigned int);
+    //itkSetMacro(WorkingImage, Image*);
+
+    void SetMinSpacing(double minSpacing);
+    void SetMaxSpacing(double maxSpacing);
+    void SetDistanceImageVolume(unsigned int distImageVolume);
+    void SetWorkingImage(Image* workingImage);
 
    /* bool DataSetHasChanged();*/
 
@@ -78,7 +83,7 @@ namespace mitk
 
     void SetDataStorage(DataStorage &ds);
 
-    unsigned int GetNewListID();
+    unsigned int CreateNewContourList();
 
     void SetCurrentListID (int ID);
 

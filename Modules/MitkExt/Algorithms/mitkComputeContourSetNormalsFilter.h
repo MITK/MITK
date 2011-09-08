@@ -56,6 +56,9 @@ public:
   */
   mitk::Surface::Pointer GetNormalsAsSurface();
 
+  //Resets the filter, i.e. removes all inputs and outputs
+  void Reset();
+
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();

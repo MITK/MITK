@@ -51,6 +51,9 @@ namespace mitk {
         itkSetMacro(StepSize, unsigned int);
         itkSetMacro(Tolerance, double);
         
+        //Resets the filter, i.e. removes all inputs and outputs
+        void Reset();
+
     protected:
         ReduceContourSetFilter();
         virtual ~ReduceContourSetFilter();

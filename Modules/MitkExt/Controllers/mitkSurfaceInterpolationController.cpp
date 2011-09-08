@@ -34,6 +34,7 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_ReduceFilter = ReduceContourSetFilter::New();
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
+
   m_Contours = Surface::New();
 
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -158,50 +159,37 @@ void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage &ds)
   m_DataStorage = &ds;
 }
 
-unsigned int mitk::SurfaceInterpolationController::GetNewListID()
+unsigned int mitk::SurfaceInterpolationController::CreateNewContourList()
 {
-  m_CurrentContourListID =  m_ListOfContourLists.size();
+  unsigned int newID =  m_ListOfContourLists.size();
   ContourPositionPairList newList;
   m_ListOfContourLists.push_back(newList);
-  this->SetCurrentListID(m_CurrentContourListID);
+  this->SetCurrentListID(newID);
   return m_CurrentContourListID;
+  //if(m_ListOfContourLists.size() == 0)
+  //  return 0;
+  //this->SetCurrentListID(m_ListOfContourLists.size());
+  //ContourPositionPairList newList;
+  //m_ListOfContourLists.push_back(newList);
+  //return m_CurrentContourListID;
+
 }
 
 void mitk::SurfaceInterpolationController::SetCurrentListID ( int ID )
 {
-  MITK_INFO<<"Alte Konturenanzahl: "<<m_ListOfContourLists.at(m_CurrentContourListID).size();
+  //MITK_INFO<<"Alte Konturenanzahl: "<<m_ListOfContourLists.at(m_CurrentContourListID).size();
   if ( ID < 0 || ID == m_CurrentContourListID)
     return;
 
+  MITK_INFO<<"OLD ID: "<<m_CurrentContourListID<<" NEW ID: "<<ID;
   m_CurrentContourListID = ID;
 
-  //if(m_ReduceFilter->GetNumberOfInputs() != 0)
-  //{
-  //  m_InterpolateSurfaceFilter->Delete();
-  //  m_NormalsFilter->Delete();
-  //  m_ReduceFilter->Delete();
+  m_ReduceFilter->Reset();
+  m_NormalsFilter->Reset();
+  m_InterpolateSurfaceFilter->Reset();
 
-  //  m_ReduceFilter->
-
-  //    mitk::ReduceContourSetFilter::Pointer rf = mitk::ReduceContourSetFilter::New();
-  //  mitk::ComputeContourSetNormalsFilter::Pointer cnf = mitk::ComputeContourSetNormalsFilter::New();
-  //  mitk::CreateDistanceImageFromSurfaceFilter::Pointer csf = mitk::CreateDistanceImageFromSurfaceFilter::New();
-
-  //  m_ReduceFilter = rf;
-  //  m_NormalsFilter = cnf;
-  //  m_InterpolateSurfaceFilter = csf;
-
-  //  m_ReduceFilter->SetMinSpacing(m_MinSpacing);
-  //  m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
-  //  m_InterpolateSurfaceFilter->SetDistanceImageVolume(m_DistImageVolume);
-  //}
-
-  for(unsigned int i = 0; i < m_ReduceFilter->GetNumberOfInputs(); i++)
-  {
-    m_ReduceFilter->RemoveInputs(const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(i)));
-    m_NormalsFilter->RemoveInputs(const_cast<mitk::Surface*>(m_NormalsFilter->GetInput(i)));
-    m_InterpolateSurfaceFilter->RemoveInputs(const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(i)));
-  }
+  //m_ReduceFilter->SetNumberOfOutputs(0);
+  //m_InterpolateSurfaceFilter->SetNumberOfOutputs(0);
   
   for (unsigned int i = 0; i < m_ListOfContourLists.at(m_CurrentContourListID).size(); i++)
   {
@@ -210,4 +198,24 @@ void mitk::SurfaceInterpolationController::SetCurrentListID ( int ID )
     m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
   }
   MITK_INFO<<"Neue Konturenanzahl: "<<m_ListOfContourLists.at(m_CurrentContourListID).size();
+}
+
+void mitk::SurfaceInterpolationController::SetMinSpacing(double minSpacing)
+{
+  this->m_MinSpacing = minSpacing;
+}
+
+void mitk::SurfaceInterpolationController::SetMaxSpacing(double maxSpacing)
+{
+  this->m_MaxSpacing = maxSpacing;
+}
+
+void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int distImgVolume)
+{
+  this->m_DistImageVolume = distImgVolume;
+}
+
+void mitk::SurfaceInterpolationController::SetWorkingImage(Image* workingImage)
+{
+  this->m_WorkingImage = workingImage;
 }

@@ -486,3 +486,12 @@ void mitk::ReduceContourSetFilter::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
 }
+
+void mitk::ReduceContourSetFilter::Reset()
+{
+  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  {
+    this->PopBackInput();
+  }
+  this->SetNumberOfOutputs(0);
+}

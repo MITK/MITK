@@ -105,6 +105,9 @@ namespace mitk {
 
     void PrintEquationSystem();
 
+    //Resets the filter, i.e. removes all inputs and outputs
+    void Reset();
+
   protected:
     CreateDistanceImageFromSurfaceFilter();
     virtual ~CreateDistanceImageFromSurfaceFilter();

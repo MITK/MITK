@@ -474,3 +474,12 @@ void mitk::CreateDistanceImageFromSurfaceFilter::RemoveInputs(mitk::Surface* inp
 {
     this->RemoveInput(input);
 }
+
+void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
+{
+  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  {
+    this->PopBackInput();
+  }
+  this->SetNumberOfOutputs(1);
+}

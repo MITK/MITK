@@ -138,25 +138,26 @@ m_3DInterpolationEnabled(false)
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 
-  //m_InterpolatedSurfaceNode = mitk::DataNode::New();
-  //m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
-  //m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
-  //m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
-  //m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_InterpolatedSurfaceNode = mitk::DataNode::New();
+  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
+  m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
+  m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
+  m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   //m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(false) );
+  m_InterpolatedSurfaceNode->SetVisibility(false);
 
-  //m_3DContourNode = mitk::DataNode::New();
-  //m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-  ////contourNode->SetProperty("helper object", mitk::BoolProperty::New(false));
-  //m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
-  //m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-  //m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-  //m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
-  //m_3DContourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-  //m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-  //m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-  //m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-  //m_3DContourNode->SetVisibility(m_CbHideMarkers->isChecked(), mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+  m_3DContourNode = mitk::DataNode::New();
+  m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
+  //contourNode->SetProperty("helper object", mitk::BoolProperty::New(false));
+  m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+  m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+  m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+  m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
+  m_3DContourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
   
   QWidget::setContentsMargins(0, 0, 0, 0);
   if ( QWidget::layout() != NULL )
@@ -493,76 +494,29 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
 void QmitkSlicesInterpolator::InterpolateSurface()
 {
-  //m_InterpolatedSurfaceNode->SetData(m_SurfaceInterpolator->Interpolate());
-
-  //mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-  //surfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
-  //surfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
-  //surfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
-  //surfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-  //surfaceNode->SetData(m_SurfaceInterpolator->Interpolate());
-
-  //TODO
-  /*
-
-  Data in SurfaceNode und ContourNode immer neu setzen wenn sich WorkingData geändert hat!
-  Keine Nodes mehr dynamisch erzeugen!
-  Wenn keine Oberfläche interpoliert wurde, dann einfach Konturen und Surface ausblenden.
-
-  */
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
   if(interpolatedSurface.IsNotNull())
   {
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
-    mitk::DataStorage::SetOfObjects::ConstPointer surfaceNode = this->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0), 
-      mitk::NodePredicateProperty::New("isInterpolatedSurface", mitk::BoolProperty::New(true)));
-
-    //mitk::DataStorage::SetOfObjects::ConstPointer contourNode = this->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0), 
-    //  mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true)));
-
     m_InterpolatedSurfaceNode->SetVisibility(true);
     m_3DContourNode->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
-    if(surfaceNode->empty())
+    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
     {
-      m_DataStorage->Add(m_3DContourNode, m_ToolManager->GetWorkingData(0));
-      m_DataStorage->Add(m_InterpolatedSurfaceNode, m_ToolManager->GetWorkingData(0));
+      m_DataStorage->Add(m_3DContourNode);
+      m_DataStorage->Add(m_InterpolatedSurfaceNode);
+
     }
   }
-  //else
-  //{
-  //  m_InterpolatedSurfaceNode->SetVisibility(false);
-  //  m_3DContourNode->SetVisibility(false);
-  //}
 
-  OnShowMarkers(m_CbHideMarkers->checkState());
+  //OnShowMarkers(m_CbHideMarkers->checkState());
 
   if (m_MultiWidget)
   {
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-  //mitk::DataStorage::SetOfObjects::ConstPointer contours3D = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("3DContourContainer"
-  //  , mitk::BoolProperty::New(true)));
-
-  //if(contours3D->empty())
-  //{
-    //mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
-    //m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
-    //contourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-    ////contourNode->SetProperty("helper object", mitk::BoolProperty::New(false));
-    //contourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
-    //contourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-    //contourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-    //contourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
-    //contourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-    //contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-    //contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-    //contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-    //contourNode->SetVisibility(m_CbHideMarkers->isChecked(), mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    //m_DataStorage->Add(m_3DContourNode, m_ToolManager->GetWorkingData(0));
-  //}
 }
 
 void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
@@ -777,72 +731,28 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
     if ( m_DataStorage.IsNotNull() && m_ToolManager && on)
     {
       mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
       if (workingNode)
       {
-
-        mitk::DataStorage::SetOfObjects::ConstPointer surfaceNodes = this->GetDataStorage()->GetDerivations(workingNode, 
-          mitk::NodePredicateProperty::New("isInterpolatedSurface", mitk::BoolProperty::New(true)));
-
-        mitk::DataStorage::SetOfObjects::ConstPointer contourNodes = this->GetDataStorage()->GetDerivations(workingNode, 
-          mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true)));
-
+        int listID;
         if (workingNode->IsSelected())
         {
-          if (surfaceNodes->Size() == 0)
+          if (workingNode->GetIntProperty("3DInterpolationListID", listID))
           {
-            MITK_INFO<<"Creating new Surfacenode...";
-
-            mitk::DataNode::Pointer surfNode = mitk::DataNode::New();
-            surfNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
-            surfNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
-            surfNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
-            //newNode->SetProperty( "helper object", mitk::BoolProperty::New(false) );
-            surfNode->SetProperty( "isInterpolatedSurface", mitk::BoolProperty::New(true));
-            surfNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-            unsigned int newID = m_SurfaceInterpolator->GetNewListID();
-            surfNode->SetIntProperty( "ContourListID", newID);
-
-            m_InterpolatedSurfaceNode = surfNode;
-
-            mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
-            contourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-            //contourNode->SetProperty("helper object", mitk::BoolProperty::New(false));
-            contourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
-            contourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-            contourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-            contourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
-            contourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-            contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-            contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-            contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-            contourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-
-            m_3DContourNode = contourNode;
-
-            MITK_INFO<<"New ListID is: "<<newID;
-
-            //m_InterpolatedSurfaceNode = newNode;
-            //m_DataStorage->Add( newNode, workingNode );
+            MITK_INFO<<"SELECTED Existing ID: "<<listID;
+            m_SurfaceInterpolator->SetCurrentListID(listID);
+            this->InterpolateSurface();
           }
           else
           {
-            //Neue ListID setzen usw...
-            MITK_INFO<<"Existing Surfacenode...";
-
-            int id (-1);
-            if (surfaceNodes->ElementAt(0)->GetIntProperty("ContourListID", id))
-            {
-              MITK_INFO<<"Setting current ListID: "<<id;
-              m_SurfaceInterpolator->SetCurrentListID(id);
-              m_InterpolatedSurfaceNode = surfaceNodes->ElementAt(0);
-              m_3DContourNode = contourNodes->ElementAt(0);
-            }
-            //}
-            //else
-            //{
-            //  //surfaceNode->ElementAt(0)->SetVisible(false);
-            //}
+            listID = m_SurfaceInterpolator->CreateNewContourList();
+            MITK_INFO<<"SELECTED New ID: "<<listID;
+            workingNode->SetIntProperty("3DInterpolationListID", listID);
+            //m_SurfaceInterpolator->SetCurrentListID(listID);
+            m_InterpolatedSurfaceNode->SetVisibility(false);
+            m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
           }
+          
           mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
           double minSpacing (100);
           double maxSpacing (0);
@@ -861,40 +771,27 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           m_SurfaceInterpolator->SetWorkingImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
           m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
           m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-          m_SurfaceInterpolator->SetDistImageVolume(50000);
-          //this->InterpolateSurface();
+          m_SurfaceInterpolator->SetDistanceImageVolume(50000);
         }
         else
         {
-          if (surfaceNodes->Size() != 0 && contourNodes->Size() != 0/* && !workingNode->IsVisible()*/)
-          {
-            //m_DataStorage->Remove(surfaceNode->ElementAt(0));
-            //m_DataStorage->Remove(contourNode->ElementAt(0));
-            //surfaceNode->ElementAt(0)->SetVisibility(false);
-            //contourNode->ElementAt(0)->SetVisibility(false);
+          if (workingNode->GetIntProperty("3DInterpolationListID", listID))
             m_InterpolatedSurfaceNode->SetVisibility(false);
-            m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-            //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-          }
+          m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
         }
       }
       QWidget::setEnabled( workingNode != NULL );
       m_BtnAccept3DInterpolation->setEnabled( on );
-      //m_InterpolatedSurfaceNode->SetVisibility( on );
       m_CbHideMarkers->setEnabled(on);
 
-      // if (!on)
-      // {
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      //return;
-      // }
     }
   }
   catch(...)
   {
     // don't care (double add/remove)
   }
-  
+
   //if (m_ToolManager)
   //{
   //  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);

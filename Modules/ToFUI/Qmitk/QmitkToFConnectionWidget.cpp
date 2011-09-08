@@ -83,7 +83,8 @@ void QmitkToFConnectionWidget::ShowParameterWidget()
 {
   QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
 
-  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D"))
+  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
+    (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw") )
   {
     ShowPMDParameterWidget();
   }
@@ -130,7 +131,7 @@ void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedText)
     //m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
     ShowPMDParameterWidget();
   }
-  else if (selectedText == "PMD CamBoard") // pmd camboard
+  else if (selectedText == "PMD CamBoard" || selectedText == "PMD CamBoardRaw" ) // pmd camboard
   {
     //m_Controls->m_IntegrationTimeSpinBox->setEnabled(true);
     //m_Controls->m_ModulationFrequencySpinBox->setEnabled(true);
@@ -200,6 +201,10 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == "PMD CamBoard")
     { //PMD CamBoard
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamBoardImageGrabber();
+    }
+    else if (selectedCamera == "PMD CamBoardRaw")
+    { //PMD CamBoard
+      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamBoardImageGrabber();
     }
     else if (selectedCamera == "PMD O3D")
     {//PMD O3
@@ -322,7 +327,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-      if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D"))
+      if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
+        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
       }

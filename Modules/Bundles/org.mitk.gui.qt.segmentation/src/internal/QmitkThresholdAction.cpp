@@ -9,7 +9,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 
-using namespace itk;
+using namespace berry;
 using namespace mitk;
 using namespace std;
 
@@ -24,10 +24,10 @@ QmitkThresholdAction::~QmitkThresholdAction()
 
 void QmitkThresholdAction::Run(const vector<DataNode *> &selectedNodes)
 {
-  m_ThresholdingToolManager = mitk::ToolManager::New(m_DataStorage);
+  m_ThresholdingToolManager = ToolManager::New(m_DataStorage);
 
   m_ThresholdingToolManager->RegisterClient();
-  m_ThresholdingToolManager->ActiveToolChanged += MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
+  m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
 
   m_ThresholdingDialog = new QDialog;
   connect(m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)));
@@ -35,7 +35,7 @@ void QmitkThresholdAction::Run(const vector<DataNode *> &selectedNodes)
   QVBoxLayout *layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mitk::Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
+  Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
   
   if (binaryThresholdTool != NULL)
   {
@@ -81,9 +81,9 @@ void QmitkThresholdAction::OnThresholdingToolManagerToolModified()
         m_ThresholdingDialog->accept();
 }
 
-void QmitkThresholdAction::SetDataStorage(mitk::DataStorage *dataStorage)
+void QmitkThresholdAction::SetDataStorage(DataStorage *dataStorage)
 {
-  this->m_DataStorage = dataStorage;
+  m_DataStorage = dataStorage;
 }
 
 void QmitkThresholdAction::SetSmoothed(bool)
@@ -94,6 +94,6 @@ void QmitkThresholdAction::SetDecimated(bool)
 {
 }
 
-void QmitkThresholdAction::SetFunctionality(berry::QtViewPart *functionality)
+void QmitkThresholdAction::SetFunctionality(QtViewPart *functionality)
 {
 }

@@ -164,7 +164,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   if (!roiFound)
   {
-    ProgressBar::GetInstance()->Progress(10);
+    ProgressBar::GetInstance()->Progress(8);
     MITK_ERROR << "Didn't found segmentation labeled with " << imageLabel << "!" << endl;
     return false;
   }
@@ -502,8 +502,6 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
     InsertBelowGroupNode(node);
   }
-
-  StatusBar::GetInstance()->Clear();
 
   Superclass::ThreadedUpdateSuccessful();
 }

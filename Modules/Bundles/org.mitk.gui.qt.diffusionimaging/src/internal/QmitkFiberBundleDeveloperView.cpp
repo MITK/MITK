@@ -204,9 +204,13 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
 // Destructor
 QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
-  m_FiberBundleX->Delete();
+  //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
   delete m_hostThread;
-  delete m_FiberIDGenerator;
+  if (m_FiberIDGenerator != NULL)
+    delete m_FiberIDGenerator;
+  
+  if (m_GeneratorFibersRandom != NULL)
+    delete m_GeneratorFibersRandom;
   
 }
 
@@ -417,11 +421,21 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadO
 void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
 {
   
+  /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread */
+  QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+  localTimer->setInterval( 10 );
+  connect( localTimer, SIGNAL(timeout()), this, SLOT(UpdateGenerateRandomFibersTimer()) );
+  
   struct Package4WorkingThread ItemPackageForRandomGenerator;
   ItemPackageForRandomGenerator.st_FBX = m_FiberBundleX;
   ItemPackageForRandomGenerator.st_Controls = m_Controls;
+  ItemPackageForRandomGenerator.st_FancyGUITimer1 = localTimer;
   ItemPackageForRandomGenerator.st_host = this;
   ItemPackageForRandomGenerator.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage;
+  
+  if (m_threadInProgress)
+    return; //maybe popup window saying, working thread still in progress...pls wait
   
   m_GeneratorFibersRandom = new QmitkFiberGenerateRandomWorker(m_hostThread, ItemPackageForRandomGenerator);
   m_GeneratorFibersRandom->moveToThread(m_hostThread);
@@ -433,6 +447,16 @@ void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
   
   m_hostThread->start(QThread::LowestPriority);
   
+}
+
+void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
+{
+  //MAKE SURE by yourself THAT NOTHING ELSE THAN A NUMBER IS SET IN THAT LABEL
+  QString crntValue = m_Controls->infoTimerGenerateFiberBundle->text();
+  int tmpVal = crntValue.toInt();
+  m_Controls->infoTimerGenerateFiberBundle->setText(QString::number(++tmpVal));  
+  m_Controls->infoTimerGenerateFiberBundle->update();
+
 }
 
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()

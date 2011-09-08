@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataStorage.h>
 #include <mitkDataStorageSelection.h>
+#include <mitkWeakPointer.h>
 
 // Qt
 #include <QVector>
@@ -157,7 +158,6 @@ public:
   void DoGenerateFibers();
   void DoGenerateFiberIDs();
   void DoUpdateGenerateFibersWidget();
-  void UpdateFiberIDTimer();
   void SelectionChangedToolBox(int);
   
   //SLOTS FOR THREADS
@@ -165,6 +165,10 @@ public:
   void AfterThread_IdGenerate();
   void BeforeThread_GenerateFibersRandom();
   void AfterThread_GenerateFibersRandom();
+  
+  //SLOTS FOR TIMERS
+  void UpdateFiberIDTimer();
+  void UpdateGenerateRandomFibersTimer();
   
     
   
@@ -202,8 +206,9 @@ protected:
   
   
   //contains the selected FiberBundle
-  mitk::FiberBundleX* m_FiberBundleX;
-
+  //mitk::FiberBundleX* m_FiberBundleX;
+  mitk::WeakPointer<mitk::FiberBundleX> m_FiberBundleX;
+  
 //  radiobutton groups
   QVector< QRadioButton* > m_DirectionRadios;
   QVector< QRadioButton* > m_FARadios;

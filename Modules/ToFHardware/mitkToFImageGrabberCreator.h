@@ -55,6 +55,11 @@ namespace mitk
     \brief Create a ImageGrabber object with a PMD CamCube Camera 
     */
     ToFImageGrabber::Pointer GetPMDCamCubeImageGrabber();
+    
+    /*!
+    \brief Create a ImageGrabber object with a PMD raw data CamCube Camera 
+    */
+    ToFImageGrabber::Pointer GetPMDRawDataCamCubeImageGrabber();
 
     /*!
     \brief Create a ImageGrabber object with a PMD O3 Camera 
@@ -97,7 +102,6 @@ namespace mitk
     ToFImageGrabberCreator();
 
     ~ToFImageGrabberCreator();
-
   private:
 
   };

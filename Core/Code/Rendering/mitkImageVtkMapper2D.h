@@ -186,9 +186,9 @@ namespace mitk {
     *
     * In VTK a vtkPlaneSource is defined through three points. The origin and two
     * points defining the axes of the plane (see VTK documentation). The origin is
-    * set to (xMin; yMin; 0), where xMin and yMin are the minimal bounds of the
-    * resliced image in space. The center of the plane (C) is also the center of
-    * the view plane (cf. the image above).
+    * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
+    * resliced image in space. Z is relevant for blending and the layer property.
+    * The center of the plane (C) is also the center of the view plane (cf. the image above).
     *
     * \note For the standard MITK view with three 2D render windows showing three
     * different slices, three such planes are generated. All these planes are generated

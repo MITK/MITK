@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>IGTTrackingLabControls</class>
- <widget class="QWidget" name="IGTTrackingLabControls">
+ <class>IGTTrackingLabViewControls</class>
+ <widget class="QWidget" name="IGTTrackingLabViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -21,24 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelWarning">
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-     </property>
-     <property name="text">
-      <string>Please select an image!</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="buttonPerformImageProcessing">
-     <property name="toolTip">
-      <string>Do image processing</string>
-     </property>
-     <property name="text">
-      <string>Do Something</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="m_VBoxLayout"/>
    </item>
    <item>
     <spacer name="spacer1">

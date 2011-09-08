@@ -4,16 +4,16 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  IGTTrackingLab.cpp
+  IGTTrackingLabView.cpp
 )
 
 set(UI_FILES
-  src/internal/IGTTrackingLabControls.ui
+  src/internal/IGTTrackingLabViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/IGTTrackingLab.h
+  src/internal/IGTTrackingLabView.h
 )
 
 # list of resource files which can be used by the plug-in

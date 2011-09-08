@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtPlugin>
 
-#include "IGTTrackingLab.h"
+#include "IGTTrackingLabView.h"
 
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(IGTTrackingLab, context)
+  BERRY_REGISTER_EXTENSION_CLASS(IGTTrackingLabView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

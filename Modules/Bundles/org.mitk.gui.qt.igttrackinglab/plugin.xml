@@ -4,7 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.igttrackinglab"
           name="IGT Tracking Lab"
-          class="IGTTrackingLab"
+          class="IGTTrackingLabView"
           icon="resources/icon.xpm" />
   </extension>
 

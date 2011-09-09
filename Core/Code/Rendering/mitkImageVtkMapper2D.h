@@ -202,7 +202,7 @@ namespace mitk {
       \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
       \note This code has been taken from the deprecated library iil.
       */
-    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
+    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
 
     /** Default constructor */
     ImageVtkMapper2D();
@@ -232,6 +232,11 @@ namespace mitk {
         will have a new bounding box, which needs to be calculated. */
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+
+    /** \brief This method uses the vtkCamera clipping range and the layer property
+    * to calcualte the depth of the object (e.g. image or contour). The depth is used
+    * to keep the correct order for the final VTK rendering.*/
+    float CalculateLayerDepth(mitk::BaseRenderer* renderer);
   };
 
 } // namespace mitk

@@ -45,8 +45,8 @@ namespace mitk {
     mitkNewMacro2Param(Self, const char*, OperationActor*);
 
     itkEventMacro( InteractionEvent, itk::AnyEvent );
-    itkEventMacro( StartInteractionEvent, InteractionEvent );
-    itkEventMacro( EndInteractionEvent, InteractionEvent );
+    itkEventMacro( StartScrollInteractionEvent, InteractionEvent );
+    itkEventMacro( EndScrollInteractionEvent, InteractionEvent );
 
     /**
     * @brief Method derived from OperationActor to recieve and execute operations
@@ -61,6 +61,8 @@ namespace mitk {
     void SetAutoRepeat( bool autoRepeat );
 
     void SetInvertScrollingDirection( bool );
+
+    bool IsAltModifierActive();
 
   protected:
     /**
@@ -106,6 +108,8 @@ namespace mitk {
     bool m_AutoRepeat;
 
     bool m_InvertScrollingDirection;
+
+    bool m_IsAltModifierActive;
 
   };
 

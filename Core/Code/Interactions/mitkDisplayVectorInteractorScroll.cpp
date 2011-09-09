@@ -52,11 +52,20 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
     }
   case AcSCROLL:
     {
+      int buttonState = stateEvent->GetEvent()->GetButtonState();
+      if(buttonState == 1025)
+      {
+        m_IsAltModifierActive = true;
+      }
+      else
+      {
+        m_IsAltModifierActive = false;
+      }
       mitk::SliceNavigationController::Pointer sliceNaviController = m_Sender->GetSliceNavigationController();
 
       if(sliceNaviController)
       {
-        this->InvokeEvent( StartInteractionEvent() );
+        this->InvokeEvent( StartScrollInteractionEvent() );
 
         int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
@@ -102,7 +111,7 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
 
-        this->InvokeEvent( EndInteractionEvent() );
+        this->InvokeEvent( EndScrollInteractionEvent() );
       }
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
@@ -137,6 +146,7 @@ mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * 
   , m_IndexToSliceModifier(4)
   , m_AutoRepeat( false )
   , m_InvertScrollingDirection( false )
+  , m_IsAltModifierActive( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -157,5 +167,10 @@ mitk::DisplayVectorInteractorScroll::~DisplayVectorInteractorScroll()
 void mitk::DisplayVectorInteractorScroll::SetInvertScrollingDirection( bool invert )
 {
   m_InvertScrollingDirection = invert;
+}
+
+bool mitk::DisplayVectorInteractorScroll::IsAltModifierActive()
+{
+  return m_IsAltModifierActive;
 }
 

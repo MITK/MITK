@@ -48,29 +48,17 @@ namespace mitk
     cvtkChannelArray->SetNumberOfTuples(4);
     cvtkChannelArray->Allocate(1);
 
-    //sourceData += 256;
-    //channelDataPosition += 256; 
     channel1 = sourceData;
     cvtkChannelArray->InsertTupleValue(0,channel1);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
-    //sourceData += 256;
-    //channelDataPosition += 256;
     channel2 = sourceData;
     cvtkChannelArray->InsertTupleValue(1,channel2);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
-    //sourceData += 256;
-    //channelDataPosition += 256;
     channel3 = sourceData;
     cvtkChannelArray->InsertTupleValue(2,channel3);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
-    //sourceData += 256;
-    //channelDataPosition += 256;
     channel4 = sourceData;
     cvtkChannelArray->InsertTupleValue(3,channel4);
-    //sourceData -= channelDataPosition;
     vtkChannelArray->DeepCopy(cvtkChannelArray);
     cvtkChannelArray->Delete();
   }

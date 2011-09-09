@@ -49,13 +49,10 @@ namespace mitk
 {
 
   ThreadedToFRawDataReconstruction::ThreadedToFRawDataReconstruction(): m_Threader(0),
-    m_CISDist(0), m_CISAmpl(0), m_CISInten(0) /*, m_Dimensions(0)*/, 
+    m_CISDist(0), m_CISAmpl(0), m_CISInten(0), 
     m_ThreadedCISDist(0), m_ThreadedCISAmpl(0), m_ThreadedCISInten(0), 
     m_Init(0), m_Width(0), m_Height(0), m_SourceDataSize(0), m_ImageSize(0), m_SourceData(0)
   {
-    //this->SetNumberOfOutputs(1);
-    //this->SetNthOutput(0, this->MakeOutput(0));
-
     m_ThreadData = new ThreadDataStruct;
     m_ThreadData->m_ModulationFrequency = fMod;
 
@@ -79,9 +76,6 @@ namespace mitk
     if(m_CISInten != NULL)
       delete[] m_CISInten;
 
-    //if(m_Dimensions != NULL)
-    //  delete[] m_Dimensions;
-
     if(m_ThreadedCISInten != NULL)
       delete[] m_ThreadedCISInten;
 
@@ -92,37 +86,6 @@ namespace mitk
       delete[] m_ThreadedCISDist;
 
   }
-
-  //void ThreadedToFRawDataReconstruction::SetToFCameraController(ToFCameraController::Pointer cameraController)
-  //{
-  //  m_CameraController = cameraController;
-  //  this->InitializeDataArrays();
-  //}
-  //
-  //void ThreadedToFRawDataReconstruction::SetStackSize(int size)
-  //{
-  //  m_StackSize = size;
-  //} 
-  //
-  //void ThreadedToFRawDataReconstruction::SetRawDataRequired(bool flag)
-  //{
-  //  m_RawDataRequired = flag;
-  //} 
-  //
-  //void ThreadedToFRawDataReconstruction::SetFPPNCompensationRequired(bool flag)
-  //{
-  //  m_FPPNCompensationRequired = flag;
-  //}
-
-  //void ThreadedToFRawDataReconstruction::SetCalibrationParameter()
-  //{
-  //  ToFCalibrationFileReader::Pointer reader = ToFCalibrationFileReader::New();
-  //  reader->GenerateOutputInformation();
-  //  m_IntrinsicParameter = reader->GetIntrinsicParameter();
-  //  m_DistortionParameter = reader->GetDistortionParameter();
-  //  m_InterpolationPoints = reader->GetInterpolationPoints();
-  //  m_FPPNCompensationArray = reader->GetFPPNCompensationArray();
-  //}
 
 void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int modulationFrequency, int sourceDataSize )
 {
@@ -174,69 +137,11 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
   memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));
 }
 
-  //ImageSource::OutputImageType::Pointer ThreadedToFRawDataReconstruction::FetchIntensityFrame(int slice)
-  //{ 
-  //  Image::Pointer intensityImage = Image::New();
-  //  //int x = 0;
-  //  intensityImage->Initialize(PixelType(typeid(float)),4,m_Dimensions);
-  //  intensityImage->SetSlice(m_CISInten,0,0,0);
-  //  return intensityImage;
-  //}
-  //
-  //ImageSource::OutputImageType::Pointer ThreadedToFRawDataReconstruction::FetchAmplitudeFrame(int slice)
-  //{ 
-  //  Image::Pointer amplitudeImage = Image::New();
-  //  //int x = 0;
-  //  amplitudeImage->Initialize(PixelType(typeid(float)),4,m_Dimensions);
-  //  amplitudeImage->SetSlice(m_CISAmpl,0,0,0);
-  //  return amplitudeImage;
-  //}
-  //
-  //ImageSource::OutputImageType::Pointer ThreadedToFRawDataReconstruction::FetchDistanceFrame(int slice)
-  //{ 
-  //  Image::Pointer distanceImage = Image::New();
-  //  //int x = 0;
-  //  distanceImage->Initialize(PixelType(typeid(float)), 4, m_Dimensions);
-  //  distanceImage->SetSlice(m_CISDist, 0, 0, 0);
-  //  return distanceImage;
-  //}
-
   void ThreadedToFRawDataReconstruction::GenerateData()
   {
-    //if(!m_Init)
-    //{
-    //  this->SetNthOutput(0, this->MakeOutput(0));
-    //  this->SetNthOutput(1, this->MakeOutput(1));
-    //  this->SetNthOutput(2, this->MakeOutput(2));
-
-    //  if(m_CameraController.IsNotNull())
-    //  {
-    //    int captureWidth = m_CameraController->GetCaptureWidth();
-    //    int captureHeight = m_CameraController->GetCaptureHeight();
-    //    unsigned int* dimensions = new unsigned int[4];
-    //    dimensions[0] = captureWidth;
-    //    dimensions[1] = captureHeight;
-    //    dimensions[2] = m_StackSize;
-    //    dimensions[3] = 1;
-
-    //    this->GetOutput(0)->Initialize(mitk::PixelType(typeid(float)) , 4 , dimensions);
-    //    this->GetOutput(1)->Initialize(mitk::PixelType(typeid(float)) , 4 , dimensions);
-    //    this->GetOutput(2)->Initialize(mitk::PixelType(typeid(float)) , 4 , dimensions);
-    //    m_Init = true;
-    //    delete[] dimensions;
-    //  }
-    //}
-
     if(m_Init)
     {
-      //mitk::Image* dist = static_cast<mitk::Image*>(this->GetOutput(1));
-      //mitk::Image* inten = static_cast<mitk::Image*>(this->GetOutput(0));
-      //mitk::Image* ampl = static_cast<mitk::Image*>(this->GetOutput(2));
-
       this->BeforeThreadedGenerateData();
-      //dist->SetSlice(m_CISDist,0,0,0);
-      //inten->SetSlice(m_CISInten,0,0,0);
-      //ampl->SetSlice(m_CISAmpl,0,0,0);
     }
   }
 
@@ -247,14 +152,8 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
     int frameHeight = m_Height;
     int channelSize = lineWidth*frameHeight*2;
     int quadChannelSize = channelSize/4;
-    //int headerSize = 256;
 
     std::vector<short> quad = std::vector<short>(quadChannelSize);
-
-    //std::vector<short> quad1;
-    //std::vector<short> quad2;
-    //std::vector<short> quad3;
-    //std::vector<short> quad4;
     
     // clean the thread data array
     m_ThreadData->m_InputData.erase(m_ThreadData->m_InputData.begin(),m_ThreadData->m_InputData.end());
@@ -269,14 +168,6 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
       delete[]sourceData;
       ++channelNo;
     }
-
-    //quad2.insert(quad2.begin(),                   sourceData+2*headerSize+channelSize,                    sourceData+2*headerSize+2*channelSize);
-    //m_ThreadData->m_InputData.push_back(quad2);
-    //quad3.insert(quad3.begin(),                   sourceData+3*headerSize+2*channelSize,                  sourceData+3*headerSize+3*channelSize);
-    //m_ThreadData->m_InputData.push_back(quad3);
-    //quad4.insert(quad4.begin(),                   sourceData+4*headerSize+3*channelSize,                  sourceData+4*headerSize+4*channelSize);
-    //m_ThreadData->m_InputData.push_back(quad4);
-    //delete[] sourceData;
 
     if(m_Threader.IsNull())
     {

@@ -35,7 +35,6 @@ namespace mitk
   void ToFCameraPMDRawDataCamCubeDevice::GetChannelSourceData(short* sourceData, vtkShortArray* vtkChannelArray )
   {
     int i = 0;
-    //unsigned int channelDataPosition = 0;
     unsigned int channelSize = (this->GetCaptureHeight()*this->GetCaptureWidth()*2);
     this->SetChannelSize(channelSize);
     signed short* channel1;
@@ -43,36 +42,28 @@ namespace mitk
     signed short* channel3;
     signed short* channel4;
 
-    vtkSmartPointer<vtkShortArray> cvtkChannelArray = vtkShortArray::New();
-    cvtkChannelArray->SetNumberOfComponents(channelSize);
-    cvtkChannelArray->SetNumberOfTuples(4);
-    cvtkChannelArray->Allocate(1);
+    vtkSmartPointer<vtkShortArray> tempVTKChannelArray = vtkShortArray::New();
+    tempVTKChannelArray->SetNumberOfComponents(channelSize);
+    tempVTKChannelArray->SetNumberOfTuples(4);
+    tempVTKChannelArray->Allocate(1);
 
     sourceData += 256;
-    //channelDataPosition += 256; 
     channel1 = sourceData;
-    cvtkChannelArray->InsertTupleValue(0,channel1);
+    tempVTKChannelArray->InsertTupleValue(0,channel1);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
     sourceData += 256;
-    //channelDataPosition += 256;
     channel2 = sourceData;
-    cvtkChannelArray->InsertTupleValue(1,channel2);
+    tempVTKChannelArray->InsertTupleValue(1,channel2);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
     sourceData += 256;
-    //channelDataPosition += 256;
     channel3 = sourceData;
-    cvtkChannelArray->InsertTupleValue(2,channel3);
+    tempVTKChannelArray->InsertTupleValue(2,channel3);
     sourceData += channelSize;
-    //channelDataPosition += channelSize;
     sourceData += 256;
-    //channelDataPosition += 256;
     channel4 = sourceData;
-    cvtkChannelArray->InsertTupleValue(3,channel4);
-    //sourceData -= channelDataPosition;
-    vtkChannelArray->DeepCopy(cvtkChannelArray);
-    cvtkChannelArray->Delete();
+    tempVTKChannelArray->InsertTupleValue(3,channel4);
+    vtkChannelArray->DeepCopy(tempVTKChannelArray);
+    tempVTKChannelArray->Delete();
   }
 
   void ToFCameraPMDRawDataCamCubeDevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )

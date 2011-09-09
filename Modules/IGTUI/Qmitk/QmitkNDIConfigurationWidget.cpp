@@ -495,7 +495,12 @@ void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft
     m_Controls->m_ToolTable->setItem( topLeft.row(), topLeft.column(), filenameItem );
 
     if(QFileInfo(filename).exists())
-      emit RepresentationChanged( topLeft.row(), filename.toStdString() );
+    {
+      mitk::Surface::Pointer surface = this->LoadSurfaceFromSTLFile(filename);
+      
+      if(surface.IsNotNull())
+        emit RepresentationChanged( topLeft.row(), surface);
+    }
     break;
    default:
     break;  
@@ -701,12 +706,12 @@ void QmitkNDIConfigurationWidget::OnTableCellChanged(int row, int column)
 
 void QmitkNDIConfigurationWidget::OnSaveTool()
 {
-  if(m_Tracker.IsNull())
+  if(m_Tracker.IsNull() || m_Tracker->GetToolCount() <= 0)
     return;
 
-  QString filename = QFileDialog::getSaveFileName(NULL, "Save NDI-Tool", QDir::currentPath(),"NDI Tracking Tool file(*.ntf)");
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
-
+  QString filename = QFileDialog::getSaveFileName(NULL, "Save NDI-Tool", QString(QDir::currentPath()+QString(m_Tracker->GetTool(currId)->GetToolName())),"NDI Tracking Tool file(*.ntf)");
+  
   mitk::TrackingTool* selectedTool = m_Tracker->GetTool(currId);
   
   if(filename.isEmpty())
@@ -722,8 +727,13 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
   catch( ... )
   {    
     QMessageBox::warning(NULL, "Saving Tool Error", QString("An error occured! Could not save tool!\n\n"));
-    MBI_ERROR<<"Could not load surface for tool storage!";
+    MBI_ERROR<<"Could not save tool surface!";
     MBI_ERROR<< toolWriter->GetErrorMessage();
+
+    QFile maybeCorruptFile(filename);
+
+    if(maybeCorruptFile.exists())
+      maybeCorruptFile.remove();
   } 
 
   emit SignalSavedTool(currId, filename);
@@ -732,10 +742,9 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
 
 void QmitkNDIConfigurationWidget::OnLoadTool()
 {
-
-  if(m_Tracker.IsNull())
+  if(m_Tracker.IsNull() || m_Tracker->GetToolCount() <= 0)
     return;
-
+  
   QString filename = QFileDialog::getOpenFileName(NULL, "Load NDI-Tools", QDir::currentPath(),"NDI Tracking Tool file(*.ntf)");
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
   
@@ -744,7 +753,17 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   
   mitk::DataNode::Pointer toolNode;  
   mitk::NavigationToolReader::Pointer toolReader = mitk::NavigationToolReader::New();
-  mitk::NavigationTool::Pointer navTool = toolReader->DoRead(filename.toStdString());
+  mitk::NavigationTool::Pointer navTool;
+
+  try {
+    navTool = toolReader->DoRead(filename.toStdString());
+  }
+  catch( ... )
+  {    
+    QMessageBox::warning(NULL, "Loading Tool Error", QString("An error occured! Could not load tool!\n\n"));
+    MBI_ERROR<<"Could not load tool surface!";
+    MBI_ERROR<< toolReader->GetErrorMessage();
+  } 
 
   int currSelectedToolID = m_Controls->m_ToolSelectionComboBox->currentIndex();
   
@@ -755,7 +774,15 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::SROMCol)->setText(navTool->GetCalibrationFile().c_str());
   
   //type 
-  //m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText(navTool->GetType());
+  if(navTool->GetType() == mitk::NavigationTool::Instrument) 
+    m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Instrument");
+  else if(navTool->GetType() == mitk::NavigationTool::Fiducial)
+    m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Fiducial");
+  else if(navTool->GetType() == mitk::NavigationTool::Skinmarker)
+    m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Skinmarker");
+  else
+    m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Unknown");
+
   
   //representation
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::SROMCol)->setText(m_RepresentatonCellDefaultText);
@@ -787,26 +814,25 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
 
   // name and surface as dataNode
   mitk::DataNode::Pointer node = mitk::DataNode::New();
-  QFile surfaceFile(surfaceFileName);
-  if(surfaceFile.exists())
-  {
-    mitk::Surface::Pointer toolSurface = mitk::Surface::New();
-    mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-
-    try{
-      stlReader->SetFileName(surfaceFileName.toStdString().c_str());
-      stlReader->Update();//load surface
-      toolSurface = stlReader->GetOutput();
-    }
-    catch(std::exception& e )
-    {
-      MBI_ERROR<<"Could not load surface for tool storage!";
-      MBI_ERROR<< e.what();
-      throw e;
-    }
-    node->SetData(toolSurface); 
+  
+  mitk::Surface::Pointer toolSurface;
+  
+  try{
+   toolSurface = this->LoadSurfaceFromSTLFile(surfaceFileName);
   }
-  node->SetName(tool->GetToolName());
+  catch( ... )
+  {
+    QMessageBox::warning(NULL, "Loading Surface Error", QString("An error occured! Could not load surface from .stl file!\n\n"));
+    MBI_ERROR<<"Could not load .stl tool surface!";
+  }
+
+
+  if(toolSurface.IsNotNull())
+  {
+    node->SetData(toolSurface); 
+    node->SetName(tool->GetToolName());
+  }
+  
   navTool->SetDataNode(node);
   
   // type
@@ -825,5 +851,30 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
   navTool->SetType(type);
 
   return navTool;
+}
 
+
+mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QString surfaceFilename)
+{
+  mitk::Surface::Pointer toolSurface;
+  
+  QFile surfaceFile(surfaceFilename);
+  if(surfaceFile.exists())
+  {
+    mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
+    
+    try{
+      stlReader->SetFileName(surfaceFilename.toStdString().c_str());
+      stlReader->Update();//load surface
+      toolSurface = stlReader->GetOutput();
+    }
+    catch(std::exception& e )
+    {
+      MBI_ERROR<<"Could not load surface for tool!";
+      MBI_ERROR<< e.what();
+      throw e;
+    }
+  }
+  
+  return toolSurface;
 }

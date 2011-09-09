@@ -274,7 +274,7 @@ mitk::Image* mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 vtkProp*  mitk::OdfVtkMapper2D<T,N>
-::GetProp(mitk::BaseRenderer* renderer)
+::GetVtkProp(mitk::BaseRenderer* renderer)
 {
   return m_PropAssemblies[GetIndex(renderer)];
 }
@@ -434,9 +434,8 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  // std::cout << "MeasureDisplayedGeometry(" << renderer->GetName() << ")" << std::endl;
-  // vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
-  Geometry2D::ConstPointer worldGeometry =
+  //vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+  Geometry2D::ConstPointer worldGeometry = 
     renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry =
     dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
@@ -475,16 +474,15 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N
   O[1] = origin[1] + size[1];
 
   mitk::Point2D point1;
-  point1[0] = M[0]; point1[1] = M[1];
-
+  point1[0] = M[0]; point1[1] = M[1]; point1[2] = M[2];
   mitk::Point3D M3D;
   dispGeometry->Map(point1, M3D);
 
-  point1[0] = L[0]; point1[1] = L[1];
+  point1[0] = L[0]; point1[1] = L[1]; point1[2] = L[2];
   mitk::Point3D L3D;
   dispGeometry->Map(point1, L3D);
 
-  point1[0] = O[0]; point1[1] = O[1];
+  point1[0] = O[0]; point1[1] = O[1]; point1[2] = O[2];
   mitk::Point3D O3D;
   dispGeometry->Map(point1, O3D);
 
@@ -607,7 +605,12 @@ void  mitk::OdfVtkMapper2D<T,N>
   vtkFloatArray* pointdata = NULL;
   vtkDelaunay2D *delaunay = NULL;
   vtkPolyData* cuttedPlane = NULL;
-  if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) ||
+
+  // the cutter only works if we do not have a 2D-image
+  // or if we have a 2D-image and want to see the whole image.
+  //
+  // for side views of 2D-images, we need some special treatment
+  if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) || 
     (dims[1] == 1 && dispGeo->vnormal[1] != 0) ||
     (dims[2] == 1 && dispGeo->vnormal[2] != 0) ))
   {
@@ -814,9 +817,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    this->GetProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
+    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }
 
@@ -828,14 +831,13 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     // adapt cam pos
     OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
+    //AdaptCameraPosition(renderer, dispGeo);
 
-    AdaptCameraPosition(renderer, dispGeo);
-
-    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
+    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
     {
       glMatrixMode( GL_PROJECTION );
       glPushMatrix();
@@ -877,9 +879,9 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     }
 
-    this->GetProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
 
-    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
+    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
     {
       glMatrixMode( GL_PROJECTION );
       glPopMatrix();
@@ -898,8 +900,8 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
-    this->GetProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
+    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
 
 }
 
@@ -1115,7 +1117,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       AdaptOdfScalingToImageSpacing(index);
       SetRendererLightSources(renderer);
       ApplyPropertySettings();
-      AdaptCameraPosition(renderer, dispGeo);
+      //AdaptCameraPosition(renderer, dispGeo);
       Slice(renderer, dispGeo);
       m_LastDisplayGeometry = dispGeo;
     }

@@ -42,7 +42,7 @@ namespace mitk {
 
 class Geometry2DData;
 class BaseRenderer;
-class ImageMapperGL2D;
+class ImageVtkMapper2D;
 class DataStorage;
 
 /**
@@ -106,7 +106,7 @@ public:
 
   /**
    * \brief All images found when traversing the (sub-) tree starting at
-   * \a iterator which are resliced by an ImageMapperGL2D will be mapped.
+   * \a iterator which are resliced by an ImageVtkMapper2D will be mapped.
    * This method is used to set the data storage to traverse. This offers
    * the possibility to use this mapper for other data storages (not only
    * the default data storage).
@@ -205,7 +205,7 @@ protected:
   /** \brief List holding the vtkActor to map the image into 3D for each
    * ImageMapper
    */
-  typedef std::map< ImageMapperGL2D *, ActorInfo > ActorList;
+  typedef std::map< ImageVtkMapper2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
 
   struct LookupTableProperties
@@ -220,7 +220,7 @@ protected:
     vtkFloatingPointType windowMax;
   };
 
-  typedef std::map< ImageMapperGL2D *, LookupTableProperties >
+  typedef std::map< ImageVtkMapper2D *, LookupTableProperties >
     LookupTablePropertiesList;
 
   /** \brief List holding some lookup table properties of the previous pass */

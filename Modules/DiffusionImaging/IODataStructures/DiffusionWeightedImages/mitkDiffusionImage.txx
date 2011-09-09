@@ -100,7 +100,7 @@ template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>
 ::SetDisplayIndexForRendering(int displayIndex)
 {
-
+MITK_INFO << "ALOHA WE JUST RECEIVED A NEW INDEX FROM THE PROPERTIES IN MITK........................" << displayIndex;
   int index = displayIndex;
   int vecLength = m_VectorImage->GetVectorLength();
   index = index > vecLength-1 ? vecLength-1 : index;

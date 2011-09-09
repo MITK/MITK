@@ -309,6 +309,8 @@ public:
   //##Documentation
   //## @brief Get the MapperSlotId to use.
   itkGetMacro(MapperID, MapperSlotId);
+  itkGetConstMacro(MapperID, MapperSlotId);
+
   //##Documentation
   //## @brief Set the MapperSlotId to use.
   itkSetMacro(MapperID, MapperSlotId);

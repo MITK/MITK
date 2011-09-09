@@ -100,7 +100,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   MITK_INFO << "  Smoothing = " << smoothing << endl;
   MITK_INFO << "  Decimation = " << decimation << endl;
  
-  Geometry3D::Pointer geometry = image->GetGeometry();
+  Geometry3D::Pointer geometry = dynamic_cast<Geometry3D *>(image->GetGeometry()->Clone().GetPointer());
   
   // Make ITK image out of MITK image
   

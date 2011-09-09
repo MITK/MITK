@@ -799,10 +799,10 @@ void mitk::VtkPropRenderer::checkState()
 //### Contains all methods which are neceassry before each VTK Render() call
 void mitk::VtkPropRenderer::PrepareRender()
 {
-  if(!m_2DCameraInitialized)
-  {
-    m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
-  }
+  //  if(!m_2DCameraInitialized)
+  //  {
+  m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
+  //  }
   AdjustCameraToScene(); //Prepare camera for 2D render windows
 }
 

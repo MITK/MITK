@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkToFCameraPMDrawDataCamBoardDevice.h>
+#include <mitkToFCameraPMDRawDataCamBoardDevice.h>
 
 // vtk includes
 #include "vtkShortArray.h"

@@ -116,13 +116,6 @@ public:
     */
     void ChangeGUI();
 
-    void ViewXClicked();
-    void ViewYClicked();
-    void ViewZClicked();
-
-    void TestButtonClicked();
-
-
 private: 
 
   /*

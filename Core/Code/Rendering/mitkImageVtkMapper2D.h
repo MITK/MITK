@@ -32,6 +32,7 @@ class vtkImageChangeInformation;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
+class vtkMitkApplyLevelWindowToRGBFilter;
 
 namespace mitk {
 
@@ -55,11 +56,9 @@ namespace mitk {
  *
  * In order to transform the textured plane to the correct position in space, the
  * same transformation as used for reslicing is applied to both the camera and the
- * vtkActor. The camera position is also influenced by the mitkDisplayGeometry
- * parameters to facilitate zooming and panning. All important steps are explained
- * in more detail below. The resulting 2D image (by reslicing the
- * underlying 3D input image appropriately) can either be directly rendered
- * in a 2D view or just be calculated to be used later by another
+ * vtkActor. All important steps are explained in more detail below. The resulting
+ * 2D image (by reslicing the underlying 3D input image appropriately) can either
+ * be directly rendered in a 2D view or just be calculated to be used later by another
  * rendering entity, e.g. in texture mapping in a 3D view.
  *
  * Properties that can be set for images and influence the imageMapper2D are:
@@ -114,9 +113,6 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
-    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
-
     //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
@@ -163,6 +159,9 @@ namespace mitk {
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
 
+      /** \brief This filter is used to apply the level window to RBG(A) images. */
+      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
@@ -178,15 +177,18 @@ namespace mitk {
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   protected:
+    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
+
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
     * \image html texturedPlane.png
     *
     * In VTK a vtkPlaneSource is defined through three points. The origin and two
     * points defining the axes of the plane (see VTK documentation). The origin is
-    * set to (xMin; yMin; 0), where xMin and yMin are the minimal bounds of the
-    * resliced image in space. The center of the plane (C) is also the center of
-    * the view plane (cf. the image above).
+    * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
+    * resliced image in space. Z is relevant for blending and the layer property.
+    * The center of the plane (C) is also the center of the view plane (cf. the image above).
     *
     * \note For the standard MITK view with three 2D render windows showing three
     * different slices, three such planes are generated. All these planes are generated
@@ -200,7 +202,7 @@ namespace mitk {
       \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
       \note This code has been taken from the deprecated library iil.
       */
-    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
+    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
 
     /** Default constructor */
     ImageVtkMapper2D();
@@ -213,8 +215,7 @@ namespace mitk {
     *
     * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
     * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
-    * applied to each camera (cam->ApplyTransformation(t)) and to each textured
-    * plane (actor->SetUserTransform(t)) to transform everything
+    * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
     * to the actual 3D position (cf. the following image).
     *
     * \image html cameraPositioning3D.png
@@ -231,6 +232,11 @@ namespace mitk {
         will have a new bounding box, which needs to be calculated. */
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+
+    /** \brief This method uses the vtkCamera clipping range and the layer property
+    * to calcualte the depth of the object (e.g. image or contour). The depth is used
+    * to keep the correct order for the final VTK rendering.*/
+    float CalculateLayerDepth(mitk::BaseRenderer* renderer);
   };
 
 } // namespace mitk

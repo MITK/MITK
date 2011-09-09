@@ -3579,7 +3579,6 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ClipBoundingBox(vtkRenderer *ren,
   double camNearPoint[4];
   double camFarPoint[4];
   cam->GetClippingRange(camWorldRange);
-  MITK_INFO << "vtkMiktOpenGLGPUVolumeRayCastMapper.cpp";
   camNearWorldPoint[0] = camWorldPos[0] + camWorldRange[0]*camWorldDirection[0];
   camNearWorldPoint[1] = camWorldPos[1] + camWorldRange[0]*camWorldDirection[1];
   camNearWorldPoint[2] = camWorldPos[2] + camWorldRange[0]*camWorldDirection[2];

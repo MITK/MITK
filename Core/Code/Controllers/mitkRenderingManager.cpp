@@ -254,6 +254,13 @@ RenderingManager
   int *size = renderWindow->GetSize();
   if ( 0 != size[0] && 0 != size[1] )
   {
+    //prepare the camera etc. before rendering
+    //Note: this is a very important step which should be called before the VTK render!
+    //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
+    mitk::VtkPropRenderer *vPR =
+        dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( renderWindow ));
+    if(vPR)
+       vPR->PrepareRender();
     // Execute rendering
     renderWindow->Render();
   }
@@ -272,8 +279,7 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
-      dynamic_cast<mitk::VtkPropRenderer*>(BaseRenderer::GetInstance(it->first))->AdjustCameraToScene();
-      this->RequestUpdate( it->first );
+       this->RequestUpdate( it->first );
     }
   }
 }
@@ -296,7 +302,13 @@ RenderingManager
       int *size = it->first->GetSize();
       if ( 0 != size[0] && 0 != size[1] )
       {
-        dynamic_cast<mitk::VtkPropRenderer*>(BaseRenderer::GetInstance(it->first))->AdjustCameraToScene();
+        //prepare the camera before rendering
+        //Note: this is a very important step which should be called before the VTK render!
+        //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
+        mitk::VtkPropRenderer *vPR =
+            dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( it->first ));
+        if(vPR)
+           vPR->PrepareRender();
         // Execute rendering
         it->first->Render();
       }

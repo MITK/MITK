@@ -104,9 +104,9 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
   else
     return;
 
-  if(m_Renderer->GetRenderWindow() == m_Renderer->GetRenderWindowByName("stdmulti.widget4"))
+  if(m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D)
   {
-    //set up the view for the 3D render window. The views for 2D are set up in the mitkImageVtkMapper2D
+    //set up the view for the 3D render window. The views for 2D are set up in the mitkVtkPropRenderer
     mitk::Point3D middle = bb->GetCenter();
     vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0], middle[1], middle[2]);
     switch(view)

@@ -21,14 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGlobalInteraction.h"
 #include "mitkRenderingManager.h"
-#include <mitkImageVtkMapper2D.h>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
-#include <vtkInteractorStyle.h>
-#include <vtkInteractorStyleImage.h>
-
 
 //##Documentation
 //## @brief As Step6, but with QmitkStdMultiWidget as widget
@@ -54,9 +49,6 @@ void Step8::SetupWidgets()
 	QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
 	hlayout->setMargin(0);
 
-//	mitk::ImageVtkMapper2D::Pointer mapper = mitk::ImageVtkMapper2D::New();
-//	m_ResultNode->SetMapper(mitk::BaseRenderer::Extended2D, mapper);
-
 	//*************************************************************************
 	// Part Ia: create and initialize QmitkStdMultiWidget
 	//*************************************************************************
@@ -73,19 +65,9 @@ void Step8::SetupWidgets()
 			m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
-	// Setup render window interactor
-//  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//  vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-//		renderWindowInteractor->SetInteractorStyle(style);
-
 	// Initialize bottom-right view as 3D view
-//	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
-//			mitk::BaseRenderer::Extended2D);
-//	multiWidget->GetRenderWindow1()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
-//	renderWindowInteractor->Start();
-
-
+	multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
+			mitk::BaseRenderer::Standard3D);
 
 	// Enable standard handler for levelwindow-slider
 	multiWidget->EnableStandardLevelWindow();
@@ -101,10 +83,6 @@ void Step8::SetupWidgets()
 
 	// Moving the cut-planes to click-point
 	multiWidget->EnableNavigationControllerEventListening();
-
-  mitk::SliceNavigationController::Pointer sliceNavi = multiWidget->GetRenderWindow2()->GetSliceNavigationController();
-  sliceNavi->SetViewDirection(mitk::SliceNavigationController::Transversal);
-  sliceNavi->Update();
 
 	// Zooming and panning
 	mitk::GlobalInteraction::GetInstance()->AddListener(

@@ -12,8 +12,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkPropRenderer.h"
 
-#include "picimage.h"
-
 // MAPPERS
 #include "mitkMapper.h"
 #include "mitkImageVtkMapper2D.h"
@@ -56,12 +54,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTransform.h>
 
 
-
-
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm), 
   m_VtkMapperPresent(false), 
-  m_NewRenderer(true)
+  m_NewRenderer(true),
+  m_2DCameraInitialized(false)
 {
   didCount=false;
 
@@ -165,7 +162,6 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
 
-  //  MITK_INFO << "hier drin " << type;
   // Do we have objects to render?
   if ( this->GetEmptyWorldGeometry()) 
     return 0;
@@ -184,7 +180,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
-    //    MITK_INFO << "name " << mapper->GetNameOfClass();
     if((mapper->IsVtkBased() == true) )
     {
       sthVtkBased = true;
@@ -207,14 +202,12 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       lastVtkBased = false;
     }
 
-    //Workarround for bug GL_TEXTURE_2D
+    //Workarround for bug GL_TEXTURE_2D (bug #8188)
     GLboolean mode;
     GLenum bit = GL_TEXTURE_2D;
     GLfloat lineWidth;
     glGetFloatv(GL_LINE_WIDTH, &lineWidth);
     glGetBooleanv(bit, &mode);
-
-    AdjustCameraToScene();
 
     switch(type)
     {
@@ -229,6 +222,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       glDisable(bit);
 
     glLineWidth(lineWidth);
+    //end Workarround for bug GL_TEXTURE_2D (bug #8188)
 
   }
   
@@ -259,9 +253,10 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   m_NumberOfVisibleLODEnabledMappers = 0;
 
   // Do we have to update the mappers ?
-  if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
+  if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() ) {
     Update();
-  else if (m_MapperID>=2 && m_MapperID < 6)
+  }
+  else if (m_MapperID>=1 && m_MapperID < 6)
     Update();
 
   // remove all text properties before mappers will add new ones
@@ -303,7 +298,6 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int layer = 1;
     node->GetIntProperty("layer", layer, this);
     int nr = (layer<<16) + mapperNo;
-    //    MITK_INFO << "Layer Number " << nr << " Mapper type " << mapper->GetNameOfClass();
     m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
   }  
@@ -802,15 +796,36 @@ void mitk::VtkPropRenderer::checkState()
   }
 }
 
-void mitk::VtkPropRenderer::AdjustCameraToScene(){
-  if(this->GetMapperID() == 1)
+//### Contains all methods which are neceassry before each VTK Render() call
+void mitk::VtkPropRenderer::PrepareRender()
+{
+  //  if(!m_2DCameraInitialized)
+  //  {
+  m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
+  //  }
+  AdjustCameraToScene(); //Prepare camera for 2D render windows
+}
+
+bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
+  if(this->GetMapperID() == Standard2D)
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
+    //turn the light out in the scene in order to render correct grey values.
+    //TODO Implement a property for light in the 2D render windows (in another method)
+    this->GetVtkRenderer()->RemoveAllLights();
+    //remove the VTK interaction
+    this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+  }
+  return true;
+}
 
+void mitk::VtkPropRenderer::AdjustCameraToScene(){
+  if(this->GetMapperID() == Standard2D)
+  {
     const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 
-    double objectHeightInMM = this->GetCurrentWorldGeometry2D()->GetExtentInMM(0);//the height of the current object slice in mm
+    double objectHeightInMM = this->GetCurrentWorldGeometry2D()->GetExtentInMM(1);//the height of the current object slice in mm
     double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
     double zoomFactor = objectHeightInMM/displayHeightInMM; //displayGeometry->GetScaleFactorMMPerDisplayUnit()
     //determine how much of the object can be displayed
@@ -840,7 +855,7 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
     cameraUp[1] = 1.0;
     cameraUp[2] = 0.0;
 
-    //the position of the camera (center[0], center[1], 1000)
+    //the position of the camera (center[0], center[1], 900000)
     double cameraPosition[3];
     cameraPosition[0] = viewPlaneCenter[0];
     cameraPosition[1] = viewPlaneCenter[1];
@@ -853,17 +868,10 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
       camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
       camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
       camera->SetViewUp( cameraUp ); //set the view-up for the camera
-//      double distance = sqrt((cameraPosition[2]-viewPlaneCenter[2])*(cameraPosition[2]-viewPlaneCenter[2]));
-//      camera->SetClippingRange(distance-50, distance+50); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+      //      double distance = sqrt((cameraPosition[2]-viewPlaneCenter[2])*(cameraPosition[2]-viewPlaneCenter[2]));
+      //      camera->SetClippingRange(distance-50, distance+50); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
       camera->SetClippingRange(0.1, 1000000); //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
     }
-
-    //turn the light out in the scene in order to render correct grey values.
-    //TODO Implement a property for light in the 2D render windows
-    this->GetVtkRenderer()->RemoveAllLights();
-
-    //remove the VTK interaction
-    this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
     const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( this->GetCurrentWorldGeometry2D() );
     if ( planeGeometry != NULL )

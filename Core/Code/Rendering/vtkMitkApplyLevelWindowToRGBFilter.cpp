@@ -23,9 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 //used for acos etc.
 #include <cmath>
 
-#ifndef M_PI
-#define M_PI             3.14159265358979323846
-#endif
+//used for PI
+#include <itkMath.h>
+
+static const double PI = itk::Math::pi;
 
 vtkMitkApplyLevelWindowToRGBFilter::vtkMitkApplyLevelWindowToRGBFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
 {
@@ -59,7 +60,7 @@ void RGBtoHSI(T* RGB, T* HSI)
   nG = (G<0?0:(G>255?255:G))/255,
   nB = (B<0?0:(B>255?255:B))/255,
   m = nR<nG?(nR<nB?nR:nB):(nG<nB?nG:nB),
-  theta = (T)(std::acos(0.5f*((nR-nG)+(nR-nB))/std::sqrt(std::pow(nR-nG,2)+(nR-nB)*(nG-nB)))*180/M_PI),
+  theta = (T)(std::acos(0.5f*((nR-nG)+(nR-nB))/std::sqrt(std::pow(nR-nG,2)+(nR-nB)*(nG-nB)))*180/PI),
   sum = nR + nG + nB;
   T H = 0, S = 0, I = 0;
   if (theta>0) H = (nB<=nG)?theta:360-theta;
@@ -83,17 +84,17 @@ void HSItoRGB(T* HSI, T* RGB)
   R = 0, G = 0, B = 0;
   if (H<120) {
     B = a;
-    R = (T)(I*(1+S*std::cos(H*M_PI/180)/std::cos((60-H)*M_PI/180)));
+    R = (T)(I*(1+S*std::cos(H*PI/180)/std::cos((60-H)*PI/180)));
     G = 3*I-(R+B);
   } else if (H<240) {
     H-=120;
     R = a;
-    G = (T)(I*(1+S*std::cos(H*M_PI/180)/std::cos((60-H)*M_PI/180)));
+    G = (T)(I*(1+S*std::cos(H*PI/180)/std::cos((60-H)*PI/180)));
     B = 3*I-(R+G);
   } else {
     H-=240;
     G = a;
-    B = (T)(I*(1+S*std::cos(H*M_PI/180)/std::cos((60-H)*M_PI/180)));
+    B = (T)(I*(1+S*std::cos(H*PI/180)/std::cos((60-H)*PI/180)));
     R = 3*I-(G+B);
   }
   R*=255; G*=255; B*=255;

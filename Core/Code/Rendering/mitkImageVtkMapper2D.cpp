@@ -80,8 +80,8 @@ float mitk::ImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer* renderer)
   //get the clipping range to check how deep into z direction we can render images
   double maxRange = renderer->GetVtkRenderer()->GetActiveCamera()->GetClippingRange()[1];
 
-  //Due to a VTK bug, we cannot use the whole clipping range. 100 is empirically determined
-  float depth = -maxRange*0.01;
+  //Due to a VTK bug, we cannot use the whole clipping range. /100 is empirically determined
+  float depth = -maxRange*0.01; // divide by 100
   int layer = 0;
   GetDataNode()->GetIntProperty( "layer", layer, renderer);
   //add the layer property for each image to render images with a higher layer on top of the others
@@ -96,6 +96,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {  
+//  this->Update(renderer);
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -729,6 +730,9 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     }
   }//END PROPERTY user-defined lut
 
+  //use the finalLookuptable for mapping the colors
+  localStorage->m_Texture->SetLookupTable( finalLookuptable );
+
   //check if we need the default table
   if( useDefaultLut )
   {
@@ -770,6 +774,12 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   } //END binary image handling
   else
   {
+    LevelWindow levelWindow;
+    this->GetLevelWindow( levelWindow, renderer );
+
+    //set up the lookuptable with the level window range
+    finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+
     mitk::PixelType pixelType = this->GetInput()->GetPixelType();
     if( pixelType.GetBitsPerComponent() == pixelType.GetBpe() ) //gray images with just one component
     {
@@ -794,14 +804,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
       localStorage->m_LevelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
       localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowToRGBFilterObject->GetOutputPort());
     }
-    LevelWindow levelWindow;
-    this->GetLevelWindow( levelWindow, renderer );
-
-    //set up the lookuptable with the level window range
-    finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
-  //use the finalLookuptable for mapping the colors
-  localStorage->m_Texture->SetLookupTable( finalLookuptable );
 
   if(binaryOutline && binary)
   {
@@ -1039,7 +1042,6 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
   //Do as much actions as possible in here to avoid double executions.
-  //TODO initialize everything with NULL in the list ???
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();

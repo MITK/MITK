@@ -89,6 +89,12 @@ namespace mitk
     */
     virtual bool GetSourceData(char* sourceDataArray);
     /*!
+    \brief Convenience method to get the PMD raw data from the ToF device as short array.
+    \param sourceData array where the short raw data will be saved
+    */
+    bool GetShortSourceData(short* sourceData);
+
+    /*!
     \brief calls update on the camera -> a new ToF-image is aquired
     */
     virtual bool UpdateCamera();
@@ -147,7 +153,6 @@ namespace mitk
     \return flag indicating if an error occured (false) or not (true)
     */
     bool ErrorText(int error);
-
     char m_PMDError[128]; ///< member holding the current error text
     int m_PMDRes; ///< holds the current result message provided by PMD
 

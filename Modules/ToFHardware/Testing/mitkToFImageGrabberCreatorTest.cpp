@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFCameraPMDCamCubeDevice.h>
+#include <mitkToFCameraPMDRawDataCamCubeDevice.h>
 #include <mitkToFCameraPMDCamBoardDevice.h>
+#include <mitkToFCameraPMDRawDataCamBoardDevice.h>
 #include <mitkToFCameraPMDPlayerDevice.h>
 #include <mitkToFCameraPMDMITKPlayerDevice.h>
 #include <mitkToFImageGrabber.h>
@@ -46,12 +48,26 @@ int mitkToFImageGrabberCreatorTest(int /* argc */, char* /*argv*/[])
   mitk::ToFCameraPMDCamCubeDevice* camCubeDevice
       = dynamic_cast<mitk::ToFCameraPMDCamCubeDevice*>(imageGrabber->GetCameraDevice());
   MITK_TEST_CONDITION_REQUIRED(camCubeDevice!=NULL,"Test if image grabber was initialized with ToFCameraPMDCamCubeDevice");
+  // ToFCameraPMDRawDataCamCube
+  imageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamCubeImageGrabber();
+  MITK_TEST_CONDITION_REQUIRED(imageGrabber.IsNotNull(),"Test if MITKPlayerImageGrabber could be created");
+  mitk::ToFCameraPMDRawDataCamCubeDevice* camCubeRawDevice
+    = dynamic_cast<mitk::ToFCameraPMDRawDataCamCubeDevice*>(imageGrabber->GetCameraDevice());
+  MITK_TEST_CONDITION_REQUIRED(camCubeRawDevice!=NULL,"Test if image grabber was initialized");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(camCubeRawDevice->GetNameOfClass(), "ToFCameraPMDRawDataCamCubeDevice"), "Test if image grabber was initialized with ToFCameraPMDRawDataCamCubeDevice");
   // ToFCameraPMDCamBoard
   imageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamBoardImageGrabber();
   MITK_TEST_CONDITION_REQUIRED(imageGrabber.IsNotNull(),"Test if MITKPlayerImageGrabber could be created");
   mitk::ToFCameraPMDCamBoardDevice* camBoardDevice
       = dynamic_cast<mitk::ToFCameraPMDCamBoardDevice*>(imageGrabber->GetCameraDevice());
   MITK_TEST_CONDITION_REQUIRED(camBoardDevice!=NULL,"Test if image grabber was initialized with ToFCameraPMDCamBoardDevice");
+  // ToFCameraPMDRawDataCamBoard
+  imageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamBoardImageGrabber();
+  MITK_TEST_CONDITION_REQUIRED(imageGrabber.IsNotNull(),"Test if MITKPlayerImageGrabber could be created");
+  mitk::ToFCameraPMDRawDataCamBoardDevice* camBoardRawDevice
+    = dynamic_cast<mitk::ToFCameraPMDRawDataCamBoardDevice*>(imageGrabber->GetCameraDevice());
+  MITK_TEST_CONDITION_REQUIRED(camBoardRawDevice!=NULL,"Test if image grabber was initialized with ToFCameraPMDRawDataCamBoardDevice");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(camBoardRawDevice->GetNameOfClass(), "ToFCameraPMDRawDataCamBoardDevice"), "Test if image grabber was initialized with ToFCameraPMDRawDataCamCubeDevice"); 
   // ToFCameraPMDPlayer
   imageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDPlayerImageGrabber();
   MITK_TEST_CONDITION_REQUIRED(imageGrabber.IsNotNull(),"Test if MITKPlayerImageGrabber could be created");

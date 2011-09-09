@@ -46,7 +46,7 @@ namespace mitk
   {
     if(!m_ConnectionCheck)
     {
-      m_PMDRes = pmdOpen (&m_PMDHandle , m_SourcePlugin , m_SourceParam , m_ProcPlugin , m_ProcParam );
+      m_PMDRes = pmdOpen(&m_PMDHandle , m_SourcePlugin , m_SourceParam , m_ProcPlugin , m_ProcParam );
       m_ConnectionCheck = ErrorText(m_PMDRes);
       if (!m_ConnectionCheck)
       {

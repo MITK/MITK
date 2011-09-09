@@ -84,6 +84,12 @@ namespace mitk
     return true;
   }
 
+  bool ToFCameraPMDController::GetShortSourceData(short* sourceData)
+  {
+    MITK_WARN("ToF") << "PMD devices currently not available";
+    return true;
+  }
+
   bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
   {
     MITK_WARN("ToF") << "PMD devices currently not available";

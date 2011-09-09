@@ -6,17 +6,21 @@ SET(CPP_FILES
   mitkToFCameraMITKPlayerController.cpp
   mitkToFCameraMITKPlayerDevice.cpp
   mitkToFCameraPMDDevice.cpp
+  mitkToFCameraPMDRawDataDevice.cpp
   mitkToFCameraPMDPlayerDevice.cpp
   mitkToFCameraPMDMITKPlayerDevice.cpp
   mitkToFCameraPMDO3Device.cpp
   mitkToFCameraPMDCamCubeDevice.cpp
+  mitkToFCameraPMDRawDataCamCubeDevice.cpp
   mitkToFCameraPMDCamBoardDevice.cpp
+  mitkToFCameraPMDRawDataCamBoardDevice.cpp
   mitkToFCameraMESADevice.cpp
   mitkToFCameraMESASR4000Device.cpp
   mitkToFImageRecorder.cpp
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
   mitkToFImageCsvWriter.cpp
+  mitkThreadedToFRawDataReconstruction.cpp
 )
 
 IF(MITK_USE_TOF_PMDCAMCUBE)

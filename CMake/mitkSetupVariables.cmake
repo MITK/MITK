@@ -10,6 +10,12 @@ set(MITK_VERSION_MINOR "15")
 set(MITK_VERSION_PATCH "1")
 set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
 
+#-----------------------------------
+# Configuration of module system
+#-----------------------------------
+set(MODULES_CONF_DIRNAME modulesConf)
+set(MODULES_CONF_DIRS ${MITK_BINARY_DIR}/${MODULES_CONF_DIRNAME})
+
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()

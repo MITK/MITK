@@ -369,10 +369,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 #-----------------------------------------------------------------------------
-# MITK Modules
+# MITK Packages
 #-----------------------------------------------------------------------------
 
-set(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
@@ -442,9 +441,19 @@ endif()
 # Compile Utilities and set-up MITK variables
 #-----------------------------------------------------------------------------
 
+include(mitkSetupVariables)
+
+  #-----------------------------------------------------------------------------
+  # Cleanup
+  #-----------------------------------------------------------------------------
+
+  file(GLOB _MODULES_CONF_FILES ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
+  if(_MODULES_CONF_FILES)
+    file(REMOVE ${_MODULES_CONF_FILES})
+  endif()
+
 add_subdirectory(Utilities)
 
-include(mitkSetupVariables)
 if(MITK_USE_BLUEBERRY)
   include(mitkSetupBlueBerry)
 endif()
@@ -660,6 +669,13 @@ configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 set(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
+
+file(GLOB _MODULES_CONF_FILES RELATIVE ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME} ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
+SET(MITK_MODULE_NAMES)
+foreach(_module ${_MODULES_CONF_FILES})
+  string(REPLACE Config.cmake "" _module_name ${_module})
+  list(APPEND MITK_MODULE_NAMES ${_module_name})
+endforeach() 
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)

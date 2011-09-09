@@ -14,8 +14,8 @@ SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt qxt mbilog glew vec
 # mbilog is independent of mitk, and cant use mitk macros
 # configuring happens through mbilog/mbilogConfig.cmake.in
 SET(mbilog_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/mbilog" "${CMAKE_CURRENT_BINARY_DIR}/mbilog")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/mbilog/mbilogConfig.cmake.in"
-"${MITK_MODULES_CONF_DIR}/mbilogConfig.cmake")
+SET(mbilog_CONFIG_FILE "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/mbilogConfig.cmake" CACHE INTERNAL "Path to module config" FORCE)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/mbilog/mbilogConfig.cmake.in" "${mbilog_CONFIG_FILE}")
 
 # IF(NOT MITK_CHILI_PLUGIN)
 SUBDIRS(ipPic ipFunc)

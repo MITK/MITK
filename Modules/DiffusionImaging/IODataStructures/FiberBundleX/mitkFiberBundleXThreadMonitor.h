@@ -33,6 +33,7 @@ namespace mitk {
    * \brief Base Class for Fiber Bundles;   */
   class  MitkDiffusionImaging_EXPORT FiberBundleXThreadMonitor : public BaseData
   {
+
   public:
 
     // ======virtual methods must have======
@@ -53,9 +54,13 @@ namespace mitk {
   protected:
     FiberBundleXThreadMonitor();
     virtual ~FiberBundleXThreadMonitor();
+    
 
   private:
     QString m_Label1;
+    
+
+    
         
 
     

@@ -178,6 +178,52 @@ void QmitkFiberGenerateRandomWorker::run()
   
 }
 
+
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ * --update GUI elements of thread monitor--*/
+QmitkFiberThreadMonitorWorker::QmitkFiberThreadMonitorWorker( QThread* hostingThread, Package4WorkingThread itemPackage )
+: m_itemPackage(itemPackage),
+m_hostingThread(hostingThread)
+{
+  m_thtimer  = new QTimer;
+  m_thtimer2 = new QTimer;
+  
+  connect (m_thtimer2, SIGNAL( timeout()), this, SLOT( qgoodbye() ) );
+  connect (m_thtimer, SIGNAL( timeout()), this, SLOT( qrunner() ) );
+
+}
+void QmitkFiberThreadMonitorWorker::run()
+{
+  
+}
+
+void QmitkFiberThreadMonitorWorker::sayHello()
+{
+  MITK_INFO << "...SERVUS HANSI...";
+  m_thtimer->setInterval(100);
+  m_thtimer->start();
+  
+}
+
+void QmitkFiberThreadMonitorWorker::sayGoodbye()
+{
+    MITK_INFO << "...Pfiantench liabe leidln...";
+  m_thtimer2->setInterval(100);
+  m_thtimer2->start();
+}
+
+void QmitkFiberThreadMonitorWorker::qrunner()
+{
+  MITK_INFO << "...----RUNRUNRUN----...";  
+  m_thtimer->stop();
+}
+
+void QmitkFiberThreadMonitorWorker::qgoodbye()
+{
+  MITK_INFO << "...----Byebye----...";  
+  m_thtimer2->stop();
+}
 //==============================================
 //======== W O R K E R S ________ E N D ========
 //==============================================
@@ -185,7 +231,7 @@ void QmitkFiberGenerateRandomWorker::run()
 
 
 
-// ========= HERE STARTS THE ACTUAL FIBERBUNDLE DEVELOPER VIEW IMPLEMENTATION ======
+// ========= HERE STARTS THE ACTUAL FIBERB2UNDLE DEVELOPER VIEW IMPLEMENTATION ======
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
@@ -380,7 +426,6 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadOutput)
 {
   
-  MITK_INFO << "YEHAAAAAAAAA WHAT A GREAT DAY!!!!!!";
   MITK_INFO << "lines: " << threadOutput->GetNumberOfLines() << "pnts: " << threadOutput->GetNumberOfPoints();
   //qthread mutex lock
   mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New();
@@ -463,11 +508,14 @@ void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 {
   m_threadInProgress = true;
+  m_fiberThreadMonitorWorker->sayHello();//dummy implementation of purpose
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
 {
   m_threadInProgress = false;
+  m_fiberThreadMonitorWorker->sayGoodbye();//dummy implementationof purpose
+  
   disconnect(m_hostThread, 0, 0, 0);
   m_hostThread->disconnect();
 }
@@ -676,14 +724,6 @@ void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
   
 }
 
-/* THE WORKER ACCESS THIS METHOD TO PASS GENERATED FIBERBUNDLE
- * TO DATASTORAGE */
-void QmitkFiberBundleDeveloperView::SetGeneratedFBX()
-{
-  
-  
-  
-}
 
 void  QmitkFiberBundleDeveloperView::ResetFiberInfoWidget()
 {
@@ -747,6 +787,17 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
   
   if (checkStatus)
   {
+    
+    m_monitorThread = new QThread;
+    struct Package4WorkingThread ItemPackageForThreadMonitor;
+    
+    m_fiberThreadMonitorWorker = new QmitkFiberThreadMonitorWorker(m_monitorThread, ItemPackageForThreadMonitor);
+    
+    m_fiberThreadMonitorWorker->moveToThread(m_monitorThread);
+    connect ( m_monitorThread, SIGNAL( started() ), m_fiberThreadMonitorWorker, SLOT( run() ) );
+    m_monitorThread->start(QThread::LowestPriority);
+    
+    
     mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
     FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
     QString str = "Aloha";
@@ -777,28 +828,30 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
       m_MultiWidget->RequestUpdate(); //necessary??
     }
     
-    for (int i=0 ; i<1000000; ++i)
-    {
-      MITK_INFO << i;
-    }
-    
-    QString str2 = "Alohaaaaaaaaa";
-    FBXThreadMonitor->setTextL1(str2);
-    m_MonitorNode->Modified();
-    m_MultiWidget->RequestUpdate();
-    
-    for (int i=0 ; i<1000000; ++i)
-    {
-      MITK_INFO << i;
-    }
-    QString str3 = "Alooooooooooooooooohaaaaaaaaa";
-    FBXThreadMonitor->setTextL1(str3);
-    m_MonitorNode->Modified();
-    m_MultiWidget->RequestUpdate();
-    
+//    for (int i=0 ; i<1000000; ++i)
+//    {
+//      MITK_INFO << i;
+//    }
+//    
+//    QString str2 = "Alohaaaaaaaaa";
+//    FBXThreadMonitor->setTextL1(str2);
+//    m_MonitorNode->Modified();
+//    m_MultiWidget->RequestUpdate();
+//    
+//    for (int i=0 ; i<1000000; ++i)
+//    {
+//      MITK_INFO << i;
+//    }
+//    QString str3 = "Alooooooooooooooooohaaaaaaaaa";
+//    FBXThreadMonitor->setTextL1(str3);
+//    m_MonitorNode->Modified();
+//    m_MultiWidget->RequestUpdate();
+//    
 
     
   } else {
+    m_monitorThread->quit();
+    //think about outsourcing following lines to quit / terminate slot of thread
     GetDataStorage()->Remove(m_MonitorNode);
     GetDataStorage()->Modified();
     m_MultiWidget->RequestUpdate(); //necessary??
@@ -832,10 +885,14 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
    */
   m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
   ResetFiberInfoWidget();
-  FBXDependendGUIElementsConfigurator(false);
-  m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
-  m_Controls->infoTimerGenerateFiberBundle->setText( "-" );
-  //====================================================
+  FBXDependendGUIElementsConfigurator(false); //every gui element which needs a FBX for processing is disabled
+  
+  //timer reset only when no thread is in progress
+  if (!m_threadInProgress) {
+    m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
+    m_Controls->infoTimerGenerateFiberBundle->setText( "-" );
+  }
+ //====================================================
   
   
   if (nodes.empty())

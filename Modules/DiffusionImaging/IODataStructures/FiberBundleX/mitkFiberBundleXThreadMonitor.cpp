@@ -22,12 +22,11 @@
 mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
 {
 
-  
 }
 
 mitk::FiberBundleXThreadMonitor::~FiberBundleXThreadMonitor()
 {
-
+ 
 }
 
 void mitk::FiberBundleXThreadMonitor::setTextL1(QString txt)
@@ -66,3 +65,4 @@ void mitk::FiberBundleXThreadMonitor::SetRequestedRegion( itk::DataObject *data 
 {
   
 }
+

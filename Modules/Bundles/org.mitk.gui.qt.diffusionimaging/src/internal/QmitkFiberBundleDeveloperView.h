@@ -73,16 +73,12 @@ class QmitkFiberIDWorker : public QObject
   Q_OBJECT
   
 public:
-  
   QmitkFiberIDWorker( QThread*, Package4WorkingThread );
   
   public slots:
-  
   void run();
   
 private:
-  //mitk::FiberBundleX* m_FBX;
-
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   
@@ -97,23 +93,40 @@ class QmitkFiberGenerateRandomWorker : public QObject
   Q_OBJECT
   
 public:
-  
   QmitkFiberGenerateRandomWorker( QThread*, Package4WorkingThread );
   
   public slots:
-  
   void run();
   
 private:
-  //mitk::FiberBundleX* m_FBX;
-  
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   
   
 };
 
-
+class QmitkFiberThreadMonitorWorker : public QObject
+{
+  Q_OBJECT
+  
+public:
+  QmitkFiberThreadMonitorWorker( QThread*, Package4WorkingThread );
+  
+  void sayHello();
+  void sayGoodbye();
+  
+  public slots:
+  void run();
+  void qrunner();
+  void qgoodbye();
+  
+private:
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+  QTimer* m_thtimer;
+  QTimer* m_thtimer2;
+  
+};
 
 
 
@@ -221,9 +234,10 @@ protected:
   QmitkFiberGenerateRandomWorker * m_GeneratorFibersRandom;
   
   QThread * m_hostThread;
+  QThread * m_monitorThread; 
   bool m_threadInProgress;
   mitk::DataNode::Pointer m_MonitorNode;
-  
+  QmitkFiberThreadMonitorWorker *m_fiberThreadMonitorWorker;
 
 };
 

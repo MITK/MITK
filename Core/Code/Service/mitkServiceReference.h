@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include <mitkAny.h>
+#include <mitkConfig.h>
 
 #ifdef MITK_HAS_UNORDERED_MAP_H
 namespace std {

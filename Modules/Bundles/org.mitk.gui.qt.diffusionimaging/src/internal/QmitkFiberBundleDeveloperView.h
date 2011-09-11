@@ -55,10 +55,16 @@ struct Package4WorkingThread
   QTimer* st_FancyGUITimer1;
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
   
+  
+  
   //functors to outdoor methods
   QmitkFiberBundleDeveloperView* st_host;
   void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) (vtkPolyData*);
   
+  //host MITK I/O elements
+  mitk::DataStorage::Pointer st_DataStorage;
+  mitk::DataNode::Pointer st_ThreadMonitorDataNode;
+  QmitkStdMultiWidget* st_MultiWidget;
   
 };
 
@@ -112,19 +118,23 @@ class QmitkFiberThreadMonitorWorker : public QObject
 public:
   QmitkFiberThreadMonitorWorker( QThread*, Package4WorkingThread );
   
-  void sayHello();
+  void threadForFiberProcessingStarted();
   void sayGoodbye();
   
   public slots:
   void run();
-  void qrunner();
+  void fancyTextFading_threadStarted();
   void qgoodbye();
   
 private:
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
-  QTimer* m_thtimer;
+  QTimer* m_thtimer_threadStarted;
   QTimer* m_thtimer2;
+  
+  // flags for fancy fading
+  bool m_decreaseOpacity_threadStarted;
+
   
 };
 

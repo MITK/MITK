@@ -181,28 +181,39 @@ void QmitkFiberGenerateRandomWorker::run()
 
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
- * --update GUI elements of thread monitor--*/
+ * --update GUI elements of thread monitor--
+ * implementation not thread safe, not needed so far because
+ * there exists only 1 thread for fiberprocessing
+ * for threadsafety, you need to implement checking mechanisms in methods "::threadFor...." */
 QmitkFiberThreadMonitorWorker::QmitkFiberThreadMonitorWorker( QThread* hostingThread, Package4WorkingThread itemPackage )
 : m_itemPackage(itemPackage),
 m_hostingThread(hostingThread)
 {
-  m_thtimer  = new QTimer;
+
+  
+  //set timers
+  m_thtimer_threadStarted  = new QTimer;
+  m_thtimer_threadStarted->setInterval(100);
+  
   m_thtimer2 = new QTimer;
   
+  connect (m_thtimer_threadStarted, SIGNAL( timeout()), this, SLOT( fancyTextFading_threadStarted() ) );
   connect (m_thtimer2, SIGNAL( timeout()), this, SLOT( qgoodbye() ) );
-  connect (m_thtimer, SIGNAL( timeout()), this, SLOT( qrunner() ) );
-
+  
+  //first, the current text shall turn transparent
+  m_decreaseOpacity_threadStarted = true;
+  
 }
 void QmitkFiberThreadMonitorWorker::run()
 {
   
 }
 
-void QmitkFiberThreadMonitorWorker::sayHello()
+void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
 {
-  MITK_INFO << "...SERVUS HANSI...";
-  m_thtimer->setInterval(100);
-  m_thtimer->start();
+  MITK_INFO << "...thread initialized...";
+  
+  m_thtimer_threadStarted->start();
   
 }
 
@@ -213,10 +224,37 @@ void QmitkFiberThreadMonitorWorker::sayGoodbye()
   m_thtimer2->start();
 }
 
-void QmitkFiberThreadMonitorWorker::qrunner()
+void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 {
   MITK_INFO << "...----RUNRUNRUN----...";  
-  m_thtimer->stop();
+  
+  if (m_decreaseOpacity_threadStarted) {
+
+    /*int currentOpacity = QString.toInt( */ m_itemPackage.st_ThreadMonitorDataNode; /* ->getCurrentOpacityValue() */
+    m_itemPackage.st_ThreadMonitorDataNode; /* ->SetCuerrentOpacity( --currentOpacity )*/
+    m_itemPackage.st_ThreadMonitorDataNode->Modified();
+//    m_itemPackage.st_MultiWidget->RequestUpdate(rendererOfRenWin4);
+    
+    if (true /* DN->current_opacity == 0.0 */) {
+      m_decreaseOpacity_threadStarted = false;
+    }
+    
+  } else {
+    
+    
+    /*int currentOpacity = QString.toInt( */ m_itemPackage.st_ThreadMonitorDataNode; /* ->getCurrentOpacityValue() */
+    m_itemPackage.st_ThreadMonitorDataNode; /* ->SetCuerrentOpacity( ++currentOpacity )*/
+    m_itemPackage.st_ThreadMonitorDataNode->Modified();
+    //    m_itemPackage.st_MultiWidget->RequestUpdate(rendererOfRenWin4);
+    
+    if (true /* GET CURRENT OPACITY VALUE == DN->getDesiredOpacityValue() */) {
+      m_thtimer_threadStarted->stop();
+    }
+
+    
+  }
+  
+
 }
 
 void QmitkFiberThreadMonitorWorker::qgoodbye()
@@ -508,7 +546,7 @@ void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 {
   m_threadInProgress = true;
-  m_fiberThreadMonitorWorker->sayHello();//dummy implementation of purpose
+  m_fiberThreadMonitorWorker->threadForFiberProcessingStarted();
 }
 
 void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
@@ -788,16 +826,7 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
   if (checkStatus)
   {
     
-    m_monitorThread = new QThread;
-    struct Package4WorkingThread ItemPackageForThreadMonitor;
-    
-    m_fiberThreadMonitorWorker = new QmitkFiberThreadMonitorWorker(m_monitorThread, ItemPackageForThreadMonitor);
-    
-    m_fiberThreadMonitorWorker->moveToThread(m_monitorThread);
-    connect ( m_monitorThread, SIGNAL( started() ), m_fiberThreadMonitorWorker, SLOT( run() ) );
-    m_monitorThread->start(QThread::LowestPriority);
-    
-    
+    // Generate Node hosting thread information
     mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
     FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
     QString str = "Aloha";
@@ -811,6 +840,7 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
     
     GetDataStorage()->Add(m_MonitorNode);
     
+    //following code is needed for rendering text in mitk! without geometry nothing is rendered
     const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();	
     if (tsgeo == NULL) {
       /* GetDataStorage()->Modified etc. have no effect, therefore proceed as followed below */
@@ -827,26 +857,22 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
       GetDataStorage()->Modified();
       m_MultiWidget->RequestUpdate(); //necessary??
     }
+    //__GEOMETRY FOR THREADMONITOR GENERATED
     
-//    for (int i=0 ; i<1000000; ++i)
-//    {
-//      MITK_INFO << i;
-//    }
-//    
-//    QString str2 = "Alohaaaaaaaaa";
-//    FBXThreadMonitor->setTextL1(str2);
-//    m_MonitorNode->Modified();
-//    m_MultiWidget->RequestUpdate();
-//    
-//    for (int i=0 ; i<1000000; ++i)
-//    {
-//      MITK_INFO << i;
-//    }
-//    QString str3 = "Alooooooooooooooooohaaaaaaaaa";
-//    FBXThreadMonitor->setTextL1(str3);
-//    m_MonitorNode->Modified();
-//    m_MultiWidget->RequestUpdate();
-//    
+    /* ====== initialize thread for managing fiberThread information ========= */
+    m_monitorThread = new QThread;
+    // the package needs datastorage, MonitorDatanode, standardmultiwidget,  
+    struct Package4WorkingThread ItemPackageForThreadMonitor;
+    ItemPackageForThreadMonitor.st_DataStorage = GetDataStorage();
+    ItemPackageForThreadMonitor.st_ThreadMonitorDataNode = m_MonitorNode;
+    ItemPackageForThreadMonitor.st_MultiWidget = m_MultiWidget;
+    
+    m_fiberThreadMonitorWorker = new QmitkFiberThreadMonitorWorker(m_monitorThread, ItemPackageForThreadMonitor);
+    
+    m_fiberThreadMonitorWorker->moveToThread(m_monitorThread);
+    connect ( m_monitorThread, SIGNAL( started() ), m_fiberThreadMonitorWorker, SLOT( run() ) );
+    m_monitorThread->start(QThread::LowestPriority);
+    
 
     
   } else {

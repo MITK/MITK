@@ -27,11 +27,15 @@
 
 
 mitk::FiberBundleXThreadMonitorMapper3D::FiberBundleXThreadMonitorMapper3D()
-:m_FiberMonitorMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
- m_TextActor(vtkSmartPointer<vtkTextActor>::New()),
- m_FiberAssembly(vtkPropAssembly::New())
+: m_FiberMonitorMapper(vtkSmartPointer<vtkPolyDataMapper>::New())
+, m_TextActorClose(vtkSmartPointer<vtkTextActor>::New())
+, m_TextActorOpen(vtkSmartPointer<vtkTextActor>::New())
+, m_TextActorHeading(vtkSmartPointer<vtkTextActor>::New())
+, m_FiberAssembly(vtkPropAssembly::New())
 {
-m_FiberAssembly->AddPart(m_TextActor);
+  m_FiberAssembly->AddPart(m_TextActorClose);
+  m_FiberAssembly->AddPart(m_TextActorOpen);
+  m_FiberAssembly->AddPart(m_TextActorHeading);
 }
 
 
@@ -55,22 +59,40 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
 {
   FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetData() );
 
-  monitor->getBracketOpen();
-  monitor->getBracketClose();
+
+
   monitor->getBracketClosePosition();
   
-  monitor->getHeading();
+ 
   
 //	m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
-  m_TextActor->SetInput( monitor->getBracketClose().toStdString().c_str() );
-  vtkTextProperty* tprop = m_TextActor->GetTextProperty();
-  tprop->SetFontFamilyToArial ();
-  tprop->SetLineSpacing(1.0);
-  tprop->SetFontSize(20);
-  tprop->SetColor(1.0,0.0,0.0);
-  m_TextActor->SetDisplayPosition( monitor->getBracketClosePosition()[0], monitor->getBracketClosePosition()[1] );
-  m_TextActor->Modified();
+  m_TextActorClose->SetInput( monitor->getBracketClose().toStdString().c_str() );
+  vtkTextProperty* tpropClose = m_TextActorClose->GetTextProperty();
+  //tprop->SetFontFamilyToArial ();
+  //tprop->SetLineSpacing(1.0);
+  tpropClose->SetFontSize(20);
+  tpropClose->SetColor(255.0,255.0,255.0);
+  m_TextActorClose->SetDisplayPosition( monitor->getBracketClosePosition()[0], monitor->getBracketClosePosition()[1] );
+  m_TextActorClose->Modified();
   
+  
+  m_TextActorOpen->SetInput( monitor->getBracketOpen().toStdString().c_str() );
+  vtkTextProperty* tpropOpen = m_TextActorOpen->GetTextProperty();
+  //tprop->SetFontFamilyToArial ();
+  //tprop->SetLineSpacing(1.0);
+  tpropOpen->SetFontSize(20);
+  tpropOpen->SetColor(255.0,255.0,255.0);
+  m_TextActorOpen->SetDisplayPosition( monitor->getBracketOpenPosition()[0], monitor->getBracketOpenPosition()[1] );
+  m_TextActorOpen->Modified();
+  
+  
+  m_TextActorHeading->SetInput(  monitor->getHeading().toStdString().c_str() );
+  vtkTextProperty* tpropHeading = m_TextActorHeading->GetTextProperty();
+  tpropHeading->SetFontSize(20);
+  tpropHeading->SetOpacity( monitor->getHeadingOpacity() );
+  tpropHeading->SetColor(255.0,255.0,255.0);
+  m_TextActorHeading->SetDisplayPosition( monitor->getHeadingPosition()[0], monitor->getHeadingPosition()[1] );
+  m_TextActorHeading->Modified();
   
 }
 

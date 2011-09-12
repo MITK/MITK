@@ -186,8 +186,10 @@ void QmitkFiberGenerateRandomWorker::run()
  * there exists only 1 thread for fiberprocessing
  * for threadsafety, you need to implement checking mechanisms in methods "::threadFor...." */
 QmitkFiberThreadMonitorWorker::QmitkFiberThreadMonitorWorker( QThread* hostingThread, Package4WorkingThread itemPackage )
-: m_itemPackage(itemPackage),
-m_hostingThread(hostingThread)
+: m_itemPackage(itemPackage)
+, m_hostingThread(hostingThread)
+, m_pixelstepper(10) 
+, m_steppingDistance(110) //use only a multiple value of pixelstepper
 {
 
   
@@ -196,7 +198,7 @@ m_hostingThread(hostingThread)
   m_thtimer_threadStarted->setInterval(100);
   
   m_thtimer_initMonitor = new QTimer;
-  m_thtimer_initMonitor->setInterval(20);
+  m_thtimer_initMonitor->setInterval(10);
   
   connect (m_thtimer_threadStarted, SIGNAL( timeout()), this, SLOT( fancyTextFading_threadStarted() ) );
   connect (m_thtimer_initMonitor, SIGNAL( timeout()), this, SLOT( fancyMonitorInitialization() ) );
@@ -212,8 +214,6 @@ void QmitkFiberThreadMonitorWorker::run()
 
 void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
 {
-  MITK_INFO << "...thread initialized...";
-  
   m_thtimer_threadStarted->start();
   
 }
@@ -225,8 +225,7 @@ void QmitkFiberThreadMonitorWorker::initializeMonitor()
 
 void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 {
-  MITK_INFO << "...----RUNRUNRUN----...";  
-  
+    
   if (m_decreaseOpacity_threadStarted) {
 
     /*int currentOpacity = QString.toInt( */ m_itemPackage.st_ThreadMonitorDataNode; /* ->getCurrentOpacityValue() */
@@ -258,16 +257,22 @@ void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 
 void QmitkFiberThreadMonitorWorker::fancyMonitorInitialization()
 {
-  MITK_INFO << "...----move move move----...";
+  
   mitk::Point2D pntClose = m_itemPackage.st_FBX_Monitor->getBracketClosePosition(); //possible bottleneck, set pntClose to member
-  pntClose[0] += 1;
+  mitk::Point2D pntOpen = m_itemPackage.st_FBX_Monitor->getBracketOpenPosition(); //possible bottleneck, set pntClose to member
+ 
+  pntClose[0] += m_pixelstepper;
+  pntOpen[0] -= m_pixelstepper;
   m_itemPackage.st_FBX_Monitor->setBracketClosePosition(pntClose);
+  m_itemPackage.st_FBX_Monitor->setBracketOpenPosition(pntOpen);
+  
+  
   
   m_itemPackage.st_ThreadMonitorDataNode->Modified();
   m_itemPackage.st_MultiWidget->RequestUpdate();
   
-  
-  if (pntClose[1] == 100)
+   
+  if (pntClose[0] >= m_steppingDistance)
     m_thtimer_initMonitor->stop();
 
 }
@@ -288,6 +293,8 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
 : QmitkFunctionality()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
+, m_FiberIDGenerator( NULL)
+, m_GeneratorFibersRandom( NULL )
 {
   m_hostThread = new QThread;
   m_threadInProgress = false;

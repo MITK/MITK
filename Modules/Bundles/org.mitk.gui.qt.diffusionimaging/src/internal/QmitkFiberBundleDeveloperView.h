@@ -137,6 +137,10 @@ private:
   
   // flags for fancy fading
   bool m_decreaseOpacity_threadStarted;
+  
+  // members for fancy animation
+  int m_pixelstepper;
+  int m_steppingDistance;
 
   
 };

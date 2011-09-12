@@ -67,7 +67,9 @@ namespace mitk {
 
 
     vtkSmartPointer<vtkPolyDataMapper> m_FiberMonitorMapper;
-    vtkSmartPointer<vtkTextActor> m_TextActor;
+    vtkSmartPointer<vtkTextActor> m_TextActorClose;
+    vtkSmartPointer<vtkTextActor> m_TextActorOpen;
+    vtkSmartPointer<vtkTextActor> m_TextActorHeading;
     vtkPropAssembly* m_FiberAssembly;
     
 

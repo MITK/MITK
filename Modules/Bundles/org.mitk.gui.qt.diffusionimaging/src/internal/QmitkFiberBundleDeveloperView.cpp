@@ -32,7 +32,7 @@
 
 // MITK
 //#include <mitkFiberBundleX.h> //for fiberStructure
-#include <mitkFiberBundleXThreadMonitor.h>
+
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -195,10 +195,11 @@ m_hostingThread(hostingThread)
   m_thtimer_threadStarted  = new QTimer;
   m_thtimer_threadStarted->setInterval(100);
   
-  m_thtimer2 = new QTimer;
+  m_thtimer_initMonitor = new QTimer;
+  m_thtimer_initMonitor->setInterval(100);
   
   connect (m_thtimer_threadStarted, SIGNAL( timeout()), this, SLOT( fancyTextFading_threadStarted() ) );
-  connect (m_thtimer2, SIGNAL( timeout()), this, SLOT( qgoodbye() ) );
+  connect (m_thtimer_initMonitor, SIGNAL( timeout()), this, SLOT( fancyMonitorInitialization() ) );
   
   //first, the current text shall turn transparent
   m_decreaseOpacity_threadStarted = true;
@@ -217,11 +218,11 @@ void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
   
 }
 
-void QmitkFiberThreadMonitorWorker::sayGoodbye()
+void QmitkFiberThreadMonitorWorker::initializeMonitor()
 {
-    MITK_INFO << "...Pfiantench liabe leidln...";
-  m_thtimer2->setInterval(100);
-  m_thtimer2->start();
+  MITK_INFO << "...Pfiantench liabe leidln...";
+
+  m_thtimer_initMonitor->start();
 }
 
 void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
@@ -257,10 +258,11 @@ void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 
 }
 
-void QmitkFiberThreadMonitorWorker::qgoodbye()
+void QmitkFiberThreadMonitorWorker::fancyMonitorInitialization()
 {
-  MITK_INFO << "...----Byebye----...";  
-  m_thtimer2->stop();
+  MITK_INFO << "...----Byebye----...";
+  mitk::Point2D pntClose = m_itemPackage.st_FBX_Monitor->getBracketClosePosition();
+  m_thtimer_initMonitor->stop();
 }
 //==============================================
 //======== W O R K E R S ________ E N D ========
@@ -552,7 +554,7 @@ void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
 {
   m_threadInProgress = false;
-  m_fiberThreadMonitorWorker->sayGoodbye();//dummy implementationof purpose
+  //m_fiberThreadMonitorWorker->sayGoodbye();//dummy implementationof purpose
   
   disconnect(m_hostThread, 0, 0, 0);
   m_hostThread->disconnect();
@@ -866,13 +868,14 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
     ItemPackageForThreadMonitor.st_DataStorage = GetDataStorage();
     ItemPackageForThreadMonitor.st_ThreadMonitorDataNode = m_MonitorNode;
     ItemPackageForThreadMonitor.st_MultiWidget = m_MultiWidget;
+    ItemPackageForThreadMonitor.st_FBX_Monitor = FBXThreadMonitor;
     
     m_fiberThreadMonitorWorker = new QmitkFiberThreadMonitorWorker(m_monitorThread, ItemPackageForThreadMonitor);
     
     m_fiberThreadMonitorWorker->moveToThread(m_monitorThread);
     connect ( m_monitorThread, SIGNAL( started() ), m_fiberThreadMonitorWorker, SLOT( run() ) );
     m_monitorThread->start(QThread::LowestPriority);
-    
+    m_fiberThreadMonitorWorker->initializeMonitor();//do some init animation ;-)
 
     
   } else {

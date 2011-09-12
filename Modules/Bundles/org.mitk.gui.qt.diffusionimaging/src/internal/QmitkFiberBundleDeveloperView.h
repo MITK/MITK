@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorage.h>
 #include <mitkDataStorageSelection.h>
 #include <mitkWeakPointer.h>
+#include <mitkFiberBundleXThreadMonitor.h>
 
 // Qt
 #include <QVector>
@@ -42,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QTimer>
 #include <QThread>
+
 
 class QmitkFiberBundleDeveloperView; //this include is needed for the struct element, especially for functors to QmitkFiberBundleDeveloperView
 
@@ -62,9 +64,10 @@ struct Package4WorkingThread
   void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) (vtkPolyData*);
   
   //host MITK I/O elements
-  mitk::DataStorage::Pointer st_DataStorage;
-  mitk::DataNode::Pointer st_ThreadMonitorDataNode;
-  QmitkStdMultiWidget* st_MultiWidget;
+  mitk::FiberBundleXThreadMonitor::Pointer st_FBX_Monitor; //needed for direct access do animation/fancy methods
+  mitk::DataNode::Pointer st_ThreadMonitorDataNode; //needed for renderer to recognize node modifications
+  mitk::DataStorage::Pointer st_DataStorage; //well that is discussable if needed ;-) probably not
+  QmitkStdMultiWidget* st_MultiWidget; //needed for rendering update
   
 };
 
@@ -119,18 +122,18 @@ public:
   QmitkFiberThreadMonitorWorker( QThread*, Package4WorkingThread );
   
   void threadForFiberProcessingStarted();
-  void sayGoodbye();
+  void initializeMonitor();
   
   public slots:
   void run();
   void fancyTextFading_threadStarted();
-  void qgoodbye();
+  void fancyMonitorInitialization();
   
 private:
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   QTimer* m_thtimer_threadStarted;
-  QTimer* m_thtimer2;
+  QTimer* m_thtimer_initMonitor;
   
   // flags for fancy fading
   bool m_decreaseOpacity_threadStarted;

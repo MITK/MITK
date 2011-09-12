@@ -51,12 +51,35 @@ namespace mitk {
     void setTextL1(QString);
     QString getTextL1();
     
+    QString getBracketOpen();
+    mitk::Point2D  getBracketOpenPosition();
+    QString getBracketOpenOpacity(); // range 0 - 100
+    
+    QString getBracketClose();
+    mitk::Point2D  getBracketClosePosition();
+    void setBracketClosePosition(mitk::Point2D);
+    int getBracketCloseOpacity(); // range 0 - 100
+
+    QString getHeading();
+    mitk::Point2D getHeadingPosition();
+    int getHeadingOpacity(); // range 0 - 100
+    
+    
   protected:
     FiberBundleXThreadMonitor();
     virtual ~FiberBundleXThreadMonitor();
     
 
   private:
+    QString m_monitorBracketOpen;
+    mitk::Point2D m_monitorBracketOpenPosition;
+    
+    QString m_monitorBracketClose;
+    mitk::Point2D m_monitorBracketClosePosition;
+
+    QString m_monitorHeading;
+    mitk::Point2D m_monitorHeadingPosition;
+    
     QString m_Label1;
     
 

@@ -20,8 +20,14 @@
 
 
 mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
+: m_monitorBracketOpen("["),
+  m_monitorBracketClose("]"),
+  m_monitorHeading("Monitoring Fiberprocessing Threads")
 {
-
+  m_monitorBracketOpenPosition[0] = 10;
+  m_monitorBracketOpenPosition[1] = 10;
+  m_monitorBracketClosePosition[0] = m_monitorBracketOpenPosition[0];
+  m_monitorBracketClosePosition[1] = m_monitorBracketOpenPosition[1];
 }
 
 mitk::FiberBundleXThreadMonitor::~FiberBundleXThreadMonitor()
@@ -41,6 +47,32 @@ QString mitk::FiberBundleXThreadMonitor::getTextL1()
 //setter textproperty opacity etc....
 //setter color
 //setter text
+
+
+
+
+QString mitk::FiberBundleXThreadMonitor::getBracketOpen(){
+  return m_monitorBracketOpen;
+}
+mitk::Point2D mitk::FiberBundleXThreadMonitor::getBracketOpenPosition(){
+  return m_monitorBracketOpenPosition;
+}
+QString mitk::FiberBundleXThreadMonitor::getBracketClose(){
+  return m_monitorBracketClose;
+}
+mitk::Point2D mitk::FiberBundleXThreadMonitor::getBracketClosePosition(){
+  return m_monitorBracketClosePosition;
+}
+void mitk::FiberBundleXThreadMonitor::setBracketClosePosition(mitk::Point2D pnt){
+  m_monitorBracketClosePosition[0] = pnt[0];
+  m_monitorBracketClosePosition[1] = pnt[1];
+}
+
+
+
+QString mitk::FiberBundleXThreadMonitor::getHeading(){
+  return m_monitorHeading;
+}
 
 
 

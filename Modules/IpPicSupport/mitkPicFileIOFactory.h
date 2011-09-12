@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #pragma warning ( disable : 4786 )
 #endif
 
+#include "IpPicSupportExports.h"
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 
@@ -30,7 +31,7 @@ namespace mitk
 //## @brief Create instances of PicFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITK_CORE_EXPORT PicFileIOFactory : public itk::ObjectFactoryBase
+class IpPicSupport_EXPORT PicFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

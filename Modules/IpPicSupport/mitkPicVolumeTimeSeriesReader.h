@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _PIC_VOLUME_TIME_SERIES_READER__H_
 #define _PIC_VOLUME_TIME_SERIES_READER__H_
 
-#include <MitkExports.h>
+#include <IpPicSupportExports.h>
 #include "mitkFileSeriesReader.h"
 #include "mitkImageSource.h"
 #include <vector>
@@ -29,7 +29,7 @@ namespace mitk
 //##Documentation
 //## @brief Reader to read a series of volume files in DKFZ-pic-format
 //## @ingroup IO
-class MITK_CORE_EXPORT PicVolumeTimeSeriesReader : public ImageSource, public FileSeriesReader
+class IpPicSupport_EXPORT PicVolumeTimeSeriesReader : public ImageSource, public FileSeriesReader
 {
 public:
     mitkClassMacro( PicVolumeTimeSeriesReader, FileReader );

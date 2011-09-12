@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
-#include <MitkExports.h>
+#include "IpPicSupportExports.h"
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
@@ -31,7 +31,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format
 //## @ingroup IO
-class MITK_CORE_EXPORT PicFileReader : public ImageSource, public FileReader
+class IpPicSupport_EXPORT PicFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(PicFileReader, FileReader);

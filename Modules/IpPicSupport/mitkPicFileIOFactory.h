@@ -51,12 +51,14 @@ public:
   itkTypeMacro(PicFileIOFactory, ObjectFactoryBase);
 
   /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
+/*  static void RegisterOneFactory(void)
   {
+    std::cout << "Register PicFile Factory.";
+
     PicFileIOFactory::Pointer PicFileIOFactory = PicFileIOFactory::New();
     ObjectFactoryBase::RegisterFactory(PicFileIOFactory);
   }
-  
+*/
 protected:
   PicFileIOFactory();
   ~PicFileIOFactory();

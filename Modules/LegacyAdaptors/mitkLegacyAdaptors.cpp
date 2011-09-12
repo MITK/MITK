@@ -22,7 +22,15 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg)
 
 mitk::ImageDescriptor::Pointer mitk::CastToImageDescriptor(mitkIpPicDescriptor *desc)
 {
+  mitk::ImageDescriptor::Pointer imDescriptor = mitk::ImageDescriptor::New();
 
+  imDescriptor->Initialize( desc->n, desc->dim );
+
+  // cast IpPicType to PixelType
+  mitk::PixelType ptype = MakePixelType<short,short,1>();
+  imDescriptor->AddNewChannel(ptype, "imported by pic");
+
+  return imDescriptor;
 }
 
 mitkIpPicType_t mitk::CastToIpPicType(const mitk::PixelType &ptype)

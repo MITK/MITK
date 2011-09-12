@@ -6,7 +6,7 @@ if(BUILD_TESTING)
     # package testing in windows only for release
     if(WIN32)
       add_test(NAME mitkPackageTest CONFIGURATIONS Release
-               COMMAND ${CMAKE_COMMANDS} --build ${MITK_BINARY_DIR} --config Release --target package)
+               COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config Release --target package)
 
       set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 3600

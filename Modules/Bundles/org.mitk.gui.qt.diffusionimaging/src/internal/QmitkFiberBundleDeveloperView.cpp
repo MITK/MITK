@@ -196,7 +196,7 @@ m_hostingThread(hostingThread)
   m_thtimer_threadStarted->setInterval(100);
   
   m_thtimer_initMonitor = new QTimer;
-  m_thtimer_initMonitor->setInterval(100);
+  m_thtimer_initMonitor->setInterval(20);
   
   connect (m_thtimer_threadStarted, SIGNAL( timeout()), this, SLOT( fancyTextFading_threadStarted() ) );
   connect (m_thtimer_initMonitor, SIGNAL( timeout()), this, SLOT( fancyMonitorInitialization() ) );
@@ -220,8 +220,6 @@ void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
 
 void QmitkFiberThreadMonitorWorker::initializeMonitor()
 {
-  MITK_INFO << "...Pfiantench liabe leidln...";
-
   m_thtimer_initMonitor->start();
 }
 
@@ -260,9 +258,18 @@ void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 
 void QmitkFiberThreadMonitorWorker::fancyMonitorInitialization()
 {
-  MITK_INFO << "...----Byebye----...";
-  mitk::Point2D pntClose = m_itemPackage.st_FBX_Monitor->getBracketClosePosition();
-  m_thtimer_initMonitor->stop();
+  MITK_INFO << "...----move move move----...";
+  mitk::Point2D pntClose = m_itemPackage.st_FBX_Monitor->getBracketClosePosition(); //possible bottleneck, set pntClose to member
+  pntClose[0] += 1;
+  m_itemPackage.st_FBX_Monitor->setBracketClosePosition(pntClose);
+  
+  m_itemPackage.st_ThreadMonitorDataNode->Modified();
+  m_itemPackage.st_MultiWidget->RequestUpdate();
+  
+  
+  if (pntClose[1] == 100)
+    m_thtimer_initMonitor->stop();
+
 }
 //==============================================
 //======== W O R K E R S ________ E N D ========

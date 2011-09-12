@@ -57,15 +57,18 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
 
   monitor->getBracketOpen();
   monitor->getBracketClose();
+  monitor->getBracketClosePosition();
+  
   monitor->getHeading();
   
-	m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
+//	m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
+  m_TextActor->SetInput( monitor->getBracketClose().toStdString().c_str() );
   vtkTextProperty* tprop = m_TextActor->GetTextProperty();
   tprop->SetFontFamilyToArial ();
   tprop->SetLineSpacing(1.0);
   tprop->SetFontSize(20);
   tprop->SetColor(1.0,0.0,0.0);
-  m_TextActor->SetDisplayPosition( 20, 20 );
+  m_TextActor->SetDisplayPosition( monitor->getBracketClosePosition()[0], monitor->getBracketClosePosition()[1] );
   m_TextActor->Modified();
   
   

@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "ctkCommandLineParser.h"
+#include <PluginGeneratorConfig.h>
 
 #include <QCoreApplication>
 #include <QTextStream>
@@ -127,8 +128,10 @@ bool generateFiles(const QHash<QString, QString>& parameters,
 
 int main(int argc, char** argv)
 {
+  QString appName("MITKPluginGenerator");
+
   QCoreApplication app(argc, argv);
-  app.setApplicationName("PluginGenerator");
+  app.setApplicationName(appName);
   app.setOrganizationName("DKFZ");
   
   ctkCommandLineParser parser;
@@ -168,7 +171,7 @@ int main(int argc, char** argv)
   if (!ok)
   {
     QTextStream(stderr, QIODevice::WriteOnly) << "Error parsing arguments: "
-     << parser.errorString() << "\n";
+     << parser.errorString() << "\nType '" << appName << " -h' for help\n";
    return EXIT_FAILURE;
   }
 
@@ -177,7 +180,7 @@ int main(int argc, char** argv)
   // Show a help message
   if (parsedArgs.contains("help"))
   {
-    out << "A CTK plug-in generator for MITK\n\n"
+    out << "A CTK plug-in generator for MITK (version " PLUGIN_GENERATOR_VERSION ")\n\n"
         << parser.helpText();
     return EXIT_SUCCESS;
   }
@@ -199,6 +202,7 @@ int main(int argc, char** argv)
   if (pluginSymbolicName.isEmpty())
   {
     qCritical() << "Required argument 'plugin-symbolic-name' missing.";
+    qCritical("%s%s%s", "Type '", qPrintable(appName), " -h' for help");
     return EXIT_FAILURE;
   }
 
@@ -223,6 +227,7 @@ int main(int argc, char** argv)
   if (viewName.isEmpty())
   {
     qCritical() << "Required argument 'view-name' missing.";
+    qCritical("%s%s%s", "Type '", qPrintable(appName), " -h' for help");
     return EXIT_FAILURE;
   }
 

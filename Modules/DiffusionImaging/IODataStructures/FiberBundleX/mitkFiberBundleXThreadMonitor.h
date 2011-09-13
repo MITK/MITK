@@ -54,17 +54,24 @@ namespace mitk {
     QString         getBracketOpen();
     mitk::Point2D   getBracketOpenPosition();
     void            setBracketOpenPosition(mitk::Point2D);
-    int             getBracketOpenOpacity(); // range 0 - 100
+    int             getBracketOpenOpacity(); // range 0 - 10,  multiplicationfactor 0.1 (in mapper)
     
     QString         getBracketClose();
     mitk::Point2D   getBracketClosePosition();
     void            setBracketClosePosition(mitk::Point2D);
-    int             getBracketCloseOpacity(); // range 0 - 100
+    int             getBracketCloseOpacity(); // range 0 - 10,  multiplicationfactor 0.1 (in mapper)
 
     QString         getHeading();
     mitk::Point2D   getHeadingPosition();
-    int             getHeadingOpacity(); // range 0 - 100
+    void            setHeadingPosition(mitk::Point2D);
+    int             getHeadingOpacity(); // range 0 - 10,  multiplicationfactor 0.1 (in mapper)
     void            setHeadingOpacity(int);
+    
+    QString         getMask();
+    mitk::Point2D   getMaskPosition();
+    void            setMaskPosition(mitk::Point2D);
+    int             getMaskOpacity(); // multiplicationfactor 0.1 (in mapper)
+    void            setMaskOpacity(int);
     
     
   protected:
@@ -82,6 +89,10 @@ namespace mitk {
     QString m_monitorHeading;
     mitk::Point2D m_monitorHeadingPosition;
     int m_monitorHeadingOpacity;
+    
+    QString m_monitorMask;
+    mitk::Point2D m_monitorMaskPosition;
+    int m_monitorMaskOpacity;
     
     QString m_Label1;
     

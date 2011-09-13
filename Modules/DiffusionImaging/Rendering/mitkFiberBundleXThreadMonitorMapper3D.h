@@ -70,6 +70,7 @@ namespace mitk {
     vtkSmartPointer<vtkTextActor> m_TextActorClose;
     vtkSmartPointer<vtkTextActor> m_TextActorOpen;
     vtkSmartPointer<vtkTextActor> m_TextActorHeading;
+    vtkSmartPointer<vtkTextActor> m_TextActorMask;
     vtkPropAssembly* m_FiberAssembly;
     
 

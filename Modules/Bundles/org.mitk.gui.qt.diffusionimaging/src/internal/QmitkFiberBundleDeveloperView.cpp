@@ -189,7 +189,7 @@ QmitkFiberThreadMonitorWorker::QmitkFiberThreadMonitorWorker( QThread* hostingTh
 : m_itemPackage(itemPackage)
 , m_hostingThread(hostingThread)
 , m_pixelstepper(10) 
-, m_steppingDistance(110) //use only a multiple value of pixelstepper
+, m_steppingDistance(220) //use only a multiple value of pixelstepper
 {
 
   
@@ -200,11 +200,23 @@ QmitkFiberThreadMonitorWorker::QmitkFiberThreadMonitorWorker( QThread* hostingTh
   m_thtimer_initMonitor = new QTimer;
   m_thtimer_initMonitor->setInterval(10);
   
+  m_thtimer_initMonitorSetFinalPosition = new QTimer;
+  m_thtimer_initMonitorSetFinalPosition->setInterval(10);
+  
+  m_thtimer_initMonitorSetMasks = new QTimer;
+  m_thtimer_initMonitorSetFinalPosition->setInterval(10);
+  
+  
   connect (m_thtimer_threadStarted, SIGNAL( timeout()), this, SLOT( fancyTextFading_threadStarted() ) );
   connect (m_thtimer_initMonitor, SIGNAL( timeout()), this, SLOT( fancyMonitorInitialization() ) );
+  connect ( m_thtimer_initMonitorSetFinalPosition, SIGNAL( timeout() ), this, SLOT( fancyMonitorInitializationFinalPos() ) );
+  connect ( m_thtimer_initMonitorSetMasks, SIGNAL( timeout() ), this, SLOT( fancyMonitorInitializationMask() ) );
   
   //first, the current text shall turn transparent
   m_decreaseOpacity_threadStarted = true;
+  
+  
+  
   
 }
 void QmitkFiberThreadMonitorWorker::run()
@@ -220,6 +232,19 @@ void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
 
 void QmitkFiberThreadMonitorWorker::initializeMonitor()
 {
+  //fancy configuration of animation start
+  mitk::Point2D pntOpen;
+  pntOpen[0] = 118;
+  pntOpen[1] = 10;
+  
+  mitk::Point2D headPos;
+  headPos[0] = 19;
+  headPos[1] = 10;
+  
+  m_itemPackage.st_FBX_Monitor->setBracketClosePosition(pntOpen);
+  m_itemPackage.st_FBX_Monitor->setBracketOpenPosition(pntOpen);
+  m_itemPackage.st_FBX_Monitor->setHeadingPosition(headPos);
+  m_itemPackage.st_FBX_Monitor->setMaskPosition(headPos);
   m_thtimer_initMonitor->start();
 }
 
@@ -263,9 +288,15 @@ void QmitkFiberThreadMonitorWorker::fancyMonitorInitialization()
  
   pntClose[0] += m_pixelstepper;
   pntOpen[0] -= m_pixelstepper;
+  //MITK_INFO << pntClose[0] << " " << pntOpen[0];
+                                          
   m_itemPackage.st_FBX_Monitor->setBracketClosePosition(pntClose);
   m_itemPackage.st_FBX_Monitor->setBracketOpenPosition(pntOpen);
   
+  int opacity = m_itemPackage.st_FBX_Monitor->getHeadingOpacity() + 1;
+  if (opacity > 10)
+    opacity = 10;
+  m_itemPackage.st_FBX_Monitor->setHeadingOpacity(opacity);
   
   
   m_itemPackage.st_ThreadMonitorDataNode->Modified();
@@ -273,7 +304,61 @@ void QmitkFiberThreadMonitorWorker::fancyMonitorInitialization()
   
    
   if (pntClose[0] >= m_steppingDistance)
+  {
+    if (m_itemPackage.st_FBX_Monitor->getHeadingOpacity() != 10 )
+    {
+      m_itemPackage.st_FBX_Monitor->setHeadingOpacity(10);
+      m_itemPackage.st_ThreadMonitorDataNode->Modified();
+      m_itemPackage.st_MultiWidget->RequestUpdate();
+    }
+      
     m_thtimer_initMonitor->stop();
+    
+    //position them to obt y=25
+    m_thtimer_initMonitorSetFinalPosition->start();
+  }
+
+}
+
+void QmitkFiberThreadMonitorWorker::fancyMonitorInitializationFinalPos()
+{
+  //get y pos of 
+  mitk::Point2D pntClose = m_itemPackage.st_FBX_Monitor->getBracketClosePosition();
+  mitk::Point2D pntOpen = m_itemPackage.st_FBX_Monitor->getBracketOpenPosition();
+  mitk::Point2D pntHead = m_itemPackage.st_FBX_Monitor->getHeadingPosition();
+  
+  pntClose[1] += 5;
+  pntOpen[1] += 5;
+  pntHead[1] += 5;
+  
+  m_itemPackage.st_FBX_Monitor->setBracketClosePosition(pntClose);
+  m_itemPackage.st_FBX_Monitor->setBracketOpenPosition(pntOpen);
+  m_itemPackage.st_FBX_Monitor->setHeadingPosition(pntHead);
+  
+  m_itemPackage.st_ThreadMonitorDataNode->Modified();
+  m_itemPackage.st_MultiWidget->RequestUpdate();
+
+  if (pntClose[1] >= 35) { //30 = y position
+    m_thtimer_initMonitorSetFinalPosition->stop();
+    
+    //now init mask of labels
+    m_thtimer_initMonitorSetMasks->start();
+  }
+}
+
+void QmitkFiberThreadMonitorWorker::fancyMonitorInitializationMask()
+{
+  //increase opacity
+  int opacity = m_itemPackage.st_FBX_Monitor->getMaskOpacity();
+  ++opacity;
+  m_itemPackage.st_FBX_Monitor->setMaskOpacity(opacity);
+  
+  m_itemPackage.st_ThreadMonitorDataNode->Modified();
+  m_itemPackage.st_MultiWidget->RequestUpdate();
+  
+  if (opacity >=10) {
+    m_thtimer_initMonitorSetMasks->stop();
+  }
 
 }
 //==============================================

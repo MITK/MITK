@@ -31,11 +31,13 @@ mitk::FiberBundleXThreadMonitorMapper3D::FiberBundleXThreadMonitorMapper3D()
 , m_TextActorClose(vtkSmartPointer<vtkTextActor>::New())
 , m_TextActorOpen(vtkSmartPointer<vtkTextActor>::New())
 , m_TextActorHeading(vtkSmartPointer<vtkTextActor>::New())
+, m_TextActorMask(vtkSmartPointer<vtkTextActor>::New())
 , m_FiberAssembly(vtkPropAssembly::New())
 {
   m_FiberAssembly->AddPart(m_TextActorClose);
   m_FiberAssembly->AddPart(m_TextActorOpen);
   m_FiberAssembly->AddPart(m_TextActorHeading);
+  m_FiberAssembly->AddPart(m_TextActorMask);
 }
 
 
@@ -70,7 +72,7 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   vtkTextProperty* tpropClose = m_TextActorClose->GetTextProperty();
   //tprop->SetFontFamilyToArial ();
   //tprop->SetLineSpacing(1.0);
-  tpropClose->SetFontSize(20);
+  tpropClose->SetFontSize(18);
   tpropClose->SetColor(255.0,255.0,255.0);
   m_TextActorClose->SetDisplayPosition( monitor->getBracketClosePosition()[0], monitor->getBracketClosePosition()[1] );
   m_TextActorClose->Modified();
@@ -80,20 +82,32 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   vtkTextProperty* tpropOpen = m_TextActorOpen->GetTextProperty();
   //tprop->SetFontFamilyToArial ();
   //tprop->SetLineSpacing(1.0);
-  tpropOpen->SetFontSize(20);
+  tpropOpen->SetFontSize(18);
   tpropOpen->SetColor(255.0,255.0,255.0);
   m_TextActorOpen->SetDisplayPosition( monitor->getBracketOpenPosition()[0], monitor->getBracketOpenPosition()[1] );
   m_TextActorOpen->Modified();
   
   
+
   m_TextActorHeading->SetInput(  monitor->getHeading().toStdString().c_str() );
   vtkTextProperty* tpropHeading = m_TextActorHeading->GetTextProperty();
-  tpropHeading->SetFontSize(20);
-  tpropHeading->SetOpacity( monitor->getHeadingOpacity() );
+  tpropHeading->SetFontSize(12);
+  tpropHeading->SetOpacity( monitor->getHeadingOpacity() * 0.1 );
   tpropHeading->SetColor(255.0,255.0,255.0);
   m_TextActorHeading->SetDisplayPosition( monitor->getHeadingPosition()[0], monitor->getHeadingPosition()[1] );
   m_TextActorHeading->Modified();
   
+  
+  m_TextActorMask->SetInput(  monitor->getMask().toStdString().c_str() );
+  vtkTextProperty* tpropMask = m_TextActorMask->GetTextProperty();
+  tpropMask->SetFontSize(12);
+  tpropMask->SetOpacity( monitor->getMaskOpacity() * 0.1 );
+  tpropMask->SetColor(255.0,255.0,255.0);
+  m_TextActorMask->SetDisplayPosition( monitor->getMaskPosition()[0], monitor->getMaskPosition()[1] );
+  m_TextActorHeading->Modified();
+  
+  
+
 }
 
 

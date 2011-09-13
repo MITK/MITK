@@ -128,12 +128,16 @@ public:
   void run();
   void fancyTextFading_threadStarted();
   void fancyMonitorInitialization();
+  void fancyMonitorInitializationFinalPos();
+  void fancyMonitorInitializationMask();
   
 private:
   Package4WorkingThread m_itemPackage;
   QThread* m_hostingThread;
   QTimer* m_thtimer_threadStarted;
   QTimer* m_thtimer_initMonitor;
+  QTimer* m_thtimer_initMonitorSetFinalPosition;
+  QTimer* m_thtimer_initMonitorSetMasks;
   
   // flags for fancy fading
   bool m_decreaseOpacity_threadStarted;

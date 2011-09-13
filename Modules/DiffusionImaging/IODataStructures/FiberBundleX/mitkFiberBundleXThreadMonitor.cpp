@@ -20,18 +20,23 @@
 
 
 mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
-: m_monitorBracketOpen("["),
-  m_monitorBracketClose("]"),
-  m_monitorHeading("Monitoring Fiberprocessing Threads")
+: m_monitorBracketOpen("[")
+, m_monitorBracketClose("]")
+, m_monitorHeading("Monitoring Fiberprocessing Threads")
+, m_monitorMask("Mask Line1:\nLine2         Item2          Item3")
 {
-  m_monitorBracketOpenPosition[0] = 60;
-  m_monitorBracketOpenPosition[1] = 10;
-  m_monitorBracketClosePosition[0] = m_monitorBracketOpenPosition[0];
-  m_monitorBracketClosePosition[1] = m_monitorBracketOpenPosition[1];
-  m_monitorHeadingPosition[0] =  m_monitorBracketOpenPosition[0] + 5;
-  m_monitorHeadingPosition[1] =  m_monitorBracketOpenPosition[1];
+  m_monitorBracketOpenPosition[0] = 0;
+  m_monitorBracketOpenPosition[1] = 0;
+  m_monitorBracketClosePosition[0] = 0;
+  m_monitorBracketClosePosition[1] = 0;
+  m_monitorHeadingPosition[0] =  0;
+  m_monitorHeadingPosition[1] =  0;
+  m_monitorMaskPosition[0] = 0;
+  m_monitorMaskPosition[1] = 0;
+  
   
   m_monitorHeadingOpacity = 0;
+  m_monitorMaskOpacity = 0;
 }
 
 mitk::FiberBundleXThreadMonitor::~FiberBundleXThreadMonitor()
@@ -90,6 +95,11 @@ mitk::Point2D mitk::FiberBundleXThreadMonitor::getHeadingPosition(){
   return m_monitorHeadingPosition;
 }
 
+void mitk::FiberBundleXThreadMonitor::setHeadingPosition(mitk::Point2D pnt){
+  m_monitorHeadingPosition[0] = pnt[0];
+  m_monitorHeadingPosition[1] = pnt[1];
+}
+
 int mitk::FiberBundleXThreadMonitor::getHeadingOpacity(){
   return m_monitorHeadingOpacity;
 }
@@ -98,10 +108,26 @@ void mitk::FiberBundleXThreadMonitor::setHeadingOpacity(int opacity){
   m_monitorHeadingOpacity = opacity;
 }
 
+QString mitk::FiberBundleXThreadMonitor::getMask(){
+  return m_monitorMask;
+}
 
+mitk::Point2D mitk::FiberBundleXThreadMonitor::getMaskPosition(){
+  return m_monitorMaskPosition;
+}
 
+void mitk::FiberBundleXThreadMonitor::setMaskPosition(mitk::Point2D pnt){
+  m_monitorMaskPosition[0] = pnt[0];
+  m_monitorMaskPosition[1] = pnt[1];
+}
 
+int mitk::FiberBundleXThreadMonitor::getMaskOpacity(){
+  return m_monitorMaskOpacity;
+}
 
+void mitk::FiberBundleXThreadMonitor::setMaskOpacity(int opacity){
+  m_monitorMaskOpacity = opacity;
+}
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleXThreadMonitor::UpdateOutputInformation()
@@ -122,6 +148,6 @@ bool mitk::FiberBundleXThreadMonitor::VerifyRequestedRegion()
 }
 void mitk::FiberBundleXThreadMonitor::SetRequestedRegion( itk::DataObject *data )
 {
-  
+
 }
 

@@ -33,9 +33,10 @@ void mitk::DisplayVectorInteractorScroll::ExecuteOperation(Operation* itkNotUsed
 bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
-  
+
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-  if(posEvent==NULL) return false;
+
+//  if(posEvent==NULL) return false;
 
   int actionId = action->GetActionId();
   
@@ -43,10 +44,48 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
   {
   case AcINITMOVE:
     {
-      m_Sender=posEvent->GetSender();
-      m_StartDisplayCoordinate=posEvent->GetDisplayPosition();
-      m_LastDisplayCoordinate=posEvent->GetDisplayPosition();
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      if(posEvent != NULL)
+      {
+        m_Sender=posEvent->GetSender();
+        m_StartDisplayCoordinate=posEvent->GetDisplayPosition();
+        m_LastDisplayCoordinate=posEvent->GetDisplayPosition();
+        m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      }
+      ok = true;
+      break;
+    }
+  case AcSCROLLMOUSEWHEEL:
+    {
+    const WheelEvent* wheelEvent=dynamic_cast<const WheelEvent*>(stateEvent->GetEvent());
+
+    if(wheelEvent != NULL)
+    {
+      mitk::SliceNavigationController::Pointer sliceNaviController = wheelEvent->GetSender()->GetSliceNavigationController();
+
+      if ( !sliceNaviController->GetSliceLocked() )
+      {
+        mitk::Stepper* stepper = sliceNaviController->GetSlice();
+
+        if (stepper->GetSteps() <= 1)
+        {
+          stepper = sliceNaviController->GetTime();
+        }
+
+        // get the desired delta
+        int delta = wheelEvent->GetDelta();
+        if ( m_InvertScrollingDirection )
+          delta *= -1;  // If we want to invert the scrolling direction -> delta * -1
+
+        if ( delta < 0 )
+        {
+          stepper->Next();
+        }
+        else
+        {
+          stepper->Previous();
+        }
+      }
+    }
       ok = true;
       break;
     }
@@ -67,7 +106,12 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       {
         this->InvokeEvent( StartScrollInteractionEvent() );
 
-        int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
+        int delta = 0;
+
+        if(posEvent != NULL)
+        {
+          delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
+        }
 
         // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
         if ( delta>0 && delta<m_IndexToSliceModifier )
@@ -115,7 +159,10 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       }
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();   
+      if( posEvent != NULL )
+      {
+        m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      }
     }
   case AcFINISHMOVE:
     {

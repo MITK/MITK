@@ -132,6 +132,8 @@
     <event NAME="ALT+leftBN+MouseMove" ID="610" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0401" KEY="Key_none" />
     <!-- ALT + leftMouseButtonRelease -->
     <event NAME="ALT+leftMouseRelease" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
+    <!-- CTRL + MouseWheel -->
+    <event NAME="CTRL+MouseWheel" ID="630" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonPress -->
     <event NAME="Shift+rightMousePress" ID="2000" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0100" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonMove -->
@@ -3659,6 +3661,24 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="MiddleClickScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="240" Y_POS="84" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
+        <action ID="9" />
+      </transition>
+      <transition NAME="scrollWheelEvent" EVENT_ID="9" NEXT_STATE_ID="0">
+        <action ID="1015" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="533">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="BinaryImageInteractor">
     <state START_STATE="TRUE" NAME="UndecidedState" ID="2" X_POS="374" Y_POS="98" WIDTH="139" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="11">
@@ -3688,6 +3708,12 @@
       </transition>
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="6">
         <action ID="49006" />
+      </transition>
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="6">
+        <action ID="49006" />
+      </transition>
+      <transition NAME="name" EVENT_ID="630" NEXT_STATE_ID="6">
+        <action ID="49007" />
       </transition>
     </state>
     <state NAME="DragSegmentationSurface" ID="7" X_POS="95" Y_POS="473" WIDTH="202" HEIGHT="50">

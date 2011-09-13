@@ -121,8 +121,11 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="maximum">
+                 <number>9999</number>
+                </property>
                 <property name="value">
-                 <number>99</number>
+                 <number>100</number>
                 </property>
                </widget>
               </item>
@@ -472,7 +475,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>366</width>
+        <width>307</width>
         <height>403</height>
        </rect>
       </property>
@@ -745,8 +748,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>381</width>
-        <height>249</height>
+        <width>185</width>
+        <height>116</height>
        </rect>
       </property>
       <attribute name="label">

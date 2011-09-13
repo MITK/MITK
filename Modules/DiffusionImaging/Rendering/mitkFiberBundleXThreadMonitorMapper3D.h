@@ -71,8 +71,14 @@ namespace mitk {
     vtkSmartPointer<vtkTextActor> m_TextActorOpen;
     vtkSmartPointer<vtkTextActor> m_TextActorHeading;
     vtkSmartPointer<vtkTextActor> m_TextActorMask;
+    vtkSmartPointer<vtkTextActor> m_TextActorStatus;
+    vtkSmartPointer<vtkTextActor> m_TextActorStarted;
+    vtkSmartPointer<vtkTextActor> m_TextActorFinished;
+    vtkSmartPointer<vtkTextActor> m_TextActorTerminated;
     vtkPropAssembly* m_FiberAssembly;
     
+  private:
+    double m_lastModifiedMonitorNodeTime;
 
   };
 

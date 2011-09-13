@@ -25,6 +25,7 @@
 #include "MitkDiffusionImagingExports.h"
 #include <QString>
 
+#include <QMutex>
 
 
 namespace mitk {
@@ -73,6 +74,34 @@ namespace mitk {
     int             getMaskOpacity(); // multiplicationfactor 0.1 (in mapper)
     void            setMaskOpacity(int);
     
+    QString         getStatus();
+    void            setStatus(QString);
+    mitk::Point2D   getStatusPosition();
+    void            setStatusPosition(mitk::Point2D);
+    int             getStatusOpacity(); // multiplicationfactor 0.1 (in mapper)
+    void            setStatusOpacity(int);
+
+    int             getStarted();
+    void            setStarted(int);
+    mitk::Point2D   getStartedPosition();
+    void            setStartedPosition(mitk::Point2D);
+    int             getStartedOpacity(); // multiplicationfactor 0.1 (in mapper)
+    void            setStartedOpacity(int);
+    
+    int             getFinished();
+    void            setFinished(int);
+    mitk::Point2D   getFinishedPosition();
+    void            setFinishedPosition(mitk::Point2D);
+    int             getFinishedOpacity(); // multiplicationfactor 0.1 (in mapper)
+    void            setFinishedOpacity(int);
+    
+    int             getTerminated();
+    void            setTerminated(int);
+    mitk::Point2D   getTerminatedPosition();
+    void            setTerminatedPosition(mitk::Point2D);
+    int             getTerminatedOpacity(); // multiplicationfactor 0.1 (in mapper)
+    void            setTerminatedOpacity(int);
+    
     
   protected:
     FiberBundleXThreadMonitor();
@@ -94,8 +123,26 @@ namespace mitk {
     mitk::Point2D m_monitorMaskPosition;
     int m_monitorMaskOpacity;
     
-    QString m_Label1;
+    QString m_monitorStatus;
+    mitk::Point2D m_monitorStatusPosition;
+    int m_monitorStatusOpacity;
     
+    int m_monitorStarted;
+    mitk::Point2D m_monitorStartedPosition;
+    int m_monitorStartedOpacity;
+
+    int m_monitorFinished;
+    mitk::Point2D m_monitorFinishedPosition;
+    int m_monitorFinishedOpacity;
+    
+    int m_monitorTerminated;
+    mitk::Point2D m_monitorTerminatedPosition;
+    int m_monitorTerminatedOpacity;
+    
+    QMutex m_startedMutex;
+    QMutex m_finishedMutex;
+    QMutex m_terminatedMutex;
+    QMutex m_statusMutex;
 
     
         

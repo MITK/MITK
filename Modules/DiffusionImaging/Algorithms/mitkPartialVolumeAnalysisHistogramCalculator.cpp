@@ -59,7 +59,8 @@ namespace mitk
     m_MaskingModeChanged( false ),
     m_NumberOfBins(256),
     m_UpsamplingFactor(1),
-    m_GaussianSigma(0)
+    m_GaussianSigma(0),
+    m_ForceUpdate(false)
   {
     m_EmptyHistogram = HistogramType::New();
     HistogramType::SizeType histogramSize;
@@ -225,10 +226,10 @@ namespace mitk
     bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerBool;
     bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerBool;
 
-    if ( /*prevent calculation without mask*/ m_MaskingMode == MASKING_MODE_NONE || (
+    if ( /*prevent calculation without mask*/!m_ForceUpdate &&( m_MaskingMode == MASKING_MODE_NONE || (
         ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
         && ((m_MaskingMode != MASKING_MODE_IMAGE) || (m_ImageMask.IsNotNull() && maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
-        && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (m_PlanarFigure.IsNotNull() && planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) ) )
+        && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (m_PlanarFigure.IsNotNull() && planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) ) ) )
     {
       MITK_INFO << "Returning, statistics already up to date!";
       if ( m_MaskingModeChanged )
@@ -286,6 +287,7 @@ namespace mitk
     {
       if ( m_MaskingMode == MASKING_MODE_NONE )
       {
+        // Reset state changed flag
         AccessFixedDimensionByItk_2(
             m_InternalImage,
             InternalCalculateStatisticsUnmasked,

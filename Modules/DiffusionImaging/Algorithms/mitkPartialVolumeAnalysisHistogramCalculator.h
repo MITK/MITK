@@ -203,6 +203,11 @@ namespace mitk
       }
     }
 
+    void SetForceUpdate(bool b)
+    {
+      m_ForceUpdate = b;
+    }
+
   protected:
 
     PartialVolumeAnalysisHistogramCalculator();
@@ -346,6 +351,8 @@ namespace mitk
     float m_GaussianSigma;
 
     itk::ImageRegion<3> m_CropRegion;
+
+    bool m_ForceUpdate;
   };
 
 }

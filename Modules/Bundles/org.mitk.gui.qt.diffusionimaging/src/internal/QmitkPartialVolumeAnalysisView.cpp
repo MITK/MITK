@@ -67,6 +67,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkPolarToCartesianVectorImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkMaskImageFilter.h"
+#include "itkCastImageFilter.h"
 
 #include "itkImageMomentsCalculator.h"
 
@@ -1285,7 +1286,34 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
     if ( m_SelectedImageMask.IsNotNull() )
     {
+
+      mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
+      std::cout << pixelType.GetType() << std::endl;
+
+      if(pixelType.GetBitsPerComponent() == 16)
+      {
+        //convert from short to uchar
+        typedef itk::Image<short, 3> ShortImageType;
+        typedef itk::Image<unsigned char, 3> CharImageType;
+
+        CharImageType::Pointer charImage;
+        ShortImageType::Pointer shortImage;
+        mitk::CastToItkImage(m_SelectedImageMask, shortImage);
+
+        typedef itk::CastImageFilter<ShortImageType, CharImageType> ImageCasterType;
+
+        ImageCasterType::Pointer caster = ImageCasterType::New();
+        caster->SetInput( shortImage );
+        caster->Update();
+        charImage = caster->GetOutput();
+
+
+        mitk::CastToMitkImage(charImage, m_SelectedImageMask);
+      }
+
       m_CurrentStatisticsCalculator->SetImageMask( m_SelectedImageMask );
+
+
       m_CurrentStatisticsCalculator->SetMaskingModeToImage();
 
       maskName = m_SelectedMaskNode->GetName();

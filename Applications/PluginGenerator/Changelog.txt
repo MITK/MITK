@@ -1,0 +1,18 @@
+This is the change log for the MITK Plugin Generator
+
+
+Changes since version 1.0.0
+======================================================================
+
+Changes in the MITKPluginGenerator executable
+----------------------------------------------------------------------
+
+- Added printing the version number to the console.
+- Added hint how to get more help if something went wrong.
+
+Changes in the generated files
+----------------------------------------------------------------------
+
+- Fixed user manual for the generated plugin.
+- Added comments in the generated project's CMakeLists.txt file about
+  how to set-up the MITK module system.

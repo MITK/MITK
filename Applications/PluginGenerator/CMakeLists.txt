@@ -3,8 +3,10 @@ cmake_minimum_required(VERSION 2.8.4)
 project(MITKPluginGenerator)
 
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 0)
-set(VERSION_PATCH 0)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 1)
+
+set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(standalone_build 1)
@@ -20,6 +22,10 @@ set(QT_DONT_USE_QTGUI 1)
 find_package(Qt 4.6.2 REQUIRED)
 
 include(${QT_USE_FILE})
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PluginGeneratorConfig.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/PluginGeneratorConfig.h" @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 #-----------------------------------------------------------------------------
 # Executable

@@ -298,6 +298,20 @@ endif()
 # MITK modules
 #-----------------------------------------------------------------------------
 
+# This project's directory holding module config files
+#set(${PROJECT_NAME}_MODULES_CONF_DIR "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}")
+
+# Append this projects's module config directory to the global list
+# (This is used to get include directories for the <module_name>Exports.h files right)
+#list(APPEND MODULES_CONF_DIRS ${${PROJECT_NAME}_MODULES_CONF_DIR})
+
+# Clean the modulesConf directory. This ensures that modules are sorted
+# according to their dependencies in the Modules/CMakeLists.txt file
+#file(GLOB _modules_conf_files ${${PROJECT_NAME}_MODULES_CONF_DIR}/*.cmake)
+#if(_modules_conf_files)
+#  file(REMOVE ${_modules_conf_files})
+#endif()
+
 #add_subdirectory(Modules)
 
 #-----------------------------------------------------------------------------

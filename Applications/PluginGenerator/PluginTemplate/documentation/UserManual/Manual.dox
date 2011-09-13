@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{$(plugin-symbolic-name)} $(plugin-name)
 
-\image html icon.png "Icon of $(plugin-name)"
+\image html icon.xpm "Icon of $(plugin-name)"
 
 Available sections:
   - \ref $(plugin-symbolic-name)Overview

@@ -797,7 +797,7 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
   mitk::NDIPassiveTool::Pointer passiveTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
 
   if(passiveTool.IsNull())
-    throw std::exception("Could not cast TrackingTool to PassiveTool");
+    throw std::runtime_error("Could not cast TrackingTool to PassiveTool");
 
   int currSelectedToolID = m_Controls->m_ToolSelectionComboBox->currentIndex();
 

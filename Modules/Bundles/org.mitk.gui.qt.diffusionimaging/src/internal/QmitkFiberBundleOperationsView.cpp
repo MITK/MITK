@@ -51,6 +51,7 @@
 #include <itkTractsToProbabilityImageFilter.h>
 #include <mitkDiffusionImage.h>
 #include <mitkDataNodeObject.h>
+#include <itkImageRegion.h>
 
 
 const std::string QmitkFiberBundleOperationsView::VIEW_ID = "org.mitk.views.fiberbundleoperations";
@@ -212,7 +213,7 @@ void QmitkFiberBundleOperationsView::GenerateROIImage(){
 
 
   for (int i=0; i<m_SelectedPF.size(); i++)
-    CompositeExtraction(dynamic_cast<mitk::PlanarFigure*>(m_SelectedPF.at(i)->GetData()), image);
+    CompositeExtraction(m_SelectedPF.at(i), image);
 
   DataNode::Pointer node = DataNode::New();
   Image::Pointer tmpImage = Image::New();
@@ -223,36 +224,65 @@ void QmitkFiberBundleOperationsView::GenerateROIImage(){
   this->GetDefaultDataStorage()->Add(node);
 }
 
-void QmitkFiberBundleOperationsView::CompositeExtraction(mitk::PlanarFigure::Pointer planarFigure, mitk::Image* image)
+void QmitkFiberBundleOperationsView::CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image)
 {
-  if (dynamic_cast<mitk::PlanarFigureComposite*>(planarFigure.GetPointer())){
-    mitk::PlanarFigureComposite::Pointer pfcomp = dynamic_cast<mitk::PlanarFigureComposite*>(planarFigure.GetPointer());
-
-    for (int i=0; i<pfcomp->getNumberOfChildren(); ++i)
-    {
-      CompositeExtraction(pfcomp->getChildAt(i), image);
-    }
-  }
-  else
+  if (dynamic_cast<mitk::PlanarFigure*>(node.GetPointer()->GetData()) && !dynamic_cast<mitk::PlanarFigureComposite*>(node.GetPointer()->GetData()))
   {
-    m_PlanarFigure = planarFigure;
-    AccessFixedDimensionByItk_3(
+    m_PlanarFigure = dynamic_cast<mitk::PlanarFigure*>(node.GetPointer()->GetData());
+    AccessFixedDimensionByItk_2(
         image,
         InternalReorientImagePlane, 3,
-        image->GetGeometry(),
         m_PlanarFigure->GetGeometry(), -1);
 
-    AccessFixedDimensionByItk_1(
+//    itk::Image< unsigned char, 3 >::Pointer outimage = itk::Image< unsigned char, 3 >::New();
+
+//    outimage->SetSpacing( m_PlanarFigure->GetGeometry()->GetSpacing()/m_UpsamplingFactor );   // Set the image spacing
+
+//    mitk::Point3D origin = m_PlanarFigure->GetGeometry()->GetOrigin();
+//    mitk::Point3D indexOrigin;
+//    m_PlanarFigure->GetGeometry()->WorldToIndex(origin, indexOrigin);
+//    indexOrigin[0] = indexOrigin[0] - .5 * (1.0-1.0/m_UpsamplingFactor);
+//    indexOrigin[1] = indexOrigin[1] - .5 * (1.0-1.0/m_UpsamplingFactor);
+//    indexOrigin[2] = indexOrigin[2] - .5 * (1.0-1.0/m_UpsamplingFactor);
+//    mitk::Point3D newOrigin;
+//    m_PlanarFigure->GetGeometry()->IndexToWorld(indexOrigin, newOrigin);
+
+//    outimage->SetOrigin( newOrigin );     // Set the image origin
+//    itk::Matrix<double, 3, 3> matrix;
+//    for (int i=0; i<3; i++)
+//      for (int j=0; j<3; j++)
+//        matrix[j][i] = m_PlanarFigure->GetGeometry()->GetMatrixColumn(i)[j]/m_PlanarFigure->GetGeometry()->GetSpacing().GetElement(i);
+//    outimage->SetDirection( matrix );  // Set the image direction
+
+//    itk::ImageRegion<3> upsampledRegion;
+//    upsampledRegion.SetSize(0, m_PlanarFigure->GetGeometry()->GetParametricExtentInMM(0)/m_PlanarFigure->GetGeometry()->GetSpacing()[0]);
+//    upsampledRegion.SetSize(1, m_PlanarFigure->GetGeometry()->GetParametricExtentInMM(1)/m_PlanarFigure->GetGeometry()->GetSpacing()[1]);
+//    upsampledRegion.SetSize(2, 1);
+
+//    typename itk::Image< unsigned char, 3 >::RegionType::SizeType upsampledSize = upsampledRegion.GetSize();
+//    for (unsigned int n = 0; n < 2; n++)
+//    {
+//      upsampledSize[n] = upsampledSize[n] * m_UpsamplingFactor;
+//    }
+//    upsampledRegion.SetSize( upsampledSize );
+//    outimage->SetRegions( upsampledRegion );
+
+//    outimage->Allocate();
+
+//    this->m_InternalImage = mitk::Image::New();
+//    this->m_InternalImage->InitializeByItk( outimage.GetPointer() );
+//    this->m_InternalImage->SetVolume( outimage->GetBufferPointer() );
+
+    AccessFixedDimensionByItk_2(
         m_InternalImage,
         InternalCalculateMaskFromPlanarFigure,
-        3, 2 );
+        3, 2, node->GetName() );
   }
 }
 
 template < typename TPixel, unsigned int VImageDimension >
     void QmitkFiberBundleOperationsView::InternalReorientImagePlane(
-        const itk::Image< TPixel, VImageDimension > *image,
-        mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex )
+        const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex )
 {
 
   MITK_INFO << "InternalReorientImagePlane() start";
@@ -363,7 +393,7 @@ template < typename TPixel, unsigned int VImageDimension >
 
 template < typename TPixel, unsigned int VImageDimension >
     void QmitkFiberBundleOperationsView::InternalCalculateMaskFromPlanarFigure(
-        itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
+        itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string nodeName )
 {
 
   MITK_INFO << "InternalCalculateMaskFromPlanarFigure() start";
@@ -597,12 +627,13 @@ template < typename TPixel, unsigned int VImageDimension >
   roi2->Update();
   m_InternalImageMask3D = roi2->GetOutput();
 
-  DataNode::Pointer node = DataNode::New();
+//  DataNode::Pointer node = DataNode::New();
   Image::Pointer tmpImage = Image::New();
   tmpImage->InitializeByItk(m_InternalImageMask3D.GetPointer());
   tmpImage->SetVolume(m_InternalImageMask3D->GetBufferPointer());
-  node->SetData(tmpImage);
-  this->GetDefaultDataStorage()->Add(node);
+//  node->SetData(tmpImage);
+//  node->SetName(nodeName);
+//  GetDefaultDataStorage()->Add(node);
 
   Image::Pointer tmpImage2 = Image::New();
   tmpImage2->InitializeByItk(m_PlanarFigureImage.GetPointer());
@@ -663,49 +694,39 @@ void QmitkFiberBundleOperationsView::StdMultiWidgetNotAvailable()
 
 void QmitkFiberBundleOperationsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-
   if ( !this->IsVisible() )
-  {
-    // do nothing if nobody wants to see me :-(
     return;
-  }
 
+  if (nodes.empty())
+  {
+    m_Controls->doExtractFibersButton->setDisabled(true);
+    m_Controls->PFCompoANDButton->setDisabled(true);
+    m_Controls->PFCompoORButton->setDisabled(true);
+    m_Controls->PFCompoNOTButton->setDisabled(true);
+    m_Controls->m_JoinBundles->setEnabled(false);
+    m_Controls->m_SubstractBundles->setEnabled(false);
+    m_Controls->PFCompoDELButton->setDisabled(true);
+  }
 
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
   m_SelectedFB.clear();
   m_SelectedPF.clear();
   m_Image = NULL;
 
-
-  //differ between 2 scenarios...
-  // 1) add PF to an existing Spaghetti
-  // 2) BOOLEAN OPERATORS HANDLING ... selection of multiple PF, and or multiple Spaghetti
-
-
-  //scenario 1
-
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-      it != nodes.end(); ++it )
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
-
     mitk::DataNode::Pointer node = *it;
     if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
     {
-      //  MITK_INFO << "onselectionchg(): " << node->GetData()->GetNameOfClass();
       m_SelectedFB.push_back(node);
       mitk::FiberBundle::Pointer bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
       QString numFibers;
       this->m_Controls->m_NumFibersLabel->setText(numFibers.setNum(bundle->GetNumTracts()));
-
-    } else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData())){
-
-      //   MITK_INFO << "onselectionchg(): " << node->GetData()->GetNameOfClass();
-      m_SelectedPF.push_back(node);
-
-    } else if (dynamic_cast<mitk::Image*>(node->GetData())){
-      m_Image = dynamic_cast<mitk::Image*>(node->GetData());
     }
-
+    else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+      m_SelectedPF.push_back(node);
+    else if (dynamic_cast<mitk::Image*>(node->GetData()))
+      m_Image = dynamic_cast<mitk::Image*>(node->GetData());
   }
 
   if (m_SelectedPF.size() >= 1 && m_Image.IsNotNull())
@@ -713,95 +734,37 @@ void QmitkFiberBundleOperationsView::OnSelectionChanged( std::vector<mitk::DataN
   else
     m_Controls->m_GenerateROIImage->setEnabled(false);
 
-  //quick and dirty control structure for extraction ATM
-  if (m_SelectedPF.size() == 1) {
-
-
-    //#############################################
-    //### PLANAR FIGURE COMPOSIT SelectionLOGIC ###
-    //#############################################
-
+  if (m_SelectedPF.size() == 1)
+  {
     m_Controls->PFCompoANDButton->setDisabled(true);
     m_Controls->PFCompoORButton->setDisabled(true);
     m_Controls->PFCompoNOTButton->setEnabled(true);
     m_Controls->PFCompoDELButton->setDisabled(true);
 
-    //if planarFigureComposite selected, activate DEL button
     if ( dynamic_cast<mitk::PlanarFigureComposite*>(m_SelectedPF.at(0)->GetData()) )
-    {
       m_Controls->PFCompoDELButton->setEnabled(true);
-    }
-
-
-  } else if (m_SelectedPF.size() > 1) {
-
-    //#############################################
-    //### PLANAR FIGURE COMPOSIT SelectionLOGIC ###
-    //#############################################
-    // if 2 PlanarFigure objects (PFCircle, PFPoly, ..., PFComposite) selected,
-    //then activate AND OR NOT PF Composite Buttons
-
+  }
+  else if (m_SelectedPF.size() > 1)
+  {
     m_Controls->PFCompoANDButton->setEnabled(true);
     m_Controls->PFCompoORButton->setEnabled(true);
     m_Controls->PFCompoNOTButton->setDisabled(true);
     m_Controls->PFCompoDELButton->setDisabled(true);
   }
 
-
-
   if (m_SelectedFB.size() == 1 && m_SelectedPF.size() == 1)
-  {
-
-    //#############################################
-    //##### EXTRACT FIBERBUNDLE SelectionLOGIC ####
-    //#############################################
-
     m_Controls->doExtractFibersButton->setEnabled(true);
-
-
-
-  } else if (nodes.size() > 1 ) {
-    //scenario 2
-
-
-  } else if (nodes.empty()) {
-
-    //#############################################
-    //##### EXTRACT FIBERBUNDLE SelectionLOGIC ####
-    //#############################################
-
-    m_Controls->doExtractFibersButton->setDisabled(true);
-
-
-    //#############################################
-    //### PLANAR FIGURE COMPOSIT SelectionLOGIC ###
-    //#############################################
-
-    m_Controls->PFCompoANDButton->setDisabled(true);
-    m_Controls->PFCompoORButton->setDisabled(true);
-    m_Controls->PFCompoNOTButton->setDisabled(true);
-
-  }
 
   if (m_SelectedFB.size() == 2)
   {
-
-    //#############################################
-    //##### JOIN/SUBSTRACT FIBERBUNDLES        ####
-    //#############################################
-
     m_Controls->m_JoinBundles->setEnabled(true);
     m_Controls->m_SubstractBundles->setEnabled(true);
-
   }
   else
   {
-
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
-
   }
-
 }
 
 
@@ -1065,6 +1028,10 @@ void QmitkFiberBundleOperationsView::DoFiberExtraction()
 void QmitkFiberBundleOperationsView::generatePFCompo_AND()
 {
   mitk::PlanarFigureComposite::Pointer PFCAnd = mitk::PlanarFigureComposite::New();
+
+  mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D()));
+  PFCAnd->SetGeometry2D(currentGeometry2D);
+
   PFCAnd->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
 
 
@@ -1185,6 +1152,8 @@ void QmitkFiberBundleOperationsView::debugPFComposition(mitk::PlanarFigureCompos
 void QmitkFiberBundleOperationsView::generatePFCompo_OR()
 {
   mitk::PlanarFigureComposite::Pointer PFCOr = mitk::PlanarFigureComposite::New();
+  mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D()));
+  PFCOr->SetGeometry2D(currentGeometry2D);
   PFCOr->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
 
 
@@ -1211,6 +1180,8 @@ void QmitkFiberBundleOperationsView::generatePFCompo_OR()
 void QmitkFiberBundleOperationsView::generatePFCompo_NOT()
 {
   mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
+  mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D()));
+  PFCNot->SetGeometry2D(currentGeometry2D);
   PFCNot->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
 
 

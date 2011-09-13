@@ -155,11 +155,11 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension >
       void InternalCalculateMaskFromPlanarFigure(
-          itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
+          itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string nodeName );
 
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
-          const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex );
+          const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex );
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
@@ -185,7 +185,7 @@ private:
 
   void addPFCompositionToDataStorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
-  void CompositeExtraction(mitk::PlanarFigure::Pointer planarFigure, mitk::Image* image);
+  void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
   void GenerateGreyscaleHeatmap(bool binary);
   void GenerateColorHeatmap();
   void GenerateFiberEndingsImage();

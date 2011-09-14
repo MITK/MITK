@@ -38,8 +38,6 @@ mitk::TrackingDevice::TrackingDevice() :
 
 mitk::TrackingDevice::~TrackingDevice()
 {
-  m_TrackingFinishedMutex = NULL;
-  m_StopTrackingMutex = NULL;
 }
 
 

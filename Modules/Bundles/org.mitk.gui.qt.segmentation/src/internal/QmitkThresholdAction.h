@@ -1,57 +1,46 @@
-#ifndef QMITK_THRESHOLDACTION_H
-#define QMITK_THRESHOLDACTION_H
+#ifndef QMITKTHRESHOLDACTION_H
+#define QMITKTHRESHOLDACTION_H
 
-#include <berryISelectionListener.h>
-#include "berryQtViewPart.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
-#include "mitkIContextMenuAction.h"
-
-#include "mitkDataStorage.h"
-#include "mitkToolManager.h"
-
-#include "org_mitk_gui_qt_segmentation_Export.h"
-
+// Parent classes
 #include <QObject>
-#include <QDialog>
+#include <mitkIContextMenuAction.h>
 
-class MITK_QT_SEGMENTATION QmitkThresholdAction: public QObject, public mitk::IContextMenuAction
+// Data members
+#include <mitkDataStorage.h>
+#include <mitkToolManager.h>
+
+class QDialog;
+
+class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
-
   QmitkThresholdAction();
-  QmitkThresholdAction(const QmitkThresholdAction& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
-  virtual ~QmitkThresholdAction();
+  ~QmitkThresholdAction();
 
-  //interface methods
-  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
-  void SetDataStorage(mitk::DataStorage* dataStorage);
+  // IContextMenuAction
+  void Run(const std::vector<mitk::DataNode *> &selectedNodes);
+  void SetDataStorage(mitk::DataStorage *dataStorage);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
-  void SetFunctionality(berry::QtViewPart* functionality);
+  void SetFunctionality(berry::QtViewPart *functionality);
 
-  // for receiving messages
   void OnThresholdingToolManagerToolModified();
 
-protected:
+private slots:
+  void ThresholdingDone(int);
 
-  typedef std::vector<mitk::DataNode*> NodeList;
+private:
+  QmitkThresholdAction(const QmitkThresholdAction &);
+  QmitkThresholdAction & operator=(const QmitkThresholdAction &);
 
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::ToolManager::Pointer m_ThresholdingToolManager;
-
-  QDialog* m_ThresholdingDialog;
-
-protected slots:
-
-  // class internal slot
-  void ThresholdingDone(int);
+  QDialog *m_ThresholdingDialog;
 };
 
-#endif // QMITK_THRESHOLDACTION_H
+#endif

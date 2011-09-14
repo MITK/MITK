@@ -494,6 +494,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the current slice as texture for the plane
   localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
 
+
+
+
+
+
   //setup the textured plane
   this->GeneratePlane( renderer, sliceBounds );
 
@@ -680,7 +685,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
-
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;
   this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );

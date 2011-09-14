@@ -1171,6 +1171,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     std::string portInfo;
     NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
     if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i+numberOfToolsAtStart))->SetSerialNumber(portInfo.substr(23,8));
+    itksys::SystemTools::Delay(10);
     }
 
   return true;

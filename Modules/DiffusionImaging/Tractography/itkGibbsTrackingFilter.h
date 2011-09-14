@@ -145,7 +145,7 @@ namespace itk{
     bool    m_AbortTracking;
     bool    m_SubtractMean;
     int     m_NumAcceptedFibers;
-    bool    m_BuildFibers;
+    volatile bool    m_BuildFibers;
     int     m_Steps;
     float   m_Memory;
     float   m_ProposalAcceptance;

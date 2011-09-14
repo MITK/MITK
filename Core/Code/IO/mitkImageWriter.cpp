@@ -74,7 +74,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
   mitk::Point3D origin = image->GetGeometry()->GetOrigin();
 
-  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), 
+  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( fileName.c_str(),
     itk::ImageIOFactory::WriteMode );
 
   if(imageIO.IsNull())
@@ -119,6 +119,21 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
 void mitk::ImageWriter::GenerateData()
 {
+  const std::string& locale = "C";
+  const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+  if ( locale.compare(currLocale)!=0 )
+  {
+    try
+    {
+      setlocale(LC_ALL, locale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not set locale " << locale;
+    }
+  }
+
   if ( m_FileName == "" )
   {
     itkWarningMacro( << "Sorry, filename has not been set!" );
@@ -170,7 +185,7 @@ void mitk::ImageWriter::GenerateData()
           writeVti(filename.str().c_str(), input, t);
         }
         else
-        {        
+        {
           WriteByITK(input, filename.str());
         }
       }
@@ -221,6 +236,15 @@ void mitk::ImageWriter::GenerateData()
 
   }
   m_MimeType = "application/MITK.Pic";
+
+  try
+  {
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
 }
 
 bool mitk::ImageWriter::CanWriteDataType( DataNode* input )

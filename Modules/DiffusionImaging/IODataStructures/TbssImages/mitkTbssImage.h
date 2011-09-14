@@ -77,6 +77,8 @@ namespace mitk
       m_Roi = roi;
     }
 
+
+    // depricated
     std::vector< itk::Index<3> > GetRoi()
     {
       return m_Roi;
@@ -88,11 +90,19 @@ namespace mitk
       this->InitializeByItk(m_Image.GetPointer(),1,1);
     }
 
-  protected:
-    TbssImage():m_PreprocessedFA(false)
+    void SetNumberOfGroups(int i)
     {
-
+      m_NumberOfGroups = i;
     }
+
+    int GetNumberOfGroups()
+    {
+      return m_NumberOfGroups;
+    }
+
+
+  protected:
+    TbssImage();
     virtual ~TbssImage(){}
 
     typename ImageType::Pointer m_Image;
@@ -105,6 +115,11 @@ namespace mitk
     std::string m_PreprocessedFAFile;
 
     std::string m_Structure;
+
+
+    int m_NumberOfGroups;
+    std::vector< std::pair<std::string, int> > m_Groups;
+
 
   };
 

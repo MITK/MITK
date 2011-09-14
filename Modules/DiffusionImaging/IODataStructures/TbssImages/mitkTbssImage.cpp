@@ -25,6 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 
 
+
+template<typename TPixelType>
+mitk::TbssImage<TPixelType>::TbssImage() : m_PreprocessedFA(false)
+{
+
+}
+
 /*
 template<typename TPixelType>
 mitk::TbssImage<TPixelType>::TbssImage()

@@ -70,6 +70,7 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
+  IODataStructures/TbssImages/mitkTbssImporter.cpp
 
 
   # Rendering

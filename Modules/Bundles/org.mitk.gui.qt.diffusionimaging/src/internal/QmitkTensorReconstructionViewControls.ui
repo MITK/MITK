@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>288</width>
-    <height>672</height>
+    <width>345</width>
+    <height>836</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -272,6 +272,34 @@
         </property>
         <property name="text">
          <string>Diffusion Image Estimation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Estimate Q-Ball Image from Tensores</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QCommandLinkButton" name="m_TensorsToQbiButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="statusTip">
+         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="whatsThis">
+         <string notr="true" comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="text">
+         <string>Q-Ball Image Estimation</string>
         </property>
        </widget>
       </item>

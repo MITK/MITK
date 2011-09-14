@@ -98,13 +98,13 @@ public:
     //test IsMicronTrackerInstalled
     MITK_TEST_CONDITION(!myClaronTrackingDevice->IsMicronTrackerInstalled(),"Testing method IsMicronTrackerInstalled().\n")
 
-      //test getToolCount
-      int toolCount = myClaronTrackingDevice->GetToolCount();
+    //test getToolCount
+    int toolCount = myClaronTrackingDevice->GetToolCount();
     MITK_TEST_CONDITION((toolCount==3), "Testing method GetToolCount().\n");
 
     //test getTool
     mitk::TrackingTool* myTool = myClaronTrackingDevice->GetTool(2);
-    MITK_TEST_CONDITION((std::string(myTool->GetToolName()) == "Tool3"), "Testing method GetTool().\n");
+    MITK_TEST_CONDITION((std::string(myTool->GetToolName()) == "Tool3"), "Testing method GetTool().\n");  
 
     //StartTracking
     MITK_TEST_CONDITION( (!myClaronTrackingDevice->StartTracking()), "Testing behavior of method StartTracking().\n");

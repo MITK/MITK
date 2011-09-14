@@ -134,6 +134,20 @@
     <event NAME="ALT+leftMouseRelease" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
     <!-- CTRL + MouseWheel -->
     <event NAME="CTRL+MouseWheel" ID="630" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+    <!-- ALT + MouseWheel -->
+    <event NAME="ALT+MouseWheel" ID="640" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- ALT + middle MouseButton -->
+    <event NAME="ALT+middleBN" ID="641" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- ALT + middle MouseButton and MouseMove -->
+    <event NAME="ALT+middleBN+MouseMove" ID="642" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0404" KEY="Key_none" />
+    <!-- ALT + middle MouseButtonRelease -->
+    <event NAME="ALT+middleBNRelease" ID="643" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0404" KEY="Key_none" />
+    <!-- ALT + SHIFT + right MouseButton -->
+    <event NAME="ALT+SHIFT+rightBN" ID="644" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0500" KEY="Key_none" />
+    <!-- ALT + SHIFT + right MouseButton and MouseMove -->
+    <event NAME="ALT+SHIFT+rightBN+MouseMove" ID="645" TYPE="Type_MouseButtonPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0502" KEY="Key_none" />
+    <!-- ALT + SHIFT + right MouseButtonRelease -->
+    <event NAME="ALT+SHIFT+rightBN" ID="646" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0502" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonPress -->
     <event NAME="Shift+rightMousePress" ID="2000" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0100" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonMove -->
@@ -3464,24 +3478,12 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="538" />
     </state>
   </stateMachine>
-  <stateMachine NAME="MiddleClickScroll">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
-        <action ID="9" />
-      </transition>
-    </state>
-    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
-      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="533">
-        <action ID="1013" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506">
-        <action ID="43" />
-      </transition>
-    </state>
-  </stateMachine>
   <stateMachine NAME="ShiftClickPan">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="2000">
+      <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="644">
+        <action ID="9" />
+      </transition>
+      <transition NAME="altinitshiftmove" NEXT_STATE_ID="1" EVENT_ID="2000">
         <action ID="9" />
       </transition>
     </state>
@@ -3490,6 +3492,12 @@
         <action ID="92" />
       </transition>
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="2002">
+        <action ID="43" />
+      </transition>
+      <transition NAME="altshiftmove" NEXT_STATE_ID="1" EVENT_ID="645">
+        <action ID="92" />
+      </transition>
+      <transition NAME="altfinish" NEXT_STATE_ID="0" EVENT_ID="646">
         <action ID="43" />
       </transition>
     </state>
@@ -3661,24 +3669,6 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="MiddleClickScroll">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="240" Y_POS="84" WIDTH="100" HEIGHT="50">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
-        <action ID="9" />
-      </transition>
-      <transition NAME="scrollWheelEvent" EVENT_ID="9" NEXT_STATE_ID="0">
-        <action ID="1015" />
-      </transition>
-    </state>
-    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
-      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="533">
-        <action ID="1013" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506">
-        <action ID="43" />
-      </transition>
-    </state>
-  </stateMachine>
   <stateMachine NAME="BinaryImageInteractor">
     <state START_STATE="TRUE" NAME="UndecidedState" ID="2" X_POS="374" Y_POS="98" WIDTH="139" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="11">
@@ -3801,6 +3791,40 @@
       <transition NAME="name" EVENT_ID="620" NEXT_STATE_ID="0" />
       <transition NAME="name" EVENT_ID="610" NEXT_STATE_ID="2">
         <action ID="1012" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="MouseWheelScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="0">
+        <action ID="1015" />
+      </transition>
+      <transition NAME="name" EVENT_ID="640" NEXT_STATE_ID="0">
+        <action ID="1015" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="MiddleClickScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
+        <action ID="9" />
+      </transition>
+      <transition NAME="altinitmove" EVENT_ID="641" NEXT_STATE_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="533">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506">
+        <action ID="43" />
+      </transition>
+      <transition NAME="altfinish" EVENT_ID="643" NEXT_STATE_ID="0">
+        <action ID="43" />
+      </transition>
+      <transition NAME="altscroll" EVENT_ID="642" NEXT_STATE_ID="1">
+        <action ID="1013" />
       </transition>
     </state>
   </stateMachine>

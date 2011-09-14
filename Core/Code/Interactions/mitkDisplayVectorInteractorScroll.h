@@ -62,7 +62,7 @@ namespace mitk {
 
     void SetInvertScrollingDirection( bool );
 
-    bool IsAltModifierActive();
+    bool IsAltModifierActive() const;
 
   protected:
     /**

@@ -40,6 +40,21 @@ namespace mitk
     {
       try
       {
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+        if ( locale.compare(currLocale)!=0 )
+        {
+          try
+          {
+            setlocale(LC_ALL, locale.c_str());
+          }
+          catch(...)
+          {
+            MITK_INFO << "Could not set locale " << locale;
+          }
+        }
+
         typedef itk::VectorImage<float,3> ImageType;
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
         typedef itk::ImageFileReader<ImageType> FileReaderType;
@@ -104,6 +119,15 @@ namespace mitk
 
         this->GetOutput()->InitializeByItk(vecImg.GetPointer());
         this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+
+        try
+        {
+          setlocale(LC_ALL, currLocale.c_str());
+        }
+        catch(...)
+        {
+          MITK_INFO << "Could not reset locale " << currLocale;
+        }
 
       }
       catch(std::exception& e)

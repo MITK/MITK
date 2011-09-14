@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
+#include "mitkFiberBundleMapper2D.h"
 #include "mitkFiberBundleMapper3D.h"
 #include "mitkFiberBundleIOFactory.h"
 #include "mitkFiberBundleWriterFactory.h"
@@ -145,6 +146,20 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::ImageVtkMapper2D::New();
       newMapper->SetDataNode(node);
     }
+    
+    classname = "FiberBundle";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::FiberBundleMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+    
+//    classname = "FiberBundleX";
+//    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+//    {
+//      newMapper = mitk::FiberBundleXMapper2D::New();
+//      newMapper->SetDataNode(node);
+//    }
 
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
@@ -227,12 +242,14 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::FiberBundleMapper3D::SetDefaultProperties(node);
+    mitk::FiberBundleMapper2D::SetDefaultProperties(node);
   }
 
   classname = "FiberBundleX";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::FiberBundleXMapper3D::SetDefaultProperties(node);
+//    mitk::FiberBundleXMapper2D::SetDefaultProperties(node);
   }
 
   classname = "FiberBundleXThreadMonitor";

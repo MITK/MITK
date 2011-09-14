@@ -449,6 +449,11 @@ const mitk::FiberBundle* mitk::FiberBundleMapper3D::GetInput()
   return static_cast<const mitk::FiberBundle * > ( GetData() );
 }
 
+vtkOpenGLPolyDataMapper* mitk::FiberBundleMapper3D::getVtkFiberBundleMapper()
+{
+  return m_VtkFiberDataMapperGL;
+}
+
 /* 
  This method is called once the mapper gets new input, 
  for UI rotation or changes in colorcoding this method is NOT called 

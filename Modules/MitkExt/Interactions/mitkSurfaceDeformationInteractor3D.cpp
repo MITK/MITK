@@ -392,8 +392,7 @@ bool mitk::SurfaceDeformationInteractor3D
       m_PolyData->Modified();
       m_Surface->Modified();
 
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(
-        mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       ok = false;
       break;
     }

@@ -145,7 +145,7 @@
     <!-- ALT + SHIFT + right MouseButton -->
     <event NAME="ALT+SHIFT+rightBN" ID="644" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0500" KEY="Key_none" />
     <!-- ALT + SHIFT + right MouseButton and MouseMove -->
-    <event NAME="ALT+SHIFT+rightBN+MouseMove" ID="645" TYPE="Type_MouseButtonPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0502" KEY="Key_none" />
+    <event NAME="ALT+SHIFT+rightBN+MouseMove" ID="645" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0502" KEY="Key_none" />
     <!-- ALT + SHIFT + right MouseButtonRelease -->
     <event NAME="ALT+SHIFT+rightBN" ID="646" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0502" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonPress -->

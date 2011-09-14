@@ -33,9 +33,11 @@ void mitk::DisplayVectorInteractorScroll::ExecuteOperation(Operation* itkNotUsed
 bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
-  
+
+
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-  if(posEvent==NULL) return false;
+
+  m_IsAltModifierActive = false;
 
   int actionId = action->GetActionId();
   
@@ -43,6 +45,8 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
   {
   case AcINITMOVE:
     {
+      if(posEvent==NULL) return false;
+
       m_Sender=posEvent->GetSender();
       m_StartDisplayCoordinate=posEvent->GetDisplayPosition();
       m_LastDisplayCoordinate=posEvent->GetDisplayPosition();
@@ -50,15 +54,69 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
       ok = true;
       break;
     }
-  case AcSCROLL:
+  case AcSCROLLMOUSEWHEEL:
     {
+    const WheelEvent* wheelEvent=dynamic_cast<const WheelEvent*>(stateEvent->GetEvent());
+
+    if(wheelEvent != NULL)
+    {
+      int buttonState = stateEvent->GetEvent()->GetButtonState();
+      if(buttonState == 1024)
+      {
+        m_IsAltModifierActive = true;
+      }
+      mitk::SliceNavigationController::Pointer sliceNaviController = wheelEvent->GetSender()->GetSliceNavigationController();
+
+      if ( !sliceNaviController->GetSliceLocked() )
+      {
+        this->InvokeEvent( StartScrollInteractionEvent() );
+        mitk::Stepper* stepper = sliceNaviController->GetSlice();
+
+        if (stepper->GetSteps() <= 1)
+        {
+          stepper = sliceNaviController->GetTime();
+        }
+
+        // get the desired delta
+        int delta = wheelEvent->GetDelta();
+        if ( m_InvertScrollingDirection )
+          delta *= -1;  // If we want to invert the scrolling direction -> delta * -1
+
+        if ( delta < 0 )
+        {
+          stepper->Next();
+        }
+        else
+        {
+          stepper->Previous();
+        }
+      }
+      this->InvokeEvent( EndScrollInteractionEvent() );
+    }
+      ok = true;
+      break;
+    }
+  case AcSCROLL:
+  {
+      if(posEvent==NULL) return false;
+
+      int buttonState = stateEvent->GetEvent()->GetButtonState();
+      //1025 = Alt+LeftMouseButton+Move
+      //1028 = Alt+MiddleMouseButton+Move
+      if(buttonState == 1025 || buttonState == 1028 )
+      {
+        m_IsAltModifierActive = true;
+      }
+
       mitk::SliceNavigationController::Pointer sliceNaviController = m_Sender->GetSliceNavigationController();
 
       if(sliceNaviController)
       {
-        this->InvokeEvent( StartInteractionEvent() );
+        this->InvokeEvent( StartScrollInteractionEvent() );
 
-        int delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
+        int delta = 0;
+
+        delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
 
         // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
         if ( delta>0 && delta<m_IndexToSliceModifier )
@@ -102,11 +160,11 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
 
-        this->InvokeEvent( EndInteractionEvent() );
+        this->InvokeEvent( EndScrollInteractionEvent() );
       }
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();   
+      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
     }
   case AcFINISHMOVE:
     {
@@ -137,6 +195,7 @@ mitk::DisplayVectorInteractorScroll::DisplayVectorInteractorScroll(const char * 
   , m_IndexToSliceModifier(4)
   , m_AutoRepeat( false )
   , m_InvertScrollingDirection( false )
+  , m_IsAltModifierActive( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -157,5 +216,10 @@ mitk::DisplayVectorInteractorScroll::~DisplayVectorInteractorScroll()
 void mitk::DisplayVectorInteractorScroll::SetInvertScrollingDirection( bool invert )
 {
   m_InvertScrollingDirection = invert;
+}
+
+bool mitk::DisplayVectorInteractorScroll::IsAltModifierActive() const
+{
+  return m_IsAltModifierActive;
 }
 

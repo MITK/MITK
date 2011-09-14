@@ -46,8 +46,8 @@ namespace mitk {
 
     #pragma GCC visibility push(default)
     itkEventMacro( InteractionEvent, itk::AnyEvent );
-    itkEventMacro( StartInteractionEvent, InteractionEvent );
-    itkEventMacro( EndInteractionEvent, InteractionEvent );
+    itkEventMacro( StartScrollInteractionEvent, InteractionEvent );
+    itkEventMacro( EndScrollInteractionEvent, InteractionEvent );
     #pragma GCC visibility pop
 
     /**
@@ -63,6 +63,8 @@ namespace mitk {
     void SetAutoRepeat( bool autoRepeat );
 
     void SetInvertScrollingDirection( bool );
+
+    bool IsAltModifierActive() const;
 
   protected:
     /**
@@ -108,6 +110,8 @@ namespace mitk {
     bool m_AutoRepeat;
 
     bool m_InvertScrollingDirection;
+
+    bool m_IsAltModifierActive;
 
   };
 

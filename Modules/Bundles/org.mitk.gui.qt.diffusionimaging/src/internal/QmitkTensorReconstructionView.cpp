@@ -655,8 +655,7 @@ void QmitkTensorReconstructionView::TensorsToDWI()
 
 void QmitkTensorReconstructionView::TensorsToQbi()
 {
-  MITK_INFO << "TEST";
-  if (m_TensorImage)
+  if (m_TensorImageNode)
   {
     MITK_INFO << "starting Q-Ball estimation";
 
@@ -665,7 +664,7 @@ void QmitkTensorReconstructionView::TensorsToQbi()
     typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
 
     TensorImageType::Pointer itkvol = TensorImageType::New();
-    mitk::CastToItkImage<TensorImageType>(m_TensorImage, itkvol);
+    mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(m_TensorImageNode->GetData()), itkvol);
 
     typedef itk::TensorImageToQBallImageFilter< TTensorPixelType, TTensorPixelType > FilterType;
     FilterType::Pointer filter = FilterType::New();
@@ -681,6 +680,10 @@ void QmitkTensorReconstructionView::TensorsToQbi()
     image->SetVolume( outimg->GetBufferPointer() );
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
+    QString newname;
+    newname = newname.append(m_TensorImageNode->GetName().c_str());
+    newname = newname.append("_qbi");
+    node->SetName(newname.toAscii());
     GetDefaultDataStorage()->Add(node);
   }
 }
@@ -690,14 +693,14 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
   if ( !this->IsVisible() )
     return;
 
-  m_TensorImage = NULL;
+  m_TensorImageNode = NULL;
 
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
     if ( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
     {
-      m_TensorImage = dynamic_cast<mitk::TensorImage*>(node->GetData());
+      m_TensorImageNode = node;
     }
   }
 }
@@ -807,7 +810,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       filter->SetInput( itkvol );
       filter->SetBValue(bVal);
       filter->SetGradientList(gradientList);
-      filter->SetNumberOfThreads(1);
+      //filter->SetNumberOfThreads(1);
       filter->Update();
       clock.Stop();
       MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";

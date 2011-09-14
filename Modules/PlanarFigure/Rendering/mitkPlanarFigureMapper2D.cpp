@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkVtkPropRenderer.h"
 
+static const float PLANAR_OFFSET = 0.5f;
+
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
 {
   this->InitializeDefaultPlanarFigureProperties();
@@ -103,6 +105,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Enable line antialiasing
   glEnable( GL_LINE_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+  glEnable(GL_DEPTH_TEST);
   
   // Get properties from node (if present)
   const mitk::DataNode* node=this->GetDataNode();
@@ -325,7 +328,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     if(iter == vertices.begin())
       firstPoint = displayPoint;
 
-    glVertex2f( displayPoint[0], displayPoint[1] );
+    glVertex3f( displayPoint[0], displayPoint[1],PLANAR_OFFSET);
   }
 
   glEnd();
@@ -476,10 +479,10 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       // Paint outline
       glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
       glBegin( GL_LINE_LOOP );
-      glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
-      glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
-      glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
-      glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
+      glVertex3f( displayPoint[0] - 4, displayPoint[1] - 4 ,PLANAR_OFFSET);
+      glVertex3f( displayPoint[0] - 4, displayPoint[1] + 4 ,PLANAR_OFFSET );
+      glVertex3f( displayPoint[0] + 4, displayPoint[1] + 4 ,PLANAR_OFFSET);
+      glVertex3f( displayPoint[0] + 4, displayPoint[1] - 4 ,PLANAR_OFFSET);
       glEnd();
       break;
 
@@ -492,7 +495,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
         float angleRad = angle * (float) 3.14159 / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex2f(x,y);
+        glVertex3f(x,y,PLANAR_OFFSET);
       }
       glEnd();
 
@@ -504,7 +507,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
         float angleRad = angle * (float) 3.14159 / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex2f(x,y);
+        glVertex3f(x,y,PLANAR_OFFSET);
       }
       glEnd();
       break;

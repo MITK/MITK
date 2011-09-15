@@ -655,8 +655,10 @@ void QmitkTensorReconstructionView::TensorsToDWI()
 
 void QmitkTensorReconstructionView::TensorsToQbi()
 {
-  if (m_TensorImageNode)
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  for (int i=0; i<nodes.size(); i++)
   {
+    mitk::DataNode::Pointer tensorImageNode = nodes.at(i);
     MITK_INFO << "starting Q-Ball estimation";
 
     typedef float                                       TTensorPixelType;
@@ -664,7 +666,7 @@ void QmitkTensorReconstructionView::TensorsToQbi()
     typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
 
     TensorImageType::Pointer itkvol = TensorImageType::New();
-    mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(m_TensorImageNode->GetData()), itkvol);
+    mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(tensorImageNode->GetData()), itkvol);
 
     typedef itk::TensorImageToQBallImageFilter< TTensorPixelType, TTensorPixelType > FilterType;
     FilterType::Pointer filter = FilterType::New();
@@ -681,7 +683,7 @@ void QmitkTensorReconstructionView::TensorsToQbi()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
     QString newname;
-    newname = newname.append(m_TensorImageNode->GetName().c_str());
+    newname = newname.append(tensorImageNode->GetName().c_str());
     newname = newname.append("_qbi");
     node->SetName(newname.toAscii());
     GetDefaultDataStorage()->Add(node);
@@ -693,16 +695,6 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
   if ( !this->IsVisible() )
     return;
 
-  m_TensorImageNode = NULL;
-
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-    if ( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
-    {
-      m_TensorImageNode = node;
-    }
-  }
 }
 
 template<int ndirs>

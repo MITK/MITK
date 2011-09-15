@@ -114,7 +114,6 @@ protected:
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-  mitk::DataNode::Pointer m_TensorImageNode;
 };
 
 

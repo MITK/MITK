@@ -491,26 +491,55 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 //    localStorage->m_ReslicedImage = reslicedImage;
   localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
+  int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
+  //get the binary property
+  bool binary = false;
+  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  if(binary) //binary image
+  {
+    localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
+    bool binaryOutline = false;
+    this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
+    if(binaryOutline) //contour rendering
+    {
+
+    }
+    else //standard binary image
+    {
+      if(numberOfComponents != 1)
+        MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
+    }
+  }
+  else if( numberOfComponents == 1 ) //gray images
+  {
+  }
+  else if ( (numberOfComponents == 3) || (numberOfComponents == 4) ) //RBG(A) images
+  {
+  }
+  else
+  {
+    MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
+  }
+
+
   //set the current slice as texture for the plane
-  localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
-
-
-
-
+//  localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
 
 
   //setup the textured plane
-  this->GeneratePlane( renderer, sliceBounds );
+//  this->GeneratePlane( renderer, sliceBounds );
 
   //apply the properties after the slice was set
-  this->ApplyProperties( renderer );
+//  this->ApplyProperties( renderer );
 
   //transform the actor to its actual position in 3D
-  this->TransformActor( renderer );
+//  this->TransformActor( renderer );
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
 }
+
+
 
 
 

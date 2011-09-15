@@ -17,47 +17,45 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkToFNrrdImageWriter.h>
+#include <mitkToFPicImageWriter.h>
 #include <mitkImageGenerator.h>
 #include <mitkImageSliceSelector.h>
-#include "mitkItkImageFileReader.h"
+#include <mitkPicFileReader.h>
+#include <mitkPicFileWriter.h>
 
 /**Documentation
- *  test for the class "ToFImageWriter".
+ *  test for the class "ToFPicImageWriter".
  */
-int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
+int mitkToFPicImageWriterTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("ToFNrrdImageWriter");
+  MITK_TEST_BEGIN("ToFPicImageWriter");
 
-  mitk::ToFNrrdImageWriter::Pointer tofNrrdWriter = mitk::ToFNrrdImageWriter::New();
-  // testing correct initialization 
-  MITK_TEST_CONDITION_REQUIRED(tofNrrdWriter.GetPointer(), "Testing initialization of test object!");
-  MITK_TEST_CONDITION_REQUIRED(tofNrrdWriter->GetExtension() == ".nrrd", "testing initialization of extension member variable!");
+  mitk::ToFPicImageWriter::Pointer tofPicWriter = mitk::ToFPicImageWriter::New();
+  MITK_TEST_CONDITION_REQUIRED(tofPicWriter.GetPointer(), "Testing initialization of test object!");
+  MITK_TEST_CONDITION_REQUIRED(tofPicWriter->GetExtension() == ".pic", "Testing initialization of extension member variable!");
 
-  //GENERATE TEST DATA
-  ////run the test with some unusual parameters
+  //run the test with some unusual parameters
   unsigned int dimX = 255;
-  unsigned int dimY = 178;
+  unsigned int dimY = 188;
   unsigned int pixelNumber = dimX*dimY;
-  unsigned int numOfFrames = 23; //or numberOfSlices
-  ////create 3 images filled with random values
-  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 1.0f);
-  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 0.0f, 2000.0f);
-  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 0.0f, 100000.0f);
+  unsigned int numOfFrames = 117; //or numberOfSlices
 
-  //SET NEEDED PARAMETER
+  //create 3 images filled with random values
+  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0);
+  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0);
+  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0);
+
   //file names on the disc
-  std::string distanceImageFileName("distImg.nrrd");
-  std::string amplitudeImageFileName("amplImg.nrrd");
-  std::string intensityImageFileName("intImg.nrrd");
- 
-  // set file name methods
-  tofNrrdWriter->SetDistanceImageFileName(distanceImageFileName);
-  tofNrrdWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
-  tofNrrdWriter->SetIntensityImageFileName(intensityImageFileName);
-  tofNrrdWriter->SetCaptureWidth(dimX);
-  tofNrrdWriter->SetCaptureHeight(dimY);
-  tofNrrdWriter->SetToFImageType(mitk::ToFNrrdImageWriter::ToFImageType3D);
+  std::string distanceImageFileName("distImg.pic");
+  std::string amplitudeImageFileName("amplImg.pic");
+  std::string intensityImageFileName("intImg.pic");
+
+  tofPicWriter->SetDistanceImageFileName(distanceImageFileName);
+  tofPicWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
+  tofPicWriter->SetIntensityImageFileName(intensityImageFileName);
+  tofPicWriter->SetCaptureWidth(dimX);
+  tofPicWriter->SetCaptureHeight(dimY);
+  tofPicWriter->SetToFImageType(mitk::ToFImageWriter::ToFImageType3D);
 
   //buffer for each slice
   float* distanceArray;
@@ -68,40 +66,41 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   float* amplitudeArrayRead;
   float* intensityArrayRead;
 
-  tofNrrdWriter->Open(); //open file/stream
-
-  for(unsigned int i = 0; i < numOfFrames ; i++)
-  { 
-    distanceArray = (float*)distanceImage->GetSliceData(i, 0, 0)->GetData();
-    amplitudeArray = (float*)amplitudeImage->GetSliceData(i, 0, 0)->GetData();
-    intensityArray = (float*)intensityImage->GetSliceData(i, 0, 0)->GetData();
+  tofPicWriter->Open(); //open file/stream
+  //Note: the slices are written out reverse order, because the ToFPicImageWriter has to write them out immediately.
+  //A PicFileWriter would write them out vice versa and the PicFileWriter reads the slices vice versa.
+  
+  for(unsigned int i = numOfFrames; i > 0 ; i--)
+  { //write values to file/stream
+    //The slice index is "i-1", because "for(unsigned int i = numOfFrames-1; i >= 0 ; i--)" does not work for some reason
+    distanceArray = (float*)distanceImage->GetSliceData(i-1, 0, 0)->GetData();
+    amplitudeArray = (float*)amplitudeImage->GetSliceData(i-1, 0, 0)->GetData();
+    intensityArray = (float*)intensityImage->GetSliceData(i-1, 0, 0)->GetData();
 
     //write (or add) the three slices to the file
-    tofNrrdWriter->Add(distanceArray, amplitudeArray, intensityArray);
+    tofPicWriter->Add(distanceArray, amplitudeArray, intensityArray);
   }
- 
-  tofNrrdWriter->Close(); //close file
-
+  tofPicWriter->Close(); //close file
 
   //read in the three images from disc
-  mitk::ItkImageFileReader::Pointer fileReader = mitk::ItkImageFileReader::New();
+  mitk::PicFileReader::Pointer fileReader = mitk::PicFileReader::New();
   fileReader->SetFileName(distanceImageFileName);
   fileReader->Update();
   mitk::Image::Pointer distanceImageRead = fileReader->GetOutput();
 
-  fileReader = mitk::ItkImageFileReader::New();
+  fileReader = mitk::PicFileReader::New();
   fileReader->SetFileName(amplitudeImageFileName);
   fileReader->Update();
   mitk::Image::Pointer amplitudeImageRead = fileReader->GetOutput();
 
-  fileReader = mitk::ItkImageFileReader::New();
+  fileReader = mitk::PicFileReader::New();
   fileReader->SetFileName(intensityImageFileName);
   fileReader->Update();
   mitk::Image::Pointer intensityImageRead = fileReader->GetOutput();
 
   bool readingCorrect = true;
   //  for all frames...
-  for(unsigned int j=0; j < numOfFrames; j++)
+  for(unsigned int j=0; j<numOfFrames; j++)
   {
     //get one slice of each image and compare it
     //original data
@@ -115,10 +114,10 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
     intensityArrayRead = (float*)intensityImageRead->GetSliceData(j, 0, 0)->GetData();
 
     //for all pixels
-    for(unsigned int i=0; i<pixelNumber; i++)
+for(unsigned int i=0; i<pixelNumber; i++)
     {
       //compare if input == output
-      if(!mitk::Equal(distanceArrayRead[i], distanceArray[i]) ||
+      if(!mitk::Equal(distanceArrayRead[i],distanceArray[i]) ||
          !mitk::Equal(amplitudeArrayRead[i], amplitudeArray[i]) ||
          !mitk::Equal(intensityArrayRead[i], intensityArray[i]))
       {
@@ -127,12 +126,11 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
     }
   }
 
+  //delete created image files
   remove( distanceImageFileName.c_str() );
   remove( amplitudeImageFileName.c_str() );
   remove( intensityImageFileName.c_str() );
   MITK_TEST_CONDITION_REQUIRED(readingCorrect, "Testing if the output values are correct.");
-
-  //delete created image files
 
   MITK_TEST_END();  
 }

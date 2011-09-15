@@ -96,11 +96,11 @@ namespace mitk
   protected:
 
     /*!
-    \brief Checks file name if file extension exists. If not .pic is added to fileName
-    \param fileName file name to be checked
+    \brief Checks file name if file extension exists. If not an error message is returned
     */
     void CheckForFileExtension(std::string& fileName);
-
+    
+    // member variables
     std::string m_DistanceImageFileName; ///< file name for saving the distance image
     std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image
     std::string m_IntensityImageFileName; ///< file name for saving the intensity image
@@ -116,31 +116,9 @@ namespace mitk
     bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
     bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
     bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
-    
-    //Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
-    //FILE* m_DistanceOutfile; ///< file for distance image
-    //FILE* m_AmplitudeOutfile; ///< file for amplitude image
-    //FILE* m_IntensityOutfile; ///< file for intensity image
-
 
   private:
 
-    ///*!
-    //\brief Open file by filename to gain write access to it.
-    //*/
-    //void OpenPicFile(FILE** outfile, std::string outfileName);
-    ///*!
-    //\brief Close file after work on it is finished.
-    //*/
-    //void ClosePicFile(FILE* outfile);
-    ///*!
-    //\brief Replace current PicFileHeader information.
-    //*/
-    //void ReplacePicFileHeader(FILE* outfile);
-    ///*!
-    //\brief Write image information to the PicFileHeader.
-    //*/
-    //void WritePicFileHeader(FILE* outfile, mitkIpPicDescriptor* pic);
   };
 } //END mitk namespace
 #endif // __mitkToFImageWriter_h

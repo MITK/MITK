@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <mitkToFImageCsvWriter.h>
-//#include <mitkCommon.h>
 
 namespace mitk
 {

@@ -15,15 +15,12 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+// mitk includes
 #include <mitkToFNrrdImageWriter.h>
-//#include <mitkPicFileWriter.h>
-#include <mitkCommon.h>
-//#include <mitkPicFileReader.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
 #include "itkNrrdImageIO.h"
-//#include "itkImageIOBase.h"
 
 namespace mitk
 {
@@ -77,23 +74,6 @@ namespace mitk
     }
   }
 
-  //void ToFNrrdImageWriter::CheckForFileExtension(std::string& fileName)
-  //{
-  //  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
-  //  std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
-
-  //  if( extension.length() != 0 && extension != this->m_Extension)
-  //  {
-  //    this->m_Extension = extension;
-  //  }
-
-  //  size_t found = fileName.find( this->m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
-  //  if( fileName.length() > 3 && found != fileName.length() - this->m_Extension.length() )
-  //  {
-  //    fileName.append(this->m_Extension);
-  //  }
-  //}
-
   void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
   {
     if (this->m_DistanceImageSelected)
@@ -131,7 +111,7 @@ namespace mitk
       return;
     }
 
-    // flush the last data to the file and convert the stream data to Nrrd file
+    // flush the last data to the file and convert the stream data to nrrd file
     outfile.flush();
     this->ConvertStreamToNrrdFormat( fileName );
     outfile.close();
@@ -215,21 +195,7 @@ namespace mitk
     unsigned int size = this->m_PixelNumber * this->m_NumOfFrames;
     unsigned int sizeInBytes = size * sizeof(float);
     float* data = new float[size];
-
-    //int count = 0;
-    //while(count < size)
-    //{
-    //  data[count] = 0.0f;  
-    //  count++;
-    //}
     stream.read((char*)data, sizeInBytes);
-    
-    //count = 0;
-    //while(count < size)
-    //{
-    //  MITK_INFO<< "data at " << count << " = " << data[count];
-    //  count++;
-    //}
     nrrdWriter->Write(data);
     stream.close();
 
@@ -237,15 +203,5 @@ namespace mitk
     delete[] dimensions;
     delete[] floatData;
   }
-
-  //ToFNrrdImageWriter::ToFImageType ToFNrrdImageWriter::GetToFImageType()
-  //{
-  //  return this->m_ToFImageType;
-  //}
-
-  //void ToFNrrdImageWriter::SetToFImageType(ToFNrrdImageWriter::ToFImageType toFImageType)
-  //{
-  //  this->m_ToFImageType = toFImageType;
-  //}
 
 } // end namespace mitk

@@ -19,12 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkToFPicImageWriter_h
 
 #include "mitkToFHardwareExports.h"
-#include "mitkCommon.h"
-#include "mitkToFImageGrabber.h"
 #include "mitkToFImageWriter.h"
-
-#include "itkObject.h"
-#include "itkObjectFactory.h"
 
 namespace mitk
 {
@@ -49,37 +44,6 @@ namespace mitk
     mitkClassMacro( ToFPicImageWriter , ToFImageWriter );
     itkNewMacro( Self );
 
-    //itkGetMacro( DistanceImageFileName, std::string );
-    //itkGetMacro( AmplitudeImageFileName, std::string );
-    //itkGetMacro( IntensityImageFileName, std::string );
-    //itkGetMacro( Extension, std::string );
-    //itkGetMacro( CaptureWidth, int );
-    //itkGetMacro( CaptureHeight, int );
-    //itkGetMacro( DistanceImageSelected, bool );
-    //itkGetMacro( AmplitudeImageSelected, bool );
-    //itkGetMacro( IntensityImageSelected, bool );
-
-    //itkSetMacro( DistanceImageFileName, std::string );
-    //itkSetMacro( AmplitudeImageFileName, std::string );
-    //itkSetMacro( IntensityImageFileName, std::string );
-    //itkSetMacro( Extension, std::string );
-    //itkSetMacro( CaptureWidth, int );
-    //itkSetMacro( CaptureHeight, int );
-    //itkSetMacro( DistanceImageSelected, bool );
-    //itkSetMacro( AmplitudeImageSelected, bool );
-    //itkSetMacro( IntensityImageSelected, bool );
-
-    //enum ToFImageType{ ToFImageType3D, ToFImageType2DPlusT };
-    /*!
-    \brief Get the type of image to be written
-    \return ToF image type: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-    */
-    //ToFImageWriter::ToFImageType GetToFImageType();
-    /*!
-    \brief Set the type of image to be written
-    \param toFImageType type of the ToF image: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-    */
-    //void SetToFImageType(ToFImageWriter::ToFImageType toFImageType);
     /*!
     \brief Open file(s) for writing
     */
@@ -94,28 +58,6 @@ namespace mitk
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
 
   protected:
-
-    /*!
-    \brief Checks file name if file extension exists. If not .pic is added to fileName
-    \param fileName file name to be checked
-    */
-    //void CheckForFileExtension(std::string& fileName);
-
-    //std::string m_DistanceImageFileName; ///< file name for saving the distance image
-    //std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image
-    //std::string m_IntensityImageFileName; ///< file name for saving the intensity image
-    //std::string m_Extension; ///< file extension used for saving images
-
-    //int m_CaptureWidth; ///< width (x-dimension) of the images to record.
-    //int m_CaptureHeight; ///< height (y-dimension) of the images to record.
-    //int m_PixelNumber; ///< number of pixels (widht*height) of the images to record
-    //int m_ImageSizeInBytes; ///< size of the image to save in bytes
-    //int m_NumOfFrames; ///< number of frames written to the image. Used for pic header.
-    //ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-
-    //bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
-    //bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
-    //bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
     
     Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
     FILE* m_DistanceOutfile; ///< file for distance image

@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include <mitkToFPicImageWriter.h>
 #include <mitkPicFileWriter.h>
-#include <mitkCommon.h>
 #include <mitkPicFileReader.h>
 
 // itk includes
@@ -71,33 +70,6 @@ namespace mitk
       this->m_MitkImage->Initialize( PixelType(typeid(float)), 3, dimensions, 1);
     }
     this->m_MitkImage->SetSlice(floatData, 0, 0, 0);
-
-
-    //ImageWriter::Pointer imageWriter = ImageWriter::New();
-    //  if (this->m_DistanceImageSelected)
-    //  {
-    //    imageWriter->SetFileName(this->m_DistanceImageFileName);
-    //    imageWriter->SetInputImage();
-    //    imageWriter->SetExtension(this->m_Extension);
-    //    imageWriter->Modified();
-    //    imageWriter->Update();
-    //  }
-    //  if (this->m_AmplitudeImageSelected)
-    //  {
-    //    imageWriter->SetFileName(this->m_AmplitudeImageFileName);
-    //    imageWriter->SetInputImage();
-    //    imageWriter->SetExtension(this->m_Extension);
-    //    imageWriter->Modified();
-    //    imageWriter->Update();
-    //  }
-    //  if (this->m_IntensityImageSelected)
-    //  {
-    //    imageWriter->SetFileName(this->m_IntensityImageFileName);
-    //    imageWriter->SetInputImage();
-    //    imageWriter->SetExtension(this->m_Extension);
-    //    imageWriter->Modified();
-    //    imageWriter->Update();
-    //  }
 
     mitkIpPicDescriptor* pic = this->m_MitkImage->GetPic();
 
@@ -223,30 +195,4 @@ namespace mitk
     pic->info->pixel_start_in_file = ftell( outfile );
   }
 
-  //void ToFPicImageWriter::CheckForFileExtension(std::string& fileName)
-  //{
-  //  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
-  //  std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
-
-  //  if( extension.length() != 0 && extension != this->m_Extension)
-  //  {
-  //    this->m_Extension = extension;
-  //  }
-
-  //  size_t found  = fileName.find( this->m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
-  //  if( fileName.length() > this->m_Extension.length() && found != fileName.length() - this->m_Extension.length() )
-  //  {
-  //    fileName.append(this->m_Extension);
-  //  }
-  //}
-
-  //ToFPicImageWriter::ToFImageType ToFImageWriter::GetToFImageType()
-  //{
-  //  return this->m_ToFImageType;
-  //}
-
-  //void ToFPicImageWriter::SetToFImageType(ToFImageWriter::ToFImageType toFImageType)
-  //{
-  //  this->m_ToFImageType = toFImageType;
-  //}
 } // end namespace mitk

@@ -205,13 +205,13 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == 5)
     {//PMD MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.nrrd);;MITK Images (deprecated) (*.pic)");
+      fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
     }
     else if (selectedCamera == 6)
     {//MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.nrrd);;MITK Images (deprecated) (*.pic)");
+      fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
     }
 

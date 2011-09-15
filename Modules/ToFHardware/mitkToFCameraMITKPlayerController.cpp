@@ -138,7 +138,7 @@ namespace mitk
         }
         else
         {
-          throw std::exception("Please check image type, currently only .nrrd files are supported (.pic files are depracated!)");
+          throw std::logic_error("Please check image type, currently only .nrrd files are supported (.pic files are depracated!)");
         }
 
         // check if the opened files contained data
@@ -180,7 +180,7 @@ namespace mitk
           this->m_ToFImageType = ToFImageType2DPlusT;
 
         else
-          throw std::exception("Error opening ToF data file: Invalid dimension.");
+          throw std::logic_error("Error opening ToF data file: Invalid dimension.");
 
         this->m_CaptureWidth = infoImage->GetDimension(0);
         this->m_CaptureHeight = infoImage->GetDimension(1);

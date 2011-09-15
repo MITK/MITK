@@ -87,7 +87,7 @@ namespace mitk
       return false;
     }
 
-    ok = OpenMITKFile();
+    ok = this->OpenMITKFile();
     if (!ok)
     {
       this->CloseCameraConnection();

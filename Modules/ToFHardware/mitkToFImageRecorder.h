@@ -21,8 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFHardwareExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
-#include "mitkToFImageWriter.h"
+#include "mitkToFPicImageWriter.h"
 #include "mitkToFImageCsvWriter.h"
+#include "mitkToFNrrdImageWriter.h"
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"

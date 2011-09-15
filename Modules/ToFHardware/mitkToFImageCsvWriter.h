@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToFImageWriter.h"
 #include "mitkToFHardwareExports.h"
-#include "mitkCommon.h"
 
 namespace mitk
 {
@@ -63,6 +62,12 @@ namespace mitk
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
 
   protected:
+
+    Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
+    FILE* m_DistanceOutfile; ///< file for distance image
+    FILE* m_AmplitudeOutfile; ///< file for amplitude image
+    FILE* m_IntensityOutfile; ///< file for intensity image
+
 
   private:
     /*!

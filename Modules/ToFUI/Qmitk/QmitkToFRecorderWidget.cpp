@@ -218,19 +218,19 @@ void QmitkToFRecorderWidget::OnStartRecorder()
 
       if (selectedFilter.compare("Text (*.csv)") == 0)
       {
-        this->m_ToFImageRecorder->SetFileFormat("csv");
+        this->m_ToFImageRecorder->SetFileFormat(".csv");
       }
-      else if (selectedFilter.compare("MITK-Images (*.pic)") == 0)
+      else if (selectedFilter.compare("MITK-Images (*.pic)(deprecated)") == 0)
       {
         //default
-        this->m_ToFImageRecorder->SetFileFormat("pic");
+        this->m_ToFImageRecorder->SetFileFormat(".pic");
         
         QMessageBox::warning(NULL, "Deprecated File Format!", 
           "Please note that *.pic file format is deprecated and not longer supported! The suggested file format for images is *.nrrd!");
       }
       else if (selectedFilter.compare("MITK-Images (*.nrrd)") == 0)
       {
-        this->m_ToFImageRecorder->SetFileFormat("nrrd");
+        this->m_ToFImageRecorder->SetFileFormat(".nrrd");
       }
       else
       {

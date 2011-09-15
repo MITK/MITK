@@ -16,27 +16,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <mitkToFNrrdImageWriter.h>
-#include <mitkPicFileWriter.h>
+//#include <mitkPicFileWriter.h>
 #include <mitkCommon.h>
-#include <mitkPicFileReader.h>
+//#include <mitkPicFileReader.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
 #include "itkNrrdImageIO.h"
-
-//extern "C" 
-//{
-//size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
-//}
+//#include "itkImageIOBase.h"
 
 namespace mitk
 {
-  ToFNrrdImageWriter::ToFNrrdImageWriter():m_Extension(".nrrd"),
-    m_DistanceOutfile(), m_AmplitudeOutfile(), m_IntensityOutfile(),
-    m_NumOfFrames(0), m_DistanceImageSelected(true), m_AmplitudeImageSelected(true), m_IntensityImageSelected(true),
-    m_CaptureWidth(200), m_CaptureHeight(200), m_PixelNumber(0), m_ImageSizeInBytes(0),
-    m_ToFImageType(ToFNrrdImageWriter::ToFImageType3D)
+  ToFNrrdImageWriter::ToFNrrdImageWriter(): ToFImageWriter(),
+    m_DistanceOutfile(), m_AmplitudeOutfile(), m_IntensityOutfile()   
   {
+    m_Extension = std::string(".nrrd");
   }
 
   ToFNrrdImageWriter::~ToFNrrdImageWriter()
@@ -54,7 +48,7 @@ namespace mitk
 
     if (this->m_DistanceImageSelected)
     {
-      this->OpenStreamFile(this->m_DistanceOutfile, this->m_DistanceImageFileName);
+      this->OpenStreamFile( this->m_DistanceOutfile, this->m_DistanceImageFileName);
     }
     if (this->m_AmplitudeImageSelected)
     {
@@ -83,43 +77,44 @@ namespace mitk
     }
   }
 
-  void ToFNrrdImageWriter::CheckForFileExtension(std::string& fileName)
-  {
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+  //void ToFNrrdImageWriter::CheckForFileExtension(std::string& fileName)
+  //{
+  //  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
+  //  std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
 
-    if( extension.length() != 0 && extension != this->m_Extension)
-    {
-      this->m_Extension = extension;
-    }
+  //  if( extension.length() != 0 && extension != this->m_Extension)
+  //  {
+  //    this->m_Extension = extension;
+  //  }
 
-    size_t found = fileName.find( this->m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
-    if( fileName.length() > 3 && found != fileName.length() - this->m_Extension.length() )
-    {
-      fileName.append(this->m_Extension);
-    }
-  }
+  //  size_t found = fileName.find( this->m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
+  //  if( fileName.length() > 3 && found != fileName.length() - this->m_Extension.length() )
+  //  {
+  //    fileName.append(this->m_Extension);
+  //  }
+  //}
+
   void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
   {
     if (this->m_DistanceImageSelected)
     {
-      this->m_DistanceOutfile->write(( char* ) distanceFloatData, this->m_ImageSizeInBytes);
+      this->m_DistanceOutfile.write( (char*) distanceFloatData, this->m_ImageSizeInBytes);
     }
     if (this->m_AmplitudeImageSelected)
     {
-      this->m_AmplitudeOutfile->write(( char* )amplitudeFloatData, this->m_ImageSizeInBytes);
+      this->m_AmplitudeOutfile.write( (char*)amplitudeFloatData, this->m_ImageSizeInBytes);
     }
     if (this->m_IntensityImageSelected)
     {
-      this->m_IntensityOutfile->write(( char* )intensityFloatData, this->m_ImageSizeInBytes);
+      this->m_IntensityOutfile.write(( char* )intensityFloatData, this->m_ImageSizeInBytes);
     }
     this->m_NumOfFrames++;
   }
 
-  void ToFNrrdImageWriter::OpenStreamFile( std::ofstream*  &outfile, std::string outfileName )
+  void ToFNrrdImageWriter::OpenStreamFile( std::ofstream &outfile, std::string outfileName )
   {
-    outfile = new std::ofstream(outfileName.c_str());
-    if(! outfile)
+    outfile.open(outfileName.c_str(), std::ofstream::binary);
+    if(!outfile.is_open())
     {
       MITK_ERROR << "Error opening outfile: " << outfileName;
       throw std::logic_error("Error opening outfile.");
@@ -127,22 +122,24 @@ namespace mitk
     }
   }
 
-  void ToFNrrdImageWriter::CloseStreamFile( std::ofstream* &outfile, std::string fileName )
+  void ToFNrrdImageWriter::CloseStreamFile( std::ofstream &outfile, std::string fileName )
   {
     if (this->m_NumOfFrames == 0)
     {
-      outfile->close();
+      outfile.close();
       throw std::logic_error("File is empty.");
       return;
     }
-    // TODO set data to itk::NrrdImageIO and write it to file!
-    this->ConvertStreamToNrrdFormat(outfile, fileName);
 
-    outfile->close();
+    // flush the last data to the file and convert the stream data to Nrrd file
+    outfile.flush();
+    this->ConvertStreamToNrrdFormat( fileName );
+    outfile.close();
   }
 
-  void ToFNrrdImageWriter::ConvertStreamToNrrdFormat(std::ofstream* outfile, std::string fileName)
+  void ToFNrrdImageWriter::ConvertStreamToNrrdFormat( std::string fileName )
   {
+
     float* floatData = new float[this->m_PixelNumber];
     for(int i=0; i<this->m_PixelNumber; i++)
     {
@@ -150,7 +147,6 @@ namespace mitk
     }
 
     Image::Pointer imageTemplate = Image::New();
-    
     int dimension ;
     unsigned int* dimensions;
     if(m_ToFImageType == ToFImageType2DPlusT)
@@ -191,7 +187,7 @@ namespace mitk
     mitk::Vector3D spacing = imageTemplate->GetGeometry()->GetSpacing();
     mitk::Point3D origin = imageTemplate->GetGeometry()->GetOrigin();
 
-    for(unsigned int i=0; i<dimension; i++)
+    for(unsigned int i = 0; i < dimension; i++)
     {
       nrrdWriter->SetDimensions(i,dimensions[i]);
       nrrdWriter->SetSpacing(i,spacing[i]);
@@ -201,7 +197,7 @@ namespace mitk
       direction.Set_vnl_vector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
       vnl_vector< double > axisDirection(dimension);
 
-      for(unsigned int j=0; j<dimension; j++)
+      for(unsigned int j = 0; j < dimension; j++)
       {
         axisDirection[j] = direction[j]/spacing[i];
       }
@@ -215,22 +211,41 @@ namespace mitk
     nrrdWriter->SetFileName(fileName);
     nrrdWriter->SetUseStreamedWriting(true);
 
-    const void * data = (void*) outfile;
-    nrrdWriter->Write(data);
+    std::ifstream stream(fileName.c_str(), std::ifstream::binary);
+    unsigned int size = this->m_PixelNumber * this->m_NumOfFrames;
+    unsigned int sizeInBytes = size * sizeof(float);
+    float* data = new float[size];
 
+    //int count = 0;
+    //while(count < size)
+    //{
+    //  data[count] = 0.0f;  
+    //  count++;
+    //}
+    stream.read((char*)data, sizeInBytes);
+    
+    //count = 0;
+    //while(count < size)
+    //{
+    //  MITK_INFO<< "data at " << count << " = " << data[count];
+    //  count++;
+    //}
+    nrrdWriter->Write(data);
+    stream.close();
+
+    delete[] data;
     delete[] dimensions;
     delete[] floatData;
-
   }
 
-  ToFNrrdImageWriter::ToFImageType ToFNrrdImageWriter::GetToFImageType()
-  {
-    return this->m_ToFImageType;
-  }
+  //ToFNrrdImageWriter::ToFImageType ToFNrrdImageWriter::GetToFImageType()
+  //{
+  //  return this->m_ToFImageType;
+  //}
 
-  void ToFNrrdImageWriter::SetToFImageType(ToFNrrdImageWriter::ToFImageType toFImageType)
-  {
-    this->m_ToFImageType = toFImageType;
-  }
+  //void ToFNrrdImageWriter::SetToFImageType(ToFNrrdImageWriter::ToFImageType toFImageType)
+  //{
+  //  this->m_ToFImageType = toFImageType;
+  //}
 
 } // end namespace mitk

@@ -74,20 +74,19 @@ namespace mitk
       throw std::invalid_argument("ToFCameraDevice is NULL.");
       return;
     }
-    if (this->m_FileFormat.compare("csv") == 0)
+    if (this->m_FileFormat.compare(".csv") == 0)
     {
       this->m_ToFImageWriter = ToFImageCsvWriter::New();
     }
-    else if(this->m_FileFormat.compare("nrrd") == 0)
+    else if(this->m_FileFormat.compare(".nrrd") == 0)
     {
-      this->m_ToFImageWriter = ToFImageWriter::New();
+      this->m_ToFImageWriter = ToFNrrdImageWriter::New();
       this->m_ToFImageWriter->SetExtension(m_FileFormat);
     }
-    else if(this->m_FileFormat.compare("pic") == 0)
+    else if(this->m_FileFormat.compare(".pic") == 0)
     {
-      this->m_ToFImageWriter = ToFImageWriter::New();
+      this->m_ToFImageWriter = ToFPicImageWriter::New();
       this->m_ToFImageWriter->SetExtension(m_FileFormat);
-
     }
 
     this->m_CaptureWidth = this->m_ToFCameraDevice->GetCaptureWidth();

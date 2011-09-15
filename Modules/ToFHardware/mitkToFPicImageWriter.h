@@ -15,16 +15,16 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkToFNrrdImageWriter_h
-#define __mitkToFNrrdImageWriter_h
+#ifndef __mitkToFPicImageWriter_h
+#define __mitkToFPicImageWriter_h
 
-//#include "mitkToFHardwareExports.h"
-//#include "mitkCommon.h"
-//#include "mitkToFImageGrabber.h"
+#include "mitkToFHardwareExports.h"
+#include "mitkCommon.h"
+#include "mitkToFImageGrabber.h"
 #include "mitkToFImageWriter.h"
 
-//#include "itkObject.h"
-//#include "itkObjectFactory.h"
+#include "itkObject.h"
+#include "itkObjectFactory.h"
 
 namespace mitk
 {
@@ -38,10 +38,15 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFNrrdImageWriter : public ToFImageWriter
+  class MITK_TOFHARDWARE_EXPORT ToFPicImageWriter : public ToFImageWriter
   {
   public: 
-    mitkClassMacro( ToFNrrdImageWriter , ToFImageWriter );
+
+    ToFPicImageWriter();
+
+    ~ToFPicImageWriter();
+
+    mitkClassMacro( ToFPicImageWriter , ToFImageWriter );
     itkNewMacro( Self );
 
     //itkGetMacro( DistanceImageFileName, std::string );
@@ -65,16 +70,16 @@ namespace mitk
     //itkSetMacro( IntensityImageSelected, bool );
 
     //enum ToFImageType{ ToFImageType3D, ToFImageType2DPlusT };
-    ///*!
-    //\brief Get the type of image to be written
-    //\return ToF image type: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-    //*/
-    //ToFNrrdImageWriter::ToFImageType GetToFImageType();
-    ///*!
-    //\brief Set the type of image to be written
-    //\param toFImageType type of the ToF image: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-    //*/
-    //void SetToFImageType(ToFNrrdImageWriter::ToFImageType toFImageType);
+    /*!
+    \brief Get the type of image to be written
+    \return ToF image type: ToFImageType3D (0) or ToFImageType2DPlusT (1)
+    */
+    //ToFImageWriter::ToFImageType GetToFImageType();
+    /*!
+    \brief Set the type of image to be written
+    \param toFImageType type of the ToF image: ToFImageType3D (0) or ToFImageType2DPlusT (1)
+    */
+    //void SetToFImageType(ToFImageWriter::ToFImageType toFImageType);
     /*!
     \brief Open file(s) for writing
     */
@@ -106,34 +111,37 @@ namespace mitk
     //int m_PixelNumber; ///< number of pixels (widht*height) of the images to record
     //int m_ImageSizeInBytes; ///< size of the image to save in bytes
     //int m_NumOfFrames; ///< number of frames written to the image. Used for pic header.
-    //ToFNrrdImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
+    //ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
 
     //bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
     //bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
     //bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
     
-    //Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
-    std::ofstream m_DistanceOutfile; ///< file for distance image
-    std::ofstream m_AmplitudeOutfile; ///< file for amplitude image
-    std::ofstream m_IntensityOutfile; ///< file for intensity image
+    Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
+    FILE* m_DistanceOutfile; ///< file for distance image
+    FILE* m_AmplitudeOutfile; ///< file for amplitude image
+    FILE* m_IntensityOutfile; ///< file for intensity image
+
 
   private:
-
-    ToFNrrdImageWriter();
-    ~ToFNrrdImageWriter();
 
     /*!
     \brief Open file by filename to gain write access to it.
     */
-    void OpenStreamFile(std::ofstream &outfile, std::string outfileName);
+    void OpenPicFile(FILE** outfile, std::string outfileName);
     /*!
     \brief Close file after work on it is finished.
     */
-    void CloseStreamFile(std::ofstream &outfile, std::string fileName);
+    void ClosePicFile(FILE* outfile);
     /*!
-    \brief Write image information to the NrrdFile.
+    \brief Replace current PicFileHeader information.
     */
-    void ConvertStreamToNrrdFormat( std::string fileName );
+    void ReplacePicFileHeader(FILE* outfile);
+    /*!
+    \brief Write image information to the PicFileHeader.
+    */
+    void WritePicFileHeader(FILE* outfile, mitkIpPicDescriptor* pic);
+
   };
 } //END mitk namespace
-#endif // __mitkToFNrrdImageWriter_h
+#endif // __mitkToFPicImageWriter_h

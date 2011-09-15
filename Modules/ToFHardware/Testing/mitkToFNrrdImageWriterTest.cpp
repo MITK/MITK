@@ -30,16 +30,16 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ToFNrrdImageWriter");
 
-  //run the test with some unusual parameters
-  unsigned int dimX = 255;
-  unsigned int dimY = 188;
+  ////run the test with some unusual parameters
+  unsigned int dimX = 25;
+  unsigned int dimY = 18;
   unsigned int pixelNumber = dimX*dimY;
-  unsigned int numOfFrames = 1; //or numberOfSlices
+  unsigned int numOfFrames = 5; //or numberOfSlices
 
-  //create 3 images filled with random values
-  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 1.0f);
-  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 1.0f);
-  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 1.0f);
+  ////create 3 images filled with random values
+  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 5.0f);
+  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 6.0f, 10.0f);
+  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 11.0f, 15.0f);
 
   mitk::ToFNrrdImageWriter::Pointer tofWriter = mitk::ToFNrrdImageWriter::New();
 
@@ -77,7 +77,7 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   float* amplitudeArrayRead;
   float* intensityArrayRead;
 
-  tofWriter->Open(); //open file/stream
+   tofWriter->Open(); //open file/stream
   //Note: the slices are written out reverse order, because the ToFImageWriter has to write them out immediately.
   //A PicFileWriter would write them out vice versa and the PicFileWriter reads the slices vice versa.
   for(unsigned int i = numOfFrames; i > 0 ; i--)

@@ -205,13 +205,13 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == 5)
     {//PMD MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.pic)");
+      fileFilter.append("MITK Images (*.nrrd);;MITK Images (deprecated) (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
     }
     else if (selectedCamera == 6)
     {//MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.nrrd);;MITK Images (*.pic) (deprecated)");
+      fileFilter.append("MITK Images (*.nrrd);;MITK Images (deprecated) (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
     }
 
@@ -225,7 +225,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         m_Controls->m_ConnectCameraButton->setEnabled(true);
         m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //        m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-        OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+        this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }

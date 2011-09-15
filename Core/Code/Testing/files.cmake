@@ -82,7 +82,7 @@ SET(MODULE_TESTIMAGES
 SET(MODULE_CUSTOM_TESTS
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
-    mitkDataStorageTest.cpp
+    #mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
@@ -90,7 +90,7 @@ SET(MODULE_CUSTOM_TESTS
     mitkNodeDependentPointSetInteractorTest.cpp
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
-    mitkImageTest.cpp
+    #mitkImageTest.cpp
     mitkImageWriterTest.cpp
 )
 

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 #include "mitkPixelType.h"
+#include <itkImage.h>
 #include <mitkLogMacros.h>
 
 
@@ -28,9 +29,11 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("PixelTypeTest");
 
   mitk::PixelType ptype( typeid(int) ,5);
-  MITK_TEST_CONDITION_REQUIRED( *ptype.GetTypeId() == typeid(int), "GetTypeId()");
+  typedef itk::Image<int, 5> ItkImageType;
+
+  MITK_TEST_CONDITION_REQUIRED( ptype.GetTypeId() == typeid(int), "GetTypeId()");
   //MITK_TEST_CONDITION_REQUIRED( ptype == typeid(int), "operator ==");
-  MITK_TEST_CONDITION_REQUIRED( ptype.GetItkTypeId() == NULL, "GetItkTypeId(");
+  MITK_TEST_CONDITION_REQUIRED( ptype.GetPixelTypeId() == typeid(ItkImageType), "GetPixelTypeId(");
   MITK_INFO << sizeof(int);
   MITK_TEST_CONDITION_REQUIRED( ptype.GetBpe() == 8*sizeof(int)*5, "GetBpe()");
   MITK_TEST_CONDITION_REQUIRED( ptype.GetNumberOfComponents() == 5, "GetNumberOfComponents()");
@@ -41,8 +44,8 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
 
     {
       mitk::PixelType ptype2( ptype); 
-      MITK_TEST_CONDITION_REQUIRED( *ptype.GetTypeId() == typeid(int), "ptype2( ptype)- GetTypeId()");
-      MITK_TEST_CONDITION_REQUIRED( ptype.GetItkTypeId() == NULL, "ptype2( ptype)-GetItkTypeId(");
+      MITK_TEST_CONDITION_REQUIRED( ptype.GetTypeId() == typeid(int), "ptype2( ptype)- GetTypeId()");
+      MITK_TEST_CONDITION_REQUIRED( ptype.GetPixelTypeId() == typeid(ItkImageType), "ptype2( ptype)-GetPixelTypeId(");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetBpe() == 8*sizeof(int)*5, "ptype2( ptype)-GetBpe()");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetNumberOfComponents() == 5, "ptype2( ptype)-GetNumberOfComponents()");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetBitsPerComponent() == 8*sizeof(int), "ptype2( ptype)-GetBitsPerComponent()");
@@ -51,8 +54,8 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
 
     {
       mitk::PixelType ptype2 = ptype; 
-      MITK_TEST_CONDITION_REQUIRED( *ptype.GetTypeId() == typeid(int), "ptype2 = ptype- GetTypeId()");
-      MITK_TEST_CONDITION_REQUIRED( ptype.GetItkTypeId() == NULL, "ptype2 = ptype- GetItkTypeId(");
+      MITK_TEST_CONDITION_REQUIRED( ptype.GetTypeId() == typeid(int), "ptype2 = ptype- GetTypeId()");
+      MITK_TEST_CONDITION_REQUIRED( ptype.GetPixelTypeId() == typeid(ItkImageType), "ptype2 = ptype- GetPixelTypeId(");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetBpe() == 8*sizeof(int)*5, "ptype2 = ptype- GetBpe()");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetNumberOfComponents() == 5, "ptype2 = ptype- GetNumberOfComponents()");
       MITK_TEST_CONDITION_REQUIRED( ptype.GetBitsPerComponent() == 8*sizeof(int), "ptype2 = ptype- GetBitsPerComponent()");

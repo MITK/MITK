@@ -180,6 +180,8 @@ namespace mitk {
       }
     };
 
+    void GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary = false );
+
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 

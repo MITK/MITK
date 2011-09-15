@@ -178,8 +178,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   mitk::ScalarType widthInMM, heightInMM;
 
   // where we want to sample
-//  Point3D origin;
-//  Vector3D right, bottom, normal;
+  //  Point3D origin;
+  //  Vector3D right, bottom, normal;
 
   // take transform of input image into account
   const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
@@ -339,7 +339,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     {
     case VTK_RESLICE_NEAREST:
       localStorage->m_Reslicer->SetInterpolationModeToNearestNeighbor();
-//      localStorage->m_Reslicer->SetInterpolationMode();
+      //      localStorage->m_Reslicer->SetInterpolationMode();
       break;
     case VTK_RESLICE_LINEAR:
       localStorage->m_Reslicer->SetInterpolationModeToLinear();
@@ -488,33 +488,58 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
   //set the current slice for the localStorage
-//    localStorage->m_ReslicedImage = reslicedImage;
+  //    localStorage->m_ReslicedImage = reslicedImage;
   localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
   bool binary = false;
+  bool binaryOutline = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   if(binary) //binary image
   {
-    localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
-    bool binaryOutline = false;
     this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
     if(binaryOutline) //contour rendering
     {
+      if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
+      {
+        //generate ontours/outlines
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData(renderer);
 
+        float binaryOutlineWidth(1.0);
+        if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+        {
+          localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
+        }
+      }
+      else
+      {
+        MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
+      }
     }
     else //standard binary image
     {
       if(numberOfComponents != 1)
         MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
+      //Interpret the values as binary values
+      localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+
+      this->GenerateLookuptable(renderer, true);
     }
   }
   else if( numberOfComponents == 1 ) //gray images
   {
+    //Interpret the values as gray values
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+
+    this->GenerateLookuptable(renderer);
   }
   else if ( (numberOfComponents == 3) || (numberOfComponents == 4) ) //RBG(A) images
   {
+    //Interpret the RGB(A) images values correctly
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+
+    this->GenerateLookuptable(renderer);
   }
   else
   {
@@ -522,26 +547,95 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
 
-  //set the current slice as texture for the plane
-//  localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
-
-
   //setup the textured plane
-//  this->GeneratePlane( renderer, sliceBounds );
+  //  this->GeneratePlane( renderer, sliceBounds );
 
   //apply the properties after the slice was set
-//  this->ApplyProperties( renderer );
+  //  this->ApplyProperties( renderer );
 
   //transform the actor to its actual position in 3D
-//  this->TransformActor( renderer );
+  this->TransformActor( renderer );
+
+  if(binary && binaryOutline)
+  {
+    //We need the contour for the binary oultine property as actor
+    localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+    localStorage->m_Actor->SetTexture(NULL); //no texture for contours
+  }
+  else
+  {
+    //set the current slice as texture for the plane
+    localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
+
+    localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+
+    //setup the textured plane
+    this->GeneratePlane( renderer, sliceBounds );
+    //set the plane as input for the mapper
+    localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+    //set the texture for the actor
+    localStorage->m_Actor->SetTexture(localStorage->m_Texture);
+  }
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
 }
 
+void mitk::ImageVtkMapper2D::GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary )
+{
+  LocalStorage* localStorage = this->GetLocalStorage(renderer);
+  //are there any changes in the property list?
+  if( localStorage->m_LookupTable->GetMTime() <= this->GetDataNode()->GetPropertyList()->GetMTime())
+  {
+    if(binary)
+    {
+      //default lookuptable for binary images
+      localStorage->m_LookupTable->SetRange(0.0, 1.0);
+    }
+    else
+    {
+      bool useColor = true;
+      this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
+      if((!useColor))
+      {
+        //BEGIN PROPERTY user-defined lut
+        //currently we do not allow a lookuptable if it is a binary image
+        // If lookup table use is requested...
+        mitk::LookupTableProperty::Pointer LookupTableProp;
+        LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
+                          (this->GetDataNode()->GetProperty("LookupTable"));
+        //...check if there is a lookuptable provided by the user
+        if ( LookupTableProp.IsNull() )
+        {
+          MITK_WARN << "The use of a lookuptable is requested, but there is no lookuptable supplied by the user! The default lookuptable will be used instead.";
+        }
+        else
+        {
+          // If lookup table use is requested and supplied by the user:
+          // only update the lut, when the properties have changed...
+          if( LookupTableProp->GetLookupTable()->GetMTime()
+            <= this->GetDataNode()->GetPropertyList()->GetMTime() )
+            {
+            LookupTableProp->GetLookupTable()->ChangeOpacityForAll( localStorage->m_Actor->GetProperty()->GetOpacity() );
+            LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+          }
+          //we use the user-defined lookuptable
+          localStorage->m_LookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
+          //we obtained a user-defined lut and dont have to use the default table
+        }
+      }//END PROPERTY user-defined lut
+      else //most common case: default lut
+      {
+        //default lookuptable with level window property
+        LevelWindow levelWindow;
+        this->GetLevelWindow( levelWindow, renderer );
 
-
-
+        //set up the lookuptable with the level window range
+        localStorage->m_LookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+      }
+    }
+  }
+}
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
                                                 vtkFloatingPointType *bounds )

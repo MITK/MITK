@@ -377,7 +377,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   pic_transformed = mitkIpPicNew();
   pic_transformed->dim=3;
   pic_transformed->bpe  = output->GetPixelType().GetBpe();
-  pic_transformed->type = output->GetPixelType().GetType();
+  //pic_transformed->type = output->GetPixelType().GetType();
   pic_transformed->n[0] = output->GetDimension(0);
   pic_transformed->n[1] = output->GetDimension(1);
   pic_transformed->n[2] = output->GetDimension(2);

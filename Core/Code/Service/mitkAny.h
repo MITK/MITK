@@ -47,10 +47,12 @@ DEALINGS IN THE SOFTWARE.
 namespace mitk {
 
 template<class T>
-std::string any_value_to_string(const T& val);
+MITK_CORE_EXPORT std::string any_value_to_string(const T& val);
 
-MITK_CORE_EXPORT std::string any_value_to_string(const std::vector<std::string>& val);
-MITK_CORE_EXPORT std::string any_value_to_string(const std::list<std::string>& val);
+#ifndef Mitk_EXPORTS
+extern template std::string any_value_to_string(const std::vector<std::string>& val);
+extern template std::string any_value_to_string(const std::list<std::string>& val);
+#endif
 
 /**
  * An Any class represents a general type and is capable of storing any type, supporting type-safe extraction

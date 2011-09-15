@@ -50,7 +50,6 @@ SET(MODULE_TESTS
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   #mitkAbstractTransformGeometryTest.cpp
-  #mitkPicFileIOTest.cpp
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
@@ -63,10 +62,8 @@ SET(MODULE_TESTS
 # test with image filename as an extra command line parameter
 SET(MODULE_IMAGE_TESTS
   mitkSurfaceVtkWriterTest.cpp
-  mitkPicFileWriterTest.cpp
   #mitkImageSliceSelectorTest.cpp
   mitkImageTimeSelectorTest.cpp
-  mitkPicFileReaderTest.cpp
   # mitkVtkPropRendererTest.cpp
   mitkDataNodeFactoryTest.cpp
   #mitkSTLFileReaderTest.cpp

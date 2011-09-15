@@ -84,7 +84,8 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id)
   }
   else
   {
-    return (this->m_ChannelDesc[id]).GetPixelType();
+    mitk::ChannelDescriptor refDesc = this->m_ChannelDesc[id];
+    return refDesc.GetPixelType();//  .GetPixelType();
   }
 }
 

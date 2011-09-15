@@ -62,7 +62,18 @@ public:
     unsigned char* GetData() const
     { return m_Data; }
 
+    void SetData( void* dataPtr )
+    {
+      if(dataPtr != NULL)
+      {
+        m_Data = (unsigned char*) dataPtr;
+      }
+    }
+
+
 protected:
+
+
     void AllocateData();
 
     /** Name of the channel */

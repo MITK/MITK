@@ -598,6 +598,7 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
       std::memcpy(vol->GetData(), data, m_OffsetTable[3]*(ptypeSize));
     }
     vol->SetComplete(true);
+    this->m_ImageDescriptor->GetChannelDescriptor(n).SetData( vol->GetData() );
     //we just added a missing Volume, which is not regarded as modification.
     //Therefore, we do not call Modified()!
   }
@@ -635,6 +636,8 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
     if ( ch->GetData() != data )
       std::memcpy(ch->GetData(), data, m_OffsetTable[4]*(ptypeSize));
     ch->SetComplete(true);
+
+    this->m_ImageDescriptor->GetChannelDescriptor(n).SetData( ch->GetData() );
     //we just added a missing Channel, which is not regarded as modification.
     //Therefore, we do not call Modified()!
   }

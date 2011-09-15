@@ -28,7 +28,9 @@ namespace mitk
 
     Meant to support legacy mitkIpPicDescriptor using an own type description, different to the mitk::PixelType
   */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( const mitk::PixelType&) );
+  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( const std::type_info& intype ) );
+
+  LegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype ) );
 
 } // end namespace mitk
 

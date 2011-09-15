@@ -43,6 +43,9 @@ void OpenCsvFile(FILE** outfile, std::string outfileName)
 int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ToFImageCsvWriter");
+  mitk::ToFImageCsvWriter::Pointer csvWriter = mitk::ToFImageCsvWriter::New();
+  MITK_TEST_CONDITION_REQUIRED(csvWriter.GetPointer(), "Testing initialization of test object!");
+  MITK_TEST_CONDITION_REQUIRED(csvWriter->GetExtension() == ".csv", "Testing correct initialization of member variable extension!");
 
   unsigned int dimX = 320;
   unsigned int dimY = 160;
@@ -53,7 +56,6 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames);
   mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames);
 
-  mitk::ToFImageCsvWriter::Pointer csvWriter = mitk::ToFImageCsvWriter::New();
 
   std::string distanceImageFileName("distImg.csv");
   std::string amplitudeImageFileName("amplImg.csv");

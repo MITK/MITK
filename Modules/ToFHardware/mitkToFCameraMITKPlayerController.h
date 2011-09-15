@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFHardwareExports.h"
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
+#include "mitkImage.h"
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -95,8 +96,14 @@ namespace mitk
     bool m_ConnectionCheck; ///< flag showing whether the camera is connected (true) or not (false)
 
     std::string m_InputFileName;
+    std::string m_Extension;
 
     ToFImageType m_ToFImageType; ///< type of the ToF image to be played: 3D Volume (ToFImageType3D), temporal 2D image stack (ToFImageType2DPlusT)
+
+    Image::Pointer m_DistanceImage;
+    Image::Pointer m_AmplitudeImage;
+    Image::Pointer m_IntensityImage;
+    std::vector<bool> m_ImageStatus;
 
     FILE* m_DistanceInfile; ///< file holding the distance data
     FILE* m_AmplitudeInfile; ///< file holding the amplitude data
@@ -116,8 +123,12 @@ namespace mitk
 
   private:
 
-    void OpenPicFileToData(FILE** outfile, const char *outfileName);
-
+    //void OpenPicFileToData(FILE** outfile, const char *outfileName);
+    void AccessData(int frame, Image::Pointer image, float* &data);
+    bool CheckCurrentFileType();
+    void OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image);
+    void OpenPicImageFile( const std::string outfileName, Image::Pointer &image);
+    void CleanUp();
   };
 } //END mitk namespace
 #endif

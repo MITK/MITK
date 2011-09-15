@@ -16,25 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <mitkToFImageCsvWriter.h>
-#include <mitkCommon.h>
 
 namespace mitk
 {
-  ToFImageCsvWriter::ToFImageCsvWriter()
+  ToFImageCsvWriter::ToFImageCsvWriter(): ToFImageWriter(), m_DistanceOutfile(NULL), 
+    m_AmplitudeOutfile(NULL), m_IntensityOutfile(NULL)
   {
-    this->m_Extension = ".csv";
-    this->m_DistanceOutfile = NULL;
-    this->m_AmplitudeOutfile = NULL;
-    this->m_IntensityOutfile = NULL;
-    this->m_NumOfFrames = 0;
-    this->m_MitkImage = NULL;
-    this->m_ToFImageType = mitk::ToFImageWriter::ToFImageType3D;
-    this->m_DistanceImageSelected = true;
-    this->m_AmplitudeImageSelected = true;
-    this->m_IntensityImageSelected = true;
-    this->m_DistanceImageFileName = "";
-    this->m_AmplitudeImageFileName = "";
-    this->m_IntensityImageFileName = "";
+    this->m_Extension = std::string(".csv");
   }
 
   ToFImageCsvWriter::~ToFImageCsvWriter()

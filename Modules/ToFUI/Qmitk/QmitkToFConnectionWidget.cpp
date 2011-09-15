@@ -223,13 +223,13 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == "PMD Raw Data Player")
     {//PMD MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.pic)");
+      fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
     }
     else if (selectedCamera == "MITK Player")
     {//MITK player
       playerMode = true;
-      fileFilter.append("MITK Images (*.pic)");
+      fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
     }
 
@@ -261,9 +261,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( tmpFileName.toStdString() );
           std::string extension = itksys::SystemTools::GetFilenameLastExtension( tmpFileName.toStdString() );
 
-          if (extension != ".pic")
+          if (extension != ".pic" && extension != ".nrrd")
           {
-            msg = msg + "Invalid file format, please select a \".pic\"-file";
+            msg = msg + "Invalid file format, please select a \".nrrd\"-file";
             throw std::logic_error(msg.c_str());
           }
           int found = baseFilename.rfind("_DistanceImage");
@@ -393,7 +393,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     m_Controls->m_ConnectCameraButton->setText("Connect");
     m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-    OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
+    this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
 
     this->m_ToFImageGrabber = NULL;
     // send disconnect signal to the caller functionality

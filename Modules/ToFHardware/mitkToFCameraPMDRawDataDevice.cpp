@@ -161,9 +161,9 @@ namespace mitk
         vtkShortArray* channelData = vtkShortArray::New();
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
+        toFCameraDevice->m_ImageMutex->Unlock();
         toFCameraDevice->m_Controller->GetShortSourceData(toFCameraDevice->m_ShortSourceData);
         toFCameraDevice->GetChannelSourceData( toFCameraDevice->m_ShortSourceData, channelData );
-        toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
@@ -231,50 +231,50 @@ namespace mitk
 
   void ToFCameraPMDRawDataDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
+      m_ImageMutex->Lock();
       this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 1, 0 );
+      m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
     else
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
-    m_ImageMutex->Unlock();
   }
 
   void ToFCameraPMDRawDataDevice::GetIntensities(float* intensityArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
+      m_ImageMutex->Lock();
       this->XYAxisFlipImage(this->m_IntensityArray, intensityArray, 0, 1);
+      m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
     else
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
-    m_ImageMutex->Unlock();
   }
 
   void ToFCameraPMDRawDataDevice::GetDistances(float* distanceArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
       // Flip around y- axis (vertical axis)
+      m_ImageMutex->Lock();
       this->XYAxisFlipImage(this->m_DistanceArray,distanceArray, 1, 1);
+      m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
     else
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
-    m_ImageMutex->Unlock();
   }
 
   void ToFCameraPMDRawDataDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
@@ -282,7 +282,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      m_ImageMutex->Lock();
       // 1) copy the image buffer
       // 2) convert the distance values from m to mm
       // 3) Flip around y- axis (vertical axis)
@@ -293,7 +292,6 @@ namespace mitk
         // buffer empty
         MITK_INFO << "Buffer empty!! ";
         capturedImageSequence = this->m_ImageSequence;
-        m_ImageMutex->Unlock();
         return;
       }
 
@@ -317,9 +315,9 @@ namespace mitk
         capturedImageSequence = requiredImageSequence;
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
-      m_ImageMutex->Unlock();
 
       int u, v;
+      m_ImageMutex->Lock();
       for (int i=0; i<this->m_CaptureHeight; i++)
       {
         for (int j=0; j<this->m_CaptureWidth; j++)
@@ -331,8 +329,8 @@ namespace mitk
           intensityArray[u] = this->m_IntensityArray[v];
         }
       }
-
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
+      m_ImageMutex->Unlock();
     }
     else
     {

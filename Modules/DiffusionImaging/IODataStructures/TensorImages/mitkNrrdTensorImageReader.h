@@ -38,7 +38,8 @@ namespace mitk
 
     typedef mitk::TensorImage OutputType;
     typedef mitk::TensorImageSource DTImgSourceType;
- 
+    typedef itk::Matrix< float, 3, 3 > MeasurementFrameType;
+
     mitkClassMacro( NrrdTensorImageReader, DTImgSourceType );
     itkNewMacro(Self);
 

@@ -82,12 +82,98 @@ namespace mitk
         typedef VecImgType::PixelType FixPixType;
         int numComponents = img->GetNumberOfComponentsPerPixel();
 
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+        if ( locale.compare(currLocale)!=0 )
+        {
+          try
+          {
+            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+            setlocale(LC_ALL, locale.c_str());
+          }
+          catch(...)
+          {
+            MITK_INFO << "Could not set locale " << locale;
+          }
+        }
+
+        itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
+        std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+        std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+        std::string metaString;
+
+        bool readFrame = false;
+        double xx, xy, xz, yx, yy, yz, zx, zy, zz;
+        MeasurementFrameType measFrame;
+        measFrame.SetIdentity();
+        MeasurementFrameType measFrameTransp;
+        measFrameTransp.SetIdentity();
+
+        for (; itKey != imgMetaKeys.end(); itKey ++)
+        {
+          itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+          if (itKey->find("measurement frame") != std::string::npos)
+          {
+            MITK_INFO << *itKey << " ---> " << metaString.c_str();
+            sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
+
+            if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
+                yx>10e-10 || yy>10e-10 || yz>10e-10 ||
+                zx>10e-10 || zy>10e-10 || zz>10e-10 )
+            {
+              readFrame = true;
+
+              measFrame(0,0) = xx;
+              measFrame(0,1) = xy;
+              measFrame(0,2) = xz;
+              measFrame(1,0) = yx;
+              measFrame(1,1) = yy;
+              measFrame(1,2) = yz;
+              measFrame(2,0) = zx;
+              measFrame(2,1) = zy;
+              measFrame(2,2) = zz;
+
+              measFrameTransp = measFrame.GetTranspose();
+
+              MITK_INFO << "Will apply following measurement frame: \n" << measFrame;
+            }
+          }
+        }
+
+        try
+        {
+          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+          setlocale(LC_ALL, currLocale.c_str());
+        }
+        catch(...)
+        {
+          MITK_INFO << "Could not reset locale " << currLocale;
+        }
+
         if (numComponents==6)
         {
           while (!it.IsAtEnd())
           {
+            // T'=RTR'
             VarPixType vec = it.Get();
             FixPixType fixVec(vec.GetDataPointer());
+
+            if(readFrame)
+            {
+              itk::DiffusionTensor3D<float> tensor;
+              tensor.SetElement(0, vec.GetElement(0));
+              tensor.SetElement(1, vec.GetElement(1));
+              tensor.SetElement(2, vec.GetElement(2));
+              tensor.SetElement(3, vec.GetElement(3));
+              tensor.SetElement(4, vec.GetElement(4));
+              tensor.SetElement(5, vec.GetElement(5));
+
+              tensor = tensor.PreMultiply(measFrame);
+              tensor = tensor.PostMultiply(measFrameTransp);
+              fixVec = tensor;
+            }
+
             ot.Set(fixVec);
             ++ot;
             ++it;
@@ -105,6 +191,12 @@ namespace mitk
             tensor.SetElement(3, vec.GetElement(4));
             tensor.SetElement(4, vec.GetElement(5));
             tensor.SetElement(5, vec.GetElement(8));
+
+            if(readFrame)
+            {
+              tensor = tensor.PreMultiply(measFrame);
+              tensor = tensor.PostMultiply(measFrameTransp);
+            }
 
             FixPixType fixVec(tensor);
             ot.Set(fixVec);

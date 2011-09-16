@@ -317,9 +317,10 @@ namespace mitk
       }
 
       m_ImageMutex->Lock();
-      m_RawDataSource->GetAmplitudes(amplitudeArray);
-      m_RawDataSource->GetIntensities(intensityArray);
-      m_RawDataSource->GetDistances(distanceArray);
+      m_RawDataSource->GetAllData(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray);
+      memcpy(distanceArray, this->m_DistanceArray, this->m_PixelNumber*sizeof(float));
+      memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_PixelNumber*sizeof(float));
+      memcpy(intensityArray, this->m_IntensityArray, this->m_PixelNumber*sizeof(float));
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
       m_ImageMutex->Unlock();
 

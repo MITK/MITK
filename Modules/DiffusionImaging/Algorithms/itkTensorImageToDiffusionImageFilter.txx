@@ -89,7 +89,7 @@ namespace itk
       itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
 
     rescaler->SetOutputMinimum ( 0 );
-    rescaler->SetOutputMaximum ( 32767 );
+    rescaler->SetOutputMaximum ( 10000 );
     rescaler->SetInput ( myFilter1->GetOutput() );
     try
     {
@@ -156,12 +156,13 @@ namespace itk
 
       OutputPixelType out;
       out.SetSize(m_GradientList.size()+1);
+      out.Fill(0);
 
-      for( unsigned int i=0; i<m_GradientList.size(); i++)
+      if( b0 > 0)
       {
-
-        if( b0 > 0)
+        for( unsigned int i=0; i<m_GradientList.size(); i++)
         {
+
           GradientType g = m_GradientList[i];
 
           InputPixelType S;
@@ -178,8 +179,8 @@ namespace itk
               T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
 
           out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
-        }
 
+        }
       }
 
       out[m_GradientList.size()] = b0;

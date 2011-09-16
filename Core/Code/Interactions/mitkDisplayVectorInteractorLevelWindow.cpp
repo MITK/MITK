@@ -97,6 +97,8 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
       lv.SetLevelWindow( level, window );
       dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow( lv );
 
+      m_Sender->GetRenderingManager()->RequestUpdateAll();
+
       ok = true;
       break;
     }

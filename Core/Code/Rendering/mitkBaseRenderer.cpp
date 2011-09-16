@@ -634,6 +634,12 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 
 void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
+  BaseRendererMapType::iterator brIter;
+  for( brIter = baseRendererMap.begin(); brIter != baseRendererMap.end(); brIter++ )
+  {
+    (*brIter).second->GetRenderingManager()->ExecutePendingRequests();
+  }
+
   //if (m_CameraController)
   //{
   //  if((me->GetButtonState()<=512) || (me->GetButtonState()>=516))// provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine

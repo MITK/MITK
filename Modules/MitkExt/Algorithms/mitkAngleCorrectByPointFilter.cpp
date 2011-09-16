@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkAngleCorrectByPointFilter.h"
+#include "mitkIpPic.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 
@@ -191,7 +192,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
           }
         }
       }
-      output->SetPicVolume(pic_out, t, n);
+      //output->SetPicVolume(pic_out, t, n);
     }
   }
 }

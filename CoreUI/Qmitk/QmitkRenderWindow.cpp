@@ -80,7 +80,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mousePressMitkEvent(&myevent);
   
-  QVTKWidget::mousePressEvent(me);
+  //QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
@@ -90,7 +90,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mouseReleaseMitkEvent(&myevent);
   
-  QVTKWidget::mouseReleaseEvent(me);
+  //QVTKWidget::mouseReleaseEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
@@ -103,7 +103,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mouseMoveMitkEvent(&myevent);
   
-  QVTKWidget::mouseMoveEvent(me);
+  //QVTKWidget::mouseMoveEvent(me);
 
   //if (m_ResendQtEvents) me->ignore();
   ////Show/Hide Menu Widget
@@ -139,7 +139,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
   this->wheelMitkEvent(&myevent);
 
-  QVTKWidget::wheelEvent(we);
+  //QVTKWidget::wheelEvent(we);
 
   if (m_ResendQtEvents) 
     we->ignore();
@@ -152,7 +152,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   this->keyPressMitkEvent(&mke);
   ke->accept();
 
-  QVTKWidget::keyPressEvent(ke);
+  //QVTKWidget::keyPressEvent(ke);
 
   if (m_ResendQtEvents) ke->ignore();
 }

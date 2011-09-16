@@ -267,14 +267,14 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
   
   mitk::Image::Pointer mitkResult= mitk::Image::New();
  
-  if (*mitkInput->GetPixelType().GetTypeId() == typeid(unsigned char))
+  if (mitkInput->GetPixelType().GetTypeId() == typeid(unsigned char))
   {
     //cast to itkImage
     itk::Image< unsigned char, 3 >::Pointer itkInput;
     mitk::CastToItkImage(mitkInput,itkInput);
     mitkResult = ScalarToRGBA<unsigned char>(itkInput, tf);
   }
-  else if (*mitkInput->GetPixelType().GetTypeId() == typeid(short))
+  else if (mitkInput->GetPixelType().GetTypeId() == typeid(short))
   {
     //cast to itkImage
     itk::Image< short, 3 >::Pointer itkInput;
@@ -561,12 +561,12 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
   itk::Image< short, 3 >::Pointer inputCT;
   itk::Image< unsigned char, 3 >::Pointer inputBinary;
  
-  if (*input1->GetPixelType().GetTypeId() == typeid(unsigned char) && *input2->GetPixelType().GetTypeId() == typeid(short))
+  if (input1->GetPixelType().GetTypeId() == typeid(unsigned char) && input2->GetPixelType().GetTypeId() == typeid(short))
   {
     mitk::CastToItkImage(input1,inputBinary);
     mitk::CastToItkImage(input2,inputCT);
   }
-  else if (*input1->GetPixelType().GetTypeId() == typeid(short) && *input2->GetPixelType().GetTypeId() == typeid(unsigned char))
+  else if (input1->GetPixelType().GetTypeId() == typeid(short) && input2->GetPixelType().GetTypeId() == typeid(unsigned char))
   {
     mitk::CastToItkImage(input1,inputCT);
     mitk::CastToItkImage(input2,inputBinary);
@@ -848,12 +848,12 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
   itk::Image< short, 3 >::Pointer inputCT;
   itk::Image< unsigned char, 3 >::Pointer inputBinary;
  
-  if (*input1->GetPixelType().GetTypeId() == typeid(unsigned char) && *input2->GetPixelType().GetTypeId() == typeid(short))
+  if (input1->GetPixelType().GetTypeId() == typeid(unsigned char) && input2->GetPixelType().GetTypeId() == typeid(short))
   {
     mitk::CastToItkImage(input1,inputBinary);
     mitk::CastToItkImage(input2,inputCT);
   }
-  else if (*input1->GetPixelType().GetTypeId() == typeid(short) && *input2->GetPixelType().GetTypeId() == typeid(unsigned char))
+  else if (input1->GetPixelType().GetTypeId() == typeid(short) && input2->GetPixelType().GetTypeId() == typeid(unsigned char))
   {
     mitk::CastToItkImage(input1,inputCT);
     mitk::CastToItkImage(input2,inputBinary);

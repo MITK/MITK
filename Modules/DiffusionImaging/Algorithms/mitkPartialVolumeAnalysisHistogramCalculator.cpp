@@ -60,7 +60,7 @@ namespace mitk
     m_NumberOfBins(256),
     m_UpsamplingFactor(1),
     m_GaussianSigma(0),
-    m_ForceUpdate(false)
+    m_ForceUpdate(false),
     m_PlanarFigureThickness(0)
   {
     m_EmptyHistogram = HistogramType::New();

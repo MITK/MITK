@@ -179,11 +179,8 @@ namespace mitk
         }
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
         toFCameraDevice->m_RawDataSource->Update();
-        toFCameraDevice->m_ImageMutex->Lock();
-        toFCameraDevice->m_RawDataSource->GetAmplitudes(toFCameraDevice->m_AmplitudeArray);
-        toFCameraDevice->m_RawDataSource->GetIntensities(toFCameraDevice->m_IntensityArray);
-        toFCameraDevice->m_RawDataSource->GetDistances(toFCameraDevice->m_DistanceArray);
-        toFCameraDevice->m_ImageMutex->Unlock();
+        //toFCameraDevice->m_ImageMutex->Lock();
+        //toFCameraDevice->m_ImageMutex->Unlock();
 
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -235,7 +232,8 @@ namespace mitk
     {
       // Flip around y- axis (vertical axis)
       m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 1, 0 );
+      this->m_RawDataSource->GetAmplitudes(amplitudeArray);
+      //this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 1, 0 );
       m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
@@ -251,7 +249,8 @@ namespace mitk
     {
       // Flip around y- axis (vertical axis)
       m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_IntensityArray, intensityArray, 0, 1);
+      this->m_RawDataSource->GetIntensities(intensityArray);
+      //this->XYAxisFlipImage(this->m_IntensityArray, intensityArray, 0, 1);
       m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
@@ -267,7 +266,8 @@ namespace mitk
     {
       // Flip around y- axis (vertical axis)
       m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_DistanceArray,distanceArray, 1, 1);
+      this->m_RawDataSource->GetDistances(distanceArray);
+      //this->XYAxisFlipImage(this->m_DistanceArray,distanceArray, 1, 1);
       m_ImageMutex->Unlock();
       imageSequence = this->m_ImageSequence;
     }
@@ -316,21 +316,25 @@ namespace mitk
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
 
-      int u, v;
       m_ImageMutex->Lock();
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          u = i*this->m_CaptureWidth+j;
-          v = (i+1)*this->m_CaptureWidth-1-j;
-          distanceArray[u] = this->m_DistanceArray[v]; // unit in millimeter
-          amplitudeArray[u] = this->m_AmplitudeArray[v];
-          intensityArray[u] = this->m_IntensityArray[v];
-        }
-      }
+      m_RawDataSource->GetAmplitudes(amplitudeArray);
+      m_RawDataSource->GetIntensities(intensityArray);
+      m_RawDataSource->GetDistances(distanceArray);
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
       m_ImageMutex->Unlock();
+
+      //int u, v;
+      //for (int i=0; i<this->m_CaptureHeight; i++)
+      //{
+      //  for (int j=0; j<this->m_CaptureWidth; j++)
+      //  {
+      //    u = i*this->m_CaptureWidth+j;
+      //    v = (i+1)*this->m_CaptureWidth-1-j;
+      //    distanceArray[v] = this->m_DistanceArray[v];
+      //    amplitudeArray[v] = this->m_AmplitudeArray[v];
+      //    intensityArray[v] = this->m_IntensityArray[v];
+      //  }
+      //}
     }
     else
     {

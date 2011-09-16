@@ -124,17 +124,23 @@ void ThreadedToFRawDataReconstruction::SetChannelData(vtkShortArray* sourceData)
 
 void ThreadedToFRawDataReconstruction::GetDistances(float* dist)
 {
+  m_ThreadData->m_ImageDataMutex->Lock();
   memcpy(dist, m_CISDist, m_ImageSize*sizeof(float) );
+  m_ThreadData->m_ImageDataMutex->Unlock();
 }
 
 void ThreadedToFRawDataReconstruction::GetAmplitudes(float* ampl)
-{
+{  
+  m_ThreadData->m_ImageDataMutex->Lock();
   memcpy(ampl, m_CISAmpl, m_ImageSize*sizeof(float));
+  m_ThreadData->m_ImageDataMutex->Unlock();
 }
 
 void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
 {
-  memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));
+  m_ThreadData->m_ImageDataMutex->Lock();
+  memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));  
+  m_ThreadData->m_ImageDataMutex->Unlock();
 }
 
   void ThreadedToFRawDataReconstruction::GenerateData()

@@ -22,9 +22,10 @@ SET(module_dirs
     OpenCVVideoSupport
     Overlays
     InputDevices
-    ToFHardware
-    ToFProcessing
-    ToFUI
+# bug-8977-IpPicFree : Deactivating temporarily ToF
+#   ToFHardware
+#   ToFProcessing
+#   ToFUI
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

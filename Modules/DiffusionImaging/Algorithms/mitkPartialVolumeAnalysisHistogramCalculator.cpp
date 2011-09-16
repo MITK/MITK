@@ -61,6 +61,7 @@ namespace mitk
     m_UpsamplingFactor(1),
     m_GaussianSigma(0),
     m_ForceUpdate(false)
+    m_PlanarFigureThickness(0)
   {
     m_EmptyHistogram = HistogramType::New();
     HistogramType::SizeType histogramSize;
@@ -594,14 +595,14 @@ namespace mitk
     typename ResamplerType::SpacingType spacing = planegeo->GetSpacing();
     spacing[0] = image->GetSpacing()[0] / upsamp;
     spacing[1] = image->GetSpacing()[1] / upsamp;
-    spacing[2] = image->GetSpacing()[2];
+    spacing[2] = image->GetSpacing()[2] / upsamp; // klaus add /upsamp
     resampler->SetOutputSpacing( spacing );
 
     // Size
     typename ResamplerType::SizeType size;
     size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
     size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
-    size[2] = 1;
+    size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
     resampler->SetSize( size );
 
     // Origin
@@ -610,7 +611,7 @@ namespace mitk
     planegeo3D->WorldToIndex(orig,corrorig);
     corrorig[0] += 0.5/upsamp;
     corrorig[1] += 0.5/upsamp;
-    corrorig[2] += 0;
+    corrorig[2] -= (float)m_PlanarFigureThickness/upsamp; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
     planegeo3D->IndexToWorld(corrorig,corrorig);
     resampler->SetOutputOrigin(corrorig );
 
@@ -1113,12 +1114,32 @@ namespace mitk
     m_InternalImageMask3D = itkImporter->GetOutput();
     m_InternalImageMask3D->SetDirection(image->GetDirection());
 
-    itk::ImageRegionConstIterator<MaskImage3DType>
+    itk::ImageRegionIterator<MaskImage3DType>
         itmask(m_InternalImageMask3D, m_InternalImageMask3D->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<ImageType>
-        itimage(image, image->GetLargestPossibleRegion());
+    itmask = itmask.Begin();
+    while( !itmask.IsAtEnd() )
+    {
+      if(itmask.Get() != 0)
+      {
+        typename ImageType::IndexType index = itmask.GetIndex();
+        for(int thick=0; thick<2*m_PlanarFigureThickness+1; thick++)
+        {
+          index[axis] = thick;
+          m_InternalImageMask3D->SetPixel(index, itmask.Get());
+        }
+      }
+      ++itmask;
+    }
+
+//    typedef itk::ImageFileWriter< MaskImage3DType >  WriterType;
+//    WriterType::Pointer writer = WriterType::New();
+//    writer->SetFileName( "/home/fritzsck/Desktop/mask.nrrd" );
+//    writer->SetInput( m_InternalImageMask3D );
+//    writer->Update();
 
     itmask = itmask.Begin();
+    itk::ImageRegionIterator<ImageType>
+        itimage(image, image->GetLargestPossibleRegion());
     itimage = itimage.Begin();
 
     typename ImageType::SizeType lowersize = {{9999999999.0,9999999999.0,9999999999.0}};

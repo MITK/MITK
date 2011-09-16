@@ -166,6 +166,21 @@ namespace mitk
       }
     }
 
+    /** \brief Get thickness of planar figure. */
+    unsigned int GetPlanarFigureThickness( )
+    { return m_PlanarFigureThickness; }
+
+
+    /** \brief Set thickness of planar figure. */
+    void SetPlanarFigureThickness( unsigned int number )
+    {
+      if(m_PlanarFigureThickness != number)
+      {
+        m_PlanarFigureThickness = number;
+        SetModified();
+      }
+    }
+
     /** \brief Get histogram number of bins. */
     float GetGaussianSigma( )
     { return m_GaussianSigma; }
@@ -353,6 +368,9 @@ namespace mitk
     itk::ImageRegion<3> m_CropRegion;
 
     bool m_ForceUpdate;
+
+    unsigned int m_PlanarFigureThickness;
+
   };
 
 }

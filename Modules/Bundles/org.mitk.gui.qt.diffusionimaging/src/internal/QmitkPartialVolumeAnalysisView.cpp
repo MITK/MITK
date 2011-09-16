@@ -1262,6 +1262,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     else
     {
       m_CurrentStatisticsCalculator = mitk::PartialVolumeAnalysisHistogramCalculator::New();
+//      m_CurrentStatisticsCalculator->SetPlanarFigureThickness(1);
       if(m_IsTensorImage)
       {
         m_CurrentStatisticsCalculator->SetImage( m_CAImage );

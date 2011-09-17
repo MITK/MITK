@@ -19,7 +19,7 @@
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAtomic.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
@@ -681,14 +681,14 @@ void QmitkDataStorageTreeModel::SetShowNodesContainingNoData(bool _ShowNodesCont
 void QmitkDataStorageTreeModel::UpdateNodeVisibility()
 {
   mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
-  mitk::NodePredicateNot::Pointer dataIsNotNull = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain dat
+  mitk::NodePredicateNot::Pointer dataIsNotNull = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain data
 
   if (m_ShowHelperObjects)
   {
     if (m_ShowNodesContainingNoData)
     {
       // Show every node
-      m_Predicate = mitk::NodePredicateOr::New(dataIsNull, dataIsNotNull);
+      m_Predicate = mitk::NodePredicateAtomic::True;
     }
     else
     {

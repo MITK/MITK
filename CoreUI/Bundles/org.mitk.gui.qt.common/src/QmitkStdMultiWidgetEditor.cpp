@@ -149,6 +149,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
 
+    bool pixelValueInExponentialFormat = prefs->GetBool("Show pixel value in exponential format", false);
+    m_StdMultiWidget->SetPixelValueInExponentialFormat(pixelValueInExponentialFormat);
+    int pixelValuePrecision = prefs->GetInt("Pixel value precision", 2);
+    m_StdMultiWidget->SetPixelValuePrecision(pixelValuePrecision);
+
     this->OnPreferencesChanged(prefs.GetPointer());
   }
 }
@@ -220,6 +225,11 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   {
     m_StdMultiWidget->DisableStandardLevelWindow();
   }
+
+  bool pixelValueInExponentialFormat = prefs->GetBool("Show pixel value in exponential format", false);
+  m_StdMultiWidget->SetPixelValueInExponentialFormat(pixelValueInExponentialFormat);
+  int pixelValuePrecision = prefs->GetInt("Pixel value precision", 2);
+  m_StdMultiWidget->SetPixelValuePrecision(pixelValuePrecision);
 }
 
 

@@ -55,12 +55,14 @@ mitkWidget1(NULL),
 mitkWidget2(NULL),
 mitkWidget3(NULL),
 mitkWidget4(NULL),
+m_GradientBackgroundFlag(true),
 m_PlaneNode1(NULL), 
 m_PlaneNode2(NULL), 
 m_PlaneNode3(NULL), 
 m_Node(NULL),
-m_GradientBackgroundFlag(true),
-m_PendingCrosshairPositionEvent(false)
+m_PendingCrosshairPositionEvent(false),
+m_PixelValueInExponentialFormat(false),
+m_PixelValuePrecision(2)
 {
   /*******************************/
   //Create Widget manually
@@ -1635,16 +1637,13 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     image3D->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
-    stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
+    stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> "
+         << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: ";
     mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
-    if (fabs(pixelValue)>1000000)
-    {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+    if (m_PixelValueInExponentialFormat) {
+      stream << std::scientific;
     }
-    else
-    {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
-    }
+    stream << setprecision(m_PixelValuePrecision) << pixelValue << "  ";
   }
   else
   {
@@ -2129,4 +2128,14 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
   m_RectangleRendering2->Disable();
   m_RectangleRendering3->Disable();
   m_RectangleRendering4->Disable();
+}
+
+void QmitkStdMultiWidget::SetPixelValueInExponentialFormat(bool value)
+{
+  m_PixelValueInExponentialFormat = value;
+}
+
+void QmitkStdMultiWidget::SetPixelValuePrecision(int precision)
+{
+  m_PixelValuePrecision = precision;
 }

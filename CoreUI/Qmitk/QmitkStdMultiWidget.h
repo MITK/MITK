@@ -215,6 +215,10 @@ public slots:
 
   void ResetCrosshair();
 
+  void SetPixelValueInExponentialFormat(bool value);
+
+  void SetPixelValuePrecision(int precision);
+
 signals:
 
   void LeftMouseClicked(mitk::Point3D pointValue);
@@ -311,6 +315,9 @@ protected:
   } m_CornerAnnotaions[3];
 
   bool m_PendingCrosshairPositionEvent;
-    
+
+  bool m_PixelValueInExponentialFormat;
+  int m_PixelValuePrecision;
+
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

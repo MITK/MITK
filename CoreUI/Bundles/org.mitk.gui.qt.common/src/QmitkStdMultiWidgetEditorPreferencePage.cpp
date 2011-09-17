@@ -23,6 +23,7 @@
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QColorDialog>
+#include <QLineEdit>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -34,6 +35,7 @@ QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage
 }
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage(const QmitkStdMultiWidgetEditorPreferencePage& other)
+: berry::Object(), QObject()
 {
   Q_UNUSED(other)
   throw std::runtime_error("Copy constructor not implemented");
@@ -57,13 +59,32 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_ShowLevelWindowWidget = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
-  formLayout->addRow("&Use constrained zooming and padding", m_EnableFlexibleZooming);
-  formLayout->addRow("&Show level/window widget", m_ShowLevelWindowWidget);
+  formLayout->addRow("&Use constrained zooming and padding:", m_EnableFlexibleZooming);
+  formLayout->addRow("&Show level/window widget:", m_ShowLevelWindowWidget);
+
+  QLabel* exponentialFormatLabel = new QLabel("Pixel value in exponential format:");
+  m_PixelValueInExponentialFormat = new QCheckBox;
+  QString exponentialFormatToolTip =
+		  "If checked, the value of the selected pixel\n"
+		  "will be displayed in exponential format on\n"
+		  "the status bar.";
+  exponentialFormatLabel->setToolTip(exponentialFormatToolTip);
+  m_PixelValueInExponentialFormat->setToolTip(exponentialFormatToolTip);
+  formLayout->addRow(exponentialFormatLabel, m_PixelValueInExponentialFormat);
+
+  QLabel* precisionLabel = new QLabel("Pixel value precision:");
+  m_PixelValuePrecision = new QLineEdit;
+  m_PixelValuePrecision->setMaxLength(2);
+  m_PixelValuePrecision->setValidator(new QIntValidator);
+  QString precisionToolTip =
+		  "Pixel value precision shown on the status bar";
+  precisionLabel->setToolTip(precisionToolTip);
+  m_PixelValuePrecision->setToolTip(precisionToolTip);
+  formLayout->addRow(precisionLabel, m_PixelValuePrecision);
 
   // gradient background
   QLabel* gBName = new QLabel;
   gBName->setText("Gradient background");
-  formLayout->addRow(gBName);
 
   // color
   m_ColorButton1 = new QPushButton;
@@ -94,6 +115,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   QSpacerItem *spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   QVBoxLayout* vBoxLayout = new QVBoxLayout;
   vBoxLayout->addLayout(formLayout);
+  vBoxLayout->addWidget(gBName);
   vBoxLayout->addWidget(colorWidget);
   vBoxLayout->addSpacerItem(spacer);
 
@@ -122,11 +144,14 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_StdMultiWidgetEditorPreferencesNode->Put("second background color style sheet", m_SecondColorStyleSheet.toStdString());
   m_StdMultiWidgetEditorPreferencesNode->PutByteArray("first background color", m_FirstColor);
   m_StdMultiWidgetEditorPreferencesNode->PutByteArray("second background color", m_SecondColor);
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("Use constrained zooming and padding"
-                                        , m_EnableFlexibleZooming->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget"
-                                        , m_ShowLevelWindowWidget->isChecked());
-
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Use constrained zooming and padding",
+      m_EnableFlexibleZooming->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget",
+      m_ShowLevelWindowWidget->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show pixel value in exponential format",
+      m_PixelValueInExponentialFormat->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutInt("Pixel value precision",
+      m_PixelValuePrecision->text().toInt());
 
   return true;
 }
@@ -140,6 +165,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
   m_EnableFlexibleZooming->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Use constrained zooming and padding", true));
   m_ShowLevelWindowWidget->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show level/window widget", true));
+  m_PixelValueInExponentialFormat->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show pixel value in exponential format", false));
+  m_PixelValuePrecision->setText(QString::number(m_StdMultiWidgetEditorPreferencesNode->GetInt("Pixel value precision", 2)));
   m_FirstColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("first background color style sheet", ""));
   m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
   m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");

@@ -53,10 +53,12 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_StdMultiWidgetEditorPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID);
 
   m_MainControl = new QWidget(parent);
-  m_EnableFlexibleZooming = new QCheckBox;  
+  m_EnableFlexibleZooming = new QCheckBox;
+  m_ShowLevelWindowWidget = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("&Use constrained zooming and padding", m_EnableFlexibleZooming);
+  formLayout->addRow("&Show level/window widget", m_ShowLevelWindowWidget);
 
   // gradient background
   QLabel* gBName = new QLabel;
@@ -122,6 +124,9 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_StdMultiWidgetEditorPreferencesNode->PutByteArray("second background color", m_SecondColor);
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Use constrained zooming and padding"
                                         , m_EnableFlexibleZooming->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget"
+                                        , m_ShowLevelWindowWidget->isChecked());
+
 
   return true;
 }
@@ -134,6 +139,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
   m_EnableFlexibleZooming->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Use constrained zooming and padding", true));
+  m_ShowLevelWindowWidget->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show level/window widget", true));
   m_FirstColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("first background color style sheet", ""));
   m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
   m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");

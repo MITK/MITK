@@ -159,6 +159,7 @@ SET(CPP_FILES
   DataManagement/mitkModeOperation.cpp
   DataManagement/mitkNodePredicateAnd.cpp
   DataManagement/mitkNodePredicateBase.cpp
+  DataManagement/mitkNodePredicateAtomic.cpp
   DataManagement/mitkNodePredicateCompositeBase.cpp
   DataManagement/mitkNodePredicateData.cpp
   DataManagement/mitkNodePredicateDataType.cpp

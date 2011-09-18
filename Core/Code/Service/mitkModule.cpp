@@ -87,6 +87,16 @@ void Module::Init(CoreModuleContext* coreCtx,
   delete mp;
 }
 
+void Module::Uninit()
+{
+  if (d->moduleContext)
+  {
+    delete d->moduleContext;
+    d->moduleContext = 0;
+  }
+  d->moduleActivator = 0;
+}
+
 bool Module::IsLoaded() const
 {
   return d->moduleContext != 0;

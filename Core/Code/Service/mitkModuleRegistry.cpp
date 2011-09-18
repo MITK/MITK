@@ -36,11 +36,27 @@ typedef itk::hash_map<long, Module*> ModuleMap;
 
 MITK_GLOBAL_STATIC(CoreModuleContext, coreModuleContext)
 
+template<typename T>
+struct ModuleDeleter
+{
+  void operator()(GlobalStatic<T>& globalStatic) const
+  {
+    ModuleMap* moduleMap = globalStatic.pointer;
+    for (ModuleMap::const_iterator i = moduleMap->begin();
+         i != moduleMap->end(); ++i)
+    {
+      delete i->second;
+    }
+    DefaultGlobalStaticDeleter<T> defaultDeleter;
+    defaultDeleter(globalStatic);
+  }
+};
+
 /**
  * Table of all installed modules in this framework.
- * Key is the module location.
+ * Key is the module id.
  */
-MITK_GLOBAL_STATIC(ModuleMap, modules)
+MITK_GLOBAL_STATIC_WITH_DELETER(ModuleMap, modules, ModuleDeleter)
 
 
 typedef itk::SimpleFastMutexLock MutexType;
@@ -116,7 +132,7 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   MutexLocker lock(*modulesLock());
   Module* curr = modules()->operator[](info->id);
   curr->Stop();
-  delete curr->GetModuleContext();
+  curr->Uninit();
 }
 
 Module* ModuleRegistry::GetModule(long id)

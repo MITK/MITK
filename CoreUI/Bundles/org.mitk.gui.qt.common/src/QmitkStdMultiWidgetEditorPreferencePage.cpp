@@ -65,9 +65,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   QLabel* exponentialFormatLabel = new QLabel("Display values in exponential format:");
   m_ExponentialFormat = new QCheckBox;
   QString exponentialFormatToolTip =
-		  "If checked, the value of the selected pixel\n"
-		  "will be displayed in exponential format on\n"
-		  "the status bar.";
+		  "If checked, the intensity value at the cross-hair will be displayed"
+		  "in exponential format on the status bar, and the level/window fields\n"
+		  "will accept and display values in exponential format as well.";
   exponentialFormatLabel->setToolTip(exponentialFormatToolTip);
   m_ExponentialFormat->setToolTip(exponentialFormatToolTip);
   formLayout->addRow(exponentialFormatLabel, m_ExponentialFormat);
@@ -77,7 +77,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Precision->setMaxLength(2);
   m_Precision->setValidator(new QIntValidator);
   QString precisionToolTip =
-		  "Pixel value precision shown on the status bar";
+		  "Precision of floating point numbers shown on the status bar\n"
+		  "and in the level/window fields.";
   precisionLabel->setToolTip(precisionToolTip);
   m_Precision->setToolTip(precisionToolTip);
   formLayout->addRow(precisionLabel, m_Precision);

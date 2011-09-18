@@ -43,6 +43,8 @@ class Image;
 //## @ingroup DataManagement
 class MITK_CORE_EXPORT LevelWindow
 {
+  typedef double ScalarType;
+
 public:
   LevelWindow(ScalarType level=127.5, ScalarType window=255.0);
   LevelWindow(const mitk::LevelWindow& levWin);

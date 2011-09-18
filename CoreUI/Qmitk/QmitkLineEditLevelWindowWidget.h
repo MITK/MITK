@@ -108,6 +108,12 @@ public slots:
   // validator to accept only possible values for Level/Window in lineedits
   //void setValidator();
 
+  /// if true, displays values in exponential format
+  void SetExponentialFormat(bool value);
+
+  /// displays and accepts values of the specified precision
+  void SetPrecision(int precision);
+
 protected:
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
@@ -116,6 +122,9 @@ protected:
   *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
+
+  bool m_ExponentialFormat;
+  int m_Precision;
 
 };
 #endif // QMITKLINEEDITLEVELWINDOWWIDGET

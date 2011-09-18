@@ -40,3 +40,13 @@ mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();
 }
+
+void QmitkLevelWindowWidget::SetExponentialFormat(bool value)
+{
+  LineEditLevelWindowWidget->SetExponentialFormat(value);
+}
+
+void QmitkLevelWindowWidget::SetPrecision(int precision)
+{
+  LineEditLevelWindowWidget->SetPrecision(precision);
+}

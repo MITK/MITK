@@ -61,8 +61,8 @@ m_PlaneNode2(NULL),
 m_PlaneNode3(NULL), 
 m_Node(NULL),
 m_PendingCrosshairPositionEvent(false),
-m_PixelValueInExponentialFormat(false),
-m_PixelValuePrecision(2)
+m_ExponentialFormat(false),
+m_Precision(2)
 {
   /*******************************/
   //Create Widget manually
@@ -1638,12 +1638,12 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream.precision(2);
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> "
-         << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: ";
+         << "; Time: " << baseRenderer->GetTime() << " ms; Pixel value: ";
     mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
-    if (m_PixelValueInExponentialFormat) {
+    if (m_ExponentialFormat) {
       stream << std::scientific;
     }
-    stream << setprecision(m_PixelValuePrecision) << pixelValue << "  ";
+    stream << setprecision(m_Precision) << pixelValue << "  ";
   }
   else
   {
@@ -2130,12 +2130,12 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
   m_RectangleRendering4->Disable();
 }
 
-void QmitkStdMultiWidget::SetPixelValueInExponentialFormat(bool value)
+void QmitkStdMultiWidget::SetExponentialFormat(bool value)
 {
-  m_PixelValueInExponentialFormat = value;
+  m_ExponentialFormat = value;
 }
 
-void QmitkStdMultiWidget::SetPixelValuePrecision(int precision)
+void QmitkStdMultiWidget::SetPrecision(int precision)
 {
-  m_PixelValuePrecision = precision;
+  m_Precision = precision;
 }

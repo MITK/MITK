@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_TBSS_IMAGE_DATA_SOURCE_H_HEADER_
-#define _MITK_TBSS_IMAGE_DATA_SOURCE_H_HEADER_
+#ifndef _MITK_TBSS_ROI_IMAGE_DATA_SOURCE_H_HEADER_
+#define _MITK_TBSS_ROI_IMAGE_DATA_SOURCE_H_HEADER_
 
 
 // Should be changed in a new type for TBSS
@@ -29,7 +29,7 @@ namespace mitk {
 
   template<typename TPixelType>
 
-  class TbssImage;
+  class TbssRoiImage;
 
 
 //##Documentation
@@ -38,13 +38,13 @@ namespace mitk {
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class MitkDiffusionImaging_EXPORT TbssImageSource : public ImageSource
+class MitkDiffusionImaging_EXPORT TbssRoiImageSource : public ImageSource
 {
 public:
-  mitkClassMacro(TbssImageSource, BaseProcess)
+  mitkClassMacro(TbssRoiImageSource, BaseProcess)
   itkNewMacro(Self)
 
-  typedef TbssImage<TPixelType> OutputType;
+  typedef TbssRoiImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
@@ -63,14 +63,14 @@ public:
   //virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
-  TbssImageSource();
+  TbssRoiImageSource();
 
-  virtual ~TbssImageSource(){}
+  virtual ~TbssRoiImageSource(){}
 };
 
 } // namespace mitk
 
-#include "mitkTbssImageSource.cpp"
+#include "mitkTbssRoiImageSource.cpp"
 
 
 #endif /* _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_ */

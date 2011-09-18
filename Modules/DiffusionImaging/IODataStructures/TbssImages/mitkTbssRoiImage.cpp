@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkTbssImage__cpp
-#define __mitkTbssImage__cpp
+#ifndef __mitkTbssRoiImage__cpp
+#define __mitkTbssRoiImage__cpp
 
 
-#include "mitkTbssImage.h"
+#include "mitkTbssRoiImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "mitkImageCast.h"
@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 template<typename TPixelType>
-mitk::TbssImage<TPixelType>::TbssImage()
+mitk::TbssRoiImage<TPixelType>::TbssRoiImage() : m_PreprocessedFA(false)
 {
 
 }

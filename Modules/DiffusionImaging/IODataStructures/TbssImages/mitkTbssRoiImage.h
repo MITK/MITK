@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef __mitkTbssImage__h
-#define __mitkTbssImage__h
+#ifndef __mitkTbssRoiImage__h
+#define __mitkTbssRoiImage__h
 
 #include "mitkImage.h"
 #include "itkImage.h"
@@ -31,7 +31,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
   template<class TPixelType>
-  class TbssImage : public Image
+  class TbssRoiImage : public Image
   {
 
   public:
@@ -40,11 +40,11 @@ namespace mitk
     typedef itk::Index<3> IndexType;
     //typedef typename std::vector <Index<3> > RoiType;
 
-    mitkClassMacro( TbssImage, Image )
+    mitkClassMacro( TbssRoiImage, Image )
     itkNewMacro(Self)
 
 
-    //void SetRequestedRegionToLargestPossibleReg tbssRoi->SetTbssType(mitk::TbssImage<char>::ROI);ion();
+    //void SetRequestedRegionToLargestPossibleRegion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();
     //void SetRequestedRegion(itk::DataObject *data);
@@ -58,6 +58,24 @@ namespace mitk
       this->m_Image = image;
     }
 
+    itkGetMacro(PreprocessedFA, bool)
+    itkSetMacro(PreprocessedFA, bool)
+    itkGetMacro(PreprocessedFAFile, std::string)
+    itkSetMacro(PreprocessedFAFile, std::string)
+    itkGetMacro(Structure, std::string)
+    itkSetMacro(Structure, std::string)
+
+    void SetRoi(std::vector< itk::Index<3> > roi)
+    {
+      m_Roi = roi;
+    }
+
+
+    // depricated
+    std::vector< itk::Index<3> > GetRoi()
+    {
+      return m_Roi;
+    }
 
     void InitializeFromImage()
     {
@@ -65,29 +83,21 @@ namespace mitk
       this->InitializeByItk(m_Image.GetPointer(),1,1);
     }
 
-    void SetGroupInfo( std::vector< std::pair<std::string, int> > info)
-    {
-      m_GroupInfo = info;
-    }
 
-
-
-    TbssImage();
+    TbssRoiImage();
 
   protected:
 
-    virtual ~TbssImage(){}
+    virtual ~TbssRoiImage(){}
 
     typename ImageType::Pointer m_Image;
 
-
-
     std::vector< itk::Index<3> > m_Roi;
 
-    std::vector< std::pair<std::string, int> > m_GroupInfo;
+    bool m_PreprocessedFA;
+    std::string m_PreprocessedFAFile;
 
-
-
+    std::string m_Structure;
 
 
   };
@@ -95,11 +105,11 @@ namespace mitk
 
   // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
   template <typename ItkOutputImageType, typename PixelType>
-  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssImage<PixelType> >& tbssoutputimage)
+  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssRoiImage<PixelType> >& tbssoutputimage)
   {
     if(tbssoutputimage.IsNull())
     {
-      tbssoutputimage = mitk::TbssImage<PixelType>::New();
+      tbssoutputimage = mitk::TbssRoiImage<PixelType>::New();
     }
     tbssoutputimage->InitializeByItk(itkimage);
     tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
@@ -112,5 +122,5 @@ namespace mitk
 
 } // namespace mitk
 
-#include "mitkTbssImage.cpp"
-#endif /* __mitkTbssImage__h */
+#include "mitkTbssRoiImage.cpp"
+#endif /* __mitkTbssRoiImage__h */

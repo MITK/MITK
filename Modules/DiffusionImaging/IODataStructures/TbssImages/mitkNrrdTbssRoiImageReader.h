@@ -15,13 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdTbssImageReader_h
-#define __mitkNrrdTbssImageReader_h
+#ifndef __mitkNrrdTbssRoiImageReader_h
+#define __mitkNrrdTbssRoiImageReader_h
 
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
-#include "mitkTbssImageSource.h"
+#include "mitkTbssRoiImageSource.h"
 #include "itkImage.h"
+#include "mitkTbssRoiImage.h"
 
 namespace mitk
 {
@@ -30,17 +31,17 @@ namespace mitk
   */
 
   template < class TPixelType >
-  class MitkDiffusionImaging_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource<TPixelType>, public FileReader
+  class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource<TPixelType>, public FileReader
   {
   public:
 
-    typedef mitk::TbssImage<TPixelType>  OutputType;
+    typedef mitk::TbssRoiImage<TPixelType> OutputType;
     typedef itk::Image<TPixelType,3>     ImageType;
-    typedef TbssImageSource<TPixelType>  TbssVolSourceType;
+    typedef TbssRoiImageSource<TPixelType>  TbssVolSourceType;
 
 
 
-    mitkClassMacro( NrrdTbssImageReader, TbssVolSourceType )
+    mitkClassMacro( NrrdTbssRoiImageReader, TbssVolSourceType )
     itkNewMacro(Self)
 
     const char* GetFileName() const;
@@ -74,6 +75,6 @@ namespace mitk
 
 } //namespace MITK
 
-#include "mitkNrrdTbssImageReader.cpp"
+#include "mitkNrrdTbssRoiImageReader.cpp"
 
 #endif // __mitkNrrdTbssImageReader_h

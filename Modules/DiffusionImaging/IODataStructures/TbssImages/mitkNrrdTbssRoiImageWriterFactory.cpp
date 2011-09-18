@@ -15,38 +15,38 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNrrdTbssImageWriterFactory.h"
+#include "mitkNrrdTbssRoiImageWriterFactory.h"
 
 #include "itkCreateObjectFunction.h"
 #include "itkVersion.h"
 
-#include <mitkNrrdTbssImageWriter.h>
+#include <mitkNrrdTbssRoiImageWriter.h>
 
 namespace mitk
 {
 
-NrrdTbssImageWriterFactory::NrrdTbssImageWriterFactory()
+NrrdTbssRoiImageWriterFactory::NrrdTbssRoiImageWriterFactory()
 {
-  typedef float TbssPixelType;
+  typedef char TbssRoiPixelType;
   this->RegisterOverride("IOWriter",
-                         "NrrdTbssImageWriter",
-                         "NrrdTbssImage Writer",
+                         "NrrdTbssRoiImageWriter",
+                         "NrrdTbssRoiImage ROI Writer",
                          1,
-                         itk::CreateObjectFunction< mitk::NrrdTbssImageWriter<TbssPixelType> >::New());
+                         itk::CreateObjectFunction< mitk::NrrdTbssRoiImageWriter<TbssRoiPixelType> >::New());
 }
 
-NrrdTbssImageWriterFactory::~NrrdTbssImageWriterFactory()
+NrrdTbssRoiImageWriterFactory::~NrrdTbssRoiImageWriterFactory()
 {
 }
 
-const char* NrrdTbssImageWriterFactory::GetITKSourceVersion() const
+const char* NrrdTbssRoiImageWriterFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;
 }
 
-const char* NrrdTbssImageWriterFactory::GetDescription() const
+const char* NrrdTbssRoiImageWriterFactory::GetDescription() const
 {
-  return "NrrdTbssImageWriterFactory";
+  return "NrrdTbssRoiImageWriterFactory";
 }
 
 } // end namespace mitk

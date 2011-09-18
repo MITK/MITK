@@ -15,10 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdTbssImageWriter__cpp
-#define __mitkNrrdTbssImageWriter__cpp
+#ifndef __mitkNrrdTbssRoiImageWriter__cpp
+#define __mitkNrrdTbssRoiImageWriter__cpp
 
-#include "mitkNrrdTbssImageWriter.h"
+#include "mitkNrrdTbssRoiImageWriter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
@@ -30,35 +30,58 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 
 template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::NrrdTbssImageWriter()
+mitk::NrrdTbssRoiImageWriter<TPixelType>::NrrdTbssRoiImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
 template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::~NrrdTbssImageWriter()
+mitk::NrrdTbssRoiImageWriter<TPixelType>::~NrrdTbssRoiImageWriter()
 {}
 
 template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
+void mitk::NrrdTbssRoiImageWriter<TPixelType>::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
   if (input == NULL)
   {
-    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!");
+    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
     return;
   }
   if ( m_FileName == "" )
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
+    itkWarningMacro( << "Sorry, filename has not been set!" )
     return ;
   }
 
 
 
-  itk::Image<float,3>::Pointer img = input->GetImage();
+  itk::Image<char,3>::Pointer img = input->GetImage();
+
+
+  char keybuffer[512];
+  char valbuffer[512];
+
+  std::vector< itk::Index<3> > roi = input->GetRoi();
+
+  std::vector< itk::Index<3> >::iterator it = roi.begin();
+
+  int i=0;
+  while(it != roi.end())
+  {
+    itk::Index<3> ix = *it;
+
+    sprintf( keybuffer, "ROI_index_%04d", i );
+    sprintf( valbuffer, "%1d %1d %1d", ix[0],ix[1],ix[2]);
+
+    std::cout << valbuffer << std::endl;
+
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+    it++;
+    ++i;
+  }
 
   typedef itk::Image<TPixelType,3> ImageType;
 
@@ -74,7 +97,7 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
   nrrdWriter->SetFileName(m_FileName);
- // nrrdWriter->UseCompressionOn();
+  // nrrdWriter->UseCompressionOn();
   nrrdWriter->SetImageIO(io);
   try
   {
@@ -85,17 +108,22 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
     std::cout << e << std::endl;
   }
 
+
+
+
+
+
   m_Success = true;
 }
 
 template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::SetInput( InputType* tbssVol )
+void mitk::NrrdTbssRoiImageWriter<TPixelType>::SetInput( InputType* tbssVol )
 {
   this->ProcessObject::SetNthInput( 0, tbssVol );
 }
 
 template<typename TPixelType>
-mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
+mitk::TbssRoiImage<TPixelType>* mitk::NrrdTbssRoiImageWriter<TPixelType>::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -108,11 +136,11 @@ mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
 }
 
 template<typename TPixelType>
-std::vector<std::string> mitk::NrrdTbssImageWriter<TPixelType>::GetPossibleFileExtensions()
+std::vector<std::string> mitk::NrrdTbssRoiImageWriter<TPixelType>::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".tbss");
+  possibleFileExtensions.push_back(".roi");
   return possibleFileExtensions;
 }
 
-#endif //__mitkNrrdTbssImageWriter__cpp
+#endif //__mitkNrrdTbssRoiImageWriter__cpp

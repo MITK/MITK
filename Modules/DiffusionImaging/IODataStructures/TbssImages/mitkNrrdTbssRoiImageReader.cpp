@@ -15,10 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdDiffusionImageReader_cpp
-#define __mitkNrrdDiffusionImageReader_cpp
+#ifndef __mitkNrrdTbssRoiReader_cpp
+#define __mitkNrrdTbssRoiReader_cpp
 
-#include "mitkNrrdTbssImageReader.h"
+#include "mitkNrrdTbssRoiImageReader.h"
 
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
@@ -36,7 +36,7 @@ namespace mitk
 {
 
   template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssRoiImageReader<TPixelType>
       ::GenerateData()
   {
 
@@ -175,7 +175,7 @@ namespace mitk
 
       std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
       ext = itksys::SystemTools::LowerCase(ext);
-      if (ext == ".tbss")
+      if (ext == ".roi")
       {
         typedef itk::ImageFileReader<ImageType> FileReaderType;
         typename FileReaderType::Pointer reader = FileReaderType::New();
@@ -184,8 +184,10 @@ namespace mitk
         reader->SetImageIO(imageIO);
         reader->Update();
 
-        img = reader->GetOutput();        
+        img = reader->GetOutput();
 
+        itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
+        ReadRoiInfo(imgMetaDictionary);
 
       }
 
@@ -211,7 +213,7 @@ namespace mitk
       throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
     }
     catch(...)
-    {
+    {http://www.wetter.com/deutschland/heidelberg/DE0004329.html
       MITK_INFO << "Exception while reading file!!";
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
     }
@@ -221,7 +223,7 @@ namespace mitk
 
 
   template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssRoiImageReader<TPixelType>
       ::ReadRoiInfo(itk::MetaDataDictionary dict)
   {
     std::vector<std::string> imgMetaKeys = dict.GetKeys();
@@ -261,49 +263,49 @@ namespace mitk
   }
 
   template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+      const char* NrrdTbssRoiImageReader<TPixelType>
       ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
   template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssRoiImageReader<TPixelType>
       ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
   template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+      const char* NrrdTbssRoiImageReader<TPixelType>
       ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
   template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssRoiImageReader<TPixelType>
       ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
   template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+      const char* NrrdTbssRoiImageReader<TPixelType>
       ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
   template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssRoiImageReader<TPixelType>
       ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
   template <class TPixelType>
-      bool NrrdTbssImageReader<TPixelType>
+      bool NrrdTbssRoiImageReader<TPixelType>
       ::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
 
@@ -319,7 +321,7 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".tbss")
+    if (ext == ".roi")
     {
       itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
@@ -338,31 +340,11 @@ namespace mitk
         return false;
       }
 
-
-/*
-      typename ImageType::Pointer img = reader->GetOutput();
-      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();    
-      std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-      std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-      std::string metaString;
-
-      for (; itKey != imgMetaKeys.end(); itKey ++)
-      {
-        itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-        if (itKey->find("tbss") != std::string::npos)
-        {
-          if (metaString.find("ROI") != std::string::npos)
-          {
-            return true;
-          }
-        }
-      }
-    }
-*/
- //  return false;
-
       return true;
+
+
     }
+
     return false;
   }
 

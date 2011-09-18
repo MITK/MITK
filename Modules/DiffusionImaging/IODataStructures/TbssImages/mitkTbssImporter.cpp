@@ -26,22 +26,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  template<typename TPixelType>
-  mitk::TbssImporter<TPixelType>::TbssImporter()
+  //template<typename TPixelType>
+  mitk::TbssImporter::TbssImporter()
   {
 
   }
 
-  template<typename TPixelType>
-  mitk::TbssImporter<TPixelType>::TbssImporter(std::string path) : m_InputPath(path)
+  //template<typename TPixelType>
+  mitk::TbssImporter::TbssImporter(std::string path) : m_InputPath(path)
   {
 
   }
 
-  template<typename TPixelType>
-  mitk::TbssImage<TPixelType>* mitk::TbssImporter<TPixelType>::Import()
+
+  //template<typename TPixelType>
+  mitk::TbssImage<float>::Pointer mitk::TbssImporter::Import()
   {
     // read all images with all_*.nii.gz
+    mitk::TbssImage<float>::Pointer tbssImg = mitk::TbssImage<float>::New();
 
 
     QDir currentDir = QDir(QString(m_InputPath.c_str()));
@@ -123,6 +125,13 @@ namespace mitk
 
           m_Data->SetDirection(dataDir);
 
+          //VariableLengthVector<float> vec;
+          //vec.SetElement(i, 0.0);
+          //m_Data->FillBuffer(0.0);
+
+
+          // Set the length to one because otherwise allocate fails. Should be changed when groups/measurements are added
+          m_Data->SetVectorLength(1);
           m_Data->Allocate();
 
 
@@ -174,7 +183,15 @@ namespace mitk
 
     }
 
+
+    mitk::CastToTbssImage(m_Data.GetPointer(), tbssImg);
+
+    tbssImg->SetGroupInfo(m_Groups);
+
+    return tbssImg;
+
   }
+
 
 }
 

@@ -29,11 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  template<class TPixelType>
+  //template<class TPixelType>
   class TbssImporter : public itk::Object {
 
   public:
-    typedef TPixelType PixelType;
+   // typedef TPixelType PixelType;
     typedef itk::VectorImage<float> DataImageType; // type of the 3d vector image containing the skeletonized images
     typedef itk::Image<float, 4> FloatImage4DType;
     typedef itk::ImageFileReader<FloatImage4DType> FileReaderType4D;
@@ -52,7 +52,18 @@ namespace mitk
       m_InputPath = p;
     }
 
-    mitk::TbssImage<TPixelType>* Import();
+    mitk::TbssImage<float>::Pointer Import();
+
+    void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
+    {
+      m_Groups = groups;
+    }
+
+    std::vector< std::pair<std::string, int> > GetGroupInfo()
+    {
+      return m_Groups;
+    }
+
 
   protected:
 
@@ -63,6 +74,7 @@ namespace mitk
     std::string m_InputPath;
 
     DataImageType::Pointer m_Data;
+    std::vector< std::pair<std::string, int> > m_Groups;
 
 
   };

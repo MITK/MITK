@@ -62,25 +62,25 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   formLayout->addRow("&Use constrained zooming and padding:", m_EnableFlexibleZooming);
   formLayout->addRow("&Show level/window widget:", m_ShowLevelWindowWidget);
 
-  QLabel* exponentialFormatLabel = new QLabel("Pixel value in exponential format:");
-  m_PixelValueInExponentialFormat = new QCheckBox;
+  QLabel* exponentialFormatLabel = new QLabel("Display values in exponential format:");
+  m_ExponentialFormat = new QCheckBox;
   QString exponentialFormatToolTip =
 		  "If checked, the value of the selected pixel\n"
 		  "will be displayed in exponential format on\n"
 		  "the status bar.";
   exponentialFormatLabel->setToolTip(exponentialFormatToolTip);
-  m_PixelValueInExponentialFormat->setToolTip(exponentialFormatToolTip);
-  formLayout->addRow(exponentialFormatLabel, m_PixelValueInExponentialFormat);
+  m_ExponentialFormat->setToolTip(exponentialFormatToolTip);
+  formLayout->addRow(exponentialFormatLabel, m_ExponentialFormat);
 
-  QLabel* precisionLabel = new QLabel("Pixel value precision:");
-  m_PixelValuePrecision = new QLineEdit;
-  m_PixelValuePrecision->setMaxLength(2);
-  m_PixelValuePrecision->setValidator(new QIntValidator);
+  QLabel* precisionLabel = new QLabel("Precision:");
+  m_Precision = new QLineEdit;
+  m_Precision->setMaxLength(2);
+  m_Precision->setValidator(new QIntValidator);
   QString precisionToolTip =
 		  "Pixel value precision shown on the status bar";
   precisionLabel->setToolTip(precisionToolTip);
-  m_PixelValuePrecision->setToolTip(precisionToolTip);
-  formLayout->addRow(precisionLabel, m_PixelValuePrecision);
+  m_Precision->setToolTip(precisionToolTip);
+  formLayout->addRow(precisionLabel, m_Precision);
 
   // gradient background
   QLabel* gBName = new QLabel;
@@ -148,10 +148,10 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
       m_EnableFlexibleZooming->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget",
       m_ShowLevelWindowWidget->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show pixel value in exponential format",
-      m_PixelValueInExponentialFormat->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutInt("Pixel value precision",
-      m_PixelValuePrecision->text().toInt());
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Exponential format",
+      m_ExponentialFormat->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutInt("Precision",
+      m_Precision->text().toInt());
 
   return true;
 }
@@ -165,8 +165,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
   m_EnableFlexibleZooming->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Use constrained zooming and padding", true));
   m_ShowLevelWindowWidget->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show level/window widget", true));
-  m_PixelValueInExponentialFormat->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show pixel value in exponential format", false));
-  m_PixelValuePrecision->setText(QString::number(m_StdMultiWidgetEditorPreferencesNode->GetInt("Pixel value precision", 2)));
+  m_ExponentialFormat->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Exponential format", false));
+  m_Precision->setText(QString::number(m_StdMultiWidgetEditorPreferencesNode->GetInt("Precision", 2)));
   m_FirstColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("first background color style sheet", ""));
   m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
   m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");

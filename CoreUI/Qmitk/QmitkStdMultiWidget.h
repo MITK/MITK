@@ -215,9 +215,9 @@ public slots:
 
   void ResetCrosshair();
 
-  void SetPixelValueInExponentialFormat(bool value);
+  void SetExponentialFormat(bool value);
 
-  void SetPixelValuePrecision(int precision);
+  void SetPrecision(int precision);
 
 signals:
 
@@ -316,8 +316,8 @@ protected:
 
   bool m_PendingCrosshairPositionEvent;
 
-  bool m_PixelValueInExponentialFormat;
-  int m_PixelValuePrecision;
+  bool m_ExponentialFormat;
+  int m_Precision;
 
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

@@ -31,6 +31,10 @@ public:
   QmitkLevelWindowWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   mitk::LevelWindowManager* GetManager();
   
+  void SetExponentialFormat(bool value);
+
+  void SetPrecision(int precision);
+
 public slots:
   void SetDataStorage( mitk::DataStorage* ds );
   

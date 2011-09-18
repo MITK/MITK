@@ -53,7 +53,7 @@ void mitk::LevelWindow::EnsureConsistency()
   }
 }
  
-mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
+mitk::LevelWindow::LevelWindow(mitk::LevelWindow::ScalarType level, mitk::LevelWindow::ScalarType window)
 : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
   m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
   m_DefaultLowerBound( -2048.0 ), m_DefaultUpperBound( 4096.0 ),
@@ -77,22 +77,22 @@ mitk::LevelWindow::~LevelWindow()
 {
 }
 
-mitk::ScalarType mitk::LevelWindow::GetLevel() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetLevel() const
 {
   return (m_UpperWindowBound-m_LowerWindowBound) / 2.0 + m_LowerWindowBound;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetWindow() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetWindow() const
 {
   return (m_UpperWindowBound-m_LowerWindowBound);
 }
 
-mitk::ScalarType mitk::LevelWindow::GetDefaultLevel() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetDefaultLevel() const
 {
   return ((m_DefaultUpperBound+m_DefaultLowerBound)/2.0);
 }
 
-mitk::ScalarType mitk::LevelWindow::GetDefaultWindow() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetDefaultWindow() const
 {
   return ((m_DefaultUpperBound-m_DefaultLowerBound));
 }
@@ -102,27 +102,27 @@ void mitk::LevelWindow::ResetDefaultLevelWindow()
   SetLevelWindow(GetDefaultLevel(), GetDefaultWindow());
 }
 
-mitk::ScalarType mitk::LevelWindow::GetLowerWindowBound() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetLowerWindowBound() const
 {
   return m_LowerWindowBound;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetUpperWindowBound() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetUpperWindowBound() const
 {
   return m_UpperWindowBound;
 }
 
-void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
+void mitk::LevelWindow::SetDefaultLevelWindow(mitk::LevelWindow::ScalarType level, mitk::LevelWindow::ScalarType window)
 {
   SetDefaultBoundaries((level-(window/2)), (level+(window/2)));
 }
 
-void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
+void mitk::LevelWindow::SetLevelWindow(mitk::LevelWindow::ScalarType level, mitk::LevelWindow::ScalarType window)
 {
   SetWindowBounds((level-(window/2.0)), (level+(window/2.0)));
 }
 
-void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound)
+void mitk::LevelWindow::SetWindowBounds(mitk::LevelWindow::ScalarType lowerBound, mitk::LevelWindow::ScalarType upperBound)
 {
   if ( IsFixed() ) return;
   m_LowerWindowBound = lowerBound;
@@ -130,7 +130,7 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
   EnsureConsistency();
 }
 
-void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
+void mitk::LevelWindow::SetRangeMinMax(mitk::LevelWindow::ScalarType min, mitk::LevelWindow::ScalarType max)
 {
   if ( IsFixed() ) return;
   m_RangeMin = min;
@@ -138,7 +138,7 @@ void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType ma
   EnsureConsistency();
 }
 
-void mitk::LevelWindow::SetDefaultBoundaries(mitk::ScalarType low, mitk::ScalarType up)
+void mitk::LevelWindow::SetDefaultBoundaries(mitk::LevelWindow::ScalarType low, mitk::LevelWindow::ScalarType up)
 {
   if ( IsFixed() )  return;
   m_DefaultLowerBound = low;
@@ -159,27 +159,27 @@ void mitk::LevelWindow::SetToMaxWindowSize()
   SetWindowBounds( m_RangeMin , m_RangeMax );
 }
 
-mitk::ScalarType mitk::LevelWindow::GetRangeMin() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetRangeMin() const
 {
   return m_RangeMin;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetRangeMax() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetRangeMax() const
 {
   return m_RangeMax;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetRange() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetRange() const
 {
   return  m_RangeMax - m_RangeMin;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetDefaultUpperBound() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetDefaultUpperBound() const
 {
   return m_DefaultUpperBound;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetDefaultLowerBound() const
+mitk::LevelWindow::ScalarType mitk::LevelWindow::GetDefaultLowerBound() const
 {
   return m_DefaultLowerBound;
 }

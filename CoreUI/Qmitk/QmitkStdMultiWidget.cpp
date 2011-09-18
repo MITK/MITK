@@ -2133,9 +2133,11 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
 void QmitkStdMultiWidget::SetExponentialFormat(bool value)
 {
   m_ExponentialFormat = value;
+  levelWindowWidget->SetExponentialFormat(value);
 }
 
 void QmitkStdMultiWidget::SetPrecision(int precision)
 {
   m_Precision = precision;
+  levelWindowWidget->SetPrecision(precision);
 }

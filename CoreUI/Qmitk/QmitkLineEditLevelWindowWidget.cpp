@@ -32,7 +32,9 @@ using namespace std;
 * Constructor
 */
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
- : QWidget(parent, f)
+ : QWidget(parent, f),
+m_ExponentialFormat(false),
+m_Precision(2)
 {
   m_Manager = mitk::LevelWindowManager::New();
   
@@ -66,11 +68,11 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
   //QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
-  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
+  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), m_Precision, this);
   m_WindowInput->setValidator(validatorWindowInput);
 
   //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
+  QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), m_Precision, this);
   //m_LevelInput->setValidator(validatorLevelInput);
   
   this->hide();
@@ -91,11 +93,12 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
     //setValidator();
+    char format = m_ExponentialFormat ? 'e' : 'f';
     QString level;
-    level.setNum((int)(m_LevelWindow.GetLevel()));
+    level.setNum(m_LevelWindow.GetLevel(), format, m_Precision);
     m_LevelInput->setText(level);
     QString window;
-    window.setNum((int)(m_LevelWindow.GetWindow()));
+    window.setNum(m_LevelWindow.GetWindow(), format, m_Precision);
     m_WindowInput->setText(window);
     m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());  
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());  
@@ -166,11 +169,10 @@ void QmitkLineEditLevelWindowWidget::validLevel()
     level = m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2;
   }
   
-  std::stringstream ss;
-  ss << std::setprecision(2) << level;
-  QString qLevel(ss.str().c_str());
+  char format = m_ExponentialFormat ? 'e' : 'f';
+  QString qLevel;
+  qLevel.setNum(level, format, m_Precision);
 
-  //qLevel.setNum(level);
   m_LevelInput->setText(qLevel);
   m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
@@ -188,8 +190,9 @@ void QmitkLineEditLevelWindowWidget::validWindow()
   {
     window = (m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin())*2;
   }
+  char format = m_ExponentialFormat ? 'e' : 'f';
   QString qWindow;
-  qWindow.setNum(window);
+  qWindow.setNum(window, format, m_Precision);
   m_WindowInput->setText(qWindow);
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
   m_Manager->SetLevelWindow(m_LevelWindow);
@@ -199,4 +202,14 @@ void QmitkLineEditLevelWindowWidget::validWindow()
 mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();
+}
+
+void QmitkLineEditLevelWindowWidget::SetExponentialFormat(bool value)
+{
+  m_ExponentialFormat = value;
+}
+
+void QmitkLineEditLevelWindowWidget::SetPrecision(int precision)
+{
+  m_Precision = precision;
 }

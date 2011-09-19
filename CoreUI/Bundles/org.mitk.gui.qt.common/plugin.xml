@@ -9,7 +9,7 @@
     </editor>
   </extension>
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.StdMultiWidgetEditorPreferencePage" name="StdMultiWidgetEditor" class="QmitkStdMultiWidgetEditorPreferencePage">
+    <page id="org.mitk.gui.qt.application.StdMultiWidgetEditorPreferencePage" name="Display" class="QmitkStdMultiWidgetEditorPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.StdMultiWidgetEditorPreferencePageKeywords"></keywordreference>
     </page>    	
   </extension>

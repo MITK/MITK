@@ -154,6 +154,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setAcceptDrops(true);
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_NodeTreeModel);
+  m_NodeTreeView->setHeaderHidden(true);
   m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );

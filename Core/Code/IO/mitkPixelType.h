@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <itkImageIOBase.h>
+#include <itkImage.h>
 //#include "mitkItkImageFileReader.h"
 
 namespace mitk {
@@ -182,10 +183,12 @@ private:
 template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
 PixelType MakePixelType()
 {
-  return PixelType( typeid(ComponentT), typeid(PixelT),
+  typedef itk::Image< PixelT, numOfComponents> ItkImageType;
+
+  return PixelType( typeid(ComponentT), typeid(ItkImageType),
                     sizeof(ComponentT), numOfComponents,
                     ComponentTypeToString<ComponentT>(),
-                    PixelTypeToString<PixelT>()
+                    PixelTypeToString<ItkImageType>()
                    );
 }
 
@@ -208,7 +211,7 @@ PixelType MakePixelType()
 
   // call the constructor
   return PixelType(
-            typeid(ComponentT), typeid(PixelT),
+            typeid(ComponentT), typeid(ItkImageType),
             sizeof(ComponentT), numComp,
             ComponentTypeToString<ComponentT>(),
             PixelTypeToString<PixelT >()

@@ -99,9 +99,13 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     QString level;
     level.setNum(m_LevelWindow.GetLevel(), format, m_Precision);
     m_LevelInput->setText(level);
+    m_LevelInput->setCursorPosition(0);
+    m_LevelInput->setToolTip(QString("Level: %1").arg(level));
     QString window;
     window.setNum(m_LevelWindow.GetWindow(), format, m_Precision);
     m_WindowInput->setText(window);
+    m_WindowInput->setCursorPosition(0);
+    m_WindowInput->setToolTip(QString("Window: %1").arg(window));
     m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());  
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());  
     this->show();

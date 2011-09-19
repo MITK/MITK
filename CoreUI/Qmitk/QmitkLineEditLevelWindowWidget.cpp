@@ -50,11 +50,13 @@ m_Precision(2)
   layout->setSpacing(0);
 
   m_LevelInput = new QLineEdit( this );
+  m_LevelInput->setToolTip("Level");
   m_LevelInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
   //m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
   m_WindowInput = new QLineEdit( this );
+  m_WindowInput->setToolTip("Window");
   m_WindowInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
   //m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_WindowInput->setFrameShadow( QLineEdit::Sunken );

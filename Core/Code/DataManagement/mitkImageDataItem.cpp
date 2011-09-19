@@ -88,6 +88,16 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, vo
 
   this->ComputeItemSize(dimensions, m_Dimension );
 
+  if(m_Data == NULL)
+  {
+    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
+    m_ManageMemory = true;
+  }
+
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
+
 }
 
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) :

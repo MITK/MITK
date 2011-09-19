@@ -830,7 +830,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::
 
 void mitk::Image::Initialize(const mitk::Image* image) 
 {
-  Initialize(image->GetPixelType().GetTypeId(), *image->GetTimeSlicedGeometry());
+  Initialize(image->GetPixelType(), *image->GetTimeSlicedGeometry());
 }
 
 void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)

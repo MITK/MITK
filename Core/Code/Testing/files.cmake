@@ -90,7 +90,7 @@ SET(MODULE_CUSTOM_TESTS
     mitkNodeDependentPointSetInteractorTest.cpp
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
-    #mitkImageTest.cpp
+    mitkImageTest.cpp
     mitkImageWriterTest.cpp
 )
 

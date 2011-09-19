@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+//class ItkImageFileReader;
+
 template< typename ComponentT>
 const char* ComponentTypeToString()
 {
@@ -63,7 +65,7 @@ public:
 
   PixelType(void);
 
-  PixelType(const std::type_info& aTypeId, int numberOfComponents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
+  //PixelType(const std::type_info& aTypeId, int numberOfComponents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
 
   PixelType(const mitk::PixelType & aPixelType);
 
@@ -137,7 +139,7 @@ public:
 
 private:
 
-  //friend void ItkImageFileReader::GenerateData();
+  friend class ItkImageFileReader;
 
   template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
     friend PixelType MakePixelType();

@@ -24,6 +24,7 @@
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QLineEdit>
+#include <QComboBox>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -60,14 +61,32 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("&Use constrained zooming and padding:", m_EnableFlexibleZooming);
-  formLayout->addRow("&Show level/window widget:", m_ShowLevelWindowWidget);
+  formLayout->addRow("&Show intensity range control:", m_ShowLevelWindowWidget);
+
+  QLabel* intensityRangeTypeLabel = new QLabel("Intensity range defined by:");
+  m_IntensityRangeType = new QComboBox;
+  m_IntensityRangeType->addItem("Level / Window");
+  m_IntensityRangeType->addItem("Window Bounds");
+  // 0: Level / Window, 1: Window Bounds
+  m_IntensityRangeType->setCurrentIndex(0);
+  QString intensityRangeTypeToolTip =
+		  "Affects how you can control the displayed intensity\n"
+		  "range of the current image. If set to \"Level / Window\",\n"
+		  "the two fields in the bottom-right corner of the display\n"
+		  "will set the level and window values, respectively.\n"
+		  "Otherwise, the fields set the lower and the upper\n"
+		  "window bound.";
+  intensityRangeTypeLabel->setToolTip(intensityRangeTypeToolTip);
+  m_IntensityRangeType->setToolTip(intensityRangeTypeToolTip);
+  formLayout->addRow(intensityRangeTypeLabel, m_IntensityRangeType);
 
   QLabel* exponentialFormatLabel = new QLabel("Display values in exponential format:");
   m_ExponentialFormat = new QCheckBox;
   QString exponentialFormatToolTip =
-		  "If checked, the intensity value at the cross-hair will be displayed"
-		  "in exponential format on the status bar, and the level/window fields\n"
-		  "will accept and display values in exponential format as well.";
+		  "If checked, the intensity value at the crosshair will\n"
+		  "be displayed in exponential format on the status bar.\n"
+		  "The intensity range control will accept and display\n"
+		  "values in exponential format as well.";
   exponentialFormatLabel->setToolTip(exponentialFormatToolTip);
   m_ExponentialFormat->setToolTip(exponentialFormatToolTip);
   formLayout->addRow(exponentialFormatLabel, m_ExponentialFormat);
@@ -77,15 +96,14 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Precision->setMaxLength(2);
   m_Precision->setValidator(new QIntValidator);
   QString precisionToolTip =
-		  "Precision of floating point numbers shown on the status bar\n"
-		  "and in the level/window fields.";
+		  "Precision of floating point numbers shown on the status\n"
+		  "bar and in the intensity range control.";
   precisionLabel->setToolTip(precisionToolTip);
   m_Precision->setToolTip(precisionToolTip);
   formLayout->addRow(precisionLabel, m_Precision);
 
   // gradient background
-  QLabel* gBName = new QLabel;
-  gBName->setText("Gradient background");
+  QLabel* gBName = new QLabel("Gradient background:");
 
   // color
   m_ColorButton1 = new QPushButton;
@@ -96,9 +114,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   resetButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
   resetButton->setText("Reset");
 
-  QLabel* colorLabel1 = new QLabel("first color : ");
+  QLabel* colorLabel1 = new QLabel("first color:");
   colorLabel1->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-  QLabel* colorLabel2 = new QLabel("second color: ");
+  QLabel* colorLabel2 = new QLabel("second color:");
   colorLabel2->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
   QHBoxLayout* colorWidgetLayout = new QHBoxLayout;
@@ -149,6 +167,9 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
       m_EnableFlexibleZooming->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget",
       m_ShowLevelWindowWidget->isChecked());
+  // 0: Level / Window, 1: Window Bounds
+  m_StdMultiWidgetEditorPreferencesNode->PutBool("Window bounds intensity range",
+      m_IntensityRangeType->currentIndex());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Exponential format",
       m_ExponentialFormat->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutInt("Precision",
@@ -166,6 +187,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
   m_EnableFlexibleZooming->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Use constrained zooming and padding", true));
   m_ShowLevelWindowWidget->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show level/window widget", true));
+  // 0: Level / Window, 1: Window Bounds
+  m_IntensityRangeType->setCurrentIndex(m_StdMultiWidgetEditorPreferencesNode->GetBool("Window bounds intensity range", false));
   m_ExponentialFormat->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Exponential format", false));
   m_Precision->setText(QString::number(m_StdMultiWidgetEditorPreferencesNode->GetInt("Precision", 2)));
   m_FirstColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("first background color style sheet", ""));

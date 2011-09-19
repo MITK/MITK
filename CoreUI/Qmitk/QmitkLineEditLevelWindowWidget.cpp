@@ -26,15 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLineEdit>
 #include <limits>
 
-using namespace std;
-
 /**
 * Constructor
 */
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
  : QWidget(parent, f),
-m_ExponentialFormat(false),
-m_Precision(2)
+m_Format('f'),
+m_Precision(2),
+m_IntensityRangeType(LevelWindow)
 {
   m_Manager = mitk::LevelWindowManager::New();
   
@@ -50,13 +49,11 @@ m_Precision(2)
   layout->setSpacing(0);
 
   m_LevelInput = new QLineEdit( this );
-  m_LevelInput->setToolTip("Level");
   m_LevelInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
   //m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
   m_WindowInput = new QLineEdit( this );
-  m_WindowInput->setToolTip("Window");
   m_WindowInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
   //m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_WindowInput->setFrameShadow( QLineEdit::Sunken );
@@ -68,14 +65,11 @@ m_Precision(2)
   connect( m_LevelInput, SIGNAL(editingFinished()), this, SLOT( SetLevelValue() ) );
   connect( m_WindowInput, SIGNAL(editingFinished()), this, SLOT( SetWindowValue() ) );
 
-  // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  //QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
-  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), m_Precision, this);
-  m_WindowInput->setValidator(validatorWindowInput);
+  m_Validator1 = new QDoubleValidator(0, std::numeric_limits<double>::max(), m_Precision, this);
+  m_WindowInput->setValidator(m_Validator1);
 
-  //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), m_Precision, this);
-  //m_LevelInput->setValidator(validatorLevelInput);
+  m_Validator2 = new QDoubleValidator(std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), m_Precision, this);
+  m_LevelInput->setValidator(m_Validator2);
   
   this->hide();
 }
@@ -93,20 +87,8 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
 {
   try
   {
-    m_LevelWindow = m_Manager->GetLevelWindow();
-    //setValidator();
-    char format = m_ExponentialFormat ? 'e' : 'f';
-    QString level;
-    level.setNum(m_LevelWindow.GetLevel(), format, m_Precision);
-    m_LevelInput->setText(level);
-    m_LevelInput->setCursorPosition(0);
-    m_LevelInput->setToolTip(QString("Level: %1").arg(level));
-    QString window;
-    window.setNum(m_LevelWindow.GetWindow(), format, m_Precision);
-    m_WindowInput->setText(window);
-    m_WindowInput->setCursorPosition(0);
-    m_WindowInput->setToolTip(QString("Window: %1").arg(window));
-    m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());  
+    updateInputs();
+    m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());  
     this->show();
   }
@@ -120,6 +102,39 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     {
     }
   }
+}
+
+void QmitkLineEditLevelWindowWidget::updateInputs()
+{
+  m_LevelWindow = m_Manager->GetLevelWindow();
+  double number1, number2;
+  QString toolTip1, toolTip2;
+  if (m_IntensityRangeType == LevelWindow)
+  {
+    number1 = m_LevelWindow.GetLevel();
+    number2 = m_LevelWindow.GetWindow();
+    toolTip1 = QString("Level: %1").arg(number1);
+    toolTip2 = QString("Window: %1").arg(number2);
+  }
+  else
+  {
+    number1 = m_LevelWindow.GetUpperWindowBound();
+    number2 = m_LevelWindow.GetLowerWindowBound();
+    toolTip1 = QString("Lower bound: %1").arg(number1);
+    toolTip2 = QString("Upper bound: %1").arg(number2);
+  }
+
+  //setValidator();
+  QString qNumber1;
+  qNumber1.setNum(number1, m_Format, m_Precision);
+  m_LevelInput->setText(qNumber1);
+  m_LevelInput->setCursorPosition(0);
+  m_LevelInput->setToolTip(toolTip1);
+  QString qNumber2;
+  qNumber2.setNum(number2, m_Format, m_Precision);
+  m_WindowInput->setText(qNumber2);
+  m_WindowInput->setCursorPosition(0);
+  m_WindowInput->setToolTip(toolTip2);
 }
 
 void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
@@ -147,13 +162,71 @@ void QmitkLineEditLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
-  validLevel();
+  if (m_IntensityRangeType == LevelWindow)
+  {
+    double level = m_LevelInput->text().toDouble();
+    if (correctLevel(level))
+    {
+      QString qLevel;
+      qLevel.setNum(level, m_Format, m_Precision);
+      m_LevelInput->setText(qLevel);
+      m_LevelInput->setCursorPosition(0);
+      m_LevelInput->setToolTip(QString("Level: %1").arg(qLevel));
+      m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
+      m_Manager->SetLevelWindow(m_LevelWindow);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+  else
+  {
+    double lowerBound = m_LevelInput->text().toDouble();
+    if (correctLowerBound(lowerBound))
+    {
+      QString qLowerBound;
+      qLowerBound.setNum(lowerBound, m_Format, m_Precision);
+      m_LevelInput->setText(qLowerBound);
+      m_LevelInput->setCursorPosition(0);
+      m_LevelInput->setToolTip(QString("Lower bound: %1").arg(qLowerBound));
+      m_LevelWindow.SetWindowBounds(lowerBound, m_LevelWindow.GetUpperWindowBound());
+      m_Manager->SetLevelWindow(m_LevelWindow);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
 }
 
 //read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
-  validWindow();
+  if (m_IntensityRangeType == LevelWindow)
+  {
+    double window = m_WindowInput->text().toDouble();
+    if (correctWindow(window))
+    {
+      QString qWindow;
+      qWindow.setNum(window, m_Format, m_Precision);
+      m_WindowInput->setText(qWindow);
+      m_WindowInput->setCursorPosition(0);
+      m_WindowInput->setToolTip(QString("Window: %1").arg(qWindow));
+      m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
+      m_Manager->SetLevelWindow(m_LevelWindow);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+  else
+  {
+    double upperBound = m_WindowInput->text().toDouble();
+    if (correctUpperBound(upperBound))
+    {
+      QString qUpperBound;
+      qUpperBound.setNum(upperBound, m_Format, m_Precision);
+      m_WindowInput->setText(qUpperBound);
+      m_WindowInput->setCursorPosition(0);
+      m_WindowInput->setToolTip(QString("Upper bound: %1").arg(qUpperBound));
+      m_LevelWindow.SetWindowBounds(m_LevelWindow.GetLowerWindowBound(), upperBound);
+      m_Manager->SetLevelWindow(m_LevelWindow);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
 }
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
@@ -162,47 +235,86 @@ void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
   m_Contextmenu->getContextMenu();
 }
 
-void QmitkLineEditLevelWindowWidget::validLevel()
+bool QmitkLineEditLevelWindowWidget::correctLevel(double& level)
 {
-  double level =m_LevelInput->text().toDouble();
-  
-  if ( level + m_LevelWindow.GetWindow()/2 > m_LevelWindow.GetRangeMax())
+  double window = m_LevelWindow.GetWindow();
+  double halfWindow = window / 2;
+  double upperLimit = m_LevelWindow.GetRangeMax() - halfWindow;
+  if (level > upperLimit)
   {
-    level = m_LevelWindow.GetRangeMax() - m_LevelWindow.GetWindow()/2;
+    level = upperLimit;
+    return true;
   }
-  if (level - m_LevelWindow.GetWindow()/2 < m_LevelWindow.GetRangeMin())
+  else
   {
-    level = m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2;
+    double lowerLimit = m_LevelWindow.GetRangeMin() + halfWindow;
+    if (level < lowerLimit)
+    {
+      level = lowerLimit;
+      return true;
+    }
   }
-  
-  char format = m_ExponentialFormat ? 'e' : 'f';
-  QString qLevel;
-  qLevel.setNum(level, format, m_Precision);
-
-  m_LevelInput->setText(qLevel);
-  m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
-  m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  return false;
 }
 
-void QmitkLineEditLevelWindowWidget::validWindow()
+bool QmitkLineEditLevelWindowWidget::correctWindow(double& window)
 {
-  double window = m_WindowInput->text().toDouble();
-  if ( m_LevelWindow.GetLevel() + window/2 > m_LevelWindow.GetRangeMax())
+  double level = m_LevelWindow.GetLevel();
+  double upperLimit = (m_LevelWindow.GetRangeMax() - level) * 2;
+  if (window > upperLimit)
   {
-    window = (m_LevelWindow.GetRangeMax() - m_LevelWindow.GetLevel())*2;
+    window = upperLimit;
+    return true;
   }
-  if (m_LevelWindow.GetLevel() - window/2 < m_LevelWindow.GetRangeMin())
+  else
   {
-    window = (m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin())*2;
+    double lowerLimit = (level - m_LevelWindow.GetRangeMin()) * 2;
+    if (window < lowerLimit)
+    {
+      window = lowerLimit;
+      return true;
+    }
   }
-  char format = m_ExponentialFormat ? 'e' : 'f';
-  QString qWindow;
-  qWindow.setNum(window, format, m_Precision);
-  m_WindowInput->setText(qWindow);
-  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
-  m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  return false;
+}
+
+bool QmitkLineEditLevelWindowWidget::correctLowerBound(double& lowerBound)
+{
+  double rangeMin = m_LevelWindow.GetRangeMin();
+  if(lowerBound < rangeMin)
+  {
+    lowerBound = rangeMin;
+    return true;
+  }
+  else
+  {
+    double rangeMax = m_LevelWindow.GetRangeMax();
+    if(lowerBound > rangeMax)
+    {
+      lowerBound = rangeMax;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool QmitkLineEditLevelWindowWidget::correctUpperBound(double& upperBound)
+{
+  double rangeMin = m_LevelWindow.GetRangeMin();
+  if(upperBound < rangeMin)
+  {
+    upperBound = rangeMin;
+    return true;
+  }
+  else {
+    double rangeMax = m_LevelWindow.GetRangeMax();
+    if(upperBound > rangeMax)
+    {
+      upperBound = rangeMax;
+      return true;
+    }
+  }
+  return false;
 }
 
 mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()
@@ -212,10 +324,27 @@ mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()
 
 void QmitkLineEditLevelWindowWidget::SetExponentialFormat(bool value)
 {
-  m_ExponentialFormat = value;
+  m_Format = value ? 'e' : 'f';
 }
 
 void QmitkLineEditLevelWindowWidget::SetPrecision(int precision)
 {
   m_Precision = precision;
+  m_Validator1->setDecimals(precision);
+  m_Validator2->setDecimals(precision);
+  if (!this->isHidden())
+  {
+    updateInputs();
+  }
+}
+
+void QmitkLineEditLevelWindowWidget::SetIntensityRangeType(QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType)
+{
+  m_IntensityRangeType = intensityRangeType;
+  /// The other bounds are set in the constructor and cannot change
+  m_Validator2->setBottom(intensityRangeType == LevelWindow ? 0.0 : std::numeric_limits<double>::min());
+  if (!this->isHidden())
+  {
+    updateInputs();
+  }
 }

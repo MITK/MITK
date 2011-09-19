@@ -2130,6 +2130,11 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
   m_RectangleRendering4->Disable();
 }
 
+void QmitkStdMultiWidget::SetIntensityRangeType(QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType)
+{
+  levelWindowWidget->SetIntensityRangeType(intensityRangeType);
+}
+
 void QmitkStdMultiWidget::SetExponentialFormat(bool value)
 {
   m_ExponentialFormat = value;

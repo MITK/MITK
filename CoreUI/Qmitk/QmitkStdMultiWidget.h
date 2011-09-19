@@ -215,6 +215,8 @@ public slots:
 
   void ResetCrosshair();
 
+  void SetIntensityRangeType(QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType);
+
   void SetExponentialFormat(bool value);
 
   void SetPrecision(int precision);

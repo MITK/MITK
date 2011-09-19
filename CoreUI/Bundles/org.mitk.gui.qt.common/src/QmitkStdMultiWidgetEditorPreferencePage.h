@@ -28,6 +28,7 @@ class QCheckBox;
 class QPushButton;
 class QWidgetAction;
 class QLineEdit;
+class QComboBox;
 
 struct MITK_QT_COMMON QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -74,6 +75,7 @@ protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableFlexibleZooming;
   QCheckBox* m_ShowLevelWindowWidget;
+  QComboBox* m_IntensityRangeType;
   QCheckBox* m_ExponentialFormat;
   QLineEdit* m_Precision;
   QCheckBox* m_UseGradientBackground;

@@ -26,13 +26,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkLevelWindowWidgetContextMenu;
 class QLineEdit;
+class QDoubleValidator;
 
 /**
   \class QmitkLineEditLevelWindowWidget QmitkLineEditLevelWindowWidget.h QmitkLineEditLevelWindowWidget.h
   \ingroup Widgets
 
-  \brief Provides a widget with two lineedit fields, one to change the window value of the current image and one to change the level value of the current image.
+  \brief Provides a widget with two lineedit fields for controling the
+  displayed intensity range of the current image.
 
+  The widget has two operation mode. If the intensity range type is set to LevelWindow,
+  the two fields set the level and window values, respectively. In WindowBounds mode,
+  they set the upper and lower window bound, respectively. The default intensity range
+  type is LevelWindow.
   */
 
 class QMITK_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
@@ -41,16 +47,21 @@ class QMITK_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 
 public:
 
+  enum IntensityRangeType {
+    LevelWindow,
+    WindowBounds
+  };
+
   /// constructor
   QmitkLineEditLevelWindowWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 );
 
   /// destructor
   ~QmitkLineEditLevelWindowWidget();
   
-  /// inputfield for level value
+  /// input field for level value
   QLineEdit* m_LevelInput;
 
-  /// inputfield for window value
+  /// input field for window value
   QLineEdit* m_WindowInput;
 
   /*!
@@ -58,6 +69,18 @@ public:
   *  by a QmitkLineEditLevelWindowWidget
   */
   mitk::LevelWindow m_LevelWindow;
+
+  char m_Format;
+  int m_Precision;
+
+  /// stores if the fields set the level/window or lower/upper window bound values
+  IntensityRangeType m_IntensityRangeType;
+
+  /// Validator for the level/lower bound value (depending on the intensity range type)
+  QDoubleValidator* m_Validator1;
+
+  /// Validator for the window/upper bound value (depending on the intensity range type)
+  QDoubleValidator* m_Validator2;
 
   /// manager who is responsible to collect and deliver changes on Level/Window
   mitk::LevelWindowManager::Pointer m_Manager;
@@ -79,25 +102,42 @@ private:
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);
 
-  /*!
-  * tests if new level + window/2 <= maxRange, if not level would be set to maxRange - window/2
-  *
-  * tests if new level - window/2 >= maxRange, if not level would be set to minRange + window/2
-  *
-  * window keeps its old value
-  */
-  void validLevel();
+  /// updates the input fields with the values read from the current LevelWindow
+  void updateInputs();
 
   /*!
-  * tests if current level + window/2 <= maxRange, if not window/2 would be set to maxRange - level
-  *
-  * tests if current level - window/2 >= minRange, if not window/2 would be set to level - minRange
-  *
-  * level keeps its old value
+  * Tests if level <= maxRange - window/2, if not, level will be set to that limit.
+  * Otherwise, tests if level >= minRange + window/2, if not, it will be set to that limit.
+  * The window keeps its old value.
+  * \return true if the level needed correction, otherwise false
   */
-  void validWindow();
+  bool correctLevel(double& level);
 
-public slots:
+  /*!
+  * Tests if window <= (maxRange - level) * 2, if not, window will be set to that limit.
+  * Otherwise, tests if window >= (level - minRange) * 2, if not, it will be set to that limit.
+  * The level keeps its old value.
+  * \return true if the window needed correction, otherwise false
+  */
+  bool correctWindow(double& window);
+
+  /*!
+  * Tests if lower bound <= maxRange, if not, it will be set to maxRange.
+  * Otherwise, tests if lower bound >= minRange, if not, it will be set to minRange.
+  * The upper bound keeps its old value.
+  * \return true if the lower bound needed correction, otherwise false
+  */
+  bool correctLowerBound(double& lowerBound);
+
+  /*!
+  * Tests if upper bound <= maxRange, if not, it will be set to maxRange.
+  * Otherwise, tests if upper bound >= minRange, if not, it will be set to minRange.
+  * The lower bound keeps its old value.
+  * \return true if the upper bound needed correction, otherwise false
+  */
+  bool correctUpperBound(double& upperBound);
+
+private slots:
 
   /// called when return is pressed in levelinput field
   void SetLevelValue();
@@ -105,6 +145,8 @@ public slots:
   /// called when return is pressed in windowinput field
   void SetWindowValue();
   
+public slots:
+
   // validator to accept only possible values for Level/Window in lineedits
   //void setValidator();
 
@@ -114,6 +156,9 @@ public slots:
   /// displays and accepts values of the specified precision
   void SetPrecision(int precision);
 
+  /// switches between level/window and window bounds operation mode
+  void SetIntensityRangeType(IntensityRangeType mode);
+
 protected:
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
@@ -122,9 +167,6 @@ protected:
   *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
-
-  bool m_ExponentialFormat;
-  int m_Precision;
 
 };
 #endif // QMITKLINEEDITLEVELWINDOWWIDGET

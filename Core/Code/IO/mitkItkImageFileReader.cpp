@@ -136,7 +136,7 @@ void mitk::ItkImageFileReader::GenerateData()
     ndim = 2;
 
   mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), imageIO->GetComponentTypeInfo(),
-                                              imageIO->GetNumberOfComponents(), imageIO->GetImageSizeInBytes(),
+                                              imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
                                               imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
                                               imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );
   image->Initialize( pixelType, ndim, dimensions );

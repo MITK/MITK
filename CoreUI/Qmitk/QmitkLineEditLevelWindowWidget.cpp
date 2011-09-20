@@ -118,8 +118,8 @@ void QmitkLineEditLevelWindowWidget::updateInputs()
   }
   else
   {
-    number1 = m_LevelWindow.GetUpperWindowBound();
-    number2 = m_LevelWindow.GetLowerWindowBound();
+    number1 = m_LevelWindow.GetLowerWindowBound();
+    number2 = m_LevelWindow.GetUpperWindowBound();
     toolTip1 = QString("Lower bound: %1").arg(number1);
     toolTip2 = QString("Upper bound: %1").arg(number2);
   }

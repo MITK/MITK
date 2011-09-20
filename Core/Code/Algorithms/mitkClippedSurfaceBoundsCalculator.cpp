@@ -177,15 +177,25 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     intersectionWorldPoint.Fill(std::numeric_limits<int>::min());
 
     // Get intersection point of line and plane geometry
-    m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  
-
     double t = -1.0;
     bool isIntersectionPointOnLine;
-    isIntersectionPointOnLine = m_PlaneGeometry->IntersectionPointParam(line, t);
+    Vector3D lineVector = line.GetPoint1() - line.GetPoint2();
+    if(lineVector[0] == 0 && lineVector[1] == 0 && lineVector[2] == 0
+        && m_PlaneGeometry->IsOnPlane(line.GetPoint1()))
+    {
+      t = 1.0;
+      isIntersectionPointOnLine = true;
+      intersectionWorldPoint = line.GetPoint1();
+    }
+    else
+    {
+      m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);
+      isIntersectionPointOnLine = m_PlaneGeometry->IntersectionPointParam(line, t);
+    }
 
     mitk::Point3D intersectionIndexPoint;
     //Get index point
-    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    
+    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);
 
     if(0.0 <= t && t <= 1.0 && isIntersectionPointOnLine)
     {

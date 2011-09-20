@@ -253,7 +253,7 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
     dimensions[ 1 ] = ioSize[1];
     dimensions[ 2 ] = ioSize[2];
 
-    mitk::PixelType pixelType( typeid(RGBAPixel), 1, itk::ImageIOBase::RGBA );
+    mitk::PixelType pixelType( MakePixelType<RGBAImage>() );
     image->Initialize( pixelType, 3, dimensions );
     image->SetImportChannel( RGBABuffer, 0, Image::ManageMemory );
 
@@ -546,7 +546,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
     dimensions[ 1 ] = ioSize[1];
     dimensions[ 2 ] = ioSize[2];
 
-    mitk::PixelType pixelType( typeid(RGBAPixel), 1, itk::ImageIOBase::RGBA );
+    mitk::PixelType pixelType( MakePixelType<RGBAImage>() );
     image->Initialize( pixelType, 3, dimensions );
     image->SetImportChannel( RGBABuffer, 0, Image::ManageMemory );
 
@@ -833,7 +833,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
     dimensions[ 1 ] = ioSize[1];
     dimensions[ 2 ] = ioSize[2];
 
-    mitk::PixelType pixelType( typeid(RGBAPixel), 1, itk::ImageIOBase::RGBA );
+    mitk::PixelType pixelType( MakePixelType<RGBAImage>() );
     image->Initialize( pixelType, 3, dimensions );
     image->SetImportChannel( RGBABuffer, 0, Image::ManageMemory );
 
@@ -953,7 +953,7 @@ mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* 
     dimensions[ 1 ] = sizeY;
     dimensions[ 2 ] = sizeZ;
 
-    mitk::PixelType pixelType( typeid(RGBAPixel), 1, itk::ImageIOBase::RGBA );
+    mitk::PixelType pixelType( MakePixelType<RGBAImage>() );
     image->Initialize( pixelType, 3, dimensions );
     image->SetImportChannel( RGBABuffer, 0, Image::ManageMemory );
 

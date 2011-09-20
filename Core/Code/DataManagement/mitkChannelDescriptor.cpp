@@ -4,7 +4,7 @@
 mitk::ChannelDescriptor::ChannelDescriptor( mitk::PixelType& type, size_t numOfElements, bool allocate)
   : m_PixelType(type), m_Size(numOfElements), m_Data(NULL)
 {
-  MITK_INFO << "Entering ChannelDescriptor constructor.";
+  //MITK_INFO << "Entering ChannelDescriptor constructor.";
 }
 /*
 void mitk::ChannelDescriptor::Initialize(mitk::PixelType &type, size_t numOfElements, bool allocate)

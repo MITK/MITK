@@ -86,7 +86,7 @@ struct GetComponentType
 template<bool V, typename T>
 struct ComponentsTrait
 {
-  static const size_t Size = T::ImageDimension;
+  static const size_t Size = 1;
 };
 
 template<typename T>

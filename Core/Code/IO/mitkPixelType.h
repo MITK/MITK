@@ -86,6 +86,11 @@ public:
     return m_PixelTypeName;
   }
 
+  std::string GetComponentTypeAsString() const
+  {
+      return m_ComponentTypeName;
+  }
+
   /** \brief Get the number of bits per element (of an
   * element)
   *

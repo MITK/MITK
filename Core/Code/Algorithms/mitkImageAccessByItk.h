@@ -609,9 +609,9 @@ public:
   _accessTwoImagesByItkForEach(itkImageTypeFunction, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension), MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)) \
   {                                                                                                 \
     std::string msg("Pixel type ");                                                                 \
-    msg.append(pixelType1.GetItkTypeAsString());                                                    \
+    msg.append(pixelType1.GetComponentTypeAsString() );                                                    \
     msg.append(" or pixel type ");                                                                  \
-    msg.append(pixelType2.GetItkTypeAsString());                                                    \
+    msg.append(pixelType2.GetComponentTypeAsString() );                                                    \
     msg.append(" is not in " MITK_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));        \
     throw mitk::AccessByItkException(msg);                                                          \
   }                                                                                                 \

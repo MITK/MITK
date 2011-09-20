@@ -41,6 +41,11 @@ mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
   return m_Manager.GetPointer();
 }
 
+void QmitkLevelWindowWidget::SetIntensityRangeType(QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType)
+{
+  LineEditLevelWindowWidget->SetIntensityRangeType(intensityRangeType);
+}
+
 void QmitkLevelWindowWidget::SetExponentialFormat(bool value)
 {
   LineEditLevelWindowWidget->SetExponentialFormat(value);

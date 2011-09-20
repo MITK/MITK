@@ -31,6 +31,8 @@ public:
   QmitkLevelWindowWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   mitk::LevelWindowManager* GetManager();
   
+  void SetIntensityRangeType(QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType);
+
   void SetExponentialFormat(bool value);
 
   void SetPrecision(int precision);

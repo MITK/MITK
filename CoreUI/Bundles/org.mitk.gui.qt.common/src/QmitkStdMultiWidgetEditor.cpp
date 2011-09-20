@@ -41,6 +41,7 @@ QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
 }
 
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor(const QmitkStdMultiWidgetEditor& other)
+: berry::Object()
 {
   Q_UNUSED(other)
   throw std::runtime_error("Copy constructor not implemented");
@@ -149,6 +150,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
 
+    bool windowBoundsIntensityRange = prefs->GetBool("Window bounds intensity range", false);
+    QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType =
+        windowBoundsIntensityRange
+          ? QmitkLineEditLevelWindowWidget::WindowBounds
+          : QmitkLineEditLevelWindowWidget::LevelWindow;
+    m_StdMultiWidget->SetIntensityRangeType(intensityRangeType);
     bool exponentialFormat = prefs->GetBool("Exponential format", false);
     m_StdMultiWidget->SetExponentialFormat(exponentialFormat);
     int precision = prefs->GetInt("Precision", 2);
@@ -226,6 +233,12 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     m_StdMultiWidget->DisableStandardLevelWindow();
   }
 
+  bool windowBoundsIntensityRange = prefs->GetBool("Window bounds intensity range", false);
+  QmitkLineEditLevelWindowWidget::IntensityRangeType intensityRangeType =
+      windowBoundsIntensityRange
+        ? QmitkLineEditLevelWindowWidget::WindowBounds
+        : QmitkLineEditLevelWindowWidget::LevelWindow;
+  m_StdMultiWidget->SetIntensityRangeType(intensityRangeType);
   bool exponentialFormat = prefs->GetBool("Exponential format", false);
   m_StdMultiWidget->SetExponentialFormat(exponentialFormat);
   int precision = prefs->GetInt("Precision", 2);

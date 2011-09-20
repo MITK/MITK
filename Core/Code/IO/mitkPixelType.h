@@ -28,11 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageIOBase.h>
 #include <itkImage.h>
-//#include "mitkItkImageFileReader.h"
 
 namespace mitk {
-
-//class ItkImageFileReader;
 
 template< typename ComponentT>
 const char* ComponentTypeToString()
@@ -220,6 +217,12 @@ PixelType MakePixelType()
          );
 }
 
+
+template< typename T>
+PixelType MakeSimpleType()
+{
+    return MakePixelType<T,T,1>();
+}
 
 } // namespace mitk
 

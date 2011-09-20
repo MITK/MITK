@@ -87,7 +87,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
-        // FIXME
+        // FIXME ISG
         output->Initialize( CastToImageDescriptor(header));//, channels);
         mitkIpPicFree ( header );
     }

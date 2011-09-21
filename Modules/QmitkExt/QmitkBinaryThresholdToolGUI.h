@@ -44,6 +44,8 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 
     void OnThresholdingIntervalBordersChanged(int lower, int upper);
     void OnThresholdingValueChanged(int current);
+    void OnThresholdingIntervalBordersChanged(double lower, double upper);
+    void OnThresholdingValueChanged(double current);
 
   signals:
 

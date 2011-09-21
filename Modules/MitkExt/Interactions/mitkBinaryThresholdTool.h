@@ -79,6 +79,7 @@ namespace mitk
     int m_SensibleMinimumThresholdValue;
     int m_SensibleMaximumThresholdValue;
     int m_CurrentThresholdValue;
+    bool m_IsFloatImage;
 
   };
 

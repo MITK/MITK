@@ -227,7 +227,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       QMessageBox::critical(NULL,"ERROR","Cannot write data (invalid/empty)"); 
       return;
     }
-  } catch(itk::ExceptionObject e)
+  } catch(itk::ExceptionObject & e)
   {
     QMessageBox::critical( NULL, "SaveDialog", e.GetDescription(),QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
   }

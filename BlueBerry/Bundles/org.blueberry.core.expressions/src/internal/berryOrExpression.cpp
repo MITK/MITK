@@ -30,7 +30,7 @@ bool OrExpression::operator==(Expression& object)
     OrExpression& that = dynamic_cast<OrExpression&>(object);
     return this->fExpressions == that.fExpressions;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

@@ -435,7 +435,7 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
                 WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY,
                 IEditorMatchingStrategy::GetManifestName());
           }
-        } catch (CoreException e)
+        } catch (CoreException & e)
         {
           WorkbenchPlugin::Log(
               "Error creating editor management policy for editor id "

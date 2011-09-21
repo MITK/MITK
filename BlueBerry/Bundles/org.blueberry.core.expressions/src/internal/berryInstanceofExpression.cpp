@@ -64,7 +64,7 @@ InstanceofExpression::operator==(Expression& object)
     InstanceofExpression& that = dynamic_cast<InstanceofExpression&>(object);
     return this->fTypeName == that.fTypeName;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

@@ -60,7 +60,7 @@ Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id)
           foundExpression= this->GetExpression(id, *i);
           break;
         }
-        catch (InvalidServiceObjectException e)
+        catch (InvalidServiceObjectException & e)
         {
           throw CoreException("Missing expression", id);
         }

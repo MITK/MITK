@@ -293,7 +293,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
           }
-          catch (std::bad_alloc)
+          catch (std::bad_alloc&)
           {
             QMessageBox::warning(NULL,"Create new segmentation","Could not allocate memory for new segmentation");
           }

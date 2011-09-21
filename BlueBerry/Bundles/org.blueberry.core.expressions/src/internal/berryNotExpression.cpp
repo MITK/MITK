@@ -50,7 +50,7 @@ NotExpression::operator==(Expression& object)
     NotExpression& that = dynamic_cast<NotExpression&>(object);
     return this->fExpression == that.fExpression;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

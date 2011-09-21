@@ -126,7 +126,7 @@ TestExpression::operator==(Expression& object)
             this->Equals(this->fArgs, that.fArgs) &&
             this->fExpectedValue == that.fExpectedValue;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

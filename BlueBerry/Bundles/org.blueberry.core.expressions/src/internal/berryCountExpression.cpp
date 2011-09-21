@@ -54,7 +54,7 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("ber
         fSize= Poco::NumberParser::parse(size);
         fMode= EXACT;
       }
-      catch (Poco::SyntaxException e)
+      catch (Poco::SyntaxException & e)
       {
         fMode= UNKNOWN;
       }
@@ -132,7 +132,7 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("ber
       CountExpression& that = dynamic_cast<CountExpression&>(object);
       return (this->fMode == that.fMode) && (this->fSize == that.fSize);
     }
-    catch (std::bad_cast e)
+    catch (std::bad_cast & e)
     {
       return false;
     }

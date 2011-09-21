@@ -51,7 +51,7 @@ void QtShowViewAction::Run()
     {
       page->ShowView(m_Desc->GetId());
     }
-    catch (PartInitException e)
+    catch (PartInitException & e)
     {
       BERRY_ERROR << "Error: " << e.displayText() << std::endl;
     }

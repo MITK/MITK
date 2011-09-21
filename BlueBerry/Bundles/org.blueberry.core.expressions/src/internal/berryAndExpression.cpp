@@ -27,7 +27,7 @@ bool AndExpression::operator==(Expression& object)
     AndExpression& that = dynamic_cast<AndExpression&>(object);
     return this->Equals(this->fExpressions, that.fExpressions);
   }
-  catch (std::bad_cast exc)
+  catch (std::bad_cast exc&)
   {
     return false;
   }

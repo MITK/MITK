@@ -479,7 +479,7 @@ namespace mitk
       {
         reader->Update();
       }
-      catch(itk::ExceptionObject e)
+      catch(itk::ExceptionObject & e)
       {
         MITK_INFO << e.GetDescription();
       }

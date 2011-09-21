@@ -59,7 +59,7 @@ Object::Pointer ShowViewHandler::Execute(
     {
       this->OpenView(value, window);
     }
-    catch (PartInitException e)
+    catch (PartInitException & e)
     {
       throw ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
     }
@@ -94,7 +94,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
     {
       this->OpenView(descriptors[i]->GetId(), window);
     }
-    catch (PartInitException e)
+    catch (PartInitException & e)
     {
 //      StatusUtil.handleStatus(e.getStatus(),
 //          WorkbenchMessages.ShowView_errorTitle

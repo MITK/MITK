@@ -50,7 +50,7 @@ void ViewRegistryReader::ReadCategory(IConfigurationElement::Pointer element)
     Category<IViewDescriptor::Pointer>::Pointer cat(new Category<IViewDescriptor::Pointer>(element));
     viewRegistry->Add(cat);
   }
-  catch (CoreException e)
+  catch (CoreException & e)
   {
     // log an error since its not safe to show a dialog here
     WorkbenchPlugin::Log(
@@ -104,7 +104,7 @@ void ViewRegistryReader::ReadView(IConfigurationElement::Pointer element)
     ViewDescriptor::Pointer desc(new ViewDescriptor(element));
     viewRegistry->Add(desc);
   }
-  catch (CoreException e)
+  catch (CoreException & e)
   {
     // log an error since its not safe to open a dialog here
     WorkbenchPlugin::Log(

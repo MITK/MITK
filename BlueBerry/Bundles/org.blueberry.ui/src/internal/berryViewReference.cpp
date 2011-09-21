@@ -155,7 +155,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   try
   {
     result = this->CreatePartHelper();
-  } catch (PartInitException e)
+  } catch (PartInitException & e)
   {
     exception = e;
     error = true;
@@ -206,7 +206,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     try
     {
       part->Init(site);
-    } catch (PartInitException e)
+    } catch (PartInitException & e)
     {
       BERRY_ERROR << e.displayText();
       //StatusUtil.handleStatus(e, StatusManager.SHOW
@@ -220,7 +220,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     try
     {
       part->CreatePartControl(parent);
-    } catch (std::exception e)
+    } catch (std::exception & e)
     {
       BERRY_ERROR << "Error creating view: " << e.what() << std::endl;
       //          StatusUtil.handleStatus(e, StatusManager.SHOW

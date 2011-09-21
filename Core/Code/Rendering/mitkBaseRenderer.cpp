@@ -676,6 +676,7 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
 {
   if(m_MapperID==1)
   {
+    mitk::EventMapper::MapEvent( we, m_RenderingManager->GetGlobalInteraction() );
     Point2D p(we->GetDisplayPosition());
     Point2D p_mm;
     Point3D position;

@@ -145,6 +145,8 @@ private:
 
   /** \brief True if the mouse is currently hovering over the image. */
   bool m_IsHovering;
+
+  bool m_LastPointWasValid;
 };
 
 }

@@ -230,7 +230,6 @@ public:
   //## @return @a true property was found
   template <typename T>
     bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL) const
-#ifdef _MSC_VER
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer));
       if ( gp != NULL )
@@ -240,9 +239,6 @@ public:
       }
       return false;
     }
-#else
-  ;
-#endif
 
   // @brief Get a set of all group tags from this node's property list
   GroupTagList GetGroupTags() const;

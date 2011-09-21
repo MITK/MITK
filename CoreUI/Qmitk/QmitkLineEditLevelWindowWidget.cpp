@@ -164,8 +164,10 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
   if (m_IntensityRangeType == LevelWindow)
   {
+    double oldLevel = m_LevelWindow.GetLevel();
     double level = m_LevelInput->text().toDouble();
-    if (correctLevel(level))
+    correctLevel(level);
+    if (level != oldLevel)
     {
       QString qLevel;
       qLevel.setNum(level, m_Format, m_Precision);
@@ -179,8 +181,10 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
   }
   else
   {
+    double oldLowerBound = m_LevelWindow.GetLowerWindowBound();
     double lowerBound = m_LevelInput->text().toDouble();
-    if (correctLowerBound(lowerBound))
+    correctLowerBound(lowerBound);
+    if (lowerBound != oldLowerBound)
     {
       QString qLowerBound;
       qLowerBound.setNum(lowerBound, m_Format, m_Precision);
@@ -199,8 +203,10 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
   if (m_IntensityRangeType == LevelWindow)
   {
+    double oldWindow = m_LevelWindow.GetWindow();
     double window = m_WindowInput->text().toDouble();
-    if (correctWindow(window))
+    correctWindow(window);
+    if (window != oldWindow)
     {
       QString qWindow;
       qWindow.setNum(window, m_Format, m_Precision);
@@ -214,8 +220,10 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
   }
   else
   {
+    double oldUpperBound = m_LevelWindow.GetUpperWindowBound();
     double upperBound = m_WindowInput->text().toDouble();
-    if (correctUpperBound(upperBound))
+    correctUpperBound(upperBound);
+    if (upperBound != oldUpperBound)
     {
       QString qUpperBound;
       qUpperBound.setNum(upperBound, m_Format, m_Precision);

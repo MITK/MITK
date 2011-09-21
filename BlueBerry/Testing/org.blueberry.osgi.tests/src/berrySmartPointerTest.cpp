@@ -96,7 +96,7 @@ CppUnit::Test* SmartPointerTest::Suite()
       berry::SmartPointer<TestObject> testobj(ptr_weak);
       failmsg("this should throw a BadWeakPointerException");
     }
-    catch (BadWeakPointerException )
+    catch (BadWeakPointerException & )
     {
       // expected
     }
@@ -157,7 +157,7 @@ CppUnit::Test* SmartPointerTest::Suite()
       obj != 1;
       failmsg("should throw a std::invalid_argument exception");
     }
-    catch (std::invalid_argument)
+    catch (std::invalid_argument&)
     { //expectted }
 
     }
@@ -175,7 +175,7 @@ CppUnit::Test* SmartPointerTest::Suite()
       obj == 1;
       failmsg("should throw a std::invalid_argument exception");
     }
-    catch (std::invalid_argument)
+    catch (std::invalid_argument&)
     { // expected }
 
     }

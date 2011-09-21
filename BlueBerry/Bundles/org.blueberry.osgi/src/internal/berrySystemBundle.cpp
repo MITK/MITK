@@ -47,7 +47,7 @@ void SystemBundle::Resume()
   {
     m_BundleLoader.ReadAllContributions();
   }
-  catch (Poco::Exception exc)
+  catch (Poco::Exception & exc)
   {
     BERRY_ERROR << exc.displayText() << std::endl;
   }
@@ -57,7 +57,7 @@ void SystemBundle::Resume()
   {
     m_BundleLoader.StartAllBundles();
   }
-  catch (Poco::Exception exc)
+  catch (Poco::Exception & exc)
   {
     BERRY_ERROR << exc.displayText() << std::endl;
   }

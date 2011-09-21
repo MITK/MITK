@@ -67,7 +67,7 @@ class GenericProperty : public BaseProperty
         if(otherProp==NULL) return false;
         if (this->m_Value == otherProp->m_Value) return true;
       }
-      catch (std::bad_cast)
+      catch (std::bad_cast&)
       {
         // nothing to do now - just return false
       }
@@ -89,7 +89,7 @@ class GenericProperty : public BaseProperty
         dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
         return true;
       }
-      catch (std::bad_cast)
+      catch (std::bad_cast&)
       {
       }
       return false;
@@ -107,7 +107,7 @@ class GenericProperty : public BaseProperty
           this->Modified();
         }
       }
-      catch (std::bad_cast)
+      catch (std::bad_cast&)
       {
         // nothing to do then
       }

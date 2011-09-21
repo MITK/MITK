@@ -65,7 +65,7 @@ EqualsExpression::operator==(Expression& object) {
     EqualsExpression& that = dynamic_cast<EqualsExpression&>(object);
     return this->fExpectedValue == that.fExpectedValue;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

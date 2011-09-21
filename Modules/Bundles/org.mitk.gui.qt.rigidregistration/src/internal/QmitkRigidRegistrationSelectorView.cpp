@@ -311,7 +311,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     {
       registration->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (itk::ExceptionObject & e)
     {
       MITK_INFO << "Caught exception: "<<e.GetDescription();
       QMessageBox::information( this, "Registration exception", e.GetDescription());

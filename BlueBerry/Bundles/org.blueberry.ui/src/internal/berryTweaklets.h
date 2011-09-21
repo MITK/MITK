@@ -137,7 +137,7 @@ private:
           tweaklets.insert(definition, tweaklet);
           return tweaklet;
         }
-        catch (CoreException e)
+        catch (CoreException & e)
         {
           //StatusManager.getManager().handle(
           //    StatusUtil.newStatus(IStatus.ERR,

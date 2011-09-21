@@ -194,7 +194,7 @@ BundleLoader::ResolveBundle(IBundle::Pointer bundle)
     bundle->Resolve();
     BERRY_INFO(m_ConsoleLog) << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString();
   }
-  catch (BundleResolveException exc)
+  catch (BundleResolveException & exc)
   {
     BERRY_ERROR << "Bundle resolve failed: " << exc.displayText();
   }
@@ -392,7 +392,7 @@ BundleLoader::StartAllBundles()
         !iter->second.m_Bundle->IsSystemBundle())
         this->StartBundle(iter->second.m_Bundle);
     }
-    catch (Poco::Exception exc)
+    catch (Poco::Exception & exc)
     {
       BERRY_ERROR << exc.displayText() << std::endl;
     }
@@ -492,7 +492,7 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
     bundleInfo.m_ClassLoader->loadLibrary(strLibPath);
     return bundleInfo.m_ClassLoader->create(activator);
   }
-  catch (Poco::LibraryLoadException exc)
+  catch (Poco::LibraryLoadException & exc)
   {
     BERRY_ERROR << "Could not create Plugin activator. Did you export the class \"" << activator << "\" ?\n"
                  << "  Exception displayText(): " << exc.displayText();

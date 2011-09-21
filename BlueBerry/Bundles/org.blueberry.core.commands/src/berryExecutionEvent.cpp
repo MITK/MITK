@@ -82,7 +82,7 @@ const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
 //    .convertToObject(stringValue);
     return objectValue;
   }
-  catch (NotDefinedException e)
+  catch (NotDefinedException & e)
   {
     throw ExecutionException("Command is not defined", e); //$NON-NLS-1$
   }

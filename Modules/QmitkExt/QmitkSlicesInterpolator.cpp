@@ -354,7 +354,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       }    
     }
   }
-  catch(std::bad_cast)
+  catch(std::bad_cast&)
   {
     return false; // so what
   }

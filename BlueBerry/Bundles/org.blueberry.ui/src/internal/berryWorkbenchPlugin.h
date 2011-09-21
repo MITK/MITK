@@ -318,7 +318,7 @@ private:
               impl = targetElement->CreateExecutableExtension<C>("class", C::GetManifestName());
             }
             return impl;
-        } catch (CoreException e) {
+        } catch (CoreException & e) {
             // log it since we cannot safely display a dialog.
             WorkbenchPlugin::Log("Unable to create extension: " + targetID //$NON-NLS-1$
                     + " in extension point: " + extensionPointId); //$NON-NLS-1$

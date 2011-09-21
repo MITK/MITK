@@ -272,7 +272,7 @@ namespace berry
         ObjectFloat::Pointer var(new ObjectFloat((float) num));
         return var;
       }
-      catch (Poco::SyntaxException)
+      catch (Poco::SyntaxException&)
       {
         ObjectString::Pointer var(new ObjectString(arg));
         return var;
@@ -286,7 +286,7 @@ namespace berry
         ObjectInt::Pointer var(new ObjectInt(num));
         return var;
       }
-      catch (Poco::SyntaxException e)
+      catch (Poco::SyntaxException & e)
       {
         ObjectString::Pointer var(new ObjectString(arg));
         return var;

@@ -75,7 +75,7 @@ SystemTestExpression::operator==(Expression& object)
     return this->fProperty == that.fProperty
       && this->fExpectedValue == that.fExpectedValue;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

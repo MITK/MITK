@@ -352,7 +352,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
             minimalIntervallSize = minTB[1]-minTB[0];
           }
         }
-        catch(itk::ExceptionObject e)
+        catch(itk::ExceptionObject & e)
         {
           MITK_ERROR << e << std::endl;
         }

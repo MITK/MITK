@@ -119,7 +119,7 @@ namespace berry
         editorsFontNode->Parent();
         failmsg("this should throw a Poco::IllegalStateException");
       }
-      catch (Poco::IllegalStateException)
+      catch (Poco::IllegalStateException&)
       {
         // expected
       }

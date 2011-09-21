@@ -33,7 +33,7 @@ EnablementExpression::operator==(Expression& object)
     EnablementExpression& that = dynamic_cast<EnablementExpression&>(object);
     return this->Equals(this->fExpressions, that.fExpressions);
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

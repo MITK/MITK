@@ -32,7 +32,7 @@ class MITK_QT_COMMON_EXT_EXPORT QmitkCommonWorkbenchWindowAdvisor : public berry
 {
 public:
   QmitkCommonWorkbenchWindowAdvisor( berry::IWorkbenchWindowConfigurer::Pointer configurer );
-  void PostWindowCreate();
+  virtual void PostWindowCreate();
 
 private:
   QmitkFunctionalityCoordinator::Pointer m_FunctionalityCoordinator;

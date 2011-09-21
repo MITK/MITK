@@ -177,10 +177,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // how big the area is in physical coordinates: widthInMM x heightInMM pixels
   mitk::ScalarType widthInMM, heightInMM;
 
-  // where we want to sample
-  //  Point3D origin;
-  //  Vector3D right, bottom, normal;
-
   // take transform of input image into account
   const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
   const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
@@ -585,8 +581,8 @@ void mitk::ImageVtkMapper2D::GenerateLookuptable( mitk::BaseRenderer* renderer, 
 {
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
   //are there any changes in the property list?
-  if( localStorage->m_LookupTable->GetMTime() <= this->GetDataNode()->GetPropertyList()->GetMTime())
-  {
+//  if( localStorage->m_LookupTable->GetMTime() <= this->GetDataNode()->GetPropertyList()->GetMTime())
+//  {
     if(binary)
     {
       //default lookuptable for binary images
@@ -629,12 +625,11 @@ void mitk::ImageVtkMapper2D::GenerateLookuptable( mitk::BaseRenderer* renderer, 
         //default lookuptable with level window property
         LevelWindow levelWindow;
         this->GetLevelWindow( levelWindow, renderer );
-
         //set up the lookuptable with the level window range
         localStorage->m_LookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
       }
     }
-  }
+//  }
 }
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,

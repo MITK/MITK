@@ -684,7 +684,6 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, we->GetType(), we->GetButton(), we->GetButtonState(), mitk::Key_unknown, p, position);
-    mitk::EventMapper::MapEvent( we, m_RenderingManager->GetGlobalInteraction() );
     mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID==2)

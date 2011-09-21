@@ -54,6 +54,9 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
 
 mitk::ToolManager::~ToolManager()
 {
+  for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
+    (*dataIter)->RemoveObserver(m_WorkingDataObserverTags[(*dataIter)]);
+
   if (m_ActiveTool)
   {
     m_ActiveTool->Deactivated();

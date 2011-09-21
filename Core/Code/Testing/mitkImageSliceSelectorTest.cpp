@@ -155,7 +155,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   {
     slice->UpdateLargestPossibleRegion();
   }
-  catch ( itk::ExceptionObject )
+  catch ( itk::ExceptionObject & )
   {
     std::cout<<"Part 2 [FAILED]"<<std::endl;
     return EXIT_FAILURE;

@@ -62,7 +62,7 @@ TypeExtension::TypeExtension(const std::string& typeInfo)
           inst.Cast<PropertyTester>()->InternalInitialize(descriptor);
           fExtenders[i]= extender = inst;
           return extender;
-        } catch (CoreException e) {
+        } catch (CoreException & e) {
           fExtenders[i] = IPropertyTester::Pointer();
           throw e;
         }

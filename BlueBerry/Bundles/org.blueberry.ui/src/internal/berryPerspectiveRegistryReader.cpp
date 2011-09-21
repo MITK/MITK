@@ -49,7 +49,7 @@ bool PerspectiveRegistryReader::ReadElement(IConfigurationElement::Pointer eleme
           new PerspectiveDescriptor(id, element));
       registry->AddPerspective(desc);
     }
-    catch (CoreException e)
+    catch (CoreException & e)
     {
       // log an error since its not safe to open a dialog here
       WorkbenchPlugin::Log("Unable to create layout descriptor.", e);//$NON-NLS-1$

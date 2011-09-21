@@ -138,7 +138,7 @@ namespace berry {
         IPropertyTester::Pointer descr(new PropertyTesterDescriptor(config));
         result.push_back(descr);
       }
-      catch (CoreException e)
+      catch (CoreException & e)
       {
         //TODO
         //ExpressionPlugin.getDefault().getLog().log(e.getStatus());

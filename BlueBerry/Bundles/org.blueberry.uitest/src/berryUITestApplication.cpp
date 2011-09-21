@@ -178,7 +178,7 @@ std::string UITestApplication::GetApplicationToRun()
     testApp = Platform::GetConfiguration().getString(
         Platform::ARG_TESTAPPLICATION);
   }
-  catch (Poco::NotFoundException)
+  catch (Poco::NotFoundException&)
   {
   }
 

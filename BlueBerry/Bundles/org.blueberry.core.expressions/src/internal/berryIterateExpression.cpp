@@ -221,7 +221,7 @@ bool IterateExpression::operator==(Expression& object)
     IterateExpression& that = dynamic_cast<IterateExpression&> (object);
     return (this->fOperator == that.fOperator) && this->Equals(
         this->fExpressions, that.fExpressions);
-  } catch (std::bad_cast)
+  } catch (std::bad_cast&)
   {
     return false;
   }

@@ -41,7 +41,7 @@ bool mitk::GroupTagProperty::Assignable(const BaseProperty& other) const
     dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
     return true; 
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
   }
   return false;

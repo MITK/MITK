@@ -120,7 +120,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     {
       nrrdWriter->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (itk::ExceptionObject & e)
     {
       std::cout << e << std::endl;
     }
@@ -219,7 +219,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     {
       nrrdWriter4->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (itk::ExceptionObject & e)
     {
       std::cout << e << std::endl;
     }

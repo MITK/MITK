@@ -126,7 +126,7 @@ bool mitk::Material::Assignable(const Material& other) const
     otherinstance.GetOpacity();
     return true;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
   }
   return false;
@@ -140,7 +140,7 @@ mitk::Material& mitk::Material::operator=(const mitk::Material& other)
 
     Initialize(otherProp);
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     // nothing to do then
   }

@@ -66,7 +66,7 @@ ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info)
   {
     expr= GetDefinitionRegistry().GetExpression(fDefinitionId);
   }
-  catch (CoreException e)
+  catch (CoreException & e)
   {
     // We didn't find the expression definition. So no
     // expression info can be collected.
@@ -82,7 +82,7 @@ ReferenceExpression::operator==(Expression& object)
     ReferenceExpression& that = dynamic_cast<ReferenceExpression&>(object);
     return this->fDefinitionId == that.fDefinitionId;
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

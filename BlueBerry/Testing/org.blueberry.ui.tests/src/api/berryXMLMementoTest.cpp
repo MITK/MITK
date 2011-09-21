@@ -536,7 +536,7 @@ void XMLMementoTest::TestCreateReadRootReaderExceptionCases()
 
     XMLMemento::CreateReadRoot(ss);
     failmsg("should throw WorkbenchException because of invalid format");
-  } catch (WorkbenchException e)
+  } catch (WorkbenchException & e)
   {
     // expected
   }
@@ -545,7 +545,7 @@ void XMLMementoTest::TestCreateReadRootReaderExceptionCases()
     std::stringstream ss("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
     XMLMemento::CreateReadRoot(ss);
     failmsg("should throw WorkbenchException because there is no element");
-  } catch (WorkbenchException e)
+  } catch (WorkbenchException & e)
   {
     // expected
   }
@@ -554,7 +554,7 @@ void XMLMementoTest::TestCreateReadRootReaderExceptionCases()
     std::ifstream file("__123thisshouldnotexist_238waer");
     XMLMemento::CreateReadRoot(file);
     failmsg("should throw WorkbenchException because of IOException");
-  } catch (WorkbenchException e)
+  } catch (WorkbenchException & e)
   {
     // expected
   }

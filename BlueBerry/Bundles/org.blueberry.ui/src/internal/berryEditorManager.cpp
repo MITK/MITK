@@ -603,11 +603,11 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
     }
 
   }
-  catch (PartInitException e)
+  catch (PartInitException & e)
   {
     throw e;
   }
-  catch (std::exception e)
+  catch (std::exception & e)
   {
     throw PartInitException("An exception was thrown during initialization", e.what());
   }
@@ -1276,7 +1276,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
         this->CreateEditorTab(result, ""); //$NON-NLS-1$
         return result;
       }
-      catch (PartInitException e)
+      catch (PartInitException & e)
       {
 //        StatusManager.getManager().handle(
 //            StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));

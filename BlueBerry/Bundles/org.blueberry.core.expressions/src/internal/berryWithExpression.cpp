@@ -55,7 +55,7 @@ WithExpression::operator==(Expression& object)
     return this->fVariable == that.fVariable &&
             this->Equals(this->fExpressions, that.fExpressions);
   }
-  catch (std::bad_cast)
+  catch (std::bad_cast&)
   {
     return false;
   }

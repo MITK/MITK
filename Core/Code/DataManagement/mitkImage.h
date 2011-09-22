@@ -93,7 +93,7 @@ public:
 public:
   //##Documentation
   //## @brief Returns the PixelType of channel @a n.
-  const mitk::PixelType& GetPixelType(int n = 0) const;
+  const mitk::PixelType GetPixelType(int n = 0) const;
 
   //##Documentation
   //## @brief Get dimension of the image

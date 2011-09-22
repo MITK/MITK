@@ -86,7 +86,7 @@ mitk::Image::~Image()
   delete [] m_OffsetTable;
 }
 
-const mitk::PixelType& mitk::Image::GetPixelType(int n) const
+const mitk::PixelType mitk::Image::GetPixelType(int n) const
 {
   return this->m_ImageDescriptor->GetChannelTypeById(n);
 }

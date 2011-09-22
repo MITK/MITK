@@ -62,8 +62,6 @@ public:
 
   PixelType(void);
 
-  //PixelType(const std::type_info& aTypeId, int numberOfComponents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
-
   PixelType(const mitk::PixelType & aPixelType);
 
   /** \brief Get the \a type_info of the scalar (!) type. Each element

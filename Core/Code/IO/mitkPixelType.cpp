@@ -87,21 +87,11 @@ mitk::PixelType::PixelType( const mitk::PixelType& other )
 }
 
 mitk::PixelType& mitk::PixelType::operator =( const mitk::PixelType& other)
-{
-  *this = other;
+{  
+  *this = PixelType(other);
   return *this;
 }
-/*
-mitk::PixelType::PixelType( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType )
-  : m_ComponentType( aTypeId ), m_PixelType( typeid(anItkIoPixelType) ), m_NumberOfComponents( numberOfComponents ),
-    m_PixelTypeName( m_PixelType.name() ), m_ComponentTypeName( m_ComponentType.name() ),
-    m_BytesPerComponent(0)
-{
-  m_BytesPerComponent = sizeof( m_ComponentType );
 
-  Initialize( aTypeId, numberOfComponents, anItkIoPixelType );
-}
-*/
 bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
 {
   MITK_DEBUG << "operator==" << std::endl;
@@ -118,8 +108,10 @@ bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
 
 bool mitk::PixelType::operator ==(const std::type_info& typeId) const
 {
-  return (m_NumberOfComponents == 1
-       && m_ComponentType == typeId);
+  if( m_NumberOfComponents ==1 )
+      return (m_ComponentType == typeId);
+  else
+      return (m_PixelType == typeId);
 }
 
 bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const

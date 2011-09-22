@@ -60,6 +60,34 @@ void QmitkFiducialRegistrationWidget::CreateConnections()
   connect( (QObject*)(m_Controls->m_UseICPRegistration), SIGNAL(toggled(bool)), this, SIGNAL(FindFiducialCorrespondences(bool)) );
 }
 
+void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMode widgetMode)
+{
+  if (widgetMode==LANDMARKMODE)
+  {
+    this->HideContinousRegistrationRadioButton(true);
+    this->HideStaticRegistrationRadioButton(true);
+    this->HideUseICPRegistrationCheckbox(true);
+    this->HideImageFiducialButton(false);
+    this->m_Controls->registrationGroupBox->setTitle("");
+    this->m_Controls->sourceLandmarksGroupBox->setTitle("Source landmarks");
+    this->m_Controls->targetLandmarksGroupBox->setTitle("Target/Reference Landmarks");
+    this->m_Controls->m_AddImageFiducialBtn->setText("Add source landmark");
+    this->m_Controls->m_AddTrackingFiducialBtn->setText("Add target landmark");
+  }
+  else if (widgetMode==FIDUCIALMODE)
+  {
+    this->HideContinousRegistrationRadioButton(false);
+    this->HideStaticRegistrationRadioButton(false);
+    this->HideUseICPRegistrationCheckbox(false);
+    this->HideImageFiducialButton(true);
+    this->m_Controls->registrationGroupBox->setTitle("Select fiducials in image and OR (world)");
+    this->m_Controls->sourceLandmarksGroupBox->setTitle("Image fiducials");
+    this->m_Controls->targetLandmarksGroupBox->setTitle("OR fiducials");
+    this->m_Controls->m_AddImageFiducialBtn->setText("Add image fiducial");
+    this->m_Controls->m_AddTrackingFiducialBtn->setText("Add current instrument position");
+  }
+}
+
 void QmitkFiducialRegistrationWidget::SetQualityDisplayText( QString text )
 {
   if (text == NULL)

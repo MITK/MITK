@@ -40,6 +40,23 @@ public:
   QmitkFiducialRegistrationWidget(QWidget* parent);
   virtual ~QmitkFiducialRegistrationWidget();
 
+  /*!
+  \brief enumeration to specify the appearance of the widget.
+  'FIDUCIALMODE' is likely to be used for (tracking) fiducial based registration purposes
+  'LANDMARKMODE' can be used for any kind of landmark based registration (source landmarks -> target/reference landmarks)
+  */
+  enum WidgetAppearanceMode
+  {
+    FIDUCIALMODE,
+    LANDMARKMODE
+  };
+  /*!
+  \brief set the appearance mode of this widget
+  'FIDUCIALMODE' adapts the widget for (tracking) fiducial based registration purposes
+  'LANDMARKMODE' adapts the widget for landmark based registration (source landmarks -> target/reference landmarks)
+  */
+  void SetWidgetAppearanceMode(WidgetAppearanceMode widgetMode);
+
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< Set the default stdMultiWidget (needed for the PointListwidget)
 
   void SetImageFiducialsNode(mitk::DataNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials

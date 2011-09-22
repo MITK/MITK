@@ -5,6 +5,8 @@ SET(MODULE_IMAGE_TESTS
 )
 
 SET(MODULE_TESTIMAGES
- Pic3D.pic.gz
- Pic2DplusT.pic.gz
+  US4DCyl.pic.gz
+  Pic3D.pic.gz
+  Pic2DplusT.pic.gz
+  BallBinary30x30x30.pic.gz
 )

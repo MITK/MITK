@@ -1257,7 +1257,8 @@ void mitk::Image::ComputeImageStatistics(int t) const
   if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 
     m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
 // FIXME Commended calls to itk statistics to avoid run-time erorrs
- /* if(this->m_PixelType->GetNumberOfComponents() == 1)
+  const mitk::PixelType pType = m_ImageDescriptor->GetChannelTypeById(0);
+  if(pType.GetNumberOfComponents() == 1)
   {
     // recompute
     mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
@@ -1270,7 +1271,7 @@ void mitk::Image::ComputeImageStatistics(int t) const
       AccessByItk_2( image, _ComputeExtremaInItkImage, thisImage, t );
     }
   }
-  else*/ if(1)//this->m_PixelType->GetNumberOfComponents() > 1)
+  else if(pType.GetNumberOfComponents() > 1)
   {
     m_ScalarMin[t] = 0;
     m_ScalarMax[t] = 255;

@@ -38,7 +38,7 @@ int mitkImageTest(int argc, char* argv[])
 
   //Create Image out of nowhere
   mitk::Image::Pointer imgMem;
-  mitk::PixelType pt = mitk::MakePixelType<int,int,1>();
+  mitk::PixelType pt = mitk::MakeSimpleType<int>();
   unsigned int dim[]={100,100,20};
 
   std::cout << "Testing creation of Image: ";

@@ -481,5 +481,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
   {
     this->PopBackInput();
   }
+  this->SetNumberOfInputs(0);
   this->SetNumberOfOutputs(1);
 }

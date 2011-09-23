@@ -353,15 +353,29 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   MITK_INFO<<"WorkingData changed";
-  OnInterpolationActivated( m_2DInterpolationEnabled ); // re-initialize if needed
-  On3DInterpolationActivated( m_3DInterpolationEnabled);
+  if (m_2DInterpolationEnabled)
+  {
+    OnInterpolationActivated( true ); // re-initialize if needed
+  }
+  if (m_3DInterpolationEnabled)
+  {
+    On3DInterpolationActivated( true);
+  }
 }
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
   MITK_INFO<<"RefData changed";
-  OnInterpolationActivated( m_2DInterpolationEnabled ); // re-initialize if needed
-  On3DInterpolationActivated( m_3DInterpolationEnabled);
+  if (m_2DInterpolationEnabled)
+  {
+    OnInterpolationActivated( true ); // re-initialize if needed
+  }
+  if (m_3DInterpolationEnabled)
+  {
+    On3DInterpolationActivated( true);
+  }
+  //OnInterpolationActivated( m_2DInterpolationEnabled ); // re-initialize if needed
+  //On3DInterpolationActivated( m_3DInterpolationEnabled);
 }
 
 
@@ -509,6 +523,11 @@ void QmitkSlicesInterpolator::InterpolateSurface()
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
 
     }
+  }
+  else if (interpolatedSurface.IsNull() && m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+  {
+    m_InterpolatedSurfaceNode->SetVisibility(false);
+    m_3DContourNode->SetVisibility(false);
   }
 
   //OnShowMarkers(m_CbHideMarkers->checkState());
@@ -735,20 +754,25 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
       if (workingNode)
       {
         int listID;
-        if (workingNode->IsSelected())
+        bool visible = workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+        bool selected = workingNode->IsSelected();
+        MITK_INFO<<"Name: "<<workingNode->GetName();
+        MITK_INFO<<"Selected: "<<selected;
+        MITK_INFO<<"Visible: "<<visible;
+        if ((workingNode->IsSelected() && workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) 
+      )
         {
           if (workingNode->GetIntProperty("3DInterpolationListID", listID))
           {
-            MITK_INFO<<"SELECTED Existing ID: "<<listID;
+            MITK_INFO<<"Existing ID: "<<listID;
             m_SurfaceInterpolator->SetCurrentListID(listID);
             this->InterpolateSurface();
           }
           else
           {
             listID = m_SurfaceInterpolator->CreateNewContourList();
-            MITK_INFO<<"SELECTED New ID: "<<listID;
+            MITK_INFO<<"New ID: "<<listID;
             workingNode->SetIntProperty("3DInterpolationListID", listID);
-            //m_SurfaceInterpolator->SetCurrentListID(listID);
             m_InterpolatedSurfaceNode->SetVisibility(false);
             m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
           }
@@ -773,7 +797,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           m_SurfaceInterpolator->SetMinSpacing(minSpacing);
           m_SurfaceInterpolator->SetDistanceImageVolume(50000);
         }
-        else
+        else 
         {
           if (workingNode->GetIntProperty("3DInterpolationListID", listID))
             m_InterpolatedSurfaceNode->SetVisibility(false);
@@ -791,45 +815,6 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   {
     // don't care (double add/remove)
   }
-
-  //if (m_ToolManager)
-  //{
-  //  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  //  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-  //  QWidget::setEnabled( workingNode != NULL );
-
-  //  m_BtnAccept3DInterpolation->setEnabled( on );
-  //  m_InterpolatedSurfaceNode->SetVisibility( on );
-  //  m_CbHideMarkers->setEnabled(on);
-
-  //  if (!on)
-  //  {
-  //    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //    return;
-  //  }
-
-  //  if (workingNode)
-  //  {
-  //    mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
-  //    double minSpacing (100);
-  //    double maxSpacing (0);
-  //    for (int i =0; i < 3; i++)
-  //    {
-  //      if (spacing[i] < minSpacing)
-  //      {
-  //        minSpacing = spacing[i];
-  //      }
-  //      else if (spacing[i] > maxSpacing)
-  //      {
-  //        maxSpacing = spacing[i];
-  //      }
-  //    }
-
-  //    m_SurfaceInterpolator->SetWorkingImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
-  //    m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
-  //    m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-  //  }
-  //}
 }
 
 void QmitkSlicesInterpolator::EnableInterpolation(bool on)

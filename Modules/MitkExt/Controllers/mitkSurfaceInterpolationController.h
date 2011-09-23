@@ -87,6 +87,8 @@ namespace mitk
 
     void SetCurrentListID (int ID);
 
+    mitk::Image* GetImage();
+
 
 
  protected:

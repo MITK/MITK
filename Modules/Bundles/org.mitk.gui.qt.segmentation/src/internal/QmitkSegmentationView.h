@@ -44,6 +44,8 @@ public:
     throw std::runtime_error("Copy constructor not implemented");
   }
   virtual ~QmitkSegmentationView();
+
+  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   
   /*!
     \brief Invoked when the DataManager selection changed
@@ -95,6 +97,12 @@ protected slots:
   void OnRememberContourPositions(bool state);
 
   void OnHideMarkerNodes(bool);
+
+  //For controlling the selection behaviour of the segmentation bundle
+  void OnWorkingNodeVisibilityChanged();
+
+  //For removing the observers for visibility of the working nodes
+  void OnWorkingNodeDeleted(const itk::Object* caller, const itk::EventObject& e);
   
 protected:
   
@@ -153,6 +161,9 @@ protected:
   unsigned long m_RenderingManagerObserverTag;
   unsigned long m_SlicesRotationObserverTag1;
   unsigned long m_SlicesRotationObserverTag2;
+  unsigned long m_VisibilityChangedObserverTag;
+
+  NodeTagMapType  m_WorkingDataObserverTags;
   
   
 };

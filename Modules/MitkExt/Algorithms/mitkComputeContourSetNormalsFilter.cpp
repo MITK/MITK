@@ -255,5 +255,6 @@ void mitk::ComputeContourSetNormalsFilter::Reset()
   {
     this->PopBackInput();
   }
+  this->SetNumberOfInputs(0);
   this->SetNumberOfOutputs(0);
 }

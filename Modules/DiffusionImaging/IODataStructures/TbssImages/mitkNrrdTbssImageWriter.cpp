@@ -58,9 +58,9 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
 
 
-  itk::Image<float,3>::Pointer img = input->GetImage();
+  itk::VectorImage<float, 3>::Pointer img = input->GetImage();
 
-  typedef itk::Image<TPixelType,3> ImageType;
+  typedef itk::VectorImage<TPixelType,3> ImageType;
 
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();

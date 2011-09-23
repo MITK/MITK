@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 #include "mitkDiffusionImage.h"
+#include "mitkTbssImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
@@ -222,6 +223,7 @@ struct CvpSelListener : ISelectionListener
       bool foundImage = false;
       bool foundMultipleOdfImages = false;
       bool foundRGBAImage = false;
+      bool foundTbssImage = false;
 
       // do something with the selected items
       if(m_View->m_CurrentSelection)
@@ -263,6 +265,35 @@ struct CvpSelListener : ISelectionListener
               m_View->m_Controls->label_channel->setText(label);
 
               int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(node->GetData()))->GetVectorImage()->GetVectorLength();
+              m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
+            }
+
+            if(QString("TbssImage").compare(node->GetData()->GetNameOfClass())==0)
+            {
+              foundTbssImage = true;
+              bool tex_int;
+              node->GetBoolProperty("texture interpolation", tex_int);
+              if(tex_int)
+              {
+                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexON);
+                m_View->m_Controls->m_TextureIntON->setChecked(true);
+                m_View->m_TexIsOn = true;
+              }
+              else
+              {
+                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexOFF);
+                m_View->m_Controls->m_TextureIntON->setChecked(false);
+                m_View->m_TexIsOn = false;
+              }
+              int val;
+              node->GetIntProperty("DisplayChannel", val);
+              m_View->m_Controls->m_DisplayIndex->setValue(val);
+
+              QString label = "Channel %1";
+              label = label.arg(val);
+              m_View->m_Controls->label_channel->setText(label);
+
+              int maxVal = (dynamic_cast<mitk::TbssImage<short>* >(node->GetData()))->GetImage()->GetVectorLength();
               m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
             }
 
@@ -308,8 +339,13 @@ struct CvpSelListener : ISelectionListener
         }
       }
 
-      m_View->m_Controls->m_DisplayIndex->setVisible(foundDiffusionImage);
-      m_View->m_Controls->label_channel->setVisible(foundDiffusionImage);
+
+      if(foundDiffusionImage || foundTbssImage)
+      {
+        m_View->m_Controls->m_DisplayIndex->setVisible(true);
+        m_View->m_Controls->label_channel->setVisible(true);
+      }
+
 
       m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                       && !foundMultipleOdfImages;
@@ -332,7 +368,7 @@ struct CvpSelListener : ISelectionListener
       m_View->m_Controls->m_VisibleOdfsON_C->setVisible(m_View->m_FoundSingleOdfImage);
 
       bool foundAnyImage = foundDiffusionImage ||
-                           foundQBIVolume || foundTensorVolume || foundImage;
+                           foundQBIVolume || foundTensorVolume || foundImage || foundTbssImage;
 
       m_View->m_Controls->m_Reinit->setVisible(foundAnyImage);
       m_View->m_Controls->m_TextureIntON->setVisible(foundAnyImage);
@@ -905,6 +941,26 @@ void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
     //m_MultiWidget->RequestUpdate();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+
+  set = ActiveSet("TbssImage");
+
+  if(set.IsNotNull())
+  {
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
+      ++itemiter;
+    }
+
+    //m_MultiWidget->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+
+
 }
 
 void QmitkControlVisualizationPropertiesView::Reinit()

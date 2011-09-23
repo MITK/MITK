@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkTbssImage__h
 
 #include "mitkImage.h"
-#include "itkImage.h"
+#include "itkVectorImage.h"
 #include "mitkImageCast.h"
 
 namespace mitk 
@@ -36,7 +36,10 @@ namespace mitk
 
   public:
     typedef TPixelType PixelType;
-    typedef typename itk::Image<TPixelType, 3>  ImageType;
+    typedef typename itk::VectorImage<TPixelType, 3>
+                                                ImageType;
+
+
     typedef itk::Index<3> IndexType;
     //typedef typename std::vector <Index<3> > RoiType;
 
@@ -70,7 +73,14 @@ namespace mitk
       m_GroupInfo = info;
     }
 
+    std::vector< std::pair<std::string, int> > GetGroupInfo()
+    {
+      return m_GroupInfo;
+    }
 
+    void InitializeFromVectorImage();
+
+    void SetDisplayIndexForRendering(int displayIndex);
 
     TbssImage();
 
@@ -81,11 +91,9 @@ namespace mitk
     typename ImageType::Pointer m_Image;
 
 
-
-    std::vector< itk::Index<3> > m_Roi;
-
     std::vector< std::pair<std::string, int> > m_GroupInfo;
 
+    int m_DisplayIndex;
 
 
 

@@ -35,7 +35,7 @@ namespace mitk
   public:
 
     typedef mitk::TbssImage<TPixelType>  OutputType;
-    typedef itk::Image<TPixelType,3>     ImageType;
+    typedef itk::VectorImage<TPixelType,3>     ImageType;
     typedef TbssImageSource<TPixelType>  TbssVolSourceType;
 
 
@@ -56,12 +56,14 @@ namespace mitk
 
     /** Does the real work. */
     virtual void GenerateData();
+    virtual void GenerateOutputInformation();
 
-    void ReadRoiInfo(itk::MetaDataDictionary dict);
 
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;
+
+    std::vector< std::pair<std::string, int> > m_GroupInfo;
 
     typename OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;

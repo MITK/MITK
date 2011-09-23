@@ -80,7 +80,7 @@ public:
      * @param input the diffusion volumes to write to file.
      */
     void SetInput( InputType* input );
-    /**
+    /**itk::VectorImage<TPixelType, 3>
      * @returns the 0'th input object of the filter.
      */
     InputType* GetInput();

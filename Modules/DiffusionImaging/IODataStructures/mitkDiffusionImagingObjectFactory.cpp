@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffusionImageMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
+#include "mitkTbssImageMapper.h"
 
 //====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
@@ -154,6 +155,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssImageMapper<short>::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -200,6 +208,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeDataVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssImageMapper<short>::New();
       newMapper->SetDataNode(node);
     }
 
@@ -254,6 +269,13 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::ImageVtkMapper2D::SetDefaultProperties(node);
     mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+  }
+
+  classname = "TbssImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::TbssImageMapper<short>::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 }
 

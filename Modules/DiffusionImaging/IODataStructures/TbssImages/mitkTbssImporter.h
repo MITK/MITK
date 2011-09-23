@@ -34,7 +34,7 @@ namespace mitk
 
   public:
    // typedef TPixelType PixelType;
-    typedef itk::VectorImage<float> DataImageType; // type of the 3d vector image containing the skeletonized images
+    typedef itk::VectorImage<float,3> DataImageType; // type of the 3d vector image containing the skeletonized images
     typedef itk::Image<float, 4> FloatImage4DType;
     typedef itk::ImageFileReader<FloatImage4DType> FileReaderType4D;
 
@@ -53,6 +53,7 @@ namespace mitk
     }
 
     mitk::TbssImage<float>::Pointer Import();
+
 
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
     {

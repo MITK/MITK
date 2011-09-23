@@ -57,11 +57,8 @@ namespace mitk
 
       std::string filename = entries.at(i).toStdString();
 
-      if (std::string::npos != filename.find("all") && std::string::npos != filename.find("skeletonised"))
+      if (std::string::npos != filename.find("all_FA_skeletonised") && std::string::npos != filename.find("skeletonised"))
       {
-
-        size_t found = m_InputPath.find_last_of("/");
-        size_t end = m_InputPath.size();
 
         // Found a 4d skeletonized image
         if(m_InputPath.find_last_of("/") != m_InputPath.size()-1)
@@ -141,15 +138,12 @@ namespace mitk
 
         // m_Data should be allocated here so move on filling it with values from the 4D image
         FloatImage4DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
-        DataImageType::SizeType dataSize = m_Data->GetLargestPossibleRegion().GetSize();
 
-
-        DataImageType::DirectionType dataDir;
-        for(int i=0; i<=2; i++)
+        for(int i=0; i<size[0]; i++)
         {
-          for(int j=0; j<=2; j++)
+          for(int j=0; j<size[1]; j++)
           {
-            for(int k=0; k<=2; k++)
+            for(int k=0; k<size[2]; k++)
             {
               itk::Index<3> ix;
               ix[0] = i;
@@ -157,8 +151,8 @@ namespace mitk
               ix[2] = k;
               itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
               int vecSize = pixel.Size();
-
-              pixel.SetSize(size[3]+vecSize, false);
+              int newSize = vecSize+size[3];
+              pixel.SetSize(newSize, false);
 
               for(int z=0; z<size[3]; z++)
               {
@@ -169,7 +163,7 @@ namespace mitk
                 ix4[3] = z;
                 float value = img->GetPixel(ix4);
 
-                pixel.SetElement(z, value);
+                pixel.SetElement(z+vecSize, value);
               }
             }
           }
@@ -184,9 +178,14 @@ namespace mitk
     }
 
 
-    mitk::CastToTbssImage(m_Data.GetPointer(), tbssImg);
+//    mitk::CastToTbssImage(m_Data.GetPointer(), tbssImg);
+
+
 
     tbssImg->SetGroupInfo(m_Groups);
+    tbssImg->SetImage(m_Data);
+
+   tbssImg->InitializeFromVectorImage();
 
     return tbssImg;
 

@@ -102,6 +102,7 @@ SET(CPP_FILES
 SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
+  Rendering/mitkTbssImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h

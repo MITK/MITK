@@ -733,7 +733,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     return;
   }
 
-  this->m_ImageDescriptor->AddNewChannel( type );
+  for( unsigned int i=0u; i<channels; i++)
+  {
+    this->m_ImageDescriptor->AddNewChannel( type );
+  }
 
   PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
   planegeometry->InitializeStandardPlane(m_Dimensions[0], m_Dimensions[1]);
@@ -860,8 +863,8 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
       m_Dimension = 4;
   }
 
-  mitk::PixelType pixelType;
-
+  mitk::PixelType pixelType = MakeSimpleType<int>();
+/* FIXME
   switch ( vtkimagedata->GetScalarType() ) 
   {
   case VTK_BIT: 
@@ -897,7 +900,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     break;
   default:
     break;
-  }
+  }*/
   Initialize(pixelType, 
     m_Dimension, 
     tmpDimensions,

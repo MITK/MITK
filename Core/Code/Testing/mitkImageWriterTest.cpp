@@ -105,8 +105,6 @@ int mitkImageWriterTest(int  argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED(myImageWriter->GetInput()==image,"test Set/GetInput()");
   myImageWriter->SetFileName(filename);
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFileName(),filename.c_str()),"test Set/GetFileName()");
-  myImageWriter->SetExtension(".pic");
-  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetExtension(),".pic"),"test Set/GetExtension()");
   myImageWriter->SetFilePrefix("pref");
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFilePrefix(),"pref"),"test Set/GetFilePrefix()");
   myImageWriter->SetFilePattern("pattern");
@@ -133,22 +131,6 @@ int mitkImageWriterTest(int  argc , char* argv[])
     {
       MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing");
     }
-  }
-
-  // write MITK .pic image
-  try
-  {
-    myImageWriter->SetExtension(".pic");
-    myImageWriter->Update();
-    std::fstream fin;
-    fin.open(AppendExtension(filename, ".pic").c_str(),std::ios::in);
-    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .pic file");
-    fin.close();
-    remove(AppendExtension(filename, ".pic").c_str());
-  }
-  catch (...)
-  {
-    MITK_TEST_FAILED_MSG(<< "Exception during .pic file writing");
   }
 
   //testing more component image writing as nrrd files

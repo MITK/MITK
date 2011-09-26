@@ -91,6 +91,15 @@ public:
     */
     virtual void AddNavigationData(const NavigationData* nd);
 
+    ///
+    /// set an additional attribute for a specified navigation data
+    /// this will be written for each navigation data and may be
+    /// updated before calling Update()
+    ///
+    void SetAdditionalAttribute( const NavigationData* nd, const std::string& attributeName
+                                 , const std::string& attributeValue );
+    void RemoveAdditionalAttribute( const NavigationData* nd );
+
     /**Documentation
     * \brief Starts the recording with the presetted OutputMode 
     * this method calls StartRecording(std::ostream*)
@@ -185,6 +194,8 @@ protected:
     mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag in output xml file
 
     bool m_DoNotOverwriteFiles; ///< do not overwrite any files if true
+
+    std::map<const mitk::NavigationData*, std::pair<std::string, std::string> > m_AdditionalAttributes;
 
 };
 

@@ -26,19 +26,18 @@
 #include <vtkRenderer.h>
 #include <vtkCellArray.h>
 
-#include <vtkRenderWindowInteractor.h>
 
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
 
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
 {
-  
+  MITK_INFO << "FB Mapper2d initialized";
 }
 
 mitk::FiberBundleMapper2D::~FiberBundleMapper2D()
 {
-
+  MITK_INFO << "FB Mapper2d destroyed";
 }
 
 

@@ -15,10 +15,13 @@
  
  =========================================================================*/
 
+#ifndef FIBERBUNDLEMAPPER2D_H_HEADER_INCLUDED
+#define FIBERBUNDLEMAPPER2D_H_HEADER_INCLUDED
+
 //MITK Rendering
 #include <mitkCommon.h>
 #include <mitkBaseRenderer.h>
-#include "MitkDiffusionImagingExports.h"
+//#include "MitkDiffusionImagingExports.h"
 
 #include <mitkVtkMapper2D.h>
 #include <mitkFiberBundle.h>
@@ -40,7 +43,7 @@ class vtkPolyData;
 namespace mitk {
   
   
-  class MitkDiffusionImaging_EXPORT FiberBundleMapper2D : public VtkMapper2D
+  class FiberBundleMapper2D : public VtkMapper2D
   {
     
   public:
@@ -65,7 +68,7 @@ namespace mitk {
     //### end of methods of MITK-VTK rendering pipeline
     
    
-    class MitkDiffusionImaging_EXPORT FBLocalStorage : public mitk::Mapper::BaseLocalStorage
+    class  FBLocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
       /** \brief Point Actor of a 2D render window. */
@@ -111,3 +114,5 @@ namespace mitk {
 
 
 }//end namespace
+
+#endif

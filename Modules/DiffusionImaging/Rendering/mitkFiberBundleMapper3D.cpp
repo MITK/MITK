@@ -50,7 +50,7 @@ mitk::FiberBundleMapper3D::FiberBundleMapper3D()
 m_vtkTubeMapper(NULL)
 
 {
-  //MITK_INFO << "FiberBundleMapper3D()";
+  MITK_INFO << "FiberBundleMapper3D()";
   m_FiberAssembly = vtkPropAssembly::New();
   m_FiberActor = vtkOpenGLActor::New();
   m_TubeActor = vtkOpenGLActor::New();
@@ -432,7 +432,7 @@ m_vtkTubeMapper(NULL)
 //template<class TPixelType>
 mitk::FiberBundleMapper3D::~FiberBundleMapper3D()
 {
-  //MITK_INFO << "FiberBundleMapper3D(destructor)";
+  MITK_INFO << "FiberBundleMapper3D(destructor)";
   m_FiberActor->Delete();
   m_FiberAssembly->Delete();
   //m_vtkFiberList->Delete();

@@ -191,7 +191,15 @@ void mitk::NavigationDataRecorder::Update()
             elem->SetAttribute("hP",1);
           else
             elem->SetAttribute("hP",0);
-          
+
+          // set additional attribute?
+          std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+              it = m_AdditionalAttributes.find( nd );
+          if( it != m_AdditionalAttributes.end() )
+          {
+            elem->SetAttribute(it->second.first, it->second.second);
+          }
+
           *m_Stream << "        " << *elem << std::endl;
 
           delete elem;
@@ -209,6 +217,30 @@ void mitk::NavigationDataRecorder::Update()
   }
   m_RecordCounter++;
   if ((m_RecordCountLimit<=m_RecordCounter)&&(m_RecordCountLimit != -1)) {StopRecording();}
+}
+
+void mitk::NavigationDataRecorder::SetAdditionalAttribute(const NavigationData* nd,
+                                                          const std::string& attributeName
+                             , const std::string& attributeValue )
+{
+   std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+       it = m_AdditionalAttributes.find( nd );
+  if( it == m_AdditionalAttributes.end() )
+    m_AdditionalAttributes[nd] = std::pair<std::string, std::string>(attributeName, attributeValue);
+  else
+  {
+    it->second.first = attributeName;
+    it->second.second = attributeValue;
+  }
+
+}
+
+void mitk::NavigationDataRecorder::RemoveAdditionalAttribute( const NavigationData* nd )
+{
+  std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+      it = m_AdditionalAttributes.find( nd );
+ if( it != m_AdditionalAttributes.end() )
+   m_AdditionalAttributes.erase(it);
 }
 
 void mitk::NavigationDataRecorder::StartRecording()

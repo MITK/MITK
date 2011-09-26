@@ -29,6 +29,7 @@ namespace mitk {
     mitkClassMacro(Transform, itk::Object);
     itkFactorylessNewMacro(Transform);
     mitkNewMacro1Param(Transform, const mitk::NavigationData*);
+    mitkNewMacro1Param(Transform, const std::string&);
 
     ///
     /// constants describing the type of transform
@@ -39,8 +40,14 @@ namespace mitk {
     static const std::string ENDOSCOPE_CAM_TOOL;
     static const std::string CHESSBOARD_TOOL;
     static const std::string POINTER_TOOL;
+    static const std::string POINTER_TO_CHESSBOARD_ORIGIN;
+    static const std::string POINTER_TO_CHESSBOARD_X_SUPPORT_POINT;
+    static const std::string POINTER_TO_CHESSBOARD_Y_SUPPORT_POINT;
     static const std::string BOARD_TO_BOARD_TOOL;
-
+    static const std::string REFERENCE_CAMERA_TRANSFORM;
+    static const std::string REFERENCE_SCOPE_TRANSFORM;
+    static const std::string EYE_TO_HAND_TRANSFORM;
+    static const std::string CAMERA_EXTRINSICS;
 
     itkGetConstMacro(Type, std::string);
     itkSetMacro(Type, std::string&);
@@ -258,6 +265,7 @@ namespace mitk {
   protected:
     Transform();
     Transform(const mitk::NavigationData* nd);
+    Transform(const std::string& s);
 
     // everything is stored here
     mitk::NavigationData::Pointer m_NavData;

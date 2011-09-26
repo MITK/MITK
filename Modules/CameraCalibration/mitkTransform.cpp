@@ -13,7 +13,14 @@ namespace mitk
   const std::string Transform::ENDOSCOPE_CAM_TOOL = "Endoscope camera tool";
   const std::string Transform::CHESSBOARD_TOOL = "Chessboard tool";
   const std::string Transform::POINTER_TOOL = "Pointer tool";
+  const std::string Transform::POINTER_TO_CHESSBOARD_ORIGIN = "Pointer to chessboard origin";
+  const std::string Transform::POINTER_TO_CHESSBOARD_X_SUPPORT_POINT = "Pointer to chessboard X support origin";
+  const std::string Transform::POINTER_TO_CHESSBOARD_Y_SUPPORT_POINT = "Pointer to chessboard Y support origin";
   const std::string Transform::BOARD_TO_BOARD_TOOL = "Board to board tool";
+  const std::string Transform::REFERENCE_CAMERA_TRANSFORM = "Reference camera transform";
+  const std::string Transform::REFERENCE_SCOPE_TRANSFORM = "Reference scope transform";
+  const std::string Transform::EYE_TO_HAND_TRANSFORM = "Eye to hand transform";
+  const std::string Transform::CAMERA_EXTRINSICS = "Camera extrinsics";
 
   Transform::Transform()
     : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )
@@ -29,6 +36,14 @@ namespace mitk
         m_NavData->Graft(nd);
   }
 
+  Transform::Transform(const std::string& s)
+    : m_NavData(mitk::NavigationData::New()), m_Type( s )
+  {
+    vnl_matrix_fixed<mitk::ScalarType, 3, 3> rot;
+    rot.set_identity();
+    this->SetRotation( rot );
+  }
+
   void Transform::Copy(const mitk::NavigationData* nd)
   {
     (const_cast<mitk::NavigationData*>(m_NavData.GetPointer()))->Graft(nd);
@@ -39,6 +54,7 @@ namespace mitk
     vnl_matrix_fixed<mitk::ScalarType, 4, 4> mat = transform->GetMatrix();
     mat = mat * this->GetMatrix(); //
     this->SetMatrix( mat );
+
   }
 
   void Transform::Concatenate( const vnl_matrix_fixed<mitk::ScalarType, 4, 4>&
@@ -227,6 +243,7 @@ namespace mitk
   void Transform::Copy( const mitk::Transform* transform ) 
   {
     m_NavData->Graft(transform->GetNavigationData());
+    m_Type = transform->GetType();
   }
 
   mitk::Transform::Pointer Transform::Clone() const

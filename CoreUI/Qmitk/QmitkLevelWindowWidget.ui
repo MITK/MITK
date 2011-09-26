@@ -1,66 +1,67 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>QmitkLevelWindow</class>
- <widget class="QWidget" name="QmitkLevelWindow" >
-  <property name="geometry" >
+ <widget class="QWidget" name="QmitkLevelWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>0</width>
-    <height>0</height>
+    <width>16</width>
+    <height>50</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>0</width>
     <height>0</height>
    </size>
   </property>
-  <property name="maximumSize" >
+  <property name="maximumSize">
    <size>
     <width>114</width>
     <height>32767</height>
    </size>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>QmitkLevelWindowWidget</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <property name="leftMargin">
     <number>0</number>
    </property>
-   <property name="leftMargin" >
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
     <number>0</number>
    </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QmitkSliderLevelWindowWidget" native="1" name="SliderLevelWindowWidget" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <widget class="QmitkSliderLevelWindowWidget" name="SliderLevelWindowWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize" >
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>50</height>
       </size>
      </property>
-     <property name="maximumSize" >
+     <property name="maximumSize">
       <size>
        <width>50</width>
        <height>32767</height>
@@ -69,20 +70,20 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkLineEditLevelWindowWidget" native="1" name="LineEditLevelWindowWidget" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <widget class="QmitkLineEditLevelWindowWidget" name="LineEditLevelWindowWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize" >
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>0</height>
       </size>
      </property>
-     <property name="maximumSize" >
+     <property name="maximumSize">
       <size>
        <width>50</width>
        <height>32767</height>
@@ -92,17 +93,17 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>QmitkSliderLevelWindowWidget</class>
    <extends>QWidget</extends>
-   <header location="global" >QmitkSliderLevelWindowWidget.h</header>
+   <header location="global">QmitkSliderLevelWindowWidget.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkLineEditLevelWindowWidget</class>
    <extends>QWidget</extends>
-   <header location="global" >QmitkLineEditLevelWindowWidget.h</header>
+   <header location="global">QmitkLineEditLevelWindowWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

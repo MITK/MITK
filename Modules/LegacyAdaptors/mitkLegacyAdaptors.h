@@ -14,7 +14,7 @@ namespace mitk
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
  */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer));
+  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
 
   /**
     \brief Constructs an ImageDescriptor from legacy mitkIpPicDescriptor
@@ -30,7 +30,7 @@ namespace mitk
   */
   LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( const std::type_info& intype ) );
 
-  LegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype ) );
+  LegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype, size_t bpe ) );
 
 } // end namespace mitk
 

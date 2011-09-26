@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFileReader.h"
 #include "mitkTbssImageSource.h"
 #include "itkImage.h"
+#include "itkVectorImage.h"
+#include "mitkTbssImage.h"
 
 namespace mitk
 {
@@ -29,14 +31,14 @@ namespace mitk
   /** \brief 
   */
 
-  template < class TPixelType >
-  class MitkDiffusionImaging_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource<TPixelType>, public FileReader
+
+  class MitkDiffusionImaging_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource, public FileReader
   {
   public:
 
-    typedef mitk::TbssImage<TPixelType>  OutputType;
-    typedef itk::VectorImage<TPixelType,3>     ImageType;
-    typedef TbssImageSource<TPixelType>  TbssVolSourceType;
+    typedef mitk::TbssImage OutputType;
+    typedef itk::VectorImage<float,3>     ImageType;
+    typedef TbssImageSource  TbssVolSourceType;
 
 
 
@@ -65,7 +67,7 @@ namespace mitk
 
     std::vector< std::pair<std::string, int> > m_GroupInfo;
 
-    typename OutputType::Pointer m_OutputCache;
+    OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
 
 
@@ -76,6 +78,6 @@ namespace mitk
 
 } //namespace MITK
 
-#include "mitkNrrdTbssImageReader.cpp"
+//#include "mitkNrrdTbssImageReader.cpp"
 
 #endif // __mitkNrrdTbssImageReader_h

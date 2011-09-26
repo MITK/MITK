@@ -29,19 +29,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <fstream>
 
-template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::NrrdTbssImageWriter()
+
+mitk::NrrdTbssImageWriter::NrrdTbssImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::~NrrdTbssImageWriter()
+mitk::NrrdTbssImageWriter::~NrrdTbssImageWriter()
 {}
 
-template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
+
+void mitk::NrrdTbssImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
@@ -60,7 +59,7 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
   itk::VectorImage<float, 3>::Pointer img = input->GetImage();
 
-  typedef itk::VectorImage<TPixelType,3> ImageType;
+  typedef itk::VectorImage<float,3> ImageType;
 
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
@@ -69,7 +68,7 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
 
   typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer nrrdWriter = WriterType::New();
+  WriterType::Pointer nrrdWriter = WriterType::New();
   nrrdWriter->UseInputMetaDataDictionaryOn();
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
@@ -88,14 +87,14 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
   m_Success = true;
 }
 
-template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::SetInput( InputType* tbssVol )
+
+void mitk::NrrdTbssImageWriter::SetInput( InputType* tbssVol )
 {
   this->ProcessObject::SetNthInput( 0, tbssVol );
 }
 
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
+
+mitk::TbssImage* mitk::NrrdTbssImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -107,8 +106,8 @@ mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
   }
 }
 
-template<typename TPixelType>
-std::vector<std::string> mitk::NrrdTbssImageWriter<TPixelType>::GetPossibleFileExtensions()
+
+std::vector<std::string> mitk::NrrdTbssImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".tbss");

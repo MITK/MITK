@@ -32,7 +32,7 @@ NrrdTbssImageWriterFactory::NrrdTbssImageWriterFactory()
                          "NrrdTbssImageWriter",
                          "NrrdTbssImage Writer",
                          1,
-                         itk::CreateObjectFunction< mitk::NrrdTbssImageWriter<TbssPixelType> >::New());
+                         itk::CreateObjectFunction< mitk::NrrdTbssImageWriter >::New());
 }
 
 NrrdTbssImageWriterFactory::~NrrdTbssImageWriterFactory()

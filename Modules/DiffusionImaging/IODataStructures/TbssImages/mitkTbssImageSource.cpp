@@ -21,23 +21,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTbssImageSource.h"
 #include "mitkTbssImage.h"
 
-template<typename TPixelType>
-mitk::TbssImageSource<TPixelType>::TbssImageSource()
+
+mitk::TbssImageSource::TbssImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type DiffusionImage
-  typename mitk::TbssImage<TPixelType>::Pointer output
-    = static_cast<typename mitk::TbssImage<TPixelType>*>(this->MakeOutput(0).GetPointer());
+  mitk::TbssImage::Pointer output
+    = static_cast<mitk::TbssImage*>(this->MakeOutput(0).GetPointer());
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
 
-template<typename TPixelType>
-itk::DataObject::Pointer mitk::TbssImageSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( unsigned int /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::TbssImage<TPixelType>::New().GetPointer());
+  return static_cast<itk::DataObject*>(mitk::TbssImage::New().GetPointer());
 }
 
 /*

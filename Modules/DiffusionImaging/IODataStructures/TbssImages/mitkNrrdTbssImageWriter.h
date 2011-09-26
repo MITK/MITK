@@ -31,7 +31,7 @@ namespace mitk
  * Writes diffusion volumes to a file
  * @ingroup Process
  */
-template < class TPixelType >
+
 class MitkDiffusionImaging_EXPORT NrrdTbssImageWriter : public mitk::FileWriterWithInformation
 {
 public:
@@ -42,7 +42,7 @@ public:
 
     itkNewMacro( Self )
     
-    typedef mitk::TbssImage<TPixelType> InputType;
+    typedef mitk::TbssImage InputType;
     
     /**
      * Sets the filename of the file to write.
@@ -101,13 +101,13 @@ public:
     virtual const char * GetDefaultExtension() { return ".tbss"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
-      return (dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::TbssImage*>(data.GetPointer()) != NULL);
     }
 
 
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::TbssImage<TPixelType>*>(data.GetPointer()));
+        this->SetInput(dynamic_cast<mitk::TbssImage*>(data.GetPointer()));
         this->Update(); 
       }
     }
@@ -133,6 +133,6 @@ protected:
 
 } // end of namespace mitk
 
-#include "mitkNrrdTbssImageWriter.cpp"
+
 
 #endif

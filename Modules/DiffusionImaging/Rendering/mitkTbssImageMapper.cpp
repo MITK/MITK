@@ -19,23 +19,24 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef TbssImageMapper__cpp
 #define TbssImageMapper__cpp
 
+#include "mitkTbssImageMapper.h"
+
 #include "mitkProperties.h"
 #include "mitkTbssImage.h"
 
 
-template<class TPixelType>
-mitk::TbssImageMapper<TPixelType>::TbssImageMapper()
+
+mitk::TbssImageMapper::TbssImageMapper()
 {
 }
 
-template<class TPixelType>
-mitk::TbssImageMapper<TPixelType>::~TbssImageMapper()
+
+mitk::TbssImageMapper::~TbssImageMapper()
 {
 }
 
-template<class TPixelType>
-void
-mitk::TbssImageMapper<TPixelType>::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
+
+void mitk::TbssImageMapper::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   int displayIndex(0);
 
@@ -44,7 +45,7 @@ mitk::TbssImageMapper<TPixelType>::GenerateDataForRenderer( mitk::BaseRenderer *
   mitk::Image *input = const_cast< mitk::Image* >(
     this->GetInput()
     );
-  mitk::TbssImage<TPixelType> *input2 = dynamic_cast< mitk::TbssImage<TPixelType>* >(
+  mitk::TbssImage *input2 = dynamic_cast< mitk::TbssImage* >(
     input
     );
 
@@ -55,8 +56,8 @@ mitk::TbssImageMapper<TPixelType>::GenerateDataForRenderer( mitk::BaseRenderer *
   Superclass::GenerateDataForRenderer(renderer);
 }
 
-template<class TPixelType>
-void mitk::TbssImageMapper<TPixelType>::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+
+void mitk::TbssImageMapper::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( 0 ), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);

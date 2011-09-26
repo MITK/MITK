@@ -52,7 +52,7 @@ namespace mitk
       m_InputPath = p;
     }
 
-    mitk::TbssImage<float>::Pointer Import();
+    mitk::TbssImage::Pointer Import();
 
 
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)

@@ -90,6 +90,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
+  Rendering/mitkTbssImageMapper.cpp
   
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -118,7 +119,7 @@ SET(H_FILES
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
-  IODataStructures/TbssImages/mitkTbssImage.h
+  #IODataStructures/TbssImages/mitkTbssImage.h
   IODataStructures/TbssImages/mitkTbssRoiImage.h
 
   # DataStructures -> FiberBundleX

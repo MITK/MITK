@@ -26,16 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>::TbssImage()
+
+mitk::TbssImage::TbssImage()
 {
 
 }
 
 
-template<typename TPixelType>
-void mitk::TbssImage<TPixelType>
-::InitializeFromVectorImage()
+void mitk::TbssImage::InitializeFromVectorImage()
 {
   if(!m_Image)
   {
@@ -44,8 +42,8 @@ void mitk::TbssImage<TPixelType>
   }
 
 
-  typedef itk::Image<TPixelType,3> ImgType;
-  typename ImgType::Pointer img = ImgType::New();
+  typedef itk::Image<float,3> ImgType;
+  ImgType::Pointer img = ImgType::New();
   img->SetSpacing( m_Image->GetSpacing() );   // Set the image spacing
   img->SetOrigin( m_Image->GetOrigin() );     // Set the image origin
   img->SetDirection( m_Image->GetDirection() );  // Set the image direction
@@ -57,7 +55,7 @@ void mitk::TbssImage<TPixelType>
   InitializeByItk( img.GetPointer(), 1, vecLength );
 
   //for(int i=0; i<vecLength; i++)
-  //{
+  //{TbssImage();
 
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
@@ -84,9 +82,7 @@ void mitk::TbssImage<TPixelType>
 }
 
 
-template<typename TPixelType>
-void mitk::TbssImage<TPixelType>
-::SetDisplayIndexForRendering(int displayIndex)
+void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
 {
   MITK_INFO << "displayindex: " << displayIndex;
   int index = displayIndex;
@@ -94,8 +90,8 @@ void mitk::TbssImage<TPixelType>
   index = index > vecLength-1 ? vecLength-1 : index;
   if( m_DisplayIndex != index )
   {
-    typedef itk::Image<TPixelType,3> ImgType;
-    typename ImgType::Pointer img = ImgType::New();
+    typedef itk::Image<float,3> ImgType;
+    ImgType::Pointer img = ImgType::New();
     CastToItkImage<ImgType>(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
@@ -117,26 +113,4 @@ void mitk::TbssImage<TPixelType>
 
 
 
-/*
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>::TbssImage()
-{
-
-}
-
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>::~TbssImage()
-{
-
-}
-
-
-template<typename TPixelType>
-void mitk::TbssImage<TPixelType>::InitializeFromImage()
-{
-
-}
-
-
-*/
 #endif /* __mitkTbssImage__cpp */

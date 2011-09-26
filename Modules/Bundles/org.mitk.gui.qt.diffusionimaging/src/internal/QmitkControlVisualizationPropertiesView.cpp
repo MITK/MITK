@@ -293,7 +293,7 @@ struct CvpSelListener : ISelectionListener
               label = label.arg(val);
               m_View->m_Controls->label_channel->setText(label);
 
-              int maxVal = (dynamic_cast<mitk::TbssImage<float>* >(node->GetData()))->GetImage()->GetVectorLength();
+              int maxVal = (dynamic_cast<mitk::TbssImage* >(node->GetData()))->GetImage()->GetVectorLength();
               m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
             }
 

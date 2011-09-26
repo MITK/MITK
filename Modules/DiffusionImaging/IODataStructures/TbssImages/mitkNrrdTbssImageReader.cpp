@@ -33,10 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itksys/SystemTools.hxx"
 
 namespace mitk
-{
-
-  template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+{  
+      void NrrdTbssImageReader
       ::GenerateData()
   {
 
@@ -69,13 +67,10 @@ namespace mitk
 
   }
 
-
-
-  template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssImageReader
       ::GenerateOutputInformation()
   {
-    typename OutputType::Pointer outputForCache = OutputType::New();
+    OutputType::Pointer outputForCache = OutputType::New();
     if ( m_FileName == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename to be read is empty!");
@@ -102,14 +97,14 @@ namespace mitk
 
 
         MITK_INFO << "NrrdDiffusionImageReader READING IMAGE INFORMATION";
-        typename ImageType::Pointer img;
+        ImageType::Pointer img;
 
         std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
         ext = itksys::SystemTools::LowerCase(ext);
         if (ext == ".tbss")
         {
           typedef itk::ImageFileReader<ImageType> FileReaderType;
-          typename FileReaderType::Pointer reader = FileReaderType::New();
+          FileReaderType::Pointer reader = FileReaderType::New();
           reader->SetFileName(this->m_FileName);
           itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
           reader->SetImageIO(io);
@@ -129,9 +124,6 @@ namespace mitk
 
 
           int numberOfGradientImages = 0;
-
-
-
 
           for (; itKey != imgMetaKeys.end(); itKey ++)
           {
@@ -193,50 +185,44 @@ namespace mitk
   }
 
 
-  template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+
+      const char* NrrdTbssImageReader
       ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+       void NrrdTbssImageReader
       ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
-  template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+      const char* NrrdTbssImageReader
       ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssImageReader
       ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
-  template <class TPixelType>
-      const char* NrrdTbssImageReader<TPixelType>
+      const char* NrrdTbssImageReader
       ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssImageReader<TPixelType>
+      void NrrdTbssImageReader
       ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
-  template <class TPixelType>
-      bool NrrdTbssImageReader<TPixelType>
+      bool NrrdTbssImageReader
       ::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
 
@@ -257,7 +243,7 @@ namespace mitk
       itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
       typedef itk::ImageFileReader<ImageType> FileReaderType;
-      typename FileReaderType::Pointer reader = FileReaderType::New();
+      FileReaderType::Pointer reader = FileReaderType::New();
       reader->SetImageIO(io);
       reader->SetFileName(filename);
 

@@ -107,7 +107,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
-    m_FileWriters.push_back( NrrdTbssImageWriter<TbssPixelType>::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter<TbssRoiPixelType>::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
 
@@ -158,7 +158,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::TbssImageMapper<float>::New();
+      newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -214,7 +214,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {  
-      newMapper = mitk::TbssImageMapper<float>::New();
+      newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -274,7 +274,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   classname = "TbssImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::TbssImageMapper<float>::SetDefaultProperties(node);
+    mitk::TbssImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 }

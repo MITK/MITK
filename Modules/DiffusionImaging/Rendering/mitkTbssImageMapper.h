@@ -20,14 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 #define TbssImageMapper_H_HEADER_INCLUDED
 
 #include "mitkImageVtkMapper2D.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk {
 
   //##Documentation
   //## @brief Mapper for raw diffusion weighted images
   //## @ingroup Mapper
-  template<class TPixelType>
-  class TbssImageMapper : public ImageVtkMapper2D
+
+  class MitkDiffusionImaging_EXPORT TbssImageMapper : public ImageVtkMapper2D
   {
   public:
 
@@ -47,7 +48,7 @@ namespace mitk {
 
 } // namespace mitk
 
-#include "mitkTbssImageMapper.cpp"
+//#include "mitkTbssImageMapper.cpp"
 
 
 #endif /* TbssImageMapper_H_HEADER_INCLUDED */

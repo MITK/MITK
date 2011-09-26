@@ -26,24 +26,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  //template<typename TPixelType>
+
   mitk::TbssImporter::TbssImporter()
   {
 
   }
 
-  //template<typename TPixelType>
+
   mitk::TbssImporter::TbssImporter(std::string path) : m_InputPath(path)
   {
 
   }
 
 
-  //template<typename TPixelType>
-  mitk::TbssImage<float>::Pointer mitk::TbssImporter::Import()
+
+  mitk::TbssImage::Pointer mitk::TbssImporter::Import()
   {
     // read all images with all_*.nii.gz
-    mitk::TbssImage<float>::Pointer tbssImg = mitk::TbssImage<float>::New();
+    mitk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
 
 
     QDir currentDir = QDir(QString(m_InputPath.c_str()));
@@ -161,13 +161,8 @@ namespace mitk
                 ix4[3] = z;
                 float value = img->GetPixel(ix4);
 
-                if(z==0)
-                  pixel.SetElement(z,1);
-                if(z==1)
-                  pixel.SetElement(z,2);
-                else
-                  pixel.SetElement(z,7);
-               // pixel.SetElement(z, value);
+
+                pixel.SetElement(z, value);
               }
               m_Data->SetPixel(ix, pixel);
             }

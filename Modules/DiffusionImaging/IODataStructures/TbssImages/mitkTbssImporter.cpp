@@ -50,14 +50,14 @@ namespace mitk
     currentDir.setFilter( QDir::Files );
     QStringList entries = currentDir.entryList();
 
-    std::vector<double> values;
 
-    for(int i=0; i<entries.size(); i++)
+
+    for(int e=0; e<entries.size(); e++)
     {
 
-      std::string filename = entries.at(i).toStdString();
+      std::string filename = entries.at(e).toStdString();
 
-      if (std::string::npos != filename.find("all_FA_skeletonised") && std::string::npos != filename.find("skeletonised"))
+      if (std::string::npos != filename.find("vectorimage"))
       {
 
         // Found a 4d skeletonized image
@@ -128,7 +128,7 @@ namespace mitk
 
 
           // Set the length to one because otherwise allocate fails. Should be changed when groups/measurements are added
-          m_Data->SetVectorLength(1);
+          m_Data->SetVectorLength(3);
           m_Data->Allocate();
 
 
@@ -151,8 +151,6 @@ namespace mitk
               ix[2] = k;
               itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
               int vecSize = pixel.Size();
-              int newSize = vecSize+size[3];
-              pixel.SetSize(newSize, false);
 
               for(int z=0; z<size[3]; z++)
               {
@@ -163,8 +161,15 @@ namespace mitk
                 ix4[3] = z;
                 float value = img->GetPixel(ix4);
 
-                pixel.SetElement(z+vecSize, value);
+                if(z==0)
+                  pixel.SetElement(z,1);
+                if(z==1)
+                  pixel.SetElement(z,2);
+                else
+                  pixel.SetElement(z,7);
+               // pixel.SetElement(z, value);
               }
+              m_Data->SetPixel(ix, pixel);
             }
           }
         }
@@ -185,7 +190,9 @@ namespace mitk
     tbssImg->SetGroupInfo(m_Groups);
     tbssImg->SetImage(m_Data);
 
-   tbssImg->InitializeFromVectorImage();
+    int vecsize = m_Data->GetVectorLength();
+
+    tbssImg->InitializeFromVectorImage();
 
     return tbssImg;
 

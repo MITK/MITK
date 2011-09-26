@@ -68,8 +68,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 typedef short DiffusionPixelType;
-typedef float TbssPixelType;
 typedef char TbssRoiPixelType;
+typedef float TbssPixelType;
 
 
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -158,7 +158,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::TbssImageMapper<short>::New();
+      newMapper = mitk::TbssImageMapper<float>::New();
       newMapper->SetDataNode(node);
     }
 
@@ -213,8 +213,8 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
 
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::TbssImageMapper<short>::New();
+    {  
+      newMapper = mitk::TbssImageMapper<float>::New();
       newMapper->SetDataNode(node);
     }
 
@@ -274,7 +274,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   classname = "TbssImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::TbssImageMapper<short>::SetDefaultProperties(node);
+    mitk::TbssImageMapper<float>::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 }

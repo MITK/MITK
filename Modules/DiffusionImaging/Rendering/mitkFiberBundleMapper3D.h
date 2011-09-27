@@ -61,7 +61,7 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void GenerateData();
 
-    
+    vtkOpenGLPolyDataMapper* getVtkFiberBundleMapper();
   protected:
 
     FiberBundleMapper3D();

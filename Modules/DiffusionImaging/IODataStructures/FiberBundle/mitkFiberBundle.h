@@ -23,7 +23,7 @@
 
 //includes for MITK datastructure
 #include "mitkBaseData.h"
-//#include "MitkDiffusionImagingExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 //=======modernized================
 //includes storing fiberdata
@@ -63,7 +63,7 @@ namespace mitk {
 
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class   FiberBundle : public BaseData
+  class MitkDiffusionImaging_EXPORT FiberBundle : public BaseData
   {
   public:
 

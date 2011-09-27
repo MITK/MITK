@@ -583,6 +583,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->radioButton_directionY, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
     connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
+    connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
     
     connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
     
@@ -897,6 +898,7 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
 void QmitkFiberBundleDeveloperView::DoColorFibers()
 {
   //
+  MITK_INFO << "call fibercoloring in fiberBundleX";
 }
 
 
@@ -1085,23 +1087,31 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
   {
    if (m_FiberBundleX != NULL)
    {
-     if (m_Controls->tabColoring->isActiveWindow()){
+     if (m_Controls->tabColoring->isVisible()){
       //show button colorCoding
       m_Controls->buttonColorFibers->setEnabled(true);
        MITK_INFO << "Color";
        
-     }else if(m_Controls->tabCutting->isActiveWindow()){
-       m_Controls->buttonGenerateFiberIds->setEnabled(true);
-       MITK_INFO << "Cutting";
+     }else if(m_Controls->tabCutting->isVisible()){
+//       m_Controls->buttonGenerateFiberIds->setEnabled(true);
+
        
-     }else if(m_Controls->tabShape->isActiveWindow()){
-       MITK_INFO << "Shape";
+     }else if(m_Controls->tabShape->isVisible()){
+//       m_Controls->buttonSMFibers->setEnabled(true);
+//       m_Controls->buttonVtkDecimatePro->setEnabled(true);
+//       m_Controls->buttonVtkSmoothPD->setEnabled(true);
+//       m_Controls->buttonGenerateTubes->setEnabled(true);
      }
      
      
    } else {
      m_Controls->buttonColorFibers->setEnabled(false);
-      m_Controls->buttonGenerateFiberIds->setEnabled(false);
+     m_Controls->buttonGenerateFiberIds->setEnabled(false);
+     m_Controls->buttonSMFibers->setEnabled(false);
+     m_Controls->buttonVtkDecimatePro->setEnabled(false);
+     m_Controls->buttonVtkSmoothPD->setEnabled(false);
+     m_Controls->buttonGenerateTubes->setEnabled(true);
+
    }
   }
   
@@ -1112,7 +1122,7 @@ void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator(bool isV
   // ==== FIBER PROCESSING ELEMENTS and ALL ELEMENTS WHICH NEED A FBX DATANODE======
 //  m_Controls->buttonGenerateFiberIds->setEnabled(isVisible); moved to selectionChangedToolBox
   
-  SelectionChangedToolBox(-1); //set gui elements with respect to active tab, widget, etc.
+  SelectionChangedToolBox(-1); //set gui elements with respect to active tab, widget, etc. -1 has no effect
   
 }
 

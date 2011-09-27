@@ -69,10 +69,10 @@ void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMo
     this->HideUseICPRegistrationCheckbox(true);
     this->HideImageFiducialButton(false);
     this->m_Controls->registrationGroupBox->setTitle("");
-    this->m_Controls->sourceLandmarksGroupBox->setTitle("Source landmarks");
-    this->m_Controls->targetLandmarksGroupBox->setTitle("Target/Reference Landmarks");
-    this->m_Controls->m_AddImageFiducialBtn->setText("Add source landmark");
-    this->m_Controls->m_AddTrackingFiducialBtn->setText("Add target landmark");
+    this->m_Controls->sourceLandmarksGroupBox->setTitle("Target/Reference landmarks");
+    this->m_Controls->targetLandmarksGroupBox->setTitle("Source Landmarks");
+    this->m_Controls->m_AddImageFiducialBtn->setText("Add target landmark");
+    this->m_Controls->m_AddTrackingFiducialBtn->setText("Add source landmark");
   }
   else if (widgetMode==FIDUCIALMODE)
   {

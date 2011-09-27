@@ -26,10 +26,8 @@ namespace mitk
 {
 
 NrrdTbssRoiImageIOFactory::NrrdTbssRoiImageIOFactory()
-{
-  typedef char PixelType;
-  typedef itk::Image< PixelType, 3 >  ImageType;
-  typedef NrrdTbssRoiImageReader<PixelType> NrrdTbssRoiVolReaderType;
+{  
+  typedef NrrdTbssRoiImageReader NrrdTbssRoiVolReaderType;
   this->RegisterOverride("mitkIOAdapter",
                          "mitkNrrdTbssRoiImageReader",
                          "mitk Tbss Image IO",

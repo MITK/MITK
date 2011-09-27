@@ -78,6 +78,16 @@ namespace mitk
       return m_GroupInfo;
     }
 
+    void SetMeasurementInfo(std::string s)
+    {
+      m_MeasurementInfo = s;
+    }
+
+    std::string GetMeasurementInfo()
+    {
+      return m_MeasurementInfo;
+    }
+
     void InitializeFromVectorImage();
 
     void SetDisplayIndexForRendering(int displayIndex);
@@ -96,6 +106,8 @@ namespace mitk
     std::vector< std::pair<std::string, int> > m_GroupInfo;
 
     int m_DisplayIndex;
+
+    std::string m_MeasurementInfo;
 
 
 

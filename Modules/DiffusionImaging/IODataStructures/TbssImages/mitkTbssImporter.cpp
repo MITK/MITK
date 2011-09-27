@@ -57,7 +57,7 @@ namespace mitk
 
       std::string filename = entries.at(e).toStdString();
 
-      if (std::string::npos != filename.find("vectorimage"))
+      if (std::string::npos != filename.find("all_FA_skeletonised.nii.gz"))
       {
 
         // Found a 4d skeletonized image
@@ -128,7 +128,7 @@ namespace mitk
 
 
           // Set the length to one because otherwise allocate fails. Should be changed when groups/measurements are added
-          m_Data->SetVectorLength(3);
+          m_Data->SetVectorLength(size[3]);
           m_Data->Allocate();
 
 
@@ -182,7 +182,9 @@ namespace mitk
 
 
 
+
     tbssImg->SetGroupInfo(m_Groups);
+    tbssImg->SetMeasurementInfo(m_MeasurementInfo);
     tbssImg->SetImage(m_Data);
 
     int vecsize = m_Data->GetVectorLength();

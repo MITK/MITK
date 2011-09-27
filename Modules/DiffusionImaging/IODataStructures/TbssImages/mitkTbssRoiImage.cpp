@@ -26,8 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-template<typename TPixelType>
-mitk::TbssRoiImage<TPixelType>::TbssRoiImage() : m_PreprocessedFA(false)
+
+mitk::TbssRoiImage::TbssRoiImage() : m_PreprocessedFA(false)
 {
 
 }

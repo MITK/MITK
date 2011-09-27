@@ -27,12 +27,11 @@ namespace mitk
 
 NrrdTbssRoiImageWriterFactory::NrrdTbssRoiImageWriterFactory()
 {
-  typedef char TbssRoiPixelType;
   this->RegisterOverride("IOWriter",
                          "NrrdTbssRoiImageWriter",
                          "NrrdTbssRoiImage ROI Writer",
                          1,
-                         itk::CreateObjectFunction< mitk::NrrdTbssRoiImageWriter<TbssRoiPixelType> >::New());
+                         itk::CreateObjectFunction< mitk::NrrdTbssRoiImageWriter >::New());
 }
 
 NrrdTbssRoiImageWriterFactory::~NrrdTbssRoiImageWriterFactory()

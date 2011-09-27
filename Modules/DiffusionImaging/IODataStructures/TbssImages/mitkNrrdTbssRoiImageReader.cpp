@@ -35,8 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-  template <class TPixelType>
-      void NrrdTbssRoiImageReader<TPixelType>
+
+  void NrrdTbssRoiImageReader
       ::GenerateData()
   {
 
@@ -171,14 +171,14 @@ namespace mitk
 
 
       // READ TBSS HEADER INFORMATION
-      typename ImageType::Pointer img;
+      ImageType::Pointer img;
 
       std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
       ext = itksys::SystemTools::LowerCase(ext);
       if (ext == ".roi")
       {
         typedef itk::ImageFileReader<ImageType> FileReaderType;
-        typename FileReaderType::Pointer reader = FileReaderType::New();
+        FileReaderType::Pointer reader = FileReaderType::New();
         reader->SetFileName(this->m_FileName);
 
         reader->SetImageIO(imageIO);
@@ -222,8 +222,8 @@ namespace mitk
   }
 
 
-  template <class TPixelType>
-      void NrrdTbssRoiImageReader<TPixelType>
+
+  void NrrdTbssRoiImageReader
       ::ReadRoiInfo(itk::MetaDataDictionary dict)
   {
     std::vector<std::string> imgMetaKeys = dict.GetKeys();
@@ -262,50 +262,50 @@ namespace mitk
 
   }
 
-  template <class TPixelType>
-      const char* NrrdTbssRoiImageReader<TPixelType>
+
+  const char* NrrdTbssRoiImageReader
       ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssRoiImageReader<TPixelType>
+
+  void NrrdTbssRoiImageReader
       ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
-  template <class TPixelType>
-      const char* NrrdTbssRoiImageReader<TPixelType>
+
+  const char* NrrdTbssRoiImageReader
       ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssRoiImageReader<TPixelType>
+
+  void NrrdTbssRoiImageReader
       ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
-  template <class TPixelType>
-      const char* NrrdTbssRoiImageReader<TPixelType>
+
+  const char* NrrdTbssRoiImageReader
       ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
-  template <class TPixelType>
-      void NrrdTbssRoiImageReader<TPixelType>
+
+  void NrrdTbssRoiImageReader
       ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
-  template <class TPixelType>
-      bool NrrdTbssRoiImageReader<TPixelType>
+
+  bool NrrdTbssRoiImageReader
       ::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
 
@@ -326,7 +326,7 @@ namespace mitk
       itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
       typedef itk::ImageFileReader<ImageType> FileReaderType;
-      typename FileReaderType::Pointer reader = FileReaderType::New();
+      FileReaderType::Pointer reader = FileReaderType::New();
       reader->SetImageIO(io);
       reader->SetFileName(filename);
 

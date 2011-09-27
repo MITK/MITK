@@ -65,6 +65,16 @@ namespace mitk
       return m_Groups;
     }
 
+    void SetMeasurementInfo(std::string s)
+    {
+      m_MeasurementInfo = s;
+    }
+
+    std::string GetMeasurementInfo()
+    {
+      return m_MeasurementInfo;
+    }
+
 
   protected:
 
@@ -76,6 +86,8 @@ namespace mitk
 
     DataImageType::Pointer m_Data;
     std::vector< std::pair<std::string, int> > m_Groups;
+
+    std::string m_MeasurementInfo;
 
 
   };

@@ -120,7 +120,7 @@ SET(H_FILES
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
   #IODataStructures/TbssImages/mitkTbssImage.h
-  IODataStructures/TbssImages/mitkTbssRoiImage.h
+  #IODataStructures/TbssImages/mitkTbssRoiImage.h
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h

@@ -30,13 +30,13 @@ namespace mitk
   * \brief this class encapsulates diffusion volumes (vectorimages not
   * yet supported by mitkImage)
   */
-  template<class TPixelType>
+
   class TbssRoiImage : public Image
   {
 
   public:
-    typedef TPixelType PixelType;
-    typedef typename itk::Image<TPixelType, 3>  ImageType;
+
+    typedef itk::Image<char, 3>  ImageType;
     typedef itk::Index<3> IndexType;
     //typedef typename std::vector <Index<3> > RoiType;
 
@@ -49,11 +49,11 @@ namespace mitk
     //virtual bool VerifyRequestedRegion();
     //void SetRequestedRegion(itk::DataObject *data);
 
-    typename ImageType::Pointer GetImage()
+    ImageType::Pointer GetImage()
     {
       return m_Image;
     }
-    void SetImage(typename ImageType::Pointer image )
+    void SetImage(ImageType::Pointer image )
     {
       this->m_Image = image;
     }
@@ -90,7 +90,7 @@ namespace mitk
 
     virtual ~TbssRoiImage(){}
 
-    typename ImageType::Pointer m_Image;
+    ImageType::Pointer m_Image;
 
     std::vector< itk::Index<3> > m_Roi;
 
@@ -104,12 +104,12 @@ namespace mitk
 
 
   // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
-  template <typename ItkOutputImageType, typename PixelType>
-  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssRoiImage<PixelType> >& tbssoutputimage)
+  template <typename ItkOutputImageType>
+  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssRoiImage >& tbssoutputimage)
   {
     if(tbssoutputimage.IsNull())
     {
-      tbssoutputimage = mitk::TbssRoiImage<PixelType>::New();
+      tbssoutputimage = mitk::TbssRoiImage::New();
     }
     tbssoutputimage->InitializeByItk(itkimage);
     tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
@@ -122,5 +122,5 @@ namespace mitk
 
 } // namespace mitk
 
-#include "mitkTbssRoiImage.cpp"
+//#include "mitkTbssRoiImage.cpp"
 #endif /* __mitkTbssRoiImage__h */

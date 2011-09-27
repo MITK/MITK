@@ -30,14 +30,14 @@ namespace mitk
   /** \brief 
   */
 
-  template < class TPixelType >
-  class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource<TPixelType>, public FileReader
+
+  class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource, public FileReader
   {
   public:
 
-    typedef mitk::TbssRoiImage<TPixelType> OutputType;
-    typedef itk::Image<TPixelType,3>     ImageType;
-    typedef TbssRoiImageSource<TPixelType>  TbssVolSourceType;
+    typedef mitk::TbssRoiImage OutputType;
+    typedef itk::Image<char,3>     ImageType;
+    typedef TbssRoiImageSource  TbssVolSourceType;
 
 
 
@@ -64,7 +64,7 @@ namespace mitk
     std::string m_FilePrefix;
     std::string m_FilePattern;
 
-    typename OutputType::Pointer m_OutputCache;
+    OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
 
 
@@ -75,6 +75,6 @@ namespace mitk
 
 } //namespace MITK
 
-#include "mitkNrrdTbssRoiImageReader.cpp"
+//#include "mitkNrrdTbssRoiImageReader.cpp"
 
 #endif // __mitkNrrdTbssImageReader_h

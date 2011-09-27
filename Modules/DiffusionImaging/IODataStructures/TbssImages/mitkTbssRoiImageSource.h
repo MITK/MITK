@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  template<typename TPixelType>
+
 
   class TbssRoiImage;
 
@@ -37,14 +37,14 @@ namespace mitk {
 //## of class DiffusionImage) as output. 
 //##
 //## @ingroup Process
-template<typename TPixelType>
+
 class MitkDiffusionImaging_EXPORT TbssRoiImageSource : public ImageSource
 {
 public:
   mitkClassMacro(TbssRoiImageSource, BaseProcess)
   itkNewMacro(Self)
 
-  typedef TbssRoiImage<TPixelType> OutputType;
+  typedef TbssRoiImage OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
@@ -70,7 +70,7 @@ protected:
 
 } // namespace mitk
 
-#include "mitkTbssRoiImageSource.cpp"
+//#include "mitkTbssRoiImageSource.cpp"
 
 
 #endif /* _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_ */

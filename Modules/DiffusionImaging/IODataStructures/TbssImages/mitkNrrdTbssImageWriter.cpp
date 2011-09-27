@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
+#include "boost/lexical_cast.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -59,6 +60,36 @@ void mitk::NrrdTbssImageWriter::GenerateData()
 
   itk::VectorImage<float, 3>::Pointer img = input->GetImage();
 
+  std::string key;
+  std::string val;
+
+  std::vector< std::pair <std::string, int> > groups = input->GetGroupInfo();
+
+  std::vector< std::pair <std::string, int> >::iterator it = groups.begin();
+
+  int i=0;
+  while(it != groups.end())
+  {
+    std::pair<std::string, int> p = *it;
+
+    key = "Group_index_" + boost::lexical_cast<std::string>(i);
+    val = " " + p.first + " " + boost::lexical_cast<std::string>(p.second);
+    //sprintf( keybuffer, "Group_index_%04d", std::string(i) );
+    // sprintf( valbuffer, "%1d %1d", p.first, p.second);
+
+    //std::cout << valbuffer << std::endl;
+
+    //itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+    it++;
+    ++i;
+  }
+
+  key = "Measurement info";
+  val = input->GetMeasurementInfo();
+  itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+
+
   typedef itk::VectorImage<float,3> ImageType;
 
 
@@ -73,7 +104,7 @@ void mitk::NrrdTbssImageWriter::GenerateData()
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
   nrrdWriter->SetFileName(m_FileName);
- // nrrdWriter->UseCompressionOn();
+  nrrdWriter->UseCompressionOn();
   nrrdWriter->SetImageIO(io);
   try
   {

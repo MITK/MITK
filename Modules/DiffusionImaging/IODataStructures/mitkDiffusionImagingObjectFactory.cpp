@@ -108,7 +108,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
-    m_FileWriters.push_back( NrrdTbssRoiImageWriter<TbssRoiPixelType>::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);

@@ -31,7 +31,7 @@ namespace mitk
  * Writes diffusion volumes to a file
  * @ingroup Process
  */
-template < class TPixelType >
+
 class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
 {
 public:
@@ -42,7 +42,7 @@ public:
 
     itkNewMacro( Self )
     
-    typedef mitk::TbssRoiImage<TPixelType> InputType;
+    typedef mitk::TbssRoiImage InputType;
     
     /**
      * Sets the filename of the file to write.
@@ -102,13 +102,13 @@ public:
     virtual const char * GetDefaultExtension() { return ".roi"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
-      return (dynamic_cast<mitk::TbssRoiImage<TPixelType>*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()) != NULL);
     }
 
 
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::TbssRoiImage<TPixelType>*>(data.GetPointer()));
+        this->SetInput(dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()));
         this->Update(); 
       }
     }
@@ -134,6 +134,6 @@ protected:
 
 } // end of namespace mitk
 
-#include "mitkNrrdTbssRoiImageWriter.cpp"
+//#include "mitkNrrdTbssRoiImageWriter.cpp"
 
 #endif

@@ -29,19 +29,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <fstream>
 
-template<typename TPixelType>
-mitk::NrrdTbssRoiImageWriter<TPixelType>::NrrdTbssRoiImageWriter()
+
+mitk::NrrdTbssRoiImageWriter::NrrdTbssRoiImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-template<typename TPixelType>
-mitk::NrrdTbssRoiImageWriter<TPixelType>::~NrrdTbssRoiImageWriter()
+
+mitk::NrrdTbssRoiImageWriter::~NrrdTbssRoiImageWriter()
 {}
 
-template<typename TPixelType>
-void mitk::NrrdTbssRoiImageWriter<TPixelType>::GenerateData()
+void mitk::NrrdTbssRoiImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
@@ -83,7 +82,7 @@ void mitk::NrrdTbssRoiImageWriter<TPixelType>::GenerateData()
     ++i;
   }
 
-  typedef itk::Image<TPixelType,3> ImageType;
+  typedef itk::Image<char,3> ImageType;
 
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
@@ -92,7 +91,7 @@ void mitk::NrrdTbssRoiImageWriter<TPixelType>::GenerateData()
 
 
   typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer nrrdWriter = WriterType::New();
+  WriterType::Pointer nrrdWriter = WriterType::New();
   nrrdWriter->UseInputMetaDataDictionaryOn();
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
@@ -108,22 +107,17 @@ void mitk::NrrdTbssRoiImageWriter<TPixelType>::GenerateData()
     std::cout << e << std::endl;
   }
 
-
-
-
-
-
   m_Success = true;
 }
 
-template<typename TPixelType>
-void mitk::NrrdTbssRoiImageWriter<TPixelType>::SetInput( InputType* tbssVol )
+
+void mitk::NrrdTbssRoiImageWriter::SetInput( InputType* tbssVol )
 {
   this->ProcessObject::SetNthInput( 0, tbssVol );
 }
 
-template<typename TPixelType>
-mitk::TbssRoiImage<TPixelType>* mitk::NrrdTbssRoiImageWriter<TPixelType>::GetInput()
+
+mitk::TbssRoiImage* mitk::NrrdTbssRoiImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -135,8 +129,8 @@ mitk::TbssRoiImage<TPixelType>* mitk::NrrdTbssRoiImageWriter<TPixelType>::GetInp
   }
 }
 
-template<typename TPixelType>
-std::vector<std::string> mitk::NrrdTbssRoiImageWriter<TPixelType>::GetPossibleFileExtensions()
+
+std::vector<std::string> mitk::NrrdTbssRoiImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".roi");

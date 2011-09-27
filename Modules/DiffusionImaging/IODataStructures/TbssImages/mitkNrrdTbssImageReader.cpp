@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdDiffusionImageReader_cpp
-#define __mitkNrrdDiffusionImageReader_cpp
+#ifndef __mitkNrrdTbssImageReader_cpp
+#define __mitkNrrdTbssImageReader_cpp
 
 #include "mitkNrrdTbssImageReader.h"
 
@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 
 #include "itksys/SystemTools.hxx"
+
 
 namespace mitk
 {  
@@ -96,7 +97,7 @@ namespace mitk
         }
 
 
-        MITK_INFO << "NrrdDiffusionImageReader READING IMAGE INFORMATION";
+        MITK_INFO << "NrrdTbssImageReader READING IMAGE INFORMATION";
         ImageType::Pointer img;
 
         std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
@@ -123,16 +124,35 @@ namespace mitk
           std::string metaString;
 
 
-          int numberOfGradientImages = 0;
+          //int numberOfGradientImages = 0;
+          std::string name;
+          int n;
+          std::vector< std::pair<std::string, int> > groups;
 
           for (; itKey != imgMetaKeys.end(); itKey ++)
           {
 
 
             itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-            if (itKey->find("group") != std::string::npos)
+            if (itKey->find("Group_index") != std::string::npos)
             {
 
+              MITK_INFO << *itKey << " ---> " << metaString;
+
+              std::vector<std::string> tokens;
+              this->Tokenize(metaString, tokens, " ");
+
+              if(tokens.size()==2)
+              {
+
+                std::cout << tokens.at(0) << " " << tokens.at(1) << std::endl;
+
+                std::pair< std::string, int > p;
+                p.first = tokens.at(0);
+                std::string s = tokens.at(1);
+                p.second = atoi(tokens.at(1).c_str());
+                groups.push_back(p);
+              }
 
 
             }
@@ -140,11 +160,11 @@ namespace mitk
 
           }
 
-
-
+          outputForCache->SetGroupInfo(groups);
 
 
         }
+
 
 
         // This call updates the output information of the associated VesselTreeData

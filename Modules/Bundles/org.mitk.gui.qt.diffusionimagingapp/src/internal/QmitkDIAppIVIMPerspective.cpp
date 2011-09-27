@@ -39,18 +39,11 @@ void QmitkDIAppIVIMPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.ivim");
-  lo = layout->GetViewLayout("org.mitk.views.ivim");
+  left->AddView("org.mitk.views.ivim");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.ivim");
   lo->SetCloseable(false);
 }

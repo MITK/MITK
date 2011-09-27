@@ -39,30 +39,23 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.diffusionpreprocessing");
-  lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");
+  left->AddView("org.mitk.views.diffusionpreprocessing");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.tensorreconstruction");
+  left->AddView("org.mitk.views.tensorreconstruction");
   lo = layout->GetViewLayout("org.mitk.views.tensorreconstruction");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.qballreconstruction");
+  left->AddView("org.mitk.views.qballreconstruction");
   lo = layout->GetViewLayout("org.mitk.views.qballreconstruction");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.odfdetails");
+  left->AddView("org.mitk.views.odfdetails");
   lo = layout->GetViewLayout("org.mitk.views.odfdetails");
   lo->SetCloseable(false);
 

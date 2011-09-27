@@ -39,34 +39,27 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.segmentation");
-  lo = layout->GetViewLayout("org.mitk.views.segmentation");
+  left->AddView("org.mitk.views.segmentation");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.partialvolumeanalysisview");
+  left->AddView("org.mitk.views.partialvolumeanalysisview");
   lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.diffusionquantification");
+  left->AddView("org.mitk.views.diffusionquantification");
   lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.measurement");
+  left->AddView("org.mitk.views.measurement");
   lo = layout->GetViewLayout("org.mitk.views.measurement");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.imagestatistics");
+  left->AddView("org.mitk.views.imagestatistics");
   lo = layout->GetViewLayout("org.mitk.views.imagestatistics");
   lo->SetCloseable(false);
 

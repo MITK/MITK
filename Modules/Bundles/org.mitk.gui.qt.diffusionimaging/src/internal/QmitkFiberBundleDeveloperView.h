@@ -214,6 +214,7 @@ public:
   void DoUpdateGenerateFibersWidget();
   void SelectionChangedToolBox(int);
   void DoMonitorFiberThreads(int);
+  void DoColorFibers();
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();

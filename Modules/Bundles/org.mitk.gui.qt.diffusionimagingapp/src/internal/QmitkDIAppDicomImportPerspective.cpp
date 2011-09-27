@@ -39,19 +39,12 @@ void QmitkDIAppDicomImportPerspective::CreateInitialLayout(berry::IPageLayout::P
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.diffusiondicomimport");
-  lo = layout->GetViewLayout("org.mitk.views.diffusiondicomimport");
+  left->AddView("org.mitk.views.diffusiondicomimport");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusiondicomimport");
   lo->SetCloseable(false);
 
 }

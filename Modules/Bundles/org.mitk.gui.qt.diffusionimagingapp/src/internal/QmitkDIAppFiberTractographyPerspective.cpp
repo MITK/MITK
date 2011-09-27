@@ -39,30 +39,23 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.gibbstracking");
-  lo = layout->GetViewLayout("org.mitk.views.gibbstracking");
+  left->AddView("org.mitk.views.gibbstracking");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.gibbstracking");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.fibertracking");
+  left->AddView("org.mitk.views.fibertracking");
   lo = layout->GetViewLayout("org.mitk.views.fibertracking");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.fiberbundleoperations");
+  left->AddView("org.mitk.views.fiberbundleoperations");
   lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
   lo->SetCloseable(false);
 
-  right->AddView("org.mitk.views.trackingevaluation");
+  left->AddView("org.mitk.views.trackingevaluation");
   lo = layout->GetViewLayout("org.mitk.views.trackingevaluation");
   lo->SetCloseable(false);
 

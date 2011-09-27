@@ -93,7 +93,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 //  viewExcludeList.push_back( std::string("org.mitk.views.volumevisualization") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.simplemeasurement") );
 
-  configurer->SetShowPerspectiveBar(false);
+  configurer->SetShowPerspectiveBar(true);
   configurer->SetInitialSize(berry::Point(1000,770));
 
   QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);

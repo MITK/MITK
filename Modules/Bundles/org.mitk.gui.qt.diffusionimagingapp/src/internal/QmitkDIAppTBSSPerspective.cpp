@@ -39,19 +39,12 @@ void QmitkDIAppTBSSPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
-  berry::IFolderLayout::Pointer right =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  right->AddView("org.mitk.views.tractbasedspatialstatistics");
-  lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
+  left->AddView("org.mitk.views.tractbasedspatialstatistics");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
   lo->SetCloseable(false);
 
 }

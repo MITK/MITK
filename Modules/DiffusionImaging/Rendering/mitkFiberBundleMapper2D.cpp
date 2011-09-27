@@ -19,7 +19,7 @@
 
 //#include <vtkPainterPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkLookUpTable.h>
+#include <vtkLookupTable.h>
 #include <vtkPoints.h>
 #include <vtkCamera.h>
 #include <vtkPolyLine.h>

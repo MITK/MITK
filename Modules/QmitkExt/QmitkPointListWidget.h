@@ -79,6 +79,7 @@ protected slots:
     void MoveSelectedPointDown();
     void MoveSelectedPointUp();
     void OnBtnAddPoint(bool checked);
+    void OnBtnAddPointManually();
     //void OnBtnSetPointsMode(bool checked);
     /*!
     \brief pass through signal from PointListView that point selection has changed
@@ -106,6 +107,7 @@ protected:
     QPushButton* m_SavePointsBtn;
     QPushButton* m_LoadPointsBtn;
     QPushButton* m_ToggleAddPoint;
+    QPushButton* m_AddPoint;
 
 
     mitk::PointSetInteractor::Pointer   m_Interactor;

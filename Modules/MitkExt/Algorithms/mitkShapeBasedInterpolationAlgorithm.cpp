@@ -49,11 +49,13 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   // back-convert to MITK images to access a mitkIpPicDescriptor
   Image::Pointer correctPixelTypeLowerMITKSlice = Image::New();
   CastToMitkImage( correctPixelTypeLowerITKSlice, correctPixelTypeLowerMITKSlice );
-  mitkIpPicDescriptor* lowerPICSlice = CastToIpPicDescriptor( correctPixelTypeLowerMITKSlice);
+  mitkIpPicDescriptor* lowerPICSlice = mitkIpPicNew();
+  CastToIpPicDescriptor( correctPixelTypeLowerMITKSlice, lowerPICSlice);
   
   Image::Pointer correctPixelTypeUpperMITKSlice = Image::New();
   CastToMitkImage( correctPixelTypeUpperITKSlice, correctPixelTypeUpperMITKSlice );
-  mitkIpPicDescriptor* upperPICSlice = CastToIpPicDescriptor( correctPixelTypeUpperMITKSlice);
+  mitkIpPicDescriptor* upperPICSlice = mitkIpPicNew();
+  CastToIpPicDescriptor( correctPixelTypeUpperMITKSlice, upperPICSlice);
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);

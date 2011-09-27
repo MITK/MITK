@@ -80,7 +80,9 @@ void mitk::CorrectorAlgorithm::GenerateData()
   //  temporarySlice = ImportItkImage( correctPixelTypeImage );
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  TobiasHeimannCorrectionAlgorithm( CastToIpPicDescriptor( temporarySlice ) );
+  mitkIpPicDescriptor* temporarySlicePic = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice, temporarySlicePic );
+  TobiasHeimannCorrectionAlgorithm( temporarySlicePic );
 
   // temporarySlice is our return value (user  can get it by calling GetOutput() )
 

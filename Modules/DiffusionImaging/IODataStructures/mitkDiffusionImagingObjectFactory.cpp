@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffusionImageMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
+#include "mitkTbssImageMapper.h"
 
 //====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
@@ -61,9 +62,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssImageWriterFactory.h"
 #include "mitkNrrdTbssImageWriter.h"
 
+#include "mitkNrrdTbssRoiImageIOFactory.h"
+#include "mitkNrrdTbssRoiImageWriterFactory.h"
+#include "mitkNrrdTbssRoiImageWriter.h"
+
 
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
+typedef float TbssPixelType;
 
 
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -85,6 +91,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTensorImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleIOFactory::RegisterOneFactory();
     mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
+    mitk::NrrdTbssRoiImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
 
 
@@ -93,13 +100,15 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
+    mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
-    m_FileWriters.push_back( NrrdTbssImageWriter<TbssRoiPixelType>::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
@@ -139,10 +148,17 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     }
     mitk::Mapper::Pointer newMapper=NULL;
 
-    classname = "TbssImage";
+    classname = "TbssRoiImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::ImageVtkMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -188,10 +204,17 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node); 
     }
 
-    classname = "TbssImage";
+    classname = "TbssRoiImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeDataVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname = "TbssImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {  
+      newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -241,11 +264,18 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(node);
   }
   
-  classname = "TbssImage";
+  classname = "TbssRoiImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::ImageVtkMapper2D::SetDefaultProperties(node);
     mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+  }
+
+  classname = "TbssImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::TbssImageMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 }
 
@@ -288,6 +318,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
@@ -302,6 +333,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
 }
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()

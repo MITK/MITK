@@ -15,82 +15,74 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdTbssImageWriter__cpp
-#define __mitkNrrdTbssImageWriter__cpp
+#ifndef __mitkNrrdTbssRoiImageWriter__cpp
+#define __mitkNrrdTbssRoiImageWriter__cpp
 
-#include "mitkNrrdTbssImageWriter.h"
+#include "mitkNrrdTbssRoiImageWriter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
 //#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
-#include "boost/lexical_cast.hpp"
 
 #include <iostream>
 #include <fstream>
 
 
-mitk::NrrdTbssImageWriter::NrrdTbssImageWriter()
+mitk::NrrdTbssRoiImageWriter::NrrdTbssRoiImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-mitk::NrrdTbssImageWriter::~NrrdTbssImageWriter()
+
+mitk::NrrdTbssRoiImageWriter::~NrrdTbssRoiImageWriter()
 {}
 
-
-void mitk::NrrdTbssImageWriter::GenerateData()
+void mitk::NrrdTbssRoiImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
   if (input == NULL)
   {
-    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!");
+    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
     return;
   }
   if ( m_FileName == "" )
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
+    itkWarningMacro( << "Sorry, filename has not been set!" )
     return ;
   }
 
 
 
-  itk::VectorImage<float, 3>::Pointer img = input->GetImage();
+  itk::Image<char,3>::Pointer img = input->GetImage();
 
-  std::string key;
-  std::string val;
 
-  std::vector< std::pair <std::string, int> > groups = input->GetGroupInfo();
+  char keybuffer[512];
+  char valbuffer[512];
 
-  std::vector< std::pair <std::string, int> >::iterator it = groups.begin();
+  std::vector< itk::Index<3> > roi = input->GetRoi();
+
+  std::vector< itk::Index<3> >::iterator it = roi.begin();
 
   int i=0;
-  while(it != groups.end())
+  while(it != roi.end())
   {
-    std::pair<std::string, int> p = *it;
+    itk::Index<3> ix = *it;
 
-    key = "Group_index_" + boost::lexical_cast<std::string>(i);
-    val = " " + p.first + " " + boost::lexical_cast<std::string>(p.second);
-    //sprintf( keybuffer, "Group_index_%04d", std::string(i) );
-    // sprintf( valbuffer, "%1d %1d", p.first, p.second);
+    sprintf( keybuffer, "ROI_index_%04d", i );
+    sprintf( valbuffer, "%1d %1d %1d", ix[0],ix[1],ix[2]);
 
-    //std::cout << valbuffer << std::endl;
+    std::cout << valbuffer << std::endl;
 
-    //itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
-    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
     it++;
     ++i;
   }
 
-  key = "Measurement info";
-  val = input->GetMeasurementInfo();
-  itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
-
-
-  typedef itk::VectorImage<float,3> ImageType;
+  typedef itk::Image<char,3> ImageType;
 
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
@@ -104,7 +96,7 @@ void mitk::NrrdTbssImageWriter::GenerateData()
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
   nrrdWriter->SetFileName(m_FileName);
-  nrrdWriter->UseCompressionOn();
+  // nrrdWriter->UseCompressionOn();
   nrrdWriter->SetImageIO(io);
   try
   {
@@ -119,13 +111,13 @@ void mitk::NrrdTbssImageWriter::GenerateData()
 }
 
 
-void mitk::NrrdTbssImageWriter::SetInput( InputType* tbssVol )
+void mitk::NrrdTbssRoiImageWriter::SetInput( InputType* tbssVol )
 {
   this->ProcessObject::SetNthInput( 0, tbssVol );
 }
 
 
-mitk::TbssImage* mitk::NrrdTbssImageWriter::GetInput()
+mitk::TbssRoiImage* mitk::NrrdTbssRoiImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -138,11 +130,11 @@ mitk::TbssImage* mitk::NrrdTbssImageWriter::GetInput()
 }
 
 
-std::vector<std::string> mitk::NrrdTbssImageWriter::GetPossibleFileExtensions()
+std::vector<std::string> mitk::NrrdTbssRoiImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".tbss");
+  possibleFileExtensions.push_back(".roi");
   return possibleFileExtensions;
 }
 
-#endif //__mitkNrrdTbssImageWriter__cpp
+#endif //__mitkNrrdTbssRoiImageWriter__cpp

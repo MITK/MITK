@@ -71,7 +71,8 @@ public slots:
 
 protected:
   QWidget* m_MainControl;
-  QCheckBox* m_EnableFlexibleZooming;  
+  QCheckBox* m_EnableFlexibleZooming;
+  QCheckBox* m_ShowLevelWindowWidget;
   QCheckBox* m_UseGradientBackground;
   QCheckBox* m_ChangeBackgroundColors;
   QPushButton* m_ColorButton1;

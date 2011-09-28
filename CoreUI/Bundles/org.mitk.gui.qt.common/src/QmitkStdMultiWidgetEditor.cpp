@@ -138,6 +138,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+    bool showLevelWindowWidget = prefs->GetBool("Show level/window widget", true);
+    if (!showLevelWindowWidget)
+    {
+      m_StdMultiWidget->DisableStandardLevelWindow();
+    }
+
     m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
     m_StdMultiWidget->DisableDepartmentLogo();
     m_StdMultiWidget->EnableDepartmentLogo();
@@ -204,6 +210,16 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+  // level window setting
+  bool showLevelWindowWidget = prefs->GetBool("Show level/window widget", true);
+  if (showLevelWindowWidget)
+  {
+    m_StdMultiWidget->EnableStandardLevelWindow();
+  }
+  else
+  {
+    m_StdMultiWidget->DisableStandardLevelWindow();
+  }
 }
 
 

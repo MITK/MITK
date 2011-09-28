@@ -356,7 +356,7 @@ void mitk::NavigationDataRecorder::StopRecording()
   m_NumberOfRecordedFiles++;
   m_Recording = false;
   m_Stream->flush();
-  if (m_StreamMustBeDeleted)
+  if (m_StreamMustBeDeleted) //stream must only be deleted if it was created inside this class
     {
     m_StreamMustBeDeleted = false;
     delete m_Stream;

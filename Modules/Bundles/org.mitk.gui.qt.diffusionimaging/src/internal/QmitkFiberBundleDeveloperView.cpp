@@ -955,6 +955,7 @@ void QmitkFiberBundleDeveloperView::DoColorFibers()
   struct Package4WorkingThread ItemPackageForFiberColoring;
   ItemPackageForFiberColoring.st_FBX = m_FiberBundleX;
   ItemPackageForFiberColoring.st_FancyGUITimer1 = localTimer;
+  ItemPackageForFiberColoring.st_Controls = m_Controls; //needed to catch up some selections and set options in GUI
   
   if (m_fiberMonitorIsOn) 
     ItemPackageForFiberColoring.st_fiberThreadMonitorWorker = m_fiberThreadMonitorWorker;

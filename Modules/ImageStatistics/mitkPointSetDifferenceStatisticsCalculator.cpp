@@ -144,7 +144,11 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
 {
-  if (m_PointSet1->GetSize()!=m_PointSet2->GetSize())
+  if ((m_PointSet1==NULL)||(m_PointSet2==NULL))
+  {
+    itkExceptionMacro("Point sets specified are not valid. Please specify correct Point sets");
+  }
+  else if (m_PointSet1->GetSize()!=m_PointSet2->GetSize())
   {
     itkExceptionMacro("PointSets are not equal. Please make sure that your PointSets have the same size and hold corresponding points.");
   }

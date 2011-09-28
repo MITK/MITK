@@ -43,6 +43,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_RecordCounter = 0;
   m_RecordCountLimit = -1;
   m_DoNotOverwriteFiles = false;
+  m_StreamMustBeDeleted = false;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -304,6 +305,8 @@ void mitk::NavigationDataRecorder::StartRecording()
         stream = &std::cout;
         break;
     }
+    m_Stream = stream;
+    m_StreamMustBeDeleted = true;
     m_firstLine = true;
     m_RecordCounter = 0;
     StartRecording(stream);
@@ -353,5 +356,10 @@ void mitk::NavigationDataRecorder::StopRecording()
   m_NumberOfRecordedFiles++;
   m_Recording = false;
   m_Stream->flush();
+  if (m_StreamMustBeDeleted)
+    {
+    m_StreamMustBeDeleted = false;
+    delete m_Stream;
+    }
   m_Stream = NULL;   
 }

@@ -177,6 +177,8 @@ protected:
 
     std::ostream* m_Stream; ///< the output stream
 
+    bool m_StreamMustBeDeleted;
+
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 
   	OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat

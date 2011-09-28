@@ -62,13 +62,15 @@ static void TestSimpleCase()
 
     mitk::FillVector3D(test,2,2,2);
     testPointSet2->InsertPoint(1,test);
-
-    double mean = (sqrt(0.75)+sqrt(3))/2;
-    double variance = ((sqrt(0.75)-mean)*(sqrt(0.75)-mean)+(sqrt(3)-mean)*(sqrt(3)-mean))/2;
+    double squaredDistance1 = 0.75;
+    double squaredDistance2 = 3;
+    double mean = (sqrt(squaredDistance1)+sqrt(squaredDistance2))/2;
+    double variance = ((sqrt(squaredDistance1)-mean)*(sqrt(squaredDistance1)-mean)+(sqrt(squaredDistance2)-mean)*(sqrt(squaredDistance2)-mean))/2;
     double sd = sqrt(variance);
-    double rms = sqrt(3.75/2);
-    double min = sqrt(0.75);
-    double max = sqrt(3);
+    double ms = 3.75/2;
+    double rms = sqrt(ms);
+    double min = sqrt(squaredDistance1);
+    double max = sqrt(squaredDistance2);
     double median = (min + max)/2;
 
     mitk::PointSetDifferenceStatisticsCalculator::Pointer myPointSetDifferenceStatisticsCalculator = mitk::PointSetDifferenceStatisticsCalculator::New(testPointSet1,testPointSet2);

@@ -144,7 +144,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
 {
-  if ((m_PointSet1==NULL)||(m_PointSet2==NULL))
+  if ((m_PointSet1.IsNull())||(m_PointSet2.IsNull()))
   {
     itkExceptionMacro("Point sets specified are not valid. Please specify correct Point sets");
   }

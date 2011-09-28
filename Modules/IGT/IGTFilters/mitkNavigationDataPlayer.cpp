@@ -42,6 +42,7 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_StreamEnd = false;
   m_StreamValid = true;
   m_ErrorMessage = "";
+  m_StreamSetOutsideFromClass = false;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -384,6 +385,8 @@ void mitk::NavigationDataPlayer::StopPlaying()
   //only PlayerMode and FileName are not changed
   m_Pause = false;
   m_Playing = false;
+  if (!m_StreamSetOutsideFromClass)
+    {delete m_Stream;}
   m_Stream = NULL;
   m_FileVersion = 1;
   m_Playing = false;
@@ -485,6 +488,7 @@ void mitk::NavigationDataPlayer::SetStream( PlayerMode  /*mode*/ )
   case NormalFile:
 
     m_Stream = new std::ifstream(m_FileName.c_str());
+    m_StreamSetOutsideFromClass = false;
     
     break;
   case ZipFile:
@@ -513,6 +517,7 @@ void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
   }
 
   m_Stream = stream;
+  m_StreamSetOutsideFromClass = true;
 
   this->Modified();
   InitPlayer();

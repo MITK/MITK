@@ -51,6 +51,32 @@ public:
 
     itkNewMacro( Self );
 
+    /**Documentation
+    * \brief Determines where the output is directed to
+    * 
+    * Console:    std::cout
+    * NormalFile: std::ofstream
+    * ZipFile:    Not supported yet -> std::cout
+    */
+    enum RecordingMode
+    {
+      Console,
+      NormalFile,
+      ZipFile
+    };
+
+    /**Documentation
+    * \brief Determines the output format
+    * 
+    * xml:  XML format, also default, can be read by NavigationDataPlayer
+    * csv:  use to export in excel, matlab, etc.
+    */
+	enum OutputFormatEnum
+	{
+	  xml,
+	  csv
+	};
+
     /**
     * \brief sets the file name for the OutputMode NormalFile and ZipFile
     *
@@ -75,6 +101,11 @@ public:
     * \brief Returns whether the NavigationDataRecorder is recording or not
     */
     itkGetMacro(Recording,bool);
+
+    /**
+    * \brief Returns the recording mode
+    */
+    itkGetMacro(RecordingMode,RecordingMode);
 
     /**
     * \brief Returns the number of data sets / frames which were recorded by the NavigationDataRecorder since start
@@ -121,31 +152,6 @@ public:
     */
     virtual void Update();
 
-    /**Documentation
-    * \brief Determines where the output is directed to
-    * 
-    * Console:    std::cout
-    * NormalFile: std::ofstream
-    * ZipFile:    Not supported yet -> std::cout
-    */
-    enum RecordingMode
-    {
-      Console,
-      NormalFile,
-      ZipFile
-    };
-
-    /**Documentation
-    * \brief Determines the output format
-    * 
-    * xml:  XML format, also default, can be read by NavigationDataPlayer
-    * csv:  use to export in excel, matlab, etc.
-    */
-	enum OutputFormatEnum
-	{
-	  xml,
-	  csv
-	};
 
     /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
@@ -176,6 +182,8 @@ protected:
     unsigned int m_NumberOfInputs; ///< counts the numbers of added input NavigationDatas
 
     std::ostream* m_Stream; ///< the output stream
+
+    bool m_StreamMustBeDeleted;
 
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 

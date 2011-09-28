@@ -15,6 +15,7 @@ SET(INTERNAL_CPP_FILES
   QmitkControlVisualizationPropertiesView.cpp
   QmitkODFDetailsView.cpp
   QmitkGibbsTrackingView.cpp
+  QmitkStochasticFiberTrackingView.cpp
   QmitkFiberBundleOperationsView.cpp
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
@@ -30,6 +31,7 @@ SET(UI_FILES
   src/internal/QmitkControlVisualizationPropertiesViewControls.ui
   src/internal/QmitkODFDetailsViewControls.ui
   src/internal/QmitkGibbsTrackingViewControls.ui
+  src/internal/QmitkStochasticFiberTrackingViewControls.ui
   src/internal/QmitkFiberBundleOperationsViewControls.ui
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
@@ -49,6 +51,7 @@ SET(MOC_H_FILES
   src/QmitkODFRenderWidget.h
   src/QmitkODFDetailsWidget.h
   src/internal/QmitkGibbsTrackingView.h
+  src/internal/QmitkStochasticFiberTrackingView.h
   src/internal/QmitkFiberBundleOperationsView.h
   src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
@@ -73,6 +76,7 @@ SET(CACHED_RESOURCE_FILES
   resources/GibbsTracking.png
   resources/FiberBundleOperations.png
   resources/PartialVolumeAnalysis_24.png
+  resources/stochFB.png
 )
 
 SET(QRC_FILES

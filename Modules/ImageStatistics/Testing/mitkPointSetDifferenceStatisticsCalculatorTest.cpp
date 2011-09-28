@@ -72,7 +72,7 @@ static void TestSimpleCase()
     double median = (min + max)/2;
 
     mitk::PointSetDifferenceStatisticsCalculator::Pointer myPointSetDifferenceStatisticsCalculator = mitk::PointSetDifferenceStatisticsCalculator::New(testPointSet1,testPointSet2);
-  
+
     MITK_TEST_CONDITION_REQUIRED((myPointSetDifferenceStatisticsCalculator->GetNumberOfPoints()==testPointSet1->GetSize()),".. Testing GetNumberOfPoints");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetDifferenceStatisticsCalculator->GetMean(),mean),".. Testing GetMean");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetDifferenceStatisticsCalculator->GetSD(),sd),".. Testing GetSD");
@@ -81,7 +81,15 @@ static void TestSimpleCase()
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetDifferenceStatisticsCalculator->GetMin(),min),".. Testing GetMin");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetDifferenceStatisticsCalculator->GetMax(),max),".. Testing GetMax");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetDifferenceStatisticsCalculator->GetMedian(),median),".. Testing GetMedian");
-    }
+
+    testPointSet2->InsertPoint(2,test);
+    myPointSetDifferenceStatisticsCalculator->SetPointSets(testPointSet1,testPointSet2);
+    MITK_TEST_OUTPUT(<<"Test for exception when using differently sized point sets");
+    MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject,myPointSetDifferenceStatisticsCalculator->GetMean());
+    mitk::PointSetDifferenceStatisticsCalculator::Pointer myPointSetDifferenceStatisticsCalculator2 = mitk::PointSetDifferenceStatisticsCalculator::New();
+    MITK_TEST_OUTPUT(<<"Test for exception when using point sets with size 0");
+    MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject,myPointSetDifferenceStatisticsCalculator2->GetMean());
+}
 };
 
 int mitkPointSetDifferenceStatisticsCalculatorTest(int argc, char* argv[])

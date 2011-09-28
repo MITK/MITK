@@ -23,6 +23,7 @@ mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalcul
 {
   m_PointSet1 = mitk::PointSet::New();
   m_PointSet2 = mitk::PointSet::New();
+  m_Statistics.Reset();
 }
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer pSet1, mitk::PointSet::Pointer pSet2)
@@ -30,6 +31,7 @@ mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalcul
   m_PointSet1 = pSet1;
   m_PointSet2 = pSet2;
   m_StatisticsCalculated = false;
+  m_Statistics.Reset();
 }
 
 mitk::PointSetDifferenceStatisticsCalculator::~PointSetDifferenceStatisticsCalculator()
@@ -47,6 +49,7 @@ void mitk::PointSetDifferenceStatisticsCalculator::SetPointSets(mitk::PointSet::
     m_PointSet2 = pSet2;
   }
   m_StatisticsCalculated = false;
+  m_Statistics.Reset();
 }
 
 std::vector<double> mitk::PointSetDifferenceStatisticsCalculator::GetDifferences()
@@ -141,50 +144,61 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
 {
-  double mean, sd, rms= 0.0;
-  std::vector<double> differencesVector;
-  mitk::Point3D point1;
-  mitk::Point3D point2;
-  int numberOfPoints = m_PointSet1->GetSize();
-  for (int i=0; i<numberOfPoints; i++)
+  if (m_PointSet1->GetSize()!=m_PointSet2->GetSize())
   {
-    point1 = m_PointSet1->GetPoint(i);
-    point2 = m_PointSet2->GetPoint(i);
-    double squaredDistance = point1.SquaredEuclideanDistanceTo(point2);
-    mean+=sqrt(squaredDistance);
-    rms+=squaredDistance;
-    this->m_SquaredDifferencesVector.push_back(squaredDistance);
-    differencesVector.push_back(sqrt(squaredDistance));
+    itkExceptionMacro("PointSets are not equal. Please make sure that your PointSets have the same size and hold corresponding points.");
   }
-  m_DifferencesVector = differencesVector;
-  mean = mean/numberOfPoints;
-  rms = sqrt(rms/numberOfPoints);
-  for (int i=0; i<differencesVector.size(); i++)
+  else if (m_PointSet1->GetSize()==0)
   {
-    sd+=(differencesVector.at(i)-mean)*(differencesVector.at(i)-mean);
-  }
-  double variance = sd/numberOfPoints;
-  sd = sqrt(variance);
-  std::sort(differencesVector.begin(),differencesVector.end());
-  double min = differencesVector.at(0);
-  double max = differencesVector.at(numberOfPoints-1);
-  double median = 0.0;
-  if (numberOfPoints%2 == 0)
-  {
-    median = (differencesVector.at(numberOfPoints/2)+differencesVector.at(numberOfPoints/2-1))/2;
+    itkExceptionMacro("There are no points in the PointSets. Please make sure that the PointSets contain points");
   }
   else
   {
-    median = differencesVector.at((numberOfPoints-1)/2+1);
-  }
-  m_Statistics.Mean = mean;
-  m_Statistics.Sigma = sd;
-  m_Statistics.Variance = variance;
-  m_Statistics.RMS = rms;
-  m_Statistics.Min = differencesVector.at(0);
-  m_Statistics.Max = differencesVector.at(numberOfPoints-1);
-  m_Statistics.Median = median;
-  m_Statistics.N = numberOfPoints;
+    double mean, sd, rms= 0.0;
+    std::vector<double> differencesVector;
+    mitk::Point3D point1;
+    mitk::Point3D point2;
+    int numberOfPoints = m_PointSet1->GetSize();
+    for (int i=0; i<numberOfPoints; i++)
+    {
+      point1 = m_PointSet1->GetPoint(i);
+      point2 = m_PointSet2->GetPoint(i);
+      double squaredDistance = point1.SquaredEuclideanDistanceTo(point2);
+      mean+=sqrt(squaredDistance);
+      rms+=squaredDistance;
+      this->m_SquaredDifferencesVector.push_back(squaredDistance);
+      differencesVector.push_back(sqrt(squaredDistance));
+    }
+    m_DifferencesVector = differencesVector;
+    mean = mean/numberOfPoints;
+    rms = sqrt(rms/numberOfPoints);
+    for (int i=0; i<differencesVector.size(); i++)
+    {
+      sd+=(differencesVector.at(i)-mean)*(differencesVector.at(i)-mean);
+    }
+    double variance = sd/numberOfPoints;
+    sd = sqrt(variance);
+    std::sort(differencesVector.begin(),differencesVector.end());
+    double min = differencesVector.at(0);
+    double max = differencesVector.at(numberOfPoints-1);
+    double median = 0.0;
+    if (numberOfPoints%2 == 0)
+    {
+      median = (differencesVector.at(numberOfPoints/2)+differencesVector.at(numberOfPoints/2-1))/2;
+    }
+    else
+    {
+      median = differencesVector.at((numberOfPoints-1)/2+1);
+    }
+    m_Statistics.Mean = mean;
+    m_Statistics.Sigma = sd;
+    m_Statistics.Variance = variance;
+    m_Statistics.RMS = rms;
+    m_Statistics.Min = differencesVector.at(0);
+    m_Statistics.Max = differencesVector.at(numberOfPoints-1);
+    m_Statistics.Median = median;
+    m_Statistics.N = numberOfPoints;
 
-  m_StatisticsCalculated = true;
+    m_StatisticsCalculated = true;
+  }
 }

@@ -107,6 +107,7 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 
 ModulePrivate::~ModulePrivate()
 {
+  delete moduleContext;
 }
 
 void ModulePrivate::RemoveModuleResources()

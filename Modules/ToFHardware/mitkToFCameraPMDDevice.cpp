@@ -214,13 +214,13 @@ namespace mitk
 
   void ToFCameraPMDDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
       // 1) copy the image buffer
       // 2) Flip around y- axis (vertical axis)
-
+      m_ImageMutex->Lock();
       this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_AmplitudeArray);
+      m_ImageMutex->Unlock();
 
       for (int i=0; i<this->m_CaptureHeight; i++)
       {
@@ -235,18 +235,18 @@ namespace mitk
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
-    m_ImageMutex->Unlock();
   }
 
   void ToFCameraPMDDevice::GetIntensities(float* intensityArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
     // 1) copy the image buffer
     // 2) Flip around y- axis (vertical axis)
 
+    m_ImageMutex->Lock();
     this->m_Controller->GetIntensities(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_IntensityArray);
+    m_ImageMutex->Unlock();
 
     for (int i=0; i<this->m_CaptureHeight; i++)
     {
@@ -266,14 +266,14 @@ namespace mitk
 
   void ToFCameraPMDDevice::GetDistances(float* distanceArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
     if (m_CameraActive)
     {
       // 1) copy the image buffer
       // 2) convert the distance values from m to mm
       // 3) Flip around y- axis (vertical axis)
-
+      m_ImageMutex->Lock();
       this->m_Controller->GetDistances(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_DistanceArray);
+      m_ImageMutex->Unlock();
 
       for (int i=0; i<this->m_CaptureHeight; i++)
       {
@@ -288,7 +288,6 @@ namespace mitk
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
-    m_ImageMutex->Unlock();
   }
 
   void ToFCameraPMDDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
@@ -296,7 +295,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      m_ImageMutex->Lock();
       // 1) copy the image buffer
       // 2) convert the distance values from m to mm
       // 3) Flip around y- axis (vertical axis)
@@ -307,7 +305,6 @@ namespace mitk
         // buffer empty
         MITK_INFO << "Buffer empty!! ";
         capturedImageSequence = this->m_ImageSequence;
-        m_ImageMutex->Unlock();
         return;
       }
       // determine position of image in buffer
@@ -331,9 +328,12 @@ namespace mitk
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
 
+      m_ImageMutex->Lock();
       this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], this->m_DistanceArray);
       this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[pos], this->m_AmplitudeArray);
       this->m_Controller->GetIntensities(this->m_SourceDataBuffer[pos], this->m_IntensityArray);
+      memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
+      m_ImageMutex->Unlock();
 
       int u, v;
       for (int i=0; i<this->m_CaptureHeight; i++)
@@ -348,9 +348,6 @@ namespace mitk
           intensityArray[u] = this->m_IntensityArray[v];
         }
       }
-
-      memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
-      m_ImageMutex->Unlock();
     }
     else
     {

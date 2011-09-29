@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkTensorReconstructionViewControls.h"
 
-#include "mitkDiffusionImage.h"
+#include <mitkDiffusionImage.h>
+#include <mitkTensorImage.h>
 
 #include <berryIPartListener.h>
 #include <berryISelectionListener.h>
@@ -77,6 +78,7 @@ class QmitkTensorReconstructionView : public QmitkFunctionality
 
 protected slots:
 
+  void TensorsToQbi();
   void TensorsToDWI();
   void DoTensorsToDWI(mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TeemCheckboxClicked();
@@ -95,6 +97,8 @@ protected slots:
 
 protected:
 
+  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
   Ui::QmitkTensorReconstructionViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
@@ -103,14 +107,13 @@ protected:
   std::vector<itk::Vector<double,3> > MakeGradientList() ;
 
   template<int L>
-  void TemplatedAnalyticalTensorReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols, 
+  void TemplatedAnalyticalTensorReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
 };
 
 

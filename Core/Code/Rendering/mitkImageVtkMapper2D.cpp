@@ -695,6 +695,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
 
   //use color means that we want to use the color from the property list and not a lookuptable
   bool useColor = true;

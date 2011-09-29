@@ -25,6 +25,7 @@ Some abstract concepts of MITK are described in \ref Concepts
 
 \section DevelopmentContributing Contributing To MITK
 
+\li \subpage DocumentationGuide
 \li \subpage StylesAndNotesPage
 
 */

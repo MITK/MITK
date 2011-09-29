@@ -176,8 +176,14 @@ void QmitkUpdateTimerWidget::SetIcon( WidgetButtons button, const QIcon& icon )
 {
   switch( button )
   {
-  case StartButton: m_Controls->m_StartNavigationBtn->setIcon(icon);
+  case StartButton: 
+    m_Controls->m_StartNavigationBtn->setIcon(icon);
+    break;
 
-  case StopButton: m_Controls->m_StartNavigationBtn->setIcon(icon);    
+  case StopButton: m_Controls->m_StopNavigationBtn->setIcon(icon);    
+    break;
+
+  default:
+    break;
   }
 }

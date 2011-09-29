@@ -46,7 +46,8 @@ namespace mitk {
 mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
-m_CurrentThresholdValue(1)
+m_CurrentThresholdValue(1),
+m_IsFloatImage(false)
 {
   this->SupportRoiOn();
 
@@ -117,7 +118,12 @@ void mitk::BinaryThresholdTool::SetThresholdValue(int value)
   if (m_ThresholdFeedbackNode.IsNotNull())
   {
     m_CurrentThresholdValue = value;
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 1) ) );
+
+    if (m_IsFloatImage)
+      m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue * 0.01f, 0.01f) ) );
+    else
+      m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 1) ) );
+
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -160,8 +166,18 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
 
       if (image.GetPointer() == originalImage.GetPointer())
       {
-        m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() );
-        m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() );
+        if (originalImage->GetPixelType().GetType() == mitkIpPicFloat)
+        {
+            m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() * 100.0f);
+            m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() * 100.0f);
+            m_IsFloatImage = true;
+        }
+        else
+        {
+          m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() );
+          m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() );
+          m_IsFloatImage = false;
+        }
       }
 
       LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
@@ -260,13 +276,21 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
 
   while (!outputIterator.IsAtEnd())
   {
-    if ( (signed)inputIterator.Get() >= m_CurrentThresholdValue )
+    if (m_IsFloatImage)
     {
-      outputIterator.Set( 1 );
+      float realThresholdValue = m_CurrentThresholdValue * 0.01f;
+
+      if (inputIterator.Get() >= realThresholdValue )
+        outputIterator.Set( 1 );
+      else
+        outputIterator.Set( 0 );
     }
     else
     {
-      outputIterator.Set( 0 );
+      if ( (signed)inputIterator.Get() >= m_CurrentThresholdValue )
+        outputIterator.Set( 1 );
+      else
+        outputIterator.Set( 0 );
     }
 
     ++inputIterator;

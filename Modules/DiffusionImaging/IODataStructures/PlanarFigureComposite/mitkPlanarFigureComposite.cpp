@@ -15,7 +15,6 @@ mitk::PlanarFigureComposite::PlanarFigureComposite()
 {
   m_PFVector = CompositionContainer::New();
   m_DNVector = DataNodeContainer::New();
-  
 }
 
 mitk::PlanarFigureComposite::~PlanarFigureComposite()

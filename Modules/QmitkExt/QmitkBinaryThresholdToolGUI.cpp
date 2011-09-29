@@ -105,6 +105,7 @@ void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
   }
   m_Spinner->setValue(value);
 }
+
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 {
   if (m_BinaryThresholdTool.IsNotNull())

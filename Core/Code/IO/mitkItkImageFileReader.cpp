@@ -37,6 +37,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::ItkImageFileReader::GenerateData()
 {
+  const std::string& locale = "C";
+  const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+  if ( locale.compare(currLocale)!=0 )
+  {
+    try
+    {
+      setlocale(LC_ALL, locale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not set locale " << locale;
+    }
+  }
+
   mitk::Image::Pointer image = this->GetOutput();
 
   const unsigned int MINDIM = 2;
@@ -153,12 +168,21 @@ void mitk::ItkImageFileReader::GenerateData()
   //if ( image->GetPixelType().GetNumberOfComponents() == 1 )
   //{
   //  SetDefaultImageProperties( node );
-  //} 
+  //}
   MITK_INFO << "...finished!" << std::endl;
+
+  try
+  {
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
 }
 
 
-bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
 {
   // First check the extension
   if(  filename == "" )

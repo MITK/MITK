@@ -4,6 +4,8 @@
 
 install(TARGETS ${exec_target} DESTINATION .)
 
+install(FILES "${PROJECT_SOURCE_DIR}/Changelog.txt" DESTINATION .)
+
 install(CODE "
   set(DIRS
       ${QT_LIBRARY_DIR}

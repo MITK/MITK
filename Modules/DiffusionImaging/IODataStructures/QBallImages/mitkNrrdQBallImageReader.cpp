@@ -29,8 +29,8 @@ namespace mitk
 
   void NrrdQBallImageReader
     ::GenerateData()
-  {    
-    if ( m_FileName == "") 
+  {
+    if ( m_FileName == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
     }
@@ -38,6 +38,21 @@ namespace mitk
     {
       try
       {
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+        if ( locale.compare(currLocale)!=0 )
+        {
+          try
+          {
+            setlocale(LC_ALL, locale.c_str());
+          }
+          catch(...)
+          {
+            MITK_INFO << "Could not set locale " << locale;
+          }
+        }
+
         typedef itk::VectorImage<float,3> ImageType;
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
         typedef itk::ImageFileReader<ImageType> FileReaderType;
@@ -75,10 +90,18 @@ namespace mitk
         this->GetOutput()->InitializeByItk(vecImg.GetPointer());
         this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
 
+        try
+        {
+          setlocale(LC_ALL, currLocale.c_str());
+        }
+        catch(...)
+        {
+          MITK_INFO << "Could not reset locale " << currLocale;
+        }
       }
       catch(std::exception& e)
       {
-        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());                    
+        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
       }
       catch(...)
       {
@@ -93,51 +116,51 @@ namespace mitk
   }
 
 
-  
+
   const char* NrrdQBallImageReader
     ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
-  
+
   void NrrdQBallImageReader
     ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
-  
+
   const char* NrrdQBallImageReader
     ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
-  
+
   void NrrdQBallImageReader
     ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
-  
+
   const char* NrrdQBallImageReader
     ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
-  
+
   void NrrdQBallImageReader
     ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
-  
+
   bool NrrdQBallImageReader
-    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
   {
     // First check the extension
     if(  filename == "" )

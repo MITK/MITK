@@ -65,7 +65,7 @@ namespace itk
 
     if( m_GradientList.size()==0 )
     {
-      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");      
+      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
     }
 
     // create a B0 image by taking the norm of the tensor field * scale:
@@ -89,7 +89,7 @@ namespace itk
       itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
 
     rescaler->SetOutputMinimum ( 0 );
-    rescaler->SetOutputMaximum ( 32767 );
+    rescaler->SetOutputMaximum ( 10000 );
     rescaler->SetInput ( myFilter1->GetOutput() );
     try
     {
@@ -154,16 +154,17 @@ namespace itk
 
       BaselinePixelType b0 = itB0.Get();
 
-      OutputPixelType out; 
+      OutputPixelType out;
       out.SetSize(m_GradientList.size()+1);
+      out.Fill(0);
 
-      for( unsigned int i=0; i<m_GradientList.size(); i++)
+      if( b0 > 0)
       {
-
-        if( b0 > 0)
+        for( unsigned int i=0; i<m_GradientList.size(); i++)
         {
+
           GradientType g = m_GradientList[i];
-          
+
           InputPixelType S;
           S[0] = g[0]*g[0];
           S[1] = g[1]*g[0];
@@ -171,15 +172,15 @@ namespace itk
           S[3] = g[1]*g[1];
           S[4] = g[2]*g[1];
           S[5] = g[2]*g[2];
-          
-          double res = 
-              T[0]*S[0] + T[1]*S[1] + T[2]*S[2] + 
-              T[1]*S[1] + T[3]*S[3] + T[4]*S[4] + 
-              T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
-          
-          out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
-        }
 
+          double res =
+              T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
+              T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
+              T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
+
+          out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
+
+        }
       }
 
       out[m_GradientList.size()] = b0;
@@ -187,7 +188,7 @@ namespace itk
       itOut.Set(out);
 
       if( threadId==0 && step>0)
-      {        
+      {
         if( (progress%step)==0 )
         {
           this->UpdateProgress ( double(progress)/double(numPixels) );
@@ -202,9 +203,9 @@ namespace itk
     }
 
     if( threadId==0 )
-    { 
+    {
       this->UpdateProgress (1.0);
-    }  
+    }
   }
 
 

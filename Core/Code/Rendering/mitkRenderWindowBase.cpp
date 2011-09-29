@@ -102,7 +102,11 @@ void mitk::RenderWindowBase::mouseMoveMitkEvent(mitk::MouseEvent *me)
 void mitk::RenderWindowBase::wheelMitkEvent(mitk::WheelEvent *we)
 {
   if ( !m_ProcessWheelEvents )
+  {
+    if(m_Renderer.IsNotNull()) 
+      m_Renderer->WheelEvent(we);
     return;
+  }
  
   if ( !GetSliceNavigationController()->GetSliceLocked() )
   {

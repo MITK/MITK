@@ -76,8 +76,25 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   mySource->UpdateOutputInformation();
   MITK_TEST_CONDITION(mySource->GetMTime() != modTime, "Testing if UpdateOutputInformation() modifies the object");
 
+  //test getOutput()
   mitk::NavigationData* nd0 = mySource->GetOutput(0);
+  MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [1]");
+  nd0 = mySource->GetOutput(nd0->GetName());
+  MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [2]");
+
+  //test getOutputIndex()
+  MITK_TEST_CONDITION(mySource->GetOutputIndex(nd0->GetName())==0,"Testing GetOutputIndex()");
   
+  //test GraftNthOutput()
+  mitk::NavigationData::Pointer ndCopy = mitk::NavigationData::New();
+  mySource->GraftNthOutput(1,nd0);
+  ndCopy = mySource->GetOutput(1);
+  MITK_TEST_CONDITION(std::string(ndCopy->GetName())==std::string(nd0->GetName()),"Testing GraftNthOutput()");
+
+  //test GetParameters()
+  mitk::PropertyList::ConstPointer p = mySource->GetParameters();
+  MITK_TEST_CONDITION(p.IsNotNull(),"Testing GetParameters()");
+
   nd0->Update();
   mitk::NavigationData::PositionType pos = nd0->GetPosition();
   unsigned long tmpMTime0 = nd0->GetMTime();

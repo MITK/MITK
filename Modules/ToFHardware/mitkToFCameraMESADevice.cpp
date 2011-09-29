@@ -195,9 +195,11 @@ namespace mitk
         // update the ToF camera
         toFCameraDevice->UpdateCamera();
         // get the image data from the camera and write it at the next free position in the buffer
+        toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
@@ -205,7 +207,6 @@ namespace mitk
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1
          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        toFCameraDevice->m_ImageMutex->Lock();
         //toFCameraDevice->m_ImageSequence++;
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -222,7 +223,6 @@ namespace mitk
         {
           printStatus = true;
         }
-        toFCameraDevice->m_ImageMutex->Unlock();
         if (overflow)
         {
           //itksys::SystemTools::Delay(10);
@@ -353,7 +353,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      m_ImageMutex->Lock();
       // 1) copy the image buffer
       // 2) convert the distance values from m to mm
       // 3) Flip around y- axis (vertical axis)
@@ -364,7 +363,6 @@ namespace mitk
         // buffer empty
         MITK_INFO << "Buffer empty!! ";
         capturedImageSequence = this->m_ImageSequence;
-        m_ImageMutex->Unlock();
         return;
       }
       // determine position of image in buffer
@@ -396,7 +394,6 @@ namespace mitk
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
       }
 
-      m_ImageMutex->Unlock();
 
       /*
       this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], this->m_DistanceArray);

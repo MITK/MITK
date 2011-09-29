@@ -141,7 +141,9 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
 {
-  double mean, sd, rms= 0.0;
+  double mean = 0.0;
+  double sd = 0.0;
+  double rms= 0.0;
   std::vector<double> differencesVector;
   mitk::Point3D point1;
   mitk::Point3D point2;

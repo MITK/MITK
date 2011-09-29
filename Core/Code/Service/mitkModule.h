@@ -188,6 +188,7 @@ private:
   Module(const Module&);
 
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
+  void Uninit();
 
   void Start();
   void Stop();

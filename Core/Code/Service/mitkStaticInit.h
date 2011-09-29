@@ -41,8 +41,19 @@ public:
   itk::SimpleFastMutexLock mutex;
 };
 
+template<typename T>
+struct DefaultGlobalStaticDeleter
+{
+  void operator()(GlobalStatic<T>& globalStatic) const
+  {
+    delete globalStatic.pointer;
+    globalStatic.pointer = 0;
+    globalStatic.destroyed = true;
+  }
+};
+
 // Created as a function-local static to delete a GlobalStatic<T>
-template <typename T>
+template <typename T, template<typename T_> class Deleter = DefaultGlobalStaticDeleter>
 class GlobalStaticDeleter
 {
 public:
@@ -54,9 +65,8 @@ public:
 
   inline ~GlobalStaticDeleter()
   {
-    delete globalStatic.pointer;
-    globalStatic.pointer = 0;
-    globalStatic.destroyed = true;
+    Deleter<T> deleter;
+    deleter(globalStatic);
   }
 };
 
@@ -91,6 +101,31 @@ public:
         delete x;                                                        \
       else                                                               \
         static ::mitk::GlobalStaticDeleter<TYPE > cleanup(this_##NAME());\
+    }                                                                    \
+    return this_##NAME().pointer;                                        \
+  }
+
+#define MITK_GLOBAL_STATIC_WITH_DELETER(TYPE, NAME, DELETER)             \
+  MITK_GLOBAL_STATIC_INIT(TYPE, NAME)                                    \
+  static TYPE *NAME()                                                    \
+  {                                                                      \
+    if (!this_##NAME().pointer && !this_##NAME().destroyed)              \
+    {                                                                    \
+      TYPE *x = new TYPE;                                                \
+      bool ok = false;                                                   \
+      {                                                                  \
+        this_##NAME().mutex.Lock();                                      \
+        if (!this_##NAME().pointer)                                      \
+        {                                                                \
+          this_##NAME().pointer = x;                                     \
+          ok = true;                                                     \
+        }                                                                \
+        this_##NAME().mutex.Unlock();                                    \
+      }                                                                  \
+      if (!ok)                                                           \
+        delete x;                                                        \
+      else                                                               \
+        static ::mitk::GlobalStaticDeleter<TYPE, DELETER > cleanup(this_##NAME());\
     }                                                                    \
     return this_##NAME().pointer;                                        \
   }

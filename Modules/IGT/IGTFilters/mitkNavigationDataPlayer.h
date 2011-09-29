@@ -177,6 +177,8 @@ namespace mitk {
 
     std::istream* m_Stream; ///< stores a pointer to the input stream
 
+    bool m_StreamSetOutsideFromClass; ///< stores if the stream was created in this class and must be deleted in the end
+
     PlayerMode m_PlayerMode; ///< stores the mode for the presetted PlayerMode sieh enum PlayerMode
 
     std::string m_FileName; ///< stores the filename

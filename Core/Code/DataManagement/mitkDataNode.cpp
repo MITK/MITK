@@ -551,23 +551,3 @@ void mitk::DataNode::PropertyListModified( const itk::Object* /*caller*/, const 
   Modified();
 }
 
-#ifndef _MSC_VER
-template <typename T>
-bool mitk::DataNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer) const
-{
-  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer) );
-  if ( gp != NULL )
-  {
-    value = gp->GetValue();
-    return true;
-  }
-  return false;
-}
-
-template bool mitk::DataNode::GetPropertyValue<double>(char const*, double&, mitk::BaseRenderer*) const;
-template bool mitk::DataNode::GetPropertyValue<float>(char const*, float&, mitk::BaseRenderer*) const;
-template bool mitk::DataNode::GetPropertyValue<int>(char const*, int&, mitk::BaseRenderer*) const;
-template bool mitk::DataNode::GetPropertyValue<bool>(char const*, bool&, mitk::BaseRenderer*) const;
-
-#endif
-

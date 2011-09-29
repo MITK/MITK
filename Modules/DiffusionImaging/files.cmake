@@ -80,6 +80,7 @@ SET(CPP_FILES
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
+  Rendering/mitkFiberBundleMapper2D.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
@@ -96,6 +97,7 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
+  Rendering/mitkFiberBundleMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h

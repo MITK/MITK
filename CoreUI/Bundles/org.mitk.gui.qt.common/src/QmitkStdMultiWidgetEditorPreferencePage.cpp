@@ -70,12 +70,12 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   // 0: Level / Window, 1: Window Bounds
   m_IntensityRangeType->setCurrentIndex(0);
   QString intensityRangeTypeToolTip =
-		  "Affects how you can control the displayed intensity\n"
-		  "range of the current image. If set to \"Level / Window\",\n"
-		  "the two fields in the bottom-right corner of the display\n"
-		  "will set the level and window values, respectively.\n"
-		  "Otherwise, the fields set the lower and the upper\n"
-		  "window bound.";
+        "Affects how you can control the displayed intensity\n"
+        "range of the current image. If set to \"Level / Window\",\n"
+        "the two fields in the bottom-right corner of the display\n"
+        "will set the level and window values, respectively.\n"
+        "Otherwise, the fields set the lower and the upper\n"
+        "window bound.";
   intensityRangeTypeLabel->setToolTip(intensityRangeTypeToolTip);
   m_IntensityRangeType->setToolTip(intensityRangeTypeToolTip);
   formLayout->addRow(intensityRangeTypeLabel, m_IntensityRangeType);
@@ -83,10 +83,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   QLabel* exponentialFormatLabel = new QLabel("Display values in exponential format:");
   m_ExponentialFormat = new QCheckBox;
   QString exponentialFormatToolTip =
-		  "If checked, the intensity value at the crosshair will\n"
-		  "be displayed in exponential format on the status bar.\n"
-		  "The intensity range control will accept and display\n"
-		  "values in exponential format as well.";
+        "If checked, the intensity value at the crosshair will\n"
+        "be displayed in exponential format on the status bar.\n"
+        "The intensity range control will accept and display\n"
+        "values in exponential format as well.";
   exponentialFormatLabel->setToolTip(exponentialFormatToolTip);
   m_ExponentialFormat->setToolTip(exponentialFormatToolTip);
   formLayout->addRow(exponentialFormatLabel, m_ExponentialFormat);
@@ -96,8 +96,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Precision->setMaxLength(2);
   m_Precision->setValidator(new QIntValidator);
   QString precisionToolTip =
-		  "Precision of floating point numbers shown on the status\n"
-		  "bar and in the intensity range control.";
+        "Precision of floating point numbers shown on the status\n"
+        "bar and in the intensity range control.";
   precisionLabel->setToolTip(precisionToolTip);
   m_Precision->setToolTip(precisionToolTip);
   formLayout->addRow(precisionLabel, m_Precision);

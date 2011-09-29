@@ -51,6 +51,32 @@ public:
 
     itkNewMacro( Self );
 
+    /**Documentation
+    * \brief Determines where the output is directed to
+    * 
+    * Console:    std::cout
+    * NormalFile: std::ofstream
+    * ZipFile:    Not supported yet -> std::cout
+    */
+    enum RecordingMode
+    {
+      Console,
+      NormalFile,
+      ZipFile
+    };
+
+    /**Documentation
+    * \brief Determines the output format
+    * 
+    * xml:  XML format, also default, can be read by NavigationDataPlayer
+    * csv:  use to export in excel, matlab, etc.
+    */
+	enum OutputFormatEnum
+	{
+	  xml,
+	  csv
+	};
+
     /**
     * \brief sets the file name for the OutputMode NormalFile and ZipFile
     *
@@ -77,6 +103,11 @@ public:
     itkGetMacro(Recording,bool);
 
     /**
+    * \brief Returns the recording mode
+    */
+    itkGetMacro(RecordingMode,RecordingMode);
+
+    /**
     * \brief Returns the number of data sets / frames which were recorded by the NavigationDataRecorder since start
     */
     itkGetMacro(RecordCounter,int);
@@ -90,6 +121,15 @@ public:
     * \brief Adds the input NavigationDatas
     */
     virtual void AddNavigationData(const NavigationData* nd);
+
+    ///
+    /// set an additional attribute for a specified navigation data
+    /// this will be written for each navigation data and may be
+    /// updated before calling Update()
+    ///
+    void SetAdditionalAttribute( const NavigationData* nd, const std::string& attributeName
+                                 , const std::string& attributeValue );
+    void RemoveAdditionalAttribute( const NavigationData* nd );
 
     /**Documentation
     * \brief Starts the recording with the presetted OutputMode 
@@ -112,31 +152,6 @@ public:
     */
     virtual void Update();
 
-    /**Documentation
-    * \brief Determines where the output is directed to
-    * 
-    * Console:    std::cout
-    * NormalFile: std::ofstream
-    * ZipFile:    Not supported yet -> std::cout
-    */
-    enum RecordingMode
-    {
-      Console,
-      NormalFile,
-      ZipFile
-    };
-
-    /**Documentation
-    * \brief Determines the output format
-    * 
-    * xml:  XML format, also default, can be read by NavigationDataPlayer
-    * csv:  use to export in excel, matlab, etc.
-    */
-	enum OutputFormatEnum
-	{
-	  xml,
-	  csv
-	};
 
     /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
@@ -168,6 +183,8 @@ protected:
 
     std::ostream* m_Stream; ///< the output stream
 
+    bool m_StreamMustBeDeleted;
+
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 
   	OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat
@@ -185,6 +202,8 @@ protected:
     mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag in output xml file
 
     bool m_DoNotOverwriteFiles; ///< do not overwrite any files if true
+
+    std::map<const mitk::NavigationData*, std::pair<std::string, std::string> > m_AdditionalAttributes;
 
 };
 

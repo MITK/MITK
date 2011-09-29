@@ -43,6 +43,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_RecordCounter = 0;
   m_RecordCountLimit = -1;
   m_DoNotOverwriteFiles = false;
+  m_StreamMustBeDeleted = false;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -191,7 +192,15 @@ void mitk::NavigationDataRecorder::Update()
             elem->SetAttribute("hP",1);
           else
             elem->SetAttribute("hP",0);
-          
+
+          // set additional attribute?
+          std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+              it = m_AdditionalAttributes.find( nd );
+          if( it != m_AdditionalAttributes.end() )
+          {
+            elem->SetAttribute(it->second.first, it->second.second);
+          }
+
           *m_Stream << "        " << *elem << std::endl;
 
           delete elem;
@@ -209,6 +218,30 @@ void mitk::NavigationDataRecorder::Update()
   }
   m_RecordCounter++;
   if ((m_RecordCountLimit<=m_RecordCounter)&&(m_RecordCountLimit != -1)) {StopRecording();}
+}
+
+void mitk::NavigationDataRecorder::SetAdditionalAttribute(const NavigationData* nd,
+                                                          const std::string& attributeName
+                             , const std::string& attributeValue )
+{
+   std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+       it = m_AdditionalAttributes.find( nd );
+  if( it == m_AdditionalAttributes.end() )
+    m_AdditionalAttributes[nd] = std::pair<std::string, std::string>(attributeName, attributeValue);
+  else
+  {
+    it->second.first = attributeName;
+    it->second.second = attributeValue;
+  }
+
+}
+
+void mitk::NavigationDataRecorder::RemoveAdditionalAttribute( const NavigationData* nd )
+{
+  std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+      it = m_AdditionalAttributes.find( nd );
+ if( it != m_AdditionalAttributes.end() )
+   m_AdditionalAttributes.erase(it);
 }
 
 void mitk::NavigationDataRecorder::StartRecording()
@@ -272,6 +305,8 @@ void mitk::NavigationDataRecorder::StartRecording()
         stream = &std::cout;
         break;
     }
+    m_Stream = stream;
+    m_StreamMustBeDeleted = true;
     m_firstLine = true;
     m_RecordCounter = 0;
     StartRecording(stream);
@@ -321,5 +356,10 @@ void mitk::NavigationDataRecorder::StopRecording()
   m_NumberOfRecordedFiles++;
   m_Recording = false;
   m_Stream->flush();
+  if (m_StreamMustBeDeleted) //stream must only be deleted if it was created inside this class
+    {
+    m_StreamMustBeDeleted = false;
+    delete m_Stream;
+    }
   m_Stream = NULL;   
 }

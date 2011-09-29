@@ -63,7 +63,7 @@ namespace mitk {
 
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class  MitkDiffusionImaging_EXPORT FiberBundle : public BaseData
+  class MitkDiffusionImaging_EXPORT FiberBundle : public BaseData
   {
   public:
 

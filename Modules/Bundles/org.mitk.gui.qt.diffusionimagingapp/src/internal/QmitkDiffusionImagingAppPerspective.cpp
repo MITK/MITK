@@ -39,10 +39,6 @@ void QmitkDiffusionImagingAppPerspective::CreateInitialLayout(berry::IPageLayout
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
     false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
 
-  left->AddView("org.mitk.views.masterview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.masterview");
-  lo->SetCloseable(false);
-
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////

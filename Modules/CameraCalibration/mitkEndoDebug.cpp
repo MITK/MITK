@@ -2,6 +2,9 @@
 #include <itksys/SystemTools.hxx>
 #include <itkFastMutexLock.h>
 #include <itkMutexLockHolder.h>
+#include <fstream>  
+#include <ctime>
+#include <cstdio>
 
 namespace mitk
 {
@@ -21,6 +24,7 @@ namespace mitk
     bool m_DebugEnabled;
     bool m_ShowImagesInDebug;
     size_t m_ShowImagesTimeOut;
+    std::ofstream m_Stream;
     itk::FastMutexLock::Pointer m_Mutex;
   };
 
@@ -32,6 +36,8 @@ namespace mitk
 
   EndoDebug::~EndoDebug()
   {
+    if(d->m_Stream.is_open())
+      d->m_Stream.close();
     delete d;
   }
 
@@ -168,6 +174,34 @@ namespace mitk
     {
       itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
       return d->m_ShowImagesTimeOut;
+    }
+  }
+  
+  void EndoDebug::SetLogFile( const std::string& file )
+  {
+    {
+      itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
+      d->m_Stream.open ( file.c_str(), std::ios::out | std::ios::app);
+    }
+  }
+
+  void EndoDebug::ShowMessage( const std::string& message )
+  {
+    {
+      itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
+      if(d->m_Stream.is_open())
+      {    
+        char *timestr;
+        struct tm *newtime;
+        time_t aclock;
+        time(&aclock);
+        newtime = localtime(&aclock);
+        timestr = asctime(newtime);
+        
+        d->m_Stream << timestr << ", " << message;
+      }
+      else
+        std::cout << message  << std::flush;
     }
   }
 }

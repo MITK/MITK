@@ -815,7 +815,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
     //TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
     //remove the VTK interaction
-    this->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+    this->GetVtkRenderer()->GetRenderWindow()->GetInteractor()->Disable();
   }
   return true;
 }

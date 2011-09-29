@@ -44,6 +44,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
+
   if (input == NULL)
   {
     itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
@@ -54,10 +55,6 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
     itkWarningMacro( << "Sorry, filename has not been set!" )
     return ;
   }
-
-
-
-  itk::Image<char,3>::Pointer img = input->GetImage();
 
 
   char keybuffer[512];
@@ -77,13 +74,19 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 
     std::cout << valbuffer << std::endl;
 
-    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+    //input->GetImage()->GetMetaDataDictionary();
+
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+
     it++;
     ++i;
   }
 
-  typedef itk::Image<char,3> ImageType;
+  std::string structure = input->GetStructure();
+  itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(), "structure", structure);
 
+  typedef itk::Image<char,3> ImageType;
+  ImageType::Pointer img = input->GetImage();
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   io->SetFileType( itk::ImageIOBase::Binary );

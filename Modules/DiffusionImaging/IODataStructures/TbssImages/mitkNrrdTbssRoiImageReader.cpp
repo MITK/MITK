@@ -72,7 +72,7 @@ namespace mitk
       if ( m_FileName == "" )
       {
         itkWarningMacro( << "Filename is empty!" )
-        return ;
+        return;
       }
 
       itk::NrrdImageIO::Pointer imageIO = itk::NrrdImageIO::New();
@@ -186,8 +186,12 @@ namespace mitk
 
         img = reader->GetOutput();
 
+        static_cast<OutputType*>(this->GetOutput())->SetImage(img);
+
         itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
         ReadRoiInfo(imgMetaDictionary);
+
+
 
       }
 

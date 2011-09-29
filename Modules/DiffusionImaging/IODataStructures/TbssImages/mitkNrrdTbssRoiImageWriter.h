@@ -36,6 +36,8 @@ class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWrit
 {
 public:
 
+    typedef itk::Image<char,3>     ImageType;
+
     mitkClassMacro( NrrdTbssRoiImageWriter, mitk::FileWriterWithInformation )
 
     mitkWriterMacro

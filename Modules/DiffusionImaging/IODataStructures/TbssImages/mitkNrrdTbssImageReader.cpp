@@ -65,7 +65,6 @@ namespace mitk
     static_cast<OutputType*>(this->GetOutput())
         ->InitializeFromVectorImage();
 
-
   }
 
       void NrrdTbssImageReader
@@ -109,6 +108,7 @@ namespace mitk
           reader->SetFileName(this->m_FileName);
           itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
           reader->SetImageIO(io);
+
           reader->Update();
           img = reader->GetOutput();
         }
@@ -125,8 +125,8 @@ namespace mitk
 
 
           //int numberOfGradientImages = 0;
-          std::string name;
-          int n;
+          std::string measurementInfo;
+
           std::vector< std::pair<std::string, int> > groups;
 
           for (; itKey != imgMetaKeys.end(); itKey ++)
@@ -134,10 +134,11 @@ namespace mitk
 
 
             itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+
+            MITK_INFO << *itKey << " ---> " << metaString;
+
             if (itKey->find("Group_index") != std::string::npos)
             {
-
-              MITK_INFO << *itKey << " ---> " << metaString;
 
               std::vector<std::string> tokens;
               this->Tokenize(metaString, tokens, " ");
@@ -157,11 +158,16 @@ namespace mitk
 
             }
 
+            else if(itKey->find("Measurement info"))
+            {
+              measurementInfo = metaString;
+            }
+
 
           }
 
           outputForCache->SetGroupInfo(groups);
-
+          outputForCache->SetMeasurementInfo(measurementInfo);
 
         }
 

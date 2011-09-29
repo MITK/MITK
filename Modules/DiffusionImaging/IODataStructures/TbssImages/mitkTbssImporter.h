@@ -47,9 +47,9 @@ namespace mitk
 
     TbssImporter(std::string path);
 
-    void SetInputPath(std::string p)
+    void SetInputFile(std::string f)
     {
-      m_InputPath = p;
+      m_File = f;
     }
 
     mitk::TbssImage::Pointer Import();
@@ -82,7 +82,7 @@ namespace mitk
 
     virtual ~TbssImporter(){}
 
-    std::string m_InputPath;
+    std::string m_File;
 
     DataImageType::Pointer m_Data;
     std::vector< std::pair<std::string, int> > m_Groups;

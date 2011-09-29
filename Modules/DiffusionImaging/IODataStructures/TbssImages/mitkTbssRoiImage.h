@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "itkImage.h"
 #include "mitkImageCast.h"
+#include "MitkDiffusionImagingExports.h"
+
 
 namespace mitk 
 {
@@ -31,7 +33,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
 
-  class TbssRoiImage : public Image
+  class MitkDiffusionImaging_EXPORT TbssRoiImage : public Image
   {
 
   public:
@@ -76,6 +78,7 @@ namespace mitk
     {
       return m_Roi;
     }
+
 
     void InitializeFromImage()
     {

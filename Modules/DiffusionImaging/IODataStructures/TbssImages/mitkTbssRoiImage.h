@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "itkImage.h"
 #include "mitkImageCast.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk 
 {
@@ -31,7 +32,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
 
-  class TbssRoiImage : public Image
+  class MitkDiffusionImaging_EXPORT TbssRoiImage : public Image
   {
 
   public:
@@ -84,9 +85,11 @@ namespace mitk
     }
 
 
-    TbssRoiImage();
+
 
   protected:
+
+    TbssRoiImage();
 
     virtual ~TbssRoiImage(){}
 
@@ -104,6 +107,7 @@ namespace mitk
 
 
   // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
+  /*
   template <typename ItkOutputImageType>
   void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssRoiImage >& tbssoutputimage)
   {
@@ -114,7 +118,7 @@ namespace mitk
     tbssoutputimage->InitializeByItk(itkimage);
     tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
   }
-
+*/
 
 
 

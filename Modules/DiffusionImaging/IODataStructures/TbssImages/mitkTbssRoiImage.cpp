@@ -27,31 +27,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-mitk::TbssRoiImage::TbssRoiImage() : m_PreprocessedFA(false)
+mitk::TbssRoiImage::TbssRoiImage()
 {
-
+  m_PreprocessedFA = false;
 }
+
 
 /*
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>::TbssImage()
-{
 
-}
-
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>::~TbssImage()
+mitk::TbssRoiImage::~TbssImage()
 {
 
 }
 
 
-template<typename TPixelType>
-void mitk::TbssImage<TPixelType>::InitializeFromImage()
+
+void mitk::TbssRoiImage::InitializeFromImage()
 {
 
 }
-
 
 */
+
 #endif /* __mitkTbssImage__cpp */

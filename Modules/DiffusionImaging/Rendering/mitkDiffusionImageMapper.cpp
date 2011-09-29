@@ -25,11 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 template<class TPixelType>
 mitk::DiffusionImageMapper<TPixelType>::DiffusionImageMapper()
 {
+  MITK_INFO << "DiffMapper init";
 }
 
 template<class TPixelType>
 mitk::DiffusionImageMapper<TPixelType>::~DiffusionImageMapper()
 {
+    MITK_INFO << "DiffMapper destroyed";
 }
 
 template<class TPixelType>

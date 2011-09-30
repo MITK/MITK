@@ -25,7 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
   FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) ),
+  m_MinRadius(0),
+  m_MaxRadius(100),
+  m_MinMaxRadiusContraintsActive(false)
 {
   // Circle has two control points
   this->ResetNumberOfControlPoints( 2 );
@@ -58,6 +61,54 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
     return true;
   }
   return false;
+}
+
+mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
+{
+  if ( this->GetGeometry2D() ==  NULL )
+  {
+    return point;
+  }
+
+  Point2D indexPoint;
+  this->GetGeometry2D()->WorldToIndex( point, indexPoint );
+
+  BoundingBox::BoundsArrayType bounds = this->GetGeometry2D()->GetBounds();
+  if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
+  if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
+  if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
+  if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
+
+  Point2D constrainedPoint;
+  this->GetGeometry2D()->IndexToWorld( indexPoint, constrainedPoint );
+
+  if(m_MinMaxRadiusContraintsActive)
+  {
+    if( index != 0)
+    {
+      const Point2D &centerPoint = this->GetControlPoint(0);
+      double euclideanDinstanceFromCenterToPoint1 = centerPoint.EuclideanDistanceTo(point);
+
+      Vector2D vectorProjectedPoint;
+      vectorProjectedPoint = point - centerPoint;
+      vectorProjectedPoint.Normalize();
+
+      if( euclideanDinstanceFromCenterToPoint1 > m_MaxRadius )
+      {
+        vectorProjectedPoint *= m_MaxRadius;
+        constrainedPoint = centerPoint;
+        constrainedPoint += vectorProjectedPoint;
+      }
+      else if( euclideanDinstanceFromCenterToPoint1 < m_MinRadius )
+      {
+        vectorProjectedPoint *= m_MinRadius;
+        constrainedPoint = centerPoint;
+        constrainedPoint += vectorProjectedPoint;
+      }
+    }
+  }
+
+  return constrainedPoint;
 }
 
 void mitk::PlanarCircle::GeneratePolyLine()

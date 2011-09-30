@@ -100,6 +100,28 @@ private:
 // ====================================================================
 // ============= WORKER WHICH IS PASSED TO THREAD =====================
 // ====================================================================
+//## Documentation
+//## This class does the actual work for colorcoding fibers.
+class QmitkFiberColoringWorker : public QObject
+{
+  Q_OBJECT
+  
+public:
+  QmitkFiberColoringWorker( QThread*, Package4WorkingThread );
+
+  public slots:
+  void run();
+  
+private:
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+  
+};
+
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
 class QmitkFiberGenerateRandomWorker : public QObject
 {
   Q_OBJECT
@@ -221,10 +243,13 @@ public:
   void AfterThread_IdGenerate();
   void BeforeThread_GenerateFibersRandom();
   void AfterThread_GenerateFibersRandom();
+  void BeforeThread_FiberColorCoding();
+  void AfterThread_FiberColorCoding();
   
   //SLOTS FOR TIMERS
   void UpdateFiberIDTimer();
   void UpdateGenerateRandomFibersTimer();
+  void UpdateColorFibersTimer();
   
   
   
@@ -256,7 +281,7 @@ private:
   mitk::Geometry3D::Pointer GenerateStandardGeometryForMITK();
   void ResetFiberInfoWidget();
   void FeedFiberInfoWidget();
-  void FBXDependendGUIElementsConfigurator(bool);
+  void FBXDependendGUIElementsConfigurator();
   
   void SetGeneratedFBX();
   
@@ -272,11 +297,12 @@ private:
   
   
   // Thread based Workers which do some processing of fibers
-  QmitkFiberIDWorker * m_FiberIDGenerator;
-  QmitkFiberGenerateRandomWorker * m_GeneratorFibersRandom;
+  QmitkFiberIDWorker* m_FiberIDGenerator;
+  QmitkFiberGenerateRandomWorker* m_GeneratorFibersRandom;
+  QmitkFiberColoringWorker* m_FiberColoringSlave;
   
-  QThread * m_hostThread;
-  QThread * m_monitorThread; 
+  QThread* m_hostThread;
+  QThread* m_monitorThread; 
   bool m_threadInProgress;
   mitk::DataNode::Pointer m_MonitorNode;
   QmitkFiberThreadMonitorWorker *m_fiberThreadMonitorWorker;

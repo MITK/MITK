@@ -73,7 +73,9 @@ namespace mitk {
     void SetFibers(vtkPolyData*); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
     vtkPolyData* GetFibers();
     vtkSmartPointer<vtkPolyData> GetVertices();
-    
+    char* getCurrentColorCoding();
+    bool isFiberBundleXModified();
+    void setFBXModificationDone();
     
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
@@ -110,8 +112,10 @@ namespace mitk {
     
     // this variable contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
-    
+    char* m_currentColorCoding;
 
+    //this flag conzerns only visual representation.
+    bool m_isModified;
     
     
   };

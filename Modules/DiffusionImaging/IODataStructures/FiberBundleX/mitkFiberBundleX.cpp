@@ -35,6 +35,8 @@ const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
 
 mitk::FiberBundleX::FiberBundleX()
+: m_currentColorCoding(NULL)
+, m_isModified(false)
 {
   /* ====== GEOMETRY IS ESSENTIAL =======
    * by default set a standard geometry, usually geometry is 
@@ -64,6 +66,7 @@ void mitk::FiberBundleX::SetFibers(vtkPolyData* fiberPD)
   }
   
   m_FiberStructureData = fiberPD;
+  m_isModified = true;
 }
 
 
@@ -220,6 +223,8 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
   
   
   m_FiberStructureData->GetPointData()->AddArray(colorsT);
+  m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+  m_isModified = true;
   
   //mini test, shall be ported to MITK TESTINGS!
   if (colorsT->GetSize() != numOfPoints*componentSize) {
@@ -283,9 +288,19 @@ double* mitk::FiberBundleX::DoComputeFiberStructureBoundingBox()
 
 
 
+char* mitk::FiberBundleX::getCurrentColorCoding()
+{
+  return m_currentColorCoding; 
+}
 
-
-
+bool mitk::FiberBundleX::isFiberBundleXModified()
+{
+  return m_isModified;
+}
+void mitk::FiberBundleX::setFBXModificationDone()
+{
+  m_isModified = false;
+}
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

@@ -83,6 +83,40 @@ void QmitkFiberIDWorker::run()
   
 }
 
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ * --do color coding--*/
+QmitkFiberColoringWorker::QmitkFiberColoringWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+: m_itemPackage(itemPackage)
+, m_hostingThread(hostingThread)
+{
+  
+}
+void QmitkFiberColoringWorker::run()
+{
+  if(m_itemPackage.st_Controls->checkBoxMonitorFiberThreads->isChecked())
+    m_itemPackage.st_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_RUNNING);
+ 
+  /* MEASUREMENTS AND FANCY GUI EFFECTS
+   * accurate time measurement using ITK timeProbe*/
+  itk::TimeProbe clock;
+  clock.Start();
+  
+  //set GUI representation of timer to 0, is essential for correct timer incrementation
+  m_itemPackage.st_Controls->infoTimerColorCoding->setText(QString::number(0)); 
+  m_itemPackage.st_FancyGUITimer1->start();
+  
+  //do processing
+  m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+  
+  /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
+  clock.Stop();
+  m_itemPackage.st_FancyGUITimer1->stop();
+  m_itemPackage.st_Controls->infoTimerColorCoding->setText( QString::number(clock.GetTotal()) );
+  delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
+  m_hostingThread->quit();
+
+}
 
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
@@ -98,7 +132,8 @@ void QmitkFiberGenerateRandomWorker::run()
   if(m_itemPackage.st_Controls->checkBoxMonitorFiberThreads->isChecked())
     m_itemPackage.st_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_RUNNING);
 
-  /* MEASUREMENTS AND FANCY GUI EFFECTS */
+  /* MEASUREMENTS AND FANCY GUI EFFECTS */   
+  //MAKE SURE by yourself THAT NOTHING ELSE THAN A NUMBER IS SET IN THAT LABEL
   m_itemPackage.st_Controls->infoTimerGenerateFiberBundle->setText(QString::number(0)); 
   m_itemPackage.st_FancyGUITimer1->start();
   
@@ -287,6 +322,10 @@ void QmitkFiberThreadMonitorWorker::setThreadStatus(QString status)
   m_itemPackage.st_MultiWidget->RequestUpdate();  
 }
 
+/* Methods to set status of running threads 
+ * Following three methods are usually called 
+ - before a thread starts and 
+ - a thread is finished or terminated */
 void QmitkFiberThreadMonitorWorker::threadForFiberProcessingStarted()
 {
   if(!m_thtimer_threadStarted->isActive())  {
@@ -328,7 +367,7 @@ void QmitkFiberThreadMonitorWorker::threadForFiberProcessingTerminated()
 }
 
 
-
+/* Helper methods for fancy fading efx for thread monitor */
 void QmitkFiberThreadMonitorWorker::fancyTextFading_threadStarted()
 {
   
@@ -771,8 +810,8 @@ void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
   ItemPackageForRandomGenerator.st_FBX = m_FiberBundleX;
   ItemPackageForRandomGenerator.st_Controls = m_Controls;
   ItemPackageForRandomGenerator.st_FancyGUITimer1 = localTimer;
-  ItemPackageForRandomGenerator.st_host = this;
-  ItemPackageForRandomGenerator.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage;
+  ItemPackageForRandomGenerator.st_host = this; //needed to access method "PutFibersToDataStorage()"
+  ItemPackageForRandomGenerator.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage; //actual functor calling method putFibersToDataStorage
   
   //set element for thread monitoring
   if (m_fiberMonitorIsOn) 
@@ -794,9 +833,18 @@ void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
   
 }
 
+void QmitkFiberBundleDeveloperView::UpdateColorFibersTimer()
+{
+  // Make sure that thread has set according info-label to number! here we do not check if value is numeric!
+  QString crntValue = m_Controls->infoTimerColorCoding->text();
+  int tmpVal = crntValue.toInt();
+  m_Controls->infoTimerColorCoding->setText(QString::number(++tmpVal));
+  m_Controls->infoTimerColorCoding->update();
+}
+
 void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
 {
-  //MAKE SURE by yourself THAT NOTHING ELSE THAN A NUMBER IS SET IN THAT LABEL
+  // Make sure that thread has set according info-label to number! here we do not check if value is numeric!
   QString crntValue = m_Controls->infoTimerGenerateFiberBundle->text();
   int tmpVal = crntValue.toInt();
   m_Controls->infoTimerGenerateFiberBundle->setText(QString::number(++tmpVal));  
@@ -899,10 +947,51 @@ void QmitkFiberBundleDeveloperView::DoColorFibers()
 {
   //
   MITK_INFO << "call fibercoloring in fiberBundleX";
+  QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+  localTimer->setInterval( 10 );
+  connect( localTimer, SIGNAL(timeout()), this, SLOT( UpdateColorFibersTimer() ) );
+  
+  // pack items which are needed by thread processing
+  struct Package4WorkingThread ItemPackageForFiberColoring;
+  ItemPackageForFiberColoring.st_FBX = m_FiberBundleX;
+  ItemPackageForFiberColoring.st_FancyGUITimer1 = localTimer;
+  ItemPackageForFiberColoring.st_Controls = m_Controls; //needed to catch up some selections and set options in GUI
+  
+  if (m_fiberMonitorIsOn) 
+    ItemPackageForFiberColoring.st_fiberThreadMonitorWorker = m_fiberThreadMonitorWorker;
+  
+  if (m_threadInProgress)
+    return; //maybe popup window saying, working thread still in progress...pls wait
+
+  m_FiberColoringSlave = new QmitkFiberColoringWorker(m_hostThread, ItemPackageForFiberColoring);
+  m_FiberColoringSlave->moveToThread(m_hostThread);
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberColorCoding()) );
+  connect(m_hostThread, SIGNAL(started()), m_FiberColoringSlave, SLOT(run()) );
+  connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_FiberColorCoding()));
+  connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_FiberColorCoding()));
+  m_hostThread->start(QThread::LowestPriority);
+  
+}
+
+void QmitkFiberBundleDeveloperView::BeforeThread_FiberColorCoding()
+{
+  m_threadInProgress = true;
+  if (m_fiberMonitorIsOn){
+    m_fiberThreadMonitorWorker->threadForFiberProcessingStarted();
+  }
 }
 
 
-
+void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
+{
+  m_threadInProgress = false;
+  if (m_fiberMonitorIsOn){
+    m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
+    m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
+  }
+  disconnect(m_hostThread, 0, 0, 0);
+  m_hostThread->disconnect();
+}
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===
  * WITHOUT, the rendering mechanism will ignore objects without valid Geometry 
@@ -1117,7 +1206,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
   
 }
 
-void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator(bool isVisible)
+void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator()
 {
   // ==== FIBER PROCESSING ELEMENTS and ALL ELEMENTS WHICH NEED A FBX DATANODE======
 //  m_Controls->buttonGenerateFiberIds->setEnabled(isVisible); moved to selectionChangedToolBox
@@ -1224,12 +1313,13 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
    */
   m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
   ResetFiberInfoWidget();
-  FBXDependendGUIElementsConfigurator(false); //every gui element which needs a FBX for processing is disabled
+  FBXDependendGUIElementsConfigurator(); //every gui element which needs a FBX for processing is disabled
   
   //timer reset only when no thread is in progress
   if (!m_threadInProgress) {
     m_Controls->infoTimerGenerateFiberIds->setText("-"); //set GUI representation of timer to -
     m_Controls->infoTimerGenerateFiberBundle->setText( "-" );
+    m_Controls->infoTimerColorCoding->setText( "-" );
   }
   //====================================================
   
@@ -1255,7 +1345,7 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
       
       
       // enable FiberBundleX related Gui Elements, such as buttons etc.
-      FBXDependendGUIElementsConfigurator(true);
+      FBXDependendGUIElementsConfigurator();
       
     }
     

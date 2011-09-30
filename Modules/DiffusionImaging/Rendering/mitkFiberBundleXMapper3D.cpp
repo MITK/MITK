@@ -109,8 +109,13 @@ void mitk::FiberBundleXMapper3D::GenerateData()
   m_FiberActorSP->GetProperty()->SetOpacity(1.0);
   //  m_FiberActorWP->GetProperty()->SetOpacity(1.0);
   
+  if (FBX->getCurrentColorCoding() != NULL)
+      m_FiberMapperGLSP->SelectColorArray(FBX->getCurrentColorCoding());
+  
   m_FiberAssembly->AddPart(m_FiberActorSP);
   
+  //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.
+  FBX->setFBXModificationDone();
   //====timer measurement========
   MITK_INFO << "Execution Time GenerateData() (nmiliseconds): " << myTimer.elapsed();
   //=============================
@@ -121,8 +126,16 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
+  if ( !this->IsVisible( renderer ) )
+  {
+    return;
+  }
+  
   //MITK_INFO << "FiberBundleXxXXMapper3D()DataForRenderer";
   //ToDo do update checks
+  mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
+  if(FBX->isFiberBundleXModified())
+    this->GenerateData();
 }
 
 

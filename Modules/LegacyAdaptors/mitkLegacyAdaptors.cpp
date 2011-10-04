@@ -7,21 +7,18 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
 
   const mitk::ImageDescriptor::Pointer imDesc = refImg->GetImageDescriptor();
 
+  // initialize dimension information
+  for (unsigned int i=0; i<8; i++)
+  {
+      picDesc->n[i] = 1;
+  }
+
   // set dimension information
   picDesc->dim = refImg->GetDimension();
   memcpy( picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int) );
 
-  if( refImg->IsValidChannel(0) )
-  {
-    // set pixel type
-    picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
-    picDesc->data = refImg->GetChannelData(0);
-  }
-  else
-  {
-    picDesc->type = mitkIpPicUnknown;
-    picDesc->data = NULL;
-  }
+  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
+  picDesc->data = refImg->GetData();
 
   return picDesc;
 }

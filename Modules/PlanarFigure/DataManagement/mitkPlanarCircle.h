@@ -62,7 +62,38 @@ public:
     return 2;
   }
 
+  /** \brief Sets the minimum radius
+  */
+  void SetMinimumRadius( double radius )
+  {
+      m_MinRadius = radius;
+  }
 
+  /** \brief Gets the minimum radius
+  */
+  double GetMinimumRadius()
+  {
+      return m_MinRadius;
+  }
+
+  /** \brief Sets the maximum radius
+  */
+  void SetMaximumRadius( double radius )
+  {
+      m_MaxRadius = radius;
+  }
+
+  /** \brief Gets the minimum radius
+  */
+  double GetMaximumRadius()
+  {
+      return m_MaxRadius;
+  }
+
+  void ActivateMinMaxRadiusContstraints( bool active )
+  {
+      m_MinMaxRadiusContraintsActive = active;
+  }
   
 protected:
   PlanarCircle();
@@ -74,6 +105,9 @@ protected:
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
   virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
 
+  /** \brief Spatially constrain control points of second (orthogonal) line */
+  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
+
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal();
 
@@ -84,6 +118,11 @@ protected:
   const unsigned int FEATURE_ID_RADIUS;
   const unsigned int FEATURE_ID_DIAMETER;
   const unsigned int FEATURE_ID_AREA;
+
+  //Member variables:
+  double m_MinRadius;
+  double m_MaxRadius;
+  bool m_MinMaxRadiusContraintsActive;
 
 private:
 

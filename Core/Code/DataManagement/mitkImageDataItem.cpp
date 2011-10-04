@@ -106,6 +106,10 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
 {
   m_PixelType = new mitk::PixelType(type);
 
+  m_Dimension = dimension;
+  for( unsigned int i=0; i<m_Dimension; i++)
+    m_Dimensions[i] = dimensions[i];
+
   this->ComputeItemSize(dimensions, dimension);
 
   if(m_Data == NULL)
@@ -137,10 +141,6 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
 
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
-  std::cout << m_PixelType->GetSize() << ",typeid "
-            << m_PixelType->GetItkTypeAsString() << ",name "
-            << m_PixelType->GetTypeId().name() << std::endl;
-
   vtkImageData *inData = vtkImageData::New();
   vtkDataArray *scalars = NULL;
 

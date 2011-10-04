@@ -384,7 +384,10 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
   m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
   m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png")),
   m_CurrentSelection(0),
-  m_CurrentPickingNode(0)
+  m_CurrentPickingNode(0),
+  m_GlyIsOn_S(false),
+  m_GlyIsOn_C(false),
+  m_GlyIsOn_T(false)
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;

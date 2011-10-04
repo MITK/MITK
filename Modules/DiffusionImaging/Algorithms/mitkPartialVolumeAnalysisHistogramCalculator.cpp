@@ -611,7 +611,8 @@ namespace mitk
     planegeo3D->WorldToIndex(orig,corrorig);
     corrorig[0] += 0.5/upsamp;
     corrorig[1] += 0.5/upsamp;
-    corrorig[2] -= (float)m_PlanarFigureThickness/upsamp; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
+    if(m_PlanarFigureThickness)
+      corrorig[2] -= 0.5/upsamp+(float)m_PlanarFigureThickness; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
     planegeo3D->IndexToWorld(corrorig,corrorig);
     resampler->SetOutputOrigin(corrorig );
 

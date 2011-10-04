@@ -55,18 +55,18 @@ namespace mitk {
       vtkFloatingPointType vp_original[ 3 ], vnormal_original[ 3 ];
       mitk::Vector2D size, origin;
 
-      bool Equals(OdfDisplayGeometry* other)
+      bool Equals(OdfDisplayGeometry other)
       {
-        return other->vp_original[0] == vp[0] &&
-        other->vp_original[1] == vp[1] &&
-        other->vp_original[2] == vp[2] &&
-        other->vnormal_original[0] == vnormal[0] &&
-        other->vnormal_original[1] == vnormal[1] &&
-        other->vnormal_original[2] == vnormal[2] &&
-        other->size[0] == size[0] &&
-        other->size[1] == size[1] &&
-        other->origin[0] == origin[0] &&
-        other->origin[1] == origin[1];
+        return other.vp_original[0] == vp[0] &&
+        other.vp_original[1] == vp[1] &&
+        other.vp_original[2] == vp[2] &&
+        other.vnormal_original[0] == vnormal[0] &&
+        other.vnormal_original[1] == vnormal[1] &&
+        other.vnormal_original[2] == vnormal[2] &&
+        other.size[0] == size[0] &&
+        other.size[1] == size[1] &&
+        other.origin[0] == origin[0] &&
+        other.origin[1] == origin[1];
       }
     };
 
@@ -85,13 +85,13 @@ namespace mitk {
 
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
     
-    OdfDisplayGeometry* MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
+    OdfDisplayGeometry MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
     void AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo );
     void AdaptOdfScalingToImageSpacing( int index );
     void SetRendererLightSources( mitk::BaseRenderer *renderer );
     void ApplyPropertySettings();
     virtual void Slice(mitk::BaseRenderer* renderer,
-      OdfDisplayGeometry* dispGeo);
+      OdfDisplayGeometry dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -144,7 +144,7 @@ namespace mitk {
 
     mitk::Image* GetInput();
 
-    OdfDisplayGeometry* m_LastDisplayGeometry;
+    OdfDisplayGeometry m_LastDisplayGeometry;
   };
 
 } // namespace mitk

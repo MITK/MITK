@@ -690,7 +690,7 @@ bool mitk::VolumeDataVtkMapper3D::SetMask(const mitk::Image* mask)
 {
   if (this->m_Mask)
   {
-    if (mask->GetPixelType() == PixelType(typeid(unsigned char)))
+    if (mask->GetPixelType().GetPixelTypeId() == typeid(unsigned char))
     {
       Image *img = const_cast<Image*>(mask);
 

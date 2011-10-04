@@ -142,7 +142,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
         //  temporarySlice = ImportItkImage( correctPixelTypeImage );
           CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-          mitkIpPicDescriptor* workingPicSlice = temporarySlice->GetSliceData()->GetPicDescriptor();
+          mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
+          CastToIpPicDescriptor(temporarySlice, workingPicSlice);
          
           int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 
@@ -163,7 +164,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
             {
               MITK_INFO << "OnMousePressed: got reference slice" << std::endl;
 
-              m_OriginalPicSlice = m_ReferenceSlice->GetSliceData()->GetPicDescriptor();
+              m_OriginalPicSlice = mitkIpPicNew();
+              CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
 
               // 3.1. Switch depending on the pixel value
               if (inside)

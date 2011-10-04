@@ -91,7 +91,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
   picStrainRate = mitkIpPicNew();
   picStrainRate->dim=3;
   picStrainRate->bpe  = output->GetPixelType().GetBpe();
-  picStrainRate->type = output->GetPixelType().GetType();
+  //picStrainRate->type = output->GetPixelType().GetType();
   picStrainRate->n[0] = output->GetDimension(0);
   picStrainRate->n[1] = output->GetDimension(1);
   picStrainRate->n[2] = output->GetDimension(2);

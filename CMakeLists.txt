@@ -281,7 +281,8 @@ option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
 mark_as_advanced(USE_ITKZLIB)
 
 if(NOT MITK_FAST_TESTING)
-  if(DEFINED MITK_CTEST_SCRIPT_MODE AND MITK_CTEST_SCRIPT_MODE STREQUAL "continuous")
+  if(DEFINED MITK_CTEST_SCRIPT_MODE 
+      AND (MITK_CTEST_SCRIPT_MODE STREQUAL "continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "experimental") )
     set(MITK_FAST_TESTING 1)
   endif()
 endif()

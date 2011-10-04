@@ -58,9 +58,9 @@ BoundingObjectCutter::~BoundingObjectCutter()
 {
 }
 
-const std::type_info& BoundingObjectCutter::GetOutputPixelType() 
+const mitk::PixelType BoundingObjectCutter::GetOutputPixelType()
 {
-  return *this->GetInput()->GetPixelType().GetTypeId();
+  return this->GetInput()->GetPixelType();
 }
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()

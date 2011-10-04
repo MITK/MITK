@@ -201,10 +201,11 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
       dim0 = 1; dim1 = 2; break;
   }
 
-  mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
+  //mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
+  unsigned char* rawSlice = (const_cast<Image*>(sliceDiff)->GetChannelDescriptor(0)).GetData();
   if (!rawSlice) return;
 
-  AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice->data) );
+  AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice) );
   
   //PrintStatus();
   

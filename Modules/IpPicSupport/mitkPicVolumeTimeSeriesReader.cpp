@@ -73,7 +73,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     header->dim = 4;
     header->n[ 3 ] = m_MatchedFileNames.size();
 
-    output->Initialize( header );
+    output->Initialize( CastToImageDescriptor( header) );
 
     mitkIpPicFree( header );
 
@@ -128,7 +128,8 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
         // \todo use memory of Image as in PicFileReader (or integrate everything into the PicFileReader!)
         PicFileReader::ConvertHandedness(volume3d);
         bool result;
-        result = output->SetPicVolume( volume3d, t );
+        // FIXME
+        //result = output->SetPicVolume( volume3d, t );
         if(result==false)
         {
           ::itk::OStringStream message;

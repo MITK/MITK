@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkRegionGrowingTool_h_Included
 
 #include "mitkFeedbackContourTool.h"
+#include "mitkLegacyAdaptors.h"
 #include "MitkExtExports.h"
 
 struct mitkIpPicDescriptor;

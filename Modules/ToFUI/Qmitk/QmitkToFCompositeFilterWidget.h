@@ -104,11 +104,11 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     /*!
     \brief slot updating the parameter "domain sigma" of the bilateral filter in the ToFCompositeFilter
     */
-    void OnBilateralFilterDomainSigmaSpinBoxValueChanged(int value);
+    void OnBilateralFilterDomainSigmaSpinBoxValueChanged(double value);
     /*!
     \brief slot updating the paramter "range sigma" of the bilateral filter in the ToFCompositeFilter
     */
-    void OnBilateralFilterRangeSigmaSpinBoxValueChanged(int value);
+    void OnBilateralFilterRangeSigmaSpinBoxValueChanged(double value);
     /*!
     \brief slot updating the paramter "kernel radius" of the bilateral filter in the ToFCompositeFilter
     */

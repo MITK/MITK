@@ -187,7 +187,7 @@ void mitk::ToFCompositeFilter::ProcessThresholdFilter(IplImage* inputIplImage, i
   }
 }
 
-ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage, int domainSigma, int rangeSigma, int kernelRadius) 
+ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage, double domainSigma, double rangeSigma, int kernelRadius)
 {
   ItkImageType2D::Pointer outputItkImage;
   BilateralFilterType::Pointer bilateralFilter = BilateralFilterType::New();
@@ -200,7 +200,7 @@ ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkI
   return outputItkImage;
 }
 
-void mitk::ToFCompositeFilter::ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage, int domainSigma, int rangeSigma, int kernelRadius) 
+void mitk::ToFCompositeFilter::ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage, double domainSigma, double rangeSigma, int kernelRadius)
 {
   int diameter = kernelRadius;
   double sigmaColor = rangeSigma;
@@ -394,7 +394,7 @@ void mitk::ToFCompositeFilter::SetThresholdFilterParameter(int min, int max)
   this->m_ThresholdFilterMax = max;
 }
 
-void mitk::ToFCompositeFilter::SetBilateralFilterParameter(int domainSigma, int rangeSigma, int kernelRadius = 0)
+void mitk::ToFCompositeFilter::SetBilateralFilterParameter(double domainSigma, double rangeSigma, int kernelRadius = 0)
 {
   this->m_BilateralFilterDomainSigma = domainSigma;
   this->m_BilateralFilterRangeSigma = rangeSigma;

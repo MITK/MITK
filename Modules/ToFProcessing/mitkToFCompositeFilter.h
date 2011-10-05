@@ -139,7 +139,7 @@ namespace mitk
     \param rangeSigma Parameter controlling the edge preserving effect of the bilateral filter. Default value: 60
     \param kernelRadius radius of the filter mask of the bilateral filter
     */
-    void SetBilateralFilterParameter(int domainSigma, int rangeSigma, int kernelRadius);
+    void SetBilateralFilterParameter(double domainSigma, double rangeSigma, int kernelRadius);
 
   protected:
     /*!
@@ -179,7 +179,7 @@ namespace mitk
     \param rangeSigma parameter controlling the edge preserving effect of the filter
     \param kernelRadius radius of the filter mask of the bilateral filter
     */
-    ItkImageType2D::Pointer ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage, int domainSigma, int rangeSigma, int kernelRadius);
+    ItkImageType2D::Pointer ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage, double domainSigma, double rangeSigma, int kernelRadius);
     /*!
     \brief Applies the OpenCV bilateral filter to the input image.
     See http://opencv.willowgarage.com/documentation/c/image_filtering.html#smooth for more details
@@ -187,7 +187,7 @@ namespace mitk
     \param rangeSigma parameter controlling the edge preserving effect of the filter
     \param kernelRadius radius of the filter mask of the bilateral filter
     */
-    void ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage, int domainSigma, int rangeSigma, int kernelRadius);
+    void ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage, double domainSigma, double rangeSigma, int kernelRadius);
     /*!
     \brief Applies the OpenCV median filter to the input image.
     See http://opencv.willowgarage.com/documentation/c/image_filtering.html#smooth for more details
@@ -232,8 +232,8 @@ namespace mitk
     int m_TemporalMedianFilterNumOfFrames; ///< Number of frames to be used in the calculation of the temporal median
     int m_ThresholdFilterMin; ///< Lower threshold of the threshold filter. Pixels with values below will be assigned value 0 when applying the threshold filter
     int m_ThresholdFilterMax; ///< Lower threshold of the threshold filter. Pixels with values above will be assigned value 0 when applying the threshold filter
-    int m_BilateralFilterDomainSigma; ///< Parameter of the bilateral filter controlling the smoothing effect of the filter. Default value: 2
-    int m_BilateralFilterRangeSigma; ///< Parameter of the bilateral filter controlling the edge preserving effect of the filter. Default value: 60
+    double m_BilateralFilterDomainSigma; ///< Parameter of the bilateral filter controlling the smoothing effect of the filter. Default value: 2
+    double m_BilateralFilterRangeSigma; ///< Parameter of the bilateral filter controlling the edge preserving effect of the filter. Default value: 60
     int m_BilateralFilterKernelRadius; ///< Kernel radius of the bilateral filter mask
 
   };

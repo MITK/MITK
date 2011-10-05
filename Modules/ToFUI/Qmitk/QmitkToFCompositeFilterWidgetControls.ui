@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
-    <height>142</height>
+    <width>597</width>
+    <height>166</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -150,30 +150,10 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="QSpinBox" name="m_BilateralFilterDomainSigmaSpinBox">
-     <property name="maximum">
-      <number>99</number>
-     </property>
-     <property name="value">
-      <number>2</number>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="3">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Range σ:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="4">
-    <widget class="QSpinBox" name="m_BilateralFilterRangeSigmaSpinBox">
-     <property name="maximum">
-      <number>99</number>
-     </property>
-     <property name="value">
-      <number>60</number>
      </property>
     </widget>
    </item>
@@ -197,6 +177,20 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="2">
+    <widget class="QDoubleSpinBox" name="m_BilateralFilterDomainSigmaSpinBox">
+     <property name="value">
+      <double>2.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="4">
+    <widget class="QDoubleSpinBox" name="m_BilateralFilterRangeSigmaSpinBox">
+     <property name="value">
+      <double>60.000000000000000</double>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -207,8 +201,6 @@
    <header location="global">qxtspanslider.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/QmitkToFUtilWidget.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

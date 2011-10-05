@@ -603,6 +603,7 @@ namespace mitk
     size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
     size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
+    MITK_INFO << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
 
     // Origin
@@ -612,7 +613,12 @@ namespace mitk
     corrorig[0] += 0.5/upsamp;
     corrorig[1] += 0.5/upsamp;
     if(m_PlanarFigureThickness)
-      corrorig[2] -= 0.5/upsamp+(float)m_PlanarFigureThickness; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
+    {
+      float thickyyy = m_PlanarFigureThickness;
+      thickyyy/=upsamp;
+      MITK_INFO << "setting origin2-="<<thickyyy << " (before " << corrorig[2] << ")";
+      corrorig[2] -= thickyyy; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
+    }
     planegeo3D->IndexToWorld(corrorig,corrorig);
     resampler->SetOutputOrigin(corrorig );
 
@@ -676,6 +682,12 @@ namespace mitk
     MITK_INFO << "Resampling requested image plane ... ";
     resampler->Update();
     MITK_INFO << " ... done";
+
+    typedef itk::ImageFileWriter< FloatImageType >  WriterType;
+    typename WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName( "/home/fritzsck/Desktop/mask.nrrd" );
+    writer->SetInput( resampler->GetOutput() );
+    writer->Update();
 
     if(additionalIndex < 0)
     {
@@ -1040,6 +1052,7 @@ namespace mitk
       // further due to a bug in vtkPolyDataToImageStencil
       if ( !imageGeometry3D->IsInside( point3D ) )
       {
+        MITK_INFO << point3D << " not inside resampled image plane.. :(";
         outOfBounds = true;
       }
 
@@ -1131,12 +1144,6 @@ namespace mitk
       }
       ++itmask;
     }
-
-//    typedef itk::ImageFileWriter< MaskImage3DType >  WriterType;
-//    WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName( "/home/fritzsck/Desktop/mask.nrrd" );
-//    writer->SetInput( m_InternalImageMask3D );
-//    writer->Update();
 
     itmask = itmask.Begin();
     itk::ImageRegionIterator<ImageType>

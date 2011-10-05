@@ -108,6 +108,10 @@ SET(H_FILES
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
+  Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
+  Reconstruction/itkRegularizedIVIMLocalVariationImageFilter.h
+  Reconstruction/itkRegularizedIVIMReconstructionFilter.h
+  Reconstruction/itkRegularizedIVIMReconstructionSingleIteration.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h

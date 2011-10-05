@@ -40,7 +40,8 @@ const std::string QmitkIVIMView::VIEW_ID = "org.mitk.views.ivim";
 QmitkIVIMView::QmitkIVIMView()
   : QmitkFunctionality()
   , m_Controls( 0 )
-  , m_MultiWidget( NULL )
+  , m_MultiWidget( NULL ),
+    m_Active(false)
 {
 }
 
@@ -50,6 +51,7 @@ QmitkIVIMView::~QmitkIVIMView()
 
 void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
 {
+
   // build up qt view, unless already done
   if ( !m_Controls )
   {
@@ -411,9 +413,11 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
-  m_Controls->m_VisualizeResultsWidget->setVisible(false);
-  m_Controls->m_Warning->setVisible(false);
+  if(!m_Controls || !m_Active)
+    return;
 
+  m_Controls->m_FigureWidgetFrame->setVisible(false);
+  m_Controls->m_Warning->setVisible(false);
   if(!m_Controls->m_DisplayResultsCheckbox->isChecked()) return;
 
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
@@ -778,4 +782,14 @@ void QmitkIVIMView::ClipboardStatisticsButtonClicked()
   {
     QApplication::clipboard()->clear();
   }
+}
+
+void QmitkIVIMView::Activated()
+{
+  m_Active = true;
+}
+
+void QmitkIVIMView::Deactivated()
+{
+  m_Active = false;
 }

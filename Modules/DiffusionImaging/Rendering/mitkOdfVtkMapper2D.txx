@@ -825,16 +825,14 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
-  std::cout << "OdfVtkMapper2D::MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
+  //std::cout << "OdfVtkMapper2D::MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     // adapt cam pos
-    MITK_INFO << "hallo 1";
     OdfDisplayGeometry dispGeo = MeasureDisplayedGeometry( renderer);
-    MITK_INFO << "hallo 2";
     //AdaptCameraPosition(renderer, dispGeo);
 
     if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
@@ -878,10 +876,8 @@ void  mitk::OdfVtkMapper2D<T,N>
       glLightfv(GL_LIGHT7,GL_POSITION,LightPos);
 
     }
-    MITK_INFO << "HERE 3";
 
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-    MITK_INFO << "HERE 4";
 
     if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
     {
@@ -891,7 +887,6 @@ void  mitk::OdfVtkMapper2D<T,N>
       glMatrixMode( GL_MODELVIEW );
       glPopMatrix();
     }
-    MITK_INFO << "HERE 5";
 
   }
 }

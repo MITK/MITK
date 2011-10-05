@@ -5,7 +5,10 @@
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::PlaneGeometry* geometry, 
-    mitk::Image::Pointer image)
+    mitk::Image::Pointer image):
+  m_PlaneGeometry(NULL),
+  m_Geometry3D(NULL),
+  m_Image(NULL)
 {
   // initialize with meaningless slice indices
   m_MinMaxOutput.clear();
@@ -13,6 +16,26 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
   {
     m_MinMaxOutput.push_back(
         OutputType( std::numeric_limits<int>::max() , 
+                    std::numeric_limits<int>::min() ));
+  }
+
+
+  this->SetInput(geometry, image);
+}
+
+mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
+    const mitk::Geometry3D* geometry,
+    mitk::Image::Pointer image):
+  m_PlaneGeometry(NULL),
+  m_Geometry3D(NULL),
+  m_Image(NULL)
+{
+  // initialize with meaningless slice indices
+  m_MinMaxOutput.clear();
+  for(int i = 0; i < 3; i++)
+  {
+    m_MinMaxOutput.push_back(
+        OutputType( std::numeric_limits<int>::max() ,
                     std::numeric_limits<int>::min() ));
   }
 
@@ -33,6 +56,20 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
   {
     this->m_PlaneGeometry = geometry;
     this->m_Image = image;
+    this->m_Geometry3D = NULL;        //Not possible to set both
+  }
+}
+
+void
+mitk::ClippedSurfaceBoundsCalculator::SetInput(
+    const mitk::Geometry3D* geometry,
+    mitk::Image* image)
+{
+  if(geometry && image)
+  {
+    this->m_Geometry3D = geometry;
+    this->m_Image = image;
+    this->m_PlaneGeometry = NULL;     //Not possible to set both
   }
 }
 
@@ -56,15 +93,31 @@ mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
 
 void mitk::ClippedSurfaceBoundsCalculator::Update()
 {
-  // SEE HEADER DOCUMENTATION for explanation
-
-  typedef std::vector< std::pair<mitk::Point3D, mitk::Point3D> > EdgesVector;
-
   this->m_MinMaxOutput.clear();
   for(int i = 0; i < 3; i++)
   {
     this->m_MinMaxOutput.push_back(OutputType( std::numeric_limits<int>::max() , std::numeric_limits<int>::min() ));
   }
+
+  if(m_PlaneGeometry.IsNotNull())
+  {
+    this->CalculateIntersectionPoints(m_PlaneGeometry);
+  }
+  else if(m_Geometry3D.IsNotNull())
+  {
+    // go through all slices of the image, ...
+    const mitk::SlicedGeometry3D* slicedGeometry3D = dynamic_cast<const mitk::SlicedGeometry3D*>( m_Geometry3D.GetPointer() );
+    int allSlices = slicedGeometry3D->GetSlices();
+    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(0)));
+    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(allSlices-1)));
+  }
+}
+
+void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mitk::PlaneGeometry* geometry)
+{
+  // SEE HEADER DOCUMENTATION for explanation
+
+  typedef std::vector< std::pair<mitk::Point3D, mitk::Point3D> > EdgesVector;
 
   Point3D origin;
   Vector3D xDirection, yDirection, zDirection;
@@ -181,7 +234,7 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     bool isIntersectionPointOnLine;
     Vector3D lineVector = line.GetPoint1() - line.GetPoint2();
     if(lineVector[0] == 0 && lineVector[1] == 0 && lineVector[2] == 0
-        && m_PlaneGeometry->IsOnPlane(line.GetPoint1()))
+        && geometry->IsOnPlane(line.GetPoint1()))
     {
       t = 1.0;
       isIntersectionPointOnLine = true;
@@ -189,8 +242,8 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     }
     else
     {
-      m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);
-      isIntersectionPointOnLine = m_PlaneGeometry->IntersectionPointParam(line, t);
+      geometry->IntersectionPoint(line, intersectionWorldPoint);
+      isIntersectionPointOnLine = geometry->IntersectionPointParam(line, t);
     }
 
     mitk::Point3D intersectionIndexPoint;

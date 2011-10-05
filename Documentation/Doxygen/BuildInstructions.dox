@@ -158,6 +158,6 @@ ccmake -DITK_DIR:PATH=/opt/ITK-release ../MITK
 or add them in the CMake GUI by pressing "Add Entry" (before pressing "Configure" the first time).
 
 See the following link for more information about how to configure third-party libraries:
-\ref BuildToolkits "How to build ITK, VTK and QT"
+\subpage BuildToolkits "How to build ITK, VTK and QT"
 
 */

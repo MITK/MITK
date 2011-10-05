@@ -24,10 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkMatrixConvert.h"
 #include "mitkGeometry3D.h"
-#include "mitkOdfNormalizationMethodProperty.h" 
-#include "mitkOdfScaleByProperty.h" 
-#include "mitkProperties.h" 
-#include "mitkTensorImage.h" 
+#include "mitkOdfNormalizationMethodProperty.h"
+#include "mitkOdfScaleByProperty.h"
+#include "mitkProperties.h"
+#include "mitkTensorImage.h"
 
 #include "vtkSphereSource.h"
 #include "vtkPropCollection.h"
@@ -133,7 +133,6 @@ template<class T, int N>
 mitk::OdfVtkMapper2D<T,N>
 ::OdfVtkMapper2D()
 {
-  m_VtkBased = true;
   m_LastDisplayGeometry = 0;
 
   m_PropAssemblies.push_back(vtkPropAssembly::New());
@@ -346,7 +345,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   {
     for(int i=0; i<N; i++)
       odf[i] = (double)odfvals->GetComponent(id,i);
-  } 
+  }
 
   switch(m_Normalization)
   {
@@ -369,12 +368,13 @@ void  mitk::OdfVtkMapper2D<T,N>
   switch(m_ScaleBy)
   {
   case ODFSB_NONE:
+    m_OdfSource->SetAdditionalScale(1.0);
     break;
   case ODFSB_GFA:
-    odf = odf * odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2);
+    m_OdfSource->SetAdditionalScale(odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2));
     break;
   case ODFSB_PC:
-    odf = odf * odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 0);
+    m_OdfSource->SetAdditionalScale(odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 0));
     break;
   }
 
@@ -383,12 +383,12 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     //double max = -100000;
     //double min = 100000;
-    //for( unsigned int i=0; i<N; i++) 
+    //for( unsigned int i=0; i<N; i++)
     //{
     //  max = odf[i] > max ? odf[i] : max;
     //  min = odf[i] < min ? odf[i] : min;
     //}
-    
+
   m_OdfSource->Modified();
 }
 
@@ -402,17 +402,17 @@ void  mitk::OdfVtkMapper2D<T,N>
   viewAngle /= 2;
   double dist = dispGeo->d/tan(viewAngle);
 
-  mitk::Point3D mfoc; 
+  mitk::Point3D mfoc;
   mfoc[0]=dispGeo->M3D[0];
   mfoc[1]=dispGeo->M3D[1];
   mfoc[2]=dispGeo->M3D[2];
 
-  mitk::Point3D mpos; 
+  mitk::Point3D mpos;
   mpos[0]=mfoc[0]+dist*dispGeo->normal[0];
   mpos[1]=mfoc[1]+dist*dispGeo->normal[1];
   mpos[2]=mfoc[2]+dist*dispGeo->normal[2];
 
-  mitk::Point3D mup; 
+  mitk::Point3D mup;
   mup[0]=dispGeo->O3D[0]-dispGeo->M3D[0];
   mup[1]=dispGeo->O3D[1]-dispGeo->M3D[1];
   mup[2]=dispGeo->O3D[2]-dispGeo->M3D[2];
@@ -426,7 +426,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     camera->SetPosition(mpos[0],mpos[1],mpos[2]);
     camera->SetFocalPoint(mfoc[0], mfoc[1],mfoc[2]);
     camera->SetViewUp(mup[0],mup[1],mup[2]);
-  }  
+  }
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
 }
 
@@ -434,10 +434,11 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  //vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
-  Geometry2D::ConstPointer worldGeometry = 
+  // std::cout << "MeasureDisplayedGeometry(" << renderer->GetName() << ")" << std::endl;
+  // vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+  Geometry2D::ConstPointer worldGeometry =
     renderer->GetCurrentWorldGeometry2D();
-  PlaneGeometry::ConstPointer worldPlaneGeometry = 
+  PlaneGeometry::ConstPointer worldPlaneGeometry =
     dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
   // set up the cutter orientation according to the current geometry of
@@ -474,15 +475,16 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N
   O[1] = origin[1] + size[1];
 
   mitk::Point2D point1;
-  point1[0] = M[0]; point1[1] = M[1]; point1[2] = M[2];
+  point1[0] = M[0]; point1[1] = M[1];
+
   mitk::Point3D M3D;
   dispGeometry->Map(point1, M3D);
 
-  point1[0] = L[0]; point1[1] = L[1]; point1[2] = L[2];
+  point1[0] = L[0]; point1[1] = L[1];
   mitk::Point3D L3D;
   dispGeometry->Map(point1, L3D);
 
-  point1[0] = O[0]; point1[1] = O[1]; point1[2] = O[2];
+  point1[0] = O[0]; point1[1] = O[1];
   mitk::Point3D O3D;
   dispGeometry->Map(point1, O3D);
 
@@ -528,6 +530,7 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N
   retval->size[1] = size[1];
   retval->origin[0] = origin[0];
   retval->origin[1] = origin[1];
+
   return retval;
 
 }
@@ -536,7 +539,7 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo)
 {
-  vtkLinearTransform * vtktransform = 
+  vtkLinearTransform * vtktransform =
     this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   int index = GetIndex(renderer);
@@ -552,7 +555,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   inversetransform->TransformNormalAtPoint( dispGeo->vp, dispGeo->vnormal, dispGeo->vnormal );
 
   // vtk works in axis align coords
-  // thus the normal also must be axis align, since 
+  // thus the normal also must be axis align, since
   // we do not allow arbitrary cutting through volume
   //
   // vnormal should already be axis align, but in order
@@ -604,7 +607,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   vtkFloatArray* pointdata = NULL;
   vtkDelaunay2D *delaunay = NULL;
   vtkPolyData* cuttedPlane = NULL;
-  if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) || 
+  if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) ||
     (dims[1] == 1 && dispGeo->vnormal[1] != 0) ||
     (dims[2] == 1 && dispGeo->vnormal[2] != 0) ))
   {
@@ -615,7 +618,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   }
   else
   {
-    // cutting of a 2D-Volume does not work, 
+    // cutting of a 2D-Volume does not work,
     // so we have to build up our own polydata object
     cuttedPlane = vtkPolyData::New();
     points = vtkPoints::New();
@@ -751,7 +754,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       {
         glyphGenerator->Update();
       }
-      catch( itk::ExceptionObject& err ) 
+      catch( itk::ExceptionObject& err )
       {
         std::cout << err << std::endl;
       }
@@ -799,6 +802,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     retval = this->IsVisible(renderer, "VisibleOdfs_C");
     break;
   }
+
   return retval;
 }
 
@@ -820,26 +824,26 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
-  //std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
+  // std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
   {
-
     // adapt cam pos
     OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
+
     AdaptCameraPosition(renderer, dispGeo);
 
     if(this->GetDataNode()->IsOn("DoRefresh",NULL))
     {
-      glMatrixMode( GL_PROJECTION );  
+      glMatrixMode( GL_PROJECTION );
       glPushMatrix();
-      glLoadIdentity(); 
+      glLoadIdentity();
 
-      glMatrixMode( GL_MODELVIEW );  
+      glMatrixMode( GL_MODELVIEW );
       glPushMatrix();
-      glLoadIdentity(); 
+      glLoadIdentity();
 
       renderer->GetVtkRenderer()->SetErase(false);
       renderer->GetVtkRenderer()->GetActiveCamera()->Render(renderer->GetVtkRenderer());
@@ -862,14 +866,14 @@ void  mitk::OdfVtkMapper2D<T,N>
       {
         LightPos[1] = -1000;
       }
-      glLightfv(GL_LIGHT0,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT1,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT2,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT3,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT4,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT5,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT6,GL_POSITION,LightPos);     
-      glLightfv(GL_LIGHT7,GL_POSITION,LightPos);     
+      glLightfv(GL_LIGHT0,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT1,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT2,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT3,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT4,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT5,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT6,GL_POSITION,LightPos);
+      glLightfv(GL_LIGHT7,GL_POSITION,LightPos);
 
     }
 
@@ -877,10 +881,10 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     if(this->GetDataNode()->IsOn("DoRefresh",NULL))
     {
-      glMatrixMode( GL_PROJECTION );  
+      glMatrixMode( GL_PROJECTION );
       glPopMatrix();
 
-      glMatrixMode( GL_MODELVIEW );  
+      glMatrixMode( GL_MODELVIEW );
       glPopMatrix();
     }
   }
@@ -983,7 +987,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   // Light Sources
   vtkCollectionSimpleIterator sit;
   vtkLight* light;
-  for(renderer->GetVtkRenderer()->GetLights()->InitTraversal(sit); 
+  for(renderer->GetVtkRenderer()->GetLights()->InitTraversal(sit);
     (light = renderer->GetVtkRenderer()->GetLights()->GetNextLight(sit)); )
   {
     renderer->GetVtkRenderer()->RemoveLight(light);
@@ -1105,7 +1109,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     OdfDisplayGeometry* dispGeo =
       MeasureDisplayedGeometry( renderer);
-    
+
     if(!m_LastDisplayGeometry || !dispGeo->Equals(m_LastDisplayGeometry))
     {
       AdaptOdfScalingToImageSpacing(index);

@@ -142,7 +142,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       pixel[1] = j;
       pixel[2] = 0;
 
-      unsigned int pixelID = pixel[0]+pixel[1]*yDimension;
+      unsigned int pixelID = pixel[0]+pixel[1]*xDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
@@ -171,13 +171,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
             polys->InsertNextCell(3);
-            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y);
+            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y_1);
 
             polys->InsertNextCell(3);
-            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(x_1y_1);
+            polys->InsertCellPoint(xy);
             polys->InsertCellPoint(xy_1);
           }
         }

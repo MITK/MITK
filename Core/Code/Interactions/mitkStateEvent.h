@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 
@@ -41,7 +41,7 @@ namespace mitk {
     //## @brief Constructor
     //## @param id: mitk internal EventID
     //## @param event: the information about the appeared event
-    StateEvent(int id, Event const* event = NULL );
+    StateEvent(int id, Event const* event = 0 );
 
     ~StateEvent();
 

@@ -19,14 +19,18 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPACSPluginEventshincluded
 
 #include <itkObject.h>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk
 {
+  #pragma GCC visibility push(default)
   itkEventMacro( PluginEvent, itk::AnyEvent );
   itkEventMacro( PluginStudySelected, PluginEvent );
   itkEventMacro( PluginLightBoxCountChanged, PluginEvent );
   itkEventMacro( PluginAbortPACSImport, PluginEvent );
+  #pragma GCC visibility pop
 }
 
 #endif

@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_TOOL_EVENTS_H
 #define MITK_TOOL_EVENTS_H
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 
 namespace mitk {
@@ -51,7 +53,9 @@ class MyTool : public Tool
 \endcode
 */
 
+#pragma GCC visibility push(default)
 itkEventMacro( ToolEvent, itk::ModifiedEvent );
+#pragma GCC visibility pop
 
 /**
   \brief Tool event with 1 parameter

@@ -35,13 +35,24 @@ ELSE(WIN32)
     SET(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
 ENDIF(WIN32)
 ELSE()
-SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraPMDPlayerControllerStub.cpp
+SET(CPP_FILES ${CPP_FILES}	
   mitkToFCameraPMDMITKPlayerControllerStub.cpp
   mitkToFCameraPMDCamCubeControllerStub.cpp
-  mitkToFCameraPMDControllerStub.cpp
+  mitkToFCameraPMDPlayerControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)
+
+IF(MITK_USE_TOF_PMDCAMBOARD)
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraPMDCamBoardController.cpp
+  mitkToFCameraPMDController.cpp
+)
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraPMDCamBoardControllerStub.cpp
+)
+ENDIF(MITK_USE_TOF_PMDCAMBOARD)
+
 
 IF(MITK_USE_TOF_PMDO3)
 SET(CPP_FILES ${CPP_FILES}
@@ -54,16 +65,15 @@ SET(CPP_FILES ${CPP_FILES}
 )
 ENDIF(MITK_USE_TOF_PMDO3)
 
-IF(MITK_USE_TOF_PMDCAMBOARD)
+IF(NOT MITK_USE_TOF_PMDCAMCUBE)
+IF(NOT MITK_USE_TOF_PMDCAMBOARD)
+IF(NOT MITK_USE_TOF_PMDO3)
 SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraPMDCamBoardController.cpp
-  mitkToFCameraPMDController.cpp
+  mitkToFCameraPMDControllerStub.cpp
 )
-ELSE()
-SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraPMDCamBoardControllerStub.cpp
-)
-ENDIF(MITK_USE_TOF_PMDCAMBOARD)
+ENDIF(NOT MITK_USE_TOF_PMDO3)
+ENDIF(NOT MITK_USE_TOF_PMDCAMBOARD)
+ENDIF(NOT MITK_USE_TOF_PMDCAMCUBE)
 
 IF(MITK_USE_TOF_MESASR4000)
 SET(CPP_FILES ${CPP_FILES}

@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkApplicationCursor.h"
+#include <mitkLogMacros.h>
 
 #include <iostream>
 

@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
+#include <mitkCommon.h>
 #include "mitkVector.h"
 #include "mitkOperationActor.h"
 

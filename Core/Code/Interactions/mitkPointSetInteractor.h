@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 #define MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkVector.h"
 #include <mitkInteractor.h>
 

@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_MATERIAL_H_
 #define _MITK_MATERIAL_H_
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
+#include <mitkCommon.h>
 #include <itkRGBPixel.h>
 #include <itkObject.h>
 #include <itkVectorContainer.h>

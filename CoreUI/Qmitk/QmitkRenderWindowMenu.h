@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 #endif
 
-#include "mitkCommon.h"
+#include <QmitkExports.h>
 #include "mitkBaseRenderer.h"
 
 #include <QWidget>

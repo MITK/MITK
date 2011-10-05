@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
 
+
 /** 
 * Provides a convenient interface for plotting curves using qwt.
 * Designed for qwt version 5.2.1.
@@ -162,7 +163,7 @@ public:
   */
   void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
 
-  /**
+  /**m_Skeletonize
   * Sets the title of the given curve. The title will be shown in the legend of
   * the QwtPlot.
   * @param curveId the id of the curve for which the title should be set
@@ -176,7 +177,7 @@ public:
   */
   void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
 
-  /** 
+  /** m_Skeletonize
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */
@@ -186,6 +187,8 @@ public:
   * Resets the plot into an empty state
   */
   void Clear();
+
+
 
 protected:
   /** 
@@ -205,6 +208,8 @@ protected:
 
   QwtPlot*                    m_Plot;
   std::vector<QwtPlotCurve*>  m_PlotCurveVector;
+
+
 };
 
 #endif 

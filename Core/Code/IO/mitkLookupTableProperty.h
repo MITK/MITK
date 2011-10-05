@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
 #define MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkLookupTable.h"
 

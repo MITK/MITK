@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "itkImage.h"
 #include "mitkImageCast.h"
-#include "MitkDiffusionImagingExports.h"
 
 namespace mitk 
 {
@@ -32,14 +31,14 @@ namespace mitk
   * yet supported by mitkImage)
   */
   template<class TPixelType>
-  class MitkDiffusionImaging_EXPORT TbssImage : public Image
+  class TbssImage : public Image
   {
 
   public:
     typedef TPixelType PixelType;
     typedef typename itk::Image<TPixelType, 3>  ImageType;
     typedef itk::Index<3> IndexType;
-    typedef typename std::vector<IndexType> RoiType;
+    //typedef typename std::vector <Index<3> > RoiType;
 
     mitkClassMacro( TbssImage, Image )
     itkNewMacro(Self)
@@ -73,12 +72,12 @@ namespace mitk
     itkGetMacro(Structure, std::string)
     itkSetMacro(Structure, std::string)
 
-    void SetRoi(RoiType roi)
+    void SetRoi(std::vector< itk::Index<3> > roi)
     {
       m_Roi = roi;
     }
 
-    RoiType GetRoi()
+    std::vector< itk::Index<3> > GetRoi()
     {
       return m_Roi;
     }
@@ -100,7 +99,7 @@ namespace mitk
 
     Type m_TbssType;
 
-    RoiType m_Roi;
+    std::vector< itk::Index<3> > m_Roi;
 
     bool m_PreprocessedFA;
     std::string m_PreprocessedFAFile;

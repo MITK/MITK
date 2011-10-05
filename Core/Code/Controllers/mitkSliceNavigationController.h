@@ -19,11 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 #define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"
+#include "mitkMessage.h"
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include <itkCommand.h>
 #include <mitkIpPicTypeMultiplex.h>
 #include <sstream>
@@ -244,7 +247,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkSetObjectMacro(RenderingManager, RenderingManager);
     mitk::RenderingManager* GetRenderingManager() const;
 
+    #pragma GCC visibility push(default)
     itkEventMacro( UpdateEvent, itk::AnyEvent );
+    #pragma GCC visibility pop
 
     class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent 
     { 
@@ -346,6 +351,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
       ConnectGeometrySliceEvent(receiver, false);
       ConnectGeometryTimeEvent(receiver);
     }
+
+    Message<> crosshairPositionEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can 

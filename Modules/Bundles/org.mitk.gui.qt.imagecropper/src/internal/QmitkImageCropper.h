@@ -200,18 +200,12 @@ protected:
   */
   virtual void RemoveBoundingObjectFromNode();
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void AddSurrounding( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image::Pointer image);
-
   virtual void NodeRemoved(const mitk::DataNode* node);
 
 private:
 
   // operation constant
   static const mitk::OperationType OP_EXCHANGE;
-
-  QProgressDialog *progress;
-  mitk::Image::Pointer m_surrImage;
 
   //Interface class for undo redo
   mitk::ImageCropperEventInterface* m_Interface;

@@ -25,9 +25,8 @@ QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
   m_Plot->setCanvasBackground(Qt::white);
-  boxLayout->addWidget( m_Plot );
+  boxLayout->addWidget( m_Plot );  
 } 
-
 
 QmitkPlotWidget::~QmitkPlotWidget()
 {

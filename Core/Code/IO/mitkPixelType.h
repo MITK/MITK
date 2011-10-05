@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include <mitkIpPic.h>
 #include <itkImageIOBase.h>
 

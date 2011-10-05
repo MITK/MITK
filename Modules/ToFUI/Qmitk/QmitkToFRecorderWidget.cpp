@@ -31,7 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFImageWriter.h>
 
 //itk headers
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include <itksys/SystemTools.hxx>
 
 struct QFileDialogArgs;

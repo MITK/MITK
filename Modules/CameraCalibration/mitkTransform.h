@@ -31,6 +31,20 @@ namespace mitk {
     mitkNewMacro1Param(Transform, const mitk::NavigationData*);
 
     ///
+    /// constants describing the type of transform
+    /// represented here
+    ///
+    static const std::string UNKNOWN_TYPE;
+    static const std::string ENDOSCOPE_SCOPE_TOOL;
+    static const std::string ENDOSCOPE_CAM_TOOL;
+    static const std::string CHESSBOARD_TOOL;
+    static const std::string POINTER_TOOL;
+    static const std::string BOARD_TO_BOARD_TOOL;
+
+
+    itkGetConstMacro(Type, std::string);
+    itkSetMacro(Type, std::string&);
+    ///
     /// Copies the content of transform to this
     /// instance
     ///
@@ -247,6 +261,11 @@ namespace mitk {
 
     // everything is stored here
     mitk::NavigationData::Pointer m_NavData;
+
+    ///
+    /// saves the type of the transform (Default is UNKNOWN_TYPE)
+    ///
+    std::string m_Type;
 };
 
 } // namespace mitk

@@ -232,7 +232,10 @@ void mitk::VirtualTrackingDevice::TrackTools()
     localStopTracking = this->m_StopTracking;
 
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    if (!localStopTracking) MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+    if (!localStopTracking)
+    {
+      m_TrackingFinishedMutex->Lock();
+    }
     this->m_StopTrackingMutex->Unlock();
 
     mitk::ScalarType t = 0.0;

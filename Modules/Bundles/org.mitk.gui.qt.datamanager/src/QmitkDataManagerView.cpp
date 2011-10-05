@@ -139,7 +139,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
   m_NodeTreeModel->SetShowHelperObjects(
-      prefs->GetBool("Show helper objects", false) );
+    prefs->GetBool("Show helper objects", false) );
+  m_NodeTreeModel->SetShowNodesContainingNoData(
+    prefs->GetBool("Show nodes containing no data", false) );
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
   //# Tree View (experimental)
@@ -422,7 +424,10 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   
   if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
     m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
-  
+
+  if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
+    m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
+
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
@@ -975,8 +980,8 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node )
       node->SetBoolProperty("selected", true);
   }
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //changing the selection does NOT require any rendering processes!
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ReinitMultiWidgetEditor()

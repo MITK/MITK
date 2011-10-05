@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkNodeDescriptorManager_h
 #define QmitkNodeDescriptorManager_h
 
+#include <QmitkExports.h>
+
 #include "QmitkNodeDescriptor.h"
 
 /// 

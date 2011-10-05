@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 #define OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"

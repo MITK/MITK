@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
 #define UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkUndoModel.h"
 #include "mitkOperationEvent.h"
 #include <map>

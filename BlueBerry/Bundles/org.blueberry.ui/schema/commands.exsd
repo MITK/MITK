@@ -418,7 +418,7 @@ The class that can be loaded to store the state of this command.  This element i
       </appinfo>
       <documentation>
          &lt;p&gt;
-0.1
+1.0
 &lt;/p&gt;
       </documentation>
    </annotation>

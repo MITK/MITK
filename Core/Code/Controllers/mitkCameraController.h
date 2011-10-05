@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseController.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkKeyEvent.h"

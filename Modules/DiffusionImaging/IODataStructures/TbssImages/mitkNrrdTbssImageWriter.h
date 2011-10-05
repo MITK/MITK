@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriterWithInformation.h>
 #include <mitkTbssImage.h>
 #include <QString>
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk
 {
@@ -31,7 +32,7 @@ namespace mitk
  * @ingroup Process
  */
 template < class TPixelType >
-class NrrdTbssImageWriter : public mitk::FileWriterWithInformation
+class MitkDiffusionImaging_EXPORT NrrdTbssImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 

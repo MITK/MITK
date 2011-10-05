@@ -71,5 +71,14 @@
           class="QmitkFiberBundleOperationsView"
           icon="resources/FiberBundleOperations.png" />
   </extension>
+  
+    <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fiberbundledeveloper"
+          name="FiberDevTool"
+          class="QmitkFiberBundleDeveloperView"
+          icon="resources/FiberBundleOperations.png" />
+  </extension>
+  
+
 
 </plugin>

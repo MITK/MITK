@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
 #define VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkRenderWindow.h"
 
 #include "vtkInteractorObserver.h"

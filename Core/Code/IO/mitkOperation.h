@@ -19,7 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OPERATION_H_HEADER_INCLUDED_C16E7D9E
 #define OPERATION_H_HEADER_INCLUDED_C16E7D9E
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
+#pragma GCC visibility push(default)
+#include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk {
 typedef int OperationType ;

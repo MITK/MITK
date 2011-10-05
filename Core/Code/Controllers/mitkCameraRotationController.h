@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 #define CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseController.h"
 
 class vtkCamera;

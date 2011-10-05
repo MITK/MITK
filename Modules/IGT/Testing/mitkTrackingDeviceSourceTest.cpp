@@ -79,12 +79,18 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   
   nd0->Update();
   mitk::NavigationData::PositionType pos = nd0->GetPosition();
+  unsigned long tmpMTime0 = nd0->GetMTime();
   itksys::SystemTools::Delay(500); // allow the tracking thread to advance the tool position
   nd0->Update();
-  MITK_TEST_CONDITION(mitk::Equal(nd0->GetPosition(), pos) == false, "Testing if output changes on each update");
-  mitk::NavigationData* nd1 = mySource->GetOutput(1);
-  MITK_TEST_CONDITION(nd0 != nd1, "Testing if outputs are different");
-  MITK_TEST_CONDITION(mitk::Equal(nd0->GetPosition(), nd1->GetPosition()) == false, "Testing if output contents are different");
+  mitk::NavigationData::PositionType newPos = nd0->GetPosition();
+  if(nd0->GetMTime() == tmpMTime0) //tool not modified yet
+  {
+    MITK_TEST_CONDITION(mitk::Equal(newPos, pos) == true, "Testing if output changes on each update");
+  }
+  else
+  {
+    MITK_TEST_CONDITION(mitk::Equal(newPos, pos) == false, "Testing if output changes on each update");
+  }
 
   mySource->StopTracking();
   mySource->Disconnect();

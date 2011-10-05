@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui">
+<schema targetNamespace="org.blueberry.ui">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ui" id="editors" name="Internal and External Editors"/>
+         <meta.schema plugin="org.blueberry.ui" id="editors" name="Internal and External Editors"/>
       </appInfo>
       <documentation>
          This extension point is used to add new editors to the 
@@ -120,10 +120,10 @@ will use the icon provided by the operating system.
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorPart&lt;/samp&gt;. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive. If this attribute is defined then &lt;samp&gt;contributorClass&lt;/samp&gt; should also be defined.
+                  the name of a class that implements &lt;samp&gt;berry::IEditorPart&lt;/samp&gt;. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive. If this attribute is defined then &lt;samp&gt;contributorClass&lt;/samp&gt; should also be defined.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.part.EditorPart"/>
+                  <meta.attribute kind="java" basedOn="berry::EditorPart"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -137,21 +137,21 @@ will use the icon provided by the operating system.
          <attribute name="launcher" type="string">
             <annotation>
                <documentation>
-                  the name of a class which that implements &lt;samp&gt;org.eclipse.ui.IEditorLauncher&lt;/samp&gt;. 
+                  the name of a class which that implements &lt;samp&gt;berry::IEditorLauncher&lt;/samp&gt;. 
 A launcher will open an external editor. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IEditorLauncher"/>
+                  <meta.attribute kind="java" basedOn="berry::IEditorLauncher"/>
                </appInfo>
             </annotation>
          </attribute>
          <attribute name="contributorClass" type="string">
             <annotation>
                <documentation>
-                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorActionBarContributor&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This class is used to add new actions to the workbench menu and tool bar which reflect the features of the editor type.
+                  the name of a class that implements &lt;samp&gt;berry::IEditorActionBarContributor&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This class is used to add new actions to the workbench menu and tool bar which reflect the features of the editor type.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.part.EditorActionBarContributor"/>
+                  <meta.attribute kind="java" basedOn="berry::EditorActionBarContributor"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -179,20 +179,13 @@ documents may register for &quot;ejb.htm, ejb.html&quot;.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="symbolicFontName" type="string">
-            <annotation>
-               <documentation>
-                  the symbolic name of a font. The symbolic font name must be the id of a defined font (see org.eclipse.ui.fontDefinitions). If this attribute is missing or invalid then the font name is the value of &quot;org.eclipse.jface.textfont&quot; in the editor&apos;s preferences store. If there is no preference store or the key is not defined then the JFace text font will be used. The editor implementation decides if it uses this symbolic font name to set the font.
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="matchingStrategy" type="string">
             <annotation>
                <documentation>
-                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorMatchingStrategy&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This allows the editor extension to provide its own algorithm for matching the input of one of its editors to a given editor input.
+                  the name of a class that implements &lt;samp&gt;berry::IEditorMatchingStrategy&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This allows the editor extension to provide its own algorithm for matching the input of one of its editors to a given editor input.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IEditorMatchingStrategy"/>
+                  <meta.attribute kind="java" basedOn="berry::IEditorMatchingStrategy"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -212,7 +205,7 @@ documents may register for &quot;ejb.htm, ejb.html&quot;.
          <attribute name="contentTypeId" type="string" use="required">
             <annotation>
                <documentation>
-                  The content type identifier. This is an ID defined by the &apos;org.eclipse.core.runtime.contentTypes&apos; extension point.
+                  The content type identifier. This is an ID defined by the &apos;org.blueberry.core.runtime.contentTypes&apos; extension point.
                </documentation>
             </annotation>
          </attribute>
@@ -229,15 +222,14 @@ documents may register for &quot;ejb.htm, ejb.html&quot;.
 of an internal editor extension definition: 
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.eclipse.ui.editors&quot;&gt; 
+   &lt;extension point=&quot;org.blueberry.ui.editors&quot;&gt; 
       &lt;editor 
          id=&quot;com.xyz.XMLEditor&quot; 
          name=&quot;Fancy XYZ XML editor&quot; 
          icon=&quot;./icons/XMLEditor.gif&quot; 
          extensions=&quot;xml&quot; 
-         class=&quot;com.xyz.XMLEditor&quot; 
-         contributorClass=&quot;com.xyz.XMLEditorContributor&quot; 
-         symbolicFontName=&quot;org.eclipse.jface.textfont&quot;
+         class=&quot;xyz::XMLEditor&quot; 
+         contributorClass=&quot;xyz::XMLEditorContributor&quot; 
          default=&quot;false&quot;&gt; 
       &lt;/editor&gt; 
    &lt;/extension&gt; 

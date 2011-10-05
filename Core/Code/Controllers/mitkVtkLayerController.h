@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 #include <map>
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 class vtkRenderWindow;
 class vtkRenderer;

@@ -19,11 +19,12 @@
 #ifndef QMITKDATASTORAGELISTMODEL_H_
 #define QMITKDATASTORAGELISTMODEL_H_
 
+#include <QmitkExports.h>
+
 //# Own includes
 // mitk
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
-#include "mitkCommon.h"
 // Qmitk
 
 //# Toolkit includes

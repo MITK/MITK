@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkDataStorageTableModel_h
 #define QmitkDataStorageTableModel_h
 
+#include <QmitkExports.h>
+
 /// Own includes.
 #include "mitkDataStorage.h"
 #include "mitkBaseProperty.h"

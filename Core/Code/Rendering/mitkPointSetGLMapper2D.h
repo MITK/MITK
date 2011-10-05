@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 #define MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkGLMapper2D.h"
 
 namespace mitk {

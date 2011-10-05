@@ -24,7 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 #include <vector>
 #include <map>
@@ -42,12 +44,12 @@ class PlaneGeometry;
   \sa QmitkToolReferenceDataSelectionBox
   \sa QmitkToolWorkingDataSelectionBox
   \sa Tool
-  \sa QmitkInteractiveSegmentation
+  \sa QmitkSegmentationView
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkSegmentationView: \ref QmitkSegmentationTechnicalPage
 
   This class creates and manages several instances of mitk::Tool.
 
@@ -105,10 +107,6 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
     mitkClassMacro(ToolManager, itk::Object);
     mitkNewMacro1Param(ToolManager, DataStorage*);
-
-    itkSetMacro(RememberContourPosition, bool);
-
-    itkGetMacro(RememberContourPosition, bool);
 
     /**
       \brief Gives you a list of all tools.
@@ -281,9 +279,6 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     int m_RegisteredClients;
 
     WeakPointer<DataStorage> m_DataStorage;
-
-    //if the position of each contour shall be saved. Therefor for each contour a markernode is added to the datastorage
-    bool m_RememberContourPosition;
 };
 
 } // namespace

@@ -141,9 +141,7 @@ namespace mitk
     virtual const char * GetDefaultExtension() { return ".pf"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(data);
-      return CanWriteDataType(node);
+      return dynamic_cast<mitk::PlanarFigure*>( data.GetPointer() );
     }
     virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteBaseDataType(data)) {

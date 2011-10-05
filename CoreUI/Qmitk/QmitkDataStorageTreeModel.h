@@ -19,6 +19,8 @@
 #ifndef QMITKDATASTORAGETREEMODEL_H_
 #define QMITKDATASTORAGETREEMODEL_H_
 
+#include <QmitkExports.h>
+
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
 #include <mitkWeakPointer.h>
@@ -45,6 +47,7 @@ public:
   QmitkDataStorageTreeModel(mitk::DataStorage* _DataStorage
                             , bool _PlaceNewNodesOnTop=false
                             , bool _ShowHelperObjects=false
+                            , bool _ShowNodesContainingNoData=false
                             , QObject* parent = 0);
   ~QmitkDataStorageTreeModel();
 
@@ -78,6 +81,14 @@ public:
   bool GetShowHelperObjectsFlag()
   {
     return m_ShowHelperObjects;
+  }
+
+  ///
+  /// Get the visibility flag for showing nodes that contain no data
+  ///
+  bool GetShowNodesContainingNoDataFlag()
+  {
+    return m_ShowNodesContainingNoData;
   }
 
   ///
@@ -143,6 +154,16 @@ public:
   /// Show or hide helper objects
   ///
   void SetShowHelperObjects(bool _ShowHelperObjects);
+
+  ///
+  /// Show or hide objects that contain no data
+  ///
+  void SetShowNodesContainingNoData(bool _ShowNodesContainingNoData);
+
+  ///
+  /// Update the visibility of data nodes according to the preference settings
+  ///
+  void UpdateNodeVisibility();
 
 //# MISC
 protected:
@@ -253,6 +274,7 @@ protected:
   mitk::NodePredicateBase::Pointer m_Predicate;
   bool m_PlaceNewNodesOnTop;
   bool m_ShowHelperObjects;
+  bool m_ShowNodesContainingNoData;
   TreeItem* m_Root;
 };
 

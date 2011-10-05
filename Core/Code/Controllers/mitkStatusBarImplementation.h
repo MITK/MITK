@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITKSTATUSBARIMPLEMENTATION_H
 #define MITKSTATUSBARIMPLEMENTATION_H
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 namespace mitk {
 //##Documentation

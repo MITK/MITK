@@ -6,7 +6,7 @@
          <meta.schema plugin="org.blueberry.osgi" id="applications" name="Applications"/>
       </appinfo>
       <documentation>
-         The applications extension point allows plugins to contribute applications to the Berry Platform.
+         The applications extension point allows plugins to contribute applications to the BlueBerry Platform.
       </documentation>
    </annotation>
 
@@ -83,15 +83,6 @@
 
    <annotation>
       <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         1.0
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
@@ -100,7 +91,7 @@
    &lt;pre&gt;
       &lt;extension id=&quot;sampleApplication&quot; point=&quot;org.blueberry.osgi.applications&quot;&gt;
          &lt;application id=&quot;my.domain.application&quot;&gt;
-         &lt;run class=&quot;com.xyz.applications.sample&quot;/&gt;
+         &lt;run class=&quot;xyz::SampleApp&quot;/&gt;
          &lt;/application&gt;
       &lt;/extension&gt;
    &lt;/pre&gt;

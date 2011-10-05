@@ -148,5 +148,8 @@ namespace CommonFunctionality
   
   QmitkExt_EXPORT void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
+  /** @brief Opens a dialog to define a save filename which starts in the same directory like last time. */
+  QString GetSaveFileNameStartingInLastDirectory(QString caption, QString defaultFilename, QString filter, QString* selectedFilter = 0);
+
 };
 #endif // _CommonFunctionality__h_

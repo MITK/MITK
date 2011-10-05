@@ -39,14 +39,12 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_PauseTimeStamp = 0.0;
   m_parentElement = NULL;
   m_currentNode = NULL;
-
   m_StreamEnd = false;
-
+  m_StreamValid = true;
+  m_ErrorMessage = "";
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
-
-
 }
 
 
@@ -175,18 +173,13 @@ void mitk::NavigationDataPlayer::InitPlayer()
 {
   if (m_Stream == NULL)
   { 
-    m_StreamEnd = true;
-
-    StopPlaying();
-    std::cout << "Playing not possible. Wrong file name or path? " << std::endl;
+    StreamInvalid("Playing not possible. Wrong file name or path?");
     return;
   }
+
   if (!m_Stream->good())
   {
-    m_StreamEnd = true;
-
-    StopPlaying();
-    std::cout << "Playing not possible. Stream is not good!" << std::endl;
+    StreamInvalid("Playing not possible. Stream is not good!");
     return;
   }
   
@@ -195,32 +188,29 @@ void mitk::NavigationDataPlayer::InitPlayer()
   //check if we have a valid version
   if (m_FileVersion < 1)
   {
-    m_StreamEnd = true;
-
-    StopPlaying();
-    std::cout << "Playing not possible. Stream is not good!" << std::endl;
+    StreamInvalid("Playing not possible. Stream is not good!");
     return;
   }
-  if(m_NumberOfOutputs == 0){
-    m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream); //now read the number of Tracked Tools
-  }
+
+  //now read the number of Tracked Tools
+  if(m_NumberOfOutputs == 0){m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream);}
 
   //with the information about the tracked tool number we can generate the output
   if (m_NumberOfOutputs > 0)
   {
     //Generate the output only if there are changes to the amount of outputs
     //This happens when the player is stopped and start again with different file
-    if (this->GetNumberOfOutputs() != m_NumberOfOutputs)
-    {    
-      this->SetNumberOfOutputs(m_NumberOfOutputs);
-    }
-
-    GetFirstData(); //initialize the player with first data
+    if (this->GetNumberOfOutputs() != m_NumberOfOutputs) {SetNumberOfOutputs(m_NumberOfOutputs);}
+    //initialize the player with first data
+    GetFirstData(); 
+    //set stream valid
+    m_ErrorMessage = "";
+    m_StreamValid = true;
   }
   else
   {
-    std::cout << "The input stream seems to have NavigationData incompatible format" << std::endl;
-    StopPlaying();
+    StreamInvalid("The input stream seems to have NavigationData incompatible format");
+    return;
   }
 
 }
@@ -531,4 +521,14 @@ void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
 const bool mitk::NavigationDataPlayer::IsAtEnd()
 {
   return this->m_StreamEnd;
+}
+
+void mitk::NavigationDataPlayer::StreamInvalid(std::string message)
+{
+  m_StreamEnd = true;
+  StopPlaying();
+  m_ErrorMessage = message;
+  m_StreamValid = false;
+  MITK_ERROR << m_ErrorMessage;
+  return;
 }

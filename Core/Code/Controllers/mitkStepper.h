@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STEPPER_H_HEADER_INCLUDED_C1E77191
 #define STEPPER_H_HEADER_INCLUDED_C1E77191
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
+#include <mitkCommon.h>
 #include "mitkVector.h"
 
 #include <itkObject.h>

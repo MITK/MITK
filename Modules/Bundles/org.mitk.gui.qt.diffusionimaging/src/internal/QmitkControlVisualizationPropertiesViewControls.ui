@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>414</width>
-    <height>268</height>
+    <width>432</width>
+    <height>375</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,10 +25,7 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="margin">
     <number>0</number>
    </property>
@@ -77,7 +74,7 @@
             <string/>
            </property>
            <property name="checkable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="checked">
             <bool>false</bool>
@@ -120,6 +117,11 @@
            <property name="text">
             <string/>
            </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/glyphsoff_T.png</normaloff>
+             <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>:/QmitkDiffusionImaging/glyphsoff_T.png</iconset>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
@@ -142,6 +144,11 @@
            <property name="text">
             <string/>
            </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/glyphsoff_S.png</normaloff>
+             <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>:/QmitkDiffusionImaging/glyphsoff_S.png</iconset>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
@@ -163,6 +170,11 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/glyphsoff_C.png</normaloff>
+             <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>:/QmitkDiffusionImaging/glyphsoff_C.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -325,10 +337,13 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <property name="margin">
+            <property name="horizontalSpacing">
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing">
              <number>0</number>
             </property>
-            <property name="spacing">
+            <property name="margin">
              <number>0</number>
             </property>
             <item row="1" column="1">
@@ -490,76 +505,42 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <property name="verticalSpacing">
-       <number>3</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="margin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QFrame" name="frame_3">
+      <item>
+       <widget class="QFrame" name="frame_5">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
          <property name="margin">
           <number>0</number>
          </property>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="maximumSize">
-            <size>
-             <width>43</width>
-             <height>16777215</height>
-            </size>
+         <item>
+          <widget class="QToolButton" name="m_Color">
+           <property name="toolTip">
+            <string>Uniform Color for Bundle</string>
            </property>
            <property name="text">
-            <string>Width</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QSpinBox" name="m_LineWidth">
-           <property name="maximumSize">
-            <size>
-             <width>43</width>
-             <height>16777215</height>
-            </size>
+         <item>
+          <widget class="QToolButton" name="m_Crosshair">
+           <property name="toolTip">
+            <string>Position Crosshair by 3D-Click</string>
            </property>
-           <property name="value">
-            <number>1</number>
+           <property name="statusTip">
+            <string/>
            </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
-          <widget class="QPushButton" name="m_Wire">
            <property name="text">
-            <string>Wire</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QPushButton" name="m_Color">
-           <property name="text">
-            <string>Set Color</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="2">
-          <widget class="QPushButton" name="m_Tube">
-           <property name="text">
-            <string>Tube</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="3">
-          <widget class="QToolButton" name="m_SetInteractor">
-           <property name="text">
-            <string>Position Crosshair 3D</string>
+            <string/>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -569,46 +550,171 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QDoubleSpinBox" name="m_TubeRadius">
-           <property name="maximumSize">
-            <size>
-             <width>59</width>
-             <height>16777215</height>
-            </size>
+         <item>
+          <widget class="QToolButton" name="m_2DHeatmap">
+           <property name="toolTip">
+            <string>Generate 2D-Image as Heatmap</string>
            </property>
-           <property name="maximum">
-            <double>10.000000000000000</double>
+           <property name="whatsThis">
+            <string/>
            </property>
-           <property name="singleStep">
-            <double>0.050000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.150000000000000</double>
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="maximumSize">
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
             <size>
-             <width>47</width>
-             <height>16777215</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
-           <property name="text">
-            <string>Radius</string>
-           </property>
-          </widget>
+          </spacer>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="m_2DHeatmap">
-        <property name="text">
-         <string>Generate 2D Heatmap</string>
+      <item>
+       <widget class="QFrame" name="frame_4">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
         </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QFrame" name="frame_tube">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="m_Tube">
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Tube</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="m_TubeRadius">
+              <property name="value">
+               <number>15</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_tuberadius">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>10000</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Radius</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_wire">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="m_Wire">
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Wire</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="m_LineWidth">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>9</number>
+              </property>
+              <property name="value">
+               <number>1</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_linewidth">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>43</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Width</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -627,39 +733,64 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="m_Focus">
-        <property name="text">
+       <widget class="QToolButton" name="m_Focus">
+        <property name="toolTip">
          <string>Focus Planar Figure</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="m_PFColor">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Change Color in 2D-View</string>
+        </property>
         <property name="text">
-         <string>Color</string>
+         <string>2D</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_7">
+       <widget class="QToolButton" name="m_PFColor3D">
+        <property name="toolTip">
+         <string>Change Color in 3D-View</string>
+        </property>
+        <property name="text">
+         <string>3D</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="m_PFWidth">
+        <property name="value">
+         <number>20</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_pfwidth">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Width</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDoubleSpinBox" name="m_PFWidth">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.000000000000000</double>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -667,20 +798,24 @@
     </widget>
    </item>
    <item>
-    <spacer name="spacer1">
+    <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>20</width>
+       <height>40</height>
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QToolButton" name="m_Welcome">
+     <property name="text">
+      <string>Show Welcome Screen</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -695,6 +830,8 @@
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>
- <resources/>
+ <resources>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+ </resources>
  <connections/>
 </ui>

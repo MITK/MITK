@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef INTERACTOR_H_HEADER_INCLUDED
 #define INTERACTOR_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkStateMachine.h"
 #include "mitkGeometry3D.h"
 

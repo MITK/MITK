@@ -4,20 +4,21 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkVideoPlayer.cpp
+  mitkPluginActivator.cpp
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
+  src/internal/QmitkVideoPlayer.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/videoplayer.gif
+  plugin.xml
 )
 
-SET(RES_FILES
+SET(QRC_FILES
 )
-
-
-SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkStateEvent.h"
+#include "mitkCrosshairPositionEvent.h"
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
@@ -328,6 +329,9 @@ SliceNavigationController::SendSlice()
     {
       this->InvokeEvent(
         GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()) );
+
+      // send crosshair event
+      crosshairPositionEvent.Send();
 
       // Request rendering update for all views
       this->GetRenderingManager()->RequestUpdateAll();
@@ -685,7 +689,15 @@ SliceNavigationController
                   stream.precision(2);
                   stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
                   stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-                  stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+                  mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
+                  if (fabs(pixelValue)>1000000)
+                  {
+                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+                  }
+                  else
+                  {
+                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+                  }
                 }
                 else
                 {

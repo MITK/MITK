@@ -35,10 +35,16 @@
    <item row="1" column="0">
     <widget class="QComboBox" name="m_SelectCameraCombobox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -46,7 +52,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>-1</number>
      </property>
      <property name="maxVisibleItems">
       <number>7</number>
@@ -60,41 +66,6 @@
      <property name="frame">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>PMD Camcube 2.0/3.0</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>PMD CamBoard</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>PMD O3D</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>MESA SR4000</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>PMD Player</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>PMD Raw Data Player</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>MITK Player</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="1" column="1">

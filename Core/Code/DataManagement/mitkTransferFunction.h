@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
 #include "mitkHistogramGenerator.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkImage.h"
 
 #include <itkObject.h>

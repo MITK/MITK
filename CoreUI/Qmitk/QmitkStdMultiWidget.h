@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGET_H_
 #define QMITKSTDMULTIWIDGET_H_
 
+#include <QmitkExports.h>
+
 #include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
@@ -96,6 +98,12 @@ public:
 
   void SetDataStorage( mitk::DataStorage* ds );
 
+  /** \brief Listener to the CrosshairPositionEvent
+
+    Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
+  */
+  void HandleCrosshairPositionEvent();
+
   /// activate Menu Widget. true: activated, false: deactivated
   void ActivateMenuWidget( bool state );
   
@@ -106,6 +114,9 @@ protected:
   void HideAllWidgetToolbars();
 
 public slots:
+
+  /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
+  void HandleCrosshairPositionEventDelayed();
 
   void changeLayoutTo2DImagesUp();
 
@@ -296,7 +307,7 @@ protected:
     vtkRenderer *ren;
   } m_CornerAnnotaions[3];
 
-  
+  bool m_PendingCrosshairPositionEvent;
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

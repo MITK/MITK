@@ -62,6 +62,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="m_AddImageFiducialBtn">
+           <property name="text">
+            <string>Add image fiducial</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

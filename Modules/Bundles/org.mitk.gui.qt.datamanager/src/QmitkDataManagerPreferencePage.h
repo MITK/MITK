@@ -61,6 +61,7 @@ protected:
   QCheckBox* m_EnableSingleEditing;
   QCheckBox* m_PlaceNewNodesOnTop;
   QCheckBox* m_ShowHelperObjects;
+  QCheckBox* m_ShowNodesContainingNoData;
   QCheckBox* m_UseSurfaceDecimation;
   berry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };

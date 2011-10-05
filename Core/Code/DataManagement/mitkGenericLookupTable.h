@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDataObject.h>
 
 #include "mitkVector.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 
 namespace mitk {
@@ -135,7 +135,7 @@ typedef LookupTableName Self;                                   \
   virtual Superclass& operator=(const Superclass& other) { return Superclass::operator=(other); } \
   virtual ~LookupTableName() {}                                 \
 }; \
-std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);
+MITK_CORE_EXPORT std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);
 
 /**
 * Generates the ostream << operator for the lookuptable. This definition

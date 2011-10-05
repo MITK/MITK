@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCOORDINATESUPPLIER_H
 #define MITKCOORDINATESUPPLIER_H
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkStateMachine.h"
 #include "mitkVector.h"
 

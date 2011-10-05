@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmainwindow.h>
 #include <qstatusbar.h>
 #include <qapplication.h>
+#include <qdesktopwidget.h>
 
 #include <mitkStatusBar.h>
 
@@ -80,6 +81,9 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 {
     m_StatusBar = instance;
     m_GreyValueLabel = new QLabel(m_StatusBar,0);
+    int xResolution = QApplication::desktop()->screenGeometry(0).width()-100;
+    m_GreyValueLabel->setMaximumSize(QSize(xResolution,50));
+    m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);
     m_StatusBar->addPermanentWidget(m_GreyValueLabel);
     mitk::StatusBar::SetImplementation(this);
 }

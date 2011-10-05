@@ -26,7 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractor.h"
 #include "mitkBaseRenderer.h"
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk
 {
@@ -37,6 +39,7 @@ class DisplayGeometry;
 class PlanarFigure;
 class PositionEvent;
 
+#pragma GCC visibility push(default)
 
 // Define events for PlanarFigure interaction notifications
 itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
@@ -48,7 +51,7 @@ itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
 
-
+#pragma GCC visibility pop
 
 
 /**

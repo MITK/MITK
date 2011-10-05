@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseProcess.h"
 #include "mitkTimeSlicedGeometry.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
 

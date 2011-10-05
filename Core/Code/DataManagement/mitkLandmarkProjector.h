@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 #define MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "itkObject.h"
 
 #include "mitkPlaneGeometry.h"

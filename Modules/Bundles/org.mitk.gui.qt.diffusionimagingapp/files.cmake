@@ -28,7 +28,7 @@ SET(CACHED_RESOURCE_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
   plugin.xml
-  resources/mintLogo.png
+  resources/diffusionimaging.png
 )
 
 SET(QRC_FILES

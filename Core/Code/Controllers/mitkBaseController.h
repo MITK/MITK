@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 #define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkStepper.h"
 #include "mitkStateMachine.h"
 #include <itkObjectFactory.h>

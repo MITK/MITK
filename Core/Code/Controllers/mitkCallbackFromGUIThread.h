@@ -19,8 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
 
 #include<itkCommand.h>
-#include<itkEventObject.h>
-#include "mitkCommon.h"
+#pragma GCC visibility push(default)
+#include <itkEventObject.h>
+#pragma GCC visibility pop
+#include <MitkExports.h>
 
 namespace mitk
 {

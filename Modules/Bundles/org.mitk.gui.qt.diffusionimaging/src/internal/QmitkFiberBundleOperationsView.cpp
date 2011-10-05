@@ -50,12 +50,84 @@
 #include <itkTractsToFiberEndingsImageFilter.h>
 #include <itkTractsToProbabilityImageFilter.h>
 #include <mitkDiffusionImage.h>
+#include <mitkDataNodeObject.h>
 
 
 const std::string QmitkFiberBundleOperationsView::VIEW_ID = "org.mitk.views.fiberBundleOperations";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
 using namespace mitk;
+
+struct FboSelListener : ISelectionListener
+{
+
+  berryObjectMacro(FboSelListener);
+
+  FboSelListener(QmitkFiberBundleOperationsView* view)
+  {
+    m_View = view;
+  }
+
+  void DoSelectionChanged(ISelection::ConstPointer selection)
+  {
+    // save current selection in member variable
+    m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
+
+    // do something with the selected items
+    if(m_View->m_CurrentSelection)
+    {
+      bool foundFiberBundle = false;
+      std::string classname = "FiberBundle";
+
+      // iterate selection
+      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
+        i != m_View->m_CurrentSelection->End(); ++i)
+      {
+
+        // extract datatree node
+        if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+        {
+          mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+          std::string fname = node->GetData()->GetNameOfClass();
+          if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+          {
+            foundFiberBundle = true;
+          }
+        }
+      }
+
+      if(foundFiberBundle)
+      {
+        m_View->m_Controls->m_CircleButton->setEnabled(true);
+        m_View->m_Controls->m_PolygonButton->setEnabled(true);
+        m_View->m_Controls->m_RectangleButton->setEnabled(true);
+      }
+      else{
+        m_View->m_Controls->m_CircleButton->setEnabled(false);
+        m_View->m_Controls->m_PolygonButton->setEnabled(false);
+        m_View->m_Controls->m_RectangleButton->setEnabled(false);
+      }
+    }
+  }
+
+  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  {
+    // check, if selection comes from datamanager
+    if (part)
+    {
+      QString partname(part->GetPartName().c_str());
+      if(partname.compare("Datamanager")==0)
+      {
+
+        // apply selection
+        DoSelectionChanged(selection);
+
+      }
+    }
+  }
+
+  QmitkFiberBundleOperationsView* m_View;
+};
 
 
 
@@ -92,6 +164,9 @@ void QmitkFiberBundleOperationsView::CreateQtPartControl( QWidget *parent )
     m_Controls->PFCompoORButton->setDisabled(true);
     m_Controls->PFCompoNOTButton->setDisabled(true);
     m_Controls->PFCompoDELButton->setDisabled(true);
+    m_Controls->m_CircleButton->setEnabled(false);
+    m_Controls->m_PolygonButton->setEnabled(false);
+    m_Controls->m_RectangleButton->setEnabled(false);
 
     connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
     //connect( m_Controls->comboBox_fiberAlgo, SIGNAL(selected()), this, SLOT(handleAlgoSelection() );
@@ -108,6 +183,13 @@ void QmitkFiberBundleOperationsView::CreateQtPartControl( QWidget *parent )
 
     connect( m_Controls->m_GenerationStartButton, SIGNAL(clicked()), this, SLOT(GenerationStart()) );
   }
+
+  m_SelListener = berry::ISelectionListener::Pointer(new FboSelListener(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  berry::ISelection::ConstPointer sel(
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<FboSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkFiberBundleOperationsView::GenerateROIImage(){
@@ -795,7 +877,6 @@ void QmitkFiberBundleOperationsView::ActionDrawEllipseTriggered()
       mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
     }
   }
-
 
 
 

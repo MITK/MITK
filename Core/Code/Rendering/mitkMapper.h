@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MAPPER_H_HEADER_INCLUDED_C1E6EA08
 #define MAPPER_H_HEADER_INCLUDED_C1E6EA08
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkLevelWindow.h"
 
@@ -122,14 +122,14 @@ namespace mitk {
     
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
 
+    
+    
     /** 
     * \brief Returns whether this is an vtk-based mapper
     */
-    bool IsVtkBased() const
-    {
-      return m_VtkBased;
-    }
-
+     virtual bool IsVtkBased() const = 0;
+    
+    
     /** \brief Returns true if this mapper owns the specified vtkProp for
      * the given BaseRenderer.
      *
@@ -187,8 +187,6 @@ namespace mitk {
     //## To be implemented in sub-classes.
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
 
-
-    bool m_VtkBased;
 
     itk::WeakPointer<DataNode> m_DataNode;
 

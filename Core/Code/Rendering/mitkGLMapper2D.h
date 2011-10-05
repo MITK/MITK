@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMapper2D.h"
 #include "mitkBaseRenderer.h"
 
@@ -45,6 +45,14 @@ class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
     void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
     void MitkRenderOverlay(mitk::BaseRenderer* renderer);
     void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+  
+  /** 
+   * \brief Returns whether this is an vtk-based mapper
+   */
+  virtual bool IsVtkBased() const { return false; }
+  
+
+  
   protected:
     GLMapper2D();
     virtual ~GLMapper2D();    

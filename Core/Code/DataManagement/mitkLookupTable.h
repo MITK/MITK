@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 #define MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
+#include <mitkCommon.h>
 #include "vtkLookupTable.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>

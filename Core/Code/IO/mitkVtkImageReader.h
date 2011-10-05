@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef VtkImageReader_H_HEADER_INCLUDED
 #define VtkImageReader_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 

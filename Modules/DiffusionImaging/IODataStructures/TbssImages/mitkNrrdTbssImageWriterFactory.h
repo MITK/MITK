@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 #include "MitkDiffusionImagingExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk
 {

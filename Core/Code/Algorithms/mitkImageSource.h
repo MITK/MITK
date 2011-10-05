@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 #define IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProcess.h"
 #include "mitkImage.h"
 

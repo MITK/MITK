@@ -73,6 +73,10 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     */
     void OnTemporalMedianFilterCheckBoxChecked(bool checked);
     /*!
+    \brief slot en-/disabling average filter in internal ToFCompositeFilter
+    */
+    void OnAverageFilterCheckBoxChecked(bool checked);
+    /*!
     \brief slot en-/disabling threshold filter in internal ToFCompositeFilter
     */
     void OnThresholdFilterCheckBoxChecked(bool checked);

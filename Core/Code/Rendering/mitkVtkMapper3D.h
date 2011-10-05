@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASEVTKMAPPER3D_H_HEADER_INCLUDED
 #define BASEVTKMAPPER3D_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkMapper.h"
 #include "mitkMapper3D.h"
 #include "mitkBaseRenderer.h"
@@ -81,6 +81,10 @@ public:
    * Mapper subclasses. */
   virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
   
+  /** 
+   * \brief Returns whether this is an vtk-based mapper
+   */
+  virtual bool IsVtkBased() const { return true; }
 
 protected:
   VtkMapper3D();

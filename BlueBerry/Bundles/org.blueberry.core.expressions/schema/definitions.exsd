@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.core.expressions">
+<schema targetNamespace="org.blueberry.core.expressions">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.core.expressions" id="definitions" name="Expression Definitions"/>
+         <meta.schema plugin="org.blueberry.core.expressions" id="definitions" name="Expression Definitions"/>
       </appInfo>
       <documentation>
          &lt;p&gt;
@@ -90,15 +90,15 @@ The reference element in a core expression will evaluated the expression definit
 
 &lt;p&gt;
 &lt;pre&gt;
-&amp;lt;extension point=&quot;org.eclipse.core.expressions.definitions&quot;&amp;gt;
+&amp;lt;extension point=&quot;org.blueberry.core.expressions.definitions&quot;&amp;gt;
    &amp;lt;definition id=&quot;com.example.parts.activeProblemsView&quot;&amp;gt;
        &amp;lt;with variable=&quot;activePartId&quot;&amp;gt;
-          &amp;lt;equals value=&quot;org.eclipse.ui.views.ProblemsView&quot;/&amp;gt;
+          &amp;lt;equals value=&quot;org.blueberry.ui.views.ProblemsView&quot;/&amp;gt;
        &amp;lt;/with&amp;gt;
    &amp;lt;/definition&amp;gt;
    &amp;lt;definition id=&quot;com.example.markers.markerSelection&quot;&amp;gt;
        &amp;lt;iterate&amp;gt;
-          &amp;lt;instanceof value=&quot;org.eclipse.core.resources.IMarker&quot;/&amp;gt;
+          &amp;lt;instanceof value=&quot;org.blueberry.core.resources.IMarker&quot;/&amp;gt;
        &amp;lt;/with&amp;gt;
    &amp;lt;/definition&amp;gt;
 &amp;lt;/extension&amp;gt;

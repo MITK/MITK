@@ -321,7 +321,8 @@ QmitkCommonWorkbenchWindowAdvisor(configurer),
 lastInput(0),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
-showVersionInfo(true)
+showVersionInfo(true),
+showMitkVersionInfo(true)
 {
  productName = berry::Platform::GetConfiguration().getString("application.baseName");
 }
@@ -354,6 +355,11 @@ void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
 {
  showVersionInfo = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
+{
+ showMitkVersionInfo = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
@@ -598,9 +604,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  // ===== Help menu ====================================
  QMenu* helpMenu = menuBar->addMenu("Help");
- helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
-  helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()),  QKeySequence("F1"));
- helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
+ helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
+  helpMenu->addAction("&Help Contents",this, SLOT(onHelp()),  QKeySequence("F1"));
+ helpMenu->addAction("&About",this, SLOT(onAbout()));
  // =====================================================
 
 
@@ -649,6 +655,21 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  menuPerspectiveListener = new PerspectiveListenerForMenu(this);
  configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onIntro()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onIntro();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onHelp()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onAbout()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onAbout();
 }
 
 //--------------------------------------------------------------------------------
@@ -848,7 +869,12 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
  //      title = product.getName();
  //    }
  // instead of the product name, we use a custom variable for now
- title = productName + " " + MITK_VERSION_STRING;
+ title = productName;
+
+ if(showMitkVersionInfo)
+ {
+   title += std::string(" ") + MITK_VERSION_STRING;
+ }
 
  if (showVersionInfo)
  {

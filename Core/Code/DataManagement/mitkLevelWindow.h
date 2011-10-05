@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
 #include "mitkVector.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 
 struct mitkIpPicDescriptor;
 

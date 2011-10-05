@@ -58,6 +58,8 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
       
     y=this->contentsRect().height()-qr_min.height()+5; 
     x=10; 
+
+    // Fill the tf presets in the generator widget
     
     painter.setPen(Qt::black);
     painter.drawText(QPoint(x+1,y+1),qs_min);

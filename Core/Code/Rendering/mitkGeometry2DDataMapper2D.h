@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB
 #define MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkGLMapper2D.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkDataStorage.h"

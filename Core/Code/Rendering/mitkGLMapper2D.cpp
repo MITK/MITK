@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::GLMapper2D::GLMapper2D()
 {
-  m_VtkBased = false;
+
 }
 
 

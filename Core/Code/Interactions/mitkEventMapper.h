@@ -20,9 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define EVENTMAPPER_H_HEADER_INCLUDED
 
 #include <mitkEvent.h>
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
+
+#include <itkSmartPointer.h>
+
+#include <vector>
+#include <map>
 
 namespace mitk {
   struct ltstr

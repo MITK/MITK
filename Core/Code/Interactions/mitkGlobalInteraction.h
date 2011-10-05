@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A
 
 #include "mitkFocusManager.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkStateMachineFactory.h"
 #include "mitkEventMapper.h"
 #include "mitkInteractor.h"

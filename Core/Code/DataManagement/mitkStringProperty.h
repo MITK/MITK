@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkConfigure.h>
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 
 #include <string>

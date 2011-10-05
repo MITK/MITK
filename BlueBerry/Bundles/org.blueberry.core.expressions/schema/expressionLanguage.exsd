@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.core.expressions">
+<schema targetNamespace="org.blueberry.core.expressions">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.core.expressions" id="commonExpression" name="Common Expressions"/>
+         <meta.schema plugin="org.blueberry.core.expressions" id="commonExpression" name="Common Expressions"/>
       </appInfo>
       <documentation>
          
@@ -472,14 +472,14 @@ rules:
             <meta.element labelAttribute="definitionId"/>
          </appInfo>
          <documentation>
-            This element is used to reference an expression from the &lt;b&gt;org.eclipse.core.expressions.definitions&lt;/b&gt; extension point.  The expression definition will be evaluated within the current expression element using the current evaluation context.
+            This element is used to reference an expression from the &lt;b&gt;org.blueberry.core.expressions.definitions&lt;/b&gt; extension point.  The expression definition will be evaluated within the current expression element using the current evaluation context.
          </documentation>
       </annotation>
       <complexType>
          <attribute name="definitionId" type="string" use="required">
             <annotation>
                <documentation>
-                  The unique id of an expression from &lt;b&gt;org.eclipse.core.expressions.definitions&lt;/b&gt;.
+                  The unique id of an expression from &lt;b&gt;org.blueberry.core.expressions.definitions&lt;/b&gt;.
                </documentation>
             </annotation>
          </attribute>

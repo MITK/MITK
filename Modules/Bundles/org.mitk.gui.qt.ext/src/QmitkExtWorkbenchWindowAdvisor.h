@@ -31,8 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 class QAction;
 class QMenu;
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QmitkCommonWorkbenchWindowAdvisor
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QObject, public QmitkCommonWorkbenchWindowAdvisor
 {
+  Q_OBJECT
+
 public:
 
     QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
@@ -53,6 +55,8 @@ public:
 
     void ShowVersionInfo(bool show);
 
+    void ShowMitkVersionInfo(bool show);
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -62,6 +66,12 @@ public:
 
     void SetViewExcludeList(std::vector<std::string> v);
     std::vector<std::string> GetViewExcludeList();
+
+protected slots:
+
+    virtual void onIntro();
+    virtual void onHelp();
+    virtual void onAbout();
 
 private:
 
@@ -109,6 +119,7 @@ private:
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
   bool showVersionInfo;
+  bool showMitkVersionInfo;
   std::string productName;
   std::string windowIcon;
 

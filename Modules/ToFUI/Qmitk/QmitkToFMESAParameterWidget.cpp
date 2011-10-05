@@ -62,7 +62,7 @@ void QmitkToFMESAParameterWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( m_Controls->m_IntegrationTimeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeIntegrationTimeSpinBox(int)) );
-    connect( m_Controls->m_ModulationFrequencyComboBox, SIGNAL(valueChanged(int)), this, SLOT(OnChangeModulationFrequencyComboBox(int)) );
+    connect( m_Controls->m_ModulationFrequencyComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnChangeModulationFrequencyComboBox(int)) );
     connect( m_Controls->m_FPNCB, SIGNAL(toggled(bool)), this, SLOT(OnChangeFPNCheckBox(bool)) );
     connect( m_Controls->m_ConvGrayCB, SIGNAL(toggled(bool)), this, SLOT(OnChangeConvGrayCheckBox(bool)) );
     connect( m_Controls->m_MedianCB, SIGNAL(toggled(bool)), this, SLOT(OnChangeMedianCheckBox(bool)) );

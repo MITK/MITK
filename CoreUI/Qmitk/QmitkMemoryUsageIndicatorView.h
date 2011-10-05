@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
 #define QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
 
+#include <QmitkExports.h>
+
 #include <QWidget>
 #include <qpixmap.h>
 #include "ui_QmitkMemoryUsageIndicator.h"

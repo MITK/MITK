@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITKSHADERREPOSITORY_H_
 #define _MITKSHADERREPOSITORY_H_
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include <vtkXMLDataElement.h>

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
 #define MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 

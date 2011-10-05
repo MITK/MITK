@@ -28,7 +28,9 @@ class SliceNavigationController;
 class Action;
 class StateEvent;
 
+#pragma GCC visibility push(default)
 itkEventMacro( SliceRotationEvent, itk::AnyEvent);
+#pragma GCC visibility pop
  
 /**
  * \brief Coordinates a list of SliceNavigationControllers.

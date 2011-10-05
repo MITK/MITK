@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 
 #include "mitkCoreObjectFactory.h"
-#include "mitkPlanarFigureObjectFactory.h"
+#include "mitkPlanarFigureObjectFactory.cpp"
 
 /**Documentation
  *  Test for factory registration
@@ -27,8 +27,6 @@ int mitkPlanarFigureObjectFactoryTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("PlanarFigureObjectFactoryTest");
-  
-  RegisterPlanarFigureObjectFactory();
 
   // always end with this!
   MITK_TEST_END();

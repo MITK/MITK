@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 #include "mitkPixelType.h"
+#include <mitkLogMacros.h>
 
 
 //## Documentation

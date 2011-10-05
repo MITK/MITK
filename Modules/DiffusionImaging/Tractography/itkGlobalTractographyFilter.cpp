@@ -7,7 +7,9 @@
 
 #include "GlobalTracking/BuildFibres.cpp"
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 #include <QMutexLocker>
 #include <itkHistogram.h>

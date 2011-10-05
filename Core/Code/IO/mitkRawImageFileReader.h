@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef RawImageFileReader_H_HEADER_INCLUDED
 #define RawImageFileReader_H_HEADER_INCLUDED
 #include "itkVector.h"
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 

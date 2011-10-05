@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSlicesCoordinator.h>
 #include <mitkVector.h>
 
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 
 namespace mitk {
 

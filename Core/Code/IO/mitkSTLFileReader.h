@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef STLFileReader_H_HEADER_INCLUDED
 #define STLFileReader_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkSurfaceSource.h"
 
 namespace mitk {

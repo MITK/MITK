@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.core.expressions">
+<schema targetNamespace="org.blueberry.core.expressions">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.core.expressions" id="propertyTesters" name="Property Testers"/>
+         <meta.schema plugin="org.blueberry.core.expressions" id="propertyTesters" name="Property Testers"/>
       </appInfo>
       <documentation>
          This extension point allows to add properties to an already existing type. Those
@@ -81,10 +81,10 @@
             <annotation>
                <documentation>
                   the name of the class that implements the testing methods. The class must be public and extend
-&lt;samp&gt;org.eclipse.core.expressions.PropertyTester&lt;/samp&gt; with a public 0-argument constructor.
+&lt;samp&gt;org.blueberry.core.expressions.PropertyTester&lt;/samp&gt; with a public 0-argument constructor.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.core.expressions.PropertyTester"/>
+                  <meta.attribute kind="java" basedOn="org.blueberry.core.expressions.PropertyTester"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -128,7 +128,7 @@
          <meta.section type="apiInfo"/>
       </appInfo>
       <documentation>
-         The contributed class must extend &lt;code&gt;org.eclipse.core.expressions.PropertyTester&lt;/code&gt;
+         The contributed class must extend &lt;code&gt;berry::PropertyTester&lt;/code&gt;
       </documentation>
    </annotation>
 

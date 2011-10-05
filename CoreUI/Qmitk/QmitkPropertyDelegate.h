@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkPropertyDelegate_h
 #define QmitkPropertyDelegate_h
 
+#include <QmitkExports.h>
+
 /// Own includes.
 #include "mitkBaseProperty.h"
 

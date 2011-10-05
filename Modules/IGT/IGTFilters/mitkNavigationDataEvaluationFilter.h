@@ -61,8 +61,13 @@ namespace mitk {
     mitk::Quaternion GetQuaternionMean(int input);
     /** @return Returns the standard derivation of each component of the specified input since the start of the statistic (last call of ResetStatistic()) */
     mitk::Quaternion GetQuaternionStandardDeviation(int input);
-    
-
+    /** @return Returns the mean euler angles (theta_x, theta_y, theta_z) of the specified input since the start of the statistic (last call of ResetStatistic()) */
+    mitk::Vector3D GetEulerAnglesMean(int input);
+    /** @return Returns the RMS of the error of the euler angles (theta_x, theta_y, theta_z) in radians of the specified input since the start of the statistic (last call of ResetStatistic()) */
+    double GetEulerAnglesRMS(int input);
+    /** @return Returns the RMS of the error of the euler angles (theta_x, theta_y, theta_z) in degree of the specified input since the start of the statistic (last call of ResetStatistic()) */
+    double GetEulerAnglesRMSDegree(int input);
+       
     /** @return Returns the mean distance to the mean postion (=mean error) to the specified input. */
     double GetPositionErrorMean(int input);
     /** @return Returns the standard derivation of the errors of all positions to the specified input. */
@@ -101,6 +106,12 @@ namespace mitk {
     mitk::Quaternion GetMean(std::vector<mitk::Quaternion> list);
 
     mitk::PointSet::Pointer VectorToPointSet(std::vector<mitk::Point3D> pSet);
+
+    mitk::PointSet::Pointer VectorToPointSet(std::vector<mitk::Vector3D> pSet);
+
+    /** @brief Converts a list of quaterions to a list of euler angles (theta_x, theta_y, theta_z) */
+    std::vector<mitk::Vector3D> QuaternionsToEulerAngles(std::vector<mitk::Quaternion> quaterions); //in radians
+    std::vector<mitk::Vector3D> QuaternionsToEulerAnglesGrad(std::vector<mitk::Quaternion> quaterions); //in degree
     
   };
 } // namespace mitk

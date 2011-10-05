@@ -60,8 +60,11 @@ message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
 #
 # Set initial cache options
 #
-
-set(CTEST_USE_LAUNCHERS 1)
+if(CMAKE_GENERATOR MATCHES "[Mm]ake")
+  set(CTEST_USE_LAUNCHERS 1)
+else()
+  set(CTEST_USE_LAUNCHERS 0)
+endif()
 
 # Remove this if block after all dartclients work
 if(DEFINED ADDITIONNAL_CMAKECACHE_OPTION)

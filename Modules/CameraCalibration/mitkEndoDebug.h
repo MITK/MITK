@@ -161,6 +161,19 @@ namespace mitk
     cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
   }
 
+///
+/// macro for a section that should only be executed if debugging is enabled
+///
+#define endodebugbegin \
+  if( mitk::EndoDebug::GetInstance().Debug(__FILE__) ) \
+  { \
+
+///
+/// macro for a section that should only be executed if debugging is enabled
+///
+#define endodebugend \
+  }
+
 #endif // mitkEndoDebug_h
 
 

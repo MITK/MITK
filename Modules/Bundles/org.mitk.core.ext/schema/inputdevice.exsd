@@ -16,9 +16,9 @@
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="0" maxOccurs="unbounded">
-            <element ref="SpaceNavigator"/>
-         </choice>
+         <sequence>
+            <element ref="inputdevice" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -45,45 +45,42 @@
          </attribute>
       </complexType>
    </element>
-
-   <element name="SpaceNavigator">
+   
+   <element name="inputdevice">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
          </sequence>
-         <attribute name="org.mitk.core.ext.inputdevices.spacenavigator" type="string" use="required">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  a unique name that will be used to identify this input device
+                  the identifier of the input device
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="3D Space Navigator" type="string" use="required">
+         <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  a translatable name that will be used in the UI for this view
+                  an optional name of the input device
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="SpaceNavigatorVtkCameraController" type="string" use="required">
+         <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   a fully qualified name of the class that implements 
 &lt;samp&gt;mitk::IInputDevice&lt;/samp&gt;.
                </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="icon" type="string">
-            <annotation>
-               <documentation>
-                  a relative name of the icon that will 
-be associated with the input device.
-               </documentation>
                <appinfo>
-                  <meta.attribute kind="resource"/>
+                  <meta.attribute kind="java" basedOn="mitk::IInputDevice"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -113,8 +110,9 @@ be associated with the input device.
       &lt;inputdevice
          id=&quot;com.xyz.inputdevice.XYZDevice&quot; 
          name=&quot;XYZ Device&quot; 
-         class=&quot;ns::XYZDevice&quot; 
-         icon=&quot;icons/XYZ.gif&quot;/&gt;
+         class=&quot;ns::XYZDevice&quot; &gt;
+         &lt;description&gt;My new 20-dimensional input device&lt;/description&gt;
+      &lt;/inputdevice&gt;
    &lt;/extension&gt; 
 &lt;/pre&gt;
 &lt;/p&gt;

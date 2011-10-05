@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.segment} The Segmentation Module
+\bundlemainpage{org_segment} The Segmentation Module
 
 \image html segmentation.png "Icon of the Module"
 
@@ -23,6 +23,7 @@ Available sections:
  - \ref org_mitk_gui_qt_segmentationUserManualLesionSegmentation
  - \ref org_mitk_gui_qt_segmentationUserManualPostprocessing
  - \ref org_mitk_gui_qt_segmentationUserManualSurfaceMasking
+ - \ref org_mitk_gui_qt_segmentationUserManualTechnicalDetail
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
@@ -258,6 +259,10 @@ if there is just one image and one surface)
 \image html segmentationFromSurfaceAfter.png After clicking "Create segmentation
 from surface" the newly created binary image is inserted in the DataManager and can
 be used for further processing
+
+\section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
+
+For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions .
 
 */
 

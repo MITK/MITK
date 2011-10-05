@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef ACTION_H_HEADER_INCLUDED_C19AE06B
 #define ACTION_H_HEADER_INCLUDED_C19AE06B
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkPropertyList.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>

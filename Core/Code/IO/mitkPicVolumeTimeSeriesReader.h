@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _PIC_VOLUME_TIME_SERIES_READER__H_
 #define _PIC_VOLUME_TIME_SERIES_READER__H_
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkFileSeriesReader.h"
 #include "mitkImageSource.h"
 #include <vector>

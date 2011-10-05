@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkDataStorageComboBox_h
 #define QmitkDataStorageComboBox_h
 
+#include <QmitkExports.h>
+
 // Own Includes
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"

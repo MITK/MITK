@@ -191,6 +191,7 @@ SET(MOC_H_FILES
  QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
+ QmitkPlotWidget.h
  QmitkPointListModel.h
  QmitkPointListView.h
  QmitkPointListWidget.h
@@ -213,6 +214,7 @@ SET(MOC_H_FILES
  QmitkRegionGrow3DToolGUI.h
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
+ QmitkPlotWidget.h
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )

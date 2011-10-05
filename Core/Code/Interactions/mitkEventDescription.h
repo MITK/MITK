@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 #define EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkEvent.h"
 #include <string>
 

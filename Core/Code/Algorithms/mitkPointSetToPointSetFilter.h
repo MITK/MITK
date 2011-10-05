@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _mitkpointsettopointsetfilter_h
 #define _mitkpointsettopointsetfilter_h
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkPointSetSource.h"
 
 namespace mitk

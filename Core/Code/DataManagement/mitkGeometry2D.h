@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 #define GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkGeometry3D.h"
 
 namespace mitk {

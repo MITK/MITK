@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
 #define MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkVector.h"
 

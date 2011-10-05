@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkPolyDataAlgorithm.h"
 #include "mitkCommon.h"
 
-class MitkDiffusionImaging_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm 
+class MitkDiffusionImaging_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeRevisionMacro(vtkOdfSource,vtkPolyDataAlgorithm);
@@ -39,9 +39,12 @@ public:
 
   vtkSetMacro(OdfVals,vtkDoubleArray*);
   vtkGetMacro(OdfVals,vtkDoubleArray*);
-  
+
   vtkSetMacro(Scale,double);
   vtkGetMacro(Scale,double);
+
+  vtkSetMacro(AdditionalScale,double);
+  vtkGetMacro(AdditionalScale,double);
 
 protected:
   vtkOdfSource();
@@ -54,6 +57,7 @@ protected:
   vtkDoubleArray* OdfVals;
 
   double Scale;
+  double AdditionalScale;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 #define MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkUIDGenerator.h"
 

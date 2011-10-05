@@ -47,18 +47,21 @@ std::vector<mitk::Point3D> mitk::PointSetStatisticsCalculator::PointSetToVector(
 
 double mitk::PointSetStatisticsCalculator::GetMax(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 return list.at(list.size()-1);
 }
 
 double mitk::PointSetStatisticsCalculator::GetMin(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 return list.at(0);
 }
 
 double mitk::PointSetStatisticsCalculator::GetStabw(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
 for(int i=0; i<list.size(); i++)
@@ -73,6 +76,7 @@ return returnValue;
 
 double mitk::PointSetStatisticsCalculator::GetSampleStabw(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
 for(int i=0; i<list.size(); i++)
@@ -87,6 +91,7 @@ return returnValue;
 
 double mitk::PointSetStatisticsCalculator::GetMean(std::vector<double> list)
 {
+if (list.empty()) return 0;
 double mean = 0;
 for(int i=0; i<list.size(); i++)
   {
@@ -98,6 +103,7 @@ return mean;
 
 double mitk::PointSetStatisticsCalculator::GetMedian(std::vector<double> list)
 {
+if (list.empty()) return 0;
 std::sort(list.begin(), list.end());
 if (list.size() % 2 == 0.) //even
   {
@@ -113,6 +119,13 @@ else //odd
 
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetMean(std::vector<mitk::Point3D> list)
 {
+if (list.empty()) 
+  {
+    mitk::Point3D emptyPoint;
+    emptyPoint.Fill(0);
+    return emptyPoint;
+  }
+
 //calculate mean
 mitk::Point3D mean;
 mean.Fill(0);
@@ -135,7 +148,11 @@ double mitk::PointSetStatisticsCalculator::GetPositionErrorMean()
 {
 double returnValue = 0.0;
 
+if (CheckIfAllPositionsAreEqual()) return returnValue;
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
+
+if (pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 
@@ -163,7 +180,11 @@ double mitk::PointSetStatisticsCalculator::GetPositionErrorRMS()
 {
 double returnValue = 0.0;
 
+if (CheckIfAllPositionsAreEqual()) return returnValue;
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
+
+if(pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 
@@ -196,16 +217,23 @@ std::vector<double> mitk::PointSetStatisticsCalculator::GetErrorList(std::vector
 {
 std::vector<double> errorList = std::vector<double>();
 mitk::Point3D mean = GetMean(list);
-for(int i=0; i<list.size(); i++)
-  {
-  errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));
-  }
+if (CheckIfAllPositionsAreEqual()) for(int i=0; i<list.size(); i++) {errorList.push_back(0.0);}
+else for(int i=0; i<list.size(); i++) {errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));}
 return errorList;
 }
 
 mitk::Vector3D mitk::PointSetStatisticsCalculator::GetPositionStandardDeviation()
 {
 mitk::Vector3D returnValue;
+
+if (CheckIfAllPositionsAreEqual())
+  {
+  returnValue[0]=0;
+  returnValue[1]=0;
+  returnValue[2]=0;
+  return returnValue;
+  }
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
@@ -225,6 +253,15 @@ return returnValue;
 mitk::Vector3D mitk::PointSetStatisticsCalculator::GetPositionSampleStandardDeviation()
 {
 mitk::Vector3D returnValue;
+
+if (CheckIfAllPositionsAreEqual())
+  {
+  returnValue[0]=0;
+  returnValue[1]=0;
+  returnValue[2]=0;
+  return returnValue;
+  }
+
 std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
@@ -244,4 +281,19 @@ return returnValue;
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetPositionMean()
 {
 return GetMean(PointSetToVector(m_PointSet));
+}
+
+bool mitk::PointSetStatisticsCalculator::CheckIfAllPositionsAreEqual()
+{
+if (m_PointSet->GetSize()==0) return false;
+if (m_PointSet->GetSize()==1) return true;
+
+mitk::Point3D lastPoint = m_PointSet->GetPoint(0);
+for(int i=1; i<m_PointSet->GetSize(); i++)
+  {
+  if((m_PointSet->GetPoint(i)[0]!=lastPoint[0])||(m_PointSet->GetPoint(i)[1]!=lastPoint[1])||(m_PointSet->GetPoint(i)[2]!=lastPoint[2])) return false;
+  lastPoint = m_PointSet->GetPoint(i);
+  }
+
+return true;
 }

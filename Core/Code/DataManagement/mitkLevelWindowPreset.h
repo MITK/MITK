@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LEVELWINDOWPRESET_H_HEADER
 
 #include <vtkXMLParser.h>
-#include <mitkCommon.h>
+#include <MitkExports.h>
 #include <map>
 #include <string>
 

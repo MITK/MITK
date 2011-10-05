@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITK_APPLICATION_CURSOR_H_INCLUDED
 #define QMITK_APPLICATION_CURSOR_H_INCLUDED
 
+#include <QmitkExports.h>
 #include "mitkApplicationCursor.h"
 
 /*!

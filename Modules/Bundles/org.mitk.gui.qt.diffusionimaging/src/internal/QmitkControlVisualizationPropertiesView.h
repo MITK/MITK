@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -111,12 +111,20 @@ protected slots:
 
   void SetInteractor();
 
-  void PFWidth(double);
+  void PFWidth(int);
   void PFColor();
+  void PFColor3D();
+
+  void LineWidthChanged(int);
+  void TubeRadiusChanged(int);
 
   void Heatmap();
+  void Welcome();
 
 protected:
+
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
@@ -127,6 +135,7 @@ protected:
 
   bool m_FoundSingleOdfImage;
   bool m_IsInitialized;
+  mitk::DataNode::Pointer m_NodeUsedForOdfVisualization;
 
   QIcon* m_IconTexOFF;
   QIcon* m_IconTexON;

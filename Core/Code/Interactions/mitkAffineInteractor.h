@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 #define MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 
-#include "mitkCommon.h"
+#include <MitkExports.h>
 #include "mitkInteractor.h"
 #include "mitkVector.h"
 
@@ -34,10 +34,12 @@ class DisplayPositionEvent;
 //## @ingroup Interaction
 
 //create events for interactions
+#pragma GCC visibility push(default)
 itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
 itkEventMacro(ScaleEvent, AffineInteractionEvent);
 itkEventMacro(RotateEvent, AffineInteractionEvent);
 itkEventMacro(TranslateEvent, AffineInteractionEvent);
+#pragma GCC visibility pop
 
 class MITK_CORE_EXPORT AffineInteractor : public Interactor
 {

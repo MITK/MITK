@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorage.h>
 #include "MitkExtExports.h"
 #include <mitkNodePredicateBase.h>
+#pragma GCC visibility push(default)
 #include <itkEventObject.h>
+#pragma GCC visibility pop
 #include <mitkCommon.h>
 #include <set>
 

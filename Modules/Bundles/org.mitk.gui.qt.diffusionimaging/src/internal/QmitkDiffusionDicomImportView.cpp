@@ -82,11 +82,11 @@ void QmitkDiffusionDicomImport::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_AddFoldersButton, SIGNAL(clicked()), 
+    connect( m_Controls->m_AddFoldersButton, SIGNAL(clicked()),
              this, SLOT(DicomLoadAddFolderNames()) );
-    connect( m_Controls->m_DeleteFoldersButton, SIGNAL(clicked()), 
+    connect( m_Controls->m_DeleteFoldersButton, SIGNAL(clicked()),
              this, SLOT(DicomLoadDeleteFolderNames()) );
-    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()), 
+    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()),
              this, SLOT(DicomLoadStartLoad()) );
     connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()),
              this, SLOT(AverageClicked()) );
@@ -130,12 +130,12 @@ void QmitkDiffusionDicomImport::Activated()
   QmitkFunctionality::Activated();
 }
 
-void QmitkDiffusionDicomImport::DicomLoadDeleteFolderNames() 
+void QmitkDiffusionDicomImport::DicomLoadDeleteFolderNames()
 {
   m_Controls->listWidget->clear();
 }
 
-void QmitkDiffusionDicomImport::DicomLoadAddFolderNames() 
+void QmitkDiffusionDicomImport::DicomLoadAddFolderNames()
 {
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( m_Parent, QString("Select folders containing DWI data") );
@@ -261,12 +261,27 @@ std::string QmitkDiffusionDicomImport::GetMemoryDescription( size_t processSize,
   return str.str();
 }
 
-void QmitkDiffusionDicomImport::DicomLoadStartLoad() 
+void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 {
   itk::TimeProbesCollectorBase clock;
 
   try
   {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
 
     int nrFolders = m_Controls->listWidget->count();
 
@@ -600,7 +615,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
     Status("Timing information");
     clock.Report();
-    
+
     if(!m_OutputFolderNameSet && node.IsNotNull())
     {
       mitk::BaseData::Pointer basedata = node->GetData();
@@ -613,6 +628,15 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
+    }
   }
   catch (itk::ExceptionObject &ex)
   {

@@ -31,7 +31,7 @@ public:
     , m_AcceptedProposals(0)
   {
     fprintf(stderr,"Data dimensions (mm) :  %f x %f x %f\n",width,height,depth);
-    fprintf(stderr,"Data dimensions (voxel) :  %i x %i x %i\n",datasz[0],datasz[1],datasz[2]);
+    fprintf(stderr,"Data dimensions (voxel) :  %i x %i x %i\n",datasz[1],datasz[2],datasz[3]);
     fprintf(stderr,"voxel size (mm) :  %lf x %lf x %lf\n",voxsize[0],voxsize[1],voxsize[2]);
 
     float cellcnt_x = (int)((float)width/cellsize) +1;

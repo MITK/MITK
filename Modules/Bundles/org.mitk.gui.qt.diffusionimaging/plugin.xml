@@ -44,6 +44,13 @@
           class="QmitkControlVisualizationPropertiesView" />
   </extension>
 
+   <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.ivim"
+          name="IVIM"
+          class="QmitkIVIMView"
+          icon="resources/IVIM_48.png" />
+  </extension>
+
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.publicdiffusionimaging"
                  name="Diffusion Imaging Public"

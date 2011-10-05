@@ -63,8 +63,8 @@ void QmitkToFCompositeFilterWidget::CreateConnections()
   if ( m_Controls )
   {
     connect(m_Controls->m_TemporalMedianFilterNumOfFramesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTemporalMedianFilterNumOfFramesSpinBoxValueChanged(int)));
-    connect(m_Controls->m_BilateralFilterDomainSigmaSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBilateralFilterDomainSigmaSpinBoxValueChanged(int)));
-    connect(m_Controls->m_BilateralFilterRangeSigmaSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBilateralFilterRangeSigmaSpinBoxValueChanged(int)));
+    connect(m_Controls->m_BilateralFilterDomainSigmaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBilateralFilterDomainSigmaSpinBoxValueChanged(double)));
+    connect(m_Controls->m_BilateralFilterRangeSigmaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBilateralFilterRangeSigmaSpinBoxValueChanged(double)));
     connect(m_Controls->m_BilateralFilterKernelRadiusSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBilateralFilterKernelRadiusSpinBoxValueChanged(int)));
     connect(m_Controls->m_ThresholdFilterMinValueSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnThresholdFilterMinValueChanged(int)));
     connect(m_Controls->m_ThresholdFilterMaxValueSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnThresholdFilterMaxValueChanged(int)));
@@ -148,12 +148,12 @@ void QmitkToFCompositeFilterWidget::OnTemporalMedianFilterNumOfFramesSpinBoxValu
   this->m_ToFCompositeFilter->SetTemporalMedianFilterParameter(value);
 }
 
-void QmitkToFCompositeFilterWidget::OnBilateralFilterDomainSigmaSpinBoxValueChanged(int value)
+void QmitkToFCompositeFilterWidget::OnBilateralFilterDomainSigmaSpinBoxValueChanged(double value)
 {
   SetBilateralFilterParameter();
 }
 
-void QmitkToFCompositeFilterWidget::OnBilateralFilterRangeSigmaSpinBoxValueChanged(int value)
+void QmitkToFCompositeFilterWidget::OnBilateralFilterRangeSigmaSpinBoxValueChanged(double value)
 {
   SetBilateralFilterParameter();
 }
@@ -185,8 +185,8 @@ void QmitkToFCompositeFilterWidget::SetThresholdFilterParameter()
 
 void QmitkToFCompositeFilterWidget::SetBilateralFilterParameter()
 {
-  int domainSigma = m_Controls->m_BilateralFilterDomainSigmaSpinBox->value();
-  int rangeSigma = m_Controls->m_BilateralFilterRangeSigmaSpinBox->value();
+  double domainSigma = m_Controls->m_BilateralFilterDomainSigmaSpinBox->value();
+  double rangeSigma = m_Controls->m_BilateralFilterRangeSigmaSpinBox->value();
   int kernelRadius = m_Controls->m_BilateralFilterKernelRadiusSpinBox->value();
   this->m_ToFCompositeFilter->SetBilateralFilterParameter(domainSigma, rangeSigma, kernelRadius);
 }

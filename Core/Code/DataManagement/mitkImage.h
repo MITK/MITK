@@ -21,13 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include "mitkSlicedData.h"
-//#include "mitkPixelType.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
-#include "mitkWeakPointer.h"
+
 
 class vtkImageData;
 
@@ -64,7 +63,7 @@ class MITK_CORE_EXPORT Image : public SlicedData
   friend class SubImageSelector;
 
 public:
-  mitkClassMacro(Image, SlicedData);    
+  mitkClassMacro(Image, SlicedData);
 
   itkNewMacro(Self);
 
@@ -73,7 +72,6 @@ public:
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
 
-  //typedef mitk::WeakPointer<mitk::ImageStatisticsHolder> StatisticsHolderPointer;
   typedef mitk::ImageStatisticsHolder* StatisticsHolderPointer;
 
   //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.
@@ -456,12 +454,14 @@ public:
   virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
 
-  StatisticsHolderPointer GetStatistics()
+  StatisticsHolderPointer GetStatistics() const
   {
-      return m_ImageStatistics;
+    return m_ImageStatistics;
   }
 
 protected:
+
+  friend class ImageStatisticsHolder;
 
   StatisticsHolderPointer m_ImageStatistics;
   
@@ -471,9 +471,9 @@ protected:
 
   void ComputeOffsetTable();
 
-  virtual void Expand( unsigned int timeSteps );
-
   virtual bool IsValidTimeStep(int t) const;
+
+  virtual void Expand( unsigned int timeSteps );
 
   virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
@@ -491,8 +491,6 @@ protected:
 
   //## @warning Has to be called by every Initialize method!
   virtual void Initialize();
-
-  ImageTimeSelector* GetTimeSelector() const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

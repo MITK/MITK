@@ -1,7 +1,30 @@
 #include "mitkImageStatisticsHolder.h"
 
-mitk::ImageStatisticsHolder::ImageStatisticsHolder()
+#include "mitkHistogramGenerator.h"
+#include "mitkImageTimeSelector.h"
+
+mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::ConstPointer image)
+  : m_Image(image)
 {
+  m_CountOfMinValuedVoxels.resize(1, 0);
+  m_CountOfMaxValuedVoxels.resize(1, 0);
+  m_ScalarMin.resize(1, itk::NumericTraits<ScalarType>::max());
+  m_ScalarMax.resize(1, itk::NumericTraits<ScalarType>::NonpositiveMin());
+  m_Scalar2ndMin.resize(1, itk::NumericTraits<ScalarType>::max());
+  m_Scalar2ndMax.resize(1, itk::NumericTraits<ScalarType>::NonpositiveMin());
+
+  mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
+  m_HistogramGeneratorObject = generator;
+
+  // create time selector
+  this->GetTimeSelector();
+
+}
+
+mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
+{
+  m_HistogramGeneratorObject = NULL;
+  m_TimeSelectorForExtremaObject = NULL;
 }
 
 const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::GetScalarHistogram(int t) const
@@ -20,100 +43,27 @@ const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::G
   return NULL;
 }
 
-#include "mitkImageAccessByItk.h"
-
-//#define BOUNDINGOBJECT_IGNORE
-
-template < typename ItkImageType >
-void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage, int t)
+mitk::ImageTimeSelector* mitk::ImageStatisticsHolder::GetTimeSelector() const
 {
-  typename ItkImageType::RegionType region;
-  region = itkImage->GetBufferedRegion();
-  if(region.Crop(itkImage->GetRequestedRegion()) == false) return;
-  if(region != itkImage->GetRequestedRegion()) return;
-
-  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
-  typedef typename ItkImageType::PixelType TPixel;
-  TPixel value = 0;
-
-  if ( !mitkImage || !mitkImage->IsValidTimeStep( t ) ) return;
-  mitkImage->Expand(t+1); // make sure we have initialized all arrays
-  mitkImage->m_CountOfMinValuedVoxels[t] = 0;
-  mitkImage->m_CountOfMaxValuedVoxels[t] = 0;
-
-  mitkImage->m_Scalar2ndMin[t]=
-    mitkImage->m_ScalarMin[t] = itk::NumericTraits<ScalarType>::max();
-  mitkImage->m_Scalar2ndMax[t]=
-    mitkImage->m_ScalarMax[t] = itk::NumericTraits<ScalarType>::NonpositiveMin();
-
-  while( !it.IsAtEnd() )
+  if(m_TimeSelectorForExtremaObject.IsNull())
   {
-    value = it.Get();
-    //  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin = value;
-    //  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;
-    //  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;
-    //  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin = value;
+    m_TimeSelectorForExtremaObject = ImageTimeSelector::New();
 
-    // if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
-#ifdef BOUNDINGOBJECT_IGNORE
-    if( value > -32765)
-    {
-#endif
-    // update min
-    if ( value < mitkImage->m_ScalarMin[t] )
-    {
-        mitkImage->m_Scalar2ndMin[t] = mitkImage->m_ScalarMin[t];    mitkImage->m_ScalarMin[t] = value;
-        mitkImage->m_CountOfMinValuedVoxels[t] = 1;
-    }
-    else if ( value == mitkImage->m_ScalarMin[t] )
-    {
-        ++mitkImage->m_CountOfMinValuedVoxels[t];
-    }
-    else if ( value < mitkImage->m_Scalar2ndMin[t] )
-    {
-        mitkImage->m_Scalar2ndMin[t] = value;
-    }
-
-    // update max
-    if ( value > mitkImage->m_ScalarMax[t] )
-    {
-        mitkImage->m_Scalar2ndMax[t] = mitkImage->m_ScalarMax[t];    mitkImage->m_ScalarMax[t] = value;
-        mitkImage->m_CountOfMaxValuedVoxels[t] = 1;
-    }
-    else if ( value == mitkImage->m_ScalarMax[t] )
-    {
-        ++mitkImage->m_CountOfMaxValuedVoxels[t];
-    }
-    else if ( value > mitkImage->m_Scalar2ndMax[t] )
-    {
-        mitkImage->m_Scalar2ndMax[t] = value;
-    }
-#ifdef BOUNDINGOBJECT_IGNORE
-    }
-#endif
-
-    ++it;
+    ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+    timeSelector->SetInput(m_Image);
+    m_Image->UnRegister();
   }
 
-  //// guard for wrong 2dMin/Max on single constant value images
-  if (mitkImage->m_ScalarMax[t] == mitkImage->m_ScalarMin[t])
-  {
-      mitkImage->m_Scalar2ndMax[t] = mitkImage->m_Scalar2ndMin[t] = mitkImage->m_ScalarMax[t];
-  }
-  mitkImage->m_LastRecomputeTimeStamp.Modified();
-  //MITK_DEBUG <<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max();
-}
-
-bool mitk::ImageStatisticsHolder::IsValidTimeStep(int t) const
-{
-  return ( ( m_Dimension >= 4 && t <= (int)m_Dimensions[3] && t > 0 ) || (t == 0) );
+  return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
 }
 
 void mitk::ImageStatisticsHolder::Expand( unsigned int timeSteps )
 {
-  if(timeSteps < 1) itkExceptionMacro(<< "Invalid timestep in Image!");
-  if(! IsValidTimeStep( timeSteps-1 ) ) return;
-  Superclass::Expand(timeSteps);
+  if( m_Image->IsValidTimeStep(timeSteps - 1) ) return;
+
+  // The BaseData needs to be expanded, call the mitk::Image::Expand() method
+  m_Image->Expand(timeSteps);
+
   if(timeSteps > m_ScalarMin.size() )
   {
     m_ScalarMin.resize(timeSteps, itk::NumericTraits<ScalarType>::max());
@@ -138,23 +88,19 @@ void mitk::ImageStatisticsHolder::ResetImageStatistics() const
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t) const
 {
   // timestep valid?
-  if (!IsValidTimeStep(t)) return;
+  if (!m_Image->IsValidTimeStep(t)) return;
 
   // image modified?
-  if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
+  if (this->m_Image->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
     this->ResetImageStatistics();
 
-  // adapt vector length
-  // the const_cast is necessary since the whole statistics are provided
-  // with const-methods but are actually stored inside the object with mutable
-  // members. This should be resolved in a redesign of the image class.
-  const_cast<mitk::Image*>(this)->Expand(t+1);
+  this->Expand(t+1);
 
   // do we have valid information already?
   if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() ||
-    m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
-// FIXME Commended calls to itk statistics to avoid run-time erorrs
-  const mitk::PixelType pType = m_ImageDescriptor->GetChannelTypeById(0);
+      m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
+
+  const mitk::PixelType pType = m_Image->GetPixelType(0);
   if(pType.GetNumberOfComponents() == 1)
   {
     // recompute
@@ -164,8 +110,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t) const
       timeSelector->SetTimeNr(t);
       timeSelector->UpdateLargestPossibleRegion();
       mitk::Image* image = timeSelector->GetOutput();
-      mitk::Image* thisImage = const_cast<Image*>(this);
-      AccessByItk_2( image, _ComputeExtremaInItkImage, thisImage, t );
+      AccessByItk_2( image, _ComputeExtremaInItkImage, this, t );
     }
   }
   else if(pType.GetNumberOfComponents() > 1)
@@ -173,6 +118,92 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t) const
     m_ScalarMin[t] = 0;
     m_ScalarMax[t] = 255;
   }
+}
+
+#include "mitkImageAccessByItk.h"
+
+//#define BOUNDINGOBJECT_IGNORE
+
+template < typename ItkImageType >
+void mitk::_ComputeExtremaInItkImage(const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t)
+{
+  typename ItkImageType::RegionType region;
+  region = itkImage->GetBufferedRegion();
+  if(region.Crop(itkImage->GetRequestedRegion()) == false) return;
+  if(region != itkImage->GetRequestedRegion()) return;
+
+  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
+  typedef typename ItkImageType::PixelType TPixel;
+  TPixel value = 0;
+
+  if ( statisticsHolder != NULL || !statisticsHolder->IsValidTimeStep( t ) ) return;
+  statisticsHolder->Expand(t+1); // make sure we have initialized all arrays
+  statisticsHolder->m_CountOfMinValuedVoxels[t] = 0;
+  statisticsHolder->m_CountOfMaxValuedVoxels[t] = 0;
+
+  statisticsHolder->m_Scalar2ndMin[t]=
+      statisticsHolder->m_ScalarMin[t] = itk::NumericTraits<ScalarType>::max();
+  statisticsHolder->m_Scalar2ndMax[t]=
+      statisticsHolder->m_ScalarMax[t] = itk::NumericTraits<ScalarType>::NonpositiveMin();
+
+  while( !it.IsAtEnd() )
+  {
+    value = it.Get();
+    //  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin = value;
+    //  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;
+    //  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;
+    //  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin = value;
+
+    // if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
+#ifdef BOUNDINGOBJECT_IGNORE
+    if( value > -32765)
+    {
+#endif
+      // update min
+      if ( value < statisticsHolder->m_ScalarMin[t] )
+      {
+        statisticsHolder->m_Scalar2ndMin[t] =
+            statisticsHolder->m_ScalarMin[t];    statisticsHolder->m_ScalarMin[t] = value;
+        statisticsHolder->m_CountOfMinValuedVoxels[t] = 1;
+      }
+      else if ( value == statisticsHolder->m_ScalarMin[t] )
+      {
+        ++statisticsHolder->m_CountOfMinValuedVoxels[t];
+      }
+      else if ( value < statisticsHolder->m_Scalar2ndMin[t] )
+      {
+        statisticsHolder->m_Scalar2ndMin[t] = value;
+      }
+
+      // update max
+      if ( value > statisticsHolder->m_ScalarMax[t] )
+      {
+        statisticsHolder->m_Scalar2ndMax[t] =
+            statisticsHolder->m_ScalarMax[t];    statisticsHolder->m_ScalarMax[t] = value;
+        statisticsHolder->m_CountOfMaxValuedVoxels[t] = 1;
+      }
+      else if ( value == statisticsHolder->m_ScalarMax[t] )
+      {
+        ++statisticsHolder->m_CountOfMaxValuedVoxels[t];
+      }
+      else if ( value > statisticsHolder->m_Scalar2ndMax[t] )
+      {
+        statisticsHolder->m_Scalar2ndMax[t] = value;
+      }
+#ifdef BOUNDINGOBJECT_IGNORE
+    }
+#endif
+
+    ++it;
+  }
+
+  //// guard for wrong 2dMin/Max on single constant value images
+  if (statisticsHolder->m_ScalarMax[t] == statisticsHolder->m_ScalarMin[t])
+  {
+    statisticsHolder->m_Scalar2ndMax[t] = statisticsHolder->m_Scalar2ndMin[t] = statisticsHolder->m_ScalarMax[t];
+  }
+  statisticsHolder->m_LastRecomputeTimeStamp.Modified();
+  //MITK_DEBUG <<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max();
 }
 
 

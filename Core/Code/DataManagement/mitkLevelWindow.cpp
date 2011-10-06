@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindow.h"
 #include "mitkImageSliceSelector.h"
+#include "mitkImageStatisticsHolder.h"
 
 #include <algorithm>
 
@@ -246,39 +247,39 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     image = sliceSelector->GetOutput();
     if ( image == NULL || !image->IsInitialized() ) return;
 
-    minValue    = image->GetScalarValueMin();
-    maxValue    = image->GetScalarValueMaxNoRecompute();
-    min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
-    max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+    minValue    = image->GetStatistics()->GetScalarValueMin();
+    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     if ( minValue == maxValue )
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
-      minValue    = image->GetScalarValueMin();                   
-      maxValue    = image->GetScalarValueMaxNoRecompute();
-      min2ndValue = image->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+      minValue    = image->GetStatistics()->GetScalarValueMin();
+      maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
+      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     }
   }
   else
   {
     const_cast<Image*>(image)->Update();
-    minValue    = image->GetScalarValueMin(0);
-    maxValue    = image->GetScalarValueMaxNoRecompute(0);
-    min2ndValue = image->GetScalarValue2ndMinNoRecompute(0);
-    max2ndValue = image->GetScalarValue2ndMaxNoRecompute(0);
+    minValue    = image->GetStatistics()->GetScalarValueMin(0);
+    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
-      ScalarType minValueTemp = image->GetScalarValueMin(i);
+      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i);
       if (minValue > minValueTemp)
         minValue    = minValueTemp;
-      ScalarType maxValueTemp = image->GetScalarValueMaxNoRecompute(i);
+      ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
       if (maxValue < maxValueTemp)
         maxValue = maxValueTemp;
-      ScalarType min2ndValueTemp = image->GetScalarValue2ndMinNoRecompute(i);
+      ScalarType min2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
       if (min2ndValue > min2ndValueTemp)
         min2ndValue = min2ndValueTemp; 
-      ScalarType max2ndValueTemp = image->GetScalarValue2ndMaxNoRecompute(i);
+      ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
       if (max2ndValue > max2ndValueTemp)
         max2ndValue = max2ndValueTemp; 
     }
@@ -313,8 +314,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
    
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
-  unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
-  unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
+  unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
+  unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
   float minCountFraction = minCount/float(numPixelsInDataset);
   float maxCountFraction = maxCount/float(numPixelsInDataset);
 

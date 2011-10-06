@@ -17,8 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImage.h"
 
-#include "mitkHistogramGenerator.h"
-#include "mitkImageTimeSelector.h"
+#include "mitkImageStatisticsHolder.h"
 
 #include <vtkImageData.h>
 
@@ -27,26 +26,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::Image::Image() : 
-m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL),
-m_TimeSelectorForExtremaObject( NULL)
+m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL)
 {
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
-  m_CountOfMinValuedVoxels.resize(1, 0);
-  m_CountOfMaxValuedVoxels.resize(1, 0);
-  m_ScalarMin.resize(1, itk::NumericTraits<ScalarType>::max());
-  m_ScalarMax.resize(1, itk::NumericTraits<ScalarType>::NonpositiveMin());
-  m_Scalar2ndMin.resize(1, itk::NumericTraits<ScalarType>::max());
-  m_Scalar2ndMax.resize(1, itk::NumericTraits<ScalarType>::NonpositiveMin());
-
   m_Initialized = false;
-  mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
-  m_HistogramGeneratorObject = generator;
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(NULL),
-m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_TimeSelectorForExtremaObject(NULL)
+m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL)
 {
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
@@ -78,8 +67,6 @@ mitk::Image::~Image()
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 3;
   m_ReferenceCountLock.Unlock();
-  m_HistogramGeneratorObject = NULL;
-  m_TimeSelectorForExtremaObject = NULL;
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
@@ -661,7 +648,7 @@ void mitk::Image::Initialize()
   }
   m_CompleteData = NULL;
  
-  this->GetTimeSelector(); // just to create m_TimeSelectorForExtremaObject 
+  //this->GetTimeSelector(); // just to create m_TimeSelectorForExtremaObject
 
   SetRequestedRegionToLargestPossibleRegion();
 }
@@ -673,20 +660,6 @@ void mitk::Image::Initialize(const mitk::ImageDescriptor::Pointer inDesc)
 
   // initialize image
   this->Initialize( inDesc->GetChannelDescriptor(0).GetPixelType(), inDesc->GetNumberOfDimensions(), inDesc->GetDimensions(), 1 );
-}
-
-mitk::ImageTimeSelector* mitk::Image::GetTimeSelector() const
-{
-  if(m_TimeSelectorForExtremaObject.IsNull())
-  {
-    m_TimeSelectorForExtremaObject = ImageTimeSelector::New();
-
-    ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
-    timeSelector->SetInput(this);
-    this->UnRegister();
-  }
-
-  return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
 }
 
 void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels)
@@ -980,6 +953,18 @@ void mitk::Image::ComputeOffsetTable()
   }
   for (;i < 4; ++i)
     m_OffsetTable[i+1] = num;
+}
+
+bool mitk::Image::IsValidTimeStep(int t) const
+{
+  return ( ( m_Dimension >= 4 && t <= (int)m_Dimensions[3] && t > 0 ) || (t == 0) );
+}
+
+void mitk::Image::Expand(unsigned int timeSteps)
+{
+  if(timeSteps < 1) itkExceptionMacro(<< "Invalid timestep in Image!");
+  if(! IsValidTimeStep( timeSteps-1 ) ) return;
+  Superclass::Expand(timeSteps);
 }
 
 int mitk::Image::GetSliceIndex(int s, int t, int n) const

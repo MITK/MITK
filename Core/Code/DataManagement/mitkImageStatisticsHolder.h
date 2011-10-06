@@ -11,12 +11,23 @@
 namespace mitk
 {
 
-class MITK_CORE_EXPORT ImageStatisticsHolder : public itk::Object
+/**
+  @brief Class holding the statistics informations about a single mitk::Image
+
+  This computation was previously directly included in the definition and implementation of the mitk::Image class
+  but for having a clear interface, all statistics computation is moved to the ImageStatisticsHolder class.
+
+  Each mitk::Image holds a normal pointer to its StatisticsHolder object. To get access to the methods, use the GetStatistics() method
+  in mitk::Image class.
+  */
+class MITK_CORE_EXPORT ImageStatisticsHolder
 {
 public:
-    mitkClassMacro(ImageStatisticsHolder, itk::Object)
+    /** Constructor */
+    ImageStatisticsHolder(mitk::Image::ConstPointer image);
 
-    itkNewMacro(Self)
+    /** Desctructor */
+    virtual ~ImageStatisticsHolder();
 
     typedef itk::Statistics::Histogram<double> HistogramType;
 
@@ -105,14 +116,15 @@ public:
 
 protected:
 
-      ImageStatisticsHolder();
-
-      virtual ~ImageStatisticsHolder();
-
       virtual void ResetImageStatistics() const;
 
       virtual void ComputeImageStatistics(int t=0) const;
 
+      virtual void Expand( unsigned int timeSteps );
+
+      ImageTimeSelector* GetTimeSelector() const;
+
+      mitk::Image::ConstPointer m_Image;
 
       mutable itk::Object::Pointer m_HistogramGeneratorObject;
 

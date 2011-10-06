@@ -421,27 +421,27 @@
         </property>
         <item>
          <property name="text">
-          <string>Generate Fiber Bundle Enveloppe</string>
+          <string>Fiber Bundle Enveloppe</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Generate 2D Fiber Bundle Image (Greyscale)</string>
+          <string>Tract Density Image</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Generate 2D Fiber Bundle Image (Color)</string>
+          <string>Fiber Bundle Image</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Generate 2D Fiber Endings Image</string>
+          <string>Fiber Endings Image</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Generate Fiber Endings Pointset</string>
+          <string>Fiber Endings Pointset</string>
          </property>
         </item>
        </widget>

@@ -64,11 +64,11 @@
           class="QmitkGibbsTrackingView"
           icon="resources/GibbsTracking.png" />
   </extension>
-  
+
      <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.stochasticfibertracking"
           name="Stochastic Tracking"
-          class="::QmitkFiberTrackingView"
+          class="QmitkStochasticFiberTrackingView"
           icon="resources/stochFB.png" />
   </extension>
 

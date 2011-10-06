@@ -46,7 +46,6 @@
 #include <itkResampleImageFilter.h>
 #include <itkGaussianInterpolateImageFunction.h>
 #include <itkImageRegionIteratorWithIndex.h>
-#include <itkTractsToDWIImageFilter.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
 #include <itkTractsToProbabilityImageFilter.h>
 #include <mitkDiffusionImage.h>
@@ -1615,9 +1614,6 @@ void QmitkFiberBundleOperationsView::GenerationStart()
       case 4:
         GenerateFiberEndingsPointSet();
         break;
-      case 5:
-        DWIGenerationStart();
-        break;
       }
     }
   }
@@ -1808,68 +1804,5 @@ void QmitkFiberBundleOperationsView::GenerateGreyscaleHeatmap(bool binary)
   node->AddProperty( "opaclevelwindow", prop2 );
 
   GetDataStorage()->Add(node);
-}
-
-// generate dwi from fiber bundle (experimental)
-void QmitkFiberBundleOperationsView::DWIGenerationStart()
-{
-  // get fiber bundle and dwi image from data manager
-  typedef mitk::DiffusionImage<short> DiffVolumesType;
-  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
-  DiffVolumesType::Pointer originalDWI = NULL;
-  mitk::FiberBundle::Pointer fiberBundle = NULL;
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-
-    if (node.IsNotNull() &&
-        dynamic_cast<DiffVolumesType*>(node->GetData()))
-    {
-      originalDWI = dynamic_cast<DiffVolumesType*>(node->GetData());
-      continue;
-    }
-    if (node.IsNotNull() &&
-        dynamic_cast<mitk::FiberBundle*>(node->GetData()))
-    {
-      fiberBundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-    }
-  }
-  if(fiberBundle.IsNull() || originalDWI.IsNull()){
-    QMessageBox::information( NULL, "Warning", "Please load and select a dwi image and a fiber bundle.");
-    MITK_WARN("QmitkGlobalFiberTrackingView") << "please select a fiber bundle and a diffusion image";
-    return;
-  }
-
-  // CONSTRUCT CONTAINER WITH DIRECTIONS
-  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
-  typedef itk::VectorContainer< unsigned int,  GradientDirectionType > GradientDirectionContainerType;
-  GradientDirectionContainerType::Pointer directions = originalDWI->GetDirections();
-
-  float bVal = originalDWI->GetB_Value();
-
-  typedef itk::VectorImage< short, 3 > DWIImageType;
-  DWIImageType::Pointer vectorImage = DWIImageType::New();
-  itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
-
-  filter->SetInput(originalDWI->GetVectorImage());
-  filter->SetFiberBundle(fiberBundle);
-  filter->SetbD(m_Controls->m_UpsamplingSpinBox->value());
-  filter->SetGradientDirections(directions);
-  filter->SetParticleWidth(0.2);
-  filter->GenerateData();
-  vectorImage = filter->GetOutput();
-
-  DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
-  diffImage->SetDirections(directions);
-  diffImage->SetOriginalDirections(directions);
-  diffImage->SetVectorImage(vectorImage);
-  diffImage->SetB_Value(bVal);
-  diffImage->InitializeFromVectorImage();
-
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData( diffImage );
-  QString name(m_FiberBundleNode->GetName().c_str());
-  name += "_dwi";
-  GetDefaultDataStorage()->Add(node);
 }
 

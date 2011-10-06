@@ -84,7 +84,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  
+
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -141,7 +141,6 @@ SET(H_FILES
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
   Algorithms/itkTractsToProbabilityImageFilter.h
-  Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h

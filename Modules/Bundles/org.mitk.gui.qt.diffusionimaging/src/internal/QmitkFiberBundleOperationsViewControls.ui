@@ -444,11 +444,6 @@
           <string>Generate Fiber Endings Pointset</string>
          </property>
         </item>
-        <item>
-         <property name="text">
-          <string>Generate DWI from Fiber Bundle (experimental)</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="0" column="1">

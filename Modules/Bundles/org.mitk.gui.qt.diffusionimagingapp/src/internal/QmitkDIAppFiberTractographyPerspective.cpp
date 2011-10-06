@@ -54,9 +54,4 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
   left->AddView("org.mitk.views.fiberbundleoperations");
   lo = layout->GetViewLayout("org.mitk.views.fiberbundleoperations");
   lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.trackingevaluation");
-  lo = layout->GetViewLayout("org.mitk.views.trackingevaluation");
-  lo->SetCloseable(false);
-
 }

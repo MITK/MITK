@@ -20,6 +20,7 @@ SET(INTERNAL_CPP_FILES
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
+  QmitkScreenshotMaker.cpp
 )
 
 SET(UI_FILES
@@ -35,6 +36,7 @@ SET(UI_FILES
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
+  src/internal/QmitkScreenshotMakerControls.ui
 )
 
 SET(MOC_H_FILES
@@ -55,6 +57,7 @@ SET(MOC_H_FILES
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h
+  src/internal/QmitkScreenshotMaker.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -75,6 +78,7 @@ SET(CACHED_RESOURCE_FILES
   resources/FiberBundleOperations.png
   resources/PartialVolumeAnalysis_24.png
   resources/IVIM_48.png
+  resources/screenshot_maker.png
 )
 
 SET(QRC_FILES

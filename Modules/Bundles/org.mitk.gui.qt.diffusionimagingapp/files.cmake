@@ -62,6 +62,17 @@ SET(CACHED_RESOURCE_FILES
   resources/preprocessing.png
   resources/Measurement_48.png
   resources/volvis.png
+  resources/perspectives/diffusionimaging.png
+  resources/perspectives/icon_home.png 
+  resources/perspectives/connectomics.png 
+  resources/perspectives/dicomimport.png 
+  resources/perspectives/tractography.png 
+  resources/perspectives/ivim.png 
+  resources/perspectives/preprocessingreconstruction.png 
+  resources/perspectives/quantification.png 
+  resources/perspectives/screenshotsmovies.png 
+  resources/perspectives/tbss.png 
+  resources/perspectives/volumevizualization.png 
 )
 
 SET(QRC_FILES

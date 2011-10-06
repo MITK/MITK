@@ -53,6 +53,8 @@ public:
 
     void ShowViewToolbar(bool show);
 
+    void ShowPerspectiveToolbar(bool show);
+
     void ShowVersionInfo(bool show);
 
     void ShowMitkVersionInfo(bool show);
@@ -118,6 +120,7 @@ private:
 
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
+  bool showPerspectiveToolbar;
   bool showVersionInfo;
   bool showMitkVersionInfo;
   std::string productName;

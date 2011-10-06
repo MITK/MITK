@@ -321,6 +321,7 @@ QmitkCommonWorkbenchWindowAdvisor(configurer),
 lastInput(0),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
+showPerspectiveToolbar( false ),
 showVersionInfo(true),
 showMitkVersionInfo(true)
 {
@@ -350,6 +351,11 @@ void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
 void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
  showViewToolbar = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::ShowPerspectiveToolbar(bool show)
+{
+ showPerspectiveToolbar = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
@@ -571,6 +577,17 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   VDMap.insert(p);
  }
  // ==================================================
+
+  // ==== Perspective Toolbar ==================================
+ QToolBar* qPerspectiveToolbar = new QToolBar;
+
+ if (showPerspectiveToolbar)
+ {
+  qPerspectiveToolbar->addActions(perspGroup->actions());
+  mainWindow->addToolBar(qPerspectiveToolbar);
+ }
+ else
+  delete qPerspectiveToolbar;
 
  // ==== View Toolbar ==================================
  QToolBar* qToolbar = new QToolBar;

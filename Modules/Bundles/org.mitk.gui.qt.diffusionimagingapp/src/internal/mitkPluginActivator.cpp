@@ -30,7 +30,6 @@
 #include "QmitkVolumeVisualizationPerspective.h"
 #include "src/internal/QmitkDiffusionImagingAppIntroPart.h"
 #include "src/internal/QmitkDiffusionImagingAppPerspective.h"
-#include "src/internal/QmitkMasterView.h"
 
 #include "src/internal/QmitkDIAppConnectomicsPerspective.h"
 #include "src/internal/QmitkDIAppDicomImportPerspective.h"
@@ -71,7 +70,6 @@ void mitkPluginActivator::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMasterView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFileImportPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)

@@ -6,7 +6,6 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
-  QmitkMasterView.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
   QmitkReconstructionPerspective.cpp
@@ -27,7 +26,6 @@ SET(INTERNAL_CPP_FILES
 
 SET(UI_FILES
   src/internal/QmitkWelcomeScreenViewControls.ui
-  src/internal/QmitkMasterViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -39,7 +37,6 @@ SET(MOC_H_FILES
   src/internal/QmitkQuantificationPerspective.h
   src/internal/QmitkVolumeVisualizationPerspective.h
   #src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
-  src/internal/QmitkMasterView.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h

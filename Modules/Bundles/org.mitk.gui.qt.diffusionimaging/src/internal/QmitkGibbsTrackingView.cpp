@@ -123,6 +123,8 @@ void QmitkGibbsTrackingView::StopGibbsTracking()
 {
   if (m_GlobalTracker.IsNull())
     return;
+
+  mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep);
   m_GlobalTracker->SetAbortTracking(true);
   m_Controls->m_TrackingStop->setEnabled(false);
   m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
@@ -146,6 +148,7 @@ void QmitkGibbsTrackingView::BeforeThread()
   m_TrackingTime = QTime::currentTime();
   m_ElapsedTime = 0;
   m_TrackingTimer->start(1000);
+  m_LastStep = 0;
 
   UpdateGUI();
 }
@@ -490,7 +493,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     }
   }
 
-  int steps = m_Iterations/10000;
+  unsigned int steps = m_Iterations/10000;
   if (steps<10)
     steps = 10;
 

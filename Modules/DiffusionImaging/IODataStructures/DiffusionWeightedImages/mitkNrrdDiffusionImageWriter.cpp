@@ -55,6 +55,21 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     itkWarningMacro( << "Sorry, filename has not been set!" );
     return ;
   }
+  const std::string& locale = "C";
+  const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+  if ( locale.compare(currLocale)!=0 )
+  {
+    try
+    {
+      MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+      setlocale(LC_ALL, locale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not set locale " << locale;
+    }
+  }
 
   char keybuffer[512];
   char valbuffer[512];
@@ -266,7 +281,15 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       }
     }
   }
-
+  try
+  {
+    MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
   m_Success = true;
 }
 

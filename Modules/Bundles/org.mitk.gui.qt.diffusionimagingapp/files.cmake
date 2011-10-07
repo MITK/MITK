@@ -8,11 +8,6 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionImagingAppIntroPart.cpp
   QmitkDiffusionImagingAppPerspective.cpp
   QmitkWelcomePerspective.cpp
-  QmitkReconstructionPerspective.cpp
-  QmitkTrackingPerspective.cpp
-  QmitkFileImportPerspective.cpp
-  QmitkQuantificationPerspective.cpp
-  QmitkVolumeVisualizationPerspective.cpp
   QmitkDIAppConnectomicsPerspective.cpp
   QmitkDIAppDicomImportPerspective.cpp
   QmitkDIAppFiberTractographyPerspective.cpp
@@ -31,12 +26,6 @@ SET(UI_FILES
 SET(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkReconstructionPerspective.h
-  src/internal/QmitkTrackingPerspective.h
-  src/internal/QmitkFileImportPerspective.h
-  src/internal/QmitkQuantificationPerspective.h
-  src/internal/QmitkVolumeVisualizationPerspective.h
-  #src/internal/QmitkDiffusionImagingAppApplicationPlugin.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/QmitkDiffusionImagingAppPerspective.h
   src/internal/QmitkWelcomePerspective.h
@@ -63,16 +52,16 @@ SET(CACHED_RESOURCE_FILES
   resources/Measurement_48.png
   resources/volvis.png
   resources/perspectives/diffusionimaging.png
-  resources/perspectives/icon_home.png 
-  resources/perspectives/connectomics.png 
-  resources/perspectives/dicomimport.png 
-  resources/perspectives/tractography.png 
-  resources/perspectives/ivim.png 
-  resources/perspectives/preprocessingreconstruction.png 
-  resources/perspectives/quantification.png 
-  resources/perspectives/screenshotsmovies.png 
-  resources/perspectives/tbss.png 
-  resources/perspectives/volumevizualization.png 
+  resources/perspectives/icon_home.png
+  resources/perspectives/connectomics.png
+  resources/perspectives/dicomimport.png
+  resources/perspectives/tractography.png
+  resources/perspectives/ivim.png
+  resources/perspectives/preprocessingreconstruction.png
+  resources/perspectives/quantification.png
+  resources/perspectives/screenshotsmovies.png
+  resources/perspectives/tbss.png
+  resources/perspectives/volumevizualization.png
 )
 
 SET(QRC_FILES

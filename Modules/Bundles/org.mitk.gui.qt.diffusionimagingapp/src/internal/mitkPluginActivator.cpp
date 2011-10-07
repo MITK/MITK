@@ -23,11 +23,6 @@
 #include "src/QmitkDiffusionImagingAppApplication.h"
 
 #include "QmitkWelcomePerspective.h"
-#include "QmitkReconstructionPerspective.h"
-#include "QmitkTrackingPerspective.h"
-#include "QmitkFileImportPerspective.h"
-#include "QmitkQuantificationPerspective.h"
-#include "QmitkVolumeVisualizationPerspective.h"
 #include "src/internal/QmitkDiffusionImagingAppIntroPart.h"
 #include "src/internal/QmitkDiffusionImagingAppPerspective.h"
 
@@ -71,11 +66,6 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFileImportPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkReconstructionPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkQuantificationPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkVolumeVisualizationPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkTrackingPerspective,  context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
@@ -86,11 +76,6 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
-
-//  QString collectionFile = GetQtHelpCollectionFile();
-
-//  berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
-//  berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html");
 
   delete pluginListener;
   pluginListener = new berry::QCHPluginListener(context);

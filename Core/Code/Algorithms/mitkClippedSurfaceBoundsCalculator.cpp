@@ -1,7 +1,7 @@
 #include "mitkClippedSurfaceBoundsCalculator.h"
 #include "mitkLine.h"
 
-#define ROUND_P(x) ((int)((x)+0.5))
+#define ROUND_P(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::PlaneGeometry* geometry, 
@@ -233,27 +233,26 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
     m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  
 
     double t = -1.0;
-    bool isIntersectionPointOnLine;
 
-    Vector3D lineVector = line.GetPoint1() - line.GetPoint2();
-    if(lineVector[0] == 0 && lineVector[1] == 0 && lineVector[2] == 0
-        && geometry->IsOnPlane(line.GetPoint1()))
+    bool doesLineIntersectWithPlane(false);
+
+    if(line.GetDirection().GetNorm() < mitk::eps && geometry->Distance(line.GetPoint1()) < mitk::sqrteps)
     {
       t = 1.0;
-      isIntersectionPointOnLine = true;
+      doesLineIntersectWithPlane = true;
       intersectionWorldPoint = line.GetPoint1();
     }
     else
     {
       geometry->IntersectionPoint(line, intersectionWorldPoint);
-      isIntersectionPointOnLine = geometry->IntersectionPointParam(line, t);
+      doesLineIntersectWithPlane = geometry->IntersectionPointParam(line, t);
     }
 
     mitk::Point3D intersectionIndexPoint;
     //Get index point
     m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    
 
-    if(0.0 <= t && t <= 1.0 && isIntersectionPointOnLine)
+    if ( doesLineIntersectWithPlane && -mitk::sqrteps <= t && t <= 1.0 + mitk::sqrteps )
     {
       for(int dim = 0; dim < 3; dim++)
       {

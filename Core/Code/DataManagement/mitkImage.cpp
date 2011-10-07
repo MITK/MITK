@@ -1153,3 +1153,71 @@ bool mitk::Image::IsRotated() const
   }
   return ret;
 }
+
+#include "mitkImageStatisticsHolder.h"
+
+//##Documentation
+mitk::ScalarType mitk::Image::GetScalarValueMin(int t)
+{
+  return m_ImageStatistics->GetScalarValueMin(t);
+}
+
+//##Documentation
+//## \brief Get the maximum for scalar images
+mitk::ScalarType mitk::Image::GetScalarValueMax(int t)
+{
+  return m_ImageStatistics->GetScalarValueMin(t);
+}
+
+//##Documentation
+//## \brief Get the second smallest value for scalar images
+mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t)
+{
+  return m_ImageStatistics->GetScalarValueMin(t);
+}
+
+mitk::ScalarType mitk::Image::GetScalarValueMinNoRecompute( unsigned int t ) const
+{
+  return m_ImageStatistics->GetScalarValueMinNoRecompute(t);
+}
+
+mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute( unsigned int t ) const
+{
+  return m_ImageStatistics->GetScalarValue2ndMinNoRecompute(t);
+}
+
+mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t)
+{
+  return m_ImageStatistics->GetScalarValueMin(t);
+}
+
+mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute( unsigned int t)
+{
+  return m_ImageStatistics->GetScalarValueMaxNoRecompute(t);
+}
+
+mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute( unsigned int t )
+{
+  return m_ImageStatistics->GetScalarValue2ndMaxNoRecompute(t);
+}
+
+mitk::ScalarType mitk::Image::GetCountOfMinValuedVoxels(int t )
+{
+  return m_ImageStatistics->GetCountOfMinValuedVoxels(t);
+}
+
+mitk::ScalarType mitk::Image::GetCountOfMaxValuedVoxels(int t)
+{
+  return m_ImageStatistics->GetCountOfMaxValuedVoxels(t);
+}
+
+unsigned int mitk::Image::GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t  )
+{
+  return m_ImageStatistics->GetCountOfMaxValuedVoxelsNoRecompute(t);
+}
+
+unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute( unsigned int t ) const
+{
+  return m_ImageStatistics->GetCountOfMinValuedVoxelsNoRecompute(t);
+}
+

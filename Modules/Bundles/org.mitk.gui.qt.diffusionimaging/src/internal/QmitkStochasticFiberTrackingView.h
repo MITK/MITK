@@ -23,20 +23,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <QmitkFunctionality.h>
-//#include <itkStochasticTractographyFilter.h>
+#include <itkStochasticTractographyFilter.h>
 
 #include "ui_QmitkStochasticFiberTrackingViewControls.h"
 
-//#include <itkVectorImage.h>
-//#include <itkImage.h>
+#include <itkVectorImage.h>
+#include <itkImage.h>
 
-//#include <mitkDiffusionImage.h>
-//#include <mitkTensorImage.h>
+#include <mitkDiffusionImage.h>
+#include <mitkTensorImage.h>
 
-//#include <mitkDataStorage.h>
-//#include <itkDTITubeSpatialObject.h>
-//#include <itkDTITubeSpatialObjectPoint.h>
-//#include <itkSceneSpatialObject.h>
+#include <mitkDataStorage.h>
+#include <itkDTITubeSpatialObject.h>
+#include <itkDTITubeSpatialObjectPoint.h>
+#include <itkSceneSpatialObject.h>
 
 #include <MitkDiffusionImagingExports.h>
 
@@ -46,13 +46,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 //define the input/output types
-//typedef itk::VectorImage< short int, 3 > DWIVectorImageType;
-//typedef itk::Image< float, 3 > FloatImageType;
-//typedef itk::Image< unsigned int, 3 > CImageType;
-//typedef itk::StochasticTractographyFilter< DWIVectorImageType, FloatImageType, CImageType > PTFilterType;
-//typedef itk::DTITubeSpatialObject<3>      DTITubeType;
-//typedef itk::DTITubeSpatialObjectPoint<3>  DTITubePointType;
-//typedef itk::SceneSpatialObject<3>        SceneSpatialObjectType;
+typedef itk::VectorImage< short int, 3 > DWIVectorImageType;
+typedef itk::Image< float, 3 > FloatImageType;
+typedef itk::Image< unsigned int, 3 > CImageType;
+typedef itk::StochasticTractographyFilter< DWIVectorImageType, FloatImageType, CImageType > PTFilterType;
+typedef itk::DTITubeSpatialObject<3>      DTITubeType;
+typedef itk::DTITubeSpatialObjectPoint<3>  DTITubePointType;
+typedef itk::SceneSpatialObject<3>        SceneSpatialObjectType;
 
 /*!
 \brief QmitkFiberTrackingView
@@ -102,19 +102,19 @@ protected:
 private:
 
 
-  //  \brief vector containing related (DiffusionImage) nodes of interest
-//  std::vector<mitk::DataNode*> vPselDWImg;
-  //  \brief vector containing SeedRegions(binary) nodes of interest
-//  std::vector<mitk::DataNode*> vSeedROI;
+//    \brief vector containing related (DiffusionImage) nodes of interest
+  std::vector<mitk::DataNode*> vPselDWImg;
+//    \brief vector containing SeedRegions(binary) nodes of interest
+  std::vector<mitk::DataNode*> vSeedROI;
 
-  // \brief flag to de-/activate manual seedPoint index-coordinates
-//  bool m_singleSeedpoint;
-//  bool checkDWIType( mitk::DataNode::Pointer );
-//  void refreshTableWidget(std::vector<mitk::DataNode*> ,  QString );
-//  bool checkSeedROI( mitk::DataNode::Pointer  );
-//  typedef itk::Image< unsigned char, 3 > BinaryImageType;
-//  // \brief container storing all found tracts
-//  PTFilterType::TractContainerType::Pointer m_tractcontainer;
+//   \brief flag to de-/activate manual seedPoint index-coordinates
+  bool m_singleSeedpoint;
+  bool checkDWIType( mitk::DataNode::Pointer );
+  void refreshTableWidget(std::vector<mitk::DataNode*> ,  QString );
+  bool checkSeedROI( mitk::DataNode::Pointer  );
+  typedef itk::Image< unsigned char, 3 > BinaryImageType;
+  // \brief container storing all found tracts
+  PTFilterType::TractContainerType::Pointer m_tractcontainer;
 
 
 };

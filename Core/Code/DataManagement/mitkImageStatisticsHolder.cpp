@@ -4,7 +4,7 @@
 #include "mitkImageTimeSelector.h"
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
-  : m_Image(image)
+  : m_Image(NULL)
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -15,6 +15,8 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
 
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
+
+  m_Image = image;
 
   // create time selector
   this->GetTimeSelector();
@@ -64,7 +66,7 @@ mitk::ImageTimeSelector* mitk::ImageStatisticsHolder::GetTimeSelector()
 
 void mitk::ImageStatisticsHolder::Expand( unsigned int timeSteps )
 {
-  if( m_Image->IsValidTimeStep(timeSteps - 1) ) return;
+  if(! m_Image->IsValidTimeStep(timeSteps - 1) ) return;
 
   // The BaseData needs to be expanded, call the mitk::Image::Expand() method
   m_Image->Expand(timeSteps);

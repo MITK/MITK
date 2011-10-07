@@ -26,7 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::Image::Image() : 
-m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL)
+m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL),
+  m_ImageStatistics(NULL)
 {
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
@@ -35,7 +36,7 @@ m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL)
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(NULL),
-m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL)
+m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStatistics(NULL)
 {
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
@@ -648,7 +649,10 @@ void mitk::Image::Initialize()
   }
   m_CompleteData = NULL;
  
-  //this->GetTimeSelector(); // just to create m_TimeSelectorForExtremaObject
+  if( m_ImageStatistics == NULL)
+  {
+    m_ImageStatistics = new mitk::ImageStatisticsHolder( this );
+  }
 
   SetRequestedRegionToLargestPossibleRegion();
 }
@@ -963,7 +967,6 @@ bool mitk::Image::IsValidTimeStep(int t) const
 void mitk::Image::Expand(unsigned int timeSteps)
 {
   if(timeSteps < 1) itkExceptionMacro(<< "Invalid timestep in Image!");
-  if(! IsValidTimeStep( timeSteps-1 ) ) return;
   Superclass::Expand(timeSteps);
 }
 

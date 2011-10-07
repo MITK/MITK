@@ -69,8 +69,6 @@ namespace itk{
     itkSetMacro( FiberLength, int );
     itkGetMacro( FiberLength, int );
 
-    itkGetMacro( Steps, int );
-
     itkSetMacro( AbortTracking, bool );
     itkGetMacro( AbortTracking, bool );
 
@@ -92,6 +90,7 @@ namespace itk{
     itkGetMacro(NumConnections, unsigned long);
     itkGetMacro(NumAcceptedFibers, int);
     itkGetMacro(ProposalAcceptance, float);
+    itkGetMacro(Steps, unsigned int);
 
     /** Entry Point For the Algorithm:  Is invoked when Update() is called
     either directly or through itk pipeline propagation
@@ -146,7 +145,7 @@ namespace itk{
     bool    m_SubtractMean;
     int     m_NumAcceptedFibers;
     volatile bool    m_BuildFibers;
-    int     m_Steps;
+    unsigned int    m_Steps;
     float   m_Memory;
     float   m_ProposalAcceptance;
 

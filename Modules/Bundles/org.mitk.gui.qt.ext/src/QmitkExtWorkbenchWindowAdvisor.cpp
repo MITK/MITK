@@ -321,9 +321,12 @@ QmitkCommonWorkbenchWindowAdvisor(configurer),
 lastInput(0),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
-showPerspectiveToolbar( false ),
+showPerspectiveToolbar(false),
 showVersionInfo(true),
-showMitkVersionInfo(true)
+showMitkVersionInfo(true),
+showViewMenuItem(true),
+showNewWindowMenuItem(true),
+showClosePerspectiveMenuItem(true)
 {
  productName = berry::Platform::GetConfiguration().getString("application.baseName");
 }
@@ -348,9 +351,24 @@ void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
  return label;
 }
 
+void QmitkExtWorkbenchWindowAdvisor::ShowClosePerspectiveMenuItem(bool show)
+{
+ showClosePerspectiveMenuItem = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)
+{
+ showNewWindowMenuItem = show;
+}
+
 void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
  showViewToolbar = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::ShowViewMenuItem(bool show)
+{
+ showViewMenuItem = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowPerspectiveToolbar(bool show)
@@ -479,24 +497,34 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
    mainActionsToolBar->addAction(imageNavigatorAction);
  }
  mainWindow->addToolBar(mainActionsToolBar);
-  
+
 #ifdef __APPLE__
  mainWindow->setUnifiedTitleAndToolBarOnMac(true);
 #endif
 
  // ==== Window Menu ==========================
  QMenu* windowMenu = menuBar->addMenu("Window");
- windowMenu->addAction("&New Window",
-  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
- windowMenu->addSeparator();
+ if (showNewWindowMenuItem)
+ {
+   windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+   windowMenu->addSeparator();
+ }
+
  QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
- QMenu* viewMenu = windowMenu->addMenu("Show &View");
- viewMenu->setObjectName("Show View");
+
+ QMenu* viewMenu;
+ if (showViewMenuItem)
+ {
+   viewMenu = windowMenu->addMenu("Show &View");
+   viewMenu->setObjectName("Show View");
+ }
  windowMenu->addSeparator();
  resetPerspAction = windowMenu->addAction("&Reset Perspective",
   QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
- closePerspAction = windowMenu->addAction("&Close Perspective",
-  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+
+ if(showClosePerspectiveMenuItem)
+  closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+
  windowMenu->addSeparator();
  windowMenu->addAction("&Preferences...",
   QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
@@ -509,7 +537,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(
   perspRegistry->GetPerspectives());
-    
+
     bool skip = false;
     for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
       perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
@@ -599,7 +627,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
    (*MapIter).second);
   viewActions.push_back(viewAction);
-  viewMenu->addAction(viewAction);
+  if(showViewMenuItem)
+    viewMenu->addAction(viewAction);
   if (showViewToolbar)
   {
    qToolbar->addAction(viewAction);
@@ -634,10 +663,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  //disabling the SizeGrip in the lower right corner
  statusBar->SetSizeGripEnabled(false);
 
-  
-  
+
+
  QmitkProgressBar *progBar = new QmitkProgressBar();
- 
+
  qStatusBar->addPermanentWidget(progBar, 0);
  progBar->hide();
 // progBar->AddStepsToDo(2);

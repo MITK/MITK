@@ -59,6 +59,12 @@ public:
 
     void ShowMitkVersionInfo(bool show);
 
+    void ShowViewMenuItem(bool show);
+
+    void ShowNewWindowMenuItem(bool show);
+
+    void ShowClosePerspectiveMenuItem(bool show);
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -123,6 +129,9 @@ private:
   bool showPerspectiveToolbar;
   bool showVersionInfo;
   bool showMitkVersionInfo;
+  bool showViewMenuItem;
+  bool showNewWindowMenuItem;
+  bool showClosePerspectiveMenuItem;
   std::string productName;
   std::string windowIcon;
 

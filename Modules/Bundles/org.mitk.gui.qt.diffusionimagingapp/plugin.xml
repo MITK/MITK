@@ -17,50 +17,52 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp"
-      name="Diffusion Imaging App"
+<!--    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp"
+      name="Data Display"
       class="QmitkDiffusionImagingAppPerspective"
-      icon="resources/perspectives/diffusionimaging.png"/>
+      icon="resources/perspectives/icon_home.png"/>-->
+
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
-      name="Welcome"
+      name="Data Display"
       class="QmitkWelcomePerspective"
       icon="resources/perspectives/icon_home.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics"
-      name="DI-App Connectomics"
-      class="QmitkDIAppConnectomicsPerspective"
-      icon="resources/perspectives/connectomics.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.dicomimport"
-      name="DI-App DICOM Import"
+      name="DICOM Import"
       class="QmitkDIAppDicomImportPerspective"
       icon="resources/perspectives/dicomimport.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography"
-      name="DI-App Tractography"
-      class="QmitkDIAppFiberTractographyPerspective"
-      icon="resources/perspectives/tractography.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.ivim"
-      name="DI-App IVIM"
-      class="QmitkDIAppIVIMPerspective"
-      icon="resources/perspectives/ivim.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction"
-      name="DI-App Preprocessing Reconstruction"
+      name="Preprocessing Reconstruction"
       class="QmitkDIAppPreprocessingReconstructionPerspective"
       icon="resources/perspectives/preprocessingreconstruction.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.quantification"
-      name="DI-App Quantification"
+      name="Quantification"
       class="QmitkDIAppQuantificationPerspective"
       icon="resources/perspectives/quantification.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.screenshotsmovies"
-      name="DI-App Screenshots Movies"
-      class="QmitkDIAppScreenshotsMoviesPerspective"
-      icon="resources/perspectives/screenshotsmovies.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.ivim"
+      name="IVIM"
+      class="QmitkDIAppIVIMPerspective"
+      icon="resources/perspectives/ivim.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.tbss"
-      name="DI-App TBSS"
+      name="TBSS"
       class="QmitkDIAppTBSSPerspective"
       icon="resources/perspectives/tbss.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography"
+      name="Tractography"
+      class="QmitkDIAppFiberTractographyPerspective"
+      icon="resources/perspectives/tractography.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics"
+      name="Connectomics"
+      class="QmitkDIAppConnectomicsPerspective"
+      icon="resources/perspectives/connectomics.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.volumevisualization"
-      name="DI-App Volume Visualization"
+      name="Volume Visualization"
       class="QmitkDIAppVolumeVisualizationPerspective"
       icon="resources/perspectives/volumevizualization.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.screenshotsmovies"
+      name="Screenshots Movies"
+      class="QmitkDIAppScreenshotsMoviesPerspective"
+      icon="resources/perspectives/screenshotsmovies.png"/>
+
   </extension>
 
 </plugin>

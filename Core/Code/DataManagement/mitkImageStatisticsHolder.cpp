@@ -96,7 +96,7 @@ void mitk::ImageStatisticsHolder::ResetImageStatistics()
 //#define BOUNDINGOBJECT_IGNORE
 
 template < typename ItkImageType >
-void mitk::_ComputeExtremaInItkImage(const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t)
+void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t)
 {
   typename ItkImageType::RegionType region;
   region = itkImage->GetBufferedRegion();

@@ -114,7 +114,7 @@ public:
     bool IsValidTimeStep( int t) const;
 
     template < typename ItkImageType >
-      friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
+      friend void _ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
 
 protected:
 

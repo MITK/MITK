@@ -138,7 +138,7 @@ namespace mitk
         }
         else
         {
-          throw std::logic_error("Please check image type, currently only .nrrd files are supported (.pic files are depracated!)");
+          throw std::logic_error("Please check image type, currently only .nrrd files are supported (.pic files are deprecated!)");
         }
 
         // check if the opened files contained data

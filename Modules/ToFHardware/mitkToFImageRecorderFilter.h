@@ -113,6 +113,7 @@ namespace mitk
 
     ToFImageWriter::Pointer m_ToFImageWriter; ///< image writer used for streaming input data to file
     bool m_RecordingStarted; ///< flag indicating if filter is currently recording
+    std::string m_FileExtension;
   };
 } //END mitk namespace
 #endif

@@ -243,7 +243,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         m_Controls->m_ConnectCameraButton->setEnabled(true);
         m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //        m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-        this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+        this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
@@ -315,7 +315,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           m_Controls->m_ConnectCameraButton->setEnabled(true);
           m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //          m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-          this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+          this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
           return;
         }
       }
@@ -376,7 +376,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       m_Controls->m_ConnectCameraButton->setEnabled(true);
       m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //      m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-      this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+      this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
       return;
 
     }
@@ -393,7 +393,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     m_Controls->m_ConnectCameraButton->setText("Connect");
     m_Controls->m_SelectCameraCombobox->setEnabled(true);
 //    m_Controls->m_CalibrationParameterGroupBox->setEnabled(true);
-    this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentIndex());
+    this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
 
     this->m_ToFImageGrabber = NULL;
     // send disconnect signal to the caller functionality

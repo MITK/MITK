@@ -128,12 +128,19 @@ void ThreadedToFRawDataReconstruction::GetDistances(float* dist)
 }
 
 void ThreadedToFRawDataReconstruction::GetAmplitudes(float* ampl)
-{
+{  
   memcpy(ampl, m_CISAmpl, m_ImageSize*sizeof(float));
 }
 
 void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
 {
+  memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));  
+}
+
+void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, float* inten)
+{
+  memcpy(dist, m_CISDist, m_ImageSize*sizeof(float) );
+  memcpy(ampl, m_CISAmpl, m_ImageSize*sizeof(float));
   memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));
 }
 
@@ -150,8 +157,8 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
     int sourceDataSize = m_SourceDataSize;
     int lineWidth = m_Width;
     int frameHeight = m_Height;
-    int channelSize = lineWidth*frameHeight*2;
-    int quadChannelSize = channelSize/4;
+    int channelSize = lineWidth*frameHeight << 1;
+    int quadChannelSize = channelSize * 0.25;
 
     std::vector<short> quad = std::vector<short>(quadChannelSize);
     
@@ -195,7 +202,7 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
     }
     m_ThreadData->m_DataSize = quadChannelSize;
     m_ThreadData->m_LineWidth = lineWidth;
-    m_ThreadData->m_FrameHeight = frameHeight/4;
+    m_ThreadData->m_FrameHeight = frameHeight * 0.25;
     std::vector<int> threadIDVector;
     int threadcounter = 0;
     while(threadcounter != maxThreadNr-1)
@@ -216,9 +223,9 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
       count++;
     }
     m_ThreadData->m_ImageDataMutex->Lock();
-    memcpy(m_CISDist, m_ThreadData->m_OutputData.at(0), (channelSize/2)*sizeof(float));
-    memcpy(m_CISAmpl, m_ThreadData->m_OutputData.at(1), (channelSize/2)*sizeof(float));
-    memcpy(m_CISInten, m_ThreadData->m_OutputData.at(2), (channelSize/2)*sizeof(float));
+    memcpy(m_CISDist, m_ThreadData->m_OutputData.at(0), (channelSize * 0.5)*sizeof(float));
+    memcpy(m_CISAmpl, m_ThreadData->m_OutputData.at(1), (channelSize * 0.5)*sizeof(float));
+    memcpy(m_CISInten, m_ThreadData->m_OutputData.at(2), (channelSize * 0.5)*sizeof(float));
     m_ThreadData->m_ImageDataMutex->Unlock();
 
   }
@@ -240,8 +247,6 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
 
     // some needed variables
     int x = 0;
-    int index = 0;
-    int index2 = 0;
     double phi = 0;
     double phi2 = 0;
     double A1 = 0;
@@ -258,26 +263,30 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
     double A8m6 = 0;
     double cair = cAir;
     double pi = PI;
-    double modFreq = fMod;
-    double intermed1 = 0;
-    int linewidth = 0;
-    int frameheight = 0;
+    double twoPi = pi + pi;
+    long modFreq = fMod;
 
     threadData->m_ThreadDataMutex->Lock();
     std::vector<short>  quad1 = threadData->m_InputData.at(0);
     std::vector<short>  quad2 = threadData->m_InputData.at(1);
     std::vector<short>  quad3 = threadData->m_InputData.at(2);
     std::vector<short>  quad4 = threadData->m_InputData.at(3);
-    index = (quadrant*2);
-    index2 = 3-quadrant;
+    int index = quadrant << 1;
+    int index2 = 3-quadrant;
     modFreq = threadData->m_ModulationFrequency;
-    linewidth = threadData->m_LineWidth;
-    frameheight = threadData->m_FrameHeight;
+    int linewidth = threadData->m_LineWidth;
+    int frameheight = threadData->m_FrameHeight;
     threadData->m_ThreadDataMutex->Unlock();
+
+    double intermed1 = cair/(pi*(modFreq << 2));
+    double intermed2 = intermed1*500;
+    int doubleLwidth = linewidth << 1;
+    int datasize = doubleLwidth*frameheight << 2;
+
 
     do 
     {
-      index += 2*linewidth;
+      index += doubleLwidth;
       x++;
       do 
       {
@@ -293,25 +302,24 @@ void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
 
         phi  = atan2((A3 - A1),(A2 - A4)) + pi; 
         phi2 = atan2((A7 - A5),(A6 - A8)); 
-        if(phi2<0) phi2 +=2*pi;
+        if(phi2<0) phi2 +=twoPi;
 
-        intermed1 = cair/(4*pi*modFreq);               
         A3m1 = A3*A3 - 2*A3*A1 + A1*A1;
         A4m2 = A4*A4 - 2*A4*A2 + A2*A2;
         A7m5 = A7*A7 - 2*A7*A5 + A5*A5;
         A8m6 = A8*A8 - 2*A8*A6 + A6*A6;
         threadData->m_ImageDataMutex->Lock();
-        threadData->m_OutputData.at(0)[index2] = (((phi*intermed1) + (phi2*intermed1))/2)*1000;    
-        threadData->m_OutputData.at(1)[index2] = (sqrt(A3m1 + A4m2)/2) + (sqrt(A7m5 + A8m6)/2);
-        threadData->m_OutputData.at(2)[index2] = (A1+A2+A3+A4+A5+A6+A7+A8)/8;
+        threadData->m_OutputData.at(0)[index2] = (phi+phi2)*intermed2;                        //(((phi*intermed1) + (phi2*intermed1))/2)*1000;  //   
+        threadData->m_OutputData.at(1)[index2] = (sqrt(A3m1 + A4m2)+sqrt(A7m5 + A8m6))*0.5;   //(sqrt(A3m1 + A4m2)/2) + (sqrt(A7m5 + A8m6)/2);
+        threadData->m_OutputData.at(2)[index2] = (A1+A2+A3+A4+A5+A6+A7+A8)*0.125;
         threadData->m_ImageDataMutex->Unlock();
 
         index2 += 4;
       }while(index2 <= (x*linewidth) - (1+quadrant));
 
-      index += 2*linewidth;
+      index += doubleLwidth;
 
-    }while(index < 2*(linewidth*frameheight*4));
+    }while(index < datasize);
 
     threadData->m_Barrier->Wait();
 

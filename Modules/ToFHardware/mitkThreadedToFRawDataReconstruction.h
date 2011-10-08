@@ -60,6 +60,7 @@ namespace mitk
     void GetDistances(float* dist);
     void GetAmplitudes(float* ampl);
     void GetIntensities(float* inten);
+    void GetAllData(float* dist, float* ampl, float* inten);
 
     void Update();
 
@@ -89,7 +90,7 @@ namespace mitk
     \brief threader callback function for multi threaded data generation
     */
     static ITK_THREAD_RETURN_TYPE ThreadedGenerateDataCallbackFunction(void* data);
-    
+
     // member variables
     int m_StackSize;                ///<
     int m_Width;

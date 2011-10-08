@@ -158,20 +158,15 @@ namespace mitk
         // update the ToF camera
         toFCameraDevice->UpdateCamera();
         // get the source data from the camera and write it at the next free position in the buffer
-        vtkShortArray* channelData = vtkShortArray::New();
-        toFCameraDevice->m_ImageMutex->Lock();
-        toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
-        toFCameraDevice->m_ImageMutex->Unlock();
-        toFCameraDevice->m_Controller->GetShortSourceData(toFCameraDevice->m_ShortSourceData);
-        toFCameraDevice->GetChannelSourceData( toFCameraDevice->m_ShortSourceData, channelData );
-
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
 
+        vtkShortArray* channelData = vtkShortArray::New();
+        //toFCameraDevice->m_ImageMutex->Lock();
+        toFCameraDevice->m_Controller->GetShortSourceData(toFCameraDevice->m_ShortSourceData);
+        toFCameraDevice->GetChannelSourceData( toFCameraDevice->m_ShortSourceData, channelData );
+        //toFCameraDevice->m_ImageMutex->Unlock();
 
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         if(!toFCameraDevice->m_RawDataSource->GetInit())
         {
           toFCameraDevice->m_RawDataSource->Initialize(toFCameraDevice->m_CaptureWidth, toFCameraDevice->m_CaptureHeight, 
@@ -180,10 +175,13 @@ namespace mitk
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
         toFCameraDevice->m_RawDataSource->Update();
         toFCameraDevice->m_ImageMutex->Lock();
-        toFCameraDevice->m_RawDataSource->GetAmplitudes(toFCameraDevice->m_AmplitudeArray);
-        toFCameraDevice->m_RawDataSource->GetIntensities(toFCameraDevice->m_IntensityArray);
-        toFCameraDevice->m_RawDataSource->GetDistances(toFCameraDevice->m_DistanceArray);
+        toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
+        toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray, toFCameraDevice->m_AmplitudeArray, toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_ImageMutex->Unlock();
+        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         TODO Buffer Handling currently only works for buffer size 1
+         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
 
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -233,10 +231,7 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // Flip around y- axis (vertical axis)
-      m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_AmplitudeArray, amplitudeArray, 1, 0 );
-      m_ImageMutex->Unlock();
+      memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -249,10 +244,7 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // Flip around y- axis (vertical axis)
-      m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_IntensityArray, intensityArray, 0, 1);
-      m_ImageMutex->Unlock();
+      memcpy(intensityArray, this->m_IntensityArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -265,10 +257,7 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // Flip around y- axis (vertical axis)
-      m_ImageMutex->Lock();
-      this->XYAxisFlipImage(this->m_DistanceArray,distanceArray, 1, 1);
-      m_ImageMutex->Unlock();
+      memcpy(distanceArray, this->m_DistanceArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -316,21 +305,10 @@ namespace mitk
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
 
-      int u, v;
-      m_ImageMutex->Lock();
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          u = i*this->m_CaptureWidth+j;
-          v = (i+1)*this->m_CaptureWidth-1-j;
-          distanceArray[u] = this->m_DistanceArray[v]; // unit in millimeter
-          amplitudeArray[u] = this->m_AmplitudeArray[v];
-          intensityArray[u] = this->m_IntensityArray[v];
-        }
-      }
+      memcpy(distanceArray, this->m_DistanceArray, this->m_PixelNumber*sizeof(float));
+      memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_PixelNumber*sizeof(float));
+      memcpy(intensityArray, this->m_IntensityArray, this->m_PixelNumber*sizeof(float));
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
-      m_ImageMutex->Unlock();
     }
     else
     {

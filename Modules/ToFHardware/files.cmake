@@ -19,6 +19,8 @@ SET(CPP_FILES
   mitkToFImageRecorder.cpp
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
+  mitkToFNrrdImageWriter.cpp
+  mitkToFPicImageWriter.cpp
   mitkToFImageCsvWriter.cpp
   mitkThreadedToFRawDataReconstruction.cpp
 )

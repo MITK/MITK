@@ -39,36 +39,9 @@ namespace mitk
 /**Documentation
  *  test for the class "ToFCameraMITKPlayerController".
  */
-int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
+void ReadFileFormatTestCase(std::string extension, mitk::ToFImageGrabber::Pointer grabber)
 {
-  MITK_TEST_BEGIN("ToFCameraMITKPlayerController");
-
-  mitk::ToFCameraMITKPlayerController::Pointer testObject = mitk::ToFCameraMITKPlayerController::New();
-  mitk::ToFCameraMITKPlayerDeviceImpl* deviceImpl = new mitk::ToFCameraMITKPlayerDeviceImpl;
-  mitk::ToFImageGrabber::Pointer imageGrabber = mitk::ToFImageGrabber::New();
-  imageGrabber->SetCameraDevice(deviceImpl);
-
-  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 0 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 0 ,"Testing initialization of CaptureWidth");
-
-  //test correct order of file name member
-  testObject->SetDistanceImageFileName("distTest");
-  testObject->SetAmplitudeImageFileName("amplTest");
-  testObject->SetIntensityImageFileName("intenTest");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetDistanceImageFileName()== "distTest" ,"Testing correct filename passing - Dist");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetAmplitudeImageFileName()== "amplTest" ,"Testing correct filename passing - Ampl");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetIntensityImageFileName()== "intenTest" ,"Testing correct filename passing - Inten");
-
-  //test passing of file name from image grabber
-  imageGrabber->SetStringProperty("DistanceImageFileName", "distPropertyTestName");
-  imageGrabber->SetStringProperty("AmplitudeImageFileName", "amplPropertyTestName");
-  imageGrabber->SetStringProperty("IntensityImageFileName", "intenPropertyTestName");
-  testObject = deviceImpl->GetController();
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetDistanceImageFileName()== "distPropertyTestName" ,"Testing correct filename passing from Image Grabber- Dist");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetAmplitudeImageFileName()== "amplPropertyTestName" ,"Testing correct filename passing from Image Grabber- Ampl");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetIntensityImageFileName()== "intenPropertyTestName" ,"Testing correct filename passing from Image Grabber- Inten");
-
+  MITK_INFO<<"Checking image processing with file format " << extension.c_str();
   //create some test image
   unsigned int* dim = new unsigned int[3];
   dim[0] = 100;
@@ -89,13 +62,13 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   testImage->SetVolume(data);
 
   // save image as dist, ampl and inten image to file. 
-  std::string distanceImageFileName("distTestImage.pic");
-  std::string amplitudeImageFileName("amplTestImage.pic");
-  std::string intensityImageFileName("intenTestImage.pic");
-  
+  std::string distanceImageFileName("distTestImage");
+  std::string amplitudeImageFileName("amplTestImage");
+  std::string intensityImageFileName("intenTestImage");
+
   mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
   writer->SetInput(testImage);
-  writer->SetExtension(".pic");
+  writer->SetExtension(extension);
   writer->SetFileName(distanceImageFileName);
   writer->Update();
 
@@ -104,15 +77,16 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
 
   writer->SetFileName(intensityImageFileName);
   writer->Update();
-  
+
   // load the files from directory 
-  
-  imageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
-  imageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
-  imageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
 
-  MITK_TEST_CONDITION_REQUIRED(imageGrabber->ConnectCamera() ,"Are the image files loaded correctly?");
+  grabber->SetStringProperty("DistanceImageFileName", (distanceImageFileName.append(extension)).c_str());
+  grabber->SetStringProperty("AmplitudeImageFileName", (amplitudeImageFileName.append(extension)).c_str());
+  grabber->SetStringProperty("IntensityImageFileName", (intensityImageFileName.append(extension)).c_str());
 
+  MITK_TEST_CONDITION_REQUIRED(grabber->ConnectCamera() ,"Are the image files loaded correctly?");
+
+  mitk::ToFCameraMITKPlayerController::Pointer testObject = static_cast<mitk::ToFCameraMITKPlayerDeviceImpl*>(grabber->GetCameraDevice())->GetController();
   // test load image from image grabber
   testObject->UpdateCamera();
   index = 0;
@@ -147,7 +121,7 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(amplOK ,"Testing correct loading and passing of amplitude image information!");
   MITK_TEST_CONDITION_REQUIRED(intenOK ,"Testing correct loading and passing of intensity image information!");
   MITK_TEST_CONDITION_REQUIRED(testObject->CloseCameraConnection(),"Testing disconnection of controller");
-  
+
   //clean up and delete saved image files
   if(remove(distanceImageFileName.c_str())!=0)
   {
@@ -162,12 +136,46 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   {
     MITK_ERROR<<"File: "<<intensityImageFileName<<" not successfully deleted!";
   }
-  deviceImpl->Delete();
   delete[] dist;
   delete[] ampl;
   delete[] inten;
   delete[] dim;
+}
 
+int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
+{
+  MITK_TEST_BEGIN("ToFCameraMITKPlayerController");
+
+  mitk::ToFCameraMITKPlayerController::Pointer testObject = mitk::ToFCameraMITKPlayerController::New();
+  mitk::ToFCameraMITKPlayerDeviceImpl* deviceImpl = new mitk::ToFCameraMITKPlayerDeviceImpl;
+  mitk::ToFImageGrabber::Pointer imageGrabber = mitk::ToFImageGrabber::New();
+  imageGrabber->SetCameraDevice(deviceImpl);
+
+  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 0 ,"Testing initialization of CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 0 ,"Testing initialization of CaptureWidth");
+
+  //test correct order of file name member
+  testObject->SetDistanceImageFileName("distTest");
+  testObject->SetAmplitudeImageFileName("amplTest");
+  testObject->SetIntensityImageFileName("intenTest");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetDistanceImageFileName()== "distTest" ,"Testing correct filename passing - Dist");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetAmplitudeImageFileName()== "amplTest" ,"Testing correct filename passing - Ampl");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetIntensityImageFileName()== "intenTest" ,"Testing correct filename passing - Inten");
+
+  //test passing of file name from image grabber
+  imageGrabber->SetStringProperty("DistanceImageFileName", "distPropertyTestName");
+  imageGrabber->SetStringProperty("AmplitudeImageFileName", "amplPropertyTestName");
+  imageGrabber->SetStringProperty("IntensityImageFileName", "intenPropertyTestName");
+  testObject = deviceImpl->GetController();
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetDistanceImageFileName()== "distPropertyTestName" ,"Testing correct filename passing from Image Grabber- Dist");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetAmplitudeImageFileName()== "amplPropertyTestName" ,"Testing correct filename passing from Image Grabber- Ampl");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetIntensityImageFileName()== "intenPropertyTestName" ,"Testing correct filename passing from Image Grabber- Inten");
+
+  ReadFileFormatTestCase(".pic", imageGrabber);
+  ReadFileFormatTestCase(".nrrd", imageGrabber);
+
+  deviceImpl->Delete();
   // end of test
   MITK_TEST_END();
 

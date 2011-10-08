@@ -15,54 +15,50 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkToFImageCsvWriter_h
-#define __mitkToFImageCsvWriter_h
+#ifndef __mitkToFPicImageWriter_h
+#define __mitkToFPicImageWriter_h
 
-#include "mitkToFImageWriter.h"
 #include "mitkToFHardwareExports.h"
+#include "mitkToFImageWriter.h"
 
 namespace mitk
 {
   /**
-  * @brief CSV writer class for ToF image data
+  * @brief Writer class for ToF images
   *
-  * This writer class allows streaming of ToF data into a CSV file.
-  * Writer can simultaneously save "distance", "intensity" and "amplitude" image data.
-  * Output files are written as 1D CSV data stream. 
+  * This writer class allows streaming of ToF data into a file. The .pic file format is used for writing the data.
+  * Image information is included in the header of the pic file.
+  * Writer can simultaneously save "distance", "intensity" and "amplitude" image.
+  * Images can be written as 3D volume (ToFImageType::ToFImageType3D) or temporal image stack (ToFImageType::ToFImageType2DPlusT)
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageCsvWriter : public ToFImageWriter
+  class MITK_TOFHARDWARE_EXPORT ToFPicImageWriter : public ToFImageWriter
   {
   public: 
-    /*!
-    \brief standard ctor
-    */
-    ToFImageCsvWriter();
-    /*!
-    \brief standard ~ctor
-    */
-    ~ToFImageCsvWriter();
 
-    mitkClassMacro( ToFImageCsvWriter , ToFImageWriter );
+    ToFPicImageWriter();
 
+    ~ToFPicImageWriter();
+
+    mitkClassMacro( ToFPicImageWriter , ToFImageWriter );
     itkNewMacro( Self );
+
     /*!
-    \brief Checks for file extensions and opens the output files
+    \brief Open file(s) for writing
     */
     void Open();
     /*!
-    \brief Closes the output files
+    \brief Close file(s) add .pic header and write
     */
     void Close();
     /*!
-    \brief Pushes the image data to the output files
-    \param data from distance, amplitude and intensity images as float values
+    \brief Add new data to file.
     */
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
 
   protected:
-
+    
     Image::Pointer m_MitkImage; ///< mitk image used for pic header creation
     FILE* m_DistanceOutfile; ///< file for distance image
     FILE* m_AmplitudeOutfile; ///< file for amplitude image
@@ -70,21 +66,24 @@ namespace mitk
 
 
   private:
+
     /*!
-    \brief opens CSV output file
-    \param output file, name of the output file
+    \brief Open file by filename to gain write access to it.
     */
-    void OpenCsvFile(FILE** outfile, std::string outfileName);
+    void OpenPicFile(FILE** outfile, std::string outfileName);
     /*!
-    \brief closes CSV output file
-    \param output file
+    \brief Close file after work on it is finished.
     */
-    void CloseCsvFile(FILE* outfile);
+    void ClosePicFile(FILE* outfile);
     /*!
-    \brief writes the data to the CSV output file
-    \param output file, data array of float values
+    \brief Replace current PicFileHeader information.
     */
-    void WriteCsvFile(FILE* outfile, float* floatData);
+    void ReplacePicFileHeader(FILE* outfile);
+    /*!
+    \brief Write image information to the PicFileHeader.
+    */
+    void WritePicFileHeader(FILE* outfile, mitkIpPicDescriptor* pic);
+
   };
 } //END mitk namespace
-#endif // __mitkToFImageCsvWriter_h
+#endif // __mitkToFPicImageWriter_h

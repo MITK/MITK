@@ -176,7 +176,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     mitk::ToFImageWriter::ToFImageType tofImageType;
     tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType, 
       distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rawDataSelected,
-      NULL, "Save Image To...", imageFileName, "MITK Images (*.pic);;Text (*.csv)", &selectedFilter);
+      NULL, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
 
     if (tmpFileName.isEmpty())
     {
@@ -220,12 +220,24 @@ void QmitkToFRecorderWidget::OnStartRecorder()
 
       if (selectedFilter.compare("Text (*.csv)") == 0)
       {
-        this->m_ToFImageRecorder->SetFileFormat("csv");
+        this->m_ToFImageRecorder->SetFileFormat(".csv");
+      }
+      else if (selectedFilter.compare("PIC Images - deprecated (*.pic)") == 0)
+      {
+        //default
+        this->m_ToFImageRecorder->SetFileFormat(".pic");
+        
+        QMessageBox::warning(NULL, "Deprecated File Format!", 
+          "Please note that *.pic file format is deprecated and not longer supported! The suggested file format for images is *.nrrd!");
+      }
+      else if (selectedFilter.compare("NRRD Images (*.nrrd)") == 0)
+      {
+        this->m_ToFImageRecorder->SetFileFormat(".nrrd");
       }
       else
       {
-        //default
-        this->m_ToFImageRecorder->SetFileFormat("pic");
+        QMessageBox::warning(NULL, "Unsupported file format!", "Please specify one of the supported file formats *.nrrd, *.csv!");
+        return;
       }
 
       numOfFrames = m_Controls->m_NumOfFramesSpinBox->value();
@@ -243,13 +255,13 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     }
     else
     {
-      OnRecordingStopped();
+      this->OnRecordingStopped();
     }
   }
   catch(std::exception& e)
   {
     QMessageBox::critical(NULL, "Error", QString(e.what()));
-    OnRecordingStopped();
+    this->OnRecordingStopped();
   }
 }
 

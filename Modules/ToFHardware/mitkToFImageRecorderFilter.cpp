@@ -19,11 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFImageRecorderFilter.h>
 #include <mitkImage.h>
 #include <mitkImageDataItem.h>
+#include "mitkToFNrrdImageWriter.h"
+#include "mitkToFPicImageWriter.h"
+#include "mitkToFImageCsvWriter.h"
+
+// itk includes
+#include "itksys/SystemTools.hxx"
 
 
-mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false)
+mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false), m_ToFImageWriter(0)
 {
-  m_ToFImageWriter = mitk::ToFImageWriter::New();
+  m_FileExtension = "";
 }
 
 mitk::ToFImageRecorderFilter::~ToFImageRecorderFilter()
@@ -33,6 +39,23 @@ mitk::ToFImageRecorderFilter::~ToFImageRecorderFilter()
 void mitk::ToFImageRecorderFilter::SetFileName(std::string fileName)
 {
   std::string name = fileName;
+  m_FileExtension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+  if(m_FileExtension == ".nrrd")
+  {
+    m_ToFImageWriter = mitk::ToFNrrdImageWriter::New();
+  }
+  else if(m_FileExtension == ".pic")
+  {
+    m_ToFImageWriter = mitk::ToFPicImageWriter::New();
+  }
+  else if(m_FileExtension == ".csv")
+  {
+    m_ToFImageWriter = mitk::ToFImageCsvWriter::New();
+  }
+  else
+  {
+    throw std::logic_error("The specified file type is not supported, standard file type is .nrrd!");
+  }
   int pos = name.find_last_of(".");
   name.insert(pos,"_DistanceImage");
   m_ToFImageWriter->SetDistanceImageFileName(name);
@@ -74,6 +97,11 @@ void mitk::ToFImageRecorderFilter::GenerateData()
 
 void mitk::ToFImageRecorderFilter::StartRecording()
 {
+  if(m_ToFImageWriter.IsNull())
+  {
+    throw std::logic_error("ToFImageWriter is unitialized, set filename first!");
+    return;
+  }
   m_ToFImageWriter->Open();
   m_RecordingStarted = true;
 }

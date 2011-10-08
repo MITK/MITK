@@ -60,7 +60,7 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   tofImageGrabber->SetIntegrationTime(integrationTime);
   MITK_TEST_CONDITION_REQUIRED(integrationTime==tofImageGrabber->GetIntegrationTime(),"Test Set/GetIntegrationTime()");
   MITK_TEST_OUTPUT(<<"Test methods with invalid file name");
-  MITK_TEST_CONDITION_REQUIRED(!tofImageGrabber->ConnectCamera(),"Test ConnectCamera() with no file name set");
+  MITK_TEST_FOR_EXCEPTION(std::logic_error, !tofImageGrabber->ConnectCamera());
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
   tofImageGrabber->StartCamera();
   MITK_TEST_OUTPUT(<<"Call StopCamera()");

@@ -50,7 +50,7 @@ mitk::Image::Pointer CreateTestImage(unsigned int dimX, unsigned int dimY)
   image->Allocate();
 
   //Obtaining image data from ToF camera//
-
+  
   //Correlate inten values to PixelIndex//
   ItkImageRegionIteratorType2D imageIterator(image,image->GetLargestPossibleRegion());
   imageIterator.GoToBegin();

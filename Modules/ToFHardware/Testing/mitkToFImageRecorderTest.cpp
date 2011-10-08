@@ -150,6 +150,7 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   tofImageRecorder->SetDistanceImageFileName(distanceTestFileName);
   tofImageRecorder->SetAmplitudeImageFileName(amplitudeTestFileName);
   tofImageRecorder->SetIntensityImageFileName(intensityTestFileName);
+  tofImageRecorder->SetFileFormat(".pic");
 
   tofImageRecorder->SetRecordMode(mitk::ToFImageRecorder::PerFrames);
   tofImageRecorder->SetNumOfFrames(20);

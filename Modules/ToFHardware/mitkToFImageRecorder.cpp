@@ -90,6 +90,10 @@ namespace mitk
       this->m_ToFImageWriter = ToFPicImageWriter::New();
       this->m_ToFImageWriter->SetExtension(m_FileFormat);
     }
+    else
+    {
+      throw std::logic_error("No file format specified!");
+    }
 
     this->m_CaptureWidth = this->m_ToFCameraDevice->GetCaptureWidth();
     this->m_CaptureHeight = this->m_ToFCameraDevice->GetCaptureHeight();

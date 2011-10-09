@@ -18,12 +18,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataPlayerBase.h"
 
 
-
+mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
+{
+ m_StreamValid = true;
+ m_ErrorMessage = "";
+}
 
 mitk::NavigationDataPlayerBase::~NavigationDataPlayerBase()
 {
 }
 
+ 
 
 
 

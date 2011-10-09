@@ -71,11 +71,11 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
 
     // find out _NumberOfSnapshots
     m_NumberOfSnapshots = 0;
-    TiXmlElement* nextND = m_DataElem->FirstChildElement("ND");
+    TiXmlElement* nextND = m_DataElem->FirstChildElement("NavigationData");
     while(nextND)
     {
       ++m_NumberOfSnapshots;
-      nextND = nextND->NextSiblingElement("ND");
+      nextND = nextND->NextSiblingElement("NavigationData");
     }
     // e.g. 12 nd found and 2 tools used => number of snapshots is 12:2=6
     m_NumberOfSnapshots = m_NumberOfSnapshots/toolcount;
@@ -150,11 +150,13 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
 
   // very important: go through the tools (there could be more then one)
   mitk::NavigationData::Pointer tmp;
+  //MITK_INFO << "this->GetNumberOfOutputs()" << this->GetNumberOfOutputs();
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
+    //MITK_INFO << "index" << index;
     // go to the first element
     if(!m_CurrentElem)
-      m_CurrentElem = m_DataElem->FirstChildElement("ND");
+      m_CurrentElem = m_DataElem->FirstChildElement("NavigationData");
     // go to the next element
     else
       m_CurrentElem = m_CurrentElem->NextSiblingElement();
@@ -162,7 +164,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
     // if repeat is on: go back to the first element (prior calls delivered NULL
     // elem)
     if(!m_CurrentElem && m_Repeat)
-      m_CurrentElem = m_DataElem->FirstChildElement("ND");
+      m_CurrentElem = m_DataElem->FirstChildElement("NavigationData");
 
     mitk::NavigationData* output = this->GetOutput(index);
     tmp = this->ReadVersion1();

@@ -17,6 +17,9 @@
 
  =========================================================================*/
 
+/* =============== IMPORTANT TODO ===================
+ * ==== USE vtkSmartPointer<> when necessary ONLY!!!!
+ */
 
 #ifndef _MITK_FiberBundleX_H
 #define _MITK_FiberBundleX_H
@@ -30,7 +33,7 @@
 #include <vtkSmartPointer.h> //may be replaced by class precompile argument
 #include <vtkPolyData.h> // may be replaced by class
 #include <vtkPoints.h> // my be replaced by class
-
+#include <vtkDataSet.h>
 
 namespace mitk {
 
@@ -43,6 +46,7 @@ namespace mitk {
     // names of certain arrays (e.g colorcodings, etc.) 
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
+    static const char* FIBER_ID_ARRAY;
     
     /* friend classes wanna access typedefs
     ContainerPointType, ContainerTractType, ContainerType */
@@ -66,18 +70,18 @@ namespace mitk {
     
     
     /*====FIBERBUNDLE I/O METHODS====*/
-    void SetFibers(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
-    vtkSmartPointer<vtkPolyData> GetFibers();
+    void SetFibers(vtkPolyData*); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
+    vtkPolyData* GetFibers();
     vtkSmartPointer<vtkPolyData> GetVertices();
     
     
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
-
+    void DoGenerateFiberIds();
     
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
-    // Compute Bounding Box for FiberStructure; needed for MITK Geometry
-    double* DoComputeFiberStructureBoundingBox(vtkSmartPointer<vtkPolyData>);
+    // Compute Bounding Box of FiberStructure; needed for MITK Geometry
+    double* DoComputeFiberStructureBoundingBox();
 
 
 
@@ -99,11 +103,15 @@ namespace mitk {
 //    
     //    this variable hosts the original fiber data, no smartpointer needed because who or whatever passes this data to FiberBundleX should use vtkSmartPointer structure
   
-    vtkSmartPointer<vtkPolyData> m_FiberStructureData;
+    vtkPolyData* m_FiberStructureData; //this is a common pointer because fiberDataStructure gets passed to this class. m_FiberStructureData is destroyed in the destructor then.
     
     //    VertexPolyData stores all original points as vertices computed by tracking algorithms
     vtkSmartPointer<vtkPolyData> m_VertexPolyData;
     
+    // this variable contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
+    vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
+    
+
     
     
   };

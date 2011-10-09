@@ -35,9 +35,54 @@ PURPOSE.  See the above copyright notices for more information.
 // VTK
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
+#include <mitkFiberBundleX.h>
+
+#include <mitkFiberBundleX.h>
+
+#include <QTimer>
+#include <QThread>
+
+
+/* ==== THIS STRUCT CONTAINS ALL NECESSARY VARIABLES 
+ * TO EXECUTE AND UPDATE GUI ELEMENTS DURING PROCESSING OF A THREAD 
+ */
+struct Package4WorkingThread
+{
+  mitk::FiberBundleX* st_FBX;
+  QTimer* st_idGenerateTimer;
+  Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
+};
+
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
+class QmitkFiberIDWorker : public QObject
+{
+  Q_OBJECT
+  
+public:
+  
+  QmitkFiberIDWorker( QThread*, Package4WorkingThread );
+  
+  public slots:
+  
+  void run();
+  
+private:
+  //mitk::FiberBundleX* m_FBX;
+
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+  
+  
+};
 
 
 
+
+
+// ========= HERE STARTS THE ACTUAL FIBERBUNDLE DEVELOPER VIEW =======
 
 const QString FIB_RADIOBUTTON_DIRECTION_RANDOM = "radioButton_directionRandom";
 const QString FIB_RADIOBUTTON_DIRECTION_X      = "radioButton_directionX";
@@ -76,7 +121,15 @@ public:
 
   protected slots:
   void DoGenerateFibers();
+  void DoGenerateFiberIDs();
   void DoUpdateGenerateFibersWidget();
+  void UpdateFiberIDTimer();
+  void SelectionChangedToolBox(int);
+  
+  //SLOTS FOR THREADS
+  void BeforeThread_IdGenerate();
+  void AfterThread_IdGenerate();
+  
   
   
 protected:
@@ -93,21 +146,35 @@ protected:
   private:
   
   /* METHODS GENERATING FIBERSTRUCTURES */
-  vtkSmartPointer<vtkPolyData> GenerateVtkFibersRandom();
+  vtkPolyData* GenerateVtkFibersRandom();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionX();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionY();
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
   
-  /* MITK RELEVANT HELPERMETHODS */
+  /* METHODS FOR FIBER PROCESSING OR PREPROCESSING  */
+
+  
+  /* HELPERMETHODS */
   mitk::Geometry3D::Pointer GenerateStandardGeometryForMITK();
+  void ResetFiberInfoWidget();
+  void FeedFiberInfoWidget();
+  void FBXDependendGUIElementsConfigurator(bool);
   
   //contains the selected FiberBundle
-  mitk::DataNode::Pointer m_FiberBundleNode;
+  mitk::FiberBundleX* m_FiberBundleX;
 
 //  radiobutton groups
   QVector< QRadioButton* > m_DirectionRadios;
   QVector< QRadioButton* > m_FARadios;
   QVector< QRadioButton* > m_GARadios;
+  
+  // timer for updating fiber id generation
+  QTimer m_idGenerateTimer;
+  
+  QmitkFiberIDWorker * m_FiberIDGenerator;
+  QThread * m_hostThread;
+  bool m_threadInProgress;
+  
 
 };
 

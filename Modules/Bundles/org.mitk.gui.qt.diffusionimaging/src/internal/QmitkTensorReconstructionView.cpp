@@ -164,8 +164,6 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_TensorReconstructionNumberThreadsSpinbox->setValue(8);
-
     QStringList items;
     items << "LLS (Linear Least Squares)"
       << "MLE (Maximum Likelihood)"
@@ -364,7 +362,6 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
       TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
         TensorReconstructionImageFilterType::New();
       tensorReconstructionFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-      tensorReconstructionFilter->SetNumberOfThreads( m_Controls->m_TensorReconstructionNumberThreadsSpinbox->value() );
       tensorReconstructionFilter->SetBValue(vols->GetB_Value());
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreasholdEdit->text().toFloat() );
       tensorReconstructionFilter->Update();

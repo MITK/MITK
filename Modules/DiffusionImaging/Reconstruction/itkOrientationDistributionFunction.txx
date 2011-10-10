@@ -8,8 +8,8 @@ Version:   $Revision: 1.14 $
 Copyright (c) Insight Software Consortium. All rights reserved.
 See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -30,11 +30,11 @@ namespace itk
 {
 
   /*
-  
+
   #define INIT_STATIC_ODF_VARS(N_DIRS)    \
     _INIT_STATIC_ODF_VARS(float,N_DIRS) \
     _INIT_STATIC_ODF_VARS(double,N_DIRS) \
-  
+
   #define _INIT_STATIC_ODF_VARS(PIXTYPE,N_DIRS)                                                                          \
     vtkPolyData* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_BaseMesh = NULL;                                \
     vnl_matrix_fixed<double, 3, N_DIRS>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Directions              \
@@ -42,8 +42,8 @@ namespace itk
     std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_NeighborIdxs = NULL;       \
     std::vector<int>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_HalfSphereIdxs = NULL;              \
     bool itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Mutex = false;                                                                                                \
-  
-  
+
+
     INIT_STATIC_ODF_VARS(40)
     INIT_STATIC_ODF_VARS(60)
     INIT_STATIC_ODF_VARS(80)
@@ -128,12 +128,12 @@ namespace itk
   * Returns a temporary copy of a vector
   */
   template<class T, unsigned int NOdfDirections>
-  OrientationDistributionFunction<T, NOdfDirections> 
+  OrientationDistributionFunction<T, NOdfDirections>
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator+(const Self & r) const
   {
     Self result;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       result[i] = (*this)[i] + r[i];
     }
@@ -147,12 +147,12 @@ namespace itk
   * Returns a temporary copy of a vector
   */
   template<class T, unsigned int NOdfDirections>
-  OrientationDistributionFunction<T, NOdfDirections> 
+  OrientationDistributionFunction<T, NOdfDirections>
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator-(const Self & r) const
   {
     Self result;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       result[i] = (*this)[i] - r[i];
     }
@@ -165,11 +165,11 @@ namespace itk
   * Performs addition in place
   */
   template<class T, unsigned int NOdfDirections>
-  const OrientationDistributionFunction<T, NOdfDirections> & 
+  const OrientationDistributionFunction<T, NOdfDirections> &
     OrientationDistributionFunction<T, NOdfDirections>
-    ::operator+=(const Self & r) 
+    ::operator+=(const Self & r)
   {
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       (*this)[i] += r[i];
     }
@@ -180,14 +180,14 @@ namespace itk
 
 
   /**
-  * Performs subtraction in place 
+  * Performs subtraction in place
   */
   template<class T, unsigned int NOdfDirections>
-  const OrientationDistributionFunction<T, NOdfDirections> & 
+  const OrientationDistributionFunction<T, NOdfDirections> &
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator-=(const Self & r)
   {
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       (*this)[i] -= r[i];
     }
@@ -200,11 +200,11 @@ namespace itk
   * Performs multiplication by a scalar, in place
   */
   template<class T, unsigned int NOdfDirections>
-  const OrientationDistributionFunction<T, NOdfDirections> & 
+  const OrientationDistributionFunction<T, NOdfDirections> &
     OrientationDistributionFunction<T, NOdfDirections>
-    ::operator*=(const RealValueType & r) 
+    ::operator*=(const RealValueType & r)
   {
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       (*this)[i] *= r;
     }
@@ -217,11 +217,11 @@ namespace itk
   * Performs division by a scalar, in place
   */
   template<class T, unsigned int NOdfDirections>
-  const OrientationDistributionFunction<T, NOdfDirections> & 
+  const OrientationDistributionFunction<T, NOdfDirections> &
     OrientationDistributionFunction<T, NOdfDirections>
-    ::operator/=(const RealValueType & r) 
+    ::operator/=(const RealValueType & r)
   {
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       (*this)[i] /= r;
     }
@@ -235,12 +235,12 @@ namespace itk
   * Performs multiplication with a scalar
   */
   template<class T, unsigned int NOdfDirections>
-  OrientationDistributionFunction<T, NOdfDirections> 
+  OrientationDistributionFunction<T, NOdfDirections>
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator*(const RealValueType & r) const
   {
     Self result;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       result[i] = (*this)[i] * r;
     }
@@ -252,12 +252,12 @@ namespace itk
   * Performs division by a scalar
   */
   template<class T, unsigned int NOdfDirections>
-  OrientationDistributionFunction<T, NOdfDirections> 
+  OrientationDistributionFunction<T, NOdfDirections>
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator/(const RealValueType & r) const
   {
     Self result;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       result[i] = (*this)[i] / r;
     }
@@ -273,15 +273,15 @@ namespace itk
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator()(unsigned int row, unsigned int col) const
   {
-    unsigned int k; 
+    unsigned int k;
 
-    if( row < col ) 
+    if( row < col )
     {
-      k = row * InternalDimension + col - row * ( row + 1 ) / 2; 
+      k = row * InternalDimension + col - row * ( row + 1 ) / 2;
     }
     else
     {
-      k = col * InternalDimension + row - col * ( col + 1 ) / 2; 
+      k = col * InternalDimension + row - col * ( col + 1 ) / 2;
     }
 
 
@@ -303,15 +303,15 @@ namespace itk
     OrientationDistributionFunction<T, NOdfDirections>
     ::operator()(unsigned int row, unsigned int col)
   {
-    unsigned int k; 
+    unsigned int k;
 
-    if( row < col ) 
+    if( row < col )
     {
-      k = row * InternalDimension + col - row * ( row + 1 ) / 2; 
+      k = row * InternalDimension + col - row * ( row + 1 ) / 2;
     }
     else
     {
-      k = col * InternalDimension + row - col * ( col + 1 ) / 2; 
+      k = col * InternalDimension + row - col * ( col + 1 ) / 2;
     }
 
 
@@ -329,9 +329,9 @@ namespace itk
   * Set ones in the diagonal and zeroes every where else.
   */
   template<class T, unsigned int NOdfDirections>
-  void 
+  void
     OrientationDistributionFunction<T, NOdfDirections>
-    ::SetIsotropic() 
+    ::SetIsotropic()
   {
     this->Fill(NumericTraits< T >::One / NOdfDirections);
   }
@@ -341,9 +341,9 @@ namespace itk
   * Set ones in the diagonal and zeroes every where else.
   */
   template<class T, unsigned int NOdfDirections>
-  void 
+  void
     OrientationDistributionFunction<T, NOdfDirections>
-    ::InitFromTensor(itk::DiffusionTensor3D<T> tensor) 
+    ::InitFromTensor(itk::DiffusionTensor3D<T> tensor)
   {
     for(unsigned int i=0; i<NOdfDirections; i++)
     {
@@ -352,8 +352,8 @@ namespace itk
       *  g0 g1 g2  *  | t1  t3  t4 | *  g1
       *               | t2  t4  t5 |    g2
       *
-      * =   g0 * (t0g0*t1g1*t2g2) 
-      *   + g1 * (t1g0+t3g1+t4g2) 
+      * =   g0 * (t0g0*t1g1*t2g2)
+      *   + g1 * (t1g0+t3g1+t4g2)
       *   + g2 * (t2g0+t4g1+t5g2)
       */
       T g0 = (*m_Directions)(0,i);
@@ -365,8 +365,8 @@ namespace itk
       T t3 = tensor[3];
       T t4 = tensor[4];
       T t5 = tensor[5];
-      (*this)[i] = g0 * (t0*g0+t1*g1+t2*g2) 
-        + g1 * (t1*g0+t3*g1+t4*g2) 
+      (*this)[i] = g0 * (t0*g0+t1*g1+t2*g2)
+        + g1 * (t1*g0+t3*g1+t4*g2)
         + g2 * (t2*g0+t4*g1+t5*g2);
 
       (*this)[i] = (*this)[i] < 0 ? 0 : (*this)[i];
@@ -397,18 +397,21 @@ namespace itk
   * Normalization to PDF
   */
   template<class T, unsigned int NOdfDirections>
-  void 
+  void
     OrientationDistributionFunction<T, NOdfDirections>
-    ::Normalize() 
+    ::Normalize()
   {
     T sum = 0;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       sum += (*this)[i];
     }
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    if (sum>0)
     {
-      (*this)[i] = (*this)[i] / sum;
+      for( unsigned int i=0; i<InternalDimension; i++)
+      {
+        (*this)[i] = (*this)[i] / sum;
+      }
     }
   }
 
@@ -422,13 +425,13 @@ namespace itk
   {
     T max = NumericTraits<T>::NonpositiveMin();
     T min = NumericTraits<T>::max();
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       max = (*this)[i] > max ? (*this)[i] : max;
       min = (*this)[i] < min ? (*this)[i] : min;
     }
     Self retval;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       retval[i] = ((*this)[i] - min) / (max - min);
     }
@@ -444,12 +447,12 @@ namespace itk
     ::MaxNormalize() const
   {
     T max = NumericTraits<T>::NonpositiveMin();
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       max = (*this)[i] > max ? (*this)[i] : max;
     }
     Self retval;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       retval[i] = (*this)[i] / max;
     }
@@ -525,7 +528,7 @@ namespace itk
           double *tmpPoint = points->GetPoint(pts[i]);
           double az = tmpPoint[0];
           double elev = tmpPoint[1];
-          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5)) 
+          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5))
             insert = false;
         }
         if(insert)
@@ -558,7 +561,7 @@ namespace itk
           double *tmpPoint = points2->GetPoint(pts[i]);
           double az = tmpPoint[0];
           double elev = tmpPoint[1];
-          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5)) 
+          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5))
             insert = false;
         }
         if(insert)
@@ -599,7 +602,7 @@ namespace itk
   {
     T max = NumericTraits<T>::NonpositiveMin();
     int maxidx = -1;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       if((*this)[i] >= max )
       {
@@ -663,7 +666,7 @@ namespace itk
   * Extract the n-th diffusion direction
   */
   template<class T, unsigned int NOdfDirections>
-  int 
+  int
     OrientationDistributionFunction<T, NOdfDirections>
     ::GetNthDiffusionDirection(int n, vnl_vector_fixed<double,3> rndVec) const
   {
@@ -675,7 +678,7 @@ namespace itk
     if( !m_HalfSphereIdxs )
     {
       m_HalfSphereIdxs = new std::vector<int>();
-      for( unsigned int i=0; i<InternalDimension; i++) 
+      for( unsigned int i=0; i<InternalDimension; i++)
       {
         if(dot_product(m_Directions->get_column(i),rndVec) > 0.0)
         {
@@ -689,14 +692,14 @@ namespace itk
     // that are local maxima
     std::vector<int> localMaxima;
     std::vector<int>::iterator it;
-    for( it=m_HalfSphereIdxs->begin(); 
-      it!=m_HalfSphereIdxs->end(); 
-      it++) 
+    for( it=m_HalfSphereIdxs->begin();
+      it!=m_HalfSphereIdxs->end();
+      it++)
     {
       std::vector<int> nbs = GetNeighbors(*it);
       std::vector<int>::iterator it2;
       bool max = true;
-      for(it2 = nbs.begin(); 
+      for(it2 = nbs.begin();
         it2 != nbs.end();
         it2++)
       {
@@ -718,7 +721,7 @@ namespace itk
     {
       maxidx = -1;
       T max = NumericTraits<T>::NonpositiveMin();
-      for(it = localMaxima.begin(); 
+      for(it = localMaxima.begin();
         it != localMaxima.end();
         it++)
       {
@@ -830,8 +833,8 @@ namespace itk
               barycentricCoords[2] = uv[0]<0 ? 0 : (uv[0]>1?1:uv[0]);
               barycentricCoords[1] = uv[1]<0 ? 0 : (uv[1]>1?1:uv[1]);
               barycentricCoords[0] = 1-(barycentricCoords[1]+barycentricCoords[2]);
-              retval =  barycentricCoords[0]*this->GetNthComponent(pts[0]) + 
-                barycentricCoords[1]*this->GetNthComponent(pts[1]) + 
+              retval =  barycentricCoords[0]*this->GetNthComponent(pts[0]) +
+                barycentricCoords[1]*this->GetNthComponent(pts[1]) +
                 barycentricCoords[2]*this->GetNthComponent(pts[2]);
             }
           }
@@ -895,13 +898,13 @@ namespace itk
     double mean = 0;
     double std = 0;
     double rms = 0;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       T val = (*this)[i];
       mean += val;
     }
     mean /= NOdfDirections;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       T val = (*this)[i];
       std += (val - mean) * (val - mean);
@@ -929,7 +932,7 @@ namespace itk
     double std = 0;
     double rms = 0;
     double max = NumericTraits<double>::NonpositiveMin();
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       double val = (double)(*this)[i];
       mean += pow(val,(double)p);
@@ -937,7 +940,7 @@ namespace itk
     }
     max = pow(max,(double)p);
     mean /= N;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       double val = (double)(*this)[i];
       std += (pow(val,(double)p) - mean) * (pow(val,(double)p) - mean);
@@ -994,14 +997,14 @@ namespace itk
     double mean = 0;
     double std = 0;
     T max = NumericTraits<T>::NonpositiveMin();
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       T val = (*this)[i];
       mean += val;
       max = (*this)[i] > max ? (*this)[i] : max;
     }
     mean /= InternalDimension;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       T val = (*this)[i];
       std += (val - mean) * (val - mean);
@@ -1057,7 +1060,7 @@ namespace itk
     else
     {
       mode = NumericTraits<T>::max();
-      for( unsigned int i=0; i<N; i++) 
+      for( unsigned int i=0; i<N; i++)
       {
         if((*this)[i] < mode )
         {
@@ -1088,7 +1091,7 @@ namespace itk
     //////mode = modeAndNeighborVals[floor(0.5*(double)(numNeighbors+1)+0.5)];
 
     ////////////////
-    // computing a quantile of the angular range 
+    // computing a quantile of the angular range
     ////////////////
 
     // define quantile
@@ -1127,7 +1130,7 @@ namespace itk
     ::GetNormalizedEntropy() const
   {
     double mean = 0;
-    for( unsigned int i=0; i<InternalDimension; i++) 
+    for( unsigned int i=0; i<InternalDimension; i++)
     {
       T val = (*this)[i];
       if( val != 0 )
@@ -1203,7 +1206,7 @@ namespace itk
   */
   template<class T, unsigned int NOdfDirections>
   std::ostream &
-    operator<<(std::ostream& os,const OrientationDistributionFunction<T, NOdfDirections> & c ) 
+    operator<<(std::ostream& os,const OrientationDistributionFunction<T, NOdfDirections> & c )
   {
     for(unsigned int i=0; i<c.GetNumberOfComponents(); i++)
     {
@@ -1218,7 +1221,7 @@ namespace itk
   */
   template<class T, unsigned int NOdfDirections>
   std::istream &
-    operator>>(std::istream& is, OrientationDistributionFunction<T, NOdfDirections> & dt ) 
+    operator>>(std::istream& is, OrientationDistributionFunction<T, NOdfDirections> & dt )
   {
     for(unsigned int i=0; i < dt.GetNumberOfComponents(); i++)
     {

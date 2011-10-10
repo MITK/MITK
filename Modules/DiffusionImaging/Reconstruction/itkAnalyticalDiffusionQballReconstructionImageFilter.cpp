@@ -9,8 +9,8 @@ Version:   $Revision: 1.11 $
 Copyright (c) Insight Software Consortium. All rights reserved.
 See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -53,23 +53,23 @@ namespace itk {
   {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
-    this->SetNumberOfRequiredInputs( 1 ); 
+    this->SetNumberOfRequiredInputs( 1 );
   }
 
 
-  template< 
-    class TReferenceImagePixelType, 
+  template<
+    class TReferenceImagePixelType,
     class TGradientImagePixelType,
     class TOdfPixelType,
       int NOrderL,
       int NrOdfDirections>
       typename itk::AnalyticalDiffusionQballReconstructionImageFilter<
       TReferenceImagePixelType,TGradientImagePixelType,TOdfPixelType,
-      NOrderL,NrOdfDirections>::OdfPixelType 
+      NOrderL,NrOdfDirections>::OdfPixelType
       itk::AnalyticalDiffusionQballReconstructionImageFilter
-      <TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, 
+      <TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,
       NOrderL, NrOdfDirections>
-      ::Normalize( OdfPixelType odf, 
+      ::Normalize( OdfPixelType odf,
       typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
     {
       switch( m_NormalizationMethod )
@@ -149,17 +149,17 @@ namespace itk {
     }
 
 
-    template< 
-      class TReferenceImagePixelType, 
+    template<
+      class TReferenceImagePixelType,
       class TGradientImagePixelType,
       class TOdfPixelType,
         int NOrderL,
         int NrOdfDirections>
-        vnl_vector<TOdfPixelType> 
+        vnl_vector<TOdfPixelType>
         itk::AnalyticalDiffusionQballReconstructionImageFilter
-        <TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, 
+        <TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,
         NOrderL, NrOdfDirections>
-        ::PreNormalize( vnl_vector<TOdfPixelType> vec, 
+        ::PreNormalize( vnl_vector<TOdfPixelType> vec,
         typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
       {
         switch( m_NormalizationMethod )
@@ -174,6 +174,11 @@ namespace itk {
             int n = vec.size();
             for(int i=0; i<n; i++)
             {
+              if (vec[i]<=0)
+              {
+                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
+                vec[i] = 0.001;
+              }
               vec[i] = log(vec[i]);
             }
             return vec;
@@ -194,6 +199,11 @@ namespace itk {
             int n = vec.size();
             for(int i=0; i<n; i++)
             {
+              if (vec[i]<=0)
+              {
+                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
+                vec[i] = 0.001;
+              }
               vec[i] = log(vec[i]);
             }
             return vec;
@@ -211,14 +221,16 @@ namespace itk {
             double b0f = (double)b0;
             for(int i=0; i<n; i++)
             {
-              double meas = (double)vec[i];
-              if (meas==0)
-                meas = 0.001;
+              if (vec[i]<=0)
+              {
+                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
+                vec[i] = 0.001;
+              }
               if (b0f==0)
                 b0f = 0.01;
-              if(meas >= b0f)
-                meas = b0f - 0.001;
-              vec[i] = log(-log(meas/b0f));
+              if(vec[i] >= b0f)
+                vec[i] = b0f - 0.001;
+              vec[i] = log(-log(vec[i]/b0f));
             }
             return vec;
             break;
@@ -232,24 +244,24 @@ namespace itk {
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ::BeforeThreadedGenerateData()
       {
-        // If we have more than 2 inputs, then each input, except the first is a 
+        // If we have more than 2 inputs, then each input, except the first is a
         // gradient image. The number of gradient images must match the number of
         // gradient directions.
         //const unsigned int numberOfInputs = this->GetNumberOfInputs();
 
-        // There need to be at least 6 gradient directions to be able to compute the 
+        // There need to be at least 6 gradient directions to be able to compute the
         // tensor basis
         if( m_NumberOfGradientDirections < 6 )
         {
           itkExceptionMacro( << "At least 6 gradient directions are required" );
         }
 
-        // Input must be an itk::VectorImage. 
+        // Input must be an itk::VectorImage.
         std::string gradientImageClassName(
           this->ProcessObject::GetInput(0)->GetNameOfClass());
         if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
         {
-          itkExceptionMacro( << 
+          itkExceptionMacro( <<
             "There is only one Gradient image. I expect that to be a VectorImage. "
             << "But its of type: " << gradientImageClassName );
         }
@@ -257,7 +269,7 @@ namespace itk {
         this->ComputeReconstructionMatrix();
 
         m_BZeroImage = BZeroImageType::New();
-        typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( 
+        typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >(
           this->ProcessObject::GetInput(0) );
         m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
         m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
@@ -285,9 +297,9 @@ namespace itk {
       template< class T, class TG, class TO, int L, int NODF>
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-        int ) 
+        int )
       {
-        typename OutputImageType::Pointer outputImage = 
+        typename OutputImageType::Pointer outputImage =
           static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
         ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
@@ -305,7 +317,7 @@ namespace itk {
 
         // Would have liked a dynamic_cast here, but seems SGI doesn't like it
         // The enum will ensure that an inappropriate cast is not done
-        gradientImagePointer = static_cast< GradientImagesType * >( 
+        gradientImagePointer = static_cast< GradientImagesType * >(
           this->ProcessObject::GetInput(0) );
 
         GradientIteratorType git(gradientImagePointer, outputRegionForThread );
@@ -370,7 +382,7 @@ namespace itk {
             }
             else if(m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
             {
-              /** this would be the place to implement a non-negative 
+              /** this would be the place to implement a non-negative
               * solver for quadratic programming problem:
               * min .5*|| Bc-s ||^2 subject to -CLPc <= 4*pi*ones
               * (refer to MICCAI 2009 Goh et al. "Estimating ODFs with PDF constraints")
@@ -672,14 +684,14 @@ namespace itk {
 
         int l = L;
         m_NumberCoefficients = (int)(l*l + l + 2.0)/2.0 + l;
-        vnl_matrix<double>* B = new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients); 
-        vnl_matrix<double>* _L = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients); 
+        vnl_matrix<double>* B = new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients);
+        vnl_matrix<double>* _L = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
         _L->fill(0.0);
-        vnl_matrix<double>* LL = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients); 
+        vnl_matrix<double>* LL = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
         LL->fill(0.0);
-        vnl_matrix<double>* P = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients); 
+        vnl_matrix<double>* P = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
         P->fill(0.0);
-        vnl_matrix<double>* Inv = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients); 
+        vnl_matrix<double>* Inv = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
         P->fill(0.0);
         vnl_vector<int>* lj = new vnl_vector<int>(m_NumberCoefficients);
         m_LP = new vnl_vector<double>(m_NumberCoefficients);
@@ -704,7 +716,7 @@ namespace itk {
 
         //vnl_matrix<double> temp((*_L)*(*_L));
         LL->update(*_L);
-        *LL *= *_L; 
+        *LL *= *_L;
         //tofile2(LL,"LL");
 
         for(int i=0; i<m_NumberCoefficients; i++)
@@ -717,7 +729,7 @@ namespace itk {
             m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
           {
             (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*legendre0((*lj)[i]);
-            (*m_LP)(i) *= (*P)(i,i); 
+            (*m_LP)(i) *= (*P)(i,i);
           }
           else
           {
@@ -783,7 +795,7 @@ namespace itk {
           itk::PointShell<NODF, vnl_matrix_fixed<double, 3, NODF> >::DistributePointShell();
 
         m_SphericalHarmonicBasisMatrix  = new vnl_matrix<TO>(NOdfDirections,m_NumberCoefficients);
-        vnl_matrix<double>* sphericalHarmonicBasisMatrix2  
+        vnl_matrix<double>* sphericalHarmonicBasisMatrix2
           = new vnl_matrix<double>(NOdfDirections,m_NumberCoefficients);
         for(int i=0; i<NOdfDirections; i++)
         {
@@ -826,7 +838,7 @@ namespace itk {
 
       template< class T, class TG, class TO, int L, int NODF>
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::SetGradientImage( GradientDirectionContainerType *gradientDirection, 
+        ::SetGradientImage( GradientDirectionContainerType *gradientDirection,
         const GradientImagesType *gradientImage )
       {
         this->m_GradientDirectionContainer = gradientDirection;
@@ -848,7 +860,7 @@ namespace itk {
 
         this->m_NumberOfGradientDirections = numImages - this->m_NumberOfBaselineImages;
 
-        // ensure that the gradient image we received has as many components as 
+        // ensure that the gradient image we received has as many components as
         // the number of gradient directions
         if( gradientImage->GetVectorLength() != this->m_NumberOfBaselineImages + m_NumberOfGradientDirections )
         {
@@ -858,7 +870,7 @@ namespace itk {
             << " components.");
         }
 
-        this->ProcessObject::SetNthInput( 0, 
+        this->ProcessObject::SetNthInput( 0,
           const_cast< GradientImagesType* >(gradientImage) );
 
       }
@@ -881,12 +893,12 @@ namespace itk {
         }
         else
         {
-          os << indent << 
+          os << indent <<
             "GradientDirectionContainer: (Gradient directions not set)" << std::endl;
         }
-        os << indent << "NumberOfGradientDirections: " << 
+        os << indent << "NumberOfGradientDirections: " <<
           m_NumberOfGradientDirections << std::endl;
-        os << indent << "NumberOfBaselineImages: " << 
+        os << indent << "NumberOfBaselineImages: " <<
           m_NumberOfBaselineImages << std::endl;
         os << indent << "Threshold for reference B0 image: " << m_Threshold << std::endl;
         os << indent << "BValue: " << m_BValue << std::endl;

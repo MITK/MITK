@@ -107,13 +107,13 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="statusTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="whatsThis">
-         <string notr="true" comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Average redundant gradients</string>
@@ -151,13 +151,13 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="statusTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="whatsThis">
-         <string notr="true" comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Extract B0</string>
@@ -179,13 +179,13 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="statusTip">
-         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string/>
         </property>
         <property name="whatsThis">
-         <string notr="true" comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Estimate binary brain mask</string>

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>343</width>
-    <height>434</height>
+    <height>467</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -278,7 +278,7 @@
             <item>
              <widget class="QSlider" name="m_UpsamplingSlider">
               <property name="maximum">
-               <number>40</number>
+               <number>50</number>
               </property>
               <property name="singleStep">
                <number>1</number>
@@ -674,14 +674,14 @@
         </layout>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QCheckBox" name="m_Quantiles">
         <property name="text">
          <string>quantiles</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QFrame" name="frame_8">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -722,10 +722,20 @@
         </layout>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QPushButton" name="m_EstimateCircle">
         <property name="text">
          <string>Estimate circle from binary image</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="m_PlanarFiguresThickness"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>&quot;Thick&quot; PFs</string>
         </property>
        </widget>
       </item>

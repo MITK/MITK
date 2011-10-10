@@ -86,6 +86,7 @@ namespace itk
 
       itk::OrientationDistributionFunction<TOutputScalarType, QBALL_ODFSIZE> odf;
       odf.InitFromTensor(tensor);
+      odf.Normalize();
 
       for( unsigned int i=0; i<QBALL_ODFSIZE; i++)
           out[i] = odf.GetElement(i);

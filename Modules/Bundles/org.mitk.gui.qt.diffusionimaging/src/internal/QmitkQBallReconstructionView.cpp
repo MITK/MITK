@@ -199,7 +199,6 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->setCurrentIndex(1);
     MethodChoosen(m_Controls->m_QBallReconstructionMethodComboBox->currentIndex());
 
-    m_Controls->m_QBallReconstructionNumberThreadsSpinbox->setValue(8);
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
     m_Controls->m_QBallReconstructionMethodComboBox->removeItem(3);
@@ -348,8 +347,6 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
   m_Controls->m_QBallReconstructionThresholdLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionThreasholdEdit->setVisible(check);
   m_Controls->m_OutputB0Image->setVisible(check);
-  m_Controls->m_QBallReconstructionNumberThreadsLabel_2->setVisible(check);
-  m_Controls->m_QBallReconstructionNumberThreadsSpinbox->setVisible(check);
   m_Controls->label_2->setVisible(check);
 
   //m_Controls->textLabel1_2->setVisible(check);
@@ -447,7 +444,6 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       QballReconstructionImageFilterType::Pointer filter =
         QballReconstructionImageFilterType::New();
       filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-      filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsSpinbox->value() );
       filter->SetBValue(vols->GetB_Value());
       filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
 
@@ -631,7 +627,6 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
     <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-  filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsSpinbox->value() );
   filter->SetBValue(vols->GetB_Value());
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
   filter->SetLambda(lambda);

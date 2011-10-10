@@ -104,6 +104,9 @@ protected:
       OdfType odf(x.GetDataPointer());
 
       int pd = odf.GetPrincipleDiffusionDirection();
+      if (pd==-1)
+        MITK_ERROR << "ODF corrupted: GetPrincipleDiffusionDirection returned -1";
+
       vnl_vector_fixed<double,3> dir = OdfType::GetDirection(pd);
 
       const float fa = odf.GetGeneralizedFractionalAnisotropy();
@@ -136,7 +139,7 @@ private:
   QBallToRgbImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
-  
+
 } // end namespace itk
-  
+
 #endif

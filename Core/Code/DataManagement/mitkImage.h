@@ -27,6 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
 
+#ifndef __itkHistogram_h
+#include <itkHistogram.h>
+#endif
+
 
 class vtkImageData;
 
@@ -71,7 +75,7 @@ public:
 
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
-
+  typedef itk::Statistics::Histogram<double> HistogramType;
   typedef mitk::ImageStatisticsHolder* StatisticsHolderPointer;
 
   //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.

@@ -433,11 +433,15 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
-  if(!m_Controls || !m_Active)
+  if(!m_Controls)
     return;
 
-  m_Controls->m_FigureWidgetFrame->setVisible(false);
   m_Controls->m_Warning->setVisible(false);
+  if(!m_Active)
+     return;
+
+  m_Controls->m_VisualizeResultsWidget->setVisible(false);
+
   if(!m_Controls->m_DisplayResultsCheckbox->isChecked()) return;
 
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
@@ -483,6 +487,25 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 
   if (nodes.size()==2 && (!diffusionImg || !maskImg || m_Controls->m_MethodCombo->currentIndex() == 4 )) return;
   if (nodes.size()==1 && !diffusionImg) return;
+
+  IVIMFilterType::GradientDirectionContainerType::ConstIterator gdcit =
+      diffusionImg->GetDirections()->Begin();
+  bool foundB0 = false;
+  while( gdcit != diffusionImg->GetDirections()->End() )
+  {
+    if(gdcit.Value().one_norm() <= 0.0)
+      foundB0 = true;
+    ++gdcit;
+  }
+  if(!foundB0)
+  {
+    m_Controls->m_Warning->setText(QString("No baseline (non diffusion-weighted) image found.. aborting:("));
+    m_Controls->m_Warning->setVisible(true);
+  }
+  else
+  {
+    m_Controls->m_Warning->setVisible(false);
+  }
 
   if (!m_MultiWidget) return;
 

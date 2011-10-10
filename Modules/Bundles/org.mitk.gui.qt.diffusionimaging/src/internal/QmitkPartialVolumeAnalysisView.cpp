@@ -1240,7 +1240,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     if ( !m_IsTensorImage && m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
     {
       std::stringstream message;
-      message << "<font color='red'>Multi-component images not supported.</font>";
+      message << "Non-tensor multi-component images not supported.";
       m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
       m_Controls->m_ErrorMessageLabel->show();
 
@@ -1262,7 +1262,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     else
     {
       m_CurrentStatisticsCalculator = mitk::PartialVolumeAnalysisHistogramCalculator::New();
-//      m_CurrentStatisticsCalculator->SetPlanarFigureThickness(1);
+      m_CurrentStatisticsCalculator->SetPlanarFigureThickness(m_Controls->m_PlanarFiguresThickness->value());
       if(m_IsTensorImage)
       {
         m_CurrentStatisticsCalculator->SetImage( m_CAImage );
@@ -1455,7 +1455,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     {
       // In case of exception, print error message on GUI
       std::stringstream message;
-      message << "<font color='red'>" << e.what() << "</font>";
+      message << e.what();
       m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
       m_Controls->m_ErrorMessageLabel->show();
     }
@@ -1465,7 +1465,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
       // In case of exception, print error message on GUI
       std::stringstream message;
-      message << "<font color='red'>Error in calculating histogram: " << e.what() << "</font>";
+      message << "Error in calculating histogram: " << e.what();
       m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
       m_Controls->m_ErrorMessageLabel->show();
     }

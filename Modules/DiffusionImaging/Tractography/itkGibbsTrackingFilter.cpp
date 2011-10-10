@@ -336,7 +336,7 @@ namespace itk{
 
     // load lookuptable
     ifstream BaryCoords;
-    BaryCoords.open("FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
+    BaryCoords.open("/opt/mitk-bins/mitk-release/MBI-build/bin/FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
     float* coords;
     if (BaryCoords.is_open())
     {
@@ -357,7 +357,7 @@ namespace itk{
     }
 
     ifstream Indices;
-    Indices.open("FiberTrackingLUTIndices.bin", ios::in | ios::binary);
+    Indices.open("/opt/mitk-bins/mitk-release/MBI-build/bin/FiberTrackingLUTIndices.bin", ios::in | ios::binary);
     int* ind;
     if (Indices.is_open())
     {

@@ -268,7 +268,8 @@ namespace itk {
         {
           b0 += measvec[m_Snap.baselineind[i]];
         }
-        b0 /= m_Snap.baselineind.size();
+        if(m_Snap.baselineind.size())
+          b0 /= m_Snap.baselineind.size();
 
         // measurement vector
         for(int i = 0; i < m_Snap.N; ++i)

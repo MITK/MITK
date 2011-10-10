@@ -51,6 +51,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkListSample.h"
 
+#include <iostream>
+#include <sstream>
+
 namespace mitk
 {
 
@@ -595,15 +598,24 @@ namespace mitk
     typename ResamplerType::SpacingType spacing = planegeo->GetSpacing();
     spacing[0] = image->GetSpacing()[0] / upsamp;
     spacing[1] = image->GetSpacing()[1] / upsamp;
-    spacing[2] = image->GetSpacing()[2] / upsamp; // klaus add /upsamp
+    spacing[2] = image->GetSpacing()[2];
+    if(m_PlanarFigureThickness)
+    {
+      spacing[2] = image->GetSpacing()[2] / upsamp;
+    }
     resampler->SetOutputSpacing( spacing );
+
+    MITK_INFO << "resampling spacing: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2];
 
     // Size
     typename ResamplerType::SizeType size;
     size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
     size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
+    MITK_INFO << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
+
+    MITK_INFO << "resampling size: " << size[0] << ", " << size[1] << ", " << size[2];
 
     // Origin
     typename mitk::Point3D orig = planegeo->GetOrigin();
@@ -612,7 +624,12 @@ namespace mitk
     corrorig[0] += 0.5/upsamp;
     corrorig[1] += 0.5/upsamp;
     if(m_PlanarFigureThickness)
-      corrorig[2] -= 0.5/upsamp+(float)m_PlanarFigureThickness; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
+    {
+      float thickyyy = m_PlanarFigureThickness;
+      thickyyy/=upsamp;
+      MITK_INFO << "setting origin2-="<<thickyyy << " (before " << corrorig[2] << ")";
+      corrorig[2] -= thickyyy; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
+    }
     planegeo3D->IndexToWorld(corrorig,corrorig);
     resampler->SetOutputOrigin(corrorig );
 
@@ -1040,6 +1057,7 @@ namespace mitk
       // further due to a bug in vtkPolyDataToImageStencil
       if ( !imageGeometry3D->IsInside( point3D ) )
       {
+        MITK_INFO << point3D << " not inside resampled image plane.. :(";
         outOfBounds = true;
       }
 
@@ -1131,12 +1149,6 @@ namespace mitk
       }
       ++itmask;
     }
-
-//    typedef itk::ImageFileWriter< MaskImage3DType >  WriterType;
-//    WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName( "/home/fritzsck/Desktop/mask.nrrd" );
-//    writer->SetInput( m_InternalImageMask3D );
-//    writer->Update();
 
     itmask = itmask.Begin();
     itk::ImageRegionIterator<ImageType>

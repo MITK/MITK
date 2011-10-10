@@ -51,6 +51,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkListSample.h"
 
+#include <iostream>
+#include <sstream>
+
 namespace mitk
 {
 
@@ -595,8 +598,14 @@ namespace mitk
     typename ResamplerType::SpacingType spacing = planegeo->GetSpacing();
     spacing[0] = image->GetSpacing()[0] / upsamp;
     spacing[1] = image->GetSpacing()[1] / upsamp;
-    spacing[2] = image->GetSpacing()[2] / upsamp; // klaus add /upsamp
+    spacing[2] = image->GetSpacing()[2];
+    if(m_PlanarFigureThickness)
+    {
+      spacing[2] = image->GetSpacing()[2] / upsamp;
+    }
     resampler->SetOutputSpacing( spacing );
+
+    MITK_INFO << "resampling spacing: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2];
 
     // Size
     typename ResamplerType::SizeType size;
@@ -605,6 +614,8 @@ namespace mitk
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
     MITK_INFO << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
+
+    MITK_INFO << "resampling size: " << size[0] << ", " << size[1] << ", " << size[2];
 
     // Origin
     typename mitk::Point3D orig = planegeo->GetOrigin();
@@ -682,12 +693,6 @@ namespace mitk
     MITK_INFO << "Resampling requested image plane ... ";
     resampler->Update();
     MITK_INFO << " ... done";
-
-    typedef itk::ImageFileWriter< FloatImageType >  WriterType;
-    typename WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName( "/home/fritzsck/Desktop/mask.nrrd" );
-    writer->SetInput( resampler->GetOutput() );
-    writer->Update();
 
     if(additionalIndex < 0)
     {

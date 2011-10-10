@@ -246,6 +246,7 @@ void QmitkNDIConfigurationWidget::OnAddPassiveTool()
     //if (ok == false || toolName.isEmpty())
     //  return;
     m_Tracker->AddTool(QFileInfo(fileName).baseName().toLatin1(), fileName.toLatin1());
+    m_Tracker->Modified();
   }
   emit ToolsAdded(this->GetToolNamesList());
   this->UpdateToolTable();
@@ -291,6 +292,8 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
 {
   //disconnect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // stop listening to table changes
   disconnect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
+  disconnect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
+  
   m_Controls->m_ToolTable->clearContents();
   m_Controls->m_ToolTable->setRowCount(0);
   if (m_Tracker.IsNull() || (m_Controls == NULL))
@@ -665,9 +668,8 @@ void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn()
     m_Controls->m_ToolTable->item(i,QmitkNDIToolDelegate::RepCol)->setFlags(Qt::NoItemFlags);
    }
    
-   connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
- 
-  
+   //connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
+
 }
 
 void QmitkNDIConfigurationWidget::OnDisoverDevicesBtnInfo()
@@ -769,6 +771,7 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   
   // name
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::NameCol)->setText(navTool->GetToolName().c_str());
+  dynamic_cast<mitk::NDIPassiveTool*>(m_Tracker->GetTool(currSelectedToolID))->SetToolName(navTool->GetToolName().c_str()); // also setting name to tool directly
   
   //calibration file (.srom) filename
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::SROMCol)->setText(navTool->GetCalibrationFile().c_str());

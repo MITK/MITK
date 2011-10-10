@@ -72,7 +72,7 @@ public:
     void ToolsChanged();
     void Connected();
     void Disconnected();
-    void RepresentationChanged( int id , mitk::Surface::Pointer surface ); // returns the row number of the clicked tableitem for changing tool representation 
+    void RepresentationChanged( int row , mitk::Surface::Pointer surface ); // returns the row number of the clicked tableitem for changing tool representation 
     void SignalToolNameChanged(int id, QString name);
     void SignalSavedTool(int id, QString surfaceFilename);
     void SignalLoadTool(int id, mitk::DataNode::Pointer dn);

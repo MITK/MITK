@@ -103,7 +103,7 @@
          <widget class="QPushButton" name="m_DisoverDevicesBtn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
+            <horstretch>5</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -295,7 +295,7 @@ p, li { white-space: pre-wrap; }
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Load</string>
+           <string>Replace</string>
           </property>
          </widget>
         </item>

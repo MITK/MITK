@@ -515,6 +515,9 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_PFColor3D->setIcon(iconColor);
     m_Controls->m_Color->setIcon(iconColor);
 
+    QIcon iconReset(":/QmitkDiffusionImaging/reset.png");
+    m_Controls->m_ResetColoring->setIcon(iconReset);
+
     m_Controls->m_PFColor->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_Controls->m_PFColor3D->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
@@ -679,6 +682,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Wire, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationWire()));
     connect((QObject*) m_Controls->m_Tube, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationTube()));
     connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
+    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationResetColoring()));
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
 
     connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
@@ -1232,6 +1236,21 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(14));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(3));
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring()
+{
+    if(m_SelectedNode)
+  {
+    m_Controls->m_Color->setAutoFillBackground(true);
+    QString styleSheet = "background-color:rgb(255,255,255)";
+    m_Controls->m_Color->setStyleSheet(styleSheet);
+
+    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(4));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();

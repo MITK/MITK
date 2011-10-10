@@ -532,6 +532,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QToolButton" name="m_ResetColoring">
+           <property name="toolTip">
+            <string>Reset to Default Coloring</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="m_Crosshair">
            <property name="toolTip">
             <string>Position Crosshair by 3D-Click</string>

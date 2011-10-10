@@ -107,6 +107,7 @@ protected slots:
   void BundleRepresentationWire();
   void BundleRepresentationTube();
   void BundleRepresentationColor();
+  void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
 
   void SetInteractor();

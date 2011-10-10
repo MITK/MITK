@@ -4,7 +4,7 @@
 #include "mitkImageTimeSelector.h"
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
-  : m_Image(NULL)
+  : m_Image(NULL), m_TimeSelectorForExtremaObject(NULL)
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -109,7 +109,7 @@ void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageS
   typedef typename ItkImageType::PixelType TPixel;
   TPixel value = 0;
 
-  if ( statisticsHolder != NULL || !statisticsHolder->IsValidTimeStep( t ) ) return;
+  if ( statisticsHolder == NULL || !statisticsHolder->IsValidTimeStep( t ) ) return;
   statisticsHolder->Expand(t+1); // make sure we have initialized all arrays
   statisticsHolder->m_CountOfMinValuedVoxels[t] = 0;
   statisticsHolder->m_CountOfMaxValuedVoxels[t] = 0;

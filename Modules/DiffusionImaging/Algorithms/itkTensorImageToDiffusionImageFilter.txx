@@ -178,8 +178,9 @@ namespace itk
               T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
               T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
 
-          out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
-
+          // check for corrupted tensor
+          if (res>=0)
+            out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
         }
       }
 

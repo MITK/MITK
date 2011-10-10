@@ -218,7 +218,7 @@ void QmitkFiberBundleOperationsView::GenerateROIImage(){
   tmpImage->InitializeByItk(m_PlanarFigureImage.GetPointer());
   tmpImage->SetVolume(m_PlanarFigureImage->GetBufferPointer());
   node->SetData(tmpImage);
-  node->SetName("planarFigureImage");
+  node->SetName("ROI Image");
   this->GetDefaultDataStorage()->Add(node);
 }
 
@@ -475,15 +475,25 @@ template < typename TPixel, unsigned int VImageDimension >
 
       imageGeometry3D->WorldToIndex( point3D, point3D );
 
+//      if (point3D[i0]<0)
+//        point3D[i0] = 0.5;
+//      else if (point3D[i0]>bounds[0])
+//        point3D[i0] = bounds[0]-0.5;
+
+//      if (point3D[i1]<0)
+//        point3D[i1] = 0.5;
+//      else if (point3D[i1]>bounds[1])
+//        point3D[i1] = bounds[1]-0.5;
+
       if (point3D[i0]<0)
-        point3D[i0] = 0.5;
+        point3D[i0] = 0.0;
       else if (point3D[i0]>bounds[0])
-        point3D[i0] = bounds[0]-0.5;
+        point3D[i0] = bounds[0]-0.001;
 
       if (point3D[i1]<0)
-        point3D[i1] = 0.5;
+        point3D[i1] = 0.0;
       else if (point3D[i1]>bounds[1])
-        point3D[i1] = bounds[1]-0.5;
+        point3D[i1] = bounds[1]-0.001;
 
       points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
       numberOfPoints++;
@@ -491,8 +501,6 @@ template < typename TPixel, unsigned int VImageDimension >
     else
     {
       imageGeometry3D->WorldToIndex( point3D, point3D );
-      point3D[i0] += 0.5;
-      point3D[i1] += 0.5;
 
       // Add point to polyline array
       points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
@@ -606,17 +614,6 @@ template < typename TPixel, unsigned int VImageDimension >
 
   itk::ImageRegion<3> cropRegion = itk::ImageRegion<3>(index, size);
 
-//  // crop internal image
-//  typedef itk::RegionOfInterestImageFilter< ImageType, ImageType > ROIFilterType;
-//  typename ROIFilterType::Pointer roi = ROIFilterType::New();
-//  roi->SetRegionOfInterest(cropRegion);
-//  roi->SetInput(image);
-//  roi->Update();
-
-//  m_InternalImage = mitk::Image::New();
-//  m_InternalImage->InitializeByItk(roi->GetOutput());
-//  m_InternalImage->SetVolume(roi->GetOutput()->GetBufferPointer());
-
   // crop internal mask
   typedef itk::RegionOfInterestImageFilter< MaskImage3DType, MaskImage3DType > ROIMaskFilterType;
   typename ROIMaskFilterType::Pointer roi2 = ROIMaskFilterType::New();
@@ -625,13 +622,9 @@ template < typename TPixel, unsigned int VImageDimension >
   roi2->Update();
   m_InternalImageMask3D = roi2->GetOutput();
 
-//  DataNode::Pointer node = DataNode::New();
   Image::Pointer tmpImage = Image::New();
   tmpImage->InitializeByItk(m_InternalImageMask3D.GetPointer());
   tmpImage->SetVolume(m_InternalImageMask3D->GetBufferPointer());
-//  node->SetData(tmpImage);
-//  node->SetName(nodeName);
-//  GetDefaultDataStorage()->Add(node);
 
   Image::Pointer tmpImage2 = Image::New();
   tmpImage2->InitializeByItk(m_PlanarFigureImage.GetPointer());
@@ -655,6 +648,9 @@ template < typename TPixel, unsigned int VImageDimension >
 
       intImageGeometry3D->IndexToWorld(point, point);
       pfImageGeometry3D->WorldToIndex(point, point);
+
+      point[i0] += 0.5;
+      point[i1] += 0.5;
 
       index[0] = point[0];
       index[1] = point[1];

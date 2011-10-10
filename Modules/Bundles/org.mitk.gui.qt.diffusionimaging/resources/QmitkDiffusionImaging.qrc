@@ -29,5 +29,6 @@
         <file>crosshair.png</file>
         <file>paint2.png</file>
         <file>IVIM_48.png</file>
+		<file>reset.png</file>
     </qresource>
 </RCC>

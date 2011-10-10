@@ -292,10 +292,11 @@ bool mitk::PlanarFigureInteractor
         planarFigure->Modified();
         planarFigure->DeselectControlPoint();
         planarFigure->RemoveLastControlPoint();
-        planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
-        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
         m_DataNode->Modified();
+        planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
+        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
       else

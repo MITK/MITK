@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 
 #include "mitkImageStatisticsHolder.h"
+#include "mitkPixelTypeMultiplex.h"
 
 #include <vtkImageData.h>
 
@@ -104,30 +105,53 @@ void* mitk::Image::GetData()
   return m_CompleteData->GetData();
 }
 
-/* FIXME REVIEW : used by GetPixelValueBy[Index|Coordinate]
+
 template <class T>
-void AccessPixel(mitkIpPicDescriptor* pic, const mitk::Index3D& p, double& value, int timestep)
+void AccessPixel(mitk::ImageDescriptor::Pointer desc, const mitk::Index3D& p, double& value, int timestep)
 {  
-  if ( (p[0]>=0 && p[1] >=0 && p[2]>=0 && timestep>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] && (unsigned int)timestep < pic->n[3] )
+  const unsigned int* imageDims = desc->GetDimensions();
+  const mitk::PixelType ptype = desc->GetChannelTypeById(0);
+
+  std::cout << "Inside AccessPixel() " << std::endl;
+
+  std::cout << "ptype.GetBpe() " << ptype.GetBpe() << std::endl;
+  std::cout << "Dims " << imageDims[0] <<","<< imageDims[1] <<","<< imageDims[2] << std::endl;
+  std::cout << "Point " << p[0] <<","<< p[1] <<","<< p[2] << std::endl;
+
+  const unsigned char* data = desc->GetChannelDescriptor(0).GetData();
+  value = 0.0;
+
+  if( data == NULL ) return;
+
+  if ( (p[0]>=0 && p[1] >=0 && p[2]>=0 && timestep>=0)
+       && (unsigned int)p[0] < imageDims[0] && (unsigned int)p[1] < imageDims[1] && (unsigned int)p[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
   {
-    if(pic->bpe!=24)
+
+    const unsigned int offset = p[0] + p[1]*imageDims[0] + p[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
+    const unsigned int rgboffset = 3 * offset;
+
+    std::cout << "GetBpe() " << ptype.GetBpe() << std::endl;
+
+    if(ptype.GetBpe() != 24)
     {
-      value = (double) (((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] + timestep*pic->n[0]*pic->n[1]*pic->n[2] ]);
+      value = (double) (((T*) data)[ offset ]);
+
+      std::cout << "Single value estimated in AccessPixel() " << value << std::endl;
     }
     else
     {
-      double returnvalue = (((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3 ]);
-      returnvalue += (((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
-      returnvalue += (((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
+      double returnvalue = (((T*) data)[rgboffset ]);
+      returnvalue += (((T*) data)[rgboffset + 1]);
+      returnvalue += (((T*) data)[rgboffset + 2]);
       value = returnvalue;
     }    
   }
   else
   {
-    value = 0;
+    value = 0.0;
   }
 };
-*/
+
 double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
 {
   // FIXME mitkIpPicDescriptor* pic = this->GetPic();
@@ -137,6 +161,7 @@ double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned
     timestep = this->GetTimeSteps();
   }
   // FIXME mitkIpPicTypeMultiplex3(AccessPixel, pic, position, value, timestep);
+  mitkPixelTypeMultiplex4( AccessPixel, this->m_ImageDescriptor->GetChannelTypeById(0), m_ImageDescriptor, position, value, timestep );
   return value;
 }
 
@@ -152,6 +177,8 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   Index3D itkIndex;
   this->GetGeometry()->WorldToIndex(position,itkIndex);
   // FIXME mitkIpPicTypeMultiplex3(AccessPixel, pic, itkIndex, value, timestep);
+  mitkPixelTypeMultiplex4( AccessPixel, this->m_ImageDescriptor->GetChannelTypeById(0), m_ImageDescriptor, itkIndex, value, timestep );
+
 
   return value;
 }

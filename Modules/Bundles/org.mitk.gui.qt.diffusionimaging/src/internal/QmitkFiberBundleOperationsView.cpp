@@ -163,10 +163,10 @@ void QmitkFiberBundleOperationsView::CreateQtPartControl( QWidget *parent )
     m_Controls->PFCompoANDButton->setDisabled(true);
     m_Controls->PFCompoORButton->setDisabled(true);
     m_Controls->PFCompoNOTButton->setDisabled(true);
-    m_Controls->PFCompoDELButton->setDisabled(true);
     m_Controls->m_CircleButton->setEnabled(false);
     m_Controls->m_PolygonButton->setEnabled(false);
     m_Controls->m_RectangleButton->setEnabled(false);
+    m_Controls->m_RectangleButton->setVisible(false);
 
     connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
     //connect( m_Controls->comboBox_fiberAlgo, SIGNAL(selected()), this, SLOT(handleAlgoSelection() );
@@ -175,7 +175,6 @@ void QmitkFiberBundleOperationsView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->PFCompoANDButton, SIGNAL(clicked()), this, SLOT(generatePFCompo_AND()) );
     connect(m_Controls->PFCompoORButton, SIGNAL(clicked()), this, SLOT(generatePFCompo_OR()) );
     connect(m_Controls->PFCompoNOTButton, SIGNAL(clicked()), this, SLOT(generatePFCompo_NOT()) );
-    connect(m_Controls->PFCompoDELButton, SIGNAL(clicked()), this, SLOT(deletePFCompo()) );
 
     connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
     connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
@@ -704,7 +703,7 @@ void QmitkFiberBundleOperationsView::OnSelectionChanged( std::vector<mitk::DataN
     m_Controls->PFCompoNOTButton->setDisabled(true);
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
-    m_Controls->PFCompoDELButton->setDisabled(true);
+    m_Controls->m_GenerationStartButton->setEnabled(false);
   }
 
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
@@ -738,17 +737,12 @@ void QmitkFiberBundleOperationsView::OnSelectionChanged( std::vector<mitk::DataN
     m_Controls->PFCompoANDButton->setDisabled(true);
     m_Controls->PFCompoORButton->setDisabled(true);
     m_Controls->PFCompoNOTButton->setEnabled(true);
-    m_Controls->PFCompoDELButton->setDisabled(true);
-
-    if ( dynamic_cast<mitk::PlanarFigureComposite*>(m_SelectedPF.at(0)->GetData()) )
-      m_Controls->PFCompoDELButton->setEnabled(true);
   }
   else if (m_SelectedPF.size() > 1)
   {
     m_Controls->PFCompoANDButton->setEnabled(true);
     m_Controls->PFCompoORButton->setEnabled(true);
     m_Controls->PFCompoNOTButton->setDisabled(true);
-    m_Controls->PFCompoDELButton->setDisabled(true);
   }
 
   if (m_SelectedFB.size() == 1 && m_SelectedPF.size() == 1)
@@ -764,6 +758,11 @@ void QmitkFiberBundleOperationsView::OnSelectionChanged( std::vector<mitk::DataN
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
   }
+
+  if (m_SelectedFB.size()>0)
+    m_Controls->m_GenerationStartButton->setEnabled(true);
+  else
+    m_Controls->m_GenerationStartButton->setEnabled(false);
 }
 
 
@@ -1204,11 +1203,6 @@ void QmitkFiberBundleOperationsView::generatePFCompo_NOT()
 
 }
 
-void QmitkFiberBundleOperationsView::deletePFCompo()
-{
-
-}
-
 void QmitkFiberBundleOperationsView::addPFCompositionToDataStorage(mitk::PlanarFigureComposite::Pointer pfcomp, mitk::DataNode::Pointer parentDataNode )
 {
 
@@ -1600,10 +1594,10 @@ void QmitkFiberBundleOperationsView::GenerationStart()
       m_FiberBundleNode = node;
       switch(generationMethod){
       case 0:
-        GenerateGreyscaleHeatmap(true);
+        GenerateTractDensityImage(true);
         break;
       case 1:
-        GenerateGreyscaleHeatmap(false);
+        GenerateTractDensityImage(false);
         break;
       case 2:
         GenerateColorHeatmap();
@@ -1660,7 +1654,7 @@ void QmitkFiberBundleOperationsView::GenerateFiberEndingsPointSet()
   name += "_fiber_endings";
   pointSetNode->SetName(name.toStdString());
   pointSetNode->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-  pointSetNode->SetProperty( "pointsize", mitk::FloatProperty::New( 0.3) );
+  pointSetNode->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1*m_Controls->m_UpsamplingSpinBox->value()) );
   pointSetNode->SetColor( 1.0, 1.0, 1.0 );
 
   GetDefaultDataStorage()->Add(pointSetNode);
@@ -1739,7 +1733,6 @@ void QmitkFiberBundleOperationsView::GenerateColorHeatmap()
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(img);
   QString name(m_FiberBundleNode->GetName().c_str());
-  name += "_rgba_heatmap";
   node->SetName(name.toStdString());
   node->SetVisibility(true);
 
@@ -1754,7 +1747,7 @@ void QmitkFiberBundleOperationsView::GenerateColorHeatmap()
 }
 
 // generate greyscale heatmap from fiber bundle
-void QmitkFiberBundleOperationsView::GenerateGreyscaleHeatmap(bool binary)
+void QmitkFiberBundleOperationsView::GenerateTractDensityImage(bool binary)
 {
   if(m_FiberBundle.IsNull() || m_FiberBundleNode.IsNull())
   {
@@ -1790,9 +1783,9 @@ void QmitkFiberBundleOperationsView::GenerateGreyscaleHeatmap(bool binary)
   node->SetData(img);
   QString name(m_FiberBundleNode->GetName().c_str());
   if(binary)
-    name += "_enveloppe";
+    name += "_envelope";
   else
-    name += "_heatmap";
+    name += "_tdi";
   node->SetName(name.toStdString());
   node->SetVisibility(true);
 

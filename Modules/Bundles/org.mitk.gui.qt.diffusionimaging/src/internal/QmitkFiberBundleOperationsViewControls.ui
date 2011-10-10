@@ -58,6 +58,9 @@
           <height>30</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string comment="Draw circular ROI" extracomment="Draw circular ROI">Draw circular ROI</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -87,6 +90,9 @@
           <height>30</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string comment="Draw rectangular ROI" extracomment="Draw rectangular ROI">Draw rectangular ROI</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -115,6 +121,9 @@
           <width>30</width>
           <height>30</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string comment="Draw polygonal ROI" extracomment="Draw polygonal ROI">Draw polygonal ROI</string>
         </property>
         <property name="text">
          <string/>
@@ -185,6 +194,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string comment="Create AND composition with selected ROIs" extracomment="Create AND composition with selected ROIs">Create AND composition with selected ROIs</string>
+        </property>
         <property name="text">
          <string>AND</string>
         </property>
@@ -200,6 +212,9 @@
           <width>60</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string comment="Create OR composition with selected ROIs" extracomment="Create OR composition with selected ROIs">Create OR composition with selected ROIs</string>
         </property>
         <property name="text">
          <string>OR</string>
@@ -217,85 +232,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string comment="Create NOT composition from selected ROI" extracomment="Create NOT composition from selected ROI">Create NOT composition from selected ROI</string>
+        </property>
         <property name="text">
          <string>NOT</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCommandLinkButton" name="PFCompoDELButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>DEL</string>
-        </property>
-       </widget>
-      </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCommandLinkButton" name="doExtractFibersButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Extract Fibers from ROI</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCommandLinkButton" name="m_GenerateROIImage">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>300</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string comment="Generates One Binary Image Per Planar Figure And One Binary Image Containing All Planar Figures" extracomment="Generates One Binary Image Per Planar Figure And One Binary Image Containing All Planar Figures">Generates One Binary Image Per Planar Figure And One Binary Image Containing All Planar Figures</string>
-     </property>
-     <property name="text">
-      <string>Generate Binary ROI Images</string>
-     </property>
     </widget>
    </item>
    <item>
@@ -306,14 +251,41 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_3">
       <property name="margin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
+       <widget class="QCommandLinkButton" name="doExtractFibersButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string comment="Extract fibers passing through selected ROI or composite ROI" extracomment="Extract fibers passing through selected ROI or composite ROI">Extract fibers passing through selected ROI or composite ROI</string>
+        </property>
+        <property name="text">
+         <string>Extract from ROIs</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
        <widget class="QCommandLinkButton" name="m_JoinBundles">
         <property name="enabled">
          <bool>false</bool>
@@ -335,12 +307,45 @@
           <pointsize>11</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string comment="Merge two fiber bundles" extracomment="Merge two fiber bundles">Merge two fiber bundles</string>
+        </property>
         <property name="text">
          <string>Join Bundles</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QCommandLinkButton" name="m_GenerateROIImage">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string comment="Generate a binary image containing all selected ROIs" extracomment="Generate a binary image containing all selected ROIs">Generate a binary image containing all selected ROIs</string>
+        </property>
+        <property name="text">
+         <string>Generate ROI Image</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
        <widget class="QCommandLinkButton" name="m_SubstractBundles">
         <property name="enabled">
          <bool>false</bool>
@@ -361,6 +366,9 @@
          <font>
           <pointsize>11</pointsize>
          </font>
+        </property>
+        <property name="toolTip">
+         <string comment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common" extracomment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common">Returns fiber bundle containing all fibers the two selected bundles dont't have in common</string>
         </property>
         <property name="text">
          <string>Substract Bundles</string>
@@ -388,7 +396,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Num. Fibers:</string>
+         <string>Fibers in Selected Bundle:</string>
         </property>
        </widget>
       </item>
@@ -421,12 +429,12 @@
         </property>
         <item>
          <property name="text">
-          <string>Fiber Bundle Enveloppe</string>
+          <string>Binary Envelope</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Tract Density Image</string>
+          <string>Tract Density Image (TDI)</string>
          </property>
         </item>
         <item>
@@ -465,7 +473,7 @@
       <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_GenerationStartButton">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -484,6 +492,9 @@
           <pointsize>11</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string comment="Perform selected operation on fiber bundle" extracomment="Perform selected operation on fiber bundle">Perform selected operation on fiber bundle</string>
+        </property>
         <property name="text">
          <string>Generate</string>
         </property>
@@ -491,6 +502,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QCheckBox" name="m_InvertCheckbox">
+        <property name="toolTip">
+         <string comment="If selected operation generates an image, the inverse image is returned" extracomment="If selected operation generates an image, the inverse image is returned">If selected operation generates an image, the inverse image is returned</string>
+        </property>
         <property name="text">
          <string>Invert</string>
         </property>

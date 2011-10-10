@@ -90,7 +90,6 @@ public:
   void generatePFCompo_AND();
   void generatePFCompo_OR();
   void generatePFCompo_NOT();
-  void deletePFCompo();
 
   void JoinBundles();
   void SubstractBundles();
@@ -186,7 +185,7 @@ private:
   void addPFCompositionToDataStorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
-  void GenerateGreyscaleHeatmap(bool binary);
+  void GenerateTractDensityImage(bool binary);
   void GenerateColorHeatmap();
   void GenerateFiberEndingsImage();
   void GenerateFiberEndingsPointSet();

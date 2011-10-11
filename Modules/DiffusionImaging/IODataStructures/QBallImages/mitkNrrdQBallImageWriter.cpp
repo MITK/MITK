@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-12-10 18:05:13 +0100 (Mi, 10 Dez 2008) $
 Version:   $Revision: 15922 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkNrrdQBallImageWriter.h"
@@ -40,7 +40,7 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     InputType* input = this->GetInput();
     if (input == NULL)
     {
-        itkWarningMacro(<<"Sorry, input to NrrdQBallImageWriter is NULL!");    
+        itkWarningMacro(<<"Sorry, input to NrrdQBallImageWriter is NULL!");
         return;
     }
     if ( m_FileName == "" )
@@ -48,7 +48,22 @@ void mitk::NrrdQBallImageWriter::GenerateData()
         itkWarningMacro( << "Sorry, filename has not been set!" );
         return ;
     }
-    
+
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileType( itk::ImageIOBase::Binary );
     io->UseCompressionOn();
@@ -58,7 +73,7 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
     typedef itk::ImageFileWriter<VecImgType> WriterType;
     WriterType::Pointer nrrdWriter = WriterType::New();
-    
+
     ImageType::Pointer outimage = ImageType::New();
     CastToItkImage(input, outimage);
 
@@ -102,6 +117,15 @@ void mitk::NrrdQBallImageWriter::GenerateData()
       std::cout << e << std::endl;
     }
 
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
+    }
     m_Success = true;
 }
 

@@ -2,10 +2,12 @@
 #define MITKPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
+#include <mitkExportMacros.h>
+
 
 namespace mitk {
 
-class PluginActivator :
+class MITK_LOCAL PluginActivator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT

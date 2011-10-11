@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkPluginActivator.h>
 
 #include <org_mitk_core_ext_Export.h>
+#include <mitkExportMacros.h>
 
 namespace mitk
 {
@@ -33,7 +34,7 @@ namespace mitk
   * the mitkCoreExt module.
   *
   */
-  class CoreExtActivator : public QObject, public ctkPluginActivator
+  class MITK_LOCAL CoreExtActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
     Q_INTERFACES(ctkPluginActivator)

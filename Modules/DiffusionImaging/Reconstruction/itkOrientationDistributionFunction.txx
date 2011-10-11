@@ -460,6 +460,38 @@ namespace itk
   }
 
   template<class T, unsigned int NOdfDirections>
+  T
+    OrientationDistributionFunction<T, NOdfDirections>
+    ::GetMaxValue() const
+  {
+    T max = NumericTraits<T>::NonpositiveMin();
+    for( unsigned int i=0; i<InternalDimension; i++)
+    {
+      if((*this)[i] >= max )
+      {
+        max = (*this)[i];
+      }
+    }
+    return max;
+  }
+
+  template<class T, unsigned int NOdfDirections>
+  T
+    OrientationDistributionFunction<T, NOdfDirections>
+    ::GetMinValue() const
+  {
+    T min = NumericTraits<T>::max();
+    for( unsigned int i=0; i<InternalDimension; i++)
+    {
+      if((*this)[i] >= min )
+      {
+        min = (*this)[i];
+      }
+    }
+    return min;
+  }
+
+  template<class T, unsigned int NOdfDirections>
   double
     OrientationDistributionFunction<T, NOdfDirections>
     ::GetMaxChordLength()

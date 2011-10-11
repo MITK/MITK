@@ -20,6 +20,8 @@
 
 #include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
+#include <itkRescaleIntensityImageFilter.h>
+#include <itkOrientationDistributionFunction.h>
 
 struct LessDereference {
   template <class T>
@@ -54,7 +56,8 @@ namespace itk{
       m_Sampler(NULL),
       m_Steps(10),
       m_Memory(0),
-      m_ProposalAcceptance(0)
+      m_ProposalAcceptance(0),
+      m_GfaImage(NULL)
   {
     //this->m_MeasurementFrame.set_identity();
     this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image + a Mask Image
@@ -248,6 +251,86 @@ namespace itk{
     return 0;
   }
 
+  template< class TInputOdfImage, class TInputROIImage >
+  bool
+      GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+      ::EstimateParticleWeight(){
+
+    if (m_GfaImage.IsNull())
+      return false;
+
+    float samplingStart = 1.0;
+    float samplingStopUpper = 0.66;
+    float samplingStopLower = 0.33;
+
+    typedef itk::RescaleIntensityImageFilter< GfaImageType, GfaImageType > RescaleFilterType;
+
+    RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+    rescaleFilter->SetInput( m_GfaImage );
+    rescaleFilter->SetOutputMaximum( samplingStart );
+    rescaleFilter->SetOutputMinimum( 0 );
+    m_GfaImage = rescaleFilter->GetOutput();
+
+    //// Input iterator ////
+    typedef ImageRegionConstIterator< InputQBallImageType > InputIteratorType;
+    InputIteratorType git(m_ItkQBallImage, m_ItkQBallImage->GetLargestPossibleRegion() );
+
+    //// GFA iterator ////
+    typedef ImageRegionConstIterator< GfaImageType > GfaIteratorType;
+    GfaIteratorType gfaIt(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
+
+    float upper = 0;
+    int count = 0;
+    for(float thr=samplingStart; thr>samplingStopUpper; thr-=0.01)
+    {
+      git.GoToBegin();
+      gfaIt.GoToBegin();
+      while( !gfaIt.IsAtEnd() )
+      {
+        if(gfaIt.Get() > thr)
+        {
+          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
+          upper += odf.GetMaxValue();
+
+          ++count;
+        }
+        ++gfaIt;
+        ++git;
+      }
+    }
+    if (count>0)
+      upper /= count;
+    else
+      return false;
+
+    float lower = 0;
+    count = 0;
+    for(float thr=0; thr>samplingStopLower; thr+=0.01)
+    {
+      git.GoToBegin();
+      gfaIt.GoToBegin();
+      while( !gfaIt.IsAtEnd() )
+      {
+        if(gfaIt.Get() < thr)
+        {
+          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
+          lower += odf.GetMaxValue();
+
+          ++count;
+        }
+        ++gfaIt;
+        ++git;
+      }
+    }
+    if (count>0)
+      lower /= count;
+    else
+      return false;
+
+    m_ParticleWeight = upper;
+    return true;
+  }
+
   // perform global tracking
   template< class TInputOdfImage, class TInputROIImage >
   void
@@ -403,7 +486,12 @@ namespace itk{
     if(m_ParticleWidth == 0)
       m_ParticleWidth = 0.5*minSpacing;
     if(m_ParticleWeight == 0)
-      m_ParticleWeight = 0.01;
+      if (!EstimateParticleWeight())
+      {
+        MITK_INFO << "could not estimate particle weight!";
+        return;
+      }
+    MITK_INFO << "Particle Weight: " << m_ParticleWeight;
     m_CurrentStep = 0;
     m_Memory = 0;
 

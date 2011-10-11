@@ -62,6 +62,7 @@ void QmitkTrackingWorker::run()
   m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
   m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
+  m_View->m_GlobalTracker->SetGfaImage(m_View->m_GfaImage);
   m_View->m_GlobalTracker->SetTempStart((float)m_View->m_Controls->m_StartTempSlider->value()/100);
   m_View->m_GlobalTracker->SetTempEnd((float)m_View->m_Controls->m_EndTempSlider->value()/10000);
   m_View->m_GlobalTracker->SetNumIt(m_View->m_Iterations);
@@ -87,6 +88,8 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_GlobalTracker(NULL)
   , m_QBallImage(NULL)
   , m_MaskImage(NULL)
+  , m_GfaImage(NULL)
+  , m_GfaImageNode(NULL)
   , m_QBallImageNode(NULL)
   , m_ItkQBallImage(NULL)
   , m_FiberBundleNode(NULL)
@@ -169,6 +172,7 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_TrackingStop, SIGNAL(clicked()), this, SLOT(StopGibbsTracking()) );
     connect( m_Controls->m_TrackingStart, SIGNAL(clicked()), this, SLOT(StartGibbsTracking()) );
     connect( m_Controls->m_SetMaskButton, SIGNAL(clicked()), this, SLOT(SetMask()) );
+    connect( m_Controls->m_SetGfaButton, SIGNAL(clicked()), this, SLOT(SetGfaImage()) );
     connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
     connect( m_Controls->m_SaveTrackingParameters, SIGNAL(clicked()), this, SLOT(SaveTrackingParameters()) );
     connect( m_Controls->m_LoadTrackingParameters, SIGNAL(clicked()), this, SLOT(LoadTrackingParameters()) );
@@ -411,6 +415,32 @@ void QmitkGibbsTrackingView::SetMask()
   }
 }
 
+// set gfa image data node
+void QmitkGibbsTrackingView::SetGfaImage()
+{
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_GfaImageNode = NULL;
+    m_Controls->m_GfaImageEdit->setText("N/A");
+    return;
+  }
+
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+
+    if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
+    {
+      m_GfaImageNode = node;
+      m_Controls->m_GfaImageEdit->setText(node->GetName().c_str());
+      return;
+    }
+  }
+}
+
 // cast image to float
 template<class InputImageType>
 void QmitkGibbsTrackingView::CastToFloat(InputImageType* image, mitk::Image::Pointer outImage)
@@ -490,6 +520,28 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     for (it = it.Begin(); !it.IsAtEnd(); ++it)
     {
       it.Set(1);
+    }
+  }
+
+  // gfa image found?
+  if(m_Controls->m_GfaImageEdit->text().compare("N/A") != 0)
+  {
+    m_GfaImage = 0;
+    mitk::BaseData* data = m_GfaImageNode->GetData();
+    if (data)
+    {
+      // test if this data item is an image or not (could also be a surface or something totally different)
+      mitk::Image* tmpImage = dynamic_cast<mitk::Image*>( data );
+      if (tmpImage)
+      {
+        mitk::Image::Pointer mitkMaskImg = mitk::Image::New();
+        AccessFixedDimensionByItk_1(tmpImage, CastToFloat, 3, mitkMaskImg);
+        typedef mitk::ImageToItk<MaskImgType> CastType;
+        CastType::Pointer caster = CastType::New();
+        caster->SetInput(mitkMaskImg);
+        caster->Update();
+        m_GfaImage = caster->GetOutput();
+      }
     }
   }
 

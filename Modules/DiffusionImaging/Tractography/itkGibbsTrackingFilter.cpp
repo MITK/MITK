@@ -336,7 +336,12 @@ namespace itk{
 
     // load lookuptable
     ifstream BaryCoords;
+
+#ifdef CMAKE_INTDIR
+    BaryCoords.open("../FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
+#else
     BaryCoords.open("FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
+#endif
     float* coords;
     if (BaryCoords.is_open())
     {
@@ -357,7 +362,11 @@ namespace itk{
     }
 
     ifstream Indices;
+#ifdef CMAKE_INTDIR
+    Indices.open("../FiberTrackingLUTIndices.bin", ios::in | ios::binary);
+#else
     Indices.open("FiberTrackingLUTIndices.bin", ios::in | ios::binary);
+#endif
     int* ind;
     if (Indices.is_open())
     {

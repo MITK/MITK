@@ -138,6 +138,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     catch (itk::ExceptionObject e)
     {
       std::cout << e << std::endl;
+      throw;
     }
 
   }
@@ -237,6 +238,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     catch (itk::ExceptionObject e)
     {
       std::cout << e << std::endl;
+      throw;
     }
 
     itksys::SystemTools::CopyAFile(fname3.c_str(), m_FileName.c_str());

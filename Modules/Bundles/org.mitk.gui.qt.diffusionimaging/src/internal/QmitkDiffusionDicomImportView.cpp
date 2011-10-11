@@ -40,6 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmAttribute.h"
 #include "gdcmVersion.h"
 
+#include <QMessageBox>
+
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
 
@@ -82,18 +84,12 @@ void QmitkDiffusionDicomImport::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_AddFoldersButton, SIGNAL(clicked()),
-             this, SLOT(DicomLoadAddFolderNames()) );
-    connect( m_Controls->m_DeleteFoldersButton, SIGNAL(clicked()),
-             this, SLOT(DicomLoadDeleteFolderNames()) );
-    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()),
-             this, SLOT(DicomLoadStartLoad()) );
-    connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()),
-             this, SLOT(AverageClicked()) );
-    connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()),
-             this, SLOT(OutputSet()) );
-    connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()),
-             this, SLOT(OutputClear()) );
+    connect( m_Controls->m_AddFoldersButton, SIGNAL(clicked()), this, SLOT(DicomLoadAddFolderNames()) );
+    connect( m_Controls->m_DeleteFoldersButton, SIGNAL(clicked()), this, SLOT(DicomLoadDeleteFolderNames()) );
+    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()), this, SLOT(DicomLoadStartLoad()) );
+    connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()), this, SLOT(AverageClicked()) );
+    connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
+    connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
   }
 }
 
@@ -264,6 +260,7 @@ std::string QmitkDiffusionDicomImport::GetMemoryDescription( size_t processSize,
 void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 {
   itk::TimeProbesCollectorBase clock;
+  bool imageSuccessfullySaved = true;
 
   try
   {
@@ -300,7 +297,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
     while(m_Controls->listWidget->count())
     {
-
       // RETREIVE FOLDERNAME
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
@@ -596,7 +592,13 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           }
           catch (itk::ExceptionObject &ex)
           {
+            imageSuccessfullySaved = false;
             Error(QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
+            node=mitk::DataNode::New();
+            node->SetData( diffImage );
+            GetDefaultDataStorage()->Add(node);
+            SetDwiNodeProperties(node, descr.toStdString().c_str());
+            Status(QString("Image %1 added to datastorage").arg(descr));
             continue ;
           }
           Status(QString("Image %1 written to disc (%1)").arg(fullpath.toStdString().c_str()));
@@ -644,6 +646,8 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
     return ;
   }
 
+  if (!imageSuccessfullySaved)
+    QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
   Status(QString("Finished import with memory:"));
   PrintMemoryUsage();
 }

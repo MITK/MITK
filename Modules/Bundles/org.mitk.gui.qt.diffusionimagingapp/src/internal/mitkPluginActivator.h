@@ -23,8 +23,9 @@
 #include <berryIBundleContext.h>
 
 #include <berryQCHPluginListener.h>
+#include <mitkExportMacros.h>
 
-class mitkPluginActivator :
+class MITK_LOCAL mitkPluginActivator :
     public QObject, public berry::AbstractUICTKPlugin
 {
   Q_OBJECT

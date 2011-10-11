@@ -3,6 +3,7 @@
 
 #include <ctkPluginActivator.h>
 
+
 namespace mitk {
 
 class ToolPairNavigationPluginActivator :

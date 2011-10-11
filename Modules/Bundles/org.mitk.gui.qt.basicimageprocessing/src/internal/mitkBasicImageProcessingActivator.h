@@ -2,10 +2,11 @@
 #define MITKBASICIMAGEPROCESSINGACTIVATOR_H
 
 #include <ctkPluginActivator.h>
+#include <mitkExportMacros.h>
 
 namespace mitk {
 
-class BasicImageProcessingActivator :
+class MITK_LOCAL BasicImageProcessingActivator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT

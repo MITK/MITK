@@ -2,10 +2,11 @@
 #define mitkColourImageProcessingActivator_h
 
 #include <ctkPluginActivator.h>
+#include <mitkExportMacros.h>
 
 namespace mitk {
 
-class mitkColourImageProcessingActivator :
+class MITK_LOCAL mitkColourImageProcessingActivator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT

@@ -4,121 +4,121 @@
 #define mitkPixelTypeMultiplex0( function, ptype )    \
 {                                                 \
     if ( ptype.GetTypeId() == typeid(char) )\
-      function<char>( );\
+      function<char>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(unsigned char))\
-      function<unsigned char>( );\
+      function<unsigned char>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(short) )\
-      function<short>( );      \
+      function<short>( ptype,  );      \
     else if ( ptype.GetTypeId() == typeid(unsigned short) )\
-      function<unsigned short>( );\
+      function<unsigned short>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(int) )\
-      function<int>( );\
+      function<int>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(unsigned int) )\
-      function<unsigned int>( );\
+      function<unsigned int>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(long int) )\
-      function<long int>( );\
+      function<long int>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
-      function<unsigned long int>( );\
+      function<unsigned long int>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(float)  )\
-      function<float>( );\
+      function<float>( ptype,  );\
     else if ( ptype.GetTypeId() == typeid(double)  )\
-      function<double>( );\
+      function<double>( ptype,  );\
 }\
 
 #define mitkPixelTypeMultiplex1( function, ptype, param1 )    \
 {                                                 \
     if ( ptype.GetTypeId() == typeid(char) )\
-      function<char>( param1 );\
+      function<char>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(unsigned char))\
-      function<unsigned char>( param1 );\
+      function<unsigned char>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(short) )\
-      function<short>( param1 );      \
+      function<short>( ptype,  param1 );      \
     else if ( ptype.GetTypeId() == typeid(unsigned short) )\
-      function<unsigned short>( param1 );\
+      function<unsigned short>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(int) )\
-      function<int>( param1 );\
+      function<int>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(unsigned int) )\
-      function<unsigned int>( param1 );\
+      function<unsigned int>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(long int) )\
-      function<long int>( param1 );\
+      function<long int>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
-      function<unsigned long int>( param1 );\
+      function<unsigned long int>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(float)  )\
-      function<float>( param1 );\
+      function<float>( ptype,  param1 );\
     else if ( ptype.GetTypeId() == typeid(double)  )\
-      function<double>( param1 );\
+      function<double>( ptype,  param1 );\
 }\
 
 #define mitkPixelTypeMultiplex2( function, ptype, param1, param2 )    \
 {                                                 \
     if ( ptype.GetTypeId() == typeid(char) )\
-      function<char>(  param1, param2 );\
+      function<char>( ptype,   param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(unsigned char))\
-      function<unsigned char>(  param1, param2 );\
+      function<unsigned char>( ptype,   param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(short) )\
-      function<short>(  param1, param2 );      \
+      function<short>( ptype,   param1, param2 );      \
     else if ( ptype.GetTypeId() == typeid(unsigned short) )\
-      function<unsigned short>( param1, param2 );\
+      function<unsigned short>( ptype,  param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(int) )\
-      function<int>(  param1, param2 );\
+      function<int>( ptype,   param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(unsigned int) )\
-      function<unsigned int>( param1, param2 );\
+      function<unsigned int>( ptype,  param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(long int) )\
-      function<long int>( param1, param2 );\
+      function<long int>( ptype,  param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
-      function<unsigned long int>(  param1, param2 );\
+      function<unsigned long int>( ptype,   param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(float)  )\
-      function<float>(  param1, param2 );\
+      function<float>( ptype,   param1, param2 );\
     else if ( ptype.GetTypeId() == typeid(double)  )\
-      function<double>( param1, param2 );\
+      function<double>( ptype,  param1, param2 );\
 }\
 
 #define mitkPixelTypeMultiplex3( function, ptype, param1, param2, param3 )    \
 {                                                 \
     if ( ptype.GetTypeId() == typeid(char) )\
-      function<char>(  param1, param2, param3 );\
+      function<char>( ptype,   param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(unsigned char))\
-      function<unsigned char>(  param1, param2, param3 );\
+      function<unsigned char>( ptype,   param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(short) )\
-      function<short>(  param1, param2, param3 );      \
+      function<short>( ptype,   param1, param2, param3 );      \
     else if ( ptype.GetTypeId() == typeid(unsigned short) )\
-      function<unsigned short>( param1, param2, param3 );\
+      function<unsigned short>( ptype,  param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(int) )\
-      function<int>(  param1, param2, param3 );\
+      function<int>( ptype,   param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(unsigned int) )\
-      function<unsigned int>( param1, param2, param3 );\
+      function<unsigned int>( ptype,  param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(long int) )\
-      function<long int>( param1, param2, param3 );\
+      function<long int>( ptype,  param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
-      function<unsigned long int>(  param1, param2, param3 );\
+      function<unsigned long int>( ptype,   param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(float)  )\
-      function<float>(  param1, param2, param3 );\
+      function<float>( ptype,   param1, param2, param3 );\
     else if ( ptype.GetTypeId() == typeid(double)  )\
-      function<double>( param1, param2, param3 );\
+      function<double>( ptype,  param1, param2, param3 );\
 }\
 
 #define mitkPixelTypeMultiplex4( function, ptype, param1, param2, param3, param4 )    \
 {                                                 \
     if ( ptype.GetTypeId() == typeid(char) )\
-      function<char>( param1, param2, param3, param4 );\
+      function<char>( ptype,  param1, param2, param3, param4 );\
     else if ( ptype.GetTypeId() == typeid(unsigned char))\
-      function<unsigned char>(  param1, param2, param3, param4  );\
+      function<unsigned char>( ptype,   param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(short) )\
-      function<short>(  param1, param2, param3, param4  );      \
+      function<short>( ptype,   param1, param2, param3, param4  );      \
     else if ( ptype.GetTypeId() == typeid(unsigned short) )\
-      function<unsigned short>( param1, param2, param3, param4  );\
+      function<unsigned short>( ptype,  param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(int) )\
-      function<int>(  param1, param2, param3, param4  );\
+      function<int>( ptype,   param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(unsigned int) )\
-      function<unsigned int>( param1, param2, param3, param4  );\
+      function<unsigned int>( ptype,  param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(long int) )\
-      function<long int>( param1, param2, param3, param4  );\
+      function<long int>( ptype,  param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
-      function<unsigned long int>(  param1, param2, param3, param4  );\
+      function<unsigned long int>( ptype,   param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(float)  )\
-      function<float>(  param1, param2, param3, param4  );\
+      function<float>( ptype,   param1, param2, param3, param4  );\
     else if ( ptype.GetTypeId() == typeid(double)  )\
-      function<double>( param1, param2, param3, param4 );\
+      function<double>( ptype,  param1, param2, param3, param4 );\
 }\
 
 #endif // MITKPIXELTYPEMULTIPLEX_H

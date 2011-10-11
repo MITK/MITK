@@ -62,17 +62,17 @@ public:
     unsigned char* GetData() const
     { return m_Data; }
 
+protected:
+
+    friend class Image;
+
     void SetData( void* dataPtr )
     {
-      if(dataPtr != NULL)
+      if(dataPtr == NULL)
       {
         m_Data = (unsigned char*) dataPtr;
       }
     }
-
-
-protected:
-
 
     void AllocateData();
 

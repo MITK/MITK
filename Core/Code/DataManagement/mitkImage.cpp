@@ -102,72 +102,64 @@ void* mitk::Image::GetData()
       GetSource()->UpdateOutputInformation();
   }
   m_CompleteData=GetChannelData();
+
+  // update channel's data
+  // if data was not available at creation point, the m_Data of channel descriptor is NULL
+  // if data present, it won't be overwritten
+  m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_CompleteData->GetData());
+
   return m_CompleteData->GetData();
 }
 
 
 template <class T>
-void AccessPixel(mitk::ImageDescriptor::Pointer desc, const mitk::Index3D& p, double& value, int timestep)
-{  
-  const unsigned int* imageDims = desc->GetDimensions();
-  const mitk::PixelType ptype = desc->GetChannelTypeById(0);
-
-  std::cout << "Inside AccessPixel() " << std::endl;
-
-  std::cout << "ptype.GetBpe() " << ptype.GetBpe() << std::endl;
-  std::cout << "Dims " << imageDims[0] <<","<< imageDims[1] <<","<< imageDims[2] << std::endl;
-  std::cout << "Point " << p[0] <<","<< p[1] <<","<< p[2] << std::endl;
-
-  const unsigned char* data = desc->GetChannelDescriptor(0).GetData();
+void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int offset, double& value )
+{
   value = 0.0;
-
   if( data == NULL ) return;
 
-  if ( (p[0]>=0 && p[1] >=0 && p[2]>=0 && timestep>=0)
-       && (unsigned int)p[0] < imageDims[0] && (unsigned int)p[1] < imageDims[1] && (unsigned int)p[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
+  if(ptype.GetBpe() != 24)
   {
-
-    const unsigned int offset = p[0] + p[1]*imageDims[0] + p[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
-    const unsigned int rgboffset = 3 * offset;
-
-    std::cout << "GetBpe() " << ptype.GetBpe() << std::endl;
-
-    if(ptype.GetBpe() != 24)
-    {
-      value = (double) (((T*) data)[ offset ]);
-
-      std::cout << "Single value estimated in AccessPixel() " << value << std::endl;
-    }
-    else
-    {
-      double returnvalue = (((T*) data)[rgboffset ]);
-      returnvalue += (((T*) data)[rgboffset + 1]);
-      returnvalue += (((T*) data)[rgboffset + 2]);
-      value = returnvalue;
-    }    
-  }
+    value = (double) (((T*) data)[ offset ]);
+ }
   else
   {
-    value = 0.0;
+    const unsigned int rgboffset = 3 * offset;
+
+    double returnvalue = (((T*) data)[rgboffset ]);
+    returnvalue += (((T*) data)[rgboffset + 1]);
+    returnvalue += (((T*) data)[rgboffset + 2]);
+    value = returnvalue;
   }
-};
+
+}
 
 double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
 {
-  // FIXME mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
   if (this->GetTimeSteps() < timestep)
   {
     timestep = this->GetTimeSteps();
   }
-  // FIXME mitkIpPicTypeMultiplex3(AccessPixel, pic, position, value, timestep);
-  mitkPixelTypeMultiplex4( AccessPixel, this->m_ImageDescriptor->GetChannelTypeById(0), m_ImageDescriptor, position, value, timestep );
+
+  value = 0.0;
+
+  const unsigned int* imageDims = this->m_ImageDescriptor->GetDimensions();
+  const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
+
+  if ( (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
+       && (unsigned int)position[0] < imageDims[0] && (unsigned int)position[1] < imageDims[1] && (unsigned int)position[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
+  {
+    const unsigned int offset = position[0] + position[1]*imageDims[0] + position[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
+
+    mitkPixelTypeMultiplex3( AccessPixel, ptype, this->GetData(), offset, value );
+  }
+
   return value;
 }
 
 double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep)
 {
-  // FIXME mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
   if (this->GetTimeSteps() < timestep)
   {
@@ -176,9 +168,19 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
 
   Index3D itkIndex;
   this->GetGeometry()->WorldToIndex(position,itkIndex);
-  // FIXME mitkIpPicTypeMultiplex3(AccessPixel, pic, itkIndex, value, timestep);
-  mitkPixelTypeMultiplex4( AccessPixel, this->m_ImageDescriptor->GetChannelTypeById(0), m_ImageDescriptor, itkIndex, value, timestep );
 
+  value = 0.0;
+
+  const unsigned int* imageDims = this->m_ImageDescriptor->GetDimensions();
+  const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
+
+  if ( (itkIndex[0]>=0 && itkIndex[1] >=0 && itkIndex[2]>=0 && timestep>=0)
+       && (unsigned int)itkIndex[0] < imageDims[0] && (unsigned int)itkIndex[1] < imageDims[1] && (unsigned int)itkIndex[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
+  {
+    const unsigned int offset = itkIndex[0] + itkIndex[1]*imageDims[0] + itkIndex[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
+
+    mitkPixelTypeMultiplex3( AccessPixel, ptype, this->GetData(), offset, value );
+  }
 
   return value;
 }

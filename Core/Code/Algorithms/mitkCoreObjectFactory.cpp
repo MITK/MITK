@@ -227,7 +227,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 
 /*
 // @deprecated
-//mitkTbss
+//
 #define EXTERNAL_FILE_EXTENSIONS \
     "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
     "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \

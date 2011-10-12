@@ -32,7 +32,6 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
   static bool alreadyDone = false;
   if ( !alreadyDone )
   {
-    MITK_INFO << "PlanarFigureObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
     itk::ObjectFactoryBase::RegisterFactory( PlanarFigureIOFactory::New() );
@@ -123,7 +122,6 @@ struct RegisterPlanarFigureObjectFactory{
   RegisterPlanarFigureObjectFactory()
     : m_Factory( mitk::PlanarFigureObjectFactory::New() )
   {
-    MITK_INFO << "Registering PlanarFigureObjectFactory..." << std::endl;
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
 

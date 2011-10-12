@@ -77,7 +77,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "DiffusionImagingObjectFactory c'tor" << std::endl;
+    MITK_DEBUG << "DiffusionImagingObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
 
@@ -331,7 +331,7 @@ void RegisterDiffusionImagingObjectFactory()
 {
   static bool oneDiffusionImagingObjectFactoryRegistered = false;
   if ( ! oneDiffusionImagingObjectFactoryRegistered ) {
-    MITK_INFO << "Registering DiffusionImagingObjectFactory..." << std::endl;
+    MITK_DEBUG << "Registering DiffusionImagingObjectFactory..." << std::endl;
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::DiffusionImagingObjectFactory::New());
 
     oneDiffusionImagingObjectFactoryRegistered = true;

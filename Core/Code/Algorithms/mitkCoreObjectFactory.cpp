@@ -69,13 +69,13 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
-  MITK_INFO << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
+  MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
   m_ExtraFactories.insert(CoreObjectFactoryBase::Pointer(factory));
 }
 
 void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
 {
-  MITK_INFO << "CoreObjectFactory: un-registering extra factory of type " << factory->GetNameOfClass();
+  MITK_DEBUG << "CoreObjectFactory: un-registering extra factory of type " << factory->GetNameOfClass();
   try
   {
     m_ExtraFactories.erase(factory);
@@ -134,7 +134,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "CoreObjectFactory c'tor" << std::endl;
+    MITK_DEBUG << "CoreObjectFactory c'tor" << std::endl;
 
     itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );

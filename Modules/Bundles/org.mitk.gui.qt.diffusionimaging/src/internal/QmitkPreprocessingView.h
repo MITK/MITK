@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -79,13 +79,14 @@ protected slots:
 
   void AverageGradients();
   void DoAverageGradients(mitk::DataStorage::SetOfObjects::Pointer inImages);
-  
+
   void ExtractB0();
   void DoExtractB0(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   void BrainMask();
   void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
+  void ApplyMesurementFrame();
 
 protected:
 
@@ -97,7 +98,7 @@ protected:
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
+  mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
 };
 
 

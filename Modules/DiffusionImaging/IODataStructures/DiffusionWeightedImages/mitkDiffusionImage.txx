@@ -67,7 +67,7 @@ void mitk::DiffusionImage<TPixelType>
   img->SetLargestPossibleRegion( m_VectorImage->GetLargestPossibleRegion());
   img->SetBufferedRegion( m_VectorImage->GetLargestPossibleRegion() );
   img->Allocate();
-  
+
   int vecLength = m_VectorImage->GetVectorLength();
   InitializeByItk( img.GetPointer(), 1, vecLength );
 
@@ -122,7 +122,7 @@ MITK_INFO << "ALOHA WE JUST RECEIVED A NEW INDEX FROM THE PROPERTIES IN MITK....
       ++itr;
       ++itw;
     }
-  }  
+  }
 
   m_DisplayIndex = index;
 }
@@ -189,8 +189,8 @@ MITK_INFO << "ALOHA WE JUST RECEIVED A NEW INDEX FROM THE PROPERTIES IN MITK....
 //}
 
 template<typename TPixelType>
-bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1, 
-                                                  GradientDirectionType g2, 
+bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1,
+                                                  GradientDirectionType g2,
                                                   double precision)
 {
   GradientDirectionType diff = g1 - g2;
@@ -215,17 +215,13 @@ void mitk::DiffusionImage<TPixelType>::CorrectDKFZBrokenGradientScheme(double pr
       { 0.707057,  0.707057,  0        } };
 
     int i=0;
-    for(GradientDirectionContainerType::Iterator it = m_Directions->Begin();
-    it != m_Directions->End(); ++it)
-    {
-      it.Value().set(v[i++%7]);
-    }
+
     for(GradientDirectionContainerType::Iterator it = m_OriginalDirections->Begin();
     it != m_OriginalDirections->End(); ++it)
     {
       it.Value().set(v[i++%7]);
     }
-
+    ApplyMeasurementFrame();
   }
 }
 
@@ -347,6 +343,21 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
 
     ++newIt;
     ++oldIt;
+  }
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
+{
+  m_Directions = GradientDirectionContainerType::New();
+  int c = 0;
+  for(GradientDirectionContainerType::ConstIterator gdcit = m_OriginalDirections->Begin();
+    gdcit != m_OriginalDirections->End(); ++gdcit)
+  {
+    vnl_vector<double> vec = gdcit.Value();
+    vec = vec.pre_multiply(m_MeasurementFrame);
+    m_Directions->InsertElement(c, vec);
+    c++;
   }
 }
 

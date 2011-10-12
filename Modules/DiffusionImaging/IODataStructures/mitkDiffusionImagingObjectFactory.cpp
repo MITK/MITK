@@ -138,7 +138,6 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::DiffusionImageMapper<short>::New();
       newMapper->SetDataNode(node);
     }
-    mitk::Mapper::Pointer newMapper=NULL;
 
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -150,8 +149,8 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "FiberBundle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::FiberBundleMapper2D::New();
-      newMapper->SetDataNode(node);
+//      newMapper = mitk::FiberBundleMapper2D::New();
+//      newMapper->SetDataNode(node);
     }
     
     classname = "FiberBundleX";

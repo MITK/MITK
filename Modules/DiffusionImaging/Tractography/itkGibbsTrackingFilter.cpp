@@ -20,6 +20,7 @@
 
 #include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
+#include <QCoreApplication>
 
 struct LessDereference {
   template <class T>
@@ -273,7 +274,7 @@ namespace itk{
     if (qBallImageSize[1]<3 || qBallImageSize[2]<3 || qBallImageSize[3]<3)
     {
       MITK_INFO << "image size < 3 not supported";
-      return;
+      m_AbortTracking = true;
     }
 
     // calculate rotation matrix
@@ -287,7 +288,7 @@ namespace itk{
     vnl_matrix_fixed<double, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps)){
       MITK_INFO << "Image direction is not a rotation matrix. Tracking not possible!";
-      return;
+      m_AbortTracking = true;
     }
 
     // generate local working copy of image buffer
@@ -335,13 +336,16 @@ namespace itk{
     int mask_oversamp_mult = maskImageSize[0]/qBallImageSize[1];
 
     // load lookuptable
-    ifstream BaryCoords;
+    QString applicationDir = QCoreApplication::applicationDirPath();
 
-#ifdef CMAKE_INTDIR
-    BaryCoords.open("../FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
-#else
-    BaryCoords.open("FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
-#endif
+    if (applicationDir.endsWith("bin"))
+      applicationDir.append("/");
+    else
+      applicationDir.append("\\..\\");
+
+    ifstream BaryCoords;
+    QString lutPath(applicationDir+"FiberTrackingLUTBaryCoords.bin");
+    BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
     float* coords;
     if (BaryCoords.is_open())
     {
@@ -358,15 +362,12 @@ namespace itk{
     else
     {
       MITK_INFO << "Unable to open barycoords file";
-      return;
+      m_AbortTracking = true;
     }
 
     ifstream Indices;
-#ifdef CMAKE_INTDIR
-    Indices.open("../FiberTrackingLUTIndices.bin", ios::in | ios::binary);
-#else
-    Indices.open("FiberTrackingLUTIndices.bin", ios::in | ios::binary);
-#endif
+    lutPath = applicationDir+"FiberTrackingLUTIndices.bin";
+    Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
     int* ind;
     if (Indices.is_open())
     {
@@ -383,7 +384,7 @@ namespace itk{
     else
     {
       MITK_INFO << "Unable to open indices file";
-      return;
+      m_AbortTracking = true;
     }
 
     // initialize sphere interpolator with lookuptables
@@ -416,7 +417,7 @@ namespace itk{
     if (m_Steps>m_NumIt)
     {
       MITK_INFO << "not enough iterations!";
-      return;
+      m_AbortTracking = true;
     }
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 

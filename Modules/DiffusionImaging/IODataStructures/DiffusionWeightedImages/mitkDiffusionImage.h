@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorImage.h"
 #include "itkVectorImageToImageAdaptor.h"
 
-namespace mitk 
+namespace mitk
 {
 
   /**
@@ -36,12 +36,12 @@ namespace mitk
 
   public:
     typedef TPixelType PixelType;
-    typedef typename itk::VectorImage<TPixelType, 3> 
+    typedef typename itk::VectorImage<TPixelType, 3>
                                                 ImageType;
     typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
-    typedef itk::VectorContainer< unsigned int, 
+    typedef itk::VectorContainer< unsigned int,
       GradientDirectionType >                   GradientDirectionContainerType;
-    typedef itk::VectorImageToImageAdaptor< TPixelType, 3 > 
+    typedef itk::VectorImageToImageAdaptor< TPixelType, 3 >
                                                 AdaptorType;
     typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
 
@@ -82,7 +82,7 @@ namespace mitk
     GradientDirectionContainerType::Pointer GetOriginalDirections()
     { return m_OriginalDirections; }
     void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )
-    { this->m_OriginalDirections = directions; }
+    { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
     void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions)
     {
       m_OriginalDirections = GradientDirectionContainerType::New();
@@ -90,12 +90,13 @@ namespace mitk
       {
         m_OriginalDirections->InsertElement( i, directions[i].Get_vnl_vector() );
       }
+      this->ApplyMeasurementFrame();
     }
 
     MeasurementFrameType GetMeasurementFrame()
     { return m_MeasurementFrame; }
     void SetMeasurementFrame( MeasurementFrameType mFrame )
-    { this->m_MeasurementFrame = mFrame; }
+    { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
 
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
@@ -121,6 +122,8 @@ namespace mitk
   protected:
     DiffusionImage();
     virtual ~DiffusionImage();
+
+    void ApplyMeasurementFrame();
 
     typename ImageType::Pointer               m_VectorImage;
     GradientDirectionContainerType::Pointer   m_Directions;

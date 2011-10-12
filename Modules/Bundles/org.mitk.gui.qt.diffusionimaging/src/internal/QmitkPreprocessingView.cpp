@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
+Version:   $Revision: 17495 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -55,7 +55,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
-const std::string QmitkPreprocessingView::VIEW_ID = 
+#include <QTableWidgetItem>
+#include <QTableWidget>
+
+const std::string QmitkPreprocessingView::VIEW_ID =
 "org.mitk.views.preprocessing";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
@@ -84,9 +87,10 @@ struct PrpSelListener : ISelectionListener
     if(m_View->m_CurrentSelection)
     {
       bool foundDwiVolume = false;
+      m_View->m_DiffusionImage = NULL;
 
       // iterate selection
-      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
         i != m_View->m_CurrentSelection->End(); ++i)
       {
 
@@ -99,13 +103,31 @@ struct PrpSelListener : ISelectionListener
           if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
           {
             foundDwiVolume = true;
+            m_View->m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData());
           }
         }
       }
 
       m_View->m_Controls->m_ButtonBrainMask->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
-      m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);      
+      m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
+      m_View->m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
+      m_View->m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
+
+      if (foundDwiVolume)
+      {
+        vnl_matrix_fixed< double, 3, 3 > mf = m_View->m_DiffusionImage->GetMeasurementFrame();
+        for (int r=0; r<3; r++)
+          for (int c=0; c<3; c++)
+          {
+            QTableWidgetItem* item = m_View->m_Controls->m_MeasurementFrameTable->item(r,c);
+            delete item;
+            item = new QTableWidgetItem();
+            item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+            item->setText(QString::number(mf.get(r,c)));
+            m_View->m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
+          }
+      }
     }
   }
 
@@ -131,7 +153,8 @@ struct PrpSelListener : ISelectionListener
 QmitkPreprocessingView::QmitkPreprocessingView()
 : QmitkFunctionality(),
 m_Controls(NULL),
-m_MultiWidget(NULL)
+m_MultiWidget(NULL),
+m_DiffusionImage(NULL)
 {
 }
 
@@ -181,7 +204,7 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
     connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
     connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );
-
+    connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(ApplyMesurementFrame()) );
   }
 }
 
@@ -200,6 +223,21 @@ void QmitkPreprocessingView::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
+void QmitkPreprocessingView::ApplyMesurementFrame()
+{
+  if (m_DiffusionImage.IsNull())
+    return;
+  vnl_matrix_fixed< double, 3, 3 > mf;
+  for (int r=0; r<3; r++)
+    for (int c=0; c<3; c++)
+    {
+      QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
+      if (!item)
+        return;
+      mf[r][c] = item->text().toDouble();
+    }
+  m_DiffusionImage->SetMeasurementFrame(mf);
+}
 
 void QmitkPreprocessingView::ExtractB0()
 {
@@ -210,8 +248,8 @@ void QmitkPreprocessingView::ExtractB0()
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -239,14 +277,14 @@ void QmitkPreprocessingView::DoExtractB0
   int nrFiles = inImages->size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
   {
 
-    DiffusionImageType* vols = 
+    DiffusionImageType* vols =
       static_cast<DiffusionImageType*>(
       (*itemiter)->GetData());
 
@@ -284,8 +322,8 @@ void QmitkPreprocessingView::AverageGradients()
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -306,19 +344,19 @@ void QmitkPreprocessingView::AverageGradients()
 }
 
 void QmitkPreprocessingView::DoAverageGradients
-(mitk::DataStorage::SetOfObjects::Pointer inImages) 
+(mitk::DataStorage::SetOfObjects::Pointer inImages)
 {
   int nrFiles = inImages->size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
   {
 
-    mitk::DiffusionImage<DiffusionPixelType>* vols = 
+    mitk::DiffusionImage<DiffusionPixelType>* vols =
       static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
       (*itemiter)->GetData());
 
@@ -337,8 +375,8 @@ void QmitkPreprocessingView::BrainMask()
       mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
       ++i)
     {
 
@@ -359,19 +397,19 @@ void QmitkPreprocessingView::BrainMask()
 }
 
 void QmitkPreprocessingView::DoBrainMask
-(mitk::DataStorage::SetOfObjects::Pointer inImages) 
+(mitk::DataStorage::SetOfObjects::Pointer inImages)
 {
   int nrFiles = inImages->size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
   {
 
-    mitk::DiffusionImage<DiffusionPixelType>* vols = 
+    mitk::DiffusionImage<DiffusionPixelType>* vols =
       static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
       (*itemiter)->GetData());
 
@@ -387,7 +425,7 @@ void QmitkPreprocessingView::DoBrainMask
     typedef itk::CastImageFilter<itk::Image<short,3>, itk::Image<unsigned short,3> > CastFilterType;
     CastFilterType::Pointer castfilter = CastFilterType::New();
     castfilter->SetInput(filter->GetOutput());
-    
+
     typedef itk::BrainMaskExtractionImageFilter<unsigned char> MaskFilterType;
     MaskFilterType::Pointer maskfilter = MaskFilterType::New();
     maskfilter->SetInput(castfilter->GetOutput());

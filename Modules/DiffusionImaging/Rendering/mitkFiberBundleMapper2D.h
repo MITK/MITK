@@ -57,7 +57,9 @@ namespace mitk {
     virtual void Update(mitk::BaseRenderer * renderer);
     
     
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer);//not necessary
+   static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+
     
     //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);

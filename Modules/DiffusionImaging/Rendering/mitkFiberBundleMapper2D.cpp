@@ -30,8 +30,16 @@
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
 
+#include <mitkShaderRepository.h>
+#include <mitkShaderProperty.h>
+#include <mitkStandardFileLocations.h>
+
+
+
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
 {
+
+
 }
 
 mitk::FiberBundleMapper2D::~FiberBundleMapper2D()
@@ -125,13 +133,18 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 //
   //this procedure is depricated,
   //not needed after initializaton anymore
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
-  if ( node.IsNull() )
+  mitk::DataNode* node = this->GetDataNode();
+  if ( node == NULL )
   {
     MITK_INFO << "check DATANODE: ....[Fail] ";
     return;
   }
   ///////////////////////////////////
+
+
+  
+  
+  
 
   mitk::FiberBundleMapper3D::Pointer FBMapper3D = dynamic_cast< mitk::FiberBundleMapper3D* > (node->GetMapper( 2 ));
   if ( FBMapper3D->GetInput() == NULL )
@@ -195,7 +208,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 //  localStorage->m_SlicedResult = FBMapper3D->GetCut(planeOrigin, planeN, cutParams);
  // localStorage->m_SlicedResult = FBMapper3D->GetVtkFBPolyDataMapper();
   localStorage->m_SlicedResult = (vtkPolyData*) FBMapper3D->getVtkFiberBundleMapper()->GetInputAsDataSet();
-  MITK_INFO << renderer->GetName() << " OutputPoints#: " << localStorage->m_SlicedResult->GetNumberOfPoints();
+  //MITK_INFO << renderer->GetName() << " OutputPoints#: " << localStorage->m_SlicedResult->GetNumberOfPoints();
 
 
   vtkLookupTable *lut = vtkLookupTable::New();
@@ -204,7 +217,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
   localStorage->m_PointMapper->SelectColorArray("ColorValues");
   localStorage->m_PointMapper->SetLookupTable(lut);  //apply the properties after the slice was set
-  this->ApplyProperties( renderer );
+  //this->ApplyProperties( renderer );
 
   //setup the camera according to the actor with zooming/panning etc.
  // this->AdjustCamera( renderer, planeGeo );
@@ -397,6 +410,22 @@ void mitk::FiberBundleMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk:
 
 }
 
+void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+{    //add shader to datano
+  
+  
+  //####### load shader from file #########
+  std::string m_VolumeDir = MITK_ROOT;
+  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+  mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+  shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
+  //####################################################################
+  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
+  mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
 // this method prepares data for VTK mapping and rendering
 void mitk::FiberBundleMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
@@ -404,7 +433,10 @@ void mitk::FiberBundleMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   //get the current localStorage for the corresponding renderer
   //FBLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-//  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+
+
+  //renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+
   //float opacity = 1.0f;
   //float rgb[3] = {1.0f, 1.0f, 1.0f};
 

@@ -241,7 +241,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::FiberBundleMapper3D::SetDefaultProperties(node);
-//    mitk::FiberBundleMapper2D::SetDefaultProperties(node);
+    mitk::FiberBundleMapper2D::SetDefaultProperties(node);
   }
 
   classname = "FiberBundleX";

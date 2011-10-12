@@ -142,7 +142,6 @@ namespace mitk
   tbssImg->SetMeasurementInfo(m_MeasurementInfo);
   tbssImg->SetImage(m_Data);
 
-  int vecsize = m_Data->GetVectorLength();
 
   tbssImg->InitializeFromVectorImage();
 
@@ -151,6 +150,97 @@ namespace mitk
 
 
   }
+
+  mitk::TbssImage::Pointer mitk::TbssImporter::ImportMeta()
+  {
+    mitk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
+
+
+    m_Data = DataImageType::New();
+
+    std::vector< std::pair<mitk::TbssImage::MetaDataFunction, int> > metaInfo;
+
+    for(int i=0; i<m_MetaFiles.size(); i++)
+    {
+      std::pair<std::string, std::string> p = m_MetaFiles.at(i);
+      std::string function = p.first;
+      std::string file = p.second;
+
+      // Add to metainfo to give the tbss image a function-index pair
+      std::pair<mitk::TbssImage::MetaDataFunction, int> pair;
+
+
+      pair.first = RetrieveTbssFunction(function);
+      pair.second = i;
+
+
+      metaInfo.push_back(pair);
+
+      FileReaderType3D::Pointer fileReader = FileReaderType3D::New();
+      fileReader->SetFileName(file);
+      fileReader->Update();
+
+      FloatImage3DType::Pointer img = fileReader->GetOutput();
+
+      FloatImage3DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
+
+      if(i==0)
+      {
+        // First image in serie. Properties should be used to initialize m_Data
+        m_Data->SetRegions(img->GetLargestPossibleRegion().GetSize());
+        m_Data->SetSpacing(img->GetSpacing());
+        m_Data->SetOrigin(img->GetOrigin());
+        m_Data->SetDirection(img->GetDirection());
+        m_Data->SetVectorLength(m_MetaFiles.size());
+        m_Data->Allocate();
+      }
+
+      for(int x=0; x<size[0]; x++)
+      {
+        for(int y=0; y<size[1]; y++)
+        {
+          for(int z=0; z<size[2]; z++)
+          {
+            itk::Index<3> ix;
+            ix[0] = x;
+            ix[1] = y;
+            ix[2] = z;
+
+            float f = img->GetPixel(ix);
+            itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
+            pixel.SetElement(i, f);
+            m_Data->SetPixel(ix, pixel);
+
+          }
+        }
+      }
+
+
+    }
+
+    tbssImg->SetIsMeta(true);
+    tbssImg->SetImage(m_Data);
+    tbssImg->SetMetaInfo(metaInfo);
+    tbssImg->InitializeFromVectorImage();
+
+    return tbssImg;
+  }
+
+
+  mitk::TbssImage::MetaDataFunction mitk::TbssImporter::RetrieveTbssFunction(std::string s)
+  {
+    if(s == "skeleton mask")
+    {
+      return mitk::TbssImage::MEAN_FA_SKELETON_MASK;
+    }
+    else if(s == "mean fa skeleton")
+    {
+      return mitk::TbssImage::MEAN_FA_SKELETON;
+    }
+
+    return mitk::TbssImage::MISC;
+  }
+
 }
 
 

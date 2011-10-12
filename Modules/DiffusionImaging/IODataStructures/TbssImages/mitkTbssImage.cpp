@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::TbssImage::TbssImage()
+  : m_IsMeta(false)
 {
 
 }
@@ -74,7 +75,7 @@ void mitk::TbssImage::InitializeFromVectorImage()
   // init
   SetImportVolume(img->GetBufferPointer());//, 0, 0, CopyMemory);
     //SetVolume( img->GetBufferPointer(), i );
-  //}
+  //}::
 
   m_DisplayIndex = 0;
   MITK_INFO << "Tbss-Image successfully initialized.";

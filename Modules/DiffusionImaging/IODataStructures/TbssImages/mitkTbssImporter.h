@@ -38,6 +38,9 @@ namespace mitk
     typedef itk::Image<float, 4> FloatImage4DType;
     typedef itk::ImageFileReader<FloatImage4DType> FileReaderType4D;
 
+    typedef itk::Image<float, 3> FloatImage3DType;
+    typedef itk::ImageFileReader<FloatImage3DType> FileReaderType3D;
+
     TbssImporter();
 
     mitkClassMacro( TbssImporter, Object )
@@ -54,6 +57,8 @@ namespace mitk
 
     mitk::TbssImage::Pointer Import();
 
+    mitk::TbssImage::Pointer ImportMeta();
+
 
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
     {
@@ -63,6 +68,11 @@ namespace mitk
     std::vector< std::pair<std::string, int> > GetGroupInfo()
     {
       return m_Groups;
+    }
+
+    void SetTbssDatasets(std::vector< std::pair<std::string, std::string> > files)
+    {
+      m_MetaFiles = files;
     }
 
     void SetMeasurementInfo(std::string s)
@@ -86,8 +96,13 @@ namespace mitk
 
     DataImageType::Pointer m_Data;
     std::vector< std::pair<std::string, int> > m_Groups;
+    std::vector< std::pair<std::string, std::string> > m_MetaFiles;
 
     std::string m_MeasurementInfo;
+
+
+
+    mitk::TbssImage::MetaDataFunction RetrieveTbssFunction(std::string s);
 
 
   };

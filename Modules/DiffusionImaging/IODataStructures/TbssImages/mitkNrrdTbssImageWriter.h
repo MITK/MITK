@@ -127,6 +127,9 @@ protected:
     std::string m_FilePattern;
     
     bool m_Success;
+
+
+    std::string RetrieveString(mitk::TbssImage::MetaDataFunction meta);
             
 };    
        

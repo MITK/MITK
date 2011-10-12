@@ -47,6 +47,14 @@ namespace mitk
     itkNewMacro(Self)
 
 
+    enum MetaDataFunction
+    {
+      MEAN_FA_SKELETON,
+      MEAN_FA_SKELETON_MASK,
+      MISC
+    };
+
+
     //void SetRequestedRegionToLargestPossibleReg tbssRoi->SetTbssType(mitk::TbssImage<char>::ROI);ion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();
@@ -78,6 +86,16 @@ namespace mitk
       return m_GroupInfo;
     }
 
+    void SetMetaInfo( std::vector< std::pair<MetaDataFunction, int> > info)
+    {
+      m_MetaInfo = info;
+    }
+
+    std::vector< std::pair<MetaDataFunction, int> > GetMetaInfo()
+    {
+      return m_MetaInfo;
+    }
+
     void SetMeasurementInfo(std::string s)
     {
       m_MeasurementInfo = s;
@@ -92,6 +110,16 @@ namespace mitk
 
     void SetDisplayIndexForRendering(int displayIndex);
 
+    void SetIsMeta(bool b)
+    {
+      m_IsMeta = b;
+    }
+
+    bool GetIsMeta()
+    {
+      return m_IsMeta;
+    }
+
 
 
   protected:
@@ -105,11 +133,13 @@ namespace mitk
 
     std::vector< std::pair<std::string, int> > m_GroupInfo;
 
+    std::vector< std::pair<MetaDataFunction, int> > m_MetaInfo;
+
     int m_DisplayIndex;
 
     std::string m_MeasurementInfo;
 
-
+    bool m_IsMeta;
 
 
   };

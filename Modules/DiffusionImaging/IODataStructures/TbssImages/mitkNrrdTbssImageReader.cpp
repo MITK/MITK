@@ -63,6 +63,10 @@ namespace mitk
     static_cast<OutputType*>(this->GetOutput())
         ->SetGroupInfo(m_OutputCache->GetGroupInfo());
     static_cast<OutputType*>(this->GetOutput())
+        ->SetMetaInfo(m_OutputCache->GetMetaInfo());
+    static_cast<OutputType*>(this->GetOutput())
+        ->SetIsMeta(m_OutputCache->GetIsMeta());
+    static_cast<OutputType*>(this->GetOutput())
         ->InitializeFromVectorImage();
 
   }
@@ -71,6 +75,7 @@ namespace mitk
       ::GenerateOutputInformation()
   {
     OutputType::Pointer outputForCache = OutputType::New();
+
     if ( m_FileName == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename to be read is empty!");
@@ -111,12 +116,10 @@ namespace mitk
 
           reader->Update();
           img = reader->GetOutput();
-        }
 
-        MITK_INFO << "NrrdTbssImageReader READING HEADER INFORMATION";
 
-        if (ext == ".tbss")
-        {
+          MITK_INFO << "NrrdTbssImageReader READING HEADER INFORMATION";
+
 
           itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
           std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
@@ -126,13 +129,13 @@ namespace mitk
 
           //int numberOfGradientImages = 0;
           std::string measurementInfo;
+          bool isMeta = false;
+          std::vector<std::pair<mitk::TbssImage::MetaDataFunction, int > > metaInfo;
 
           std::vector< std::pair<std::string, int> > groups;
 
           for (; itKey != imgMetaKeys.end(); itKey ++)
           {
-
-
             itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
 
             MITK_INFO << *itKey << " ---> " << metaString;
@@ -158,16 +161,43 @@ namespace mitk
 
             }
 
-            else if(itKey->find("Measurement info"))
+            else if(itKey->find("Measurement info") != std::string::npos)
             {
               measurementInfo = metaString;
             }
 
 
+            else if(itKey->find("meta") != std::string::npos)
+            {
+              if(metaString == "true")
+              {
+                isMeta = true;
+              }
+            }
+
+            else if(itKey->find("mean fa skeleton mask") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::MEAN_FA_SKELETON_MASK;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
+            else if(itKey->find("mean fa skeleton") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::MEAN_FA_SKELETON;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
+
           }
 
+          outputForCache->SetIsMeta(isMeta);
           outputForCache->SetGroupInfo(groups);
           outputForCache->SetMeasurementInfo(measurementInfo);
+          outputForCache->SetMetaInfo(metaInfo);
 
         }
 

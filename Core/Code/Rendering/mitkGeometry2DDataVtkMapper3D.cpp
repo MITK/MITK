@@ -553,7 +553,7 @@ namespace mitk
             renderer->GetRenderWindow()->MakeCurrent();
 
             // Retrieve and update image to be mapped
-            const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->m_LSH.GetLocalStorage(planeRenderer);
+            const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->GetLocalStorage(planeRenderer);
 
             if(localStorage->m_ReslicedImage != NULL)
             {

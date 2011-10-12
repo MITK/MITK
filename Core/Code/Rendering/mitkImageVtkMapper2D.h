@@ -180,8 +180,6 @@ namespace mitk {
       }
     };
 
-    void GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary = false );
-
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 
@@ -196,9 +194,6 @@ namespace mitk {
     *   \param renderer The current renderer corresponding to the render window.
     */
     void TransformActor(mitk::BaseRenderer* renderer);
-
-    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
@@ -257,6 +252,19 @@ namespace mitk {
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
+
+    /** \brief This method applied a level window on RBG(A) images.
+    * It should only be called for internally for RGB(A) images. */
+    void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
+
+    /** \brief This method generates the lookuptable for all types of images. */
+    void GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary = false );
+
+    /** \brief Set the color of the image/polydata */
+    void ApplyColor( mitk::BaseRenderer* renderer );
+
+    /** \brief Set the opacity of the actor. */
+    void ApplyOpacity( mitk::BaseRenderer* renderer );
   };
 
 } // namespace mitk

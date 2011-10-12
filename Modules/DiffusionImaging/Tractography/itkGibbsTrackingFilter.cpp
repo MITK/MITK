@@ -274,7 +274,7 @@ namespace itk{
     if (qBallImageSize[1]<3 || qBallImageSize[2]<3 || qBallImageSize[3]<3)
     {
       MITK_INFO << "image size < 3 not supported";
-      return;
+      m_AbortTracking = true;
     }
 
     // calculate rotation matrix
@@ -288,7 +288,7 @@ namespace itk{
     vnl_matrix_fixed<double, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps)){
       MITK_INFO << "Image direction is not a rotation matrix. Tracking not possible!";
-      return;
+      m_AbortTracking = true;
     }
 
     // generate local working copy of image buffer
@@ -362,7 +362,7 @@ namespace itk{
     else
     {
       MITK_INFO << "Unable to open barycoords file";
-      return;
+      m_AbortTracking = true;
     }
 
     ifstream Indices;
@@ -384,7 +384,7 @@ namespace itk{
     else
     {
       MITK_INFO << "Unable to open indices file";
-      return;
+      m_AbortTracking = true;
     }
 
     // initialize sphere interpolator with lookuptables
@@ -417,7 +417,7 @@ namespace itk{
     if (m_Steps>m_NumIt)
     {
       MITK_INFO << "not enough iterations!";
-      return;
+      m_AbortTracking = true;
     }
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 

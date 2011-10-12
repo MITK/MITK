@@ -404,7 +404,7 @@ void mitk::FiberBundleMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   //get the current localStorage for the corresponding renderer
   //FBLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+//  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
   //float opacity = 1.0f;
   //float rgb[3] = {1.0f, 1.0f, 1.0f};
 

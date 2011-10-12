@@ -20,6 +20,7 @@
 
 #include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
+#include <QCoreApplication>
 
 struct LessDereference {
   template <class T>
@@ -335,8 +336,16 @@ namespace itk{
     int mask_oversamp_mult = maskImageSize[0]/qBallImageSize[1];
 
     // load lookuptable
+    QString applicationDir = QCoreApplication::applicationDirPath();
+
+    if (applicationDir.endsWith("bin"))
+      applicationDir.append("/");
+    else
+      applicationDir.append("\\..\\");
+
     ifstream BaryCoords;
-    BaryCoords.open("FiberTrackingLUTBaryCoords.bin", ios::in | ios::binary);
+    QString lutPath(applicationDir+"FiberTrackingLUTBaryCoords.bin");
+    BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
     float* coords;
     if (BaryCoords.is_open())
     {
@@ -357,7 +366,8 @@ namespace itk{
     }
 
     ifstream Indices;
-    Indices.open("FiberTrackingLUTIndices.bin", ios::in | ios::binary);
+    lutPath = applicationDir+"FiberTrackingLUTIndices.bin";
+    Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
     int* ind;
     if (Indices.is_open())
     {

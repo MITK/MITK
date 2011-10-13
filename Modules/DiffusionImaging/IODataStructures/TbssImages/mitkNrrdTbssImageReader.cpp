@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 namespace mitk
-{  
+{
       void NrrdTbssImageReader
       ::GenerateData()
   {
@@ -84,6 +84,21 @@ namespace mitk
     {
       try
       {
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+        if ( locale.compare(currLocale)!=0 )
+        {
+          try
+          {
+            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+            setlocale(LC_ALL, locale.c_str());
+          }
+          catch(...)
+          {
+            MITK_INFO << "Could not set locale " << locale;
+          }
+        }
 
 
         MITK_INFO << "NrrdTbssImageReader READING IMAGE INFORMATION";
@@ -127,6 +142,10 @@ namespace mitk
 
             if (itKey->find("Group_index") != std::string::npos)
             {
+
+              std::vector<std::string> tokens;
+              this->Tokenize(metaString, tokens, " ");
+
               if(tokens.size()==2)
               {
 
@@ -139,7 +158,9 @@ namespace mitk
                 groups.push_back(p);
               }
 
+
             }
+
             else if(itKey->find("Measurement info") != std::string::npos)
             {
               measurementInfo = metaString;
@@ -170,9 +191,9 @@ namespace mitk
               metaInfo.push_back(p);
             }
 
+
           }
 
-          outputForCache->SetImage(img);
           outputForCache->SetIsMeta(isMeta);
           outputForCache->SetGroupInfo(groups);
           outputForCache->SetMeasurementInfo(measurementInfo);
@@ -182,24 +203,39 @@ namespace mitk
 
 
 
+        // This call updates the output information of the associated VesselTreeData
+        outputForCache->SetImage(img);
 
-
+      //  outputForCache->SetB_Value(m_B_Value);
+        //outputForCache->SetDirections(m_DiffusionVectors);
+       // outputForCache->SetOriginalDirections(m_OriginalDiffusionVectors);
+       // outputForCache->SetMeasurementFrame(m_MeasurementFrame);
 
         // Since we have already read the tree, we can store it in a cache variable
         // so that it can be assigned to the DataObject in GenerateData();
         m_OutputCache = outputForCache;
         m_CacheTime.Modified();
 
-
-
+        try
+        {
+          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+          setlocale(LC_ALL, currLocale.c_str());
+        }
+        catch(...)
+        {
+          MITK_INFO << "Could not reset locale " << currLocale;
+        }
       }
-
+      catch(std::exception& e)
+      {
+        MITK_INFO << "Std::Exception while reading file!!";
+        MITK_INFO << e.what();
+        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
+      }
       catch(...)
       {
-
         MITK_INFO << "Exception while reading file!!";
         throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
-
       }
     }
   }

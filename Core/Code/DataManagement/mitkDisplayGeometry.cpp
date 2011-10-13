@@ -587,18 +587,17 @@ if ( zoomXtooSmall && zoomYtooSmall )
 
   }
 
-
  if (correctPanning)
   {
     SetOriginInMM( newOrigin );
   }
 
+  inRecalculate = false;
+
   if ( correctPanning || correctZooming )
   {
     Modified();
   }
-
-  inRecalculate = false;
 
   // return true if any correction has been made
   return correctPanning || correctZooming;

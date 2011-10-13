@@ -196,6 +196,9 @@ void QmitkPreprocessingView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkPreprocessingViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    m_Controls->m_MeasurementFrameTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    m_Controls->m_MeasurementFrameTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
   }
 
   m_SelListener = berry::ISelectionListener::Pointer(new PrpSelListener(this));

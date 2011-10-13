@@ -25,8 +25,9 @@
 #include <vtkPolyLine.h>
 #include <vtkRenderer.h>
 #include <vtkCellArray.h>
+#include <vtkMatrix4x4.h>
 
-
+//#include <mitkGeometry3D.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
 
@@ -243,6 +244,73 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   m_VolumeDir += "Modules/DiffusionImaging/Rendering/mitkShaderFiberClipping.xml";
   localStorage->m_PointActor->GetProperty()->LoadMaterial(m_VolumeDir.c_str());
   localStorage->m_PointActor->GetProperty()->ShadingOn();
+  
+  
+  
+  
+  //get information about current position of views
+  mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
+  mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
+  
+  //generate according cutting planes based on the view position
+  float sliceN[3], planeOrigin[3];
+  
+//  sliceN[0] = planeGeo->GetNormal()[0];
+//  sliceN[1] = planeGeo->GetNormal()[1];
+//  sliceN[2] = planeGeo->GetNormal()[2];
+//  
+//  planeOrigin[0] = planeGeo->GetOrigin()[0];
+//  planeOrigin[1] = planeGeo->GetOrigin()[1];
+//  planeOrigin[2] = planeGeo->GetOrigin()[2];
+
+  vtkMatrix4x4 * mvtm = renderer->GetVtkRenderer()->GetActiveCamera()->GetViewTransformMatrix();
+  vtkMatrix4x4 * mtx4NormalT = vtkMatrix4x4::New(); //inverted then transposed matrix, needed for normal transform
+  mvtm->Invert(mvtm,mtx4NormalT);
+  mvtm->Transpose(mtx4NormalT, mtx4NormalT);
+  
+  planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
+  planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
+  planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
+  
+  const float* pT = mvtm->MultiplyFloatPoint(planeOrigin);
+  const Point3D planeOriginT[3];
+  planeOriginT[0] = (double) pT[0];
+  planeOriginT[1] = pT[1];
+  planeOriginT[2] = pT[2];
+  
+  const Point3D plane1Origin = pT + planeGeo->GetNormal() * 0.5; //calculate position of up-fiber-clippingplane
+  const Point3D plane2Origin = planeGeo->GetOrigin() + planeGeo->GetNormal() * -0.5; //calculate position of up-fiber-clippingplane
+  Vector3D n1 = planeGeo->GetNormal();
+  
+  float tmp1 = plane1Origin[0] * n1[0];
+  float tmp2 = plane1Origin[1] * n1[1];
+  float tmp3 = plane1Origin[2] * n1[2];
+  float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
+
+  float tmp4 = plane2Origin[0] * n1[0];
+  float tmp5 = plane2Origin[1] * n1[1];
+  float tmp6 = plane2Origin[2] * n1[2];
+  float d2 = tmp4 + tmp5 + tmp6;
+  
+  float plane1[4];
+  plane1[0] = n1[0] * (-1.0);
+  plane1[1] = n1[1] * (-1.0);
+  plane1[2] = n1[2] * (-1.0);
+  plane1[3] = d1;
+  
+  
+  float plane2[4];
+  plane2[0] = n1[0];
+  plane2[1] = n1[1];
+  plane2[2] = n1[2];
+  plane2[3] = d2;
+
+
+  
+   
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane1",4, plane1);
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane2",4, plane2);
+  
 
 
 

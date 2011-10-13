@@ -19,7 +19,6 @@ mitk::Particle* createMitkParticle(Particle* p)
   pos[1] = R[1]-0.5;
   pos[2] = R[2]-0.5;
   particle->SetPosition(pos);
-  //MITK_INFO << "mitk: " << particle->GetPosition();
   pVector N = p->N;
   vnl_vector_fixed<float,3> dir;
   dir[0] = N[0];
@@ -52,8 +51,6 @@ vector<Particle*>* ResampleFibers(vector<Particle*>* particleContainer, float le
   float Leng = 0;
 
   container->push_back(source);
-  //  source->R.storeXYZ();
-  //  MITK_INFO << source->R.store[0] << ", " << source->R.store[1] << ", " << source->R.store[2];
 
   float dtau = 0;
   int cur_p = 1;
@@ -74,12 +71,9 @@ vector<Particle*>* ResampleFibers(vector<Particle*>* particleContainer, float le
 
     if (dtau >= len)  // if particles reach next voxel
     {
-      // proposal = current particle position - (current p - last p)*(current fibre length - len???)/(norm current p-last p)
       Particle* p = new Particle();
       p->R = particleContainer->at(cur_p-1)->R - dR*( (dtau-len)/normdR );
       p->N = dR;
-      //      p->R.storeXYZ();
-      //      MITK_INFO << p->R.store[0] << ", " << p->R.store[1] << ", " << p->R.store[2];
       container->push_back(p);
     }
     else

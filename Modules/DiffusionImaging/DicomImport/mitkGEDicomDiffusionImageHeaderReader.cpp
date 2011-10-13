@@ -55,7 +55,6 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     {
       try
       {
-        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
         setlocale(LC_ALL, locale.c_str());
       }
       catch(...)
@@ -67,7 +66,7 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     // adapted from namic-sandbox
     // DicomToNrrdConverter.cxx
 
-    VolumeReaderType::DictionaryArrayRawPointer inputDict 
+    VolumeReaderType::DictionaryArrayRawPointer inputDict
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
     ReadPublicTags();
@@ -120,7 +119,7 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
       if (!exist || b == 0)
       {
         vect3d.fill( 0 );
-        this->m_Output->DiffusionVector = vect3d;      
+        this->m_Output->DiffusionVector = vect3d;
         continue;
       }
 
@@ -138,14 +137,13 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
       vect3d[2] = atof( tag.c_str() );
 
       vect3d.normalize();
-      this->m_Output->DiffusionVector = vect3d;      
+      this->m_Output->DiffusionVector = vect3d;
     }
 
     TransformGradients();
 
     try
     {
-      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
       setlocale(LC_ALL, currLocale.c_str());
     }
     catch(...)
@@ -155,9 +153,9 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
   }
 }
 
-//header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin, 
-//  zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow, 
-//  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0], 
+//header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin,
+//  zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow,
+//  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0],
 //  vendor,SliceMosaic);
 
 

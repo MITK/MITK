@@ -121,6 +121,21 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
     ext = itksys::SystemTools::LowerCase(ext);
 
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     if ( m_FileName == "")
     {
 
@@ -278,7 +293,6 @@ namespace mitk
           origin.SetElement(0, -center[0]);
           origin.SetElement(1, -center[1]);
           origin.SetElement(2, -center[2]);
-          MITK_INFO << origin;
 
           mitk::Surface::Pointer surf = mitk::Surface::New();
           surf->SetVtkPolyData(output);
@@ -317,6 +331,15 @@ namespace mitk
       m_OutputCache->addTractContainer(tractContainer);
       m_OutputCache->initFiberGroup();
       MITK_INFO << "Fiber bundle read";
+    }
+
+    try
+    {
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
     }
   }
 

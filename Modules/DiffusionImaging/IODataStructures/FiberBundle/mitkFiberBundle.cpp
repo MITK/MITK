@@ -43,8 +43,6 @@ const int mitk::FiberBundle::TRACTPOINT_FRNTFACE = 2;
 
 mitk::FiberBundle::FiberBundle()
 {
-  MITK_INFO << "init FB";
-  
   m_GroupFiberBundle = FiberGroupType::New();
 
   m_TractContainer = ContainerType::New();
@@ -63,7 +61,7 @@ mitk::FiberBundle::FiberBundle()
 
 mitk::FiberBundle::~FiberBundle()
 {
-  MITK_INFO << "destructed FB";
+
 }
 
 void mitk::FiberBundle::SetBounds(float* b)

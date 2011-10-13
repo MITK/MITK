@@ -25,13 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 template<class TPixelType>
 mitk::DiffusionImageMapper<TPixelType>::DiffusionImageMapper()
 {
-  MITK_INFO << "DiffMapper init";
+
 }
 
 template<class TPixelType>
 mitk::DiffusionImageMapper<TPixelType>::~DiffusionImageMapper()
 {
-    MITK_INFO << "DiffMapper destroyed";
+
 }
 
 template<class TPixelType>
@@ -48,10 +48,6 @@ mitk::DiffusionImageMapper<TPixelType>::GenerateDataForRenderer( mitk::BaseRende
   mitk::DiffusionImage<TPixelType> *input2 = dynamic_cast< mitk::DiffusionImage<TPixelType>* >(
     input
     );
-
-  MITK_INFO << "displayindex: " << displayIndex;
-
-
 
   input2->SetDisplayIndexForRendering(displayIndex);
   Superclass::GenerateDataForRenderer(renderer);

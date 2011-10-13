@@ -62,7 +62,6 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
   {
     try
     {
-      MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
       setlocale(LC_ALL, locale.c_str());
     }
     catch(...)
@@ -285,7 +284,6 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
   }
   try
   {
-    MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
     setlocale(LC_ALL, currLocale.c_str());
   }
   catch(...)

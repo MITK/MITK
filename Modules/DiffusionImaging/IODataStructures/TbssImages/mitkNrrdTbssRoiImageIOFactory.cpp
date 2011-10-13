@@ -15,9 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNrrdTbssImageIOFactory.h"
+#include "mitkNrrdTbssRoiImageIOFactory.h"
 #include "mitkIOAdapter.h"
-#include "mitkNrrdTbssImageReader.h"
+#include "mitkNrrdTbssRoiImageReader.h"
 
 #include "itkVersion.h"
 
@@ -25,26 +25,26 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-NrrdTbssImageIOFactory::NrrdTbssImageIOFactory()
+NrrdTbssRoiImageIOFactory::NrrdTbssRoiImageIOFactory()
 {  
-  typedef NrrdTbssImageReader NrrdTbssVolReaderType;
+  typedef NrrdTbssRoiImageReader NrrdTbssRoiVolReaderType;
   this->RegisterOverride("mitkIOAdapter",
-                         "mitkNrrdTbssImageReader",
+                         "mitkNrrdTbssRoiImageReader",
                          "mitk Tbss Image IO",
                          1,
-                         itk::CreateObjectFunction<IOAdapter<NrrdTbssVolReaderType> >::New());
+                         itk::CreateObjectFunction<IOAdapter<NrrdTbssRoiVolReaderType> >::New());
 }
   
-NrrdTbssImageIOFactory::~NrrdTbssImageIOFactory()
+NrrdTbssRoiImageIOFactory::~NrrdTbssRoiImageIOFactory()
 {
 }
 
-const char* NrrdTbssImageIOFactory::GetITKSourceVersion() const
+const char* NrrdTbssRoiImageIOFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;
 }
 
-const char* NrrdTbssImageIOFactory::GetDescription() const
+const char* NrrdTbssRoiImageIOFactory::GetDescription() const
 {
   return "NrrdTbssImage IO Factory, allows the loading of NRRD Tbss data";
 }

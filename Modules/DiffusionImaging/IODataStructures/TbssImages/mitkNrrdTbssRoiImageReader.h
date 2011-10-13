@@ -15,15 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkNrrdTbssImageReader_h
-#define __mitkNrrdTbssImageReader_h
+#ifndef __mitkNrrdTbssRoiImageReader_h
+#define __mitkNrrdTbssRoiImageReader_h
 
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
-#include "mitkTbssImageSource.h"
+#include "mitkTbssRoiImageSource.h"
 #include "itkImage.h"
-#include "itkVectorImage.h"
-#include "mitkTbssImage.h"
+#include "mitkTbssRoiImage.h"
 
 namespace mitk
 {
@@ -32,17 +31,17 @@ namespace mitk
   */
 
 
-  class MitkDiffusionImaging_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource, public FileReader
+  class MitkDiffusionImaging_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource, public FileReader
   {
   public:
 
-    typedef mitk::TbssImage OutputType;
-    typedef itk::VectorImage<float,3>     ImageType;
-    typedef TbssImageSource  TbssVolSourceType;
+    typedef mitk::TbssRoiImage OutputType;
+    typedef itk::Image<char,3>     ImageType;
+    typedef TbssRoiImageSource  TbssVolSourceType;
 
 
 
-    mitkClassMacro( NrrdTbssImageReader, TbssVolSourceType )
+    mitkClassMacro( NrrdTbssRoiImageReader, TbssVolSourceType )
     itkNewMacro(Self)
 
     const char* GetFileName() const;
@@ -58,38 +57,15 @@ namespace mitk
 
     /** Does the real work. */
     virtual void GenerateData();
-    virtual void GenerateOutputInformation();
 
+    void ReadRoiInfo(itk::MetaDataDictionary dict);
 
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;
 
-    std::vector< std::pair<std::string, int> > m_GroupInfo;
-
     OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
-
-
-    void Tokenize(const std::string& str,
-                  std::vector<std::string>& tokens,
-                  const std::string& delimiters = " ")
-    {
-      // Skip delimiters at beginning.
-      std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-      // Find first "non-delimiter".
-      std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-      while (std::string::npos != pos || std::string::npos != lastPos)
-      {
-          // Found a token, add it to the vector.
-          tokens.push_back(str.substr(lastPos, pos - lastPos));
-          // Skip delimiters.  Note the "not_of"
-          lastPos = str.find_first_not_of(delimiters, pos);
-          // Find next "non-delimiter"
-          pos = str.find_first_of(delimiters, lastPos);
-      }
-    }
 
 
 
@@ -99,6 +75,6 @@ namespace mitk
 
 } //namespace MITK
 
-//#include "mitkNrrdTbssImageReader.cpp"
+//#include "mitkNrrdTbssRoiImageReader.cpp"
 
 #endif // __mitkNrrdTbssImageReader_h

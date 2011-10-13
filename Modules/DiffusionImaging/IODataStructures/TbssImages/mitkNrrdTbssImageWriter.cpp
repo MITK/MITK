@@ -25,23 +25,23 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
+#include "boost/lexical_cast.hpp"
 
 #include <iostream>
 #include <fstream>
 
-template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::NrrdTbssImageWriter()
+
+mitk::NrrdTbssImageWriter::NrrdTbssImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-template<typename TPixelType>
-mitk::NrrdTbssImageWriter<TPixelType>::~NrrdTbssImageWriter()
+mitk::NrrdTbssImageWriter::~NrrdTbssImageWriter()
 {}
 
-template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
+
+void mitk::NrrdTbssImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
@@ -58,45 +58,68 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
 
 
-  itk::Image<char,3>::Pointer img = input->GetImage();
+  itk::VectorImage<float, 3>::Pointer img = input->GetImage();
+
+  std::string key;
+  std::string val;
 
 
-  char keybuffer[512];
-  char valbuffer[512];
+  /* For the case of a tbss image containing data of the patients:
+     Save info about the groups and the type of measurement */
 
-  if(input->GetTbssType() == mitk::TbssImage<char>::ROI)
+  if(!input->GetIsMeta())
   {
+    key = "meta";
+    val = "false";
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
 
-    itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(), "tbss", "ROI");
 
-
-    std::vector< itk::Index<3> > roi = input->GetRoi();
-
-    std::vector< itk::Index<3> >::iterator it = roi.begin();
+    std::vector< std::pair <std::string, int> > groups = input->GetGroupInfo();
+    std::vector< std::pair <std::string, int> >::iterator it = groups.begin();
 
     int i=0;
-    while(it != roi.end())
+    while(it != groups.end())
     {
-      itk::Index<3> ix = *it;
+      std::pair<std::string, int> p = *it;
 
-      sprintf( keybuffer, "ROI_index_%04d", i );
-      sprintf( valbuffer, "%1d %1d %1d", ix[0],ix[1],ix[2]);
+      key = "Group_index_" + boost::lexical_cast<std::string>(i);
+      val = " " + p.first + " " + boost::lexical_cast<std::string>(p.second);
+      //sprintf( keybuffer, "Group_index_%04d", std::string(i) );
+      // sprintf( valbuffer, "%1d %1d", p.first, p.second);
 
-      std::cout << valbuffer << std::endl;
+      //std::cout << valbuffer << std::endl;
 
-      itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      //itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
       it++;
       ++i;
     }
 
+    key = "Measurement info";
+    val = input->GetMeasurementInfo();
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+  }
+  /* If we are dealing with metadata we need to know what index of the vector corresponds to what image.
+     Metadata are the images involved in the algorithms of tbss, like the mean FA Skeleton. */
+  else
+  {
+    key = "meta";
+    val = "true";
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
 
-
+    std::vector< std::pair<mitk::TbssImage::MetaDataFunction, int> > metaInfo = input->GetMetaInfo();
+    std::vector< std::pair<mitk::TbssImage::MetaDataFunction, int> >::iterator it = metaInfo.begin();
+    while(it != metaInfo.end())
+    {
+      std::pair<mitk::TbssImage::MetaDataFunction, int> p = *it;
+      key = RetrieveString(p.first);
+      val = " " + boost::lexical_cast<std::string>(p.second);
+      itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+      it++;
+    }
   }
 
-
-
-  typedef itk::Image<TPixelType,3> ImageType;
-
+  typedef itk::VectorImage<float,3> ImageType;
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   io->SetFileType( itk::ImageIOBase::Binary );
@@ -104,12 +127,12 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
 
 
   typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer nrrdWriter = WriterType::New();
+  WriterType::Pointer nrrdWriter = WriterType::New();
   nrrdWriter->UseInputMetaDataDictionaryOn();
   nrrdWriter->SetInput( img );
   nrrdWriter->SetImageIO(io);
   nrrdWriter->SetFileName(m_FileName);
- // nrrdWriter->UseCompressionOn();
+  nrrdWriter->UseCompressionOn();
   nrrdWriter->SetImageIO(io);
   try
   {
@@ -120,60 +143,33 @@ void mitk::NrrdTbssImageWriter<TPixelType>::GenerateData()
     std::cout << e << std::endl;
   }
 
-
-
-  /*
-
-
-  //itk::MetaDataDictionary dic = input->GetImage()->GetMetaDataDictionary();
-
-  vnl_matrix_fixed<double,3,3> measurementFrame = input->GetMeasurementFrame();
-  if (measurementFrame(0,0) || measurementFrame(0,1) || measurementFrame(0,2) ||
-      measurementFrame(1,0) || measurementFrame(1,1) || measurementFrame(1,2) ||
-      measurementFrame(2,0) || measurementFrame(2,1) || measurementFrame(2,2))
-  {
-    sprintf( valbuffer, " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", measurementFrame(0,0), measurementFrame(0,1), measurementFrame(0,2), measurementFrame(1,0), measurementFrame(1,1), measurementFrame(1,2), measurementFrame(2,0), measurementFrame(2,1), measurementFrame(2,2));
-    itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
-  }
-
-  sprintf( valbuffer, "DWMRI");
-  itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
-
-  if(input->GetOriginalDirections()->Size())
-  {
-    sprintf( valbuffer, "%1f", input->GetB_Value() );
-    itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
-  }
-
-  for(unsigned int i=0; i<input->GetOriginalDirections()->Size(); i++)
-  {
-    sprintf( keybuffer, "DWMRI_gradient_%04d", i );
-
-    /*if(itk::ExposeMetaData<std::string>(input->GetMetaDataDictionary(),
-      std::string(keybuffer),tmp))
-      continue;*/
-
-   // sprintf( valbuffer, "%1f %1f %1f", input->GetOriginalDirections()->ElementAt(i).get(0),
-//             input->GetOriginalDirections()->ElementAt(i).get(1), input->GetOriginalDirections()->ElementAt(i).get(2));
-
-  //  itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
- // }
-
-
-
-
-
   m_Success = true;
 }
 
-template<typename TPixelType>
-void mitk::NrrdTbssImageWriter<TPixelType>::SetInput( InputType* tbssVol )
+
+
+std::string mitk::NrrdTbssImageWriter::RetrieveString(mitk::TbssImage::MetaDataFunction meta)
+{
+  if(meta == mitk::TbssImage::MEAN_FA_SKELETON)
+  {
+    return "mean fa skeleton";
+  }
+  else if(meta == mitk::TbssImage::MEAN_FA_SKELETON_MASK)
+  {
+    return "mean fa skeleton mask";
+  }
+  return "";
+}
+
+
+
+void mitk::NrrdTbssImageWriter::SetInput( InputType* tbssVol )
 {
   this->ProcessObject::SetNthInput( 0, tbssVol );
 }
 
-template<typename TPixelType>
-mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
+
+mitk::TbssImage* mitk::NrrdTbssImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -185,8 +181,8 @@ mitk::TbssImage<TPixelType>* mitk::NrrdTbssImageWriter<TPixelType>::GetInput()
   }
 }
 
-template<typename TPixelType>
-std::vector<std::string> mitk::NrrdTbssImageWriter<TPixelType>::GetPossibleFileExtensions()
+
+std::vector<std::string> mitk::NrrdTbssImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".tbss");

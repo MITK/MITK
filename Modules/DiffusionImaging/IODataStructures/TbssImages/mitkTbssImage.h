@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkTbssImage__h
 
 #include "mitkImage.h"
-#include "itkImage.h"
+#include "itkVectorImage.h"
 #include "mitkImageCast.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk 
 {
@@ -30,57 +31,44 @@ namespace mitk
   * \brief this class encapsulates diffusion volumes (vectorimages not
   * yet supported by mitkImage)
   */
-  template<class TPixelType>
-  class TbssImage : public Image
+
+  class MitkDiffusionImaging_EXPORT TbssImage : public Image
   {
 
   public:
-    typedef TPixelType PixelType;
-    typedef typename itk::Image<TPixelType, 3>  ImageType;
+
+    typedef itk::VectorImage<float, 3> ImageType;
+
+
     typedef itk::Index<3> IndexType;
     //typedef typename std::vector <Index<3> > RoiType;
 
     mitkClassMacro( TbssImage, Image )
     itkNewMacro(Self)
 
-    enum Type{
-      ROI,
-      SKELETON
+
+    enum MetaDataFunction
+    {
+      MEAN_FA_SKELETON,
+      MEAN_FA_SKELETON_MASK,
+      MISC
     };
 
 
-    //void SetRequestedRegionToLargestPossibleRegion();
+    //void SetRequestedRegionToLargestPossibleReg tbssRoi->SetTbssType(mitk::TbssImage<char>::ROI);ion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();
     //void SetRequestedRegion(itk::DataObject *data);
 
-    typename ImageType::Pointer GetImage()
+    ImageType::Pointer GetImage()
     {
       return m_Image;
     }
-    void SetImage(typename ImageType::Pointer image )
+    void SetImage(ImageType::Pointer image )
     {
       this->m_Image = image;
     }
 
-    itkSetMacro(TbssType, Type)
-    itkGetMacro(TbssType, Type)
-    itkGetMacro(PreprocessedFA, bool)
-    itkSetMacro(PreprocessedFA, bool)
-    itkGetMacro(PreprocessedFAFile, std::string)
-    itkSetMacro(PreprocessedFAFile, std::string)
-    itkGetMacro(Structure, std::string)
-    itkSetMacro(Structure, std::string)
-
-    void SetRoi(std::vector< itk::Index<3> > roi)
-    {
-      m_Roi = roi;
-    }
-
-    std::vector< itk::Index<3> > GetRoi()
-    {
-      return m_Roi;
-    }
 
     void InitializeFromImage()
     {
@@ -88,40 +76,92 @@ namespace mitk
       this->InitializeByItk(m_Image.GetPointer(),1,1);
     }
 
-  protected:
-    TbssImage():m_PreprocessedFA(false)
+    void SetGroupInfo( std::vector< std::pair<std::string, int> > info)
     {
-
+      m_GroupInfo = info;
     }
+
+    std::vector< std::pair<std::string, int> > GetGroupInfo()
+    {
+      return m_GroupInfo;
+    }
+
+    void SetMetaInfo( std::vector< std::pair<MetaDataFunction, int> > info)
+    {
+      m_MetaInfo = info;
+    }
+
+    std::vector< std::pair<MetaDataFunction, int> > GetMetaInfo()
+    {
+      return m_MetaInfo;
+    }
+
+    void SetMeasurementInfo(std::string s)
+    {
+      m_MeasurementInfo = s;
+    }
+
+    std::string GetMeasurementInfo()
+    {
+      return m_MeasurementInfo;
+    }
+
+    void InitializeFromVectorImage();
+
+    void SetDisplayIndexForRendering(int displayIndex);
+
+    void SetIsMeta(bool b)
+    {
+      m_IsMeta = b;
+    }
+
+    bool GetIsMeta()
+    {
+      return m_IsMeta;
+    }
+
+
+
+  protected:
+
+    TbssImage();
+
     virtual ~TbssImage(){}
 
-    typename ImageType::Pointer m_Image;
+    ImageType::Pointer m_Image;
 
-    Type m_TbssType;
 
-    std::vector< itk::Index<3> > m_Roi;
+    std::vector< std::pair<std::string, int> > m_GroupInfo;
 
-    bool m_PreprocessedFA;
-    std::string m_PreprocessedFAFile;
+    std::vector< std::pair<MetaDataFunction, int> > m_MetaInfo;
 
-    std::string m_Structure;
+    int m_DisplayIndex;
+
+    std::string m_MeasurementInfo;
+
+    bool m_IsMeta;
+
 
   };
 
-
+/*
   // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
-  template <typename ItkOutputImageType, typename PixelType>
-  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssImage<PixelType> >& tbssoutputimage)
+  template <typename ItkOutputImageType>
+  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssImage >& tbssoutputimage)
   {
     if(tbssoutputimage.IsNull())
     {
-      tbssoutputimage = mitk::TbssImage<PixelType>::New();
+      tbssoutputimage = mitk::TbssImage::New();
     }
     tbssoutputimage->InitializeByItk(itkimage);
     tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
   }
 
-} // namespace mitk
 
-#include "mitkTbssImage.cpp"
+*/
+
+
+
+} // namespace mitk
+//#include "mitkTbssImage.cpp"
 #endif /* __mitkTbssImage__h */

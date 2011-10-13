@@ -72,6 +72,7 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageIOFactory.cpp
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkTbssRoiImage.cpp
+  IODataStructures/TbssImages/mitkTbssGradientImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
@@ -127,9 +128,7 @@ SET(H_FILES
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
-  #IODataStructures/TbssImages/mitkTbssImage.h
- # IODataStructures/TbssImages/mitkTbssRoiImage.h
+  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h  
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h

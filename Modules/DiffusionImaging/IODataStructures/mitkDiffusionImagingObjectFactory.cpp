@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkTbssImageMapper.h"
+#include "mitkTbssGradientImageMapper.h"
 
 //====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
@@ -71,6 +72,7 @@ PURPOSE.  See the above copyright notices for more information.
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
 typedef float TbssPixelType;
+
 
 
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -176,6 +178,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
+    classname = "TbssGradientImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssGradientImageMapper::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -229,6 +238,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {  
       newMapper = mitk::TbssImageMapper::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname = "TbssGradientImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssGradientImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -293,6 +309,14 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::TbssImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
+
+  classname = "TbssGradientImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::TbssGradientImageMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+  }
+
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions()

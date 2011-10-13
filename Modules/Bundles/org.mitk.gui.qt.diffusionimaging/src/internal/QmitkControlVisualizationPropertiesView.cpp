@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDiffusionImage.h"
 #include "mitkTbssImage.h"
+#include "mitkTbssGradientImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
@@ -297,6 +298,35 @@ struct CvpSelListener : ISelectionListener
               m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
             }
 
+            if(QString("TbssGradientImage").compare(node->GetData()->GetNameOfClass())==0)
+            {
+              foundTbssImage = true;
+              bool tex_int;
+              node->GetBoolProperty("texture interpolation", tex_int);
+              if(tex_int)
+              {
+                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexON);
+                m_View->m_Controls->m_TextureIntON->setChecked(true);
+                m_View->m_TexIsOn = true;
+              }
+              else
+              {
+                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexOFF);
+                m_View->m_Controls->m_TextureIntON->setChecked(false);
+                m_View->m_TexIsOn = false;
+              }
+              int val;
+              node->GetIntProperty("DisplayChannel", val);
+              m_View->m_Controls->m_DisplayIndex->setValue(val);
+
+              QString label = "Channel %1";
+              label = label.arg(val);
+              m_View->m_Controls->label_channel->setText(label);
+
+              int maxVal = (dynamic_cast<mitk::TbssGradientImage* >(node->GetData()))->GetImage()->GetVectorLength();
+              m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
+
+            }
             else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
             {
               foundMultipleOdfImages = foundQBIVolume || foundTensorVolume;
@@ -931,40 +961,34 @@ void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
   label = label.arg(dispIndex);
   m_Controls->label_channel->setText(label);
 
-  mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("DiffusionImage");
+  std::vector<std::string> sets;
+  sets.push_back("DiffusionImage");
+  sets.push_back("TbssImage");
+  sets.push_back("TbssGradientImage");
 
-  if(set.IsNotNull())
+  std::vector<std::string>::iterator it = sets.begin();
+  while(it != sets.end())
   {
+    std::string s = *it;
+    mitk::DataStorage::SetOfObjects::Pointer set =
+      ActiveSet(s);
 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
-    while ( itemiter != itemiterend )
+    if(set.IsNotNull())
     {
-      (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
-      ++itemiter;
+
+      mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+      mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+      while ( itemiter != itemiterend )
+      {
+        (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
+        ++itemiter;
+      }
+
+      //m_MultiWidget->RequestUpdate();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 
-    //m_MultiWidget->RequestUpdate();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-
-
-  set = ActiveSet("TbssImage");
-
-  if(set.IsNotNull())
-  {
-
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
-    while ( itemiter != itemiterend )
-    {
-      (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
-      ++itemiter;
-    }
-
-    //m_MultiWidget->RequestUpdate();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    it++;
   }
 
 

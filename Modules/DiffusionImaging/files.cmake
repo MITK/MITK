@@ -93,6 +93,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
+  Rendering/mitkTbssGradientImageMapper.cpp
   
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -109,6 +110,7 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
+  Rendering/mitkTbssGradientImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h

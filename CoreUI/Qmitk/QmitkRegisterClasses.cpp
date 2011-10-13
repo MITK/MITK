@@ -28,7 +28,7 @@ void QmitkRegisterClasses()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "QmitkRegisterClasses()";
+    MITK_DEBUG << "QmitkRegisterClasses()";
 
 
     //We have to put this in a file containing a class that is directly used

@@ -238,12 +238,18 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   //  feed the vtk fiber mapper with point data ...TODO do in constructor
   localStorage->m_PointMapper->SetInput(localStorage->m_SlicedResult);   // in optimized version, mapper is feeded by localStorage->m_cutter->GetOutput();
   localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
+  
+  std::string m_VolumeDir = MITK_ROOT;
+  m_VolumeDir += "Modules/DiffusionImaging/Rendering/mitkShaderFiberClipping.xml";
+  localStorage->m_PointActor->GetProperty()->LoadMaterial(m_VolumeDir.c_str());
+  localStorage->m_PointActor->GetProperty()->ShadingOn();
 
 
 
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
+//    mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer,localStorage->m_LastUpdateTime);
 
 }
 
@@ -415,15 +421,15 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   
   
   //####### load shader from file #########
-  std::string m_VolumeDir = MITK_ROOT;
-  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
-  mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
-  shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
-  //####################################################################
-  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
+//  std::string m_VolumeDir = MITK_ROOT;
+//  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
+//  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+//  mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+//  shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
+//  //####################################################################
+//  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
   mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
-  Superclass::SetDefaultProperties(node, renderer, overwrite);
+//  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
 // this method prepares data for VTK mapping and rendering

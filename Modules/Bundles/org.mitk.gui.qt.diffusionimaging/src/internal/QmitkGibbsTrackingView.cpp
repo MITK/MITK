@@ -454,26 +454,24 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   mitk::CastToItkImage<ItkQBallImgType>(m_QBallImage, m_ItkQBallImage);
 
   // mask image found?
-  if(m_Controls->m_MaskImageEdit->text().compare("N/A") != 0)
-  {
-    m_MaskImage = 0;
-    mitk::BaseData* data = m_MaskImageNode->GetData();
-    if (data)
+  // catch exceptions thrown by the itkAccess macros
+  try{
+    if(m_Controls->m_MaskImageEdit->text().compare("N/A") != 0)
     {
-      // test if this data item is an image or not (could also be a surface or something totally different)
-      mitk::Image* tmpImage = dynamic_cast<mitk::Image*>( data );
-      if (tmpImage)
-      {
-        mitk::Image::Pointer mitkMaskImg = mitk::Image::New();
-        AccessFixedDimensionByItk_1(tmpImage, CastToFloat, 3, mitkMaskImg);
-        typedef mitk::ImageToItk<MaskImgType> CastType;
-        CastType::Pointer caster = CastType::New();
-        caster->SetInput(mitkMaskImg);
-        caster->Update();
-        m_MaskImage = caster->GetOutput();
-      }
+      m_MaskImage = 0;
+      if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
+
+        mitk::CastToItkImage<MaskImgType>(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()),
+                                          m_MaskImage);
     }
   }
+  catch(...)
+  {
+    QMessageBox::warning(NULL, "Warning", "Incompatible mask image chosen. Processing without masking.");
+    //reset mask image
+    m_MaskImage = NULL;
+  }
+
 
   // if no mask image is selected generate it
   if( m_MaskImage.IsNull() )

@@ -360,4 +360,37 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
   }
 }
 
+template<typename TPixelType>
+int mitk::DiffusionImage<TPixelType>::GetNumDirections()
+{
+  int gradients = m_OriginalDirections->Size();
+  for (int i=0; i<gradients; i++)
+    if (GetB_Value(i)<=0)
+    {
+      gradients--;
+    }
+  return gradients;
+}
 
+template<typename TPixelType>
+int mitk::DiffusionImage<TPixelType>::GetNumB0()
+{
+  int b0 = m_OriginalDirections->Size();
+  for (int i=0; i<b0; i++)
+    if (GetB_Value(i)<=0)
+    {
+      b0++;
+    }
+  return b0;
+}
+
+template<typename TPixelType>
+bool mitk::DiffusionImage<TPixelType>::IsMultiBval()
+{
+  int gradients = m_OriginalDirections->Size();
+
+  for (int i=0; i<gradients; i++)
+    if (GetB_Value(i)>0 && std::fabs(m_B_Value-GetB_Value(i))>50)
+      return true;
+  return false;
+}

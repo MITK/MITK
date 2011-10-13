@@ -279,53 +279,60 @@ namespace itk{
     typedef ImageRegionConstIterator< GfaImageType > GfaIteratorType;
     GfaIteratorType gfaIt(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
 
+    int buff = m_GfaImage->GetLargestPossibleRegion().GetSize().GetElement(0)*m_GfaImage->GetLargestPossibleRegion().GetSize().GetElement(1)*m_GfaImage->GetLargestPossibleRegion().GetSize().GetElement(2);
+    float* buffer = (float*)m_GfaImage->GetBufferPointer();
+    MITK_INFO << "image size: " << buff;
+    for (int i=0; i<buff; i++)
+      MITK_INFO << buffer[i];
+
     float upper = 0;
-    int count = 0;
-    for(float thr=samplingStart; thr>samplingStopUpper; thr-=0.01)
-    {
-      git.GoToBegin();
-      gfaIt.GoToBegin();
-      while( !gfaIt.IsAtEnd() )
-      {
-        if(gfaIt.Get() > thr)
-        {
-          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
-          upper += odf.GetMaxValue();
+//    int count = 0;
+//    for(float thr=samplingStart; thr>samplingStopUpper; thr-=0.01)
+//    {
+//      git.GoToBegin();
+//      gfaIt.GoToBegin();
+//      while( !gfaIt.IsAtEnd() )
+//      {
+//        MITK_INFO << gfaIt.Get();
+////        if(gfaIt.Get() > thr)
+////        {
+////          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
+////          upper += odf.GetMaxValue()-odf.GetMeanValue();
 
-          ++count;
-        }
-        ++gfaIt;
-        ++git;
-      }
-    }
-    if (count>0)
-      upper /= count;
-    else
-      return false;
+////          ++count;
+////        }
+//        ++gfaIt;
+//        ++git;
+//      }
+//    }
+//    if (count>0)
+//      upper /= count;
+//    else
+//      return false;
 
-    float lower = 0;
-    count = 0;
-    for(float thr=0; thr>samplingStopLower; thr+=0.01)
-    {
-      git.GoToBegin();
-      gfaIt.GoToBegin();
-      while( !gfaIt.IsAtEnd() )
-      {
-        if(gfaIt.Get() < thr)
-        {
-          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
-          lower += odf.GetMaxValue();
+//    float lower = 0;
+//    count = 0;
+//    for(float thr=0; thr>samplingStopLower; thr+=0.01)
+//    {
+//      git.GoToBegin();
+//      gfaIt.GoToBegin();
+//      while( !gfaIt.IsAtEnd() )
+//      {
+//        if(gfaIt.Get() < thr)
+//        {
+//          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
+//          lower += odf.GetMaxValue();
 
-          ++count;
-        }
-        ++gfaIt;
-        ++git;
-      }
-    }
-    if (count>0)
-      lower /= count;
-    else
-      return false;
+//          ++count;
+//        }
+//        ++gfaIt;
+//        ++git;
+//      }
+//    }
+//    if (count>0)
+//      lower /= count;
+//    else
+//      return false;
 
     m_ParticleWeight = upper;
     return true;

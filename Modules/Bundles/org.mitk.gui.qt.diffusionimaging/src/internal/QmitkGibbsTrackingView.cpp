@@ -58,7 +58,6 @@ void QmitkTrackingWorker::run()
   resampler->SetDefaultPixelValue(0);
   resampler->Update();
   m_View->m_MaskImage = resampler->GetOutput();
-
   m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
   m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
@@ -484,25 +483,17 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   mitk::CastToItkImage<ItkQBallImgType>(m_QBallImage, m_ItkQBallImage);
 
   // mask image found?
+  try{
   if(m_Controls->m_MaskImageEdit->text().compare("N/A") != 0)
   {
     m_MaskImage = 0;
-    mitk::BaseData* data = m_MaskImageNode->GetData();
-    if (data)
-    {
-      // test if this data item is an image or not (could also be a surface or something totally different)
-      mitk::Image* tmpImage = dynamic_cast<mitk::Image*>( data );
-      if (tmpImage)
-      {
-        mitk::Image::Pointer mitkMaskImg = mitk::Image::New();
-        AccessFixedDimensionByItk_1(tmpImage, CastToFloat, 3, mitkMaskImg);
-        typedef mitk::ImageToItk<MaskImgType> CastType;
-        CastType::Pointer caster = CastType::New();
-        caster->SetInput(mitkMaskImg);
-        caster->Update();
-        m_MaskImage = caster->GetOutput();
-      }
-    }
+    if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
+      mitk::CastToItkImage<MaskImgType>(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
+  }
+  }
+  catch(...)
+  {
+    QMessageBox::warning(NULL, "Alarm", "Alarm");
   }
 
   // if no mask image is selected generate it
@@ -527,22 +518,9 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   if(m_Controls->m_GfaImageEdit->text().compare("N/A") != 0)
   {
     m_GfaImage = 0;
-    mitk::BaseData* data = m_GfaImageNode->GetData();
-    if (data)
-    {
-      // test if this data item is an image or not (could also be a surface or something totally different)
-      mitk::Image* tmpImage = dynamic_cast<mitk::Image*>( data );
-      if (tmpImage)
-      {
-        mitk::Image::Pointer mitkMaskImg = mitk::Image::New();
-        AccessFixedDimensionByItk_1(tmpImage, CastToFloat, 3, mitkMaskImg);
-        typedef mitk::ImageToItk<MaskImgType> CastType;
-        CastType::Pointer caster = CastType::New();
-        caster->SetInput(mitkMaskImg);
-        caster->Update();
-        m_GfaImage = caster->GetOutput();
-      }
-    }
+    if (dynamic_cast<mitk::Image*>(m_GfaImageNode->GetData()))
+      mitk::CastToItkImage<MaskImgType>(dynamic_cast<mitk::Image*>(m_GfaImageNode->GetData()), m_GfaImage);
+
   }
 
   unsigned int steps = m_Iterations/10000;

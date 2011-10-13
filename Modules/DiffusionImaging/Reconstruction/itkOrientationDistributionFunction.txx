@@ -492,6 +492,17 @@ namespace itk
   }
 
   template<class T, unsigned int NOdfDirections>
+  T
+    OrientationDistributionFunction<T, NOdfDirections>
+    ::GetMeanValue() const
+  {
+    T sum = 0;
+    for( unsigned int i=0; i<InternalDimension; i++)
+      sum += (*this)[i];
+    return sum/InternalDimension;
+  }
+
+  template<class T, unsigned int NOdfDirections>
   double
     OrientationDistributionFunction<T, NOdfDirections>
     ::GetMaxChordLength()

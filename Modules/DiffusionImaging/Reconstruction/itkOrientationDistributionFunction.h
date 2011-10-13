@@ -177,6 +177,8 @@ public:
 
   ComponentType GetMinValue() const;
 
+  ComponentType GetMeanValue() const;
+
   TComponent GetPrincipleCurvature(double alphaMinDegree, double alphaMaxDegree, int invert) const;
 
   static std::vector<int> GetNeighbors(int idx);

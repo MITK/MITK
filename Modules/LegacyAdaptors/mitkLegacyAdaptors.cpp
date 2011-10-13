@@ -29,7 +29,7 @@ mitk::ImageDescriptor::Pointer mitk::CastToImageDescriptor(mitkIpPicDescriptor *
 
   imDescriptor->Initialize( desc->n, desc->dim );
 
-  mitk::PixelType ptype = CastToPixelType( desc->type, desc->bpe );
+  mitk::PixelType ptype = CastToPixelType( desc->type, (desc->bpe/8) );
   imDescriptor->AddNewChannel(ptype, "imported by pic");
 
   return imDescriptor;
@@ -62,16 +62,8 @@ mitkIpPicType_t mitk::CastToIpPicType( const std::type_info& intype )
 
 mitk::PixelType mitk::CastToPixelType(mitkIpPicType_t pictype, size_t bpe)
 {
-    const bool isSignedIntegralType = (pictype == mitkIpTypeInt1
-                                       || pictype == mitkIpTypeInt2
-                                       || pictype == mitkIpTypeInt4 );
-
-    const bool isUnsignedIntegralType = (pictype == mitkIpTypeUInt1
-                                         || pictype == mitkIpTypeUInt2
-                                         || pictype == mitkIpTypeUInt4 );
-
-    const bool isFloatingPointType = (   pictype == mitkIpTypeFloat4
-                                         || pictype == mitkIpTypeFloat8 );
+    const bool isSignedIntegralType = (pictype == mitkIpPicInt );
+    const bool isUnsignedIntegralType = (pictype == mitkIpPicUInt );
 
     if(isSignedIntegralType)
     {

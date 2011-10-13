@@ -36,6 +36,7 @@
 #include "mitkDiffImageApplier.h"
 #include "mitkSegTool2D.h"
 #include "mitkCoreObjectFactory.h"
+#include "mitkSurfaceToImageFilter.h"
 
 #include <itkCommand.h>
 
@@ -85,7 +86,8 @@ m_3DInterpolationEnabled(false)
   grid->addWidget(m_CbHideMarkers,0,2);
 
   m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
-  m_BtnAccept3DInterpolation->setEnabled(true); 
+  m_BtnAccept3DInterpolation->setEnabled(false);
+  connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
   grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
 
   m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
@@ -511,6 +513,8 @@ void QmitkSlicesInterpolator::InterpolateSurface()
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
   if(interpolatedSurface.IsNotNull())
   {
+    MITK_INFO<<"Setting enabled TRUE";
+    m_BtnAccept3DInterpolation->setEnabled(true);
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -524,10 +528,15 @@ void QmitkSlicesInterpolator::InterpolateSurface()
 
     }
   }
-  else if (interpolatedSurface.IsNull() && m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+  else if (interpolatedSurface.IsNull())
   {
-    m_InterpolatedSurfaceNode->SetVisibility(false);
-    m_3DContourNode->SetVisibility(false);
+    m_BtnAccept3DInterpolation->setEnabled(false);
+
+    if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+    {
+      m_InterpolatedSurfaceNode->SetVisibility(false);
+      m_3DContourNode->SetVisibility(false);
+    }
   }
 
   //OnShowMarkers(m_CbHideMarkers->checkState());
@@ -634,6 +643,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
+
 void QmitkSlicesInterpolator::FinishInterpolation(int windowID)
 {
   //this redirect is for calling from outside
@@ -654,6 +664,29 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   connect( &orientationPopup, SIGNAL(triggered(QAction*)), this, SLOT(OnAcceptAllPopupActivated(QAction*)) );
   
   orientationPopup.exec( QCursor::pos() );
+}
+
+void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
+{
+  if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
+  {
+    mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
+    s2iFilter->MakeOutputBinaryOn();
+    s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
+    s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
+    s2iFilter->Update();
+
+    mitk::DataNode* refImageNode = m_ToolManager->GetReferenceData(0);
+
+    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+    std::string nameOfResultImage = refImageNode->GetName();
+    nameOfResultImage.append(m_InterpolatedSurfaceNode->GetName());
+    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
+    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+    resultNode->SetData( s2iFilter->GetOutput() );
+
+    this->GetDataStorage()->Add(resultNode, refImageNode);
+  }
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
@@ -805,7 +838,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         }
       }
       QWidget::setEnabled( workingNode != NULL );
-      m_BtnAccept3DInterpolation->setEnabled( on );
+      //m_BtnAccept3DInterpolation->setEnabled( on );
       m_CbHideMarkers->setEnabled(on);
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

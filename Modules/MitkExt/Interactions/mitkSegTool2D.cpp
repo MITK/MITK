@@ -268,7 +268,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->Update();
   }
   slice->DisconnectPipeline();
-  if ( m_ToolManager->GetRememberContourPosition() )
+  if ( true )
   {
     unsigned int pos = this->AddContourmarker(positionEvent);
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();

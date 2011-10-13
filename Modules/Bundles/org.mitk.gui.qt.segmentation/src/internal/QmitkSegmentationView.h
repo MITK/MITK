@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkSegmentationControls.h"
 
+
 class QmitkRenderWindow;
 // class QmitkSegmentationPostProcessing;
 
@@ -99,10 +100,7 @@ protected slots:
   void OnHideMarkerNodes(bool);
 
   //For controlling the selection behaviour of the segmentation bundle
-  void OnWorkingNodeVisibilityChanged();
-
-  //For removing the observers for visibility of the working nodes
-  void OnWorkingNodeDeleted(const itk::Object* caller, const itk::EventObject& e);
+  void OnWorkingNodeVisibilityChanged(const itk::Object* caller, const itk::EventObject& e);
   
 protected:
   
@@ -146,6 +144,8 @@ protected:
   
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected (const mitk::DataNode* node);
+
+  void NodeRemoved(const mitk::DataNode* node);
   
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;

@@ -24,7 +24,7 @@ PURPOSE. See the above copyright notices for more information.
 mitk::ReduceContourSetFilter::ReduceContourSetFilter()
 {
   m_MaxSegmentLenght = 0;
-  m_StepSize = 10;
+  m_StepSize = 20;
   m_Tolerance = 3;
   m_ReductionType = NTH_POINT;
 }

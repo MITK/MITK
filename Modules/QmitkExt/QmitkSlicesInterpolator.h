@@ -172,6 +172,11 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     void OnAcceptAllInterpolationsClicked();
 
     /*
+     Reaction to button clicks
+    */
+    void OnAccept3DInterpolationClicked();
+
+    /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
      */
     void OnAcceptAllPopupActivated(QAction* action);

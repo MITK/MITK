@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 
 //For Segmentation in rotated slices
+//TODO clean up includes
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkPlanarCircle.h"
 
@@ -83,6 +84,7 @@ void QmitkSegmentationView::Activated()
 
     m_Controls->m_SlicesInterpolator->Enable3DInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 
+    //TODO Remove Observer
     itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
     command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
     m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
@@ -100,7 +102,7 @@ void QmitkSegmentationView::Activated()
       ++iter)
     {
       mitk::DataNode* node = *iter;
-        itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+        itk::MemberCommand<QmitkSegmentationView>::Pointer command = itk::MemberCommand<QmitkSegmentationView>::New();
         command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
         m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( node, node->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
     }
@@ -169,6 +171,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   // save the current multiwidget as the working widget
   m_MultiWidget = multiWidget;
 
+  //TODO Remove Observers
   if (m_MultiWidget)
   {
     mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
@@ -187,6 +190,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
       m_SlicesRotationObserverTag2 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
     }
   }
+  //TODO End Remove Observers
 
   if (m_Parent)
   {
@@ -207,11 +211,13 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   ForceDisplayPreferencesUponAllImages();
 }
 
+//TODO remove function
 void QmitkSegmentationView::RenderingManagerReinitialized(const itk::EventObject&)
 {
   CheckImageAlignment();
 }
 
+//TODO remove function
 void QmitkSegmentationView::SliceRotation(const itk::EventObject&)
 {
   CheckImageAlignment();
@@ -345,7 +351,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
   }
 }
 
-void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
+void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(const itk::Object* caller, const itk::EventObject& e)
 {
   if (!m_Parent || !m_Parent->isVisible()) return;
 
@@ -357,6 +363,9 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   //    
 
   MITK_INFO<<"PropertyChanged";
+//      mitk::DataNode* node = const_cast<mitk::DataNode*>(dynamic_cast<const mitk::DataNode*>(caller));
+//    if (node)
+//        MITK_INFO<<"Caller: "<<node->GetName();
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
   mitk::DataNode::Pointer referenceData = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
   mitk::DataNode::Pointer referenceDataNew;
@@ -411,7 +420,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
       //SetToolManagerSelection(referenceDataNew, workingData);
       continue;
     }
-    if (workingData.IsNull() || workingNodeIsVisible && node != referenceDataNew)
+    if (workingData.IsNull() || (workingNodeIsVisible && node != referenceDataNew))
     {
       node->SetVisibility((false));
     }
@@ -422,12 +431,17 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSegmentationView::OnWorkingNodeDeleted(const itk::Object* caller, const itk::EventObject& e)
+void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 {
-  mitk::DataNode* node = const_cast<mitk::DataNode*>(dynamic_cast<const mitk::DataNode*>(caller));
-  MITK_INFO<<"Delete: "<<node->GetName();
-  node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[node] );
-  m_WorkingDataObserverTags.erase(node);
+  bool isSeg(false);
+  if(node->GetBoolProperty("binary", isSeg))
+  {
+    mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
+    MITK_INFO<<"Delete: "<<tempNode->GetName();
+    node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
+    m_WorkingDataObserverTags.erase(tempNode);
+    this->SetToolManagerSelection(NULL, NULL);
+  }
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()
@@ -569,7 +583,7 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
 //to remember the contour positions
 void QmitkSegmentationView::OnRememberContourPositions (bool state)
 {
-  m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( state );
+  //m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( state );
 }
 
 void QmitkSegmentationView::OnHideMarkerNodes(bool state)
@@ -670,15 +684,17 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
     NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( workingData );
     if ( searchIter == m_WorkingDataObserverTags.end() )
     {
-      //MITK_INFO<<"Creating new observer";
-      itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-      m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-      workingData->GetProperty("visible")->Modified();
+      MITK_INFO<<"Creating new observer";
+//      itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+//      command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
+//      m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
+//      workingData->GetProperty("visible")->Modified();
+        
+        itk::MemberCommand<QmitkSegmentationView>::Pointer command = itk::MemberCommand<QmitkSegmentationView>::New();
+        command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
+        m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
+        workingData->GetProperty("visible")->Modified();
 
-      itk::MemberCommand<QmitkSegmentationView>::Pointer deleteCommand = itk::MemberCommand<QmitkSegmentationView>::New();
-      deleteCommand->SetCallbackFunction( this, &QmitkSegmentationView::OnWorkingNodeDeleted );
-      workingData->AddObserver(itk::DeleteEvent(), deleteCommand);
       return;
     }
 
@@ -838,6 +854,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
     m_Controls->lblSegmentation->hide();
   }
 
+  //TODO remove statement
   // check, wheter reference image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
   CheckImageAlignment();
 
@@ -869,6 +886,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
   }
 }
 
+//TODO remove function
 void QmitkSegmentationView::CheckImageAlignment()
 {
   bool wrongAlignment(true);
@@ -894,6 +912,7 @@ void QmitkSegmentationView::CheckImageAlignment()
   }
 }
 
+//TODO remove function
 bool QmitkSegmentationView::IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image)
 {
   if (!renderWindow) return false;
@@ -907,6 +926,7 @@ bool QmitkSegmentationView::IsRenderWindowAligned(QmitkRenderWindow* renderWindo
   return mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice );
 }
 
+//TODO remove function
 void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
 {
   if (!m_Parent || !m_Parent->isVisible()) return;

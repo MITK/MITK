@@ -276,7 +276,7 @@
                <string/>
               </property>
               <property name="text">
-               <string>0.001</string>
+               <string>auto</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -298,7 +298,7 @@
                <number>1</number>
               </property>
               <property name="value">
-               <number>10</number>
+               <number>0</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -699,9 +699,9 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QFrame" name="m_MaskFrame_2">
+          <widget class="QFrame" name="m_GfaFrame">
            <property name="toolTip">
-            <string>Mask image. Particles will be sampled with a probability according to the voxel value.</string>
+            <string>Only needed for automatic particle weight estimation.</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>

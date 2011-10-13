@@ -132,7 +132,7 @@ namespace itk{
     // Input Images
     typename InputQBallImageType::Pointer m_ItkQBallImage;
     typename MaskImageType::Pointer m_MaskImage;
-    GfaImageTypePointer m_GfaImage;
+    typename GfaImageType::Pointer m_GfaImage;
 
     // Tracking parameters
     float   m_TempStart;  // Start temperature

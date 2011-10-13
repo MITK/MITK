@@ -198,7 +198,16 @@ void QmitkGibbsTrackingView::SetFiberLength(int value)
 
 void QmitkGibbsTrackingView::SetParticleWeight(int value)
 {
-  m_Controls->m_ParticleWeightLabel->setText(QString::number((float)value/10000));
+  if (value>0)
+  {
+    m_Controls->m_ParticleWeightLabel->setText(QString::number((float)value/10000));
+    m_Controls->m_GfaFrame->setEnabled(false);
+  }
+  else
+  {
+    m_Controls->m_ParticleWeightLabel->setText("auto");
+    m_Controls->m_GfaFrame->setEnabled(true);
+  }
 }
 
 void QmitkGibbsTrackingView::SetStartTemp(int value)
@@ -349,6 +358,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(true);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
+    m_Controls->m_GfaFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -361,6 +371,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
+    m_Controls->m_GfaFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -373,6 +384,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(false);
     m_Controls->m_MaskFrame->setEnabled(false);
+    m_Controls->m_GfaFrame->setEnabled(false);
     m_Controls->m_IterationsSlider->setEnabled(false);
     m_Controls->m_AdvancedFrame->setEnabled(false);
     m_Controls->m_AdvancedFrame->setVisible(false);
@@ -483,17 +495,11 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   mitk::CastToItkImage<ItkQBallImgType>(m_QBallImage, m_ItkQBallImage);
 
   // mask image found?
-  try{
   if(m_Controls->m_MaskImageEdit->text().compare("N/A") != 0)
   {
     m_MaskImage = 0;
     if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
       mitk::CastToItkImage<MaskImgType>(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
-  }
-  }
-  catch(...)
-  {
-    QMessageBox::warning(NULL, "Alarm", "Alarm");
   }
 
   // if no mask image is selected generate it

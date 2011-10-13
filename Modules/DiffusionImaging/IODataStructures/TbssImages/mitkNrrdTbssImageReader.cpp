@@ -51,7 +51,6 @@ namespace mitk
       {
         try
         {
-          MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
           setlocale(LC_ALL, locale.c_str());
         }
         catch(...)
@@ -129,7 +128,6 @@ namespace mitk
       ioRegion.SetSize( ioSize );
       ioRegion.SetIndex( ioStart );
 
-      MITK_INFO << "ioRegion: " << ioRegion << std::endl;
       imageIO->SetIORegion( ioRegion );
       void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
       imageIO->Read( buffer );
@@ -166,9 +164,7 @@ namespace mitk
       static_cast<OutputType*>(this->GetOutput())->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetOutput())->GetDimension(3));
 
       buffer = NULL;
-      MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
-
-
+      //MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
 
       // READ TBSS HEADER INFORMATION
       typename ImageType::Pointer img;
@@ -197,11 +193,11 @@ namespace mitk
           itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
           if (itKey->find("tbss") != std::string::npos)
           {
-            MITK_INFO << *itKey << " ---> " << metaString;
+            //MITK_INFO << *itKey << " ---> " << metaString;
 
             if(metaString == "ROI")
             {
-              MITK_INFO << "Read the ROI info";
+              //MITK_INFO << "Read the ROI info";
               ReadRoiInfo(imgMetaDictionary); // move back into if statement
               static_cast<OutputType*>(this->GetOutput())->SetTbssType(OutputType::ROI);
             }
@@ -216,7 +212,6 @@ namespace mitk
       // RESET LOCALE
       try
       {
-        MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
         setlocale(LC_ALL, currLocale.c_str());
       }
       catch(...)
@@ -224,18 +219,17 @@ namespace mitk
         MITK_INFO << "Could not reset locale " << currLocale;
       }
 
-      MITK_INFO << "...finished!" << std::endl;
+      //MITK_INFO << "...finished!" << std::endl;
 
     }
     catch(std::exception& e)
     {
-      MITK_INFO << "Std::Exception while reading file!!";
-      MITK_INFO << e.what();
+      //MITK_INFO << "Std::Exception while reading file!!";
+      //MITK_INFO << e.what();
       throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
     }
     catch(...)
     {
-      MITK_INFO << "Exception while reading file!!";
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
     }
 
@@ -260,14 +254,14 @@ namespace mitk
 
       if (itKey->find("ROI_index") != std::string::npos)
       {
-        MITK_INFO << *itKey << " ---> " << metaString;
+        //MITK_INFO << *itKey << " ---> " << metaString;
         sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
         ix[0] = x; ix[1] = y; ix[2] = z;
         roi.push_back(ix);
       }
       else if(itKey->find("preprocessed FA") != std::string::npos)
       {
-        MITK_INFO << *itKey << " ---> " << metaString;
+        //MITK_INFO << *itKey << " ---> " << metaString;
         static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFA(true);
         static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFAFile(metaString);
       }
@@ -275,7 +269,7 @@ namespace mitk
       // Name of structure
       if (itKey->find("structure") != std::string::npos)
       {
-        MITK_INFO << *itKey << " ---> " << metaString;
+        //MITK_INFO << *itKey << " ---> " << metaString;
         static_cast<OutputType*>(this->GetOutput())->SetStructure(metaString);
       }
     }
@@ -362,7 +356,7 @@ namespace mitk
       }
 
       typename ImageType::Pointer img = reader->GetOutput();
-      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();    
+      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
       std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
       std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
       std::string metaString;

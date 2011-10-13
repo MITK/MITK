@@ -42,17 +42,17 @@ namespace mitk
     // in a cache variable. A timestamp is associated.
     // If the timestamp of the cache variable is newer than the MTime, we only need to
     // assign the cache variable to the DataObject.
-    // Otherwise, the tree must be read again from the file and OuputInformation must 
+    // Otherwise, the tree must be read again from the file and OuputInformation must
     // be updated!
     if ( ( ! m_OutputCache ) || ( this->GetMTime( ) > m_CacheTime.GetMTime( ) ) )
     {
       this->GenerateOutputInformation();
-      itkWarningMacro("Cache regenerated!");    
+      itkWarningMacro("Cache regenerated!");
     }
 
     if (!m_OutputCache)
     {
-      itkWarningMacro("Tree cache is empty!");    
+      itkWarningMacro("Tree cache is empty!");
     }
 
     static_cast<OutputType*>(this->GetOutput())
@@ -73,7 +73,7 @@ namespace mitk
       void NrrdDiffusionImageReader<TPixelType>::GenerateOutputInformation()
   {
     typename OutputType::Pointer outputForCache = OutputType::New();
-    if ( m_FileName == "") 
+    if ( m_FileName == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename to be read is empty!");
     }
@@ -88,7 +88,6 @@ namespace mitk
         {
           try
           {
-            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
             setlocale(LC_ALL, locale.c_str());
           }
           catch(...)
@@ -98,7 +97,7 @@ namespace mitk
         }
 
 
-        MITK_INFO << "NrrdDiffusionImageReader READING IMAGE INFORMATION";
+        MITK_INFO << "NrrdDiffusionImageReader: reading image information";
         typename ImageType::Pointer img;
 
         std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
@@ -193,7 +192,6 @@ namespace mitk
           }
         }
 
-        MITK_INFO << "NrrdDiffusionImageReader READING HEADER INFORMATION";
         m_DiffusionVectors = GradientDirectionContainerType::New();
         m_OriginalDiffusionVectors = GradientDirectionContainerType::New();
         if (ext == ".hdwi" || ext == ".dwi")
@@ -219,7 +217,6 @@ namespace mitk
             itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
             if (itKey->find("DWMRI_gradient") != std::string::npos)
             {
-              MITK_INFO << *itKey << " ---> " << metaString;
               sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
               vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
               m_DiffusionVectors->InsertElement( numberOfImages, vect3d );
@@ -236,13 +233,11 @@ namespace mitk
             }
             else if (itKey->find("DWMRI_b-value") != std::string::npos)
             {
-              MITK_INFO << *itKey << " ---> " << metaString;
               readb0 = true;
               m_B_Value = atof(metaString.c_str());
             }
             else if (itKey->find("measurement frame") != std::string::npos)
             {
-              MITK_INFO << *itKey << " ---> " << metaString;
               sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
 
               readFrame = true;
@@ -277,9 +272,6 @@ namespace mitk
 
           if(readFrame)
           {
-            MITK_INFO << "Applying Measurement Frame: (" << xx << "," << xy << "," << xz
-                << ") (" << yx << "," << yy << "," << yz << ") (" << zx << "," << zy << "," << zz  << ")";
-
             for(int i=0; i<numberOfImages; i++)
             {
               vnl_vector<double> vec(3);
@@ -288,11 +280,6 @@ namespace mitk
               m_DiffusionVectors->ElementAt(i).copy_in(vec.data_block());
             }
           }
-
-          MITK_INFO << "Number of gradient images: "
-              << numberOfGradientImages
-              << " and Number of reference images: "
-              << numberOfImages - numberOfGradientImages;
 
           if(!readb0)
           {
@@ -350,7 +337,6 @@ namespace mitk
             MITK_INFO << "Unable to open bvals file";
           }
 
-          MITK_INFO << "Found " << bval_entries.size() << " b-values and " << bvec_entries.size() << " bvec-entries";
           m_B_Value = -1;
           unsigned int numb = bval_entries.size();
           for(unsigned int i=0; i<numb; i++)
@@ -389,7 +375,6 @@ namespace mitk
 
         try
         {
-          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
           setlocale(LC_ALL, currLocale.c_str());
         }
         catch(...)
@@ -401,7 +386,7 @@ namespace mitk
       {
         MITK_INFO << "Std::Exception while reading file!!";
         MITK_INFO << e.what();
-        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());                    
+        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
       }
       catch(...)
       {
@@ -485,7 +470,7 @@ namespace mitk
       }
 
       typename ImageType::Pointer img = reader->GetOutput();
-      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();    
+      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
       std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
       std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
       std::string metaString;
@@ -495,7 +480,7 @@ namespace mitk
         itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
         if (itKey->find("modality") != std::string::npos)
         {
-          if (metaString.find("DWMRI") != std::string::npos) 
+          if (metaString.find("DWMRI") != std::string::npos)
           {
             return true;
           }

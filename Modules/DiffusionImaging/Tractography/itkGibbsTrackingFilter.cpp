@@ -154,7 +154,7 @@ namespace itk{
 
 //    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
 
-//    MITK_INFO << "Bessel oefficients: " << coeff;
+//    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
 
     BESSEL_APPROXCOEFF = new float[4];
 
@@ -174,7 +174,7 @@ namespace itk{
       GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       ::BuildFibers(float* points, int numPoints)
   {
-    MITK_INFO << "Building fibers ...";
+    MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
 
     typename InputQBallImageType::Pointer odfImage
         = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
@@ -190,7 +190,7 @@ namespace itk{
     int numFibers = ccana.iterate(m_FiberLength);
 
     if (numFibers<=0){
-      MITK_INFO << "0 fibers accepted";
+      MITK_INFO << "itkGibbsTrackingFilter: 0 fibers accepted";
       return;
     }
 
@@ -273,7 +273,7 @@ namespace itk{
     // make sure image has enough slices
     if (qBallImageSize[1]<3 || qBallImageSize[2]<3 || qBallImageSize[3]<3)
     {
-      MITK_INFO << "image size < 3 not supported";
+      MITK_INFO << "itkGibbsTrackingFilter: image size < 3 not supported";
       m_AbortTracking = true;
     }
 
@@ -287,7 +287,7 @@ namespace itk{
     directionMatrix.set_column(2, d2);
     vnl_matrix_fixed<double, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps)){
-      MITK_INFO << "Image direction is not a rotation matrix. Tracking not possible!";
+      MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
       m_AbortTracking = true;
     }
 
@@ -361,7 +361,7 @@ namespace itk{
     }
     else
     {
-      MITK_INFO << "Unable to open barycoords file";
+      MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
       m_AbortTracking = true;
     }
 
@@ -383,7 +383,7 @@ namespace itk{
     }
     else
     {
-      MITK_INFO << "Unable to open indices file";
+      MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
       m_AbortTracking = true;
     }
 
@@ -416,7 +416,7 @@ namespace itk{
       m_Steps = 10;
     if (m_Steps>m_NumIt)
     {
-      MITK_INFO << "not enough iterations!";
+      MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
       m_AbortTracking = true;
     }
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
@@ -442,15 +442,15 @@ namespace itk{
 
       m_CurrentStep = step+1;
       float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-      MITK_INFO << "iterating step " << m_CurrentStep;
+      MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
 
       m_Sampler->SetTemperature(temperature);
       m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
 
-      MITK_INFO << "proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-      MITK_INFO << "particles: " << m_NumParticles;
-      MITK_INFO << "connections: " << m_NumConnections;
-      MITK_INFO << "progress: " << 100*(float)step/m_Steps << "%";
+      MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+      MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
+      MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
+      MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
 
       if (m_BuildFibers)
       {
@@ -476,7 +476,7 @@ namespace itk{
     m_AbortTracking = true;
     m_BuildFibers = false;
 
-    MITK_INFO << "done generate data";
+    MITK_INFO << "itkGibbsTrackingFilter: done generate data";
   }
 }
 

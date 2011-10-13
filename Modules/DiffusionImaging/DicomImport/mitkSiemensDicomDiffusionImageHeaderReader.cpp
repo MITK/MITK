@@ -61,11 +61,11 @@ int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInforma
 
 int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
 {
-  int nItems = 0; 
+  int nItems = 0;
   std::string::size_type pos = -1;
   while(nItems != 3)
   {
-    nItems = ExtractSiemensDiffusionInformation( tagString, nameString, valueArray, pos+1 );  
+    nItems = ExtractSiemensDiffusionInformation( tagString, nameString, valueArray, pos+1 );
     pos = tagString.find( nameString, pos+1 );
     if ( pos == std::string::npos )
     {
@@ -89,7 +89,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     {
       try
       {
-        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
         setlocale(LC_ALL, locale.c_str());
       }
       catch(...)
@@ -101,7 +100,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     // adapted from slicer
     // DicomToNrrdConverter.cxx
 
-    VolumeReaderType::DictionaryArrayRawPointer 
+    VolumeReaderType::DictionaryArrayRawPointer
         inputDict = m_VolumeReader->GetMetaDataDictionaryArray();
 
     //    gdcm::DictEntry SiemensDictBValue( "0019,100c", "B Value of diffusion weighting", gdcm::VR::IS, gdcm::VM::VM1 );
@@ -182,7 +181,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       for(; it != ds.End(); ++it)
       {
         const gdcm::DataElement &ref = *it;
-        if (ref.GetTag() == gdcm::Tag(0x0029,0x1010)) {    
+        if (ref.GetTag() == gdcm::Tag(0x0029,0x1010)) {
           tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
         }
       }
@@ -240,7 +239,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
           }
         }
       }
-      else 
+      else
       {
         MITK_INFO << "Reading diffusion info from 0029,1010 tag" << std::endl;
         this->m_Output->bValue = valueArray[0];
@@ -275,7 +274,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     }
     try
     {
-      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
       setlocale(LC_ALL, currLocale.c_str());
     }
     catch(...)
@@ -285,9 +283,9 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
   }
 }
 
-//header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin, 
-//  zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow, 
-//  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0], 
+//header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin,
+//  zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow,
+//  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0],
 //  vendor,SliceMosaic);
 
 
@@ -306,7 +304,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //    bool SliceOrderIS = true;
 //    bool SingleSeries = true;
 //
-//    VolumeReaderType::DictionaryArrayRawPointer inputDict 
+//    VolumeReaderType::DictionaryArrayRawPointer inputDict
 //      = m_VolumeReader->GetMetaDataDictionaryArray();
 //
 //    if ( vendor.find("GE") != std::string::npos )
@@ -434,7 +432,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        MITK_INFO << "Warning: Cannot find complete information on NumberOfImagesInMosaic in 0029|1010\n";
 //        MITK_INFO << "         Resulting image may contain empty slices.\n";
 //      }
-//      else 
+//      else
 //      {
 //        nSliceInVolume = static_cast<int>(valueArray[0]);
 //        mMosaic = static_cast<int> (ceil(sqrt(valueArray[0])));
@@ -473,8 +471,8 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        if (!exist || b == 0)
 //        {
 //          vect3d.fill( 0 );
-//          DiffusionVectors.push_back(vect3d);      
-//          DiffusionVectorsOrig.push_back(vect3d);      
+//          DiffusionVectors.push_back(vect3d);
+//          DiffusionVectorsOrig.push_back(vect3d);
 //          continue;
 //        }
 //
@@ -491,9 +489,9 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        itk::ExposeMetaData<std::string> ( *(*inputDict)[k], "0019|10bd",  tag);
 //        vect3d[2] = atof( tag.c_str() );
 //
-//        DiffusionVectorsOrig.push_back(vect3d);      
+//        DiffusionVectorsOrig.push_back(vect3d);
 //        vect3d.normalize();
-//        DiffusionVectors.push_back(vect3d);      
+//        DiffusionVectors.push_back(vect3d);
 //      }
 //    }
 //    else if ( vendor.find("SIEMENS") != std::string::npos )
@@ -560,11 +558,11 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //          MITK_INFO << "Warning: Cannot find complete information on B_value in 0029|1010\n";
 //          bValues.push_back( 0.0 );
 //          vect3d.fill( 0.0 );
-//          DiffusionVectors.push_back(vect3d);      
-//          DiffusionVectorsOrig.push_back(vect3d);    
+//          DiffusionVectors.push_back(vect3d);
+//          DiffusionVectorsOrig.push_back(vect3d);
 //          continue;
 //        }
-//        else 
+//        else
 //        {
 //          bValues.push_back( valueArray[0] );
 //        }
@@ -576,17 +574,17 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        {
 //          MITK_INFO << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
 //          vect3d.fill( 0 );
-//          DiffusionVectors.push_back(vect3d);      
-//          DiffusionVectorsOrig.push_back(vect3d);      
+//          DiffusionVectors.push_back(vect3d);
+//          DiffusionVectorsOrig.push_back(vect3d);
 //        }
-//        else 
+//        else
 //        {
 //          vect3d[0] = valueArray[0];
 //          vect3d[1] = valueArray[1];
 //          vect3d[2] = valueArray[2];
-//          DiffusionVectorsOrig.push_back(vect3d);      
+//          DiffusionVectorsOrig.push_back(vect3d);
 //          vect3d.normalize();
-//          DiffusionVectors.push_back(vect3d);      
+//          DiffusionVectors.push_back(vect3d);
 //          int p = bValues.size();
 //          MITK_INFO << "Image#: " << k << " BV: " << bValues[p-1] << " GD: " << DiffusionVectors[p-1] << std::endl;
 //        }
@@ -601,9 +599,9 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //    ///////////////////////////////////////////////
 //    // construct header info
 //
-//    header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin, 
-//      zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow, 
-//      zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0], 
+//    header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin,
+//      zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow,
+//      zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0],
 //      vendor,SliceMosaic);
 //
 //    // set m_Output

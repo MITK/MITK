@@ -47,7 +47,6 @@ namespace mitk
         {
           try
           {
-            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
             setlocale(LC_ALL, locale.c_str());
           }
           catch(...)
@@ -100,7 +99,6 @@ namespace mitk
           itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
           if (itKey->find("measurement frame") != std::string::npos)
           {
-            MITK_INFO << *itKey << " ---> " << metaString.c_str();
             sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
 
             if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
@@ -120,8 +118,6 @@ namespace mitk
               measFrame(2,2) = zz;
 
               measFrameTransp = measFrame.GetTranspose();
-
-              MITK_INFO << "Will apply following measurement frame: \n" << measFrame;
             }
           }
         }
@@ -189,7 +185,6 @@ namespace mitk
 
         try
         {
-          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
           setlocale(LC_ALL, currLocale.c_str());
         }
         catch(...)

@@ -44,6 +44,8 @@ QmitkTrackingWorker::QmitkTrackingWorker(QmitkGibbsTrackingView* view)
 
 void QmitkTrackingWorker::run()
 {
+  m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
+
   MITK_INFO << "Resampling mask images";
   // setup resampler
   typedef itk::ResampleImageFilter<QmitkGibbsTrackingView::MaskImgType, QmitkGibbsTrackingView::MaskImgType, float> ResamplerType;
@@ -58,7 +60,20 @@ void QmitkTrackingWorker::run()
   resampler->SetDefaultPixelValue(0);
   resampler->Update();
   m_View->m_MaskImage = resampler->GetOutput();
-  m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
+
+  if (m_View->m_GfaImage.IsNotNull())
+  {
+    ResamplerType::Pointer resampler = ResamplerType::New();
+    resampler->SetOutputSpacing( m_View->m_ItkQBallImage->GetSpacing() );
+    resampler->SetOutputOrigin( m_View->m_ItkQBallImage->GetOrigin() );
+    resampler->SetOutputDirection( m_View->m_ItkQBallImage->GetDirection() );
+    resampler->SetSize( m_View->m_ItkQBallImage->GetLargestPossibleRegion().GetSize() );
+    resampler->SetInput( m_View->m_GfaImage );
+    resampler->SetDefaultPixelValue(0);
+    resampler->Update();
+    m_View->m_GfaImage = resampler->GetOutput();
+  }
+
   m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
   m_View->m_GlobalTracker->SetGfaImage(m_View->m_GfaImage);

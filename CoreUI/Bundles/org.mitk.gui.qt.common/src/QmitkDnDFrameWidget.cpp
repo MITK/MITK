@@ -66,7 +66,7 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
     try
     {
-      nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
+      nodeReader->SetFileName(fileName->toLocalFile().toStdString());
       if(event->dropAction()==Qt::LinkAction)
         nodeReader->SetImageSerie(true);
       nodeReader->Update();

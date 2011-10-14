@@ -286,7 +286,7 @@
             <item row="2" column="2">
              <widget class="QSlider" name="m_ParticleWeightSlider">
               <property name="toolTip">
-               <string>unitless w</string>
+               <string>automatic estimation from gfa map and q-ball data.</string>
               </property>
               <property name="minimum">
                <number>0</number>

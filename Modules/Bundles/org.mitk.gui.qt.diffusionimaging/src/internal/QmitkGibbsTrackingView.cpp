@@ -141,6 +141,16 @@ void QmitkGibbsTrackingView::AfterThread()
   UpdateGUI();
   UpdateTrackingStatus();
   GenerateFiberBundle();
+  QString paramMessage;
+  if(m_Controls->m_ParticleWeightSlider->value()==0)
+    paramMessage += "Particle weight was set to " + QString::number(this->m_GlobalTracker->GetParticleWeight()) + "\n";
+  if(m_Controls->m_ParticleWidthSlider->value()==0)
+    paramMessage += "Particle width was set to " + QString::number(this->m_GlobalTracker->GetParticleWidth()) + " mm\n";
+  if(m_Controls->m_ParticleLengthSlider->value()==0)
+    paramMessage += "Particle length was set to " + QString::number(this->m_GlobalTracker->GetParticleLength()) + " mm\n";
+
+  if (paramMessage.length()>0)
+    QMessageBox::information(NULL, "Automatically selected parameters", paramMessage);
 }
 
 // start tracking timer and update gui elements before tracking is started

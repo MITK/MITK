@@ -18,7 +18,7 @@
 #ifndef BERRYNATIVETABFOLDER_H_
 #define BERRYNATIVETABFOLDER_H_
 
-#include "../util/berryAbstractTabFolder.h"
+#include <internal/util/berryAbstractTabFolder.h>
 
 #include <berryIQtStyleManager.h>
 

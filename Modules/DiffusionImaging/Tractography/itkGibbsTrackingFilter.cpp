@@ -331,7 +331,7 @@ namespace itk{
     else
       return false;
 
-    m_ParticleWeight = upper/5;
+    m_ParticleWeight = upper/6;
     return true;
   }
 

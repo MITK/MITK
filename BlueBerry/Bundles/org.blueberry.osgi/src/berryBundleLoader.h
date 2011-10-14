@@ -64,7 +64,7 @@ private:
   BundleMap m_BundleMap;
   BundleEvents m_BundleEvents;
   CodeCache* m_CodeCache;
-  mutable Poco::Logger& m_Logger;
+  Poco::Logger& m_Logger;
 
   Bundle::Pointer m_SystemBundle;
 

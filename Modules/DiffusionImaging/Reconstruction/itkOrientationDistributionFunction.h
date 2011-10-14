@@ -45,7 +45,7 @@ namespace itk
 /** \class OrientationDistributionFunction
  * \brief Represents an ODF for Q-Ball imaging.
  *
- * Reference: David S. Tuch, Q-ball imaging, 
+ * Reference: David S. Tuch, Q-ball imaging,
  * Magnetic Resonance in Medicine Volume 52 Issue 6, Pages 1358 - 1372
  *
  * \author Klaus Fritzsche, MBI
@@ -53,7 +53,7 @@ namespace itk
  */
 
 template < typename TComponent, unsigned int NOdfDirections >
-class OrientationDistributionFunction: public 
+class OrientationDistributionFunction: public
         FixedArray<TComponent,NOdfDirections>
 {
 public:
@@ -67,35 +67,35 @@ public:
   /** Standard class typedefs. */
   typedef OrientationDistributionFunction  Self;
   typedef FixedArray<TComponent,NOdfDirections> Superclass;
-  
+
   /** Dimension of the vector space. */
   itkStaticConstMacro(InternalDimension, unsigned int, NOdfDirections);
 
   /** Convenience typedefs. */
   typedef FixedArray<TComponent,
     itkGetStaticConstMacro(InternalDimension)> BaseArray;
-  
+
   /**  Define the component type. */
   typedef TComponent ComponentType;
   typedef typename Superclass::ValueType ValueType;
   typedef typename NumericTraits<ValueType>::RealType AccumulateValueType;
   typedef typename NumericTraits<ValueType>::RealType RealValueType;
-  
+
   typedef Matrix<TComponent, NOdfDirections, NOdfDirections> MatrixType;
 
   typedef vnl_matrix_fixed<double, 3, NOdfDirections> DirectionsType;
 
   /** Default constructor has nothing to do. */
   OrientationDistributionFunction() {this->Fill(0);}
-  
+
   OrientationDistributionFunction (const ComponentType& r) { this->Fill(r); }
-  
+
   typedef ComponentType ComponentArrayType[ itkGetStaticConstMacro(InternalDimension) ];
 
   /** Pass-through constructor for the Array base class. */
   OrientationDistributionFunction(const Self& r): BaseArray(r) {}
-  OrientationDistributionFunction(const ComponentArrayType r): BaseArray(r) {}    
-  
+  OrientationDistributionFunction(const ComponentArrayType r): BaseArray(r) {}
+
   /** Pass-through assignment operator for the Array base class. */
   Self& operator= (const Self& r);
   Self& operator= (const ComponentType& r);
@@ -114,14 +114,14 @@ public:
   const Self & operator/=(const RealValueType & scalar );
 
   /** Return the number of components. */
-  static DirectionsType* GetDirections() 
-  { 
+  static DirectionsType* GetDirections()
+  {
     return itkGetStaticConstMacro(m_Directions);
   }
 
   /** Return the number of components. */
-  static unsigned int GetNumberOfComponents() 
-  { 
+  static unsigned int GetNumberOfComponents()
+  {
     return itkGetStaticConstMacro(InternalDimension);
   }
 
@@ -133,7 +133,7 @@ public:
   ComponentType GetInterpolatedComponent( vnl_vector_fixed<double,3> dir, InterpolationMethods method ) const;
 
   /** Set the Nth component to v. */
-  void SetNthComponent(int c, const ComponentType& v)  
+  void SetNthComponent(int c, const ComponentType& v)
   {  this->operator[](c) = v; }
 
   /** Matrix notation, in const and non-const forms. */
@@ -154,7 +154,7 @@ public:
   void Normalize();
 
   Self MinMaxNormalize() const;
-  
+
   Self MaxNormalize() const;
 
   void L2Normalize();
@@ -170,8 +170,14 @@ public:
   TComponent GetNormalizedEntropy() const;
 
   TComponent GetNematicOrderParameter() const;
-  
+
   TComponent GetStdDevByMaxValue() const;
+
+  ComponentType GetMaxValue() const;
+
+  ComponentType GetMinValue() const;
+
+  ComponentType GetMeanValue() const;
 
   TComponent GetPrincipleCurvature(double alphaMinDegree, double alphaMaxDegree, int invert) const;
 
@@ -211,14 +217,14 @@ private:
 typedef std::ostream               OutputStreamType;
 typedef std::istream               InputStreamType;
 
-template< typename TComponent, unsigned int NOdfDirections  >  
-MitkDiffusionImaging_EXPORT OutputStreamType& operator<<(OutputStreamType& os, 
-              const OrientationDistributionFunction<TComponent,NOdfDirections> & c); 
-template< typename TComponent, unsigned int NOdfDirections  >  
-MitkDiffusionImaging_EXPORT InputStreamType& operator>>(InputStreamType& is, 
-                    OrientationDistributionFunction<TComponent,NOdfDirections> & c); 
+template< typename TComponent, unsigned int NOdfDirections  >
+MitkDiffusionImaging_EXPORT OutputStreamType& operator<<(OutputStreamType& os,
+              const OrientationDistributionFunction<TComponent,NOdfDirections> & c);
+template< typename TComponent, unsigned int NOdfDirections  >
+MitkDiffusionImaging_EXPORT InputStreamType& operator>>(InputStreamType& is,
+                    OrientationDistributionFunction<TComponent,NOdfDirections> & c);
 
-   
+
 
 } // end namespace itk
 

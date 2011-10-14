@@ -99,6 +99,7 @@ protected slots:
   void BeforeThread();
   void TimerUpdate();
   void SetMask();
+  void SetGfaImage();
   void AdvancedSettings();
   void SaveTrackingParameters();
   void LoadTrackingParameters();
@@ -132,12 +133,14 @@ private:
   // data objects
   mitk::FiberBundle::Pointer  m_FiberBundle;
   MaskImgType::Pointer        m_MaskImage;
+  MaskImgType::Pointer        m_GfaImage;
   mitk::QBallImage::Pointer   m_QBallImage;
   ItkQBallImgType::Pointer    m_ItkQBallImage;
 
   // data nodes
   mitk::DataNode::Pointer m_QBallImageNode;
   mitk::DataNode::Pointer m_MaskImageNode;
+  mitk::DataNode::Pointer m_GfaImageNode;
   mitk::DataNode::Pointer m_FiberBundleNode;
 
   // flags etc.

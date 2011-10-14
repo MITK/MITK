@@ -131,7 +131,7 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="m_IterationsLabel">
            <property name="toolTip">
             <string/>
@@ -147,7 +147,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QCheckBox" name="m_VisualizationCheckbox">
            <property name="enabled">
             <bool>true</bool>
@@ -160,14 +160,14 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
            <property name="text">
             <string>Advanced Settings</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0" colspan="2">
+         <item row="7" column="0" colspan="2">
           <widget class="QFrame" name="m_AdvancedFrame">
            <property name="enabled">
             <bool>true</bool>
@@ -276,7 +276,7 @@
                <string/>
               </property>
               <property name="text">
-               <string>0.001</string>
+               <string>auto</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -286,10 +286,10 @@
             <item row="2" column="2">
              <widget class="QSlider" name="m_ParticleWeightSlider">
               <property name="toolTip">
-               <string>unitless w</string>
+               <string>automatic estimation from gfa map and q-ball data.</string>
               </property>
               <property name="minimum">
-               <number>1</number>
+               <number>0</number>
               </property>
               <property name="maximum">
                <number>1000</number>
@@ -298,7 +298,7 @@
                <number>1</number>
               </property>
               <property name="value">
-               <number>10</number>
+               <number>0</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -592,7 +592,7 @@
            </layout>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QCommandLinkButton" name="m_SaveTrackingParameters">
            <property name="enabled">
             <bool>true</bool>
@@ -612,7 +612,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <widget class="QCommandLinkButton" name="m_LoadTrackingParameters">
            <property name="enabled">
             <bool>true</bool>
@@ -632,7 +632,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QSlider" name="m_IterationsSlider">
            <property name="toolTip">
             <string>Specify number of iterations for the tracking algorithm.</string>
@@ -651,7 +651,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="9" column="0">
           <widget class="QCommandLinkButton" name="m_TrackingStart">
            <property name="enabled">
             <bool>false</bool>
@@ -671,7 +671,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <widget class="QCommandLinkButton" name="m_TrackingStop">
            <property name="enabled">
             <bool>false</bool>
@@ -689,6 +689,54 @@
             <iconset resource="../../../../QmitkExt/resources/QmitkResources.qrc">
              <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
            </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>GFA Image</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QFrame" name="m_GfaFrame">
+           <property name="toolTip">
+            <string>Only needed for automatic particle weight estimation.</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QToolButton" name="m_SetGfaButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>=&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="m_GfaImageEdit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>N/A</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>

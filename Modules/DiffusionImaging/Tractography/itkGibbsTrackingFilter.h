@@ -34,6 +34,9 @@ namespace itk{
     typedef std::vector< itk::Point<float, 3> > FiberTractType;
     typedef std::vector< FiberTractType > FiberBundleType;
 
+    typedef Image< float, 3 >                  GfaImageType;
+    typedef typename GfaImageType::Pointer     GfaImageTypePointer;
+
     itkSetMacro( TempStart, float );
     itkGetMacro( TempStart, float );
 
@@ -86,6 +89,9 @@ namespace itk{
     itkSetMacro(MaskImage, MaskImageTypePointer);
     itkGetMacro(MaskImage, MaskImageTypePointer);
 
+    itkSetMacro(GfaImage, GfaImageTypePointer);
+    itkGetMacro(GfaImage, GfaImageTypePointer);
+
     itkGetMacro(NumParticles, unsigned long);
     itkGetMacro(NumConnections, unsigned long);
     itkGetMacro(NumAcceptedFibers, int);
@@ -112,6 +118,7 @@ namespace itk{
 
     FiberBundleType* GetFiberBundle();
     float GetMemoryUsage();
+    bool EstimateParticleWeight();
 
   protected:
 
@@ -125,6 +132,7 @@ namespace itk{
     // Input Images
     typename InputQBallImageType::Pointer m_ItkQBallImage;
     typename MaskImageType::Pointer m_MaskImage;
+    typename GfaImageType::Pointer m_GfaImage;
 
     // Tracking parameters
     float   m_TempStart;  // Start temperature

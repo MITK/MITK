@@ -171,7 +171,8 @@ void QmitkExtFileOpenAction::Run()
       mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
       try
       {
-        nodeReader->SetFileName(fileName->toStdString());
+        // the ITK Nrrd file reader cannot handle '/' in file path on Win 64bit
+        nodeReader->SetFileName(QDir::fromNativeSeparators(*fileName).toStdString());
         nodeReader->Update();
         for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
         {

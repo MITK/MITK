@@ -116,7 +116,7 @@ namespace mitk
 }
 
 // DISABLE DEBUGGING FOR RELEASE MODE ON WINDOWS
-#if defined(WIN32) &&  !defined(_DEBUG)
+#if (defined(WIN32) &&  !defined(_DEBUG)) || defined(NDEBUG)
     #define endodebugmarker
     #define endodebug(msg)
     #define endodebugvar(var)

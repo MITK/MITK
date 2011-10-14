@@ -88,21 +88,50 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
 
   if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
   {
-    MITK_INFO << "update clipping range only:";
+   // MITK_INFO << "uSERWAAAAAAAS, da shader brauchat a poor neue zoin";
     //get information about current position of views
     mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
     mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
+    
+    //generate according cutting planes based on the view position
+    float sliceN[3], planeOrigin[3];
+    
+    
+    // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
+    
+    
+    planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
+    planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
+    planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
+    
+    sliceN[0] = planeGeo->GetNormal()[0];
+    sliceN[1] = planeGeo->GetNormal()[1];
+    sliceN[2] = planeGeo->GetNormal()[2];
+    
+    
+    float tmp1 = planeOrigin[0] * sliceN[0];
+    float tmp2 = planeOrigin[1] * sliceN[1];
+    float tmp3 = planeOrigin[2] * sliceN[2];
+    float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
+    
+    
+    float plane1[4];
+    plane1[0] = sliceN[0];
+    plane1[1] = sliceN[1];
+    plane1[2] = sliceN[2];
+    plane1[3] = d1;
+    
+    float thickness[1];
+    thickness[0] = 2.0;
+    
+    localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane1",4, plane1);
+    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, thickness);
 
-    //
-     vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
-    double *focPnt = camera->GetFocalPoint();
-    double *camPos = camera->GetPosition();
-    double dist1 = sqrt( pow( (focPnt[0]-camPos[0]), 2.0) +  pow( (focPnt[1]-camPos[1]), 2.0) + pow( (focPnt[2]-camPos[2]), 2.0));
-    MITK_INFO << "DIST for CLIPPING RANGE: " << dist1;
-    camera->SetClippingRange( (dist1-1.0),(dist1+1.0) );
-    double cl1 =  camera->GetClippingRange()[0];
-    double cl2 = camera->GetClippingRange()[1];
-    MITK_INFO << "Camera clipping range: " << cl1 << " " << cl2;
+    //get information about current position of views
+//    mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
+//    mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
+//
+//    //
 
 
 
@@ -178,25 +207,34 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   //get distance from camera to focal point
 
 
-  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  double *focPnt = camera->GetFocalPoint();
-  double *camPos = camera->GetPosition();
-  double dist1 = sqrt( pow( (focPnt[0]-camPos[0]), 2.0) +  pow( (focPnt[1]-camPos[1]), 2.0) + pow( (focPnt[2]-camPos[2]), 2.0));
-  MITK_INFO << "DIST for CLIPPING RANGE: " << dist1;
-  camera->SetClippingRange( (dist1-1.0),(dist1+1.0) );
-  double cl1 =  camera->GetClippingRange()[0];
-  double cl2 = camera->GetClippingRange()[1];
-  MITK_INFO << "Camera clipping range: " << cl1 << " " << cl2;
+//  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+//  double *focPnt = camera->GetFocalPoint();
+//  double *camPos = camera->GetPosition();
+//  double dist1 = sqrt( pow( (focPnt[0]-camPos[0]), 2.0) +  pow( (focPnt[1]-camPos[1]), 2.0) + pow( (focPnt[2]-camPos[2]), 2.0));
+//  MITK_INFO << "DIST for CLIPPING RANGE: " << dist1;
+//  camera->SetClippingRange( (dist1-1.0),(dist1+1.0) );
+//  double cl1 =  camera->GetClippingRange()[0];
+//  double cl2 = camera->GetClippingRange()[1];
+//  MITK_INFO << "Camera clipping range: " << cl1 << " " << cl2;
 
   //  feed the vtk fiber mapper with point data ...TODO do in constructor
   localStorage->m_PointMapper->SetInput(localStorage->m_SlicedResult);   // in optimized version, mapper is feeded by localStorage->m_cutter->GetOutput();
   localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
   
-  std::string m_VolumeDir = MITK_ROOT;
-  m_VolumeDir += "Modules/DiffusionImaging/Rendering/mitkShaderFiberClipping.xml";
-  localStorage->m_PointActor->GetProperty()->LoadMaterial(m_VolumeDir.c_str());
+//  std::string m_VolumeDir = MITK_ROOT;
+//  m_VolumeDir += "Modules/DiffusionImaging/Rendering/mitkShaderFiberClipping.xml";
+//  localStorage->m_PointActor->GetProperty()->LoadMaterial(m_VolumeDir.c_str());
   localStorage->m_PointActor->GetProperty()->ShadingOn();
   
+  // Applying shading properties    
+  {
+    //Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
+    // VTK Properties
+    //ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
+    // Shaders
+    mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
+  }
+
   
   
   
@@ -416,15 +454,15 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   
   
   //####### load shader from file #########
-//  std::string m_VolumeDir = MITK_ROOT;
-//  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
-//  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
-//  mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
-//  shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
-//  //####################################################################
-//  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
-  //mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
-//  Superclass::SetDefaultProperties(node, renderer, overwrite);
+  std::string m_VolumeDir = MITK_ROOT;
+  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+  mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+  shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
+  //####################################################################
+  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
+  mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
 // this method prepares data for VTK mapping and rendering

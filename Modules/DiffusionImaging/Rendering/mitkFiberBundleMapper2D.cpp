@@ -155,54 +155,6 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   }
 
 
-  //get information about current position of views
-//  mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
-//  mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-//
-//
-//  //generate according cutting planes based on the view position
-//  double planeN[3], planeOrigin[3], cutParams[3];
-////
-//  planeN[0] = planeGeo->GetNormal()[0];
-//  planeN[1] = planeGeo->GetNormal()[1];
-//  planeN[2] = planeGeo->GetNormal()[2];
-//
-//  planeOrigin[0] = planeGeo->GetOrigin()[0];
-//  planeOrigin[1] = planeGeo->GetOrigin()[1];
-//  planeOrigin[2] = planeGeo->GetOrigin()[2];
-////
-//  MITK_INFO << "renWinNAME: " << renderer->GetName();
-//  MITK_INFO << "PlaneNormal: " << planeN[0] << " | " << planeN[1] << " | " << planeN[2];
-//  MITK_INFO << "PlaneOrigin: " << planeOrigin[0] << " | " << planeOrigin[1] << " | " << planeOrigin[2];
-//
-//
-//  //cutParams[0] = this->GetDataNode()->GetPropertyValue("ColorCoding", nodeCC);;
-
-  //feed cutter with parameters gathered from GUI
-//  int numSlices;
-//  bool existsPropNS = this->GetDataNode()->GetPropertyValue("2DPlanes", numSlices);
-//  if ( !existsPropNS ){
-//    return;
-//  }
-//
-//  int distFront;
-//  bool existsPropDF = this->GetDataNode()->GetPropertyValue("2DFront", distFront);
-//  if ( !existsPropDF ){
-//    return;
-//  }
-//
-//  int distBackDB;
-//  bool existsProp = this->GetDataNode()->GetPropertyValue("2DBack", distBackDB);
-//  if ( !existsProp ){
-//    return;
-//  }
-//
-//
-//  cutParams[0] = numSlices;
-//  cutParams[1] = distFront;
-//  cutParams[2] = distBackDB;
-
-
 
 
   //feed local storage with data we want to visualize

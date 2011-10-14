@@ -65,6 +65,8 @@ public:
 
     void ShowClosePerspectiveMenuItem(bool show);
 
+    bool GetShowClosePerspectiveMenuItem();
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);

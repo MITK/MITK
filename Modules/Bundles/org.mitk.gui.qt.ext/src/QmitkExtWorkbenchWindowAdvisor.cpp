@@ -233,7 +233,10 @@ public:
      windowAdvisor->redoAction->setEnabled(true);
      windowAdvisor->imageNavigatorAction->setEnabled(true);
      windowAdvisor->resetPerspAction->setEnabled(true);
-     windowAdvisor->closePerspAction->setEnabled(true);
+     if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
+     {
+       windowAdvisor->closePerspAction->setEnabled(true);
+     }   
     }
 
     perspectivesClosed = false;
@@ -266,7 +269,10 @@ public:
      windowAdvisor->redoAction->setEnabled(false);
      windowAdvisor->imageNavigatorAction->setEnabled(false);
      windowAdvisor->resetPerspAction->setEnabled(false);
-     windowAdvisor->closePerspAction->setEnabled(false);
+     if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
+     {
+       windowAdvisor->closePerspAction->setEnabled(false);
+     }     
     }
    }
 
@@ -354,6 +360,11 @@ void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
 void QmitkExtWorkbenchWindowAdvisor::ShowClosePerspectiveMenuItem(bool show)
 {
  showClosePerspectiveMenuItem = show;
+}
+
+bool QmitkExtWorkbenchWindowAdvisor::GetShowClosePerspectiveMenuItem()
+{
+  return showClosePerspectiveMenuItem;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)

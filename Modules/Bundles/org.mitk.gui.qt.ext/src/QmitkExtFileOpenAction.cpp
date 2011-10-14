@@ -171,7 +171,7 @@ void QmitkExtFileOpenAction::Run()
       mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
       try
       {
-        nodeReader->SetFileName(fileName->toLocal8Bit().data());
+        nodeReader->SetFileName(fileName->toStdString());
         nodeReader->Update();
         for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
         {

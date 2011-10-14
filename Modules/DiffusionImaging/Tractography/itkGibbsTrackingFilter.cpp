@@ -23,6 +23,7 @@
 #include <QCoreApplication>
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkOrientationDistributionFunction.h>
+#include <itkImageDuplicator.h>
 
 struct LessDereference {
   template <class T>
@@ -258,38 +259,63 @@ namespace itk{
       ::EstimateParticleWeight(){
 
     if (m_GfaImage.IsNull())
+    {
+      MITK_INFO << "no gfa image found";
       return false;
+    }
 
     float samplingStart = 1.0;
-    float samplingStopUpper = 0.66;
-    float samplingStopLower = 0.33;
+    float samplingStop = 0.66;
 
+    // copy GFA image (original should not be changed)
+    typedef itk::ImageDuplicator< GfaImageType > DuplicateFilterType;
+    DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+    duplicator->SetInputImage( m_GfaImage );
+    duplicator->Update();
+    m_GfaImage = duplicator->GetOutput();
+
+    //// GFA iterator ////
+    typedef ImageRegionIterator< GfaImageType > GfaIteratorType;
+    GfaIteratorType gfaIt(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
+
+    //// Mask iterator ////
+    typedef ImageRegionConstIterator< MaskImageType > MaskIteratorType;
+    MaskIteratorType maskIt(m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
+
+    // set unmasked region of gfa image to 0
+    gfaIt.GoToBegin();
+    maskIt.GoToBegin();
+    while( !gfaIt.IsAtEnd() )
+    {
+      if(maskIt.Get()<=0)
+        gfaIt.Set(0);
+      ++gfaIt;
+      ++maskIt;
+    }
+
+    // rescale gfa image to [0,1]
     typedef itk::RescaleIntensityImageFilter< GfaImageType, GfaImageType > RescaleFilterType;
-
     RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
     rescaleFilter->SetInput( m_GfaImage );
     rescaleFilter->SetOutputMaximum( samplingStart );
     rescaleFilter->SetOutputMinimum( 0 );
     rescaleFilter->Update();
     m_GfaImage = rescaleFilter->GetOutput();
+    gfaIt = GfaIteratorType(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
 
     //// Input iterator ////
     typedef ImageRegionConstIterator< InputQBallImageType > InputIteratorType;
     InputIteratorType git(m_ItkQBallImage, m_ItkQBallImage->GetLargestPossibleRegion() );
 
-    //// GFA iterator ////
-    typedef ImageRegionConstIterator< GfaImageType > GfaIteratorType;
-    GfaIteratorType gfaIt(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
-
     float upper = 0;
     int count = 0;
-    for(float thr=samplingStart; thr>samplingStopUpper; thr-=0.01)
+    for(float thr=samplingStart; thr>samplingStop; thr-=0.01)
     {
       git.GoToBegin();
       gfaIt.GoToBegin();
       while( !gfaIt.IsAtEnd() )
       {
-        if(gfaIt.Get() > thr)
+        if(gfaIt.Get()>thr)
         {
           itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
           upper += odf.GetMaxValue()-odf.GetMeanValue();
@@ -305,7 +331,7 @@ namespace itk{
     else
       return false;
 
-    m_ParticleWeight = upper/10;
+    m_ParticleWeight = upper/6;
     return true;
   }
 

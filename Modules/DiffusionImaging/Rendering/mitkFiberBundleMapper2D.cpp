@@ -275,28 +275,19 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   float tmp2 = plane1Origin[1] * sliceN[1];
   float tmp3 = plane1Origin[2] * sliceN[2];
   float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-/*
-  float tmp4 = plane2Origin[0] * sliceN[0];
-  float tmp5 = plane2Origin[1] * sliceN[1];
-  float tmp6 = plane2Origin[2] * sliceN[2];
-  float d2 = tmp4 + tmp5 + tmp6;
-  */
+
+  
   float plane1[4];
-  plane1[0] = sliceN[0] * (-1.0);
-  plane1[1] = sliceN[1] * (-1.0);
-  plane1[2] = sliceN[2] * (-1.0);
+  plane1[0] = sliceN[0];
+  plane1[1] = sliceN[1];
+  plane1[2] = sliceN[2];
   plane1[3] = d1;
 
-  /*
-  
-  float plane2[4];
-  plane2[0] = sliceN[0];
-  plane2[1] = sliceN[1];
-  plane2[2] = sliceN[2];
-  plane2[3] = d2;
-*/
+  float thickness[1];
+  thickness[0] = 2.0;
+
   localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane1",4, plane1);
-  //localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane2",4, plane2);
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, thickness);
 
 
   // We have been modified => save this for next Update()

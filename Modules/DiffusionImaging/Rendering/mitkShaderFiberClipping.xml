@@ -21,7 +21,7 @@
   language='GLSL' entry='main'>
   
   uniform vec4 plane1;
-  uniform vec4 plane2;
+  uniform float fiberThickness;
   
   varying vec3 positionWorld;
   varying vec3 color;
@@ -30,10 +30,10 @@
   {
      float r1 = dot(positionWorld, plane1.xyz) - plane1.w;
         
-      if ( abs(r1) &gt; 2.0 )
+      if ( abs(r1) &gt; fiberThickness )
         discard;
      
-     float x = (r1+2.0)/4.0;
+     float x = (r1+fiberThickness)/4.0;
      
      x = 1.0 - x;
            
@@ -41,6 +41,7 @@
   }
    
   <Uniform type="vec4" name="plane1" number_of_elements="4" > </Uniform>
+  <Uniform type="float" name="fiberThickness" number_of_elements="1" > </Uniform>
    
   </Shader>
 </Material>

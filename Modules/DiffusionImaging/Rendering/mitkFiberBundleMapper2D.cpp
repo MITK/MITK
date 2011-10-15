@@ -125,11 +125,13 @@ void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rende
   plane1[3] = d1;
   
   float thickness = 2.0;
-  bool isThick = this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness);
+  if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
+    MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
 
   
   bool fiberfading = false;
-  bool isEFX = this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading);
+  if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
+      MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
 
   
   int fiberfading_i = 1;

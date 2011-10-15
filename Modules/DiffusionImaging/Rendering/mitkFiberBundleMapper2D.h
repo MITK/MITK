@@ -109,7 +109,7 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer*);
     
     void AdjustCamera(mitk::BaseRenderer* , mitk::PlaneGeometry::ConstPointer);
-   
+    void UpdateShaderParameter(mitk::BaseRenderer*);
    
 
   };

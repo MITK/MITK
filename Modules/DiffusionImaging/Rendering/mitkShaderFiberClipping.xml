@@ -20,28 +20,34 @@
   <Shader scope='Fragment' name='FragmentShader' location='Inline'
   language='GLSL' entry='main'>
   
-  uniform vec4 plane1;
+  uniform vec4 slicingPlane;
   uniform float fiberThickness;
+  uniform int fiberFadingON;
   
   varying vec3 positionWorld;
   varying vec3 color;
   
   void main(void)
   {
-     float r1 = dot(positionWorld, plane1.xyz) - plane1.w;
+     float r1 = dot(positionWorld, slicingPlane.xyz) - slicingPlane.w;
         
-      if ( abs(r1) &gt; fiberThickness )
-        discard;
+    if ( abs(r1) &gt; fiberThickness )
+       discard;
      
-     float x = (r1+fiberThickness)/4.0;
+     if (1==1)
+     {
+        float x = (r1+fiberThickness)/(fiberThickness*2.0);
+        x = 1.0 - x;
+        gl_FragColor = vec4(color*x, 1.0); 
+     }
      
-     x = 1.0 - x;
-           
-     gl_FragColor = vec4(color*x, 1.0); 
+     gl_FragColor = vec4(color, 1.0); 
   }
    
-  <Uniform type="vec4" name="plane1" number_of_elements="4" > </Uniform>
+  <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>
   <Uniform type="float" name="fiberThickness" number_of_elements="1" > </Uniform>
+  <Uniform type="int" name="fiberFadingON" number_of_elements="1" > </Uniform>
+
    
   </Shader>
 </Material>

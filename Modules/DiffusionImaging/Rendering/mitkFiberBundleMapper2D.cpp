@@ -88,52 +88,8 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
 
   if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
   {
-   // MITK_INFO << "uSERWAAAAAAAS, da shader brauchat a poor neue zoin";
-    //get information about current position of views
-    mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
-    mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-    
-    //generate according cutting planes based on the view position
-    float sliceN[3], planeOrigin[3];
-    
-    
-    // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
-    
-    
-    planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
-    planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
-    planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
-    
-    sliceN[0] = planeGeo->GetNormal()[0];
-    sliceN[1] = planeGeo->GetNormal()[1];
-    sliceN[2] = planeGeo->GetNormal()[2];
-    
-    
-    float tmp1 = planeOrigin[0] * sliceN[0];
-    float tmp2 = planeOrigin[1] * sliceN[1];
-    float tmp3 = planeOrigin[2] * sliceN[2];
-    float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-    
-    
-    float plane1[4];
-    plane1[0] = sliceN[0];
-    plane1[1] = sliceN[1];
-    plane1[2] = sliceN[2];
-    plane1[3] = d1;
-    
-    float thickness[1];
-    thickness[0] = 2.0;
-    
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane1",4, plane1);
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, thickness);
 
-    //get information about current position of views
-//    mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
-//    mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-//
-//    //
-
-
+    this->UpdateShaderParameter(renderer);
 
   }
 
@@ -146,6 +102,52 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
 
 }
 
+void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
+{
+  FBLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+  // MITK_INFO << "uSERWAAAAAAAS, da shader brauchat a poor neue zoin";
+  //get information about current position of views
+  mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
+  mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
+  
+  //generate according cutting planes based on the view position
+  float sliceN[3], planeOrigin[3];
+  
+  
+  // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
+  
+  
+  planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
+  planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
+  planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
+  
+  sliceN[0] = planeGeo->GetNormal()[0];
+  sliceN[1] = planeGeo->GetNormal()[1];
+  sliceN[2] = planeGeo->GetNormal()[2];
+  
+  
+  float tmp1 = planeOrigin[0] * sliceN[0];
+  float tmp2 = planeOrigin[1] * sliceN[1];
+  float tmp3 = planeOrigin[2] * sliceN[2];
+  float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
+  
+  
+  float plane1[4];
+  plane1[0] = sliceN[0];
+  plane1[1] = sliceN[1];
+  plane1[2] = sliceN[2];
+  plane1[3] = d1;
+  
+  float thickness[1];
+  thickness[0] = 2.0;
+  int fiberfading = 1;
+  
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("slicingPlane",4, plane1);
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, thickness);
+  localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberFadingON",1, fiberfading);
+  
+
+}
 
 // ALL RAW DATA FOR VISUALIZATION IS GENERATED HERE.
 // vtkActors and Mappers are feeded here
@@ -237,52 +239,12 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
   
   
+  this->UpdateShaderParameter(renderer);
   
   
-  //get information about current position of views
-  mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
-  mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-  
-  //generate according cutting planes based on the view position
-  float sliceN[3], planeOrigin[3];
-
-
-// since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
-  
-  
-  planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
-  planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
-  planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
-  
-  sliceN[0] = planeGeo->GetNormal()[0];
-  sliceN[1] = planeGeo->GetNormal()[1];
-  sliceN[2] = planeGeo->GetNormal()[2];
-
-
-  const Point3D plane1Origin = planeGeo->GetOrigin(); //calculate position of up-fiber-clippingplane
-  
-  float tmp1 = plane1Origin[0] * sliceN[0];
-  float tmp2 = plane1Origin[1] * sliceN[1];
-  float tmp3 = plane1Origin[2] * sliceN[2];
-  float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-
-  
-  float plane1[4];
-  plane1[0] = sliceN[0];
-  plane1[1] = sliceN[1];
-  plane1[2] = sliceN[2];
-  plane1[3] = d1;
-
-  float thickness[1];
-  thickness[0] = 2.0;
-
-  localStorage->m_PointActor->GetProperty()->AddShaderVariable("plane1",4, plane1);
-  localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, thickness);
-
-
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
-//    mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer,localStorage->m_LastUpdateTime);
+
 
 }
 

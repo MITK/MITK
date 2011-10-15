@@ -34,14 +34,15 @@
     if ( abs(r1) &gt; fiberThickness )
        discard;
      
-     if (1==1)
+     if (fiberFadingON != 0)
      {
         float x = (r1+fiberThickness)/(fiberThickness*2.0);
         x = 1.0 - x;
         gl_FragColor = vec4(color*x, 1.0); 
-     }
-     
-     gl_FragColor = vec4(color, 1.0); 
+     }else{
+       gl_FragColor = vec4(color, 1.0);
+       }
+  
   }
    
   <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>

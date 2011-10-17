@@ -563,7 +563,7 @@
          <item>
           <widget class="QToolButton" name="m_TDI">
            <property name="toolTip">
-            <string>Generate Tract Density Image</string>
+            <string comment="Generate Tract Density Image" extracomment="Generate Tract Density Image">Generate Tract Density Image</string>
            </property>
            <property name="whatsThis">
             <string/>

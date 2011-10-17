@@ -60,7 +60,7 @@ namespace mitk {
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+    //    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
@@ -74,17 +74,19 @@ namespace mitk {
     
     void UpdateVtkObjects();
     
-    
+    vtkPoints* m_points;
+    vtkPolygon* m_polygon;
+    vtkPolyData* m_polygonPolyData;
     vtkAppendPolyData *m_vtkPolygonList;
-
-        vtkCellArray* m_polygonsCell;
+    
+    vtkCellArray* m_polygonsCell;
     
     vtkOpenGLPolyDataMapper *m_VtkPolygonDataMapperGL;
-        
-    vtkOpenGLActor *m_PolygonActor;
-
     
-
+    vtkOpenGLActor *m_PolygonActor;
+    
+    
+    
     
     vtkPropAssembly *m_PolygonAssembly;
     

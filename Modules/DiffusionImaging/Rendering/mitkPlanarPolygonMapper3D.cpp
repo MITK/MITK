@@ -52,6 +52,11 @@ m_VtkPolygonDataMapperGL(NULL)
   m_PolygonActor = vtkOpenGLActor::New();
   m_polygonSource = vtkPolygon::New();
   m_polygonsCell = vtkCellArray::New();
+  m_points = vtkPoints::New();
+  m_polygon = vtkPolygon::New(); 
+  m_VtkPolygonDataMapperGL = vtkOpenGLPolyDataMapper::New();
+  m_polygonPolyData = vtkPolyData::New();
+  
   
   
 }
@@ -64,7 +69,10 @@ mitk::PlanarPolygonMapper3D::~PlanarPolygonMapper3D()
   m_PolygonAssembly->Delete();
   m_polygonSource->Delete();
   m_polygonsCell->Delete();
-  
+  m_points->Delete();
+  m_polygon->Delete();
+  m_VtkPolygonDataMapperGL->Delete();
+  m_polygonPolyData->Delete();
   
 }
 
@@ -109,40 +117,46 @@ void mitk::PlanarPolygonMapper3D::GenerateData()
       return;
     }
     
-    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-    points->SetNumberOfPoints(nrCtrlPnts);
+    //maybe reset points first?
+    //m_points->Reset();
+    m_points->SetNumberOfPoints(nrCtrlPnts);
     
     // Create the polygon
-    vtkSmartPointer<vtkPolygon> polygon = vtkPolygon::New();      
-    polygon->GetPointIds()->SetNumberOfIds(nrCtrlPnts); //make a quad
+    m_polygon->GetPointIds()->SetNumberOfIds(nrCtrlPnts); //make a quad
     
     
     //add controlpoints to vtkPoints and link corresponding point id's
     for (unsigned int i=0; i<nrCtrlPnts; ++i) 
     {
-      points->InsertPoint(i,(double)PFPolygon->GetWorldControlPoint(i)[0], (double)PFPolygon->GetWorldControlPoint(i)[1], (double)PFPolygon->GetWorldControlPoint(i)[2] );
-      polygon->GetPointIds()->SetId(i, i);
+      m_points->InsertPoint(i,(double)PFPolygon->GetWorldControlPoint(i)[0], (double)PFPolygon->GetWorldControlPoint(i)[1], (double)PFPolygon->GetWorldControlPoint(i)[2] );
+      m_polygon->GetPointIds()->SetId(i, i);
       
     }
     
     
-    vtkSmartPointer<vtkCellArray> polygonsCell = vtkCellArray::New();
-    polygonsCell->InsertNextCell(polygon);
-    
-    vtkSmartPointer<vtkPolyData> polygonPolyData = vtkPolyData::New();
-    polygonPolyData->SetPoints(points);
-    polygonPolyData->SetPolys(polygonsCell);
+//      m_polygonsCell->InsertNextCell(m_polygon);
+    m_polygonsCell->Reset();
+    m_polygonsCell->InsertNextCell(m_polygon);   
+   
+    m_polygonPolyData->SetPoints(m_points);
+    m_polygonPolyData->SetPolys(m_polygonsCell);
+
     
     // Visualize
-    m_VtkPolygonDataMapperGL = vtkOpenGLPolyDataMapper::New();
-    m_VtkPolygonDataMapperGL->SetInput(polygonPolyData);
-    
-    
+   
+    m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
     m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
     m_PolygonAssembly->AddPart(m_PolygonActor);
     
     this->GetDataNode()->SetColor(200.0,200.0,200.0);
     this->GetDataNode()->SetOpacity(0.8);
+    
+    //guess 1 call might be enough ;)
+    m_points->Modified();
+    m_polygonsCell->Modified();
+    m_polygon->Modified();
+    m_VtkPolygonDataMapperGL->Modified();
+    
   }
   catch(...) { 
     MITK_INFO << "catch in PlanarPolygonMapper3D GenerateData()"; 
@@ -165,10 +179,64 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
 //  }
   //get the polydata from mapper and then modify points ... thats it what sould happen here
   
-  
-  //MITK_INFO << "mitkPlanarCircleMapper3D GenerateData(BaseRenderer)" ;
+   // MITK_INFO << "polygonPlaced(GDrender):" << PFPolygon->IsPlaced();  
+//  MITK_INFO << "mitkPlanarCircleMapper3D GenerateData(BaseRenderer)" ;
   try{
 
+    
+    mitk::PlanarPolygon* PFPolygon = dynamic_cast< mitk::PlanarPolygon* > (this->GetData());
+    
+    //get the control points from pf and insert them to vtkPolygon
+    unsigned int nrCtrlPnts = 0;
+    nrCtrlPnts =  PFPolygon->GetNumberOfControlPoints();
+    
+    if (nrCtrlPnts <= 2) {
+      return;
+    }
+    
+    //maybe reset points first?
+    //m_points->Reset();
+    m_points->SetNumberOfPoints(nrCtrlPnts);
+    
+    // Create the polygon
+    m_polygon->GetPointIds()->SetNumberOfIds(nrCtrlPnts); //make a quad
+    
+    
+    //add controlpoints to vtkPoints and link corresponding point id's
+    for (unsigned int i=0; i<nrCtrlPnts; ++i) 
+    {
+      m_points->InsertPoint(i,(double)PFPolygon->GetWorldControlPoint(i)[0], (double)PFPolygon->GetWorldControlPoint(i)[1], (double)PFPolygon->GetWorldControlPoint(i)[2] );
+      m_polygon->GetPointIds()->SetId(i, i);
+      
+    }
+    
+    
+    //      m_polygonsCell->InsertNextCell(m_polygon);
+    m_polygonsCell->Reset();
+    m_polygonsCell->InsertNextCell(m_polygon);   
+    
+    m_polygonPolyData->SetPoints(m_points);
+    m_polygonPolyData->SetPolys(m_polygonsCell);
+    
+
+    m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
+    m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
+    m_PolygonAssembly->AddPart(m_PolygonActor);
+
+    
+    //guess 1 call might be enough ;)
+    m_points->Modified();
+    m_polygonsCell->Modified();
+    m_polygon->Modified();
+    m_VtkPolygonDataMapperGL->Modified();
+
+    
+    
+    
+    
+    
+    
+    
     float polyOpaq;
     this->GetDataNode()->GetOpacity(polyOpaq, NULL);
     m_PolygonActor->GetProperty()->SetOpacity((double) polyOpaq);
@@ -204,9 +272,9 @@ vtkProp* mitk::PlanarPolygonMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
   
 }
 
-void mitk::PlanarPolygonMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
-{
-}
+//void mitk::PlanarPolygonMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+//{
+//}
 
 void mitk::PlanarPolygonMapper3D::UpdateVtkObjects()
 {

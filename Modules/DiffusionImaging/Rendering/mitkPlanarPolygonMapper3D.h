@@ -19,27 +19,21 @@
 #ifndef PlanarPolygonMapper3D_H
 #define PlanarPolygonMapper3D_H
 
-//#include "mitkCommon.h"
-//#include "mitkBaseRenderer.h"
-
-
-#include <mitkFiberBundle.h>
-#include <vtkSmartPointer.h>
-#include <mitkVtkMapper3D.h>
-//#include "MitkDiffusionImagingMBIExports.h"
 #include <mitkBaseData.h>
-#include <vtkAppendPolyData.h>
+#include <mitkVtkMapper3D.h>
+#include <mitkPlanarPolygon.h>
+
+#include <vtkPoints.h>
+#include <vtkPolygon.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLActor.h>
 #include <vtkPropAssembly.h>
-#include <vtkProperty.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkCellArray.h>
+#include <vtkPolyData.h>;
 
-#include <vtkPolygon.h>
-#include <vtkPoints.h>
 
-#include <mitkPlanarPolygon.h>
+
+
 
 namespace mitk {
   
@@ -77,21 +71,11 @@ namespace mitk {
     vtkPoints* m_points;
     vtkPolygon* m_polygon;
     vtkPolyData* m_polygonPolyData;
-    vtkAppendPolyData *m_vtkPolygonList;
     
-    vtkCellArray* m_polygonsCell;
-    
+    vtkCellArray* m_polygonsCell;    
     vtkOpenGLPolyDataMapper *m_VtkPolygonDataMapperGL;
-    
     vtkOpenGLActor *m_PolygonActor;
-    
-    
-    
-    
     vtkPropAssembly *m_PolygonAssembly;
-    
-    vtkPolygon *m_polygonSource;
-    
     
   };
   

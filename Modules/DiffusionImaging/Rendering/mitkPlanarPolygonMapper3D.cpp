@@ -16,48 +16,24 @@
  =========================================================================*/
 
 #include "mitkPlanarPolygonMapper3D.h"
-
 #include <mitkProperties.h>
 #include <mitkPlaneGeometry.h>
-#include <mitkPlanarCircle.h>
-#include <vtkDoubleArray.h>
-#include <vtkPoints.h>
-#include <vtkPolyLine.h>
-#include <vtkPolyData.h>
+
 #include <vtkPointData.h>
-#include <vtkTubeFilter.h>
-#include <vtkCamera.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkVertex.h>
-
-#include <mitkVector.h>
-
-
-#include <vtkOpenGLRenderer.h>
-#include <vtkLookupTable.h>
-
+#include <vtkProperty.h>
 
 
 
 //template<class TPixelType>
 mitk::PlanarPolygonMapper3D::PlanarPolygonMapper3D() 
-: m_vtkPolygonList(NULL),
-m_VtkPolygonDataMapperGL(NULL)
-
+: m_points(vtkPoints::New())
+, m_polygon(vtkPolygon::New())
+, m_polygonPolyData(vtkPolyData::New())
+, m_polygonsCell(vtkCellArray::New())
+, m_VtkPolygonDataMapperGL(vtkOpenGLPolyDataMapper::New())
+, m_PolygonActor(vtkOpenGLActor::New())
+, m_PolygonAssembly(vtkPropAssembly::New())
 {
-  
-  MITK_INFO << "PolygonMapper3D";
-  m_PolygonAssembly = vtkPropAssembly::New();
-  m_PolygonActor = vtkOpenGLActor::New();
-  m_polygonSource = vtkPolygon::New();
-  m_polygonsCell = vtkCellArray::New();
-  m_points = vtkPoints::New();
-  m_polygon = vtkPolygon::New(); 
-  m_VtkPolygonDataMapperGL = vtkOpenGLPolyDataMapper::New();
-  m_polygonPolyData = vtkPolyData::New();
-  
-  
   
 }
 
@@ -65,14 +41,13 @@ m_VtkPolygonDataMapperGL(NULL)
 mitk::PlanarPolygonMapper3D::~PlanarPolygonMapper3D()
 {
   //MITK_INFO << "FiberBundleMapper3D(destructor)";
-  m_PolygonActor->Delete();
-  m_PolygonAssembly->Delete();
-  m_polygonSource->Delete();
-  m_polygonsCell->Delete();
   m_points->Delete();
   m_polygon->Delete();
-  m_VtkPolygonDataMapperGL->Delete();
   m_polygonPolyData->Delete();
+  m_polygonsCell->Delete();
+  m_VtkPolygonDataMapperGL->Delete();
+  m_PolygonActor->Delete();
+  m_PolygonAssembly->Delete();
   
 }
 
@@ -90,19 +65,19 @@ const mitk::PlanarPolygon* mitk::PlanarPolygonMapper3D::GetInput()
  */
 
 
-/* NEEDS TO BE OPTiMISED!!! */
+/* */
 void mitk::PlanarPolygonMapper3D::GenerateData()
 {
-
+  
   
   // bool enableIn3D;
   //check if property exists
   //return if circle should not be painted in 3d View
-//  bool is3DEnabled;
-//  this->GetDataNode()->GetPropertyValue("PlanarPolygon_3D",is3DEnabled);
-//  if (!is3DEnabled) {
-//    return;
-//  }
+  //  bool is3DEnabled;
+  //  this->GetDataNode()->GetPropertyValue("PlanarPolygon_3D",is3DEnabled);
+  //  if (!is3DEnabled) {
+  //    return;
+  //  }
   
   
   try{ 
@@ -117,8 +92,6 @@ void mitk::PlanarPolygonMapper3D::GenerateData()
       return;
     }
     
-    //maybe reset points first?
-    //m_points->Reset();
     m_points->SetNumberOfPoints(nrCtrlPnts);
     
     // Create the polygon
@@ -133,17 +106,15 @@ void mitk::PlanarPolygonMapper3D::GenerateData()
       
     }
     
-    
-//      m_polygonsCell->InsertNextCell(m_polygon);
     m_polygonsCell->Reset();
     m_polygonsCell->InsertNextCell(m_polygon);   
-   
+    
     m_polygonPolyData->SetPoints(m_points);
     m_polygonPolyData->SetPolys(m_polygonsCell);
-
+    
     
     // Visualize
-   
+    
     m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
     m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
     m_PolygonAssembly->AddPart(m_PolygonActor);
@@ -152,14 +123,11 @@ void mitk::PlanarPolygonMapper3D::GenerateData()
     this->GetDataNode()->SetOpacity(0.8);
     
     //guess 1 call might be enough ;)
-    m_points->Modified();
-    m_polygonsCell->Modified();
-    m_polygon->Modified();
     m_VtkPolygonDataMapperGL->Modified();
     
   }
   catch(...) { 
-    MITK_INFO << "catch in PlanarPolygonMapper3D GenerateData()"; 
+//    MITK_INFO << "catch in PlanarPolygonMapper3D GenerateData()"; 
   } 
   
   //MITK_INFO << "_______GENERATE DATA() END_________ \n ===============================";
@@ -172,17 +140,15 @@ void mitk::PlanarPolygonMapper3D::GenerateData()
 //template<class TPixelType>
 void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-//  bool is3DEnabled;
-//  this->GetDataNode()->GetPropertyValue("PlanarPolygon_3D",is3DEnabled);
-//  if (!is3DEnabled) {
-//    return;
-//  }
+  //  bool is3DEnabled;
+  //  this->GetDataNode()->GetPropertyValue("PlanarPolygon_3D",is3DEnabled);
+  //  if (!is3DEnabled) {
+  //    return;
+  //  }
   //get the polydata from mapper and then modify points ... thats it what sould happen here
   
-   // MITK_INFO << "polygonPlaced(GDrender):" << PFPolygon->IsPlaced();  
-//  MITK_INFO << "mitkPlanarCircleMapper3D GenerateData(BaseRenderer)" ;
   try{
-
+    
     
     mitk::PlanarPolygon* PFPolygon = dynamic_cast< mitk::PlanarPolygon* > (this->GetData());
     
@@ -197,8 +163,8 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
     if (nrCtrlPnts == 3)
       this->GenerateData();
     
-    //maybe reset points first?
-    //m_points->Reset();
+    //update points in polygon
+    
     m_points->SetNumberOfPoints(nrCtrlPnts);
     
     // Create the polygon
@@ -213,18 +179,11 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
       
     }
     
-    
-
+        
     //updates all polygon pipeline
     m_VtkPolygonDataMapperGL->Modified();
+    
 
-    
-    
-    
-    
-    
-    
-    
     float polyOpaq;
     this->GetDataNode()->GetOpacity(polyOpaq, NULL);
     m_PolygonActor->GetProperty()->SetOpacity((double) polyOpaq);
@@ -237,18 +196,15 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
     
   }
   catch (...) {
-    MITK_INFO << "catch PolygonMapperr3DgenerateData(baseRenderer)";
+//    MITK_INFO << "catch PolygonMapperr3DgenerateData(baseRenderer)";
   }
 }
 
 //template<class TPixelType>
 void mitk::PlanarPolygonMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-// node->AddProperty( "PlanarPolygon_3D", mitk::BoolProperty::New( true ), renderer, overwrite  ); 
+  // node->AddProperty( "PlanarPolygon_3D", mitk::BoolProperty::New( true ), renderer, overwrite  ); 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
-  
-  
-  
   
 }
 
@@ -260,9 +216,6 @@ vtkProp* mitk::PlanarPolygonMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
   
 }
 
-//void mitk::PlanarPolygonMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
-//{
-//}
 
 void mitk::PlanarPolygonMapper3D::UpdateVtkObjects()
 {

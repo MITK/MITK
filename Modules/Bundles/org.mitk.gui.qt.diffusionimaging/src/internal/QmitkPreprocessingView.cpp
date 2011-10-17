@@ -127,6 +127,25 @@ struct PrpSelListener : ISelectionListener
             item->setText(QString::number(mf.get(r,c)));
             m_View->m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
           }
+        m_View->m_Controls->m_GradientsLabel->setText(QString::number(m_View->m_DiffusionImage->GetNumDirections()));
+
+        if (m_View->m_DiffusionImage->IsMultiBval())
+          m_View->m_Controls->m_BvalLabel->setText("Acquisition with multiple b-values!");
+        else
+          m_View->m_Controls->m_BvalLabel->setText(QString::number(m_View->m_DiffusionImage->GetB_Value()));
+      }
+      else
+      {
+        for (int r=0; r<3; r++)
+          for (int c=0; c<3; c++)
+          {
+            QTableWidgetItem* item = m_View->m_Controls->m_MeasurementFrameTable->item(r,c);
+            delete item;
+            item = new QTableWidgetItem();
+            m_View->m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
+          }
+        m_View->m_Controls->m_GradientsLabel->setText("-");
+        m_View->m_Controls->m_BvalLabel->setText("-");
       }
     }
   }
@@ -177,6 +196,9 @@ void QmitkPreprocessingView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkPreprocessingViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    m_Controls->m_MeasurementFrameTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    m_Controls->m_MeasurementFrameTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
   }
 
   m_SelListener = berry::ISelectionListener::Pointer(new PrpSelListener(this));

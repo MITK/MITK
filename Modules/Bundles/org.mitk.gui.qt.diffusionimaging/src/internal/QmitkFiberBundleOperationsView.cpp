@@ -875,6 +875,10 @@ void QmitkFiberBundleOperationsView::Activated()
 void QmitkFiberBundleOperationsView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                                             const char *propertyKey, mitk::BaseProperty *property )
 {
+  // initialize figure's geometry with empty geometry
+  mitk::PlaneGeometry::Pointer emptygeometry = mitk::PlaneGeometry::New();
+  figure->SetGeometry2D( emptygeometry );
+
   //set desired data to DataNode where Planarfigure is stored
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());

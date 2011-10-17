@@ -38,7 +38,7 @@ void QmitkExtRegisterClasses()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "QmitkExtRegisterClasses()";
+    MITK_DEBUG << "QmitkExtRegisterClasses()";
     
     static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
     

@@ -51,6 +51,9 @@ namespace mitk
     {
       MEAN_FA_SKELETON,
       MEAN_FA_SKELETON_MASK,
+      GRADIENT_X,
+      GRADIENT_Y,
+      GRADIENT_Z,
       MISC
     };
 
@@ -141,6 +144,7 @@ namespace mitk
 
     bool m_IsMeta;
 
+    bool m_ContainsGradient;
 
   };
 

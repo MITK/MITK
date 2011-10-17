@@ -63,7 +63,7 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "CoreExtObjectFactory c'tor" << std::endl;
+    MITK_DEBUG << "CoreExtObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
     itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
@@ -208,7 +208,7 @@ void RegisterCoreExtObjectFactory()
   static bool oneCoreExtObjectFactoryRegistered = false;
   if ( ! oneCoreExtObjectFactoryRegistered ) 
   {
-    MITK_INFO << "Registering CoreExtObjectFactory..." << std::endl;
+    MITK_DEBUG << "Registering CoreExtObjectFactory..." << std::endl;
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::CoreExtObjectFactory::New());
     oneCoreExtObjectFactoryRegistered = true;
   }

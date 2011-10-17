@@ -119,6 +119,10 @@ namespace mitk
 
     bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
 
+    int GetNumDirections();
+    int GetNumB0();
+    bool IsMultiBval();
+
   protected:
     DiffusionImage();
     virtual ~DiffusionImage();

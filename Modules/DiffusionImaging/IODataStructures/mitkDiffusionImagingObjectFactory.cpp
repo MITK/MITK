@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkTbssImageMapper.h"
+#include "mitkTbssGradientImageMapper.h"
 
 //====depricated fiberstructure=====
 #include "mitkFiberBundle.h"
@@ -67,10 +68,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
+#include "mitkNrrdTbssGradientImageWriterFactory.h"
+#include "mitkNrrdTbssGradientImageWriter.h"
+
 
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
 typedef float TbssPixelType;
+typedef int TbssGradientPixelType;
 
 
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -83,7 +88,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "DiffusionImagingObjectFactory c'tor" << std::endl;
+    MITK_DEBUG << "DiffusionImagingObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
 
@@ -103,6 +108,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
+    mitk::NrrdTbssGradientImageWriterFactory::RegisterOneFactory();
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
@@ -111,6 +117,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
+    m_FileWriters.push_back( mitk::NrrdTbssGradientImageWriter::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
@@ -176,6 +183,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
+    classname = "TbssGradientImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssGradientImageMapper::New();
+      newMapper->SetDataNode(node);
+    }
+
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -229,6 +243,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {  
       newMapper = mitk::TbssImageMapper::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname = "TbssGradientImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::TbssGradientImageMapper::New();
       newMapper->SetDataNode(node);
     }
 
@@ -293,6 +314,14 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::TbssImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
+
+  classname = "TbssGradientImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::TbssGradientImageMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+  }
+
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions()
@@ -336,6 +365,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tgi", "TBSS gradient image"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
@@ -352,6 +382,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tgi", "TBSS gradient image"));
 }
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()
@@ -362,7 +393,7 @@ void RegisterDiffusionImagingObjectFactory()
 {
   static bool oneDiffusionImagingObjectFactoryRegistered = false;
   if ( ! oneDiffusionImagingObjectFactoryRegistered ) {
-    MITK_INFO << "Registering DiffusionImagingObjectFactory..." << std::endl;
+    MITK_DEBUG << "Registering DiffusionImagingObjectFactory..." << std::endl;
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::DiffusionImagingObjectFactory::New());
 
     oneDiffusionImagingObjectFactoryRegistered = true;

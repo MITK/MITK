@@ -561,9 +561,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="m_2DHeatmap">
+          <widget class="QToolButton" name="m_TDI">
            <property name="toolTip">
-            <string>Generate 2D-Image as Heatmap</string>
+            <string>Generate Tract Density Image</string>
            </property>
            <property name="whatsThis">
             <string/>

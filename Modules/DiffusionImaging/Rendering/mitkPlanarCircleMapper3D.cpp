@@ -143,7 +143,7 @@ void mitk::PlanarCircleMapper3D::GenerateData()
     
   } 
   catch(...) { 
-    MITK_INFO << "catch in PlanarCircleMapper3D..."; 
+//    MITK_INFO << "catch in PlanarCircleMapper3D..."; 
   } 
   
 }
@@ -189,7 +189,7 @@ void mitk::PlanarCircleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
     
   }
   catch (...) {
-    MITK_INFO << "catch generateData(baseRenderer)";
+//    MITK_INFO << "catch generateData(baseRenderer)";
   }
 }
 

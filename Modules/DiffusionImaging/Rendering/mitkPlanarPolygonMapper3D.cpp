@@ -190,9 +190,12 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
     unsigned int nrCtrlPnts = 0;
     nrCtrlPnts =  PFPolygon->GetNumberOfControlPoints();
     
-    if (nrCtrlPnts <= 2) {
+    if (nrCtrlPnts <= 2) 
       return;
-    }
+    
+    //if there are 3 points available, draw current polygon in 3D
+    if (nrCtrlPnts == 3)
+      this->GenerateData();
     
     //maybe reset points first?
     //m_points->Reset();
@@ -211,23 +214,8 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
     }
     
     
-    //      m_polygonsCell->InsertNextCell(m_polygon);
-    m_polygonsCell->Reset();
-    m_polygonsCell->InsertNextCell(m_polygon);   
-    
-    m_polygonPolyData->SetPoints(m_points);
-    m_polygonPolyData->SetPolys(m_polygonsCell);
-    
 
-    m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
-    m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
-    m_PolygonAssembly->AddPart(m_PolygonActor);
-
-    
-    //guess 1 call might be enough ;)
-    m_points->Modified();
-    m_polygonsCell->Modified();
-    m_polygon->Modified();
+    //updates all polygon pipeline
     m_VtkPolygonDataMapperGL->Modified();
 
     

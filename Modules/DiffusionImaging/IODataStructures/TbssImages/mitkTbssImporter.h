@@ -35,8 +35,10 @@ namespace mitk
   public:
    // typedef TPixelType PixelType;
     typedef itk::VectorImage<float,3> DataImageType; // type of the 3d vector image containing the skeletonized images
+    typedef itk::VectorImage<int,3> VectorImageType; // Datatype of the tbss gradient images
     typedef itk::Image<float, 4> FloatImage4DType;
     typedef itk::ImageFileReader<FloatImage4DType> FileReaderType4D;
+    typedef itk::ImageFileReader<VectorImageType> VectorReaderType;
 
     typedef itk::Image<float, 3> FloatImage3DType;
     typedef itk::ImageFileReader<FloatImage3DType> FileReaderType3D;

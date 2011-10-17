@@ -72,8 +72,11 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageIOFactory.cpp
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkTbssRoiImage.cpp
+  IODataStructures/TbssImages/mitkTbssGradientImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriter.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
@@ -92,6 +95,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
+  Rendering/mitkTbssGradientImageMapper.cpp
   
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -108,6 +112,7 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
+  Rendering/mitkTbssGradientImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
@@ -127,9 +132,7 @@ SET(H_FILES
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
-  #IODataStructures/TbssImages/mitkTbssImage.h
- # IODataStructures/TbssImages/mitkTbssRoiImage.h
+  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h  
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h

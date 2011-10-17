@@ -67,6 +67,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
+#include "mitkPlanarCircleMapper3D.h"
+
 
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
@@ -231,6 +233,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
+    
+    classname =  "PlanarCircle";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+       MITK_INFO << "DI_NodeClassname: " << node->GetData()->GetNameOfClass();
+      newMapper = mitk::PlanarCircleMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
 
   }
 
@@ -293,6 +303,13 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::TbssImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
+  
+  classname = "PlanarCircle";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarCircleMapper3D::SetDefaultProperties(node);
+  }
+    
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions()

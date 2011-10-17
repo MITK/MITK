@@ -57,7 +57,6 @@ namespace mitk {
     virtual void Update(mitk::BaseRenderer * renderer);
     
     
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);//not necessary
    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 
     
@@ -108,8 +107,7 @@ namespace mitk {
     /** Does the actual resampling, without rendering. */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer*);
     
-    void AdjustCamera(mitk::BaseRenderer* , mitk::PlaneGeometry::ConstPointer);
-   
+    void UpdateShaderParameter(mitk::BaseRenderer*);
    
 
   };

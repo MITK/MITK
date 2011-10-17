@@ -165,8 +165,8 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "FiberBundle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-//      newMapper = mitk::FiberBundleMapper2D::New();
-//      newMapper->SetDataNode(node);
+      newMapper = mitk::FiberBundleMapper2D::New();
+      newMapper->SetDataNode(node);
     }
     
     classname = "FiberBundleX";

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-  <Material name='GenericAttributes1'>
+  <Material name='FiberClipping2D'>
   <Shader 
     scope='Vertex' 
     name='VertexShader' 
@@ -7,39 +7,48 @@
     language='GLSL' 
     entry='main'> 
   
-  <Uniform name="LightPosition" type="vec3" number_of_elements="3" value="0.0 1000.0 0.0"></Uniform>
-  <Uniform name="SkyColor" type="vec3" number_of_elements="3" value="0.9 0.8 0.5"></Uniform>
-  <Uniform name="GroundColor" type="vec3" number_of_elements="3" value="0.0 0.0 0.0"></Uniform>
-  
-  attribute vec3 scalars; 
-  
-  uniform vec3 LightPosition;
-  uniform vec3 SkyColor;
-  uniform vec3 GroundColor;
-  
-  varying vec3  DiffuseColor;
-  
-
+  varying vec3 positionWorld;
+  varying vec3 color;
+    
   void main(void) 
   {
-    vec3 ecPosition = vec3(gl_ModelViewMatrix * gl_Vertex);
-    vec3 tnorm      = normalize(gl_NormalMatrix * gl_Normal);
-    vec3 lightVec   = normalize(LightPosition - ecPosition);
-    float costheta  = dot(tnorm, lightVec);
-    float a         = 0.5 + 0.5 * costheta;
-
-    DiffuseColor  = mix(GroundColor, SkyColor, a);
-
-    gl_Position     = ftransform();
-
+    color = gl_Color.rgb;
+    positionWorld = vec3(gl_Vertex);
+    gl_Position = ftransform();
   }
-  </Shader>
+  </Shader> 
   <Shader scope='Fragment' name='FragmentShader' location='Inline'
   language='GLSL' entry='main'>
-  varying vec3  DiffuseColor;
+  
+  uniform vec4 slicingPlane;
+  uniform float fiberThickness;
+  uniform int fiberFadingON;
+  
+  varying vec3 positionWorld;
+  varying vec3 color;
+  
   void main(void)
   {
-    gl_FragColor = vec4(DiffuseColor, 1.0);
+     float r1 = dot(positionWorld, slicingPlane.xyz) - slicingPlane.w;
+        
+    if ( abs(r1) &gt; fiberThickness )
+       discard;
+     
+     if (fiberFadingON != 0)
+     {
+        float x = (r1+fiberThickness)/(fiberThickness*2.0);
+        x = 1.0 - x;
+        gl_FragColor = vec4(color*x, 1.0); 
+     }else{
+       gl_FragColor = vec4(color, 1.0);
+       }
+  
   }
+   
+  <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>
+  <Uniform type="float" name="fiberThickness" number_of_elements="1" > </Uniform>
+  <Uniform type="int" name="fiberFadingON" number_of_elements="1" > </Uniform>
+
+   
   </Shader>
 </Material>

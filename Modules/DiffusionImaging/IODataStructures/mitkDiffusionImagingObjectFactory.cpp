@@ -68,8 +68,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
+<<<<<<< HEAD
 #include "mitkNrrdTbssGradientImageWriterFactory.h"
 #include "mitkNrrdTbssGradientImageWriter.h"
+=======
+#include "mitkPlanarCircleMapper3D.h"
+#include "mitkPlanarPolygonMapper3D.h"
+>>>>>>> bug-9661-enable3DPlanarFigureViz
 
 
 typedef short DiffusionPixelType;
@@ -245,6 +250,21 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
+    
+    classname =  "PlanarCircle";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PlanarCircleMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    
+    classname = "PlanarPolygon";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PlanarPolygonMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    
 
     classname = "TbssGradientImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -314,6 +334,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::TbssImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
+<<<<<<< HEAD
 
   classname = "TbssGradientImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -322,6 +343,22 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
+=======
+  
+  classname = "PlanarCircle";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarCircleMapper3D::SetDefaultProperties(node);
+  }
+  
+  classname = "PlanarPolygon";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarPolygonMapper3D::SetDefaultProperties(node);
+  }
+
+    
+>>>>>>> bug-9661-enable3DPlanarFigureViz
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions()

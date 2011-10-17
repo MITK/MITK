@@ -93,6 +93,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
   Rendering/mitkPlanarCircleMapper3D.cpp
+  Rendering/mitkPlanarPolygonMapper3D.cpp
   
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -115,6 +116,7 @@ SET(H_FILES
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkPlanarCircleMapper3D.h
+  Rendering/mitkPlanarPolygonMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

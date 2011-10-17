@@ -68,6 +68,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssRoiImageWriter.h"
 
 #include "mitkPlanarCircleMapper3D.h"
+#include "mitkPlanarPolygonMapper3D.h"
 
 
 typedef short DiffusionPixelType;
@@ -240,6 +241,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::PlanarCircleMapper3D::New();
       newMapper->SetDataNode(node);
     }
+    
+    classname = "PlanarPolygon";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PlanarPolygonMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    
 
   }
 
@@ -308,6 +317,13 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::PlanarCircleMapper3D::SetDefaultProperties(node);
   }
+  
+  classname = "PlanarPolygon";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarPolygonMapper3D::SetDefaultProperties(node);
+  }
+
     
 }
 

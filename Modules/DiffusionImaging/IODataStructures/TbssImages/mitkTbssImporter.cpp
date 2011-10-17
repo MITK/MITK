@@ -174,6 +174,8 @@ namespace mitk
     }
 
 
+    int currIndex = 0;
+
 
     for(int i=0; i < m_MetaFiles.size(); i++)
     {
@@ -237,7 +239,7 @@ namespace mitk
               itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
               for(int j=0; j<vec.Size(); j++)
               {
-                int pos = i+j;
+                int pos = currIndex+j;
                 float f = vec.GetElement(j);
                 pixel.SetElement(pos, f);
 
@@ -247,6 +249,8 @@ namespace mitk
           }
         }
 
+        currIndex += img->GetVectorLength();
+        tbssImg->SetContainsGradient(true);
         // Read vector image and add to m_Data
       }
 
@@ -268,15 +272,7 @@ namespace mitk
           m_Data->SetSpacing(img->GetSpacing());
           m_Data->SetOrigin(img->GetOrigin());
           m_Data->SetDirection(img->GetDirection());
-          m_Data->SetVectorLength(vecLength);
-          /*
-          if(containsGradient)
-          {
-            m_Data->SetVectorLength(m_MetaFiles.size()+2);
-          }
-          else{
-            m_Data->SetVectorLength(m_MetaFiles.size());
-          }*/
+          m_Data->SetVectorLength(vecLength);         
           m_Data->Allocate();
         }
 
@@ -293,13 +289,28 @@ namespace mitk
 
               float f = img->GetPixel(ix);
               itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
-              pixel.SetElement(i, f);
+              pixel.SetElement(currIndex, f);
               m_Data->SetPixel(ix, pixel);
 
             }
           }
         }
       }
+
+      if(pair.first == mitk::TbssImage::MEAN_FA_SKELETON)
+      {
+        tbssImg->SetContainsMeanSkeleton(true);
+      }
+      else if(pair.first == mitk::TbssImage::MEAN_FA_SKELETON_MASK)
+      {
+        tbssImg->SetContainsSkeletonMask(true);
+      }
+      else if(pair.first == mitk::TbssImage::DISTANCE_MAP)
+      {
+        tbssImg->SetContainsDistanceMap(true);
+      }
+
+      currIndex++;
 
     }
 
@@ -326,7 +337,14 @@ namespace mitk
     {
       return mitk::TbssImage::GRADIENT_X;
     }
-
+    else if(s == "tubular structure")
+    {
+      return mitk::TbssImage::TUBULAR_STRUCTURE;
+    }
+    else if(s == "distance map")
+    {
+      return mitk::TbssImage::DISTANCE_MAP;
+    }
     return mitk::TbssImage::MISC;
   }
 

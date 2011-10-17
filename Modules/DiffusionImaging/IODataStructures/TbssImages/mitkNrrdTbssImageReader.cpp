@@ -215,6 +215,22 @@ namespace mitk
             }
 
 
+            else if(itKey->find("tubular structure") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::TUBULAR_STRUCTURE;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
+            else if(itKey->find("distance map") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::DISTANCE_MAP;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
           }
 
           outputForCache->SetIsMeta(isMeta);

@@ -28,7 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::TbssImage::TbssImage()
-  : m_IsMeta(false), m_ContainsGradient(false)
+  : m_IsMeta(false),
+  m_ContainsGradient(false),
+  m_ContainsMeanSkeleton(false),
+  m_ContainsSkeletonMask(false)
 {
 
 }
@@ -81,7 +84,6 @@ void mitk::TbssImage::InitializeFromVectorImage()
   MITK_INFO << "Tbss-Image successfully initialized.";
 
 }
-
 
 void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
 {

@@ -170,6 +170,14 @@ std::string mitk::NrrdTbssImageWriter::RetrieveString(mitk::TbssImage::MetaDataF
   {
     return "gradient_z";
   }
+  else if(meta == mitk::TbssImage::TUBULAR_STRUCTURE)
+  {
+    return "tubular structure";
+  }
+  else if(meta == mitk::TbssImage::DISTANCE_MAP)
+  {
+    return "distance map";
+  }
   return "";
 }
 

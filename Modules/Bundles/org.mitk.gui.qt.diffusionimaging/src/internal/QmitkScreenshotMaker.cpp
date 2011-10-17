@@ -132,6 +132,11 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
 {
   QString fileName = QFileDialog::getExistingDirectory(NULL, "Save screenshots to...", QDir::currentPath());
 
+  if( fileName.isEmpty() )
+  {
+    return;
+  }
+
   emit StartBlockControls();
 
   mitk::DataNode* n;
@@ -202,6 +207,11 @@ void QmitkScreenshotMaker::Generate3DHighresScreenshot()
 void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 {
   QString fileName = QFileDialog::getExistingDirectory( NULL, "Save screenshots to...", QDir::currentPath());
+
+  if( fileName.isEmpty() )
+  {
+    return;
+  }
 
   GetCam()->Azimuth( -7.5 );
   GetCam()->Roll(-4);

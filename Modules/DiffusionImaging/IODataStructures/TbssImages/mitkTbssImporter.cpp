@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTbssImporter.h"
 #include <QDir>
 #include <QStringList>
-
+#include "itkNrrdImageIO.h"
 
 
 namespace mitk
@@ -161,9 +161,21 @@ namespace mitk
     std::vector< std::pair<mitk::TbssImage::MetaDataFunction, int> > metaInfo;
 
     // Gradient images are vector images, so they will add more dimensions to the vector
-    int extradims=0;
+    int vecLength = m_MetaFiles.size();
+    //Check if there is a gradient image
 
-    for(int i=0; i < (m_MetaFiles.size() + extradims); i++)
+    for(int i=0; i < m_MetaFiles.size(); i++)
+    {
+      std::pair<std::string, std::string> p = m_MetaFiles.at(i);
+      if(RetrieveTbssFunction(p.first) == mitk::TbssImage::GRADIENT_X)
+      {
+        vecLength += 2;
+      }
+    }
+
+
+
+    for(int i=0; i < m_MetaFiles.size(); i++)
     {
       std::pair<std::string, std::string> p = m_MetaFiles.at(i);
       std::string function = p.first;
@@ -176,18 +188,71 @@ namespace mitk
       pair.first = RetrieveTbssFunction(function);
       pair.second = i;
 
-
-      metaInfo.push_back(pair);
-
-
       if(pair.first == mitk::TbssImage::GRADIENT_X)
       {
-        extradims +=3;
+        metaInfo.push_back(std::pair<mitk::TbssImage::MetaDataFunction, int>(mitk::TbssImage::GRADIENT_X, i));
+        metaInfo.push_back(std::pair<mitk::TbssImage::MetaDataFunction, int>(mitk::TbssImage::GRADIENT_Y, i+1));
+        metaInfo.push_back(std::pair<mitk::TbssImage::MetaDataFunction, int>(mitk::TbssImage::GRADIENT_Z, i+2));
+
+
+        VectorReaderType::Pointer fileReader = VectorReaderType::New();
+        fileReader->SetFileName(file);
+        itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+        fileReader->SetImageIO(io);
+        fileReader->Update();
+
+        VectorImageType::Pointer img = fileReader->GetOutput();
+
+        VectorImageType::SizeType size = img->GetLargestPossibleRegion().GetSize();
+
+        if(i==0)
+        {
+          // First image in serie. Properties should be used to initialize m_Data
+          m_Data->SetRegions(img->GetLargestPossibleRegion().GetSize());
+          m_Data->SetSpacing(img->GetSpacing());
+          m_Data->SetOrigin(img->GetOrigin());
+          m_Data->SetDirection(img->GetDirection());
+          m_Data->SetVectorLength(vecLength);
+          m_Data->Allocate();
+        }
+
+
+        /* Dealing with a gradient image, so the size of the vector need to be increased by 2
+            since this image contains 3 volumes. Old data should not be deleted*/
+
+
+
+        for(int x=0; x<size[0]; x++)
+        {
+          for(int y=0; y<size[1]; y++)
+          {
+            for(int z=0; z<size[2]; z++)
+            {
+              itk::Index<3> ix;
+              ix[0] = x;
+              ix[1] = y;
+              ix[2] = z;
+
+              itk::VariableLengthVector<int> vec = img->GetPixel(ix);
+              itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
+              for(int j=0; j<vec.Size(); j++)
+              {
+                int pos = i+j;
+                float f = vec.GetElement(j);
+                pixel.SetElement(pos, f);
+
+              }
+              m_Data->SetPixel(ix, pixel);
+            }
+          }
+        }
 
         // Read vector image and add to m_Data
       }
 
       else {
+
+        metaInfo.push_back(pair);
         FileReaderType3D::Pointer fileReader = FileReaderType3D::New();
         fileReader->SetFileName(file);
         fileReader->Update();
@@ -203,7 +268,15 @@ namespace mitk
           m_Data->SetSpacing(img->GetSpacing());
           m_Data->SetOrigin(img->GetOrigin());
           m_Data->SetDirection(img->GetDirection());
-          m_Data->SetVectorLength(m_MetaFiles.size());
+          m_Data->SetVectorLength(vecLength);
+          /*
+          if(containsGradient)
+          {
+            m_Data->SetVectorLength(m_MetaFiles.size()+2);
+          }
+          else{
+            m_Data->SetVectorLength(m_MetaFiles.size());
+          }*/
           m_Data->Allocate();
         }
 

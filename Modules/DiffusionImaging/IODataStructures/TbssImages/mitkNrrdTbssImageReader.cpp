@@ -191,6 +191,29 @@ namespace mitk
               metaInfo.push_back(p);
             }
 
+            else if(itKey->find("gradient_x") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_X;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+            else if(itKey->find("gradient_y") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_Y;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
+            else if(itKey->find("gradient_z") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_Z;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
 
           }
 

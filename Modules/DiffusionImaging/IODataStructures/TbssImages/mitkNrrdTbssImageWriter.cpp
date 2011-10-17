@@ -158,6 +158,18 @@ std::string mitk::NrrdTbssImageWriter::RetrieveString(mitk::TbssImage::MetaDataF
   {
     return "mean fa skeleton mask";
   }
+  else if(meta == mitk::TbssImage::GRADIENT_X)
+  {
+    return "gradient_x";
+  }
+  else if(meta == mitk::TbssImage::GRADIENT_Y)
+  {
+    return "gradient_y";
+  }
+  else if(meta == mitk::TbssImage::GRADIENT_Z)
+  {
+    return "gradient_z";
+  }
   return "";
 }
 

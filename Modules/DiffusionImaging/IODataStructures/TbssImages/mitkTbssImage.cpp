@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::TbssImage::TbssImage()
-  : m_IsMeta(false)
+  : m_IsMeta(false), m_ContainsGradient(false)
 {
 
 }

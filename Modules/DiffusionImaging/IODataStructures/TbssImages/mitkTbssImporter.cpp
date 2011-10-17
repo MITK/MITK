@@ -160,7 +160,10 @@ namespace mitk
 
     std::vector< std::pair<mitk::TbssImage::MetaDataFunction, int> > metaInfo;
 
-    for(int i=0; i<m_MetaFiles.size(); i++)
+    // Gradient images are vector images, so they will add more dimensions to the vector
+    int extradims=0;
+
+    for(int i=0; i < (m_MetaFiles.size() + extradims); i++)
     {
       std::pair<std::string, std::string> p = m_MetaFiles.at(i);
       std::string function = p.first;
@@ -176,45 +179,54 @@ namespace mitk
 
       metaInfo.push_back(pair);
 
-      FileReaderType3D::Pointer fileReader = FileReaderType3D::New();
-      fileReader->SetFileName(file);
-      fileReader->Update();
 
-      FloatImage3DType::Pointer img = fileReader->GetOutput();
-
-      FloatImage3DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
-
-      if(i==0)
+      if(pair.first == mitk::TbssImage::GRADIENT_X)
       {
-        // First image in serie. Properties should be used to initialize m_Data
-        m_Data->SetRegions(img->GetLargestPossibleRegion().GetSize());
-        m_Data->SetSpacing(img->GetSpacing());
-        m_Data->SetOrigin(img->GetOrigin());
-        m_Data->SetDirection(img->GetDirection());
-        m_Data->SetVectorLength(m_MetaFiles.size());
-        m_Data->Allocate();
+        extradims +=3;
+
+        // Read vector image and add to m_Data
       }
 
-      for(int x=0; x<size[0]; x++)
-      {
-        for(int y=0; y<size[1]; y++)
+      else {
+        FileReaderType3D::Pointer fileReader = FileReaderType3D::New();
+        fileReader->SetFileName(file);
+        fileReader->Update();
+
+        FloatImage3DType::Pointer img = fileReader->GetOutput();
+
+        FloatImage3DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
+
+        if(i==0)
         {
-          for(int z=0; z<size[2]; z++)
+          // First image in serie. Properties should be used to initialize m_Data
+          m_Data->SetRegions(img->GetLargestPossibleRegion().GetSize());
+          m_Data->SetSpacing(img->GetSpacing());
+          m_Data->SetOrigin(img->GetOrigin());
+          m_Data->SetDirection(img->GetDirection());
+          m_Data->SetVectorLength(m_MetaFiles.size());
+          m_Data->Allocate();
+        }
+
+        for(int x=0; x<size[0]; x++)
+        {
+          for(int y=0; y<size[1]; y++)
           {
-            itk::Index<3> ix;
-            ix[0] = x;
-            ix[1] = y;
-            ix[2] = z;
+            for(int z=0; z<size[2]; z++)
+            {
+              itk::Index<3> ix;
+              ix[0] = x;
+              ix[1] = y;
+              ix[2] = z;
 
-            float f = img->GetPixel(ix);
-            itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
-            pixel.SetElement(i, f);
-            m_Data->SetPixel(ix, pixel);
+              float f = img->GetPixel(ix);
+              itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
+              pixel.SetElement(i, f);
+              m_Data->SetPixel(ix, pixel);
 
+            }
           }
         }
       }
-
 
     }
 
@@ -236,6 +248,10 @@ namespace mitk
     else if(s == "mean fa skeleton")
     {
       return mitk::TbssImage::MEAN_FA_SKELETON;
+    }
+    else if(s == "gradient image")
+    {
+      return mitk::TbssImage::GRADIENT_X;
     }
 
     return mitk::TbssImage::MISC;

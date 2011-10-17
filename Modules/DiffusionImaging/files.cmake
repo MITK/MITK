@@ -75,6 +75,8 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkTbssGradientImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriter.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp

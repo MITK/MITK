@@ -68,11 +68,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
+#include "mitkNrrdTbssGradientImageWriterFactory.h"
+#include "mitkNrrdTbssGradientImageWriter.h"
+
 
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
 typedef float TbssPixelType;
-
+typedef int TbssGradientPixelType;
 
 
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -105,6 +108,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
+    mitk::NrrdTbssGradientImageWriterFactory::RegisterOneFactory();
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
@@ -113,6 +117,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
+    m_FileWriters.push_back( mitk::NrrdTbssGradientImageWriter::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
@@ -360,6 +365,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tgi", "TBSS gradient image"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
@@ -376,6 +382,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tgi", "TBSS gradient image"));
 }
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()

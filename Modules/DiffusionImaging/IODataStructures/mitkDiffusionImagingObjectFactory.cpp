@@ -237,7 +237,6 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname =  "PlanarCircle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-       MITK_INFO << "DI_NodeClassname: " << node->GetData()->GetNameOfClass();
       newMapper = mitk::PlanarCircleMapper3D::New();
       newMapper->SetDataNode(node);
     }

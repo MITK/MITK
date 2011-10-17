@@ -32,13 +32,9 @@ mitk::StringProperty::StringProperty( const std::string& s )
 
 }
 
-bool mitk::StringProperty::operator==(const BaseProperty& property ) const 
+bool mitk::StringProperty::IsEqual(const BaseProperty& property ) const
 {
-  const Self *other = dynamic_cast<const Self*>(&property);
-
-  if(other==NULL) return false;
-
-  return other->m_Value==m_Value;
+  return this->m_Value == static_cast<const Self&>(property).m_Value;
 }
 
 std::string mitk::StringProperty::GetValueAsString() const 

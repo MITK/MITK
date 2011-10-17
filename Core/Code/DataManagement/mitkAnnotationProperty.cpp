@@ -80,14 +80,10 @@ void mitk::AnnotationProperty::SetPosition( const mitk::Point3D &position )
 }
 
 
-bool mitk::AnnotationProperty::operator==( const BaseProperty &property ) const 
+bool mitk::AnnotationProperty::IsEqual( const BaseProperty &property ) const
 {  
-  const Self *other = dynamic_cast< const Self * >( &property );
-
-  if ( other == NULL ) return false;
-
-  return ( (other->m_Label == m_Label )
-    && (other->m_Position == m_Position ) );
+  return ( (this->m_Label == static_cast<const Self&>(property).m_Label )
+           && (this->m_Position == static_cast<const Self&>(property).m_Position ) );
 }
 
 

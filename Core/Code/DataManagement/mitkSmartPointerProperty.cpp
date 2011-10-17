@@ -69,22 +69,14 @@ std::string mitk::SmartPointerProperty::GetReferenceUIDFor(itk::Object* object)
   }
 }
 
-bool mitk::SmartPointerProperty::operator==(const BaseProperty& property) const
+bool mitk::SmartPointerProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    if(other==NULL) return false;
-
-    return other->m_SmartPointer==m_SmartPointer;
+  return this->m_SmartPointer == static_cast<const Self&>(property).m_SmartPointer;
 }
 
 mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer)
 {
   SetSmartPointer( pointer );
-}
-
-mitk::SmartPointerProperty::~SmartPointerProperty()
-{
 }
 
 itk::Object::Pointer mitk::SmartPointerProperty::GetSmartPointer() const

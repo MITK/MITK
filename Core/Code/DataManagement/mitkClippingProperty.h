@@ -56,7 +56,6 @@ public:
   const Vector3D &GetNormal() const;
   void SetNormal( const Vector3D &normal );
 
-  virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
 
 
@@ -69,6 +68,10 @@ protected:
   
   ClippingProperty();
   ClippingProperty( const Point3D &origin, const Vector3D &normal );
+
+private:
+
+  virtual bool IsEqual(const BaseProperty& property ) const;
 
 };
 

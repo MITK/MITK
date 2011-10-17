@@ -51,7 +51,7 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
   {
     // yes
     //is the property contained in the list identical to the new one?
-    if( it->second == property) 
+    if( it->second->operator==(*property) )
     {
       // yes? do nothing and return.
       return;

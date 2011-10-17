@@ -39,10 +39,6 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
 
     itkNewMacro(SmartPointerProperty);
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
-    
-    virtual bool operator==(const BaseProperty&) const;
-
-    virtual ~SmartPointerProperty();
 
     itk::Object::Pointer GetSmartPointer() const;
 
@@ -70,6 +66,8 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     itk::Object::Pointer m_SmartPointer;
 
   private:
+
+    virtual bool IsEqual(const BaseProperty&) const;
 
     typedef std::map<itk::Object*, unsigned int>             ReferenceCountMapType;
     typedef std::map<itk::Object*, std::string>              ReferencesUIDMapType;

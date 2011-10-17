@@ -40,10 +40,6 @@ mitk::ColorProperty::ColorProperty(const mitk::Color & color) : m_Color(color)
 
 }
 
-mitk::ColorProperty::~ColorProperty()
-{
-}
-
 bool mitk::ColorProperty::Assignable(const mitk::BaseProperty& other) const
 {
   try
@@ -78,17 +74,9 @@ mitk::BaseProperty& mitk::ColorProperty::operator=(const mitk::BaseProperty& oth
  }
 
 
-bool mitk::ColorProperty::operator==(const BaseProperty& property) const
+bool mitk::ColorProperty::IsEqual(const BaseProperty& property) const
 {
-  try
-  {
-    const Self& other = dynamic_cast<const Self&>(property);
-    return other.m_Color == m_Color;
-  }
-  catch (std::bad_cast&)
-  {
-    return false;
-  }
+  return this->m_Color == static_cast<const Self&>(property).m_Color;
 }
 
 const mitk::Color & mitk::ColorProperty::GetColor() const

@@ -52,28 +52,8 @@ class GenericProperty : public BaseProperty
     
     typedef T ValueType;
 
-    virtual ~GenericProperty() 
-    {
-    }
-
     itkSetMacro(Value,T);
     itkGetConstMacro(Value,T);
-
-    virtual bool operator==(const BaseProperty& other) const 
-    {
-      try
-      {
-        const Self *otherProp = dynamic_cast<const Self*>(&other);
-        if(otherProp==NULL) return false;
-        if (this->m_Value == otherProp->m_Value) return true;
-      }
-      catch (std::bad_cast)
-      {
-        // nothing to do now - just return false
-      }
-
-      return false;
-    }
     
     virtual std::string GetValueAsString() const 
     {
@@ -120,6 +100,13 @@ class GenericProperty : public BaseProperty
     GenericProperty(T x) 
        : m_Value(x) {}
     T m_Value;
+
+  private:
+
+    virtual bool IsEqual(const BaseProperty& other) const
+    {
+      return (this->m_Value == static_cast<const Self&>(other).m_Value);
+    }
 };
 
 } // namespace mitk
@@ -138,13 +125,10 @@ public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \
   itkNewMacro(PropertyName);                              \
   mitkNewMacro1Param(PropertyName, Type);                 \
-  virtual ~PropertyName() {}                              \
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 protected:                                                \
   PropertyName() { m_Value = DefaultValue; }              \
   PropertyName(Type x) : GenericProperty<Type>(x) {}      \
 };
 
+
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */
-
-

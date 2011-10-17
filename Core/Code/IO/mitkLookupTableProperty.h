@@ -51,11 +51,13 @@ namespace mitk {
 
     virtual ~LookupTableProperty();
 
-    virtual bool operator==(const BaseProperty& property) const;
-
     itkGetObjectMacro(LookupTable, LookupTable );
 
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
+
+  private:
+
+    virtual bool IsEqual(const BaseProperty& property) const;
 
   };
 

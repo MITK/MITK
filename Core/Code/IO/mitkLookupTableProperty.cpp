@@ -36,14 +36,9 @@ mitk::LookupTableProperty::~LookupTableProperty()
 {
 }
 
-bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
+bool mitk::LookupTableProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    if(other==NULL) return false;
-
-    return *(other->m_LookupTable.GetPointer())==*(m_LookupTable.GetPointer());
-
+    return *(this->m_LookupTable) == *(static_cast<const Self&>(property).m_LookupTable);
 }
 
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)

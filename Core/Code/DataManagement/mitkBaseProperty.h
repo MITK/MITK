@@ -44,15 +44,21 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
 
     mitkClassMacro(BaseProperty,itk::Object);
 
-    /*! @brief Subclasses must implement this operator==.
-        Operator== which is used by PropertyList to check whether a property has been changed.
+    /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
+
+        operator== which is used by PropertyList to check whether a property has been changed.
     */
-    virtual bool operator==(const BaseProperty& property) const = 0;
+    bool operator==(const BaseProperty& property) const;
     
     virtual BaseProperty& operator=(const BaseProperty& property);
     
     virtual std::string GetValueAsString() const;
     
+    /*!
+      Should be implemented by subclasses to indicate whether they can accept the parameter
+      as the right-hand-side argument of an assignment. This test will most probably include
+      some dynamic_cast.
+     */
     virtual bool Assignable(const BaseProperty& ) const;
 
   protected:
@@ -60,9 +66,12 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
     
     virtual ~BaseProperty();
 
-    friend class PropertyList; // for VALUE
-
-    static std::string VALUE;
+  private:
+    /*!
+      Override this method in subclasses to implement a meaningful comparison. The property
+      argument is guaranteed to be castable to the type of the implementing subclass.
+    */
+    virtual bool IsEqual(const BaseProperty& property) const = 0;
 };
 
 } // namespace mitk

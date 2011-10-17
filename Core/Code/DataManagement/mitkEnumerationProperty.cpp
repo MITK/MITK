@@ -136,20 +136,11 @@ mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetEnumId( const st
 }
 
 
-bool mitk::EnumerationProperty::operator==( const BaseProperty& property ) const
+bool mitk::EnumerationProperty::IsEqual( const BaseProperty& property ) const
 {
-  const Self * other = dynamic_cast<const Self*>( &property );
-
-  if ( other == NULL )
-    return false;
-
-  if ( this->Size() != other->Size() )
-    return false;
-
-  if ( this->GetValueAsId() != other->GetValueAsId() )
-    return false;
-
-  return std::equal( this->Begin(), this->End(), other->Begin() );
+  const Self& other = static_cast<const Self&>(property);
+  return this->Size() == other.Size() && this->GetValueAsId() == other.GetValueAsId() &&
+      std::equal( this->Begin(), this->End(), other.Begin() );
 }
 
 

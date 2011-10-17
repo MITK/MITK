@@ -24,10 +24,6 @@ mitk::GroupTagProperty::GroupTagProperty()
 {
 }
 
-mitk::GroupTagProperty::~GroupTagProperty()
-{
-}
-
 
 /*!
   Should be implemented by subclasses to indicate whether they can accept the parameter 
@@ -47,9 +43,8 @@ bool mitk::GroupTagProperty::Assignable(const BaseProperty& other) const
   return false;
 }
 
-bool mitk::GroupTagProperty::operator==(const BaseProperty& property) const
+bool mitk::GroupTagProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    return (other!=NULL); // if other property is also a GroupTagProperty, then it is equal to us, because tags have no value themselves
+  // if other property is also a GroupTagProperty, then it is equal to us, because tags have no value themselves
+  return true;
 }

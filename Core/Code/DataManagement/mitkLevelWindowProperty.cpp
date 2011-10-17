@@ -32,13 +32,9 @@ mitk::LevelWindowProperty::~LevelWindowProperty()
 {
 }
 
-bool mitk::LevelWindowProperty::operator==(const BaseProperty& property) const
+bool mitk::LevelWindowProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    if(other==NULL) return false;
-
-    return other->m_LevWin==m_LevWin;
+    return this->m_LevWin == static_cast<const Self&>(property).m_LevWin;
 }
 
 const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const

@@ -32,11 +32,6 @@ std::string mitk::BaseProperty::GetValueAsString() const
   return std::string("n/a"); 
 }
 
-/*!
-  Should be implemented by subclasses to indicate whether they can accept the parameter 
-  as the right-hand-side argument of an assignment. This test will most probably include
-  some dynamic_cast.
- */
 bool mitk::BaseProperty::Assignable( const BaseProperty& ) const
 {
   return false;
@@ -53,4 +48,9 @@ mitk::BaseProperty& mitk::BaseProperty::operator=(const BaseProperty& rhs)
   // place meaningful copy code here (nothing possible with BaseProeprties)
 
   return *this;
+}
+
+bool mitk::BaseProperty::operator==(const BaseProperty& property) const
+{
+  return (typeid(*this) == typeid(property) && IsEqual(property));
 }

@@ -73,14 +73,10 @@ void ClippingProperty::SetNormal( const Vector3D &normal )
 }
 
 
-bool ClippingProperty::operator==( const BaseProperty &property ) const 
+bool ClippingProperty::IsEqual( const BaseProperty &property ) const
 {  
-  const Self *other = dynamic_cast< const Self * >( &property );
-
-  if ( other == NULL ) return false;
-
-  return ( (other->m_Origin == m_Origin )
-    && (other->m_Normal == m_Normal ) );
+  return ( (this->m_Origin == static_cast<const Self&>(property).m_Origin )
+           && (this->m_Normal == static_cast<const Self&>(property).m_Normal ) );
 }
 
 

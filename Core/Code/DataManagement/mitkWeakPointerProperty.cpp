@@ -18,13 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkWeakPointerProperty.h"
 
-bool mitk::WeakPointerProperty::operator==(const BaseProperty& property) const
+bool mitk::WeakPointerProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    if(other==NULL) return false;
-
-    return other->m_WeakPointer==m_WeakPointer;
+    return this->m_WeakPointer == static_cast<const Self&>(property).m_WeakPointer;
 }
 
 mitk::WeakPointerProperty::WeakPointerProperty(itk::Object* pointer) : m_WeakPointer(pointer)

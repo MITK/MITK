@@ -36,8 +36,6 @@ namespace mitk {
 
     mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
 
-    virtual bool operator==(const BaseProperty& property) const;
-
     virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
 
     virtual ~WeakPointerProperty();
@@ -49,6 +47,9 @@ namespace mitk {
     itk::WeakPointer<itk::Object> m_WeakPointer;
 
     WeakPointerProperty(itk::Object* pointer);
+
+  private:
+    virtual bool IsEqual(const BaseProperty& property) const;
   };
 
 } // namespace mitk

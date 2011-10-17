@@ -164,6 +164,8 @@ void QmitkGibbsTrackingView::AfterThread()
   if(m_Controls->m_ParticleLengthSlider->value()==0)
     paramMessage += "Particle length was set to " + QString::number(this->m_GlobalTracker->GetParticleLength()) + " mm\n";
 
+  m_FiberBundleNode = NULL;
+
   if (paramMessage.length()>0)
     QMessageBox::information(NULL, "Automatically selected parameters", paramMessage);
 }
@@ -501,7 +503,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   if (!m_QBallSelected)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select a qball image before starting image processing.");
+    QMessageBox::information( NULL, "Warning", "Please load and select a qball image before starting image processing.");
     return;
   }
 

@@ -591,7 +591,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
 
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
-    m_Controls->m_2DHeatmap->setIcon(iconPaint);
+    m_Controls->m_TDI->setIcon(iconPaint);
 
     m_Controls->m_TextureIntON->setCheckable(true);
 
@@ -757,7 +757,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
     connect((QObject*) m_Controls->m_PFColor3D, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor3D()));
 
-    connect((QObject*) m_Controls->m_2DHeatmap, SIGNAL(clicked()), (QObject*) this, SLOT(Heatmap()));
+    connect((QObject*) m_Controls->m_TDI, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateTdi()));
 
     connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
     connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
@@ -1577,7 +1577,7 @@ void QmitkControlVisualizationPropertiesView::PFColor3D()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkControlVisualizationPropertiesView::Heatmap()
+void QmitkControlVisualizationPropertiesView::GenerateTdi()
 {
   if(m_SelectedNode)
   {
@@ -1613,7 +1613,7 @@ void QmitkControlVisualizationPropertiesView::Heatmap()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(img2);
     QString name(m_SelectedNode->GetName().c_str());
-    name += "_heatmap";
+    name += "_TDI";
     node->SetName(name.toStdString());
     node->SetVisibility(true);
 

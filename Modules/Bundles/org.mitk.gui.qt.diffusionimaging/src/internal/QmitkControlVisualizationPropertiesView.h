@@ -119,7 +119,7 @@ protected slots:
   void LineWidthChanged(int);
   void TubeRadiusChanged(int);
 
-  void Heatmap();
+  void GenerateTdi();
   void Welcome();
 
 protected:

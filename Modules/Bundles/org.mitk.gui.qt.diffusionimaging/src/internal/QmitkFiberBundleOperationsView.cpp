@@ -1785,7 +1785,7 @@ void QmitkFiberBundleOperationsView::GenerateTractDensityImage(bool binary)
   if(binary)
     name += "_envelope";
   else
-    name += "_tdi";
+    name += "_TDI";
   node->SetName(name.toStdString());
   node->SetVisibility(true);
 

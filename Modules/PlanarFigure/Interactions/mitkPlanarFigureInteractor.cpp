@@ -236,6 +236,13 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
+      // check if the control points shall be hidden during interaction
+      bool hidecontrolpointsduringinteraction = false;
+      m_DataNode->GetBoolProperty( "planarfigure.hidecontrolpointsduringinteraction", hidecontrolpointsduringinteraction );
+
+      // hide the control points if necessary
+      m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", !hidecontrolpointsduringinteraction );
+
       // Move current control point to this point
       planarFigure->SetCurrentControlPoint( point2D );
 
@@ -263,6 +270,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
@@ -301,6 +309,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->RemoveLastControlPoint();
         planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         m_DataNode->Modified();
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
@@ -417,6 +426,7 @@ bool mitk::PlanarFigureInteractor
       planarFigure->Modified();
       planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
+      m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
       m_DataNode->Modified();
 
       // falls through
@@ -630,6 +640,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->EvaluateFeatures();
         planarFigure->Modified();
 
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         renderer->GetRenderingManager()->RequestUpdateAll();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );

@@ -33,12 +33,6 @@ void mitk::PhilipsDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
-    // adapted from namic-sandbox
-    // DicomToNrrdConverter.cxx
-
-    //VolumeReaderType::DictionaryArrayRawPointer inputDict 
-    //  = m_VolumeReader->GetMetaDataDictionaryArray();
-
     ReadPublicTags();
 
     ReadPublicTags2();

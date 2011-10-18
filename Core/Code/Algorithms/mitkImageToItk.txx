@@ -215,11 +215,11 @@ template<class TOutputImage>
   if (  TOutputImage::ImageDimension <= 2)
   {
      if (( TOutputImage::ImageDimension == 2) && (
-        ( matrix[0][2] != 0) ||
-        ( matrix[1][2] != 0) ||
-        ( matrix[2][0] != 0) ||
-        ( matrix[2][1] != 0) ||
-        ( matrix[2][2] != 1) &&  ( matrix[2][2] != -1) ) )
+           ( matrix[0][2] != 0) ||
+           ( matrix[1][2] != 0) ||
+           ( matrix[2][0] != 0) ||
+           ( matrix[2][1] != 0) ||
+           (( matrix[2][2] != 1) &&  ( matrix[2][2] != -1) )))
      {
         // The 2D MITK image contains 3D rotation information.
         // This cannot be expressed in a 2D ITK image, so the ITK image will have no rotation

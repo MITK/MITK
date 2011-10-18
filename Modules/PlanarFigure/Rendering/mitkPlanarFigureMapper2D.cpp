@@ -78,7 +78,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
     if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
       || !(planarFigurePlaneGeometry->DistanceFromPlane( 
-           rendererPlaneGeometry ) < planeThickness / 3.0) )
+      rendererPlaneGeometry ) < planeThickness / 3.0) )
     {
       // Planes are not parallel or renderer plane is not within PlanarFigure
       // geometry bounds --> exit
@@ -103,7 +103,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Enable line antialiasing
   glEnable( GL_LINE_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-  
+
   // Get properties from node (if present)
   const mitk::DataNode* node=this->GetDataNode();
   this->InitializePlanarFigurePropertiesFromDataNode( node );
@@ -118,7 +118,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   {
     lineDisplayMode = PF_HOVER;
   }
- 
+
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
 
   if ( m_DrawOutline )
@@ -177,7 +177,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
           m_LineColor[lineDisplayMode][1],
           m_LineColor[lineDisplayMode][2] );
       }
-      
+
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
     }
@@ -237,55 +237,57 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
 
-
-  // Draw markers at control points (selected control point will be colored)
-  for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
+  if ( m_DrawControlPoints )
   {
-    
-    bool isEditable = true;
-    m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
-    
-    PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
-
-    // Only if planar figure is marked as editable: display markers (control points) in a
-    // different style if mouse is over them or they are selected
-    if ( isEditable )
+    // Draw markers at control points (selected control point will be colored)
+    for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
     {
-      if ( i == (unsigned int) planarFigure->GetSelectedControlPoint() )
+
+      bool isEditable = true;
+      m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
+      PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
+
+      // Only if planar figure is marked as editable: display markers (control points) in a
+      // different style if mouse is over them or they are selected
+      if ( isEditable )
       {
-        pointDisplayMode = PF_SELECTED;
+        if ( i == (unsigned int) planarFigure->GetSelectedControlPoint() )
+        {
+          pointDisplayMode = PF_SELECTED;
+        }
+        else if ( m_IsHovering )
+        {
+          pointDisplayMode = PF_HOVER;
+        }
       }
-      else if ( m_IsHovering )
-      {
-        pointDisplayMode = PF_HOVER;
-      }
+
+      this->DrawMarker( planarFigure->GetControlPoint( i ),
+        m_MarkerlineColor[pointDisplayMode],
+        m_MarkerlineOpacity[pointDisplayMode],
+        m_MarkerColor[pointDisplayMode],
+        m_MarkerOpacity[pointDisplayMode],
+        m_LineWidth,
+        m_ControlPointShape,
+        planarFigureGeometry2D, 
+        rendererGeometry2D, 
+        displayGeometry );
     }
 
-    this->DrawMarker( planarFigure->GetControlPoint( i ),
-      m_MarkerlineColor[pointDisplayMode],
-      m_MarkerlineOpacity[pointDisplayMode],
-      m_MarkerColor[pointDisplayMode],
-      m_MarkerOpacity[pointDisplayMode],
-      m_LineWidth,
-      m_ControlPointShape,
-      planarFigureGeometry2D, 
-      rendererGeometry2D, 
-      displayGeometry );
-  }
-
-  if ( planarFigure->IsPreviewControlPointVisible() )
-  {
-    this->DrawMarker( planarFigure->GetPreviewControlPoint(),
-      m_MarkerlineColor[PF_HOVER],
-      m_MarkerlineOpacity[PF_HOVER],
-      m_MarkerColor[PF_HOVER],
-      m_MarkerOpacity[PF_HOVER],
-      m_LineWidth,
-      m_ControlPointShape,
-      planarFigureGeometry2D, 
-      rendererGeometry2D, 
-      displayGeometry 
-      );
+    if ( planarFigure->IsPreviewControlPointVisible() )
+    {
+      this->DrawMarker( planarFigure->GetPreviewControlPoint(),
+        m_MarkerlineColor[PF_HOVER],
+        m_MarkerlineOpacity[PF_HOVER],
+        m_MarkerColor[PF_HOVER],
+        m_MarkerOpacity[PF_HOVER],
+        m_LineWidth,
+        m_ControlPointShape,
+        planarFigureGeometry2D, 
+        rendererGeometry2D, 
+        displayGeometry 
+        );
+    }
   }
 
   glLineWidth( 1.0f );
@@ -408,7 +410,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       this->PaintPolyLine( helperPolyLine, false,
         shadow, 0.8, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-    
+
       delete shadow;
     }
 
@@ -462,54 +464,54 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
 
   switch ( shape )
   {
-    case PlanarFigureControlPointStyleProperty::Square:
-    default:
-      // Paint filled square
+  case PlanarFigureControlPointStyleProperty::Square:
+  default:
+    // Paint filled square
 
-      // Disable line antialiasing (does not look nice for squares)
-      glDisable( GL_LINE_SMOOTH );
+    // Disable line antialiasing (does not look nice for squares)
+    glDisable( GL_LINE_SMOOTH );
 
-      glRectf(
-        displayPoint[0] - 4, displayPoint[1] - 4, 
-        displayPoint[0] + 4, displayPoint[1] + 4 );
+    glRectf(
+      displayPoint[0] - 4, displayPoint[1] - 4, 
+      displayPoint[0] + 4, displayPoint[1] + 4 );
 
-      // Paint outline
-      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
-      glBegin( GL_LINE_LOOP );
-      glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
-      glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
-      glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
-      glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
-      glEnd();
-      break;
+    // Paint outline
+    glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
+    glBegin( GL_LINE_LOOP );
+    glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
+    glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
+    glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
+    glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
+    glEnd();
+    break;
 
-    case PlanarFigureControlPointStyleProperty::Circle:
-      // Paint filled circle
-      glBegin( GL_POLYGON );
-      float radius = 4.0;
-      for ( int angle = 0; angle < 8; ++angle )
-      {
-        float angleRad = angle * (float) 3.14159 / 4.0;
-        float x = displayPoint[0] + radius * (float)cos( angleRad );
-        float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex2f(x,y);
-      }
-      glEnd();
+  case PlanarFigureControlPointStyleProperty::Circle:
+    // Paint filled circle
+    glBegin( GL_POLYGON );
+    float radius = 4.0;
+    for ( int angle = 0; angle < 8; ++angle )
+    {
+      float angleRad = angle * (float) 3.14159 / 4.0;
+      float x = displayPoint[0] + radius * (float)cos( angleRad );
+      float y = displayPoint[1] + radius * (float)sin( angleRad );
+      glVertex2f(x,y);
+    }
+    glEnd();
 
-      // Paint outline
-      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
-      glBegin( GL_LINE_LOOP );
-      for ( int angle = 0; angle < 8; ++angle )
-      {
-        float angleRad = angle * (float) 3.14159 / 4.0;
-        float x = displayPoint[0] + radius * (float)cos( angleRad );
-        float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex2f(x,y);
-      }
-      glEnd();
-      break;
+    // Paint outline
+    glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
+    glBegin( GL_LINE_LOOP );
+    for ( int angle = 0; angle < 8; ++angle )
+    {
+      float angleRad = angle * (float) 3.14159 / 4.0;
+      float x = displayPoint[0] + radius * (float)cos( angleRad );
+      float y = displayPoint[1] + radius * (float)sin( angleRad );
+      glVertex2f(x,y);
+    }
+    glEnd();
+    break;
 
-    } // end switch
+  } // end switch
 }
 
 
@@ -520,6 +522,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawOutline = false;
   m_DrawQuantities = false;
   m_DrawShadow = false;
+  m_DrawControlPoints = false;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -575,7 +578,8 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawoutline", m_DrawOutline );
   node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawshadow", m_DrawShadow );
-  
+  node->GetBoolProperty( "planarfigure.drawcontrolpoints", m_DrawControlPoints );
+
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
   node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );
@@ -634,6 +638,7 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
   //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawControlPoints", mitk::BoolProperty::New(true) );
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );

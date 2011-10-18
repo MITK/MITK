@@ -30,11 +30,11 @@ mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
   }
 }
 
-mitk::SlicedData::SlicedData( const SlicedData &other ): BaseData(other), 
-m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion), 
+mitk::SlicedData::SlicedData( const SlicedData &other ): BaseData(other),
 m_LargestPossibleRegion(other.m_LargestPossibleRegion),
 m_RequestedRegion(other.m_RequestedRegion),
-m_BufferedRegion(other.m_BufferedRegion)
+m_BufferedRegion(other.m_BufferedRegion),
+m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
 {
 
 }

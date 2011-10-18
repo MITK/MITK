@@ -57,19 +57,26 @@ public:
   mitkNewMacro1Param(ColorProperty, const float*);
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);
-  
-  virtual bool Assignable(const BaseProperty& other) const;
-  virtual BaseProperty& operator=(const BaseProperty& other);
+
+  typedef mitk::Color ValueType;
   
   const mitk::Color & GetColor() const;
   const mitk::Color & GetValue() const;
   std::string GetValueAsString() const;
   void SetColor(const mitk::Color & color );
+  void SetValue(const mitk::Color & color );
   void SetColor( float red, float green, float blue );
+
+  using BaseProperty::operator=;
 
 private:
 
+  // purposely not implemented
+  ColorProperty(const ColorProperty&);
+  ColorProperty& operator=(const ColorProperty&);
+
   virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty & property);
 
 };
 

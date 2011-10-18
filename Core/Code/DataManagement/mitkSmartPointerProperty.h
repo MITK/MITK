@@ -40,17 +40,17 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     itkNewMacro(SmartPointerProperty);
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
 
+    typedef itk::Object::Pointer ValueType;
+
     itk::Object::Pointer GetSmartPointer() const;
+    ValueType GetValue() const;
 
     void SetSmartPointer(itk::Object*);
+    void SetValue(const ValueType&);
 
     /// mainly for XML output
     virtual std::string GetValueAsString() const;
     
-    virtual bool Assignable(const BaseProperty&) const;
-    
-    virtual BaseProperty& operator=(const BaseProperty& property);
-
     static void PostProcessXMLReading();
 
     /// Return the number of SmartPointerProperties that reference the object given as parameter
@@ -58,6 +58,7 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     static std::string GetReferenceUIDFor(itk::Object*);
     static void RegisterPointerTarget(itk::Object*, const std::string uid);
 
+    using BaseProperty::operator=;
 
   protected:
     
@@ -67,7 +68,12 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
 
   private:
 
+    // purposely not implemented
+    SmartPointerProperty(const SmartPointerProperty&);
+    SmartPointerProperty& operator=(const SmartPointerProperty&);
+
     virtual bool IsEqual(const BaseProperty&) const;
+    virtual bool Assign(const BaseProperty&);
 
     typedef std::map<itk::Object*, unsigned int>             ReferenceCountMapType;
     typedef std::map<itk::Object*, std::string>              ReferencesUIDMapType;

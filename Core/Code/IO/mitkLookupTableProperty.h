@@ -39,25 +39,33 @@ namespace mitk {
 
     LookupTableProperty(const mitk::LookupTable::Pointer lut);
 
-    //    LookupTableProperty(const mitk::LookupTable& aLookupTable);
-
   public:
+
+    typedef LookupTable::Pointer ValueType;
+
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
     itkNewMacro(LookupTableProperty);
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
-    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-
-    virtual ~LookupTableProperty();
-
     itkGetObjectMacro(LookupTable, LookupTable );
+    ValueType GetValue() const;
 
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
+    void SetValue(const ValueType&);
+
+    virtual std::string GetValueAsString() const;
+
+    using BaseProperty::operator=;
 
   private:
 
+    // purposely not implemented
+    LookupTableProperty(const LookupTableProperty&);
+    LookupTableProperty& operator=(const LookupTableProperty&);
+
     virtual bool IsEqual(const BaseProperty& property) const;
+    virtual bool Assign(const BaseProperty& property);
 
   };
 

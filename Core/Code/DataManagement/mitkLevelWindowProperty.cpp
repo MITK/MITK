@@ -37,9 +37,20 @@ bool mitk::LevelWindowProperty::IsEqual(const BaseProperty& property) const
     return this->m_LevWin == static_cast<const Self&>(property).m_LevWin;
 }
 
+bool mitk::LevelWindowProperty::Assign(const BaseProperty& property)
+{
+  this->m_LevWin = static_cast<const Self&>(property).m_LevWin;
+  return true;
+}
+
 const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const
 {
     return m_LevWin;
+}
+
+const mitk::LevelWindow & mitk::LevelWindowProperty::GetValue() const
+{
+    return GetLevelWindow();
 }
 
 void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
@@ -49,6 +60,11 @@ void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
         m_LevWin = levWin;
         Modified();
     }
+}
+
+void mitk::LevelWindowProperty::SetValue(const ValueType& levWin)
+{
+  SetLevelWindow(levWin);
 }
 
 std::string mitk::LevelWindowProperty::GetValueAsString() const

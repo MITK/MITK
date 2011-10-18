@@ -24,27 +24,13 @@ mitk::GroupTagProperty::GroupTagProperty()
 {
 }
 
-
-/*!
-  Should be implemented by subclasses to indicate whether they can accept the parameter 
-  as the right-hand-side argument of an assignment. This test will most probably include
-  some dynamic_cast.
- */
-bool mitk::GroupTagProperty::Assignable(const BaseProperty& other) const
-{
-  try
-  {
-    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
-    return true; 
-  }
-  catch (std::bad_cast)
-  {
-  }
-  return false;
-}
-
 bool mitk::GroupTagProperty::IsEqual(const BaseProperty& property) const
 {
   // if other property is also a GroupTagProperty, then it is equal to us, because tags have no value themselves
+  return true;
+}
+
+bool mitk::GroupTagProperty::Assign(const BaseProperty& property)
+{
   return true;
 }

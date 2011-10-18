@@ -55,8 +55,8 @@ int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T:
   std::cout << "[PASSED]" << std::endl;
 
   prop->SetValue(testValue1);
-  std::cout << "    Testing assignment operator (operator=): ";
-  *prop = *prop3;
+  std::cout << "    Testing Assignment: ";
+  prop->AssignProperty(*prop3);
   if ( (! (*prop == *prop3)) || (*prop == *prop2) ) {
     std::cout << " [FAILED]" << std::endl;
     return EXIT_FAILURE;

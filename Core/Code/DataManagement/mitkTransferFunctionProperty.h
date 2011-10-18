@@ -28,6 +28,9 @@ namespace mitk {
 class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
 {
 public:
+
+  typedef mitk::TransferFunction::Pointer ValueType;
+
   mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
   itkNewMacro(TransferFunctionProperty);
@@ -36,9 +39,9 @@ public:
   itkSetMacro(Value, mitk::TransferFunction::Pointer );
   itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
 
-  virtual BaseProperty& operator=(const BaseProperty& other);
-
   std::string GetValueAsString() const;
+
+  using BaseProperty::operator=;
 
 protected:
   mitk::TransferFunction::Pointer m_Value;
@@ -49,7 +52,12 @@ protected:
 
 private:
 
+  // purposely not implemented
+  TransferFunctionProperty(const TransferFunctionProperty&);
+  TransferFunctionProperty& operator=(const TransferFunctionProperty&);
+
   virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty& property);
 };
 
 } // namespace mitk  

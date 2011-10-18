@@ -50,16 +50,23 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
     */
     bool operator==(const BaseProperty& property) const;
     
-    virtual BaseProperty& operator=(const BaseProperty& property);
+    /*! @brief Assigns property to this BaseProperty instance.
+
+        Subclasses must implement Assign(const BaseProperty&) and call the superclass
+        Assign method for proper handling of polymorphic assignments. The assignment
+        operator of the subclass should be disabled and the baseclass operator should
+        be made visible using "using" statements.
+    */
+    BaseProperty& operator=(const BaseProperty& property);
+
+    /*! @brief Assigns property to this BaseProperty instance.
+
+        This method is identical to the assignment operator, except for the return type.
+        It allows to directly check if the assignemnt was successfull.
+    */
+    bool AssignProperty(const BaseProperty & property);
     
     virtual std::string GetValueAsString() const;
-    
-    /*!
-      Should be implemented by subclasses to indicate whether they can accept the parameter
-      as the right-hand-side argument of an assignment. This test will most probably include
-      some dynamic_cast.
-     */
-    virtual bool Assignable(const BaseProperty& ) const;
 
   protected:
     BaseProperty();
@@ -67,11 +74,23 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
     virtual ~BaseProperty();
 
   private:
+
     /*!
       Override this method in subclasses to implement a meaningful comparison. The property
       argument is guaranteed to be castable to the type of the implementing subclass.
     */
     virtual bool IsEqual(const BaseProperty& property) const = 0;
+
+    /*!
+      Override this method in subclasses to implement a meaningful assignment. The property
+      argument is guaranteed to be castable to the type of the implementing subclass.
+
+      @warning This is not yet exception aware/safe and if this method returns false,
+               this property's state might be undefined.
+
+      @return True if the argument could be assigned to this property.
+     */
+    virtual bool Assign(const BaseProperty& ) = 0;
 };
 
 } // namespace mitk

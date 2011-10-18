@@ -26,15 +26,16 @@ bool TransferFunctionProperty::IsEqual(const BaseProperty& property) const
   return *(this->m_Value) == *(static_cast<const Self&>(property).m_Value);
 }
 
-BaseProperty&  TransferFunctionProperty::operator=(const BaseProperty& other)
+bool TransferFunctionProperty::Assign(const BaseProperty& property)
 {
-  return Superclass::operator=(other);
+  this->m_Value = static_cast<const Self&>(property).m_Value;
+  return true;
 }
 
 std::string  TransferFunctionProperty::GetValueAsString() const
 {
   std::stringstream myStr;
-  myStr << GetValue() ;
+  myStr << GetValue();
   return myStr.str();
 }
 

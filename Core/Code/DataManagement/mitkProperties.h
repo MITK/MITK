@@ -25,26 +25,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-   mitkSpecializeGenericProperty(BoolProperty,bool,false);
+   mitkDeclareGenericProperty(BoolProperty,bool,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(IntProperty,int,0);
+   mitkDeclareGenericProperty(IntProperty,int,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(FloatProperty,float,0.0f);
+   mitkDeclareGenericProperty(FloatProperty,float,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(DoubleProperty,double,0.0);
+   mitkDeclareGenericProperty(DoubleProperty,double,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(Vector3DProperty,Vector3D,Vector3D(0.0f));
+   mitkDeclareGenericProperty(Vector3DProperty,Vector3D,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(Point3dProperty,Point3D,Point3D::BaseArray::Filled(0.0f).GetDataPointer() );
+   mitkDeclareGenericProperty(Point3dProperty,Point3D,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
+   mitkDeclareGenericProperty(Point4dProperty,Point4D,MITK_CORE_EXPORT);
 
-   mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
+   mitkDeclareGenericProperty(Point3iProperty,Point3I,MITK_CORE_EXPORT);
    
-   mitkSpecializeGenericProperty(FloatLookupTableProperty,  FloatLookupTable,  FloatLookupTable());
-   mitkSpecializeGenericProperty(BoolLookupTableProperty,   BoolLookupTable,   BoolLookupTable());
-   mitkSpecializeGenericProperty(IntLookupTableProperty,    IntLookupTable,    IntLookupTable());
-   mitkSpecializeGenericProperty(StringLookupTableProperty, StringLookupTable, StringLookupTable());
+   mitkDeclareGenericProperty(FloatLookupTableProperty, FloatLookupTable,MITK_CORE_EXPORT);
+   mitkDeclareGenericProperty(BoolLookupTableProperty, BoolLookupTable,MITK_CORE_EXPORT);
+   mitkDeclareGenericProperty(IntLookupTableProperty, IntLookupTable,MITK_CORE_EXPORT);
+   mitkDeclareGenericProperty(StringLookupTableProperty, StringLookupTable,MITK_CORE_EXPORT);
    /**
    * \warning If you add more specialization of GenericProperty, you must also add these to the
    * templated GetPropertyValue() method in mitkPropertyList.cpp!

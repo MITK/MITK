@@ -40,43 +40,15 @@ mitk::ColorProperty::ColorProperty(const mitk::Color & color) : m_Color(color)
 
 }
 
-bool mitk::ColorProperty::Assignable(const mitk::BaseProperty& other) const
-{
-  try
-  {
-    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
-    return true;
-  }
-  catch (std::bad_cast)
-  {
-  }
-  return false;
-}
-
-mitk::BaseProperty& mitk::ColorProperty::operator=(const mitk::BaseProperty& other)
-{
-  try
-  {
-    const Self& otherProp( dynamic_cast<const Self&>(other) );
-
-    if (this->m_Color != otherProp.m_Color)
-    {
-      this->m_Color = otherProp.m_Color;
-      this->Modified();
-    }
-  }
-  catch (std::bad_cast)
-  {
-    // nothing to do then
-  }
-
-  return *this;
- }
-
-
 bool mitk::ColorProperty::IsEqual(const BaseProperty& property) const
 {
   return this->m_Color == static_cast<const Self&>(property).m_Color;
+}
+
+bool mitk::ColorProperty::Assign(const BaseProperty& property)
+{
+  this->m_Color = static_cast<const Self&>(property).m_Color;
+  return true;
 }
 
 const mitk::Color & mitk::ColorProperty::GetColor() const
@@ -93,9 +65,15 @@ void mitk::ColorProperty::SetColor(const mitk::Color & color )
     }
 }
 
+void mitk::ColorProperty::SetValue(const mitk::Color & color )
+{
+  SetColor(color);
+}
+
 void mitk::ColorProperty::SetColor( float red, float green, float blue )
 {
-  m_Color.Set(red, green, blue);
+  float tmp[3] = { red, green, blue };
+  SetColor(mitk::Color(tmp));
 }
 
 std::string mitk::ColorProperty::GetValueAsString() const {

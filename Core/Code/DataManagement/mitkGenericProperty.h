@@ -43,7 +43,7 @@ namespace mitk {
 
 */
 template <typename T>
-class GenericProperty : public BaseProperty
+class MITK_EXPORT GenericProperty : public BaseProperty
 {
   public:
 
@@ -61,39 +61,8 @@ class GenericProperty : public BaseProperty
       myStr << GetValue() ;
       return myStr.str(); 
     }
-    
-    virtual bool Assignable(const BaseProperty& other) const
-    {
-      try
-      {
-        dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
-        return true;
-      }
-      catch (std::bad_cast)
-      {
-      }
-      return false;
-    }
 
-    virtual BaseProperty& operator=(const BaseProperty& other)
-    {
-      try
-      {
-        const Self& otherProp( dynamic_cast<const Self&>(other) );
-
-        if (this->m_Value != otherProp.m_Value)
-        {
-          this->m_Value = otherProp.m_Value;
-          this->Modified();
-        }
-      }
-      catch (std::bad_cast)
-      {
-        // nothing to do then
-      }
-
-      return *this;
-     }
+    using BaseProperty::operator=;
 
   protected:
     GenericProperty() {}
@@ -103,9 +72,19 @@ class GenericProperty : public BaseProperty
 
   private:
 
+    // purposely not implemented
+    GenericProperty(const GenericProperty&);
+    GenericProperty& operator=(const GenericProperty&);
+
     virtual bool IsEqual(const BaseProperty& other) const
     {
       return (this->m_Value == static_cast<const Self&>(other).m_Value);
+    }
+
+    virtual bool Assign(const BaseProperty& other)
+    {
+      this->m_Value = static_cast<const Self&>(other).m_Value;
+      return true;
     }
 };
 
@@ -115,20 +94,26 @@ class GenericProperty : public BaseProperty
  * Generates a specialized subclass of mitk::GenericProperty. 
  * This way, GetNameOfClass() returns the value provided by PropertyName.
  * Please see mitkProperties.h for examples.
- * @param PropertyName the name of the instantiation of GenericProperty
+ * @param PropertyName the name of the subclass of GenericProperty
  * @param Type the value type of the GenericProperty
+ * @param Export the export macro for DLL usage
  */
-#define mitkSpecializeGenericProperty(PropertyName,Type,DefaultValue)  \
-class MITK_EXPORT PropertyName: public GenericProperty< Type >        \
-{                                                         \
-public:                                                   \
-  mitkClassMacro(PropertyName, GenericProperty< Type >);  \
-  itkNewMacro(PropertyName);                              \
-  mitkNewMacro1Param(PropertyName, Type);                 \
-protected:                                                \
-  PropertyName() { m_Value = DefaultValue; }              \
-  PropertyName(Type x) : GenericProperty<Type>(x) {}      \
+#define mitkDeclareGenericProperty(PropertyName,Type,Export)  \
+class Export PropertyName: public GenericProperty< Type >     \
+{                                                             \
+public:                                                       \
+  mitkClassMacro(PropertyName, GenericProperty< Type >);      \
+  itkNewMacro(PropertyName);                                  \
+  mitkNewMacro1Param(PropertyName, Type);                     \
+  using BaseProperty::operator=;                              \
+protected:                                                    \
+  PropertyName();                                             \
+  PropertyName(Type x);                                       \
 };
+
+#define mitkDefineGenericProperty(PropertyName,Type,DefaultValue)    \
+  mitk::PropertyName::PropertyName()  : Superclass(DefaultValue) { } \
+  mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}
 
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */

@@ -73,7 +73,12 @@ protected:
 
 private:
 
-  virtual bool IsEqual(const BaseProperty& property ) const;
+  // purposely not implemented
+  AnnotationProperty(const AnnotationProperty&);
+  AnnotationProperty& operator=(const AnnotationProperty&);
+
+  virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty & property);
 
 };
 

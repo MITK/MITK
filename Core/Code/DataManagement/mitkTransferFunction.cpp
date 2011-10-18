@@ -295,4 +295,16 @@ void TransferFunction::InitializeHistogram( const Image * image )
   m_Min = (int)GetHistogram()->GetBinMin(0,0);
   m_Max = (int)GetHistogram()->GetBinMax(0, GetHistogram()->Size()-1);
 }
+
+void TransferFunction::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+  os << indent << "ScalarOpacity: ";
+  m_ScalarOpacityFunction->PrintHeader(os, vtkIndent());
+  os << indent << "GradientOpacity: ";
+  m_GradientOpacityFunction->PrintHeader(os, vtkIndent());
+  os << indent << "ColorTransfer: ";
+  m_ColorTransferFunction->PrintHeader(os, vtkIndent());
+  os << indent << "Min: " << m_Min << ", Max: " << m_Max << std::endl;
+}
+
 }// namespace

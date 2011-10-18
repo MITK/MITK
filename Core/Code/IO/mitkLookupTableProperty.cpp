@@ -27,18 +27,27 @@ mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable::Pointer 
     this->SetLookupTable(lut);
 }
 
-//mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable &aLookupTable)
-//{
-//    SetLookupTable(aLookupTable);
-//}
-
-mitk::LookupTableProperty::~LookupTableProperty()
-{
-}
-
 bool mitk::LookupTableProperty::IsEqual(const BaseProperty& property) const
 {
     return *(this->m_LookupTable) == *(static_cast<const Self&>(property).m_LookupTable);
+}
+
+bool mitk::LookupTableProperty::Assign(const BaseProperty& property)
+{
+  this->m_LookupTable = static_cast<const Self&>(property).m_LookupTable;
+  return true;
+}
+
+std::string mitk::LookupTableProperty::GetValueAsString() const
+{
+  std::stringstream ss;
+  ss << m_LookupTable;
+  return ss.str();
+}
+
+mitk::LookupTableProperty::ValueType mitk::LookupTableProperty::GetValue() const
+{
+  return m_LookupTable;
 }
 
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)
@@ -52,4 +61,9 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
     }
           
 //    MITK_INFO << "setting LUT property OK! " << std::endl;    
+}
+
+void mitk::LookupTableProperty::SetValue(const ValueType & value)
+{
+  SetLookupTable(value);
 }

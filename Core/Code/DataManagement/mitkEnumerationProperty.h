@@ -176,12 +176,13 @@ public:
    */
   virtual bool IsValidEnumerationValue( const std::string& val ) const;
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   const EnumIdsContainerType& GetEnumIds() const;
   const EnumStringsContainerType& GetEnumStrings() const;
   
   EnumIdsContainerType& GetEnumIds();
   EnumStringsContainerType& GetEnumStrings();
+
+  using BaseProperty::operator=;
   
 protected:
   
@@ -190,15 +191,16 @@ protected:
    */
   EnumerationProperty();
 
+  virtual bool IsEqual( const BaseProperty& property ) const;
+  virtual bool Assign( const BaseProperty& property );
+
 private:
 
-  virtual bool IsEqual( const BaseProperty& property ) const;
+  // purposely not implemented
+  EnumerationProperty(const EnumerationProperty&);
+  EnumerationProperty& operator=(const EnumerationProperty&);
 
   IdType m_CurrentValue;
-
-  EnumIdsContainerType m_EnumIds;
-
-  EnumStringsContainerType m_EnumStrings;
 
   typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
   typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;

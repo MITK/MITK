@@ -40,7 +40,6 @@ class MITK_CORE_EXPORT ClippingProperty : public BaseProperty
 public:
   mitkClassMacro(ClippingProperty, BaseProperty);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
   typedef std::string ValueType;
   
   itkNewMacro( ClippingProperty );
@@ -58,6 +57,7 @@ public:
 
   virtual std::string GetValueAsString() const;
 
+  using BaseProperty::operator =;
 
 protected:
 
@@ -71,7 +71,12 @@ protected:
 
 private:
 
-  virtual bool IsEqual(const BaseProperty& property ) const;
+  // purposely not implemented
+  ClippingProperty(const ClippingProperty&);
+  ClippingProperty& operator=(const ClippingProperty&);
+
+  virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty& property);
 
 };
 

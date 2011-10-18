@@ -91,7 +91,7 @@ template< class TReferenceImagePixelType,
           int NrOdfDirections>
 class AnalyticalDiffusionQballReconstructionImageFilter :
   public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >, 
-                             Image< Vector< TOdfPixelType, /*(NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >, 3 > >
+                             Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
 
 public:
@@ -111,7 +111,7 @@ public:
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
   typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>, 
-          Image< Vector< TOdfPixelType, /*NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >, 3 > >
+          Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
                           Superclass;
   
    /** Method for creation through the object factory. */
@@ -125,7 +125,7 @@ public:
 
   typedef TGradientImagePixelType                  GradientPixelType;
 
-  typedef Vector< TOdfPixelType, /*NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >
+  typedef Vector< TOdfPixelType, NrOdfDirections >
                                                    OdfPixelType;
 
   /** Reference image data,  This image is aquired in the absence 
@@ -285,8 +285,6 @@ private:
 
   int                                               m_NumberCoefficients;
 
-//  QuadProgPP::Matrix<double>                        m_G, m_CE, m_CI;
-//  QuadProgPP::Vector<double>                        m_g0, m_ce0, m_ci0, m_x;
   vnl_matrix<double>*                               m_B_t;
   vnl_vector<double>*                               m_LP;
   BlaImage::Pointer m_ODFSumImage;

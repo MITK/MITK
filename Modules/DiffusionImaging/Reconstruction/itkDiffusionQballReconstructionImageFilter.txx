@@ -407,25 +407,6 @@ namespace itk {
     std::cout << "One Thread finished reconstruction" << std::endl;
   }
 
-  //void tofile(vnl_matrix<double> A, std::string fname)
-  //{
-  //  ofstream myfile;
-  //  myfile.open (fname.c_str());
-  //  myfile << "A1=[";
-  //  for(int i=0; i<A.rows(); i++)
-  //  {
-  //    for(int j=0; j<A.columns(); j++)
-  //    {
-  //      myfile << A(i,j) << " ";
-  //      if(j==A.columns()-1 && i!=A.rows()-1)
-  //        myfile << ";" << std::endl;
-  //    }
-  //  }
-  //  myfile << "];";
-  //  myfile.close();
-
-  //}
-
   template< class TReferenceImagePixelType, 
   class TGradientImagePixelType,
   class TOdfPixelType,
@@ -693,10 +674,6 @@ namespace itk {
         r /= r.sum();
         GH_plus->set_row(i,r);
       }
-
-      //tofile((*G),"G.m");
-      //tofile((*H_plus),"H_plus.m");
-      //tofile((*GH_plus),"GH_plus.m");
 
       m_ReconstructionMatrix
         = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);

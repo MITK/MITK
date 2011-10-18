@@ -638,7 +638,7 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
   //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
-  node->AddProperty( "planarfigure.drawControlPoints", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );

@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkIGTUIExports.h"
 #include "mitkNodePredicateBase.h"
 
+#include "mitkNavigationTool.h"
+
 class QmitkNDIToolDelegate;
 namespace mitk
 {
@@ -70,7 +72,10 @@ public:
     void ToolsChanged();
     void Connected();
     void Disconnected();
-    void RepresentationChanged( const int & row , const std::string & filename ); // returns the row number of the clicked tableitem for changing tool representation 
+    void RepresentationChanged( int row , mitk::Surface::Pointer surface ); // returns the row number of the clicked tableitem for changing tool representation 
+    void SignalToolNameChanged(int id, QString name);
+    void SignalSavedTool(int id, QString surfaceFilename);
+    void SignalLoadTool(int id, mitk::DataNode::Pointer dn);
 
   public slots:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
@@ -85,6 +90,10 @@ public:
     void UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/);
     void OnTableItemClicked(const QModelIndex & topLeft); ///< for clicking on tooltable items
     void OnDisoverDevicesBtnInfo();
+    void OnTableCellChanged(int row, int column);
+    void OnSaveTool();
+    void OnLoadTool();
+    
 
 protected:
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;  // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
@@ -97,6 +106,7 @@ protected:
   */
   void ScanPortsForNDITrackingDevices(PortDeviceMap& portsAndDevices);
   mitk::TrackingDeviceType ScanPort(QString port);
+  mitk::NavigationTool::Pointer GenerateNavigationTool(mitk::TrackingTool* tool);
   
   QStringList GetToolNamesList(); ///< returns a string list with the names of all tools of the current tracking device
 
@@ -115,6 +125,12 @@ protected:
   mitk::NDITrackingDevice::Pointer m_Tracker;   ///< tracking device object
   mitk::TrackingDeviceSource::Pointer m_Source;
   QmitkNDIToolDelegate* m_Delegate;
+  
+  QString m_SROMCellDefaultText;
+  QString m_RepresentatonCellDefaultText;
+  
+  mitk::Surface::Pointer LoadSurfaceFromSTLFile(QString surfaceFilename);
+  
 };
 #endif // _QmitkNDIConfigurationWidget_H_INCLUDED
 

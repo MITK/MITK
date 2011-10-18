@@ -97,7 +97,6 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
   m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
   m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
   m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
-  m_RegistrationWidget->SetQualityDisplayText("FRE");
 
   m_ToolBox->addItem(m_RegistrationWidget, "Registration");
 
@@ -557,8 +556,11 @@ void QmitkIGTTrackingLabView::RenderScene( )
       MITK_WARN << "Exception during QmitkIGTTrackingLab::RenderScene():" << e.what() << "\n";
     }
 
+    if(m_VirtualViewCheckBox->isChecked())
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
     //update all Widgets
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+    else
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 
 
   }

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPlanePositionManager_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+//#include "MitkExtExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
 #include <mitkServiceReference.h>

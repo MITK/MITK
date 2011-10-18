@@ -210,6 +210,7 @@ private:
   bool m_DrawOutline;
   bool m_DrawQuantities;
   bool m_DrawShadow;
+  bool m_DrawControlPoints;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;

@@ -21,36 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDicomDiffusionImageReader.h"
 
 #include "itkImageSeriesReader.h"
-//#include "itkImageFileReader.h"
-//#include "itkImageRegion.h"
-//#include "itkImageRegionIterator.h"
-//#include "itkImageRegionConstIterator.h"
-//#include "itkExceptionObject.h"
-//#include "itkArray.h"
-//#include "vnl/vnl_math.h"
-//#include "itkProgressReporter.h"
-//#include "itkMetaDataObject.h"
+
 
 namespace mitk
 {
-
-// Destructor
-  //template <class TPixelType, int TDimension>
-  //DicomDiffusionImageReader<TPixelType, TDimension>
-  //  ::~DicomDiffusionImageReader()
-  //{
-  //  //// Clear the eventual previous content of the MetaDictionary array
-  //  //if( m_MetaDataDictionaryArray.size() )
-  //  //  {
-  //  //  for(unsigned int i=0; i<m_MetaDataDictionaryArray.size(); i++)
-  //  //    {
-  //  //    // each element is a raw pointer, delete them.
-  //  //    delete m_MetaDataDictionaryArray[i];
-  //  //    }
-  //  //  }
-  //  //m_MetaDataDictionaryArray.clear();
-  //}
-
 
 template <class TPixelType, const int TDimension>
 void DicomDiffusionImageReader<TPixelType, TDimension>
@@ -131,17 +105,6 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
                             m_Headers.size());
 
   itk::ImageRegionIterator<OutputImageType> ot (output, requestedRegion );
-
-  // Clear the eventual previous content of the MetaDictionary array
-  //if( m_MetaDataDictionaryArray.size() )
-  //  {
-  //  for(unsigned int i=0; i<m_MetaDataDictionaryArray.size(); i++)
-  //    {
-  //    // each element is a raw pointer, delete them.
-  //    delete m_MetaDataDictionaryArray[i];
-  //    }
-  //  }
-  //m_MetaDataDictionaryArray.clear();
 
   typename OutputImageType::PixelType vec;
 

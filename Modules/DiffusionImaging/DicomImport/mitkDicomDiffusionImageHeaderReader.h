@@ -55,7 +55,7 @@ namespace mitk
     typedef itk::ImageFileReader< SliceType > SliceReaderType;
     typedef itk::GDCMImageIO ImageIOType;
 
-    // set input
+    /// set input
     void SetSeriesDicomFilenames(FileNamesContainer dicomFilenames)
     { this->m_DicomFilenames = dicomFilenames; }
 
@@ -68,21 +68,14 @@ namespace mitk
     void SetOutputPointer(DiffusionImageHeaderInformation::Pointer output)
     { this->m_Output = output; }
 
-    // do the work
+    /// do the work
     virtual void Update();
 
-    // return output
+    /// return output
     DiffusionImageHeaderInformation::Pointer GetOutput();
 
-    // identify vendor
+    /// identify vendor
     SupportedVendors GetVendorID();
-
-    //virtual const char* GetFileName() const {return 0;}
-    //virtual void SetFileName(const char* aFileName) {}
-    //virtual const char* GetFilePrefix() const {return 0;}
-    //virtual void SetFilePrefix(const char* aFilePrefix) {}
-    //virtual const char* GetFilePattern() const {return 0;}
-    //virtual void SetFilePattern(const char* aFilePattern) {}
 
   protected:
 

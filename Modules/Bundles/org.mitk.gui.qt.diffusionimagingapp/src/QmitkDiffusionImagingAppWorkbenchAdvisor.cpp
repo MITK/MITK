@@ -46,8 +46,8 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer
   QString collectionFile = mitkPluginActivator::GetDefault()->GetQtHelpCollectionFile();
   if (!collectionFile.isEmpty())
   {
-//    berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
-//    berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html");
+    berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
+    berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html");
 
     typedef std::vector<berry::IBundle::Pointer> BundleContainer;
     BundleContainer bundles = berry::Platform::GetBundles();

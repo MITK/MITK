@@ -24,18 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkDataObject.h"
 #include "mitkCommon.h"
 
-//#include "itkImageIOBase.h"
-//#include "itkExceptionObject.h"
-//#include "itkSize.h"
-//#include "itkImageRegion.h"
-//#include <vector>
-//#include <string>
-//#include "itkMetaDataDictionary.h"
-
 namespace mitk
 {
 
-/** \brief 
+/** \brief Reads in the image data stored as DICOM series. The series is specified by a HeaderContainer
  */
 
 template <class TPixelType, const int TDimension>
@@ -57,12 +49,6 @@ public:
   /** The region of the output image. */
   typedef typename OutputImageType::RegionType  ImageRegionType;
 
-  /** The dictionary type of the output image. */
-  //typedef MetaDataDictionary                   DictionaryType;
-  //typedef MetaDataDictionary *                 DictionaryRawPointer;
-  //typedef std::vector< DictionaryRawPointer >  DictionaryArrayType;
-  //typedef const DictionaryArrayType *          DictionaryArrayRawPointer;
-  
   typedef  std::vector<DiffusionImageHeaderInformation::Pointer> HeaderContainer;
 
   /** Set the vector of strings that contains the file names. Files
@@ -91,13 +77,7 @@ public:
    * enlarge the RequestedRegion to the size of the image on disk. */
   virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
   
-  /** Get access to the Array of MetaDataDictionaries */
-  //DictionaryArrayRawPointer GetMetaDataDictionaryArray() const;
-  
 protected:
-  //DicomDiffusionImageReader();
-  //~DicomDiffusionImageReader();
-
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
   
   /** Does the real work. */
@@ -110,12 +90,8 @@ protected:
    *  the series. */
   int m_NumberOfDimensionsInImage;
 
-  /** Array of MetaDataDictionaries. This allows to hold information from the
-   * ImageIO objects after reading every sub image in the series */
-  //DictionaryArrayType m_MetaDataDictionaryArray;
 
 private:
-  //DicomDiffusionImageReader(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
 

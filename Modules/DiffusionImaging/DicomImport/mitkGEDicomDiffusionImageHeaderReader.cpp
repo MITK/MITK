@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGEDicomDiffusionImageHeaderReader.h"
 
 #include "gdcmGlobal.h"
-//#include "gdcmVersion.h"
-
 #include "gdcmDict.h"
 #include "gdcmDicts.h"
 #include "gdcmDictEntry.h"
@@ -28,10 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmDict.h"
 #include "gdcmFile.h"
 #include "gdcmSerieHelper.h"
-//const gdcm::DictEntry GEDictBValue( "0043,1039", gdcm::VR::IS, gdcm::VM::VM1, "B Value of diffusion weighting" );
-//const gdcm::DictEntry GEDictXGradient( "0019,10bb", gdcm::VR::DS, gdcm::VM::VM1 , "X component of gradient direction" );
-//const gdcm::DictEntry GEDictYGradient( "0019,10bc", gdcm::VR::DS, gdcm::VM::VM1 , "Y component of gradient direction" );
-//const gdcm::DictEntry GEDictZGradient( "0019,10bd", gdcm::VR::DS, gdcm::VM::VM1 , "Z component of gradient direction" );
+
 
 mitk::GEDicomDiffusionImageHeaderReader::GEDicomDiffusionImageHeaderReader()
 {
@@ -70,9 +65,6 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
     ReadPublicTags();
-
-    //int mMosaic;   // number of raws in each mosaic block;
-    //int nMosaic;   // number of columns in each mosaic block
 
     float x0, y0, z0;
     float x1, y1, z1;
@@ -152,10 +144,5 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     }
   }
 }
-
-//header = new mitk::DWIHeader(nRows, nCols, xRes, yRes, xOrigin,yOrigin,
-//  zOrigin, sliceThickness, sliceSpacing,nSliceInVolume, xRow, yRow,
-//  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0],
-//  vendor,SliceMosaic);
 
 

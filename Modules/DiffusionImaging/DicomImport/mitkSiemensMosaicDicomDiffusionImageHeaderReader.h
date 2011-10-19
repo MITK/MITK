@@ -23,22 +23,28 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /**
+    @brief The SiemensMosaicDicomDiffusionImageHeaderReader class reads the image header for diffusion MR data stored in
+    Siemens MOSAIC Format
+    */
   class SiemensMosaicDicomDiffusionImageHeaderReader : public DicomDiffusionImageHeaderReader 
   {
   public:
-
     mitkClassMacro( SiemensMosaicDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
     itkNewMacro(Self);
 
+    /** Extracts the information stored under the key nameString in the tagString */
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray );
 
+    /** Read the data */
     virtual void Update();
 
   protected:
-
+    /** Default c'tor */
     SiemensMosaicDicomDiffusionImageHeaderReader();
-    virtual ~SiemensMosaicDicomDiffusionImageHeaderReader();
 
+    /** Default class d'tor */
+    virtual ~SiemensMosaicDicomDiffusionImageHeaderReader();
   };
 
 }

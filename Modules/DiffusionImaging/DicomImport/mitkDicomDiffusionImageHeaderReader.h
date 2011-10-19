@@ -30,7 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-
+  /**
+    @brief Reads the header information from a DICOM series and stores it into an output object of type
+    DiffusionImageHeaderInformation
+    */
   class MitkDiffusionImaging_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
   {
   public:
@@ -38,6 +41,7 @@ namespace mitk
     mitkClassMacro( DicomDiffusionImageHeaderReader, itk::Object );
     itkNewMacro(Self);
 
+    /** En enum to distinguish in processing between the different vendoors */
     enum SupportedVendors{ 
       SV_SIEMENS,
       SV_SIEMENS_MOSAIC,
@@ -55,38 +59,35 @@ namespace mitk
     typedef itk::ImageFileReader< SliceType > SliceReaderType;
     typedef itk::GDCMImageIO ImageIOType;
 
-    // set input
+    /** Set the dicom file names to be considered */
     void SetSeriesDicomFilenames(FileNamesContainer dicomFilenames)
     { this->m_DicomFilenames = dicomFilenames; }
 
     void SetGdcmIO(ImageIOType::Pointer gdcmIO)
     { this->m_GdcmIO = gdcmIO; }
 
+    /** Set the volume reader in case the default volume reader shouldn't be used */
     void SetVolumeReader(VolumeReaderType::Pointer volumeReader)
     { this->m_VolumeReader = volumeReader; }
 
+    /** Set the output object that will contain the read-in information after update */
     void SetOutputPointer(DiffusionImageHeaderInformation::Pointer output)
     { this->m_Output = output; }
 
-    // do the work
+    /** do the work */
     virtual void Update();
 
-    // return output
+    /** return output */
     DiffusionImageHeaderInformation::Pointer GetOutput();
 
-    // identify vendor
+    /** identify vendor */
     SupportedVendors GetVendorID();
 
-    //virtual const char* GetFileName() const {return 0;}
-    //virtual void SetFileName(const char* aFileName) {}
-    //virtual const char* GetFilePrefix() const {return 0;}
-    //virtual void SetFilePrefix(const char* aFilePrefix) {}
-    //virtual const char* GetFilePattern() const {return 0;}
-    //virtual void SetFilePattern(const char* aFilePattern) {}
-
   protected:
-
+    /** Default c'tor */
     DicomDiffusionImageHeaderReader();
+
+    /** Default d'tor */
     virtual ~DicomDiffusionImageHeaderReader();
 
     void ReadPublicTags();

@@ -203,22 +203,6 @@ namespace mitk
         this->m_IntensityArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
 
-      //  mitkIpPicDescriptor* pic = NULL;
-      //  mitkIpPicDescriptor* info = NULL;
-
-      //  pic = mitkIpPicGetHeader(const_cast<char *>(this->m_DistanceImageFileName.c_str()), pic);
-      //  if (pic==NULL)
-      //  {
-      //    MITK_ERROR << "Error opening ToF data file " << this->m_InputFileName;
-      //    return false;
-      //  }
-      //  info = mitkIpPicGetTags(const_cast<char *>(this->m_DistanceImageFileName.c_str()), pic);
-      //  this->m_PixelStartInFile = info->info->pixel_start_in_file;
-
-      //  OpenPicFileToData(&(this->m_DistanceInfile), this->m_DistanceImageFileName.c_str());
-      //  OpenPicFileToData(&(this->m_AmplitudeInfile), this->m_AmplitudeImageFileName.c_str());
-      //  OpenPicFileToData(&(this->m_IntensityInfile), this->m_IntensityImageFileName.c_str());
-
         MITK_INFO << "NumOfFrames: " << this->m_NumOfFrames;
 
         this->m_ConnectionCheck = true;
@@ -276,18 +260,6 @@ namespace mitk
     }
   }
 
-  //void ToFCameraMITKPlayerController::OpenPicFileToData(FILE** outfile, const char *outfileName)
-  //{
-  //  (*outfile) = fopen( outfileName, "rb" );
-  //  if( (*outfile) == NULL )
-  //  {
-  //    MITK_ERROR << "Error opening ToF data file: file is empty" << outfileName;
-  //    throw std::logic_error("Error opening ToF data file: file is empty");
-  //    return;
-  //  }
-  //  fseek ( (*outfile), this->m_PixelStartInFile, SEEK_SET );
-  //}
-
   bool ToFCameraMITKPlayerController::CloseCameraConnection()
   {
     if (this->m_ConnectionCheck)
@@ -320,22 +292,6 @@ namespace mitk
       this->AccessData(this->m_CurrentFrame, this->m_IntensityImage, this->m_IntensityArray);
     }
     itksys::SystemTools::Delay(50);
-
-    //size_t distanceBytesReturn;
-    //size_t amplitudeBytesReturn;
-    //size_t intensityBytesReturn;
-
-    //this->m_CurrentFrame++;
-    //if (this->m_CurrentFrame >= this->m_NumOfFrames)
-    //{
-    //  
-    //  fseek ( this->m_DistanceInfile, this->m_PixelStartInFile, SEEK_SET );
-    //  fseek ( this->m_AmplitudeInfile, this->m_PixelStartInFile, SEEK_SET );
-    //  fseek ( this->m_IntensityInfile, this->m_PixelStartInFile, SEEK_SET );
-    //}
-    //distanceBytesReturn = fread( this->m_DistanceArray, this->m_NumberOfBytes, 1, this->m_DistanceInfile );
-    //amplitudeBytesReturn = fread( this->m_AmplitudeArray, this->m_NumberOfBytes, 1, this->m_AmplitudeInfile );
-    //intensityBytesReturn = fread( this->m_IntensityArray, this->m_NumberOfBytes, 1, this->m_IntensityInfile );
   }
 
   void ToFCameraMITKPlayerController::AccessData(int frame, Image::Pointer image, float* &data)

@@ -118,6 +118,8 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     void RemoveBackground();
 
+    void AddBackground();
+
 //    void CreateSurface();
 
     Ui::QmitkToFUtilViewControls* m_Controls;

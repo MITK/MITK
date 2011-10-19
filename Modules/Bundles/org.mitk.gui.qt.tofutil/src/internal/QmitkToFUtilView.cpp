@@ -69,11 +69,6 @@ QmitkToFUtilView::QmitkToFUtilView()
   this->m_ToFImageGrabber = NULL;
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
 
-  CreateNode("ToF_Distance", this->m_DistanceImageNode);
-  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
-  CreateNode("ToF_Surface", this->m_SurfaceNode);      
-
   this->m_DataNodesInitilized = false;
   this->m_TransferFunctionInitialized = false;
   this->m_SurfaceInitialized = false;
@@ -100,6 +95,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
+  // remove nodes
   RemoveNode("ToF_Distance", this->m_DistanceImageNode);
   RemoveNode("ToF_Amplitude", this->m_AmplitudeImageNode);
   RemoveNode("ToF_Intensity", this->m_IntensityImageNode);
@@ -159,7 +155,12 @@ void QmitkToFUtilView::StdMultiWidgetNotAvailable()
 void QmitkToFUtilView::Activated()
 {
   QmitkFunctionality::Activated();
-
+  // add necessary nodes
+  CreateNode("ToF_Distance", this->m_DistanceImageNode);
+  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
+  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
+  CreateNode("ToF_Surface", this->m_SurfaceNode);
+  // configure views
   m_MultiWidget->SetWidgetPlanesVisibility(false);
   m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
   m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SliceLockedOn();
@@ -193,7 +194,7 @@ void QmitkToFUtilView::Deactivated()
 
   mitk::RenderingManager::GetInstance()->InitializeViews();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
+  RemoveBackground();
   QmitkFunctionality::Deactivated();
 }
 
@@ -358,25 +359,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
     }
     m_MultiWidget->DisableGradientBackground();
 
-    InitTexture(this->m_Widget1Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-    InitTexture(this->m_Widget2Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-    InitTexture(this->m_Widget3Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-
-    this->m_QmitkToFImageBackground1 = new QmitkToFImageBackground();
-    this->m_QmitkToFImageBackground1->AddRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-    this->m_QmitkToFImageBackground1->UpdateBackground(this->m_Widget1Texture);
-    this->m_Widget1ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
-
-    this->m_QmitkToFImageBackground2 = new QmitkToFImageBackground();
-    this->m_QmitkToFImageBackground2->AddRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-    this->m_QmitkToFImageBackground2->UpdateBackground(this->m_Widget2Texture);
-    this->m_Widget2ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ImageType();
-
-    this->m_QmitkToFImageBackground3 = new QmitkToFImageBackground();
-    this->m_QmitkToFImageBackground3->AddRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-    this->m_QmitkToFImageBackground3->UpdateBackground(this->m_Widget3Texture);
-    this->m_Widget3ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ImageType();
-
+    this->AddBackground();
   }
   catch (std::logic_error& e)
   {
@@ -968,3 +951,24 @@ void QmitkToFUtilView::RemoveBackground()
   }
 }
 
+void QmitkToFUtilView::AddBackground()
+{
+  InitTexture(this->m_Widget1Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+  InitTexture(this->m_Widget2Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+  InitTexture(this->m_Widget3Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+
+  this->m_QmitkToFImageBackground1 = new QmitkToFImageBackground();
+  this->m_QmitkToFImageBackground1->AddRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+  this->m_QmitkToFImageBackground1->UpdateBackground(this->m_Widget1Texture);
+  this->m_Widget1ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
+
+  this->m_QmitkToFImageBackground2 = new QmitkToFImageBackground();
+  this->m_QmitkToFImageBackground2->AddRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+  this->m_QmitkToFImageBackground2->UpdateBackground(this->m_Widget2Texture);
+  this->m_Widget2ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ImageType();
+
+  this->m_QmitkToFImageBackground3 = new QmitkToFImageBackground();
+  this->m_QmitkToFImageBackground3->AddRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
+  this->m_QmitkToFImageBackground3->UpdateBackground(this->m_Widget3Texture);
+  this->m_Widget3ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ImageType();
+}

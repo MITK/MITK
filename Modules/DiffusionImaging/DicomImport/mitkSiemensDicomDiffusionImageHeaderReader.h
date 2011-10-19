@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /**
+    @brief The SiemensDicomDiffusionImageHeaderReader class reads in the header information for the standard Siemens DICOM format
+  */
   class SiemensDicomDiffusionImageHeaderReader : public DicomDiffusionImageHeaderReader 
   {
   public:
@@ -30,14 +33,20 @@ namespace mitk
     mitkClassMacro( SiemensDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
     itkNewMacro(Self);
 
+    /** Extract the key value for the key nameString from the tagString */
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray, int startPos = 0 );
+
+    /** Extracts the diffusion gradient information from the tagString and stores it into the valueArray vector */
     int ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray);
 
+    /** Read the data */
     virtual void Update();
 
   protected:
-
+    /** Default c'tor */
     SiemensDicomDiffusionImageHeaderReader();
+
+    /** Default d'tor */
     virtual ~SiemensDicomDiffusionImageHeaderReader();
 
   };

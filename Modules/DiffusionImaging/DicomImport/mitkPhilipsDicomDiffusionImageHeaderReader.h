@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /**
+    @brief The PhilipsDicomDiffusionImageHeaderReader class reads in the image header information for the Philips DICOM Format */
   class PhilipsDicomDiffusionImageHeaderReader : public DicomDiffusionImageHeaderReader 
   {
   public:
@@ -30,11 +32,15 @@ namespace mitk
     mitkClassMacro( PhilipsDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
     itkNewMacro(Self);
 
+    /** read in the data */
     virtual void Update();
 
   protected:
 
+    /** Default c'tor */
     PhilipsDicomDiffusionImageHeaderReader();
+
+    /** Default d'tor */
     virtual ~PhilipsDicomDiffusionImageHeaderReader();
 
   };

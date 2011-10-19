@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-/** \brief 
+/** \brief Reads in the image data stored as DICOM series. The series is specified by a HeaderContainer
  */
 
 template <class TPixelType, const int TDimension>

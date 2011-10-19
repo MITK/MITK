@@ -158,11 +158,23 @@ void QmitkGibbsTrackingView::AfterThread()
   GenerateFiberBundle();
   QString paramMessage;
   if(m_Controls->m_ParticleWeightSlider->value()==0)
-    paramMessage += "Particle weight was set to " + QString::number(this->m_GlobalTracker->GetParticleWeight()) + "\n";
+  {
+    m_Controls->m_ParticleWeightLabel->setText(QString::number(m_GlobalTracker->GetParticleWeight()));
+    m_Controls->m_ParticleWeightSlider->setValue(m_GlobalTracker->GetParticleWeight()*10000);
+    paramMessage += "Particle weight was set to " + QString::number(m_GlobalTracker->GetParticleWeight()) + "\n";
+  }
   if(m_Controls->m_ParticleWidthSlider->value()==0)
-    paramMessage += "Particle width was set to " + QString::number(this->m_GlobalTracker->GetParticleWidth()) + " mm\n";
+  {
+    m_Controls->m_ParticleWidthLabel->setText(QString::number(m_GlobalTracker->GetParticleWidth()));
+    m_Controls->m_ParticleWidthSlider->setValue(m_GlobalTracker->GetParticleWidth()*10);
+    paramMessage += "Particle width was set to " + QString::number(m_GlobalTracker->GetParticleWidth()) + " mm\n";
+  }
   if(m_Controls->m_ParticleLengthSlider->value()==0)
-    paramMessage += "Particle length was set to " + QString::number(this->m_GlobalTracker->GetParticleLength()) + " mm\n";
+  {
+    m_Controls->m_ParticleWidthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
+    m_Controls->m_ParticleLengthSlider->setValue(m_GlobalTracker->GetParticleLength()*10);
+    paramMessage += "Particle length was set to " + QString::number(m_GlobalTracker->GetParticleLength()) + " mm\n";
+  }
 
   m_FiberBundleNode = NULL;
 

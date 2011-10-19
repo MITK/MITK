@@ -29,14 +29,7 @@ IF(MITK_USE_OpenCV)
     OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
     MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
 
-    #IF(WIN32)
-      #SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
-    #ELSE()
-      #SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.3.1a.tar.bz2)
-    #ENDIF()
-
-    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.3.1a.tar.bz2)
-    #SET(opencv_url file:///tmp/OpenCV-2.3.0.tar.bz2)
+    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.3.0.tar.bz2)
 
     ExternalProject_Add(${proj}
 URL ${opencv_url}

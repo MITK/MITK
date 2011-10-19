@@ -47,10 +47,16 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(csvWriter.GetPointer(), "Testing initialization of test object!");
   MITK_TEST_CONDITION_REQUIRED(csvWriter->GetExtension() == ".csv", "Testing correct initialization of member variable extension!");
 
-  unsigned int dimX = 320;
-  unsigned int dimY = 160;
+  srand(time(0));
+
+  unsigned int dimX = 100 + rand()%100;
+  unsigned int dimY = 100 + rand()%100;
   unsigned int pixelNumber = dimX*dimY;
-  unsigned int numOfFrames = 87;
+  unsigned int numOfFrames = 1 + rand()%100;
+
+  MITK_INFO<<dimX;
+  MITK_INFO<<dimY;
+  MITK_INFO<<numOfFrames;
 
   mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames);
   mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames);

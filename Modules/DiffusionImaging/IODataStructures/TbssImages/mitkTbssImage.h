@@ -54,6 +54,8 @@ namespace mitk
       GRADIENT_X,
       GRADIENT_Y,
       GRADIENT_Z,
+      TUBULAR_STRUCTURE,
+      DISTANCE_MAP,
       MISC
     };
 
@@ -113,16 +115,20 @@ namespace mitk
 
     void SetDisplayIndexForRendering(int displayIndex);
 
-    void SetIsMeta(bool b)
-    {
-      m_IsMeta = b;
-    }
 
-    bool GetIsMeta()
-    {
-      return m_IsMeta;
-    }
 
+
+
+    itkGetMacro(IsMeta, bool)
+    itkGetMacro(ContainsGradient, bool)
+    itkGetMacro(ContainsMeanSkeleton, bool)
+    itkGetMacro(ContainsSkeletonMask, bool)
+    itkGetMacro(ContainsDistanceMap, bool)
+    itkSetMacro(IsMeta, bool)
+    itkSetMacro(ContainsGradient, bool)
+    itkSetMacro(ContainsMeanSkeleton, bool)
+    itkSetMacro(ContainsSkeletonMask, bool)
+    itkSetMacro(ContainsDistanceMap, bool)
 
 
   protected:
@@ -145,6 +151,14 @@ namespace mitk
     bool m_IsMeta;
 
     bool m_ContainsGradient;
+
+    bool m_ContainsMeanSkeleton;
+
+    bool m_ContainsSkeletonMask;
+
+    bool m_ContainsDistanceMap;
+
+
 
   };
 

@@ -47,9 +47,6 @@ namespace mitk
     itkNewMacro(Self)
 
 
-
-
-
     //void SetRequestedRegionToLargestPossibleReg tbssRoi->SetTbssType(mitk::TbssImage<char>::ROI);ion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();

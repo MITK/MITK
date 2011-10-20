@@ -85,11 +85,12 @@ endforeach(file ${INTERNAL_CPP_FILES})
 
 IF (BLUEBERRY_USE_QT_HELP)
   SET(_plugin_qhcp_input "${CMAKE_CURRENT_SOURCE_DIR}/documentation/MitkDiffusionImagingAppQtHelpCollectionProject.qhcp")
-  SET(_plugin_qhcp_output "${PLUGIN_OUTPUT_DIR}/resources/MitkDiffusionImagingAppQtHelpCollection_${MBI_WC_REVISION_HASH}.qhc")
+  SET(_plugin_qhcp_output "${CMAKE_CURRENT_BINARY_DIR}/MitkDiffusionImagingAppQtHelpCollection.qhc")
   ADD_CUSTOM_COMMAND(OUTPUT ${_plugin_qhcp_output}
                      COMMAND ${QT_COLLECTIONGENERATOR_EXECUTABLE} ${_plugin_qhcp_input} -o ${_plugin_qhcp_output}
                      DEPENDS ${_plugin_qhcp_input}
                      )
 
-  SET(FILE_DEPENDENCIES ${_plugin_qhcp_output})
+  LIST(APPEND CACHED_RESOURCE_FILES ${_plugin_qhcp_output})
+  #SET(FILE_DEPENDENCIES ${_plugin_qhcp_output})
 ENDIF()

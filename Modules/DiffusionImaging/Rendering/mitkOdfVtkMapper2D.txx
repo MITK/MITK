@@ -1111,15 +1111,15 @@ void  mitk::OdfVtkMapper2D<T,N>
     OdfDisplayGeometry dispGeo =
       MeasureDisplayedGeometry( renderer);
 
-    if(!dispGeo.Equals(m_LastDisplayGeometry))
-    {
+//    if(!dispGeo.Equals(m_LastDisplayGeometry))
+//    {
       AdaptOdfScalingToImageSpacing(index);
       SetRendererLightSources(renderer);
       ApplyPropertySettings();
       //AdaptCameraPosition(renderer, dispGeo);
       Slice(renderer, dispGeo);
       m_LastDisplayGeometry = dispGeo;
-    }
+//    }
   }
 
   // Get the TimeSlicedGeometry of the input object

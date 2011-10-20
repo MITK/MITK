@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <QHelpCollectionProject version="1.0">
      <assistant>
-         <title>MITK 3M3 Help</title>
+         <title>MITK Diffusion Help</title>
 		 <applicationIcon>assistant-logo.png</applicationIcon>
          <startPage>qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html</startPage>
 		 <applicationIcon>assistant-icon.png</applicationIcon>
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
-         <cacheDirectory>Mitk3M3</cacheDirectory>
+         <cacheDirectory>MitkDIApp</cacheDirectory>
          <aboutMenuText>
-             <text>About MITK 3M3 Help</text>
+             <text>About MITK Diffusion Help</text>
          </aboutMenuText>
          <aboutDialog>		 
 		     <icon>about-logo.png</icon>

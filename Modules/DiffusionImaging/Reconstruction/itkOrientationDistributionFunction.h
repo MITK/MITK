@@ -18,11 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __itkOrientationDistributionFunction_h
 #define __itkOrientationDistributionFunction_h
 
-//// Undefine an eventual OrientationDistributionFunction macro
-//#ifdef OrientationDistributionFunction
-//#undef OrientationDistributionFunction
-//#endif
-
 #include "MitkDiffusionImagingExports.h"
 #include "itkIndent.h"
 #include "itkFixedArray.h"
@@ -227,9 +222,6 @@ MitkDiffusionImaging_EXPORT InputStreamType& operator>>(InputStreamType& is,
 
 
 } // end namespace itk
-
-//#include "itkNumericTraitsTensorPixel.h"
-
 
 // Define instantiation macro for this template.
 #define ITK_TEMPLATE_OrientationDistributionFunction(_, EXPORT, x, y) namespace itk { \

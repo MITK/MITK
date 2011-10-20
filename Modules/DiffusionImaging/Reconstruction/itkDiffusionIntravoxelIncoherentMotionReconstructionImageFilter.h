@@ -1,17 +1,17 @@
 /*=========================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkDiffusionTensor3DReconstructionImageFilter.h,v $
-  Language:  C++
-  Date:      $Date: 2006-03-27 17:01:06 $
-  Version:   $Revision: 1.12 $
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2009-07-14 19:11:20 +0200 (Tue, 14 Jul 2009) $
+Version:   $Revision: 18127 $
 
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #ifndef __itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter_h
@@ -36,8 +36,7 @@
 
 namespace itk{
 
-  ///////////////////////////////////////////////////////////////////////
-  // baseclass for IVIM fitting algorithms
+  /** baseclass for IVIM fitting algorithms */
   struct IVIM_base
   {
 
@@ -60,8 +59,7 @@ namespace itk{
 
   };
 
-  ///////////////////////////////////////////////////////////////////////
-  // fitt all three parameters
+  /** Fitt all three parameters */
   struct IVIM_3param : public IVIM_base, vnl_least_squares_function
   {
 
@@ -86,8 +84,7 @@ namespace itk{
     }
   };
 
-  ///////////////////////////////////////////////////////////////////////
-  // fit by setting DStar to a fix value
+  /** fit by setting DStar to a fix value */
   struct IVIM_fixdstar : public IVIM_base, vnl_least_squares_function
   {
 
@@ -115,8 +112,7 @@ namespace itk{
 
   };
 
-  ///////////////////////////////////////////////////////////////////////
-  // fit a monoexponential curve only estimating D
+  /** fit a monoexponential curve only estimating D */
   struct IVIM_d_and_f : public IVIM_base, vnl_least_squares_function
   {
 
@@ -140,8 +136,7 @@ namespace itk{
     }
   };
 
-  ///////////////////////////////////////////////////////////////////////
-  // fiting DStar and f with fix value of D
+  /** fiting DStar and f with fix value of D */
   struct IVIM_fixd : public IVIM_base, vnl_least_squares_function
   {
 
@@ -168,8 +163,7 @@ namespace itk{
     double fixD;
   };
 
-  ///////////////////////////////////////////////////////////////////////
-  // fiting DStar with given f and D
+  /** fiting DStar with given f and D */
   struct IVIM_dstar_only : public IVIM_base, vnl_least_squares_function
   {
 
@@ -204,10 +198,7 @@ namespace itk{
     int N;
   };
 
-  /** \class DiffusionIntravoxelIncoherentMotionReconstructionImageFilter
- * 
- */
-
+  /** \class DiffusionIntravoxelIncoherentMotionReconstructionImageFilter */
   template< class TInputPixelType,
   class TOutputPixelType>
   class DiffusionIntravoxelIncoherentMotionReconstructionImageFilter :
@@ -244,12 +235,6 @@ namespace itk{
 
       vnl_vector<double> meas2;
       vnl_vector<double> bvals2;
-
-//      double currentADC;
-//      int Nadc;                       // number used measurements for ADC calculation
-//      std::vector<int> adc_indices;   // indices used for ADC calculation
-//      vnl_vector<double> adc_bvalues; // bvals used for ADC calculation
-//      vnl_vector<double> adc_meas;    // for ADC calculation
 
     };
 
@@ -317,7 +302,6 @@ namespace itk{
     void SetLambda(double lambda){m_Lambda = lambda;}
     void SetCrossPosition(typename InputImageType::IndexType crosspos){this->m_CrossPosition = crosspos;}
     void SetMethod(IVIM_Method method){m_Method = method;}
-//    void SetGradientIndicesForADCCalculation(std::vector<int> inds){this->m_ADCInds = inds;}
 
     IVIMSnapshot GetSnapshot(){return m_Snap;}
 
@@ -367,8 +351,6 @@ namespace itk{
 
     typename OutputImageType::Pointer m_DStarMap;
 
-//    typename OutputImageType::Pointer m_ADCMap;
-
     bool m_FitDStar;
 
     IVIMSnapshot m_Snap;
@@ -386,8 +368,6 @@ namespace itk{
     double m_Lambda;
 
     typename InputImageType::IndexType m_CrossPosition;
-
-//    std::vector<int> m_ADCInds;
 
   };
 

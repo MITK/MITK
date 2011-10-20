@@ -1,15 +1,16 @@
 /*=========================================================================
 
-Program:   Insight Segmentation & Registration Toolkit
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2006-07-19 15:11:41 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2009-07-14 19:11:20 +0200 (Tue, 14 Jul 2009) $
+Version:   $Revision: 18127 $
 
-Copyright (c) Insight Software Consortium. All rights reserved.
-See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -407,25 +408,6 @@ namespace itk {
     std::cout << "One Thread finished reconstruction" << std::endl;
   }
 
-  //void tofile(vnl_matrix<double> A, std::string fname)
-  //{
-  //  ofstream myfile;
-  //  myfile.open (fname.c_str());
-  //  myfile << "A1=[";
-  //  for(int i=0; i<A.rows(); i++)
-  //  {
-  //    for(int j=0; j<A.columns(); j++)
-  //    {
-  //      myfile << A(i,j) << " ";
-  //      if(j==A.columns()-1 && i!=A.rows()-1)
-  //        myfile << ";" << std::endl;
-  //    }
-  //  }
-  //  myfile << "];";
-  //  myfile.close();
-
-  //}
-
   template< class TReferenceImagePixelType, 
   class TGradientImagePixelType,
   class TOdfPixelType,
@@ -693,10 +675,6 @@ namespace itk {
         r /= r.sum();
         GH_plus->set_row(i,r);
       }
-
-      //tofile((*G),"G.m");
-      //tofile((*H_plus),"H_plus.m");
-      //tofile((*GH_plus),"GH_plus.m");
 
       m_ReconstructionMatrix
         = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);

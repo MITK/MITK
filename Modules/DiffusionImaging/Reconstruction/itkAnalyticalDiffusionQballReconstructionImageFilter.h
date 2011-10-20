@@ -1,30 +1,30 @@
 /*=========================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkDiffusionTensor3DReconstructionImageFilter.h,v $
-  Language:  C++
-  Date:      $Date: 2006-03-27 17:01:06 $
-  Version:   $Revision: 1.12 $
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2009-07-14 19:11:20 +0200 (Tue, 14 Jul 2009) $
+Version:   $Revision: 18127 $
 
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
 #ifndef __itkAnalyticalDiffusionQballReconstructionImageFilter_h_
 #define __itkAnalyticalDiffusionQballReconstructionImageFilter_h_
 
 #include "itkImageToImageFilter.h"
-//#include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/vnl_matrix.h"
 #include "vnl/algo/vnl_svd.h"
 #include "itkVectorContainer.h"
 #include "itkVectorImage.h"
-//#include "QuadProg.h"
+
 
 namespace itk{
 /** \class AnalyticalDiffusionQballReconstructionImageFilter
@@ -91,7 +91,7 @@ template< class TReferenceImagePixelType,
           int NrOdfDirections>
 class AnalyticalDiffusionQballReconstructionImageFilter :
   public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >, 
-                             Image< Vector< TOdfPixelType, /*(NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >, 3 > >
+                             Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
 
 public:
@@ -111,7 +111,7 @@ public:
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
   typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>, 
-          Image< Vector< TOdfPixelType, /*NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >, 3 > >
+          Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
                           Superclass;
   
    /** Method for creation through the object factory. */
@@ -125,7 +125,7 @@ public:
 
   typedef TGradientImagePixelType                  GradientPixelType;
 
-  typedef Vector< TOdfPixelType, /*NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL*/NrOdfDirections >
+  typedef Vector< TOdfPixelType, NrOdfDirections >
                                                    OdfPixelType;
 
   /** Reference image data,  This image is aquired in the absence 
@@ -285,8 +285,6 @@ private:
 
   int                                               m_NumberCoefficients;
 
-//  QuadProgPP::Matrix<double>                        m_G, m_CE, m_CI;
-//  QuadProgPP::Vector<double>                        m_g0, m_ce0, m_ci0, m_x;
   vnl_matrix<double>*                               m_B_t;
   vnl_vector<double>*                               m_LP;
   BlaImage::Pointer m_ODFSumImage;

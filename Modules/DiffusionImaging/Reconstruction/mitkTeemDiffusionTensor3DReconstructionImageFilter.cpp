@@ -168,10 +168,6 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   sprintf( filename, "tensors_%d.nhdr", random_integer);
   file_replace(filename,"3D-masked-symmetric-matrix","vector");
 
-  //file_replace(filename,"3D-symmetric-matrix","vector");
-  //itksys::SystemTools::ReplaceString(line,"3D-masked-symmetric-matrix","vector");
-  //itksys::SystemTools::ReplaceString(line,"vector","domain");
-
   // read result as mitk::Image and provide it in m_Output
   typedef itk::ImageFileReader<VectorImageType> FileReaderType;
   typename FileReaderType::Pointer reader = FileReaderType::New();

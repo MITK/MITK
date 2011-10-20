@@ -1,18 +1,20 @@
 /*=========================================================================
 
-Program:   Insight Segmentation & Registration Toolkit
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2008-03-10 22:48:13 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2009-07-14 19:11:20 +0200 (Tue, 14 Jul 2009) $
+Version:   $Revision: 18127 $
 
-Copyright (c) Insight Software Consortium. All rights reserved.
-See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
 #ifndef _itkOrientationDistributionFunction_txx
 #define _itkOrientationDistributionFunction_txx
 
@@ -24,34 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/algo/vnl_matrix_inverse.h>
 #include "itkPointShell.h"
 
-//#include "itkNumericTraitsTensorPixel.h"
 
 namespace itk
 {
-
-  /*
-
-  #define INIT_STATIC_ODF_VARS(N_DIRS)    \
-    _INIT_STATIC_ODF_VARS(float,N_DIRS) \
-    _INIT_STATIC_ODF_VARS(double,N_DIRS) \
-
-  #define _INIT_STATIC_ODF_VARS(PIXTYPE,N_DIRS)                                                                          \
-    vtkPolyData* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_BaseMesh = NULL;                                \
-    vnl_matrix_fixed<double, 3, N_DIRS>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Directions              \
-      = itk::PointShell<N_DIRS, vnl_matrix_fixed<double, 3, N_DIRS> >::DistributePointShell();                           \
-    std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_NeighborIdxs = NULL;       \
-    std::vector<int>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_HalfSphereIdxs = NULL;              \
-    bool itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Mutex = false;                                                                                                \
-
-
-    INIT_STATIC_ODF_VARS(40)
-    INIT_STATIC_ODF_VARS(60)
-    INIT_STATIC_ODF_VARS(80)
-    INIT_STATIC_ODF_VARS(100)
-    INIT_STATIC_ODF_VARS(150)
-    INIT_STATIC_ODF_VARS(200)
-    INIT_STATIC_ODF_VARS(250)
-  */
 
   template<class T, unsigned int N>
   vtkPolyData* itk::OrientationDistributionFunction<T,N>::m_BaseMesh = NULL;
@@ -84,7 +61,7 @@ namespace itk
 
 #define ODF_PI       3.14159265358979323846
 
-  /*
+  /**
   * Assignment Operator
   */
   template<class T, unsigned int NOdfDirections>
@@ -96,8 +73,7 @@ namespace itk
     return *this;
   }
 
-
-  /*
+  /**
   * Assignment Operator from a scalar constant
   */
   template<class T, unsigned int NOdfDirections>
@@ -109,8 +85,7 @@ namespace itk
     return *this;
   }
 
-
-  /*
+  /**
   * Assigment from a plain array
   */
   template<class T, unsigned int NOdfDirections>
@@ -121,8 +96,6 @@ namespace itk
     BaseArray::operator=(r);
     return *this;
   }
-
-
 
   /**
   * Returns a temporary copy of a vector
@@ -140,9 +113,6 @@ namespace itk
     return result;
   }
 
-
-
-
   /**
   * Returns a temporary copy of a vector
   */
@@ -159,8 +129,6 @@ namespace itk
     return result;
   }
 
-
-
   /**
   * Performs addition in place
   */
@@ -175,9 +143,6 @@ namespace itk
     }
     return *this;
   }
-
-
-
 
   /**
   * Performs subtraction in place
@@ -194,8 +159,6 @@ namespace itk
     return *this;
   }
 
-
-
   /**
   * Performs multiplication by a scalar, in place
   */
@@ -211,8 +174,6 @@ namespace itk
     return *this;
   }
 
-
-
   /**
   * Performs division by a scalar, in place
   */
@@ -227,9 +188,6 @@ namespace itk
     }
     return *this;
   }
-
-
-
 
   /**
   * Performs multiplication with a scalar
@@ -247,7 +205,6 @@ namespace itk
     return result;
   }
 
-
   /**
   * Performs division by a scalar
   */
@@ -264,8 +221,7 @@ namespace itk
     return result;
   }
 
-
-  /*
+  /**
   * Matrix notation access to elements
   */
   template<class T, unsigned int NOdfDirections>
@@ -293,9 +249,7 @@ namespace itk
     return (*this)[k];
   }
 
-
-
-  /*
+  /**
   * Matrix notation access to elements
   */
   template<class T, unsigned int NOdfDirections>
@@ -323,8 +277,7 @@ namespace itk
     return (*this)[k];
   }
 
-
-  /*
+  /**
   * Set the Tensor to an Identity.
   * Set ones in the diagonal and zeroes every where else.
   */
@@ -336,7 +289,7 @@ namespace itk
     this->Fill(NumericTraits< T >::One / NOdfDirections);
   }
 
-  /*
+  /**
   * Set the Tensor to an Identity.
   * Set ones in the diagonal and zeroes every where else.
   */
@@ -373,7 +326,7 @@ namespace itk
     }
   }
 
-  /*
+  /**
   * L2-Normalization
   */
   template<class T, unsigned int NOdfDirections>
@@ -393,7 +346,7 @@ namespace itk
     }
   }
 
-  /*
+  /**
   * Normalization to PDF
   */
   template<class T, unsigned int NOdfDirections>
@@ -415,7 +368,7 @@ namespace itk
     }
   }
 
-  /*
+  /**
   * Min/Max-Normalization
   */
   template<class T, unsigned int NOdfDirections>
@@ -438,7 +391,7 @@ namespace itk
     return retval;
   }
 
-  /*
+  /**
   * Max-Normalization
   */
   template<class T, unsigned int NOdfDirections>
@@ -619,23 +572,12 @@ namespace itk
       }
       polydata->SetPoints( points );
 
-      ////clean up the poly data to remove redundant points
-      //vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-      //cleaner->SetInput( polydata );
-      //cleaner->SetAbsoluteTolerance( 0.0 );
-      //cleaner->Update();
-
-      //vtkAppendPolyData* append = vtkAppendPolyData::New();
-      //append->AddInput(cleaner->GetOutput());
-      //append->Update();
-      //m_BaseMesh = append->GetOutput();
-
       m_BaseMesh = polydata;
     }
     m_MutexBaseMesh.Unlock();
   }
 
-  /*
+  /**
   * Extract the principle diffusion direction
   */
   template<class T, unsigned int NOdfDirections>
@@ -705,7 +647,7 @@ namespace itk
     return *m_NeighborIdxs->at(idx);
   }
 
-  /*
+  /**
   * Extract the n-th diffusion direction
   */
   template<class T, unsigned int NOdfDirections>
@@ -789,7 +731,7 @@ namespace itk
     return m_Directions->get_column(i);
   }
 
-  /*
+  /**
   * Interpolate a position between sampled directions
   */
   template<class T, unsigned int NOdfDirections>
@@ -930,7 +872,7 @@ namespace itk
 
   }
 
-  /*
+  /**
   * Calculate Generalized Fractional Anisotropy
   */
   template<class T, unsigned int NOdfDirections>
@@ -1019,7 +961,7 @@ namespace itk
     }
   }
 
-  /*
+  /**
   * Calculate Nematic Order Parameter
   */
   template < typename T, unsigned int N >
@@ -1030,7 +972,7 @@ namespace itk
     return 0;
   }
 
-  /*
+  /**
   * Calculate StdDev by MaxValue
   */
   template < typename T, unsigned int N >
@@ -1165,7 +1107,7 @@ namespace itk
     }
   }
 
-  /*
+  /**
   * Calculate Normalized Entropy
   */
   template < typename T, unsigned int N >
@@ -1191,7 +1133,7 @@ namespace itk
     return (T) (-_n / log(_n) * mean);
   }
 
-  /*
+  /**
   * Pre-multiply the Tensor by a Matrix
   */
   template<class T, unsigned int NOdfDirections>
@@ -1216,7 +1158,7 @@ namespace itk
     return result;
   }
 
-  /*
+  /**
   * Post-multiply the Tensor by a Matrix
   */
   template<class T, unsigned int NOdfDirections>
@@ -1241,9 +1183,6 @@ namespace itk
     return result;
   }
 
-
-
-
   /**
   * Print content to an ostream
   */
@@ -1257,7 +1196,6 @@ namespace itk
     }
     return os;
   }
-
 
   /**
   * Read content from an istream

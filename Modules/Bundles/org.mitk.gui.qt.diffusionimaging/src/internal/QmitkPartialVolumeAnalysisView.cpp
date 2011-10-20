@@ -1382,71 +1382,76 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
         // perform clustering
         const HistogramType *histogram = m_CurrentStatisticsCalculator->GetHistogram( );
-        ClusteringType::Pointer clusterer = ClusteringType::New();
-        clusterer->SetStepsNumIntegration(200);
-        clusterer->SetMaxIt(1000);
 
-        mitk::Image::Pointer pFiberImg;
-        if(m_QuantifyClass==3)
+        if(histogram != NULL)
         {
-          if(m_Controls->m_Quantiles->isChecked())
+          ClusteringType::Pointer clusterer = ClusteringType::New();
+          clusterer->SetStepsNumIntegration(200);
+          clusterer->SetMaxIt(1000);
+
+          mitk::Image::Pointer pFiberImg;
+          if(m_QuantifyClass==3)
           {
-            m_CurrentRGBClusteringResults = clusterer->PerformRGBQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
+            if(m_Controls->m_Quantiles->isChecked())
+            {
+              m_CurrentRGBClusteringResults = clusterer->PerformRGBQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
+            }
+            else
+            {
+              m_CurrentRGBClusteringResults = clusterer->PerformRGBClustering(imgToCluster, histogram);
+            }
+
+            pFiberImg = m_CurrentRGBClusteringResults->rgbChannels->r;
+            cparams = m_CurrentRGBClusteringResults->params;
+            cresult = m_CurrentRGBClusteringResults->result;
+            chist = m_CurrentRGBClusteringResults->hist;
           }
           else
           {
-            m_CurrentRGBClusteringResults = clusterer->PerformRGBClustering(imgToCluster, histogram);
+            if(m_Controls->m_Quantiles->isChecked())
+            {
+              m_CurrentPerformClusteringResults =
+                  clusterer->PerformQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
+            }
+            else
+            {
+              m_CurrentPerformClusteringResults =
+                clusterer->PerformClustering(imgToCluster, histogram, m_QuantifyClass);
+            }
+
+            pFiberImg = m_CurrentPerformClusteringResults->clusteredImage;
+            cparams = m_CurrentPerformClusteringResults->params;
+            cresult = m_CurrentPerformClusteringResults->result;
+            chist = m_CurrentPerformClusteringResults->hist;
           }
 
-          pFiberImg = m_CurrentRGBClusteringResults->rgbChannels->r;
-          cparams = m_CurrentRGBClusteringResults->params;
-          cresult = m_CurrentRGBClusteringResults->result;
-          chist = m_CurrentRGBClusteringResults->hist;
-        }
-        else
-        {
-          if(m_Controls->m_Quantiles->isChecked())
+          if(m_IsTensorImage)
           {
-            m_CurrentPerformClusteringResults =
-                clusterer->PerformQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
-          }
-          else
-          {
-            m_CurrentPerformClusteringResults =
-              clusterer->PerformClustering(imgToCluster, histogram, m_QuantifyClass);
-          }
+            m_AngularErrorImage = clusterer->CaculateAngularErrorImage(
+                m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1),
+                m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2),
+                pFiberImg);
 
-          pFiberImg = m_CurrentPerformClusteringResults->clusteredImage;
-          cparams = m_CurrentPerformClusteringResults->params;
-          cresult = m_CurrentPerformClusteringResults->result;
-          chist = m_CurrentPerformClusteringResults->hist;
+            //          GetDefaultDataStorage()->Remove(m_newnode2);
+            //          m_newnode2 = mitk::DataNode::New();
+            //          m_newnode2->SetData(m_AngularErrorImage);
+            //          m_newnode2->SetName(("AngularError"));
+            //          m_newnode2->SetIntProperty( "layer", 1003 );
+            //          GetDefaultDataStorage()->Add(m_newnode2, m_SelectedImageNodes->GetNode());
+
+            //          newnode = mitk::DataNode::New();
+            //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1));
+            //          newnode->SetName(("Comp1"));
+            //          GetDefaultDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
+
+            //          newnode = mitk::DataNode::New();
+            //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2));
+            //          newnode->SetName(("Comp2"));
+            //          GetDefaultDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
+          }
+          ShowClusteringResults();
         }
 
-        if(m_IsTensorImage)
-        {
-          m_AngularErrorImage = clusterer->CaculateAngularErrorImage(
-              m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1),
-              m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2),
-              pFiberImg);
-
-          //          GetDefaultDataStorage()->Remove(m_newnode2);
-          //          m_newnode2 = mitk::DataNode::New();
-          //          m_newnode2->SetData(m_AngularErrorImage);
-          //          m_newnode2->SetName(("AngularError"));
-          //          m_newnode2->SetIntProperty( "layer", 1003 );
-          //          GetDefaultDataStorage()->Add(m_newnode2, m_SelectedImageNodes->GetNode());
-
-          //          newnode = mitk::DataNode::New();
-          //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1));
-          //          newnode->SetName(("Comp1"));
-          //          GetDefaultDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
-
-          //          newnode = mitk::DataNode::New();
-          //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2));
-          //          newnode->SetName(("Comp2"));
-          //          GetDefaultDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
-        }
-        ShowClusteringResults();
       }
 
       statisticsCalculationSuccessful = true;

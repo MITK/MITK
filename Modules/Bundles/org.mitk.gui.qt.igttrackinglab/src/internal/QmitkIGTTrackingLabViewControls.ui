@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>IGTTrackingLabViewControls</class>
- <widget class="QWidget" name="IGTTrackingLabViewControls">
+ <class>QmitkIGTTrackingLabViewControls</class>
+ <widget class="QWidget" name="QmitkIGTTrackingLabViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
-    <height>161</height>
+    <width>436</width>
+    <height>374</height>
    </rect>
   </property>
   <property name="minimumSize">

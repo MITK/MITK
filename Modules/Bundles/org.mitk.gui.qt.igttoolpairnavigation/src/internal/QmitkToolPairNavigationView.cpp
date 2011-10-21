@@ -86,8 +86,6 @@ void QmitkToolPairNavigationView::CreateBundleWidgets(QWidget* parent)
   this->m_Controls.m_ToolBox->insertItem(0,m_NDIConfigWidget,QString("Configuration"));
   this->m_Controls.m_ToolBox->insertItem(1,m_DistanceWidget,QString("Distances"));
 
-
-
 }
 
 void QmitkToolPairNavigationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

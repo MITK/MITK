@@ -56,6 +56,9 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkExt_EXPORT QmitkPlotWidget: public QWidget 
 {
 
+private:
+  Q_OBJECT
+
 public:
   /** 
   * represents the data type used for scalar values stored

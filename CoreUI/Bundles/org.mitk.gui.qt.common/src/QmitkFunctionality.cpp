@@ -246,7 +246,7 @@ void QmitkFunctionality::DataStorageChanged()
 
 }
 
-QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
+QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateWidget )
 {
   QmitkStdMultiWidget* activeStdMultiWidget = 0;
   berry::IEditorPart::Pointer editor =
@@ -256,7 +256,7 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
   {
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
-  else
+  else if (reCreateWidget)
   {
     mitk::DataStorageEditorInput::Pointer editorInput;
     editorInput = new mitk::DataStorageEditorInput();

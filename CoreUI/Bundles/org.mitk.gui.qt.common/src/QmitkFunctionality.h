@@ -241,9 +241,11 @@ protected:
   mitk::DataStorage::Pointer GetDefaultDataStorage() const;
   ///
   /// Returns the default and active StdMultiWidget.
-  /// <b>If there is not StdMultiWidget yet a new one is created in this method!</b>
+  /// \param reCreateWidget a boolean flag to en-/disable the attept to re-create the StdWidget
+  /// <b>If there is not StdMultiWidget yet a new one is
+  /// created in this method when called with default parameter!</b>
   ///
-  QmitkStdMultiWidget* GetActiveStdMultiWidget();
+  QmitkStdMultiWidget* GetActiveStdMultiWidget( bool reCreateWidget = true);
   ///
   /// Outputs an error message to the console and displays a message box containing
   /// the exception description.

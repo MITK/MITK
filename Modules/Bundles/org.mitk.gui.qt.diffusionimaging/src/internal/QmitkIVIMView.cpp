@@ -40,32 +40,36 @@ const std::string QmitkIVIMView::VIEW_ID = "org.mitk.views.ivim";
 QmitkIVIMView::QmitkIVIMView()
   : QmitkFunctionality()
   , m_Controls( 0 )
-  , m_MultiWidget( NULL ),
-    m_Active(false)
+  , m_MultiWidget( NULL )
+  , m_Active(false)
+  , m_SliceObserverTag1(0), m_SliceObserverTag2(0), m_SliceObserverTag3(0)
 {
 }
 
 QmitkIVIMView::~QmitkIVIMView()
 {
-  //unregister observers when view is destroyed
-  if(m_SliceObserverTag1 != 0)
+  QmitkStdMultiWidget* MultiWidget = this->GetActiveStdMultiWidget(false);
+
+  if(MultiWidget)
   {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag1 );
-  }
+    //unregister observers when view is destroyed
+    if( MultiWidget->mitkWidget1 != NULL && m_SliceObserverTag1 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget1->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag1 );
+    }
 
-  if(m_SliceObserverTag2 != 0)
+    if( MultiWidget->mitkWidget2 != NULL && m_SliceObserverTag2 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget2->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag2 );
+    }
 
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag2 );
-  }
-
-  if(m_SliceObserverTag3 != 0)
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag3 );
+    if( MultiWidget->mitkWidget3!= NULL && m_SliceObserverTag3 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget3->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag3 );
+    }
   }
 }
 

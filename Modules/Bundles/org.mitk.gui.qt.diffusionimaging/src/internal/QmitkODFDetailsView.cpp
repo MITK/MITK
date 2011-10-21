@@ -40,14 +40,29 @@ QmitkODFDetailsView::QmitkODFDetailsView()
 
 QmitkODFDetailsView::~QmitkODFDetailsView()
 {
-  mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-  slicer->RemoveObserver(this->m_SliceObserverTag1);
+  QmitkStdMultiWidget* MultiWidget = this->GetActiveStdMultiWidget(false);
 
-  slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-  slicer->RemoveObserver(this->m_SliceObserverTag2);
+  if(MultiWidget)
+  {
+    //unregister observers when view is destroyed
+    if( MultiWidget->mitkWidget1 != NULL && m_SliceObserverTag1 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget1->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag1 );
+    }
 
-  slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-  slicer->RemoveObserver(this->m_SliceObserverTag3);
+    if( MultiWidget->mitkWidget2 != NULL && m_SliceObserverTag2 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget2->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag2 );
+    }
+
+    if( MultiWidget->mitkWidget3!= NULL && m_SliceObserverTag3 != 0)
+    {
+      mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget3->GetSliceNavigationController();
+      slicer->RemoveObserver( m_SliceObserverTag3 );
+    }
+  }
 }
 
 void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )

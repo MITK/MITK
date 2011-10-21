@@ -537,7 +537,11 @@ void QmitkIGTTrackingLabView::RenderScene( )
       
       
       if(m_VirtualViewCheckBox->isChecked())
+      {
         m_VirtualView->Update();
+        mitk::Point3D p = m_Visualizer->GetOutput(m_VirtualViewToolSelectionComboBox->currentIndex())->GetPosition();
+        this->GetActiveStdMultiWidget()->MoveCrossToPosition(p);
+      }
 
       if(m_PointSetRecording && m_PSRecordingPointSet.IsNotNull())
       {
@@ -557,10 +561,10 @@ void QmitkIGTTrackingLabView::RenderScene( )
       MITK_WARN << "Exception during QmitkIGTTrackingLab::RenderScene():" << e.what() << "\n";
     }
 
-    if(m_VirtualViewCheckBox->isChecked())
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-    //update all Widgets
-    else
+    //if(m_VirtualViewCheckBox->isChecked())
+    //  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+    ////update all Widgets
+    //else
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 
 
@@ -653,29 +657,6 @@ void QmitkIGTTrackingLabView::OnToolsAdded(QStringList toolsList)
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 
 }
-
-void QmitkIGTTrackingLabView::VisualizeAllTools()
-{
-
-  
-  //for (unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
-  //{
-  //  m_FiducialRegistrationFilter->SetInput(i, m_Source->GetOutput(i)); // set input for registration filter
-  //  m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i)); // set input for visualization filter
-  //}
-
-  //for(unsigned int i= 0; i < m_Visualizer->GetNumberOfOutputs(); ++i)
-  //{
-  //  //const char* toolName = tracker->GetTool(i)->GetToolName();
-
-  //  mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), m_Source->GetTrackingDevice()->GetTool(i)->GetToolName());
-  //  m_Visualizer->SetRepresentationObject(i, representation->GetData());
-
-  //  //m_VisualizedTools.append(representation->GetName().c_str());
-  //}
-
-}
-
 
 void QmitkIGTTrackingLabView::InitializeRegistration()
 {

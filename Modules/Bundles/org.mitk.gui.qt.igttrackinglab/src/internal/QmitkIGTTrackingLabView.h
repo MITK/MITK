@@ -45,7 +45,6 @@ class QmitkUpdateTimerWidget;
 class QmitkToolTrackingStatusWidget;
 
 
-
 /*!
   \brief QmitkIGTTrackingLabView
 
@@ -64,66 +63,149 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
 
     static const std::string VIEW_ID;
 
+    /**
+    \brief default constructor
+    */
     QmitkIGTTrackingLabView();
+    
+    /**
+    \brief default destructor
+    */
     virtual ~QmitkIGTTrackingLabView();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
   protected slots:
-  
+    /**
+    \brief This method adds a new fiducial to the tracker fiducials PointSet.
+    */
     void OnAddRegistrationTrackingFiducial();
+    /**
+    \brief This method calls the fiducial registration.
+    */
     void OnRegisterFiducials();
+    /**
+    \brief This method should be called if deconnecting the tracker.
+    */
     void OnTrackerDisconnected();
+    /**
+    \brief This method sets up the navigation pipeline before tracking is started.
+    */
     void OnSetupNavigation();
+    /**
+    \brief This method changes the name of a specific tool.
+    */
     void OnChangeToolName(int index, QString name);
+    /**
+    \brief This method creates the surface representation for a tool loaded from file.
+    */
     void OnToolLoaded(int index, mitk::DataNode::Pointer toolNode);
+    /**
+    \brief This method starts the navigation.
+    */
     void OnStartNavigation();
+    /**
+    \brief This method stops the navigation.
+    */
     void OnStopNavigation();
+    /**
+    \brief This method performs the visualisation of all action.
+    */
     void RenderScene();
+    /**
+    \brief This method should be called if new tools have been added to the tracking device.
+    */
     void OnToolsAdded(QStringList toolsList);
-
+    /**
+    \brief This method reacts on toolbox item changes.
+    */
     void OnToolBoxCurrentChanged(int index);
+    /**
+    \brief This method initializes the registration for the FiducialRegistrationWidget.
+    */
     void InitializeRegistration();
+    /**
+    \brief This method reacts on tool surface changes.
+    */
     void ChangeToolRepresentation( int toolID , mitk::Surface::Pointer surface );
-
+    /**
+    \brief This method starts the PointSet recording.
+    */
     void OnPointSetRecording(bool record);
+    /**
+    \brief This method activates the virtual camera.
+    */
     void OnVirtualCameraChanged(int toolNr);
-    //void OnVirtualViewToggled(bool toggled);
-    
-
-
-    /// \brief Called when the user clicks the GUI button
-//    void DoImageProcessing();
 
   protected:
 
-    enum ToolBoxElement  
+
+    enum ToolBoxElement  // enums for the different ToolBox item tabs.
     {
       NDIConfigurationWidget = 0,
-      RegistrationWidget = 1
+      RegistrationWidget = 1,
+      PointSetRecording = 2,
+      VirtualCamera = 3
     };
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-//    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
     Ui::QmitkIGTTrackingLabViewControls m_Controls;
+    /**
+    \brief This method creates all widgets this bundle needs.
+    */
     void CreateBundleWidgets( QWidget* parent );
+    /**
+    \brief This method creates the SIGNAL SLOT connections.
+    */
     void CreateConnections();
 
+    /**
+    \brief This method sets up the filter pipeline.
+    */
     void SetupIGTPipeline();
+    /**
+    \brief This method initializes all needed filters.
+    */
     void InitializeFilters();
+    /**
+    \brief This method destroys the filter pipeline.
+    */
     void DestroyIGTPipeline();
+    /**
+    \brief This method starts the continuos update of the tracking device and the rendering.
+    */
     void StartContinuousUpdate();
+    /**
+    \brief This method stops the continuos update of the tracking device and the rendering.
+    */
     void StopContinuousUpdate();
 
+    /**
+    \brief This method creates a DataNode for fiducial PointSets.
+    */
     mitk::DataNode::Pointer CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color);
-    
-    void VisualizeAllTools();
-    
+    /**
+    \brief This method creates the visualization for all connected instruments.
+    */
     mitk::DataNode::Pointer CreateInstrumentVisualization(mitk::DataStorage* ds, const char* toolName); // create 3D models for all connected tools
+    /**
+    \brief This method creates a DataNode of a 3D cone object.
+    */
     mitk::DataNode::Pointer CreateConeRepresentation(const char* label = ""); // create a 3D cone as representation for a tool
-  
+    /**
+    \brief This method destroys the instrument visualization.
+    */
     void DestroyInstrumentVisualization(mitk::DataStorage* ds, mitk::TrackingDevice::Pointer tracker);
+
+    /**
+    \brief This method creates a widget with all input objects needed for the PointSet recording.
+    */
+    QWidget* CreatePointSetRecordingWidget(QWidget* parent);
+    /**
+    \brief This method creates a widget with all input objects needed for the virtual camera view.
+    */
+    QWidget* CreateVirtualViewWidget(QWidget* parent);
+
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
 
@@ -131,11 +213,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
+    mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
-    QWidget* CreatePointSetRecordingWidget(QWidget* parent);
-    QWidget* CreateVirtualViewWidget(QWidget* parent);
-
-    mitk::Vector3D  m_DirectionOfProjectionVector;
 
 
 private:
@@ -156,11 +235,12 @@ private:
   std::string m_RegistrationTrackingFiducialsName;
   std::string m_RegistrationImageFiducialsName;
   
-  //QVector<QString> m_VisualizedTools;
-
   std::string m_PointSetRecordingDataNodeName;
   bool m_PointSetRecording;
 
+  /**
+    \brief This method performs GlobalReinit() for the rendering widgets.
+    */
   void GlobalReinit();
 
 };

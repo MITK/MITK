@@ -150,9 +150,6 @@ void mitk::TrackingDeviceSource::Connect()
 
 void mitk::TrackingDeviceSource::StartTracking()
 {
-  if(this->GetTrackingDevice()->GetToolCount() != this->GetNumberOfOutputs())
-    this->CreateOutputs();
-
   if (m_TrackingDevice.IsNull())
     throw std::invalid_argument("mitk::TrackingDeviceSource: No tracking device set");
   if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)

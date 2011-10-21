@@ -179,6 +179,9 @@ void mitk::TrackingDeviceSource::StopTracking()
 
 void mitk::TrackingDeviceSource::UpdateOutputInformation()
 {
+  if(this->GetTrackingDevice()->GetToolCount() != this->GetNumberOfOutputs())
+    this->CreateOutputs();
+
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
 }

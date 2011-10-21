@@ -1,0 +1,19 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.igttrackinglab} Igttrackinglab
+
+\image html icon.png "Icon of Igttrackinglab"
+
+Available sections:
+  - \ref org.mitk.gui.qt.igttrackinglabOverview
+
+\section org.mitk.gui.qt.igttrackinglabOverview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/
+

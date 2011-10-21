@@ -473,6 +473,7 @@ void QmitkIGTTrackingLabView::OnToolLoaded(int index, mitk::DataNode::Pointer to
 
 void QmitkIGTTrackingLabView::OnStartNavigation()
 {
+  
   if(m_Source.IsNull())
   {
     QMessageBox::warning(NULL, "IGTTrackingLab: Error", "can not access tracking source. Navigation not possible");
@@ -482,7 +483,7 @@ void QmitkIGTTrackingLabView::OnStartNavigation()
   if(!m_Source->IsTracking())
   {
     m_Source->StartTracking();
-    
+       
     try
     {
       m_RenderingTimerWidget->GetTimerInterval();
@@ -534,7 +535,7 @@ void QmitkIGTTrackingLabView::RenderScene( )
 
       m_Visualizer->Update();
       
-
+      
       if(m_VirtualViewCheckBox->isChecked())
         m_VirtualView->Update();
 

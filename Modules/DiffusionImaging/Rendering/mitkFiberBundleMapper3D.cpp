@@ -16,7 +16,7 @@
  =========================================================================*/
 
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 #include "mitkFiberBundleMapper3D.h"
 
 
@@ -27,46 +27,32 @@
 #include <vtkPolyLine.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
-#include <vtkTubeFilter.h>
-#include <vtkCamera.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleTrackballCamera.h>
-#include "vtkVertex.h"
 
-#include <vtkOpenGLRenderer.h>
+
 #include <vtkLookupTable.h>
 #include <vtkKochanekSpline.h>
 #include <vtkParametricSpline.h>
 #include <vtkParametricFunctionSource.h>
 
 #include "mitkFiberBundleInteractor.h"
-#include "mitkGlobalInteraction.h"
+#include <mitkGlobalInteraction.h>
 
 //template<class TPixelType>
 mitk::FiberBundleMapper3D::FiberBundleMapper3D() 
-: m_vtkFiberList(NULL),
-//m_VtkFiberDataMapperGL(NULL),
- m_VtkFiberDataMapperGL(vtkOpenGLPolyDataMapper::New()),
-m_vtkTubeMapper(NULL)
-
+: m_VtkFiberDataMapperGL(vtkOpenGLPolyDataMapper::New())
+, m_FiberActor(vtkOpenGLActor::New())
+, m_FiberAssembly(vtkPropAssembly::New())
+, m_vtkTubeMapper(vtkOpenGLPolyDataMapper::New())
+, m_tubes(vtkTubeFilter::New())
+, m_TubeActor(vtkOpenGLActor::New())
 {
-  MITK_INFO << "FiberBundleMapper3D()";
-  m_FiberAssembly = vtkPropAssembly::New();
-  m_FiberActor = vtkOpenGLActor::New();
-  m_TubeActor = vtkOpenGLActor::New();
-  
+
+
 }
 
-//template<class TPixelType>
 mitk::FiberBundleMapper3D::~FiberBundleMapper3D()
 {
-  MITK_INFO << "FiberBundleMapper3D(destructor)";
-  m_FiberActor->Delete();
-  m_FiberAssembly->Delete();
-  //m_vtkFiberList->Delete();
-  //m_VtkFiberDataMapperGL->Delete();
-  //m_VtkFiberDataMapper->Delete();
-  
+
 }
 
 
@@ -105,23 +91,23 @@ void mitk::FiberBundleMapper3D::GenerateData()
   /* ######## VTK FIBER REPRESENTATION  ######## */
   //create a vtkPoints object and store the all the brainFiber points in it
   
-  vtkPoints* vtkSmoothPoints = vtkPoints::New(); //in smoothpoints the interpolated points representing a fiber are stored.
+ vtkSmartPointer<vtkPoints> vtkSmoothPoints = vtkPoints::New(); //in smoothpoints the interpolated points representing a fiber are stored.
   
   //in vtkcells all polylines are stored, actually all id's of them are stored
-  vtkCellArray *vtkSmoothCells = vtkCellArray::New(); //cellcontainer for smoothed lines
+  vtkSmartPointer<vtkCellArray> vtkSmoothCells = vtkCellArray::New(); //cellcontainer for smoothed lines
   
   //in some cases a fiber includes just 1 point, so put it in here
-  vtkCellArray *vtkVrtxs = vtkCellArray::New(); 
+  vtkSmartPointer<vtkCellArray> vtkVrtxs = vtkCellArray::New(); 
   
   //colors and alpha value for each single point, RGBA = 4 components
-  vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
+  vtkSmartPointer<vtkUnsignedCharArray> colorsT = vtkUnsignedCharArray::New();
   colorsT->SetNumberOfComponents(4);
   colorsT->SetName("ColorValues");
   
-  vtkDoubleArray *faColors = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> faColors = vtkDoubleArray::New();
   faColors->SetName("FaColors");
   
-  vtkDoubleArray *tubeRadius = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> tubeRadius = vtkDoubleArray::New();
   tubeRadius->SetName("TubeRadius");
   
   
@@ -147,7 +133,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
   
     //MITK_INFO << "REAL AMOUNT OF FIBERS: " << fibrNrPnts;
     
-    vtkPoints *vtkpointsDTI =  vtkPoints::New();
+    vtkSmartPointer<vtkPoints> vtkpointsDTI =  vtkPoints::New();
     
     if (fibrNrPnts <= 0) { //this should never occour! but who knows
       MITK_INFO << "HyperERROR in fiberBundleMapper3D.cpp ...no point in fiberBundle!!! .. check ur trackingAlgorithm";
@@ -183,18 +169,18 @@ void mitk::FiberBundleMapper3D::GenerateData()
     
     
     /////PROCESS POLYLINE SMOOTHING/////
-    vtkKochanekSpline* xSpline = vtkKochanekSpline::New();
-    vtkKochanekSpline* ySpline = vtkKochanekSpline::New();
-    vtkKochanekSpline* zSpline = vtkKochanekSpline::New();
+    vtkSmartPointer<vtkKochanekSpline> xSpline = vtkKochanekSpline::New();
+    vtkSmartPointer<vtkKochanekSpline> ySpline = vtkKochanekSpline::New();
+    vtkSmartPointer<vtkKochanekSpline> zSpline = vtkKochanekSpline::New();
     
-    vtkParametricSpline* spline = vtkParametricSpline::New();
+    vtkSmartPointer<vtkParametricSpline> spline = vtkParametricSpline::New();
     spline->SetXSpline(xSpline);
     spline->SetYSpline(ySpline);
     spline->SetZSpline(zSpline);
     spline->SetPoints(vtkpointsDTI);
     
     
-    vtkParametricFunctionSource* functionSource = vtkParametricFunctionSource::New();
+    vtkSmartPointer<vtkParametricFunctionSource> functionSource = vtkParametricFunctionSource::New();
     functionSource->SetParametricFunction(spline);
     functionSource->SetUResolution(200);
     functionSource->SetVResolution(200);
@@ -206,7 +192,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
     vtkPolyData* outputFunction = functionSource->GetOutput();
     vtkPoints* tmpSmoothPnts = outputFunction->GetPoints(); //smoothPoints of current fiber
        
-    vtkPolyLine* smoothLine = vtkPolyLine::New();
+    vtkSmartPointer<vtkPolyLine> smoothLine = vtkPolyLine::New();
     smoothLine->GetPointIds()->SetNumberOfIds(tmpSmoothPnts->GetNumberOfPoints());
 //    MITK_INFO << "SMOOTHED AMOUNT OF POINTS:" << tmpSmoothPnts->GetNumberOfPoints();
 
@@ -319,7 +305,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
   //vtkcells->InitTraversal();
   
   // Put points and lines together in one polyData structure
-  vtkPolyData *polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkPolyData::New();
   polyData->SetPoints(vtkSmoothPoints);
   polyData->SetLines(vtkSmoothCells);
   
@@ -331,7 +317,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
   //polyData->GetPointData()->AddArray(tubeRadius);
   
   
-  vtkLookupTable *lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
   lut->Build();
   
   
@@ -343,8 +329,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
   //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
   m_VtkFiberDataMapperGL->SelectColorArray("ColorValues");
   m_VtkFiberDataMapperGL->SetLookupTable(lut);
-  
-  m_vtkTubeMapper = vtkOpenGLPolyDataMapper::New();
+
   
   //m_FiberActor = vtkOpenGLActor::New();
   m_FiberActor->SetMapper(m_VtkFiberDataMapperGL);
@@ -637,7 +622,7 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     vtkPolyData *tmpPolyData = m_VtkFiberDataMapperGL->GetInput();
     
     
-    m_tubes = vtkTubeFilter::New();
+  
     m_tubes->SetInput(tmpPolyData);
     m_tubes->SidesShareVerticesOn();
     m_tubes->SetRadius((double)(tmpRadius));

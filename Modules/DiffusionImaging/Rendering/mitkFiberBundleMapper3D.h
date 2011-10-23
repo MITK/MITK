@@ -22,18 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "mitkCommon.h"
 //#include "mitkBaseRenderer.h"
 
-#include "mitkFiberBundle.h"
+#include <mitkFiberBundle.h>
 #include <vtkSmartPointer.h>
-#include "mitkVtkMapper3D.h"
-#include "MitkDiffusionImagingExports.h"
-//#include "mitkBaseData.h"
-#include "vtkAppendPolyData.h"
-#include "vtkOpenGLPolyDataMapper.h"
-#include "vtkOpenGLActor.h"
-#include "vtkPropAssembly.h"
-#include "vtkProperty.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkTubeFilter.h"
+#include <mitkVtkMapper3D.h>
+
+
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLActor.h>
+#include <vtkPropAssembly.h>
+#include <vtkProperty.h>
+#include <vtkTubeFilter.h>
 
 
 namespace mitk {
@@ -70,25 +68,16 @@ namespace mitk {
     void UpdateVtkObjects();
     
     
-    vtkAppendPolyData *m_vtkFiberList;
-    //vtkSmartPointer<vtkAppendPolyData> m_vtkFiberList;
     
-    vtkOpenGLPolyDataMapper *m_VtkFiberDataMapperGL;
-    //vtkPainterPolyDataMapper *m_VtkFiberDataMapperGL;
-    //vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkFiberDataMapperGL;
-    
-    //vtkOpenGLPolyDataMapper *m_VtkFiberDataMapper;
-    //vtkSmartPointer<vtkPolyDataMapper> m_VtkFiberDataMapper;
-    
-    vtkOpenGLActor *m_FiberActor;
-    //vtkSmartPointer<vtkActor> m_FiberActor;
-    
-    vtkTubeFilter *m_tubes;
-    vtkOpenGLActor *m_TubeActor;
-    vtkOpenGLPolyDataMapper *m_vtkTubeMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkFiberDataMapperGL;
+    vtkSmartPointer<vtkOpenGLActor> m_FiberActor;
+    vtkSmartPointer<vtkPropAssembly> m_FiberAssembly;
+       
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_vtkTubeMapper;
+    vtkSmartPointer<vtkTubeFilter> m_tubes;
+    vtkSmartPointer<vtkOpenGLActor> m_TubeActor;
     
     
-    vtkPropAssembly *m_FiberAssembly;
     
 
 

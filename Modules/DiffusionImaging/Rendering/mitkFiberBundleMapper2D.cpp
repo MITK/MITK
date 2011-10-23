@@ -187,7 +187,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   //MITK_INFO << renderer->GetName() << " OutputPoints#: " << localStorage->m_SlicedResult->GetNumberOfPoints();
 
 
-  vtkLookupTable *lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
   lut->Build();
   localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
   //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");

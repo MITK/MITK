@@ -23,7 +23,7 @@
 
 //includes for MITK datastructure
 #include "mitkBaseData.h"
-#include "MitkDiffusionImagingExports.h"
+#include <MitkDiffusionImagingExports.h>
 
 //=======modernized================
 //includes storing fiberdata
@@ -37,19 +37,19 @@
 //=========modernized end===========
 
 
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigure.h>
 
 /* This Class represents a bunch of FiberTracts as a Bundle.
  A Bundle is represented by a GroupSpatialObject */
 
-#include "itkDTITubeSpatialObject.h"
-#include "itkDTITubeSpatialObjectPoint.h"
-#include "itkGroupSpatialObject.h"
-#include "itkPolyLineParametricPath.h"
-#include "itkSlowPolyLineParametricPath.h"
-#include "itkVectorContainer.h"
-#include "itkPointSet.h"
-#include "itkVector.h"
+#include <itkDTITubeSpatialObject.h>
+#include <itkDTITubeSpatialObjectPoint.h>
+#include <itkGroupSpatialObject.h>
+#include <itkPolyLineParametricPath.h>
+#include <itkSlowPolyLineParametricPath.h>
+#include <itkVectorContainer.h>
+#include <itkPointSet.h>
+#include <itkVector.h>
 #include <vtkCell.h>
 //#include <vtkPolyData.h>
 #include <vtkCellArray.h>
@@ -155,7 +155,7 @@ namespace mitk {
     int FindTractByEndpoints(mitk::FiberBundle::DTITubeType::Pointer searchTract);
     mitk::FiberBundle::Pointer SubstractBundle(mitk::FiberBundle::Pointer bundle);
     void InsertBundle(mitk::FiberBundle::Pointer bundle);
-    vtkPolyData* GeneratePolydata();
+    vtkSmartPointer<vtkPolyData> GeneratePolydata();
 
 //    int SearchFiber(worldPoint, tolerance, resultDistance);
 
@@ -187,7 +187,7 @@ namespace mitk {
 
     /* Methods for PlanarFigure ROIs */
     bool isPointInSelection(mitk::Point3D, mitk::PlanarFigure::Pointer);
-    vtkPolyData* m_PolyData;
+    vtkSmartPointer<vtkPolyData> m_PolyData;
 
   };
 

@@ -17,7 +17,7 @@ SET(INTERNAL_CPP_FILES
   QmitkODFDetailsView.cpp
   QmitkGibbsTrackingView.cpp
   QmitkStochasticFiberTrackingView.cpp
-  QmitkFiberBundleOperationsView.cpp
+  QmitkFiberProcessingView.cpp
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
@@ -34,7 +34,7 @@ SET(UI_FILES
   src/internal/QmitkODFDetailsViewControls.ui
   src/internal/QmitkGibbsTrackingViewControls.ui
   src/internal/QmitkStochasticFiberTrackingViewControls.ui
-  src/internal/QmitkFiberBundleOperationsViewControls.ui
+  src/internal/QmitkFiberProcessingViewControls.ui
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
@@ -55,7 +55,7 @@ SET(MOC_H_FILES
   src/QmitkODFDetailsWidget.h
   src/internal/QmitkGibbsTrackingView.h
   src/internal/QmitkStochasticFiberTrackingView.h
-  src/internal/QmitkFiberBundleOperationsView.h
+  src/internal/QmitkFiberProcessingView.h
   src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h

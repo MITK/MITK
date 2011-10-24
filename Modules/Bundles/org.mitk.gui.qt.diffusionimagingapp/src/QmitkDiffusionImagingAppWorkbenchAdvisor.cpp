@@ -81,7 +81,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 //  viewExcludeList.push_back( std::string("org.mitk.views.tensorreconstruction") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.perspectiveswitcher") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.basicimageprocessing") );
-//  viewExcludeList.push_back( std::string("org.mitk.views.fiberbundleoperations") );
+//  viewExcludeList.push_back( std::string("org.mitk.views.fiberprocessing") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.measurement") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.moviemaker") );
 //  viewExcludeList.push_back( std::string("org.mitk.views.odfdetails") );

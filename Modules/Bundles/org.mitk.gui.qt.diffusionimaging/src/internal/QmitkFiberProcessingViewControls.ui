@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkFiberBundleOperationsViewControls</class>
- <widget class="QWidget" name="QmitkFiberBundleOperationsViewControls">
+ <class>QmitkFiberProcessingViewControls</class>
+ <widget class="QWidget" name="QmitkFiberProcessingViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -429,12 +429,12 @@
         </property>
         <item>
          <property name="text">
-          <string>Binary Envelope</string>
+          <string>Tract Density Image (TDI)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Tract Density Image (TDI)</string>
+          <string>Binary Envelope</string>
          </property>
         </item>
         <item>

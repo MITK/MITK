@@ -15,14 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkFiberBundleOperationsView_h
-#define QmitkFiberBundleOperationsView_h
+#ifndef QmitkFiberProcessingView_h
+#define QmitkFiberProcessingView_h
 
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 
 #include <QmitkFunctionality.h>
-#include "ui_QmitkFiberBundleOperationsViewControls.h"
+#include "ui_QmitkFiberProcessingViewControls.h"
 
 #include "mitkDataStorage.h"
 #include "mitkDataStorageSelection.h"
@@ -55,7 +55,7 @@ struct FboSelListener;
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkFiberBundleOperationsView : public QmitkFunctionality
+class QmitkFiberProcessingView : public QmitkFunctionality
 {
 
 
@@ -72,8 +72,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkFiberBundleOperationsView();
-  virtual ~QmitkFiberBundleOperationsView();
+  QmitkFiberProcessingView();
+  virtual ~QmitkFiberProcessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -87,9 +87,9 @@ public:
   void ActionDrawEllipseTriggered();
   void ActionDrawPolygonTriggered();
   void DoFiberExtraction();
-  void generatePFCompo_AND();
-  void generatePFCompo_OR();
-  void generatePFCompo_NOT();
+  void GenerateAndComposite();
+  void GenerateOrComposite();
+  void GenerateNotComposite();
 
   void JoinBundles();
   void SubstractBundles();
@@ -105,7 +105,7 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  Ui::QmitkFiberBundleOperationsViewControls* m_Controls;
+  Ui::QmitkFiberProcessingViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
@@ -182,7 +182,7 @@ private:
   mitk::FiberBundle::Pointer m_FiberBundle;
   mitk::DataNode::Pointer m_FiberBundleNode;
 
-  void addPFCompositionToDataStorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
+  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
   void GenerateTractDensityImage(bool binary);

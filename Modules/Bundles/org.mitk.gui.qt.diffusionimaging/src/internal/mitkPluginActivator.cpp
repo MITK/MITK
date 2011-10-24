@@ -14,7 +14,7 @@
 #include "src/internal/QmitkODFDetailsView.h"
 #include "src/internal/QmitkGibbsTrackingView.h"
 #include "src/internal/QmitkStochasticFiberTrackingView.h"
-#include "src/internal/QmitkFiberBundleOperationsView.h"
+#include "src/internal/QmitkFiberProcessingView.h"
 #include "src/internal/QmitkFiberBundleDeveloperView.h"
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
@@ -35,7 +35,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkODFDetailsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStochasticFiberTrackingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleOperationsView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)

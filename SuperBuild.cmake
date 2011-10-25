@@ -190,6 +190,13 @@ IF(MITK_INITIAL_CACHE_FILE)
   SET(mitk_initial_cache_arg -C "${MITK_INITIAL_CACHE_FILE}")
 ENDIF()
 
+SET(mitk_optional_cache_args )
+FOREACH(type RUNTIME ARCHIVE LIBRARY)
+  IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
+    LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
+  ENDIF()
+ENDFOREACH()
+
 SET(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -199,6 +206,7 @@ ExternalProject_Add(${proj}
   CMAKE_CACHE_ARGS
     ${ep_common_args}
     ${mitk_superbuild_boolean_args}
+    ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
     -DMITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
     -DMITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}

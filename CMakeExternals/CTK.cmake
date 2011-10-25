@@ -15,10 +15,17 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 25b5c22)
+    SET(revision_tag 6af583b8)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()
+    
+    SET(ctk_optional_cache_args )
+    FOREACH(type RUNTIME ARCHIVE LIBRARY)
+      IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
+        LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
+      ENDIF()
+    ENDFOREACH()
   
     ExternalProject_Add(${proj}
       GIT_REPOSITORY git://github.com/commontk/CTK.git
@@ -29,6 +36,7 @@ IF(MITK_USE_CTK)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
+        ${ctk_optional_cache_args}
         -DDESIRED_QT_VERSION:STRING=4
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
         -DCTK_LIB_DICOM/Widgets:BOOL=ON

@@ -32,7 +32,7 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
   IF(CTK_PLUGINS_OUTPUT_DIR)
     SET(_output_dir "${CTK_PLUGINS_OUTPUT_DIR}")
   ELSE()
-    SET(_output_dir plugins)
+    SET(_output_dir "")
   ENDIF()
 
   IF(_PLUGIN_TEST_PLUGIN)

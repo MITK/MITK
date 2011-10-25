@@ -544,16 +544,12 @@ if(MITK_USE_BLUEBERRY)
   FunctionCreateProvisioningFile(
     FILE ${MITK_COREAPP_PROVISIONING_FILE}
     INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
-    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
     PLUGINS ${mitk_core_plugins_fullpath}
   )
 
   set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
   FunctionCreateProvisioningFile(
     FILE ${MITK_EXTAPP_PROVISIONING_FILE}
-    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
-    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
-    PLUGINS ${mitk_core_plugins_fullpath} ${mitk_ext_plugins_fullpath}
   )
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")

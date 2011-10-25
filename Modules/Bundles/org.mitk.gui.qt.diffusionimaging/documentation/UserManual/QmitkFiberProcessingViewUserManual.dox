@@ -1,0 +1,25 @@
+/**
+\bundlemainpage{org_fiberprocessing} Fiber Processing View
+
+This view provides everything needed to process fiber bundles.
+
+Available sections:
+  - \ref QmitkDiffusionImagingUserManualFiberManpulation
+  - \ref QmitkDiffusionImagingUserManualFiberProcessing
+
+\image html fiberbundleoperationsview.png The Fiber Processing View
+
+\section QmitkDiffusionImagingUserManualFiberManpulation Fiber Bundle Manipulation
+
+Fiber extraction:
+Place ROIs in the 2D render widgets (cricles or polygons) and extract fibers from the bundle that pass through these ROIs by selecting the according ROI and fiber bundle in the datamanger and starting the extraction. The ROIs can be combined via logical operations. All fibers that pass through the thus generated composite ROI are extracted.
+
+\section QmitkDiffusionImagingUserManualFiberProcessing Generation of additional information from fiber bundles
+
+\li Tract density image: generate a 2D heatmap from a fiber bundle
+\li Binary envelope: generate a binary image from a fiber bundle
+\li Fiber bundle image: generate a 2D rgba image representation of the fiber bundle
+\li Fiber endings image: generate a 2D binary image showing the locations of fiber endpoints
+\li Fiber endings pointset: generate a poinset containing the locations of fiber endpoints
+
+*/

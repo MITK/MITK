@@ -1,0 +1,11 @@
+/**
+\bundlemainpage{org_odfdetails} ODF Details View
+
+This view provides detailed information about the orentation distribution function at the current crosshair position (if a Q-Ball image is selected). A visualization of the ODF as well as the ODF values and according statistical information are displayed.
+
+\image html odfdetailsview.png The Gibbs Tracking View
+
+\section QmitkDiffusionImagingUserManualInputData Issues
+At the moment this view can opnly process Q-Ball images but not tensor images. Also the normalization properties etc. of the image as well as the correct rotation of the ODF are currently not incorporated into the views visualization.
+
+*/

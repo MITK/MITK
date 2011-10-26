@@ -600,6 +600,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ./ \
                          @BLUEBERRY_SOURCE_DIR@/Documentation/ \
+                         @BLUEBERRY_SOURCE_DIR@/CMake/ \
                          @_doxygen_bundles@ \
                          @_doxygen_qt4bundles@ \
                          @_doxygen_binary_bundles@ \
@@ -625,7 +626,8 @@ FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
                          *.txx \
-                         *.cxx
+                         *.cxx \
+                         *.cmake
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -637,7 +639,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                =
+EXCLUDE                = @BLUEBERRY_SOURCE_DIR@/CMake/BundleTemplate
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -652,7 +654,9 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = moc_* \
-                         Register*
+                         Register* \
+                         */files.cmake \
+                         @BLUEBERRY_BINARY_DIR@/*.cmake
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -708,7 +712,7 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty or if
 # non of the patterns match the file name, INPUT_FILTER is applied.
 
-FILTER_PATTERNS        =
+FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will be used to filter the input files when producing source

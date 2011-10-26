@@ -41,10 +41,11 @@ QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataSt
 : QAbstractItemModel(parent)
 , m_DataStorage(0)
 , m_PlaceNewNodesOnTop(_PlaceNewNodesOnTop)
+, m_ShowHelperObjects(_ShowHelperObjects)
+, m_ShowNodesContainingNoData(_ShowNodesContainingNoData)
 , m_Root(0)
 {
-  this->SetShowHelperObjects( _ShowHelperObjects );
-  this->SetShowNodesContainingNoData( _ShowNodesContainingNoData );
+  this->UpdateNodeVisibility();
   this->SetDataStorage(_DataStorage);
 }
 

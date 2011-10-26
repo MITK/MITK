@@ -251,7 +251,7 @@ protected:
    * of the stack needs to spatially aligned, in two respects:
    *
    * 1. Re-alignment with respect to the dataset center; this is necessary 
-   *    since the distance from the first palne to the center could otherwise
+   *    since the distance from the first plane to the center could otherwise
    *    continuously decrease or increase.
    * 2. Re-alignment with respect to a given reference point; the reference
    *    point is a location which the user wants to be exactly touched by one

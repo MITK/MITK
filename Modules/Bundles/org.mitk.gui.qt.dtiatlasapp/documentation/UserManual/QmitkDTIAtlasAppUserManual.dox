@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org_dti_atlas_application} Using The DTI Atlas Application
 
-\section  What is the DTI Atlas Application
+\section QMitkDTIAtlasApplicationManualOverview What is the DTI Atlas Application
 
 The DTI Atlas Application is a viewer for MR, diffusion tensor and fibre images and contains no additional functionality. The welcome page allows the selection of which example data to examine.
 

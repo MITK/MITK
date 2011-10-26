@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org_diffusionapplication} Using The Diffusion Imaging Application
 
-\section  What is the Diffusion Imaging Application
+\section QMitkDiffusionApplicationManualOverview What is the Diffusion Imaging Application
 
 The Diffusion Imaging Application contains selected views for the analysis of images of the human brain. These encompass the views developed by the <a href="http://www.dkfz.de/en/mbi/projects/neuroimaging.html">Neuroimaging Group</a> of the Division Medical and Biological Informatics as well as basic image processing views such as segmentation and volumevisualization.
 

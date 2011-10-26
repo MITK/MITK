@@ -34,6 +34,12 @@ IF(MITK_USE_DCMTK)
          "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${DCMTK_C_FLAGS}"
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+         -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
+         -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894
+         -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894
+         -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
+         -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
+         -DDCMTK_FORCE_FPIC_ON_UNIX:BOOL=ON
       DEPENDS ${proj_DEPENDENCIES}
       )
     SET(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)

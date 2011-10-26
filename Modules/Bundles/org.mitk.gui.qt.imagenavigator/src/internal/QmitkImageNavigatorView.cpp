@@ -98,6 +98,22 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
 
   this->GetSite()->GetPage()->AddPartListener(multiWidgetListener);
+
+  bool worldCoordinatesAreVisible = false;
+  m_Controls.m_ShowWorldCoordinatesCheckBox->setChecked(worldCoordinatesAreVisible);
+  this->OnShowWorldCoordinatesToggled(worldCoordinatesAreVisible);
+
+  connect(m_Controls.m_ShowWorldCoordinatesCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowWorldCoordinatesToggled(bool)));
+  connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateChanged()));
+  connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateChanged()));
+  connect(m_Controls.m_ZWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateChanged()));
+  connect(m_Controls.m_XIndexCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnIndexCoordinateChanged()));
+  connect(m_Controls.m_YIndexCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnIndexCoordinateChanged()));
+  connect(m_Controls.m_ZIndexCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnIndexCoordinateChanged()));
+  connect(m_TransversalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+  connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+  connect(m_FrontalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+
 }
 
 void QmitkImageNavigatorView::SetFocus ()
@@ -174,3 +190,101 @@ int QmitkImageNavigatorView::ComputePreferredSize(bool width, int /*availablePar
   }
 }
 
+void QmitkImageNavigatorView::OnShowWorldCoordinatesToggled(bool isOn)
+{
+  m_Controls.m_WorldLabel->setVisible(isOn);
+  m_Controls.m_XWorldCoordinateSpinBox->setVisible(isOn);
+  m_Controls.m_YWorldCoordinateSpinBox->setVisible(isOn);
+  m_Controls.m_ZWorldCoordinateSpinBox->setVisible(isOn);
+
+  m_Controls.m_IndexLabel->setVisible(isOn);
+  m_Controls.m_XIndexCoordinateSpinBox->setVisible(isOn);
+  m_Controls.m_YIndexCoordinateSpinBox->setVisible(isOn);
+  m_Controls.m_ZIndexCoordinateSpinBox->setVisible(isOn);
+
+  m_Controls.m_XLabel->setVisible(isOn);
+  m_Controls.m_YLabel->setVisible(isOn);
+  m_Controls.m_ZLabel->setVisible(isOn);
+}
+
+void QmitkImageNavigatorView::OnMillimetreCoordinateChanged()
+{
+  if (m_MultiWidget)
+  {
+    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetCreatedWorldGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Point3D positionInWorldCoordinates;
+      positionInWorldCoordinates[0] = m_Controls.m_XWorldCoordinateSpinBox->value();
+      positionInWorldCoordinates[1] = m_Controls.m_YWorldCoordinateSpinBox->value();
+      positionInWorldCoordinates[2] = m_Controls.m_ZWorldCoordinateSpinBox->value();
+
+      m_MultiWidget->MoveCrossToPosition(positionInWorldCoordinates);
+    }
+  }
+}
+
+void QmitkImageNavigatorView::OnIndexCoordinateChanged()
+{
+  if (m_MultiWidget)
+  {
+    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetCreatedWorldGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Point3D positionInIndexCoordinates;
+      positionInIndexCoordinates[0] = m_Controls.m_XIndexCoordinateSpinBox->value();
+      positionInIndexCoordinates[1] = m_Controls.m_YIndexCoordinateSpinBox->value();
+      positionInIndexCoordinates[2] = m_Controls.m_ZIndexCoordinateSpinBox->value();
+
+      mitk::Point3D positionInWorldCoordinates;
+      geometry->IndexToWorld(positionInIndexCoordinates, positionInWorldCoordinates);
+
+      m_MultiWidget->MoveCrossToPosition(positionInWorldCoordinates);
+    }
+  }
+}
+
+void QmitkImageNavigatorView::OnRefetch()
+{
+  if (m_MultiWidget)
+  {
+    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetCreatedWorldGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Point3D crossPositionInWorldCoordinates = m_MultiWidget->GetCrossPosition();
+      mitk::Point3D cornerPoint1InWorldCoordinates = geometry->GetCornerPoint(true, true, true);
+      mitk::Point3D cornerPoint2InWorldCoordinates = geometry->GetCornerPoint(false, false, false);
+
+      mitk::Point3D crossPositionInIndexCoordinates;
+      mitk::Point3D cornerPoint1InIndexCoordinates;
+      mitk::Point3D cornerPoint2InIndexCoordinates;
+
+      geometry->WorldToIndex(crossPositionInWorldCoordinates, crossPositionInIndexCoordinates);
+      geometry->WorldToIndex(cornerPoint1InWorldCoordinates, cornerPoint1InIndexCoordinates);
+      geometry->WorldToIndex(cornerPoint2InWorldCoordinates, cornerPoint2InIndexCoordinates);
+
+      m_Controls.m_XWorldCoordinateSpinBox->setMinimum(std::min(cornerPoint1InWorldCoordinates[0], cornerPoint2InWorldCoordinates[0]));
+      m_Controls.m_YWorldCoordinateSpinBox->setMinimum(std::min(cornerPoint1InWorldCoordinates[1], cornerPoint2InWorldCoordinates[1]));
+      m_Controls.m_ZWorldCoordinateSpinBox->setMinimum(std::min(cornerPoint1InWorldCoordinates[2], cornerPoint2InWorldCoordinates[2]));
+      m_Controls.m_XWorldCoordinateSpinBox->setMaximum(std::max(cornerPoint1InWorldCoordinates[0], cornerPoint2InWorldCoordinates[0]));
+      m_Controls.m_YWorldCoordinateSpinBox->setMaximum(std::max(cornerPoint1InWorldCoordinates[1], cornerPoint2InWorldCoordinates[1]));
+      m_Controls.m_ZWorldCoordinateSpinBox->setMaximum(std::max(cornerPoint1InWorldCoordinates[2], cornerPoint2InWorldCoordinates[2]));
+      m_Controls.m_XWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[0]);
+      m_Controls.m_YWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[1]);
+      m_Controls.m_ZWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[2]);
+
+      m_Controls.m_XIndexCoordinateSpinBox->setMinimum(std::min(cornerPoint1InIndexCoordinates[0], cornerPoint2InIndexCoordinates[0]));
+      m_Controls.m_YIndexCoordinateSpinBox->setMinimum(std::min(cornerPoint1InIndexCoordinates[1], cornerPoint2InIndexCoordinates[1]));
+      m_Controls.m_ZIndexCoordinateSpinBox->setMinimum(std::min(cornerPoint1InIndexCoordinates[2], cornerPoint2InIndexCoordinates[2]));
+      m_Controls.m_XIndexCoordinateSpinBox->setMaximum(std::max(cornerPoint1InIndexCoordinates[0], cornerPoint2InIndexCoordinates[0]) -1);
+      m_Controls.m_YIndexCoordinateSpinBox->setMaximum(std::max(cornerPoint1InIndexCoordinates[1], cornerPoint2InIndexCoordinates[1]) -1);
+      m_Controls.m_ZIndexCoordinateSpinBox->setMaximum(std::max(cornerPoint1InIndexCoordinates[2], cornerPoint2InIndexCoordinates[2]) -1);
+      m_Controls.m_XIndexCoordinateSpinBox->setValue(crossPositionInIndexCoordinates[0]);
+      m_Controls.m_YIndexCoordinateSpinBox->setValue(crossPositionInIndexCoordinates[1]);
+      m_Controls.m_ZIndexCoordinateSpinBox->setValue(crossPositionInIndexCoordinates[2]);
+    }
+  }
+}

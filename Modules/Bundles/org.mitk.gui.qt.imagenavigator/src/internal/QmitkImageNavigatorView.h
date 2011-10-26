@@ -71,6 +71,11 @@ class QmitkImageNavigatorView : public berry::QtViewPart, public berry::ISizePro
 
 protected slots:
 
+  void OnShowWorldCoordinatesToggled(bool);
+  void OnMillimetreCoordinateChanged();
+  void OnIndexCoordinateChanged();
+  void OnRefetch();
+
 protected:
 
   friend class ImageNavigatorPartListener;

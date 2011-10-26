@@ -501,7 +501,7 @@ void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::Eve
   if ( figure != NULL )
   {
     // Get node corresponding to PlanarFigure
-    mitk::DataNode* figureNode = this->GetDefaultDataStorage()->GetNode(
+    mitk::DataNode::Pointer figureNode = this->GetDefaultDataStorage()->GetNode(
       mitk::NodePredicateData::New( figure ) );
 
     // Select this node (and deselect all others)

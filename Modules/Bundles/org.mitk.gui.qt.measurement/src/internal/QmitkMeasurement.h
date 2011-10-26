@@ -181,7 +181,7 @@ protected:
   /// Selected image on which measurements will be performed
   ///
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
-  mitk::WeakPointer<mitk::DataNode> m_CurrentFigureNode;
+  mitk::DataNode::Pointer m_CurrentFigureNode;
 
   /// Counter variables to give a newly created Figure a unique name.
   ///

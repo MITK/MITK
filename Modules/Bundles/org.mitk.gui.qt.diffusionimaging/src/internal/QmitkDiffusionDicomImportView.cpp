@@ -169,8 +169,8 @@ bool SortBySeqName(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
   gdcm::Attribute<0x0018, 0x0024> at2;
   at2.Set( ds2 );
 
-  std::string str1 = at1.GetValue(0).Trim();
-  std::string str2 = at2.GetValue(0).Trim();
+  std::string str1 = at1.GetValue().Trim();
+  std::string str2 = at2.GetValue().Trim();
   return std::lexicographical_compare(str1.begin(), str1.end(),
                                       str2.begin(), str2.end() );
 }

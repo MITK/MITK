@@ -176,7 +176,7 @@ ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& 
   try
   {
     std::list<ServiceReference> srs;
-    Get_Unlocked(clazz, "", module, srs);
+    Get_unlocked(clazz, "", module, srs);
     MITK_INFO << "get service ref " << clazz << " for module "
              << module->info.name << " = " << srs.size() << " refs";
 
@@ -195,10 +195,10 @@ void ServiceRegistry::Get(const std::string& clazz, const std::string& filter,
                           ModulePrivate* module, std::list<ServiceReference>& res) const
 {
   MutexLocker lock(mutex);
-  Get_Unlocked(clazz, filter, module, res);
+  Get_unlocked(clazz, filter, module, res);
 }
 
-void ServiceRegistry::Get_Unlocked(const std::string& clazz, const std::string& filter,
+void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& filter,
                           ModulePrivate* /*module*/, std::list<ServiceReference>& res) const
 {
   std::list<ServiceRegistration>::const_iterator s;

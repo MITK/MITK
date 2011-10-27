@@ -20,11 +20,15 @@ IF(NOT DEFINED ITK_DIR)
         -DCMAKE_USE_PTHREADS:BOOL=OFF)
   ENDIF()
 
+  IF(GDCM_IS_2_0_18)
+    SET(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-3.20.cmake)
+  ENDIF()
+
   ExternalProject_Add(${proj}
      URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.0.tar.gz
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
-     PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-3.20.cmake
+     PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

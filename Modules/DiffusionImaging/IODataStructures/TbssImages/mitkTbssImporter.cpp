@@ -62,8 +62,19 @@ namespace mitk
 
     //Direction must be set
     DataImageType::DirectionType dir;
-    mitk::AccessFixedDimensionByItk_1(m_InputVolume, _CastToItkImage2Access, 4, m_Data);
+    const itk::Transform<float, 3, 3>* transform3D = geo->GetParametricTransform();
+    itk::Transform<float,3,3>::ParametersType p = transform3D->GetParameters();
+    int t=0;
+    for(int i=0; i<3; i++)
+    {
+      for(int j=0; j<3; j++)
+      {
+        dir[j][i] = p[t]; // row-major order (where the column index varies the fastest)
+        t++;
+      }
+    }
 
+    m_Data->SetDirection(dir);
 
     // Set the length to one because otherwise allocate fails. Should be changed when groups/measurements are added
     m_Data->SetVectorLength(m_InputVolume->GetDimension(3));

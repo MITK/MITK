@@ -41,7 +41,7 @@ ServiceRegistration::ServiceRegistration()
 ServiceRegistration::ServiceRegistration(const ServiceRegistration& reg)
   : d(reg.d)
 {
-  d->ref.Ref();
+  if (d) d->ref.Ref();
 }
 
 ServiceRegistration::ServiceRegistration(ServiceRegistrationPrivate* registrationPrivate)

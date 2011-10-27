@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDir>
 #include <QStringList>
 #include "itkNrrdImageIO.h"
-
+#include "mitkImageAccessByItk.h"
 
 namespace mitk
 {
@@ -32,82 +32,64 @@ namespace mitk
   mitk::TbssImage::Pointer mitk::TbssImporter::Import()
   {
     // read all images with all_*.nii.gz
-    m9caeaddc2b0612c296c4fe82978534c277bb1d8ditk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
-
+    mitk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
     m_Data = DataImageType::New();
 
-    FloatImage4DType::SizeType size = m_InputVolume->GetLargestPossibleRegion().GetSize();
-    FloatImage4DType::SpacingType spacing = m_InputVolume->GetSpacing();
+    mitk::Geometry3D* geo = m_InputVolume->GetGeometry();
+    mitk::Vector3D spacing = geo->GetSpacing();
+    mitk::Point3D origin = geo->GetOrigin();
 
-
+    //Size size
     DataImageType::SizeType dataSize;
-    dataSize[0] = size[0];
-    dataSize[1] = size[1];
-    dataSize[2] = size[2];
+    dataSize[0] = m_InputVolume->GetDimension(0);
+    dataSize[1] = m_InputVolume->GetDimension(1);
+    dataSize[2] = m_InputVolume->GetDimension(2);
 
     m_Data->SetRegions(dataSize);
 
-
+    // Set spacing
     DataImageType::SpacingType dataSpacing;
     dataSpacing[0] = spacing[0];
     dataSpacing[1] = spacing[1];
     dataSpacing[2] = spacing[2];
-
     m_Data->SetSpacing(dataSpacing);
-
-    FloatImage4DType::PointType origin = m_InputVolume->GetOrigin();
 
     DataImageType::PointType dataOrigin;
     dataOrigin[0] = origin[0];
     dataOrigin[1] = origin[1];
     dataOrigin[2] = origin[2];
-
     m_Data->SetOrigin(dataOrigin);
 
-
-    FloatImage4DType::DirectionType dir = m_InputVolume->GetDirection();
-
-    DataImageType::DirectionType dataDir;
-    for(int i=0; i<=2; i++)
-    {
-      for(int j=0; j<=2; j++)
-      {
-        dataDir[i][j] = dir[i][j];
-      }
-    }
-
-    m_Data->SetDirection(dataDir);
-
+    //Direction must be set
+    DataImageType::DirectionType dir;
+    mitk::AccessFixedDimensionByItk_1(m_InputVolume, _CastToItkImage2Access, 4, m_Data);
 
 
     // Set the length to one because otherwise allocate fails. Should be changed when groups/measurements are added
-    m_Data->SetVectorLength(size[3]);
+    m_Data->SetVectorLength(m_InputVolume->GetDimension(3));
     m_Data->Allocate();
 
 
-    for(int i=0; i<size[0]; i++)
+    for(int i=0; i<dataSize[0]; i++)
     {
-      for(int j=0; j<size[1]; j++)
+      for(int j=0; j<dataSize[1]; j++)
       {
-        for(int k=0; k<size[2]; k++)
+        for(int k=0; k<dataSize[2]; k++)
         {
           itk::Index<3> ix;
           ix[0] = i;
           ix[1] = j;
           ix[2] = k;
           itk::VariableLengthVector<float> pixel = m_Data->GetPixel(ix);
-          int vecSize = pixel.Size();
 
-          for(int z=0; z<size[3]; z++)
+          for(int z=0; z<pixel.Size(); z++)
           {
-            itk::Index<4> ix4;
-            ix4[0] = i;
-            ix4[1] = j;
-            ix4[2] = k;
-            ix4[3] = z;
-            float value = m_InputVolume->GetPixel(ix4);
+            mitk::Index3D ix;
+            ix[0] = i;
+            ix[1] = j;
+            ix[2] = k;
 
-
+            float value = m_InputVolume->GetPixelValueByIndex(ix, z);
             pixel.SetElement(z, value);
           }
           m_Data->SetPixel(ix, pixel);

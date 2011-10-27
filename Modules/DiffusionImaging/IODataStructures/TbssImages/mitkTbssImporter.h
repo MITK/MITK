@@ -82,7 +82,7 @@ namespace mitk
     }
 
 
-    void SetImportVolume(FloatImage4DType::Pointer inputVolume)
+    void SetImportVolume(mitk::Image::Pointer inputVolume)
     {
       m_InputVolume = inputVolume;
     }
@@ -100,7 +100,7 @@ namespace mitk
     std::string m_MeasurementInfo;
 
 
-    FloatImage4DType::Pointer m_InputVolume;
+    mitk::Image::Pointer m_InputVolume;
     
 
     mitk::TbssImage::MetaDataFunction RetrieveTbssFunction(std::string s);

@@ -158,6 +158,26 @@ std::string mitk::NrrdTbssImageWriter::RetrieveString(mitk::TbssImage::MetaDataF
   {
     return "mean fa skeleton mask";
   }
+  else if(meta == mitk::TbssImage::GRADIENT_X)
+  {
+    return "gradient_x";
+  }
+  else if(meta == mitk::TbssImage::GRADIENT_Y)
+  {
+    return "gradient_y";
+  }
+  else if(meta == mitk::TbssImage::GRADIENT_Z)
+  {
+    return "gradient_z";
+  }
+  else if(meta == mitk::TbssImage::TUBULAR_STRUCTURE)
+  {
+    return "tubular structure";
+  }
+  else if(meta == mitk::TbssImage::DISTANCE_MAP)
+  {
+    return "distance map";
+  }
   return "";
 }
 

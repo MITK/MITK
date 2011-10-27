@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkTbssImage__cpp
-#define __mitkTbssImage__cpp
+#ifndef __mitkTbssGradientImage__cpp
+#define __mitkTbssGradientImage__cpp
 
 
-#include "mitkTbssImage.h"
+#include "mitkTbssGradientImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "mitkImageCast.h"
@@ -27,21 +27,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-mitk::TbssImage::TbssImage()
-  : m_IsMeta(false),
-  m_ContainsGradient(false),
-  m_ContainsMeanSkeleton(false),
-  m_ContainsSkeletonMask(false)
+mitk::TbssGradientImage::TbssGradientImage()
 {
 
 }
 
 
-void mitk::TbssImage::InitializeFromVectorImage()
+void mitk::TbssGradientImage::InitializeFromVectorImage()
 {
   if(!m_Image)
   {
-    MITK_INFO << "TBSS Image could not be initialized. Set all members first!" << std::endl;
+    MITK_INFO << "TBSS Gradient Image could not be initialized. Set all members first!" << std::endl;
     return;
   }
 
@@ -55,12 +51,7 @@ void mitk::TbssImage::InitializeFromVectorImage()
   img->SetBufferedRegion( m_Image->GetLargestPossibleRegion() );
   img->Allocate();
 
-  int vecLength = m_Image->GetVectorLength();
-  InitializeByItk( img.GetPointer(), 1, vecLength );
-
-  //for(int i=0; i<vecLength; i++)
-  //{TbssImage();
-
+  InitializeByItk( img.GetPointer(), 1, 3 );
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
   itw = itw.Begin();
@@ -75,17 +66,16 @@ void mitk::TbssImage::InitializeFromVectorImage()
     ++itw;
   }
 
-  // init
+
   SetImportVolume(img->GetBufferPointer());//, 0, 0, CopyMemory);
-    //SetVolume( img->GetBufferPointer(), i );
-  //}::
 
   m_DisplayIndex = 0;
   MITK_INFO << "Tbss-Image successfully initialized.";
 
 }
 
-void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
+
+void mitk::TbssGradientImage::SetDisplayIndexForRendering(int displayIndex)
 {
   MITK_INFO << "displayindex: " << displayIndex;
   int index = displayIndex;
@@ -116,4 +106,4 @@ void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
 
 
 
-#endif /* __mitkTbssImage__cpp */
+#endif /* __mitkTbssGradientImage__cpp */

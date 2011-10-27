@@ -67,6 +67,14 @@ namespace mitk
     static_cast<OutputType*>(this->GetOutput())
         ->SetIsMeta(m_OutputCache->GetIsMeta());
     static_cast<OutputType*>(this->GetOutput())
+        ->SetContainsDistanceMap(m_OutputCache->GetContainsDistanceMap());
+    static_cast<OutputType*>(this->GetOutput())
+        ->SetContainsMeanSkeleton(m_OutputCache->GetContainsMeanSkeleton());
+    static_cast<OutputType*>(this->GetOutput())
+        ->SetContainsSkeletonMask(m_OutputCache->GetContainsSkeletonMask());
+    static_cast<OutputType*>(this->GetOutput())
+        ->SetContainsGradient(m_OutputCache->GetContainsGradient());
+    static_cast<OutputType*>(this->GetOutput())
         ->InitializeFromVectorImage();
 
   }
@@ -130,6 +138,13 @@ namespace mitk
           //int numberOfGradientImages = 0;
           std::string measurementInfo;
           bool isMeta = false;
+          bool containsSkeleton;
+          bool containsSkeletonMask;
+          bool containsGradient;
+          bool containsDistanceMap;
+
+
+
           std::vector<std::pair<mitk::TbssImage::MetaDataFunction, int > > metaInfo;
 
           std::vector< std::pair<std::string, int> > groups;
@@ -181,6 +196,7 @@ namespace mitk
               p.first = mitk::TbssImage::MEAN_FA_SKELETON_MASK;
               p.second = atoi(metaString.c_str());
               metaInfo.push_back(p);
+              containsSkeletonMask = true;
             }
 
             else if(itKey->find("mean fa skeleton") != std::string::npos)
@@ -189,12 +205,60 @@ namespace mitk
               p.first = mitk::TbssImage::MEAN_FA_SKELETON;
               p.second = atoi(metaString.c_str());
               metaInfo.push_back(p);
+              containsSkeleton = true;
             }
 
+            else if(itKey->find("gradient_x") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_X;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+              containsGradient = true;
+            }
+            else if(itKey->find("gradient_y") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_Y;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+              containsGradient = true;
+            }
+
+            else if(itKey->find("gradient_z") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::GRADIENT_Z;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+              containsGradient = true;
+            }
+
+
+            else if(itKey->find("tubular structure") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::TUBULAR_STRUCTURE;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+            }
+
+            else if(itKey->find("distance map") != std::string::npos)
+            {
+              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
+              p.first = mitk::TbssImage::DISTANCE_MAP;
+              p.second = atoi(metaString.c_str());
+              metaInfo.push_back(p);
+              containsDistanceMap = true;
+            }
 
           }
 
           outputForCache->SetIsMeta(isMeta);
+          outputForCache->SetContainsGradient(containsGradient);
+          outputForCache->SetContainsSkeletonMask(containsSkeletonMask);
+          outputForCache->SetContainsMeanSkeleton(containsSkeleton);
+          outputForCache->SetContainsDistanceMap(containsDistanceMap);
           outputForCache->SetGroupInfo(groups);
           outputForCache->SetMeasurementInfo(measurementInfo);
           outputForCache->SetMetaInfo(metaInfo);

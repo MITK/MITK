@@ -114,7 +114,7 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     QTimer* m_Frametimer;
 
-    mitk::ToFImageGrabber* m_ToFImageGrabber;
+    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber;
     
     mitk::Image::Pointer m_MitkDistanceImage; ///< object to hold the distance image
 
@@ -163,6 +163,14 @@ class QmitkToFUtilView : public QmitkFunctionality
     mitk::ToFVisualizationFilter::Pointer m_ToFVisualizationFilter;
 
   private:
+
+    /*!
+    \brief helper method to replace data of the specified node. If node does not exist it will be created
+    \param nodeName Name of the node
+    \param data Data object to be replaced
+    \return returns the node
+    */
+    mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
 
     void RemoveNode(const char* nodename, mitk::DataNode::Pointer node);
 

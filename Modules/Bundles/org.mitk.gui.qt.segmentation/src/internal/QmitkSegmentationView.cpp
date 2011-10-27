@@ -104,7 +104,7 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
-    mitk::PlanePositionManager::GetInstance()->DeleteAllMarkers();
+    mitk::PlanePositionManager::GetInstance()->RemoveAllPlanePositions();
   }
 }
 

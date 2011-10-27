@@ -38,9 +38,9 @@ namespace mitk
 
     unsigned int AddNewPlanePosition(const Geometry2D* plane, unsigned int sliceIndex = 0);
 
-    bool DeletePlanePosition(unsigned int ID);
+    bool RemovePlanePosition(unsigned int ID);
 
-    void DeleteAllMarkers();
+    void RemoveAllPlanePositions();
 
     RestorePlanePositionOperation* GetPlanePosition( unsigned int ID);
 

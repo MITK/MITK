@@ -51,14 +51,14 @@ unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D*
       bool isSameMatrix(true);
       for (unsigned int j = 0; j < 3; j++)
       {
-        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
+        if (fabs(diffM[j][0]) > 0.00001 || fabs(diffM[j][1]) > 0.00001 || fabs(diffM[j][2]) > 0.00001)
         {
           isSameMatrix = false;
           break;
         }
       }
       itk::Vector<float> diffV = m_PositionList.at(i)->GetTransform()->GetOffset()-transform->GetOffset();
-      if ( isSameMatrix && m_PositionList.at(i)->GetPos() == sliceIndex && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
+      if ( isSameMatrix && m_PositionList.at(i)->GetPos() == sliceIndex && (fabs(diffV[0]) < 0.00001 && fabs(diffV[1]) < 0.00001 && fabs(diffV[2]) < 0.00001) )
         return i;
     }
     
@@ -71,7 +71,7 @@ unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D*
   return GetNumberOfPlanePositions()-1;
 }
 
-bool mitk::PlanePositionManager::DeletePlanePosition( unsigned int ID )
+bool mitk::PlanePositionManager::RemovePlanePosition( unsigned int ID )
 {
   if (m_PositionList.size() > ID)
   {
@@ -86,14 +86,14 @@ bool mitk::PlanePositionManager::DeletePlanePosition( unsigned int ID )
 
 mitk::RestorePlanePositionOperation* mitk::PlanePositionManager::GetPlanePosition ( unsigned int ID )
 {
-  if ( m_PositionList.at(ID) != 0 )
+  if ( ID < m_PositionList.size() )
   {
     return m_PositionList.at(ID);
   }
   else
   {
-    MITK_INFO<<"GetPlanePosition returned NULL";
-    return 0;
+      MITK_WARN<<"GetPlanePosition returned NULL!";
+      return 0;
   }
 }
 
@@ -102,7 +102,7 @@ unsigned int mitk::PlanePositionManager::GetNumberOfPlanePositions()
   return m_PositionList.size();
 }
 
-void mitk::PlanePositionManager::DeleteAllMarkers()
+void mitk::PlanePositionManager::RemoveAllPlanePositions()
 {
   m_PositionList.clear();
 }
@@ -129,7 +129,7 @@ void mitk::PlanePositionManager::DataStorageRemovedNode(const mitk::DataNode* re
   {
     unsigned int t = removedNode->GetName().find_last_of(" ");
     unsigned int id = atof(removedNode->GetName().substr(t+1).c_str());
-    this->DeletePlanePosition(id-1);
+    this->RemovePlanePosition(id-1);
   }
 }
 

@@ -105,7 +105,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraStop()), this, SLOT(OnToFCameraStop()) );
+//    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraStop()), this, SLOT(OnToFCameraStop()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
@@ -317,6 +317,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
+  m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
   if(this->m_VideoSource)
@@ -371,11 +372,6 @@ void QmitkToFUtilView::OnToFCameraStarted()
     OnVideoTextureCheckBoxChecked(true);
   }
 
-}
-
-void QmitkToFUtilView::OnToFCameraStop()
-{
-  m_Controls->m_ToFRecorderWidget->OnStop();
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()

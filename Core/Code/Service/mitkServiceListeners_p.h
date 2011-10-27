@@ -162,7 +162,8 @@ public:
    *
    *
    */
-  void GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& listeners);
+  void GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& listeners,
+                                   bool lockProps = true);
 
   void ModuleChanged(const ModuleEvent& evt);
 

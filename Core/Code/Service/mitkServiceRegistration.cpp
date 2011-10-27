@@ -121,7 +121,7 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
     }
   }
   ServiceListeners::ServiceListenerEntries matchingListeners;
-  d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, matchingListeners);
+  d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, matchingListeners, false);
   d->module->coreCtx->listeners.ServiceChanged(matchingListeners,
                                                ServiceEvent(ServiceEvent::MODIFIED, d->reference),
                                                before);

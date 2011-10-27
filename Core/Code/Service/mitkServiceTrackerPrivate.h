@@ -67,6 +67,8 @@ public:
   std::list<ServiceReference> GetInitialReferences(const std::string& className,
                                                    const std::string& filterString);
 
+  void GetServiceReferences_unlocked(std::list<ServiceReference>& refs, TrackedService<S,T>* t) const;
+
   /* set this to true to compile in debug messages */
   static const bool DEBUG; // = false;
 

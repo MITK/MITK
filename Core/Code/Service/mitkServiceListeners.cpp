@@ -147,7 +147,8 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
   MITK_INFO << "Notified " << n << " listeners";
 }
 
-void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& set)
+void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& set,
+                                                   bool lockProps)
 {
   MutexLocker lock(mutex);
 
@@ -169,14 +170,14 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, S
 
   // Check the cache
   const std::list<std::string> c(any_cast<std::list<std::string> >
-                                 (sr.GetProperty(ServiceConstants::OBJECTCLASS())));
+                                 (sr.d->GetProperty(ServiceConstants::OBJECTCLASS(), lockProps)));
   for (std::list<std::string>::const_iterator objClass = c.begin();
        objClass != c.end(); ++objClass)
   {
     AddToSet(set, OBJECTCLASS_IX, *objClass);
   }
 
-  long service_id = any_cast<long>(sr.GetProperty(ServiceConstants::SERVICE_ID()));
+  long service_id = any_cast<long>(sr.d->GetProperty(ServiceConstants::SERVICE_ID(), lockProps));
   std::stringstream ss;
   ss << service_id;
   AddToSet(set, SERVICE_ID_IX, ss.str());

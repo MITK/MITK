@@ -112,6 +112,17 @@ std::list<ServiceReference> ServiceTrackerPrivate<S,T>::GetInitialReferences(
 }
 
 template<class S, class T>
+void ServiceTrackerPrivate<S,T>::GetServiceReferences_unlocked(std::list<ServiceReference>& refs,
+                                                               TrackedService<S,T>* t) const
+{
+  if (t->Size() == 0)
+  {
+    return;
+  }
+  t->GetTracked(refs);
+}
+
+template<class S, class T>
 itk::SmartPointer<TrackedService<S,T> > ServiceTrackerPrivate<S,T>::Tracked() const
 {
   return trackedService;

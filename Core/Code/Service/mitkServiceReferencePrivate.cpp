@@ -156,4 +156,22 @@ ServiceProperties ServiceReferencePrivate::GetProperties() const
   return registration->properties;
 }
 
+Any ServiceReferencePrivate::GetProperty(const std::string& key, bool lock) const
+{
+  if (lock)
+  {
+    MutexLocker lock(registration->propsLock);
+    ServiceProperties::const_iterator iter = registration->properties.find(key);
+    if (iter != registration->properties.end())
+      return iter->second;
+  }
+  else
+  {
+    ServiceProperties::const_iterator iter = registration->properties.find(key);
+    if (iter != registration->properties.end())
+      return iter->second;
+  }
+  return Any();
+}
+
 }

@@ -27,37 +27,17 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-  mitk::TbssImporter::TbssImporter()
-  {
-
-  }
-
-
-  mitk::TbssImporter::TbssImporter(std::string path) : m_File(path)
-  {
-
-  }
-
 
 
   mitk::TbssImage::Pointer mitk::TbssImporter::Import()
   {
     // read all images with all_*.nii.gz
-    mitk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
-
-    FileReaderType4D::Pointer reader = FileReaderType4D::New();
-    reader->SetFileName(m_File);
-    reader->Update();
-
-    FloatImage4DType::Pointer img = FloatImage4DType::New();
-    img = reader->GetOutput();
-
-
+    m9caeaddc2b0612c296c4fe82978534c277bb1d8ditk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
 
     m_Data = DataImageType::New();
 
-    FloatImage4DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
-    FloatImage4DType::SpacingType spacing = img->GetSpacing();
+    FloatImage4DType::SizeType size = m_InputVolume->GetLargestPossibleRegion().GetSize();
+    FloatImage4DType::SpacingType spacing = m_InputVolume->GetSpacing();
 
 
     DataImageType::SizeType dataSize;
@@ -75,7 +55,7 @@ namespace mitk
 
     m_Data->SetSpacing(dataSpacing);
 
-    FloatImage4DType::PointType origin = img->GetOrigin();
+    FloatImage4DType::PointType origin = m_InputVolume->GetOrigin();
 
     DataImageType::PointType dataOrigin;
     dataOrigin[0] = origin[0];
@@ -85,7 +65,7 @@ namespace mitk
     m_Data->SetOrigin(dataOrigin);
 
 
-    FloatImage4DType::DirectionType dir = img->GetDirection();
+    FloatImage4DType::DirectionType dir = m_InputVolume->GetDirection();
 
     DataImageType::DirectionType dataDir;
     for(int i=0; i<=2; i++)
@@ -125,7 +105,7 @@ namespace mitk
             ix4[1] = j;
             ix4[2] = k;
             ix4[3] = z;
-            float value = img->GetPixel(ix4);
+            float value = m_InputVolume->GetPixel(ix4);
 
 
             pixel.SetElement(z, value);
@@ -154,7 +134,6 @@ namespace mitk
   mitk::TbssImage::Pointer mitk::TbssImporter::ImportMeta()
   {
     mitk::TbssImage::Pointer tbssImg = mitk::TbssImage::New();
-
 
     m_Data = DataImageType::New();
 

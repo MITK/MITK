@@ -1,0 +1,23 @@
+/**
+\bundlemainpage{org_pvanalysis} Partial Volume Analysis
+
+The "Partial Volume Analysis" view can be found in the "Quantification" perspective. It allows for robust quantification of diffusion or other scalar measures in the presents of two classes (e.g. fiber vs. non-fiber) and partial volume between them. The algorithm estimates a probabilistic segmentation of the three classes and returns a weighted average of the measure of interest within the each class. 
+
+\image html pvanalysisview.png The Partial Volume Analysis View
+
+\section QmitkDiffusionImagingUserManualInputData Export
+
+All measures are automatically written to the clipboard once the estimation is updated. The histogram export is provided by the button underneath the histogram. The values can be pasted to excel or any text editor. 
+
+\section QmitkDiffusionImagingUserManualInputData Advanced Settings
+
+Are not recommended for use yet.
+
+\section QmitkDiffusionImagingUserManualInputData Suggested Readings
+
+Diffusion tensor imaging in primary brain tumors: reproducible quantitative analysis of corpus callosum infiltration and contralateral involvement using a probabilistic mixture model.
+Stieltjes B, Schlüter M, Didinger B, Weber MA, Hahn HK, Parzer P, Rexilius J, Konrad-Verse O, Peitgen HO, Essig M.
+Neuroimage. 2006 Jun;31(2):531-42. Epub 2006 Feb 14.
+PMID: 16478665
+
+*/

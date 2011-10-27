@@ -37,8 +37,10 @@ ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
     trackedService(0), cachedReference(0), cachedService(0), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  this->listenerFilter = std::string("(") + ServiceConstants::SERVICE_ID() +
-      "=" + any_cast<std::string>(reference.GetProperty(ServiceConstants::SERVICE_ID())) + ")";
+  std::stringstream ss;
+  ss << "(" << ServiceConstants::SERVICE_ID() << "="
+     << any_cast<long>(reference.GetProperty(ServiceConstants::SERVICE_ID())) << ")";
+  this->listenerFilter = ss.str();
   try
   {
     this->filter = LDAPFilter(listenerFilter);

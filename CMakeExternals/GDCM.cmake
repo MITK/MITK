@@ -27,9 +27,18 @@ IF(NOT DEFINED GDCM_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
   SET(GDCM_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
-  
+
+  SET(GDCM_IS_2_0_18 TRUE)
 ELSE()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+  FIND_PACKAGE(GDCM)
+  
+  IF( GDCM_BUILD_VERSION EQUAL "18")
+    SET(GDCM_IS_2_0_18 TRUE)
+  ELSE()
+    SET(GDCM_IS_2_0_18 FALSE)
+  ENDIF()
    
 ENDIF()

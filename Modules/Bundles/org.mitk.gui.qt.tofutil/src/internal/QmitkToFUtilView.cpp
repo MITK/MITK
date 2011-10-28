@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkBaseRenderer.h>
 #include <mitkVtkRepresentationProperty.h>
 
+#include <mitkLookupTableProperty.h>
+
 // VTK
 #include <vtkCamera.h>
 
@@ -155,21 +157,6 @@ void QmitkToFUtilView::Deactivated()
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {
-//  RemoveNode("ToF_Distance", this->m_DistanceImageNode);
-//  RemoveNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-//  RemoveNode("ToF_Intensity", this->m_IntensityImageNode);
-//  RemoveNode("ToF_Surface", this->m_SurfaceNode);
-
-//  CreateNode("ToF_Distance", this->m_DistanceImageNode);
-//  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-//  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
-//  CreateNode("ToF_Surface", this->m_SurfaceNode);
-
-//  this->m_DistanceImageNode->SetData( NULL );
-//  this->m_AmplitudeImageNode->SetData( NULL );
-//  this->m_IntensityImageNode->SetData( NULL );
-//  this->m_SurfaceNode->SetData( NULL );
-
   this->m_TransferFunctionInitialized = false;
   this->m_ImageSequence = 0;
 
@@ -183,59 +170,8 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
 
-//  this->m_MitkDistanceImage = mitk::Image::New();
-//  this->m_MitkAmplitudeImage = mitk::Image::New();
-//  this->m_MitkIntensityImage = mitk::Image::New();
-
-//  InitImage(this->m_MitkDistanceImage, 1);
-//  InitImage(this->m_MitkAmplitudeImage, 1);
-//  InitImage(this->m_MitkIntensityImage, 1);
-
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
-
-//  if ( this->m_SurfaceNode.IsNotNull() )
-//  {
-//    this->m_SurfaceNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-//    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-//    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-//    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-//    this->m_SurfaceNode->SetProperty( "inRenWin4" , mitk::BoolProperty::New( true ));
-//    this->m_SurfaceNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New("Surface"));
-//    this->m_SurfaceNode->SetIntProperty("layer", 10);
-//    this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
-//    this->m_SurfaceNode->SetFloatProperty("ScalarsRangeMaximum", 20000);
-//    this->m_SurfaceNode->SetFloatProperty("color_coefficient", 0);
-//    this->m_SurfaceNode->SetBoolProperty("color mode", true);
-
-//    this->m_SurfaceNode->SetData(mitk::Surface::New());
-//    this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, this->m_ToFSurfaceVtkMapper3D);
-//    this->GetDefaultDataStorage()->Add( this->m_SurfaceNode );
-//  }
-//  if(this->GetDataStorage()->GetNamedNode("ToF_Distance") == NULL)
-//  {
-//    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-//    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-//    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-//    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-//    this->m_DistanceImageNode->SetProperty( "inRenWin2" , mitk::BoolProperty::New( true ));
-//    //m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( false ));
-//    this->m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-//    this->m_DistanceImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-//    //m_DistanceImageNode->SetIntProperty( "layer", 10);
-//    //this->m_DistanceImageNode->SetData( this->m_MitkDistanceImage );
-
-//    mitk::Image::Pointer myImage = mitk::Image::New();
-//    unsigned int dimensions[2];
-//    dimensions[0] = this->m_ToFImageGrabber->GetCaptureWidth();
-//    dimensions[1] = this->m_ToFImageGrabber->GetCaptureHeight();
-//    myImage->Initialize(mitk::PixelType(mitkIpPicUInt, 24, 3), 2, dimensions); //unsigned char RGB
-
-//    this->m_DistanceImageNode->SetData( myImage );
-//    this->GetDataStorage()->Add( this->m_DistanceImageNode );
-//  }
-
-
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
@@ -339,6 +275,33 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
     this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
     this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+//    m_DistanceImageNode->SetBoolProperty( "use color", false );
+//    // add a default rainbow lookup table for color mapping
+//    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+//    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+//    vtkLut->SetHueRange(0.6667, 0.0);
+//    vtkLut->SetTableRange(0.0, 1.0);
+//    vtkLut->Build();
+//    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+//    mitkLutProp->SetLookupTable(mitkLut);
+//    m_DistanceImageNode->SetProperty( "LookupTable", mitkLutProp );
+
+//    float a = 255.0;
+//    mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+//    vtkColorTransferFunction *ctf = tf->GetColorTransferFunction();
+//    ctf->RemoveAllPoints();
+//    //ctf->AddRGBPoint(-1000, 0.0, 0.0, 0.0);
+//    ctf->AddRGBPoint(1, 203/a, 104/a, 102/a);
+//    ctf->AddRGBPoint(0, 255/a, 0/a, 0/a);
+//    ctf->ClampingOn();
+//    ctf->Modified();
+//    mitk::TransferFunctionProperty::Pointer tfp = mitk::TransferFunctionProperty::New();
+//    tfp->SetValue(tf);
+//    m_DistanceImageNode->SetProperty("TransferFunction", tfp);
+
+//    vtkColorTransferFunction* ctf = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Distance");
+//    this->PrepareImageForBackground(colorTransferFunction,);
+
 
     this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
@@ -403,16 +366,6 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
   }
 }
 
-void QmitkToFUtilView::InitImage(mitk::Image::Pointer image, int numOfChannel)
-{
-  unsigned int dimensions[4];
-  dimensions[0] = this->m_ToFImageGrabber->GetCaptureWidth();
-  dimensions[1] = this->m_ToFImageGrabber->GetCaptureHeight();       
-  dimensions[2] = 1;
-  dimensions[3] = 1;
-  image->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, numOfChannel);
-}
-
 void QmitkToFUtilView::InitTexture(unsigned char* &image, int width, int height)
 {
   int texSize = width * height * 3;
@@ -446,17 +399,17 @@ void QmitkToFUtilView::OnUpdateCamera()
   int currentImageSequence = 0;
 
 
-//  if (!this->m_TransferFunctionInitialized)
-//  {
-//    m_Controls->m_ToFVisualisationSettingsWidget->InitializeTransferFunction(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
-//    this->m_TransferFunctionInitialized = true;
-//  }
+  if (!this->m_TransferFunctionInitialized)
+  {
+    m_Controls->m_ToFVisualisationSettingsWidget->InitializeTransferFunction(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
+    this->m_TransferFunctionInitialized = true;
+  }
 
-//  if (m_Controls->m_VideoTextureCheckBox->isChecked() && this->m_VideoEnabled && this->m_VideoSource)
-//  {
-//    this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
-//    ProcessVideoTransform();
-//  }
+  if (m_Controls->m_VideoTextureCheckBox->isChecked() && this->m_VideoEnabled && this->m_VideoSource)
+  {
+    this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
+    ProcessVideoTransform();
+  }
 
   vtkColorTransferFunction* colorTransferFunction;
 //  std::string imageType;

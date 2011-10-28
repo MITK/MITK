@@ -96,8 +96,6 @@ class QmitkToFUtilView : public QmitkFunctionality
 
   protected:
 
-    void InitImage(mitk::Image::Pointer image, int numOfChannel);
-
     void InitTexture(unsigned char* &image, int width, int height);
 
     void PrepareImageForBackground(vtkLookupTable* lut, float* floadData, unsigned char* image);

@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkResliceMethodProperty.h"
 #include "mitkRenderingManager.h"
 
-#include "mitkDiffusionImage.h"
 #include "mitkTbssImage.h"
 #include "mitkTbssGradientImage.h"
 #include "mitkPlanarFigure.h"
@@ -34,6 +33,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 #include "mitkFiberBundleInteractor.h"
 #include "mitkPlanarFigureInteractor.h"
+#include <mitkQBallImage.h>
+#include <mitkTensorImage.h>
+#include <mitkDiffusionImage.h>
 
 #include "mitkGlobalInteraction.h"
 
@@ -50,8 +52,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
-#include <mitkQBallImage.h>
-#include <mitkTensorImage.h>
 
 const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.views.controlvisualizationpropertiesview";
 
@@ -815,6 +815,18 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     return;
   }
 
+  // deactivate channel slider if no diffusion weighted image is selected
+  m_Controls->m_DisplayIndex->setVisible(false);
+  m_Controls->label_channel->setVisible(false);
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+    if (node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+    {
+      m_Controls->m_DisplayIndex->setVisible(true);
+      m_Controls->label_channel->setVisible(true);
+    }
+  }
 
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
@@ -833,8 +845,12 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
       m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
       if(m_MultiWidget)
         m_MultiWidget->RequestUpdate();
+
+      m_Controls->m_TSMenu->setVisible(false);  // deactivate mip etc. for tensor and q-ball images
       break;
     }
+    else
+      m_Controls->m_TSMenu->setVisible(true);
   }
 }
 

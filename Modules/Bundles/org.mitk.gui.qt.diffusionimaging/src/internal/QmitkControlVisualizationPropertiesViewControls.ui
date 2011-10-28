@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>432</width>
-    <height>375</height>
+    <width>567</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -561,9 +561,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="m_2DHeatmap">
+          <widget class="QToolButton" name="m_TDI">
            <property name="toolTip">
-            <string>Generate 2D-Image as Heatmap</string>
+            <string comment="Generate Tract Density Image" extracomment="Generate Tract Density Image">Generate Tract Density Image</string>
            </property>
            <property name="whatsThis">
             <string/>
@@ -574,7 +574,62 @@
           </widget>
          </item>
          <item>
+          <widget class="QToolButton" name="m_FiberFading2D">
+           <property name="toolTip">
+            <string>2D Fiberfading on/off</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>2D Fiber Thickness</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="m_FiberThicknessSlider">
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>2</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>

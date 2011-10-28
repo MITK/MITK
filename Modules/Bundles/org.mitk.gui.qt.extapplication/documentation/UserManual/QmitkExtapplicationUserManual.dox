@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org_extapplication} Using The Ext Application
 
-\section  What is the Ext App
+\section QMitkExtApplicationManualOverview  What is the Ext App
 
 The MITK Ext Application is used by developers. As such the kind and number of views it contains is highly variable and dependent on the specific build. Typically it contains no special perspectives and whatever views the developer deemed desirable. Be aware, that it may contain views which are work in progress and may behave erratically.
 

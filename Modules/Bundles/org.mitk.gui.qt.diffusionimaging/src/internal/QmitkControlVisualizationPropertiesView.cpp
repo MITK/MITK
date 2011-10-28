@@ -595,9 +595,12 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
-
+// was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
+    
+    QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
+    m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
 
     m_Controls->m_TextureIntON->setCheckable(true);
 
@@ -758,6 +761,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
     connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
     connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
+    connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
 
     connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
@@ -1298,13 +1302,17 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
     
     
     float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
-    QString label = "Range %1";
-    label = label.arg(fibThickness);
-    m_Controls->label_range->setText(label);
-
     m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
+}
+
+void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
+{
+  QString label = "Range %1";
+  label = label.arg(value * 0.1);
+  m_Controls->label_range->setText(label);
+
 }
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()

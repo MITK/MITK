@@ -29,6 +29,8 @@
         <file>crosshair.png</file>
         <file>paint2.png</file>
         <file>IVIM_48.png</file>
-		<file>reset.png</file>
+	<file>reset.png</file>
+        <file>MapperEfx2D.png</file>
+
     </qresource>
 </RCC>

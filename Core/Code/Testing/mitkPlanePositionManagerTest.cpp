@@ -223,7 +223,21 @@ void testRestorePlanePosition()
     geometry3d->ExecuteOperation(opReset);
 
     sliceCtrl->Update();
+
     //Restore PlanePosition
+    mitk::RestorePlanePositionOperation* restoreOp = mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id);
+    sliceCtrl->ExecuteOperation(restoreOp);
+    sliceCtrl->Update();
+
+    MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(sliceCtrl->GetCreatedWorldGeometry()->GetIndexToWorldTransform()->GetMatrix(), restoreOp->GetTransform()->GetMatrix()),"Testing for correct restoration of geometry");
+    MITK_TEST_OUTPUT(<<"RestoredMatrix: "<<sliceCtrl->GetCreatedWorldGeometry()->GetIndexToWorldTransform()->GetMatrix()<<"  OriginalMatrix: "<<restoreOp->GetTransform()->GetMatrix());
+    MITK_TEST_CONDITION(mitk::Equal(sliceCtrl->GetCreatedWorldGeometry()->GetIndexToWorldTransform()->GetOffset(), restoreOp->GetTransform()->GetOffset()), "Testing for correct restoration of geometry");
+    MITK_TEST_CONDITION(mitk::Equal(sliceCtrl->GetCreatedWorldGeometry()->GetSpacing(), restoreOp->GetSpacing()), "Testing for correct restoration of geometry");
+    //MITK_TEST_CONDITION(mitk::Equal(sliceCtrl->GetCreatedWorldGeometry()->GetEx, restoreOp->GetSpacing()), "Testing for correct restoration of geometry");
+    MITK_TEST_CONDITION(mitk::Equal(sliceCtrl->GetCreatedWorldGeometry()->GetSpacing(), restoreOp->GetSpacing()), "Testing for correct restoration of geometry");
+    MITK_TEST_CONDITION(mitk::Equal(sliceCtrl->GetSlice()->GetPos(), restoreOp->GetPos()), "Testing for correct restoration of geometry");
+
+
 }
 
 void testDataStorageNodeRemoved()

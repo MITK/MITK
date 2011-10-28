@@ -70,7 +70,7 @@ var moduleDescriptions = new Array("'Dicom Import' supports direct import of Sie
                             "'Preprocessing & Reconstruction' lets you estimate diffusion tensors or q-balls using different reconstruction methods. It also includes an ODF-details view and preprocessing steps like gradient avaraging, baseline image extraction, and binary mask estimation.",
                             "'Quantification' calculates scalar indices (FA, GFA, ...) and allows ROI-analysis in 2D or 3D. The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
                             "'Tractography' implements a global yet computationally efficient tracking algorithm (gibbs-tracking). In addition it provides a stochastic tractography method. The fiber bundle operations view allows for extraction, join, and substraction of bundles. It also generates a variety of images from given fiber tracts.",
-                            "'TBSS' does *not* reimplement the original Tract Based Spatial Statistics method available in FLS. Aim of this module is to read TBSS output and provides means to interactively explore and evaluate the datasets.",
+                            "'TBSS' does *not* reimplement the original Tract Based Spatial Statistics method available in FSL. Aim of this module is to read TBSS output and to provide means to interactively explore and evaluate the datasets.",
                             "'Connectomics' aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis. fMRI-data might be incorporated in future.",
                             "'IVIM' stands for Intravoxel Incoherent Motion. The technique allows for the estimation of tissue perfusion on basis of diffusion measurements. Several models are supported by this module. Interactive exploration of the data is supported.",
                             "'Volume Visualization' provides easy to use and fast volume rendering of images. Transfer-functions can be loaded, saved, and adapted interactively.",
@@ -81,11 +81,11 @@ var bttns = new Array();
 
 var d = document, da = d.all;
 
-// holds id of current mouseover-HTML-element 
+// holds id of current mouseover-HTML-element
 var currentTarget;
 
 // get the id of current mouseover-HTML-element
-d.onmouseover = function(o){ 
+d.onmouseover = function(o){
   var e = da ? event.srcElement : o.target;
   currentTarget = e.id;
 }
@@ -93,25 +93,25 @@ d.onmouseover = function(o){
 
 // build-function called by onload-event in HTML-document
 function createButtons(){
-  
+
   for (i=0; i < moduleNames.length; i++){
     bttns[i] = new Button(moduleNames[i],moduleLinks[i], picFilenames[i], aniFilenames[i],moduleDescriptions[i]);
     bttns[i].createButton();
   }
-  
+
   for (i=0; i < moduleNames.length; i++){
-    
+
     if(experimental[i]){
       setExperimental(i);
     }
   }
-  
+
   createClearFloat();
 }
 
-// Class Button 
+// Class Button
 function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
-  
+
   // Properties
   this.bttnID = "bttn" + moduleName;
   this.modName = moduleName;
@@ -119,18 +119,18 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
   this.picPath = "pics/" + picFilename;
   this.aniPath = "pics/" + aniFilename;
   this.modDescr = moduleDescr;
-  
+
   // Methods
   this.createButton = function(){
-    
+
     // get DIV-wrapper for Button and append it to HTML-document
     bttnWrapper = this.createWrapper();
     document.getElementById("bttnField").appendChild(bttnWrapper);
-    
+
     // get link-element for picture and append it to DIV-wrapper
     bttnPicLink = this.createPicLink();
     bttnWrapper.appendChild(bttnPicLink);
-    
+
     // set HTML attributes for button-element
     bttn = document.createElement("img");
     bttn.src = this.picPath;
@@ -140,10 +140,10 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     bttn.width = 136;
     bttn.onmouseover = function(){startAni(this.id);};
     bttn.onmouseout = function(){stopAni(this.id);};
-    
+
     // append button to link-element
     bttnPicLink.appendChild(bttn);
-    
+
     // create text-link and add it to DIV-wrapper
     bttnTxtLink = document.createElement("a");
     bttnTxtLink.href = this.modLink;
@@ -161,10 +161,10 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     bttnPopUpLink.appendChild(document.createTextNode("more info >>"));
     bttnWrapper.appendChild(document.createElement("br"));
     bttnWrapper.appendChild(bttnPopUpLink);
-  
+
     return bttn;
   }
-  
+
   this.createWrapper = function(){
     bttnWrapper = document.createElement("div");
     bttnWrapper.id = "wrapper" + this.modName;
@@ -172,7 +172,7 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
 
     return bttnWrapper;
   }
-  
+
   this.createPicLink = function(){
     picLink = document.createElement("a");
     picLink.href = this.modLink;
@@ -180,39 +180,39 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
 
     return picLink;
   }
-        
+
 }
 
 
 function showPopUpWindow(){
-  
+
   // modules position in array?
   modulePos = getPos(currentTarget,"popup");
-  
+
   // get reference to anchor-element in HTML-document
   popUpAnchor = document.getElementById("popupAnchor");
-  
+
   // check if a popUp is open
   if(popUpAnchor.hasChildNodes()){
     // if a popUp is open, remove it!
     popUpAnchor.removeChild(document.getElementById("popup"));
   }
-  
+
   // create new container for popUp
   container = document.createElement("div");
   container.id = "popup";
   container.align = "right";
-  
+
   // append popUp-container to HTML-document
   popUpAnchor.appendChild(container);
-  
+
   // create close-button and append it to popUp-container
   bttnClose = document.createElement("img");
   bttnClose.src = "pics/popup_bttn_close.png";
   bttnClose.id = "bttnClose";
   bttnClose.onclick = function(){closeInfoWindow();};
   container.appendChild(bttnClose);
-  
+
   // create container for content-elements
   contHeadline = document.createElement("div");
   contHeadline.id = "contHeadline";
@@ -220,12 +220,12 @@ function showPopUpWindow(){
   contDescription.id = "contDescription";
   contModLink = document.createElement("div");
   contModLink.id = "contModLink";
-  
+
   // append content-container to popUp-container
   container.appendChild(contHeadline);
   container.appendChild(contDescription);
   container.appendChild(contModLink);
-  
+
   // create text-elements with content
   headline = document.createTextNode(moduleNames[modulePos] + " ");
   description = document.createTextNode(moduleDescriptions[modulePos]);
@@ -234,7 +234,7 @@ function showPopUpWindow(){
   moduleLink.className = 'moduleLink';
   moduleLinkTxt = document.createTextNode("Click here to open '" + moduleNames[modulePos].toLowerCase() + "'");
   moduleLink.appendChild(moduleLinkTxt);
-  
+
   // append text-elements to their container
   contHeadline.appendChild(headline);
   contDescription.appendChild(description);
@@ -242,7 +242,7 @@ function showPopUpWindow(){
 }
 
 function getPos(id,prefix){
-  
+
   if(prefix == "popup"){
     targetID = id.slice(5);
   }else{
@@ -250,7 +250,7 @@ function getPos(id,prefix){
       targetID = id.slice(4);
     }
   }
-  
+
   for(i=0; i < moduleNames.length; i++ ){
     if(moduleNames[i] == targetID){
       return i;
@@ -260,14 +260,14 @@ function getPos(id,prefix){
 
 function setExperimental(modPos){
   linkID = "link" + moduleNames[modPos];
-  
+
   expPic = document.createElement("img");
   expPic.src = "pics/experimental.png";
   expPic.className = "expPic";
   //alert(bttns[modPos].bttnID);
   expPic.onmouseover = function(){startAni(bttns[modPos].bttnID);changeToHover(bttns[modPos].bttnID);};
-  expPic.onmouseout = function(){stopAni(bttns[modPos].bttnID);changeToNormal(bttns[modPos].bttnID);};  
-  
+  expPic.onmouseout = function(){stopAni(bttns[modPos].bttnID);changeToNormal(bttns[modPos].bttnID);};
+
   document.getElementById(linkID).appendChild(expPic);
 }
 
@@ -295,7 +295,7 @@ function createClearFloat(){
 
 startAni = function(targetId){
   modulePos = getPos(targetId,"bttn");
-  
+
   if(aniFilenames[modulePos] != ''){
     bttn = document.getElementById(targetId);
     bttn.src = "pics/" + aniFilenames[modulePos];

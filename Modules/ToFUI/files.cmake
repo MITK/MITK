@@ -1,6 +1,7 @@
 
 SET(CPP_FILES
   Qmitk/QmitkToFConnectionWidget.cpp
+  Qmitk/QmitkToFPointSetWidget.cpp
   Qmitk/QmitkToFRecorderWidget.cpp
   Qmitk/QmitkToFVisualisationSettingsWidget.cpp
   Qmitk/QmitkToFCompositeFilterWidget.cpp
@@ -9,6 +10,7 @@ SET(CPP_FILES
 )
 SET(UI_FILES
   Qmitk/QmitkToFConnectionWidgetControls.ui
+  Qmitk/QmitkToFPointSetWidgetControls.ui
   Qmitk/QmitkToFRecorderWidgetControls.ui
   Qmitk/QmitkToFVisualisationSettingsWidgetControls.ui
   Qmitk/QmitkToFCompositeFilterWidgetControls.ui
@@ -18,6 +20,7 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   Qmitk/QmitkToFConnectionWidget.h
+  Qmitk/QmitkToFPointSetWidget.h
   Qmitk/QmitkToFRecorderWidget.h
   Qmitk/QmitkToFVisualisationSettingsWidget.h
   Qmitk/QmitkToFCompositeFilterWidget.h

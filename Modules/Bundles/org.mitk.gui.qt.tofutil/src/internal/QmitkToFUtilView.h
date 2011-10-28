@@ -21,14 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 #include "QmitkToFImageBackground.h"
 #include <QmitkVideoBackground.h>
+#include <QmitkOverlayController.h>
 
 #include <ui_QmitkToFUtilViewControls.h>
 
 #include <QTimer>
 
+#include <mitkCameraIntrinsics.h>
 #include <mitkRealTimeClock.h>
 #include <mitkToFImageGrabber.h>
 #include <mitkOpenCVVideoSource.h>
+#include <mitkPointSetInteractor.h>
 #include <mitkSurface.h>
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 #include <mitkToFSurfaceVtkMapper3D.h>

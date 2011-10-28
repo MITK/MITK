@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkToFUtilView.h"
 #include <QmitkStdMultiWidget.h>
+#include <QmitkTextOverlay.h>
 
 // Qt
 #include <QMessageBox>
@@ -25,12 +26,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK
 #include <mitkBaseRenderer.h>
+#include <mitkGlobalInteraction.h>
 #include <mitkVtkRepresentationProperty.h>
 
 #include <mitkLookupTableProperty.h>
+#include <mitkToFDistanceImageToPointSetFilter.h>
 
 // VTK
 #include <vtkCamera.h>
+
+// ITK
+#include <itkCommand.h>
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
@@ -339,6 +345,8 @@ void QmitkToFUtilView::OnToFCameraStarted()
       OnVideoTextureCheckBoxChecked(true);
     }
   }
+  // initialize point set measurement
+  m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
@@ -434,7 +442,7 @@ void QmitkToFUtilView::OnUpdateCamera()
     // update surface
     this->m_Surface->Update();
 
-    colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Intensity");
+    colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Distance");
  
     this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
 

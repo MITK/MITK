@@ -109,6 +109,8 @@ protected slots:
   void BundleRepresentationColor();
   void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
+  void Fiber2DfadingEFX();
+  void FiberSlicingThickness2D();
 
   void SetInteractor();
 

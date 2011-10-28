@@ -180,7 +180,7 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
-
+          
           float val;
           node->GetFloatProperty("TubeRadius", val);
           m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
@@ -196,6 +196,12 @@ struct CvpSelListener : ISelectionListener
           label = "Width %1";
           label = label.arg(width);
           m_View->m_Controls->label_linewidth->setText(label);
+          
+          float range;
+          node->GetFloatProperty("Fiber2DSliceThickness",range);
+          label = "Range %1";
+          label = label.arg(range*0.1);
+          m_View->m_Controls->label_range->setText(label);
 
 //          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
 //          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
@@ -750,6 +756,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
     connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationResetColoring()));
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
+    connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
+    connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
 
     connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
@@ -1271,6 +1279,33 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
   }
 }
 
+void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
+{
+  if (m_SelectedNode) 
+  {
+    bool currentMode;
+    m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
+    m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  }
+  
+}
+
+void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
+{
+  if (m_SelectedNode) 
+  {
+    
+    
+    float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
+    QString label = "Range %1";
+    label = label.arg(fibThickness);
+    m_Controls->label_range->setText(label);
+
+    m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  }
+}
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
 {

@@ -4,34 +4,39 @@
 This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
 
 Available sections:
-  - \ref QmitkDiffusionImagingUserManualIssues 
+  - \ref QmitkDiffusionImagingUserManualIssues
+  - \ref QmitkDiffusionImagingUserManualPreprocessing
   - \ref QmitkDiffusionImagingUserManualTensorReconstruction
   - \ref QmitkDiffusionImagingUserManualQBallReconstruction
   - \ref QmitkDiffusionImagingUserManualDicomImport
   - \ref QmitkDiffusionImagingUserManualQuantification
   - \ref QmitkDiffusionImagingUserManualVisualizationSettings
-  - \ref QmitkDiffusionImagingUserManualReferences 
+  - \ref QmitkDiffusionImagingUserManualReferences
   - \ref QmitkDiffusionImagingUserManualTechnicalDetail
-  
+
 \image html overview.png The MITK Diffusion Imaging Module
 
 \section QmitkDiffusionImagingUserManualIssues Known Issues
 
 \li <b>Dicom Import:</b> The dicom import has so far only been implemented for Siemens dicom images. MITK-DI is capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
 
+\section QmitkDiffusionImagingUserManualPreprocessing Preprocessing
+
+The preprocessing view gives an overview over the important features of a diffusion weighted image like the number of gradient directions, b-value and the measurement frame. Additionally it allows the extraction of the B0 image and the generation of a binary brain mask. The image volume can be modified by applying a new mesurement frame, which is useful if the measurement frame is not set correctly in the image header, or by averaging redundant gradient directions.
+
+\image html prepro1.png Preprocessing
+
 \section QmitkDiffusionImagingUserManualTensorReconstruction Tensor Reconstruction
 
-The tensor reconstruction view allows ITK based tensor reconstruction [3].
+The tensor reconstruction view allows ITK based tensor reconstruction [3]. The advanced settings for ITK reconstruction let you configure a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank. It is also possible to check for negative eigenvalues. The according voxels are also left blank.
 
 \image html tensor1.png ITK tensor reconstruction
-
-The advanced settings for ITK reconstruction let you configure the number of threads to be used and a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank.
-
-\image html tensor2.png Advanced settings for ITK tensor reconstruction
 
 A few seconds (depending on the image size) after the reconstruction button is hit, a colored image should appear in the main window.
 
 \image html tensor4.png Tensor image after reconstruction
+
+The view also allows the generation of artificial diffusion weighted or Q-Ball images from the selected tensor image. The ODFs of the Q-Ball image are directly initialized from the tensor values and afterwards normalized. The diffusion weighted image is estimated using the l2-norm image of the tensor image as B0. The gradient images are afterwards generated using the standard tensor equation.
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
 
@@ -44,7 +49,7 @@ The q-ball reonstruction bundle implements a variety of reconstruction methods. 
 
 \image html qballs1.png The q-ball resonstruction view
 
-B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings. 
+B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings.
 
 \image html qballs2.png Advanced q-ball reconstruction settings
 

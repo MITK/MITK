@@ -1,0 +1,36 @@
+/**
+\bundlemainpage{org_stochastictracking} Stochastic Tracking View
+
+This view provides the user interface for the Stochastic Fibertracking algorithm, proposed by Ngo [1]. 
+
+Available sections:
+  - \ref QmitkStochasticTrackingUserManualInputData
+  - \ref QmitkStochasticTrackingUserManualParameters
+  - \ref QmitkStochasticTrackingUserManualReferences
+
+\image html stochastictrackingview.png Stochastic Tracking View
+\image html segmentationview.png Segmentation View to define ROIs
+
+
+\section QmitkStochasticTrackingUserManualInputData Input Data
+
+Mandatory Input:
+\li For a successful execution of the stochastic tractography filter, a DWI input and a binary image defining the desired ROI are required. The ROI serves as the origin from where on the fibers are beeing tracked. Both, DWI and ROI data can be imported via drag n’ drop or via the opening dialog box provided by MITK. Alternatively, the segmentation view offers tools for generating ROI data.
+
+\li One DWI Image image selected in the datamanager
+\li One or more ROIs selected in the datamanager
+
+
+\section QmitkStochasticTrackingUserManualParameters Input Parameters
+
+
+\li Parameters such as max. tract length (Tract_len), number of total tracts per voxel (TotalTracts) and likelihood cache size in MB (Lkhd chache) are individually set by the user.
+
+\li After successfully setting necessary Input and Parameter, pressing the command button executes the algorithm.
+
+
+\section QmitkStochasticTrackingUserManualReferences References
+
+[1] Tri M. Ngo, Polina Golland, and Tri M. Ngo. A stochastic tractography system and applications, 2007
+
+*/

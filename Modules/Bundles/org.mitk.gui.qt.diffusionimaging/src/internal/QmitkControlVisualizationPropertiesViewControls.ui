@@ -438,11 +438,6 @@
                 <string>None</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string>Global-Max</string>
-               </property>
-              </item>
              </widget>
             </item>
            </layout>

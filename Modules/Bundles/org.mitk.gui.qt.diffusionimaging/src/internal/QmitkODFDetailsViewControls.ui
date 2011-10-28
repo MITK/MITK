@@ -38,9 +38,9 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>ODF Details</string>
+      <string>Overview</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QGridLayout" name="gridLayout_4">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -53,6 +53,41 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item row="0" column="0">
+       <widget class="QTextEdit" name="m_OverviewTextEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QmitkODFRenderWidget" name="m_ODFRenderWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>200</height>
+         </size>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -83,164 +118,40 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QFrame" name="frame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_OdfBox">
+     <property name="title">
+      <string>ODF Values</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="2" column="0">
+       <widget class="QTextEdit" name="m_OdfValuesTextEdit">
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <property name="horizontalSpacing">
-          <number>0</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>4</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Sum: </string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="m_Sum">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Mean: </string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="m_Mean">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Pos:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="m_Pos">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QLabel" name="m_Pos_2">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="m_Min">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Min:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLabel" name="m_Max">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Max:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>GFA:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLabel" name="m_GFA">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QmitkODFRenderWidget" name="m_ODFRenderWidget" native="true">
+      <item row="1" column="0">
+       <widget class="QmitkODFDetailsWidget" name="m_ODFDetailsWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>200</height>
+         </size>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QmitkODFDetailsWidget" name="m_ODFDetailsWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>200</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableWidget" name="m_ODFValueTable"/>
    </item>
    <item>
     <spacer name="spacer1">

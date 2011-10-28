@@ -36,7 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCellData.h>
 #include <vtkSphereSource.h>
 #include <vtkPolyDataMapper.h>
-
+#include <vtkCamera.h>
+#include <mitkGlobalInteraction.h>
 
 class DIFFUSIONIMAGING_EXPORT QmitkODFRenderWidget : public QWidget
 {
@@ -47,7 +48,7 @@ public:
   QmitkODFRenderWidget( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   virtual ~QmitkODFRenderWidget();
 
-  void GenerateODF( std::vector<double> odfVals );
+  void GenerateODF( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf );
 
 protected:
 

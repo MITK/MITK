@@ -41,8 +41,6 @@ public:
  
   mitkNewMacro1Param(VtkInterpolationProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-  
   /**
    * Returns the current interpolation value as defined by VTK constants.
    * @returns the current interpolation as VTK constant.
@@ -63,6 +61,8 @@ public:
    * Sets the interpolation type to VTK_SURFACE.
    */
   virtual void SetInterpolationToPhong();
+
+  using BaseProperty::operator=;
   
 protected:
   
@@ -96,6 +96,12 @@ protected:
    * enumeration values.
    */
   virtual void AddInterpolationTypes();
+
+private:
+
+  // purposely not implemented
+  VtkInterpolationProperty(const VtkInterpolationProperty&);
+  VtkInterpolationProperty& operator=(const VtkInterpolationProperty&);
 };
 
 } // end of namespace mitk

@@ -25,57 +25,41 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
-  {
-    public:
-      mitkClassMacro(TransferFunctionProperty, BaseProperty);
+class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
+{
+public:
 
-      itkNewMacro(TransferFunctionProperty);
-      mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
+  typedef mitk::TransferFunction::Pointer ValueType;
 
-      itkSetMacro(Value, mitk::TransferFunction::Pointer );
-      itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
+  mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
-      /**
-       *
-       */
-      virtual bool operator==(const BaseProperty& property) const {
+  itkNewMacro(TransferFunctionProperty);
+  mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
-        const Self *other = dynamic_cast<const Self*>(&property);
+  itkSetMacro(Value, mitk::TransferFunction::Pointer );
+  itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
 
-        if(other==NULL) 
-          return false;
-        else
-          return *(m_Value.GetPointer()) == *(other->m_Value.GetPointer());
-      }
-      virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-      /**
-       *
-       */
-      std::string GetValueAsString() const {
-        std::stringstream myStr;
-        myStr << GetValue() ;
-        return myStr.str(); 
-      }
+  std::string GetValueAsString() const;
 
-      protected:
-        mitk::TransferFunction::Pointer m_Value;  
-        
-        TransferFunctionProperty()
-          : BaseProperty()
-        {};
+  using BaseProperty::operator=;
 
-        virtual ~TransferFunctionProperty()
-        {
-        };
+protected:
+  mitk::TransferFunction::Pointer m_Value;
 
-        TransferFunctionProperty( mitk::TransferFunction::Pointer value )
-          : BaseProperty(), m_Value( value )
-        {};
-  };
+  TransferFunctionProperty();
 
+  TransferFunctionProperty( mitk::TransferFunction::Pointer value );
 
-  //  typedef GenericProperty<mitk::TransferFunction::Pointer> TransferFunctionProperty;
+private:
+
+  // purposely not implemented
+  TransferFunctionProperty(const TransferFunctionProperty&);
+  TransferFunctionProperty& operator=(const TransferFunctionProperty&);
+
+  virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty& property);
+};
+
 } // namespace mitk  
 
 #endif /* MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED */ 

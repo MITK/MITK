@@ -52,12 +52,8 @@ public:
   std::string GetShaderName();
   void SetShader(const IdType& i);
   void SetShader(const std::string& i);
-  
-  virtual BaseProperty& operator=(const BaseProperty& other)
-  {
-    shaderList = dynamic_cast<const ShaderProperty&>(other).shaderList;
-    return Superclass::operator=(other);
-  }
+
+  using BaseProperty::operator=;
 
 protected:
   
@@ -93,6 +89,14 @@ protected:
    * enumeration values.
    */
   void AddShaderTypes();
+
+private:
+
+  // purposely not implemented
+  ShaderProperty(const ShaderProperty&);
+  ShaderProperty& operator=(const ShaderProperty&);
+
+  virtual bool Assign(const BaseProperty &property);
   
 };
 

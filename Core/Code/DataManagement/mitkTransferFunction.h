@@ -157,7 +157,9 @@ public:
 protected:
   TransferFunction();
   virtual ~TransferFunction();
-    
+
+  void PrintSelf(std::ostream &os, itk::Indent indent) const;
+
   /** Wrapped VTK scalar opacity transfer function */
   vtkSmartPointer<vtkPiecewiseFunction> m_ScalarOpacityFunction;
 

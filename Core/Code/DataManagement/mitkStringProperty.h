@@ -51,13 +51,19 @@ namespace mitk {
       itkGetStringMacro(Value);
       itkSetStringMacro(Value);
 
-      virtual bool operator==(const BaseProperty& property ) const;
       virtual std::string GetValueAsString() const;
-
-      bool Assignable(const BaseProperty& other) const;
-      virtual BaseProperty& operator=(const BaseProperty& other);
       
       static const char* PATH;
+
+      using BaseProperty::operator=;
+
+    private:
+      // purposely not implemented
+      StringProperty(const StringProperty&);
+      StringProperty& operator=(const StringProperty&);
+
+      virtual bool IsEqual(const BaseProperty& property ) const;
+      virtual bool Assign(const BaseProperty& property );
   };
 
 } // namespace mitk

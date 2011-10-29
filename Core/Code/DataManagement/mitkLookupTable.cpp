@@ -286,3 +286,9 @@ void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gr
 
   free(alphasHead);
 }
+
+void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+  os << indent;
+  m_LookupTable->PrintHeader(os, vtkIndent());
+}

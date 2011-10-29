@@ -16,34 +16,35 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkStringProperty.h"
+#include "mitkTransferFunctionProperty.h"
 
-const char* mitk::StringProperty::PATH = "path";
-mitk::StringProperty::StringProperty( const char* string ) 
-: m_Value()
+
+namespace mitk {
+
+bool TransferFunctionProperty::IsEqual(const BaseProperty& property) const
 {
-  if ( string )
-    m_Value = string;
+  return *(this->m_Value) == *(static_cast<const Self&>(property).m_Value);
 }
 
-mitk::StringProperty::StringProperty( const std::string& s )
-: m_Value( s )
-{
-
-}
-
-bool mitk::StringProperty::IsEqual(const BaseProperty& property ) const
-{
-  return this->m_Value == static_cast<const Self&>(property).m_Value;
-}
-
-bool mitk::StringProperty::Assign(const BaseProperty& property )
+bool TransferFunctionProperty::Assign(const BaseProperty& property)
 {
   this->m_Value = static_cast<const Self&>(property).m_Value;
   return true;
 }
 
-std::string mitk::StringProperty::GetValueAsString() const 
+std::string  TransferFunctionProperty::GetValueAsString() const
 {
-  return m_Value;
+  std::stringstream myStr;
+  myStr << GetValue();
+  return myStr.str();
 }
+
+TransferFunctionProperty::TransferFunctionProperty()
+  : BaseProperty()
+{}
+
+TransferFunctionProperty::TransferFunctionProperty( mitk::TransferFunction::Pointer value )
+  : BaseProperty(), m_Value( value )
+{}
+
+} // namespace mitk  

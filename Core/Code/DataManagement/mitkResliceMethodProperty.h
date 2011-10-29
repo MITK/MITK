@@ -33,10 +33,10 @@ public:
   mitkClassMacro( ResliceMethodProperty, EnumerationProperty );
   itkNewMacro(ResliceMethodProperty);
   mitkNewMacro1Param(ResliceMethodProperty, const IdType&); 
-  mitkNewMacro1Param(ResliceMethodProperty, const std::string&);  
+  mitkNewMacro1Param(ResliceMethodProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-  
+  using BaseProperty::operator=;
+
 protected:
   
   ResliceMethodProperty( );  
@@ -44,6 +44,12 @@ protected:
   ResliceMethodProperty( const std::string& value );
   
   void AddThickSlicesTypes();
+
+private:
+
+  // purposely not implemented
+  ResliceMethodProperty(const ResliceMethodProperty&);
+  ResliceMethodProperty& operator=(const ResliceMethodProperty&);
 };
 
 } // end of namespace mitk

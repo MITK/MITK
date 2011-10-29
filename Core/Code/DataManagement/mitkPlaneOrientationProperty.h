@@ -48,8 +48,6 @@ public:
  
   mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-
   enum
   {
     PLANE_DECORATION_NONE,
@@ -76,6 +74,8 @@ public:
    * Sets the decoration type to arrows in negative plane direction.
    */
   virtual void SetPlaneDecorationToNegativeOrientation();
+
+  using BaseProperty::operator=;
   
 protected:
   
@@ -107,6 +107,12 @@ protected:
    * Adds the standard enumeration types with corresponding strings.
    */
   virtual void AddDecorationTypes();
+
+private:
+
+  // purposely not implemented
+  PlaneOrientationProperty(const PlaneOrientationProperty&);
+  PlaneOrientationProperty& operator=(const PlaneOrientationProperty&);
 };
 
 } // end of namespace mitk

@@ -44,17 +44,28 @@ public:
     itkNewMacro(LevelWindowProperty);
     mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow&);
 
+    typedef LevelWindow ValueType;
+
     virtual ~LevelWindowProperty();
 
-    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-
-    virtual bool operator==(const BaseProperty& property) const;
-
     const mitk::LevelWindow & GetLevelWindow() const;
+    const mitk::LevelWindow & GetValue() const;
 
     void SetLevelWindow(const LevelWindow &levWin);
+    void SetValue(const ValueType& levWin);
 
     virtual std::string GetValueAsString() const;
+
+    using BaseProperty::operator=;
+
+private:
+
+    // purposely not implemented
+    LevelWindowProperty(const LevelWindowProperty&);
+    LevelWindowProperty& operator=(const LevelWindowProperty&);
+
+    virtual bool IsEqual(const BaseProperty& property) const;
+    virtual bool Assign(const BaseProperty& property);
 
 };
 

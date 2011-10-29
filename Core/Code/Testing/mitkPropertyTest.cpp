@@ -137,7 +137,7 @@ void TestGenericProperties()
   TestProperty<mitk::BoolProperty>(false, true, "0", "1");
   TestProperty<mitk::IntProperty>(3, 5, "3", "5");
   TestProperty<mitk::FloatProperty>(0.3f, -23.5f, "0.3", "-23.5");
-  TestProperty<mitk::DoubleProperty>(64.1d, 2.34d, "64.1", "2.34");
+  TestProperty<mitk::DoubleProperty>(64.1f, 2.34f, "64.1", "2.34");
 
   {
     mitk::Vector3D p1; p1[0] = 2.0; p1[1] = 3.0; p1[2] = 4.0;

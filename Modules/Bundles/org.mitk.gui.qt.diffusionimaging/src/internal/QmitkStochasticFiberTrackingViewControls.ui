@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
+    <width>290</width>
     <height>331</height>
    </rect>
   </property>
@@ -81,7 +81,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Execute FibreTracking</string>
+      <string>execute stochastic fiber tracking</string>
      </property>
     </widget>
    </item>
@@ -103,13 +103,19 @@
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_3">
+     <property name="toolTip">
+      <string>Length of single tracts</string>
+     </property>
      <property name="text">
-      <string>Tract_len</string>
+      <string>tarct length</string>
      </property>
     </widget>
    </item>
    <item row="4" column="0">
     <widget class="QLineEdit" name="lineEdit_maxTractLength">
+     <property name="toolTip">
+      <string>define length of single tract</string>
+     </property>
      <property name="text">
       <string>50</string>
      </property>
@@ -117,13 +123,19 @@
    </item>
    <item row="3" column="1">
     <widget class="QLabel" name="label_4">
+     <property name="toolTip">
+      <string>Number of tracts for each seedpoint</string>
+     </property>
      <property name="text">
-      <string>TotalTracts</string>
+      <string># of tracts</string>
      </property>
     </widget>
    </item>
    <item row="4" column="1">
     <widget class="QLineEdit" name="lineEdit_totalTracts">
+     <property name="toolTip">
+      <string>define number of tracts for each seedpoint</string>
+     </property>
      <property name="text">
       <string>1</string>
      </property>
@@ -131,13 +143,19 @@
    </item>
    <item row="3" column="2">
     <widget class="QLabel" name="label_5">
+     <property name="toolTip">
+      <string>Likelihood cache in Megabytes</string>
+     </property>
      <property name="text">
-      <string>Lkhd cache</string>
+      <string>cache (MB)</string>
      </property>
     </widget>
    </item>
    <item row="4" column="2">
     <widget class="QLineEdit" name="lineEdit_likelihood_cache">
+     <property name="toolTip">
+      <string>define likelihood cache in Megabytes</string>
+     </property>
      <property name="text">
       <string>500</string>
      </property>

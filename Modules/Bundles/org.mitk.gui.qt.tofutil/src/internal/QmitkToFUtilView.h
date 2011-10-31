@@ -105,10 +105,6 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     void PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image);
 
-    void RemoveBackground();
-
-    void AddBackground();
-
     Ui::QmitkToFUtilViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
@@ -172,10 +168,6 @@ class QmitkToFUtilView : public QmitkFunctionality
     \return returns the node
     */
     mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
-
-    void RemoveNode(const char* nodename, mitk::DataNode::Pointer node);
-
-    void CreateNode(const char* nodename, mitk::DataNode::Pointer& node);
 
     void* GetDataFromImage(std::string imageType);
 

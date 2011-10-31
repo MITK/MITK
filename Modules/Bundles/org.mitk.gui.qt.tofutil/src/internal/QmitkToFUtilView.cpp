@@ -60,28 +60,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-  // remove nodes
-  RemoveNode("ToF_Distance", this->m_DistanceImageNode);
-  RemoveNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  RemoveNode("ToF_Intensity", this->m_IntensityImageNode);
-  RemoveNode("ToF_Surface", this->m_SurfaceNode);
-  //RemoveBackground();
 }
-
-void QmitkToFUtilView::RemoveNode(const char* nodename, mitk::DataNode::Pointer node)
-{
-  if(this->GetDataStorage()->GetNamedNode(nodename) != NULL)
-  {
-    this->GetDataStorage()->Remove(node);
-  }
-}
-
-void QmitkToFUtilView::CreateNode(const char* nodename, mitk::DataNode::Pointer& node)
-{
-  node = mitk::DataNode::New();
-  node->SetProperty( "name", mitk::StringProperty::New(nodename));
-}
-
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
@@ -118,11 +97,6 @@ void QmitkToFUtilView::StdMultiWidgetNotAvailable()
 void QmitkToFUtilView::Activated()
 {
   QmitkFunctionality::Activated();
-  // add necessary nodes
-  CreateNode("ToF_Distance", this->m_DistanceImageNode);
-  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
-  CreateNode("ToF_Surface", this->m_SurfaceNode);
   // configure views
   m_MultiWidget->SetWidgetPlanesVisibility(false);
   m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
@@ -157,7 +131,6 @@ void QmitkToFUtilView::Deactivated()
 
   mitk::RenderingManager::GetInstance()->InitializeViews();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-  RemoveBackground();
   QmitkFunctionality::Deactivated();
 }
 
@@ -223,8 +196,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
       this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
     }
     m_MultiWidget->DisableGradientBackground();
-
-    this->AddBackground();
   }
   catch (std::logic_error& e)
   {
@@ -247,7 +218,6 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
     this->m_VideoSource->StopCapturing();
     this->m_VideoSource = NULL;
   }
-  RemoveBackground();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
   delete[] this->m_Widget1Texture;
@@ -651,44 +621,6 @@ void QmitkToFUtilView::PrepareImageForBackground(vtkColorTransferFunction* color
   colorTransferFunction->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
 
   delete[] flippedFloatData;
-}
-
-void QmitkToFUtilView::RemoveBackground()
-{
-  if(this->m_QmitkToFImageBackground1)
-  {
-    this->m_QmitkToFImageBackground1->RemoveRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow());
-  }
-  if(this->m_QmitkToFImageBackground2)
-  {
-    this->m_QmitkToFImageBackground2->RemoveRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow());
-  }
-  if(this->m_QmitkToFImageBackground3)
-  {
-    this->m_QmitkToFImageBackground3->RemoveRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow());
-  }
-}
-
-void QmitkToFUtilView::AddBackground()
-{
-  InitTexture(this->m_Widget1Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  InitTexture(this->m_Widget2Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  InitTexture(this->m_Widget3Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-
-  this->m_QmitkToFImageBackground1 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground1->AddRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground1->UpdateBackground(this->m_Widget1Texture);
-  this->m_Widget1ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
-
-  this->m_QmitkToFImageBackground2 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground2->AddRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground2->UpdateBackground(this->m_Widget2Texture);
-  this->m_Widget2ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ImageType();
-
-  this->m_QmitkToFImageBackground3 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground3->AddRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground3->UpdateBackground(this->m_Widget3Texture);
-  this->m_Widget3ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ImageType();
 }
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )

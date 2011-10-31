@@ -52,7 +52,7 @@ namespace mitk
 
     if (!m_OutputCache)
     {
-      itkWarningMacro("Tree cache is empty!");
+      itkWarningMacro("cache is empty!");
     }
 
     int vecsize = m_OutputCache->GetVectorImage()->GetVectorLength();
@@ -368,7 +368,6 @@ namespace mitk
               m_MeasurementFrame[i][j] = i==j ? 1 : 0;
         }
 
-        // This call updates the output information of the associated VesselTreeData
         outputForCache->SetVectorImage(img);
         outputForCache->SetB_Value(m_B_Value);
         outputForCache->SetDirections(m_DiffusionVectors);

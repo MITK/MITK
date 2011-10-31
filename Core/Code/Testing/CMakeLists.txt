@@ -37,3 +37,4 @@ SET_PROPERTY(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 
 add_subdirectory(DICOMTesting)
 
+add_subdirectory(TestModules)

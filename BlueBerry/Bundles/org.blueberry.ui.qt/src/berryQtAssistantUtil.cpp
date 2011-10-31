@@ -120,7 +120,9 @@ void QtAssistantUtil::CloseAssistant()
 bool QtAssistantUtil::RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles)
 {
   QStringList qchFiles = ExtractQCHFiles(bundles);
-  return CallQtAssistant(qchFiles);
+  // unregister old files
+  CallQtAssistant(qchFiles, false);
+  return CallQtAssistant(qchFiles, true);
 }
 
 bool QtAssistantUtil::RegisterQCHFiles(const QStringList& qchFiles)

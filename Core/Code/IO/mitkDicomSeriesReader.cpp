@@ -490,7 +490,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     }
 
     // recored current origin for reference in later iterations
-    if ( !lastOriginInitialized || fileFitsIntoPattern && (thisOrigin != lastOrigin) )
+    if ( !lastOriginInitialized || ( fileFitsIntoPattern && (thisOrigin != lastOrigin) ) )
     {
       lastDifferentOrigin = thisOrigin;
     }

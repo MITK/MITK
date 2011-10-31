@@ -79,8 +79,12 @@ void ModuleRegistry::Register(ModuleInfo* info)
   if (info->id > 0)
   {
     // The module was already registered
-    MutexLocker lock(*modulesLock());
-    Module* module = modules()->operator[](info->id);
+    Module* module = 0;
+    {
+      MutexLocker lock(*modulesLock());
+      module = modules()->operator[](info->id);
+      assert(module != 0);
+    }
     module->Start();
   }
   else
@@ -129,8 +133,12 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   // nothing to do.
   if (info->id == 1) return;
 
-  MutexLocker lock(*modulesLock());
-  Module* curr = modules()->operator[](info->id);
+  Module* curr = 0;
+  {
+    MutexLocker lock(*modulesLock());
+    curr = modules()->operator[](info->id);
+    assert(curr != 0);
+  }
   curr->Stop();
   curr->Uninit();
 }

@@ -388,7 +388,12 @@ void QmitkToFUtilView::OnUpdateCamera()
   vtkColorTransferFunction* colorTransferFunction;
 //  std::string imageType;
 
-//  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
+  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+  tf->SetColorTransferFunction( colorTransferFunction );
+//  mitk::TransferFunctionProperty::Pointer
+
+      m_DistanceImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf));
 //  imageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
 //  RenderWidget(m_MultiWidget->mitkWidget1, this->m_QmitkToFImageBackground1, this->m_Widget1ImageType, imageType,
 //    colorTransferFunction, this->m_VideoTexture, this->m_Widget1Texture );

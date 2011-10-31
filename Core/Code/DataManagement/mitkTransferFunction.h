@@ -83,6 +83,9 @@ public:
   /** \brief Get/Set wrapped vtk transfer function. */
   itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
 
+  /** \brief Get/Set wrapped vtk transfer function. */
+  itkSetMacro(ColorTransferFunction,vtkSmartPointer<vtkColorTransferFunction>);
+
   /** \brief Get histogram used for transfer function initialization. */
   itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
 

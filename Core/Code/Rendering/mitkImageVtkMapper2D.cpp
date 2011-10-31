@@ -741,7 +741,11 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );
 
-  ApplyColorTransferFunction(renderer);
+  if((useDefaultLut) && (!useColor))
+  { //the color function can be applied if the user does not want to use color
+    //and does not provide a lookuptable
+    ApplyColorTransferFunction(renderer);
+  }
 
   //check if we need the default table
   if( useDefaultLut )

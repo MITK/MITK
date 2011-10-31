@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
 
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
@@ -43,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
+#include <vtkColorTransferFunction.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -100,7 +103,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {  
-//  this->Update(renderer);
+  //  this->Update(renderer);
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -490,7 +493,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
   //set the current slice for the localStorage
-//  localStorage->m_ReslicedImage = reslicedImage;
+  //  localStorage->m_ReslicedImage = reslicedImage;
   localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
   //set the current slice as texture for the plane
@@ -738,6 +741,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );
 
+  ApplyColorTransferFunction(renderer);
+
   //check if we need the default table
   if( useDefaultLut )
   {
@@ -863,7 +868,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
-        this->GenerateDataForRenderer( renderer );
+    this->GenerateDataForRenderer( renderer );
   }
 
   // since we have checked that nothing important has changed, we can set
@@ -1042,6 +1047,17 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   // Add the lines to the dataset
   polyData->SetLines(lines);
   return polyData;
+}
+
+void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* renderer)
+{
+  mitk::TransferFunctionProperty::Pointer transferFunctionProperty =
+      dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("imageRendering.tranferFunction",renderer ));
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  if(transferFunctionProperty)
+  {
+    localStorage->m_Texture->SetLookupTable(transferFunctionProperty->GetValue()->GetColorTransferFunction());
+  }
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()

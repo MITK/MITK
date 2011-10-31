@@ -208,4 +208,9 @@ QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)
   return QSharedPointer<ctkPlugin>(0);
 }
 
+QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(long id)
+{
+  return InternalPlatform::GetInstance()->GetCTKPluginFrameworkContext()->getPlugin(id);
+}
+
 }

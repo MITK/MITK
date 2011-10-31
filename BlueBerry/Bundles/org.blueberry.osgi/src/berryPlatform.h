@@ -337,6 +337,8 @@ public:
 
   static QSharedPointer<ctkPlugin> GetCTKPlugin(const QString& symbolicName);
 
+  static QSharedPointer<ctkPlugin> GetCTKPlugin(long id);
+
 private:
   Platform();
 };

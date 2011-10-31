@@ -37,7 +37,7 @@ namespace berry
 QProcess* QtAssistantUtil::assistantProcess = 0;
 QString QtAssistantUtil::helpCollectionFile;
 QString QtAssistantUtil::defaultHelpUrl;
-QStringList QtAssistantUtil::registeredBundles;
+QSet<QString> QtAssistantUtil::registeredBundles;
 
 void QtAssistantUtil::SetHelpCollectionFile(const QString& file)
 {
@@ -160,7 +160,7 @@ QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>
 
     if (qchFileFound)
     {
-      registeredBundles.push_back(QString::fromStdString(bundles[i]->GetSymbolicName()));
+      registeredBundles.insert(QString::fromStdString(bundles[i]->GetSymbolicName()));
     }
   }
 
@@ -251,6 +251,40 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
     {
       exitCode = process->exitCode();
       errorString = process->readAllStandardError();
+    }
+
+    if (success && exitCode == 0)
+    {
+      // Use a hack to get the plug-in id from the qch path
+      QString strId = QFileInfo(qchFiles[i]).dir().dirName();
+      if (strId.isEmpty())
+      {
+        BERRY_ERROR << "Could not get last directory name from: " << qchFiles[i].toStdString();
+      }
+      else
+      {
+        bool okay = true;
+        long pluginId = strId.toLong(&okay);
+        if (okay)
+        {
+          QSharedPointer<ctkPlugin> plugin = berry::Platform::GetCTKPlugin(pluginId);
+          if (plugin)
+          {
+            if (registerFile)
+            {
+              registeredBundles.insert(plugin->getSymbolicName());
+            }
+            else
+            {
+              registeredBundles.remove(plugin->getSymbolicName());
+            }
+          }
+        }
+        else
+        {
+          BERRY_WARN << "Could convert last directory name into an integer (legacy BlueBerry plug-in?): " << qchFiles[i].toStdString();
+        }
+      }
     }
   }
   progress.setValue(argsVector.size());

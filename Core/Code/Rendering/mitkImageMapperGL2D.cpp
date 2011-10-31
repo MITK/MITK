@@ -1300,6 +1300,17 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
   
+  std::string modality;
+  if ( node->GetStringProperty( "dicom.series.Modality", modality ) )
+  {
+    // modality provided by DICOM or other reader
+    if ( modality == "PT") // NOT a typo, PT is the abbreviation for PET used in DICOM
+    {
+      node->SetProperty( "use color", mitk::BoolProperty::New( false ), renderer );
+      node->SetProperty( "opacity", mitk::FloatProperty::New( 0.5 ), renderer );
+    }
+  }
+
   bool isBinaryImage(false);
   if ( ! node->GetBoolProperty("binary", isBinaryImage) )
   {

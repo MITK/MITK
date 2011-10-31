@@ -148,6 +148,8 @@ void QmitkToFPointSetWidget::SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer
 
 void QmitkToFPointSetWidget::OnMeasurement()
 {
+  // initial update of measurement
+  this->MeasurementPointSetChanged();
   if (m_Controls->measureButton->isChecked())
   {
     // uncheck point set button
@@ -168,6 +170,8 @@ void QmitkToFPointSetWidget::OnMeasurement()
 
 void QmitkToFPointSetWidget::OnPointSet()
 {
+  // initial update of PointSet
+  this->PointSetChanged();
   if (m_Controls->pointSetButton->isChecked())
   {
     // uncheck point set button
@@ -186,47 +190,83 @@ void QmitkToFPointSetWidget::OnPointSet()
 
 void QmitkToFPointSetWidget::MeasurementPointSetChanged()
 {
+  int imageSizeX = m_DistanceImage->GetDimensions()[0];
+  int imageSizeY = m_DistanceImage->GetDimensions()[1];
+  mitk::Point3D point1 = m_MeasurementPointSet2D->GetPoint(0);
+  mitk::Point3D point2 = m_MeasurementPointSet2D->GetPoint(1);
   if (m_MeasurementPointSet2D->GetSize()>0)
   {
-    // create PointSet filter
-    mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
-    if (m_CameraIntrinsics.IsNotNull())
+    if ((point1[0]>=0.0f)&&(point1[0]<imageSizeX)&&(point1[1]>=0)&&(point1[1]<imageSizeY)&&
+        (point2[0]>=0.0f)&&(point2[0]<imageSizeX)&&(point2[1]>=0)&&(point2[1]<imageSizeY))
     {
-      toFDistanceImageToPointSetFilter->SetCameraIntrinsics(m_CameraIntrinsics);
-    }
-    toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
-    toFDistanceImageToPointSetFilter->SetSubset(m_MeasurementPointSet2D);
-    toFDistanceImageToPointSetFilter->Update();
-    mitk::PointSet::Pointer measurementPointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
-    m_MeasurementPointSet3DNode->SetData(measurementPointSet3D);
+      // create PointSet filter
+      mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
+      if (m_CameraIntrinsics.IsNotNull())
+      {
+        toFDistanceImageToPointSetFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+      }
+      toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
+      toFDistanceImageToPointSetFilter->SetSubset(m_MeasurementPointSet2D);
+      toFDistanceImageToPointSetFilter->Update();
+      mitk::PointSet::Pointer measurementPointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
+      m_MeasurementPointSet3DNode->SetData(measurementPointSet3D);
 
-    // calculate distance between points
-    if (measurementPointSet3D->GetSize()==2)
+      // calculate distance between points
+      if (measurementPointSet3D->GetSize()==2)
+      {
+        mitk::Point3D point1 = measurementPointSet3D->GetPoint(0);
+        mitk::Point3D point2 = measurementPointSet3D->GetPoint(1);
+        float distance = point1.EuclideanDistanceTo(point2);
+        std::stringstream stream;
+        stream<<distance<<" mm";
+        m_MeasurementPropertyList->SetStringProperty("overlay.text.distance",stream.str().c_str());
+      }
+    }
+    else
     {
-      mitk::Point3D point1 = measurementPointSet3D->GetPoint(0);
-      mitk::Point3D point2 = measurementPointSet3D->GetPoint(1);
-      float distance = point1.EuclideanDistanceTo(point2);
-      std::stringstream stream;
-      stream<<distance<<" mm";
-      m_MeasurementPropertyList->SetStringProperty("overlay.text.distance",stream.str().c_str());
+      m_MeasurementPropertyList->SetStringProperty("overlay.text.distance","Measurement outside image range.");
     }
   }
 }
 
 void QmitkToFPointSetWidget::PointSetChanged()
 {
+  int imageSizeX = m_DistanceImage->GetDimensions()[0];
+  int imageSizeY = m_DistanceImage->GetDimensions()[1];
+  int pointSetValid = 1;
+  for (int i=0; i<m_PointSet2D->GetSize(); i++)
+  {
+    mitk::Point3D currentPoint = m_PointSet2D->GetPoint(i);
+    if ((currentPoint[0]>=0.0f)&&(currentPoint[0]<imageSizeX)&&(currentPoint[1]>=0)&&(currentPoint[1]<imageSizeY))
+    {
+      pointSetValid*=1;
+    }
+    else
+    {
+      pointSetValid*=0;
+    }
+  }
   if (m_PointSet2D->GetSize()>0)
   {
-    // create PointSet filter
-    mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
-    if (m_CameraIntrinsics.IsNotNull())
+    if (pointSetValid)
     {
-      toFDistanceImageToPointSetFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+      m_OverlayController->SetOverlayVisibility(false);
+      // create PointSet filter
+      mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
+      if (m_CameraIntrinsics.IsNotNull())
+      {
+        toFDistanceImageToPointSetFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+      }
+      toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
+      toFDistanceImageToPointSetFilter->SetSubset(m_PointSet2D);
+      toFDistanceImageToPointSetFilter->Update();
+      mitk::PointSet::Pointer pointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
+      m_PointSet3DNode->SetData(pointSet3D);
     }
-    toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
-    toFDistanceImageToPointSetFilter->SetSubset(m_PointSet2D);
-    toFDistanceImageToPointSetFilter->Update();
-    mitk::PointSet::Pointer pointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
-    m_PointSet3DNode->SetData(pointSet3D);
+    else
+    {
+      m_OverlayController->SetOverlayVisibility(true);
+      m_MeasurementPropertyList->SetStringProperty("overlay.text.distance","PointSet outside image range.");
+    }
   }
 }

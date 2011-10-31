@@ -130,6 +130,8 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
+  virtual void NodeAdded(const mitk::DataNode *node);
+
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;

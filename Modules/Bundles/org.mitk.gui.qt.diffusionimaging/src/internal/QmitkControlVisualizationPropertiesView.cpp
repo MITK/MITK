@@ -817,6 +817,17 @@ int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, in
   }
 }
 
+// set diffusion image channel to b0 volume
+void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *node)
+{
+  mitk::DataNode* notConst = const_cast<mitk::DataNode*>(node);
+  if (dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData()))
+  {
+    mitk::DiffusionImage<short>::Pointer dimg = dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData());
+    notConst->SetIntProperty("DisplayChannel", dimg->GetB0Indices().front());
+  }
+}
+
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
  implement SelectionService Listener explicitly */
 void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -981,6 +992,8 @@ void QmitkControlVisualizationPropertiesView::SetEnumProp(
     }
   }
 }
+
+
 
 void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
 {

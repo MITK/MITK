@@ -219,10 +219,6 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
     this->m_VideoSource = NULL;
   }
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-  delete[] this->m_Widget1Texture;
-  delete[] this->m_Widget2Texture;
-  delete[] this->m_Widget3Texture;
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()

@@ -145,9 +145,6 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     mitk::OpenCVVideoSource::Pointer m_VideoSource;
     unsigned char* m_VideoTexture;
-    unsigned char* m_Widget1Texture;
-    unsigned char* m_Widget2Texture;
-    unsigned char* m_Widget3Texture;
 
     int m_ToFCaptureWidth;
     int m_ToFCaptureHeight;

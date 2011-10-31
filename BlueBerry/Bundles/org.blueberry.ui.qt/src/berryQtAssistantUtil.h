@@ -61,7 +61,7 @@ private:
   static QString helpCollectionFile;
   static QString defaultHelpUrl;
 
-  static QStringList registeredBundles;
+  static QSet<QString> registeredBundles;
 
   static QString GetAssistantExecutable();
   static QStringList ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles);

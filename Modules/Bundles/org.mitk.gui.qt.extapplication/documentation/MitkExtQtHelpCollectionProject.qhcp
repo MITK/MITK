@@ -6,7 +6,7 @@
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
-         <cacheDirectory>MitkExt</cacheDirectory>
+         <cacheDirectory base="collection">qhc_cache</cacheDirectory>
          <aboutMenuText>
              <text>About MITK Help</text>
          </aboutMenuText>

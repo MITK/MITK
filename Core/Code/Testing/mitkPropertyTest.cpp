@@ -360,7 +360,9 @@ int mitkPropertyTest(int /* argc */, char* /*argv*/[])
 
   {
     mitk::LookupTable::Pointer lut1 = mitk::LookupTable::New();
+    lut1->GetVtkLookupTable()->SetTableValue(0, 0.2, 0.3, 0.4);
     mitk::LookupTable::Pointer lut2 = mitk::LookupTable::New();
+    lut2->GetVtkLookupTable()->SetTableValue(0, 0.2, 0.4, 0.4);
     std::stringstream ss;
     ss << lut1;
     std::string strLUT1 = ss.str();

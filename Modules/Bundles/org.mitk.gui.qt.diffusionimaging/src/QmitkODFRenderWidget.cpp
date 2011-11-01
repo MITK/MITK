@@ -117,10 +117,16 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   mitk::Geometry2D::ConstPointer worldGeometry = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetCurrentWorldGeometry2D();
   mitk::PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry.GetPointer() );
   mitk::Vector3D normal = worldPlaneGeometry->GetNormal();
+  mitk::Vector3D up = worldPlaneGeometry->GetAxisVector(1);
+  normal.Normalize();
+  up.Normalize();
+
   vtkSmartPointer<vtkCamera> cam = vtkSmartPointer<vtkCamera>::New();
   const double camPos[3] = {normal[0],normal[1],normal[2]};
+  const double camUp[3] = {up[0],up[1],up[2]};
+  MITK_INFO << normal;
   cam->SetPosition(camPos);
-  cam->Roll(180);
+  cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);
   m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetActiveCamera(cam);
 }

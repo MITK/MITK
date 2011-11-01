@@ -112,8 +112,6 @@ void QmitkODFRenderWidget::GenerateODF( std::vector<double> odfVals )
   m_RenderWindow->GetRenderer()->SetDataStorage( m_ds );
   m_RenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
 
-<<<<<<< Updated upstream
-=======
   // adjust camera to current plane rotation
   mitk::Geometry2D::ConstPointer worldGeometry = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetCurrentWorldGeometry2D();
   mitk::PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry.GetPointer() );
@@ -125,10 +123,8 @@ void QmitkODFRenderWidget::GenerateODF( std::vector<double> odfVals )
   vtkSmartPointer<vtkCamera> cam = vtkSmartPointer<vtkCamera>::New();
   const double camPos[3] = {normal[0],normal[1],normal[2]};
   const double camUp[3] = {up[0],up[1],up[2]};
-  MITK_INFO << normal;
   cam->SetPosition(camPos);
   cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);
   m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetActiveCamera(cam);
->>>>>>> Stashed changes
 }

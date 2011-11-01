@@ -188,7 +188,7 @@ public:
 
 private:
 
-  void Get_Unlocked(const std::string& clazz, const std::string& filter,
+  void Get_unlocked(const std::string& clazz, const std::string& filter,
                     ModulePrivate* module, std::list<ServiceReference>& serviceRefs) const;
 
 };

@@ -195,11 +195,7 @@ void ServiceTracker<S,T>::GetServiceReferences(std::list<ServiceReference>& refs
   }
   {
     itk::MutexLockHolder<itk::SimpleMutexLock> lockT(*t);
-    if (t->Size() == 0)
-    {
-      return;
-    }
-    t->GetTracked(refs);
+    d->GetServiceReferences_unlocked(refs, t.GetPointer());
   }
 }
 
@@ -314,7 +310,7 @@ void ServiceTracker<S,T>::GetServices(std::list<T>& services) const
   {
     itk::MutexLockHolder<itk::SimpleMutexLock> lockT(*t);
     std::list<ServiceReference> references;
-    GetServiceReferences(references);
+    d->GetServiceReferences_unlocked(references, t.GetPointer());
     for(std::list<ServiceReference>::const_iterator ref = references.begin();
         ref != references.end(); ++ref)
     {

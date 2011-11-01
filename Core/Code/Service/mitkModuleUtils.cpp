@@ -38,7 +38,17 @@ std::string GetLibraryPath_impl(const std::string& /*libName*/, const void* symb
 
 void* GetSymbol_impl(const std::string& libName, const char* symbol)
 {
-  void* selfHandle = dlopen(libName.c_str(), RTLD_LAZY);
+  void* selfHandle = 0;
+  if (libName.empty())
+  {
+    // Get the handle of the executable
+    selfHandle = dlopen(0, RTLD_LAZY);
+  }
+  else
+  {
+    selfHandle = dlopen(libName.c_str(), RTLD_LAZY);
+  }
+
   if (selfHandle)
   {
     void* addr = dlsym(selfHandle, symbol);
@@ -117,7 +127,17 @@ std::string GetLibraryPath_impl(const std::string& libName, const void *symbol)
 
 void* GetSymbol_impl(const std::string& libName, const char* symbol)
 {
-  HMODULE handle = GetModuleHandle(libName.c_str());
+  HMODULE handle = 0;
+  if (libName.empty())
+  {
+    // Get the handle of the executable
+    handle = GetModuleHandle(NULL);
+  }
+  else
+  {
+    handle = GetModuleHandle(libName.c_str());
+  }
+
   if (!handle)
   {
     PrintLastError_impl("GetSymbol_impl():GetModuleHandle()");

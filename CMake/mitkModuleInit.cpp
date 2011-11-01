@@ -42,6 +42,12 @@ public:
     activator_func.append(moduleInfo()->name);
 
     moduleInfo()->location = location;
+
+    if (moduleInfo()->libName.empty())
+    {
+      // make sure we retrieve symbols from the executable, if "libName" is empty
+      location.clear();
+    }
     moduleInfo()->activatorHook = (ModuleInfo::ModuleActivatorHook)ModuleUtils::GetSymbol(location, activator_func.c_str());
 
     Register();

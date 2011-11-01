@@ -124,7 +124,6 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   vtkSmartPointer<vtkCamera> cam = vtkSmartPointer<vtkCamera>::New();
   const double camPos[3] = {normal[0],normal[1],normal[2]};
   const double camUp[3] = {up[0],up[1],up[2]};
-  MITK_INFO << normal;
   cam->SetPosition(camPos);
   cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);

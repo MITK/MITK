@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSimpleFastMutexLock.h>
 #include <itkMutexLockHolder.h>
 
+#include <cassert>
+
 namespace mitk {
 
 #ifdef MITK_HAS_UNORDERED_MAP_H

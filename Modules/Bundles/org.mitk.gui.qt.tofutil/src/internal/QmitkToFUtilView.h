@@ -154,7 +154,7 @@ class QmitkToFUtilView : public QmitkFunctionality
     mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter;
 
     mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter;
-    mitk::ToFVisualizationFilter::Pointer m_ToFVisualizationFilter;
+    //mitk::ToFVisualizationFilter::Pointer m_ToFVisualizationFilter;
 
   private:
 

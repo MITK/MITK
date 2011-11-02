@@ -21,13 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkTextOverlay.h>
 
 #include <mitkGlobalInteraction.h>
+#include <mitkVtkLayerController.h>
 
 const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpointsetwidget";
 
 QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 , m_CameraIntrinsics(NULL)
-, m_OverlayController(NULL)
-, m_MeasurementPropertyList(NULL)
 , m_MeasurementPointSet2D(NULL)
 , m_MeasurementPointSet3DNode(NULL)
 , m_PointSet2D(NULL)
@@ -51,7 +50,10 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
   {
     m_PointSet2D->RemoveObserver(m_PointSetChangedObserverTag);
   }
-  delete m_OverlayController;
+  if (m_ForegroundRenderer&&m_MultiWidget)
+  {
+    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer);
+  }
 }
 
 void QmitkToFPointSetWidget::CreateQtPartControl(QWidget *parent)
@@ -78,6 +80,7 @@ void QmitkToFPointSetWidget::CreateConnections()
 void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidget, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage)
 {
   // initialize members
+  m_MultiWidget = stdMultiWidget;
   m_DistanceImage = distanceImage;
   if ((stdMultiWidget!=NULL)&&(dataStorage.IsNotNull()))
   {
@@ -85,13 +88,16 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     m_Controls->pointSetButton->setEnabled(true);
     m_Controls->measureButton->setEnabled(true);
     // initialize overlays
-    m_MeasurementPropertyList = mitk::PropertyList::New();
-    m_MeasurementPropertyList->SetStringProperty("overlay.text.distance","");
-    m_MeasurementPropertyList->SetIntProperty("overlay.fontSize",16);
-    QmitkTextOverlay* textOverlay1 = new QmitkTextOverlay("overlay.text.distance");
-    m_OverlayController = new QmitkOverlayController(stdMultiWidget->mitkWidget1,m_MeasurementPropertyList);
-    m_OverlayController->AddOverlay(textOverlay1);
-    m_OverlayController->SetOverlayVisibility(false);
+    this->m_VtkTextActor = vtkTextActor::New();
+    this->m_VtkTextActor->SetInput("");
+    int windowHeight = m_MultiWidget->mitkWidget1->GetRenderer()->GetSizeY();
+    this->m_VtkTextActor->SetDisplayPosition(10,windowHeight-30);
+    this->m_VtkTextActor->GetTextProperty()->SetFontSize(20);
+//    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
+    this->m_VtkTextActor->GetTextProperty()->BoldOn();
+    this->m_ForegroundRenderer = vtkRenderer::New();
+    this->m_ForegroundRenderer->AddActor(m_VtkTextActor);
+    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer,true);
     // initialize 2D measurement point set
     m_MeasurementPointSet2D = mitk::PointSet::New();
     mitk::DataNode::Pointer measurementNode2D = mitk::DataNode::New();
@@ -146,21 +152,26 @@ void QmitkToFPointSetWidget::SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer
 
 void QmitkToFPointSetWidget::OnMeasurement()
 {
-  // initial update of measurement
-  this->MeasurementPointSetChanged();
   if (m_Controls->measureButton->isChecked())
   {
-    // uncheck point set button
-    m_Controls->pointSetButton->setChecked(false);
+    // disable point set interaction
+    if (m_Controls->pointSetButton->isChecked())
+    {
+      m_Controls->pointSetButton->setChecked(false);
+      // remove interactor
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+    }
     // show overlays
-    m_OverlayController->SetOverlayVisibility(true);
+    m_VtkTextActor->SetVisibility(1);
     // enable interactor
     mitk::GlobalInteraction::GetInstance()->AddInteractor(m_MeasurementPointSetInteractor);
+    // initial update of measurement
+    this->MeasurementPointSetChanged();
   }
   else
   {
     // hide overlays
-    m_OverlayController->SetOverlayVisibility(false);
+    m_VtkTextActor->SetVisibility(0);
     // disable interactor
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_MeasurementPointSetInteractor);
   }
@@ -168,16 +179,21 @@ void QmitkToFPointSetWidget::OnMeasurement()
 
 void QmitkToFPointSetWidget::OnPointSet()
 {
-  // initial update of PointSet
-  this->PointSetChanged();
   if (m_Controls->pointSetButton->isChecked())
   {
-    // uncheck point set button
-    m_Controls->measureButton->setChecked(false);
+    // disable measurement
+    if (m_Controls->measureButton->isChecked())
+    {
+      m_Controls->measureButton->setChecked(false);
+      // remove interactor
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_MeasurementPointSetInteractor);
+    }
     // hide overlays
-    m_OverlayController->SetOverlayVisibility(false);
+    m_VtkTextActor->SetVisibility(0);
     // enable interactor
     mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+    // initial update of PointSet
+    this->PointSetChanged();
   }
   else
   {
@@ -217,12 +233,12 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
         float distance = point1.EuclideanDistanceTo(point2);
         std::stringstream stream;
         stream<<distance<<" mm";
-        m_MeasurementPropertyList->SetStringProperty("overlay.text.distance",stream.str().c_str());
+        this->m_VtkTextActor->SetInput(stream.str().c_str());
       }
     }
     else
     {
-      m_MeasurementPropertyList->SetStringProperty("overlay.text.distance","Measurement outside image range.");
+      this->m_VtkTextActor->SetInput("Measurement outside image range.");
     }
   }
 }
@@ -248,7 +264,8 @@ void QmitkToFPointSetWidget::PointSetChanged()
   {
     if (pointSetValid)
     {
-      m_OverlayController->SetOverlayVisibility(false);
+      // hide overlay
+      m_VtkTextActor->SetVisibility(0);
       // create PointSet filter
       mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
       if (m_CameraIntrinsics.IsNotNull())
@@ -263,8 +280,8 @@ void QmitkToFPointSetWidget::PointSetChanged()
     }
     else
     {
-      m_OverlayController->SetOverlayVisibility(true);
-      m_MeasurementPropertyList->SetStringProperty("overlay.text.distance","PointSet outside image range.");
+      m_VtkTextActor->SetVisibility(1);
+      this->m_VtkTextActor->SetInput("Point set outside image range.");
     }
   }
 }

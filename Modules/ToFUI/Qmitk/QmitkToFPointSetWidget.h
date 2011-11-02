@@ -32,7 +32,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk headers
 #include <QmitkStdMultiWidget.h>
-#include <QmitkOverlayController.h>
+
+// vtk includes
+#include <vtkSmartPointer.h>
+#include <vtkTextActor.h>
+#include <vtkRenderer.h>
 
 /**
 * @brief Widget allowing interaction with point sets for measurement and PointSet definition
@@ -98,11 +102,13 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     Ui::QmitkToFPointSetWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
+    QmitkStdMultiWidget* m_MultiWidget; ///< multi widget used for overlay visualization
+
     mitk::Image::Pointer m_DistanceImage; ///< image holding the range data of the ToF camera
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
-    QmitkOverlayController* m_OverlayController; ///< overlay controller holding the text overlay of the measurement
-    mitk::PropertyList::Pointer m_MeasurementPropertyList; ///< property list holding the properties for the measurement text
+    vtkSmartPointer<vtkTextActor> m_VtkTextActor; ///< actor containing the text of the overlay
+    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer; ///< renderer responsible for text rendering in the foreground
 
     mitk::PointSet::Pointer m_MeasurementPointSet2D; ///< PointSet holding the 2D ToF image point selection used for measuring
     mitk::DataNode::Pointer m_MeasurementPointSet3DNode; ///< DataNode holding the 3D ToF coordinates used for measuring

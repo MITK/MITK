@@ -438,7 +438,9 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 {
   bool isSeg(false);
-  if(node->GetBoolProperty("binary", isSeg))
+  bool isHelperObject(false);
+  node->GetBoolProperty("helper object", isHelperObject);
+  if(node->GetBoolProperty("binary", isSeg) && !isHelperObject)
   {
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
     MITK_INFO<<"Delete: "<<tempNode->GetName();

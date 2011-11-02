@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkLookupTableProperty.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -53,7 +55,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 
   this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
   this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
-  this->m_ToFVisualizationFilter = mitk::ToFVisualizationFilter::New();
+  //this->m_ToFVisualizationFilter = mitk::ToFVisualizationFilter::New();
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
@@ -107,8 +109,8 @@ void QmitkToFUtilView::Activated()
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOn();
 
   //m_Controls->m_ToFImageConverterWidget->Initialize(this->GetDefaultDataStorage(), m_MultiWidget);
-  m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->GetDefaultDataStorage(), m_MultiWidget);
-  m_Controls->m_ToFVisualisationSettingsWidget->SetParameter(this->m_ToFVisualizationFilter);
+  //m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->GetDefaultDataStorage(), m_MultiWidget);
+  //m_Controls->m_ToFVisualisationSettingsWidget->SetParameter(this->m_ToFVisualizationFilter);
 
   m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
 
@@ -233,11 +235,11 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
     // initial update of composite filter
     this->m_ToFCompositeFilter->Update();
-    this->m_ToFVisualizationFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
-    this->m_ToFVisualizationFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
-    this->m_ToFVisualizationFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
-    // initial update of visualization filter
-    this->m_ToFVisualizationFilter->Update();
+    //this->m_ToFVisualizationFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
+    //this->m_ToFVisualizationFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
+    //this->m_ToFVisualizationFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
+    //// initial update of visualization filter
+    //this->m_ToFVisualizationFilter->Update();
     //this->m_MitkDistanceImage = m_ToFVisualizationFilter->GetOutput(0);
     //this->m_MitkAmplitudeImage = m_ToFVisualizationFilter->GetOutput(1);
     //this->m_MitkIntensityImage = m_ToFVisualizationFilter->GetOutput(2);
@@ -375,7 +377,7 @@ void QmitkToFUtilView::OnUpdateCamera()
 
   if (!this->m_TransferFunctionInitialized)
   {
-    m_Controls->m_ToFVisualisationSettingsWidget->InitializeTransferFunction(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
+    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
     this->m_TransferFunctionInitialized = true;
   }
 
@@ -385,15 +387,21 @@ void QmitkToFUtilView::OnUpdateCamera()
     ProcessVideoTransform();
   }
 
-  vtkColorTransferFunction* colorTransferFunction;
-//  std::string imageType;
-
-  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-  tf->SetColorTransferFunction( colorTransferFunction );
-//  mitk::TransferFunctionProperty::Pointer
-
-      m_DistanceImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf));
+  vtkColorTransferFunction* colorTransferFunction1;
+  colorTransferFunction1 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf1 = mitk::TransferFunction::New();
+  tf1->SetColorTransferFunction( colorTransferFunction1 );
+  m_DistanceImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf1));
+  vtkColorTransferFunction* colorTransferFunction2;
+  colorTransferFunction2 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
+  tf2->SetColorTransferFunction( colorTransferFunction2 );
+  m_AmplitudeImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf2));
+  vtkColorTransferFunction* colorTransferFunction3;
+  colorTransferFunction3 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
+  tf3->SetColorTransferFunction( colorTransferFunction3 );
+  m_IntensityImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf3));
 //  imageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
 //  RenderWidget(m_MultiWidget->mitkWidget1, this->m_QmitkToFImageBackground1, this->m_Widget1ImageType, imageType,
 //    colorTransferFunction, this->m_VideoTexture, this->m_Widget1Texture );
@@ -413,7 +421,7 @@ void QmitkToFUtilView::OnUpdateCamera()
     // update surface
     this->m_Surface->Update();
 
-    colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Distance");
+    vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();
  
     this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
 
@@ -584,44 +592,44 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* floatData, unsigned char* image)
 {
-  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
-  floatArrayDist->Initialize();
-  int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
-  float* flippedFloatData = new float[numOfPixel];
+  //vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
+  //floatArrayDist->Initialize();
+  //int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
+  //float* flippedFloatData = new float[numOfPixel];
 
-  for (int i=0; i<this->m_ToFCaptureHeight; i++)
-  {
-    for (int j=0; j<this->m_ToFCaptureWidth; j++)
-    {
-      flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
-    }
-  }
+  //for (int i=0; i<this->m_ToFCaptureHeight; i++)
+  //{
+  //  for (int j=0; j<this->m_ToFCaptureWidth; j++)
+  //  {
+  //    flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
+  //  }
+  //}
 
-  floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
-  lut->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
+  //floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
+  //lut->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
 
-  delete[] flippedFloatData;
+  //delete[] flippedFloatData;
 }
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image)
 {
-  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
-  floatArrayDist->Initialize();
-  int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
-  float* flippedFloatData = new float[numOfPixel];
+  //vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
+  //floatArrayDist->Initialize();
+  //int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
+  //float* flippedFloatData = new float[numOfPixel];
 
-  for (int i=0; i<this->m_ToFCaptureHeight; i++)
-  {
-    for (int j=0; j<this->m_ToFCaptureWidth; j++)
-    {
-      flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
-    }
-  }
+  //for (int i=0; i<this->m_ToFCaptureHeight; i++)
+  //{
+  //  for (int j=0; j<this->m_ToFCaptureWidth; j++)
+  //  {
+  //    flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
+  //  }
+  //}
 
-  floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
-  colorTransferFunction->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
+  //floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
+  //colorTransferFunction->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
 
-  delete[] flippedFloatData;
+  //delete[] flippedFloatData;
 }
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )

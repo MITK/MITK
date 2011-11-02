@@ -557,7 +557,6 @@ namespace mitk
 
             if(localStorage->m_ReslicedImage != NULL)
             {
-              localStorage->m_ReslicedImage->Update();
               texture->SetInput( localStorage->m_ReslicedImage );
 
               //default level window

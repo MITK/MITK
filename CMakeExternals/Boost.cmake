@@ -34,7 +34,7 @@ IF(MITK_USE_Boost)
       ENDIF()  
       
       SET(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
-      SET(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build ${_boost_variant} ${_boost_libs} link=shared threading=multi runtime-link=shared -q)
+      SET(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q)
     ELSE()
       SET(_boost_cfg_cmd )
       SET(_boost_build_cmd )

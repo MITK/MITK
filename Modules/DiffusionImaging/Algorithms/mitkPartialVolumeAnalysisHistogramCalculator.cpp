@@ -728,8 +728,8 @@ namespace mitk
         BaseInterpType;
     typedef itk::GaussianInterpolateImageFunction<ImageType, double>
         GaussianInterpolatorType;
-    typedef itk::BSplineInterpolateImageFunction<ImageType, double>
-        BSplineInterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, double>
+        LinearInterpolatorType;
 
     typename BaseInterpType::Pointer interpolator;
 
@@ -748,7 +748,7 @@ namespace mitk
     }
     else
     {
-      interpolator = BSplineInterpolatorType::New();
+      interpolator = LinearInterpolatorType::New();
     }
 
     interpolator->SetInputImage( image );

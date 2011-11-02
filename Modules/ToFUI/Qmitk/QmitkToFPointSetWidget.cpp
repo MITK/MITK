@@ -52,8 +52,6 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
     m_PointSet2D->RemoveObserver(m_PointSetChangedObserverTag);
   }
   delete m_OverlayController;
-  delete m_OverlayController;
-  delete m_OverlayController;
 }
 
 void QmitkToFPointSetWidget::CreateQtPartControl(QWidget *parent)

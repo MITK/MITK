@@ -234,7 +234,15 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage";
 
     //test serialization
-    bool success = mySerializer->Serialize(filename,myStorage);
+    bool success = true;
+    try
+     {
+	 success = mySerializer->Serialize(filename,myStorage);
+	 }
+    catch(...)
+     {
+     success = false;
+     }
     MITK_TEST_CONDITION_REQUIRED(!success,"Testing serialization into invalid file.");
     }
 

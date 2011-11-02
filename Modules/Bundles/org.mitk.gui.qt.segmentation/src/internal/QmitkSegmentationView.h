@@ -45,6 +45,8 @@ public:
   }
   virtual ~QmitkSegmentationView();
 
+  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
+
   /*!
     \brief Invoked when the DataManager selection changed
     */
@@ -96,6 +98,8 @@ protected slots:
   //called when the checkbox Remember Contour Positions is selected/deselected
   void CheckboxRememberContourPositionsStateChanged(int state);
 
+  void OnWorkingNodeVisibilityChanged();
+
 protected:
 
   // a type for handling lists of DataNodes
@@ -139,6 +143,8 @@ protected:
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected (const mitk::DataNode* node);
 
+  void NodeRemoved(const mitk::DataNode* node);
+
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 
@@ -153,7 +159,9 @@ protected:
   unsigned long m_RenderingManagerObserverTag;
   unsigned long m_SlicesRotationObserverTag1;
   unsigned long m_SlicesRotationObserverTag2;
+  unsigned long m_VisibilityChangedObserverTag;
 
+  NodeTagMapType  m_WorkingDataObserverTags;
 
 };
 

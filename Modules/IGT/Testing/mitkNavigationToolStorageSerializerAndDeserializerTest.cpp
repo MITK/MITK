@@ -209,7 +209,7 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of invalid data storage.");
     MITK_TEST_CONDITION_REQUIRED(myDeserializer->GetErrorMessage() == "Cannot open 'noStorage.tfl' for reading", "Checking Error Message");
     }
-    
+
     static void TestWriteStorageToInvalidFile()
     {
      //create Tool Storage
@@ -231,7 +231,7 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
     //create filename
-    std::string filename = "dsfdsf:$§$342INVALIDFILE.storage";
+    std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage";
 
     //test serialization
     bool success = mySerializer->Serialize(filename,myStorage);

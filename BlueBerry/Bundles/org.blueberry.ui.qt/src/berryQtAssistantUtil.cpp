@@ -191,7 +191,10 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
       args << QLatin1String("-unregister");
     }
     args << qchFile;
-    //args << QLatin1String("-quiet");
+    // This is necessary on Windows to suppress the pop-up dialogs on registering
+    // or unregistering .qch files. Unfortunately, it also suppresses specific
+    // error messages.
+    args << QLatin1String("-quiet");
     //BERRY_INFO << "Registering " << qchFile.toStdString() << " with " << helpCollectionFile.toStdString();
     argsVector.push_back(args);
   }

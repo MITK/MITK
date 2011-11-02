@@ -96,8 +96,15 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
     static void CleanUp()
     {
-    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage").c_str());
-    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage2.storage").c_str());
+    try
+      {
+      std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage").c_str());
+      std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage2.storage").c_str());
+      }
+    catch(...)
+      {
+      MITK_INFO << "Warning: Error occured when deleting test file!";
+      }
     }
 
     static void TestWriteComplexToolStorage()
@@ -235,14 +242,8 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
     //test serialization
     bool success = true;
-    try
-     {
-	 success = mySerializer->Serialize(filename,myStorage);
-	 }
-    catch(...)
-     {
-     success = false;
-     }
+    success = mySerializer->Serialize(filename,myStorage);
+	
     MITK_TEST_CONDITION_REQUIRED(!success,"Testing serialization into invalid file.");
     }
 

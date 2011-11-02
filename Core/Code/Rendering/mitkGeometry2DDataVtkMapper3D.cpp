@@ -557,7 +557,7 @@ namespace mitk
 
             if(localStorage->m_ReslicedImage != NULL)
             {
-              texture->SetInput( localStorage->m_ReslicedImage );
+              texture->SetInput( localStorage->m_Texture->GetInput() );
 
               //default level window
               ScalarType windowMin = 0.0;

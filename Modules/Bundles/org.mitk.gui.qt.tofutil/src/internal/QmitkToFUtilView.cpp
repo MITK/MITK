@@ -62,6 +62,8 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
@@ -269,6 +271,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
       OnVideoTextureCheckBoxChecked(true);
     }
   }
+  m_Controls->m_TextureCheckBox->setEnabled(true);
   // initialize point set measurement
   m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
 }
@@ -439,13 +442,16 @@ void QmitkToFUtilView::ProcessVideoTransform()
 
 void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
 {
-  if (checked)
+  if(m_SurfaceNode.IsNotNull())
   {
-    this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
-  }
-  else
-  {
-    this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
+    if (checked)
+    {
+      this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
+    }
+    else
+    {
+      this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
+    }
   }
 }
 

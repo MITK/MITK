@@ -81,6 +81,10 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \return vtkColorTransferFunction that can be used to define a TransferFunctionProperty
     */
     vtkColorTransferFunction* GetSelectedColorTransferFunction();
+    /*!
+    \brief Return the index of the selected image: 0 = Distance, 1 = Amplitude, 2 = Intensity
+    */
+    int GetSelectedImageIndex();
 
   protected slots:
   

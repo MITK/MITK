@@ -419,6 +419,7 @@ void QmitkToFUtilView::OnUpdateCamera()
   if (m_Controls->m_SurfaceCheckBox->isChecked())
   {
     // update surface
+    m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
     this->m_Surface->Update();
 
     vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();

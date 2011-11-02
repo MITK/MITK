@@ -284,7 +284,8 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
 
   if (currentWidgetIndex == 0)
   {
-    m_RangeSliderMin = this->m_MitkDistanceImage->GetScalarValueMin();
+    // use second minimum to draw 0 values (that are usually segmented) black
+    m_RangeSliderMin = this->m_MitkDistanceImage->GetScalarValue2ndMin();
     m_RangeSliderMax = this->m_MitkDistanceImage->GetScalarValueMaxNoRecompute();
     ResetTransferFunction(this->m_Widget1ColorTransferFunction, currentTransferFunctionTypeIndex, this->m_RangeSliderMin, this->m_RangeSliderMax);
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget1ColorTransferFunction );
@@ -352,4 +353,9 @@ vtkColorTransferFunction* QmitkToFVisualisationSettingsWidget::GetSelectedColorT
   {
     return this->m_Widget3ColorTransferFunction;
   }
+}
+
+int QmitkToFVisualisationSettingsWidget::GetSelectedImageIndex()
+{
+  return this->m_Controls->m_SelectWidgetCombobox->currentIndex();
 }

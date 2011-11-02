@@ -259,37 +259,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
     if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
     {
-      /* initialize level/window from DICOM tags */
-      std::string sLevel;
-      std::string sWindow;
-
-      if (    node->GetStringProperty( "dicom.voilut.WindowCenter", sLevel )
-           && node->GetStringProperty( "dicom.voilut.WindowWidth", sWindow ) )
-      {
-        float level = atof( sLevel.c_str() );
-        float window = atof( sWindow.c_str() );
-
-        mitk::LevelWindow contrast;
-        std::string sSmallestPixelValueInSeries;
-        std::string sLargestPixelValueInSeries;
-
-        if (    node->GetStringProperty( "dicom.series.SmallestPixelValueInSeries", sSmallestPixelValueInSeries )
-             && node->GetStringProperty( "dicom.series.LargestPixelValueInSeries", sLargestPixelValueInSeries ) )
-        {
-          float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
-          float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );
-          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer? 
-                                                                                               // might buffer some l/w widget challenges
-        }
-        else
-        {
-          contrast.SetAuto( static_cast<mitk::Image*>(node->GetData()), false, true ); // we need this as a fallback
-        }
-    
-        contrast.SetLevelWindow( level, window);
-        node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ) );
-      }
-
       std::string nodeName(uid);
       std::string studyDescription;
       if ( node->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )

@@ -587,6 +587,9 @@ endif()
 #if(DCMTK_DIR)
 #  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${DCMTK_DIR}/bin/@VS_BUILD_TYPE@")
 #endif()
+if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
+endif()
 
 # Add applications directory
 add_subdirectory(Applications)

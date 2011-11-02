@@ -280,12 +280,15 @@ namespace mitk
       pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
     }
 
-    // write image data to float arrays
-    for (int i=0; i<this->m_PixelNumber; i++)
+    if(this->m_DistanceDataBuffer&&this->m_AmplitudeDataBuffer&&this->m_IntensityDataBuffer)
     {
-      distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
-      amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
-      intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+      // write image data to float arrays
+      for (int i=0; i<this->m_PixelNumber; i++)
+      {
+        distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
+        amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
+        intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+      }
     }
     m_ImageMutex->Unlock();
   }

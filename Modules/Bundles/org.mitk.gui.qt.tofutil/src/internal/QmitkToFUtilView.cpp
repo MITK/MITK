@@ -62,6 +62,8 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )

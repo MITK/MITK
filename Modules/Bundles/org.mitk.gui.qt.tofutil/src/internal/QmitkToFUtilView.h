@@ -19,33 +19,33 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToFUtilView_h
 
 #include <QmitkFunctionality.h>
-#include "QmitkToFImageBackground.h"
-#include <QmitkVideoBackground.h>
 #include <QmitkOverlayController.h>
 
 #include <ui_QmitkToFUtilViewControls.h>
 
 #include <QTimer>
 
-#include <mitkCameraIntrinsics.h>
 #include <mitkRealTimeClock.h>
 #include <mitkToFImageGrabber.h>
 #include <mitkOpenCVVideoSource.h>
-#include <mitkPointSetInteractor.h>
 #include <mitkSurface.h>
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 #include <mitkToFSurfaceVtkMapper3D.h>
 #include <mitkToFImageRecorder.h>
 #include <mitkToFCompositeFilter.h>
 
-#include <vtkLookupTable.h>
-
-typedef itk::Image<float, 2> ItkImageType2D;
-
 /*!
   \brief QmitkToFUtilView 
 
-  \warning  This application is still under active development. Complete documentation will be added when class is finished.
+  Application that allows simple playing, recording, visualization, processing and measurement of Time-of-Flight (ToF) data.
+  Currently the following features are implemented:
+  <ul>
+  <li>Connecting and showing ToF data from various cameras (PMD CamCube 2/3, PMD CamBoard, PMD O3, MESA SwissRanger)</li>
+  <li>Recording and playing of ToF data</li>
+  <li>Color coded visualization of ToF images</li>
+  <li>Preprocessing of the distance data: Threshold, median, average and bilateral filtering; surface generation</li>
+  <li>Simple measurement and PointSet definition</li>
+  </ul>
 
   \sa QmitkFunctionality
   \ingroup Functionalities
@@ -61,100 +61,89 @@ class QmitkToFUtilView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkToFUtilView();
-    QmitkToFUtilView(const QmitkToFUtilView& other)
-	{
-	  Q_UNUSED(other)
-	  throw std::runtime_error("Copy constructor not implemented");
-	}
     ~QmitkToFUtilView();
 
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated
     virtual void Activated();
+    /// \brief Called when the functionality is deactivated
     virtual void Deactivated();
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
     virtual void StdMultiWidgetNotAvailable();
 
   protected slots:
   
-    /// \brief Called when the user clicks the GUI button
+    /*!
+    \brief Slot triggered from the timer to update the images and visualization
+    */
     void OnUpdateCamera();
-
-	/*!
-    \This method is automatically called by the connection widgets when the configuration is completed 
+    /*!
+    \brief Slot called when the "Connect" button of the ConnectionWidget is pressed
     */
     void OnToFCameraConnected();
-
+    /*!
+    \brief Slot called when the "Disconnect" button of the ConnectionWidget is pressed
+    */
     void OnToFCameraDisconnected();
-
-    void OnToFCameraStarted();
-
-    void OnToFCameraStopped();
-
+    /*!
+    \brief Slot called when the camera selection in the ConnectionWidget has changed
+    */
     void OnToFCameraSelected(const QString selected);
-
+    /*!
+    \brief Slot called when the "Start" button of the RecorderWidget is pressed
+    */
+    void OnToFCameraStarted();
+    /*!
+    \brief Slot called when the "Stop" button of the RecorderWidget is pressed
+    */
+    void OnToFCameraStopped();
+    /*!
+    \brief Slot invoked when the texture checkbox is checked. Enables the scalar visibility of the surface
+    */
     void OnTextureCheckBoxChecked(bool checked);
-
+    /*!
+    \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
+    */
     void OnVideoTextureCheckBoxChecked(bool checked);
 
   protected:
-
-    void InitTexture(unsigned char* &image, int width, int height);
-
-    void PrepareImageForBackground(vtkLookupTable* lut, float* floadData, unsigned char* image);
-
-    void PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image);
 
     Ui::QmitkToFUtilViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
 
-    QTimer* m_Frametimer;
+    QTimer* m_Frametimer; ///< Timer used to continuously update the images
 
-    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber;
-    
-    mitk::Image::Pointer m_MitkDistanceImage; ///< object to hold the distance image
+    mitk::Image::Pointer m_MitkDistanceImage; ///< member holding a pointer to the distance image of the selected camera
+    mitk::Image::Pointer m_MitkAmplitudeImage; ///< member holding a pointer to the amplitude image of the selected camera
+    mitk::Image::Pointer m_MitkIntensityImage; ///< member holding a pointer to the intensity image of the selected camera
+    mitk::Surface::Pointer m_Surface; ///< member holding a pointer to the surface generated from the distance image of the selected camera
 
-    mitk::Image::Pointer m_MitkAmplitudeImage; ///< object to hold the amplitude image
+    mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode holding the distance image of the selected camera
+    mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode holding the amplitude image of the selected camera
+    mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode holding the intensity image of the selected camera
+    mitk::DataNode::Pointer m_SurfaceNode; ///< DataNode holding the surface generated from the distanc image of the selected camera
 
-    mitk::Image::Pointer m_MitkIntensityImage; ///< object to hold the amplitude image
+    // ToF processing and recording filter
+    mitk::ToFImageRecorder::Pointer m_ToFImageRecorder; ///< ToF image recorder used for lossless recording of ToF image data
+    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< Source of a ToF image processing pipeline. Provides pointers to distance, amplitude and intensity image
+    mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
+    mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
 
-    mitk::Surface::Pointer m_Surface;
+    int m_SurfaceDisplayCount; ///< member used to determine whether surface is initialized or not
+    int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
+    // members for calculating the frame rate
+    mitk::RealTimeClock::Pointer m_RealTimeClock; ///< real time clock used to calculate the display framerate
+    int m_StepsForFramerate; ///< number of steps used for calculating the display framerate
+    double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
+    double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
 
-    mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode to get the distance image into the DataStorage
-
-    mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode to get the amplitude image into the DataStorage
-
-    mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode to get the intensity image into the DataStorage
-
-    mitk::DataNode::Pointer m_SurfaceNode;
-
-    mitk::ToFImageRecorder::Pointer m_ToFImageRecorder;
-
-    int m_ImageSequence;
-
-    mitk::RealTimeClock::Pointer m_RealTimeClock;
-
-    int m_StepsForFramerate; 
-
-    double m_2DTimeBefore, m_2DTimeAfter;
-
-    QmitkToFImageBackground* m_QmitkToFImageBackground1;
-    QmitkToFImageBackground* m_QmitkToFImageBackground2;
-    QmitkToFImageBackground* m_QmitkToFImageBackground3;
-
-    mitk::OpenCVVideoSource::Pointer m_VideoSource;
-    unsigned char* m_VideoTexture;
-
-    int m_ToFCaptureWidth;
-    int m_ToFCaptureHeight;
-    int m_VideoCaptureWidth;
-    int m_VideoCaptureHeight;
-
-    mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter;
-
-    mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter;
-    //mitk::ToFVisualizationFilter::Pointer m_ToFVisualizationFilter;
+    // members used for displaying an external video source
+    mitk::OpenCVVideoSource::Pointer m_VideoSource; ///< OpenCV video source to connect a video device
+    unsigned char* m_VideoTexture; ///< texture used to show video image
+    int m_VideoCaptureWidth; ///< width of the video image
+    int m_VideoCaptureHeight; ///< height of the video image
+    bool m_VideoEnabled; ///< flag indicating whether video grabbing is enabled. Set via the RGB texture checkbox
 
   private:
 
@@ -166,27 +155,10 @@ class QmitkToFUtilView : public QmitkFunctionality
     */
     mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
 
-    void* GetDataFromImage(std::string imageType);
-
-    void RenderWidget(QmitkRenderWindow* mitkWidget, QmitkToFImageBackground* imageBackground, std::string& oldImageType, std::string newImageType, 
-      vtkColorTransferFunction* colorTransferFunction, unsigned char* videoTexture, unsigned char* tofTexture );
-
     void ProcessVideoTransform();
-
-    bool m_TransferFunctionInitialized;
-
-    int m_SurfaceDisplayCount;
-	  int m_2DDisplayCount;
-    bool m_VideoEnabled;
-
-    std::string m_Widget1ImageType;
-    std::string m_Widget2ImageType;
-    std::string m_Widget3ImageType;
 
     mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
 };
-
-
 
 #endif // _QMITKTOFUTILVIEW_H_INCLUDED
 

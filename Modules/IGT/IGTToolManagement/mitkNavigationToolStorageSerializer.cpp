@@ -58,6 +58,11 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   if (!file.good())
     {
     m_ErrorMessage = "Could not open a zip file for writing: '" + filename + "'";
+    for (int i=0; i<storage->GetToolCount();i++)
+      {
+      std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+      std::remove(fileName.c_str());
+      }
     return false;
     }
   Poco::Zip::Compress zipper( file, true );

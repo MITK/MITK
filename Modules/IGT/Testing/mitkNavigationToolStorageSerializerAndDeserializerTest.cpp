@@ -238,8 +238,13 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
     //create filename
-    std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage";
-
+	#ifdef WIN32
+		std::string filename = "C:\342INVALIDFILE<>.storage"; //invalid filename for windows
+	#else
+		std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage"; //invalid filename for linux
+	#endif
+   
+	
     //test serialization
     bool success = true;
     success = mySerializer->Serialize(filename,myStorage);

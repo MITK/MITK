@@ -166,7 +166,9 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     float min = itk::NumericTraits<float>::max();
     QString values;
     QString overviewText;
-    if (dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()))
+    // check if dynamic_cast successfull and if the crosshair position is inside of the geometry of the ODF data
+    // otherwise possible crash for a scenario with multiple nodes
+    if (dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()) && ( nodes.front()->GetData()->GetGeometry()->IsInside(world) ) )
     {
       m_Controls->m_OdfBox->setVisible(true);
       OdfVectorImgType::Pointer itkQBallImage = OdfVectorImgType::New();

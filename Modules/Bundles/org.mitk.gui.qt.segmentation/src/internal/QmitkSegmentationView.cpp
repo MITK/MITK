@@ -360,7 +360,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   //   
   //    
 
-  MITK_INFO<<"PropertyChanged";
+  //MITK_INFO<<"PropertyChanged";
 //      mitk::DataNode* node = const_cast<mitk::DataNode*>(dynamic_cast<const mitk::DataNode*>(caller));
 //    if (node)
 //        MITK_INFO<<"Caller: "<<node->GetName();
@@ -443,7 +443,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   if(node->GetBoolProperty("binary", isSeg) && !isHelperObject)
   {
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-    MITK_INFO<<"Delete: "<<tempNode->GetName();
+    //MITK_INFO<<"Delete: "<<tempNode->GetName();
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);
     this->SetToolManagerSelection(NULL, NULL);
@@ -705,7 +705,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
     NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( workingData );
     if ( searchIter == m_WorkingDataObserverTags.end() )
     {
-      MITK_INFO<<"Creating new observer";
+      //MITK_INFO<<"Creating new observer";
       itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
       command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
       m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );

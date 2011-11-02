@@ -62,11 +62,9 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+  float depth = this->CalculateLayerDepth(renderer);
   //Set the origin to (xMin; yMin; depth) of the plane. This is necessary for obtaining the correct
   //plane size in crosshair rotation and swivel mode.
-
-  float depth = this->CalculateLayerDepth(renderer);
-
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
@@ -100,7 +98,6 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {  
-  //  this->Update(renderer);
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -395,13 +392,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   localStorage->m_Reslicer->SetResliceAxesOrigin( originArray );
 
   double cosines[9];
-
   // direction of the X-axis of the sampled result
   vnl2vtk( localStorage->m_Right.Get_vnl_vector(), cosines );
-
   // direction of the Y-axis of the sampled result
   vnl2vtk( localStorage->m_Bottom.Get_vnl_vector(), cosines + 3 );//fill next 3 elements
-
   // normal of the plane
   vnl2vtk( localStorage->m_Normal.Get_vnl_vector(), cosines + 6 );//fill the last 3 elements
 
@@ -487,6 +481,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //    localStorage->m_ReslicedImage = reslicedImage;
   localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
+  //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
   bool binary = false;
@@ -510,17 +505,20 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       }
       else
       {
+        binaryOutline = false;
+        this->ApplyLookuptable(renderer);
         MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
       }
     }
     else //standard binary image
     {
       if(numberOfComponents != 1)
+      {
         MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
+      }
       //Interpret the values as binary values
       localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
-
-      this->GenerateLookuptable(renderer, true);
+      this->ApplyLookuptable(renderer);
     }
   }
   else if( numberOfComponents == 1 ) //gray images
@@ -528,24 +526,23 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     //Interpret the values as gray values
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
 
-    this->GenerateLookuptable(renderer);
+    this->ApplyLookuptable(renderer);
   }
   else if ( (numberOfComponents == 3) || (numberOfComponents == 4) ) //RBG(A) images
   {
     //Interpret the RGB(A) images values correctly
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-    this->GenerateLookuptable(renderer);
+    this->ApplyLookuptable(renderer);
     this->ApplyRBGALevelWindow(renderer);
   }
   else
   {
     MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
   }
+
   this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );
-
-  //transform the actor to its actual position in 3D
   this->TransformActor( renderer );
 
   //connect mapper with the data
@@ -636,20 +633,25 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   float opacity = 1.0f;
-
   // check for opacity prop and use it for rendering if it exists
   GetOpacity( opacity, renderer );
   //set the opacity according to the properties
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
 }
 
-void mitk::ImageVtkMapper2D::GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary )
+void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
+  bool binary = false;
+  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
+
+  //default lookuptable
+  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+
   if(binary)
   {
     //default lookuptable for binary images
-    localStorage->m_LookupTable->SetRange(0.0, 1.0);
+    localStorage->m_Texture->GetLookupTable()->SetRange(0.0, 1.0);
   }
   else
   {
@@ -679,21 +681,15 @@ void mitk::ImageVtkMapper2D::GenerateLookuptable( mitk::BaseRenderer* renderer, 
           LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
         }
         //we use the user-defined lookuptable
-        localStorage->m_LookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
-        //we obtained a user-defined lut and dont have to use the default table
+        localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
       }
     }//END PROPERTY user-defined lut
-    else //most common case: default lut
-    {
-      //default lookuptable with level window property
-      LevelWindow levelWindow;
-      this->GetLevelWindow( levelWindow, renderer );
-      //set up the lookuptable with the level window range
-      localStorage->m_LookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-    }
+    LevelWindow levelWindow;
+    this->GetLevelWindow( levelWindow, renderer );
+    //set up the lookuptable with the level window range
+    localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
   localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
-  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 }
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
@@ -807,19 +803,21 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
 void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
+  //pass the LuT to the RBG filter
   localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
   mitk::LevelWindow opacLevelWindow;
   if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-  {
+  {//pass the opaque level window to the filter
     localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
     localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
   }
   else
-  {
+  {//no opaque level window
     localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(0.0);
     localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(255.0);
   }
   localStorage->m_LevelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
+  //connect the texture with the output of the RGB filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowToRGBFilterObject->GetOutputPort());
 }
 

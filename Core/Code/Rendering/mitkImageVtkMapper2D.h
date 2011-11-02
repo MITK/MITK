@@ -253,12 +253,12 @@ namespace mitk {
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
-    /** \brief This method applied a level window on RBG(A) images.
+    /** \brief This method applies a level window on RBG(A) images.
     * It should only be called for internally for RGB(A) images. */
     void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
 
-    /** \brief This method generates the lookuptable for all types of images. */
-    void GenerateLookuptable( mitk::BaseRenderer* renderer, bool binary = false );
+    /** \brief This method applies (or modifies) the lookuptable for all types of images. */
+    void ApplyLookuptable( mitk::BaseRenderer* renderer );
 
     /** \brief Set the color of the image/polydata */
     void ApplyColor( mitk::BaseRenderer* renderer );

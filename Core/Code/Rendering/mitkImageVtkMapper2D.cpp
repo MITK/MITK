@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
-#include <mitkTransferFunction.h>
+//#include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 
 //MITK Rendering

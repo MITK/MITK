@@ -225,7 +225,7 @@ void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
     m_Controls->m_SelectTransferFunctionTypeCombobox->setCurrentIndex(this->m_Widget2TransferFunctionType);
     numPoints = this->m_Widget2ColorTransferFunction->GetSize();
     this->m_Widget2ColorTransferFunction->GetNodeValue( 0, valMin );
-    this->m_Widget2ColorTransferFunction->GetNodeValue( numPoints-2, valMax );
+    this->m_Widget2ColorTransferFunction->GetNodeValue( numPoints-1, valMax );
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget2ColorTransferFunction );
   }
   else if (currentWidgetIndex == 2)
@@ -233,7 +233,7 @@ void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
     m_Controls->m_SelectTransferFunctionTypeCombobox->setCurrentIndex(this->m_Widget3TransferFunctionType);
     numPoints = this->m_Widget3ColorTransferFunction->GetSize();
     this->m_Widget3ColorTransferFunction->GetNodeValue( 0, valMin );
-    this->m_Widget3ColorTransferFunction->GetNodeValue( numPoints-3, valMax );
+    this->m_Widget3ColorTransferFunction->GetNodeValue( numPoints-1, valMax );
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget3ColorTransferFunction );
   }
   else if (currentWidgetIndex == 3)

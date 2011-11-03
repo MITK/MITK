@@ -28,7 +28,7 @@ IF(MITK_USE_CTK)
     ENDFOREACH()
   
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY git://github.com/commontk/CTK.git
+      GIT_REPOSITORY http://github.com/commontk/CTK.git
       GIT_TAG ${revision_tag}
       BINARY_DIR ${proj}-build
       UPDATE_COMMAND ""
@@ -40,6 +40,7 @@ IF(MITK_USE_CTK)
         -DDESIRED_QT_VERSION:STRING=4
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
         -DCTK_LIB_DICOM/Widgets:BOOL=ON
+        -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
       DEPENDS ${proj_DEPENDENCIES}
      )
   SET(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)

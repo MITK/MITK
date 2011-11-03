@@ -46,9 +46,9 @@ namespace mitk
 
     unsigned int GetNumberOfPlanePositions();
 
-    void DataStorageRemovedNode(const mitk::DataNode* removedNode = NULL);
+//    void DataStorageRemovedNode(const mitk::DataNode* removedNode = NULL);
 
-    void SetDataStorage(mitk::DataStorage* ds);
+//    void SetDataStorage(mitk::DataStorage* ds);
 
  protected:
 
@@ -60,8 +60,7 @@ namespace mitk
 
    static PlanePositionManager* m_Instance;
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
-   unsigned int m_ID;
-   DataStorage::Pointer m_DataStorage;
+   //DataStorage::Pointer m_DataStorage;
 
  };
 }

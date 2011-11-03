@@ -87,7 +87,7 @@ void QmitkSegmentationView::Activated()
     itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
     command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
     m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
-    mitk::PlanePositionManager::GetInstance()->SetDataStorage(this->GetDataStorage());
+    //mitk::PlanePositionManager::GetInstance()->SetDataStorage(this->GetDataStorage());
   }
 }
 

@@ -656,7 +656,7 @@ void QmitkGibbsTrackingView::SaveTrackingParameters()
   documentXML.LinkEndChild(mainXML);
 
   TiXmlElement* paramXML = new TiXmlElement("parameter_set");
-  paramXML->SetAttribute("iterations", m_Iterations);
+  paramXML->SetAttribute("iterations", QString::number(m_Iterations).toStdString());
   paramXML->SetAttribute("particle_length", QString::number((float)m_Controls->m_ParticleLengthSlider->value()/10).toStdString());
   paramXML->SetAttribute("particle_width", QString::number((float)m_Controls->m_ParticleWidthSlider->value()/10).toStdString());
   paramXML->SetAttribute("particle_weight", QString::number((float)m_Controls->m_ParticleWeightSlider->value()/10000).toStdString());

@@ -496,6 +496,7 @@ namespace itk{
         m_ParticleWeight = 0.0001;
       }
     MITK_INFO << "Particle Weight: " << m_ParticleWeight;
+    MITK_INFO << "Iterations: " << m_NumIt;
     m_CurrentStep = 0;
     m_Memory = 0;
 
@@ -510,6 +511,7 @@ namespace itk{
       MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
       m_AbortTracking = true;
     }
+    MITK_INFO << "Steps: " << m_Steps;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
     // setup metropolis hastings sampler

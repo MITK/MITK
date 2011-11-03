@@ -108,7 +108,9 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
     vtkSmartPointer<vtkTextActor> m_VtkTextActor; ///< actor containing the text of the overlay
-    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer; ///< renderer responsible for text rendering in the foreground
+    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer1; ///< renderer responsible for text rendering in the foreground of widget 1
+    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer2; ///< renderer responsible for text rendering in the foreground of widget 2
+    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer3; ///< renderer responsible for text rendering in the foreground of widget 3
 
     mitk::PointSet::Pointer m_MeasurementPointSet2D; ///< PointSet holding the 2D ToF image point selection used for measuring
     mitk::DataNode::Pointer m_MeasurementPointSet3DNode; ///< DataNode holding the 3D ToF coordinates used for measuring

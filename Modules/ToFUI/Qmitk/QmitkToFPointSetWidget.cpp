@@ -27,6 +27,10 @@ const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpoin
 
 QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 , m_CameraIntrinsics(NULL)
+, m_VtkTextActor(NULL)
+, m_ForegroundRenderer1(NULL)
+, m_ForegroundRenderer2(NULL)
+, m_ForegroundRenderer3(NULL)
 , m_MeasurementPointSet2D(NULL)
 , m_MeasurementPointSet3DNode(NULL)
 , m_PointSet2D(NULL)
@@ -50,9 +54,20 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
   {
     m_PointSet2D->RemoveObserver(m_PointSetChangedObserverTag);
   }
-  if (m_ForegroundRenderer&&m_MultiWidget)
+  if (m_MultiWidget)
   {
-    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer);
+    if (m_ForegroundRenderer1)
+    {
+      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer1);
+    }
+    if (m_ForegroundRenderer2)
+    {
+      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer2);
+    }
+    if (m_ForegroundRenderer3)
+    {
+      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer3);
+    }
   }
 }
 
@@ -95,9 +110,15 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     this->m_VtkTextActor->GetTextProperty()->SetFontSize(20);
 //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
     this->m_VtkTextActor->GetTextProperty()->BoldOn();
-    this->m_ForegroundRenderer = vtkRenderer::New();
-    this->m_ForegroundRenderer->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer,true);
+    this->m_ForegroundRenderer1 = vtkRenderer::New();
+    this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
+    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer1,true);
+    this->m_ForegroundRenderer2 = vtkRenderer::New();
+    this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
+    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer2,true);
+    this->m_ForegroundRenderer3 = vtkRenderer::New();
+    this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
+    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer3,true);
     // initialize 2D measurement point set
     m_MeasurementPointSet2D = mitk::PointSet::New();
     mitk::DataNode::Pointer measurementNode2D = mitk::DataNode::New();
@@ -204,6 +225,10 @@ void QmitkToFPointSetWidget::OnPointSet()
 
 void QmitkToFPointSetWidget::MeasurementPointSetChanged()
 {
+  // replace text actor
+  int windowHeight = m_MultiWidget->mitkWidget1->GetRenderer()->GetSizeY();
+  this->m_VtkTextActor->SetDisplayPosition(10,windowHeight-30);
+  // check if points are inside the image range
   int imageSizeX = m_DistanceImage->GetDimensions()[0];
   int imageSizeY = m_DistanceImage->GetDimensions()[1];
   mitk::Point3D point1 = m_MeasurementPointSet2D->GetPoint(0);
@@ -240,6 +265,12 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
     {
       this->m_VtkTextActor->SetInput("Measurement outside image range.");
     }
+  }
+  else
+  {
+    // initialize 3D pointset empty
+    mitk::PointSet::Pointer pointSet3D = mitk::PointSet::New();
+    m_MeasurementPointSet3DNode->SetData(pointSet3D);
   }
 }
 
@@ -283,5 +314,11 @@ void QmitkToFPointSetWidget::PointSetChanged()
       m_VtkTextActor->SetVisibility(1);
       this->m_VtkTextActor->SetInput("Point set outside image range.");
     }
+  }
+  else
+  {
+    // initialize 3D pointset empty
+    mitk::PointSet::Pointer pointSet3D = mitk::PointSet::New();
+    m_PointSet3DNode->SetData(pointSet3D);
   }
 }

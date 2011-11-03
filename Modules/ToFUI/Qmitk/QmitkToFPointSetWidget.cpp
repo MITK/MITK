@@ -104,12 +104,13 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     m_Controls->measureButton->setEnabled(true);
     // initialize overlays
     this->m_VtkTextActor = vtkTextActor::New();
-    this->m_VtkTextActor->SetInput("");
+    this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
     int windowHeight = m_MultiWidget->mitkWidget1->GetRenderer()->GetSizeY();
     this->m_VtkTextActor->SetDisplayPosition(10,windowHeight-30);
-    this->m_VtkTextActor->GetTextProperty()->SetFontSize(20);
+    this->m_VtkTextActor->GetTextProperty()->SetFontSize(16);
 //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
     this->m_VtkTextActor->GetTextProperty()->BoldOn();
+    this->m_VtkTextActor->SetVisibility(0);
     this->m_ForegroundRenderer1 = vtkRenderer::New();
     this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
     mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer1,true);
@@ -184,6 +185,7 @@ void QmitkToFPointSetWidget::OnMeasurement()
     }
     // show overlays
     m_VtkTextActor->SetVisibility(1);
+    this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
     // enable interactor
     mitk::GlobalInteraction::GetInstance()->AddInteractor(m_MeasurementPointSetInteractor);
     // initial update of measurement
@@ -209,8 +211,9 @@ void QmitkToFPointSetWidget::OnPointSet()
       // remove interactor
       mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_MeasurementPointSetInteractor);
     }
-    // hide overlays
-    m_VtkTextActor->SetVisibility(0);
+    // show overlays
+    m_VtkTextActor->SetVisibility(1);
+    this->m_VtkTextActor->SetInput("Choose points with SHIFT+Click");
     // enable interactor
     mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
     // initial update of PointSet
@@ -218,6 +221,8 @@ void QmitkToFPointSetWidget::OnPointSet()
   }
   else
   {
+    // hide overlays
+    m_VtkTextActor->SetVisibility(0);
     // disable interactor
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
   }
@@ -260,6 +265,10 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
         stream<<distance<<" mm";
         this->m_VtkTextActor->SetInput(stream.str().c_str());
       }
+      else
+      {
+        this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
+      }
     }
     else
     {
@@ -295,8 +304,6 @@ void QmitkToFPointSetWidget::PointSetChanged()
   {
     if (pointSetValid)
     {
-      // hide overlay
-      m_VtkTextActor->SetVisibility(0);
       // create PointSet filter
       mitk::ToFDistanceImageToPointSetFilter::Pointer toFDistanceImageToPointSetFilter = mitk::ToFDistanceImageToPointSetFilter::New();
       if (m_CameraIntrinsics.IsNotNull())
@@ -311,7 +318,6 @@ void QmitkToFPointSetWidget::PointSetChanged()
     }
     else
     {
-      m_VtkTextActor->SetVisibility(1);
       this->m_VtkTextActor->SetInput("Point set outside image range.");
     }
   }

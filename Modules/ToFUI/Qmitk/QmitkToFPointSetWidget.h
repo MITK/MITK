@@ -111,6 +111,9 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     vtkSmartPointer<vtkRenderer> m_ForegroundRenderer1; ///< renderer responsible for text rendering in the foreground of widget 1
     vtkSmartPointer<vtkRenderer> m_ForegroundRenderer2; ///< renderer responsible for text rendering in the foreground of widget 2
     vtkSmartPointer<vtkRenderer> m_ForegroundRenderer3; ///< renderer responsible for text rendering in the foreground of widget 3
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow1; ///< vtk render window used for showing overlay in widget 1
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow2; ///< vtk render window used for showing overlay in widget 2
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow3; ///< vtk render window used for showing overlay in widget 3
 
     mitk::PointSet::Pointer m_MeasurementPointSet2D; ///< PointSet holding the 2D ToF image point selection used for measuring
     mitk::DataNode::Pointer m_MeasurementPointSet3DNode; ///< DataNode holding the 3D ToF coordinates used for measuring

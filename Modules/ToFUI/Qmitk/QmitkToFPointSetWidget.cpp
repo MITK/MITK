@@ -56,18 +56,31 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
   }
   if (m_MultiWidget)
   {
-    if (m_ForegroundRenderer1)
+    if (m_ForegroundRenderer1&&m_RenderWindow1)
     {
-      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer1);
+      if (mitk::VtkLayerController::GetInstance(m_RenderWindow1))
+      {
+        mitk::VtkLayerController::GetInstance(m_RenderWindow1)->RemoveRenderer(m_ForegroundRenderer1);
+      }
     }
-    if (m_ForegroundRenderer2)
+    if (m_ForegroundRenderer2&&m_RenderWindow2)
     {
-      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer2);
+      if (mitk::VtkLayerController::GetInstance(m_RenderWindow2))
+      {
+        mitk::VtkLayerController::GetInstance(m_RenderWindow2)->RemoveRenderer(m_ForegroundRenderer2);
+      }
     }
-    if (m_ForegroundRenderer3)
+    if (m_ForegroundRenderer3&&m_RenderWindow3)
     {
-      mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RemoveRenderer(m_ForegroundRenderer3);
+      if (mitk::VtkLayerController::GetInstance(m_RenderWindow3))
+      {
+        mitk::VtkLayerController::GetInstance(m_RenderWindow3)->RemoveRenderer(m_ForegroundRenderer3);
+      }
     }
+  }
+  if (mitk::RenderingManager::GetInstance())
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -113,13 +126,16 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     this->m_VtkTextActor->SetVisibility(0);
     this->m_ForegroundRenderer1 = vtkRenderer::New();
     this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
+    m_RenderWindow1 = m_MultiWidget->mitkWidget1->GetRenderWindow();
     mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer1,true);
     this->m_ForegroundRenderer2 = vtkRenderer::New();
     this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer2,true);
+    m_RenderWindow2 = m_MultiWidget->mitkWidget2->GetRenderWindow();
+    mitk::VtkLayerController::GetInstance(m_RenderWindow2)->InsertForegroundRenderer(m_ForegroundRenderer2,true);
     this->m_ForegroundRenderer3 = vtkRenderer::New();
     this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer3,true);
+    m_RenderWindow3 = m_MultiWidget->mitkWidget3->GetRenderWindow();
+    mitk::VtkLayerController::GetInstance(m_RenderWindow3)->InsertForegroundRenderer(m_ForegroundRenderer3,true);
     // initialize 2D measurement point set
     m_MeasurementPointSet2D = mitk::PointSet::New();
     mitk::DataNode::Pointer measurementNode2D = mitk::DataNode::New();

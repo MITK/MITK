@@ -334,7 +334,7 @@ void QmitkToFPointSetWidget::PointSetChanged()
       toFDistanceImageToPointSetFilter->Update();
       mitk::PointSet::Pointer pointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
       m_PointSet3DNode->SetData(pointSet3D);
-    }
+      this->m_VtkTextActor->SetInput("Choose points with SHIFT+Click");    }
     else
     {
       this->m_VtkTextActor->SetInput("Point set outside image range.");

@@ -247,24 +247,37 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   ProgressBar::GetInstance()->AddStepsToDo(size);
   ProgressBar::GetInstance()->Progress();
 
-  unsigned int i = 0u;
+  unsigned int outputIndex = 0u;
   const DicomSeriesReader::UidFileNamesMap::const_iterator n_end = names_map.end();
 
   for (DicomSeriesReader::UidFileNamesMap::const_iterator n_it = names_map.begin(); n_it != n_end; ++n_it)
   {
     const std::string &uid = n_it->first;
-    DataNode::Pointer node = this->GetOutput(i);
+    DataNode::Pointer node = this->GetOutput(outputIndex);
 
-    MITK_INFO << "Reading series " << i << ": " << uid << std::endl;
+    MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
 
     if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
     {
-      ++i;
-      node->SetName(uid);
+      std::string nodeName(uid);
+      std::string studyDescription;
+      if ( node->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )
+      {
+        nodeName = studyDescription;
+        std::string seriesDescription;
+        if ( node->GetStringProperty( "dicom.series.SeriesDescription", seriesDescription ) )
+        {
+          nodeName += "/" + seriesDescription;
+        }
+      }
+
+      node->SetName(nodeName);
+
+      ++outputIndex;
     }
     else
     {
-      MITK_ERROR << "Skipping series " << i << " due to exception" << std::endl;
+      MITK_ERROR << "Skipping series " << outputIndex << " due to exception" << std::endl;
     }
 
     ProgressBar::GetInstance()->Progress();

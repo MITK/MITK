@@ -886,6 +886,17 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
+  std::string modality;
+  if ( node->GetStringProperty( "dicom.series.Modality", modality ) )
+  {
+    // modality provided by DICOM or other reader
+    if ( modality == "PT") // NOT a typo, PT is the abbreviation for PET used in DICOM
+    {
+      node->SetProperty( "use color", mitk::BoolProperty::New( false ), renderer );
+      node->SetProperty( "opacity", mitk::FloatProperty::New( 0.5 ), renderer );
+    }
+  }
+
   bool isBinaryImage(false);
   if ( ! node->GetBoolProperty("binary", isBinaryImage) )
   {
@@ -947,11 +958,35 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {
-      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image, true, true );
-      levWinProp->SetLevelWindow( levelwindow );
-      node->SetProperty( "levelwindow", levWinProp, renderer );
+      /* initialize level/window from DICOM tags */
+      std::string sLevel;
+      std::string sWindow;
+      if (   node->GetStringProperty( "dicom.voilut.WindowCenter", sLevel )
+          && node->GetStringProperty( "dicom.voilut.WindowWidth", sWindow ) )
+      {
+        float level = atof( sLevel.c_str() );
+        float window = atof( sWindow.c_str() );
+
+        mitk::LevelWindow contrast;
+        std::string sSmallestPixelValueInSeries;
+        std::string sLargestPixelValueInSeries;
+
+        if (    node->GetStringProperty( "dicom.series.SmallestPixelValueInSeries", sSmallestPixelValueInSeries )
+            && node->GetStringProperty( "dicom.series.LargestPixelValueInSeries", sLargestPixelValueInSeries ) )
+        {
+          float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
+          float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );
+          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer? 
+                                                                                               // might remedy some l/w widget challenges
+        }
+        else
+        {
+          contrast.SetAuto( static_cast<mitk::Image*>(node->GetData()), false, true ); // we need this as a fallback
+        }
+
+        contrast.SetLevelWindow( level, window);
+        node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
+      }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
       && (image->GetPixelType().GetItkTypeId() && *(image->GetPixelType().GetItkTypeId()) == typeid(itk::RGBAPixel<unsigned char>)))

@@ -108,6 +108,12 @@ class QmitkToFUtilView : public QmitkFunctionality
 
   protected:
 
+    /*!
+    \brief initialize the visibility settings of ToF data (images + surface)
+    \param useToF true: distance image: widget1, amplitude image: widget 2, intensity image: widget 3; false: standard
+    */
+    void UseToFVisibilitySettings(bool useToF);
+
     Ui::QmitkToFUtilViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;

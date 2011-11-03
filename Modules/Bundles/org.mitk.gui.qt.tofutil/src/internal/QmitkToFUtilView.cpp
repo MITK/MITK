@@ -110,6 +110,8 @@ void QmitkToFUtilView::Activated()
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOn();
 
+  this->UseToFVisibilitySettings(true);
+
   m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
 
   if (this->m_ToFImageGrabber.IsNull())
@@ -128,6 +130,8 @@ void QmitkToFUtilView::Deactivated()
   m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SliceLockedOff();
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOff();
+
+  this->UseToFVisibilitySettings(false);
 
   mitk::RenderingManager::GetInstance()->InitializeViews();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -228,24 +232,10 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_ToFCompositeFilter->Update();
     this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
     this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-
     this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    this->m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    this->m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-
     this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-    this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    this->m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    this->m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
 
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
@@ -253,8 +243,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
     this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
 
-    mitk::RenderingManager::GetInstance()->InitializeViews(
-      this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    this->UseToFVisibilitySettings(true);
 
     this->m_Frametimer->start(0);
 
@@ -490,4 +479,36 @@ mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName,
     node->SetData(data);
   }
   return node;
+}
+
+void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
+{
+  // set node properties
+  if (m_DistanceImageNode.IsNotNull())
+  {
+    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+  }
+  if (m_AmplitudeImageNode.IsNotNull())
+  {
+    this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+  }
+  if (m_IntensityImageNode.IsNotNull())
+  {
+    this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+  }
+  // initialize images
+  if (m_MitkDistanceImage.IsNotNull())
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+          this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+  }
 }

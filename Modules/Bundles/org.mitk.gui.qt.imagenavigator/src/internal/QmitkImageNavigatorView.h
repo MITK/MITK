@@ -35,9 +35,13 @@ PURPOSE.  See the above copyright notices for more information.
 /*!
  * \ingroup org_mitk_gui_qt_imagenavigator_internal
  *
- * \brief QmitkImageNavigatorView
+ * \class QmitkImageNavigatorView
  *
- * Document your class here.
+ * \brief Provides a means to scan quickly through a dataset via Transversal,
+ * Coronal and Sagittal sliders, displaying millimetre location and stepper position.
+ *
+ * For images, the stepper position corresponds to a voxel index. For other datasets
+ * such as a surface, it corresponds to a sub-division of the bounding box.
  *
  * \sa QmitkFunctionality
  */
@@ -71,9 +75,7 @@ class QmitkImageNavigatorView : public berry::QtViewPart, public berry::ISizePro
 
 protected slots:
 
-  void OnShowWorldCoordinatesToggled(bool);
-  void OnMillimetreCoordinateChanged();
-  void OnIndexCoordinateChanged();
+  void OnMillimetreCoordinateValueChanged();
   void OnRefetch();
 
 protected:

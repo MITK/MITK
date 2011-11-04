@@ -5,15 +5,15 @@ The "Partial Volume Analysis" view can be found in the "Quantification" perspect
 
 \image html pvanalysisview.png The Partial Volume Analysis View
 
-\section QmitkDiffusionImagingUserManualInputData Export
+\section QmitkPVAAnalysisUserManualExport  Export
 
 All measures are automatically written to the clipboard once the estimation is updated. The histogram export is provided by the button underneath the histogram. The values can be pasted to excel or any text editor. 
 
-\section QmitkDiffusionImagingUserManualInputData Advanced Settings
+\section QmitkPVAAnalysisUserManualAdvancedSettings  Advanced Settings
 
 Are not recommended for use yet.
 
-\section QmitkDiffusionImagingUserManualInputData Suggested Readings
+\section QmitkPVAAnalysisUserManualSuggestedReadings  Suggested Readings
 
 Diffusion tensor imaging in primary brain tumors: reproducible quantitative analysis of corpus callosum infiltration and contralateral involvement using a probabilistic mixture model.
 Stieltjes B, Schlüter M, Didinger B, Weber MA, Hahn HK, Parzer P, Rexilius J, Konrad-Verse O, Peitgen HO, Essig M.

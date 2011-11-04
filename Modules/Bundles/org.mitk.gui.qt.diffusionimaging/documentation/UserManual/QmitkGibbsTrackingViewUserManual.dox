@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_gibbstracking} Gibbs Tracking View
+\page org_gibbstracking Gibbs Tracking View
 
 This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
 

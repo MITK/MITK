@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_odfdetails} ODF Details View
+\page org_odfdetails ODF Details View
 
 This view provides detailed information about the orentation distribution function at the current crosshair position (if a Q-Ball image is selected). A visualization of the ODF as well as the ODF values and according statistical information are displayed.
 

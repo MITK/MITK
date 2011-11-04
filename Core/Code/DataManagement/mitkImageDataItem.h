@@ -84,6 +84,25 @@ namespace mitk {
       return *m_PixelType;
     }
 
+    int GetDimension() const
+    {
+      return m_Dimension;
+    }
+
+    int GetDimension(int i) const
+    {
+      int returnValue = 0;
+
+      if (i<m_Dimension)
+        returnValue = m_Dimensions[i];
+      else
+      {
+
+      }
+
+
+    }
+
     ImageDataItem::ConstPointer GetParent() const
     {
       return m_Parent;

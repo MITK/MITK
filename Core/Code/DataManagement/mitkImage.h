@@ -459,55 +459,57 @@ public:
 
   //##Documentation
   //## \brief Get the minimum for scalar images
-  DEPRECATED (ScalarType GetScalarValueMin(int t=0));
+  DEPRECATED (ScalarType GetScalarValueMin(int t=0) const);
+
+  //ScalarType GetScalarValueMin(int t=0) const;
 
   //##Documentation
   //## \brief Get the maximum for scalar images
-  DEPRECATED (ScalarType GetScalarValueMax(int t=0));
+  DEPRECATED (ScalarType GetScalarValueMax(int t=0) const);
 
   //##Documentation
   //## \brief Get the second smallest value for scalar images
-  DEPRECATED (ScalarType GetScalarValue2ndMin(int t=0));
+  DEPRECATED (ScalarType GetScalarValue2ndMin(int t=0) const);
 
 
   //##Documentation
   //## \brief Get the smallest value for scalar images, but do not recompute it first
-  DEPRECATED (mitk::ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const);
+  DEPRECATED (ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const);
 
   //##Documentation
   //## \brief Get the second smallest value for scalar images, but do not recompute it first
-  DEPRECATED (mitk::ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const);
+  DEPRECATED (ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const);
 
   //##Documentation
   //## \brief Get the second largest value for scalar images
-  DEPRECATED (ScalarType GetScalarValue2ndMax(int t=0));
+  DEPRECATED (ScalarType GetScalarValue2ndMax(int t=0) const);
 
   //##Documentation
   //## \brief Get the largest value for scalar images, but do not recompute it first
-  DEPRECATED (mitk::ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ));
+  DEPRECATED (ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ) const );
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  DEPRECATED (mitk::ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ));
+  DEPRECATED (ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ) const);
 
   //##Documentation
   //## \brief Get the count of voxels with the smallest scalar value in the dataset
-  DEPRECATED (mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0));
+  DEPRECATED (ScalarType GetCountOfMinValuedVoxels(int t = 0) const);
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  DEPRECATED (mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0));
+  DEPRECATED (ScalarType GetCountOfMaxValuedVoxels(int t = 0) const);
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  DEPRECATED (unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ));
+  DEPRECATED (unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
 
   //##Documentation
   //## \brief Get the count of voxels with the smallest scalar value in the dataset
   DEPRECATED (unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
 
 
-  StatisticsHolderPointer GetStatistics() const
+  const StatisticsHolderPointer GetStatistics() const
   {
     return m_ImageStatistics;
   }

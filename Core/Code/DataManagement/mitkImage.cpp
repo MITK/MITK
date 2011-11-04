@@ -148,7 +148,7 @@ double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned
   const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
 
   if ( (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
-       && (unsigned int)position[0] < imageDims[0] && (unsigned int)position[1] < imageDims[1] && (unsigned int)position[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
+       && (unsigned int)position[0] < imageDims[0] && (unsigned int)position[1] < imageDims[1] && (unsigned int)position[2] < imageDims[2] /*&& (unsigned int)timestep < imageDims[3]*/ )
   {
     const unsigned int offset = position[0] + position[1]*imageDims[0] + position[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
 
@@ -175,7 +175,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
 
   if ( (itkIndex[0]>=0 && itkIndex[1] >=0 && itkIndex[2]>=0 && timestep>=0)
-       && (unsigned int)itkIndex[0] < imageDims[0] && (unsigned int)itkIndex[1] < imageDims[1] && (unsigned int)itkIndex[2] < imageDims[2] && (unsigned int)timestep < imageDims[3] )
+       && (unsigned int)itkIndex[0] < imageDims[0] && (unsigned int)itkIndex[1] < imageDims[1] && (unsigned int)itkIndex[2] < imageDims[2] /*&& (unsigned int)timestep < imageDims[3]*/ )
   {
     const unsigned int offset = itkIndex[0] + itkIndex[1]*imageDims[0] + itkIndex[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
 
@@ -1189,21 +1189,21 @@ bool mitk::Image::IsRotated() const
 #include "mitkImageStatisticsHolder.h"
 
 //##Documentation
-mitk::ScalarType mitk::Image::GetScalarValueMin(int t)
+mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
 {
   return m_ImageStatistics->GetScalarValueMin(t);
 }
 
 //##Documentation
 //## \brief Get the maximum for scalar images
-mitk::ScalarType mitk::Image::GetScalarValueMax(int t)
+mitk::ScalarType mitk::Image::GetScalarValueMax(int t) const
 {
   return m_ImageStatistics->GetScalarValueMin(t);
 }
 
 //##Documentation
 //## \brief Get the second smallest value for scalar images
-mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t)
+mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t) const
 {
   return m_ImageStatistics->GetScalarValueMin(t);
 }
@@ -1218,32 +1218,32 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute( unsigned int t ) 
   return m_ImageStatistics->GetScalarValue2ndMinNoRecompute(t);
 }
 
-mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t)
+mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
 {
   return m_ImageStatistics->GetScalarValueMin(t);
 }
 
-mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute( unsigned int t)
+mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute( unsigned int t) const
 {
   return m_ImageStatistics->GetScalarValueMaxNoRecompute(t);
 }
 
-mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute( unsigned int t )
+mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute( unsigned int t ) const
 {
   return m_ImageStatistics->GetScalarValue2ndMaxNoRecompute(t);
 }
 
-mitk::ScalarType mitk::Image::GetCountOfMinValuedVoxels(int t )
+mitk::ScalarType mitk::Image::GetCountOfMinValuedVoxels(int t ) const
 {
   return m_ImageStatistics->GetCountOfMinValuedVoxels(t);
 }
 
-mitk::ScalarType mitk::Image::GetCountOfMaxValuedVoxels(int t)
+mitk::ScalarType mitk::Image::GetCountOfMaxValuedVoxels(int t) const
 {
   return m_ImageStatistics->GetCountOfMaxValuedVoxels(t);
 }
 
-unsigned int mitk::Image::GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t  )
+unsigned int mitk::Image::GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t  ) const
 {
   return m_ImageStatistics->GetCountOfMaxValuedVoxelsNoRecompute(t);
 }

@@ -57,6 +57,8 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 ,m_RegistrationImageFiducialsName("Image Fiducials")
 ,m_PointSetRecordingDataNodeName("Recorded Points")
 ,m_PointSetRecording(false)
+,m_ImageFiducialsDataNode(NULL)
+,m_TrackerFiducialsDataNode(NULL)
 {
 
   //[-1;0;0] for WOLF_6D bronchoscope       
@@ -154,6 +156,14 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     QMessageBox::warning(NULL, "Adding Fiducials not possible", message.c_str());
     return;
   }
+  
+  if (m_FiducialRegistrationFilter->GetNumberOfOutputs() < 1 || m_FiducialRegistrationFilter->GetNumberOfInputs() < 1)
+  {
+    std::string message("There are no tracking instruments! Please add an instrument first!");
+    QMessageBox::warning(NULL, "Adding Fiducials not possible", message.c_str());
+    return;
+  }
+
   if (m_FiducialRegistrationFilter->GetInput()->IsDataValid() == false)
   {
     std::string message("instrument can currently not be tracked. Please make sure that the instrument is visible to the tracker");
@@ -161,24 +171,31 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_FiducialRegistrationFilter->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
   
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
 
-  mitk::PointSet::Pointer trackerFiducialsPS = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName);
-
   // in case the tracker fiducials datanode has been renamed or removed
-  if(trackerFiducialsPS.IsNull())
-  {
-    mitk::DataNode::Pointer trackerFiducialsDN = mitk::DataNode::New();
-    trackerFiducialsDN->SetName(m_RegistrationTrackingFiducialsName);
-    trackerFiducialsPS = mitk::PointSet::New();
-    trackerFiducialsDN->SetData(trackerFiducialsPS);
-    m_RegistrationWidget->SetTrackerFiducialsNode(trackerFiducialsDN);
-  }
+  //if(trackerFiducialsPS.IsNull())
+  //{
+  //  mitk::DataNode::Pointer trackerFiducialsDN = mitk::DataNode::New();
+  //  trackerFiducialsDN->SetName(m_RegistrationTrackingFiducialsName);
+  //  trackerFiducialsPS = mitk::PointSet::New();
+  //  trackerFiducialsDN->SetData(trackerFiducialsPS);
+  //  m_RegistrationWidget->SetTrackerFiducialsNode(trackerFiducialsDN);
+  //}
 
-  trackerFiducialsPS->InsertPoint(trackerFiducialsPS->GetSize(), nd->GetPosition());
+  
+
+  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
+  {
+    mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+    ps->InsertPoint(ps->GetSize(), nd->GetPosition());
+  }
+  else
+    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
+   
 
 }
 
@@ -286,8 +303,12 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
   /* retrieve fiducials from data storage */
   mitk::DataStorage* ds = this->GetDefaultDataStorage();
 
-  mitk::PointSet::Pointer imageFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationImageFiducialsName.c_str());
-  mitk::PointSet::Pointer trackerFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName.c_str());
+
+  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
+  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+ 
+  //mitk::PointSet::Pointer imageFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationImageFiducialsName.c_str());
+  //mitk::PointSet::Pointer trackerFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName.c_str());
   if (imageFiducials.IsNull() || trackerFiducials.IsNull())
   {
     QMessageBox::warning(NULL, "Registration not possible", "Fiducial data objects not found. \n"
@@ -312,8 +333,8 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
   else
     m_FiducialRegistrationFilter->UseICPInitializationOff();
 
-  m_FiducialRegistrationFilter->SetSourceLandmarks(trackerFiducials);
-  m_FiducialRegistrationFilter->SetTargetLandmarks(imageFiducials);
+    m_FiducialRegistrationFilter->SetSourceLandmarks(trackerFiducials);
+    m_FiducialRegistrationFilter->SetTargetLandmarks(imageFiducials);
 
 
   if (m_FiducialRegistrationFilter.IsNotNull() && m_FiducialRegistrationFilter->IsInitialized()) // update registration quality display
@@ -331,7 +352,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
       m_RegistrationWidget->SetQualityDisplayText(registrationQuality);
     }
 
-  trackerFiducials->Clear();
+  //trackerFiducials->Clear();
   //this->GlobalReinit();
 }
 
@@ -547,13 +568,15 @@ void QmitkIGTTrackingLabView::RenderScene( )
       {
         int size = m_PSRecordingPointSet->GetSize();
         mitk::NavigationData::Pointer nd= m_Visualizer->GetOutput(m_PSRecToolSelectionComboBox->currentIndex());
-        m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
-
-        if(size >= 200)
+        
+        if(size > 0)
         {
-          this->OnPointSetRecording(false);
-          m_PointSetRecordPushButton->setChecked(false);
+          mitk::Point3D p = m_PSRecordingPointSet->GetPoint(size-1);
+          if(p.EuclideanDistanceTo(nd->GetPosition()) > (double) m_PSRecordingSpinBox->value())
+            m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
         }
+        else
+          m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
       }
     }
     catch(std::exception& e) 
@@ -664,37 +687,43 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   if( ds == NULL )
     return;
 
-
-  mitk::DataNode::Pointer targetFiducials = ds->GetNamedNode(m_RegistrationImageFiducialsName);
-
-  if(targetFiducials.IsNull()) // create a point set for the target fiducials
-  {
-    mitk::Color color;  
-    color.Set(1.0f, 0.0f, 0.0f);
-    targetFiducials = this->CreateRegistrationFiducialsNode(m_RegistrationImageFiducialsName, color);
-    targetFiducials = mitk::DataNode::New();
-    mitk::PointSet::Pointer ps = mitk::PointSet::New();
-    targetFiducials->SetData(ps);
-    targetFiducials->SetName(m_RegistrationImageFiducialsName);
-
-    ds->Add(targetFiducials);
-  }
-
+    
   m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget()); // passing multiwidget to pointsetwidget
-  m_RegistrationWidget->SetImageFiducialsNode(targetFiducials); // passing pointsetnode to the pointsetwidget
 
-
-  mitk::DataNode::Pointer sourceFiducials = ds->GetNamedNode( m_RegistrationTrackingFiducialsName );
-
-  if(sourceFiducials.IsNull())
+  if(m_ImageFiducialsDataNode.IsNull())
   {
-    mitk::Color color;  
-    color.Set(0.0f, 0.0f, 1.0f);
-    sourceFiducials = this->CreateRegistrationFiducialsNode( m_RegistrationTrackingFiducialsName, color );
-    ds->Add(sourceFiducials);
+    m_ImageFiducialsDataNode = mitk::DataNode::New();
+    mitk::PointSet::Pointer ifPS = mitk::PointSet::New();
+   
+    m_ImageFiducialsDataNode->SetData(ifPS);
+    
+    mitk::Color color;
+    color.Set(1.0f, 0.0f, 0.0f);
+    m_ImageFiducialsDataNode->SetName(m_RegistrationImageFiducialsName);
+    m_ImageFiducialsDataNode->SetColor(color);
+    m_ImageFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
+   
+    ds->Add(m_ImageFiducialsDataNode);
   }
 
-    m_RegistrationWidget->SetTrackerFiducialsNode(sourceFiducials);
+  m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
+
+  if(m_TrackerFiducialsDataNode.IsNull())
+  {
+    m_TrackerFiducialsDataNode = mitk::DataNode::New();
+    mitk::PointSet::Pointer tfPS = mitk::PointSet::New();
+    m_TrackerFiducialsDataNode->SetData(tfPS);
+    
+    mitk::Color color;
+    color.Set(0.0f, 1.0f, 0.0f);
+    m_TrackerFiducialsDataNode->SetName(m_RegistrationTrackingFiducialsName);
+    m_TrackerFiducialsDataNode->SetColor(color);
+    m_TrackerFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
+   
+    ds->Add(m_TrackerFiducialsDataNode);
+  }
+  
+  m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
 
@@ -771,7 +800,9 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
 {
   QWidget* pointSetRecordingWidget = new QWidget(parent);
   m_PSRecToolSelectionComboBox = new QComboBox(pointSetRecordingWidget);
-  
+  m_PSRecordingSpinBox = new QSpinBox(pointSetRecordingWidget);
+  QLabel* psRecordingEpsilonDistance = new QLabel("mm (point distance)", pointSetRecordingWidget);
+   
   // the recording button
   m_PointSetRecordPushButton = new QPushButton("Start PointSet Recording", pointSetRecordingWidget);
   m_PointSetRecordPushButton->setDisabled(true);
@@ -779,6 +810,10 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
   m_PointSetRecordPushButton->setCheckable(true);
   connect( m_PointSetRecordPushButton, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
   
+  // distances spin
+  m_PSRecordingSpinBox->setValue(1);
+  m_PSRecordingSpinBox->setMinimum(1);
+  m_PSRecordingSpinBox->setMaximum(20);
   
   QLabel* toolSelectLabel = new QLabel("Select tool for recording:", pointSetRecordingWidget);
   QGridLayout* layout = new QGridLayout(pointSetRecordingWidget);
@@ -787,8 +822,18 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
   int col = 0;
 
   layout->addWidget(toolSelectLabel,row,col++,1,1,Qt::AlignRight);
-  layout->addWidget(m_PSRecToolSelectionComboBox,row,col++,1,1,Qt::AlignLeft);
+  layout->addWidget(m_PSRecToolSelectionComboBox,row,col++,1,3,Qt::AlignLeft);
+  col +=2;
+  layout->addWidget(m_PSRecordingSpinBox,row,col++,1,1,Qt::AlignRight);
+  layout->addWidget(psRecordingEpsilonDistance, row, col++,1,1,Qt::AlignLeft);
+  
+  row++;
+  col=4;
+
   layout->addWidget(m_PointSetRecordPushButton,row,col++,1,2,Qt::AlignRight);
+
+  
+  
 
   return pointSetRecordingWidget;
 }

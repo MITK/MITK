@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QComboBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QSpinBox>
 
 class QmitkNDIConfigurationWidget;
 class QmitkFiducialRegistrationWidget;
@@ -109,7 +110,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnStopNavigation();
     /**
-    \brief This method performs the visualisation of all action.
+    \brief This method performs the visualisation of all NavigationDatas and performs the PointSet recording if activated.
     */
     void RenderScene();
     /**
@@ -221,6 +222,7 @@ private:
 
   QToolBox* m_ToolBox;
   QComboBox* m_PSRecToolSelectionComboBox;
+  QSpinBox* m_PSRecordingSpinBox;
   QComboBox* m_VirtualViewToolSelectionComboBox;
   QPushButton* m_PointSetRecordPushButton;
   QCheckBox* m_VirtualViewCheckBox;
@@ -237,6 +239,9 @@ private:
   
   std::string m_PointSetRecordingDataNodeName;
   bool m_PointSetRecording;
+
+  mitk::DataNode::Pointer m_ImageFiducialsDataNode;
+  mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

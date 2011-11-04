@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{screenshot_maker} The Screenshot Maker
+\page screenshot_maker The Screenshot Maker
 
 This module provides the functionality to create and save screenshots of the data.
 

@@ -13,6 +13,7 @@ Available sections:
   - \ref QmitkDiffusionImagingUserManualVisualizationSettings
   - \ref QmitkDiffusionImagingUserManualReferences
   - \ref QmitkDiffusionImagingUserManualTechnicalDetail
+  - \ref QmitkDiffusionImagingUserManualSubManuals
 
 \image html overview.png The MITK Diffusion Imaging Module
 
@@ -106,4 +107,17 @@ This is how a visualization with activated glyphs should look like:
 \section QmitkDiffusionImagingUserManualTechnicalDetail Technical Information for Developers
 
 The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \subpage DiffusionImagingPropertiesPage .
+
+\section QmitkDiffusionImagingUserManualSubManuals Manuals of componentes
+
+The MITK Diffusion tools consist of further components, which have their own documentation, see:
+
+\subpage org_fiberprocessing
+\subpage org_gibbstracking
+\subpage org_odfdetails
+\subpage org_pvanalysis
+\subpage screenshot_maker
+\subpage org_stochastictracking
+\subpage org_ivim
+
 */

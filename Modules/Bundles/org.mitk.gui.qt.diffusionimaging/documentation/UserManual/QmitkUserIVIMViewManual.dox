@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_ivim} Intra-voxel incoherent motion estimation (IVIM)
+\page org_ivim Intra-voxel incoherent motion estimation (IVIM)
 
 The required input for the "Intra-voxel incoherent motion estimation" (IVIM) is a diffusion weighted image (.dwi or .hdwi) that was acquired with several different b-values.
 

@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_stochastictracking} Stochastic Tracking View
+\page org_stochastictracking Stochastic Tracking View
 
 This view provides the user interface for the Stochastic Fibertracking algorithm, proposed by Ngo [1]. 
 

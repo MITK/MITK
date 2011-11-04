@@ -36,7 +36,7 @@ IF(MITK_USE_Boost)
       ENDIF()  
       
       SET(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
-      SET(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q)
+      SET(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
     ELSE()
       SET(_boost_cfg_cmd )
       SET(_boost_build_cmd )
@@ -46,16 +46,18 @@ IF(MITK_USE_Boost)
       URL http://mitk.org/download/thirdparty/boost_1_45_0.tar.bz2
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-src
+      INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"
       INSTALL_COMMAND ""
       DEPENDS ${proj_DEPENDENCIES}
       )
-      
-    SET(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
     
-    SET(BOOST_INCLUDEDIR "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
-    SET(BOOST_LIBRARYDIR "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/stage/lib")
+    IF(MITK_USE_Boost_LIBRARIES)
+      SET(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
+    ELSE()
+      SET(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
+    ENDIF()
 
   ELSE()
 

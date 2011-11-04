@@ -2,9 +2,6 @@
 
 mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mitkIpPicDescriptor* picDesc)
 {
-  // create descriptor
-  // mitkIpPicDescriptor *picDesc = mitkIpPicNew();
-
   const mitk::ImageDescriptor::Pointer imDesc = refImg->GetImageDescriptor();
 
   // initialize dimension information
@@ -21,6 +18,25 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
   picDesc->data = refImg->GetData();
 
   return picDesc;
+}
+
+mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem> refItem, mitkIpPicDescriptor *picDesc)
+{
+  // initialize dimension information
+  for (unsigned int i=0; i<8; i++)
+  {
+      picDesc->n[i] = 1;
+  }
+
+  // get the dimensionality information from image item
+  picDesc->dim = refItem->GetDimension();
+  for( unsigned int i=0; i<picDesc->dim; i++)
+  {
+    picDesc->n[i] = refItem->GetDimension(i);
+  }
+
+  return picDesc;
+
 }
 
 mitk::ImageDescriptor::Pointer mitk::CastToImageDescriptor(mitkIpPicDescriptor *desc)

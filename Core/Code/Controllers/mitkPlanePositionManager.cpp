@@ -40,19 +40,6 @@ unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D*
             isSameMatrix = mitk::MatrixEqualElementWise(m_PositionList.at(i)->GetTransform()->GetMatrix(), plane->GetIndexToWorldTransform()->GetMatrix());
             if(isSameMatrix)
                 return i;
-            //      itk::Matrix<float> diffM = plane->GetIndexToWorldTransform()->GetMatrix()-m_PositionList.at(i)->GetTransform()->GetMatrix();
-            //      bool isSameMatrix(true);
-            //      for (unsigned int j = 0; j < 3; j++)
-            //      {
-            //        if (fabs(diffM[j][0]) > 0.00001 || fabs(diffM[j][1]) > 0.00001 || fabs(diffM[j][2]) > 0.00001)
-            //        {
-            //          isSameMatrix = false;
-            //          break;
-            //        }
-            //      }
-            //      itk::Vector<float> diffV = m_PositionList.at(i)->GetTransform()->GetOffset()-transform->GetOffset();
-            //      if ( isSameMatrix && m_PositionList.at(i)->GetPos() == sliceIndex && (fabs(diffV[0]) < 0.00001 && fabs(diffV[1]) < 0.00001 && fabs(diffV[2]) < 0.00001) )
-            //        return i;
         }
 
     }
@@ -114,31 +101,3 @@ void mitk::PlanePositionManager::RemoveAllPlanePositions()
 {
   m_PositionList.clear();
 }
-
-//void mitk::PlanePositionManager::SetDataStorage( mitk::DataStorage* ds )
-//{
-//  if (ds == NULL)
-//    return;
-
-//  /* remove listeners of old DataStorage */
-//  if (m_DataStorage.IsNotNull())
-//  {
-//    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<PlanePositionManager, const mitk::DataNode*>( this, &PlanePositionManager::DataStorageRemovedNode ));
-//  }
-//  /* register listener for new DataStorage */
-//  m_DataStorage = ds;  // register
-//  m_DataStorage->RemoveNodeEvent.AddListener(MessageDelegate1<PlanePositionManager, const mitk::DataNode*>( this, &PlanePositionManager::DataStorageRemovedNode ));
-//}
-
-//void mitk::PlanePositionManager::DataStorageRemovedNode(const mitk::DataNode* removedNode)
-//{
-//  bool isContourMarker (false);
-//  if (removedNode->GetBoolProperty("isContourMarker", isContourMarker))
-//  {
-//    unsigned int t = removedNode->GetName().find_last_of(" ");
-//    unsigned int id = atof(removedNode->GetName().substr(t+1).c_str());
-//    this->RemovePlanePosition(id-1);
-//  }
-//}
-
-  

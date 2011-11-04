@@ -908,6 +908,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
           m_SliceNavigationController->GetSlice()->SetPos( restorePlaneOp->GetPos() );
           m_SliceNavigationController->AdjustSliceStepperRange();
         }
+        Geometry3D::ExecuteOperation(restorePlaneOp);
       }
     }
     else

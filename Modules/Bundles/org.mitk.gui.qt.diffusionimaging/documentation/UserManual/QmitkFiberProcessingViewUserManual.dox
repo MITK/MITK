@@ -7,7 +7,7 @@ Available sections:
   - \ref QmitkDiffusionImagingUserManualFiberManpulation
   - \ref QmitkDiffusionImagingUserManualFiberProcessing
 
-\image html fiberbundleoperationsview.png The Fiber Processing View
+\image html fiberprocessing.png The Fiber Processing View
 
 \section QmitkDiffusionImagingUserManualFiberManpulation Fiber Bundle Manipulation
 

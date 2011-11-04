@@ -24,8 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <sstream>
 
-mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
-  : m_Doc(new TiXmlDocument)
+mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer() 
+  : mitk::NavigationDataPlayerBase()
+  , m_Doc(new TiXmlDocument)
   , m_DataElem(0)
   , m_CurrentElem(0)
   , m_Repeat(false)
@@ -168,9 +169,16 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
     mitk::NavigationData* output = this->GetOutput(index);
     tmp = this->ReadVersion1();
     if(tmp.IsNotNull())
+      {
       output->Graft(tmp);
+      m_StreamValid = true;
+      }
     else // no valid output
+      {
       output->SetDataValid(false);
+      m_StreamValid = false;
+      m_ErrorMessage = "Error: Cannot parse input file.";
+      }
   }
 }
 

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
+#include <mitkTimeStamp.h>
 #include <itksys/SystemTools.hxx>
 
 mitk::NavigationDataToPointSetFilter::NavigationDataToPointSetFilter()
@@ -135,7 +136,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
 {
   //make it editable through a Set method if needed
-  const unsigned int numberforMean = 100; 
+  const unsigned int numberforMean = 5; 
 
   //check for outputs and inputs
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
@@ -150,16 +151,22 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
   mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize(); 
 
-  for (unsigned int counter = 0; counter < numberforMean; counter++)
+  //for (unsigned int counter = 0; counter < numberforMean; counter++)
+  //{
+  MITK_INFO<<this->GetNumberOfOutputs();
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
   {
-    for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+    counterVec[i] = 0;
+    while (counterVec[i]<numberforMean)
     {
+      //MITK_INFO<<"counterVecBegin: "<<counterVec[i];
       mitk::PointSet* output = this->GetOutput(i);
       const mitk::NavigationData* input = this->GetInput(i);
+      mitk::NavigationData::TimeStampType oldTime = input->GetTimeStamp();
       if (input->IsDataValid() == false)  // don't add point if input is invalid
         continue;//do not store
       mitk::PointSet::PointType pos;
-      if (counter == 0) //first Element must be inserted
+      if (counterVec[i] == 0) //first Element must be inserted
       {
         //no need to call an update
         pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
@@ -170,23 +177,31 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
       {
         //manually call an update to track new positions
         this->ProcessObject::GetInput(i)->Update();
-        pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
+        input = this->GetInput(i);
+        mitk::NavigationData::TimeStampType newTime = input->GetTimeStamp();
+        if (oldTime!=newTime)
+        {
+        MITK_INFO<<"old time: "<<oldTime;
+        MITK_INFO<<"new time: "<<newTime;
+        //MITK_INFO<<"counterVec: "<<counterVec[i];
+          pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
+          MITK_INFO<<pos;
 
-        //calculate the summ of the old position and the current coordinate
-        mitk::Vector3D vec;
-        vec.SetVnlVector(pos.GetVnlVector());
-        mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
-        oPoint += vec;//summ up 
-        output->SetPoint(newPointId, oPoint); 
+          //calculate the summ of the old position and the current coordinate
+          mitk::Vector3D vec;
+          vec.SetVnlVector(pos.GetVnlVector());
+          mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
+          oPoint += vec;//summ up 
+          output->SetPoint(newPointId, oPoint); 
 
-        //store in counterVec to know how many have been added (and not skipped because of invalid data)
-        counterVec[i]++;
+          //store in counterVec to know how many have been added (and not skipped because of invalid data)
+          counterVec[i]++;
+          oldTime = newTime;
+        }
       }
       // \TODO: regard ringbuffersize
     }
-
-    //wait some time to be sure, that we receive new coordinates
-    itksys::SystemTools::Delay(25);
+    //}
   }
 
   //divide with counterVec

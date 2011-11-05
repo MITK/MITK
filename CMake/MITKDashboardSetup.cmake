@@ -51,6 +51,13 @@ if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
 endif()
 
 #
+# Site specific options
+#
+if(NOT CDASH_ADMIN_URL_PREFIX)
+  set(CDASH_ADMIN_URL_PREFIX "http://mbits")
+endif()
+
+#
 # Display build info
 #
 message("Site name: ${CTEST_SITE}")

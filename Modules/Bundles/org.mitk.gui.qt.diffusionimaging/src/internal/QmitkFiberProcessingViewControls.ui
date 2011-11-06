@@ -401,11 +401,41 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Fibers in Selected Bundle:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCommandLinkButton" name="m_GenerateStatsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string comment="Perform selected operation on fiber bundle" extracomment="Perform selected operation on fiber bundle">Perform selected operation on fiber bundle</string>
+        </property>
+        <property name="text">
+         <string>Generate Bundle Statistics</string>
         </property>
        </widget>
       </item>
@@ -415,6 +445,9 @@
          <string>0</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QTextEdit" name="m_StatsTextEdit"/>
       </item>
      </layout>
     </widget>

@@ -181,6 +181,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_GenerateROIImage, SIGNAL(clicked()), this, SLOT(GenerateROIImage()) );
 
     connect( m_Controls->m_GenerationStartButton, SIGNAL(clicked()), this, SLOT(GenerationStart()) );
+    connect( m_Controls->m_GenerateStatsButton, SIGNAL(clicked()), this, SLOT(GenerateStats()) );
   }
 
   m_SelListener = berry::ISelectionListener::Pointer(new FboSelListener(this));
@@ -700,6 +701,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
     m_Controls->m_GenerationStartButton->setEnabled(false);
+    m_Controls->m_GenerateStatsButton->setEnabled(false);
   }
 
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
@@ -756,9 +758,15 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
   }
 
   if (m_SelectedFB.size()>0)
+  {
+    m_Controls->m_GenerateStatsButton->setEnabled(true);
     m_Controls->m_GenerationStartButton->setEnabled(true);
+  }
   else
+  {
     m_Controls->m_GenerationStartButton->setEnabled(false);
+    m_Controls->m_GenerateStatsButton->setEnabled(false);
+  }
 }
 
 
@@ -1571,6 +1579,52 @@ void QmitkFiberProcessingView::SubstractBundles()
   fbNode->SetName(m_SelectedFB.at(0)->GetName()+"-"+m_SelectedFB.at(1)->GetName());
   fbNode->SetVisibility(true);
   GetDataStorage()->Add(fbNode);
+}
+
+void QmitkFiberProcessingView::GenerateStats()
+{
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty()){
+    QMessageBox::information( NULL, "Warning", "No data object selected!");
+    MITK_WARN("QmitkFiberProcessingView") << "no data object selected";
+    return;
+  }
+
+  QString stats("");
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+    if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
+    {
+      stats += "****************\n" + QString(node->GetName().c_str()) + ":\n";
+      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+      stats += "Number of fibers: "+ QString::number(fib->GetNumTracts()) + "\n";
+
+      float length = 0;
+      std::vector<float> lengths;
+      for (int i=0; i<fib->GetNumTracts(); i++)
+      {
+        ContainerTractType::Pointer tract = fib->GetTract(i);
+        if (tract.IsNull())
+          continue;
+        float l=0;
+        for (unsigned int j=0; j<tract->Size(); j++)
+        {
+          ContainerPointType p1, p2;
+          if (tract->GetElementIfIndexExists(j, &p1) && tract->GetElementIfIndexExists(j+1, &p1))
+          {
+            length += std::abs(p1.EuclideanDistanceTo(p2));
+            l+=length;
+          }
+        }
+        lengths.push_back(l);
+      }
+      if (fib->GetNumTracts()>0)
+      length /= fib->GetNumTracts();
+      stats += "Mean fiber length: "+ QString::number(length/10) + "cm\n";
+    }
+  }
+  this->m_Controls->m_StatsTextEdit->setText(stats);
 }
 
 void QmitkFiberProcessingView::GenerationStart()

@@ -70,6 +70,9 @@ public:
   typedef itk::Image< unsigned char, 3 >    MaskImage3DType;
   typedef itk::Image< float, 3 >            FloatImageType;
 
+  typedef itk::Point<float,3>                                     ContainerPointType;
+  typedef itk::VectorContainer<unsigned int, ContainerPointType>  ContainerTractType;
+
   static const std::string VIEW_ID;
 
   QmitkFiberProcessingView();
@@ -95,6 +98,7 @@ public:
   void SubstractBundles();
   void GenerateROIImage();
   void GenerationStart();
+  void GenerateStats();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

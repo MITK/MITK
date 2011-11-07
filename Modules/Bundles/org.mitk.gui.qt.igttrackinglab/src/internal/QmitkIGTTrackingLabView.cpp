@@ -391,7 +391,7 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateConeRepresentation( const
 
   vtkData->SetRadius(7.5);
   vtkData->SetHeight(15.0);
-  vtkData->SetDirection(0.0, 0.0, 1.0);
+  vtkData->SetDirection(m_DirectionOfProjectionVector[0],m_DirectionOfProjectionVector[1],m_DirectionOfProjectionVector[2]);
   vtkData->SetCenter(0.0, 0.0, 0.0);
   vtkData->SetResolution(20);
   vtkData->CappingOn();
@@ -588,7 +588,7 @@ void QmitkIGTTrackingLabView::RenderScene( )
     //  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
     ////update all Widgets
     //else
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 
 
   }
@@ -705,9 +705,9 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
    
     ds->Add(m_ImageFiducialsDataNode);
   }
-
+  m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget());
   m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
-
+  
   if(m_TrackerFiducialsDataNode.IsNull())
   {
     m_TrackerFiducialsDataNode = mitk::DataNode::New();

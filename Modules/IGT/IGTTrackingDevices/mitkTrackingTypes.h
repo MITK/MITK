@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKTRACKINGTYPES_H_HEADER_INCLUDED_
 
 #include <itkPoint.h>
+#include <vector>
 //#include <mitkVector.h>
 
 namespace mitk 
@@ -78,7 +79,8 @@ namespace mitk
     };
 
     /**Documentation
-    * \brief identifier for tracking device
+    * \brief identifier for tracking device. The way it is currently used 
+	* represents a product line rather than an actal type. Refactoring is a future option.
     */
     enum TrackingDeviceType
     {
@@ -92,6 +94,8 @@ namespace mitk
       TrackingSystemInvalid      ///< entry for invalid state (mainly for testing)
     };
 
+	
+
     /**Documentation
     * \brief Error codes of NDI tracking devices
     */
@@ -103,21 +107,54 @@ namespace mitk
       HybridTracking
     };
 
- 
     /**
     * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
     * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
-     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
+    * as defined by NDI API SFLIST (Aurora and Polaris API guide)
+	* This enum is deprecated. In Future, specific Model Enums should be used (eg. AuroraTrackingVolume)
     */
     enum NDITrackingVolume
     {
-      Standard,
+	  Standard,
       Pyramid,
       SpectraPyramid,
       VicraVolume,
       Cube,
       Dome
     };
+
+	/**
+	* /brief This structure defines key variables of a device model and type.
+	* It is specifically used to find out which models belong to which vendor, and what volume
+	* to use for a specific Model. Leaving VolumeModelLocation set to null will instruct the Generator
+	* to generate a field to the best of his ability
+	*/
+	struct TrackingDeviceData {
+      TrackingDeviceType Line;
+	  std::string Model;
+	  std::string VolumeModelLocation;
+    };	
+		
+
+	/**
+	* Here all supported devices are defined. Dont forget to introduce new Devices into the TrackingDeviceList Array at the bottom!
+	*/
+	static TrackingDeviceData AuroraCompact = {NDIAurora, "CompactFG", "File"};
+	static TrackingDeviceData AuroraPlanarCube = {NDIAurora, "PlanarFG_Cube", "File"};
+	static TrackingDeviceData AuroraPlanarDome = {NDIAurora, "PlanarFG_Dome", "File"};
+	static TrackingDeviceData AuroraTabletop = {NDIAurora, "TabletopFG", "File"};
+	static TrackingDeviceData Micron = {ClaronMicron, "PlanarFG", "File"};
+	static TrackingDeviceData PolarisSpectra = {NDIPolaris, "Spectra", "File"};
+	static TrackingDeviceData PolarisVicra = {NDIPolaris, "Vicra", "File"};
+	static TrackingDeviceData TrackingDeviceList[] = {AuroraCompact, AuroraPlanarCube, AuroraPlanarDome, AuroraTabletop, Micron, PolarisSpectra, PolarisVicra};
+
+	/**
+	* /brief Returns all devices compatibel to the given Line of Devices 
+	*/
+	inline static std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type){
+		//TODO Make it happen
+	}
+
     /**Documentation
     * \brief activation rate of IR illuminator for NDI Polaris tracking device
     */
@@ -127,6 +164,7 @@ namespace mitk
       Hz30 = 30,
       Hz60 = 60
     };
+
     /**Documentation
     * \brief Data transfer mode for NDI tracking devices
     */

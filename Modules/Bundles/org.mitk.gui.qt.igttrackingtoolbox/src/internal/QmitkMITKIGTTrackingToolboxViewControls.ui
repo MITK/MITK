@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="m_MainWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -305,6 +305,9 @@ p, li { white-space: pre-wrap; }
           <string>Show Tool Quaternions</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="VolumeSelectionBox"/>
        </item>
        <item>
         <spacer name="verticalSpacer_3">

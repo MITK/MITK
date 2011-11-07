@@ -100,6 +100,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
     void UpdateTrackingTimer();
 
+	
+
 
   protected:
 

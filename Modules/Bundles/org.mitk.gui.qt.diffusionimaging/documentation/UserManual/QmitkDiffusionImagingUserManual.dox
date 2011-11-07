@@ -112,12 +112,12 @@ The diffusion imaging module uses additional properties beside the ones in use i
 
 The MITK Diffusion tools consist of further components, which have their own documentation, see:
 
-\subpage org_fiberprocessing
-\subpage org_gibbstracking
-\subpage org_odfdetails
-\subpage org_pvanalysis
-\subpage screenshot_maker
-\subpage org_stochastictracking
-\subpage org_ivim
+  \li \subpage org_fiberprocessing
+  \li \subpage org_gibbstracking
+  \li \subpage org_odfdetails
+  \li \subpage org_pvanalysis
+  \li \subpage screenshot_maker
+  \li \subpage org_stochastictracking
+  \li \subpage org_ivim
 
 */

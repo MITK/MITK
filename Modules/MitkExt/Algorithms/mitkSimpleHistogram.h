@@ -19,6 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSIMPLEHISTOGRAM_H
 #define MITKSIMPLEHISTOGRAM_H
 
+
+#ifndef __itkHistogram_h
+#include <itkHistogram.h>
+#endif
+
 #include "MitkExtExports.h"
 
 #include <mitkImage.h>
@@ -51,6 +56,8 @@ public:
 class MitkExt_EXPORT SimpleImageHistogram : public SimpleHistogram
 {
   public:
+
+  typedef itk::Statistics::Histogram<double> HistogramType;
 
   SimpleImageHistogram()
   {

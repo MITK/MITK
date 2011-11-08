@@ -37,8 +37,9 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.basicimageprocessing
     org.mitk.gui.qt.colourimageprocessing
     org.mitk.gui.qt.navigationdataplayer
-    org.mitk.gui.qt.tofutil
-    org.mitk.gui.qt.toftutorial
+ #  bug-8977 Deactivating ToF for testing purposes
+ #   org.mitk.gui.qt.tofutil
+ #   org.mitk.gui.qt.toftutorial
     org.mitk.gui.qt.imagenavigator
     org.mitk.gui.qt.moviemaker
     org.mitk.gui.qt.deformableregistration

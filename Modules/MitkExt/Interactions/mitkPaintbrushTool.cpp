@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
 
+
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 int mitk::PaintbrushTool::m_Size = 1;
@@ -82,7 +83,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   Image::Pointer temporarySlice = Image::New();
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
 

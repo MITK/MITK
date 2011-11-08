@@ -114,7 +114,8 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   }
 
   assert( sliceImage->GetSliceData() );
-  mitkIpPicDescriptor* originalPicSlice = sliceImage->GetSliceData()->GetPicDescriptor();
+  mitkIpPicDescriptor* originalPicSlice = mitkIpPicNew();
+  CastToIpPicDescriptor( sliceImage, originalPicSlice);
   mitkIpPicDescriptor* picSlice = ipMITKSegmentationNew( originalPicSlice );
   ipMITKSegmentationClear( picSlice );
 
@@ -130,8 +131,8 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   //    make the pic slice an mitk/itk image (as little ipPic code as possible), call a templated method with accessbyitk, iterate over the original and the modified slice
 
   Image::Pointer ipsegmentationModifiedSlice = Image::New();
-  ipsegmentationModifiedSlice->Initialize( picSlice );
-  ipsegmentationModifiedSlice->SetPicSlice( picSlice );
+  ipsegmentationModifiedSlice->Initialize( CastToImageDescriptor( picSlice ) );
+  ipsegmentationModifiedSlice->SetSlice( picSlice->data );
 
   AccessFixedDimensionByItk_2( sliceImage, ItkCopyFilledContourToSlice, 2, ipsegmentationModifiedSlice, paintingPixelValue );
 

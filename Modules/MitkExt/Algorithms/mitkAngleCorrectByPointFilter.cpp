@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkAngleCorrectByPointFilter.h"
+#include "mitkIpPic.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 
@@ -121,7 +122,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   pic_out = mitkIpPicNew();
   pic_out->dim = 3;
   pic_out->bpe  = output->GetPixelType().GetBpe();
-  pic_out->type = output->GetPixelType().GetType();
+  //pic_out->type = output->GetPixelType().GetType();
   pic_out->n[0] = xDim;
   pic_out->n[1] = yDim;
   pic_out->n[2] = zDim;
@@ -154,7 +155,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
       typedef unsigned char InputImagePixelType;
       typedef ScalarType OutputImagePixelType;
 
-      if(*input->GetPixelType().GetTypeId()!=typeid(InputImagePixelType))
+      if(input->GetPixelType().GetTypeId()!=typeid(InputImagePixelType))
       {
         itkExceptionMacro("only implemented for " << typeid(PixelType).name() );
       }
@@ -191,7 +192,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
           }
         }
       }
-      output->SetPicVolume(pic_out, t, n);
+      //output->SetPicVolume(pic_out, t, n);
     }
   }
 }

@@ -80,7 +80,9 @@ void mitk::CorrectorAlgorithm::GenerateData()
   //  temporarySlice = ImportItkImage( correctPixelTypeImage );
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  TobiasHeimannCorrectionAlgorithm( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  mitkIpPicDescriptor* temporarySlicePic = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice, temporarySlicePic );
+  TobiasHeimannCorrectionAlgorithm( temporarySlicePic );
 
   // temporarySlice is our return value (user  can get it by calling GetOutput() )
 
@@ -482,7 +484,7 @@ void mitk::CorrectorAlgorithm::ItkCalculateDifferenceImage( itk::Image<TPixel, V
   // this new image is the output of this filter class
   typename DiffImageType::Pointer diffImage;
   m_DifferenceImage = Image::New();
-  PixelType pixelType( typeid(short signed int) );
+  PixelType pixelType( mitk::MakeSimpleType<short>() );
   m_DifferenceImage->Initialize( pixelType, 2, modifiedMITKImage->GetDimensions() );
   CastToItkImage( m_DifferenceImage, diffImage );
 

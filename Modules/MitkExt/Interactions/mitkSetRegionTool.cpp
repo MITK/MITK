@@ -90,8 +90,9 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
 
   // check index positions
-  mitkIpPicDescriptor* originalPicSlice = temporarySlice->GetSliceData()->GetPicDescriptor();
- 
+  mitkIpPicDescriptor* originalPicSlice = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice, originalPicSlice );
+
   int m_SeedPointMemoryOffset = projectedPointIn2D[1] * originalPicSlice->n[0] + projectedPointIn2D[0];
 
   if ( m_SeedPointMemoryOffset >= static_cast<int>( originalPicSlice->n[0] * originalPicSlice->n[1] ) ||

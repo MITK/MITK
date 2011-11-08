@@ -58,7 +58,8 @@ void mitk::PicFileWriter::GenerateData()
     itkExceptionMacro(<< "Nothing to write: Input is NULL." );
   }
 
-  mitkIpPicDescriptor * picImage = input->GetPic();
+  mitkIpPicDescriptor * picImage = mitkIpPicNew();
+          picImage = CastToIpPicDescriptor(input, picImage);
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
   {

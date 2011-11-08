@@ -166,7 +166,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
 
       if (image.GetPointer() == originalImage.GetPointer())
       {
-        if (originalImage->GetPixelType().GetType() == mitkIpPicFloat)
+        if (originalImage->GetPixelType() == typeid(float))
         {
             m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() * 100.0f);
             m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() * 100.0f);

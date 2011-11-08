@@ -126,7 +126,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   SetDefaultLocale();
 
   // basic image data
-  DumpLine( "Pixeltype",    TypeIDToString( *(image->GetPixelType().GetTypeId()) ));
+  DumpLine( "Pixeltype",    TypeIDToString( (image->GetPixelType().GetTypeId()) ));
   DumpLine( "BitsPerPixel", image->GetPixelType().GetBpe() );
   DumpLine( "Dimension",    image->GetDimension() );
 

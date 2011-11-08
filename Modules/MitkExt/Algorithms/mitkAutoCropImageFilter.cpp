@@ -71,8 +71,9 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   mitk::Image::Pointer newMitkImage = mitk::Image::New();
   mitk::CastToMitkImage( outputItk, newMitkImage );
 
-  mitkIpPicDescriptor* image3D = newMitkImage->GetVolumeData(0)->GetPicDescriptor();
-  this->GetOutput()->SetPicVolume( image3D , timestep );
+  const mitk::ChannelDescriptor desc = newMitkImage->GetChannelDescriptor(0);
+  unsigned char* image3D = desc.GetData();
+  this->GetOutput()->SetVolume( (void*) &image3D , timestep );
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
@@ -333,9 +334,9 @@ void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 
 }
 
-const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType()
+const mitk::PixelType mitk::AutoCropImageFilter::GetOutputPixelType()
 {
-  return *this->GetInput()->GetPixelType().GetTypeId();
+  return this->GetInput()->GetPixelType();
 }
 
 void mitk::AutoCropImageFilter::SetCroppingRegion(RegionType overrideRegion)

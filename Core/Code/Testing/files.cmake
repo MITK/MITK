@@ -51,7 +51,6 @@ SET(MODULE_TESTS
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   #mitkAbstractTransformGeometryTest.cpp
-  #mitkPicFileIOTest.cpp
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
@@ -64,10 +63,8 @@ SET(MODULE_TESTS
 # test with image filename as an extra command line parameter
 SET(MODULE_IMAGE_TESTS
   mitkSurfaceVtkWriterTest.cpp
-  mitkPicFileWriterTest.cpp
   #mitkImageSliceSelectorTest.cpp
   mitkImageTimeSelectorTest.cpp
-  mitkPicFileReaderTest.cpp
   # mitkVtkPropRendererTest.cpp
   mitkDataNodeFactoryTest.cpp
   #mitkSTLFileReaderTest.cpp
@@ -75,10 +72,15 @@ SET(MODULE_IMAGE_TESTS
 
 # list of images for which the tests are run
 SET(MODULE_TESTIMAGES
-  US4DCyl.pic.gz
-  Pic3D.pic.gz
-  Pic2DplusT.pic.gz
-  BallBinary30x30x30.pic.gz
+ # Pic-Factory no more available in Core, replace test images by .nrrd data
+ # US4DCyl.pic.gz
+ # Pic3D.pic.gz
+ # Pic2DplusT.pic.gz
+ # BallBinary30x30x30.pic.gz
+  /localdata/dartclient/NewTestImages/US4DCyl.nrrd
+  /localdata/dartclient/NewTestImages/Pic3D.nrrd
+  /localdata/dartclient/NewTestImages/Pic2DplusT.nrrd
+  /localdata/dartclient/NewTestImages/BallBinary30x30x30.nrrd
   binary.stl
   ball.stl
 )
@@ -86,7 +88,7 @@ SET(MODULE_TESTIMAGES
 SET(MODULE_CUSTOM_TESTS
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
-    mitkDataStorageTest.cpp
+    #mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp

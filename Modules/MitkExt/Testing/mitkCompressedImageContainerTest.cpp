@@ -54,14 +54,14 @@ static void Test( mitk::CompressedImageContainer* container, mitk::Image* image,
     
     mitk::PixelType m_PixelType = image->GetPixelType();
     std::cout << "Original pixel type:" << std::endl;
-    std::cout << " PixelType: " << m_PixelType.GetTypeId()->name() << std::endl;
+    std::cout << " PixelType: " << m_PixelType.GetTypeId().name() << std::endl;
     std::cout << " BitsPerElement: " << m_PixelType.GetBpe() << std::endl;
     std::cout << " NumberOfComponents: " << m_PixelType.GetNumberOfComponents() << std::endl;
     std::cout << " BitsPerComponent: " << m_PixelType.GetBitsPerComponent() << std::endl;
 
     m_PixelType = uncompressedImage->GetPixelType();
     std::cout << "Uncompressed pixel type:" << std::endl;
-    std::cout << " PixelType: " << m_PixelType.GetTypeId()->name() << std::endl;
+    std::cout << " PixelType: " << m_PixelType.GetTypeId().name() << std::endl;
     std::cout << " BitsPerElement: " << m_PixelType.GetBpe() << std::endl;
     std::cout << " NumberOfComponents: " << m_PixelType.GetNumberOfComponents() << std::endl;
     std::cout << " BitsPerComponent: " << m_PixelType.GetBitsPerComponent() << std::endl;

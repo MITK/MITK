@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
@@ -490,6 +491,8 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
     this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
     this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
+    this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
@@ -497,6 +500,8 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
+    this->m_AmplitudeImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
   if (m_IntensityImageNode.IsNotNull())
   {
@@ -504,6 +509,8 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
+    this->m_IntensityImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())

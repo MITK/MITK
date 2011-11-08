@@ -132,7 +132,7 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
 
   Image::Pointer ipsegmentationModifiedSlice = Image::New();
   ipsegmentationModifiedSlice->Initialize( CastToImageDescriptor( picSlice ) );
-  // FIXME ipsegmentationModifiedSlice->SetPicSlice( picSlice );
+  ipsegmentationModifiedSlice->SetSlice( picSlice->data );
 
   AccessFixedDimensionByItk_2( sliceImage, ItkCopyFilledContourToSlice, 2, ipsegmentationModifiedSlice, paintingPixelValue );
 

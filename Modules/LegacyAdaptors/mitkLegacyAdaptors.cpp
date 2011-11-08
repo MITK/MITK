@@ -15,6 +15,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
   memcpy( picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int) );
 
   picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
+  picDesc->bpe = refImg->GetPixelType().GetBpe();
   picDesc->data = refImg->GetData();
 
   return picDesc;
@@ -34,6 +35,10 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDa
   {
     picDesc->n[i] = refItem->GetDimension(i);
   }
+
+  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetTypeId() );
+  picDesc->bpe = refItem->GetPixelType().GetBpe();
+  picDesc->data = refItem->GetData();
 
   return picDesc;
 

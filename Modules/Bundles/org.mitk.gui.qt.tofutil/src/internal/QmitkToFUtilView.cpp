@@ -304,17 +304,17 @@ void QmitkToFUtilView::OnUpdateCamera()
   colorTransferFunction1 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
   mitk::TransferFunction::Pointer tf1 = mitk::TransferFunction::New();
   tf1->SetColorTransferFunction( colorTransferFunction1 );
-  m_DistanceImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf1));
+  m_DistanceImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf1));
   vtkColorTransferFunction* colorTransferFunction2;
   colorTransferFunction2 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ColorTransferFunction();
   mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
   tf2->SetColorTransferFunction( colorTransferFunction2 );
-  m_AmplitudeImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf2));
+  m_AmplitudeImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf2));
   vtkColorTransferFunction* colorTransferFunction3;
   colorTransferFunction3 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ColorTransferFunction();
   mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
   tf3->SetColorTransferFunction( colorTransferFunction3 );
-  m_IntensityImageNode->SetProperty("imageRendering.tranferFunction",mitk::TransferFunctionProperty::New(tf3));
+  m_IntensityImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf3));
 
   if (m_Controls->m_SurfaceCheckBox->isChecked())
   {

@@ -79,9 +79,9 @@ void QmitkToFRecorderWidget::CreateConnections()
   }
 }
 
-void QmitkToFRecorderWidget::SetParameter(mitk::ToFImageGrabber* ToFImageGrabber, mitk::ToFImageRecorder* toFImageRecorder)
+void QmitkToFRecorderWidget::SetParameter(mitk::ToFImageGrabber* toFImageGrabber, mitk::ToFImageRecorder* toFImageRecorder)
 {
-  this->m_ToFImageGrabber = ToFImageGrabber;
+  this->m_ToFImageGrabber = toFImageGrabber;
 
   this->m_ToFImageRecorder = toFImageRecorder;
 

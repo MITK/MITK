@@ -57,6 +57,7 @@ namespace mitk
     itkGetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);
     itkSetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
     itkGetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
+    itkSetMacro(TextureIndex,int);
     /*!
     \brief Set scalar image used as texture of the surface.
     \param iplScalarImage OpenCV image for texturing
@@ -146,6 +147,8 @@ namespace mitk
     int m_TextureImageWidth; ///< Width (x-dimension) of the texture image
     int m_TextureImageHeight; ///< Height (y-dimension) of the texture image
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
+
+    int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
 
   };
 } //END mitk namespace

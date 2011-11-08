@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter(): m_CameraIntrinsics(),
-m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL), m_InterPixelDistance()
+  m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL), m_InterPixelDistance(), m_TextureIndex(0)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -120,9 +120,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     scalarFloatData = (float*)this->m_IplScalarImage->imageData;
   }
-  else if ((this->GetNumberOfInputs()>2)&&this->GetInput(2)) // otherwise use intensity image (input(2))
+  else if (this->GetInput(m_TextureIndex)) // otherwise use intensity image (input(2))
   {
-    scalarFloatData = (float*)this->GetInput(2)->GetData();
+    scalarFloatData = (float*)this->GetInput(m_TextureIndex)->GetData();
   }
 
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());

@@ -15,5 +15,7 @@
     <file>widget4.png</file>
     <file>grayscale.png</file>
     <file>color.png</file>
+    <file>measurement.png</file>
+    <file>path.png</file>
   </qresource>
 </RCC>

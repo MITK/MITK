@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFImageGrabber.h>
 
+#include <mitkPixelType.h>
+
 #include <mitkImageWriter.h>
 
 namespace mitk
@@ -58,7 +60,9 @@ void ReadFileFormatTestCase(std::string extension, mitk::ToFImageGrabber::Pointe
   }
 
   mitk::Image::Pointer testImage = mitk::Image::New();
-  testImage->Initialize(mitk::PixelType(typeid(float)), 3, dim);
+
+  mitk::PixelType FloatType = mitk::MakeSimpleType<float>();
+  testImage->Initialize( FloatType, 3, dim);
   testImage->SetVolume(data);
 
   // save image as dist, ampl and inten image to file. 

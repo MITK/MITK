@@ -146,7 +146,9 @@ void mitk::ToFVisualizationFilter::InitImage(mitk::Image::Pointer image)
   unsigned int dimensions[2];
   dimensions[0] = this->m_ImageWidth;
   dimensions[1] = this->m_ImageHeight;
-  image->Initialize( mitk::PixelType(mitkIpPicUInt, 24, 3), 2, dimensions); //unsigned char RGB
+
+  mitk::PixelType RGBPixelType = MakePixelType< unsigned char, unsigned char, 3>();
+  image->Initialize( RGBPixelType, 2, dimensions); //unsigned char RGB
 }
 
 void mitk::ToFVisualizationFilter::CreateOutputsForAllInputs()

@@ -6,5 +6,4 @@ SET(CPP_FILES
   mitkToFProcessingCommon.cpp  
   mitkToFSurfaceVtkMapper3D.cpp
   mitkToFTestingCommon.cpp
-  mitkToFVisualizationFilter.cpp
 )

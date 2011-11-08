@@ -237,6 +237,8 @@ namespace mitk {
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
+
+    void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
   };
 
 } // namespace mitk

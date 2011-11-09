@@ -243,30 +243,17 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   //####### load shader from file #########
 
   QString applicationDir = QCoreApplication::applicationDirPath();
-  MITK_INFO << QCoreApplication::applicationDirPath().toStdString().c_str();
+  applicationDir.append("/");
 
-    applicationDir.append("/");
-
-
-
-
-  MITK_INFO << applicationDir.toStdString().c_str();
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
   mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
 
-
   std::string filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
   if ( filepath.empty() )
-{
+{ //for windows systems
   applicationDir = QCoreApplication::applicationDirPath();
   applicationDir.append("\\..\\");
-  MITK_INFO << "WINWAS";
-
-
-  QString lutPath(applicationDir);
-  MITK_INFO << applicationDir.toStdString().c_str();
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-
 
 }
 

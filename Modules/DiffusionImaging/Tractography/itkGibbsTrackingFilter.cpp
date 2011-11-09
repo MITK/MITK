@@ -426,6 +426,17 @@ namespace itk{
     
     ifstream BaryCoords;
     QString lutPath(applicationDir+"/FiberTrackingLUTBaryCoords.bin");
+
+
+    if (applicationDir.endsWith("bin"))
+      applicationDir.append("/");
+    else if (applicationDir.endsWith("MacOS"))
+        applicationDir.append("/../../../");
+    else
+      applicationDir.append("\\..\\");
+
+    ifstream BaryCoords;
+    QString lutPath(applicationDir+"FiberTrackingLUTBaryCoords.bin");
     BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
     float* coords;
     if (BaryCoords.is_open())

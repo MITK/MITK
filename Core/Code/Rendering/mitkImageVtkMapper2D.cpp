@@ -717,11 +717,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, mitk:
     LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
                       (this->GetDataNode()->GetProperty("LookupTable"));
     //...check if there is a lookuptable provided by the user
-    if ( LookupTableProp.IsNull() )
-    {
-      MITK_WARN << "The use of a lookuptable is requested, but there is no lookuptable supplied by the user! The default lookuptable will be used instead.";
-    }
-    else
+    if ( LookupTableProp.IsNotNull() )
     {
       // If lookup table use is requested and supplied by the user:
       // only update the lut, when the properties have changed...
@@ -1058,9 +1054,13 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* rend
   mitk::TransferFunctionProperty::Pointer transferFunctionProperty =
       dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  if(transferFunctionProperty)
+  if(transferFunctionProperty.IsNotNull())
   {
     localStorage->m_Texture->SetLookupTable(transferFunctionProperty->GetValue()->GetColorTransferFunction());
+  }
+  else
+  {
+    MITK_WARN << "Neither a lookuptable nor a transfer function is set and use color is off.";
   }
 }
 

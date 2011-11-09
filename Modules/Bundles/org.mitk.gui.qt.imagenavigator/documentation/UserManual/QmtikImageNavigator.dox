@@ -5,5 +5,11 @@
 
 \image html ImageNavigator.png "Image Navigator"
 
-Fast movement through the available data can be achieved by using the Image Navigator. By moving the sliders around you can scroll quickly through the slides and timesteps. By entering numbers in the relevant fields you can jump directly to your point of interest.
+Fast movement through the available data can be achieved by using the Image Navigator. 
+By moving the sliders around you can scroll quickly through the slides and timesteps. 
+By entering numbers in the relevant fields you can jump directly to your point of interest.
+
+The "Show detail" checkbox enables you to see the world coordinates in millimetres
+and the index/voxel coordinates.  These may be edited to jump to a specific location.
+
 */

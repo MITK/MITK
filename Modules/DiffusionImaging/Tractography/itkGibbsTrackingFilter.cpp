@@ -26,57 +26,57 @@
 #include <itkImageDuplicator.h>
 
 struct LessDereference {
-  template <class T>
-  bool operator()(const T * lhs, const T * rhs) const {
-    return *lhs < *rhs;
-  }
+    template <class T>
+    bool operator()(const T * lhs, const T * rhs) const {
+        return *lhs < *rhs;
+    }
 };
 
 namespace itk{
-  
-  template< class TInputOdfImage, class TInputROIImage >
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::GibbsTrackingFilter():
-  m_TempStart(0.1),
-  m_TempEnd(0.001),
-  m_NumIt(500000),
-  m_ParticleWeight(0),
-  m_ParticleWidth(0),
-  m_ParticleLength(0),
-  m_ChempotConnection(10),
-  m_ChempotParticle(0),
-  m_InexBalance(0),
-  m_Chempot2(0.2),
-  m_FiberLength(10),
-  m_AbortTracking(false),
-  m_NumConnections(0),
-  m_NumParticles(0),
-  m_NumAcceptedFibers(0),
-  m_CurrentStep(0),
-  m_SubtractMean(true),
-  m_BuildFibers(false),
-  m_Sampler(NULL),
-  m_Steps(10),
-  m_Memory(0),
-  m_ProposalAcceptance(0),
-  m_GfaImage(NULL)
-  {
+
+template< class TInputOdfImage, class TInputROIImage >
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::GibbsTrackingFilter():
+    m_TempStart(0.1),
+    m_TempEnd(0.001),
+    m_NumIt(500000),
+    m_ParticleWeight(0),
+    m_ParticleWidth(0),
+    m_ParticleLength(0),
+    m_ChempotConnection(10),
+    m_ChempotParticle(0),
+    m_InexBalance(0),
+    m_Chempot2(0.2),
+    m_FiberLength(10),
+    m_AbortTracking(false),
+    m_NumConnections(0),
+    m_NumParticles(0),
+    m_NumAcceptedFibers(0),
+    m_CurrentStep(0),
+    m_SubtractMean(true),
+    m_BuildFibers(false),
+    m_Sampler(NULL),
+    m_Steps(10),
+    m_Memory(0),
+    m_ProposalAcceptance(0),
+    m_GfaImage(NULL)
+{
     //this->m_MeasurementFrame.set_identity();
     this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image + a Mask Image
-  }
-  
-  template< class TInputOdfImage, class TInputROIImage >
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::~GibbsTrackingFilter(){
+}
+
+template< class TInputOdfImage, class TInputROIImage >
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::~GibbsTrackingFilter(){
     delete BESSEL_APPROXCOEFF;
     if (m_Sampler!=NULL)
-      delete m_Sampler;
-  }
-  
-  template< class TInputOdfImage, class TInputROIImage >
-  void
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::ComputeFiberCorrelation(){
+        delete m_Sampler;
+}
+
+template< class TInputOdfImage, class TInputROIImage >
+void
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::ComputeFiberCorrelation(){
     
     //    float bD = 15;
     
@@ -170,18 +170,18 @@ namespace itk{
     BESSEL_APPROXCOEFF[1] = 0.5332;
     BESSEL_APPROXCOEFF[2] = -1.4889;
     BESSEL_APPROXCOEFF[3] = 2.0389;
-  }
-  
-  // build fibers from tracking result
-  template< class TInputOdfImage, class TInputROIImage >
-  void
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::BuildFibers(float* points, int numPoints)
-  {
+}
+
+// build fibers from tracking result
+template< class TInputOdfImage, class TInputROIImage >
+void
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::BuildFibers(float* points, int numPoints)
+{
     MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
     
     typename InputQBallImageType::Pointer odfImage
-    = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
+            = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
     double spacing[3];
     spacing[0] = odfImage->GetSpacing().GetElement(0);
     spacing[1] = odfImage->GetSpacing().GetElement(1);
@@ -194,74 +194,74 @@ namespace itk{
     int numFibers = ccana.iterate(m_FiberLength);
     
     if (numFibers<=0){
-      MITK_INFO << "itkGibbsTrackingFilter: 0 fibers accepted";
-      return;
+        MITK_INFO << "itkGibbsTrackingFilter: 0 fibers accepted";
+        return;
     }
     
     // fill output datastructure
     m_FiberBundle.clear();
     for (int i = 0; i < numFibers; i++)
     {
-      vector< Particle* >* particleContainer = ccana.m_FiberContainer->at(i);
-      
-      // resample fibers
-      std::vector< Particle* >* pCon = ResampleFibers(particleContainer, 0.9*spacing[0]);
-      
-      FiberTractType tract;
-      for (int j=0; j<pCon->size(); j++)
-      {
-        Particle* particle = pCon->at(j);
-        pVector p = particle->R;
-        
-        itk::Point<float, 3> point;
-        point[0] = p[0]-0.5;
-        point[1] = p[1]-0.5;
-        point[2] = p[2]-0.5;
-        tract.push_back(point);
-        delete(particle);
-      }
-      m_FiberBundle.push_back(tract);
-      delete(pCon);
+        vector< Particle* >* particleContainer = ccana.m_FiberContainer->at(i);
+
+        // resample fibers
+        std::vector< Particle* >* pCon = ResampleFibers(particleContainer, 0.9*spacing[0]);
+
+        FiberTractType tract;
+        for (int j=0; j<pCon->size(); j++)
+        {
+            Particle* particle = pCon->at(j);
+            pVector p = particle->R;
+
+            itk::Point<float, 3> point;
+            point[0] = p[0]-0.5;
+            point[1] = p[1]-0.5;
+            point[2] = p[2]-0.5;
+            tract.push_back(point);
+            delete(particle);
+        }
+        m_FiberBundle.push_back(tract);
+        delete(pCon);
     }
     m_NumAcceptedFibers = numFibers;
     MITK_INFO << "itkGibbsTrackingFilter: "  << numFibers << " fibers accepted";
-  }
-  
-  // fill output fiber bundle datastructure
-  template< class TInputOdfImage, class TInputROIImage >
-  typename GibbsTrackingFilter< TInputOdfImage, TInputROIImage >::FiberBundleType*
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::GetFiberBundle()
-  {
+}
+
+// fill output fiber bundle datastructure
+template< class TInputOdfImage, class TInputROIImage >
+typename GibbsTrackingFilter< TInputOdfImage, TInputROIImage >::FiberBundleType*
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::GetFiberBundle()
+{
     if (!m_AbortTracking)
     {
-      m_BuildFibers = true;
-      while (m_BuildFibers){}
+        m_BuildFibers = true;
+        while (m_BuildFibers){}
     }
     
     return &m_FiberBundle;
-  }
-  
-  // get memory allocated for particle grid
-  template< class TInputOdfImage, class TInputROIImage >
-  float
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::GetMemoryUsage()
-  {
+}
+
+// get memory allocated for particle grid
+template< class TInputOdfImage, class TInputROIImage >
+float
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::GetMemoryUsage()
+{
     if (m_Sampler!=NULL)
-      return m_Sampler->m_ParticleGrid.GetMemoryUsage();
+        return m_Sampler->m_ParticleGrid.GetMemoryUsage();
     return 0;
-  }
-  
-  template< class TInputOdfImage, class TInputROIImage >
-  bool
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::EstimateParticleWeight(){
+}
+
+template< class TInputOdfImage, class TInputROIImage >
+bool
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::EstimateParticleWeight(){
     
     if (m_GfaImage.IsNull())
     {
-      MITK_INFO << "no gfa image found";
-      return false;
+        MITK_INFO << "no gfa image found";
+        return false;
     }
     
     float samplingStart = 1.0;
@@ -287,10 +287,10 @@ namespace itk{
     maskIt.GoToBegin();
     while( !gfaIt.IsAtEnd() )
     {
-      if(maskIt.Get()<=0)
-        gfaIt.Set(0);
-      ++gfaIt;
-      ++maskIt;
+        if(maskIt.Get()<=0)
+            gfaIt.Set(0);
+        ++gfaIt;
+        ++maskIt;
     }
     
     // rescale gfa image to [0,1]
@@ -311,35 +311,35 @@ namespace itk{
     int count = 0;
     for(float thr=samplingStart; thr>samplingStop; thr-=0.01)
     {
-      git.GoToBegin();
-      gfaIt.GoToBegin();
-      while( !gfaIt.IsAtEnd() )
-      {
-        if(gfaIt.Get()>thr)
+        git.GoToBegin();
+        gfaIt.GoToBegin();
+        while( !gfaIt.IsAtEnd() )
         {
-          itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
-          upper += odf.GetMaxValue()-odf.GetMeanValue();
-          
-          ++count;
+            if(gfaIt.Get()>thr)
+            {
+                itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(git.Get().GetDataPointer());
+                upper += odf.GetMaxValue()-odf.GetMeanValue();
+
+                ++count;
+            }
+            ++gfaIt;
+            ++git;
         }
-        ++gfaIt;
-        ++git;
-      }
     }
     if (count>0)
-      upper /= count;
+        upper /= count;
     else
-      return false;
+        return false;
     
     m_ParticleWeight = upper/6;
     return true;
-  }
-  
-  // perform global tracking
-  template< class TInputOdfImage, class TInputROIImage >
-  void
-  GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-  ::GenerateData(){
+}
+
+// perform global tracking
+template< class TInputOdfImage, class TInputROIImage >
+void
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::GenerateData(){
     
     // input qball image
     m_ItkQBallImage = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
@@ -351,16 +351,16 @@ namespace itk{
     
     // image sizes and spacing
     int qBallImageSize[4] = {QBALL_ODFSIZE,
-      m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(0),
-      m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(1),
-      m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(2)};
+                             m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(0),
+                             m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(1),
+                             m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(2)};
     double qBallImageSpacing[3] = {m_ItkQBallImage->GetSpacing().GetElement(0),m_ItkQBallImage->GetSpacing().GetElement(1),m_ItkQBallImage->GetSpacing().GetElement(2)};
     
     // make sure image has enough slices
     if (qBallImageSize[1]<3 || qBallImageSize[2]<3 || qBallImageSize[3]<3)
     {
-      MITK_INFO << "itkGibbsTrackingFilter: image size < 3 not supported";
-      m_AbortTracking = true;
+        MITK_INFO << "itkGibbsTrackingFilter: image size < 3 not supported";
+        m_AbortTracking = true;
     }
     
     // calculate rotation matrix
@@ -373,8 +373,8 @@ namespace itk{
     directionMatrix.set_column(2, d2);
     vnl_matrix_fixed<double, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps)){
-      MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
-      m_AbortTracking = true;
+        MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
+        m_AbortTracking = true;
     }
     
     // generate local working copy of image buffer
@@ -382,24 +382,24 @@ namespace itk{
     float* qBallImageBuffer = (float*) m_ItkQBallImage->GetBufferPointer();
     float* workingQballImage = new float[bufferSize];
     for (int i=0; i<bufferSize; i++)
-      workingQballImage[i] = qBallImageBuffer[i];
+        workingQballImage[i] = qBallImageBuffer[i];
     
     // perform mean subtraction on odfs
     if (m_SubtractMean)
     {
-      float sum = 0;
-      for (int i=0; i<bufferSize; i++)
-      {
-        if (qBallImageSize[0]>0 && i%qBallImageSize[0] == 0 && i>0)
+        float sum = 0;
+        for (int i=0; i<bufferSize; i++)
         {
-          sum /= qBallImageSize[0];
-          for (int j=i-qBallImageSize[0]; j<i; j++){
-            workingQballImage[j] -= sum;
-          }
-          sum = 0;
+            if (qBallImageSize[0]>0 && i%qBallImageSize[0] == 0 && i>0)
+            {
+                sum /= qBallImageSize[0];
+                for (int j=i-qBallImageSize[0]; j<i; j++){
+                    workingQballImage[j] -= sum;
+                }
+                sum = 0;
+            }
+            sum += workingQballImage[i];
         }
-        sum += workingQballImage[i];
-      }
     }
     
     // mask image
@@ -407,17 +407,17 @@ namespace itk{
     float *mask;
     if(m_MaskImage.IsNotNull())
     {
-      mask = (float*) m_MaskImage->GetBufferPointer();
-      maskImageSize[0] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(0);
-      maskImageSize[1] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(1);
-      maskImageSize[2] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(2);
+        mask = (float*) m_MaskImage->GetBufferPointer();
+        maskImageSize[0] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(0);
+        maskImageSize[1] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(1);
+        maskImageSize[2] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(2);
     }
     else
     {
-      mask = 0;
-      maskImageSize[0] = qBallImageSize[1];
-      maskImageSize[1] = qBallImageSize[2];
-      maskImageSize[2] = qBallImageSize[3];
+        mask = 0;
+        maskImageSize[0] = qBallImageSize[1];
+        maskImageSize[1] = qBallImageSize[2];
+        maskImageSize[2] = qBallImageSize[3];
     }
     int mask_oversamp_mult = maskImageSize[0]/qBallImageSize[1];
     
@@ -425,11 +425,16 @@ namespace itk{
     QString applicationDir = QCoreApplication::applicationDirPath();
     
     if (applicationDir.endsWith("bin"))
-      applicationDir.append("/");
+        applicationDir.append("/");
     else if (applicationDir.endsWith("MacOS"))
-        applicationDir.append("/../../../");
-    else
-      applicationDir.append("\\..\\");
+    {
+        //on osx, check if path for installer or MITK development is needed
+        applicationDir.append("/");
+        QFile f( applicationDir+"FiberTrackingLUTBaryCoords.bin" );
+        if( !f.exists() ) // if file does not exist, then look in MITK development build directory
+            applicationDir.append("../../../");
+    }else
+        applicationDir.append("\\..\\");
 
     ifstream BaryCoords;
     QString lutPath(applicationDir+"FiberTrackingLUTBaryCoords.bin");
@@ -437,38 +442,38 @@ namespace itk{
     float* coords;
     if (BaryCoords.is_open())
     {
-      float tmp;
-      coords = new float [1630818];
-      BaryCoords.seekg (0, ios::beg);
-      for (int i=0; i<1630818; i++)
-      {
-        BaryCoords.read((char *)&tmp, sizeof(tmp));
-        coords[i] = tmp;
-      }
-      BaryCoords.close();
-    }
-    else
-    {
-      lutPath = applicationDir+"\\..\\FiberTrackingLUTBaryCoords.bin";
-      
-      BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
-      if (BaryCoords.is_open())
-      {
         float tmp;
         coords = new float [1630818];
         BaryCoords.seekg (0, ios::beg);
         for (int i=0; i<1630818; i++)
         {
-          BaryCoords.read((char *)&tmp, sizeof(tmp));
-          coords[i] = tmp;
+            BaryCoords.read((char *)&tmp, sizeof(tmp));
+            coords[i] = tmp;
         }
         BaryCoords.close();
-      } else {
-        
-        MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
-        m_AbortTracking = true;
-      }
-      
+    }
+    else
+    {
+        lutPath = applicationDir+"\\..\\FiberTrackingLUTBaryCoords.bin";
+
+        BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
+        if (BaryCoords.is_open())
+        {
+            float tmp;
+            coords = new float [1630818];
+            BaryCoords.seekg (0, ios::beg);
+            for (int i=0; i<1630818; i++)
+            {
+                BaryCoords.read((char *)&tmp, sizeof(tmp));
+                coords[i] = tmp;
+            }
+            BaryCoords.close();
+        } else {
+
+            MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
+            m_AbortTracking = true;
+        }
+
     }
     
     ifstream Indices;
@@ -477,39 +482,39 @@ namespace itk{
     int* ind;
     if (Indices.is_open())
     {
-      int tmp;
-      ind = new int [1630818];
-      Indices.seekg (0, ios::beg);
-      for (int i=0; i<1630818; i++)
-      {
-        Indices.read((char *)&tmp, 4);
-        ind[i] = tmp;
-      }
-      Indices.close();
-    }
-    else
-    {
-      lutPath = applicationDir+"\\..\\FiberTrackingLUTIndices.bin";
-      Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
-      
-      if (Indices.is_open())
-      {
         int tmp;
         ind = new int [1630818];
         Indices.seekg (0, ios::beg);
         for (int i=0; i<1630818; i++)
         {
-          Indices.read((char *)&tmp, 4);
-          ind[i] = tmp;
+            Indices.read((char *)&tmp, 4);
+            ind[i] = tmp;
         }
         Indices.close();
-      }
-      
-      else 
-      {
-        MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
-        m_AbortTracking = true;
-      }
+    }
+    else
+    {
+        lutPath = applicationDir+"\\..\\FiberTrackingLUTIndices.bin";
+        Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
+
+        if (Indices.is_open())
+        {
+            int tmp;
+            ind = new int [1630818];
+            Indices.seekg (0, ios::beg);
+            for (int i=0; i<1630818; i++)
+            {
+                Indices.read((char *)&tmp, 4);
+                ind[i] = tmp;
+            }
+            Indices.close();
+        }
+
+        else
+        {
+            MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
+            m_AbortTracking = true;
+        }
     }
     
     // initialize sphere interpolator with lookuptables
@@ -518,22 +523,22 @@ namespace itk{
     // get paramters
     float minSpacing;
     if(qBallImageSpacing[0]<qBallImageSpacing[1] && qBallImageSpacing[0]<qBallImageSpacing[2])
-      minSpacing = qBallImageSpacing[0];
+        minSpacing = qBallImageSpacing[0];
     else if (qBallImageSpacing[1] < qBallImageSpacing[2])
-      minSpacing = qBallImageSpacing[1];
+        minSpacing = qBallImageSpacing[1];
     else
-      minSpacing = qBallImageSpacing[2];
+        minSpacing = qBallImageSpacing[2];
     
     if(m_ParticleLength == 0)
-      m_ParticleLength = 1.5*minSpacing;
+        m_ParticleLength = 1.5*minSpacing;
     if(m_ParticleWidth == 0)
-      m_ParticleWidth = 0.5*minSpacing;
+        m_ParticleWidth = 0.5*minSpacing;
     if(m_ParticleWeight == 0)
-      if (!EstimateParticleWeight())
-      {
-        MITK_INFO << "could not estimate particle weight!";
-        m_ParticleWeight = 0.0001;
-      }
+        if (!EstimateParticleWeight())
+        {
+            MITK_INFO << "could not estimate particle weight!";
+            m_ParticleWeight = 0.0001;
+        }
     MITK_INFO << "Particle Weight: " << m_ParticleWeight;
     MITK_INFO << "Iterations: " << m_NumIt;
     m_CurrentStep = 0;
@@ -544,11 +549,11 @@ namespace itk{
     float alpha = log(m_TempEnd/m_TempStart);
     m_Steps = m_NumIt/10000;
     if (m_Steps<10)
-      m_Steps = 10;
+        m_Steps = 10;
     if (m_Steps>m_NumIt)
     {
-      MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
-      m_AbortTracking = true;
+        MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
+        m_AbortTracking = true;
     }
     MITK_INFO << "Steps: " << m_Steps;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
@@ -556,7 +561,7 @@ namespace itk{
     // setup metropolis hastings sampler
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
     if (m_Sampler!=NULL)
-      delete m_Sampler;
+        delete m_Sampler;
     m_Sampler = new RJMCMC(NULL, 0, workingQballImage, qBallImageSize, qBallImageSpacing, cellsize);
     
     // setup energy computer
@@ -569,30 +574,30 @@ namespace itk{
     // main loop
     for( int step = 0; step < m_Steps; step++ )
     {
-      if (m_AbortTracking)
-        break;
-      
-      m_CurrentStep = step+1;
-      float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-      MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
-      
-      m_Sampler->SetTemperature(temperature);
-      m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
-      
-      MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-      MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
-      MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-      MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
-      
-      if (m_BuildFibers)
-      {
-        int numPoints = m_Sampler->m_ParticleGrid.pcnt;
-        float* points = new float[numPoints*m_Sampler->m_NumAttributes];
-        m_Sampler->WriteOutParticles(points);
-        BuildFibers(points, numPoints);
-        delete points;
-        m_BuildFibers = false;
-      }
+        if (m_AbortTracking)
+            break;
+
+        m_CurrentStep = step+1;
+        float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
+        MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
+
+        m_Sampler->SetTemperature(temperature);
+        m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
+
+        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
+        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
+        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
+
+        if (m_BuildFibers)
+        {
+            int numPoints = m_Sampler->m_ParticleGrid.pcnt;
+            float* points = new float[numPoints*m_Sampler->m_NumAttributes];
+            m_Sampler->WriteOutParticles(points);
+            BuildFibers(points, numPoints);
+            delete points;
+            m_BuildFibers = false;
+        }
     }
     
     int numPoints = m_Sampler->m_ParticleGrid.pcnt;
@@ -609,7 +614,7 @@ namespace itk{
     m_BuildFibers = false;
     
     MITK_INFO << "itkGibbsTrackingFilter: done generate data";
-  }
+}
 }
 
 

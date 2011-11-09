@@ -35,7 +35,7 @@
 #include <mitkShaderProperty.h>
 #include <mitkStandardFileLocations.h>
 
-
+#include <QCoreApplication>
 
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
 {
@@ -243,6 +243,7 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   //####### load shader from file #########
 
   QString applicationDir = QCoreApplication::applicationDirPath();
+  MITK_INFO << QCoreApplication::applicationDirPath().toStdString().c_str();
   applicationDir.append("/");
 
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );

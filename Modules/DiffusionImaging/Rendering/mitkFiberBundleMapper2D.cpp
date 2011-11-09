@@ -36,6 +36,7 @@
 #include <mitkStandardFileLocations.h>
 
 #include <QCoreApplication>
+#include <QFile>
 
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
 {
@@ -242,28 +243,42 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
     //####### load shader from file #########
     QString applicationDir = QCoreApplication::applicationDirPath();
     MITK_INFO << "pathAppdir: " << QCoreApplication::applicationDirPath().toStdString().c_str();
-    applicationDir.append("/"); //directory to look when building installer
+
+
+    if (applicationDir.endsWith("bin"))
+        applicationDir.append("/");
+    else if (applicationDir.endsWith("MacOS"))
+    {
+        //on osx, check if path for installer or MITK development is needed
+        applicationDir.append("/");
+        QFile f( applicationDir+"FiberTrackingLUTBaryCoords.bin" );
+        if( !f.exists() ) // if file does not exist, then look in MITK development build directory
+            applicationDir.append("../../../");
+    }else
+        applicationDir.append("\\..\\");
+
+//    applicationDir.append("/"); //directory to look when building installer
 
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
     mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
 
-    std::string filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
-    if ( filepath.empty() )
-    {
-        applicationDir = QCoreApplication::applicationDirPath();
-        applicationDir.append("/../../"); //directory to look when developing in MITK
-        mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-        filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
+//    std::string filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
+//    if ( filepath.empty() )
+//    {
+//        applicationDir = QCoreApplication::applicationDirPath();
+//        applicationDir.append("/../../"); //directory to look when developing in MITK
+//        mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
+//        filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
 
-        if ( filepath.empty() )
-        { //for windows systems
-            applicationDir = QCoreApplication::applicationDirPath();
-            applicationDir.append("\\..\\");
-            mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
+//        if ( filepath.empty() )
+//        { //for windows systems
+//            applicationDir = QCoreApplication::applicationDirPath();
+//            applicationDir.append("\\..\\");
+//            mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
 
-        }
+//        }
 
-    }
+//    }
 
 
 

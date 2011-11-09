@@ -80,12 +80,7 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
 {
   itkDebugMacro("setting  m_Position to " << position);
-
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
-  if (mitk::Equal(position, m_Position))
-  { 
-    return;
-  }
   m_Position = position;
   this->Modified();
 }
@@ -102,10 +97,6 @@ void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   itkDebugMacro("setting  m_Orientation to " << orientation);
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
-  if (mitk::Equal(orientation, m_Orientation))
-  { 
-    return;
-  }
   m_Orientation = orientation;
   this->Modified();
 }

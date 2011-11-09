@@ -83,6 +83,13 @@ protected:
   friend class ImageNavigatorPartListener;
 
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
+  void SetBorderColors();
+  void SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString);
+  void SetBorderColor(int axis, QString colorAsStyleSheetString);
+  void SetStepSizes();
+  void SetStepSize(int axis);
+  void SetStepSize(int axis, double stepSize);
+  int  GetClosestAxisIndex(mitk::Vector3D normal);
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 

@@ -182,6 +182,141 @@ int QmitkImageNavigatorView::ComputePreferredSize(bool width, int /*availablePar
   }
 }
 
+int QmitkImageNavigatorView::GetClosestAxisIndex(mitk::Vector3D normal)
+{
+  // cos(theta) = normal . axis
+  // cos(theta) = (a, b, c) . (d, e, f)
+  // cos(theta) = (a, b, c) . (1, 0, 0) = a
+  // cos(theta) = (a, b, c) . (0, 1, 0) = b
+  // cos(theta) = (a, b, c) . (0, 0, 1) = c
+  double absCosThetaWithAxis[3];
+
+  for (int i = 0; i < 3; i++)
+  {
+    absCosThetaWithAxis[i] = fabs(normal[i]);
+  }
+  int largestIndex = 0;
+  double largestValue = absCosThetaWithAxis[0];
+  for (int i = 1; i < 3; i++)
+  {
+    if (absCosThetaWithAxis[i] > largestValue)
+    {
+      largestValue = absCosThetaWithAxis[i];
+      largestIndex = i;
+    }
+  }
+  return largestIndex;
+}
+
+void QmitkImageNavigatorView::SetBorderColors()
+{
+  if (m_MultiWidget)
+  {
+    mitk::PlaneGeometry::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Vector3D normal = geometry->GetNormal();
+      int axis = this->GetClosestAxisIndex(normal);
+      this->SetBorderColor(axis, QString("red"));
+    }
+
+    geometry = m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Vector3D normal = geometry->GetNormal();
+      int axis = this->GetClosestAxisIndex(normal);
+      this->SetBorderColor(axis, QString("green"));
+    }
+
+    geometry = m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Vector3D normal = geometry->GetNormal();
+      int axis = this->GetClosestAxisIndex(normal);
+      this->SetBorderColor(axis, QString("blue"));
+    }
+
+  }
+}
+
+void QmitkImageNavigatorView::SetBorderColor(int axis, QString colorAsStyleSheetString)
+{
+  if (axis == 0)
+  {
+    this->SetBorderColor(m_Controls.m_XWorldCoordinateSpinBox, colorAsStyleSheetString);
+  }
+  else if (axis == 1)
+  {
+    this->SetBorderColor(m_Controls.m_YWorldCoordinateSpinBox, colorAsStyleSheetString);
+  }
+  else if (axis == 2)
+  {
+    this->SetBorderColor(m_Controls.m_ZWorldCoordinateSpinBox, colorAsStyleSheetString);
+  }
+}
+
+void QmitkImageNavigatorView::SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString)
+{
+  assert(spinBox);
+  spinBox->setStyleSheet(QString("border: 2px solid ") + colorAsStyleSheetString + ";");
+}
+
+void QmitkImageNavigatorView::SetStepSizes()
+{
+  this->SetStepSize(0);
+  this->SetStepSize(1);
+  this->SetStepSize(2);
+}
+
+void QmitkImageNavigatorView::SetStepSize(int axis)
+{
+  if (m_MultiWidget)
+  {
+    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetInputWorldGeometry();
+
+    if (geometry.IsNotNull())
+    {
+      mitk::Point3D crossPositionInIndexCoordinates;
+      mitk::Point3D crossPositionInIndexCoordinatesPlus1;
+      mitk::Point3D crossPositionInMillimetresPlus1;
+      mitk::Vector3D transformedAxisDirection;
+
+      mitk::Point3D crossPositionInMillimetres = m_MultiWidget->GetCrossPosition();
+      geometry->WorldToIndex(crossPositionInMillimetres, crossPositionInIndexCoordinates);
+
+      crossPositionInIndexCoordinatesPlus1 = crossPositionInIndexCoordinates;
+      crossPositionInIndexCoordinatesPlus1[axis] += 1;
+
+      geometry->IndexToWorld(crossPositionInIndexCoordinatesPlus1, crossPositionInMillimetresPlus1);
+
+      transformedAxisDirection = crossPositionInMillimetresPlus1 - crossPositionInMillimetres;
+
+      int closestAxisInMillimetreSpace = this->GetClosestAxisIndex(transformedAxisDirection);
+      double stepSize = transformedAxisDirection.GetNorm();
+      this->SetStepSize(closestAxisInMillimetreSpace, stepSize);
+    }
+  }
+}
+
+void QmitkImageNavigatorView::SetStepSize(int axis, double stepSize)
+{
+  if (axis == 0)
+  {
+    m_Controls.m_XWorldCoordinateSpinBox->setSingleStep(stepSize);
+  }
+  else if (axis == 1)
+  {
+    m_Controls.m_YWorldCoordinateSpinBox->setSingleStep(stepSize);
+  }
+  else if (axis == 2)
+  {
+    m_Controls.m_ZWorldCoordinateSpinBox->setSingleStep(stepSize);
+  }
+}
+
 void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 {
   if (m_MultiWidget)
@@ -257,5 +392,8 @@ void QmitkImageNavigatorView::OnRefetch()
       m_Controls.m_YWorldCoordinateSpinBox->blockSignals(false);
       m_Controls.m_ZWorldCoordinateSpinBox->blockSignals(false);
     }
+
+    this->SetBorderColors();
+
   }
 }

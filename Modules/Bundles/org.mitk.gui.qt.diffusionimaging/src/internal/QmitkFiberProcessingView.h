@@ -70,8 +70,9 @@ public:
   typedef itk::Image< unsigned char, 3 >    MaskImage3DType;
   typedef itk::Image< float, 3 >            FloatImageType;
 
-  typedef itk::Point<float,3>                                     ContainerPointType;
-  typedef itk::VectorContainer<unsigned int, ContainerPointType>  ContainerTractType;
+  typedef mitk::FiberBundle::ContainerPointType   ContainerPointType;
+  typedef mitk::FiberBundle::ContainerTractType   ContainerTractType;
+  typedef mitk::FiberBundle::ContainerType        ContainerType;
 
   static const std::string VIEW_ID;
 
@@ -99,6 +100,9 @@ public:
   void GenerateROIImage();
   void GenerationStart();
   void GenerateStats();
+  void MirrorFibX();
+  void MirrorFibY();
+  void MirrorFibZ();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

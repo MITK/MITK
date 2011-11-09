@@ -180,6 +180,8 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
     connect(m_Controls->m_GenerateROIImage, SIGNAL(clicked()), this, SLOT(GenerateROIImage()) );
 
+    connect( m_Controls->m_MirrorXButton, SIGNAL(clicked()), this, SLOT(MirrorFibX()) );
+
     connect( m_Controls->m_GenerationStartButton, SIGNAL(clicked()), this, SLOT(GenerationStart()) );
     connect( m_Controls->m_GenerateStatsButton, SIGNAL(clicked()), this, SLOT(GenerateStats()) );
   }
@@ -715,9 +717,6 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
     if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
     {
       m_SelectedFB.push_back(node);
-      mitk::FiberBundle::Pointer bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-      QString numFibers;
-      this->m_Controls->m_NumFibersLabel->setText(numFibers.setNum(bundle->GetNumTracts()));
     }
     else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
       m_SelectedPF.push_back(node);
@@ -1546,12 +1545,6 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
       MITK_INFO << "we have an UNDEFINED composition... ERROR" ;
       break;
   }
-
-
-
-
-
-
 }
 
 
@@ -1581,6 +1574,54 @@ void QmitkFiberProcessingView::SubstractBundles()
   GetDataStorage()->Add(fbNode);
 }
 
+void QmitkFiberProcessingView::MirrorFibX()
+{
+  if( m_SelectedFB.empty() )
+    return;
+
+  MITK_INFO << "START";
+  mitk::FiberBundle::Pointer bundle = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(0)->GetData());
+  mitk::FiberBundle::Pointer newBundle = mitk::FiberBundle::New();
+
+  ContainerType::Pointer tractContainer = bundle->GetTractContainer();
+
+  for (int i=0; i<tractContainer->Size(); i++)
+  {
+    ContainerTractType::Pointer tract = tractContainer->GetElement(i);
+
+    for (int j=0; j<tract->Size(); j++)
+    {
+      ContainerPointType p = tract->GetElement(j);
+      p[0] *= -1;
+      p[1] *= -1;
+      p[2] *= -1;
+
+      tract->SetElement(j, p);
+    }
+    tractContainer->SetElement(i, tract);
+  }
+
+  newBundle->addTractContainer(tractContainer);
+  newBundle->initFiberGroup();
+
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(newBundle);
+  node->SetName("mirror");
+  GetDefaultDataStorage()->Add(node);
+
+  MITK_INFO << "END";
+}
+
+void QmitkFiberProcessingView::MirrorFibY()
+{
+
+}
+
+void QmitkFiberProcessingView::MirrorFibZ()
+{
+
+}
+
 void QmitkFiberProcessingView::GenerateStats()
 {
   std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
@@ -1596,7 +1637,7 @@ void QmitkFiberProcessingView::GenerateStats()
     mitk::DataNode::Pointer node = *it;
     if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
     {
-      stats += "****************\n" + QString(node->GetName().c_str()) + ":\n";
+      stats += "****************\n" + QString(node->GetName().c_str()) + "\n";
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
       stats += "Number of fibers: "+ QString::number(fib->GetNumTracts()) + "\n";
 
@@ -1611,7 +1652,7 @@ void QmitkFiberProcessingView::GenerateStats()
         for (unsigned int j=0; j<tract->Size(); j++)
         {
           ContainerPointType p1, p2;
-          if (tract->GetElementIfIndexExists(j, &p1) && tract->GetElementIfIndexExists(j+1, &p1))
+          if (tract->GetElementIfIndexExists(j, &p1) && tract->GetElementIfIndexExists(j+1, &p2))
           {
             length += std::abs(p1.EuclideanDistanceTo(p2));
             l+=length;
@@ -1619,9 +1660,41 @@ void QmitkFiberProcessingView::GenerateStats()
         }
         lengths.push_back(l);
       }
+
+      std::sort(lengths.begin(), lengths.end());
+
       if (fib->GetNumTracts()>0)
-      length /= fib->GetNumTracts();
+        length /= fib->GetNumTracts();
+
+      float dev=0;
+      int count = 0;
+      for (int i=0; i<fib->GetNumTracts(); i++)
+      {
+        ContainerTractType::Pointer tract = fib->GetTract(i);
+        if (tract.IsNull())
+          continue;
+        float l=0;
+        for (unsigned int j=0; j<tract->Size(); j++)
+        {
+          ContainerPointType p1, p2;
+          if (tract->GetElementIfIndexExists(j, &p1) && tract->GetElementIfIndexExists(j+1, &p2))
+          {
+            l += std::abs(p1.EuclideanDistanceTo(p2));
+          }
+        }
+        dev += (length-l)*(length-l);
+        count++;
+      }
+
+      if (fib->GetNumTracts()>0)
+      {
+        dev /= fib->GetNumTracts();
+        dev = std::sqrt(dev);
+      }
+
       stats += "Mean fiber length: "+ QString::number(length/10) + "cm\n";
+      stats += "Median fiber length: "+ QString::number(lengths.at(lengths.size()/2)/10) + "cm\n";
+      stats += "Standard deviation: "+ QString::number(dev/10) + "cm\n";
     }
   }
   this->m_Controls->m_StatsTextEdit->setText(stats);

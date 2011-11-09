@@ -140,7 +140,9 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   tofCameraMITKPlayerDevice->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
   tofCameraMITKPlayerDevice->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
 
+  MITK_TEST_OUTPUT(<< "Test ConnectCamera()");
   tofCameraMITKPlayerDevice->ConnectCamera();
+  MITK_TEST_OUTPUT(<< "Test StartCamera()");
   tofCameraMITKPlayerDevice->StartCamera();
 
   std::string distanceTestFileName = "test_distance.pic";
@@ -148,30 +150,40 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   std::string intensityTestFileName = "test_intensity.pic";
 
   tofImageRecorder->SetDistanceImageFileName(distanceTestFileName);
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetDistanceImageFileName() == distanceTestFileName, "Testing Set/GetDistanceImageFileName()");
   tofImageRecorder->SetAmplitudeImageFileName(amplitudeTestFileName);
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetAmplitudeImageFileName() == amplitudeTestFileName, "Testing Set/GetAmplitudeImageFileName()");
   tofImageRecorder->SetIntensityImageFileName(intensityTestFileName);
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetIntensityImageFileName() == intensityTestFileName, "Testing Set/GetIntensityImageFileName()");
   tofImageRecorder->SetFileFormat(".pic");
-
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetFileFormat() == ".pic", "Testing Set/GetFileFormat()");
   tofImageRecorder->SetRecordMode(mitk::ToFImageRecorder::PerFrames);
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetRecordMode() == mitk::ToFImageRecorder::PerFrames, "Testing Set/GetRecordMode()");
   tofImageRecorder->SetNumOfFrames(20);
+  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetNumOfFrames() == 20, "Testing Set/GetNumOfFrames()");
 
+  MITK_TEST_OUTPUT(<< "Test StartRecording()");
   tofImageRecorder->StartRecording();
   itksys::SystemTools::Delay(1000); // wait to allow recording
+  MITK_TEST_OUTPUT(<< "Test StopRecording()");
   tofImageRecorder->StopRecording();
 
+  MITK_TEST_OUTPUT(<< "Test StopCamera()");
   tofCameraMITKPlayerDevice->StopCamera();
+  MITK_TEST_OUTPUT(<< "Test DisconnectCamera()");
   tofCameraMITKPlayerDevice->DisconnectCamera();
-
 
   // Load images (recorded and original ones) with PicFileReader for comparison
   mitk::PicFileReader::Pointer picFileReader = mitk::PicFileReader::New();
   mitk::Image::Pointer originalImage = NULL;
   mitk::Image::Pointer recordedImage = NULL;
   
+  MITK_TEST_OUTPUT(<< "Read original distance image using PicFileReader");
   picFileReader->SetFileName(distanceFileName);
   picFileReader->Update();
   originalImage = picFileReader->GetOutput();
 
+  MITK_TEST_OUTPUT(<< "Read recorded distance image using PicFileReader");
   picFileReader->SetFileName(distanceTestFileName);
   picFileReader->Update();
   recordedImage = picFileReader->GetOutput();
@@ -183,10 +195,12 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(CompareImages(originalImage, recordedImage), "Compare original and saved distance image");
 
 
+  MITK_TEST_OUTPUT(<< "Read original amplitude image using PicFileReader");
   picFileReader->SetFileName(amplitudeFileName);
   picFileReader->Update();
   originalImage = picFileReader->GetOutput();
 
+  MITK_TEST_OUTPUT(<< "Read recorded amplitude image using PicFileReader");
   picFileReader->SetFileName(amplitudeTestFileName);
   picFileReader->Update();
   recordedImage = picFileReader->GetOutput();
@@ -198,10 +212,12 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(CompareImages(originalImage, recordedImage), "Compare original and saved amplitude image");
 
 
+  MITK_TEST_OUTPUT(<< "Read original intensity image using PicFileReader");
   picFileReader->SetFileName(intensityFileName);
   picFileReader->Update();
   originalImage = picFileReader->GetOutput();
 
+  MITK_TEST_OUTPUT(<< "Read recorded intensity image using PicFileReader");
   picFileReader->SetFileName(intensityTestFileName);
   picFileReader->Update();
   recordedImage = picFileReader->GetOutput();
@@ -211,7 +227,6 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(2) == recordedImage->GetDimension(2), "Testing number of frames");
 
   MITK_TEST_CONDITION_REQUIRED(CompareImages(originalImage, recordedImage), "Compare original and saved intensity image");
-
 
   //clean up and delete saved image files
   if( remove( "test_distance.pic" ) != 0 )
@@ -227,9 +242,7 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
     MITK_ERROR<<"File: test_intensity.pic not successfully deleted!";
   }
 
-
   MITK_TEST_END();
-
 }
 
 

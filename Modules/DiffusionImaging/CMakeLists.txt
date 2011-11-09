@@ -17,7 +17,7 @@ MITK_CREATE_MODULE( MitkDiffusionImaging
 MITK_USE_MODULE(MitkDiffusionImaging)
 if(MitkDiffusionImaging_IS_ENABLED)
   file(DOWNLOAD http://mitk.org/download/data/FibertrackingLUT.tar.gz ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FibertrackingLUT.tar.gz TIMEOUT 10)
-  execute_process(COMMAND cmake -E chdir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} tar xzf FibertrackingLUT.tar.gz)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} tar xzf FibertrackingLUT.tar.gz)
   MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FiberTrackingLUTBaryCoords.bin ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FiberTrackingLUTIndices.bin)
 endif()
 

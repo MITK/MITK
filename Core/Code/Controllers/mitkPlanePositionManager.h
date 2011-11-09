@@ -22,31 +22,30 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkExtExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
+#include <mitkServiceReference.h>
+#include <mitkModuleContext.h>
+#include <mitkServiceInterface.h>
+
+class MitkCoreActivator;
 
 namespace mitk
 {
 
 /**
-    The mitk::PlanePositionManager holds and manages a list of certain planepositions.
+    The mitk::PlanePositionManagerService holds and manages a list of certain planepositions.
     To store a new position you need to specify the first slice of your slicestack and the
     slicenumber you want to restore in the mitk::PlanePositionManager::AddNewPlanePosition() function.
 
-    To restore a position call mitk::PlanePositionManager::GetPlanePosition(ID) where ID is the position
+    To restore a position call mitk::PlanePositionManagerService::GetPlanePosition(ID) where ID is the position
     in the plane positionlist (returned by AddNewPlanePostion). This will give a mitk::RestorePlanePositionOperation
     which can be executed by the SliceNavigationController of the slicestack.
 
     \sa QmitkSegmentationView.cpp
   */
- class MITK_CORE_EXPORT PlanePositionManager : public itk::Object
+ class MITK_CORE_EXPORT PlanePositionManagerService : public itk::LightObject
  {
 
   public:
-
-    mitkClassMacro(PlanePositionManager, itk::Object);
-    itkNewMacro(Self);
-
-    /// \brief For mitkPlanePositionManager is a singleton this static function must be called instead of a constructor
-    static PlanePositionManager* GetInstance();
 
     /**
       \brief Adds a new plane position to the list. If this geometry is identical to one of the list nothing will be added
@@ -56,7 +55,7 @@ namespace mitk
       \return returns the ID i.e. the position in the positionlist. If the PlaneGeometry which is to be added already exists the existing
               ID will be returned.
     */
-    unsigned int AddNewPlanePosition(const Geometry2D* plane, unsigned int sliceIndex = 0);
+    unsigned int AddNewPlanePosition(const mitk::Geometry2D* plane, unsigned int sliceIndex = 0);
 
     /**
       \brief Removes the plane at the position \a ID from the list.
@@ -75,23 +74,31 @@ namespace mitk
       \a ID the ID of the plane position
       \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or NULL for an invalid ID
     */
-    RestorePlanePositionOperation* GetPlanePosition( unsigned int ID);
+    mitk::RestorePlanePositionOperation* GetPlanePosition( unsigned int ID);
 
     /// \brief Getting the number of all stored planes
     unsigned int GetNumberOfPlanePositions();
 
- protected:
-
-   PlanePositionManager();
-
-   ~PlanePositionManager();
+    friend class ::MitkCoreActivator;
 
  private:
 
-   static PlanePositionManager* m_Instance;
+
+   mitkClassMacro(PlanePositionManagerService, LightObject);
+
+   itkFactorylessNewMacro(PlanePositionManagerService);
+
+   PlanePositionManagerService();
+   ~PlanePositionManagerService();
+
+   // Disable copy constructor and assignment operator.
+   PlanePositionManagerService(const PlanePositionManagerService&);
+   PlanePositionManagerService& operator=(const PlanePositionManagerService&);
+
+   static PlanePositionManagerService* m_Instance;
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
  };
 }
-
+MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 
 #endif

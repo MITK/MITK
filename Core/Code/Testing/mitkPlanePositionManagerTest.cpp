@@ -13,15 +13,23 @@
 #include "mitkInteractionConst.h"
 #include "vnl/vnl_vector.h"
 #include <itkAffineGeometryFrame.h>
-
-//TODO: Test GetInstance() / GetService
+#include "mitkGetModuleContext.h"
 
 std::vector<mitk::PlaneGeometry::Pointer> m_Geometries;
 std::vector<unsigned int> m_SliceIndices;
 
+mitk::PlanePositionManagerService* m_Service;
 
-void SetUpBeforeTest()
+
+int SetUpBeforeTest()
 {
+    //Getting Service
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    m_Service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+
+    if (m_Service == 0)
+        return EXIT_FAILURE;
+
     //Creating different Geometries
     m_Geometries.reserve(100);
     mitk::PlaneGeometry::PlaneOrientation views[] = {mitk::PlaneGeometry::Transversal, mitk::PlaneGeometry::Sagittal, mitk::PlaneGeometry::Frontal};
@@ -80,15 +88,15 @@ int testAddPlanePosition()
 {
     MITK_TEST_OUTPUT(<<"Starting Test: ######### A d d P l a n e P o s i t i o n #########");
 
-    MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance() != NULL, "Testing GetInstance() of PlanePositionManager");
+    MITK_TEST_CONDITION(m_Service != NULL, "Testing getting of PlanePositionManagerService");
 
-    unsigned int currentID(mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(m_Geometries.at(0),0));
+    unsigned int currentID(m_Service->AddNewPlanePosition(m_Geometries.at(0),0));
 
-    bool error = ((mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() != 1)||(currentID != 0));
+    bool error = ((m_Service->GetNumberOfPlanePositions() != 1)||(currentID != 0));
 
     if(error)
     {
-        MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() == 1,"Checking for correct number of planepositions");
+        MITK_TEST_CONDITION(m_Service->GetNumberOfPlanePositions() == 1,"Checking for correct number of planepositions");
         MITK_TEST_CONDITION(currentID == 0, "Testing for correct ID");
         return EXIT_FAILURE;
     }
@@ -96,12 +104,12 @@ int testAddPlanePosition()
     //Adding new planes
     for(unsigned int i = 1; i < m_Geometries.size(); ++i)
     {
-        unsigned int newID = mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(m_Geometries.at(i),i);
-        error = ((mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() != i+1)||(newID != (currentID+1)));
+        unsigned int newID = m_Service->AddNewPlanePosition(m_Geometries.at(i),i);
+        error = ((m_Service->GetNumberOfPlanePositions() != i+1)||(newID != (currentID+1)));
 
         if (error)
         {
-            MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() == i+1,"Checking for correct number of planepositions");
+            MITK_TEST_CONDITION(m_Service->GetNumberOfPlanePositions() == i+1,"Checking for correct number of planepositions");
             MITK_TEST_CONDITION(newID == (currentID+1), "Testing for correct ID");
             MITK_TEST_OUTPUT(<<"New: "<<newID<<" Last: "<<currentID);
             return EXIT_FAILURE;
@@ -109,16 +117,16 @@ int testAddPlanePosition()
         currentID = newID;
     }
 
-    unsigned int numberOfPlanePos = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+    unsigned int numberOfPlanePos = m_Service->GetNumberOfPlanePositions();
 
     //Adding existing planes -> nothing should change
     for(unsigned int i = 0; i < (m_Geometries.size()-1)*0.5; ++i)
     {
-        unsigned int newID = mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(m_Geometries.at(i*2),i*2);
-        error = ((mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() != numberOfPlanePos)||(newID != i*2));
+        unsigned int newID = m_Service->AddNewPlanePosition(m_Geometries.at(i*2),i*2);
+        error = ((m_Service->GetNumberOfPlanePositions() != numberOfPlanePos)||(newID != i*2));
         if (error)
         {
-            MITK_TEST_CONDITION( mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() == numberOfPlanePos, "Checking for correct number of planepositions");
+            MITK_TEST_CONDITION( m_Service->GetNumberOfPlanePositions() == numberOfPlanePos, "Checking for correct number of planepositions");
             MITK_TEST_CONDITION(newID == i*2, "Testing for correct ID");
             return EXIT_FAILURE;
         }
@@ -141,7 +149,7 @@ int testGetPlanePosition()
     {
         plane = m_Geometries.at(i);
         mitk::PlaneGeometry* test = m_Geometries.at(i);
-        op = mitk::PlanePositionManager::GetInstance()->GetPlanePosition(i);
+        op = m_Service->GetPlanePosition(i);
         error = ( !mitk::Equal(op->GetHeight(),plane->GetExtent(1)) ||
                   !mitk::Equal(op->GetWidth(),plane->GetExtent(0)) ||
                   !mitk::Equal(op->GetSpacing(),plane->GetSpacing()) ||
@@ -163,13 +171,13 @@ int testGetPlanePosition()
     }
 
     //Testing for not existing planepositions
-    error = ( mitk::PlanePositionManager::GetInstance()->GetPlanePosition(100000000) != 0 ||
-              mitk::PlanePositionManager::GetInstance()->GetPlanePosition(-1) != 0 );
+    error = ( m_Service->GetPlanePosition(100000000) != 0 ||
+              m_Service->GetPlanePosition(-1) != 0 );
 
     if (error)
     {
-        MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(100000000) == 0, "Trying to get non existing pos");
-        MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(-1) == 0, "Trying to get non existing pos");
+        MITK_TEST_CONDITION(m_Service->GetPlanePosition(100000000) == 0, "Trying to get non existing pos");
+        MITK_TEST_CONDITION(m_Service->GetPlanePosition(-1) == 0, "Trying to get non existing pos");
         return EXIT_FAILURE;
     }
 
@@ -179,13 +187,13 @@ int testGetPlanePosition()
 int testRemovePlanePosition()
 {
     MITK_TEST_OUTPUT(<<"Starting Test: ######### R e m o v e P l a n e P o s i t i o n #########");
-    unsigned int size = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+    unsigned int size = m_Service->GetNumberOfPlanePositions();
 
     bool removed (true);
     //Testing for invalid IDs
-    removed = mitk::PlanePositionManager::GetInstance()->RemovePlanePosition( -1 );
-    removed = mitk::PlanePositionManager::GetInstance()->RemovePlanePosition( 1000000 );
-    unsigned int size2 = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+    removed = m_Service->RemovePlanePosition( -1 );
+    removed = m_Service->RemovePlanePosition( 1000000 );
+    unsigned int size2 = m_Service->GetNumberOfPlanePositions();
 
     if (removed)
     {
@@ -197,8 +205,8 @@ int testRemovePlanePosition()
     //Testing for valid IDs
     for (unsigned int i = 0; i < m_Geometries.size()*0.5; i++)
     {
-        removed = mitk::PlanePositionManager::GetInstance()->RemovePlanePosition( i );
-        unsigned int size2 = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+        removed = m_Service->RemovePlanePosition( i );
+        unsigned int size2 = m_Service->GetNumberOfPlanePositions();
         removed = (size2 == (size-(i+1)));
         if (!removed)
         {
@@ -215,20 +223,20 @@ int testRemoveAll()
 {
     MITK_TEST_OUTPUT(<<"Starting Test: ######### R e m o v e A l l #########");
 
-    unsigned int numPos = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
+    unsigned int numPos = m_Service->GetNumberOfPlanePositions();
     MITK_INFO<<numPos;
 
-    mitk::PlanePositionManager::GetInstance()->RemoveAllPlanePositions();
+    m_Service->RemoveAllPlanePositions();
 
     bool error (true);
 
-    error = (mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() != 0 ||
-             mitk::PlanePositionManager::GetInstance()->GetPlanePosition(60) != 0);
+    error = (m_Service->GetNumberOfPlanePositions() != 0 ||
+             m_Service->GetPlanePosition(60) != 0);
 
     if (error)
     {
-        MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions() == 0, "Testing remove all pos");
-        MITK_TEST_CONDITION(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(60) == 0, "Testing remove all pos");
+        MITK_TEST_CONDITION(m_Service->GetNumberOfPlanePositions() == 0, "Testing remove all pos");
+        MITK_TEST_CONDITION(m_Service->GetPlanePosition(60) == 0, "Testing remove all pos");
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

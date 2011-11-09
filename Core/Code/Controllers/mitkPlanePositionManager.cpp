@@ -1,12 +1,16 @@
 #include "mitkPlanePositionManager.h"
 #include "mitkInteractionConst.h"
 
+#include <mitkModule.h>
+#include <mitkGetModuleContext.h>
+#include <mitkModuleRegistry.h>
 
-mitk::PlanePositionManager::PlanePositionManager()
+
+mitk::PlanePositionManagerService::PlanePositionManagerService()
 {
 }
 
-mitk::PlanePositionManager::~PlanePositionManager()
+mitk::PlanePositionManagerService::~PlanePositionManagerService()
 {
   for (unsigned int i = 0; i < m_PositionList.size(); i++)
   {
@@ -14,19 +18,7 @@ mitk::PlanePositionManager::~PlanePositionManager()
   }
 }
 
-mitk::PlanePositionManager* mitk::PlanePositionManager::GetInstance()
-{
-  static mitk::PlanePositionManager* m_Instance;
-
-  if ( m_Instance == 0)
-  {
-    m_Instance = new PlanePositionManager();
-  }
-
-  return m_Instance;
-}
-
-unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
+unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
 {
     for (unsigned int i = 0; i < m_PositionList.size(); i++)
     {
@@ -65,13 +57,12 @@ unsigned int mitk::PlanePositionManager::AddNewPlanePosition ( const Geometry2D*
     return GetNumberOfPlanePositions()-1;
 }
 
-bool mitk::PlanePositionManager::RemovePlanePosition( unsigned int ID )
+bool mitk::PlanePositionManagerService::RemovePlanePosition( unsigned int ID )
 {
   if (m_PositionList.size() > ID && ID >= 0)
   {
       m_PositionList.erase(m_PositionList.begin()+ID);
-    //m_PositionList.at(ID) = 0;
-    return true;
+      return true;
   }
   else
   {
@@ -79,7 +70,7 @@ bool mitk::PlanePositionManager::RemovePlanePosition( unsigned int ID )
   }
 }
 
-mitk::RestorePlanePositionOperation* mitk::PlanePositionManager::GetPlanePosition ( unsigned int ID )
+mitk::RestorePlanePositionOperation* mitk::PlanePositionManagerService::GetPlanePosition ( unsigned int ID )
 {
   if ( ID < m_PositionList.size() )
   {
@@ -92,12 +83,12 @@ mitk::RestorePlanePositionOperation* mitk::PlanePositionManager::GetPlanePositio
   }
 }
 
-unsigned int mitk::PlanePositionManager::GetNumberOfPlanePositions()
+unsigned int mitk::PlanePositionManagerService::GetNumberOfPlanePositions()
 {
   return m_PositionList.size();
 }
 
-void mitk::PlanePositionManager::RemoveAllPlanePositions()
+void mitk::PlanePositionManagerService::RemoveAllPlanePositions()
 {
   m_PositionList.clear();
 }

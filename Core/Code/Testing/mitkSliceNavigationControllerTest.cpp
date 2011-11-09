@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkTestingMacros.h"
+#include "mitkGetModuleContext.h"
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
@@ -286,8 +287,10 @@ int testRestorePlanePostionOperation ()
     slicedgeometry2->ExecuteOperation(op);
     sliceCtrl2->Update();
 
-    mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
-    sliceCtrl1->ExecuteOperation(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(0));
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    service->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
+    sliceCtrl1->ExecuteOperation(service->GetPlanePosition(0));
     sliceCtrl1->Update();
     mitk::Geometry2D* planeRotated = slicedgeometry2->GetGeometry2D(178);
     mitk::Geometry2D* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);

@@ -36,6 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkResliceInterpolationProperty.h"
 
+#include "mitkGetModuleContext.h"
+
 const std::string QmitkSegmentationView::VIEW_ID =
 "org.mitk.views.segmentation";
 
@@ -104,7 +106,10 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
-    mitk::PlanePositionManager::GetInstance()->RemoveAllPlanePositions();
+    //mitk::PlanePositionManager::GetInstance()->RemoveAllPlanePositions();
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    service->RemoveAllPlanePositions();
   }
 }
 
@@ -614,8 +619,9 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     unsigned int t = nodeName.find_last_of(" ");
     unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
 
-    //selectedRenderWindow->GetSliceNavigationController()->RestorePlanePosition(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
-    selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(mitk::PlanePositionManager::GetInstance()->GetPlanePosition(id));
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
     selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

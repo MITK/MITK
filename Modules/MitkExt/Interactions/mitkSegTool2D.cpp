@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 #include "mitkPlanarCircle.h"
 
+#include "mitkGetModuleContext.h"
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -239,8 +241,10 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
-  unsigned int size = mitk::PlanePositionManager::GetInstance()->GetNumberOfPlanePositions();
-  unsigned int id = mitk::PlanePositionManager::GetInstance()->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
+  mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+  PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+  unsigned int size = service->GetNumberOfPlanePositions();
+  unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
   if (plane)
   {

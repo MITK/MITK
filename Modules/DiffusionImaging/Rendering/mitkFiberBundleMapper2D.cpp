@@ -238,26 +238,57 @@ vtkProp* mitk::FiberBundleMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {    //add shader to datano
-  
-  
+
+
   //####### load shader from file #########
-  std::string m_VolumeDir = MITK_ROOT;
-  m_VolumeDir += "Modules/DiffusionImaging/Rendering/";
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+
+  QString applicationDir = QCoreApplication::applicationDirPath();
+  MITK_INFO << QCoreApplication::applicationDirPath().toStdString().c_str();
+
+    applicationDir.append("/");
+
+
+
+
+  MITK_INFO << applicationDir.toStdString().c_str();
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
   mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+
+
+  std::string filepath = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml");
+  if ( filepath.empty() )
+{
+  applicationDir = QCoreApplication::applicationDirPath();
+  applicationDir.append("\\..\\");
+  MITK_INFO << "WINWAS";
+
+
+  QString lutPath(applicationDir);
+  MITK_INFO << applicationDir.toStdString().c_str();
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
+
+
+}
+
+
+
   shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
+
+
+
   //####################################################################
-  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));  
+  node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
   mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
-  
-  
+
+
   //add other parameters to propertylist
   node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );
   node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
-  
-  
+
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
+
 
 
 

@@ -75,7 +75,7 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
       || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
       || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
-    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+//    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
     this->GenerateDataForRenderer( renderer );
   }
 
@@ -150,7 +150,6 @@ void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rende
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  MITK_INFO << "FiberBundlemapper2D _ GENERATE DATA";
 
   //the handler of local storage gets feeded in this method with requested data for related renderwindow
   FBLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
@@ -243,7 +242,7 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   //####### load shader from file #########
 
   QString applicationDir = QCoreApplication::applicationDirPath();
-  MITK_INFO << QCoreApplication::applicationDirPath().toStdString().c_str();
+  MITK_INFO << "pathAppdir: " << QCoreApplication::applicationDirPath().toStdString().c_str();
   applicationDir.append("/");
 
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );

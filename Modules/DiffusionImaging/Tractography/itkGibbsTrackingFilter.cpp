@@ -424,10 +424,6 @@ namespace itk{
     // load lookuptable
     QString applicationDir = QCoreApplication::applicationDirPath();
     
-    ifstream BaryCoords;
-    QString lutPath(applicationDir+"/FiberTrackingLUTBaryCoords.bin");
-
-
     if (applicationDir.endsWith("bin"))
       applicationDir.append("/");
     else if (applicationDir.endsWith("MacOS"))

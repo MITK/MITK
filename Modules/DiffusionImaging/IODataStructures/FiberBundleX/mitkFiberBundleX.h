@@ -35,6 +35,8 @@
 #include <vtkPoints.h> // my be replaced by class
 #include <vtkDataSet.h>
 
+#include <QStringList>
+
 namespace mitk {
 
   /**
@@ -64,7 +66,6 @@ namespace mitk {
     
     mitkClassMacro( FiberBundleX, BaseData );
     itkNewMacro( Self );
-
     //custom constructor with passing argument
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>)
 
@@ -79,6 +80,7 @@ namespace mitk {
     bool isFiberBundleXModified();
     void setFBXModificationDone();
     void UpdateFiberGeometry();
+    QStringList GetAvailableColorCodings();
     
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();

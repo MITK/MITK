@@ -84,9 +84,9 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFiberPolyData()
 
 
 
-/*==============================================
- *++++ PROCESSING WITH FIBER INFORMATION +++++++
- =============================================*/
+/*===================================
+ *++++ PROCESSING WITH FIBERS +++++++
+ ====================================*/
 
 void mitk::FiberBundleX::DoColorCodingOrientationbased()
 {
@@ -264,7 +264,6 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 
 }
 
-
 void mitk::FiberBundleX::UpdateFiberGeometry()
 {
 
@@ -314,7 +313,7 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
 
     for(int i=1; i<=5; i+=2){
         b[i] +=10;
-      }
+    }
 
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->SetImageGeometry(true);
@@ -326,10 +325,27 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
 
 }
 
+/*==============================
+ *++++ FIBER INFORMATION +++++++
+ ===============================*/
+
+QStringList mitk::FiberBundleX::GetAvailableColorCodings()
+{
+    int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
+    for(int i=0; i<numColors; ++i)
+    {
+        MITK_INFO << m_FiberPolyData->GetPointData()->GetArrayName(i);
+        //todo store sting in QStringList
+    }
+
+}
+
 char* mitk::FiberBundleX::getCurrentColorCoding()
 {
     return m_currentColorCoding;
 }
+
+
 
 bool mitk::FiberBundleX::isFiberBundleXModified()
 {
@@ -339,6 +355,11 @@ void mitk::FiberBundleX::setFBXModificationDone()
 {
     m_isModified = false;
 }
+
+
+
+
+
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()

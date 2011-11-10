@@ -92,6 +92,7 @@ SET(CPP_FILES
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper2D.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
+  Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
@@ -119,6 +120,7 @@ SET(H_FILES
   Rendering/mitkFiberBundleMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
+  Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkPlanarCircleMapper3D.h
   Rendering/mitkPlanarPolygonMapper3D.h

@@ -72,6 +72,12 @@ namespace mitk
     this->Concatenate( t );
   }
 
+  void Transform::Reset()
+  {
+    mitk::NavigationData::Pointer nd
+      = NavigationData::New();
+    this->Copy( nd );
+  }
   void  Transform::SetOrientation(
       const vnl_quaternion<mitk::ScalarType>& orientation)
   {

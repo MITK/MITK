@@ -98,6 +98,10 @@ namespace mitk {
     /// invert this transform
     ///
     void Invert();
+    ///
+    /// resets the internal variables except type
+    ///
+    void Reset();
 
     ///
     /// read from xml

@@ -176,52 +176,7 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       }
 
       bool dsmodified = false;
-
-      QString *fileName = new QString(dataset.data());
-
-      if ( fileName->right(5) == ".mitk" )
-      {
-        mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
-
-        bool clearDataStorageFirst(false);
-        QString *sClear = new QString(clear.data());
-        if ( sClear->right(4) == "true" )
-        {
-          clearDataStorageFirst = true;
-        }
-
-        mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-        dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
-        dsmodified = true;
-        mitk::ProgressBar::GetInstance()->Progress(2);
-      }
-      else
-      {
-        mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-        try
-        {
-          nodeReader->SetFileName(fileName->toLocal8Bit().data());
-          nodeReader->Update();
-          for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
-          {
-            mitk::DataNode::Pointer node;
-            node = nodeReader->GetOutput(i);
-            if ( node->GetData() != NULL )
-            {
-              dataStorage->Add(node);
-              dsmodified = true;
-            }
-          }
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not open file!";
-        }
-      }
-
-
-
-      if(dataStorage.IsNotNull() && dsmodified)
+     if(dataStorage.IsNotNull() && dsmodified)
       {
         // get all nodes that have not set "includeInBoundingBox" to false
         mitk::NodePredicateNot::Pointer pred
@@ -238,10 +193,6 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
           mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
         }
       }
-
-
-
-
 
     }
     // searching for the load

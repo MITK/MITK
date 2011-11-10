@@ -24,6 +24,7 @@
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkOrientationDistributionFunction.h>
 #include <itkImageDuplicator.h>
+#include <mitkStandardFileLocations.h>
 
 struct LessDereference {
     template <class T>
@@ -77,14 +78,14 @@ template< class TInputOdfImage, class TInputROIImage >
 void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::ComputeFiberCorrelation(){
-    
+
     //    float bD = 15;
-    
+
     //    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
     //        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
-    
+
     //    const int N = QBALL_ODFSIZE;
-    
+
     //    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
     //    vnl_matrix_fixed<double, N, N> C = temp*bDir;
     //    vnl_matrix_fixed<double, N, N> Q = C;
@@ -100,14 +101,14 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     //      }
     //      mean[i] = tempMean/N;
     //    }
-    
+
     //    vnl_matrix_fixed<double, N, N> repMean;
     //    for (int i=0; i<N; i++)
     //      repMean.set_row(i, mean);
     //    Q -= repMean;
-    
+
     //    vnl_matrix_fixed<double, N, N> P = Q*Q;
-    
+
     //    std::vector<const double *> pointer;
     //    pointer.reserve(N*N);
     //    double * start = C.data_block();
@@ -117,18 +118,18 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     //      pointer.push_back(iter);
     //    }
     //    std::sort(pointer.begin(), pointer.end(), LessDereference());
-    
+
     //    vnl_vector_fixed<double,N*N> alpha;
     //    vnl_vector_fixed<double,N*N> beta;
     //    for (int i=0; i<N*N; i++) {
     //      alpha(i) = *pointer[i];
     //      beta(i)  = *(P.data_block()+(pointer[i]-start));
     //    }
-    
+
     //    double nfac = sqrt(beta(N*N-1));
     //    beta = beta / (nfac*nfac);
     //    Q = Q / nfac;
-    
+
     //    double sum = 0;
     //    for(int i=0; i<N; i++)
     //    {
@@ -137,7 +138,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     //    // if left to default 0
     //    // then mean is not substracted in order to correct odf integral
     //    // this->m_Meanval_sq = (sum*sum)/N;
-    
+
     //    vnl_vector_fixed<double,N*N> alpha_0;
     //    vnl_vector_fixed<double,N*N> alpha_2;
     //    vnl_vector_fixed<double,N*N> alpha_4;
@@ -149,19 +150,19 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     //      alpha_4(i) = alpha_2(i)*alpha_2(i);
     //      alpha_6(i) = alpha_4(i)*alpha_2(i);
     //    }
-    
+
     //    vnl_matrix_fixed<double, N*N, 4> T;
     //    T.set_column(0,alpha_0);
     //    T.set_column(1,alpha_2);
     //    T.set_column(2,alpha_4);
     //    T.set_column(3,alpha_6);
-    
+
     //    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
-    
+
     //    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
-    
+
     BESSEL_APPROXCOEFF = new float[4];
-    
+
     //    BESSEL_APPROXCOEFF[0] = coeff(0);
     //    BESSEL_APPROXCOEFF[1] = coeff(1);
     //    BESSEL_APPROXCOEFF[2] = coeff(2);
@@ -179,25 +180,25 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::BuildFibers(float* points, int numPoints)
 {
     MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
-    
+
     typename InputQBallImageType::Pointer odfImage
             = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
     double spacing[3];
     spacing[0] = odfImage->GetSpacing().GetElement(0);
     spacing[1] = odfImage->GetSpacing().GetElement(1);
     spacing[2] = odfImage->GetSpacing().GetElement(2);
-    
+
     // initialize array of particles
     CCAnalysis ccana(points, numPoints, spacing);
-    
+
     // label the particles according to fiber affiliation and return number of fibers
     int numFibers = ccana.iterate(m_FiberLength);
-    
+
     if (numFibers<=0){
         MITK_INFO << "itkGibbsTrackingFilter: 0 fibers accepted";
         return;
     }
-    
+
     // fill output datastructure
     m_FiberBundle.clear();
     for (int i = 0; i < numFibers; i++)
@@ -238,7 +239,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         m_BuildFibers = true;
         while (m_BuildFibers){}
     }
-    
+
     return &m_FiberBundle;
 }
 
@@ -257,31 +258,31 @@ template< class TInputOdfImage, class TInputROIImage >
 bool
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::EstimateParticleWeight(){
-    
+
     if (m_GfaImage.IsNull())
     {
         MITK_INFO << "no gfa image found";
         return false;
     }
-    
+
     float samplingStart = 1.0;
     float samplingStop = 0.66;
-    
+
     // copy GFA image (original should not be changed)
     typedef itk::ImageDuplicator< GfaImageType > DuplicateFilterType;
     DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
     duplicator->SetInputImage( m_GfaImage );
     duplicator->Update();
     m_GfaImage = duplicator->GetOutput();
-    
+
     //// GFA iterator ////
     typedef ImageRegionIterator< GfaImageType > GfaIteratorType;
     GfaIteratorType gfaIt(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
-    
+
     //// Mask iterator ////
     typedef ImageRegionConstIterator< MaskImageType > MaskIteratorType;
     MaskIteratorType maskIt(m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
-    
+
     // set unmasked region of gfa image to 0
     gfaIt.GoToBegin();
     maskIt.GoToBegin();
@@ -292,7 +293,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         ++gfaIt;
         ++maskIt;
     }
-    
+
     // rescale gfa image to [0,1]
     typedef itk::RescaleIntensityImageFilter< GfaImageType, GfaImageType > RescaleFilterType;
     RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
@@ -302,11 +303,11 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     rescaleFilter->Update();
     m_GfaImage = rescaleFilter->GetOutput();
     gfaIt = GfaIteratorType(m_GfaImage, m_GfaImage->GetLargestPossibleRegion() );
-    
+
     //// Input iterator ////
     typedef ImageRegionConstIterator< InputQBallImageType > InputIteratorType;
     InputIteratorType git(m_ItkQBallImage, m_ItkQBallImage->GetLargestPossibleRegion() );
-    
+
     float upper = 0;
     int count = 0;
     for(float thr=samplingStart; thr>samplingStop; thr-=0.01)
@@ -330,7 +331,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         upper /= count;
     else
         return false;
-    
+
     m_ParticleWeight = upper/6;
     return true;
 }
@@ -340,29 +341,29 @@ template< class TInputOdfImage, class TInputROIImage >
 void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::GenerateData(){
-    
+
     // input qball image
     m_ItkQBallImage = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
-    
+
     // approximationscoeffizienten der
     // teilchenkorrelationen im orientierungsraum
     // 4er vektor
     ComputeFiberCorrelation();
-    
+
     // image sizes and spacing
     int qBallImageSize[4] = {QBALL_ODFSIZE,
                              m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(0),
                              m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(1),
                              m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(2)};
     double qBallImageSpacing[3] = {m_ItkQBallImage->GetSpacing().GetElement(0),m_ItkQBallImage->GetSpacing().GetElement(1),m_ItkQBallImage->GetSpacing().GetElement(2)};
-    
+
     // make sure image has enough slices
     if (qBallImageSize[1]<3 || qBallImageSize[2]<3 || qBallImageSize[3]<3)
     {
         MITK_INFO << "itkGibbsTrackingFilter: image size < 3 not supported";
         m_AbortTracking = true;
     }
-    
+
     // calculate rotation matrix
     vnl_matrix_fixed<double, 3, 3>  directionMatrix = m_ItkQBallImage->GetDirection().GetVnlMatrix();
     vnl_vector_fixed<double, 3> d0 = directionMatrix.get_column(0); d0.normalize();
@@ -376,14 +377,14 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
         m_AbortTracking = true;
     }
-    
+
     // generate local working copy of image buffer
     int bufferSize = qBallImageSize[0]*qBallImageSize[1]*qBallImageSize[2]*qBallImageSize[3];
     float* qBallImageBuffer = (float*) m_ItkQBallImage->GetBufferPointer();
     float* workingQballImage = new float[bufferSize];
     for (int i=0; i<bufferSize; i++)
         workingQballImage[i] = qBallImageBuffer[i];
-    
+
     // perform mean subtraction on odfs
     if (m_SubtractMean)
     {
@@ -401,7 +402,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
             sum += workingQballImage[i];
         }
     }
-    
+
     // mask image
     int maskImageSize[3];
     float *mask;
@@ -420,106 +421,63 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         maskImageSize[2] = qBallImageSize[3];
     }
     int mask_oversamp_mult = maskImageSize[0]/qBallImageSize[1];
-    
+
     // load lookuptable
     QString applicationDir = QCoreApplication::applicationDirPath();
-    
-    if (applicationDir.endsWith("bin"))
-        applicationDir.append("/");
-    else if (applicationDir.endsWith("MacOS"))
-    {
-        //on osx, check if path for installer or MITK development is needed
-        applicationDir.append("/");
-        QFile f( applicationDir+"FiberTrackingLUTBaryCoords.bin" );
-        if( !f.exists() ) // if file does not exist, then look in MITK development build directory
-            applicationDir.append("../../../");
-    }else
-        applicationDir.append("\\..\\");
+    applicationDir.append("/");
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
+    applicationDir.append("../");
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
+    applicationDir.append("../../");
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
 
+    std::string lutPath = mitk::StandardFileLocations::GetInstance()->FindFile("FiberTrackingLUTBaryCoords.bin");
     ifstream BaryCoords;
-    QString lutPath(applicationDir+"FiberTrackingLUTBaryCoords.bin");
-    BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
+    BaryCoords.open(lutPath.c_str(), ios::in | ios::binary);
     float* coords;
     if (BaryCoords.is_open())
     {
-        float tmp;
-        coords = new float [1630818];
-        BaryCoords.seekg (0, ios::beg);
-        for (int i=0; i<1630818; i++)
-        {
-            BaryCoords.read((char *)&tmp, sizeof(tmp));
-            coords[i] = tmp;
-        }
-        BaryCoords.close();
+      float tmp;
+      coords = new float [1630818];
+      BaryCoords.seekg (0, ios::beg);
+      for (int i=0; i<1630818; i++)
+      {
+          BaryCoords.read((char *)&tmp, sizeof(tmp));
+          coords[i] = tmp;
+      }
+      BaryCoords.close();
     }
     else
     {
-        lutPath = applicationDir+"\\..\\FiberTrackingLUTBaryCoords.bin";
-
-        BaryCoords.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
-        if (BaryCoords.is_open())
-        {
-            float tmp;
-            coords = new float [1630818];
-            BaryCoords.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
-            {
-                BaryCoords.read((char *)&tmp, sizeof(tmp));
-                coords[i] = tmp;
-            }
-            BaryCoords.close();
-        } else {
-
-            MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
-            m_AbortTracking = true;
-        }
-
+      MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
+      m_AbortTracking = true;
     }
-    
+
     ifstream Indices;
-    lutPath = applicationDir+"/FiberTrackingLUTIndices.bin";
-    Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
+    lutPath = mitk::StandardFileLocations::GetInstance()->FindFile("FiberTrackingLUTIndices.bin");
+    Indices.open(lutPath.c_str(), ios::in | ios::binary);
     int* ind;
     if (Indices.is_open())
     {
-        int tmp;
-        ind = new int [1630818];
-        Indices.seekg (0, ios::beg);
-        for (int i=0; i<1630818; i++)
-        {
-            Indices.read((char *)&tmp, 4);
-            ind[i] = tmp;
-        }
-        Indices.close();
+      int tmp;
+      ind = new int [1630818];
+      Indices.seekg (0, ios::beg);
+      for (int i=0; i<1630818; i++)
+      {
+          Indices.read((char *)&tmp, 4);
+          ind[i] = tmp;
+      }
+      Indices.close();
     }
     else
     {
-        lutPath = applicationDir+"\\..\\FiberTrackingLUTIndices.bin";
-        Indices.open(lutPath.toStdString().c_str(), ios::in | ios::binary);
-
-        if (Indices.is_open())
-        {
-            int tmp;
-            ind = new int [1630818];
-            Indices.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
-            {
-                Indices.read((char *)&tmp, 4);
-                ind[i] = tmp;
-            }
-            Indices.close();
-        }
-
-        else
-        {
-            MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
-            m_AbortTracking = true;
-        }
+      MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
+      m_AbortTracking = true;
     }
-    
+
     // initialize sphere interpolator with lookuptables
     SphereInterpolator *sinterp = new SphereInterpolator(coords, ind, QBALL_ODFSIZE, 301, 0.5);
-    
+
     // get paramters
     float minSpacing;
     if(qBallImageSpacing[0]<qBallImageSpacing[1] && qBallImageSpacing[0]<qBallImageSpacing[2])
@@ -528,7 +486,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         minSpacing = qBallImageSpacing[1];
     else
         minSpacing = qBallImageSpacing[2];
-    
+
     if(m_ParticleLength == 0)
         m_ParticleLength = 1.5*minSpacing;
     if(m_ParticleWidth == 0)
@@ -543,7 +501,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     MITK_INFO << "Iterations: " << m_NumIt;
     m_CurrentStep = 0;
     m_Memory = 0;
-    
+
     float cellsize = 2*m_ParticleLength;
     float curvatureHardThreshold = 0.7;
     float alpha = log(m_TempEnd/m_TempStart);
@@ -557,20 +515,20 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     }
     MITK_INFO << "Steps: " << m_Steps;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
-    
+
     // setup metropolis hastings sampler
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
     if (m_Sampler!=NULL)
         delete m_Sampler;
     m_Sampler = new RJMCMC(NULL, 0, workingQballImage, qBallImageSize, qBallImageSpacing, cellsize);
-    
+
     // setup energy computer
     MITK_INFO << "itkGibbsTrackingFilter: setting up Energy-computer";
     EnergyComputer encomp(workingQballImage,qBallImageSize,qBallImageSpacing,sinterp,&(m_Sampler->m_ParticleGrid),mask,mask_oversamp_mult, directionMatrix);
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,curvatureHardThreshold,m_InexBalance,m_Chempot2);
     m_Sampler->SetEnergyComputer(&encomp);
     m_Sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,curvatureHardThreshold,m_ChempotParticle);
-    
+
     // main loop
     for( int step = 0; step < m_Steps; step++ )
     {
@@ -599,20 +557,20 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
             m_BuildFibers = false;
         }
     }
-    
+
     int numPoints = m_Sampler->m_ParticleGrid.pcnt;
     float* points = new float[numPoints*m_Sampler->m_NumAttributes];
     m_Sampler->WriteOutParticles(points);
     BuildFibers(points, numPoints);
     delete points;
-    
+
     delete sinterp;
     delete coords;
     delete ind;
     delete workingQballImage;
     m_AbortTracking = true;
     m_BuildFibers = false;
-    
+
     MITK_INFO << "itkGibbsTrackingFilter: done generate data";
 }
 }

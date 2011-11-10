@@ -93,14 +93,11 @@ namespace mitk {
     {
       int returnValue = 0;
 
-      if (i<m_Dimension)
+      // return the true size if dimension available
+      if (i< (int) m_Dimension)
         returnValue = m_Dimensions[i];
-      else
-      {
 
-      }
-
-
+      return returnValue;
     }
 
     ImageDataItem::ConstPointer GetParent() const

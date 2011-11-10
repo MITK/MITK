@@ -509,16 +509,12 @@ public:
   DEPRECATED (unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
 
 
-  const StatisticsHolderPointer GetStatistics() const
+  StatisticsHolderPointer GetStatistics() const
   {
     return m_ImageStatistics;
   }
 
 protected:
-
-  friend class ImageStatisticsHolder;
-
-  StatisticsHolderPointer m_ImageStatistics;
   
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
@@ -561,6 +557,10 @@ protected:
 
   size_t *m_OffsetTable;
   ImageDataItemPointer m_CompleteData;
+
+  // Image statistics Holder replaces the former implementation directly inside this class
+  friend class ImageStatisticsHolder;
+  StatisticsHolderPointer m_ImageStatistics;
 
 };
 

@@ -112,7 +112,7 @@ public:
   *
   * Each pixel can consist of multiple components, e.g. RGB.
   */
-  inline int GetNumberOfComponents() const
+  inline size_t GetNumberOfComponents() const
   {
     return m_NumberOfComponents;    
   }
@@ -120,7 +120,7 @@ public:
   /** \brief Get the number of bits per components
   * \sa GetBitsPerComponent
   */
-  inline int GetBitsPerComponent() const
+  inline size_t GetBitsPerComponent() const
   {
     return m_BytesPerComponent * 8;
   }

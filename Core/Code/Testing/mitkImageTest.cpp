@@ -315,7 +315,7 @@ int mitkImageTest(int argc, char* argv[])
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
-    return NULL;
+    return 0;
   }  
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

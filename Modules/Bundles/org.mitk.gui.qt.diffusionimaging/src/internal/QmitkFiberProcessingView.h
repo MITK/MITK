@@ -70,6 +70,10 @@ public:
   typedef itk::Image< unsigned char, 3 >    MaskImage3DType;
   typedef itk::Image< float, 3 >            FloatImageType;
 
+  typedef mitk::FiberBundle::ContainerPointType   ContainerPointType;
+  typedef mitk::FiberBundle::ContainerTractType   ContainerTractType;
+  typedef mitk::FiberBundle::ContainerType        ContainerType;
+
   static const std::string VIEW_ID;
 
   QmitkFiberProcessingView();
@@ -159,6 +163,8 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
           const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex );
+
+  void GenerateStats();
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;

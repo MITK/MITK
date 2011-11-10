@@ -171,7 +171,7 @@ void QmitkGibbsTrackingView::AfterThread()
   }
   if(m_Controls->m_ParticleLengthSlider->value()==0)
   {
-    m_Controls->m_ParticleWidthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
+    m_Controls->m_ParticleLengthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
     m_Controls->m_ParticleLengthSlider->setValue(m_GlobalTracker->GetParticleLength()*10);
     paramMessage += "Particle length was set to " + QString::number(m_GlobalTracker->GetParticleLength()) + " mm\n";
   }

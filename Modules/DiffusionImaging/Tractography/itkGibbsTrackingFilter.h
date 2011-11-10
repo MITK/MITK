@@ -9,6 +9,7 @@
 #include "GibbsTracking/auxilary_classes.cpp"
 
 #include <fstream>
+#include <QFile>
 
 namespace itk{
 

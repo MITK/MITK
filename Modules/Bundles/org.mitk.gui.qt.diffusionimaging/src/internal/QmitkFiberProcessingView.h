@@ -99,10 +99,6 @@ public:
   void SubstractBundles();
   void GenerateROIImage();
   void GenerationStart();
-  void GenerateStats();
-  void MirrorFibX();
-  void MirrorFibY();
-  void MirrorFibZ();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
@@ -167,6 +163,8 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
           const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex );
+
+  void GenerateStats();
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;

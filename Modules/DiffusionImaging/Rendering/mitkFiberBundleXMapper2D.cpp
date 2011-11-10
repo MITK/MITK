@@ -49,9 +49,9 @@ mitk::FiberBundleXMapper2D::~FiberBundleXMapper2D()
 }
 
 
-const mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
+mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 {
-    return dynamic_cast<const mitk::FiberBundleX * > ( GetData() );
+    return dynamic_cast< mitk::FiberBundleX * > ( GetData() );
 }
 
 
@@ -170,9 +170,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
 
 ///THIS GET INPUT
-    const mitk::FiberBundleX* fbx = this->GetInput();
-//extract polydata
-    //todo
+    mitk::FiberBundleX* fbx = this->GetInput();
     
     vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
     lut->Build();
@@ -183,7 +181,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
 
     //  feed the vtk fiber mapper with point data ...TODO do in constructor
-    localStorage->m_PointMapper->SetInput(localStorage->m_SlicedResult);   // in optimized version, mapper is feeded by localStorage->m_cutter->GetOutput();
+    localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
 

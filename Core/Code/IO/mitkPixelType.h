@@ -206,7 +206,7 @@ PixelType MakePixelType()
   // get the component type ( is either directly ImportPixelType or ImportPixelType::ValueType for compound types )
   typedef typename GetComponentType<ImportPixelType>::ComponentType ComponentT;
 
-  // FIXME The PixelType is the same as the ComponentT for simple types
+  // The PixelType is the same as the ComponentT for simple types
   typedef typename ItkImageType::PixelType PixelT;
 
   // Get the length of compound type ( initialized to 1 for simple types and variable-length vector images)
@@ -215,7 +215,7 @@ PixelType MakePixelType()
 
   // call the constructor
   return PixelType(
-            typeid(ComponentT), typeid(ItkImageType),
+            typeid(ComponentT), typeid(PixelT),
             sizeof(ComponentT), numComp,
             ComponentTypeToString<ComponentT>(),
             PixelTypeToString<PixelT >()

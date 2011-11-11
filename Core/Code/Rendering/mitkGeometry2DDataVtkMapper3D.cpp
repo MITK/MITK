@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DDataVtkMapper3D.h"
 
 #include "mitkImageVtkMapper2D.h"
-#include "mitkLookupTableProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkSurface.h"
 #include "mitkVtkRepresentationProperty.h"
@@ -32,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkHedgeHog.h>
 #include <vtkImageData.h>
 #include <vtkLinearTransform.h>
-#include <vtkLookupTable.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>

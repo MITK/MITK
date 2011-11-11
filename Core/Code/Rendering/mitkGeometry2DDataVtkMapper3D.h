@@ -30,8 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkActor;
 class vtkPolyDataMapper;
-class vtkDataSetMapper;
-class vtkLookupTable;
 class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;

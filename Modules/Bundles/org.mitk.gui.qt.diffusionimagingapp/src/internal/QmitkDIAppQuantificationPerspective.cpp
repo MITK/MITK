@@ -33,11 +33,11 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
     false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+    layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mitk.diffusionimaginginternal.leftcontrols");
+    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
 
   /////////////////////////////////////////////
   // here goes the perspective specific stuff

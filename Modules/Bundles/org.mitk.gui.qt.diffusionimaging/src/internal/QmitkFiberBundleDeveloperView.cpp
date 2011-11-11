@@ -197,7 +197,7 @@ void QmitkFiberGenerateRandomWorker::run()
   }
   
   /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
-  vtkPolyData* PDRandom = vtkPolyData::New(); //no need to delete because data is needed in datastorage.
+  vtkSmartPointer<vtkPolyData> PDRandom = vtkPolyData::New(); //could also be a standard pointer instead of smartpointer cuz ther is no need to delete because data is managed in datastorage.
   PDRandom->SetPoints(pnts);
   PDRandom->SetLines(linesCell);
   
@@ -756,15 +756,12 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
   
 } 
 
-void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadOutput)
+void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkPolyData> threadOutput)
 {
   
   MITK_INFO << "lines: " << threadOutput->GetNumberOfLines() << "pnts: " << threadOutput->GetNumberOfPoints();
   //qthread mutex lock
-  mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New(threadOutput);
-//  FB->SetFiberPolyData();
-//  FB->SetGeometry(this->GenerateStandardGeometryForMITK());
-  
+  mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New(threadOutput);  
   mitk::DataNode::Pointer FBNode;
   FBNode = mitk::DataNode::New();
   FBNode->SetName("FiberBundleX");
@@ -785,6 +782,7 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadO
     mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
     // initialize the views to the bounding geometry
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+
   } else {
     
     GetDataStorage()->Modified();
@@ -1013,7 +1011,7 @@ mitk::Geometry3D::Pointer QmitkFiberBundleDeveloperView::GenerateStandardGeometr
   
   
   // generate identity transform-matrix
-  vtkMatrix4x4* m = vtkMatrix4x4::New();
+  vtkSmartPointer<vtkMatrix4x4> m = vtkMatrix4x4::New();
   geometry->SetIndexToWorldTransformByVtkMatrix(m);
   
   // generate boundingbox

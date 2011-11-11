@@ -25,7 +25,7 @@
 #define _MITK_FiberBundleX_H
 
 //includes for MITK datastructure
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 #include "MitkDiffusionImagingExports.h"
 
 
@@ -64,8 +64,8 @@ namespace mitk {
     virtual void SetRequestedRegion( itk::DataObject *data );
     //=======================================
     
-    mitkClassMacro( FiberBundleX, BaseData );
-    itkNewMacro( Self );
+    mitkClassMacro( FiberBundleX, BaseData )
+    itkNewMacro( Self )
     //custom constructor with passing argument
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>)
 

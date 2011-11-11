@@ -185,7 +185,7 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
   /** A default grayscale lookup-table, used for reference */
-  vtkLookupTable *m_DefaultLookupTable;
+//  vtkLookupTable *m_DefaultLookupTable;
 
   class MITK_CORE_EXPORT ActorInfo
   {
@@ -208,23 +208,23 @@ protected:
   typedef std::map< ImageVtkMapper2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
 
-  struct LookupTableProperties
-  {
-    LookupTableProperties()
-    : LookupTableSource( NULL ),
-      windowMin( 0.0 ),
-      windowMax( 4096.0 )
-    {}
-    vtkLookupTable *LookupTableSource;
-    vtkFloatingPointType windowMin;
-    vtkFloatingPointType windowMax;
-  };
+//  struct LookupTableProperties
+//  {
+//    LookupTableProperties()
+//    : LookupTableSource( NULL ),
+//      windowMin( 0.0 ),
+//      windowMax( 4096.0 )
+//    {}
+//    vtkLookupTable *LookupTableSource;
+//    vtkFloatingPointType windowMin;
+//    vtkFloatingPointType windowMax;
+//  };
 
-  typedef std::map< ImageVtkMapper2D *, LookupTableProperties >
-    LookupTablePropertiesList;
+//  typedef std::map< ImageVtkMapper2D *, LookupTableProperties >
+//    LookupTablePropertiesList;
 
-  /** \brief List holding some lookup table properties of the previous pass */
-  LookupTablePropertiesList m_LookupTableProperties;
+//  /** \brief List holding some lookup table properties of the previous pass */
+//  LookupTablePropertiesList m_LookupTableProperties;
 
   // responsiblity to remove the observer upon its destruction
   typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;

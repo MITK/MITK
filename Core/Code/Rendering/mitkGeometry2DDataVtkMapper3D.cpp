@@ -124,13 +124,13 @@ namespace mitk
     m_BackNormalsActor = vtkActor::New();
     m_BackNormalsActor->SetMapper(m_BackNormalsMapper);
 
-    m_DefaultLookupTable = vtkLookupTable::New();
-    m_DefaultLookupTable->SetTableRange( -1024.0, 4096.0 );
-    m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
-    m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
-    m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
-    m_DefaultLookupTable->Build();
-    m_DefaultLookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
+//    m_DefaultLookupTable = vtkLookupTable::New();
+//    m_DefaultLookupTable->SetTableRange( -1024.0, 4096.0 );
+//    m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
+//    m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
+//    m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
+//    m_DefaultLookupTable->Build();
+//    m_DefaultLookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
 
     m_ImageMapperDeletedCommand = MemberCommandType::New();
     m_ImageMapperDeletedCommand->SetCallbackFunction(
@@ -150,7 +150,7 @@ namespace mitk
     m_EdgeActor->Delete();
     m_BackgroundMapper->Delete();
     m_BackgroundActor->Delete();
-    m_DefaultLookupTable->Delete();
+//    m_DefaultLookupTable->Delete();
     m_FrontNormalsMapper->Delete();
     m_FrontNormalsActor->Delete();
     m_FrontHedgeHog->Delete();
@@ -161,15 +161,15 @@ namespace mitk
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
 
-    LookupTablePropertiesList::iterator it;
-    for(it = m_LookupTableProperties.begin(); it != m_LookupTableProperties.end();++it)
-    {
-      if ( it->second.LookupTableSource != NULL )
-      {
-        it->second.LookupTableSource->Delete();
-        it->second.LookupTableSource = NULL;
-      }
-    }
+//    LookupTablePropertiesList::iterator it;
+//    for(it = m_LookupTableProperties.begin(); it != m_LookupTableProperties.end();++it)
+//    {
+//      if ( it->second.LookupTableSource != NULL )
+//      {
+//        it->second.LookupTableSource->Delete();
+//        it->second.LookupTableSource = NULL;
+//      }
+//    }
     m_DataStorage = NULL;
   }
 
@@ -218,11 +218,11 @@ namespace mitk
         m_ImageActors[imageMapper].m_Sender = NULL; // sender is already destroying itself
         m_ImageActors.erase( imageMapper );
       }
-      if ( m_LookupTableProperties.count( imageMapper ) > 0 )
-      {
-        m_LookupTableProperties[imageMapper].LookupTableSource->Delete();
-        m_LookupTableProperties.erase( imageMapper );
-      }
+//      if ( m_LookupTableProperties.count( imageMapper ) > 0 )
+//      {
+//        m_LookupTableProperties[imageMapper].LookupTableSource->Delete();
+//        m_LookupTableProperties.erase( imageMapper );
+//      }
     }
   }
 
@@ -500,7 +500,7 @@ namespace mitk
             // render the image associated with the ImageVtkMapper2D.
             vtkActor *imageActor;
             vtkDataSetMapper *dataSetMapper = NULL;
-            vtkLookupTable *lookupTable;
+//            vtkLookupTable *lookupTable;
             vtkTexture *texture;
             if ( m_ImageActors.count( imageMapper ) == 0 )
             {
@@ -508,21 +508,21 @@ namespace mitk
               //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
-              lookupTable = vtkLookupTable::New();
-              lookupTable->DeepCopy( m_DefaultLookupTable );
+//              lookupTable = vtkLookupTable::New();
+//              lookupTable->DeepCopy( m_DefaultLookupTable );
 
               texture = vtkTexture::New();
               texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
-              imageActor->GetProperty()->SetAmbient( 0.5 );
+//              imageActor->GetProperty()->SetAmbient( 0.5 );
               imageActor->SetMapper( dataSetMapper );
               imageActor->SetTexture( texture );
 
               // Make imageActor the sole owner of the mapper and texture
               // objects
-              lookupTable->UnRegister( NULL );
+//              lookupTable->UnRegister( NULL );
               dataSetMapper->UnRegister( NULL );
               texture->UnRegister( NULL );
 
@@ -538,7 +538,7 @@ namespace mitk
               dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
               texture = imageActor->GetTexture();
 
-              lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
+//              lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
             }
 
             // Set poly data new each time its object changes (e.g. when
@@ -548,11 +548,11 @@ namespace mitk
               dataSetMapper->SetInput( surface->GetVtkPolyData() );
             }
 
-            imageActor->GetMapper()->GetInput()->Update();
-            imageActor->GetMapper()->Update();
+//            imageActor->GetMapper()->GetInput()->Update();
+//            imageActor->GetMapper()->Update();
 
-            // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
-            renderer->GetRenderWindow()->MakeCurrent();
+//            // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
+//            renderer->GetRenderWindow()->MakeCurrent();
 
             if(localStorage->m_ReslicedImage != NULL)
             {
@@ -566,13 +566,13 @@ namespace mitk
               bool binary = false;
               node->GetBoolProperty( "binary", binary, renderer );
 
-              // check for "use color"
-              bool useColor = false;
-              node->GetBoolProperty( "use color", useColor, planeRenderer );
+//              // check for "use color"
+//              bool useColor = false;
+//              node->GetBoolProperty( "use color", useColor, planeRenderer );
 
               // VTK (mis-)interprets unsigned char (binary) images as color images;
               // So, we must manually turn on their mapping through a (gray scale) lookup table;
-              texture->SetMapColorScalarsThroughLookupTable(binary);
+              texture->SetMapColorScalarsThroughLookupTable( localStorage->m_Texture->GetMapColorScalarsThroughLookupTable() );
 
               //if we have a binary image, the range is just 0 to 1
 //              if( binary )

@@ -108,7 +108,9 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
                            (2) // dimensions
                            )
     }
-    catch (const AccessByItkException& ) {}
+    catch (const AccessByItkException& e) {
+      std::cout << "Caught exception [from AccessFixedTypeByItk]: \n" << e.what() << "\n";
+    }
   }
   return m_OpenCVImage;
 }

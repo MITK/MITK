@@ -219,6 +219,21 @@ QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes)
   QTextStream(&result2) << b;
   ret->setData("application/x-mitk-datanode", QByteArray(result2.toAscii()));
   ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));
+
+  QString listOfIndexes("");
+  for (int i = 0; i < indexes.size(); i++)
+  {
+    TreeItem* treeItem = static_cast<TreeItem*>(indexes.at(i).internalPointer());
+    long dataNodeAddress = reinterpret_cast<long>(treeItem->GetDataNode().GetPointer());
+    QTextStream(&listOfIndexes) << dataNodeAddress;
+
+    if (i != indexes.size() - 1)
+    {
+      QTextStream(&listOfIndexes) << ",";
+    }
+  }
+  ret->setData("application/x-mitk-datanodes", QByteArray(listOfIndexes.toAscii()));
+
   return ret;
 }
 

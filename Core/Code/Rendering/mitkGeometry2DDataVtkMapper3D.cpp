@@ -490,12 +490,14 @@ namespace mitk
         if ( rendererProp.IsNotNull() )
         {
           BaseRenderer::Pointer planeRenderer = dynamic_cast< BaseRenderer * >(rendererProp->GetWeakPointer().GetPointer());
+          // Retrieve and update image to be mapped
+          const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->GetLocalStorage(planeRenderer);
 
           if ( planeRenderer.IsNotNull() )
           {
             // If it has not been initialized already in a previous pass,
             // generate an actor, a lookup table and a texture object to
-            // render the image associated with the ImageMapperGL2D.
+            // render the image associated with the ImageVtkMapper2D.
             vtkActor *imageActor;
             vtkDataSetMapper *dataSetMapper = NULL;
             vtkLookupTable *lookupTable;
@@ -510,7 +512,7 @@ namespace mitk
               lookupTable->DeepCopy( m_DefaultLookupTable );
 
               texture = vtkTexture::New();
-              texture->SetLookupTable( lookupTable );
+              texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
@@ -552,17 +554,14 @@ namespace mitk
             // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
             renderer->GetRenderWindow()->MakeCurrent();
 
-            // Retrieve and update image to be mapped
-            const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->GetLocalStorage(planeRenderer);
-
             if(localStorage->m_ReslicedImage != NULL)
             {
               texture->SetInput( localStorage->m_Texture->GetInput() );
 
               //default level window
-              ScalarType windowMin = 0.0;
-              ScalarType windowMax = 255.0;
-              LevelWindow levelWindow;
+//              ScalarType windowMin = 0.0;
+//              ScalarType windowMax = 255.0;
+//              LevelWindow levelWindow;
 
               bool binary = false;
               node->GetBoolProperty( "binary", binary, renderer );
@@ -576,84 +575,93 @@ namespace mitk
               texture->SetMapColorScalarsThroughLookupTable(binary);
 
               //if we have a binary image, the range is just 0 to 1
-              if( binary )
-              {
-                windowMin = 0;
-                windowMax = 1;
-                useColor = true;
-              }
+//              if( binary )
+//              {
+//                windowMin = 0;
+//                windowMax = 1;
+//                useColor = true;
+//              }
 
-              // check for level-window-prop and use it if it exists
-              if( !binary &&
-                  ( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
-                    || node->GetLevelWindow( levelWindow, planeRenderer ) ) )
-              {
-                windowMin = levelWindow.GetLowerWindowBound();
-                windowMax = levelWindow.GetUpperWindowBound();
-              }
+//              // check for level-window-prop and use it if it exists
+//              if( !binary &&
+//                  ( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
+//                    || node->GetLevelWindow( levelWindow, planeRenderer ) ) )
+//              {
+//                windowMin = levelWindow.GetLowerWindowBound();
+//                windowMax = levelWindow.GetUpperWindowBound();
+//              }
 
-              vtkLookupTable *lookupTableSource;
+//              vtkLookupTable *lookupTableSource;
 
 
-              // check for LookupTable
-              LookupTableProperty::Pointer lookupTableProp;
-              lookupTableProp = dynamic_cast< LookupTableProperty * >(node->GetPropertyList()->GetProperty( "LookupTable" ));
+//              // check for LookupTable
+//              LookupTableProperty::Pointer lookupTableProp;
+//              lookupTableProp = dynamic_cast< LookupTableProperty * >(node->GetPropertyList()->GetProperty( "LookupTable" ));
 
-              // If there is a lookup table supplied and we don't
-              // want to use the color property, use it;
-              //otherwise, use the default grayscale table
-              if ( lookupTableProp.IsNotNull()  && !useColor )
-              {
-                lookupTableSource = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
-              }
-              else
-              {
-                lookupTableSource = m_DefaultLookupTable;
-              }
+//              // If there is a lookup table supplied and we don't
+//              // want to use the color property, use it;
+//              //otherwise, use the default grayscale table
+//              if ( lookupTableProp.IsNotNull()  && !useColor )
+//              {
+//                lookupTableSource = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+//              }
+//              else
+//              {
+//                lookupTableSource = m_DefaultLookupTable;
+//              }
 
-              LookupTableProperties &lutProperties =
-                  m_LookupTableProperties[imageMapper];
+//              LookupTableProperties &lutProperties =
+//                  m_LookupTableProperties[imageMapper];
 
-              // If there has been some change since the last pass which
-              // makes it necessary to re-build the lookup table, do it.
-              if ( (lutProperties.LookupTableSource != lookupTableSource)
-                || (lutProperties.windowMin != windowMin)
-                || (lutProperties.windowMax != windowMax) )
-                {
-                // Note the values for the next pass (lutProperties is a
-                // reference to the list entry!)
-                if ( lutProperties.LookupTableSource != NULL )
-                {
-                  lutProperties.LookupTableSource->Delete();
-                }
-                lutProperties.LookupTableSource = lookupTableSource;
-                lutProperties.LookupTableSource->Register( NULL );
-                lutProperties.windowMin = windowMin;
-                lutProperties.windowMax = windowMax;
+//              // If there has been some change since the last pass which
+//              // makes it necessary to re-build the lookup table, do it.
+//              if ( (lutProperties.LookupTableSource != lookupTableSource)
+//                || (lutProperties.windowMin != windowMin)
+//                || (lutProperties.windowMax != windowMax) )
+//                {
+//                // Note the values for the next pass (lutProperties is a
+//                // reference to the list entry!)
+//                if ( lutProperties.LookupTableSource != NULL )
+//                {
+//                  lutProperties.LookupTableSource->Delete();
+//                }
+//                lutProperties.LookupTableSource = lookupTableSource;
+//                lutProperties.LookupTableSource->Register( NULL );
+//                lutProperties.windowMin = windowMin;
+//                lutProperties.windowMax = windowMax;
 
-                lookupTable->DeepCopy( lookupTableSource );
-                lookupTable->SetRange( windowMin, windowMax );
-              }
+//                lookupTable->DeepCopy( lookupTableSource );
+//                lookupTable->SetRange( windowMin, windowMax );
+//              }
 
               //get the color
-              float rgb[3] = { 1.0, 1.0, 1.0 };
-              node->GetColor( rgb, renderer );
+//              float rgb[3] = { 1.0, 1.0, 1.0 };
+//              node->GetColor( rgb, renderer );
 
-              // Apply color property (of the node, not of the plane)
-              // if we want to use the color
-              if(useColor)
-              {
-                imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-              }
-              else //else default color = white to avoid site effects from the lookuptable
-              {
-                imageActor->GetProperty()->SetColor( 1, 1, 1 );
-              }
+//              // Apply color property (of the node, not of the plane)
+//              // if we want to use the color
+
+////              MITK_INFO << "color ren " << rgb[0] << " " << rgb[1] << " " << rgb[2];
+////              MITK_INFO << "color ls " << localStorage->m_Actor->GetProperty()->GetColor()[0] << " " << localStorage->m_Actor->GetProperty()->GetColor()[1] << " " << localStorage->m_Actor->GetProperty()->GetColor()[2];
+
+//              localStorage->m_Actor->GetProperty()->Print(std::cout);
+//              if(useColor)
+//              {
+                imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
+                imageActor->GetProperty()->SetAmbient(0.5);
+//                imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
+//              }
+//              else //else default color = white to avoid site effects from the lookuptable
+//              {
+//                imageActor->GetProperty()->SetColor( 1, 1, 1 );
+//              }
+//              localStorage->m_Actor->GetProperty()->Print(std::cout);
+//              imageActor->GetProperty()->Print(std::cout);
 
               // Apply opacity property (of the node, not of the plane)
-              float opacity = 0.999;
-              node->GetOpacity( opacity, renderer );
-              imageActor->GetProperty()->SetOpacity( opacity );
+//              float opacity = 0.999;
+//              node->GetOpacity( opacity, renderer );
+//              imageActor->GetProperty()->SetOpacity( opacity );
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn( "texture interpolation", renderer );

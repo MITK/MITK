@@ -55,7 +55,7 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
 
       /**
       * \brief        Sets the tracking device type of the volume. After doing this
-      *               the tracking volume gets generatet and set to the correct dimensions in the correct
+      *               the tracking volume gets generated and set to the correct dimensions in the correct
       *               coordinate system. The TV of a VirtualTrackingDevice is always a 400*400 cube.
       * \param type   The type of the tracking device (currently supported:NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker).
       */
@@ -74,7 +74,8 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
 
   protected:
       TrackingVolumeGenerator();
-      mitk::TrackingDeviceType m_TrackingDeviceType;
+	  mitk::TrackingDeviceData m_TrackingDeviceData;
+	  mitk::TrackingDeviceType m_TrackingDeviceType;
 
       void GenerateData();
   };

@@ -111,7 +111,7 @@ namespace mitk
     * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
     * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
-	* This enum is deprecated. In Future, specific Model Enums should be used (eg. AuroraTrackingVolume)
+	* This enum is deprecated. In future, please use the new TrackingDeviceData to model Specific tracking Volumes
     */
     enum NDITrackingVolume
     {
@@ -140,10 +140,10 @@ namespace mitk
 	* Here all supported devices are defined. Dont forget to introduce new Devices into the TrackingDeviceList Array at the bottom!
 	* If a model does not have a corresponding tracking volume yet, pass an empty string to denote "No Model"
 	*/
-	static TrackingDeviceData AuroraCompact = {NDIAurora, "CompactFG", ""};
-	static TrackingDeviceData AuroraPlanarCube = {NDIAurora, "PlanarFG_Cube", ""};
-	static TrackingDeviceData AuroraPlanarDome = {NDIAurora, "PlanarFG_Dome",""};
-	static TrackingDeviceData AuroraTabletop = {NDIAurora, "TabletopFG", ""};
+	static TrackingDeviceData AuroraCompact = {NDIAurora, "CompactFG", "NDIAuroraCompactFG_Dome.stl"};
+	static TrackingDeviceData AuroraPlanarCube = {NDIAurora, "PlanarFG_Cube", "NDIAurora.stl"};
+	static TrackingDeviceData AuroraPlanarDome = {NDIAurora, "PlanarFG_Dome","NDIAuroraPlanarFG_Dome.stl"};
+	static TrackingDeviceData AuroraTabletop = {NDIAurora, "TabletopFG", "NDIAuroraTabletopFG_Dome.stl"};
 	static TrackingDeviceData Micron = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
 	static TrackingDeviceData PolarisSpectra = {NDIPolaris, "Spectra", "NDIPolaris.stl"};
 	static TrackingDeviceData PolarisVicra = {NDIPolaris, "Vicra", "NDIPolaris.stl"};
@@ -168,6 +168,15 @@ namespace mitk
 			if(TrackingDeviceList[i].Line == Type ) Result.push_back(TrackingDeviceList[i]);
 		} 
 		return Result;
+	}
+
+	/**
+	* /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
+	* with the old way to manage Devices
+	*/
+	static TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type){
+		
+		return GetDeviceDataForLine(Type).front();
 	}
 
     /**Documentation

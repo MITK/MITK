@@ -32,13 +32,14 @@ mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
     volumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( volumeDir.c_str(), false ); //add this directory to StdFileLocations for the search
 
-    m_TrackingDeviceType = mitk::TrackingSystemNotSpecified;
+	m_TrackingDeviceData = mitk::Unspecified;
 }
 
 
 void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
     this->m_TrackingDeviceType = tracker->GetType();
+	this->m_TrackingDeviceData = mitk::GetFirstCompatibleDeviceDataForLine(m_TrackingDeviceType);
 }
 
 void mitk::TrackingVolumeGenerator::GenerateData()
@@ -47,6 +48,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
     std::string filename = "";
 
+	/**
     switch(m_TrackingDeviceType)
     {
     case mitk::ClaronMicron:
@@ -83,7 +85,9 @@ void mitk::TrackingVolumeGenerator::GenerateData()
         }
 
     }
+	*/
 
+	filename = this->m_TrackingDeviceData.VolumeModelLocation;
     if (filename.empty())
     {
         MITK_ERROR << "Filename is empty";

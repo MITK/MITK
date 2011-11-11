@@ -124,14 +124,6 @@ namespace mitk
     m_BackNormalsActor = vtkActor::New();
     m_BackNormalsActor->SetMapper(m_BackNormalsMapper);
 
-//    m_DefaultLookupTable = vtkLookupTable::New();
-//    m_DefaultLookupTable->SetTableRange( -1024.0, 4096.0 );
-//    m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
-//    m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
-//    m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
-//    m_DefaultLookupTable->Build();
-//    m_DefaultLookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
-
     m_ImageMapperDeletedCommand = MemberCommandType::New();
     m_ImageMapperDeletedCommand->SetCallbackFunction(
         this, &Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback );
@@ -150,7 +142,6 @@ namespace mitk
     m_EdgeActor->Delete();
     m_BackgroundMapper->Delete();
     m_BackgroundActor->Delete();
-//    m_DefaultLookupTable->Delete();
     m_FrontNormalsMapper->Delete();
     m_FrontNormalsActor->Delete();
     m_FrontHedgeHog->Delete();
@@ -161,15 +152,6 @@ namespace mitk
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
 
-//    LookupTablePropertiesList::iterator it;
-//    for(it = m_LookupTableProperties.begin(); it != m_LookupTableProperties.end();++it)
-//    {
-//      if ( it->second.LookupTableSource != NULL )
-//      {
-//        it->second.LookupTableSource->Delete();
-//        it->second.LookupTableSource = NULL;
-//      }
-//    }
     m_DataStorage = NULL;
   }
 
@@ -218,11 +200,6 @@ namespace mitk
         m_ImageActors[imageMapper].m_Sender = NULL; // sender is already destroying itself
         m_ImageActors.erase( imageMapper );
       }
-//      if ( m_LookupTableProperties.count( imageMapper ) > 0 )
-//      {
-//        m_LookupTableProperties[imageMapper].LookupTableSource->Delete();
-//        m_LookupTableProperties.erase( imageMapper );
-//      }
     }
   }
 
@@ -496,11 +473,10 @@ namespace mitk
           if ( planeRenderer.IsNotNull() )
           {
             // If it has not been initialized already in a previous pass,
-            // generate an actor, a lookup table and a texture object to
+            // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.
             vtkActor *imageActor;
             vtkDataSetMapper *dataSetMapper = NULL;
-//            vtkLookupTable *lookupTable;
             vtkTexture *texture;
             if ( m_ImageActors.count( imageMapper ) == 0 )
             {
@@ -508,21 +484,16 @@ namespace mitk
               //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
-//              lookupTable = vtkLookupTable::New();
-//              lookupTable->DeepCopy( m_DefaultLookupTable );
-
               texture = vtkTexture::New();
               texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
-//              imageActor->GetProperty()->SetAmbient( 0.5 );
               imageActor->SetMapper( dataSetMapper );
               imageActor->SetTexture( texture );
 
               // Make imageActor the sole owner of the mapper and texture
               // objects
-//              lookupTable->UnRegister( NULL );
               dataSetMapper->UnRegister( NULL );
               texture->UnRegister( NULL );
 
@@ -537,8 +508,6 @@ namespace mitk
               imageActor = m_ImageActors[imageMapper].m_Actor;
               dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
               texture = imageActor->GetTexture();
-
-//              lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
             }
 
             // Set poly data new each time its object changes (e.g. when
@@ -548,120 +517,15 @@ namespace mitk
               dataSetMapper->SetInput( surface->GetVtkPolyData() );
             }
 
-//            imageActor->GetMapper()->GetInput()->Update();
-//            imageActor->GetMapper()->Update();
-
-//            // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
-//            renderer->GetRenderWindow()->MakeCurrent();
-
             if(localStorage->m_ReslicedImage != NULL)
             {
               texture->SetInput( localStorage->m_Texture->GetInput() );
-
-              //default level window
-//              ScalarType windowMin = 0.0;
-//              ScalarType windowMax = 255.0;
-//              LevelWindow levelWindow;
-
-              bool binary = false;
-              node->GetBoolProperty( "binary", binary, renderer );
-
-//              // check for "use color"
-//              bool useColor = false;
-//              node->GetBoolProperty( "use color", useColor, planeRenderer );
-
               // VTK (mis-)interprets unsigned char (binary) images as color images;
               // So, we must manually turn on their mapping through a (gray scale) lookup table;
               texture->SetMapColorScalarsThroughLookupTable( localStorage->m_Texture->GetMapColorScalarsThroughLookupTable() );
 
-              //if we have a binary image, the range is just 0 to 1
-//              if( binary )
-//              {
-//                windowMin = 0;
-//                windowMax = 1;
-//                useColor = true;
-//              }
-
-//              // check for level-window-prop and use it if it exists
-//              if( !binary &&
-//                  ( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
-//                    || node->GetLevelWindow( levelWindow, planeRenderer ) ) )
-//              {
-//                windowMin = levelWindow.GetLowerWindowBound();
-//                windowMax = levelWindow.GetUpperWindowBound();
-//              }
-
-//              vtkLookupTable *lookupTableSource;
-
-
-//              // check for LookupTable
-//              LookupTableProperty::Pointer lookupTableProp;
-//              lookupTableProp = dynamic_cast< LookupTableProperty * >(node->GetPropertyList()->GetProperty( "LookupTable" ));
-
-//              // If there is a lookup table supplied and we don't
-//              // want to use the color property, use it;
-//              //otherwise, use the default grayscale table
-//              if ( lookupTableProp.IsNotNull()  && !useColor )
-//              {
-//                lookupTableSource = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
-//              }
-//              else
-//              {
-//                lookupTableSource = m_DefaultLookupTable;
-//              }
-
-//              LookupTableProperties &lutProperties =
-//                  m_LookupTableProperties[imageMapper];
-
-//              // If there has been some change since the last pass which
-//              // makes it necessary to re-build the lookup table, do it.
-//              if ( (lutProperties.LookupTableSource != lookupTableSource)
-//                || (lutProperties.windowMin != windowMin)
-//                || (lutProperties.windowMax != windowMax) )
-//                {
-//                // Note the values for the next pass (lutProperties is a
-//                // reference to the list entry!)
-//                if ( lutProperties.LookupTableSource != NULL )
-//                {
-//                  lutProperties.LookupTableSource->Delete();
-//                }
-//                lutProperties.LookupTableSource = lookupTableSource;
-//                lutProperties.LookupTableSource->Register( NULL );
-//                lutProperties.windowMin = windowMin;
-//                lutProperties.windowMax = windowMax;
-
-//                lookupTable->DeepCopy( lookupTableSource );
-//                lookupTable->SetRange( windowMin, windowMax );
-//              }
-
-              //get the color
-//              float rgb[3] = { 1.0, 1.0, 1.0 };
-//              node->GetColor( rgb, renderer );
-
-//              // Apply color property (of the node, not of the plane)
-//              // if we want to use the color
-
-////              MITK_INFO << "color ren " << rgb[0] << " " << rgb[1] << " " << rgb[2];
-////              MITK_INFO << "color ls " << localStorage->m_Actor->GetProperty()->GetColor()[0] << " " << localStorage->m_Actor->GetProperty()->GetColor()[1] << " " << localStorage->m_Actor->GetProperty()->GetColor()[2];
-
-//              localStorage->m_Actor->GetProperty()->Print(std::cout);
-//              if(useColor)
-//              {
                 imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
                 imageActor->GetProperty()->SetAmbient(0.5);
-//                imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-//              }
-//              else //else default color = white to avoid site effects from the lookuptable
-//              {
-//                imageActor->GetProperty()->SetColor( 1, 1, 1 );
-//              }
-//              localStorage->m_Actor->GetProperty()->Print(std::cout);
-//              imageActor->GetProperty()->Print(std::cout);
-
-              // Apply opacity property (of the node, not of the plane)
-//              float opacity = 0.999;
-//              node->GetOpacity( opacity, renderer );
-//              imageActor->GetProperty()->SetOpacity( opacity );
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn( "texture interpolation", renderer );

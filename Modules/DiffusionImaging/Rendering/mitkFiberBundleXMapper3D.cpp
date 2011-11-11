@@ -27,6 +27,7 @@
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
+#include <vtkLookupTable.h>
 
 //not essential for mapper
 #include <QTime>
@@ -80,10 +81,7 @@ void mitk::FiberBundleXMapper3D::GenerateData()
     return;
   }
 
-  MITK_INFO << "NumOfFibs: " << FiberData->GetNumberOfLines();
-  MITK_INFO << "NumOfPoints: " << FiberData->GetNumberOfPoints();
-  
-  
+
   m_FiberMapperGLSP->SetInput(FiberData); 
   //  m_FiberMapperGLWP->SetInput(FiberData);
   
@@ -115,9 +113,9 @@ void mitk::FiberBundleXMapper3D::GenerateData()
   m_FiberActorSP->GetProperty()->SetOpacity(1.0);
   //  m_FiberActorWP->GetProperty()->SetOpacity(1.0);
   
-  if (FBX->getCurrentColorCoding() != NULL)
-      m_FiberMapperGLSP->SelectColorArray(FBX->getCurrentColorCoding());
-  
+  if (FBX->GetCurrentColorCoding() != NULL)
+      m_FiberMapperGLSP->SelectColorArray(FBX->GetCurrentColorCoding());
+
   m_FiberAssembly->AddPart(m_FiberActorSP);
   
   //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.

@@ -101,15 +101,18 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
 
     /*  make sure that processing colorcoding is only called when necessary */
-    if ( m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) /*&&
+    if ( m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) &&
          m_FiberPolyData->GetNumberOfPoints() ==
-         m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() */)
+         m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
     {
         // fiberstructure is already colorcoded
         MITK_INFO << " NO NEED TO REGENERATE COLORCODING! " ;
-        MITK_INFO <<  m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetName();
-        MITK_INFO <<   m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfComponents();
-         MITK_INFO <<  m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples();
+//     set current colorcoding to orientationbased if needed
+        if (m_currentColorCoding != COLORCODING_ORIENTATION_BASED ) {
+            m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+            m_isModified = true;
+        }
+
         return;
     }
 
@@ -132,24 +135,21 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     /* checkpoint: does polydata contain any fibers */
     int numOfFibers = m_FiberPolyData->GetNumberOfLines();
     if (numOfFibers < 1) {
-        MITK_INFO << "\n ========= Number of Fibers is below 1 ========= \n";
+        MITK_INFO << "\n ========= Number of Fibers is 0 and below ========= \n";
         return;
     }
 
 
     /* extract single fibers of fiberBundle */
     vtkCellArray* fiberList = m_FiberPolyData->GetLines();
+    fiberList->InitTraversal();
     for (int fi=0; fi<numOfFibers; ++fi) {
 
         vtkIdType* idList; // contains the point id's of the line
         vtkIdType pointsPerFiber; // number of points for current line
         fiberList->GetNextCell(pointsPerFiber, idList);
 
-        MITK_INFO << "Fib#: " << fi << " of " << numOfFibers;
-        MITK_INFO << sizeof(idList);
-
-
-
+    //    MITK_INFO << "Fib#: " << fi << " of " << numOfFibers << " pnts in fiber: " << pointsPerFiber ;
 
         /* single fiber checkpoints: is number of points valid */
         if (pointsPerFiber > 1)
@@ -168,14 +168,13 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
                     vnl_vector_fixed< double, 3 > diff1;
                     diff1 = currentPntvtk - nextPntvtk;
-                    diff1.normalize();
 
                     vnl_vector_fixed< double, 3 > diff2;
                     diff2 = currentPntvtk - prevPntvtk;
-                    diff2.normalize();
 
                     vnl_vector_fixed< double, 3 > diff;
                     diff = (diff1 - diff2) / 2.0;
+                    diff.normalize();
 
                     rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
                     rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
@@ -198,6 +197,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
                     rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
                     rgba[3] = (unsigned char) (255.0);
 
+
                 } else if (i==pointsPerFiber-1) {
                     /* Last point has no next point, therefore only diff2 is taken */
                     vnl_vector_fixed< double, 3 > currentPntvtk(extrPoints->GetPoint(idList[i])[0], extrPoints->GetPoint(idList[i])[1],extrPoints->GetPoint(idList[i])[2]);
@@ -215,6 +215,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
                 }
 
                 colorsT->InsertTupleValue(idList[i], rgba);
+
             } //end for loop
 
         } else if (pointsPerFiber == 1) {
@@ -234,19 +235,19 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
 
     m_FiberPolyData->GetPointData()->AddArray(colorsT);
+
+    /*=========================
+      - this is more relevant for renderer than for fiberbundleX datastructure
+      - think about sourcing this to a explicit method which coordinates colorcoding */
     m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
     m_isModified = true;
+//  ===========================
 
     //mini test, shall be ported to MITK TESTINGS!
     if (colorsT->GetSize() != numOfPoints*componentSize) {
         MITK_INFO << "ALLOCATION ERROR IN INITIATING COLOR ARRAY";
     }
 
-MITK_INFO << " AfterColorcodingFiber " << m_FiberPolyData->GetNumberOfPoints() << " " <<  m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples();
-    //===== clean memory =====
-
-
-    //========================
 }
 
 void mitk::FiberBundleX::DoGenerateFiberIds()
@@ -354,12 +355,16 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     return availableColorCodings;
 }
 
-char* mitk::FiberBundleX::getCurrentColorCoding()
+char* mitk::FiberBundleX::GetCurrentColorCoding()
 {
     return m_currentColorCoding;
 }
 
-
+void mitk::FiberBundleX::SetColorCoding(char* requestedColorCoding)
+{
+    m_currentColorCoding = requestedColorCoding;
+    m_isModified = true;
+}
 
 bool mitk::FiberBundleX::isFiberBundleXModified()
 {

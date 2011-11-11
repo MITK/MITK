@@ -76,12 +76,15 @@ namespace mitk {
     /*====FIBERBUNDLE I/O METHODS====*/
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
-    char* getCurrentColorCoding();
+    void UpdateFiberGeometry();
+    char* GetCurrentColorCoding();
+    QStringList GetAvailableColorCodings();
+    void SetColorCoding(char*);
+    
     bool isFiberBundleXModified();
     void setFBXModificationDone();
-    void UpdateFiberGeometry();
-    QStringList GetAvailableColorCodings();
-    
+
+
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();

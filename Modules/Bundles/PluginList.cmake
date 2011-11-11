@@ -8,6 +8,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.dicom:ON
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF

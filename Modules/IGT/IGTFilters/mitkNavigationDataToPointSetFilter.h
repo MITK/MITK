@@ -64,6 +64,18 @@ namespace mitk {
     */
     itkSetMacro(RingBufferSize, unsigned int)
 
+
+    /**
+    * \brief Sets the number of Navigation Data, which should be averaged.
+    */
+    itkSetMacro(NumberForMean, unsigned int)
+
+    /**
+    * \brief Gets the number of Navigation Data, which should be averaged.
+    */
+    itkGetMacro(NumberForMean, unsigned int);
+
+
     /**
     * \brief filter execute method
     */
@@ -139,6 +151,7 @@ namespace mitk {
     OperationMode m_OperationMode;  ///< Stores the mode. See enum OperationMode
     unsigned int m_RingBufferSize;  ///< Stores the ringbuffer size
     unsigned int m_CurrentTimeStep; ///< Indicates the current timestamp
+    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
   };
 } // namespace mitk
 #endif // _MITKNAVIGATIONDATATOPOINTSETFILTER_H__

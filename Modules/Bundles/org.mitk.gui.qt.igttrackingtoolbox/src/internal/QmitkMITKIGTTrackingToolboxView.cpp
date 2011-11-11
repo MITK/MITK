@@ -93,6 +93,14 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopTracking->setEnabled(false);
     m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
+
+	// Update List of available models for selected tool.
+    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+    m_Controls->VolumeSelectionBox->clear();
+    for(int i = 0; i < Compatibles.size(); i++)
+	{
+      m_Controls->VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+    }
   }
 }
 
@@ -240,23 +248,24 @@ this->GlobalReinit();
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
-
+  mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
 	// Code to enable auto detection
-if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
-  {m_Controls->m_AutoDetectTools->setVisible(true);}
-else
-  {m_Controls->m_AutoDetectTools->setVisible(false);}
+  if (Type == mitk::NDIAurora)
+    {m_Controls->m_AutoDetectTools->setVisible(true);}
+  else
+    {m_Controls->m_AutoDetectTools->setVisible(false);}
 
-	// Code to select appropriate tracking volumes
-if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora){
-	m_Controls->VolumeSelectionBox->clear();
-	m_Controls->VolumeSelectionBox->addItem("AuroraCompactFG");
-	m_Controls->VolumeSelectionBox->addItem("AuroaPlanarFG_Cube");
-	m_Controls->VolumeSelectionBox->addItem("AuroaPlanarFG_Dome");
-	m_Controls->VolumeSelectionBox->addItem("AuroraTabletopFG");
+// Code to select appropriate tracking volumes
+    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
+
+  m_Controls->VolumeSelectionBox->clear();
+  for(int i = 0; i < Compatibles.size(); i++)
+  {
+    m_Controls->VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+  }
+
 }
 
-}
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {

@@ -372,8 +372,8 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
         this->m_isModified = true;
     } else {
         MITK_INFO << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
-//        this->m_currentColorCoding = "---";
-//        this->m_isModified = true;
+        this->m_currentColorCoding = "---"; //will cause blank colorcoding of fibers
+        this->m_isModified = true;
     }
 
 }

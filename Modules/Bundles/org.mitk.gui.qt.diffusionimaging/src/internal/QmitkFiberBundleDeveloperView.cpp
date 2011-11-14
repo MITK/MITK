@@ -609,6 +609,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     m_Controls->buttonGenerateFiberIds->setEnabled(false);
     m_Controls->buttonGenerateFibers->setEnabled(true);
     m_Controls->buttonColorFibers->setEnabled(false);
+    m_Controls->ddAvailableColorcodings->setEnabled(false);
     
     m_Controls->buttonSMFibers->setEnabled(false);//not yet implemented
     m_Controls->buttonVtkDecimatePro->setEnabled(false);//not yet implemented
@@ -627,7 +628,6 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
     
     connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
-    connect( m_Controls->buttonGetAvailableColorCoding, SIGNAL(clicked()), this, SLOT(DoGatherColorCodings()) );
     connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
     
     connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
@@ -1014,8 +1014,9 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
         m_Controls->ddAvailableColorcodings->removeItem(i);
     }
     //fill new data into menu
-    m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
     m_Controls->ddAvailableColorcodings->addItem("---");
+    m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
+
 
     //highlight current colorcoding
     QString cc = m_FiberBundleX->GetCurrentColorCoding();
@@ -1219,6 +1220,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
      if (m_Controls->tabColoring->isVisible()){
       //show button colorCoding
       m_Controls->buttonColorFibers->setEnabled(true);
+      m_Controls->ddAvailableColorcodings->setEnabled(true);
        MITK_INFO << "Color";
        
      }else if(m_Controls->tabCutting->isVisible()){
@@ -1235,6 +1237,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
      
    } else {
      m_Controls->buttonColorFibers->setEnabled(false);
+     m_Controls->ddAvailableColorcodings->setEnabled(false);
      m_Controls->buttonGenerateFiberIds->setEnabled(false);
      m_Controls->buttonSMFibers->setEnabled(false);
      m_Controls->buttonVtkDecimatePro->setEnabled(false);

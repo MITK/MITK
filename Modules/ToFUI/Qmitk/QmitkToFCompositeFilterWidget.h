@@ -64,6 +64,8 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     \brief update parameters of ToFCompositeFilter according to current GUI setting
     */
     void UpdateFilterParameter();
+
+    void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
   
   signals:
 
@@ -80,6 +82,10 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     \brief slot en-/disabling threshold filter in internal ToFCompositeFilter
     */
     void OnThresholdFilterCheckBoxChecked(bool checked);
+    /*!
+    \brief slot en-/disabling the mask segmentation in internal ToFCompositeFilter
+    */
+    void OnMaskSegmentationCheckBoxChecked(bool checked);
     /*!
     \brief slot en-/disabling median filter in internal ToFCompositeFilter
     */
@@ -138,6 +144,8 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     \brief method updating the parameters of the threshold filter in the ToFCompositeFilter
     */
     void SetThresholdFilterParameter();
+
+    mitk::DataStorage::Pointer m_DataStorage;
 };
 
 #endif // _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED

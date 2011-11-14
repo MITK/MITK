@@ -107,7 +107,9 @@ void QmitkFiberColoringWorker::run()
   m_itemPackage.st_FancyGUITimer1->start();
   
   //do processing
+  //TODO check which colorcoding option is checked!
   m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+
   
   /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
   clock.Stop();
@@ -155,7 +157,7 @@ void QmitkFiberGenerateRandomWorker::run()
   randomPoints->SetRadius(distrRadius);
   randomPoints->Update();
   vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
-  
+
   /* ASSIGN EACH POINT TO A RANDOM FIBER */
   srand((unsigned)time(0)); // init randomizer
   for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
@@ -963,7 +965,7 @@ void QmitkFiberBundleDeveloperView::DoColorFibers()
 
   m_FiberColoringSlave = new QmitkFiberColoringWorker(m_hostThread, ItemPackageForFiberColoring);
   m_FiberColoringSlave->moveToThread(m_hostThread);
-    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberColorCoding()) );
+  connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberColorCoding()) );
   connect(m_hostThread, SIGNAL(started()), m_FiberColoringSlave, SLOT(run()) );
   connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_FiberColorCoding()));
   connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_FiberColorCoding()));
@@ -989,6 +991,8 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
   }
   disconnect(m_hostThread, 0, 0, 0);
   m_hostThread->disconnect();
+  //update renderer
+  m_MultiWidget->RequestUpdate(); //necessary??
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

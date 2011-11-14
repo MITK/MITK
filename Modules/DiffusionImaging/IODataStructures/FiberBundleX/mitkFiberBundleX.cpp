@@ -232,8 +232,6 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
     }//end for loop
 
-
-
     m_FiberPolyData->GetPointData()->AddArray(colorsT);
 
     /*=========================
@@ -346,12 +344,19 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
     for(int i=0; i<numColors; ++i)
     {
-        MITK_INFO << m_FiberPolyData->GetPointData()->GetArrayName(i);
-        //todo store sting in QStringList
+        MITK_INFO << "try to insert: " << m_FiberPolyData->GetPointData()->GetArrayName(i);
+        availableColorCodings.append(m_FiberPolyData->GetPointData()->GetArrayName(i));
     }
 
+    //this controlstructure shall be implemented by the calling method
     if (availableColorCodings.isEmpty())
         MITK_INFO << "no colorcodings available in fiberbundleX";
+
+    for(int i=0; availableColorCodings.size(); i++)
+    {
+            MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
+    }
+
     return availableColorCodings;
 }
 

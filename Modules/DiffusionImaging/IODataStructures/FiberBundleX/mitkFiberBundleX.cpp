@@ -342,7 +342,7 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
 {
     QStringList availableColorCodings;
     int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
-    for(int i=0; i<numColors; ++i)
+    for(int i=0; i<numColors; i++)
     {
         MITK_INFO << "try to insert: " << m_FiberPolyData->GetPointData()->GetArrayName(i);
         availableColorCodings.append(m_FiberPolyData->GetPointData()->GetArrayName(i));
@@ -352,7 +352,7 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     if (availableColorCodings.isEmpty())
         MITK_INFO << "no colorcodings available in fiberbundleX";
 
-    for(int i=0; availableColorCodings.size(); i++)
+    for(int i=0; i<availableColorCodings.size(); i++)
     {
             MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
     }

@@ -609,14 +609,7 @@
               <string>Fiber Color Information</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_17">
-              <item row="1" column="0">
-               <widget class="QCommandLinkButton" name="buttonGetAvailableColorCoding">
-                <property name="text">
-                 <string>Gather Available Colorcodings</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
+              <item row="1" column="2">
                <spacer name="horizontalSpacer_5">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -629,10 +622,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="0" column="0">
-               <widget class="QComboBox" name="ddAvailableColorcodings"/>
-              </item>
-              <item row="0" column="1">
+              <item row="0" column="2">
                <spacer name="horizontalSpacer_6">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -644,6 +634,16 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCommandLinkButton" name="buttonGetAvailableColorCoding">
+                <property name="text">
+                 <string>Gather Available Colorcodings</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="ddAvailableColorcodings"/>
               </item>
              </layout>
             </widget>

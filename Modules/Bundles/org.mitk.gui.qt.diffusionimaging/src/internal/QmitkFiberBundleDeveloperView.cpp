@@ -627,6 +627,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
     
     connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
+    connect( m_Controls->buttonGetAvailableColorCoding, SIGNAL(clicked()), this, SLOT(DoGatherColorCodings()) );
     
     connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
     
@@ -993,6 +994,27 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
   m_hostThread->disconnect();
   //update renderer
   m_MultiWidget->RequestUpdate(); //necessary??
+
+
+  //update QComboBox(dropDown menu) in view of available ColorCodings
+  DoGatherColorCodings();
+}
+
+
+void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
+{
+    QStringList fbxColorCodings = m_FiberBundleX->GetAvailableColorCodings();
+
+    //update dropDown Menu
+    //remove all items from menu
+    int ddItems = m_Controls->ddAvailableColorcodings->count();
+    for(int i=ddItems-1; i>=0; i--)
+    {   //note, after each item remove, index in QComboBox is updated, therefore we start from the back which causes less update calculation
+        m_Controls->ddAvailableColorcodings->removeItem(i);
+    }
+    //fill new data into menu
+    m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
+
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

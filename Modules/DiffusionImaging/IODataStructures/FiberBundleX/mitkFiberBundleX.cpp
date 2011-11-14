@@ -107,12 +107,6 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     {
         // fiberstructure is already colorcoded
         MITK_INFO << " NO NEED TO REGENERATE COLORCODING! " ;
-//     set current colorcoding to orientationbased if needed
-        if (m_currentColorCoding != COLORCODING_ORIENTATION_BASED ) {
-            m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
-            m_isModified = true;
-        }
-
         return;
     }
 
@@ -237,7 +231,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     /*=========================
       - this is more relevant for renderer than for fiberbundleX datastructure
       - think about sourcing this to a explicit method which coordinates colorcoding */
-    m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+    this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
     m_isModified = true;
 //  ===========================
 
@@ -344,7 +338,6 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
     for(int i=0; i<numColors; i++)
     {
-        MITK_INFO << "try to insert: " << m_FiberPolyData->GetPointData()->GetArrayName(i);
         availableColorCodings.append(m_FiberPolyData->GetPointData()->GetArrayName(i));
     }
 
@@ -352,23 +345,37 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     if (availableColorCodings.isEmpty())
         MITK_INFO << "no colorcodings available in fiberbundleX";
 
-    for(int i=0; i<availableColorCodings.size(); i++)
-    {
-            MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
-    }
+//    for(int i=0; i<availableColorCodings.size(); i++)
+//    {
+//            MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
+//    }
 
     return availableColorCodings;
 }
 
-char* mitk::FiberBundleX::GetCurrentColorCoding()
+
+ char* mitk::FiberBundleX::GetCurrentColorCoding()
 {
-    return m_currentColorCoding;
+    return this->m_currentColorCoding;
 }
 
-void mitk::FiberBundleX::SetColorCoding(char* requestedColorCoding)
+void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
 {
-    m_currentColorCoding = requestedColorCoding;
-    m_isModified = true;
+//    MITK_INFO << "FbX try to set colorCoding: " << requestedColorCoding << " compare with: " << COLORCODING_ORIENTATION_BASED;
+    if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )
+    {
+            this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+            this->m_isModified = true;
+
+    } else if(strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
+        this->m_currentColorCoding = (char*) COLORCODING_FA_BASED;
+        this->m_isModified = true;
+    } else {
+        MITK_INFO << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
+//        this->m_currentColorCoding = "---";
+//        this->m_isModified = true;
+    }
+
 }
 
 bool mitk::FiberBundleX::isFiberBundleXModified()

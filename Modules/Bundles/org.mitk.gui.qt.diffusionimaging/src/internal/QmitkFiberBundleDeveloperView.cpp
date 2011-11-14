@@ -628,6 +628,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     
     connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
     connect( m_Controls->buttonGetAvailableColorCoding, SIGNAL(clicked()), this, SLOT(DoGatherColorCodings()) );
+    connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
     
     connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
     
@@ -993,7 +994,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
   disconnect(m_hostThread, 0, 0, 0);
   m_hostThread->disconnect();
   //update renderer
-  m_MultiWidget->RequestUpdate(); //necessary??
+  m_MultiWidget->RequestUpdate();
 
 
   //update QComboBox(dropDown menu) in view of available ColorCodings
@@ -1014,7 +1015,22 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
     }
     //fill new data into menu
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
+    m_Controls->ddAvailableColorcodings->addItem("---");
 
+    //highlight current colorcoding
+    QString cc = m_FiberBundleX->GetCurrentColorCoding();
+    MITK_INFO << "current idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
+    m_Controls->ddAvailableColorcodings->setCurrentIndex( m_Controls->ddAvailableColorcodings->findText(cc) );
+
+}
+
+
+void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
+{
+    QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
+    m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
+    // update rendering
+    m_MultiWidget->RequestUpdate();
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

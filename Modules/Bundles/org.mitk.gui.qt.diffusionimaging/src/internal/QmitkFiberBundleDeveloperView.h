@@ -238,6 +238,7 @@ public:
   void DoMonitorFiberThreads(int);
   void DoColorFibers();
   void DoGatherColorCodings();
+  void SetCurrentColorCoding(int);
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();

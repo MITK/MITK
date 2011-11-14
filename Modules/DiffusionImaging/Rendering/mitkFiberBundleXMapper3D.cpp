@@ -113,9 +113,10 @@ void mitk::FiberBundleXMapper3D::GenerateData()
   m_FiberActorSP->GetProperty()->SetOpacity(1.0);
   //  m_FiberActorWP->GetProperty()->SetOpacity(1.0);
   
-  if (FBX->GetCurrentColorCoding() != NULL)
+  if (FBX->GetCurrentColorCoding() != NULL){
       m_FiberMapperGLSP->SelectColorArray(FBX->GetCurrentColorCoding());
-
+      MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
+  }
   m_FiberAssembly->AddPart(m_FiberActorSP);
   
   //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.

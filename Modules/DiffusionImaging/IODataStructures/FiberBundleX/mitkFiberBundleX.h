@@ -79,7 +79,7 @@ namespace mitk {
     void UpdateFiberGeometry();
     char* GetCurrentColorCoding();
     QStringList GetAvailableColorCodings();
-    void SetColorCoding(char*);
+    void SetColorCoding(const char*);
     
     bool isFiberBundleXModified();
     void setFBXModificationDone();

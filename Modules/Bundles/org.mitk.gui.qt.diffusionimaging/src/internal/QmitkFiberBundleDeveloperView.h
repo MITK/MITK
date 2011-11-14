@@ -237,6 +237,8 @@ public:
   void SelectionChangedToolBox(int);
   void DoMonitorFiberThreads(int);
   void DoColorFibers();
+  void DoGatherColorCodings();
+  void SetCurrentColorCoding(int);
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();

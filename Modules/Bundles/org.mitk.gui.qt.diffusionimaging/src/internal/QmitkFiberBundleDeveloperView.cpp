@@ -107,7 +107,9 @@ void QmitkFiberColoringWorker::run()
   m_itemPackage.st_FancyGUITimer1->start();
   
   //do processing
+  //TODO check which colorcoding option is checked!
   m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+
   
   /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
   clock.Stop();
@@ -155,7 +157,7 @@ void QmitkFiberGenerateRandomWorker::run()
   randomPoints->SetRadius(distrRadius);
   randomPoints->Update();
   vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
-  
+
   /* ASSIGN EACH POINT TO A RANDOM FIBER */
   srand((unsigned)time(0)); // init randomizer
   for (int i=0; i<pnts->GetNumberOfPoints(); ++i) {
@@ -625,6 +627,8 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
     
     connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
+    connect( m_Controls->buttonGetAvailableColorCoding, SIGNAL(clicked()), this, SLOT(DoGatherColorCodings()) );
+    connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
     
     connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
     
@@ -963,7 +967,7 @@ void QmitkFiberBundleDeveloperView::DoColorFibers()
 
   m_FiberColoringSlave = new QmitkFiberColoringWorker(m_hostThread, ItemPackageForFiberColoring);
   m_FiberColoringSlave->moveToThread(m_hostThread);
-    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberColorCoding()) );
+  connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberColorCoding()) );
   connect(m_hostThread, SIGNAL(started()), m_FiberColoringSlave, SLOT(run()) );
   connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_FiberColorCoding()));
   connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_FiberColorCoding()));
@@ -989,6 +993,44 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
   }
   disconnect(m_hostThread, 0, 0, 0);
   m_hostThread->disconnect();
+  //update renderer
+  m_MultiWidget->RequestUpdate();
+
+
+  //update QComboBox(dropDown menu) in view of available ColorCodings
+  DoGatherColorCodings();
+}
+
+
+void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
+{
+    QStringList fbxColorCodings = m_FiberBundleX->GetAvailableColorCodings();
+
+    //update dropDown Menu
+    //remove all items from menu
+    int ddItems = m_Controls->ddAvailableColorcodings->count();
+    for(int i=ddItems-1; i>=0; i--)
+    {   //note, after each item remove, index in QComboBox is updated, therefore we start from the back which causes less update calculation
+        m_Controls->ddAvailableColorcodings->removeItem(i);
+    }
+    //fill new data into menu
+    m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
+    m_Controls->ddAvailableColorcodings->addItem("---");
+
+    //highlight current colorcoding
+    QString cc = m_FiberBundleX->GetCurrentColorCoding();
+    MITK_INFO << "current idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
+    m_Controls->ddAvailableColorcodings->setCurrentIndex( m_Controls->ddAvailableColorcodings->findText(cc) );
+
+}
+
+
+void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
+{
+    QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
+    m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
+    // update rendering
+    m_MultiWidget->RequestUpdate();
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

@@ -114,6 +114,7 @@ void QmitkToFUtilView::Activated()
   this->UseToFVisibilitySettings(true);
 
   m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+  m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDefaultDataStorage());
 
   if (this->m_ToFImageGrabber.IsNull())
   {

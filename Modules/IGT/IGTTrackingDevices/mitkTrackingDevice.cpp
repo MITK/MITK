@@ -62,6 +62,16 @@ void mitk::TrackingDevice::SetState( TrackingDeviceState state )
 }
 
 
+mitk::TrackingDeviceType mitk::TrackingDevice::GetType() const{
+	return m_Data.Line;
+}
+
+void mitk::TrackingDevice::SetType(mitk::TrackingDeviceType deviceType){
+	m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+	m_Type = m_Data.Line;
+}
+
+
 bool mitk::TrackingDevice::StopTracking()
 {
   if (this->GetState() == Tracking) // Only if the object is in the correct state

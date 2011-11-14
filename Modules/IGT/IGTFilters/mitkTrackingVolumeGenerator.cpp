@@ -32,14 +32,14 @@ mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
     volumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( volumeDir.c_str(), false ); //add this directory to StdFileLocations for the search
 
-	m_TrackingDeviceData = mitk::Unspecified;
+	m_Data = mitk::Unspecified;
 }
 
 
 void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
-    this->m_TrackingDeviceType = tracker->GetType();
-	this->m_TrackingDeviceData = mitk::GetFirstCompatibleDeviceDataForLine(m_TrackingDeviceType);
+    this->m_Type = tracker->GetType();
+	this->m_Data = mitk::GetFirstCompatibleDeviceDataForLine(m_Type);
 }
 
 void mitk::TrackingVolumeGenerator::GenerateData()
@@ -49,7 +49,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     std::string filename = "";
 
 	/**
-    switch(m_TrackingDeviceType)
+    switch(m_Type)
     {
     case mitk::ClaronMicron:
         filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
@@ -86,8 +86,9 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
     }
 	*/
-
-	filename = this->m_TrackingDeviceData.VolumeModelLocation;
+	
+	std::string fn = this->m_Data.VolumeModelLocation;
+	filename = mitk::StandardFileLocations::GetInstance()->FindFile(fn.c_str());
     if (filename.empty())
     {
         MITK_ERROR << "Filename is empty";
@@ -106,5 +107,23 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 
+void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)
+{
+  m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+  m_Type = m_Data.Line;
+}
 
+mitk::TrackingDeviceType mitk::TrackingVolumeGenerator::GetTrackingDeviceType() const
+{
+ return m_Data.Line;
+}
 
+void mitk::TrackingVolumeGenerator::SetTrackingDeviceData(mitk::TrackingDeviceData deviceData)
+{
+  m_Data= deviceData;
+}
+
+mitk::TrackingDeviceData mitk::TrackingVolumeGenerator::GetTrackingDeviceData() const
+{
+   return m_Data;
+}

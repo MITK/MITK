@@ -266,6 +266,16 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Select Model:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="VolumeSelectionBox"/>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
           <widget class="QLabel" name="m_OptionsUpdateRateLabel">
@@ -305,9 +315,6 @@ p, li { white-space: pre-wrap; }
           <string>Show Tool Quaternions</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="VolumeSelectionBox"/>
        </item>
        <item>
         <spacer name="verticalSpacer_3">

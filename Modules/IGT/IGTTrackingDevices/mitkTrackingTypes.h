@@ -179,6 +179,19 @@ namespace mitk
 		return GetDeviceDataForLine(Type).front();
 	}
 
+	/**
+	* /brief Returns the device Data set matching the model name or the invalid device, if none was found
+	*/
+	static TrackingDeviceData GetDeviceDataByName(std::string modelName){
+	
+		int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
+		for(int i=0; i < size; i++)
+		{			
+			if(TrackingDeviceList[i].Model.compare(modelName) == 0 ) return TrackingDeviceList[i];
+		} 
+		return Invalid;
+	}
+
     /**Documentation
     * \brief activation rate of IR illuminator for NDI Polaris tracking device
     */

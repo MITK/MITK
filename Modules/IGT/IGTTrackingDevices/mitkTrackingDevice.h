@@ -108,11 +108,11 @@ namespace mitk {
       /**
        * \brief return device type identifier
        */
-      itkGetConstMacro(Type,TrackingDeviceType);
+	  TrackingDeviceType GetType() const;
        /**
        * \brief set device type
        */
-      itkSetMacro(Type,TrackingDeviceType);
+	  void SetType(TrackingDeviceType type);
 
     protected:
       /**
@@ -129,6 +129,7 @@ namespace mitk {
       virtual ~TrackingDevice();
 
       TrackingDeviceType m_Type; ///< current device type 
+	  TrackingDeviceData m_Data; ///< current device Data 
       TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
       bool m_StopTracking;       ///< signal stop to tracking thread
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking

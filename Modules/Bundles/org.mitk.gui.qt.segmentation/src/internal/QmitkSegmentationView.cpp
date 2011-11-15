@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 
 #include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
 
 const std::string QmitkSegmentationView::VIEW_ID =
 "org.mitk.views.segmentation";
@@ -137,8 +139,13 @@ void QmitkSegmentationView::Deactivated()
     }
     m_WorkingDataObserverTags.clear();
 
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    // gets the context of the "Mitk" (Core) module (always has id 1)
+    // TODO Workaround until CTL plugincontext is available
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    // Workaround end
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    //mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
     service->RemoveAllPlanePositions();
   }
 }
@@ -336,6 +343,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
+            this->SetToolManagerSelection(node, emptySegmentation);
           }
           catch (std::bad_alloc)
           {
@@ -828,8 +836,14 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     unsigned int t = nodeName.find_last_of(" ");
     unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
 
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    // gets the context of the "Mitk" (Core) module (always has id 1)
+    // TODO Workaround until CTL plugincontext is available
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    // Workaround end
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    //mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
     selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
     selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

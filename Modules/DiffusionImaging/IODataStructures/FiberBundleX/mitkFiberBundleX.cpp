@@ -27,6 +27,7 @@
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 #include <vtkIdFilter.h>
+#include <vtkClipPolyData.h>
 
 // baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
@@ -143,7 +144,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
         vtkIdType pointsPerFiber; // number of points for current line
         fiberList->GetNextCell(pointsPerFiber, idList);
 
-    //    MITK_INFO << "Fib#: " << fi << " of " << numOfFibers << " pnts in fiber: " << pointsPerFiber ;
+        //    MITK_INFO << "Fib#: " << fi << " of " << numOfFibers << " pnts in fiber: " << pointsPerFiber ;
 
         /* single fiber checkpoints: is number of points valid */
         if (pointsPerFiber > 1)
@@ -233,7 +234,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
       - think about sourcing this to a explicit method which coordinates colorcoding */
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
     m_isModified = true;
-//  ===========================
+    //  ===========================
 
     //mini test, shall be ported to MITK TESTINGS!
     if (colorsT->GetSize() != numOfPoints*componentSize) {
@@ -264,6 +265,37 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
     m_FiberIdDataSet = idFiberFilter->GetOutput();
 
     MITK_INFO << "Generating Fiber Ids...[done] | " << m_FiberIdDataSet->GetNumberOfCells();
+
+}
+
+std::vector<int> mitk::FiberBundleX::DoGetFiberIds(/*mitk::PlanarFigure::Pointer slicing_plane */)
+{
+
+    /* get all points/fibers cutting the plane */
+    vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
+    clipper->SetInput(m_FiberIdDataSet);
+//    clipper->SetClipFunction(slicing_plane);
+      clipper->GenerateClipScalarsOn();
+      clipper->GenerateClippedOutputOn();
+
+      vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
+// clipper throws all lines away which are not crossing plane
+//   clipper calculates distances to all points, also to those which are not crossing the plane but which are along the normal direction of the plane.
+// get the distances:
+      vtkSmartPointer<vtkDataArray> distanceList = clipperout->GetPointData()->GetScalars();
+      for (int i=0; i<distanceList->GetNumberOfTuples(); ++i) {
+          std::cout << "distance of point (idx in clippedpolydata) " << i << " :" ;
+              vtkIdType components = distanceList->GetNumberOfComponents();
+              double *distance = distanceList->GetTuple(i);
+
+              for (int j=0; j<components; ++j) {
+                  std::cout << "point distance " << distance[j] << std::endl;
+                  //even if points are on the plane (where distance shall be 0), they can store an approximation to 0 like 2.22045e-16
+                  //if distance is almost 0, remember that point :-)
+              }
+
+          }
+
 
 }
 
@@ -345,27 +377,27 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     if (availableColorCodings.isEmpty())
         MITK_INFO << "no colorcodings available in fiberbundleX";
 
-//    for(int i=0; i<availableColorCodings.size(); i++)
-//    {
-//            MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
-//    }
+    //    for(int i=0; i<availableColorCodings.size(); i++)
+    //    {
+    //            MITK_INFO << availableColorCodings.at(i).toLocal8Bit().constData();
+    //    }
 
     return availableColorCodings;
 }
 
 
- char* mitk::FiberBundleX::GetCurrentColorCoding()
+char* mitk::FiberBundleX::GetCurrentColorCoding()
 {
     return this->m_currentColorCoding;
 }
 
 void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
 {
-//    MITK_INFO << "FbX try to set colorCoding: " << requestedColorCoding << " compare with: " << COLORCODING_ORIENTATION_BASED;
+    //    MITK_INFO << "FbX try to set colorCoding: " << requestedColorCoding << " compare with: " << COLORCODING_ORIENTATION_BASED;
     if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )
     {
-            this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
-            this->m_isModified = true;
+        this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+        this->m_isModified = true;
 
     } else if(strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
         this->m_currentColorCoding = (char*) COLORCODING_FA_BASED;

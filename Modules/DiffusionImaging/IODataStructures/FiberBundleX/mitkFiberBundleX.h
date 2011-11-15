@@ -88,6 +88,7 @@ namespace mitk {
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();
+    std::vector<int> DoGetFiberIds(/* mitkPlanarfigure slicing plane*/);
     
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
 

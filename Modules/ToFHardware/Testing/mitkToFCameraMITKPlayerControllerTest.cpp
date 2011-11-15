@@ -176,7 +176,8 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(testObject->GetAmplitudeImageFileName()== "amplPropertyTestName" ,"Testing correct filename passing from Image Grabber- Ampl");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetIntensityImageFileName()== "intenPropertyTestName" ,"Testing correct filename passing from Image Grabber- Inten");
 
-  ReadFileFormatTestCase(".pic", imageGrabber);
+  // PIC Format is deprecated
+  // ReadFileFormatTestCase(".pic", imageGrabber);
   ReadFileFormatTestCase(".nrrd", imageGrabber);
 
   deviceImpl->Delete();

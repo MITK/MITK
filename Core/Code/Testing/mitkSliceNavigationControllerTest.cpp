@@ -19,6 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkTimeSlicedGeometry.h"
+#include "mitkRotationOperation.h"
+#include "mitkInteractionConst.h"
+#include "mitkPlanePositionManager.h"
+#include "mitkTestingMacros.h"
+#include "mitkGetModuleContext.h"
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
@@ -203,6 +208,120 @@ int testGeometry(const mitk::Geometry3D * geometry,
   return EXIT_SUCCESS;
 }
 
+int testRestorePlanePostionOperation ()
+{
+    //Create PlaneGeometry
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1.5;
+
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    mitk::Vector3D spacing;
+    normal.Normalize(); normal *= thicknessInMM;
+    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
+    planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+    planegeometry->SetOrigin(origin);
+
+    //Create SlicedGeometry3D out of planeGeometry
+    mitk::SlicedGeometry3D::Pointer slicedgeometry1 = mitk::SlicedGeometry3D::New();
+    unsigned int numSlices = 300;
+    slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+
+    //Create another slicedgeo which will be rotated
+    mitk::SlicedGeometry3D::Pointer slicedgeometry2 = mitk::SlicedGeometry3D::New();
+    slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+
+    //Create  geo3D as reference
+    mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+    geometry->SetBounds(slicedgeometry1->GetBounds());
+    geometry->SetIndexToWorldTransform(slicedgeometry1->GetIndexToWorldTransform());
+
+    //Initialize planes
+    for (int i=0; i < numSlices; i++)
+    {
+      mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
+      geo2d->Initialize();
+      geo2d->SetReferenceGeometry(geometry);
+      slicedgeometry1->SetGeometry2D(geo2d,i);
+    }
+
+    for (int i=0; i < numSlices; i++)
+    {
+      mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
+      geo2d->Initialize();
+      geo2d->SetReferenceGeometry(geometry);
+      slicedgeometry2->SetGeometry2D(geo2d,i);
+    }
+
+    slicedgeometry1->SetReferenceGeometry(geometry);
+    slicedgeometry2->SetReferenceGeometry(geometry);
+
+    //Create SNC
+    mitk::SliceNavigationController::Pointer sliceCtrl1 = mitk::SliceNavigationController::New();
+    sliceCtrl1->SetInputWorldGeometry(slicedgeometry1);
+    sliceCtrl1->Update();
+
+    mitk::SliceNavigationController::Pointer sliceCtrl2 = mitk::SliceNavigationController::New();
+    sliceCtrl2->SetInputWorldGeometry(slicedgeometry2);
+    sliceCtrl2->Update();
+
+    slicedgeometry1->SetSliceNavigationController(sliceCtrl1);
+    slicedgeometry2->SetSliceNavigationController(sliceCtrl2);
+
+    //Rotate slicedgeo2
+    double angle = 63.84;
+    mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 0.5, 0.95, 0.23 );
+    mitk::Point3D center = slicedgeometry2->GetCenter();
+    mitk::RotationOperation* op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
+    slicedgeometry2->ExecuteOperation(op);
+    sliceCtrl2->Update();
+
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    service->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
+    sliceCtrl1->ExecuteOperation(service->GetPlanePosition(0));
+    sliceCtrl1->Update();
+    mitk::Geometry2D* planeRotated = slicedgeometry2->GetGeometry2D(178);
+    mitk::Geometry2D* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);
+    bool error = ( !mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()) ||
+                   !mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin()) ||
+                   !mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()) ||
+                   !mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()) ||
+                   !mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()) ||
+                   !mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix())
+                   );
+
+    if (error)
+    {
+        MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
+        MITK_INFO<<"Rotated: \n"<<planeRotated->GetIndexToWorldTransform()->GetMatrix()<<" Restored: \n"<<planeRestored->GetIndexToWorldTransform()->GetMatrix();
+        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin()),"Testing for origin");
+        MITK_INFO<<"Rotated: \n"<<planeRotated->GetOrigin()<<" Restored: \n"<<planeRestored->GetOrigin();
+        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()),"Testing for spacing");
+        MITK_INFO<<"Rotated: \n"<<planeRotated->GetSpacing()<<" Restored: \n"<<planeRestored->GetSpacing();
+        MITK_TEST_CONDITION(mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()),"Testing for directionvector");
+        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetDirectionVector()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector();
+        MITK_TEST_CONDITION(mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()),"Testing for numslices");
+        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetSlices()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices();
+        MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
+        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetIndexToWorldTransform()->GetMatrix()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix();
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
 {
   int result=EXIT_FAILURE;
@@ -291,9 +410,10 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   if(result!=EXIT_SUCCESS)
     return result;
 
-
-
-
+  //Testing Execute RestorePlanePositionOperation
+  result = testRestorePlanePostionOperation();
+  if(result!=EXIT_SUCCESS)
+    return result;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

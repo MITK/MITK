@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry3D.h"
 #include "mitkMatrixConvert.h"
 #include "mitkRotationOperation.h"
+#include "mitkRestorePlanePositionOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 //#include "mitkStatusBar.h"
@@ -343,6 +344,14 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       vtktransform->PreMultiply();
       break;
     }
+  case OpRESTOREPLANEPOSITION:
+  {
+      //Copy necessary to avoid vtk warning
+      vtkMatrix4x4* matrix = vtkMatrix4x4::New();
+      TransferItkTransformToVtkMatrix(dynamic_cast<mitk::RestorePlanePositionOperation*>(operation)->GetTransform().GetPointer(), matrix);
+      vtktransform->SetMatrix(matrix);
+      break;
+  }
 
   default:
     vtktransform->Delete();

@@ -316,7 +316,6 @@ PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
 
   Vector3D  originVector; 
   FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
-  MITK_DEBUG << originVector;
 
   if(geometry3D->GetImageGeometry())
   {
@@ -731,8 +730,32 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       transform->Translate( -center[0], -center[1], -center[2] );
       break;
     }
+  case OpRESTOREPLANEPOSITION:
+    {
+      RestorePlanePositionOperation *op = dynamic_cast< mitk::RestorePlanePositionOperation* >(operation);
+      if(op == NULL)
+      {
+        return;
+      }
 
+      AffineTransform3D::Pointer transform2 = AffineTransform3D::New();
+      Matrix3D matrix;
+      matrix.GetVnlMatrix().set_column(0, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+      matrix.GetVnlMatrix().set_column(1, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+      matrix.GetVnlMatrix().set_column(2, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+      transform2->SetMatrix(matrix);
+      Vector3D offset = op->GetTransform()->GetOffset();
+      transform2->SetOffset(offset);
 
+      this->SetIndexToWorldTransform(transform2);
+      ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
+      this->SetBounds(bounds);
+      TransferItkToVtkTransform();
+      this->Modified();
+      transform->Delete();
+      return;
+
+    }
   default:
     Superclass::ExecuteOperation( operation );
     transform->Delete();

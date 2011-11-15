@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include "mitkGeometry2D.h"
+#include "mitkRestorePlanePositionOperation.h"
 
 #include <vnl/vnl_cross.h>
 

@@ -291,7 +291,7 @@ std::vector<int> mitk::FiberBundleX::DoGetFiberIds(/*mitk::PlanarFigure::Pointer
               for (int j=0; j<components; ++j) {
                   std::cout << "point distance " << distance[j] << std::endl;
                   //even if points are on the plane (where distance shall be 0), they can store an approximation to 0 like 2.22045e-16
-                  //if distance is almost 0, remember that point :-)
+                  //if distance is almost 0, remember that point (inkl. coordinate) we need it for ROI/fiber extraction :-)
               }
 
           }

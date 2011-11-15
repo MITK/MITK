@@ -24,9 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MITKDICOM.h"
 #include "QmitkStdMultiWidget.h"
 
+#include <mitkDicomSeriesReader.h>
+
 // Qt
 #include <QMessageBox>
 
+#include "ctkDICOMModel.h"
+
+#include "ctkDICOMAppWidget.h"
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";
 
@@ -41,71 +46,73 @@ MITKDICOM::~MITKDICOM()
 
 void MITKDICOM::CreateQtPartControl( QWidget *parent )
 {
-  // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
-  m_Controls.m_ctkDICOMAppWidget->cl
-  connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
+    //Q_D(ctkDICOMAppWidget);
+    // create GUI widgets from the Qt Designer's .ui file
+    m_Controls.setupUi( parent );
+    connect( m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked(QModelIndex)), this, SLOT(onSeriesModelSelected(QModelIndex)) );
 }
 
 void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-       it != nodes.end();
-       ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    // iterate all selected objects, adjust warning visibility
+    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+        it != nodes.end();
+        ++it )
     {
-      //m_Controls.labelWarning->setVisible( false );
-      //m_Controls.buttonPerformImageProcessing->setEnabled( true );
-      return;
+        mitk::DataNode::Pointer node = *it;
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        {
+            //m_Controls.labelWarning->setVisible( false );
+            //m_Controls.buttonPerformImageProcessing->setEnabled( true );
+            return;
+        }
     }
-  }
 
-  //m_Controls.labelWarning->setVisible( true );
-  //m_Controls.buttonPerformImageProcessing->setEnabled( false );
+    //m_Controls.labelWarning->setVisible( true );
+    //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
+void MITKDICOM::onSeriesModelSelected(const QModelIndex &index){
+    QModelIndex seriesIndex = index;
 
-void MITKDICOM::DoImageProcessing()
-{
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
+    ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
 
-  mitk::DataNode* node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
+    if(model)
     {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
+        model->fetchMore(seriesIndex);
 
-      // actually do something here...
+        int imageCount = model->rowCount(seriesIndex);
 
+        MITK_INFO<< "Series Index:"<< imageCount << "\n";
+
+        QString filePath = this->DatabaseDirectory +
+            "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString();
+
+        QString series_uid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
+
+        MITK_INFO << filePath.toStdString() << "\n";
+
+        if(QFile(filePath).exists())
+        {
+            //add all fienames from series to strin container
+            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries((filePath.toStdString(),series_uid.toStdString());
+            mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
+
+            if (node.IsNull())
+            {
+                MITK_ERROR << "Could not load series: " << series_uid.toStdString();
+            }
+            else
+            {
+                node->SetName(series_uid.toStdString());
+                this->GetDefaultDataStorage()->Add(node);
+
+                this->GetActiveStdMultiWidget();
+
+                mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+                mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+            }
+
+        }
     }
-  }
 }

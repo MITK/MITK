@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_MITKDICOMControls.h"
 
-#include "ctkDICOMAppWidget.h"
-
 
 /*!
   \brief MITKDICOM
@@ -53,8 +51,8 @@ class MITKDICOM : public QmitkFunctionality
 
   protected slots:
 
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+    /// \brief Called when series in TreeView is double clicked.
+    void onSeriesModelSelected(const QModelIndex &index);
 
   protected:
 

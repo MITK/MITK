@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _QMITKCTKPYTHONSHELL_H
 #define _QMITKCTKPYTHONSHELL_H
 
-#include <ctkPythonShell.h>
+#include <ctkPythonConsole.h>
 #include <ctkAbstractPythonManager.h>
 
 #include <QDragEnterEvent>
@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkCTKPythonShell : public ctkPythonShell
+class QmitkCTKPythonShell : public ctkPythonConsole
 {
 public:
   QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent = 0);

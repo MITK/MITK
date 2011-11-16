@@ -83,7 +83,7 @@ class QmitkPythonConsoleView : public QObject, public QmitkFunctionality, public
     berry::SmartPointer<QmitkPythonEditor> m_PythonEditor;
   private:
     FILE * m_scriptFile;
-    ctkPythonShell *m_ctkPythonShell;
+    ctkPythonConsole *m_ctkPythonShell;
     ctkAbstractPythonManager *m_ctkPythonManager;
     QPushButton *m_ButtonOpenEditor;
     QmitkPythonMediator *m_PythonMediator;

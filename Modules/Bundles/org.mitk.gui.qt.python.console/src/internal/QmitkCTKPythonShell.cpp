@@ -38,9 +38,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkCTKPythonShell::QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent)
-: ctkPythonShell(pythonManager)
 {
-  m_PythonManager = pythonManager;
+  this->initialize( pythonManager );
+  m_PythonManager = pythonManager;  
 }
 
 QmitkCTKPythonShell::~QmitkCTKPythonShell()

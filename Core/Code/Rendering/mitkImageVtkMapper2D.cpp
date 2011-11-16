@@ -513,10 +513,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       {
         MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
       }
-      //Interpret the values as binary values
-      localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
-      this->ApplyLookuptable(renderer);
     }
+    this->ApplyLookuptable(renderer);
+    //Interpret the values as binary values
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
   }
   else if( numberOfComponents == 1 ) //gray images
   {

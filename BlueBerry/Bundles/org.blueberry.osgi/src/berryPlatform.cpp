@@ -65,6 +65,8 @@ std::string Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 std::string Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 std::string Platform::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
+std::string Platform::ARG_XARGS = "xargs";
+
 const Poco::Path& Platform::GetConfigurationPath()
 {
   return InternalPlatform::GetInstance()->GetConfigurationPath();
@@ -173,6 +175,11 @@ int& Platform::GetRawApplicationArgs(char**& argv)
 std::vector<std::string> Platform::GetApplicationArgs()
 {
   return InternalPlatform::GetInstance()->GetApplicationArgs();
+}
+
+std::string Platform::GetExtendedApplicationArgs()
+{
+  return InternalPlatform::GetInstance()->GetConfiguration().getString(ARG_XARGS, "");
 }
 
 Poco::Util::LayeredConfiguration& Platform::GetConfiguration()

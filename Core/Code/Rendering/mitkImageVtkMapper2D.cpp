@@ -454,7 +454,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // SetOutputExtent wants an inclusive bound. Thus, we need
   // to subtract 1.
 
-  vtkImageData* reslicedImage = 0;
   // Do the reslicing. Modified() is called to make sure that the reslicer is
   // executed even though the input geometry information did not change; this
   // is necessary when the input /em data, but not the /em geometry changes.
@@ -464,24 +463,20 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
     localStorage->m_TSFilter->Modified();
     localStorage->m_TSFilter->Update();
-    reslicedImage = localStorage->m_TSFilter->GetOutput();
+    localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
   }
   else
   {
     localStorage->m_Reslicer->Modified();
     localStorage->m_Reslicer->Update();
-    reslicedImage = localStorage->m_Reslicer->GetOutput();
+    localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetOutput();
   }
 
-  if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
+  if((localStorage->m_ReslicedImage == NULL) || (localStorage->m_ReslicedImage->GetDataDimension() < 1))
   {
     MITK_WARN << "reslicer returned empty image";
     return;
   }
-
-  //set the current slice for the localStorage
-  //  localStorage->m_ReslicedImage = reslicedImage;
-  localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
   //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
@@ -1111,19 +1106,11 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
-
-  //transform the origin to center based coordinates, because MITK is center based.
-  Point3D originCenterBased = localStorage->m_Origin;
-  originCenterBased -= localStorage->m_Right * ( localStorage->m_mmPerPixel[0] * 0.5 );
-  originCenterBased -= localStorage->m_Bottom * ( localStorage->m_mmPerPixel[1] * 0.5 );
-
-  matrix->SetElement(0, 3, originCenterBased[0]);
-  matrix->SetElement(1, 3, originCenterBased[1]);
-  matrix->SetElement(2, 3, originCenterBased[2]);
   trans->SetMatrix(matrix);
-
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
+  //transform the origin to center based coordinates, because MITK is center based.
+  localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()

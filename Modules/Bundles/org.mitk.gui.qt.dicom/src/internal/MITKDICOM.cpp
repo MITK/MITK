@@ -29,9 +29,15 @@ PURPOSE.  See the above copyright notices for more information.
 // Qt
 #include <QMessageBox>
 
+#include <QtSql>
+
+#include <QSqlDatabase>
+
 #include "ctkDICOMModel.h"
 
 #include "ctkDICOMAppWidget.h"
+
+
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";
 
@@ -49,7 +55,7 @@ void MITKDICOM::CreateQtPartControl( QWidget *parent )
     //Q_D(ctkDICOMAppWidget);
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked(QModelIndex)), this, SLOT(onSeriesModelSelected(QModelIndex)) );
+    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked(QModelIndex)), this, SLOT(onSeriesModelSelected(QModelIndex)) );
 }
 
 void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -73,6 +79,7 @@ void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 }
 
 void MITKDICOM::onSeriesModelSelected(const QModelIndex &index){
+    QModelIndex studyIndex = index.parent();
     QModelIndex seriesIndex = index;
 
     ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
@@ -85,17 +92,19 @@ void MITKDICOM::onSeriesModelSelected(const QModelIndex &index){
 
         MITK_INFO<< "Series Index:"<< imageCount << "\n";
 
-        QString filePath = this->DatabaseDirectory +
+        QString filePath = m_Controls.m_ctkDICOMAppWidget->databaseDirectory() +
             "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString();
+
+        MITK_INFO << "filepath: "<< filePath.toStdString() << "\n";
 
         QString series_uid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
 
-        MITK_INFO << filePath.toStdString() << "\n";
+        MITK_INFO << "series_uid: " << series_uid.toStdString() << "\n";
 
         if(QFile(filePath).exists())
         {
             //add all fienames from series to strin container
-            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries((filePath.toStdString(),series_uid.toStdString());
+            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(filePath.toStdString(),series_uid.toStdString());
             mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
 
             if (node.IsNull())

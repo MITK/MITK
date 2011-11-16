@@ -508,6 +508,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   testAppOption.argument("<id>").binding(Platform::ARG_TESTAPPLICATION);
   options.addOption(testAppOption);
 
+  Poco::Util::Option xargsOption(Platform::ARG_XARGS, "", "Extended argument list");
+  xargsOption.argument("<args>").binding(Platform::ARG_XARGS);
+  options.addOption(xargsOption);
+
   Poco::Util::Application::defineOptions(options);
 }
 

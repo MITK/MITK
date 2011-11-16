@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -517,13 +511,21 @@ namespace mitk
 
             if(localStorage->m_ReslicedImage != NULL)
             {
-              texture->SetInput( localStorage->m_Texture->GetInput() );
+              bool binaryOutline = node->IsOn( "outline binary", renderer );
+              if( binaryOutline )
+              {
+                texture->SetInput( localStorage->m_ReslicedImage );
+              }
+              else
+              {
+                texture->SetInput( localStorage->m_Texture->GetInput() );
+              }
               // VTK (mis-)interprets unsigned char (binary) images as color images;
               // So, we must manually turn on their mapping through a (gray scale) lookup table;
               texture->SetMapColorScalarsThroughLookupTable( localStorage->m_Texture->GetMapColorScalarsThroughLookupTable() );
 
-                imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
-                imageActor->GetProperty()->SetAmbient(0.5);
+              imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
+              imageActor->GetProperty()->SetAmbient(0.5);
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn( "texture interpolation", renderer );

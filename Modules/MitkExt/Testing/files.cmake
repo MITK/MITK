@@ -21,7 +21,7 @@ SET(MODULE_TESTS
 SET(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
   mitkCompressedImageContainerTest.cpp
-  #mitkCylindricToCartesianFilterTest.cpp
+  mitkCylindricToCartesianFilterTest.cpp
   #mitkExtractImageFilterTest.cpp
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp

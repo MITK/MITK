@@ -10,7 +10,7 @@ SET(CPP_FILES
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
-  # Algorithms/mitkCylindricToCartesianFilter.cpp
+  Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDiffImageApplier.cpp
   # Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp

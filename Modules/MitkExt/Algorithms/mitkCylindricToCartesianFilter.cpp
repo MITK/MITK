@@ -427,30 +427,38 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       timeSelector->Update();
 
+      // Cast to pic descriptor for the timeSelector image
+      mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
+      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+
       _mitkIpPicFreeTags(pic_transformed->info->tags_head);
-      pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
+      pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
+
       if(input->GetDimension(2)>1)
       {
-
-        mitkIpPicTypeMultiplex9(_transform, CastToIpPicDescriptor( timeSelector->GetOutput()) , pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        mitkIpPicTypeMultiplex9(_transform, timeSelectorPic , pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         //  mitkIpPicPut("1trf.pic",pic_transformed);  
       }
       else
       {
         // HEADER copy. FIXME
-        mitkIpPicDescriptor *doubleSlice=mitkIpPicCopyHeader( CastToIpPicDescriptor( timeSelector->GetOutput()) , NULL);
+        mitkIpPicDescriptor *doubleSlice=mitkIpPicCopyHeader( timeSelectorPic , NULL);
         doubleSlice->dim=3;
         doubleSlice->n[2]=2;
         doubleSlice->data=malloc(_mitkIpPicSize(doubleSlice));
-        memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _mitkIpPicSize(doubleSlice)/2);
+        memcpy(doubleSlice->data, timeSelectorPic->data, _mitkIpPicSize(doubleSlice)/2);
         mitkIpPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         mitkIpPicFree(doubleSlice);
       }
-      output->SetPicVolume(pic_transformed, t, n);
+      output->SetVolume(pic_transformed->data, t, n);
+
+      // release the pic descriptor for timeSelector
+      mitkIpPicFree(timeSelectorPic);
     }
   }
   //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);  
   mitkIpPicFree(pic_transformed);
+
   m_TimeOfHeaderInitialization.Modified();
 }
 

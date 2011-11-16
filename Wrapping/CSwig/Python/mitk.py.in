@@ -1,0 +1,5 @@
+import sys
+sys.path.append('@ITK_LIBRARY_DIRS@')
+sys.path.append('@ITK_DIR@/Wrapping/WrapITK/Python')
+sys.path.append('@VTK_LIBRARY_DIRS@')
+sys.path.append('@VTK_DIR@/Wrapping/Python')

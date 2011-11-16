@@ -18,8 +18,7 @@ IF(NOT DEFINED CableSwig_DIR)
   SET(additional_cmake_args )
 
   ExternalProject_Add(${proj}
-     #URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.0.tar.gz
-     URL file:///tmp/CableSwig-ITK-3.20.0.tar.gz
+     URL http://mitk.org/download/thirdparty/CableSwig-ITK-3.20.0.tar.gz
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}

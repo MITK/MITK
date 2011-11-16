@@ -514,7 +514,7 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
 int InternalPlatform::main(const std::vector<std::string>& args)
 {
   m_FilteredArgs = args;
-  m_FilteredArgs.insert(m_FilteredArgs.begin(), this->config().getString("application.argv[0]"));
+  //m_FilteredArgs.insert(m_FilteredArgs.begin(), this->config().getString("application.argv[0]"));
 
   ctkPluginContext* context = GetCTKPluginFrameworkContext();
   QFileInfo storageDir = context->getDataFile("");

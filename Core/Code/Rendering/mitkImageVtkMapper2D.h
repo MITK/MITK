@@ -99,7 +99,6 @@ namespace mitk {
   {
 
   public:
-
     /** Standard class typedefs. */
     mitkClassMacro( ImageVtkMapper2D,VtkMapper2D );
 
@@ -159,6 +158,17 @@ namespace mitk {
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
 
+      /** \brief Origin of the 2D geometry. */
+      mitk::Point3D m_Origin;
+      /** \brief Bottom end point of the y-axis of the 2D geometry. */
+      mitk::Vector3D m_Bottom;
+      /** \brief Right end point of the x-axis of the 2D geometry. */
+      mitk::Vector3D m_Right;
+      /** \brief Normal of the 2D geometry. */
+      mitk::Vector3D m_Normal;
+      /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
+      mitk::ScalarType m_mmPerPixel[2];
+
       /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
 
@@ -173,12 +183,17 @@ namespace mitk {
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 
+    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+
     /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   protected:
-    /** \brief Apply all properties to the vtkActor (e.g. color, opacity, binary image handling, etc.).*/
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
+    /** \brief Transforms the actor to the actual position in 3D.
+    *   \param renderer The current renderer corresponding to the render window.
+    */
+    void TransformActor(mitk::BaseRenderer* renderer);
 
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
@@ -202,7 +217,7 @@ namespace mitk {
       \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
       \note This code has been taken from the deprecated library iil.
       */
-    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
+    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 
     /** Default constructor */
     ImageVtkMapper2D();
@@ -238,7 +253,23 @@ namespace mitk {
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
+    /** \brief This method applies a level window on RBG(A) images.
+    * It should only be called for internally for RGB(A) images. */
+    void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
+
+    /** \brief This method applies (or modifies) the lookuptable for all types of images. */
+    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+
+    /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
+    Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
+    images (e.g. float) */
     void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
+
+    /** \brief Set the color of the image/polydata */
+    void ApplyColor( mitk::BaseRenderer* renderer );
+
+    /** \brief Set the opacity of the actor. */
+    void ApplyOpacity( mitk::BaseRenderer* renderer );
   };
 
 } // namespace mitk

@@ -103,6 +103,7 @@ QmitkMeasurement::~QmitkMeasurement()
 
   m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
     , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+
 }
 
 void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
@@ -492,9 +493,7 @@ void QmitkMeasurement::PlanarFigureInitialized()
   m_DrawRectangle->setChecked(false);
   m_DrawPolygon->setChecked(false);
   // enable the crosshair navigation
-  this->GetActiveStdMultiWidget()->EnableNavigationControllerEventListening();
-
-
+  this->EnableCrosshairNavigation();
 }
 
 
@@ -524,7 +523,6 @@ void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::Eve
     m_CurrentFigureNode = figureNode;
 
     *m_SelectedPlanarFigures = figureNode;
-
 
     // Re-initialize after selecting new PlanarFigure
     this->PlanarFigureSelectionChanged();
@@ -589,6 +587,16 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   selectCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureSelected );
   m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
 
+  // add observer for event when interaction with figure starts
+  SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
+  startInteractionCommand->SetCallbackFunction( this, &QmitkMeasurement::DisableCrosshairNavigation);
+  m_StartInteractionObserverTag = figure->AddObserver( mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand );
+
+  // add observer for event when interaction with figure starts
+  SimpleCommandType::Pointer endInteractionCommand = SimpleCommandType::New();
+  endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurement::EnableCrosshairNavigation);
+  m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
+
 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
@@ -625,7 +633,7 @@ bool QmitkMeasurement::AssertDrawingIsPossible(bool checked)
 
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
   // disable the crosshair navigation during the drawing
-  this->GetActiveStdMultiWidget()->DisableNavigationControllerEventListening();
+  this->DisableCrosshairNavigation();
 
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
 
@@ -768,8 +776,7 @@ void QmitkMeasurement::Deactivated()
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
   this->SetMeasurementInfoToRenderWindow("", m_LastRenderWindow);
-  // enable the crosshair navigation
-  this->GetActiveStdMultiWidget()->EnableNavigationControllerEventListening();
+  this->EnableCrosshairNavigation();
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
   mitk::DataNode* node = 0;
@@ -783,6 +790,8 @@ void QmitkMeasurement::Deactivated()
     figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
     if(figure)
     {
+
+      figure->RemoveAllObservers();
       figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
 
       if(figureInteractor)
@@ -912,6 +921,19 @@ void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
     }
   }
 }
+
+void QmitkMeasurement::EnableCrosshairNavigation()
+{
+  // enable the crosshair navigation
+  this->GetActiveStdMultiWidget()->EnableNavigationControllerEventListening();
+}
+
+void QmitkMeasurement::DisableCrosshairNavigation()
+{
+    // disable the crosshair navigation during the drawing
+  this->GetActiveStdMultiWidget()->DisableNavigationControllerEventListening();
+}
+
 
 
 void QmitkMeasurement::OnRenderWindowDelete(QObject * obj)

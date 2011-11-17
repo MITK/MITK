@@ -85,6 +85,10 @@ class mitkTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
     */
     void ToFCameraStopped();
     /*!
+    \brief signal emitted when recording is started
+    */
+    void RecordingStarted();
+    /*!
     \brief signal emitted AbortEvent() in ToFImageRecorder is observed
     */
     void RecordingStopped();

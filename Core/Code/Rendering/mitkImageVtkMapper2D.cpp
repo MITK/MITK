@@ -643,6 +643,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
+  float blackOpacity = 0.0;
+  this->GetDataNode()->GetFloatProperty( "black opacity", blackOpacity, renderer);
+  localStorage->m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, blackOpacity);
+
   //default lookuptable
   localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 
@@ -672,7 +676,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
           <= this->GetDataNode()->GetPropertyList()->GetMTime() )
           {
           LookupTableProp->GetLookupTable()->ChangeOpacityForAll( localStorage->m_Actor->GetProperty()->GetOpacity() );
-          LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+          LookupTableProp->GetLookupTable()->ChangeOpacity(0, blackOpacity);
         }
         //we use the user-defined lookuptable
         localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
@@ -963,6 +967,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   else          //...or image type object
   {
     node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+    node->AddProperty( "black opacity", mitk::FloatProperty::New( 0.0 ), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
@@ -1140,8 +1145,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable->SetHueRange( 0.0, 0.0 );
   m_LookupTable->SetValueRange( 0.0, 1.0 );
   m_LookupTable->Build();
-  //map all black values to transparent
-  m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

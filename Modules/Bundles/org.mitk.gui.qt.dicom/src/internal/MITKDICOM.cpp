@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 // Qt
 #include <QMessageBox>
 
+#include <QWidget>
+
 #include <QtSql>
 
 #include <QSqlDatabase>
@@ -53,9 +55,10 @@ MITKDICOM::~MITKDICOM()
 void MITKDICOM::CreateQtPartControl( QWidget *parent )
 {
     //Q_D(ctkDICOMAppWidget);
+ 
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked(QModelIndex)), this, SLOT(onSeriesModelSelected(QModelIndex)) );
+    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(m_Controls.m_ctkDICOMAppWidget->seriesDoubleClicked(QModelIndex)), this, SLOT(this->onSeriesModelSelected(QModelIndex)) );
 }
 
 void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -78,7 +81,7 @@ void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
     //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
-void MITKDICOM::onSeriesModelSelected(const QModelIndex &index){
+void MITKDICOM::onSeriesModelSelected(QModelIndex index){
     QModelIndex studyIndex = index.parent();
     QModelIndex seriesIndex = index;
 

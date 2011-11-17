@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MITKDICOMControls</class>
  <widget class="QWidget" name="MITKDICOMControls">
@@ -49,6 +49,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ctkDICOMAppWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkdicomappwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

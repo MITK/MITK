@@ -52,7 +52,7 @@ class MITKDICOM : public QmitkFunctionality
   protected slots:
 
     /// \brief Called when series in TreeView is double clicked.
-    void onSeriesModelSelected(const QModelIndex &index);
+    void onSeriesModelSelected(QModelIndex index);
 
   protected:
 

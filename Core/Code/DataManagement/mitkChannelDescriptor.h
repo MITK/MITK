@@ -39,13 +39,6 @@ public:
 
     ~ChannelDescriptor(){}
 
-    /** \brief Initialize method for the channel descriptor
-
-      \param numOfElements the size of the channel described in elements
-      \param allocate if set to true, the channel descriptor allocates numOfElements * type.GetSize() bytes
-    */
-    //void Initialize(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
-
     /** \brief Get the type of channel's elements */
     PixelType GetPixelType() const
     { return m_PixelType; }

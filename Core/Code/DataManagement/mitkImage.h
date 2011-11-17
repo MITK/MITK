@@ -441,74 +441,115 @@ public:
   ChannelDescriptor GetChannelDescriptor( int id = 0 ) const
   { return m_ImageDescriptor->GetChannelDescriptor(id); }
 
-  //##Documentation
-  //## @brief Sets a geometry to an image.
+  /** \brief Sets a geometry to an image.
+    */
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##Documentation
-  //## \brief Get the minimum for scalar images
+  /**
+  \brief (DEPRECATED) Get the minimum for scalar images
+  */
   DEPRECATED (ScalarType GetScalarValueMin(int t=0) const);
 
-  //ScalarType GetScalarValueMin(int t=0) const;
 
-  //##Documentation
-  //## \brief Get the maximum for scalar images
+  /**
+  \brief (DEPRECATED) Get the maximum for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValueMax(int t=0) const);
 
-  //##Documentation
-  //## \brief Get the second smallest value for scalar images
+  /**
+  \brief (DEPRECATED) Get the second smallest value for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValue2ndMin(int t=0) const);
 
 
-  //##Documentation
-  //## \brief Get the smallest value for scalar images, but do not recompute it first
+  /**
+  \brief (DEPRECATED) Get the smallest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const);
 
-  //##Documentation
-  //## \brief Get the second smallest value for scalar images, but do not recompute it first
+  /**
+  \brief (DEPRECATED) Get the second smallest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const);
 
-  //##Documentation
-  //## \brief Get the second largest value for scalar images
+  /**
+  \brief (DEPRECATED) Get the second largest value for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValue2ndMax(int t=0) const);
 
-  //##Documentation
-  //## \brief Get the largest value for scalar images, but do not recompute it first
+  /**
+  \brief (DEPRECATED) Get the largest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ) const );
 
-  //##Documentation
-  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  /**
+  \brief (DEPRECATED) Get the second largest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ) const);
 
-  //##Documentation
-  //## \brief Get the count of voxels with the smallest scalar value in the dataset
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetCountOfMinValuedVoxels(int t = 0) const);
 
-  //##Documentation
-  //## \brief Get the count of voxels with the largest scalar value in the dataset
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (ScalarType GetCountOfMaxValuedVoxels(int t = 0) const);
 
-  //##Documentation
-  //## \brief Get the count of voxels with the largest scalar value in the dataset
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
 
-  //##Documentation
-  //## \brief Get the count of voxels with the smallest scalar value in the dataset
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
   DEPRECATED (unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
 
+  /**
+    \brief Returns a pointer to the ImageStatisticsHolder object that holds all statistics information for the image.
 
+    All Get-methods for statistics properties formerly accessible directly from an Image object are now moved to the
+    new \a ImageStatisticsHolder object.
+    */
   StatisticsHolderPointer GetStatistics() const
   {
     return m_ImageStatistics;

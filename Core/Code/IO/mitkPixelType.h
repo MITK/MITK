@@ -67,26 +67,47 @@ public:
   /** \brief Get the \a type_info of the scalar (!) type. Each element
   * may contain m_NumberOfComponents (more than one) of these scalars.
   *
-  * \sa GetItkTypeId
   */
   inline const std::type_info& GetTypeId() const
   {
     return m_ComponentType;
   }
 
+  /** \brief Get the \a type_info of the whole pixel type.
+  *
+  * If you want the type information for the component of a compound type use the
+  * GetTypeId() method
+  */
   inline const std::type_info& GetPixelTypeId() const
   {
     return m_PixelType;
   }
 
+  /** \brief Returns a string containing the ItkTypeName,
+    *
+    * The string provides the same information as GetPixelTypeId.name()
+    */
   std::string GetItkTypeAsString() const
   {
     return m_PixelTypeName;
   }
 
+  /** \brief Returns a string containing the type name of the component,
+    *
+    * The string provides the same information as GetTypeId.name()
+    */
   std::string GetComponentTypeAsString() const
   {
       return m_ComponentTypeName;
+  }
+
+  /** \brief Get size of the PixelType in bytes
+    *
+    * A RGBA PixelType of floats will return 4 * sizeof(float)
+  */
+  size_t GetSize() const
+  {
+    return (m_NumberOfComponents * m_BytesPerComponent);
   }
 
   /** \brief Get the number of bits per element (of an
@@ -98,11 +119,6 @@ public:
   * \sa GetItkTypeId
   * \sa GetTypeId
   */
-  size_t GetSize() const
-  {
-    return (m_NumberOfComponents * m_BytesPerComponent);
-  }
-
   size_t GetBpe() const
   {
     return this->GetSize() * 8;
@@ -184,6 +200,8 @@ private:
 
 };
 
+/** \brief A template method for creating a pixel type.
+  */
 template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
 PixelType MakePixelType()
 {
@@ -196,7 +214,11 @@ PixelType MakePixelType()
                    );
 }
 
-
+/** \brief A template method for creating a pixel type from an ItkImageType
+  *
+  * For fixed size vector images ( i.e. images of type itk::FixedArray<3,float> ) also the number of components
+  * is propagated to the constructor
+  */
 template< typename ItkImageType >
 PixelType MakePixelType()
 {
@@ -222,7 +244,10 @@ PixelType MakePixelType()
          );
 }
 
-
+/** \brief An interface to the MakePixelType method for creating scalar pixel types.
+  *
+  * Usage: for example MakeSimpleType<short>() for a scalar short image
+  */
 template< typename T>
 PixelType MakeSimpleType()
 {

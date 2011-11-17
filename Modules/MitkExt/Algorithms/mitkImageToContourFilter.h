@@ -35,6 +35,8 @@ namespace mitk {
   extraction is done by using the itk::ContourExtractor2DImageFilter.
   
   The output is a mitk::Surface.
+
+  $Author: fetzer$
 */
 class MitkExt_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {

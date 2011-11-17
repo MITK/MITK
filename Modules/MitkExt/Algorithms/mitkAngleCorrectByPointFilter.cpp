@@ -49,7 +49,8 @@ void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
     tmpDimensions[i]=input->GetDimension(i);
 
   //@todo maybe we should shift the following somehow in ImageToImageFilter
-  output->Initialize(PixelType(typeid(ScalarType)),
+  mitk::PixelType scalarPType = MakeSimpleType<ScalarType>();
+  output->Initialize(scalarPType,
     input->GetDimension(),
     tmpDimensions,
     input->GetNumberOfChannels());

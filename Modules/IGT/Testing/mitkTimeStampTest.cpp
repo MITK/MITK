@@ -34,7 +34,6 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
 
   // let's create an object of our class  
   
-  
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.

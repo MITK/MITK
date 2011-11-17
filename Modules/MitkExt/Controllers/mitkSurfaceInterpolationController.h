@@ -22,10 +22,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkExtExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
+#include "mitkInteractionConst.h"
+#include "mitkColorProperty.h"
+#include "mitkProperties.h"
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
 #include "mitkComputeContourSetNormalsFilter.h"
+
+#include "mitkDataNode.h"
+#include "mitkDataStorage.h"
+#include "mitkWeakPointer.h"
 
 #include "vtkPolygon.h"
 #include "vtkPoints.h"
@@ -34,9 +41,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkSmartPointer.h"
 #include "vtkAppendPolyData.h"
 
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
+#include "vtkMarchingCubes.h"
+#include "vtkImageData.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "vtkProperty.h"
+
 
 namespace mitk
 {
@@ -57,27 +66,14 @@ namespace mitk
     void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
 
     /*
-     * If a contour at the position represented by the RestorePlaneOperation already exists
-       this contour is returned. Otherwise NULL is returned.
-     */
-    //Surface::Pointer GetSurface (RestorePlanePositionOperation &op);
-
-    /*
      * Interpolates the 3D surface from the given extracted contours
      */
     Surface::Pointer Interpolate ();
-
-    //itkSetMacro(MinSpacing, double);
-    //itkSetMacro(MaxSpacing, double);
-    //itkSetMacro(DistImageVolume, unsigned int);
-    //itkSetMacro(WorkingImage, Image*);
 
     void SetMinSpacing(double minSpacing);
     void SetMaxSpacing(double maxSpacing);
     void SetDistanceImageVolume(unsigned int distImageVolume);
     void SetWorkingImage(Image* workingImage);
-
-   /* bool DataSetHasChanged();*/
 
     Surface* GetContoursAsSurface();
 
@@ -85,11 +81,9 @@ namespace mitk
 
     unsigned int CreateNewContourList();
 
-    void SetCurrentListID (int ID);
+    void SetCurrentListID (unsigned int ID);
 
     mitk::Image* GetImage();
-
-
 
  protected:
 
@@ -105,9 +99,7 @@ namespace mitk
    };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
-   //typedef std::map< RestorePlanePositionOperation*, Surface::Pointer > ContourPositionPairList;
 
-    //ContourPositionPairList m_ContourList;
     ContourPositionPairList::iterator m_Iterator;
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
@@ -125,13 +117,11 @@ namespace mitk
 
     unsigned int m_DistImageVolume;
 
-   /* bool m_Modified;*/
-
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     std::vector<ContourPositionPairList> m_ListOfContourLists;
-    unsigned int m_CurrentContourListID;
 
+    unsigned int m_CurrentContourListID;
  };
 }
 #endif

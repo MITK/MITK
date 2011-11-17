@@ -17,15 +17,38 @@
 
 #include "MitkExtExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
+#include "mitkSurface.h"
 
-//Test
-//#include "mitkNthPointFilter.h"
-//#include "mitkDouglasPeuckerFilter.h"
+#include "vtkSmartPointer.h"
+#include "vtkPolyData.h"
+#include "vtkPolygon.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
+#include "vtkMath.h"
+
+#include <stack>
 
 namespace mitk {
-    
+
+/**
+  \brief A filter that reduces the number of points of contours represented by a mitk::Surface
+
+  The type of the reduction can be set via SetReductionType. The two ways provided by this filter is the
+
+  \li NTH_POINT Algorithm which reduces the contours according to a certain stepsize
+  \li DOUGLAS_PEUCKER Algorithm which incorpates an error tolerance into the reduction.
+
+  Stepsize and error tolerance can be set via SetStepSize and SetTolerance.
+
+  Additional if more than one input contour is provided this filter tries detect contours which occur just because
+  of an intersection. These intersection contours are eliminated. In oder to ensure a correct elimination the min and max
+  spacing of the original image must be provided.
+
+  The output is a mitk::Surface.
+
+  $Author: fetzer$
+*/
+
     class MitkExt_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
     {
         

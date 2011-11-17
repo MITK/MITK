@@ -441,8 +441,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
       }
       else
       {
-        // HEADER copy. FIXME
-        mitkIpPicDescriptor *doubleSlice=mitkIpPicCopyHeader( timeSelectorPic , NULL);
+        mitkIpPicDescriptor *doubleSlice = mitkIpPicCopyHeader( timeSelectorPic , NULL);
         doubleSlice->dim=3;
         doubleSlice->n[2]=2;
         doubleSlice->data=malloc(_mitkIpPicSize(doubleSlice));
@@ -451,9 +450,6 @@ void mitk::CylindricToCartesianFilter::GenerateData()
         mitkIpPicFree(doubleSlice);
       }
       output->SetVolume(pic_transformed->data, t, n);
-
-      // release the pic descriptor for timeSelector
-      mitkIpPicFree(timeSelectorPic);
     }
   }
   //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);  

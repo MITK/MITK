@@ -10,7 +10,7 @@ mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest ${MITK
 #mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz)
 mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest   /localdata/dartclient/NewTestImages/Pic3D.nrrd /localdata/dartclient/NewTestImages/BallBinary30x30x30.nrrd)
 
-mitkAddCustomeModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest /localdata/dartclient/NewTestImages/US4DCyl.nrrd)
+mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest /localdata/dartclient/NewTestImages/US4DCyl.nrrd)
 
 mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
 

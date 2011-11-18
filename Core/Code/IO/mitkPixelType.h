@@ -246,10 +246,10 @@ PixelType MakePixelType()
 
 /** \brief An interface to the MakePixelType method for creating scalar pixel types.
   *
-  * Usage: for example MakeSimpleType<short>() for a scalar short image
+  * Usage: for example MakeScalarPixelType<short>() for a scalar short image
   */
 template< typename T>
-PixelType MakeSimpleType()
+PixelType MakeScalarPixelType()
 {
     return MakePixelType<T,T,1>();
 }

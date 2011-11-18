@@ -61,7 +61,7 @@ void ReadFileFormatTestCase(std::string extension, mitk::ToFImageGrabber::Pointe
 
   mitk::Image::Pointer testImage = mitk::Image::New();
 
-  mitk::PixelType FloatType = mitk::MakeSimpleType<float>();
+  mitk::PixelType FloatType = mitk::MakeScalarPixelType<float>();
   testImage->Initialize( FloatType, 3, dim);
   testImage->SetVolume(data);
 

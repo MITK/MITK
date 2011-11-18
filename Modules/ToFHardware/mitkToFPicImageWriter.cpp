@@ -61,7 +61,7 @@ namespace mitk
     dimensions[0] = this->m_CaptureWidth;
     dimensions[1] = this->m_CaptureHeight;
 
-    mitk::PixelType FloatType = MakeSimpleType<float>();
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
     if (this->m_ToFImageType == ToFImageWriter::ToFImageType2DPlusT)
     {
       dimensions[2] = 1;

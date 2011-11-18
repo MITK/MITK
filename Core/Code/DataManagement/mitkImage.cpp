@@ -877,7 +877,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
       m_Dimension = 4;
   }
 
-  mitk::PixelType pixelType = MakeSimpleType<int>();
+  mitk::PixelType pixelType = MakeScalarPixelType<int>();
 /* FIXME
   switch ( vtkimagedata->GetScalarType() ) 
   {

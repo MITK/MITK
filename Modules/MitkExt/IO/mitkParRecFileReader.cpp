@@ -103,9 +103,9 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
           p=strchr(s,':')+1;
           int bpe=atoi(p);
           if(bpe==8)
-            type=MakeSimpleType<signed char>();
+            type=MakeScalarPixelType<signed char>();
           else
-            type=MakeSimpleType<signed short>();
+            type=MakeScalarPixelType<signed short>();
         }
         else
         if(strstr(s,"Recon resolution"))

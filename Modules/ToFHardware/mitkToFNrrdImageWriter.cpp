@@ -151,7 +151,7 @@ namespace mitk
       throw std::logic_error("No image type set, please choose between 2D+t and 3D!");
     }
 
-    mitk::PixelType FloatType = MakeSimpleType<float>();
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
     imageTemplate->Initialize( FloatType,dimension, dimensions, 1);
     imageTemplate->SetSlice(floatData, 0, 0, 0);
 

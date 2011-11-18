@@ -345,7 +345,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
       unsigned int dimensions[2];
       dimensions[0] = this->m_VideoCaptureWidth;
       dimensions[1] = this->m_VideoCaptureHeight;       
-      this->m_SurfaceTextureImage->Initialize( mitk::MakeSimpleType<unsigned char>(), 2, dimensions, 1);
+      this->m_SurfaceTextureImage->Initialize( mitk::MakeScalarPixelType<unsigned char>(), 2, dimensions, 1);
 
       //this->m_SurfaceWorkerThread.SetTextureImageWidth(this->m_VideoCaptureWidth);
       //this->m_SurfaceWorkerThread.SetTextureImageHeight(this->m_VideoCaptureHeight);
@@ -514,7 +514,7 @@ void QmitkToFUtilView::InitImage(mitk::Image::Pointer image, int numOfChannel)
   dimensions[1] = this->m_ToFImageGrabber->GetCaptureHeight();       
   dimensions[2] = 1;
   dimensions[3] = 1;
-  image->Initialize(mitk::MakeSimpleType<float>(), 2, dimensions, numOfChannel);
+  image->Initialize(mitk::MakeScalarPixelType<float>(), 2, dimensions, numOfChannel);
 }
 
 void QmitkToFUtilView::InitTexture(unsigned char* &image, int width, int height)

@@ -53,7 +53,7 @@ namespace mitk
     dimensions[3] = 1;
 
     // create single component float pixel type
-    mitk::PixelType FloatType = MakeSimpleType<float>();
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
 
     mitk::Image::Pointer currentMITKIntensityImage = mitk::Image::New();
     currentMITKIntensityImage->Initialize(FloatType, 2, dimensions);

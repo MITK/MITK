@@ -429,7 +429,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
     // create a diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();
     diffImage->Initialize( m_Segmentation );
-    mitk::PixelType pixelType( mitk::MakeSimpleType<short signed int>()  );
+    mitk::PixelType pixelType( mitk::MakeScalarPixelType<short signed int>()  );
     diffImage->Initialize( pixelType, 3, m_Segmentation->GetDimensions() );
     
     memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );

@@ -70,7 +70,7 @@ namespace mitk
       amplitudeImage->ReleaseData();
       intensityImage->ReleaseData();
 
-      mitk::PixelType FloatType = MakeSimpleType<float>();
+      mitk::PixelType FloatType = MakeScalarPixelType<float>();
 
       unsigned int dimensions[2];
       dimensions[0] = this->m_ToFCameraDevice->GetCaptureWidth();

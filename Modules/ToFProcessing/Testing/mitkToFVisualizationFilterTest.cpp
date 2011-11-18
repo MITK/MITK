@@ -40,7 +40,7 @@ int mitkToFVisualizationFilterTest(int  argc , char* argv[])
   //Create test image
   mitk::Image::Pointer inputImage = mitk::Image::New();
   unsigned int dims[2] = {1, 4};
-  inputImage->Initialize(mitk::MakeSimpleType<float>(), 2, dims, 1);
+  inputImage->Initialize(mitk::MakeScalarPixelType<float>(), 2, dims, 1);
   //special cases for transformation
   float* cornerCases = new float[4];
   cornerCases[0] = 0.0f;

@@ -105,7 +105,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
        m_SliceDifferenceImage->GetDimension(1) != m_SliceImage->GetDimension(1) )
   {
     m_SliceDifferenceImage = mitk::Image::New();
-    mitk::PixelType pixelType( mitk::MakeSimpleType<short signed int>() );
+    mitk::PixelType pixelType( mitk::MakeScalarPixelType<short signed int>() );
     m_SliceDifferenceImage->Initialize( pixelType, 2, m_SliceImage->GetDimensions() );
   }
 

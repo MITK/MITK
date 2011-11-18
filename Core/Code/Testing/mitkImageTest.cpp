@@ -40,7 +40,7 @@ int mitkImageTest(int argc, char* argv[])
 
   //Create Image out of nowhere
   mitk::Image::Pointer imgMem = mitk::Image::New();
-  mitk::PixelType pt = mitk::MakeSimpleType<int>();
+  mitk::PixelType pt = mitk::MakeScalarPixelType<int>();
   unsigned int dim[]={100,100,20};
 
   MITK_TEST_CONDITION_REQUIRED( imgMem.IsNotNull(), "An image was created. ");

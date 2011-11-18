@@ -91,11 +91,11 @@ mitk::PixelType mitk::CastToPixelType(mitkIpPicType_t pictype, size_t bpe)
         switch(bpe)
         {
         case sizeof(char):
-            return MakeSimpleType<char>();
+            return MakeScalarPixelType<char>();
         case sizeof(short):
-            return MakeSimpleType<short>();
+            return MakeScalarPixelType<short>();
         default:
-            return MakeSimpleType<int>();
+            return MakeScalarPixelType<int>();
         }
     }
     else if( isUnsignedIntegralType )
@@ -103,11 +103,11 @@ mitk::PixelType mitk::CastToPixelType(mitkIpPicType_t pictype, size_t bpe)
         switch(bpe)
         {
         case sizeof(unsigned char):
-            return MakeSimpleType<unsigned char>();
+            return MakeScalarPixelType<unsigned char>();
         case sizeof(unsigned short):
-            return MakeSimpleType<unsigned short>();
+            return MakeScalarPixelType<unsigned short>();
         default:
-            return MakeSimpleType<unsigned int>();
+            return MakeScalarPixelType<unsigned int>();
         }
     }
     else // is floating point type
@@ -115,9 +115,9 @@ mitk::PixelType mitk::CastToPixelType(mitkIpPicType_t pictype, size_t bpe)
         switch(bpe)
         {
         case sizeof(float):
-            return MakeSimpleType<float>();
+            return MakeScalarPixelType<float>();
         default:
-            return MakeSimpleType<double>();
+            return MakeScalarPixelType<double>();
         }
     }
 

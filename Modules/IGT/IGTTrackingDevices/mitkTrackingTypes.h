@@ -190,7 +190,7 @@ namespace mitk
 		int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
 		for(int i=0; i < size; i++)
 		{			
-			if(TrackingDeviceList[i].Model.compare(modelName) == 0 ) return TrackingDeviceList[i];
+			if(TrackingDeviceList[i].Model == modelName) return TrackingDeviceList[i];
 		} 
 		return DeviceDataInvalid;
 	}

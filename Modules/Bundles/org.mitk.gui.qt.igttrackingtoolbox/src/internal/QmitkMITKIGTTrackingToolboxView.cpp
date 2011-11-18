@@ -160,17 +160,17 @@ else if (this->m_toolStorage->GetToolCount() == 0)
 //build the IGT pipeline
 mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
 
+
+//Get Tracking Volume Data
 mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 
 QString qstr =  m_Controls->VolumeSelectionBox->currentText();
 if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
   std::string str = qstr.toStdString();
-  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+  data = mitk::GetDeviceDataByName(str);
 }
+
 trackingDevice->SetData(data);
-
-
-
 
 
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
@@ -215,7 +215,7 @@ this->m_Controls->m_configurationWidget->ConfigurationFinished();
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
-	volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+	  volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
     volumeGenerator->Update();
 
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();

@@ -198,7 +198,7 @@ this->m_Controls->m_AutoDetectTools->setEnabled(false);
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
-//show tracking volume
+//show tracking volume (old code)
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();

@@ -67,7 +67,7 @@ namespace mitk
     /**
     * \brief Set the type of the NDI Tracking Device because it can not jet handle this itself
     */
-    itkSetMacro(Type, TrackingDeviceType);
+    //itkSetMacro(Type, TrackingDeviceType);
 
     /**
     * \brief initialize the connection to the tracking device

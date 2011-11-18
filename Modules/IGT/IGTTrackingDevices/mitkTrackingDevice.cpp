@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-mitk::TrackingDevice::TrackingDevice() :
-  m_Type(TrackingSystemNotSpecified),
+mitk::TrackingDevice::TrackingDevice() : 
+  m_Data(mitk::Unspecified),
   m_State(mitk::TrackingDevice::Setup),
   m_StopTracking(false), m_ErrorMessage("")
 
@@ -68,7 +68,6 @@ mitk::TrackingDeviceType mitk::TrackingDevice::GetType() const{
 
 void mitk::TrackingDevice::SetType(mitk::TrackingDeviceType deviceType){
 	m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
-	m_Type = m_Data.Line;
 }
 
 

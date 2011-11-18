@@ -128,7 +128,6 @@ namespace mitk {
       TrackingDevice();
       virtual ~TrackingDevice();
 
-      TrackingDeviceType m_Type; ///< current device type 
 	  TrackingDeviceData m_Data; ///< current device Data 
       TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
       bool m_StopTracking;       ///< signal stop to tracking thread

@@ -265,8 +265,6 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   {
     m_Controls->VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
   }
-
-  //OnTrackingVolumeChanged();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)

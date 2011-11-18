@@ -415,9 +415,13 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       numberOfSelectedSegmentations++;
 
       workingData = node;
-      referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+      if (this->GetDefaultDataStorage()->GetSources(node)->Size() != 0)
+      {
+        referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+      }
+
       //MITK_INFO<<"REFNew: "<<referenceDataNew->GetName();
-      if (workingNodeIsVisible)
+      if (workingNodeIsVisible && referenceDataNew)
         referenceDataNew->SetVisibility(true);
 
       //set comboBox to reference image

@@ -23,22 +23,17 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "MITKDICOM.h"
 #include "QmitkStdMultiWidget.h"
-
 #include <mitkDicomSeriesReader.h>
 
 // Qt
 #include <QMessageBox>
-
 #include <QWidget>
-
 #include <QtSql>
-
 #include <QSqlDatabase>
 
+//CTK
 #include "ctkDICOMModel.h"
-
 #include "ctkDICOMAppWidget.h"
-
 
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";
@@ -54,11 +49,9 @@ MITKDICOM::~MITKDICOM()
 
 void MITKDICOM::CreateQtPartControl( QWidget *parent )
 {
-    //Q_D(ctkDICOMAppWidget);
- 
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(m_Controls.m_ctkDICOMAppWidget->seriesDoubleClicked(QModelIndex)), this, SLOT(this->onSeriesModelSelected(QModelIndex)) );
+    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
 }
 
 void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )

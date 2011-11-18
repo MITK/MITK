@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_MITKDICOMControls.h"
 
-
 /*!
   \brief MITKDICOM
 

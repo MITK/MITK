@@ -57,5 +57,10 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
-</ui>
+ <connections>
+   <sender>m_ctkDICOMAppWidget</sender>
+   <signal>seriesDoubleClicked(QModelIndex)</signal>
+   <receiver>MITKDICOMControls</receiver>
+   <slot>onSeriesModelSelected(QModelIndex)</slot>
+ </connections>
+  </ui>

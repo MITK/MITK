@@ -12,11 +12,8 @@
 #pragma GCC visibility pop
 
 #include <QMutexLocker>
-#include <itkHistogram.h>
-#include <itkListSampleToHistogramGenerator.h>
 #include <vnl/vnl_matrix_fixed.h>
 #include <vnl/vnl_vector_fixed.h>
-#include <itkzlib/zlib.h>
 
 #include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
@@ -179,58 +176,27 @@ void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::BuildFibers(float* points, int numPoints)
 {
-    MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
+  MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
 
-    typename InputQBallImageType::Pointer odfImage
-            = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
-    double spacing[3];
-    spacing[0] = odfImage->GetSpacing().GetElement(0);
-    spacing[1] = odfImage->GetSpacing().GetElement(1);
-    spacing[2] = odfImage->GetSpacing().GetElement(2);
+  double spacing[3];
+  spacing[0] = m_ItkQBallImage->GetSpacing().GetElement(0);
+  spacing[1] = m_ItkQBallImage->GetSpacing().GetElement(1);
+  spacing[2] = m_ItkQBallImage->GetSpacing().GetElement(2);
 
-    // initialize array of particles
-    CCAnalysis ccana(points, numPoints, spacing);
+  m_FiberPolyData = FiberPolyDataType::New();
 
-    // label the particles according to fiber affiliation and return number of fibers
-    int numFibers = ccana.iterate(m_FiberLength);
+  // initialize array of particles
+  FiberBuilder fiberBuilder(points, numPoints, spacing, m_ItkQBallImage);
+  // label the particles according to fiber affiliation and return polydata
+  m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
+  m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
 
-    if (numFibers<=0){
-        MITK_INFO << "itkGibbsTrackingFilter: 0 fibers accepted";
-        return;
-    }
-
-    // fill output datastructure
-    m_FiberBundle.clear();
-    for (int i = 0; i < numFibers; i++)
-    {
-        vector< Particle* >* particleContainer = ccana.m_FiberContainer->at(i);
-
-        // resample fibers
-        std::vector< Particle* >* pCon = ResampleFibers(particleContainer, 0.9*spacing[0]);
-
-        FiberTractType tract;
-        for (int j=0; j<pCon->size(); j++)
-        {
-            Particle* particle = pCon->at(j);
-            pVector p = particle->R;
-
-            itk::Point<float, 3> point;
-            point[0] = p[0]-0.5;
-            point[1] = p[1]-0.5;
-            point[2] = p[2]-0.5;
-            tract.push_back(point);
-            delete(particle);
-        }
-        m_FiberBundle.push_back(tract);
-        delete(pCon);
-    }
-    m_NumAcceptedFibers = numFibers;
-    MITK_INFO << "itkGibbsTrackingFilter: "  << numFibers << " fibers accepted";
+  MITK_INFO << "itkGibbsTrackingFilter: " << m_NumAcceptedFibers << " accepted";
 }
 
 // fill output fiber bundle datastructure
 template< class TInputOdfImage, class TInputROIImage >
-typename GibbsTrackingFilter< TInputOdfImage, TInputROIImage >::FiberBundleType*
+typename GibbsTrackingFilter< TInputOdfImage, TInputROIImage >::FiberPolyDataType
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::GetFiberBundle()
 {
@@ -240,7 +206,7 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         while (m_BuildFibers){}
     }
 
-    return &m_FiberBundle;
+    return m_FiberPolyData;
 }
 
 // get memory allocated for particle grid
@@ -532,30 +498,30 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     // main loop
     for( int step = 0; step < m_Steps; step++ )
     {
-        if (m_AbortTracking)
-            break;
+      if (m_AbortTracking)
+          break;
 
-        m_CurrentStep = step+1;
-        float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-        MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
+      m_CurrentStep = step+1;
+      float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
+      MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
 
-        m_Sampler->SetTemperature(temperature);
-        m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
+      m_Sampler->SetTemperature(temperature);
+      m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
 
-        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
-        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
+      MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+      MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
+      MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
+      MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
 
-        if (m_BuildFibers)
-        {
-            int numPoints = m_Sampler->m_ParticleGrid.pcnt;
-            float* points = new float[numPoints*m_Sampler->m_NumAttributes];
-            m_Sampler->WriteOutParticles(points);
-            BuildFibers(points, numPoints);
-            delete points;
-            m_BuildFibers = false;
-        }
+      if (m_BuildFibers)
+      {
+        int numPoints = m_Sampler->m_ParticleGrid.pcnt;
+        float* points = new float[numPoints*m_Sampler->m_NumAttributes];
+        m_Sampler->WriteOutParticles(points);
+        BuildFibers(points, numPoints);
+        delete points;
+        m_BuildFibers = false;
+      }
     }
 
     int numPoints = m_Sampler->m_ParticleGrid.pcnt;

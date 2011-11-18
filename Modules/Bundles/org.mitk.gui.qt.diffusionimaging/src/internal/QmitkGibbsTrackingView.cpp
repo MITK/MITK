@@ -109,7 +109,6 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_FiberBundleNode(NULL)
   , m_TrackingWorker(this)
   , m_QBallSelected(false)
-  , m_FibSelected(false)
   , m_Iterations(10000000)
   , m_LastStep(0)
 {
@@ -345,7 +344,6 @@ void QmitkGibbsTrackingView::StdMultiWidgetNotAvailable()
 void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   m_QBallSelected = false;
-  m_FibSelected = false;
 
   // iterate all selected objects
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -356,11 +354,6 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     {
       m_QBallSelected = true;
       m_QBallImageNode = node;
-    }
-    else if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
-    {
-      m_FibSelected = true;
-      m_FiberBundleNode = node;
     }
   }
 
@@ -604,27 +597,13 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
   if (m_GlobalTracker.IsNull() || m_ItkQBallImage.IsNull() || m_QBallImage.IsNull() || (!m_Controls->m_VisualizationCheckbox->isChecked() && m_ThreadIsRunning))
     return;
 
-  m_FiberBundle = mitk::FiberBundle::New();
 
   typedef std::vector< itk::Point<float, 3> > FiberTractType;
   typedef std::vector< FiberTractType > FiberBundleType;
 
-  FiberBundleType* fiberBundle = m_GlobalTracker->GetFiberBundle();
+  vtkSmartPointer<vtkPolyData> fiberBundle = m_GlobalTracker->GetFiberBundle();
 
-  for (int i=0; i<fiberBundle->size(); i++)
-  {
-    FiberTractType* tract = &fiberBundle->at(i);
-    for (int j=0; j<tract->size(); j++)
-      m_FiberBundle->PushPoint(i, tract->at(j));
-  }
-  m_FiberBundle->initFiberGroup();
-
-  float bounds[] = {0,0,0};
-  bounds[0] = m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(0);
-  bounds[1] = m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(1);
-  bounds[2] = m_ItkQBallImage->GetLargestPossibleRegion().GetSize().GetElement(2);
-  m_FiberBundle->SetBounds(bounds);
-  m_FiberBundle->SetGeometry(m_QBallImage->GetGeometry());
+  m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
   if (m_FiberBundleNode.IsNotNull()){
     GetDefaultDataStorage()->Remove(m_FiberBundleNode);

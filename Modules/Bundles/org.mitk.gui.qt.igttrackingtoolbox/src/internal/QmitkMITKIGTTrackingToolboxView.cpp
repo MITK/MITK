@@ -159,7 +159,20 @@ else if (this->m_toolStorage->GetToolCount() == 0)
 
 //build the IGT pipeline
 mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
-//trackingDevice->setD
+
+mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
+
+QString qstr =  m_Controls->VolumeSelectionBox->currentText();
+if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
+  std::string str = qstr.toStdString();
+  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+}
+trackingDevice->SetData(data);
+
+
+
+
+
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 if (m_TrackingDeviceSource.IsNull())
@@ -198,7 +211,7 @@ this->m_Controls->m_AutoDetectTools->setEnabled(false);
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
-//show tracking volume (old code)
+//show tracking volume
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
@@ -273,7 +286,6 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 	if (qstr.isEmpty()) return;
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
-	  
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 	
 

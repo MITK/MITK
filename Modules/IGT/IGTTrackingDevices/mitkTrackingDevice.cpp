@@ -24,7 +24,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingDevice::TrackingDevice() : 
-  m_Data(mitk::Unspecified),
+  m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::TrackingDevice::Setup),
   m_StopTracking(false), m_ErrorMessage("")
 
@@ -63,11 +63,20 @@ void mitk::TrackingDevice::SetState( TrackingDeviceState state )
 
 
 mitk::TrackingDeviceType mitk::TrackingDevice::GetType() const{
-	return m_Data.Line;
+  return m_Data.Line;
 }
 
 void mitk::TrackingDevice::SetType(mitk::TrackingDeviceType deviceType){
-	m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+  m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+}
+
+mitk::TrackingDeviceData mitk::TrackingDevice::GetData() const{
+  return m_Data;
+}
+
+
+void mitk::TrackingDevice::SetData(mitk::TrackingDeviceData data){
+  m_Data = data;
 }
 
 

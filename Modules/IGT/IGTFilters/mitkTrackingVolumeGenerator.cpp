@@ -32,7 +32,7 @@ mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
     volumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( volumeDir.c_str(), false ); //add this directory to StdFileLocations for the search
 
-	m_Data = mitk::Unspecified;
+	m_Data = mitk::DeviceDataUnspecified;
 }
 
 

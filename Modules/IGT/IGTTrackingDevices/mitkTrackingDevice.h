@@ -106,13 +106,22 @@ namespace mitk {
       TrackingDeviceState GetState() const;
 
       /**
-       * \brief return device type identifier
+       * \brief Deprecated! Use the more specific getDeviceData instead. return device type identifier
        */
 	  TrackingDeviceType GetType() const;
        /**
-       * \brief set device type
+       * \brief Deprecated! Use the more specific setDeviceData instead. set device type
        */
 	  void SetType(TrackingDeviceType type);
+
+	   /**
+       * \brief return device data
+	   */
+	  TrackingDeviceData GetData() const;
+       /**
+       * \brief set device type
+       */
+	  void SetData(TrackingDeviceData data);
 
     protected:
       /**

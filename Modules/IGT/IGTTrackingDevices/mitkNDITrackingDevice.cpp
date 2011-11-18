@@ -37,7 +37,7 @@ m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_Tools
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
 m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
-  this->m_Data = mitk::Unspecified;
+  this->m_Data = mitk::DeviceDataUnspecified;
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();

@@ -255,10 +255,6 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if ( !image || !planeGeometry ) return false;
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
-
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
   if ( slice.IsNull() )
@@ -274,41 +270,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
 
-  if ( affectedDimension != -1 )
-  {
-    // 5. Write the modified 2D working data slice back into the image
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-    if ( m_RememberContourPositions )
-    {
-        this->AddContourmarker(positionEvent);
-    }
-  }
-  else if ( affectedDimension == -1 )
-  {
-      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( false );
-      slicewriter->SetSliceImage( slice );
-      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-
-      if ( m_RememberContourPositions )
-      {
-          this->AddContourmarker(positionEvent);
-      }
-  }
-  else
-  {
-    MITK_ERROR << "FeedbackContourTool could not determine which slice of the image you are drawing on." << std::endl;
-  }
+  this->WriteBackSegmentationResult(positionEvent, slice);
 
   // 6. Make sure the result is drawn again --> is visible then. 
   assert( positionEvent->GetSender()->GetRenderWindow() );

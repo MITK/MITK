@@ -105,6 +105,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
+    void WriteBackSegmentationResult (const PositionEvent*, Image*);
+
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry

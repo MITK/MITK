@@ -288,21 +288,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   if (leftMouseButtonPressed)
   {
-
-    FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-
-    if ( m_RememberContourPositions && m_PaintingPixelValue == 1)
-    {
-      this->AddContourmarker(positionEvent);
-    }
+      FeedbackContourTool::FillContourInSlice(contour,slice,m_PaintingPixelValue);
+      this->WriteBackSegmentationResult(positionEvent, slice);
   }
 
   // visualize contour

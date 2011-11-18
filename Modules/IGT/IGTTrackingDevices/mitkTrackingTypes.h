@@ -139,7 +139,8 @@ namespace mitk
 
 	/**
 	* Here all supported devices are defined. Dont forget to introduce new Devices into the TrackingDeviceList Array at the bottom!
-	* If a model does not have a corresponding tracking volume yet, pass an empty string to denote "No Model"
+	* If a model does not have a corresponding tracking volume yet, pass an empty string to denote "No Model". pass "cube" to render
+	* a default cube of 400x400 px. You can define additional magic strings in the TrackingVolumeGenerator.
 	*/
 	static TrackingDeviceData AuroraCompact = {NDIAurora, "CompactFG", "NDIAuroraCompactFG_Dome.stl"};
 	static TrackingDeviceData AuroraPlanarCube = {NDIAurora, "PlanarFG_Cube", "NDIAurora.stl"};
@@ -150,12 +151,12 @@ namespace mitk
 	static TrackingDeviceData PolarisVicra = {NDIPolaris, "Vicra", "NDIPolaris.stl"};
 	static TrackingDeviceData DaVinci = {IntuitiveDaVinci, "IntuitiveDaVinci", "IntuitiveDaVinci.stl"};
 	static TrackingDeviceData MicroBird = {AscensionMicroBird, "AscensionMicroBird", ""};
-	static TrackingDeviceData VTracker = {VirtualTracker, "VirtualTracker", ""};
+	static TrackingDeviceData VTracker = {VirtualTracker, "VirtualTracker", "cube"};
 	static TrackingDeviceData Unspecified = {TrackingSystemNotSpecified, "Unspecified System", ""};
 	// Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data!
 	static TrackingDeviceData Invalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
 
-	static TrackingDeviceData TrackingDeviceList[] = {AuroraCompact, AuroraPlanarCube, AuroraPlanarDome, AuroraTabletop, Micron, PolarisSpectra, PolarisVicra,
+	static TrackingDeviceData TrackingDeviceList[] = {AuroraPlanarCube, AuroraCompact, AuroraPlanarDome, AuroraTabletop, Micron, PolarisSpectra, PolarisVicra,
 	DaVinci, MicroBird, VTracker, Unspecified, Invalid};
 
 	/**

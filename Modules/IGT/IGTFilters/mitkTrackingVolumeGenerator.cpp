@@ -43,51 +43,34 @@ void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Poi
 
 void mitk::TrackingVolumeGenerator::GenerateData()
 {
-    mitk::Surface::Pointer output = this->GetOutput();//the surface wich represents the tracking volume
+    mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
 
-    std::string filepath = "";
-
-	/**
-    switch(m_Type)
-    {
-    case mitk::ClaronMicron:
-        filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-        break;
-    case mitk::IntuitiveDaVinci:
-        filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
-        break;
-    case mitk::NDIPolaris:
-        filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-        break;
-    case mitk::NDIAurora:
-        filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-        break;
-    case mitk::TrackingSystemNotSpecified:
-    case mitk::VirtualTracker:
-        {
-           vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+    std::string filepath = ""; // Full path to file
+	std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String like "cube"
+	
+	// See if filename mathes a magic String.
+	if (filename.compare("cube") == 0){
+            vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();
             double bounds[6];
             bounds[0] = bounds[2] = bounds[4] = -400.0;  // initialize bounds to -400 ... +400 cube. This is the default value of the
             bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case,
-            // the tracking volume polydata has be updated manually
+                                                         // the tracking volume polydata has to be updated manually
             cubeSource->SetBounds(bounds);
             cubeSource->GetOutput()->Update();
 
             output->SetVtkPolyData(cubeSource->GetOutput()); //set the vtkCubeSource as polyData of the surface
             return;
-        }
-    default:
-        {
-            output->SetVtkPolyData(vtkPolyData::New()); //initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
-            MITK_ERROR<< "No STL to given TrackingDevice found";
-            return;
-        }
-
-    }
-	*/
+	} 
+	if (filename.compare("") == 0) // empty String means no model, return empty output
+	{
+      output->SetVtkPolyData(vtkPolyData::New()); //initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
+      return;
+	}
 	
-	std::string filename = this->m_Data.VolumeModelLocation;
+	// In the following Code, we assume that filename contains an actual filename andn ot a magic string
+
 	filepath = mitk::StandardFileLocations::GetInstance()->FindFile(filename.c_str());
+	
     if (filepath.empty())
     {
         MITK_ERROR << "Filename is empty";

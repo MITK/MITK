@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkNavigationDataToPointSetFilter.h>
 #include <mitkNavigationDataLandmarkTransformFilter.h>
+#include <mitkNavigationDataReferenceTransformFilter.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 #include <mitkNavigationDataToPointSetFilter.h>
 #include <mitkTrackingDeviceSource.h>
@@ -43,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkNDIConfigurationWidget;
 class QmitkFiducialRegistrationWidget;
 class QmitkUpdateTimerWidget;
+class QmitkToolSelectionWidget;
 class QmitkToolTrackingStatusWidget;
 
 
@@ -138,6 +140,9 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnVirtualCameraChanged(int toolNr);
 
+    void OnPermanentRegistration(int toolID, bool on);
+    
+
   protected:
 
 
@@ -205,27 +210,26 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     /**
     \brief This method creates a widget with all input objects needed for the virtual camera view.
     */
-    QWidget* CreateVirtualViewWidget(QWidget* parent);
+   // QWidget* CreateVirtualViewWidget(QWidget* parent);
 
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
 
     mitk::NavigationDataLandmarkTransformFilter::Pointer m_FiducialRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates
+    mitk::NavigationDataLandmarkTransformFilter::Pointer m_PermanentRegistrationFilter;
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
     mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
-
+    mitk::PointSet::Pointer GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData);
 
 private:
 
   QToolBox* m_ToolBox;
   QComboBox* m_PSRecToolSelectionComboBox;
   QSpinBox* m_PSRecordingSpinBox;
-  QComboBox* m_VirtualViewToolSelectionComboBox;
   QPushButton* m_PointSetRecordPushButton;
-  QCheckBox* m_VirtualViewCheckBox;
 
   mitk::PointSet::Pointer m_PSRecordingPointSet;
 
@@ -242,6 +246,13 @@ private:
 
   mitk::DataNode::Pointer m_ImageFiducialsDataNode;
   mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
+
+  QmitkToolSelectionWidget* m_PermanentRegistrationToolSelectionWidget;
+  QmitkToolSelectionWidget* m_VirtualViewToolSelectionWidget;
+
+  mitk::NavigationData::PositionType m_TargetPosition;
+  mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
+
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

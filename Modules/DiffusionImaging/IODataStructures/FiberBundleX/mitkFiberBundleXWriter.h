@@ -115,8 +115,8 @@ public:
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "FiberBundleX.fib"; }
-    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.vfib *.vtk)"; }
+    virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
+    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.vtk)"; }
     virtual const char * GetDefaultExtension() { return ".fib"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundleX*>(data.GetPointer()) != NULL); };
     virtual void DoWrite(BaseData::Pointer data) {

@@ -416,10 +416,10 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib" || ext == ".vfib")
-    {
-      return true;
-    }
+//    if (ext == ".fib" || ext == ".vfib")
+//    {
+//      return true;
+//    }
 
     return false;
   }

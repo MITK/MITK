@@ -253,8 +253,8 @@ mitk::FiberBundle* mitk::FiberBundleWriter::GetInput()
 std::vector<std::string> mitk::FiberBundleWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".fib");
-  possibleFileExtensions.push_back(".vfib");
-  possibleFileExtensions.push_back(".vtk");
+//  possibleFileExtensions.push_back(".fib");
+//  possibleFileExtensions.push_back(".vfib");
+//  possibleFileExtensions.push_back(".vtk");
   return possibleFileExtensions;
 }

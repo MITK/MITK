@@ -167,14 +167,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::ImageVtkMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname = "FiberBundle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::FiberBundleMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname = "FiberBundleX";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
@@ -230,12 +230,12 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::FiberBundleXMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname = "FiberBundleXThreadMonitor";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::FiberBundleXThreadMonitorMapper3D::New();
-      newMapper->SetDataNode(node); 
+      newMapper->SetDataNode(node);
     }
 
     classname = "TbssRoiImage";
@@ -247,25 +247,25 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
 
     classname = "TbssImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {  
+    {
       newMapper = mitk::TbssImageMapper::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname =  "PlanarCircle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::PlanarCircleMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    
+
     classname = "PlanarPolygon";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::PlanarPolygonMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    
+
 
     classname = "TbssGradientImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -321,7 +321,7 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(node);
   }
-  
+
   classname = "TbssRoiImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
@@ -342,13 +342,13 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::TbssGradientImageMapper::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
-  
+
   classname = "PlanarCircle";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::PlanarCircleMapper3D::SetDefaultProperties(node);
   }
-  
+
   classname = "PlanarPolygon";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
@@ -394,8 +394,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
@@ -411,8 +410,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vfib", "Fiber Bundle Polydata"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle Polydata"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));

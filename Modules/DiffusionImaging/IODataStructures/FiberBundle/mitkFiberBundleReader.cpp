@@ -141,7 +141,7 @@ namespace mitk
     {
 
     }
-    else if (ext == ".fib")
+    else if (ext == ".fib_deprecated")
     {
       try
       {
@@ -266,85 +266,7 @@ namespace mitk
       {
         MITK_INFO << "Could not read file ";
       }
-    }
-    else if (ext == ".vfib")
-    {
-      // generate tract container
-      ContainerType::Pointer tractContainer = ContainerType::New();
-      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
 
-      ///We create a Generic Reader to test de .vtk/
-      vtkDataReader *chooser=vtkDataReader::New();
-      chooser->SetFileName(m_FileName.c_str() );
-      if( chooser->IsFilePolyData())
-      {
-        vtkPolyDataReader *reader = vtkPolyDataReader::New();
-        reader->SetFileName( m_FileName.c_str() );
-        reader->Update();
-
-        if ( reader->GetOutput() != NULL )
-        {
-          vtkPolyData* output = reader->GetOutput();
-          double* center  = output->GetCenter();
-          MITK_INFO << "center: " << center[0] << ", "  << center[1] << ", " << center[2];
-
-          float min = itk::NumericTraits<float>::min();
-          float max = itk::NumericTraits<float>::max();
-          float b[] = {max, min, max, min, max, min};
-
-          vtkCellArray* cells = output->GetLines();
-          cells->InitTraversal();
-          for (int i=0; i<output->GetNumberOfCells(); i++)
-          {
-            ContainerTractType::Pointer tract = ContainerTractType::New();
-            vtkCell* cell = output->GetCell(i);
-            int p = cell->GetNumberOfPoints();
-            vtkPoints* points = cell->GetPoints();
-            for (int j=0; j<p; j++)
-            {
-              double p[3];
-              points->GetPoint(j, p);
-              ContainerPointType point;
-              point[0] = p[0];
-              point[1] = p[1];
-              point[2] = p[2];
-
-              if (point[0]<b[0])
-                b[0]=point[0];
-              if (point[0]>b[1])
-                b[1]=point[0];
-
-              if (point[1]<b[2])
-                b[2]=point[1];
-              if (point[1]>b[3])
-                b[3]=point[1];
-
-              if (point[2]<b[4])
-                b[4]=point[2];
-              if (point[2]>b[5])
-                b[5]=point[2];
-
-              tract->InsertElement(tract->Size(), point);
-            }
-            tractContainer->InsertElement(i, tract);
-          }
-
-          float bounds[] = {0, 0, 0};
-          bounds[0] = b[1];
-          bounds[1] = b[3];
-          bounds[2] = b[5];
-          m_OutputCache->SetBounds(bounds);
-
-          geometry->SetImageGeometry(true);
-          geometry->SetFloatBounds(b);
-          m_OutputCache->SetGeometry(geometry);
-        }
-        reader->Delete();
-      }
-      chooser->Delete();
-
-      m_OutputCache->addTractContainer(tractContainer);
-      m_OutputCache->initFiberGroup();
       MITK_INFO << "Fiber bundle read";
     }
 
@@ -416,10 +338,10 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-//    if (ext == ".fib" || ext == ".vfib")
-//    {
-//      return true;
-//    }
+    if (ext == ".fib_deprecated")
+    {
+      return true;
+    }
 
     return false;
   }

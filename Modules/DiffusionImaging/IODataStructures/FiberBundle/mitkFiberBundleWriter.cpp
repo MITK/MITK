@@ -131,7 +131,7 @@ void mitk::FiberBundleWriter::GenerateData()
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib")
+    if (ext == ".fib_deprecated")
     {
       /* direct linked includes of mitkFiberBundle DataStructure */
       typedef mitk::FiberBundle::ContainerPointType   ContainerPointType;
@@ -205,7 +205,7 @@ void mitk::FiberBundleWriter::GenerateData()
 
       MITK_INFO << "Fiber bundle written";
 
-    }else if (ext == ".vfib" || ext == ".vtk") {
+    }else if (ext == ".fib" || ext == ".vtk") {
       vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
       writer->SetInput(input->GeneratePolydata());
       writer->SetFileName(m_FileName.c_str());
@@ -253,8 +253,7 @@ mitk::FiberBundle* mitk::FiberBundleWriter::GetInput()
 std::vector<std::string> mitk::FiberBundleWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-//  possibleFileExtensions.push_back(".fib");
-//  possibleFileExtensions.push_back(".vfib");
-//  possibleFileExtensions.push_back(".vtk");
+  possibleFileExtensions.push_back(".fib");
+  possibleFileExtensions.push_back(".vtk");
   return possibleFileExtensions;
 }

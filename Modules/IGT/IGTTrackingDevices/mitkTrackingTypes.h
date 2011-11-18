@@ -108,10 +108,11 @@ namespace mitk
     };
 
     /**
-    * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
+    * \brief This enum is deprecated. In future, please use the new TrackingDeviceData to model Specific tracking Volumes
+	* Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
     * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
-	* This enum is deprecated. In future, please use the new TrackingDeviceData to model Specific tracking Volumes
+	* 
     */
     enum NDITrackingVolume
     {

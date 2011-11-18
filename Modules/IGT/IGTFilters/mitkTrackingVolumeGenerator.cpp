@@ -38,15 +38,14 @@ mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 
 void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
-    this->m_Type = tracker->GetType();
-	this->m_Data = mitk::GetFirstCompatibleDeviceDataForLine(m_Type);
+	this->m_Data = mitk::GetFirstCompatibleDeviceDataForLine(tracker->GetType());
 }
 
 void mitk::TrackingVolumeGenerator::GenerateData()
 {
     mitk::Surface::Pointer output = this->GetOutput();//the surface wich represents the tracking volume
 
-    std::string filename = "";
+    std::string filepath = "";
 
 	/**
     switch(m_Type)
@@ -87,16 +86,16 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     }
 	*/
 	
-	std::string fn = this->m_Data.VolumeModelLocation;
-	filename = mitk::StandardFileLocations::GetInstance()->FindFile(fn.c_str());
-    if (filename.empty())
+	std::string filename = this->m_Data.VolumeModelLocation;
+	filepath = mitk::StandardFileLocations::GetInstance()->FindFile(filename.c_str());
+    if (filepath.empty())
     {
         MITK_ERROR << "Filename is empty";
         return;
     }
 
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-    stlReader->SetFileName( filename.c_str() );
+    stlReader->SetFileName( filepath.c_str() );
     stlReader->Update();
 
     if ( stlReader->GetOutput() == NULL)
@@ -110,7 +109,6 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)
 {
   m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
-  m_Type = m_Data.Line;
 }
 
 mitk::TrackingDeviceType mitk::TrackingVolumeGenerator::GetTrackingDeviceType() const

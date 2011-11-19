@@ -144,56 +144,106 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
   if(data->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
     QString arg = QString(data->data("application/x-qabstractitemmodeldatalist").data());
-    long val = arg.toLong();
-    TreeItem* draggedItem = static_cast<TreeItem *>((void*)val);
+    QStringList listOfTreeItemAddressPointers = arg.split(",");
+
+    QStringList::iterator slIter;
+    QList<TreeItem*> listOfItemsToDrop;
+
+    for(slIter  = listOfTreeItemAddressPointers.begin();
+        slIter != listOfTreeItemAddressPointers.end();
+        slIter++)
+    {
+      long val = (*slIter).toLong();
+      listOfItemsToDrop << static_cast<TreeItem *>((void*)val);
+    }
+
+    // Retrieve the TreeItem* where we are dropping stuff.
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
     TreeItem* parentItem = dropItem->GetParent();
-    if(dropItem == m_Root) // item was dropped onto empty space
-      parentItem = m_Root;
 
-    if(draggedItem != dropItem && draggedItem->GetParent() == parentItem) // dragging is only allowed within the same parent
+    // If item was dropped onto empty space, we select the root node
+    if(dropItem == m_Root)
     {
+      parentItem = m_Root;
+    }
+
+    // Dragging and Dropping is only allowed within the same parent, so use the first item in list to validate.
+    // (otherwise, you could have a derived image such as a segmentation, and assign it to another image).
+    if(listOfItemsToDrop[0] != dropItem && listOfItemsToDrop[0]->GetParent() == parentItem)
+    {
+      // Retrieve the index of where we are dropping stuff.
       QModelIndex parentModelIndex = this->IndexFromTreeItem(parentItem);
 
-      // remove dragged item
-      this->beginRemoveRows(parentModelIndex, draggedItem->GetIndex(), draggedItem->GetIndex());
+      // Remove all dragged items from Model, Indexes may not be contiguous.
+      QList<TreeItem*>::iterator diIter;
+      for (diIter  = listOfItemsToDrop.begin();
+           diIter != listOfItemsToDrop.end();
+           diIter++)
+      {
+        // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
+        this->beginRemoveRows(parentModelIndex, (*diIter)->GetIndex(), (*diIter)->GetIndex());
+        parentItem->RemoveChild(*diIter);
+      }
 
-      parentItem->RemoveChild(draggedItem);
-
+      // Signal
       endRemoveRows();
 
-      // now insert it again at the drop item position
-      int index = parentItem->IndexOfChild(dropItem);
+      // Select the target index position, or put it at the end of the list.
+      diIter = listOfItemsToDrop.begin();
+      int index = parentItem->IndexOfChild(*diIter);
       if(dropItem == m_Root)
+      {
         index = parentItem->GetChildCount();
+      }
 
-      beginInsertRows(parentModelIndex, index, index);
+      // Now insert items again at the drop item position
+      for (diIter  = listOfItemsToDrop.begin();
+           diIter != listOfItemsToDrop.end();
+           diIter++)
+      {
+        this->beginInsertRows(parentModelIndex, index, index);
+        parentItem->InsertChild( (*diIter), index );
+        index++;
+      }
 
-      // add node
-      parentItem->InsertChild( draggedItem, index );
-
-      // emit endInsertRows event
+      // Signal
       endInsertRows();
 
+      // Change Layers to match.
       this->AdjustLayerProperty();
     }
   }
-  else if(data->hasFormat("application/x-mitk-datanode"))
+  else if(data->hasFormat("application/x-mitk-datanodes"))
   {
-      QString arg = QString(data->data("application/x-mitk-datanode").data());
-      long val = arg.toLong();
-      mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
+      QString arg = QString(data->data("application/x-mitk-datanodes").data());
+      QStringList listOfDataNodeAddressPointers = arg.split(",");
+      int numberOfNodesDropped = 0;
 
-      if(node && m_DataStorage.IsNotNull() && !m_DataStorage->Exists(node))
+      QStringList::iterator slIter;
+      for (slIter = listOfDataNodeAddressPointers.begin();
+           slIter != listOfDataNodeAddressPointers.end();
+           slIter++)
       {
-          m_DataStorage->Add( node );
-          mitk::BaseData::Pointer basedata = node->GetData();
-          if (basedata.IsNotNull())
-          {
-            mitk::RenderingManager::GetInstance()->InitializeViews(
-              basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-          }
+        long val = (*slIter).toLong();
+        mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
+
+        if(node && m_DataStorage.IsNotNull() && !m_DataStorage->Exists(node))
+        {
+            m_DataStorage->Add( node );
+            mitk::BaseData::Pointer basedata = node->GetData();
+
+            if (basedata.IsNotNull())
+            {
+              mitk::RenderingManager::GetInstance()->InitializeViews(
+                basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+
+              numberOfNodesDropped++;
+            }
+        }
+      }
+      if (numberOfNodesDropped > 0)
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
   }
   return false;
@@ -202,37 +252,35 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 QStringList QmitkDataStorageTreeModel::mimeTypes() const
 {
     QStringList types = QAbstractItemModel::mimeTypes();
-    types << "application/x-mitk-datanode";
+    types << "application/x-qabstractitemmodeldatalist";
+    types << "application/x-mitk-datanodes";
     return types;
 }
 
 QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
+
   QMimeData * ret = new QMimeData;
 
-  TreeItem* treeItem = static_cast<TreeItem*>(indexes.at(0).internalPointer());
-  long a = reinterpret_cast<long>(treeItem);
-  long b = reinterpret_cast<long>(treeItem->GetDataNode().GetPointer());
+  QString listOfTreeItemAddresses("");
+  QString listOfDataNodeAddresses("");
 
-  QString result;
-  QString result2;
-  QTextStream(&result) << a;
-  QTextStream(&result2) << b;
-  ret->setData("application/x-mitk-datanode", QByteArray(result2.toAscii()));
-  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));
-
-  QString listOfIndexes("");
   for (int i = 0; i < indexes.size(); i++)
   {
     TreeItem* treeItem = static_cast<TreeItem*>(indexes.at(i).internalPointer());
+    long treeItemAddress = reinterpret_cast<long>(treeItem);
     long dataNodeAddress = reinterpret_cast<long>(treeItem->GetDataNode().GetPointer());
-    QTextStream(&listOfIndexes) << dataNodeAddress;
+    QTextStream(&listOfTreeItemAddresses) << treeItemAddress;
+    QTextStream(&listOfDataNodeAddresses) << dataNodeAddress;
 
     if (i != indexes.size() - 1)
     {
-      QTextStream(&listOfIndexes) << ",";
+      QTextStream(&listOfTreeItemAddresses) << ",";
+      QTextStream(&listOfDataNodeAddresses) << ",";
     }
   }
-  ret->setData("application/x-mitk-datanodes", QByteArray(listOfIndexes.toAscii()));
+
+  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(listOfTreeItemAddresses.toAscii()));
+  ret->setData("application/x-mitk-datanodes", QByteArray(listOfDataNodeAddresses.toAscii()));
 
   return ret;
 }

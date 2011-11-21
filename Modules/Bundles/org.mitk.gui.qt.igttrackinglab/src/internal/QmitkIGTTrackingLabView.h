@@ -138,8 +138,10 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     /**
     \brief This method activates the virtual camera.
     */
-    void OnVirtualCameraChanged(int toolNr);
-
+    void OnVirtualCamera(int toolNr, bool on);
+    /**
+    \brief This method activates the permanent registration based on one tool's position.
+    */
     void OnPermanentRegistration(int toolID, bool on);
     
 
@@ -150,8 +152,9 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     {
       NDIConfigurationWidget = 0,
       RegistrationWidget = 1,
-      PointSetRecording = 2,
-      VirtualCamera = 3
+      PermanentRecording = 2,
+      PointSetRecording = 3,
+      VirtualCamera = 4
     };
 
 
@@ -164,7 +167,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method creates the SIGNAL SLOT connections.
     */
     void CreateConnections();
-
     /**
     \brief This method sets up the filter pipeline.
     */
@@ -207,22 +209,22 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method creates a widget with all input objects needed for the PointSet recording.
     */
     QWidget* CreatePointSetRecordingWidget(QWidget* parent);
+
     /**
-    \brief This method creates a widget with all input objects needed for the virtual camera view.
+    \brief This method returns a PointSet with three vritual points transformed from the position and orientation of the given NavigationData. This method is needed to calculate the source points for permanent registration from one tool's position.
     */
-   // QWidget* CreateVirtualViewWidget(QWidget* parent);
+    mitk::PointSet::Pointer GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData);
 
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
-
     mitk::NavigationDataLandmarkTransformFilter::Pointer m_FiducialRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates
-    mitk::NavigationDataLandmarkTransformFilter::Pointer m_PermanentRegistrationFilter;
+    mitk::NavigationDataLandmarkTransformFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
     mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
-    mitk::PointSet::Pointer GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData);
+    
 
 private:
 
@@ -253,6 +255,7 @@ private:
   mitk::NavigationData::PositionType m_TargetPosition;
   mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
 
+  mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

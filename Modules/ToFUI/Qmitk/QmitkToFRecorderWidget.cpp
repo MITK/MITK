@@ -255,6 +255,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       this->m_ToFImageRecorder->SetRecordMode(this->m_RecordMode);
       this->m_ToFImageRecorder->SetNumOfFrames(numOfFrames);
 
+      emit RecordingStarted();
       this->m_ToFImageRecorder->StartRecording();
     }
     else

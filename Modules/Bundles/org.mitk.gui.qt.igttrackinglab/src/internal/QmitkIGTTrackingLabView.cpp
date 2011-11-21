@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkNDIConfigurationWidget.h>
 #include <QmitkFiducialRegistrationWidget.h>
 #include <QmitkUpdateTimerWidget.h>
+#include <QmitkToolSelectionWidget.h>
 #include <QmitkToolTrackingStatusWidget.h>
 
 
@@ -50,6 +51,7 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 : QmitkFunctionality()
 ,m_Source(NULL)
 ,m_FiducialRegistrationFilter(NULL)
+,m_PermanentRegistrationFilter(NULL)
 ,m_Visualizer(NULL)
 ,m_VirtualView(NULL)
 ,m_PSRecordingPointSet(NULL)
@@ -57,13 +59,15 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 ,m_RegistrationImageFiducialsName("Image Fiducials")
 ,m_PointSetRecordingDataNodeName("Recorded Points")
 ,m_PointSetRecording(false)
+,m_ImageFiducialsDataNode(NULL)
+,m_TrackerFiducialsDataNode(NULL)
+,m_PermanentRegistrationSourcePoints(NULL)
 {
 
   //[-1;0;0] for WOLF_6D bronchoscope       
   m_DirectionOfProjectionVector[0]=0;
   m_DirectionOfProjectionVector[1]=0;
-  m_DirectionOfProjectionVector[2]=-1;
-}
+  m_DirectionOfProjectionVector[2]=-1;}
 
 QmitkIGTTrackingLabView::~QmitkIGTTrackingLabView()
 {
@@ -98,13 +102,22 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
   m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
   m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 
-  m_ToolBox->addItem(m_RegistrationWidget, "Registration");
+  m_ToolBox->addItem(m_RegistrationWidget, "Initial Registration");
+
+  // permanent registration widget
+  m_PermanentRegistrationToolSelectionWidget = new QmitkToolSelectionWidget(parent);
+  m_PermanentRegistrationToolSelectionWidget->SetCheckboxtText("Use this tool for permanent registration");
+
+  m_ToolBox->addItem(m_PermanentRegistrationToolSelectionWidget, "Permanent Registration");
 
   // pointset recording
   m_ToolBox->addItem(this->CreatePointSetRecordingWidget(parent), "PointSet Recording");
 
   // virtual view
-  m_ToolBox->addItem(this->CreateVirtualViewWidget(parent), "Virtual Camera");
+  m_VirtualViewToolSelectionWidget = new QmitkToolSelectionWidget(parent);
+  m_VirtualViewToolSelectionWidget->SetCheckboxtText("Enable Virtual Camera");
+
+  m_ToolBox->addItem(m_VirtualViewToolSelectionWidget, "Virtual Camera");
 
   // tracking status
   m_ToolStatusWidget = new QmitkToolTrackingStatusWidget( parent );
@@ -125,7 +138,7 @@ void QmitkIGTTrackingLabView::CreateConnections()
 {
   connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
 
-  connect( m_NDIConfigWidget, SIGNAL(Connected()), m_RenderingTimerWidget, SLOT(EnableWidget()) );
+  //connect( m_NDIConfigWidget, SIGNAL(Connected()), m_RenderingTimerWidget, SLOT(EnableWidget()) );
   connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(OnTrackerDisconnected()) );
   connect( m_NDIConfigWidget, SIGNAL(Connected()), this, SLOT(OnSetupNavigation()) );
   connect( m_NDIConfigWidget, SIGNAL(SignalToolNameChanged(int, QString)), this, SLOT(OnChangeToolName(int, QString)) );
@@ -138,6 +151,11 @@ void QmitkIGTTrackingLabView::CreateConnections()
 
   connect( m_RenderingTimerWidget, SIGNAL(Started()), this, SLOT(OnStartNavigation()) );
   connect( m_RenderingTimerWidget, SIGNAL(Stopped()), this, SLOT(OnStopNavigation()) );
+
+  connect( m_VirtualViewToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnVirtualCamera(int, bool)));
+  
+  connect( m_PermanentRegistrationToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnPermanentRegistration(int, bool)) );
+
 }
 
 
@@ -154,6 +172,14 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     QMessageBox::warning(NULL, "Adding Fiducials not possible", message.c_str());
     return;
   }
+  
+  if (m_FiducialRegistrationFilter->GetNumberOfOutputs() < 1 || m_FiducialRegistrationFilter->GetNumberOfInputs() < 1)
+  {
+    std::string message("There are no tracking instruments! Please add an instrument first!");
+    QMessageBox::warning(NULL, "Adding Fiducials not possible", message.c_str());
+    return;
+  }
+
   if (m_FiducialRegistrationFilter->GetInput()->IsDataValid() == false)
   {
     std::string message("instrument can currently not be tracked. Please make sure that the instrument is visible to the tracker");
@@ -161,24 +187,31 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_FiducialRegistrationFilter->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
   
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
 
-  mitk::PointSet::Pointer trackerFiducialsPS = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName);
-
   // in case the tracker fiducials datanode has been renamed or removed
-  if(trackerFiducialsPS.IsNull())
-  {
-    mitk::DataNode::Pointer trackerFiducialsDN = mitk::DataNode::New();
-    trackerFiducialsDN->SetName(m_RegistrationTrackingFiducialsName);
-    trackerFiducialsPS = mitk::PointSet::New();
-    trackerFiducialsDN->SetData(trackerFiducialsPS);
-    m_RegistrationWidget->SetTrackerFiducialsNode(trackerFiducialsDN);
-  }
+  //if(trackerFiducialsPS.IsNull())
+  //{
+  //  mitk::DataNode::Pointer trackerFiducialsDN = mitk::DataNode::New();
+  //  trackerFiducialsDN->SetName(m_RegistrationTrackingFiducialsName);
+  //  trackerFiducialsPS = mitk::PointSet::New();
+  //  trackerFiducialsDN->SetData(trackerFiducialsPS);
+  //  m_RegistrationWidget->SetTrackerFiducialsNode(trackerFiducialsDN);
+  //}
 
-  trackerFiducialsPS->InsertPoint(trackerFiducialsPS->GetSize(), nd->GetPosition());
+  
+
+  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
+  {
+    mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+    ps->InsertPoint(ps->GetSize(), nd->GetPosition());
+  }
+  else
+    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
+   
 
 }
 
@@ -245,10 +278,16 @@ void QmitkIGTTrackingLabView::SetupIGTPipeline()
 
       mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
       m_PSRecToolSelectionComboBox->addItem(QString(toolName));
-      m_VirtualViewToolSelectionComboBox->addItem(QString(toolName));
+
+      m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(toolName));
+      m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
+
       m_Visualizer->SetRepresentationObject(i, representation->GetData());
 
     }
+
+    if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
+      m_RenderingTimerWidget->setEnabled(true);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
     this->GlobalReinit();
@@ -265,8 +304,20 @@ void QmitkIGTTrackingLabView::InitializeFilters()
   //2. Visualization Filter
   m_Visualizer = mitk::NavigationDataObjectVisualizationFilter::New(); // filter to display NavigationData
 
+  m_PermanentRegistrationFilter = mitk::NavigationDataLandmarkTransformFilter::New();
+
   //3. Virtual Camera
   m_VirtualView = mitk::CameraVisualization::New(); // filter to update the vtk camera according to the reference navigation data
+  m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow()));
+
+  mitk::Vector3D viewUpInToolCoordinatesVector;
+  viewUpInToolCoordinatesVector[0]=1;
+  viewUpInToolCoordinatesVector[1]=0;
+  viewUpInToolCoordinatesVector[2]=0;
+
+  m_VirtualView->SetDirectionOfProjectionInToolCoordinates(m_DirectionOfProjectionVector);
+  m_VirtualView->SetFocalLength(5000.0); 
+  m_VirtualView->SetViewUpInToolCoordinates(viewUpInToolCoordinatesVector);
 }
 
 void QmitkIGTTrackingLabView::OnRegisterFiducials( )
@@ -286,8 +337,12 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
   /* retrieve fiducials from data storage */
   mitk::DataStorage* ds = this->GetDefaultDataStorage();
 
-  mitk::PointSet::Pointer imageFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationImageFiducialsName.c_str());
-  mitk::PointSet::Pointer trackerFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName.c_str());
+
+  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
+  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+ 
+  //mitk::PointSet::Pointer imageFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationImageFiducialsName.c_str());
+  //mitk::PointSet::Pointer trackerFiducials = ds->GetNamedObject<mitk::PointSet>(m_RegistrationTrackingFiducialsName.c_str());
   if (imageFiducials.IsNull() || trackerFiducials.IsNull())
   {
     QMessageBox::warning(NULL, "Registration not possible", "Fiducial data objects not found. \n"
@@ -312,8 +367,8 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
   else
     m_FiducialRegistrationFilter->UseICPInitializationOff();
 
-  m_FiducialRegistrationFilter->SetSourceLandmarks(trackerFiducials);
-  m_FiducialRegistrationFilter->SetTargetLandmarks(imageFiducials);
+    m_FiducialRegistrationFilter->SetSourceLandmarks(trackerFiducials);
+    m_FiducialRegistrationFilter->SetTargetLandmarks(imageFiducials);
 
 
   if (m_FiducialRegistrationFilter.IsNotNull() && m_FiducialRegistrationFilter->IsInitialized()) // update registration quality display
@@ -331,7 +386,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
       m_RegistrationWidget->SetQualityDisplayText(registrationQuality);
     }
 
-  trackerFiducials->Clear();
+  //trackerFiducials->Clear();
   //this->GlobalReinit();
 }
 
@@ -370,8 +425,8 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateConeRepresentation( const
 
   vtkData->SetRadius(7.5);
   vtkData->SetHeight(15.0);
-  vtkData->SetDirection(0.0, 0.0, 1.0);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
+  vtkData->SetDirection(m_DirectionOfProjectionVector[0],m_DirectionOfProjectionVector[1],m_DirectionOfProjectionVector[2]);
+  vtkData->SetCenter(0.0, 0.0, 7.5);
   vtkData->SetResolution(20);
   vtkData->CappingOn();
   vtkData->Update();
@@ -400,6 +455,7 @@ void QmitkIGTTrackingLabView::DestroyIGTPipeline()
     m_Source = NULL;
   }
   m_FiducialRegistrationFilter = NULL;
+  m_PermanentRegistrationFilter = NULL;
   m_Visualizer = NULL;
   m_VirtualView = NULL;
 }
@@ -463,7 +519,10 @@ void QmitkIGTTrackingLabView::OnToolLoaded(int index, mitk::DataNode::Pointer to
   tempNode->SetName(toolNode->GetName()); 
 
   m_PSRecToolSelectionComboBox->setItemText(index,toolNode->GetName().c_str());
-  m_VirtualViewToolSelectionComboBox->setItemText(index,toolNode->GetName().c_str());
+
+  m_VirtualViewToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
+  m_PermanentRegistrationToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
+
   m_Visualizer->SetRepresentationObject(index, tempNode->GetData());
   m_Visualizer->Update();
  
@@ -505,6 +564,7 @@ void QmitkIGTTrackingLabView::OnStartNavigation()
       return;
     }
     
+    m_NDIConfigWidget->EnableAddToolsButton(false);
    
   }
 }
@@ -533,27 +593,35 @@ void QmitkIGTTrackingLabView::RenderScene( )
       if(m_Source.IsNotNull() && m_Source->IsTracking())
        m_ToolStatusWidget->Refresh();
 
-      m_Visualizer->Update();
       
       
-      if(m_VirtualViewCheckBox->isChecked())
+      if(m_VirtualViewToolSelectionWidget->IsSelectedToolActivated())
       {
         m_VirtualView->Update();
-        mitk::Point3D p = m_Visualizer->GetOutput(m_VirtualViewToolSelectionComboBox->currentIndex())->GetPosition();
+        mitk::Point3D p = m_Visualizer->GetOutput(m_VirtualViewToolSelectionWidget->GetCurrentSelectedIndex())->GetPosition();
         this->GetActiveStdMultiWidget()->MoveCrossToPosition(p);
+      }
+
+      if(m_PermanentRegistrationToolSelectionWidget->IsSelectedToolActivated() && m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex() >= 0 )
+      {
+        mitk::NavigationData::Pointer permRegTool = m_Source->GetOutput((unsigned int) m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex());
+        
+        m_PermanentRegistrationFilter->SetSourceLandmarks(this->GetVirtualPointSetFromPosition(permRegTool));
       }
 
       if(m_PointSetRecording && m_PSRecordingPointSet.IsNotNull())
       {
         int size = m_PSRecordingPointSet->GetSize();
         mitk::NavigationData::Pointer nd= m_Visualizer->GetOutput(m_PSRecToolSelectionComboBox->currentIndex());
-        m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
-
-        if(size >= 200)
+        
+        if(size > 0)
         {
-          this->OnPointSetRecording(false);
-          m_PointSetRecordPushButton->setChecked(false);
+          mitk::Point3D p = m_PSRecordingPointSet->GetPoint(size-1);
+          if(p.EuclideanDistanceTo(nd->GetPosition()) > (double) m_PSRecordingSpinBox->value())
+            m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
         }
+        else
+          m_PSRecordingPointSet->InsertPoint(size, nd->GetPosition());
       }
     }
     catch(std::exception& e) 
@@ -565,7 +633,10 @@ void QmitkIGTTrackingLabView::RenderScene( )
     //  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
     ////update all Widgets
     //else
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+
+    m_Visualizer->Update();
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 
 
   }
@@ -610,6 +681,8 @@ void QmitkIGTTrackingLabView::OnStopNavigation()
     m_Source->StopTracking();
     this->StopContinuousUpdate();
     m_ToolStatusWidget->RemoveStatusLabels();
+
+    m_NDIConfigWidget->EnableAddToolsButton(true);
   }
 }
 
@@ -630,32 +703,25 @@ void QmitkIGTTrackingLabView::OnToolsAdded(QStringList toolsList)
     m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i));
   }
 
-  m_VirtualView->SetInput(m_FiducialRegistrationFilter->GetOutput(0)); // initialize with input from 0
-  m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow()));
-
-  mitk::Vector3D viewUpInToolCoordinatesVector;
-  viewUpInToolCoordinatesVector[0]=1;
-  viewUpInToolCoordinatesVector[1]=0;
-  viewUpInToolCoordinatesVector[2]=0;
-
-  m_VirtualView->SetDirectionOfProjectionInToolCoordinates(m_DirectionOfProjectionVector);
-  m_VirtualView->SetFocalLength(5000.0); 
-  m_VirtualView->SetViewUpInToolCoordinates(viewUpInToolCoordinatesVector);
-
-
   for(unsigned int j = nrOfOldOutputs; j < m_Visualizer->GetNumberOfOutputs(); ++j)
   {
     mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), m_Source->GetTrackingDevice()->GetTool(j)->GetToolName());
+    
     m_PSRecToolSelectionComboBox->addItem(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
-    m_VirtualViewToolSelectionComboBox->addItem(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
+    
+    m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
+    m_VirtualViewToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
+
     m_Visualizer->SetRepresentationObject(j, representation->GetData());
   }
+
+  if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
+    m_RenderingTimerWidget->setEnabled(true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
   this->GlobalReinit();
 
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-
 }
 
 void QmitkIGTTrackingLabView::InitializeRegistration()
@@ -664,37 +730,43 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   if( ds == NULL )
     return;
 
-
-  mitk::DataNode::Pointer targetFiducials = ds->GetNamedNode(m_RegistrationImageFiducialsName);
-
-  if(targetFiducials.IsNull()) // create a point set for the target fiducials
-  {
-    mitk::Color color;  
-    color.Set(1.0f, 0.0f, 0.0f);
-    targetFiducials = this->CreateRegistrationFiducialsNode(m_RegistrationImageFiducialsName, color);
-    targetFiducials = mitk::DataNode::New();
-    mitk::PointSet::Pointer ps = mitk::PointSet::New();
-    targetFiducials->SetData(ps);
-    targetFiducials->SetName(m_RegistrationImageFiducialsName);
-
-    ds->Add(targetFiducials);
-  }
-
+    
   m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget()); // passing multiwidget to pointsetwidget
-  m_RegistrationWidget->SetImageFiducialsNode(targetFiducials); // passing pointsetnode to the pointsetwidget
 
-
-  mitk::DataNode::Pointer sourceFiducials = ds->GetNamedNode( m_RegistrationTrackingFiducialsName );
-
-  if(sourceFiducials.IsNull())
+  if(m_ImageFiducialsDataNode.IsNull())
   {
-    mitk::Color color;  
-    color.Set(0.0f, 0.0f, 1.0f);
-    sourceFiducials = this->CreateRegistrationFiducialsNode( m_RegistrationTrackingFiducialsName, color );
-    ds->Add(sourceFiducials);
+    m_ImageFiducialsDataNode = mitk::DataNode::New();
+    mitk::PointSet::Pointer ifPS = mitk::PointSet::New();
+   
+    m_ImageFiducialsDataNode->SetData(ifPS);
+    
+    mitk::Color color;
+    color.Set(1.0f, 0.0f, 0.0f);
+    m_ImageFiducialsDataNode->SetName(m_RegistrationImageFiducialsName);
+    m_ImageFiducialsDataNode->SetColor(color);
+    m_ImageFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
+   
+    ds->Add(m_ImageFiducialsDataNode);
   }
-
-    m_RegistrationWidget->SetTrackerFiducialsNode(sourceFiducials);
+  m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget());
+  m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
+  
+  if(m_TrackerFiducialsDataNode.IsNull())
+  {
+    m_TrackerFiducialsDataNode = mitk::DataNode::New();
+    mitk::PointSet::Pointer tfPS = mitk::PointSet::New();
+    m_TrackerFiducialsDataNode->SetData(tfPS);
+    
+    mitk::Color color;
+    color.Set(0.0f, 1.0f, 0.0f);
+    m_TrackerFiducialsDataNode->SetName(m_RegistrationTrackingFiducialsName);
+    m_TrackerFiducialsDataNode->SetColor(color);
+    m_TrackerFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
+   
+    ds->Add(m_TrackerFiducialsDataNode);
+  }
+  
+  m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
 
@@ -771,7 +843,9 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
 {
   QWidget* pointSetRecordingWidget = new QWidget(parent);
   m_PSRecToolSelectionComboBox = new QComboBox(pointSetRecordingWidget);
-  
+  m_PSRecordingSpinBox = new QSpinBox(pointSetRecordingWidget);
+  QLabel* psRecordingEpsilonDistance = new QLabel("mm (point distance)", pointSetRecordingWidget);
+   
   // the recording button
   m_PointSetRecordPushButton = new QPushButton("Start PointSet Recording", pointSetRecordingWidget);
   m_PointSetRecordPushButton->setDisabled(true);
@@ -779,6 +853,10 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
   m_PointSetRecordPushButton->setCheckable(true);
   connect( m_PointSetRecordPushButton, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
   
+  // distances spin
+  m_PSRecordingSpinBox->setValue(1);
+  m_PSRecordingSpinBox->setMinimum(1);
+  m_PSRecordingSpinBox->setMaximum(20);
   
   QLabel* toolSelectLabel = new QLabel("Select tool for recording:", pointSetRecordingWidget);
   QGridLayout* layout = new QGridLayout(pointSetRecordingWidget);
@@ -787,36 +865,18 @@ QWidget* QmitkIGTTrackingLabView::CreatePointSetRecordingWidget(QWidget* parent)
   int col = 0;
 
   layout->addWidget(toolSelectLabel,row,col++,1,1,Qt::AlignRight);
-  layout->addWidget(m_PSRecToolSelectionComboBox,row,col++,1,1,Qt::AlignLeft);
+  layout->addWidget(m_PSRecToolSelectionComboBox,row,col++,1,3,Qt::AlignLeft);
+  col +=2;
+  layout->addWidget(m_PSRecordingSpinBox,row,col++,1,1,Qt::AlignRight);
+  layout->addWidget(psRecordingEpsilonDistance, row, col++,1,1,Qt::AlignLeft);
+  
+  row++;
+  col=4;
+
   layout->addWidget(m_PointSetRecordPushButton,row,col++,1,2,Qt::AlignRight);
 
   return pointSetRecordingWidget;
 }
-
-QWidget* QmitkIGTTrackingLabView::CreateVirtualViewWidget(QWidget* parent)
-{
-  QWidget* virtualViewWidget = new QWidget(parent);
-  m_VirtualViewToolSelectionComboBox = new QComboBox(virtualViewWidget);
-  connect(m_VirtualViewToolSelectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnVirtualCameraChanged(int)));
-
-  
-  QLabel* toolSelectLabel = new QLabel("Select tool for virtual camera:", virtualViewWidget);
-
-  // the virtual view checkbox
-  m_VirtualViewCheckBox = new QCheckBox("Enable Virtual Camera", virtualViewWidget);
-  
-  QGridLayout* layout = new QGridLayout(virtualViewWidget);
-  
-  int row = 0;
-  int col = 0;
-
-  layout->addWidget(toolSelectLabel,row,col++,1,1,Qt::AlignRight);
-  layout->addWidget(m_VirtualViewToolSelectionComboBox,row,col++,1,1,Qt::AlignLeft);
-  layout->addWidget(m_VirtualViewCheckBox,row,col++,1,2,Qt::AlignRight);
-
-  return virtualViewWidget;
-}
-
 
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
@@ -844,7 +904,6 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecording = true;
     m_PointSetRecordPushButton->setText("Stop PointSet Recording");
     m_PSRecToolSelectionComboBox->setDisabled(true);
-    m_VirtualViewToolSelectionComboBox->setDisabled(true);
   }
 
   else
@@ -852,7 +911,6 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecording = false;
     m_PointSetRecordPushButton->setText("Start PointSet Recording");
     m_PSRecToolSelectionComboBox->setEnabled(true);
-    m_VirtualViewToolSelectionComboBox->setEnabled(true);
   }
 }
 
@@ -886,11 +944,97 @@ void QmitkIGTTrackingLabView::GlobalReinit()
   //global reinit end
 }
 
-void QmitkIGTTrackingLabView::OnVirtualCameraChanged(int toolNr)
+void QmitkIGTTrackingLabView::OnVirtualCamera(int toolNr, bool on)
 {
    if(m_VirtualView.IsNull() || m_FiducialRegistrationFilter.IsNull())
     return;
 
-  m_VirtualView->SetInput(m_FiducialRegistrationFilter->GetOutput(toolNr));
+   if(on)
+     m_VirtualView->SetInput(m_FiducialRegistrationFilter->GetOutput(toolNr));
+}
+
+
+void QmitkIGTTrackingLabView::OnPermanentRegistration(int toolID, bool on)
+{
+  if (m_PermanentRegistrationFilter.IsNull() || m_FiducialRegistrationFilter.IsNull())
+    return;
+
+  if(on)
+  {
+    if(m_PermanentRegistrationSourcePoints.IsNull())
+      m_PermanentRegistrationSourcePoints = mitk::PointSet::New();
+
+    // interconnectiong permanent registration filter between tracking source and fiducial registration filter
+    for(unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
+    {
+        m_PermanentRegistrationFilter->SetInput(i,m_Source->GetOutput(i));
+        m_FiducialRegistrationFilter->SetInput(i,m_PermanentRegistrationFilter->GetOutput(i));
+    }
+
+    mitk::NavigationData::Pointer nd = m_Source->GetOutput((unsigned int) toolID);
+    
+    m_PermanentRegistrationFilter->SetTargetLandmarks(this->GetVirtualPointSetFromPosition(nd));
+  }
+
+  else
+  {
+    for(unsigned int i=0; i < m_FiducialRegistrationFilter->GetNumberOfOutputs(); ++i)
+      m_FiducialRegistrationFilter->SetInput(i,m_Source->GetOutput());
+  }
+    
+}
+
+mitk::PointSet::Pointer QmitkIGTTrackingLabView::GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData)
+{
+  typedef itk::QuaternionRigidTransform<double> QuaternionTransformType;
+
+  mitk::NavigationData::PositionType pointA;
+  mitk::NavigationData::PositionType pointB;
+  mitk::NavigationData::PositionType pointC;
+
+  //initializing three points with position(0|0|0)
+  pointA.Fill(0);
+  pointB.Fill(0);
+  pointC.Fill(0);
+
+  // changing position off all points in order to make them orthogonal
+  pointA[0] = 1;
+  pointB[1] = 1;
+  pointC[2] = 1;
+
+  QuaternionTransformType::Pointer quatTransform = QuaternionTransformType::New();
+
+  // orientation of NavigationData from parameter
+  mitk::NavigationData::OrientationType quatIn = navigationData->GetOrientation();
+  
+  // set orientation to quaternion transform
+  vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
+  quatTransform->SetRotation(vnlQuatIn);
+
+  // transform each point
+  pointA = quatTransform->TransformPoint(pointA);
+  pointB = quatTransform->TransformPoint(pointB);
+  pointC = quatTransform->TransformPoint(pointC);
+
+  // add position data from NavigationData parameter to each point
+  pointA[0] += navigationData->GetPosition()[0];
+  pointA[1] += navigationData->GetPosition()[1];
+  pointA[2] += navigationData->GetPosition()[2];
+  
+  pointB[0] += navigationData->GetPosition()[0];
+  pointB[1] += navigationData->GetPosition()[1];
+  pointB[2] += navigationData->GetPosition()[2];
+  
+  pointC[0] += navigationData->GetPosition()[0];
+  pointC[1] += navigationData->GetPosition()[1];
+  pointC[2] += navigationData->GetPosition()[2];
+
+  // insert points in source points pointset for the permanent registration landmark transform
+  m_PermanentRegistrationSourcePoints->InsertPoint(0,pointA);
+  m_PermanentRegistrationSourcePoints->InsertPoint(1,pointB);
+  m_PermanentRegistrationSourcePoints->InsertPoint(2,pointC);
+
+
+  return m_PermanentRegistrationSourcePoints;
 }
 

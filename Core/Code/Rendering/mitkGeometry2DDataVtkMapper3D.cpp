@@ -477,7 +477,6 @@ namespace mitk
               dataSetMapper->ImmediateModeRenderingOn();
 
               texture = vtkTexture::New();
-              texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
@@ -524,12 +523,16 @@ namespace mitk
               // So, we must manually turn on their mapping through a (gray scale) lookup table;
               texture->SetMapColorScalarsThroughLookupTable( localStorage->m_Texture->GetMapColorScalarsThroughLookupTable() );
 
+              //re-use properties from the 2D image mapper
               imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
               imageActor->GetProperty()->SetAmbient(0.5);
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn( "texture interpolation", renderer );
               texture->SetInterpolate( textureInterpolation );
+
+              //get the lookuptable from the 2D image mapper
+              texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
 
               // Store this actor to be added to the actor assembly, sort
               // by layer

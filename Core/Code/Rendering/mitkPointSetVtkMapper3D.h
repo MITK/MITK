@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkExports.h>
 #include "mitkVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
+#include <vtkSmartPointer.h>
 
 class vtkActor;
 class vtkPropAssembly;
@@ -133,7 +134,7 @@ namespace mitk {
 
     vtkActor *m_SelectedActor;
     vtkActor *m_UnselectedActor;
-    vtkActor *m_ContourActor;
+    vtkSmartPointer<vtkActor> m_ContourActor;
 
     vtkPropAssembly *m_PointsAssembly;
 

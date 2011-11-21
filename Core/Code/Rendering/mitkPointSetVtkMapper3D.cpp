@@ -70,7 +70,7 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
   //creating actors to be able to set transform
   m_SelectedActor = vtkActor::New();
   m_UnselectedActor = vtkActor::New();
-  m_ContourActor = vtkActor::New();
+  m_ContourActor = vtkSmartPointer<vtkActor>::New();
 }
 
 mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
@@ -79,7 +79,7 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 
   m_SelectedActor->Delete();
   m_UnselectedActor->Delete();
-  m_ContourActor->Delete();
+  //m_ContourActor->Delete();
 }
 
 void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
@@ -402,6 +402,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
   bool showPoints = true;
   this->GetDataNode()->GetBoolProperty("show points", showPoints);
+
   if(showPoints)
   {
     m_UnselectedActor->VisibilityOn();
@@ -553,8 +554,10 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
   int visibleBefore = m_ContourActor->GetVisibility();
   if(makeContour && (m_ContourActor != NULL) )
   {
-    if ( visibleBefore == 0)//was not visible before, so create it.
+    if ( visibleBefore == 0)
+    {//was not visible before, so create it.
       this->CreateContour(renderer);
+    }
     m_ContourActor->GetProperty()->SetColor(contourColor);
     m_ContourActor->GetProperty()->SetOpacity(opacity);
   }
@@ -569,11 +572,11 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
 
 void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 {
-  vtkAppendPolyData* vtkContourPolyData = vtkAppendPolyData::New();
-  vtkPolyDataMapper* vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 
+  vtkSmartPointer<vtkAppendPolyData> vtkContourPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
+  vtkSmartPointer<vtkPolyDataMapper> vtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New(); 
 
-  vtkPoints *points = vtkPoints::New();
-  vtkCellArray *polys = vtkCellArray::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
 
   mitk::PointSet::PointsContainer::Iterator pointsIter;
   mitk::PointSet::PointDataContainer::Iterator pointDataIter;
@@ -610,17 +613,17 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
     polys->InsertNextCell(2,cell);
   }
 
-  vtkPolyData* contour = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> contour = vtkSmartPointer<vtkPolyData>::New();
   contour->SetPoints(points);
-  points->Delete();
+  //points->Delete();
   contour->SetLines(polys);
-  polys->Delete();
+  //polys->Delete();
   contour->Update();
 
-  vtkTubeFilter* tubeFilter = vtkTubeFilter::New();
+  vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
   tubeFilter->SetNumberOfSides( 12 );
   tubeFilter->SetInput(contour);
-  contour->Delete();
+  //contour->Delete();
 
   //check for property contoursize. 
   m_ContourRadius = 0.5;
@@ -634,16 +637,16 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 
   //add to pipeline
   vtkContourPolyData->AddInput(tubeFilter->GetOutput());
-  tubeFilter->Delete();
+  //tubeFilter->Delete();
   vtkContourPolyDataMapper->SetInput(vtkContourPolyData->GetOutput());
-  vtkContourPolyData->Delete();
+  //vtkContourPolyData->Delete();
 
   //create a new instance of the actor
-  m_ContourActor->Delete();
-  m_ContourActor = vtkActor::New();
+  //m_ContourActor->Delete();
+  //m_ContourActor = vtkSmartPointer<vtkActor>::New();
 
   m_ContourActor->SetMapper(vtkContourPolyDataMapper);
-  vtkContourPolyDataMapper->Delete();
+  //vtkContourPolyDataMapper->Delete();
 
   m_PointsAssembly->AddPart(m_ContourActor);
 }

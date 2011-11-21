@@ -17,9 +17,11 @@ PURPOSE. See the above copyright notices for more information.
 mitk::ReduceContourSetFilter::ReduceContourSetFilter()
 {
   m_MaxSegmentLenght = 0;
-  m_StepSize = 20;
-  m_Tolerance = 1;
-  m_ReductionType = NTH_POINT;
+  m_StepSize = 10;
+  m_Tolerance = -1;
+  m_ReductionType = DOUGLAS_PEUCKER;
+  m_MaxSpacing = -1;
+  m_MinSpacing = -1;
 }
 
 mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
@@ -37,8 +39,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
   vtkSmartPointer<vtkPoints> newPoints;
 
   //For the purpose of evaluation
-  unsigned int numberOfPointsBefore (0);
-  unsigned int numberOfPointsAfter (0);
+  //unsigned int numberOfPointsBefore (0);
+  //unsigned int numberOfPointsAfter (0);
 
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
@@ -83,8 +85,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
       }
 
       //Again for evaluation
-      numberOfPointsBefore += cellSize;
-      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
+      //numberOfPointsBefore += cellSize;
+      //numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
 
     }
 
@@ -100,6 +102,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
     }
 
   }
+  //MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfOutputs(numberOfOutputs);
 }
 
@@ -178,6 +181,19 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
   5. If the distance value D <= m_Tolerance, then add the start and end index and the corresponding points to the reduced ones
   */
 
+  //First of all set tolerance if none is specified
+  if(m_Tolerance < 0)
+  {
+      if(m_MaxSpacing > 0)
+      {
+          m_Tolerance = 1.5*m_MinSpacing;
+      }
+      else
+      {
+          m_Tolerance = 1.5;
+      }
+  }
+
   std::stack<LineSegment> lineSegments;
 
   //1. Divide in line segments
@@ -227,7 +243,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
 
     vtkMath::Normalize(v1);
     int range = currentSegment.EndIndex - currentSegment.StartIndex;
-    for (unsigned int i = 1; i < abs(range); i++)
+    for (int i = 1; i < abs(range); ++i)
     {
       points->GetPoint(currentSegment.StartIndex+i, tempV);
       points->GetPoint(currentSegment.StartIndex, v2);
@@ -268,24 +284,29 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
     {
 
       //double temp[3];
-      int segmentLenght = currentSegment.EndIndex - currentSegment.StartIndex;
+      unsigned int segmentLenght = currentSegment.EndIndex - currentSegment.StartIndex;
       if (segmentLenght > m_MaxSegmentLenght)
       {
         m_MaxSegmentLenght = segmentLenght;
       }
-      //if (abs(segmentLenght) > 80)
-      //{
-      //  // dbFile<<"Lenght: "<<segmentLenght<<" Start: "<<currentSegment.StartIndex<<" End: "<<currentSegment.EndIndex<<endl;
-      //  pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + segmentLenght/2));
-      //  reducedPolygon->GetPointIds()->InsertNextId(pointId);
 
-      //  pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
-      //  reducedPolygon->GetPointIds()->InsertNextId(pointId);
-      //}
-      //else
-      //{
-        pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
-        reducedPolygon->GetPointIds()->InsertNextId(pointId);
+      //MITK_INFO<<"Lenght: "<<abs(segmentLenght);
+      if (abs(segmentLenght) > 20)
+      {
+          unsigned int divisions = abs(segmentLenght)%20;
+        //MITK_INFO<<"Divisions: "<<divisions<<" Start: "<<currentSegment.StartIndex<<" End: "<<currentSegment.EndIndex<<endl;
+        for (unsigned int i = 0; i<divisions; ++i)
+        {
+            if(currentSegment.EndIndex > (currentSegment.StartIndex + 20*i))
+            {
+                //MITK_INFO<<"Inserting Index: "<<(currentSegment.StartIndex + 20*i);
+                pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + 20*i));
+                reducedPolygon->GetPointIds()->InsertNextId(pointId);
+            }
+        }
+      }
+      pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
+      reducedPolygon->GetPointIds()->InsertNextId(pointId);
     }
     else
     {

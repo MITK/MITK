@@ -352,7 +352,6 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  MITK_INFO<<"WorkingData changed";
   if (m_2DInterpolationEnabled)
   {
     OnInterpolationActivated( true ); // re-initialize if needed
@@ -365,7 +364,6 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
-  MITK_INFO<<"RefData changed";
   if (m_2DInterpolationEnabled)
   {
     OnInterpolationActivated( true ); // re-initialize if needed
@@ -504,6 +502,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 void QmitkSlicesInterpolator::InterpolateSurface()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
+
   if(interpolatedSurface.IsNotNull())
   {
     //MITK_INFO<<"Setting enabled TRUE";

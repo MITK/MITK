@@ -18,16 +18,26 @@
 
 #include "mitkFiberBundleX.h"
 
+#include <mitkPlanarCircle.h>
+//#include <mitkPlanarRectangle.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarFigureComposite.h>
+
 /* musthave */
 //#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
+
+
+
 
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
+#include <vtkCellData.h>
 #include <vtkIdFilter.h>
 #include <vtkClipPolyData.h>
+#include <vtkPlane.h>
 
 // baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
@@ -268,34 +278,205 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 
 }
 
-std::vector<int> mitk::FiberBundleX::DoGetFiberIds(/*mitk::PlanarFigure::Pointer slicing_plane */)
+
+//temporarely include only
+#include <vtkPolyDataWriter.h>
+//==========================
+std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
 {
+
+    /* Handle type of planarfigure */
+    // if incoming pf is a pfc
+    mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf.GetPointer());
+    if (!pfcomp.IsNull()) {
+        // process requested boolean operation of PFC
+    } else {
+
+        mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
+        mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
+
+        if (pf->GetNameOfClass() == circleName->GetNameOfClass() )
+        {
+
+            mitk::Geometry2D::ConstPointer pfgeometry = pf->GetGeometry2D();
+            const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
+            Vector3D planeNormal = planeGeometry->GetNormal();
+            planeNormal.Normalize();
+            Point3D planeOrigin = planeGeometry->GetOrigin();
+
+            MITK_INFO << "planeOrigin: " << planeOrigin[0] << " | " << planeOrigin[1] << " | " << planeOrigin[2] << endl;
+            MITK_INFO << "planeNormal: " << planeNormal[0] << " | " << planeNormal[1] << " | " << planeNormal[2] << endl;
+        }
+
+
+    }
+
+
+
+    /* init necessary vectors hosting pointIds and FiberIds */
+    // contains all pointIds which are crossing the cutting plane
+    std::vector<int> PointsOnPlane;
+
+    // based on PointsOnPlane, all ROI relevant point IDs are stored here
+    std::vector<int> PointsInROI;
+
+    // vector which is returned, contains all extracted FiberIds
+    std::vector<int> FibersInROI;
+
+
+    /* Define cutting plane by ROI (PlanarFigure) */
+    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+    plane->SetOrigin(10.0,5.0,0.0);
+    plane->SetNormal(0.0,1.0,0.0);
+
+    //same plane but opposite normal direction. so point cloud will be reduced -> better performance
+    vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
+    planeR->SetOrigin(10.0,5.0,0.0);
+    planeR->SetNormal(0.0,-1.0,0.0);
+
 
     /* get all points/fibers cutting the plane */
     vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
     clipper->SetInput(m_FiberIdDataSet);
-//    clipper->SetClipFunction(slicing_plane);
-      clipper->GenerateClipScalarsOn();
-      clipper->GenerateClippedOutputOn();
+    clipper->SetClipFunction(plane);
+    clipper->GenerateClipScalarsOn();
+    clipper->GenerateClippedOutputOn();
+    vtkSmartPointer<vtkPolyData> clipperout1 = clipper->GetClippedOutput();
 
-      vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
-// clipper throws all lines away which are not crossing plane
-//   clipper calculates distances to all points, also to those which are not crossing the plane but which are along the normal direction of the plane.
-// get the distances:
-      vtkSmartPointer<vtkDataArray> distanceList = clipperout->GetPointData()->GetScalars();
-      for (int i=0; i<distanceList->GetNumberOfTuples(); ++i) {
-          std::cout << "distance of point (idx in clippedpolydata) " << i << " :" ;
-              vtkIdType components = distanceList->GetNumberOfComponents();
-              double *distance = distanceList->GetTuple(i);
+    /* for some reason clipperoutput is not initialized for futher processing
+      * so far only writing out clipped polydata provides requested
+      */
+    vtkSmartPointer<vtkPolyDataWriter> writerC = vtkSmartPointer<vtkPolyDataWriter>::New();
+    writerC->SetInput(clipperout1);
+    writerC->SetFileName("/vtkOutput/Cout1_FbId_clipLineId0+1+2-tests.vtk");
+    writerC->SetFileTypeToASCII();
+    writerC->Write();
 
-              for (int j=0; j<components; ++j) {
-                  std::cout << "point distance " << distance[j] << std::endl;
-                  //even if points are on the plane (where distance shall be 0), they can store an approximation to 0 like 2.22045e-16
-                  //if distance is almost 0, remember that point (inkl. coordinate) we need it for ROI/fiber extraction :-)
-              }
 
-          }
+    vtkSmartPointer<vtkClipPolyData> Rclipper = vtkSmartPointer<vtkClipPolyData>::New();
+    Rclipper->SetInput(clipperout1);
+    Rclipper->SetClipFunction(planeR);
+    Rclipper->GenerateClipScalarsOn();
+    Rclipper->GenerateClippedOutputOn();
+    vtkSmartPointer<vtkPolyData> clipperout = Rclipper->GetClippedOutput();
 
+
+    vtkSmartPointer<vtkPolyDataWriter> writerC1 = vtkSmartPointer<vtkPolyDataWriter>::New();
+    writerC1->SetInput(clipperout);
+    writerC1->SetFileName("/vtkOutput/FbId_clipLineId0+1+2-tests.vtk");
+    writerC1->SetFileTypeToASCII();
+    writerC1->Write();
+
+
+    /*======STEP 1======
+      * extract all points, which are crossing the plane */
+    // Scalar values describe the distance between each remaining point to the given plane. Values sorted by point index
+    vtkSmartPointer<vtkDataArray> distanceList = clipperout->GetPointData()->GetScalars();
+    vtkIdType sizeOfList =  distanceList->GetNumberOfTuples();
+    PointsOnPlane.reserve(sizeOfList); /* use reserve for high-performant push_back, no hidden copy procedures are processed then!
+                                         * size of list can be optimized by reducing allocation, but be aware of iterator and vector size*/
+    for (int i=0; i<sizeOfList; ++i) {
+        double *distance = distanceList->GetTuple(i);
+        std::cout << "distance of point " << i << " : " << distance[0] << std::endl;
+
+        // check if point is on plane.
+        // 0.01 due to some approximation errors when calculating distance
+        if (distance[0] >= -0.01 && distance[0] <= 0.01)
+        {
+            std::cout << "adding " << i << endl;
+            PointsOnPlane.push_back(i); //push back in combination with reserve is fastest way to fill vector with various values
+        }
+
+    }
+
+    // DEBUG print out all interesting points, stop where array starts with value -1. after -1 no more interesting idx are set!
+    std::vector<int>::iterator rit = PointsOnPlane.begin();
+    while (rit != PointsOnPlane.end() ) {
+        std::cout << "interesting point: " << *rit << " coord: " << clipperout->GetPoint(*rit)[0] << " | " <<  clipperout->GetPoint(*rit)[1] << " | " << clipperout->GetPoint(*rit)[2] << endl;
+        rit++;
+    }
+
+
+
+    /*=======STEP 2=====
+     * extract ROI relevant pointIds */
+    //ToDo
+    if( true /*point in ROI*/)
+    {
+        PointsInROI = PointsOnPlane;
+    }
+
+    /*======STEP 3=======
+     * identify fiberIds for points in ROI */
+    //prepare resulting vector
+    FibersInROI.reserve(PointsInROI.size());
+
+    vtkCellArray *clipperlines = clipperout->GetLines();
+    clipperlines->InitTraversal();
+    long numOfLineCells = clipperlines->GetNumberOfCells();
+
+    // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
+    for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3) { //ic is the index counter for the cells hosting the desired information
+
+        vtkIdType npts;
+        vtkIdType *pts;
+        clipperlines->GetCell(ic, npts, pts);
+
+        // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i.
+        for (long j=0; j<npts; j++)
+        {
+
+            //  std::cout << "pointWalker: subline " << i << " point idx: " << j << " hosting point id: " << pts[j] << endl;
+
+            for (long k = 0; k < PointsInROI.size(); k++)
+            { // k corresponds to index in PointsInRoi vector
+                /* ====================
+                 *  check if current point occurs in ROI
+                 ======================*/
+                if (pts[j] == PointsInROI[k]) {
+                    //figure out which line does it belong to
+                    if (clipperout->GetCellData()->HasArray("FB_IDs"))
+                    {
+                        int originalFibId = clipperout->GetCellData()->GetArray("FB_IDs")->GetTuple(i)[0];
+                        std::cout << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
+
+                        // do something to avoid duplicates
+                        int oldFibInRoiSize = FibersInROI.size();
+                        if (oldFibInRoiSize != 0) {
+
+
+                            for (int f=0; f<oldFibInRoiSize; f++)
+                            {
+                                if (FibersInROI[f] == originalFibId ) {
+                                    break;
+                                } else if (f == FibersInROI.size() -1){ //if there was no break until last entry, then write it in.
+                                    FibersInROI.push_back(originalFibId);
+
+                                }
+                            }
+                        } else {
+                            FibersInROI.push_back(originalFibId);
+                        }
+                    }
+                    // for performance in data overhead reason, set id of found point to -1 in ROI-set. sublines can host this id one or more times for the same fiber, therefore we do not need this information anymore.
+                    PointsInROI[k] = -1;
+
+
+                }
+            }
+
+        }
+
+
+    }
+
+    std::cout << "\n=====FINAL RESULT======\n";
+    std::vector<int>::iterator finIt = FibersInROI.begin();
+    while ( finIt != FibersInROI.end() ) {
+        std::cout << *finIt << endl;
+        ++finIt;
+    }
+    std::cout << "=====================\n";
 
 }
 

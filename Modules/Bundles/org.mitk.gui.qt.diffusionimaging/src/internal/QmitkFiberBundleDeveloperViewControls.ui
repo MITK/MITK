@@ -24,14 +24,14 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_FiberGenerator">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>355</width>
+        <width>500</width>
         <height>449</height>
        </rect>
       </property>
@@ -88,19 +88,6 @@
                  <number>100</number>
                 </property>
                </widget>
-              </item>
-              <item row="2" column="4">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
               <item row="4" column="0">
                <widget class="QLabel" name="labelDistrRadius">
@@ -177,16 +164,20 @@
                 </property>
                </widget>
               </item>
+              <item row="2" column="2">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
-             <zorder>labelFibersTotal</zorder>
-             <zorder>boxFiberNumbers</zorder>
-             <zorder>horizontalSpacer_3</zorder>
-             <zorder>labelDistrRadius</zorder>
-             <zorder>boxDistributionRadius</zorder>
-             <zorder>labelFiberMaxLength</zorder>
-             <zorder>boxFiberMaxLength</zorder>
-             <zorder>labelFiberMinLength</zorder>
-             <zorder>boxFiberMinLength</zorder>
             </widget>
            </item>
            <item row="1" column="0">
@@ -486,7 +477,7 @@
        <item row="0" column="1">
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tabColoring">
           <attribute name="title">
@@ -777,14 +768,7 @@
            <string>Cutting</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_15">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Step1: Generate Fibers IDs in FBX</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
+           <item row="6" column="0">
             <spacer name="verticalSpacer_8">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -797,50 +781,141 @@
              </property>
             </spacer>
            </item>
-           <item row="2" column="0">
-            <widget class="QFrame" name="frame_2">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+           <item row="3" column="0">
+            <widget class="QGroupBox" name="groupBox_13">
+             <property name="title">
+              <string>Step 3</string>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QFormLayout" name="formLayout_2">
-              <property name="fieldGrowthPolicy">
-               <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-              </property>
+             <layout class="QGridLayout" name="gridLayout_20">
               <item row="0" column="0">
-               <widget class="QLabel" name="labelTimerGenerateFiberIds">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
+               <widget class="QLabel" name="label_3">
                 <property name="text">
-                 <string>Timer:</string>
+                 <string>Extract Fibers by ROI</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="infoTimerGenerateFiberIds">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
+              <item row="1" column="0">
+               <widget class="QCommandLinkButton" name="buttonExtractFibers">
                 <property name="text">
-                 <string>-</string>
+                 <string>Extract Fibers</string>
                 </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QFrame" name="frame_6">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QFormLayout" name="formLayout_5">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="labelTimerExtractFibers">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Timer:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="infoTimerExtractFibers">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QCommandLinkButton" name="buttonGenerateFiberIds">
-             <property name="text">
-              <string>Execute Step1</string>
+            <widget class="QGroupBox" name="groupBox_11">
+             <property name="title">
+              <string>Step 1</string>
              </property>
+             <layout class="QGridLayout" name="gridLayout_18">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Generate Fibers IDs in FBX</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCommandLinkButton" name="buttonGenerateFiberIds">
+                <property name="text">
+                 <string>Generate Fiber Ids</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" rowspan="2">
+               <widget class="QFrame" name="frame_2">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QFormLayout" name="formLayout_2">
+                 <property name="fieldGrowthPolicy">
+                  <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="labelTimerGenerateFiberIds">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Timer:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="infoTimerGenerateFiberIds">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupBox_12">
+             <property name="title">
+              <string>Step 2</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_19">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Define ROI</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -854,8 +929,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>185</width>
-        <height>116</height>
+        <width>515</width>
+        <height>348</height>
        </rect>
       </property>
       <attribute name="label">

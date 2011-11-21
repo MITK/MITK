@@ -506,26 +506,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="cbRememberContourPositions">
-         <property name="text">
-          <string>Remember Contour Positions</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblInterpolation">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Contour interpolation</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QmitkSlicesInterpolator" name="m_SlicesInterpolator" native="true">
          <property name="font">
           <font>
@@ -555,8 +535,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
-        <height>374</height>
+        <width>98</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -609,8 +589,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
-        <height>374</height>
+        <width>98</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -663,8 +643,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
-        <height>374</height>
+        <width>195</width>
+        <height>92</height>
        </rect>
       </property>
       <attribute name="label">

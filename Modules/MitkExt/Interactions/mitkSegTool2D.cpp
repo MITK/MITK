@@ -34,6 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGetModuleContext.h"
 
+//Includes for 3DSurfaceInterpolation
+#include "mitkImageToContourFilter.h"
+//#include "mitkReduceContourSetFilter.h"
+//#include "mitkComputeContourSetNormalsFilter.h"
+#include "mitkSurfaceInterpolationController.h"
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -254,10 +260,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-    if ( m_RememberContourPositions )
-    {
-      this->AddContourmarker(positionEvent);
-    }
   }
   else {
     OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
@@ -267,21 +269,23 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-
-    if ( m_RememberContourPositions )
-    {
-      this->AddContourmarker(positionEvent);
-    }
-
+  }
+  slice->DisconnectPipeline();
+  if ( m_RememberContourPositions )
+  {
+    unsigned int pos = this->AddContourmarker(positionEvent);
+    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+    contourExtractor->SetInput(slice);
+    contourExtractor->Update();
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+    contour->DisconnectPipeline();
   }
 }
 
-void mitk::SegTool2D::SetRememberContourPositions(bool status)
-{
-  m_RememberContourPositions = status;
-}
-
-void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
+unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
@@ -317,7 +321,7 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
       m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }
-  //return id;
+  return id;
 }
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )

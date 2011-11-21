@@ -111,7 +111,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
-    void AddContourmarker ( const PositionEvent* );
+
+    unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 

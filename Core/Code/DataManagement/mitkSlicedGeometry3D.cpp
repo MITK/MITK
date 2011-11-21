@@ -387,6 +387,7 @@ mitk::SlicedGeometry3D
     m_Slices = 1;
   }
 
+
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's
   // center, and then shift the origin in the direction of the normal by the

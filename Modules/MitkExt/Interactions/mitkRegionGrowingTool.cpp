@@ -264,7 +264,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
   projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
   projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
-  if ( sliceGeometry->IsIndexInside( projectedPointIn2D ) )
+  if ( sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
     MITK_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 

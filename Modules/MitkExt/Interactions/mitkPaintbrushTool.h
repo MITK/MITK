@@ -73,12 +73,21 @@ class MitkExt_EXPORT PaintbrushTool : public FeedbackContourTool
      */
     void UpdateContour(const StateEvent* stateEvent);
 
+    /**
+      * Check if the current slice has changed
+      */
+    bool CheckIfCurrentSliceHasChanged(const PositionEvent* event);
+
     int m_PaintingPixelValue;
     static int m_Size;
 
     Contour::Pointer m_MasterContour;
 
     int m_LastContourSize;
+
+    Image::Pointer m_WorkingSlice;
+    PlaneGeometry::Pointer m_CurrentPlane;
+    DataNode::Pointer m_WorkingNode;
 };
 
 } // namespace

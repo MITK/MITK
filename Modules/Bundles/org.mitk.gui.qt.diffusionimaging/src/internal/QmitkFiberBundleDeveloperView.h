@@ -288,9 +288,9 @@ private:
   void SetGeneratedFBX();
   
   
-  //contains the selected FiberBundle
-  //mitk::FiberBundleX* m_FiberBundleX;
+  //contains the selected FiberBundle, PlanarFigure
   mitk::WeakPointer<mitk::FiberBundleX> m_FiberBundleX;
+  mitk::PlanarFigure::Pointer m_PlanarFigure;
   
   //  radiobutton groups
   QVector< QRadioButton* > m_DirectionRadios;

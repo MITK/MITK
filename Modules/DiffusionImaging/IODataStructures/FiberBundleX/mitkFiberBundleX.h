@@ -37,6 +37,8 @@
 
 #include <QStringList>
 
+#include <mitkPlanarFigure.h>
+
 namespace mitk {
 
   /**
@@ -89,6 +91,8 @@ namespace mitk {
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
+    std::vector<int> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
+    
 
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
 

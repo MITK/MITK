@@ -31,6 +31,7 @@
 #include <QTimer>
 
 // MITK
+#include <mitkPlanarCircle.h>
 
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
@@ -52,6 +53,7 @@
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
  * --generate FiberIDs--*/
+
 QmitkFiberIDWorker::QmitkFiberIDWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
     : m_itemPackage(itemPackage),
       m_hostingThread(hostingThread)
@@ -553,14 +555,24 @@ void QmitkFiberThreadMonitorWorker::fancyMonitorInitializationMask()
     m_itemPackage.st_MultiWidget->RequestUpdate();
 
 }
+
 //==============================================
 //======== W O R K E R S ________ E N D ========
 //==============================================
 
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//                   HERE STARTS THE ACTUAL FIBERB2UNDLE DEVELOPER VIEW IMPLEMENTATION
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
+//========#########################===============###########################=====================#########################
 
 
 
-// ========= HERE STARTS THE ACTUAL FIBERB2UNDLE DEVELOPER VIEW IMPLEMENTATION ======
 const std::string QmitkFiberBundleDeveloperView::VIEW_ID = "org.mitk.views.fiberbundledeveloper";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
@@ -573,6 +585,7 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
     , m_FiberIDGenerator( NULL)
     , m_GeneratorFibersRandom( NULL )
     , m_fiberMonitorIsOn( false )
+    , m_CircleCounter( 0 )
 {
     m_hostThread = new QThread;
     m_threadInProgress = false;
@@ -627,10 +640,12 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
         connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
 
+        connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( ActionDrawEllipseTriggered() ) );
         connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
         connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
 
         connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
+
 
 
     }
@@ -1394,15 +1409,25 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
         /* CHECKPOINT: PLANARFIGURE */
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarFigure*>(node->GetData()) )
         {
-                    m_PlanarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-                    MITK_INFO << "PF selected";
+            m_PlanarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+            MITK_INFO << "PF selected";
 
-                    if (m_PlanarFigure.IsNull())
-                         MITK_INFO << "========ATTENTION=========\n unable to load selected Planarfigure to FiberBundleDeveloper-plugin \n";
+            if (m_PlanarFigure.IsNull())
+                MITK_INFO << "========ATTENTION=========\n unable to load selected Planarfigure to FiberBundleDeveloper-plugin \n";
 
         }
 
     }
+}
+
+
+void QmitkFiberBundleDeveloperView::ActionDrawEllipseTriggered()
+{
+    bool checked = m_Controls->m_CircleButton->isChecked();
+    mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+//    this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_CircleCounter));
+
+    MITK_INFO << "PlanarCircle created ...";
 }
 
 void QmitkFiberBundleDeveloperView::Activated()

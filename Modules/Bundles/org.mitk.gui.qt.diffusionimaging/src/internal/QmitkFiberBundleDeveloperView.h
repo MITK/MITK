@@ -239,6 +239,7 @@ public:
   void DoColorFibers();
   void DoGatherColorCodings();
   void SetCurrentColorCoding(int);
+  void ActionDrawEllipseTriggered();
   
   //SLOTS FOR THREADS
   void BeforeThread_IdGenerate();
@@ -309,6 +310,9 @@ private:
   mitk::DataNode::Pointer m_MonitorNode;
   QmitkFiberThreadMonitorWorker *m_fiberThreadMonitorWorker;
   bool m_fiberMonitorIsOn;
+
+  // counters for ROI nodes
+  int m_CircleCounter;
   
 };
 

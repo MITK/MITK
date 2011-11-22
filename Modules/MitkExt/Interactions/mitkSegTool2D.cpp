@@ -48,7 +48,8 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_RememberContourPositions (false)
+ m_RememberContourPositions (true),
+ m_3DInterpolationEnabled (true)
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -285,6 +286,16 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   }
 }
 
+void mitk::SegTool2D::SetRememberContourPositions(bool status)
+{
+    m_RememberContourPositions = status;
+}
+
+void mitk::SegTool2D::Enable3DInterpolation(bool status)
+{
+    m_3DInterpolationEnabled = status;
+}
+
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
@@ -318,6 +329,7 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
       rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
       rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
       rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
+      rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(false));
       m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }

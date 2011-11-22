@@ -13,20 +13,15 @@ PURPOSE. See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkReduceContourSetFilter.h"
-#include "mitkSurface.h"
-#include "vtkPolygon.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkMath.h"
-
-#include <stack>
 
 mitk::ReduceContourSetFilter::ReduceContourSetFilter()
 {
   m_MaxSegmentLenght = 0;
-  m_StepSize = 20;
-  m_Tolerance = 3;
-  m_ReductionType = NTH_POINT;
+  m_StepSize = 10;
+  m_Tolerance = -1;
+  m_ReductionType = DOUGLAS_PEUCKER;
+  m_MaxSpacing = -1;
+  m_MinSpacing = -1;
 }
 
 mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
@@ -44,13 +39,13 @@ void mitk::ReduceContourSetFilter::GenerateData()
   vtkSmartPointer<vtkPoints> newPoints;
 
   //For the purpose of evaluation
-  unsigned int numberOfPointsBefore (0);
-  unsigned int numberOfPointsAfter (0);
+  //unsigned int numberOfPointsBefore (0);
+  //unsigned int numberOfPointsAfter (0);
 
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
-    Surface* currentSurface = const_cast<Surface*>( this->GetInput(i) );
-    vtkPolyData* polyData = currentSurface->GetVtkPolyData();
+    mitk::Surface* currentSurface = const_cast<mitk::Surface*>( this->GetInput(i) );
+    vtkSmartPointer<vtkPolyData> polyData = currentSurface->GetVtkPolyData();
 
     newPolyData = vtkPolyData::New();
     newPolygons = vtkCellArray::New();
@@ -67,10 +62,6 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {
-
-      //TODO implement functionality for detection intersection point so that these points won't be eliminated
-      //vtkIdType numberOfIntersections (0);
-      //vtkIdType* intersectionPoints (0);
       bool incorporatePolygon = this->CheckForIntersection(cell,cellSize,existingPoints, /*numberOfIntersections, intersectionPoints, */i);
       if ( !incorporatePolygon ) continue;
 
@@ -94,8 +85,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
       }
 
       //Again for evaluation
-      numberOfPointsBefore += cellSize;
-      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
+      //numberOfPointsBefore += cellSize;
+      //numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
 
     }
 
@@ -111,24 +102,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
     }
 
   }
+  //MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfOutputs(numberOfOutputs);
-  std::ofstream file ("C:/Users/fetzer/Desktop/Evaluation/Schritt_1/Algos/DP/segmentLenght.txt");
-  file<<m_MaxSegmentLenght;
-      file.close();
-
-  //Evaluation
- /* std::ofstream file("C:/Users/fetzer/Desktop/Evaluation/E_Reduction.txt");
-  if (m_ReductionType == NTH_POINT)
-  {
-    file<<"Reduction Type: Nth-Point Stepsize: "<<m_StepSize<<"\n\n";
-  }
-  else
-  {
-    file<<"Reduction Type: Douglas Peucker Tolerance: "<<m_Tolerance<<"\n\n";
-  }
-  file<<"Points before reduction: "<<numberOfPointsBefore<<endl;
-  file<<"Points after reduction: "<<numberOfPointsAfter<<endl;*/
-
 }
 
 void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints)
@@ -155,16 +130,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint (vtkIdType cel
 
   for (unsigned int i = 0; i < cellSize; i++)
   {
-    //TODO implement functionality for detection intersection point so that these points won't be eliminated
-    /*bool isIntersectionPoint = false;
-    for (unsigned int j = 0; j < numberOfIntersections; j++)
-    {
-    if (cell[i] == intersectionPoints[j]) {
-    isIntersectionPoint = true;
-    break;
-    }
-    }*/
-    if (i%m_StepSize == 0 /*|| isIntersectionPoint*/)
+    if (i%m_StepSize == 0)
     {
       double point[3];
       points->GetPoint(cell[i], point);
@@ -215,6 +181,19 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
   5. If the distance value D <= m_Tolerance, then add the start and end index and the corresponding points to the reduced ones
   */
 
+  //First of all set tolerance if none is specified
+  if(m_Tolerance < 0)
+  {
+      if(m_MaxSpacing > 0)
+      {
+          m_Tolerance = 1.5*m_MinSpacing;
+      }
+      else
+      {
+          m_Tolerance = 1.5;
+      }
+  }
+
   std::stack<LineSegment> lineSegments;
 
   //1. Divide in line segments
@@ -246,8 +225,6 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
   pointId = reducedPoints->InsertNextPoint(points->GetPoint(cell[0]));
   reducedPolygon->GetPointIds()->InsertNextId(pointId);
 
-  //std::ofstream dbFile ("C:/Users/fetzer/Desktop/equationSystem/dbFile.txt");
-
   while (!lineSegments.empty())
   {
     currentSegment = lineSegments.top();
@@ -266,7 +243,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
 
     vtkMath::Normalize(v1);
     int range = currentSegment.EndIndex - currentSegment.StartIndex;
-    for (unsigned int i = 1; i < abs(range); i++)
+    for (int i = 1; i < abs(range); ++i)
     {
       points->GetPoint(currentSegment.StartIndex+i, tempV);
       points->GetPoint(currentSegment.StartIndex, v2);
@@ -307,29 +284,29 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
     {
 
       //double temp[3];
-      int segmentLenght = currentSegment.EndIndex - currentSegment.StartIndex;
+      unsigned int segmentLenght = currentSegment.EndIndex - currentSegment.StartIndex;
       if (segmentLenght > m_MaxSegmentLenght)
       {
         m_MaxSegmentLenght = segmentLenght;
       }
-      //if (abs(segmentLenght) > 80)
-      //{
-      //  // dbFile<<"Lenght: "<<segmentLenght<<" Start: "<<currentSegment.StartIndex<<" End: "<<currentSegment.EndIndex<<endl;
-      //  pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + segmentLenght/2));
-      //  reducedPolygon->GetPointIds()->InsertNextId(pointId);
 
-      //  pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
-      //  reducedPolygon->GetPointIds()->InsertNextId(pointId);
-      //}
-      //else
-      //{
-        pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
-        reducedPolygon->GetPointIds()->InsertNextId(pointId);
-      //}
-
-      //points->GetPoint(currentSegment.EndIndex, temp);
-      //dbFile<<"ADD ID: "<<pointId<<" Point: ["<<temp[0]<<", "<<temp[1]<<", "<<temp[2]<<"] "<<endl;
-
+      //MITK_INFO<<"Lenght: "<<abs(segmentLenght);
+      if (abs(segmentLenght) > 20)
+      {
+          unsigned int divisions = abs(segmentLenght)%20;
+        //MITK_INFO<<"Divisions: "<<divisions<<" Start: "<<currentSegment.StartIndex<<" End: "<<currentSegment.EndIndex<<endl;
+        for (unsigned int i = 0; i<divisions; ++i)
+        {
+            if(currentSegment.EndIndex > (currentSegment.StartIndex + 20*i))
+            {
+                //MITK_INFO<<"Inserting Index: "<<(currentSegment.StartIndex + 20*i);
+                pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + 20*i));
+                reducedPolygon->GetPointIds()->InsertNextId(pointId);
+            }
+        }
+      }
+      pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
+      reducedPolygon->GetPointIds()->InsertNextId(pointId);
     }
     else
     {
@@ -340,9 +317,6 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
       ls1.StartIndex = currentSegment.StartIndex;
       ls1.EndIndex = currentMaxDistanceIndex;
       lineSegments.push(ls1);
-
-      //dbFile<<"Old Segment: "<<currentSegment.StartIndex<<" - "<<currentSegment.EndIndex<<" *** MaxDistance: "<<currentMaxDistance<<" Index: "<<currentMaxDistanceIndex<<endl;
-      //dbFile<<"New Segment Indices: S1: "<<ls1.StartIndex<<" - "<<ls1.EndIndex<<" *** S2: "<<ls2.StartIndex<<" - "<<ls2.EndIndex<<endl;
     }
     currentMaxDistance = 0;
 
@@ -361,9 +335,6 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
   3. There is no intersection
   - That mean we can just reduce the current polygons points without considering any intersections
   */
-
-  //TODO implement functionality for detection intersection point so that these points won't be eliminated
-  //std::vector<vtkIdType> intersectionPointsTemp;
 
   for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
   {

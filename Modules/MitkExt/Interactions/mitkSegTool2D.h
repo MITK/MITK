@@ -73,6 +73,7 @@ class MitkExt_EXPORT SegTool2D : public Tool
 
     void SetRememberContourPositions(bool);
 
+    void Enable3DInterpolation(bool);
 
   protected:
 
@@ -116,7 +117,6 @@ class MitkExt_EXPORT SegTool2D : public Tool
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 
-    bool m_RememberContourPositions;
  
   private:
 
@@ -124,6 +124,9 @@ class MitkExt_EXPORT SegTool2D : public Tool
     unsigned int          m_LastEventSlice;
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
+
+    bool m_RememberContourPositions;
+    bool m_3DInterpolationEnabled;
 };
 
 } // namespace

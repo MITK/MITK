@@ -634,6 +634,31 @@ void QmitkSegmentationView::OnRememberContourPositions (bool state)
   }
 }
 
+//to remember the contour positions
+void QmitkSegmentationView::On3DInterpolationEnabled (bool state)
+{
+  mitk::SegTool2D::Pointer manualSegmentationTool;
+
+  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetTools().size();
+
+  for(unsigned int i = 0; i < numberOfExistingTools; i++)
+{
+    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetToolById(i));
+
+    if (manualSegmentationTool)
+    {
+      if(state == Qt::Checked)
+      {
+        manualSegmentationTool->Enable3DInterpolation( true );
+}
+      else
+      {
+        manualSegmentationTool->Enable3DInterpolation( false );
+      }
+    }
+  }
+}
+
 void QmitkSegmentationView::OnHideMarkerNodes(bool state)
 {
 }
@@ -1154,6 +1179,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalRememberContourPositions(bool)), this, SLOT(OnRememberContourPositions(bool)));
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalHideMarkerNodes(int)), this, SLOT(OnHideMarkerNodes(int)));
+  connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

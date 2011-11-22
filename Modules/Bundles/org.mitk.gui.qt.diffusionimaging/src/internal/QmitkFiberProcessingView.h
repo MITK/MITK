@@ -30,10 +30,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "mitkPlanarFigureComposite.h"
+#include <mitkFiberBundleX.h>
+#include <mitkSurface.h>
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkPolyDataToImageStencil.h>
+#include <vtkSelectEnclosedPoints.h>
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
 #include <itkVTKImageImport.h>
@@ -41,6 +44,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageStencil.h>
 #include <itkRegionOfInterestImageFilter.h>
 #include <vtkSmartPointer.h>
+#include <vtkSelection.h>
+#include <vtkSelectionNode.h>
+#include <vtkExtractSelectedThresholds.h>
+#include <vtkFloatArray.h>
+#include <mitkUnstructuredGrid.h>
+#include <vtkXMLUnstructuredGridWriter.h>
 
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
@@ -99,6 +108,8 @@ public:
   void SubstractBundles();
   void GenerateROIImage();
   void GenerationStart();
+
+  void Extract3d();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

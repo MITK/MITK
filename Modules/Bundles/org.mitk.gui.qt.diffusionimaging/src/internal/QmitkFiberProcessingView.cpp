@@ -51,6 +51,7 @@
 #include <mitkDiffusionImage.h>
 #include <mitkDataNodeObject.h>
 #include <itkImageRegion.h>
+#include <vtkPolyDataWriter.h>
 
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
@@ -181,6 +182,8 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_GenerateROIImage, SIGNAL(clicked()), this, SLOT(GenerateROIImage()) );
 
     connect( m_Controls->m_GenerationStartButton, SIGNAL(clicked()), this, SLOT(GenerationStart()) );
+
+    connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
   }
 
   m_SelListener = berry::ISelectionListener::Pointer(new FboSelListener(this));
@@ -189,6 +192,96 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<FboSelListener>()->DoSelectionChanged(sel);
+}
+
+void QmitkFiberProcessingView::Extract3d()
+{
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  if (nodes.empty())
+    return;
+
+  mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New();
+  mitk::Surface::Pointer roi = mitk::Surface::New();
+  bool fibB = false;
+  bool roiB = false;
+  for (int i=0; i<nodes.size(); i++)
+  {
+    if (dynamic_cast<mitk::FiberBundleX*>(nodes.at(i)->GetData()))
+    {
+      fib = dynamic_cast<mitk::FiberBundleX*>(nodes.at(i)->GetData());
+      fibB = true;
+    }
+    else if (dynamic_cast<mitk::Surface*>(nodes.at(i)->GetData()))
+    {
+      roi = dynamic_cast<mitk::Surface*>(nodes.at(i)->GetData());
+      roiB = true;
+    }
+  }
+  if (!fibB)
+    return;
+  if (!roiB)
+    return;
+
+  vtkSmartPointer<vtkPolyData> polyRoi = roi->GetVtkPolyData();
+  vtkSmartPointer<vtkPolyData> polyFib = fib->GetFiberPolyData();
+
+  vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints = vtkSmartPointer<vtkSelectEnclosedPoints>::New();
+  selectEnclosedPoints->SetInput(polyFib);
+  selectEnclosedPoints->SetSurface(polyRoi);
+  selectEnclosedPoints->Update();
+
+  vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
+
+  vtkSmartPointer<vtkCellArray> vLines = polyFib->GetLines();
+
+  vtkDataArray* insideArray = vtkDataArray::SafeDownCast(selectEnclosedPoints->GetOutput()->GetPointData()->GetArray("SelectedPoints"));
+  for(vtkIdType i = 0; i < insideArray->GetNumberOfTuples(); i++)
+  {
+    if (insideArray->GetComponent(i,0)>0.0)
+    {
+      vLines->InitTraversal();
+      int numberOfLines = vLines->GetNumberOfCells();
+      for (int j=0; j<numberOfLines; j++)
+      {
+        vtkIdType   numPoints(0);
+        vtkIdType*  points(NULL);
+        vLines->GetNextCell ( numPoints, points );
+        bool ok = false;
+
+        for (int k=0; k<numPoints; k++)
+        {
+          if (points[k]==i)
+          {
+            ok = true;
+            break;
+          }
+        }
+        if (ok)
+        {
+          vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+          for (int k=0; k<numPoints; k++)
+          {
+            double* point = polyFib->GetPoint(points[k]);
+            vtkIdType pointId = newPoints->InsertNextPoint(point);
+            container->GetPointIds()->InsertNextId(pointId);
+          }
+          newCellArray->InsertNextCell(container);
+          break;
+        }
+      }
+    }
+  }
+
+  newPoly->SetPoints(newPoints);
+  newPoly->SetLines(newCellArray);
+  mitk::FiberBundleX::Pointer fb = mitk::FiberBundleX::New(newPoly);
+
+  DataNode::Pointer newNode = DataNode::New();
+  newNode->SetData(fb);
+  newNode->SetName("passing roi");
+  GetDefaultDataStorage()->Add(newNode);
 }
 
 void QmitkFiberProcessingView::GenerateROIImage(){

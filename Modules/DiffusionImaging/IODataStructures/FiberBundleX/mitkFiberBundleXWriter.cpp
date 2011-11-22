@@ -50,7 +50,7 @@ void mitk::FiberBundleXWriter::GenerateData()
         itkWarningMacro( << "Sorry, filename has not been set!" );
         return ;
     }
-    vtkSmartPointer<vtkPolyDataWriter> writer = vtkPolyDataWriter::New();
+    vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
     writer->SetInput(input->GetFiberPolyData());
     writer->SetFileName(m_FileName.c_str());
     writer->SetFileTypeToASCII();

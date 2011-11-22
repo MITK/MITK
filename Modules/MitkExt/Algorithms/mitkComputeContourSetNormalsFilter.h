@@ -31,14 +31,19 @@ PURPOSE. See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  \brief This filter takes a number of extracted contours and computes the normals for each
-         contour edge point. The normals can be accessed by calling:
+  \brief Filter to compute the normales for contours based on vtkPolygons
+
+
+
+    This filter takes a number of extracted contours and computes the normals for each
+    contour edge point. The normals can be accessed by calling:
 
          filter->GetOutput(i)->GetVtkPolyData()->GetCellData()->GetNormals();
 
          See also the method GetNormalsAsSurface()
 
-   \ingroup Process
+   Note: If a segmentation binary image is provided this filter assures that the computed normals
+         do not point into the segmentation image
 
    $Author: fetzer$
 */
@@ -52,7 +57,7 @@ public:
   itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
 
    /*
-      \brief Returns the computed normals as a surface 
+      \brief Returns the computed normals as a surface
   */
   mitk::Surface::Pointer GetNormalsAsSurface();
 

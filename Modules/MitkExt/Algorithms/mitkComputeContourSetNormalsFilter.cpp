@@ -42,7 +42,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     existingPolys->InitTraversal();
 
     vtkIdType* cell (NULL);
-    vtkIdType cellSize (0);  
+    vtkIdType cellSize (0);
 
     //The array that contains all the vertex normals of the current polygon
     vtkSmartPointer<vtkDoubleArray> normals = vtkSmartPointer<vtkDoubleArray>::New();
@@ -202,7 +202,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
     existingPolys->InitTraversal();
 
     vtkIdType* cell (NULL);
-    vtkIdType cellSize (0); 
+    vtkIdType cellSize (0);
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {

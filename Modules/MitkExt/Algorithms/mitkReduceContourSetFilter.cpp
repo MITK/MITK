@@ -186,7 +186,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
   {
       if(m_MaxSpacing > 0)
       {
-          m_Tolerance = 1.5*m_MinSpacing;
+          m_Tolerance = 2*m_MinSpacing;
       }
       else
       {

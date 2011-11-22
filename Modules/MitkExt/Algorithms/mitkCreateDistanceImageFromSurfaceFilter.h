@@ -41,13 +41,15 @@ namespace mitk {
 
   /**
   \brief This filter interpolates the 3D surface for a segmented area. The basis for the interpolation
-         are the edge points of contours that are drawn into an image.
+         are the edge-points of contours that are drawn into an image.
 
          The interpolation itself is performed via Radial Basis Function Interpolation.
 
          ATTENTION: 
          This filter needs beside the edge points of the delineated contours additionally the normals for each
-         edge point. 
+         edge point.
+
+         \sa mitkSurfaceInterpolationController
 
          Based on the contour edge points and their normal this filter calculates a distance function with the following
          properties:
@@ -56,9 +58,9 @@ namespace mitk {
          - Putting a point into the distance function that lies exactly on the considered surface gives the value zero
 
          With this interpolated distance function a distance image will be created. The desired surface can then be extract e.g.
-         with the marching cubes algorithm. (It runs at the border from positive to negative pixel values)
+         with the marching cubes algorithm. (Within the  distance image the surface goes exactly where the pixelvalues are zero)
 
-         Regard that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the image can be 
+         Note that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the image can be
          adjusted by calling SetDistanceImageVolume(unsigned int volume) which specifies the number ob pixels enclosed by the image.
 
   \ingroup Process

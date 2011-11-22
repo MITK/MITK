@@ -75,6 +75,7 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
 
     AverageClicked();
+    AdvancedCheckboxClicked();
   }
 }
 
@@ -90,9 +91,18 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()), this, SLOT(AverageClicked()) );
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
+    connect( m_Controls->m_Advanced, SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
   }
 }
 
+
+void QmitkDiffusionDicomImport::AdvancedCheckboxClicked()
+{
+  bool check = m_Controls->
+    m_Advanced->isChecked();
+
+  m_Controls->m_AdvancedFrame->setVisible(check);
+}
 
 void QmitkDiffusionDicomImport::OutputSet()
 {
@@ -345,10 +355,20 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       Status("Sorting");
 
       const gdcm::Scanner::ValuesType &values1 = s.GetValues(t1);
-      int nvalues = values1.size();
+
+      int nvalues;
+      if(m_Controls->m_DuplicateID->isChecked())
+      {
+        nvalues = 1;
+      }
+      else
+      {
+        nvalues = values1.size();
+      }
+
       if(nvalues>1)
       {
-        Error("Multiple studies found. Please limit to 1 study per folder");
+        Error("Multiple sSeries tudies found. Please limit to 1 study per folder");
         continue;
       }
 
@@ -361,7 +381,17 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       }
 
       const gdcm::Scanner::ValuesType &values2 = s.GetValues(t2);
-      int nSeries = values2.size();
+
+
+      int nSeries;
+      if(m_Controls->m_DuplicateID->isChecked())
+      {
+        nSeries = 1;
+      }
+      else
+      {
+        nSeries = values1.size();
+      }
 
       gdcm::Directory::FilenamesType files;
       if(nSeries > 1)
@@ -386,6 +416,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       int filesPerSeries = nfiles / nSeries;
 
+
       gdcm::Scanner::ValuesType::const_iterator it2 = values2.begin();
       for(int i=0; i<nSeries; i++)
       {
@@ -394,7 +425,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
         gdcm::Scanner s;
         const gdcm::Tag t3(0x0020,0x0012);  // Acquisition ID
-        const gdcm::Tag t4(0x0018, 0x0024); // Sequence Name (in case acquisitions are equal for all)
+        const gdcm::Tag t4(0x0018,0x0024); // Sequence Name (in case acquisitions are equal for all)
         //        const gdcm::Tag t5(0x20,0x32) );    // Image Position (Patient)
         s.AddTag(t3);
         s.AddTag(t4);

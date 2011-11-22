@@ -69,18 +69,20 @@ public:
 
   void SetDwiNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-  protected slots:  
+protected slots:
 
-    void DicomLoadAddFolderNames();
+  void DicomLoadAddFolderNames();
 
-    void DicomLoadDeleteFolderNames(); 
+  void DicomLoadDeleteFolderNames();
 
-    void DicomLoadStartLoad() ;
+  void DicomLoadStartLoad() ;
 
-    void AverageClicked();
+  void AverageClicked();
 
-    void OutputSet();
-    void OutputClear();
+  void OutputSet();
+  void OutputClear();
+
+  void AdvancedCheckboxClicked();
 
 protected: 
 

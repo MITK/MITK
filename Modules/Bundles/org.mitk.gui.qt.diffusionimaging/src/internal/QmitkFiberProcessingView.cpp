@@ -234,54 +234,69 @@ void QmitkFiberProcessingView::Extract3d()
   vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
 
+  vtkSmartPointer<vtkPolyData> newPolyComplement = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkCellArray> newCellArrayComplement = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints>    newPointsComplement = vtkSmartPointer<vtkPoints>::New();
+
   vtkSmartPointer<vtkCellArray> vLines = polyFib->GetLines();
 
-  vtkDataArray* insideArray = vtkDataArray::SafeDownCast(selectEnclosedPoints->GetOutput()->GetPointData()->GetArray("SelectedPoints"));
-  for(vtkIdType i = 0; i < insideArray->GetNumberOfTuples(); i++)
+  vLines->InitTraversal();
+  int numberOfLines = vLines->GetNumberOfCells();
+  // each line
+  for (int j=0; j<numberOfLines; j++)
   {
-    if (insideArray->GetComponent(i,0)>0.0)
-    {
-      vLines->InitTraversal();
-      int numberOfLines = vLines->GetNumberOfCells();
-      for (int j=0; j<numberOfLines; j++)
-      {
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
-        bool ok = false;
+    vtkIdType   numPoints(0);
+    vtkIdType*  points(NULL);
+    vLines->GetNextCell ( numPoints, points );
+    bool isPassing = false;
 
+    // each point of this line
+    for (int k=0; k<numPoints; k++)
+    {
+      // is point inside polydata ?
+      if (selectEnclosedPoints->IsInside(points[k]))
+      {
+        isPassing = true;
+        // fill new polydata
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
         for (int k=0; k<numPoints; k++)
         {
-          if (points[k]==i)
-          {
-            ok = true;
-            break;
-          }
+          double* point = polyFib->GetPoint(points[k]);
+          vtkIdType pointId = newPoints->InsertNextPoint(point);
+          container->GetPointIds()->InsertNextId(pointId);
         }
-        if (ok)
-        {
-          vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-          for (int k=0; k<numPoints; k++)
-          {
-            double* point = polyFib->GetPoint(points[k]);
-            vtkIdType pointId = newPoints->InsertNextPoint(point);
-            container->GetPointIds()->InsertNextId(pointId);
-          }
-          newCellArray->InsertNextCell(container);
-          break;
-        }
+        newCellArray->InsertNextCell(container);
+        break;
       }
+    }
+    if (!isPassing)
+    {
+      vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+      for (int k=0; k<numPoints; k++)
+      {
+        double* point = polyFib->GetPoint(points[k]);
+        vtkIdType pointId = newPointsComplement->InsertNextPoint(point);
+        container->GetPointIds()->InsertNextId(pointId);
+      }
+      newCellArrayComplement->InsertNextCell(container);
     }
   }
 
   newPoly->SetPoints(newPoints);
   newPoly->SetLines(newCellArray);
   mitk::FiberBundleX::Pointer fb = mitk::FiberBundleX::New(newPoly);
-
   DataNode::Pointer newNode = DataNode::New();
   newNode->SetData(fb);
-  newNode->SetName("passing roi");
+  newNode->SetName("passing surface");
   GetDefaultDataStorage()->Add(newNode);
+
+  newPolyComplement->SetPoints(newPointsComplement);
+  newPolyComplement->SetLines(newCellArrayComplement);
+  mitk::FiberBundleX::Pointer fbComplement = mitk::FiberBundleX::New(newPolyComplement);
+  DataNode::Pointer newNodeComplement = DataNode::New();
+  newNodeComplement->SetData(fbComplement);
+  newNodeComplement->SetName("not passing surface");
+  GetDefaultDataStorage()->Add(newNodeComplement);
 }
 
 void QmitkFiberProcessingView::GenerateROIImage(){

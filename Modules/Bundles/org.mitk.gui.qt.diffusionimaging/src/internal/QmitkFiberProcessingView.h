@@ -51,6 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUnstructuredGrid.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
+#include <itkTimeProbe.h>
+
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 

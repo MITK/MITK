@@ -52,8 +52,7 @@ mitk::FiberBundleX::FiberBundleX(vtkSmartPointer<vtkPolyData> fiberPolyData )
 
 mitk::FiberBundleX::~FiberBundleX()
 {
-  // Memory Management
-  m_FiberPolyData->Delete();
+
 }
 
 /*
@@ -384,9 +383,85 @@ void mitk::FiberBundleX::setFBXModificationDone()
   m_isModified = false;
 }
 
+// Resample fiber to get equidistant points
+void mitk::FiberBundleX::ResampleFibers(float len)
+{
+  vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
 
+  vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
+  vLines->InitTraversal();
+  int numberOfLines = vLines->GetNumberOfCells();
 
+  for (int i=0; i<numberOfLines; i++)
+  {
+    vtkIdType   numPoints(0);
+    vtkIdType*  points(NULL);
+    vLines->GetNextCell ( numPoints, points );
 
+    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+
+    double* point = m_FiberPolyData->GetPoint(points[0]);
+    vtkIdType pointId = newPoints->InsertNextPoint(point);
+    container->GetPointIds()->InsertNextId(pointId);
+
+    float dtau = 0;
+    int cur_p = 1;
+    itk::Vector<float,3> dR;
+    float normdR = 0;
+
+    for (;;)
+    {
+      while (dtau <= len && cur_p < numPoints)
+      {
+        itk::Vector<float,3> v1;
+        point = m_FiberPolyData->GetPoint(points[cur_p-1]);
+        v1[0] = point[0];
+        v1[1] = point[1];
+        v1[2] = point[2];
+        itk::Vector<float,3> v2;
+        point = m_FiberPolyData->GetPoint(points[cur_p]);
+        v2[0] = point[0];
+        v2[1] = point[1];
+        v2[2] = point[2];
+
+        dR  = v2 - v1;
+        normdR = std::sqrt(dR.GetSquaredNorm());
+        dtau += normdR;
+        cur_p++;
+      }
+
+      if (dtau >= len)
+      {
+        itk::Vector<float,3> v1;
+        point = m_FiberPolyData->GetPoint(points[cur_p-1]);
+        v1[0] = point[0];
+        v1[1] = point[1];
+        v1[2] = point[2];
+
+        itk::Vector<float,3> v2 = v1 - dR*( (dtau-len)/normdR );
+        pointId = newPoints->InsertNextPoint(v2.GetDataPointer());
+        container->GetPointIds()->InsertNextId(pointId);
+      }
+      else
+      {
+        point = m_FiberPolyData->GetPoint(points[numPoints-1]);
+        pointId = newPoints->InsertNextPoint(point);
+        container->GetPointIds()->InsertNextId(pointId);
+        break;
+      }
+      dtau = dtau-len;
+    }
+
+    newCellArray->InsertNextCell(container);
+  }
+
+  newPoly->SetPoints(newPoints);
+  newPoly->SetLines(newCellArray);
+  m_FiberPolyData = newPoly;
+  UpdateFiberGeometry();
+}
 
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */

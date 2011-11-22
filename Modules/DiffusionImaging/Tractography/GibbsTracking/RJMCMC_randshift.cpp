@@ -120,6 +120,8 @@ public:
 
       pVector R;
       enc->drawSpatPosition(&R);
+
+      //fprintf(stderr,"drawn: %f, %f, %f\n",R[0],R[1],R[2]);
       //R.setXYZ(20.5*3, 35.5*3, 1.5*3);
 
       pVector N; N.rand_sphere();

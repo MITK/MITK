@@ -20,116 +20,37 @@
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
-
-
 // Qmitk
 #include "QmitkFiberProcessingView.h"
-#include "QmitkStdMultiWidget.h"
+#include <QmitkStdMultiWidget.h>
 
 // Qt
 #include <QMessageBox>
 
 //MITK
-#include "mitkNodePredicateProperty.h"
-//#include "mitkNodePredicateAND.h"
-#include "mitkImageCast.h"
-
-#include "mitkPointSet.h"
-
-
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarPolygon.h"
+#include <mitkNodePredicateProperty.h>
+#include <mitkImageCast.h>
+#include <mitkPointSet.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
-#include "mitkPlanarFigureInteractor.h"
-#include "mitkGlobalInteraction.h"
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkGlobalInteraction.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkDataNodeObject.h>
+
+// ITK
 #include <itkResampleImageFilter.h>
 #include <itkGaussianInterpolateImageFunction.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
 #include <itkTractsToProbabilityImageFilter.h>
-#include <mitkDiffusionImage.h>
-#include <mitkDataNodeObject.h>
 #include <itkImageRegion.h>
 
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
-using namespace berry;
 using namespace mitk;
-
-struct FboSelListener : ISelectionListener
-{
-
-  berryObjectMacro(FboSelListener);
-
-  FboSelListener(QmitkFiberProcessingView* view)
-  {
-    m_View = view;
-  }
-
-  void DoSelectionChanged(ISelection::ConstPointer selection)
-  {
-    // save current selection in member variable
-    m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
-
-    // do something with the selected items
-    if(m_View->m_CurrentSelection)
-    {
-      bool foundFiberBundle = false;
-      std::string classname = "FiberBundle";
-
-      // iterate selection
-      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
-        i != m_View->m_CurrentSelection->End(); ++i)
-      {
-
-        // extract datatree node
-        if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-        {
-          mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-          std::string fname = node->GetData()->GetNameOfClass();
-          if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-          {
-            foundFiberBundle = true;
-          }
-        }
-      }
-
-      if(foundFiberBundle)
-      {
-        m_View->m_Controls->m_CircleButton->setEnabled(true);
-        m_View->m_Controls->m_PolygonButton->setEnabled(true);
-        m_View->m_Controls->m_RectangleButton->setEnabled(true);
-      }
-      else{
-        m_View->m_Controls->m_CircleButton->setEnabled(false);
-        m_View->m_Controls->m_PolygonButton->setEnabled(false);
-        m_View->m_Controls->m_RectangleButton->setEnabled(false);
-      }
-    }
-  }
-
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
-  {
-    // check, if selection comes from datamanager
-    if (part)
-    {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
-      {
-
-        // apply selection
-        DoSelectionChanged(selection);
-
-      }
-    }
-  }
-
-  QmitkFiberProcessingView* m_View;
-};
-
-
 
 QmitkFiberProcessingView::QmitkFiberProcessingView()
 : QmitkFunctionality()
@@ -137,8 +58,6 @@ QmitkFiberProcessingView::QmitkFiberProcessingView()
 , m_MultiWidget( NULL )
 , m_EllipseCounter(0)
 , m_PolygonCounter(0)
-//, m_SelectedFBNodes( NULL )
-//, m_SelectedPFNodes(0)
 , m_UpsamplingFactor(5)
 {
 
@@ -149,7 +68,6 @@ QmitkFiberProcessingView::~QmitkFiberProcessingView()
 {
 
 }
-
 
 void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
 {
@@ -169,7 +87,6 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_RectangleButton->setVisible(false);
 
     connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
-    //connect( m_Controls->comboBox_fiberAlgo, SIGNAL(selected()), this, SLOT(handleAlgoSelection() );
     connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( ActionDrawEllipseTriggered() ) );
     connect( m_Controls->m_PolygonButton, SIGNAL( clicked() ), this, SLOT( ActionDrawPolygonTriggered() ) );
     connect(m_Controls->PFCompoANDButton, SIGNAL(clicked()), this, SLOT(GenerateAndComposite()) );
@@ -178,37 +95,29 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
 
     connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
     connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
-    connect(m_Controls->m_GenerateROIImage, SIGNAL(clicked()), this, SLOT(GenerateROIImage()) );
+    connect(m_Controls->m_GenerateRoiImage, SIGNAL(clicked()), this, SLOT(GenerateRoiImage()) );
 
-    connect( m_Controls->m_GenerationStartButton, SIGNAL(clicked()), this, SLOT(GenerationStart()) );
+    connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
   }
-
-  m_SelListener = berry::ISelectionListener::Pointer(new FboSelListener(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<FboSelListener>()->DoSelectionChanged(sel);
 }
 
-void QmitkFiberProcessingView::GenerateROIImage(){
+void QmitkFiberProcessingView::GenerateRoiImage(){
 
-  if (m_Image.IsNull() || m_SelectedPF.empty())
+  if (m_SelectedImage.IsNull() || m_SelectedPF.empty())
     return;
 
-  mitk::Image* image = const_cast<mitk::Image*>(m_Image.GetPointer());
+  mitk::Image* image = const_cast<mitk::Image*>(m_SelectedImage.GetPointer());
 
-  MaskImage3DType::Pointer temp = MaskImage3DType::New();
-  mitk::CastToItkImage<MaskImage3DType>(m_Image, temp);
+  UCharImageType::Pointer temp = UCharImageType::New();
+  mitk::CastToItkImage<UCharImageType>(m_SelectedImage, temp);
 
-  m_PlanarFigureImage = MaskImage3DType::New();
+  m_PlanarFigureImage = UCharImageType::New();
   m_PlanarFigureImage->SetSpacing( temp->GetSpacing() );   // Set the image spacing
   m_PlanarFigureImage->SetOrigin( temp->GetOrigin() );     // Set the image origin
   m_PlanarFigureImage->SetDirection( temp->GetDirection() );  // Set the image direction
   m_PlanarFigureImage->SetRegions( temp->GetLargestPossibleRegion() );
   m_PlanarFigureImage->Allocate();
   m_PlanarFigureImage->FillBuffer( 0 );
-
 
   for (int i=0; i<m_SelectedPF.size(); i++)
     CompositeExtraction(m_SelectedPF.at(i), image);
@@ -397,11 +306,11 @@ template < typename TPixel, unsigned int VImageDimension >
   MITK_INFO << "InternalCalculateMaskFromPlanarFigure() start";
 
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::CastImageFilter< ImageType, MaskImage3DType > CastFilterType;
+  typedef itk::CastImageFilter< ImageType, UCharImageType > CastFilterType;
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".
-  MaskImage3DType::Pointer newMaskImage = MaskImage3DType::New();
+  UCharImageType::Pointer newMaskImage = UCharImageType::New();
   newMaskImage->SetSpacing( image->GetSpacing() );   // Set the image spacing
   newMaskImage->SetOrigin( image->GetOrigin() );     // Set the image origin
   newMaskImage->SetDirection( image->GetDirection() );  // Set the image direction
@@ -532,8 +441,8 @@ template < typename TPixel, unsigned int VImageDimension >
 
 
   // Export from ITK to VTK (to use a VTK filter)
-  typedef itk::VTKImageImport< MaskImage3DType > ImageImportType;
-  typedef itk::VTKImageExport< MaskImage3DType > ImageExportType;
+  typedef itk::VTKImageImport< UCharImageType > ImageImportType;
+  typedef itk::VTKImageExport< UCharImageType > ImageExportType;
 
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( newMaskImage );
@@ -565,7 +474,7 @@ template < typename TPixel, unsigned int VImageDimension >
   m_InternalImageMask3D = itkImporter->GetOutput();
   m_InternalImageMask3D->SetDirection(image->GetDirection());
 
-  itk::ImageRegionConstIterator<MaskImage3DType>
+  itk::ImageRegionConstIterator<UCharImageType>
       itmask(m_InternalImageMask3D, m_InternalImageMask3D->GetLargestPossibleRegion());
   itk::ImageRegionIterator<ImageType>
       itimage(image, image->GetLargestPossibleRegion());
@@ -615,7 +524,7 @@ template < typename TPixel, unsigned int VImageDimension >
   itk::ImageRegion<3> cropRegion = itk::ImageRegion<3>(index, size);
 
   // crop internal mask
-  typedef itk::RegionOfInterestImageFilter< MaskImage3DType, MaskImage3DType > ROIMaskFilterType;
+  typedef itk::RegionOfInterestImageFilter< UCharImageType, UCharImageType > ROIMaskFilterType;
   typename ROIMaskFilterType::Pointer roi2 = ROIMaskFilterType::New();
   roi2->SetRegionOfInterest(cropRegion);
   roi2->SetInput(m_InternalImageMask3D);
@@ -632,7 +541,7 @@ template < typename TPixel, unsigned int VImageDimension >
 
   const Geometry3D *intImageGeometry3D = tmpImage->GetGeometry( 0 );
 
-  typedef itk::ImageRegionIteratorWithIndex<MaskImage3DType> IteratorType;
+  typedef itk::ImageRegionIteratorWithIndex<UCharImageType> IteratorType;
   IteratorType imageIterator (m_InternalImageMask3D, m_InternalImageMask3D->GetRequestedRegion());
   imageIterator.GoToBegin();
   while ( !imageIterator.IsAtEnd() )
@@ -686,83 +595,91 @@ void QmitkFiberProcessingView::StdMultiWidgetNotAvailable()
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
  implement SelectionService Listener explicitly */
 
+void QmitkFiberProcessingView::UpdateGui()
+{
+  // are fiber bundles selected?
+  if ( m_SelectedFB.empty() )
+  {
+    m_Controls->m_JoinBundles->setEnabled(false);
+    m_Controls->m_SubstractBundles->setEnabled(false);
+    m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
+    m_Controls->doExtractFibersButton->setEnabled(false);
+  }
+  else
+  {
+    m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
+
+    // one bundle and one planar figure needed to extract fibers
+    if (m_SelectedFB.size() == 1 && m_SelectedPF.size() == 1)
+      m_Controls->doExtractFibersButton->setEnabled(true);
+
+    // two bundles needed to subtract
+    if (m_SelectedFB.size() == 2)
+      m_Controls->m_SubstractBundles->setEnabled(true);
+    else
+      m_Controls->m_SubstractBundles->setEnabled(false);
+
+    // more than two bundles needed to join
+    if (m_SelectedFB.size() > 1)
+      m_Controls->m_JoinBundles->setEnabled(true);
+    else
+      m_Controls->m_JoinBundles->setEnabled(false);
+  }
+
+  // are plar figures selected?
+  if ( m_SelectedPF.empty() )
+  {
+    m_Controls->doExtractFibersButton->setEnabled(false);
+    m_Controls->PFCompoANDButton->setEnabled(false);
+    m_Controls->PFCompoORButton->setEnabled(false);
+    m_Controls->PFCompoNOTButton->setEnabled(false);
+    m_Controls->m_GenerateRoiImage->setEnabled(false);
+  }
+  else
+  {
+    if ( m_SelectedImage.IsNotNull() )
+      m_Controls->m_GenerateRoiImage->setEnabled(true);
+    else
+      m_Controls->m_GenerateRoiImage->setEnabled(false);
+
+    if (m_SelectedPF.size() > 1)
+    {
+      m_Controls->PFCompoANDButton->setEnabled(true);
+      m_Controls->PFCompoORButton->setEnabled(true);
+      m_Controls->PFCompoNOTButton->setEnabled(false);
+    }
+    else
+    {
+      m_Controls->PFCompoANDButton->setEnabled(false);
+      m_Controls->PFCompoORButton->setEnabled(false);
+      m_Controls->PFCompoNOTButton->setEnabled(true);
+    }
+  }
+}
+
 void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   if ( !this->IsVisible() )
     return;
 
-  if (nodes.empty())
-  {
-    m_Controls->doExtractFibersButton->setDisabled(true);
-    m_Controls->PFCompoANDButton->setDisabled(true);
-    m_Controls->PFCompoORButton->setDisabled(true);
-    m_Controls->PFCompoNOTButton->setDisabled(true);
-    m_Controls->m_JoinBundles->setEnabled(false);
-    m_Controls->m_SubstractBundles->setEnabled(false);
-    m_Controls->m_GenerationStartButton->setEnabled(false);
-  }
-
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
   m_SelectedFB.clear();
   m_SelectedPF.clear();
-  m_Image = NULL;
+  m_SelectedImage = NULL;
 
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
-    {
+    if ( dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
       m_SelectedFB.push_back(node);
-    }
     else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
       m_SelectedPF.push_back(node);
     else if (dynamic_cast<mitk::Image*>(node->GetData()))
-      m_Image = dynamic_cast<mitk::Image*>(node->GetData());
+      m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
   }
-
-  if (!m_SelectedPF.empty() && m_Image.IsNotNull())
-    m_Controls->m_GenerateROIImage->setEnabled(true);
-  else
-    m_Controls->m_GenerateROIImage->setEnabled(false);
-
-  if (m_SelectedPF.size() == 1)
-  {
-    m_Controls->PFCompoANDButton->setDisabled(true);
-    m_Controls->PFCompoORButton->setDisabled(true);
-    m_Controls->PFCompoNOTButton->setEnabled(true);
-  }
-  else if (m_SelectedPF.size() > 1)
-  {
-    m_Controls->PFCompoANDButton->setEnabled(true);
-    m_Controls->PFCompoORButton->setEnabled(true);
-    m_Controls->PFCompoNOTButton->setDisabled(true);
-  }
-
-  // one bundle and one planar figure needed to extract fibers
-  if (m_SelectedFB.size() == 1 && m_SelectedPF.size() == 1)
-    m_Controls->doExtractFibersButton->setEnabled(true);
-
-  // two bundles needed to subtract
-  if (m_SelectedFB.size() == 2)
-    m_Controls->m_SubstractBundles->setEnabled(true);
-  else
-    m_Controls->m_SubstractBundles->setEnabled(false);
-
-  // more than two bundles needed to join
-  if (m_SelectedFB.size() > 1)
-    m_Controls->m_JoinBundles->setEnabled(true);
-  else
-    m_Controls->m_JoinBundles->setEnabled(false);
-
-  // at least one bundle needed to generate image
-  if (!m_SelectedFB.empty())
-    m_Controls->m_GenerationStartButton->setEnabled(true);
-  else
-    m_Controls->m_GenerationStartButton->setEnabled(false);
-
+  UpdateGui();
   GenerateStats();
 }
-
 
 void QmitkFiberProcessingView::ActionDrawPolygonTriggered()
 {
@@ -1548,21 +1465,20 @@ void QmitkFiberProcessingView::SubstractBundles()
 
 void QmitkFiberProcessingView::GenerateStats()
 {
-  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
-  if (nodes.empty())
+  if ( m_SelectedFB.empty() )
     return;
 
   QString stats("");
 
-  for( int i=0; i<nodes.size(); i++ )
+  for( int i=0; i<m_SelectedFB.size(); i++ )
   {
-    mitk::DataNode::Pointer node = nodes[i];
-    if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
+    mitk::DataNode::Pointer node = m_SelectedFB[i];
+    if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
     {
       if (i>0)
         stats += "\n-----------------------------\n";
       stats += QString(node->GetName().c_str()) + "\n";
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+      mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
       stats += "Number of fibers: "+ QString::number(fib->GetNumTracts()) + "\n";
 
       float length = 0;
@@ -1625,7 +1541,7 @@ void QmitkFiberProcessingView::GenerateStats()
   this->m_Controls->m_StatsTextEdit->setText(stats);
 }
 
-void QmitkFiberProcessingView::GenerationStart()
+void QmitkFiberProcessingView::ProcessSelectedBundles()
 {
   int generationMethod = m_Controls->m_GenerationBox->currentIndex();
 

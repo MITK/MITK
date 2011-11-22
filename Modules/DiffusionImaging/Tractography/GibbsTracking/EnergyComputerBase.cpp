@@ -6,6 +6,7 @@
 #include "ParticleGrid.cpp"
 #include <vnl/vnl_vector_fixed.h>
 #include <vnl/vnl_matrix_fixed.h>
+#include <mitkLog.h>
 
 inline float myATAN2(float y,float x)
 {

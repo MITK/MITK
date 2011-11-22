@@ -88,7 +88,7 @@ namespace mitk {
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();
-    void ResampleFibers();
+    void ResampleFibers(float len);
 
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
 

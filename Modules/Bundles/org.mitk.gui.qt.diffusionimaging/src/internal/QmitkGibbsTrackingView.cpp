@@ -605,6 +605,17 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
 
   m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
+  double qBallImageSpacing[3] = {m_ItkQBallImage->GetSpacing().GetElement(0),m_ItkQBallImage->GetSpacing().GetElement(1),m_ItkQBallImage->GetSpacing().GetElement(2)};
+  float minSpacing;
+  if(qBallImageSpacing[0]<qBallImageSpacing[1] && qBallImageSpacing[0]<qBallImageSpacing[2])
+      minSpacing = qBallImageSpacing[0];
+  else if (qBallImageSpacing[1] < qBallImageSpacing[2])
+      minSpacing = qBallImageSpacing[1];
+  else
+      minSpacing = qBallImageSpacing[2];
+
+  m_FiberBundle->ResampleFibers(minSpacing);
+
   if (m_FiberBundleNode.IsNotNull()){
     GetDefaultDataStorage()->Remove(m_FiberBundleNode);
     m_FiberBundleNode = 0;

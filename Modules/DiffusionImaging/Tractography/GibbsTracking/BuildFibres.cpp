@@ -45,7 +45,7 @@ public:
     for (int k = 0; k < numPoints; k++)
     {
       Particle *p = &(particles[k]);
-      p->R = pVector(points[attrcnt*k]/spacing[0], points[attrcnt*k+1]/spacing[1],points[attrcnt*k+2]/spacing[2]);
+      p->R = pVector(points[attrcnt*k]/spacing[0]-0.5, points[attrcnt*k+1]/spacing[1]-0.5,points[attrcnt*k+2]/spacing[2]-0.5);
       p->N = pVector(points[attrcnt*k+3],points[attrcnt*k+4],points[attrcnt*k+5]);
       p->cap =  points[attrcnt*k+6];
       p->len =  points[attrcnt*k+7];
@@ -94,9 +94,9 @@ public:
   void AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
   {
     itk::ContinuousIndex<float, 3> index;
-    index[0] = dp->R[0]-0.5;
-    index[1] = dp->R[1]-0.5;
-    index[2] = dp->R[2]-0.5;
+    index[0] = dp->R[0];
+    index[1] = dp->R[1];
+    index[2] = dp->R[2];
     itk::Point<float> point;
     m_ItkQBallImage->TransformContinuousIndexToPhysicalPoint( index, point );
     vtkIdType id = m_VtkPoints->InsertNextPoint(point.GetDataPointer());

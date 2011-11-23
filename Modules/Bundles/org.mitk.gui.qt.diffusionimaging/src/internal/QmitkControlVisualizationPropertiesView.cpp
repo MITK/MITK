@@ -180,7 +180,7 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
-          
+
           float val;
           node->GetFloatProperty("TubeRadius", val);
           m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
@@ -196,7 +196,7 @@ struct CvpSelListener : ISelectionListener
           label = "Width %1";
           label = label.arg(width);
           m_View->m_Controls->label_linewidth->setText(label);
-          
+
           float range;
           node->GetFloatProperty("Fiber2DSliceThickness",range);
           label = "Range %1";
@@ -374,14 +374,6 @@ struct CvpSelListener : ISelectionListener
           }
         }
       }
-
-
-      if(foundDiffusionImage || foundTbssImage)
-      {
-        m_View->m_Controls->m_DisplayIndex->setVisible(true);
-        m_View->m_Controls->label_channel->setVisible(true);
-      }
-
 
       m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                       && !foundMultipleOdfImages;
@@ -598,7 +590,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 // was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
-    
+
     QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
     m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
 
@@ -838,13 +830,15 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     return;
   }
 
-  // deactivate channel slider if no diffusion weighted image is selected
+  // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->label_channel->setVisible(false);
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if (node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||
+                             dynamic_cast<mitk::TbssGradientImage*>(node->GetData()) ||
+                             dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData())))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
       m_Controls->label_channel->setVisible(true);
@@ -1298,22 +1292,22 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
     bool currentMode;
     m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
     m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
-  
+
 }
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
-    
-    
+
+
     float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
     m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();

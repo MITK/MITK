@@ -375,14 +375,6 @@ struct CvpSelListener : ISelectionListener
         }
       }
 
-
-      if(foundDiffusionImage || foundTbssImage)
-      {
-        m_View->m_Controls->m_DisplayIndex->setVisible(true);
-        m_View->m_Controls->label_channel->setVisible(true);
-      }
-
-
       m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                       && !foundMultipleOdfImages;
       m_View->m_Controls->m_NumberGlyphsFrame->setVisible(m_View->m_FoundSingleOdfImage);
@@ -838,13 +830,15 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     return;
   }
 
-  // deactivate channel slider if no diffusion weighted image is selected
+  // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->label_channel->setVisible(false);
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if (node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||
+                             dynamic_cast<mitk::TbssGradientImage*>(node->GetData()) ||
+                             dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData())))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
       m_Controls->label_channel->setVisible(true);

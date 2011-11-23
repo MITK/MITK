@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 //CTK
 #include "ctkDICOMModel.h"
 #include "ctkDICOMAppWidget.h"
+#include "ctkDICOMQueryWidget.h"
 
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";
@@ -48,7 +49,7 @@ MITKDICOM::~MITKDICOM()
 }
 
 void MITKDICOM::CreateQtPartControl( QWidget *parent )
-{
+{   
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
@@ -89,7 +90,7 @@ void MITKDICOM::onSeriesModelSelected(QModelIndex index){
         MITK_INFO<< "Series Index:"<< imageCount << "\n";
 
         QString filePath = m_Controls.m_ctkDICOMAppWidget->databaseDirectory() +
-            "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString();
+            "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString() + "/";
 
         MITK_INFO << "filepath: "<< filePath.toStdString() << "\n";
 
@@ -99,8 +100,12 @@ void MITKDICOM::onSeriesModelSelected(QModelIndex index){
 
         if(QFile(filePath).exists())
         {
+            filePath.replace(0,1,"");
+            QString absolutFilePath("C:/home/bauerm/bin/MITK/MITK-build/Applications/ExtApp/ctkDICOM-Database/dicom/");
+            absolutFilePath.append(model->data(studyIndex ,ctkDICOMModel::UIDRole).toString());
+            absolutFilePath.append("/");
             //add all fienames from series to strin container
-            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(filePath.toStdString(),series_uid.toStdString());
+            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(absolutFilePath.toStdString(),series_uid.toStdString());
             mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
 
             if (node.IsNull())

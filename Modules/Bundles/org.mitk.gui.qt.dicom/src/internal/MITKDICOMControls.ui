@@ -1,68 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>MITKDICOMControls</class>
-  <widget class="QWidget" name="MITKDICOMControls">
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>222</width>
-        <height>161</height>
-      </rect>
-    </property>
-    <property name="minimumSize">
+ <class>MITKDICOMControls</class>
+ <widget class="QWidget" name="MITKDICOMControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>222</width>
+    <height>161</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="ctkDICOMAppWidget" name="m_ctkDICOMAppWidget" native="true">
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-        <width>0</width>
-        <height>0</height>
+       <width>20</width>
+       <height>220</height>
       </size>
-    </property>
-    <property name="windowTitle">
-      <string>QmitkTemplate</string>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-        <widget class="ctkDICOMAppWidget" name="m_ctkDICOMAppWidget" native="true">
-          <property name="font">
-            <font>
-              <weight>50</weight>
-              <bold>false</bold>
-            </font>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <spacer name="spacer1">
-          <property name="orientation">
-            <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-            <size>
-              <width>20</width>
-              <height>220</height>
-            </size>
-          </property>
-        </spacer>
-      </item>
-    </layout>
-  </widget>
-  <layoutdefault spacing="6" margin="11"/>
-  <customwidgets>
-    <customwidget>
-      <class>ctkDICOMAppWidget</class>
-      <extends>QWidget</extends>
-      <header>ctkdicomappwidget.h</header>
-    </customwidget>
-  </customwidgets>
-  <resources/>
-  <connections>
-    <connection>
-      <sender>m_ctkDICOMAppWidget</sender>
-      <signal>seriesDoubleClicked(QModelIndex)</signal>
-      <receiver>MITKDICOMControls</receiver>
-      <slot>onSeriesModelSelected(QModelIndex)</slot>
-    </connection>
-  </connections>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="ctkDICOMQueryWidget" name="verticalWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ctkDICOMAppWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkdicomappwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkDICOMQueryWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkdicomquerywidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>m_ctkDICOMAppWidget</sender>
+   <signal>seriesDoubleClicked(QModelIndex)</signal>
+   <receiver>MITKDICOMControls</receiver>
+   <slot>onSeriesModelSelected(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

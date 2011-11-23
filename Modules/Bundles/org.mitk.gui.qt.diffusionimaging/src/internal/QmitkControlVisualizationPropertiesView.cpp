@@ -1367,6 +1367,8 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
   if(m_SelectedNode)
   {
     QColor color = QColorDialog::getColor();
+    if (!color.isValid())
+      return;
 
     m_Controls->m_Color->setAutoFillBackground(true);
     QString styleSheet = "background-color:rgb(";

@@ -1,4 +1,4 @@
-set(Plugin-Name "The Image Cropper Module")
+set(Plugin-Name "MITK Image Cropper")
 set(Plugin-Version "1.0.0")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "http://www.mitk.org")

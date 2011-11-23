@@ -180,7 +180,7 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
-          
+
           float val;
           node->GetFloatProperty("TubeRadius", val);
           m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
@@ -196,7 +196,7 @@ struct CvpSelListener : ISelectionListener
           label = "Width %1";
           label = label.arg(width);
           m_View->m_Controls->label_linewidth->setText(label);
-          
+
           float range;
           node->GetFloatProperty("Fiber2DSliceThickness",range);
           label = "Range %1";
@@ -598,7 +598,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 // was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
-    
+
     QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
     m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
 
@@ -1298,22 +1298,22 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
     bool currentMode;
     m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
     m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
-  
+
 }
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
-    
-    
+
+
     float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
     m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -1695,20 +1695,18 @@ void QmitkControlVisualizationPropertiesView::GenerateTdi()
 
 void QmitkControlVisualizationPropertiesView::LineWidthChanged(int w)
 {
-  m_SelectedNode->SetIntProperty("LineWidth", w);
-
   QString label = "Width %1";
   label = label.arg(w);
   m_Controls->label_linewidth->setText(label);
+  BundleRepresentationWire();
 }
 
 void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
 {
-  m_SelectedNode->SetFloatProperty("TubeRadius", (float) r / 100.0);
-
   QString label = "Radius %1";
   label = label.arg(r / 100.0);
   m_Controls->label_tuberadius->setText(label);
+  this->BundleRepresentationTube();
 }
 
 void QmitkControlVisualizationPropertiesView::Welcome()

@@ -826,25 +826,24 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Change Color in 2D-View</string>
+         <string comment="Select ROI color." extracomment="Select ROI color.">Select ROI color.</string>
         </property>
         <property name="text">
-         <string>2D</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="m_PFColor3D">
-        <property name="toolTip">
-         <string>Change Color in 3D-View</string>
-        </property>
-        <property name="text">
-         <string>3D</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QSlider" name="m_PFWidth">
+        <property name="toolTip">
+         <string comment="Adjust 2D line width." extracomment="Adjust 2D line width.">Adjust 2D line width.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
         <property name="value">
          <number>20</number>
         </property>

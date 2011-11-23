@@ -17,6 +17,7 @@ PURPOSE. See the above copyright notices for more information.
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
 {
+    m_MaxSpacing = 5;
 }
 
 mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
@@ -51,7 +52,8 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
     //If the current contour is an inner contour then the direction is -1
     //A contour lies inside another one if the pixel values in the direction of the normal is 1
-    int normalDirection (1);
+    m_NegativeNormalCounter = 0;
+    m_PositiveNormalCounter = 0;
 
     //Iterating over each polygon
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
@@ -131,17 +133,20 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
         if (j == 0 && m_SegmentationBinaryImage)
         {
           Point3D worldCoord;
-          worldCoord[0] = p1[0]+finalNormal[0];
-          worldCoord[1] = p1[1]+finalNormal[1];
-          worldCoord[2] = p1[2]+finalNormal[2];
+          worldCoord[0] = p1[0]+finalNormal[0]*m_MaxSpacing;
+          worldCoord[1] = p1[1]+finalNormal[1]*m_MaxSpacing;
+          worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
           double val = m_SegmentationBinaryImage->GetPixelValueByWorldCoordinate(worldCoord);
-          if (val == 1.0) normalDirection = -1;
+          if (val == 1.0)
+          {
+              ++m_PositiveNormalCounter;
+          }
+          else
+          {
+              ++m_NegativeNormalCounter;
+          }
         }
-
-        finalNormal[0] = finalNormal[0]*normalDirection;
-        finalNormal[1] = finalNormal[1]*normalDirection;
-        finalNormal[2] = finalNormal[2]*normalDirection;
 
         vertexNormalTemp[0] = vertexNormal[0];
         vertexNormalTemp[1] = vertexNormal[1];
@@ -170,6 +175,23 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       normals->SetTuple(id,vertexNormal);
       id = cell[cellSize-1];
       normals->SetTuple(id,vertexNormal);
+
+      int normalDirection(-1);
+
+      if(m_NegativeNormalCounter < m_PositiveNormalCounter)
+      {
+          normalDirection = 1;
+      }
+
+      for(unsigned int n = 0; n < normals->GetNumberOfTuples(); n++)
+      {
+          double normal[3];
+          normals->GetTuple(n,normal);
+          normal[0] = normalDirection*normal[0];
+          normal[1] = normalDirection*normal[1];
+          normal[2] = normalDirection*normal[2];
+      }
+
 
     }//end for all cells
 
@@ -242,6 +264,11 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
   return surface;
 
+}
+
+void mitk::ComputeContourSetNormalsFilter::SetMaxSpacing(double maxSpacing)
+{
+    m_MaxSpacing = maxSpacing;
 }
 
 void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()

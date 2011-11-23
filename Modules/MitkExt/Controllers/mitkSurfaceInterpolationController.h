@@ -68,7 +68,9 @@ namespace mitk
     /*
      * Interpolates the 3D surface from the given extracted contours
      */
-    Surface::Pointer Interpolate ();
+    void/*Surface::Pointer*/ Interpolate ();
+
+    mitk::Surface::Pointer GetInterpolationResult();
 
     void SetMinSpacing(double minSpacing);
     void SetMaxSpacing(double maxSpacing);
@@ -122,6 +124,8 @@ namespace mitk
     std::vector<ContourPositionPairList> m_ListOfContourLists;
 
     unsigned int m_CurrentContourListID;
+
+    mitk::Surface::Pointer m_InterpolationResult;
  };
 }
 #endif

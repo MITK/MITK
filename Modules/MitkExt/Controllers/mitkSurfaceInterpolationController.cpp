@@ -28,6 +28,8 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
 
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
   m_PolyData->SetPoints(vtkPoints::New());
+
+  m_InterpolationResult = 0;
 }
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
@@ -106,10 +108,10 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
   this->Modified();
 }
 
-mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate()
+void /*mitk::Surface::Pointer*/ mitk::SurfaceInterpolationController::Interpolate()
 {
   if (m_ListOfContourLists.at(m_CurrentContourListID).size() < 2)
-    return 0; 
+    return /*0*/;
 
   m_InterpolateSurfaceFilter->Update();
 
@@ -121,9 +123,14 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate()
   mcFilter->Update();
   vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
 
-  mitk::Surface::Pointer surface = mitk::Surface::New();
-  surface->SetVtkPolyData(mcFilter->GetOutput());
-  surface->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
+//  mitk::Surface::Pointer surface = mitk::Surface::New();
+//  surface->SetVtkPolyData(mcFilter->GetOutput());
+//  surface->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
+
+  m_InterpolationResult = 0;
+  m_InterpolationResult = mitk::Surface::New();
+  m_InterpolationResult->SetVtkPolyData(mcFilter->GetOutput());
+  m_InterpolationResult->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
@@ -133,8 +140,14 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate()
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
-  surface->DisconnectPipeline();
-  return surface;
+  //surface->DisconnectPipeline();
+  m_InterpolationResult->DisconnectPipeline();
+  //return surface;
+}
+
+mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
+{
+    return m_InterpolationResult;
 }
 
 mitk::Surface* mitk::SurfaceInterpolationController::GetContoursAsSurface()
@@ -192,6 +205,7 @@ void mitk::SurfaceInterpolationController::SetMinSpacing(double minSpacing)
 void mitk::SurfaceInterpolationController::SetMaxSpacing(double maxSpacing)
 {
   m_ReduceFilter->SetMaxSpacing(maxSpacing);
+  m_NormalsFilter->SetMaxSpacing(maxSpacing);
   //MITK_INFO<<"Max: "<<maxSpacing;
 }
 

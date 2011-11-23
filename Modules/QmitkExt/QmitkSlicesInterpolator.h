@@ -36,6 +36,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "vtkProperty.h"
 
+//For running 3D interpolation in background
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
+
 
 namespace mitk
 {
@@ -197,6 +202,10 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     void OnInterpolationDisabled(bool);
     void OnShowMarkers(bool);
 
+    void Run3DInterpolation();
+
+    void SurfaceInterpolationFinished();
+
   protected:
 
     const std::map<QAction*, unsigned int> createActionToSliceDimension();
@@ -219,7 +228,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
      */
     void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep );
 
-    void InterpolateSurface();
+    //void InterpolateSurface();
     
     /**
       Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
@@ -275,6 +284,9 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     //unsigned int m_CurrentListID;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    QFuture<void> m_Future;
+    QFutureWatcher<void> m_Watcher;
 };
 
 #endif

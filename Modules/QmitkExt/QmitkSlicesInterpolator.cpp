@@ -167,6 +167,17 @@ m_3DInterpolationEnabled(false)
   {
     QWidget::layout()->setContentsMargins(0, 0, 0, 0);
   }
+
+  //For running 3D Interpolation in background
+  // create a QFuture and a QFutureWatcher
+
+//     m_Future = new QFuture<void>;
+//     m_Watcher = new QFutureWatcher<void>;
+
+  // display a message box when the calculation has finished
+
+     connect(&m_Watcher, SIGNAL(finished()),
+             this, SLOT(SurfaceInterpolationFinished()));
 }
 
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage& storage )
@@ -499,9 +510,10 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   }
 }
 
-void QmitkSlicesInterpolator::InterpolateSurface()
+void QmitkSlicesInterpolator::SurfaceInterpolationFinished/*InterpolateSurface*/()
 {
-  mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
+  //mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
+    mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 
   if(interpolatedSurface.IsNotNull())
   {
@@ -764,6 +776,11 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   UpdateVisibleSuggestion();
 }
 
+void QmitkSlicesInterpolator::Run3DInterpolation()
+{
+    m_SurfaceInterpolator->Interpolate();
+}
+
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 {
   m_3DInterpolationEnabled = on;
@@ -783,7 +800,9 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           if (workingNode->GetIntProperty("3DInterpolationListID", listID))
           {
             m_SurfaceInterpolator->SetCurrentListID(listID);
-            this->InterpolateSurface();
+
+            m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+            m_Watcher.setFuture(m_Future);
           }
           else
           {
@@ -791,6 +810,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
             workingNode->SetIntProperty("3DInterpolationListID", listID);
             m_InterpolatedSurfaceNode->SetVisibility(false);
             m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
           }
           
           mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
@@ -822,20 +842,18 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
       }
       QWidget::setEnabled( workingNode != NULL );
       m_CbHideMarkers->setEnabled(on);
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     else if (!on)
     {
       m_InterpolatedSurfaceNode->SetVisibility(false);
       m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
   catch(...)
   {
     // don't care (double add/remove)
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::EnableInterpolation(bool on)
@@ -897,7 +915,11 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject&
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject& /*e*/)
 {
   if(m_3DInterpolationEnabled)
-    InterpolateSurface();
+//    InterpolateSurface();
+  {
+      m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+      m_Watcher.setFuture(m_Future);
+  }
 }
 
 bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex)

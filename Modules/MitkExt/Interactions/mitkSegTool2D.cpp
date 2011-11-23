@@ -198,6 +198,31 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
       // here we have a single slice that can be modified
       Image::Pointer slice = extractor->GetOutput();
 
+      //Workaround because of bug #7079
+      Point3D origin = slice->GetGeometry()->GetOrigin();
+
+      int affectedDimension(-1);
+
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
+      {
+          affectedDimension = 2;
+      }
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
+      {
+          affectedDimension = 0;
+      }
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+      {
+          affectedDimension = 1;
+      }
+
+      if (affectedDimension != -1)
+      {
+          origin[affectedDimension] = planeGeometry->GetOrigin()[affectedDimension];
+          slice->GetGeometry()->SetOrigin(origin);
+      }
+      //Workaround end
+
       return slice;
     }
     catch(...)
@@ -271,9 +296,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
   }
-  slice->DisconnectPipeline();
-  if ( m_RememberContourPositions )
+  if ( m_3DInterpolationEnabled )
   {
+    slice->DisconnectPipeline();
     unsigned int pos = this->AddContourmarker(positionEvent);
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);

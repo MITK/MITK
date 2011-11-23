@@ -64,6 +64,8 @@ public:
   //Resets the filter, i.e. removes all inputs and outputs
   void Reset();
 
+  void SetMaxSpacing(double);
+
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();
@@ -74,6 +76,10 @@ private:
 
   //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
   mitk::Image::Pointer m_SegmentationBinaryImage;
+  double m_MaxSpacing;
+
+  unsigned int m_NegativeNormalCounter;
+  unsigned int m_PositiveNormalCounter;
 
 };//class
 

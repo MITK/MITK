@@ -161,8 +161,6 @@ struct CvpSelListener : ISelectionListener
           styleSheet.append(",");
           styleSheet.append(QString::number(color[2]*255.0));
           styleSheet.append(")");
-          m_View->m_Controls->m_PFColor3D->setAutoFillBackground(true);
-          m_View->m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
 
           m_View->PlanarFigureFocus();
         }
@@ -576,14 +574,12 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon iconColor(":/QmitkDiffusionImaging/color24.gif");
     m_Controls->m_PFColor->setIcon(iconColor);
-    m_Controls->m_PFColor3D->setIcon(iconColor);
     m_Controls->m_Color->setIcon(iconColor);
 
     QIcon iconReset(":/QmitkDiffusionImaging/reset.png");
     m_Controls->m_ResetColoring->setIcon(iconReset);
 
     m_Controls->m_PFColor->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    m_Controls->m_PFColor3D->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
@@ -759,7 +755,6 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
-    connect((QObject*) m_Controls->m_PFColor3D, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor3D()));
 
     connect((QObject*) m_Controls->m_TDI, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateTdi()));
 
@@ -1593,6 +1588,8 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 {
 
   QColor color = QColorDialog::getColor();
+  if (!color.isValid())
+    return;
 
   m_Controls->m_PFColor->setAutoFillBackground(true);
   QString styleSheet = "background-color:rgb(";
@@ -1613,33 +1610,6 @@ void QmitkControlVisualizationPropertiesView::PFColor()
   m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
   m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
   m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-
-//  m_SelectedNode->SetProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkControlVisualizationPropertiesView::PFColor3D()
-{
-
-  QColor color = QColorDialog::getColor();
-
-  m_Controls->m_PFColor3D->setAutoFillBackground(true);
-  QString styleSheet = "background-color:rgb(";
-  styleSheet.append(QString::number(color.red()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.green()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.blue()));
-  styleSheet.append(")");
-  m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
-
   m_SelectedNode->SetProperty( "color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

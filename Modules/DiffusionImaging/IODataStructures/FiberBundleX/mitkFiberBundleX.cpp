@@ -19,14 +19,8 @@
 #include "mitkFiberBundleX.h"
 
 #include <mitkPlanarCircle.h>
-//#include <mitkPlanarRectangle.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarFigureComposite.h>
-
-/* musthave */
-//#include <mitkGeometry3D.h> // without geometry, fibers are not rendered
-
-
 
 
 #include <vtkPointData.h>
@@ -39,27 +33,24 @@
 #include <vtkClipPolyData.h>
 #include <vtkPlane.h>
 
-// baptize array names
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
-
-
-
 mitk::FiberBundleX::FiberBundleX(vtkSmartPointer<vtkPolyData> fiberPolyData )
   : m_currentColorCoding(NULL)
   , m_isModified(false)
+  , m_NumFibers(0)
 {
-  //generate geometry of passed polydata
   if (fiberPolyData == NULL)
-    this->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
   else
-    this->m_FiberPolyData = fiberPolyData;
+    m_FiberPolyData = fiberPolyData;
 
-  this->UpdateFiberGeometry();
+  m_NumFibers = m_FiberPolyData->GetNumberOfLines();
+
+  UpdateFiberGeometry();
 }
-
 
 mitk::FiberBundleX::~FiberBundleX()
 {
@@ -67,35 +58,30 @@ mitk::FiberBundleX::~FiberBundleX()
 }
 
 /*
- * set computed fibers from tractography algorithms
+ * set polydata (additional flag to recompute fiber geometry, default = true)
  */
-void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD)
+void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, bool updateGeometry)
 {
   if (fiberPD == NULL)
     this->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
   else
     this->m_FiberPolyData = fiberPD;
 
+  if (updateGeometry)
+    UpdateFiberGeometry();
+
+  m_NumFibers = m_FiberPolyData->GetNumberOfLines();
+
   m_isModified = true;
 }
 
-
 /*
- * return fiberbundle as vtkPolyData
- * Depending on processing of input fibers, this method returns
- * the latest processed fibers.
+ * return vtkPolyData
  */
 vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFiberPolyData()
 {
   return m_FiberPolyData;
 }
-
-
-
-
-/*===================================
- *++++ PROCESSING WITH FIBERS +++++++
- ====================================*/
 
 void mitk::FiberBundleX::DoColorCodingOrientationbased()
 {
@@ -605,7 +591,7 @@ void mitk::FiberBundleX::ResampleFibers(float len)
 
   vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
   vLines->InitTraversal();
-  int numberOfLines = vLines->GetNumberOfCells();
+  int numberOfLines = m_NumFibers;
 
   for (int i=0; i<numberOfLines; i++)
   {

@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
 #include <mitkFiberBundleX.h>
+#include <mitkDataNode.h>
 
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
@@ -171,10 +172,10 @@ private:
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
-  void GenerateTractDensityImage(bool binary);
-  void GenerateColorHeatmap();
-  void GenerateFiberEndingsImage();
-  void GenerateFiberEndingsPointSet();
+  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary);
+  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
 };
 
 

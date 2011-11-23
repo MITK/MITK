@@ -12,4 +12,5 @@ These modules for image guided therapy contain functionalities for the tracking 
   \li \subpage org_igttrackingtoolbox
   \li \subpage org_igttutorial
   \li \subpage org_navigationdataplayer
+  \li \subpage org_igttrackinglab
 */

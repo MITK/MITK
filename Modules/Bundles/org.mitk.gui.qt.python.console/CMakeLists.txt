@@ -8,6 +8,7 @@ IF(MITK_USE_Python)
 
     MACRO_CREATE_MITK_PLUGIN(QmitkExt CTK)
     TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${SWIG_PYTHON_WRAPPER})
+    CONFIGURE_FILE(mitkPythonPath.h.in mitkPythonPath.h)
   ELSE()
     MESSAGE("MITK Python support needs CTK. Enable MITK_USE_CTK")
   ENDIF()

@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkPythonMediator.h"
 #include <dPython.h>
 
-QmitkPythonMediator *QmitkPythonMediator::m_mediatorInstance = 0;
-
 QmitkPythonMediator::QmitkPythonMediator()
 {
 }
@@ -42,9 +40,20 @@ void QmitkPythonMediator::Finalize()
 
 QmitkPythonMediator *QmitkPythonMediator::getInstance()
 {
-  if(m_mediatorInstance == 0)
-    m_mediatorInstance = new QmitkPythonMediator();
-  return m_mediatorInstance;
+  static QmitkPythonMediator m_mediatorInstance;
+  return &m_mediatorInstance;
+}
+
+void QmitkPythonMediator::paste(const QString& pasteCommand)
+{
+  std::set<QmitkPythonPasteClient *>::iterator it
+      = m_PasteClients.begin();
+
+  while( it!= m_PasteClients.end())
+  {
+    (*it)->paste( pasteCommand );
+    ++it;
+  }
 }
 
 void QmitkPythonMediator::runSimpleString(const char* str)
@@ -96,27 +105,37 @@ PyObject * QmitkPythonMediator::getPyObjectString(QString * objectName)
   return PyObject_GetAttrString(main, objectName->toLocal8Bit().data());
 }
 
+void  QmitkPythonMediator::registerPasteCommandClient(QmitkPythonPasteClient * client )
+{
+  m_PasteClients.insert( client );
+}
+
+void  QmitkPythonMediator::unregisterPasteCommandClient(QmitkPythonPasteClient * client)
+{
+  m_PasteClients.erase( client );
+}
+
 void QmitkPythonMediator::setClient(QmitkPythonClient * client)
 {
-  m_clients.push_back(client);
+  m_clients.insert(client);
 }
 
 void QmitkPythonMediator::unregisterClient(QmitkPythonClient * client)
 {
-  for(int i = 0; i < m_clients.size(); i++)
-  {
-    if(m_clients.at(i) == client)
-      m_clients.erase(m_clients.begin()+i);
-  }
+  m_clients.erase( client );
 }
 
 void QmitkPythonMediator::update()
 {
   if(Py_IsInitialized)
-  {
-    for(int i = 0; i < m_clients.size(); i++)
+  {    
+    std::set<QmitkPythonClient *>::iterator it
+        = m_clients.begin();
+
+    while( it!= m_clients.end())
     {
-      m_clients.at(i)->update();
+      (*it)->update();
+      ++it;
     }
   }
 }

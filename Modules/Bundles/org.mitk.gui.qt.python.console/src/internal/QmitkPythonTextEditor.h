@@ -21,8 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTextEdit>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include "QmitkPythonMediator.h"
 
-class QmitkPythonTextEditor : public QTextEdit
+class QmitkPythonTextEditor : public QTextEdit, public QmitkPythonPasteClient
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -32,6 +33,7 @@ public:
   QmitkPythonTextEditor(QWidget *parent = 0);
   virtual ~QmitkPythonTextEditor();
 
+  virtual void paste(const QString& command);
 signals:
 
 protected slots:  

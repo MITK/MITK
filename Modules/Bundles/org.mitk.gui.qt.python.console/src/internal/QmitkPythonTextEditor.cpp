@@ -25,10 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
 :QTextEdit(parent)
 {
+  QmitkPythonMediator::getInstance()->registerPasteCommandClient( this );
 }
 
 QmitkPythonTextEditor::~QmitkPythonTextEditor()
 {
+  QmitkPythonMediator::getInstance()->unregisterPasteCommandClient( this );
 }
 
 void QmitkPythonTextEditor::dragEnterEvent(QDragEnterEvent *event)
@@ -36,6 +38,10 @@ void QmitkPythonTextEditor::dragEnterEvent(QDragEnterEvent *event)
   event->accept();
 }
 
+void QmitkPythonTextEditor::paste(const QString& command)
+{
+  this->insertPlainText(command + "\n");
+}
 void QmitkPythonTextEditor::dropEvent(QDropEvent *event)
 {
   //QDropEvent drop(event->pos(),Qt::MoveAction, event->mimeData(), event->mouseButtons(), Qt::ShiftModifier, event->type());

@@ -15,12 +15,14 @@ SET(INTERNAL_CPP_FILES
   QmitkCTKPythonShell.cpp
   QmitkPythonMediator.cpp
   QmitkPythonPerspective.cpp
+  QmitkPythonSnippets.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkPythonConsoleViewControls.ui
   src/internal/QmitkPythonEditor.ui
   src/internal/QmitkPythonVariableStack.ui
+  src/internal/QmitkPythonSnippets.ui
 )
 
 SET(MOC_H_FILES
@@ -31,7 +33,9 @@ SET(MOC_H_FILES
   src/internal/QmitkPythonScriptEditorHighlighter.h
   src/internal/QmitkPythonTextEditor.h
   src/internal/QmitkPythonVariableStack.h
+  src/internal/QmitkPythonSnippets.h
   src/internal/QmitkPythonVariableStackTreeWidget.h
+  src/internal/QmitkCTKPythonShell.h
 )
 
 SET(RESOURCE_FILES

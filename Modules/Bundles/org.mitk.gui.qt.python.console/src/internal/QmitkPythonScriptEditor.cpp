@@ -99,13 +99,20 @@ QmitkPythonScriptEditor::QmitkPythonScriptEditor(QWidget *parent)
   connect(buttonSaveScript, SIGNAL(clicked()), this, SLOT(SaveScript()));
   connect(buttonRunScript, SIGNAL(clicked()), this, SLOT(RunScript()));
   QmitkPythonMediator::getInstance()->Initialize();
+  QmitkPythonMediator::getInstance()->registerPasteCommandClient( this );
 }
 
 QmitkPythonScriptEditor::~QmitkPythonScriptEditor()
 {
+  QmitkPythonMediator::getInstance()->unregisterPasteCommandClient( this );
   QmitkPythonMediator::getInstance()->Finalize();
 }
 
+void QmitkPythonScriptEditor::paste(const QString& command)
+{
+  if( this->isVisible() )
+    m_TextEditor->append(command);
+}
 void QmitkPythonScriptEditor::LoadScript(const char* filename){
   std::istream* fileStream = new std::ifstream(filename);
   char line[255];

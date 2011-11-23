@@ -33,6 +33,7 @@ void QmitkPythonPerspective::CreateInitialLayout(berry::IPageLayout::Pointer lay
 
   berry::IFolderLayout::Pointer leftbottomFolder = layout->CreateFolder("leftbottom", berry::IPageLayout::BOTTOM, 0.7f, "org.mitk.views.datamanager");
   leftbottomFolder->AddView("org.mitk.views.pythonvariablestack");
+  leftbottomFolder->AddView("org.mitk.views.pythonsnippets");
   leftbottomFolder->AddView("org.mitk.views.imagenavigator");
 
   berry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);

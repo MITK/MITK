@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/internal/QmitkPythonEditor.h"
 #include "src/internal/QmitkPythonConsoleView.h"
 #include "src/internal/QmitkPythonVariableStack.h"
+#include "src/internal/QmitkPythonSnippets.h"
 #include "src/internal/QmitkPythonCommandHistory.h"
 #include "src/internal/QmitkPythonPerspective.h"
 
@@ -31,6 +32,7 @@ POCO_END_MANIFEST
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(::QmitkPythonConsoleView)
   POCO_EXPORT_CLASS(::QmitkPythonVariableStack)
+  POCO_EXPORT_CLASS(::QmitkPythonSnippets)
   POCO_EXPORT_CLASS(::QmitkPythonCommandHistory)
 POCO_END_MANIFEST
 

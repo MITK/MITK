@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <ctkPythonConsole.h>
 #include <ctkAbstractPythonManager.h>
+#include "QmitkPythonMediator.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -35,17 +36,24 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkCTKPythonShell : public ctkPythonConsole
+class QmitkCTKPythonShell : public ctkPythonConsole, public QmitkPythonPasteClient
 {
+  Q_OBJECT
 public:
   QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent = 0);
   ~QmitkCTKPythonShell();
+
+  virtual void paste(const QString& command);
+
 
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent *event);
   virtual bool canInsertFromMimeData( const QMimeData *source ) const;
+  virtual void executeCommand(const QString& command);
 
+signals:
+  void executeCommandSignal(const QString&);
 private:
   ctkAbstractPythonManager* m_PythonManager;
 };

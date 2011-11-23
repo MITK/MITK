@@ -299,25 +299,27 @@ RenderingManager
     {
       // Immediately repaint this window (implementation platform specific)
       // If the size is 0, it crashes
-      int *size = it->first->GetSize();
-      if ( 0 != size[0] && 0 != size[1] )
-      {
-        //prepare the camera before rendering
-        //Note: this is a very important step which should be called before the VTK render!
-        //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-        mitk::VtkPropRenderer *vPR =
-            dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( it->first ));
-        if(vPR)
-           vPR->PrepareRender();
-        // Execute rendering
-        it->first->Render();
-      }
+      this->ForceImmediateUpdate(it->first);
 
-      it->second = RENDERING_INACTIVE;
+  //    int *size = it->first->GetSize();
+  //    if ( 0 != size[0] && 0 != size[1] )
+  //    {
+  //      //prepare the camera before rendering
+  //      //Note: this is a very important step which should be called before the VTK render!
+  //      //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
+  //      mitk::VtkPropRenderer *vPR =
+  //          dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( it->first ));
+      //      if(vPR)
+      //         vPR->PrepareRender();
+      //      // Execute rendering
+      //      it->first->Render();
+      //    }
+
+      //    it->second = RENDERING_INACTIVE;
     }
   }
 
-  m_UpdatePending = false;
+  //m_UpdatePending = false;
 }
 
 

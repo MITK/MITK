@@ -999,10 +999,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true));
 
 
-
-
-
-
   newNode->AddProperty( "selected", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );

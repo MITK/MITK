@@ -281,6 +281,7 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
 {
 
+    MITK_INFO << "Extracting fiber!";
     /* Handle type of planarfigure */
     // if incoming pf is a pfc
     mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf.GetPointer());
@@ -466,7 +467,7 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
 
     }
 
-    std::cout << "\n=====FINAL RESULT======\n";
+    std::cout << "\n=====FINAL RESULT: fib_id ======\n";
     std::vector<int>::iterator finIt = FibersInROI.begin();
     while ( finIt != FibersInROI.end() ) {
         std::cout << *finIt << endl;

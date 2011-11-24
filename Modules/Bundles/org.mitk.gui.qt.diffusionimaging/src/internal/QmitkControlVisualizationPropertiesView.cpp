@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTbssImage.h"
 #include "mitkTbssGradientImage.h"
 #include "mitkPlanarFigure.h"
-#include "mitkFiberBundle.h"
+#include "mitkFiberBundleX.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 #include "mitkFiberBundleInteractor.h"
@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryPlatformUI.h"
 
 #include "itkRGBAPixel.h"
-#include "itkTractsToProbabilityImageFilter.h"
+#include <itkTractDensityImageFilter.h>
 
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
@@ -167,7 +167,7 @@ struct CvpSelListener : ISelectionListener
           m_View->PlanarFigureFocus();
         }
 
-        if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
+        if(dynamic_cast<mitk::FiberBundleX*>(node->GetData()) != 0)
         {
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
@@ -180,7 +180,7 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
-          
+
           float val;
           node->GetFloatProperty("TubeRadius", val);
           m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
@@ -196,7 +196,7 @@ struct CvpSelListener : ISelectionListener
           label = "Width %1";
           label = label.arg(width);
           m_View->m_Controls->label_linewidth->setText(label);
-          
+
           float range;
           node->GetFloatProperty("Fiber2DSliceThickness",range);
           label = "Range %1";
@@ -598,7 +598,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 // was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
-    
+
     QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
     m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
 
@@ -1298,22 +1298,22 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
     bool currentMode;
     m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
     m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
-  
+
 }
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
-    
-    
+
+
     float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
     m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -1539,7 +1539,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
   typedef std::vector<mitk::DataNode*> Container;
   Container _NodeSet = this->GetDataManagerSelection();
   mitk::DataNode* node = 0;
-  mitk::FiberBundle* bundle = 0;
+  mitk::FiberBundleX* bundle = 0;
   mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
 
   // finally add all nodes to the model
@@ -1547,7 +1547,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
     ; it++)
     {
     node = const_cast<mitk::DataNode*>(*it);
-    bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+    bundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
 
     if(bundle)
     {
@@ -1653,37 +1653,29 @@ void QmitkControlVisualizationPropertiesView::GenerateTdi()
 {
   if(m_SelectedNode)
   {
-    mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
+    mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
     if(!bundle)
       return;
 
-    ///////////////////////////////
-    // Generate unsigned char Image
-    typedef unsigned char OutPixType2;
+    typedef float OutPixType;
+    typedef itk::Image<OutPixType, 3> OutImageType;
 
     // run generator
-    typedef itk::Image< float, 3 >            WMPImageType;
-    typedef itk::TractsToProbabilityImageFilter<WMPImageType,
-        OutPixType2> ImageGeneratorType2;
-    ImageGeneratorType2::Pointer generator = ImageGeneratorType2::New();
-    //generator->SetInput(NULL);
+    itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
     generator->SetFiberBundle(bundle);
-    generator->SetInvertImage(false);
     generator->SetUpsamplingFactor(2);
-    generator->SetBinaryEnvelope(false);
     generator->Update();
 
     // get result
-    typedef itk::Image<OutPixType2,3> OutType2;
-    OutType2::Pointer outImg = generator->GetOutput();
+    OutImageType::Pointer outImg = generator->GetOutput();
 
-    mitk::Image::Pointer img2 = mitk::Image::New();
-    img2->InitializeByItk(outImg.GetPointer());
-    img2->SetVolume(outImg->GetBufferPointer());
+    mitk::Image::Pointer img = mitk::Image::New();
+    img->InitializeByItk(outImg.GetPointer());
+    img->SetVolume(outImg->GetBufferPointer());
 
     // to datastorage
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(img2);
+    node->SetData(img);
     QString name(m_SelectedNode->GetName().c_str());
     name += "_TDI";
     node->SetName(name.toStdString());

@@ -1,28 +1,26 @@
-#ifndef __itkTractsToProbabilityImageFilter_h__
-#define __itkTractsToProbabilityImageFilter_h__
+#ifndef __itkTractDensityImageFilter_h__
+#define __itkTractDensityImageFilter_h__
 
-#include "itkImageToImageFilter.h"
-#include "itkVectorContainer.h"
-#include "itkRGBAPixel.h"
-#include "mitkFiberBundle.h"
+#include <itkImageToImageFilter.h>
+#include <itkVectorContainer.h>
+#include <itkRGBAPixel.h>
+#include <mitkFiberBundleX.h>
 
 namespace itk{
 
 template< class TInputImage, class TOutputPixelType >
-class TractsToProbabilityImageFilter :
+class TractDensityImageFilter :
     public ImageToImageFilter<TInputImage, itk::Image<TOutputPixelType,3> >
-//huhu    public ImageToImageFilter<TInputImage, itk::Image<float,3> >
 {
 
 public:
-  typedef TractsToProbabilityImageFilter Self;
+  typedef TractDensityImageFilter Self;
   typedef ImageToImageFilter<TInputImage, itk::Image<TOutputPixelType,3> > Superclass;
-//huhu  typedef ImageToImageFilter<TInputImage, itk::Image<float,3> > Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
   itkNewMacro(Self);
-  itkTypeMacro( TractsToProbabilityImageFilter,
+  itkTypeMacro( TractDensityImageFilter,
             ImageToImageFilter );
 
   /** Types for the Output Image**/
@@ -57,12 +55,13 @@ public:
 
 protected:
 
-  TractsToProbabilityImageFilter();
-  virtual ~TractsToProbabilityImageFilter();
+  itk::Point<float, 3> GetItkPoint(double point[3]);
 
+  TractDensityImageFilter();
+  virtual ~TractDensityImageFilter();
+
+  mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
-  mitk::FiberBundle::Pointer m_FiberBundle;
-
   bool m_InvertImage;
   bool m_BinaryEnvelope;
 };
@@ -70,7 +69,7 @@ protected:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTractsToProbabilityImageFilter.cpp"
+#include "itkTractDensityImageFilter.cpp"
 #endif
 
-#endif // __itkTractsToProbabilityImageFilter_h__
+#endif // __itkTractDensityImageFilter_h__

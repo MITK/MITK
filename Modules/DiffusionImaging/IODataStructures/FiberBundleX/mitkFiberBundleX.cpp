@@ -287,7 +287,8 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
     mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf.GetPointer());
     if (!pfcomp.IsNull()) {
         // process requested boolean operation of PFC
-    } else {
+    } else
+    {
 
 
 
@@ -299,11 +300,6 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
 
         MITK_INFO << "planeOrigin: " << planeOrigin[0] << " | " << planeOrigin[1] << " | " << planeOrigin[2] << endl;
         MITK_INFO << "planeNormal: " << planeNormal[0] << " | " << planeNormal[1] << " | " << planeNormal[2] << endl;
-
-
-
-
-
 
 
         /* init necessary vectors hosting pointIds and FiberIds */
@@ -420,7 +416,8 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         long numOfLineCells = clipperlines->GetNumberOfCells();
 
         // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
-        for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3) { //ic is the index counter for the cells hosting the desired information
+        for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
+        { //ic is the index counter for the cells hosting the desired information
 
             vtkIdType npts;
             vtkIdType *pts;
@@ -476,73 +473,72 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
 
         std::cout << "\n=====FINAL RESULT: fib_id ======\n";
         std::vector<int>::iterator finIt = FibersInROI.begin();
-        while ( finIt != FibersInROI.end() ) {
+        while ( finIt != FibersInROI.end() )
+        {
             std::cout << *finIt << endl;
             ++finIt;
         }
         std::cout << "=====================\n";
 
     }
+}
 
-    void mitk::FiberBundleX::UpdateFiberGeometry()
+void mitk::FiberBundleX::UpdateFiberGeometry()
+{
+
+
+    float min = itk::NumericTraits<float>::min();
+    float max = itk::NumericTraits<float>::max();
+    float b[] = {max, min, max, min, max, min};
+
+    vtkCellArray* cells = m_FiberPolyData->GetLines();
+    cells->InitTraversal();
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
 
-
-        float min = itk::NumericTraits<float>::min();
-        float max = itk::NumericTraits<float>::max();
-        float b[] = {max, min, max, min, max, min};
-
-        vtkCellArray* cells = m_FiberPolyData->GetLines();
-        cells->InitTraversal();
-        for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int p = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+        for (int j=0; j<p; j++)
         {
+            double p[3];
+            points->GetPoint(j, p);
 
-            vtkCell* cell = m_FiberPolyData->GetCell(i);
-            int p = cell->GetNumberOfPoints();
-            vtkPoints* points = cell->GetPoints();
-            for (int j=0; j<p; j++)
-            {
-                double p[3];
-                points->GetPoint(j, p);
+            if (p[0]<b[0])
+                b[0]=p[0];
+            if (p[0]>b[1])
+                b[1]=p[0];
 
-                if (p[0]<b[0])
-                    b[0]=p[0];
-                if (p[0]>b[1])
-                    b[1]=p[0];
+            if (p[1]<b[2])
+                b[2]=p[1];
+            if (p[1]>b[3])
+                b[3]=p[1];
 
-                if (p[1]<b[2])
-                    b[2]=p[1];
-                if (p[1]>b[3])
-                    b[3]=p[1];
+            if (p[2]<b[4])
+                b[4]=p[2];
+            if (p[2]>b[5])
+                b[5]=p[2];
 
-                if (p[2]<b[4])
-                    b[4]=p[2];
-                if (p[2]>b[5])
-                    b[5]=p[2];
-
-
-            }
 
         }
-
-        // provide some buffer space at borders
-
-        for(int i=0; i<=4; i+=2){
-            b[i] -=10;
-        }
-
-        for(int i=1; i<=5; i+=2){
-            b[i] +=10;
-        }
-
-        mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-        geometry->SetImageGeometry(true);
-        geometry->SetFloatBounds(b);
-        this->SetGeometry(geometry);
-
-
 
     }
+
+    // provide some buffer space at borders
+
+    for(int i=0; i<=4; i+=2){
+        b[i] -=10;
+    }
+
+    for(int i=1; i<=5; i+=2){
+        b[i] +=10;
+    }
+
+    mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+    geometry->SetImageGeometry(true);
+    geometry->SetFloatBounds(b);
+    this->SetGeometry(geometry);
+
 }
 
 /*==============================

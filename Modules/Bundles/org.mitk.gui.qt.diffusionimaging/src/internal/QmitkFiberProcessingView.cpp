@@ -44,8 +44,9 @@
 #include <itkGaussianInterpolateImageFunction.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
-#include <itkTractsToProbabilityImageFilter.h>
+#include <itkTractDensityImageFilter.h>
 #include <itkImageRegion.h>
+#include <itkTractsToRgbaImageFilter.h>
 
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
@@ -613,17 +614,17 @@ void QmitkFiberProcessingView::UpdateGui()
     if (!m_SelectedPF.empty())
       m_Controls->doExtractFibersButton->setEnabled(true);
 
-    // two bundles needed to subtract
-    if (m_SelectedFB.size() == 2)
-      m_Controls->m_SubstractBundles->setEnabled(true);
-    else
-      m_Controls->m_SubstractBundles->setEnabled(false);
-
-    // more than two bundles needed to join
+    // more than two bundles needed to join/subtract
     if (m_SelectedFB.size() > 1)
+    {
       m_Controls->m_JoinBundles->setEnabled(true);
+      m_Controls->m_SubstractBundles->setEnabled(true);
+    }
     else
+    {
       m_Controls->m_JoinBundles->setEnabled(false);
+      m_Controls->m_SubstractBundles->setEnabled(false);
+    }
   }
 
   // are planar figures selected?
@@ -1283,41 +1284,54 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 void QmitkFiberProcessingView::JoinBundles()
 {
-//  if ( m_SelectedFB.size()<2 ){
-//    QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
-//    MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
-//    return;
-//  }
-//  mitk::FiberBundleX::Pointer newBundle = mitk::FiberBundleX::New();
-//  std::vector<mitk::DataNode::Pointer>::const_iterator it;
-//  for (it = m_SelectedFB.begin(); it!=m_SelectedFB.end(); ++it)
-//  {
-//    newBundle = newBundle->JoinBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
-//  }
+  if ( m_SelectedFB.size()<2 ){
+    QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+    MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
+    return;
+  }
 
-//  mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
-//  fbNode->SetData(newBundle);
-//  fbNode->SetName("JoinedBundle");
-//  fbNode->SetVisibility(true);
-//  GetDataStorage()->Add(fbNode);
+  std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedFB.begin();
+  mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+  QString name("");
+  name += QString((*it)->GetName().c_str());
+  ++it;
+  for (it; it!=m_SelectedFB.end(); ++it)
+  {
+    newBundle = *newBundle+dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    name += "+"+QString((*it)->GetName().c_str());
+  }
+
+  mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+  fbNode->SetData(newBundle);
+  fbNode->SetName(name.toStdString());
+  fbNode->SetVisibility(true);
+  GetDataStorage()->Add(fbNode);
 }
 
 void QmitkFiberProcessingView::SubstractBundles()
 {
-//  if ( m_SelectedFB.size()!=2 ){
-//    QMessageBox::information( NULL, "Warning", "Select two fiber bundles!");
-//    MITK_WARN("QmitkFiberProcessingView") << "Select two fiber bundles!";
-//    return;
-//  }
-//  mitk::FiberBundleX::Pointer bundle1 = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(0)->GetData());
-//  mitk::FiberBundleX::Pointer bundle2 = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(1)->GetData());
+  if ( m_SelectedFB.size()<2 ){
+    QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+    MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
+    return;
+  }
 
-//  mitk::FiberBundleX::Pointer newBundle = bundle1->SubstractBundle(bundle2);
-//  mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
-//  fbNode->SetData(newBundle);
-//  fbNode->SetName(m_SelectedFB.at(0)->GetName()+"-"+m_SelectedFB.at(1)->GetName());
-//  fbNode->SetVisibility(true);
-//  GetDataStorage()->Add(fbNode);
+  std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedFB.begin();
+  mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+  QString name("");
+  name += QString((*it)->GetName().c_str());
+  ++it;
+  for (it; it!=m_SelectedFB.end(); ++it)
+  {
+    newBundle = *newBundle-dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    name += "-"+QString((*it)->GetName().c_str());
+  }
+
+  mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+  fbNode->SetData(newBundle);
+  fbNode->SetName(name.toStdString());
+  fbNode->SetVisibility(true);
+  GetDataStorage()->Add(fbNode);
 }
 
 void QmitkFiberProcessingView::GenerateStats()
@@ -1404,10 +1418,7 @@ void QmitkFiberProcessingView::GenerateStats()
       }
 
       if (numberOfLines>0)
-      {
         dev /= numberOfLines;
-        dev = std::sqrt(dev);
-      }
 
       stats += "Mean fiber length: "+ QString::number(length/10) + "cm\n";
       stats += "Median fiber length: "+ QString::number(lengths.at(lengths.size()/2)/10) + "cm\n";
@@ -1433,22 +1444,33 @@ void QmitkFiberProcessingView::ProcessSelectedBundles()
     if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
     {
       mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+      QString name(node->GetName().c_str());
+      DataNode::Pointer newNode = NULL;
       switch(generationMethod){
       case 0:
-        GenerateTractDensityImage(fib, false);
+        newNode = GenerateTractDensityImage(fib, false);
+        name += "_TDI";
         break;
       case 1:
-        GenerateTractDensityImage(fib, true);
+        newNode = GenerateTractDensityImage(fib, true);
+        name += "_envelope";
         break;
       case 2:
-        GenerateColorHeatmap(fib);
+        newNode = GenerateColorHeatmap(fib);
         break;
       case 3:
-        GenerateFiberEndingsImage(fib);
+        newNode = GenerateFiberEndingsImage(fib);
+        name += "_fiber_endings";
         break;
       case 4:
-        GenerateFiberEndingsPointSet(fib);
+        newNode = GenerateFiberEndingsPointSet(fib);
+        name += "_fiber_endings";
         break;
+      }
+      if (newNode.IsNotNull())
+      {
+        newNode->SetName(name.toStdString());
+        GetDataStorage()->Add(newNode);
       }
     }
   }
@@ -1458,56 +1480,60 @@ void QmitkFiberProcessingView::ProcessSelectedBundles()
 mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib)
 {
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
+  vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
+  vLines->InitTraversal();
 
-//  int numTracts = fib->GetNumFibers();
-//  int count = 0;
-//  for( int i=0; i<numTracts; i++ )
-//  {
-//    // get fiber start point
-//    int numVertices = m_FiberBundle->GetNumPoints(i);
-//    itk::Point<float, 3> start = m_FiberBundle->GetPoint(i,0);
-//    itk::Point<float, 3> world1;
-//    geometry->IndexToWorld(start, world1);
-//    pointSet->InsertPoint(count, world1);
-//    count++;
-//    // get fiber end point
-//    if(numVertices>1)
-//    {
-//      itk::Point<float, 3> end = m_FiberBundle->GetPoint(i,numVertices-1);
-//      itk::Point<float, 3> world;
-//      geometry->IndexToWorld(end, world);
-//      pointSet->InsertPoint(count, world);
-//      count++;
-//    }
-//  }
+  int count = 0;
+  int numFibers = fib->GetNumFibers();
+  for( int i=0; i<numFibers; i++ )
+  {
+    vtkIdType   numPoints(0);
+    vtkIdType*  points(NULL);
+    vLines->GetNextCell ( numPoints, points );
+
+    if (numPoints>0)
+    {
+      double* point = fiberPolyData->GetPoint(points[0]);
+      itk::Point<float,3> itkPoint;
+      itkPoint[0] = point[0];
+      itkPoint[1] = point[1];
+      itkPoint[2] = point[2];
+      pointSet->InsertPoint(count, itkPoint);
+      count++;
+    }
+    if (numPoints>2)
+    {
+      double* point = fiberPolyData->GetPoint(points[numPoints-1]);
+      itk::Point<float,3> itkPoint;
+      itkPoint[0] = point[0];
+      itkPoint[1] = point[1];
+      itkPoint[2] = point[2];
+      pointSet->InsertPoint(count, itkPoint);
+      count++;
+    }
+  }
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData( pointSet );
   return node;
-
-//  QString name(m_FiberBundleNode->GetName().c_str());
-//  name += "_fiber_endings";
-//  pointSetNode->SetName(name.toStdString());
-//  pointSetNode->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-//  pointSetNode->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1*m_Controls->m_UpsamplingSpinBox->value()) );
-//  pointSetNode->SetColor( 1.0, 1.0, 1.0 );
-
-//  GetDefaultDataStorage()->Add(pointSetNode);
 }
 
 // generate image displaying the fiber endings
 mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib)
 {
   typedef unsigned char OutPixType;
-  typedef itk::TractsToFiberEndingsImageFilter<FloatImageType, OutPixType> ImageGeneratorType;
+  typedef itk::Image<OutPixType,3> OutImageType;
+
+  typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;
   ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
-  //generator->SetFiberBundle(fib);
+  generator->SetFiberBundle(fib);
+  generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
   generator->Update();
 
   // get output image
-  typedef itk::Image<OutPixType,3> OutType;
-  OutType::Pointer outImg = generator->GetOutput();
+  OutImageType::Pointer outImg = generator->GetOutput();
   mitk::Image::Pointer img = mitk::Image::New();
   img->InitializeByItk(outImg.GetPointer());
   img->SetVolume(outImg->GetBufferPointer());
@@ -1516,22 +1542,16 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(img);
   return node;
-
-//  QString name(m_FiberBundleNode->GetName().c_str());
-//  name += "_fiber_endings";
-//  node->SetName(name.toStdString());
-//  node->SetVisibility(true);
-
-//  GetDataStorage()->Add(node);
 }
 
 // generate rgba heatmap from fiber bundle
 mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib)
 {
   typedef itk::RGBAPixel<unsigned char> OutPixType;
-  typedef itk::TractsToProbabilityImageFilter<FloatImageType, OutPixType> ImageGeneratorType;
+  typedef itk::Image<OutPixType, 3> OutImageType;
+  typedef itk::TractsToRgbaImageFilter< OutImageType > ImageGeneratorType;
   ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
-  //generator->SetFiberBundle(fib);
+  generator->SetFiberBundle(fib);
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
   generator->Update();
 
@@ -1546,34 +1566,19 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(img);
   return node;
-
-//  QString name(m_FiberBundleNode->GetName().c_str());
-//  node->SetName(name.toStdString());
-//  node->SetVisibility(true);
-
-//  mitk::LevelWindow opaclevwin;
-//  opaclevwin.SetRangeMinMax(0,255);
-//  opaclevwin.SetWindowBounds(0,0);
-//  mitk::LevelWindowProperty::Pointer prop =
-//      mitk::LevelWindowProperty::New(opaclevwin);
-//  node->AddProperty( "opaclevelwindow", prop );
-
-//  GetDataStorage()->Add(node);
 }
 
 // generate tract density image from fiber bundle
 mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary)
 {
-  typedef unsigned char OutPixType;
-  typedef itk::TractsToProbabilityImageFilter<FloatImageType, OutPixType> ImageGeneratorType;
-  ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
-  //generator->SetFiberBundle(fib);
+  typedef float OutPixType;
+  typedef itk::Image<OutPixType, 3> OutImageType;
+
+  itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
+  generator->SetFiberBundle(fib);
+  generator->SetBinaryOutput(binary);
   generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
-  if (binary)
-    generator->SetBinaryEnvelope(true);
-  else
-    generator->SetBinaryEnvelope(false);
   generator->Update();
 
   // get output image
@@ -1587,22 +1592,5 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(img);
   return node;
-
-//  QString name(m_FiberBundleNode->GetName().c_str());
-//  if(binary)
-//    name += "_envelope";
-//  else
-//    name += "_TDI";
-//  node->SetName(name.toStdString());
-//  node->SetVisibility(true);
-
-//  mitk::LevelWindow opaclevwin2;
-//  opaclevwin2.SetRangeMinMax(0,255);
-//  opaclevwin2.SetWindowBounds(0,0);
-//  mitk::LevelWindowProperty::Pointer prop2 =
-//      mitk::LevelWindowProperty::New(opaclevwin2);
-//  node->AddProperty( "opaclevelwindow", prop2 );
-
-//  GetDataStorage()->Add(node);
 }
 

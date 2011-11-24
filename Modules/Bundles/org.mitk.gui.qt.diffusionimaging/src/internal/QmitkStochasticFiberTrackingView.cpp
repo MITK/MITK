@@ -56,7 +56,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindowInteractor.h>
 
 #include <mitkFiberBundle.h>
-#include <itkTractsToProbabilityImageFilter.h>
 
 const std::string QmitkStochasticFiberTrackingView::VIEW_ID = "org.mitk.views.stochasticfibertracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";

@@ -99,7 +99,7 @@ SET(CPP_FILES
   Rendering/mitkTbssGradientImageMapper.cpp
   Rendering/mitkPlanarCircleMapper3D.cpp
   Rendering/mitkPlanarPolygonMapper3D.cpp
-  
+
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -138,7 +138,7 @@ SET(H_FILES
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h  
+  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h
@@ -163,8 +163,9 @@ SET(H_FILES
   Algorithms/itkB0ImageExtractionImageFilter.h
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
-  Algorithms/itkTractsToProbabilityImageFilter.h
+  Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
+  Algorithms/itkTractsToRgbaImageFilter.h
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h

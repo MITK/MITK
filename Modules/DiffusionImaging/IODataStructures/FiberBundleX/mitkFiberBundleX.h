@@ -47,13 +47,9 @@ namespace mitk {
   {
   public:
 
-    // names of certain arrays (e.g colorcodings, etc.)
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
     static const char* FIBER_ID_ARRAY;
-
-//    friend class FiberBundleXWriter;
-//    friend class FiberBundleXReader;
 
     virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
@@ -69,6 +65,9 @@ namespace mitk {
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
 
+    mitk::FiberBundleX::Pointer operator+(mitk::FiberBundleX* fib);
+    mitk::FiberBundleX::Pointer operator-(mitk::FiberBundleX* fib);
+
     char* GetCurrentColorCoding();
     void SetColorCoding(const char*);
     bool isFiberBundleXModified();
@@ -78,14 +77,18 @@ namespace mitk {
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
+    void ResampleFibers();
     std::vector<int> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
 
     itkGetMacro(NumFibers, int);
 
+    mitk::FiberBundleX::Pointer GetDeepCopy();
+
   protected:
-    FiberBundleX( vtkSmartPointer<vtkPolyData> fiberPolyData = NULL );
+    FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();
     void UpdateFiberGeometry();
+    itk::Point<float, 3> GetItkPoint(double point[3]);
 
   private:
 
@@ -96,11 +99,8 @@ namespace mitk {
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
 
     char* m_currentColorCoding;
-
-    //this flag concerns only visual representation.
     bool m_isModified;
-
-    bool m_NumFibers;
+    int m_NumFibers;
   };
 } // namespace mitk
 

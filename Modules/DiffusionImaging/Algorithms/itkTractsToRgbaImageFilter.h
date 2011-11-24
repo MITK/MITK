@@ -1,5 +1,5 @@
-#ifndef __itkTractsToFiberEndingsImageFilter_h__
-#define __itkTractsToFiberEndingsImageFilter_h__
+#ifndef __itkTractsToRgbaImageFilter_h__
+#define __itkTractsToRgbaImageFilter_h__
 
 #include <itkImageSource.h>
 #include <itkImage.h>
@@ -10,11 +10,11 @@
 namespace itk{
 
 template< class OutputImageType >
-class TractsToFiberEndingsImageFilter : public ImageSource< OutputImageType >
+class TractsToRgbaImageFilter : public ImageSource< OutputImageType >
 {
 
 public:
-  typedef TractsToFiberEndingsImageFilter Self;
+  typedef TractsToRgbaImageFilter Self;
   typedef ProcessObject Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
@@ -22,7 +22,7 @@ public:
   typedef typename OutputImageType::PixelType OutPixelType;
 
   itkNewMacro(Self);
-  itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource );
+  itkTypeMacro( TractsToRgbaImageFilter, ImageSource );
 
   /** Upsampling factor **/
   itkSetMacro( UpsamplingFactor, unsigned int);
@@ -32,6 +32,10 @@ public:
   itkSetMacro( InvertImage, bool);
   itkGetMacro( InvertImage, bool);
 
+  /** Binary Output **/
+  itkSetMacro( BinaryOutput, bool);
+  itkGetMacro( BinaryOutput, bool);
+
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
 
   void GenerateData();
@@ -40,18 +44,19 @@ protected:
 
   itk::Point<float, 3> GetItkPoint(double point[3]);
 
-  TractsToFiberEndingsImageFilter();
-  virtual ~TractsToFiberEndingsImageFilter();
+  TractsToRgbaImageFilter();
+  virtual ~TractsToRgbaImageFilter();
 
   mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
   bool m_InvertImage;
+  bool m_BinaryOutput;
 };
 
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTractsToFiberEndingsImageFilter.cpp"
+#include "itkTractsToRgbaImageFilter.cpp"
 #endif
 
-#endif // __itkTractsToFiberEndingsImageFilter_h__
+#endif // __itkTractsToRgbaImageFilter_h__

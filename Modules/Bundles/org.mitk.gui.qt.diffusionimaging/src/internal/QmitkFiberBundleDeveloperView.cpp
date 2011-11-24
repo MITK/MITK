@@ -106,16 +106,19 @@ void QmitkFiberExtractorWorker::run()
     itk::TimeProbe clock;
     clock.Start();
     //set GUI representation of timer to 0, is essential for correct timer incrementation
-    m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText(QString::number(0));
+    m_itemPackage.st_Controls->infoTimerExtractFibers->setText(QString::number(0));
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
     m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
 
+    //generate new fiberbundle by fiber iDs
+//    m_itemPackage.st_FBX->CreateNewFiberbundleByIds(std::vector<int> desiredFiberIds);
+
     /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
     clock.Stop();
     m_itemPackage.st_FancyGUITimer1->stop();
-    m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
+    m_itemPackage.st_Controls->infoTimerExtractFibers->setText( QString::number(clock.GetTotal()) );
     delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
     m_hostingThread->quit();
 
@@ -846,13 +849,13 @@ void QmitkFiberBundleDeveloperView::DoExtractFibers()
     connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
     connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
 
-    m_hostThread->start(QThread::NormalPriority) ;
+    m_hostThread->start(QThread::HighestPriority) ;
 }
 
 void QmitkFiberBundleDeveloperView::UpdateExtractFibersTimer()
 {
     // Make sure that thread has set according info-label to number! here we do not check if value is numeric! shall be done in beforeThreadstarted()
-    QString crntValue = m_Controls->infoTimerColorCoding->text();
+    QString crntValue = m_Controls->infoTimerExtractFibers->text();
     int tmpVal = crntValue.toInt();
     m_Controls->infoTimerExtractFibers->setText(QString::number(++tmpVal));
     m_Controls->infoTimerExtractFibers->update();

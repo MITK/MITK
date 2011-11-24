@@ -64,13 +64,14 @@ struct Package4WorkingThread
   void (QmitkFiberBundleDeveloperView::*st_pntr_to_Method_PutFibersToDataStorage) (vtkSmartPointer<vtkPolyData>);
   
   
-  //==DO NOT TOUCH THIS SECTION===
+  //==DO NOT TOUCH THIS SECTION=== you might extend this section, but do NOT shorten it! hai capito!
   //host MITK I/O elements, especially needed for thread monitoring
   QmitkFiberThreadMonitorWorker *st_fiberThreadMonitorWorker;
   mitk::FiberBundleXThreadMonitor::Pointer st_FBX_Monitor; //needed for direct access do animation/fancy methods
   mitk::DataNode::Pointer st_ThreadMonitorDataNode; //needed for renderer to recognize node modifications
   mitk::DataStorage::Pointer st_DataStorage; //well that is discussable if needed ;-) probably not
   QmitkStdMultiWidget* st_MultiWidget; //needed for rendering update
+  mitk::PlanarFigure::Pointer st_PlanarFigure; //needed for fiberextraction
   
 };
 
@@ -139,6 +140,28 @@ private:
   
 };
 
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
+class QmitkFiberExtractorWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+    QmitkFiberExtractorWorker( QThread*, Package4WorkingThread );
+
+public slots:
+    void run();
+
+private:
+    Package4WorkingThread m_itemPackage;
+    QThread* m_hostingThread;
+
+};
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
 class QmitkFiberThreadMonitorWorker : public QObject
 {
   Q_OBJECT
@@ -233,6 +256,7 @@ public:
   protected slots:
   void DoGenerateFibers();
   void DoGenerateFiberIDs();
+  void DoExtractFibers();
   void DoUpdateGenerateFibersWidget();
   void SelectionChangedToolBox(int);
   void DoMonitorFiberThreads(int);
@@ -248,11 +272,14 @@ public:
   void AfterThread_GenerateFibersRandom();
   void BeforeThread_FiberColorCoding();
   void AfterThread_FiberColorCoding();
+  void BeforeThread_FiberExtraction();
+  void AfterThread_FiberExtraction();
   
   //SLOTS FOR TIMERS
   void UpdateFiberIDTimer();
   void UpdateGenerateRandomFibersTimer();
   void UpdateColorFibersTimer();
+  void UpdateExtractFibersTimer();
   
   
   
@@ -276,7 +303,7 @@ private:
   vtkSmartPointer<vtkPolyData> GenerateVtkFibersDirectionZ();
   
   void PutFibersToDataStorage( vtkSmartPointer<vtkPolyData> );
-  
+  void PutFigureToDataStorage(mitk::PlanarFigure* , const QString& );
   /* METHODS FOR FIBER PROCESSING OR PREPROCESSING  */
   
   
@@ -285,7 +312,7 @@ private:
   void ResetFiberInfoWidget();
   void FeedFiberInfoWidget();
   void FBXDependendGUIElementsConfigurator();
-  
+
   void SetGeneratedFBX();
   
   
@@ -303,6 +330,7 @@ private:
   QmitkFiberIDWorker* m_FiberIDGenerator;
   QmitkFiberGenerateRandomWorker* m_GeneratorFibersRandom;
   QmitkFiberColoringWorker* m_FiberColoringSlave;
+  QmitkFiberExtractorWorker* m_FiberExtractor;
   
   QThread* m_hostThread;
   QThread* m_monitorThread; 

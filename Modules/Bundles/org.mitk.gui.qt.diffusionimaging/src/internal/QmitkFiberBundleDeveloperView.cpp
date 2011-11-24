@@ -32,6 +32,8 @@
 
 // MITK
 #include <mitkPlanarCircle.h>
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkGlobalInteraction.h>
 
 //===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
@@ -80,6 +82,43 @@ void QmitkFiberIDWorker::run()
     clock.Stop();
     m_itemPackage.st_FancyGUITimer1->stop();
     m_itemPackage.st_Controls->infoTimerGenerateFiberIds->setText( QString::number(clock.GetTotal()) );
+    delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
+    m_hostingThread->quit();
+
+}
+
+/*===================================================================================
+ * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
+ * -- extract fibers by given PlanarFigure --*/
+QmitkFiberExtractorWorker::QmitkFiberExtractorWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+    : m_itemPackage(itemPackage),
+      m_hostingThread(hostingThread)
+{
+
+}
+void QmitkFiberExtractorWorker::run()
+{
+    if(m_itemPackage.st_Controls->checkBoxMonitorFiberThreads->isChecked())
+        m_itemPackage.st_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_RUNNING);
+
+    /* MEASUREMENTS AND FANCY GUI EFFECTS
+   * accurate time measurement using ITK timeProbe*/
+    itk::TimeProbe clock;
+    clock.Start();
+    //set GUI representation of timer to 0, is essential for correct timer incrementation
+    m_itemPackage.st_Controls->infoTimerExtractFibers->setText(QString::number(0));
+    m_itemPackage.st_FancyGUITimer1->start();
+
+    //do processing
+    m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
+
+    //generate new fiberbundle by fiber iDs
+//    m_itemPackage.st_FBX->CreateNewFiberbundleByIds(std::vector<int> desiredFiberIds);
+
+    /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
+    clock.Stop();
+    m_itemPackage.st_FancyGUITimer1->stop();
+    m_itemPackage.st_Controls->infoTimerExtractFibers->setText( QString::number(clock.GetTotal()) );
     delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
     m_hostingThread->quit();
 
@@ -565,7 +604,7 @@ void QmitkFiberThreadMonitorWorker::fancyMonitorInitializationMask()
 //========#########################===============###########################=====================#########################
 //========#########################===============###########################=====================#########################
 //========#########################===============###########################=====================#########################
-//                   HERE STARTS THE ACTUAL FIBERB2UNDLE DEVELOPER VIEW IMPLEMENTATION
+//                   HERE STARTS THE ACTUAL FIBERBUNDLE DEVELOPER VIEW IMPLEMENTATION
 //========#########################===============###########################=====================#########################
 //========#########################===============###########################=====================#########################
 //========#########################===============###########################=====================#########################
@@ -623,6 +662,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
         m_Controls->buttonGenerateFibers->setEnabled(true);
         m_Controls->buttonColorFibers->setEnabled(false);
         m_Controls->ddAvailableColorcodings->setEnabled(false);
+        m_Controls->buttonExtractFibers->setEnabled(false);
 
         m_Controls->buttonSMFibers->setEnabled(false);//not yet implemented
         m_Controls->buttonVtkDecimatePro->setEnabled(false);//not yet implemented
@@ -632,7 +672,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
 
         connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
         connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
-
+        connect(  m_Controls->buttonExtractFibers, SIGNAL(clicked()), this, SLOT(DoExtractFibers()) );
         connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->radioButton_directionX, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->radioButton_directionY, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
@@ -775,6 +815,73 @@ void QmitkFiberBundleDeveloperView::DoGenerateFibers()
 
 } 
 
+void QmitkFiberBundleDeveloperView::DoExtractFibers()
+{
+
+    /* ===== TIMER CONFIGURATIONS for visual effect ======
+   * start and stop is called in Thread */
+    QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+    localTimer->setInterval( 10 );
+    connect( localTimer, SIGNAL(timeout()), this, SLOT( UpdateExtractFibersTimer()) );
+
+    struct Package4WorkingThread ItemPackageForExtractor;
+    ItemPackageForExtractor.st_FBX = m_FiberBundleX;
+    ItemPackageForExtractor.st_Controls = m_Controls;
+    ItemPackageForExtractor.st_FancyGUITimer1 = localTimer;
+    ItemPackageForExtractor.st_host = this; //needed to access method "PutFibersToDataStorage()"
+    ItemPackageForExtractor.st_pntr_to_Method_PutFibersToDataStorage = &QmitkFiberBundleDeveloperView::PutFibersToDataStorage; //actual functor calling method putFibersToDataStorage
+    ItemPackageForExtractor.st_PlanarFigure = m_PlanarFigure;
+
+    //set element for thread monitoring
+    if (m_fiberMonitorIsOn)
+        ItemPackageForExtractor.st_fiberThreadMonitorWorker = m_fiberThreadMonitorWorker;
+
+
+    if (m_threadInProgress)
+        return; //maybe popup window saying, working thread still in progress...pls wait
+
+    m_FiberExtractor = new QmitkFiberExtractorWorker(m_hostThread, ItemPackageForExtractor);
+    m_FiberExtractor->moveToThread(m_hostThread);
+
+    //connections
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(started()), m_FiberExtractor, SLOT( run() ));
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
+
+    m_hostThread->start(QThread::HighestPriority) ;
+}
+
+void QmitkFiberBundleDeveloperView::UpdateExtractFibersTimer()
+{
+    // Make sure that thread has set according info-label to number! here we do not check if value is numeric! shall be done in beforeThreadstarted()
+    QString crntValue = m_Controls->infoTimerExtractFibers->text();
+    int tmpVal = crntValue.toInt();
+    m_Controls->infoTimerExtractFibers->setText(QString::number(++tmpVal));
+    m_Controls->infoTimerExtractFibers->update();
+}
+
+void QmitkFiberBundleDeveloperView::BeforeThread_FiberExtraction()
+{
+    m_threadInProgress = true;
+    if (m_fiberMonitorIsOn){
+        m_fiberThreadMonitorWorker->threadForFiberProcessingStarted();
+        //m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_STARTED);
+    }
+}
+
+void QmitkFiberBundleDeveloperView::AfterThread_FiberExtraction()
+{
+    m_threadInProgress = false;
+    if (m_fiberMonitorIsOn){
+        m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
+        m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
+    }
+    disconnect(m_hostThread, 0, 0, 0);
+    m_hostThread->disconnect();
+
+}
+
 void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkPolyData> threadOutput)
 {
 
@@ -809,6 +916,74 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkP
     }
 
     //qthread mutex unlock
+}
+
+void QmitkFiberBundleDeveloperView::PutFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name)
+{
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetName(name.toStdString());
+    newNode->SetData(figure);
+
+
+
+    std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
+    for(unsigned int i = 0; i < selectedNodes.size(); i++)
+    {
+        selectedNodes[i]->SetSelected(false);
+    }
+
+    newNode->SetSelected(true);
+
+    newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,0.0,0.0));
+    newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));
+    newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true));
+
+    newNode->AddProperty( "selected", mitk::BoolProperty::New(true) );
+    newNode->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
+    newNode->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
+    newNode->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(false) );
+    newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
+
+    newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(3.0) );
+    newNode->AddProperty( "planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
+
+    newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
+    newNode->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.default.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.default.outline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.default.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.default.helperline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(0.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.default.markerline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(1.0,1.0,1.0)  );
+    newNode->AddProperty( "planarfigure.default.marker.opacity",mitk::FloatProperty::New(2.0) );
+
+    newNode->AddProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.hover.line.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.hover.outline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.hover.helperline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.hover.markerline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.hover.marker.opacity", mitk::FloatProperty::New(2.0) );
+
+    newNode->AddProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.selected.line.opacity",mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.selected.outline.opacity", mitk::FloatProperty::New(2.0));
+    newNode->AddProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.selected.helperline.opacity",mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.selected.markerline.opacity", mitk::FloatProperty::New(2.0) );
+    newNode->AddProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
+    newNode->AddProperty( "planarfigure.selected.marker.opacity",mitk::FloatProperty::New(2.0));
+
+    // figure drawn on the topmost layer / image
+    this->GetDataStorage()->Add(newNode);
 }
 
 /*
@@ -1230,7 +1405,16 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
     // show/reset items of selected toolbox page FiberProcessing
     if (m_Controls->page_FiberProcessing->isVisible())
     {
-        if (m_FiberBundleX != NULL)
+        if (m_FiberBundleX.IsNotNull() && m_PlanarFigure.IsNotNull() )
+        {
+            //show fiber extraction button
+            m_Controls->buttonExtractFibers->setEnabled(true);
+
+        } else {
+            m_Controls->buttonExtractFibers->setEnabled(false);
+        }
+
+        if (m_FiberBundleX.IsNotNull())
         {
             if (m_Controls->tabColoring->isVisible()){
                 //show button colorCoding
@@ -1239,7 +1423,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
                 MITK_INFO << "Color";
 
             }else if(m_Controls->tabCutting->isVisible()){
-                //       m_Controls->buttonGenerateFiberIds->setEnabled(true);
+                m_Controls->buttonGenerateFiberIds->setEnabled(true);
 
 
             }else if(m_Controls->tabShape->isVisible()){
@@ -1260,6 +1444,8 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
             m_Controls->buttonGenerateTubes->setEnabled(true);
 
         }
+
+
     }
 
 }
@@ -1423,11 +1609,34 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
 
 void QmitkFiberBundleDeveloperView::ActionDrawEllipseTriggered()
 {
-    bool checked = m_Controls->m_CircleButton->isChecked();
+    //    bool checked = m_Controls->m_CircleButton->isChecked();
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
-//    this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_CircleCounter));
+    this->PutFigureToDataStorage(figure, QString("Circle%1").arg(++m_CircleCounter));
 
     MITK_INFO << "PlanarCircle created ...";
+
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
+    mitk::DataNode* node = 0;
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
+    mitk::PlanarFigure* figureP = 0;
+
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+        ; it++)
+    {
+        node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+        figureP = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+
+        if(figureP)
+        {
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+
+            if(figureInteractor.IsNull())
+                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
+
+            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+        }
+    }
+
 }
 
 void QmitkFiberBundleDeveloperView::Activated()

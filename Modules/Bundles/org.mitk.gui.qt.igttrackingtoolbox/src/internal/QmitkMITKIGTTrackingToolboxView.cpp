@@ -77,7 +77,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-	connect( m_Controls->VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+	  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+    connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
 
     //initialize widgets
@@ -97,10 +98,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
 	// Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
-    m_Controls->VolumeSelectionBox->clear();
+    m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
 	{
-      m_Controls->VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+      m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
   }
 }
@@ -164,7 +165,7 @@ mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configuration
 //Get Tracking Volume Data
 mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 
-QString qstr =  m_Controls->VolumeSelectionBox->currentText();
+QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
 if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
   std::string str = qstr.toStdString();
   data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
@@ -212,22 +213,8 @@ this->m_Controls->m_AutoDetectTools->setEnabled(false);
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
 //show tracking volume
-if (m_Controls->m_ShowTrackingVolume->isChecked())
-  {
-    mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
-	
-	volumeGenerator->SetTrackingDeviceData(data);
-	//volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
-    volumeGenerator->Update();
+ this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
-    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
-
-    m_TrackingVolumeNode->SetData(volumeSurface);
-    m_TrackingVolumeNode->SetOpacity(0.25);
-    mitk::Color red;
-    red.SetRed(1);
-    m_TrackingVolumeNode->SetColor(red);
-  }
 
 m_tracking = true;
 
@@ -252,7 +239,6 @@ this->m_Controls->m_LoadTools->setEnabled(true);
 this->m_Controls->m_AutoDetectTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-m_TrackingVolumeNode->SetData(NULL);
 m_tracking = false;
 
 //enable Buttons
@@ -275,10 +261,10 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 
 // Code to select appropriate tracking volumes
   std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
-  m_Controls->VolumeSelectionBox->clear();
+  m_Controls->m_VolumeSelectionBox->clear();
   for(int i = 0; i < Compatibles.size(); i++)
   {
-    m_Controls->VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+    m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
   }
 }
 
@@ -291,11 +277,11 @@ if (m_Controls->m_ShowTrackingVolume->isChecked())
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 	
 
-	std::string str = qstr.toStdString();
+	  std::string str = qstr.toStdString();
 
-	mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
 
-	volumeGenerator->SetTrackingDeviceData(data);
+	  volumeGenerator->SetTrackingDeviceData(data);
     volumeGenerator->Update();
 
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
@@ -305,9 +291,19 @@ if (m_Controls->m_ShowTrackingVolume->isChecked())
     mitk::Color red;
     red.SetRed(1);
     m_TrackingVolumeNode->SetColor(red);
+    this->GlobalReinit();
   }
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
+{
+  if (m_Controls->m_ShowTrackingVolume->isChecked()){
+    this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
+  }else{
+    m_TrackingVolumeNode->SetData(NULL);
+    this->GlobalReinit();
+  }
+}
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {

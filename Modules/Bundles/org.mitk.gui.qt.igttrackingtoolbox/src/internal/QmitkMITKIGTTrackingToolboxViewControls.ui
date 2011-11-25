@@ -264,7 +264,7 @@ p, li { white-space: pre-wrap; }
           <string>Show Tracking Volume</string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -276,7 +276,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="VolumeSelectionBox"/>
+        <widget class="QComboBox" name="m_VolumeSelectionBox"/>
        </item>
        <item>
         <spacer name="verticalSpacer_4">

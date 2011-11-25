@@ -147,7 +147,7 @@ namespace mitk
 	static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "Aurora Planar - Dome Volume","NDIAuroraPlanarFG_Dome.stl"};
 	static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl"};
 	// The following entry is for the tabletop prototype, which had an lower barrier of 8cm. The new version has a lower barrier of 12cm.
-	//static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "TabletopFG Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
+	//static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
 	static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
 	static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolaris.stl"};
 	static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolaris.stl"};

@@ -151,6 +151,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
   {
     returnValue = true;
 
+    // First we extract a Qlist of TreeItem* pointers.
     QString arg = QString(data->data("application/x-qabstractitemmodeldatalist").data());
     QStringList listOfTreeItemAddressPointers = arg.split(",");
 
@@ -165,7 +166,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
       listOfItemsToDrop << static_cast<TreeItem *>((void*)val);
     }
 
-    // Retrieve the TreeItem* where we are dropping stuff.
+    // Retrieve the TreeItem* where we are dropping stuff, and its parent.
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
     TreeItem* parentItem = dropItem->GetParent();
 
@@ -177,12 +178,15 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
     // Dragging and Dropping is only allowed within the same parent, so use the first item in list to validate.
     // (otherwise, you could have a derived image such as a segmentation, and assign it to another image).
+    // NOTE: We are assuming the input list is valid... i.e. when it was dragged, all the items had the same parent.
+
     if(listOfItemsToDrop[0] != dropItem && listOfItemsToDrop[0]->GetParent() == parentItem)
     {
       // Retrieve the index of where we are dropping stuff.
+      QModelIndex dropItemModelIndex = this->IndexFromTreeItem(dropItem);
       QModelIndex parentModelIndex = this->IndexFromTreeItem(parentItem);
 
-      // Remove all dragged items from Model, Indexes may not be contiguous.
+      // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
       QList<TreeItem*>::iterator diIter;
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();
@@ -191,31 +195,27 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
         this->beginRemoveRows(parentModelIndex, (*diIter)->GetIndex(), (*diIter)->GetIndex());
         parentItem->RemoveChild(*diIter);
+        this->endRemoveRows();
       }
 
-      // Signal
-      endRemoveRows();
-
       // Select the target index position, or put it at the end of the list.
-      diIter = listOfItemsToDrop.begin();
-      int index = parentItem->IndexOfChild(*diIter);
-      if(dropItem == m_Root)
+      int dropIndex = dropItemModelIndex.row();
+      if (dropIndex == -1)
       {
-        index = parentItem->GetChildCount();
+        dropIndex = parentItem->GetChildCount();
       }
 
       // Now insert items again at the drop item position
+      this->beginInsertRows(parentModelIndex, dropIndex, listOfItemsToDrop.size());
+
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();
            diIter++)
       {
-        this->beginInsertRows(parentModelIndex, index, index);
-        parentItem->InsertChild( (*diIter), index );
-        index++;
+        parentItem->InsertChild( (*diIter), dropIndex );
+        dropIndex++;
       }
-
-      // Signal
-      endInsertRows();
+      this->endInsertRows();
 
       // Change Layers to match.
       this->AdjustLayerProperty();

@@ -146,6 +146,7 @@ namespace mitk
 	static TrackingDeviceData DeviceDataAuroraPlanarCube = {NDIAurora, "PlanarFG_Cube", "NDIAurora.stl"};
 	static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "PlanarFG_Dome","NDIAuroraPlanarFG_Dome.stl"};
 	static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "TabletopFG", "NDIAuroraTabletopFG_Dome.stl"};
+	static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "TabletopFG Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
 	static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
 	static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Spectra", "NDIPolaris.stl"};
 	static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Vicra", "NDIPolaris.stl"};
@@ -157,7 +158,7 @@ namespace mitk
 	static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
 
 	static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraCompact, DeviceDataAuroraPlanarDome,
-	DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
+	DeviceDataAuroraTabletop, DeviceDataAuroraTabletopPrototype, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
 	DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataInvalid};
 
 	/**

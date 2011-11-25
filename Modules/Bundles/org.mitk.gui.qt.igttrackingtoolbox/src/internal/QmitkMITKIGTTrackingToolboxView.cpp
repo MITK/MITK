@@ -167,10 +167,10 @@ mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 QString qstr =  m_Controls->VolumeSelectionBox->currentText();
 if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
   std::string str = qstr.toStdString();
-  data = mitk::GetDeviceDataByName(str);
+  data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
 }
 
-trackingDevice->SetData(data);
+
 
 
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
@@ -215,7 +215,9 @@ this->m_Controls->m_configurationWidget->ConfigurationFinished();
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
-	  volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+	
+	volumeGenerator->SetTrackingDeviceData(data);
+	//volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
     volumeGenerator->Update();
 
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();

@@ -1099,7 +1099,9 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
       <= this->GetDataNode()->GetPropertyList()->GetMTime() )
     {
       LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
-      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+      
+      //Attention: uncomment this line if you need to show several images in one image box
+      //LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0); 
     }
     image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());  
   }

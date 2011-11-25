@@ -45,10 +45,10 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 {
     mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
 
-    std::string filepath = ""; // Full path to file
-	std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String like "cube"
+    std::string filepath = ""; // Full path to file (wil be resolved later)
+	std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
 	
-	// See if filename mathes a magic String.
+	// See if filename matches a magic string.
 	if (filename.compare("cube") == 0){
             vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();
             double bounds[6];
@@ -67,13 +67,13 @@ void mitk::TrackingVolumeGenerator::GenerateData()
       return;
 	}
 	
-	// In the following Code, we assume that filename contains an actual filename andn ot a magic string
+	// from here on, we assume that filename contains an actual filename and not a magic string
 
 	filepath = mitk::StandardFileLocations::GetInstance()->FindFile(filename.c_str());
 	
     if (filepath.empty())
     {
-        MITK_ERROR << "Filename is empty";
+        MITK_ERROR << ("Volume Generator could not find the specified file " + filename);
         return;
     }
 

@@ -56,6 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundleXWriterFactory.h"
 #include "mitkFiberBundleXWriter.h"
 #include "mitkFiberBundleXMapper3D.h"
+#include "mitkFiberBundleXMapper2D.h"
 
 #include "mitkFiberBundleXThreadMonitorMapper3D.h"
 #include "mitkFiberBundleXThreadMonitor.h"
@@ -177,7 +178,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     classname = "FiberBundleX";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::FiberBundleMapper2D::New();
+      newMapper = mitk::FiberBundleXMapper2D::New();
       newMapper->SetDataNode(node);
     }
 

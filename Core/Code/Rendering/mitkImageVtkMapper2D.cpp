@@ -671,7 +671,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
         if( LookupTableProp->GetLookupTable()->GetMTime()
           <= this->GetDataNode()->GetPropertyList()->GetMTime() )
           {
-          LookupTableProp->GetLookupTable()->ChangeOpacityForAll( localStorage->m_Actor->GetProperty()->GetOpacity() );
+          LookupTableProp->GetLookupTable()->ChangeOpacityForAll( LookupTableProp->GetLookupTable()->GetVtkLookupTable()->GetAlpha()*localStorage->m_Actor->GetProperty()->GetOpacity() );
           LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
         }
         //we use the user-defined lookuptable

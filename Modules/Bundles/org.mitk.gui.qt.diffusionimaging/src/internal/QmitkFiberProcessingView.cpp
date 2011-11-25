@@ -27,7 +27,7 @@
 // Qt
 #include <QMessageBox>
 
-//MITK
+// MITK
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageCast.h>
 #include <mitkPointSet.h>
@@ -39,6 +39,7 @@
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
 #include <mitkSurface.h>
+#include <mitkDiffusionImage.h>
 
 // ITK
 #include <itkResampleImageFilter.h>

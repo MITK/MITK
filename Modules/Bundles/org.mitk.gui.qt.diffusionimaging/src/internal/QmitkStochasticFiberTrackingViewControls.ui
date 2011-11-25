@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
-    <height>331</height>
+    <width>480</width>
+    <height>553</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,73 +19,161 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="3">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Selected Image(s)</string>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Data</string>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Diffusion Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_DiffusionImageLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>ROI Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_RoiImageLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="enabled">
-      <bool>true</bool>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Parameters</string>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>204</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="showGrid">
-      <bool>true</bool>
-     </property>
-     <property name="gridStyle">
-      <enum>Qt::NoPen</enum>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <column>
-      <property name="text">
-       <string>Status</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>FileName</string>
-      </property>
-     </column>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="1">
+       <widget class="QSlider" name="m_MaxTractLengthSlider">
+        <property name="toolTip">
+         <string comment="Maximum tract length in voxel" extracomment="Maximum tract length in voxel">Maximum tract length in voxel</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_MaxTractLengthLabel">
+        <property name="toolTip">
+         <string>Length of single tracts</string>
+        </property>
+        <property name="text">
+         <string>Max. Tract Length: 100</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+        <property name="toolTip">
+         <string>Number of tracts for each seedpoint</string>
+        </property>
+        <property name="text">
+         <string>Seeds per Voxel: 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_MaxCacheSizeLabel">
+        <property name="toolTip">
+         <string>Likelihood cache in Megabytes</string>
+        </property>
+        <property name="text">
+         <string>Max. Chache Size: 1GB</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSlider" name="m_SeedsPerVoxelSlider">
+        <property name="toolTip">
+         <string comment="Number of tracts started in each voxel of the seed ROI" extracomment="Number of tracts started in each voxel of the seed ROI">Number of tracts started in each voxel of the seed ROI</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSlider" name="m_MaxCacheSizeSlider">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="2" column="3">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>12</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="0" colspan="4">
+   <item row="4" column="0">
     <widget class="QCommandLinkButton" name="commandLinkButton">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>execute stochastic fiber tracking</string>
+      <string>Start Tracking</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="5" column="0">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -101,71 +189,10 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="toolTip">
-      <string>Length of single tracts</string>
-     </property>
-     <property name="text">
-      <string>tarct length</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLineEdit" name="lineEdit_maxTractLength">
-     <property name="toolTip">
-      <string>define length of single tract</string>
-     </property>
-     <property name="text">
-      <string>50</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="toolTip">
-      <string>Number of tracts for each seedpoint</string>
-     </property>
-     <property name="text">
-      <string># of tracts</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLineEdit" name="lineEdit_totalTracts">
-     <property name="toolTip">
-      <string>define number of tracts for each seedpoint</string>
-     </property>
-     <property name="text">
-      <string>1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="label_5">
-     <property name="toolTip">
-      <string>Likelihood cache in Megabytes</string>
-     </property>
-     <property name="text">
-      <string>cache (MB)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QLineEdit" name="lineEdit_likelihood_cache">
-     <property name="toolTip">
-      <string>define likelihood cache in Megabytes</string>
-     </property>
-     <property name="text">
-      <string>500</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>tableWidget</tabstop>
   <tabstop>commandLinkButton</tabstop>
  </tabstops>
  <resources/>

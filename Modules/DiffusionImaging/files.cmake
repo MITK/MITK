@@ -166,6 +166,9 @@ SET(H_FILES
   Algorithms/itkDiffusionTensorPrincipleDirectionImageFilter.h
   Algorithms/itkCartesianToPolarVectorImageFilter.h
   Algorithms/itkPolarToCartesianVectorImageFilter.h
+  Algorithms/itkDistanceMapFilter.h
+  Algorithms/itkProjectionFilter.h
+  Algorithms/itkSkeletonizationFilter.h
 )
 
 SET( TOOL_FILES

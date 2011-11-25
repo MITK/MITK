@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkExports.h>
 #include "mitkVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
+#include <vtkSmartPointer.h>
 
 class vtkActor;
 class vtkPropAssembly;
@@ -121,26 +122,20 @@ namespace mitk {
     virtual void CreateContour(mitk::BaseRenderer* renderer);
     virtual void CreateVTKRenderObjects();
 
+    vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;
+    vtkSmartPointer<vtkAppendPolyData> m_vtkUnselectedPointList;
 
+    vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
+    vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
 
-    vtkAppendPolyData *m_vtkSelectedPointList;
-    vtkAppendPolyData *m_vtkUnselectedPointList;
-    //  vtkAppendPolyData *m_vtkContourPolyData;
+    vtkSmartPointer<vtkActor> m_SelectedActor;
+    vtkSmartPointer<vtkActor> m_UnselectedActor;
+    vtkSmartPointer<vtkActor> m_ContourActor;
 
-    vtkPolyDataMapper *m_VtkSelectedPolyDataMapper;
-    vtkPolyDataMapper *m_VtkUnselectedPolyDataMapper;
-    //  vtkPolyDataMapper *m_vtkContourPolyDataMapper;
-
-    vtkActor *m_SelectedActor;
-    vtkActor *m_UnselectedActor;
-    vtkActor *m_ContourActor;
-
-    vtkPropAssembly *m_PointsAssembly;
+    vtkSmartPointer<vtkPropAssembly> m_PointsAssembly;
 
     //help for contour between points
-    vtkAppendPolyData *m_vtkTextList;
-    //vtkPolyData *m_Contour;
-    //vtkTubeFilter *m_TubeFilter;
+    vtkSmartPointer<vtkAppendPolyData> m_vtkTextList;
 
     //variables to be able to log, how many inputs have been added to PolyDatas
     unsigned int m_NumberOfSelectedAdded;

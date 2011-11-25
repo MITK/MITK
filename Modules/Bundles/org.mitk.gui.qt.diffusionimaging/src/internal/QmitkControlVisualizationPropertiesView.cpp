@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 #include "mitkTbssImage.h"
-#include "mitkTbssGradientImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
@@ -302,35 +301,7 @@ struct CvpSelListener : ISelectionListener
               m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
             }
 
-            if(QString("TbssGradientImage").compare(node->GetData()->GetNameOfClass())==0)
-            {
-              foundTbssImage = true;
-              bool tex_int;
-              node->GetBoolProperty("texture interpolation", tex_int);
-              if(tex_int)
-              {
-                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexON);
-                m_View->m_Controls->m_TextureIntON->setChecked(true);
-                m_View->m_TexIsOn = true;
-              }
-              else
-              {
-                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexOFF);
-                m_View->m_Controls->m_TextureIntON->setChecked(false);
-                m_View->m_TexIsOn = false;
-              }
-              int val;
-              node->GetIntProperty("DisplayChannel", val);
-              m_View->m_Controls->m_DisplayIndex->setValue(val);
 
-              QString label = "Channel %1";
-              label = label.arg(val);
-              m_View->m_Controls->label_channel->setText(label);
-
-              int maxVal = (dynamic_cast<mitk::TbssGradientImage* >(node->GetData()))->GetImage()->GetVectorLength();
-              m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
-
-            }
             else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
             {
               foundMultipleOdfImages = foundQBIVolume || foundTensorVolume;
@@ -831,8 +802,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||
-                             dynamic_cast<mitk::TbssGradientImage*>(node->GetData()) ||
+    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||                             
                              dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData())))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
@@ -994,7 +964,6 @@ void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
   std::vector<std::string> sets;
   sets.push_back("DiffusionImage");
   sets.push_back("TbssImage");
-  sets.push_back("TbssGradientImage");
 
   std::vector<std::string>::iterator it = sets.begin();
   while(it != sets.end())

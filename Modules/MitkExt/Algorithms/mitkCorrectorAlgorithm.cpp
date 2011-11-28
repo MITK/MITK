@@ -50,17 +50,18 @@ void mitk::CorrectorAlgorithm::GenerateData()
   m_WorkingImage->Initialize( inputImage );
   m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
 
+  TimeSlicedGeometry::Pointer originalGeometry;
+
   if (inputImage->GetTimeSlicedGeometry() )
   {
     AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
-    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+    originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
     m_WorkingImage->SetGeometry( originalGeometry );
   }
   else
   {
     itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
   }
-
  
   // Convert to ipMITKSegmentationTYPE (because TobiasHeimannCorrectionAlgorithm relys on that data type)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
@@ -74,7 +75,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   // solution here: we overwrite it with an unity matrix
   itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
   imageDirection.SetIdentity();
-  correctPixelTypeImage->SetDirection(imageDirection);
+  //correctPixelTypeImage->SetDirection(imageDirection);
 
   Image::Pointer temporarySlice = this->GetOutput();
   //  temporarySlice = ImportItkImage( correctPixelTypeImage );
@@ -82,19 +83,21 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   TobiasHeimannCorrectionAlgorithm( temporarySlice->GetSliceData()->GetPicDescriptor() );
 
+  temporarySlice->SetGeometry(originalGeometry);
+
   // temporarySlice is our return value (user  can get it by calling GetOutput() )
 
-  CalculateDifferenceImage( temporarySlice, inputImage );
-  if ( m_DifferenceImage.IsNotNull() && inputImage->GetTimeSlicedGeometry() )
-  {
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
-    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
-    m_DifferenceImage->SetGeometry( originalGeometry );
-  }
-  else
-  {
-    itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
-  }
+//  CalculateDifferenceImage( temporarySlice, inputImage );
+//  if ( m_DifferenceImage.IsNotNull() && inputImage->GetTimeSlicedGeometry() )
+//  {
+//    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
+//    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+//    m_DifferenceImage->SetGeometry( originalGeometry );
+//  }
+//  else
+//  {
+//    itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
+//  }
 }
     
 void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic)

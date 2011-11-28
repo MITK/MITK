@@ -276,7 +276,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   int affectedSlice( -1 );
   DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
 
-  //TODO hier die 3D Interpolation integrieren
   if (affectedDimension != -1) {
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
     slicewriter->SetInput( image );

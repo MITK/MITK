@@ -154,7 +154,7 @@ namespace mitk
 	static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl"};
 	static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", ""};
 	static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube"};
-	static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", ""};
+	static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube"};
 	// Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
 	static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
 

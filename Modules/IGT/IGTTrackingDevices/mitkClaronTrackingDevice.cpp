@@ -29,7 +29,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
 {
   //set the type of this tracking device
-  this->m_Type = ClaronMicron;
+  this->m_Data = mitk::DeviceDataMicronTrackerH40;
 
   this->m_MultiThreader = itk::MultiThreader::New();
   m_ThreadID = 0;

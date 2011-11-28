@@ -102,6 +102,7 @@ SET(CPP_FILES
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
+  Algorithms/mitkTractAnalyzer.cpp
 
  # Tractography
  Tractography/itkStochasticTractographyFilter.h

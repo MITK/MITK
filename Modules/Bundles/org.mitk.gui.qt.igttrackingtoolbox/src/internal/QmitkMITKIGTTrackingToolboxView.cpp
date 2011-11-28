@@ -55,7 +55,9 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
-
+//remove the tracking volume
+this->GetDataStorage()->Remove(m_TrackingVolumeNode);
+this->GlobalReinit();
 }
 
 
@@ -96,11 +98,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
-	// Update List of available models for selected tool.
+	  //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
-	{
+	  {
       m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
   }

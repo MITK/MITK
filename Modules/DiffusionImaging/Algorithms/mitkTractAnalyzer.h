@@ -27,7 +27,7 @@ namespace mitk{
  */
 
 
-class MitkDiffusionImaging_EXPORT TractAnalyzer
+class TractAnalyzer
 {
 
 public:

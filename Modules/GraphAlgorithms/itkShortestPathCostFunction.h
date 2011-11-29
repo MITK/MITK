@@ -14,7 +14,7 @@ namespace itk
 
   // \brief this is a pure virtual superclass for all cost function for the itkShortestPathImageFilter
   template <class TInputImageType>            
-  class ITK_EXPORT ShortestPathCostFunction : public Object 
+  class MitkGraphAlgorithms_EXPORT ShortestPathCostFunction : public Object
   {
   public:
 

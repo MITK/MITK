@@ -6,7 +6,7 @@
 #include "itkShortestPathNode.h"
 #include <itkImageRegionIteratorWithIndex.h>
 
-//#include <MitkGraphAlgorithmsExports.h>
+#include <MitkGraphAlgorithmsExports.h>
 
 // ------- INFORMATION ----------
 /// SET FUNCTIONS
@@ -37,7 +37,7 @@ namespace itk
 {
 
    template <class TInputImageType, class TOutputImageType>
-   class ShortestPathImageFilter :
+   class MitkGraphAlgorithms_EXPORT ShortestPathImageFilter :
       public ImageToImageFilter<TInputImageType, TOutputImageType>
    {
    public:

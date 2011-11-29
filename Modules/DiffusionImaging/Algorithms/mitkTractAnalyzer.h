@@ -17,7 +17,7 @@
 #ifndef __mitkTractAnalyzer_h_
 #define __mitkTractAnalyzer_h_
 
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include <itkImage.h>
 #include <mitkTbssImage.h>
 
@@ -27,7 +27,7 @@ namespace mitk{
  */
 
 
-class MitkDiffusionImagingMBI_EXPORT TractAnalyzer
+class MitkDiffusionImaging_EXPORT TractAnalyzer
 {
 
 public:

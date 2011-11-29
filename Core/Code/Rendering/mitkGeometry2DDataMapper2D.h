@@ -61,6 +61,10 @@ public:
 
   virtual void Paint( BaseRenderer *renderer );
 
+  void DrawLine( BaseRenderer * renderer, ScalarType lengthInDisplayUnits, 
+    std::vector< ScalarType > &lineParams, Line< ScalarType, 2 > &line, 
+    const PlaneGeometry * inputPlaneGeometry, bool drawDashed );
+
 
   virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 

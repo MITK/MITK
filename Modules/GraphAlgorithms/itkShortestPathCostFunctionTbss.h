@@ -13,7 +13,7 @@ namespace itk
 {
 
   template <class TInputImageType>            
-  class MitkGraphAlgorithms_EXPORT ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
+  class ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
   {
   public:
     /** Standard class typedefs. */

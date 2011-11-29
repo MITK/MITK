@@ -7,7 +7,7 @@
 #include "itkShortestPathCostFunction.h" // Superclass of Metrics
 #include <itkImageRegionConstIterator.h>
 #include <MitkGraphAlgorithmsExports.h>
-
+#include <itkMacro.h>
 
 namespace itk
 {
@@ -31,7 +31,7 @@ namespace itk
     itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ShortestPathCostFunctionTbss, Object);
+    itkTypeMacro(Self, Superclass);
    
     // \brief calculates the costs for going from p1 to p2
     virtual double GetCost( IndexType p1, IndexType p2);
@@ -43,7 +43,7 @@ namespace itk
     virtual double GetMinCost();
 
 
-    ShortestPathCostFunctionTbss();
+
 
     void SetThreshold(double t)
     {
@@ -52,6 +52,7 @@ namespace itk
 
 
   protected:
+    ShortestPathCostFunctionTbss();
 
     virtual ~ShortestPathCostFunctionTbss() {};
 
@@ -68,6 +69,6 @@ namespace itk
 } // end namespace itk
 
 
-
+#include "itkShortestPathCostFunctionTbss.cpp"
 
 #endif /* __itkShortestPathCostFunctionTbss_h */

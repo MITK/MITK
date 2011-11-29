@@ -1,5 +1,5 @@
-#ifndef __itkShortestPathCostFunction_txx
-#define __itkShortestPathCostFunction_txx
+#ifndef __itkShortestPathCostFunction_cpp
+#define __itkShortestPathCostFunction_cpp
 
 #include "itkShortestPathCostFunction.h"
 
@@ -48,4 +48,4 @@ namespace itk
 
 } // end namespace itk
 
-#endif // __itkShortestPathCostFunction_txx
+#endif // __itkShortestPathCostFunction_cpp

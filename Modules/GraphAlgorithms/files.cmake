@@ -1,5 +1,8 @@
 SET(CPP_FILES
   itkShortestPathNode.cpp  
+  itkShortestPathCostFunction.cpp  
+  itkShortestPathCostFunctionTbss.cpp
+  itkShortestPathNode.cpp
 )
 
 SET(H_FILES

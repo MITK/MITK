@@ -451,22 +451,27 @@ mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D &d ) const
       return 1.0;
    }
 
-   // The following can be derived from the ellipsoid equation
-   //
-   //   1 = x^2/a^2 + y^2/b^2 + z^2/c^2
-   //
-   // where (a,b,c) = spacing of original volume (ellipsoid radii)
-   // and   (x,y,z) = scaled coordinates of vector d (according to ellipsoid)
-   //
    const mitk::Vector3D &spacing = m_ReferenceGeometry->GetSpacing();
+   return SlicedGeometry3D::CalculateSpacing( spacing, d );
+}
 
-   double scaling = d[0]*d[0] / (spacing[0] * spacing[0])
-      + d[1]*d[1] / (spacing[1] * spacing[1])
-      + d[2]*d[2] / (spacing[2] * spacing[2]);
+double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d )
+{
+  // The following can be derived from the ellipsoid equation
+  //
+  //   1 = x^2/a^2 + y^2/b^2 + z^2/c^2
+  //
+  // where (a,b,c) = spacing of original volume (ellipsoid radii)
+  // and   (x,y,z) = scaled coordinates of vector d (according to ellipsoid)
+  //
+  // 
+  double scaling = d[0]*d[0] / (spacing[0] * spacing[0])
+    + d[1]*d[1] / (spacing[1] * spacing[1])
+    + d[2]*d[2] / (spacing[2] * spacing[2]);
 
-   scaling = sqrt( scaling );
+  scaling = sqrt( scaling );
 
-   return ( sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] ) / scaling );
+  return ( sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] ) / scaling );
 }
 
 mitk::Vector3D 

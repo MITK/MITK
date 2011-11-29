@@ -237,6 +237,7 @@ public:
 
   virtual void ExecuteOperation(Operation* operation); 
 
+  static double CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d );
 
 protected:
   SlicedGeometry3D();
@@ -272,6 +273,7 @@ protected:
    * ellipsoid equation.
    */
   double CalculateSpacing( const mitk::Vector3D &direction ) const;
+  
 
 
   /** The extent of the slice stack, i.e. the number of slices, depends on the

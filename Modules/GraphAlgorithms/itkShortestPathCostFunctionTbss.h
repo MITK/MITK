@@ -6,14 +6,14 @@
 #include "itkShapedNeighborhoodIterator.h"
 #include "itkShortestPathCostFunction.h" // Superclass of Metrics
 #include <itkImageRegionConstIterator.h>
-#include <MitkGraphAlgorithmsExports.h>
+//#include <MitkGraphAlgorithmsExports.h>
 
 
 namespace itk
 {
 
   template <class TInputImageType>            
-  class MitkGraphAlgorithms_EXPORT ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
+  class ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
   {
   public:
     /** Standard class typedefs. */

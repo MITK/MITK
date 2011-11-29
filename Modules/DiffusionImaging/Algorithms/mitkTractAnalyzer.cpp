@@ -10,8 +10,8 @@
 #include <itkImageRegionIteratorWithIndex.h>
 
 
-#include <itkShortestPathCostFunctionTbss.h>
-#include <itkShortestPathImageFilter.h>
+//#include <itkShortestPathCostFunctionTbss.h>
+//#include <itkShortestPathImageFilter.h>
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ namespace mitk {
 
   void TractAnalyzer::BuildGraph(itk::Index<3> startPoint, itk::Index<3> endPoint)
   {
-
+/*
     typedef itk::ShortestPathImageFilter<FloatImageType, CharImageType> ShortestPathFilterType;
     typedef itk::ShortestPathCostFunctionTbss<FloatImageType> CostFunctionType;
 
@@ -65,13 +65,13 @@ namespace mitk {
       m_RoiImg = pathFinder->GetOutput();
     }
 
-
+*/
 
   }
 
   void TractAnalyzer::MeasureRoi()
   {
-
+/*
     // Output two types
     ProjectionsImageType::SizeType size = m_Projections->GetLargestPossibleRegion().GetSize();
 
@@ -155,7 +155,7 @@ namespace mitk {
 
 
   }
-
+*/
 
 
 }

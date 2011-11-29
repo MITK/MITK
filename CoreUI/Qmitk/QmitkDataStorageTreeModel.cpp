@@ -206,7 +206,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
       }
 
       // Now insert items again at the drop item position
-      this->beginInsertRows(parentModelIndex, dropIndex, listOfItemsToDrop.size());
+      this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
 
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();

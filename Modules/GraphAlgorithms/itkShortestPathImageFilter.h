@@ -7,6 +7,7 @@
 #include <itkImageRegionIteratorWithIndex.h>
 
 #include <MitkGraphAlgorithmsExports.h>
+#include <itkMacro.h>
 
 // ------- INFORMATION ----------
 /// SET FUNCTIONS
@@ -49,7 +50,7 @@ namespace itk
 
       // Typdefs for metric
       typedef ShortestPathCostFunction< TInputImageType >				   CostFunctionType;
-      typedef typename CostFunctionType::Pointer						      CostFunctionTypePointer;        
+      typedef typename CostFunctionType::Pointer						      CostFunctionTypePointer;
 
 
       // More typdefs for convenience
@@ -69,10 +70,10 @@ namespace itk
 
 
       // New Macro for smartpointer instantiation
-      itkNewMacro(Self);
+      itkNewMacro(Self)
 
       // Run-time type information
-      itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter);
+      itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter)
 
       // Display
       void PrintSelf( std::ostream& os, Indent indent ) const;
@@ -169,7 +170,7 @@ namespace itk
 
 
 
-      ShortestPathImageFilter ();
+      ShortestPathImageFilter();
 
       // \brief Fill m_VectorPath
       void MakeShortestPathVector();
@@ -208,6 +209,6 @@ namespace itk
 } // end of namespace itk
 
 
-
+#include "itkShortestPathImageFilter.cpp"
 
 #endif

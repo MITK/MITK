@@ -1,5 +1,5 @@
-#ifndef __itkShortestPathCostFunctionTbss_txx
-#define __itkShortestPathCostFunctionTbss_txx
+#ifndef __itkShortestPathCostFunctionTbss_cpp
+#define __itkShortestPathCostFunctionTbss_cpp
 
 #include "itkShortestPathCostFunctionTbss.h"
 #include <limits>

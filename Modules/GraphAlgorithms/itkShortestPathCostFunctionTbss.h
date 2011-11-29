@@ -68,8 +68,6 @@ namespace itk
 } // end namespace itk
 
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkShortestPathCostFunctionTbss.txx"
-#endif
+
 
 #endif /* __itkShortestPathCostFunctionTbss_h */

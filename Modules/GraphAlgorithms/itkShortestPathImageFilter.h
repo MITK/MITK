@@ -38,7 +38,7 @@ namespace itk
 {
 
    template <class TInputImageType, class TOutputImageType>
-   class MitkGraphAlgorithms_EXPORT ShortestPathImageFilter :
+   class ShortestPathImageFilter :
       public ImageToImageFilter<TInputImageType, TOutputImageType>
    {
    public:

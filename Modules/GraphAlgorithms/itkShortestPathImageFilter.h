@@ -208,8 +208,6 @@ namespace itk
 } // end of namespace itk
 
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkShortestPathImageFilter.txx"
-#endif
+
 
 #endif

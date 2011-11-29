@@ -153,9 +153,9 @@ namespace mitk {
 
     fileLong.close();
 
-
-  }
 */
+  }
+
 
 
 }

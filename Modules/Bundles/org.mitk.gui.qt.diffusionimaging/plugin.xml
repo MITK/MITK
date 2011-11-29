@@ -106,5 +106,12 @@
           class="QmitkScreenshotMaker"
           icon="resources/screenshot_maker.png" />
   </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.tractbasedspatialstatistics"
+          name="Tract-based spatial statistics"
+          class="QmitkTractbasedSpatialStatisticsView"
+          icon="resources/tbss.png" />
+  </extension>
 
 </plugin>

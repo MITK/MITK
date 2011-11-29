@@ -8,6 +8,7 @@ SET(module_dirs
     MitkExt
     SceneSerialization
     QmitkExt
+    GraphAlgorithms
     DiffusionImaging
     GPGPU
     IGT
@@ -22,7 +23,7 @@ SET(module_dirs
     InputDevices
     ToFHardware
     ToFProcessing
-    ToFUI
+    ToFUI    
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

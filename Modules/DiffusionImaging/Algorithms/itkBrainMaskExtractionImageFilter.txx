@@ -8,8 +8,8 @@ Version:   $Revision: 1.11 $
 Copyright (c) Insight Software Consortium. All rights reserved.
 See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
 #include <itkAndImageFilter.h>
-#include <itkRecursiveGaussianImageFilter.h> 
+#include <itkRecursiveGaussianImageFilter.h>
 #include <itkMaskImageFilter.h>
 
 namespace itk {
@@ -37,7 +37,7 @@ namespace itk {
   {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
-    this->SetNumberOfRequiredInputs( 1 ); 
+    this->SetNumberOfRequiredInputs( 1 );
   }
 
   template< class TOutputImagePixelType >
@@ -62,7 +62,7 @@ namespace itk {
     }
 
     // threshold the image
-    typename itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::Pointer threshold = 
+    typename itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::Pointer threshold =
       itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::New();
 
     threshold->SetInput( gaussian->GetOutput() );
@@ -95,7 +95,7 @@ namespace itk {
     typedef itk::BinaryBallStructuringElement<int, 3> StructuralElementType;
     StructuralElementType ball;
 
-    typename itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::Pointer erode = 
+    typename itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::Pointer erode =
       itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::New();
 
     ball.SetRadius( 3 );
@@ -135,6 +135,7 @@ namespace itk {
     Mn->SetRegions( M0->GetLargestPossibleRegion() );
     Mn->SetSpacing( M0->GetSpacing() );
     Mn->SetOrigin( M0->GetOrigin() );
+    Mn->SetDirection( M0->GetDirection() );
     Mn->Allocate();
 
     typename OutputImageType::Pointer Mnplus1 = erode->GetOutput();
@@ -226,14 +227,14 @@ namespace itk {
     }
     std::cout << "Done." << std::endl;
 
-    typename OutputImageType::Pointer outputImage = 
+    typename OutputImageType::Pointer outputImage =
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     outputImage->SetSpacing( filler->GetOutput()->GetSpacing() );   // Set the image spacing
     outputImage->SetOrigin( filler->GetOutput()->GetOrigin() );     // Set the image origin
-    outputImage->SetDirection( filler->GetOutput()->GetDirection() );  // Set the image direction
     outputImage->SetLargestPossibleRegion( filler->GetOutput()->GetLargestPossibleRegion());
     outputImage->SetBufferedRegion( filler->GetOutput()->GetLargestPossibleRegion() );
+    outputImage->SetDirection( filler->GetOutput()->GetDirection() );
     outputImage->Allocate();
 
     itk::ImageRegionIterator<OutputImageType> itIn( filler->GetOutput(), filler->GetOutput()->GetLargestPossibleRegion() );
@@ -403,7 +404,7 @@ namespace itk {
       //double alpha = std0*std1/(std0+std1);
 
       //std::cout << "alpha: " << alpha << " " << std0 << " " << std1 << std::endl;
-      //newseuil = (int) (alpha*(mean0/std0 + mean1/std1));		
+      //newseuil = (int) (alpha*(mean0/std0 + mean1/std1));
 
       //std::cout << "New threshold: " << newseuil << std::endl;
 

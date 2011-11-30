@@ -310,9 +310,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
                     diff = (diff1 - diff2) / 2.0;
                     diff.normalize();
 
-                    rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
-                    rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
-                    rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+                    rgba[0] = (unsigned char) (255.0 * std::fabs(diff[0]));
+                    rgba[1] = (unsigned char) (255.0 * std::fabs(diff[1]));
+                    rgba[2] = (unsigned char) (255.0 * std::fabs(diff[2]));
                     rgba[3] = (unsigned char) (255.0);
 
 
@@ -326,9 +326,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
                     diff1 = currentPntvtk - nextPntvtk;
                     diff1.normalize();
 
-                    rgba[0] = (unsigned char) (255.0 * std::abs(diff1[0]));
-                    rgba[1] = (unsigned char) (255.0 * std::abs(diff1[1]));
-                    rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
+                    rgba[0] = (unsigned char) (255.0 * std::fabs(diff1[0]));
+                    rgba[1] = (unsigned char) (255.0 * std::fabs(diff1[1]));
+                    rgba[2] = (unsigned char) (255.0 * std::fabs(diff1[2]));
                     rgba[3] = (unsigned char) (255.0);
 
 
@@ -341,9 +341,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
                     diff2 = currentPntvtk - prevPntvtk;
                     diff2.normalize();
 
-                    rgba[0] = (unsigned char) (255.0 * std::abs(diff2[0]));
-                    rgba[1] = (unsigned char) (255.0 * std::abs(diff2[1]));
-                    rgba[2] = (unsigned char) (255.0 * std::abs(diff2[2]));
+                    rgba[0] = (unsigned char) (255.0 * std::fabs(diff2[0]));
+                    rgba[1] = (unsigned char) (255.0 * std::fabs(diff2[1]));
+                    rgba[2] = (unsigned char) (255.0 * std::fabs(diff2[2]));
                     rgba[3] = (unsigned char) (255.0);
 
                 }

@@ -62,6 +62,10 @@
       name="Screenshots Movies"
       class="QmitkDIAppScreenshotsMoviesPerspective"
       icon="resources/perspectives/screenshotsmovies.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.trackingevaluation"
+      name="Tracking Evaluation"
+      class="QmitkDIAppTrackingEvaluationPerspective"
+      icon="resources/perspectives/screenshotsmovies.png"/>
 
   </extension>
 

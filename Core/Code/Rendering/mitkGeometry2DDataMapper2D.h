@@ -61,9 +61,6 @@ public:
 
   virtual void Paint( BaseRenderer *renderer );
 
-  void DrawLine( BaseRenderer * renderer, ScalarType lengthInDisplayUnits, 
-    std::vector< ScalarType > &lineParams, Line< ScalarType, 2 > &line, 
-    const PlaneGeometry * inputPlaneGeometry, bool drawDashed );
 
 
   virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
@@ -78,6 +75,17 @@ protected:
   virtual ~Geometry2DDataMapper2D();
 
   virtual void GenerateData();
+
+  int ThickSliceMode( DataNode * dn, int &thickSlicesNum );
+
+  void DetermineParametricCrossPositions( Line< ScalarType, 2 > &otherLine, Line< ScalarType, 2 > &mainLine, std::vector< ScalarType > &lineParams );
+
+  void DrawLine( BaseRenderer * renderer, ScalarType lengthInDisplayUnits, 
+                 Line< ScalarType, 2 > &line, std::vector< ScalarType > &lineParams,
+                 const PlaneGeometry * inputPlaneGeometry, bool drawDashed,
+                 ScalarType gapSizeInPixel
+                 );
+
 
   void DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
                             const PlaneGeometry *planeGeometry, 

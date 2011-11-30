@@ -193,7 +193,6 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         secondaryHelperLineParams.push_back( 0.0 );
         secondaryHelperLineParams.push_back( 1.0 );
 
-        Vector2D direction, dOrth;
         
         // Now iterate through all other lines displayed in this window and
         // calculate the positions of intersection with the line to be
@@ -202,8 +201,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         NodesVectorType::iterator otherPlanesIt = m_OtherGeometry2Ds.begin();
         NodesVectorType::iterator otherPlanesEnd = m_OtherGeometry2Ds.end();
 
-        int thickSlicesMode = 0;
-        int thickSlicesNum = 1;
+        int mainLineThickSlicesMode = 0;
+        int mainLineThickSlicesNum = 1;
 
         // Now we have to find the DataNode that contains the inputPlaneGeometry
         // in order to determine the state of the thick-slice rendering
@@ -221,28 +220,19 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             DataNode *dn = (*otherPlanesIt);
             if(dn)
             {
-              // determine the state and the extend of the thick-slice mode
-              mitk::ResliceMethodProperty *resliceMethodEnumProperty=0;
-              if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
-                thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
-
-              IntProperty *intProperty=0;
-              if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
-              {
-                thickSlicesNum = intProperty->GetValue();
-                if(thickSlicesNum < 1) thickSlicesNum=1;
-                if(thickSlicesNum > 10) thickSlicesNum=10;
-              }
+              mainLineThickSlicesMode = this->DetermineThickSliceMode(dn, mainLineThickSlicesNum);
             }
             break;
           }
           otherPlanesIt++;
         }
 
+        double thickSliceDistance = 0.0;
+
         // In case that we are in thick-slice mode we have to create two helperlines 
         // that are parallel to the mainLine and have a distance to the mainLine
         // that fits the pixelSpacing in that direction
-        if ( thickSlicesMode > 0 )
+        if ( mainLineThickSlicesMode > 0 )
         {
           // vectorToHelperLine defines how to reach the helperLine from the mainLine
           Vector2D vectorToHelperLine;
@@ -253,10 +243,12 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           Vector3D normal = inputPlaneGeometry->GetNormal();
 
           // and determine the pixelSpacing in that direction
-          vectorToHelperLine *= SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+          thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
           // As the inputPlaneGeometry cuts through the center of the slice in the middle
           // we have to add 0.5 pixel in order to compensate.
-          vectorToHelperLine *= thickSlicesNum+0.5;
+          thickSliceDistance *= mainLineThickSlicesNum+0.5;
+
+          vectorToHelperLine *= thickSliceDistance;
 
           primaryHelperLine.SetPoints( primaryHelperLine.GetPoint1() - vectorToHelperLine,
             primaryHelperLine.GetPoint2() - vectorToHelperLine );
@@ -264,6 +256,13 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           secondaryHelperLine.SetPoints( secondaryHelperLine.GetPoint1() + vectorToHelperLine,
             secondaryHelperLine.GetPoint2() + vectorToHelperLine );
         }
+
+
+        int otherLineThickSlicesMode = 0;
+        int otherLineThickSlicesNum = 1;
+
+        // by default, there is no gap for the helper lines
+        ScalarType gapSize = 0.0;
 
         otherPlanesIt = m_OtherGeometry2Ds.begin();
         while ( otherPlanesIt != otherPlanesEnd )
@@ -279,6 +278,13 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             && worldPlaneGeometry->IntersectionLine( 
                  otherPlane, otherCrossLine ) )
           {
+            otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
+            double otherLineThickSliceDistance = 1.0;
+            Vector3D normal = otherPlane->GetNormal();
+
+            otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+            otherLineThickSliceDistance *= (otherLineThickSlicesNum+0.5)*2;
+
             Point2D otherLineFrom, otherLineTo;
 
             // ... and clip the resulting line segment with the reference 
@@ -295,54 +301,67 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
               worldPlaneGeometry->Map( 
                 transform->TransformPoint( point2 ), otherLineTo );
 
-              // By means of the dot product, calculate the gap position as
-              // parametric value in the range [0, 1]
               otherLine.SetPoints( otherLineFrom, otherLineTo );
-              direction = otherLine.GetDirection();
-              dOrth[0] = -direction[1]; dOrth[1] = direction[0];
 
-              // t = gap position in parametric coordinates
-              ScalarType gapPosition, norm; 
-              gapPosition = ( otherLine.GetPoint1() - mainLine.GetPoint1() ) * dOrth;
-              norm = mainLine.GetDirection() * dOrth;
+              // then we have to determine the gap position of the main line
+              // by finding the position at which the two lines cross
+              this->DetermineParametricCrossPositions( otherLine, mainLine, mainLineParams );
 
-              if ( fabs( norm ) > eps )
+
+              // if the other line is also in thick slice mode, we have to determine the 
+              // gapsize considering the width of that other line and the spacing in its direction
+              if ( otherLineThickSlicesMode > 0 )
               {
-                gapPosition /= norm;
-                if ( (gapPosition > 0.0) && (gapPosition < 1.0) )
-                {
-                  mainLineParams.push_back(gapPosition);
-                }
+                Vector2D otherLineDirection = otherLine.GetDirection();
+                otherLineDirection.Normalize();
+                mainLineDirectionOrthogonal.Normalize();
+
+                gapSize = fabs( otherLineThickSliceDistance / ( otherLineDirection*mainLineDirectionOrthogonal ) );
+                gapSize = gapSize / displayGeometry->GetScaleFactorMMPerDisplayUnit();
+
+                // determine the gap positions for the helper lines as well
+                this->DetermineParametricCrossPositions( otherLine, primaryHelperLine, primaryHelperLineParams );
+                this->DetermineParametricCrossPositions( otherLine, secondaryHelperLine, secondaryHelperLineParams );
               }
             }
           }
           ++otherPlanesIt;
         }
 
+        bool drawHelperLines = (mainLineThickSlicesMode > 0) || (gapSize > 0);
+
+        // If we have to draw the helperlines, the mainline will be drawn as a dashed line
+        // with a fixed gapsize of 10 pixels
         this->DrawLine(renderer,
           lengthInDisplayUnits,
-          mainLineParams,
           mainLine,
+          mainLineParams,
           inputPlaneGeometry,
-          (thickSlicesMode == 1)
+          drawHelperLines,
+          10.0
           );
 
-        if ( thickSlicesMode == 1 )
+
+        // If drawn, the helperlines are drawn as a solid line. The gapsize depends on the 
+        // width of the crossed line.
+        if ( drawHelperLines )
         {
           this->DrawLine(renderer,
             lengthInDisplayUnits,
-            primaryHelperLineParams,
             primaryHelperLine,
+            primaryHelperLineParams,
             inputPlaneGeometry,
-            false
+            false,
+            gapSize
             );
 
           this->DrawLine(renderer,
             lengthInDisplayUnits,
-            secondaryHelperLineParams,
             secondaryHelperLine,
+            secondaryHelperLineParams,
             inputPlaneGeometry,
-            false
+            false,
+            gapSize
             );
         }
 
@@ -489,10 +508,12 @@ void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::Data
 
 void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer, 
                                             ScalarType lengthInDisplayUnits, 
-                                            std::vector< ScalarType > &lineParams, 
                                             Line< ScalarType, 2 > &line, 
+                                            std::vector< ScalarType > &lineParams, 
                                             const PlaneGeometry * inputPlaneGeometry, 
-                                            bool drawDashed )
+                                            bool drawDashed, 
+                                            ScalarType gapSizeInPixel
+                                            )
 {
   DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
   const PlaneGeometry *worldPlaneGeometry =
@@ -502,7 +523,6 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
   // Apply color and opacity read from the PropertyList.
   this->ApplyProperties( renderer );
 
-  ScalarType gapSizeInPixel = 10.0;
   ScalarType gapSizeInParamUnits = 
     1.0 / lengthInDisplayUnits * gapSizeInPixel;
 
@@ -593,4 +613,45 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
     }
   }
 
+}
+
+int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
+{
+  int thickSlicesMode = 0;
+  // determine the state and the extend of the thick-slice mode
+  mitk::ResliceMethodProperty *resliceMethodEnumProperty=0;
+  if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+    thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
+
+  IntProperty *intProperty=0;
+  if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+  {
+    thickSlicesNum = intProperty->GetValue();
+    if(thickSlicesNum < 1) thickSlicesNum=1;
+    if(thickSlicesNum > 10) thickSlicesNum=10;
+  }
+
+  return thickSlicesMode;
+}
+
+void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &otherLine, Line< mitk::ScalarType, 2 > &mainLine, std::vector< mitk::ScalarType > &lineParams )
+{
+  Vector2D direction, dOrth;
+  // By means of the dot product, calculate the gap position as
+  // parametric value in the range [0, 1]
+  direction = otherLine.GetDirection();
+  dOrth[0] = -direction[1]; dOrth[1] = direction[0];
+
+
+  ScalarType gapPosition = ( otherLine.GetPoint1() - mainLine.GetPoint1() ) * dOrth;
+  ScalarType norm = mainLine.GetDirection() * dOrth;
+
+  if ( fabs( norm ) > eps )
+  {
+    gapPosition /= norm;
+    if ( (gapPosition > 0.0) && (gapPosition < 1.0) )
+    {
+      lineParams.push_back(gapPosition);
+    }
+  }
 }

@@ -100,9 +100,7 @@ protected slots:
 
   void OnWorkingNodeVisibilityChanged();
 
-  void OnRememberContourPositions(bool state);
-
-  void OnHideMarkerNodes(bool);
+  void OnShowMarkerNodes(bool);
 
   void On3DInterpolationEnabled(bool);
 

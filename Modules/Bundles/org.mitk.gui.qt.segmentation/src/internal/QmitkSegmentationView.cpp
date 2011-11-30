@@ -609,8 +609,8 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
   }
 }
 
-//to remember the contour positions
-void QmitkSegmentationView::OnRememberContourPositions (bool state)
+
+void QmitkSegmentationView::OnShowMarkerNodes (bool state)
 {
   mitk::SegTool2D::Pointer manualSegmentationTool;
 
@@ -624,11 +624,11 @@ void QmitkSegmentationView::OnRememberContourPositions (bool state)
     {
       if(state == Qt::Checked)
       {
-        manualSegmentationTool->SetRememberContourPositions( true );
+        manualSegmentationTool->SetShowMarkerNodes( true );
 }
       else
       {
-        manualSegmentationTool->SetRememberContourPositions( false );
+        manualSegmentationTool->SetShowMarkerNodes( false );
       }
     }
   }
@@ -659,9 +659,6 @@ void QmitkSegmentationView::On3DInterpolationEnabled (bool state)
   }
 }
 
-void QmitkSegmentationView::OnHideMarkerNodes(bool state)
-{
-}
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
   std::vector<mitk::DataNode*> nodes;
@@ -1177,8 +1174,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
     this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalRememberContourPositions(bool)), this, SLOT(OnRememberContourPositions(bool)));
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalHideMarkerNodes(int)), this, SLOT(OnHideMarkerNodes(int)));
+  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());

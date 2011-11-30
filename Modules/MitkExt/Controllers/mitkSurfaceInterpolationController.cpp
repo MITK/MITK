@@ -166,6 +166,7 @@ unsigned int mitk::SurfaceInterpolationController::CreateNewContourList()
   ContourPositionPairList newList;
   m_ListOfContourLists.push_back(newList);
   this->SetCurrentListID(newID);
+  m_InterpolationResult = 0;
   return m_CurrentContourListID;
 }
 

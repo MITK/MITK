@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtConcurrentRun>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QTimer>
 
 
 namespace mitk
@@ -148,7 +149,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
   signals:
 
     void SignalRememberContourPositions(bool);
-    void SignalHideMarkerNodes(bool);
+    void SignalShowMarkerNodes(bool);
     void Signal3DInterpolationEnabled(bool);
 
   public slots:
@@ -205,6 +206,12 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     void Run3DInterpolation();
 
     void SurfaceInterpolationFinished();
+
+    void StartUpdateInterpolationTimer();
+
+    void StopUpdateInterpolationTimer();
+
+    void ChangeSurfaceColor();
 
   protected:
 
@@ -267,7 +274,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     QRadioButton* m_RBtnDisableInterpolation;
     QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
     QPushButton* m_BtnAccept3DInterpolation;
-    QCheckBox* m_CbHideMarkers;
+    QCheckBox* m_CbShowMarkers;
 
     mitk::DataNode::Pointer m_FeedbackNode;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
@@ -287,6 +294,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
+    QTimer* m_Timer;
 };
 
 #endif

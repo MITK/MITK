@@ -71,7 +71,7 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
 
-    void SetRememberContourPositions(bool);
+    void SetShowMarkerNodes(bool);
 
     void Enable3DInterpolation(bool);
 
@@ -125,7 +125,7 @@ class MitkExt_EXPORT SegTool2D : public Tool
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 
-    bool m_RememberContourPositions;
+    bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
 };
 

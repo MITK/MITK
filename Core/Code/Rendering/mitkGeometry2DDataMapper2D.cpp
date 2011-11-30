@@ -204,6 +204,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         int mainLineThickSlicesMode = 0;
         int mainLineThickSlicesNum = 1;
 
+        DataNode* dataNodeOfInputPlaneGeometry = NULL;
+
         // Now we have to find the DataNode that contains the inputPlaneGeometry
         // in order to determine the state of the thick-slice rendering
         while ( otherPlanesIt != otherPlanesEnd )
@@ -217,39 +219,48 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             && worldPlaneGeometry->IntersectionLine( 
             otherPlane, otherCrossLine ) )
           {
-            DataNode *dn = (*otherPlanesIt);
-            if(dn)
+            dataNodeOfInputPlaneGeometry = (*otherPlanesIt);
+            if( dataNodeOfInputPlaneGeometry )
             {
-              mainLineThickSlicesMode = this->DetermineThickSliceMode(dn, mainLineThickSlicesNum);
+              mainLineThickSlicesMode = this->DetermineThickSliceMode(dataNodeOfInputPlaneGeometry, mainLineThickSlicesNum);
             }
             break;
           }
           otherPlanesIt++;
         }
 
-        double thickSliceDistance = 0.0;
+        // if we did not find a dataNode for the inputPlaneGeometry there is nothing we can do from here
+        if ( dataNodeOfInputPlaneGeometry == NULL )
+          return;
 
-        // In case that we are in thick-slice mode we have to create two helperlines 
-        // that are parallel to the mainLine and have a distance to the mainLine
-        // that fits the pixelSpacing in that direction
-        if ( mainLineThickSlicesMode > 0 )
+        // Determine if we should draw the area covered by the thick slicing, default is false.
+        // This will also show the area of slices that do not have thick slice mode enabled
+        bool showAreaOfThickSlicing = true;
+        showAreaOfThickSlicing &= dataNodeOfInputPlaneGeometry->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
+
+        // get the normal of the inputPlaneGeometry
+        Vector3D normal = inputPlaneGeometry->GetNormal();
+        // determine the pixelSpacing in that direction
+        double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+
+        // As the inputPlaneGeometry cuts through the center of the slice in the middle
+        // we have to add 0.5 pixel in order to compensate.
+        thickSliceDistance *= mainLineThickSlicesNum+0.5;
+
+        // not the nicest place to do it, but we have the width of the visible bloc in MM here
+        // so we store it in this fancy property
+        dataNodeOfInputPlaneGeometry->SetFloatProperty( "reslice.thickslices.sizeinmm", thickSliceDistance*2 );
+
+        if ( showAreaOfThickSlicing )
         {
           // vectorToHelperLine defines how to reach the helperLine from the mainLine
           Vector2D vectorToHelperLine;
           vectorToHelperLine = mainLineDirectionOrthogonal;
           vectorToHelperLine.Normalize();
-
-          // get the normal of the inputPlaneGeometry
-          Vector3D normal = inputPlaneGeometry->GetNormal();
-
-          // and determine the pixelSpacing in that direction
-          thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
-          // As the inputPlaneGeometry cuts through the center of the slice in the middle
-          // we have to add 0.5 pixel in order to compensate.
-          thickSliceDistance *= mainLineThickSlicesNum+0.5;
-
+          // got the right direction, so we multiply the width
           vectorToHelperLine *= thickSliceDistance;
 
+          // and create the corresponding points
           primaryHelperLine.SetPoints( primaryHelperLine.GetPoint1() - vectorToHelperLine,
             primaryHelperLine.GetPoint2() - vectorToHelperLine );
 
@@ -279,10 +290,9 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
                  otherPlane, otherCrossLine ) )
           {
             otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
-            double otherLineThickSliceDistance = 1.0;
             Vector3D normal = otherPlane->GetNormal();
 
-            otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+            double otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
             otherLineThickSliceDistance *= (otherLineThickSlicesNum+0.5)*2;
 
             Point2D otherLineFrom, otherLineTo;
@@ -310,12 +320,13 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
               // if the other line is also in thick slice mode, we have to determine the 
               // gapsize considering the width of that other line and the spacing in its direction
-              if ( otherLineThickSlicesMode > 0 )
+              if ( showAreaOfThickSlicing )
               {
                 Vector2D otherLineDirection = otherLine.GetDirection();
                 otherLineDirection.Normalize();
                 mainLineDirectionOrthogonal.Normalize();
 
+                // determine the gapsize
                 gapSize = fabs( otherLineThickSliceDistance / ( otherLineDirection*mainLineDirectionOrthogonal ) );
                 gapSize = gapSize / displayGeometry->GetScaleFactorMMPerDisplayUnit();
 
@@ -328,8 +339,6 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           ++otherPlanesIt;
         }
 
-        bool drawHelperLines = (mainLineThickSlicesMode > 0) || (gapSize > 0);
-
         // If we have to draw the helperlines, the mainline will be drawn as a dashed line
         // with a fixed gapsize of 10 pixels
         this->DrawLine(renderer,
@@ -337,14 +346,14 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           mainLine,
           mainLineParams,
           inputPlaneGeometry,
-          drawHelperLines,
+          showAreaOfThickSlicing,
           10.0
           );
 
 
         // If drawn, the helperlines are drawn as a solid line. The gapsize depends on the 
         // width of the crossed line.
-        if ( drawHelperLines )
+        if ( showAreaOfThickSlicing )
         {
           this->DrawLine(renderer,
             lengthInDisplayUnits,
@@ -364,7 +373,6 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             gapSize
             );
         }
-
       }
     }
   }
@@ -623,9 +631,12 @@ int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &t
   if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
   {
     thickSlicesNum = intProperty->GetValue();
-    if(thickSlicesNum < 1) thickSlicesNum=1;
+    if(thickSlicesNum < 1) thickSlicesNum=0;
     if(thickSlicesNum > 10) thickSlicesNum=10;
   }
+
+  if ( thickSlicesMode == 0 )
+    thickSlicesNum = 0;
 
   return thickSlicesMode;
 }

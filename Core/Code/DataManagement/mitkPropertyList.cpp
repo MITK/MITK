@@ -51,41 +51,29 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
   {
     // yes
     //is the property contained in the list identical to the new one?
-    if( it->second == property) 
+    if( it->second->operator==(*property) )
     {
       // yes? do nothing and return.
       return;
     }
 
-    // compatible? then use operator= to assign value
-    if (it->second->Assignable( *property ))
+    if (it->second->AssignProperty(*property))
     {
-      bool changed = (it->second->GetValueAsString() != property->GetValueAsString());
-      *(static_cast<BaseProperty*>(it->second.GetPointer())) = *property;
-      // muellerm,20.10: added modified event
-      if(changed)
-        this->Modified();
-      return;
+      // The assignment was successfull
+      this->Modified();
     }
-    
-    if ( typeid( *(it->second.GetPointer()) ) != typeid( *property ) )
+    else
     {
-      // Accept only if the two types are matching. For replacing, use 
-      // ReplaceProperty.
-      MITK_ERROR << "In " __FILE__ ", l." << __LINE__ 
-        << ": Trying to set existing property to a property with different type." 
-        << " Use ReplaceProperty() instead."
-        << std::endl;
-      return;
+      MITK_ERROR << "In " __FILE__ ", l." << __LINE__
+                 << ": Trying to set existing property " << it->first << " of type " << it->second->GetNameOfClass()
+                 << " to a property with different type " << property->GetNameOfClass() << "."
+                 << " Use ReplaceProperty() instead."
+                 << std::endl;
     }
-
-    // If types are identical, but the property has no operator= (s.a.),
-    // overwrite the pointer.
-    it->second = property;
     return;
   }
 
-  //no? add/replace it.
+  //no? add it.
   PropertyMapElementType newProp;
   newProp.first = propertyKey;
   newProp.second = property;

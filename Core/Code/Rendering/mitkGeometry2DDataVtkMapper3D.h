@@ -30,8 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkActor;
 class vtkPolyDataMapper;
-class vtkDataSetMapper;
-class vtkLookupTable;
 class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
@@ -184,9 +182,6 @@ protected:
   /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-  /** A default grayscale lookup-table, used for reference */
-  vtkLookupTable *m_DefaultLookupTable;
-
   class MITK_CORE_EXPORT ActorInfo
   {
   public:
@@ -207,24 +202,6 @@ protected:
    */
   typedef std::map< ImageVtkMapper2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
-
-  struct LookupTableProperties
-  {
-    LookupTableProperties()
-    : LookupTableSource( NULL ),
-      windowMin( 0.0 ),
-      windowMax( 4096.0 )
-    {}
-    vtkLookupTable *LookupTableSource;
-    vtkFloatingPointType windowMin;
-    vtkFloatingPointType windowMax;
-  };
-
-  typedef std::map< ImageVtkMapper2D *, LookupTableProperties >
-    LookupTablePropertiesList;
-
-  /** \brief List holding some lookup table properties of the previous pass */
-  LookupTablePropertiesList m_LookupTableProperties;
 
   // responsiblity to remove the observer upon its destruction
   typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;

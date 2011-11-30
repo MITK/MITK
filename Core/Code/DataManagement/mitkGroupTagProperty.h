@@ -36,15 +36,20 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
   public:
     mitkClassMacro(GroupTagProperty, BaseProperty);
     itkNewMacro(GroupTagProperty);
-    
-    virtual ~GroupTagProperty();
 
-    virtual bool operator==(const BaseProperty& property) const;
-    virtual bool Assignable(const BaseProperty& other) const;
-    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-    
+    using BaseProperty::operator=;
+
   protected:
     GroupTagProperty();
+
+  private:
+
+    // purposely not implemented
+    GroupTagProperty(const GroupTagProperty&);
+    GroupTagProperty& operator=(const GroupTagProperty&);
+
+    virtual bool IsEqual(const BaseProperty& property) const;
+    virtual bool Assign(const BaseProperty& property);
 };
 
 } // namespace mitk

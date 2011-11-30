@@ -360,11 +360,12 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
   }
 }
 
+// returns number of gradients
 template<typename TPixelType>
 int mitk::DiffusionImage<TPixelType>::GetNumDirections()
 {
   int gradients = m_OriginalDirections->Size();
-  for (int i=0; i<gradients; i++)
+  for (int i=0; i<m_OriginalDirections->Size(); i++)
     if (GetB_Value(i)<=0)
     {
       gradients--;
@@ -372,16 +373,30 @@ int mitk::DiffusionImage<TPixelType>::GetNumDirections()
   return gradients;
 }
 
+// returns number of not diffusion weighted images
 template<typename TPixelType>
 int mitk::DiffusionImage<TPixelType>::GetNumB0()
 {
-  int b0 = m_OriginalDirections->Size();
-  for (int i=0; i<b0; i++)
+  int b0 = 0;
+  for (int i=0; i<m_OriginalDirections->Size(); i++)
     if (GetB_Value(i)<=0)
     {
       b0++;
     }
   return b0;
+}
+
+// returns a list of indices belonging to the not diffusion weighted images
+template<typename TPixelType>
+std::vector<int> mitk::DiffusionImage<TPixelType>::GetB0Indices()
+{
+  std::vector<int> indices;
+  for (int i=0; i<m_OriginalDirections->Size(); i++)
+    if (GetB_Value(i)<=0)
+    {
+      indices.push_back(i);
+    }
+  return indices;
 }
 
 template<typename TPixelType>

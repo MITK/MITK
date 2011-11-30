@@ -230,6 +230,8 @@ public:
   static std::string ARG_TESTPLUGIN;
   static std::string ARG_TESTAPPLICATION;
 
+  static std::string ARG_XARGS;
+
   static SmartPointer<IExtensionPointService> GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();
 
@@ -320,6 +322,12 @@ public:
    */
   static std::vector<std::string> GetApplicationArgs();
 
+  /**
+   * Returns the "extended" command line arguments. This is
+   * just the string given as argument to the "--xargs" option.
+   */
+  static std::string GetExtendedApplicationArgs();
+
   static ServiceRegistry& GetServiceRegistry();
 
   /**
@@ -336,6 +344,8 @@ public:
   static std::vector<IBundle::Pointer> GetBundles();
 
   static QSharedPointer<ctkPlugin> GetCTKPlugin(const QString& symbolicName);
+
+  static QSharedPointer<ctkPlugin> GetCTKPlugin(long id);
 
 private:
   Platform();

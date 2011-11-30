@@ -82,6 +82,7 @@ public:
 
   /** \brief Get/Set wrapped vtk transfer function. */
   itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
+  itkSetMacro(ColorTransferFunction,vtkSmartPointer<vtkColorTransferFunction>);
 
   /** \brief Get histogram used for transfer function initialization. */
   itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
@@ -157,7 +158,9 @@ public:
 protected:
   TransferFunction();
   virtual ~TransferFunction();
-    
+
+  void PrintSelf(std::ostream &os, itk::Indent indent) const;
+
   /** Wrapped VTK scalar opacity transfer function */
   vtkSmartPointer<vtkPiecewiseFunction> m_ScalarOpacityFunction;
 

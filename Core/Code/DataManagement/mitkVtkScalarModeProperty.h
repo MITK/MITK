@@ -44,8 +44,6 @@ public:
   
   mitkNewMacro1Param(VtkScalarModeProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.
@@ -61,6 +59,8 @@ public:
   virtual void SetScalarModeToPointFieldData();
 
   virtual void SetScalarModeToCellFieldData();
+
+  using BaseProperty::operator=;
   
 protected:
   
@@ -94,6 +94,12 @@ protected:
    * enumeration values.
    */
   virtual void AddInterpolationTypes();
+
+private:
+
+  // purposely not implemented
+  VtkScalarModeProperty(const VtkScalarModeProperty&);
+  VtkScalarModeProperty& operator=(const VtkScalarModeProperty&);
 };
 
 } // end of namespace mitk

@@ -143,8 +143,20 @@ MITK_CORE_EXPORT std::ostream& operator<<(std::ostream& stream, const LookupTabl
 * class declaration macro mitkSpecializeGenericLookupTable.
 */
 #define mitkSpecializeGenericLookupTableOperator(LookupTableName)              \
-std::ostream& mitk::operator<<(std::ostream& stream, const LookupTableName& /*l*/) \
+std::ostream& mitk::operator<<(std::ostream& stream, const LookupTableName& l) \
 {                                                                              \
-  return stream;                                                               \
+  typedef LookupTableName::LookupTableType::const_iterator IterType;           \
+  IterType e = l.GetLookupTable().end();                                       \
+  IterType b = l.GetLookupTable().begin();                                     \
+  stream << "[";                                                               \
+  for (IterType i = b; i != e; ++i)                                            \
+  {                                                                            \
+    if (i != b)                                                                \
+    {                                                                          \
+      stream << ", ";                                                          \
+    }                                                                          \
+    stream << i->first << " -> " << i->second;                                 \
+  }                                                                            \
+  return stream << "]";                                                        \
 };
 #endif

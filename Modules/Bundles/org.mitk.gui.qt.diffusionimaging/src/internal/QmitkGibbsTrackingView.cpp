@@ -171,7 +171,7 @@ void QmitkGibbsTrackingView::AfterThread()
   }
   if(m_Controls->m_ParticleLengthSlider->value()==0)
   {
-    m_Controls->m_ParticleWidthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
+    m_Controls->m_ParticleLengthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
     m_Controls->m_ParticleLengthSlider->setValue(m_GlobalTracker->GetParticleLength()*10);
     paramMessage += "Particle length was set to " + QString::number(m_GlobalTracker->GetParticleLength()) + " mm\n";
   }
@@ -656,7 +656,7 @@ void QmitkGibbsTrackingView::SaveTrackingParameters()
   documentXML.LinkEndChild(mainXML);
 
   TiXmlElement* paramXML = new TiXmlElement("parameter_set");
-  paramXML->SetAttribute("iterations", m_Iterations);
+  paramXML->SetAttribute("iterations", QString::number(m_Iterations).toStdString());
   paramXML->SetAttribute("particle_length", QString::number((float)m_Controls->m_ParticleLengthSlider->value()/10).toStdString());
   paramXML->SetAttribute("particle_width", QString::number((float)m_Controls->m_ParticleWidthSlider->value()/10).toStdString());
   paramXML->SetAttribute("particle_weight", QString::number((float)m_Controls->m_ParticleWeightSlider->value()/10000).toStdString());

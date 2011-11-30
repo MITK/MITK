@@ -394,47 +394,12 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
             {
               FeedbackContourTool::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue );
 
-              // 4. write working slice back into image volume
-              int affectedDimension( -1 );
-              int affectedSlice( -1 );
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-              FeedbackContourTool::DetermineAffectedImageSlice( dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() ), planeGeometry, affectedDimension, affectedSlice );
 
-              MITK_INFO << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
+              //MITK_INFO << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
-              //If dazu gemacht
-              Image::Pointer workingImage = dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() );
-              if ( affectedDimension != -1 )
-              {
-                  OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-                  slicewriter->SetInput( workingImage );
-                  slicewriter->SetCreateUndoInformation( true );
-                  slicewriter->SetSliceImage( m_WorkingSlice );
-                  slicewriter->SetSliceDimension( affectedDimension );
-                  slicewriter->SetSliceIndex( affectedSlice );
-                  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
-                  slicewriter->Update();
-
-                  if ( m_RememberContourPositions )
-                  {
-                      this->AddContourmarker(positionEvent);
-                  }
-              }
-              else
-              {
-                  OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-                  slicewriter->SetInput( workingImage );
-                  slicewriter->SetCreateUndoInformation( false );
-                  slicewriter->SetSliceImage( m_WorkingSlice );
-                  slicewriter->SetPlaneGeometry3D( m_WorkingSlice->GetGeometry() );
-                  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
-                  slicewriter->Update();
-
-                  if ( m_RememberContourPositions )
-                  {
-                      this->AddContourmarker(positionEvent);
-                  }
-              }
+             // 4. write working slice back into image volume
+             this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
             }
           }
         }

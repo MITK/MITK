@@ -16,10 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationDataToPointSetFilter.h"
+#include "mitkNavigationDataPlayer.h"
+#include "mitkTimeStamp.h"
+#include "mitkStandardFileLocations.h"
 
 #include "mitkTestingMacros.h"
 
 #include <iostream>
+
+#include <itksys/SystemTools.hxx>
 
 /**
  *  Simple example for a test for the (non-existent) class "NavigationDataToPointSetFilter".
@@ -167,6 +172,41 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     pointSet->GetPoint(1,1)[0] == 10.0 && pointSet->GetPoint(1,1)[1] == 11.0 && pointSet->GetPoint(1,1)[2] == 12.0
     , "Testing the correct ring buffer behavior" );
 }
+
+static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter)
+{
+  myNavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3DMean);
+  int numberForMean = 5;
+  myNavigationDataToPointSetFilter->SetNumberForMean(numberForMean);
+
+  MITK_TEST_CONDITION(mitk::Equal(myNavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
+
+  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+  
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+
+  player->SetFileName( file );
+  player->StartPlaying();
+
+  for (int i = 0; i< player->GetNumberOfOutputs(); i++)
+  {
+    myNavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
+  }
+
+  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
+
+  myNavigationDataToPointSetFilter->Update();
+
+  player->StopPlaying();
+
+  MITK_TEST_CONDITION(pointSet0->GetPoint(0)[0]==3.0 && pointSet0->GetPoint(0)[1]==2.0 && pointSet0->GetPoint(0)[2]==5.0,
+    "Testing the average of first input");
+
+  MITK_TEST_CONDITION(pointSet1->GetPoint(0)[0]==30.0 && pointSet1->GetPoint(0)[1]==20.0 && pointSet1->GetPoint(0)[2]==50.0,
+    "Testing the average of second input");
+
+}
 };
 
 
@@ -185,9 +225,28 @@ int mitkNavigationDataToPointSetFilterTest(int /* argc */, char* /*argv*/[])
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
+
+  mitk::NavigationData::Pointer nd_in = mitk::NavigationData::New();
+  const mitk::NavigationData* nd_out = mitk::NavigationData::New();
+  mitk::NavigationData::PositionType point;
+
+  point[0] = 1.0;
+  point[1] = 2.0;
+  point[2] = 3.0;
+  nd_in->SetPosition(point);
+
+  myNavigationDataToPointSetFilter->SetInput(nd_in);
+  nd_out = myNavigationDataToPointSetFilter->GetInput();
+
+  MITK_TEST_CONDITION( nd_out->GetPosition() == nd_in->GetPosition(),
+    "Testing get/set input" );
+
+  myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
   mitkNavigationDataToPointSetFilterTestClass::TestMode3D(myNavigationDataToPointSetFilter);
   myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
   mitkNavigationDataToPointSetFilterTestClass::TestMode4D(myNavigationDataToPointSetFilter);
+  myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+  mitkNavigationDataToPointSetFilterTestClass::TestMode3DMean(myNavigationDataToPointSetFilter);
   // always end with this!
   MITK_TEST_END();
 }

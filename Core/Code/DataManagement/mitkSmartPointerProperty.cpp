@@ -69,13 +69,15 @@ std::string mitk::SmartPointerProperty::GetReferenceUIDFor(itk::Object* object)
   }
 }
 
-bool mitk::SmartPointerProperty::operator==(const BaseProperty& property) const
+bool mitk::SmartPointerProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
+  return this->m_SmartPointer == static_cast<const Self&>(property).m_SmartPointer;
+}
 
-    if(other==NULL) return false;
-
-    return other->m_SmartPointer==m_SmartPointer;
+bool mitk::SmartPointerProperty::Assign(const BaseProperty& property)
+{
+  this->m_SmartPointer = static_cast<const Self&>(property).m_SmartPointer;
+  return true;
 }
 
 mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer)
@@ -83,13 +85,14 @@ mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer)
   SetSmartPointer( pointer );
 }
 
-mitk::SmartPointerProperty::~SmartPointerProperty()
-{
-}
-
 itk::Object::Pointer mitk::SmartPointerProperty::GetSmartPointer() const
 {
     return m_SmartPointer;
+}
+
+itk::Object::Pointer mitk::SmartPointerProperty::GetValue() const
+{
+  return this->GetSmartPointer();
 }
 
 void mitk::SmartPointerProperty::SetSmartPointer(itk::Object* pointer)
@@ -114,6 +117,11 @@ void mitk::SmartPointerProperty::SetSmartPointer(itk::Object* pointer)
   }
 }
 
+void mitk::SmartPointerProperty::SetValue(const ValueType & value)
+{
+  this->SetSmartPointer(value.GetPointer());
+}
+
 std::string mitk::SmartPointerProperty::GetValueAsString() const
 {
   if ( m_SmartPointer.IsNotNull() )
@@ -121,37 +129,3 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
   else
     return std::string("NULL");
 }
-
-bool mitk::SmartPointerProperty::Assignable(const BaseProperty& other) const
-{
-  try
-  {
-    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
-    return true;
-  }
-  catch (std::bad_cast)
-  {
-  }
-  return false;
-}
-
-mitk::BaseProperty& mitk::SmartPointerProperty::operator=(const BaseProperty& other)
-{
-  try
-  {
-    const Self& otherProp( dynamic_cast<const Self&>(other) );
-
-    if (this->m_SmartPointer != otherProp.m_SmartPointer)
-    {
-      this->m_SmartPointer = otherProp.m_SmartPointer;
-      this->Modified();
-    }
-  }
-  catch (std::bad_cast)
-  {
-    // nothing to do then
-  }
-
-  return *this;
-}
-

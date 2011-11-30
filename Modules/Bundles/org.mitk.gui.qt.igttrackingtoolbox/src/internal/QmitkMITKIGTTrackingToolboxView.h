@@ -92,6 +92,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief This slot enables / disables UI elements depending on the tracking device after a device is changed.*/ 
     void OnTrackingDeviceChanged();
 
+	  /** @brief This slot selects the Tracking Volume appropriate for a given model */
+	  void OnTrackingVolumeChanged(QString qstr);
+
+    /** @brief Shows or hides the tracking volume according to the checkboxe's state */
+    void OnShowTrackingVolumeChanged();
+
     /** @brief This slot auto detects tools of a NDI Aurora tracking device. If tools where found they will be stored internally as a tool storage. 
         The user is also asked if he wants to save this tool storage to load it later. Only call it if a Aurora device was configured because other 
         devices don't support auto detection.*/
@@ -99,6 +105,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
     void UpdateTrackingTimer();
+
+	
 
 
   protected:

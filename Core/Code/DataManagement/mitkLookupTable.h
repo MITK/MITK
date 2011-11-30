@@ -120,6 +120,8 @@ public:
 
 protected:
 
+    void PrintSelf(std::ostream &os, itk::Indent indent) const;
+
     vtkLookupTable* m_LookupTable;
 
 private:

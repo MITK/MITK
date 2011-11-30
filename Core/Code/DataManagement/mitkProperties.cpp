@@ -18,15 +18,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 
-template class mitk::GenericProperty<bool>;
-template class mitk::GenericProperty<int>;
-template class mitk::GenericProperty<float>;
-template class mitk::GenericProperty<double>;
-template class mitk::GenericProperty<mitk::Point3D>;
-template class mitk::GenericProperty<itk::Point<int, 3> >;
-template class mitk::GenericProperty<mitk::Point4D>;
+mitkDefineGenericProperty(BoolProperty,bool,false);
 
-template class mitk::GenericProperty<mitk::FloatLookupTable>;
-template class mitk::GenericProperty<mitk::BoolLookupTable>;
-template class mitk::GenericProperty<mitk::IntLookupTable>;
-template class mitk::GenericProperty<mitk::StringLookupTable>;
+mitkDefineGenericProperty(IntProperty,int,0);
+
+mitkDefineGenericProperty(FloatProperty,float,0.0f);
+
+mitkDefineGenericProperty(DoubleProperty,double,0.0);
+
+mitkDefineGenericProperty(Vector3DProperty,Vector3D,Vector3D(0.0f));
+
+mitkDefineGenericProperty(Point3dProperty,Point3D,Point3D::BaseArray::Filled(0.0f).GetDataPointer() );
+
+mitkDefineGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
+
+mitkDefineGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
+
+mitkDefineGenericProperty(FloatLookupTableProperty,  FloatLookupTable,  FloatLookupTable());
+mitkDefineGenericProperty(BoolLookupTableProperty,   BoolLookupTable,   BoolLookupTable());
+mitkDefineGenericProperty(IntLookupTableProperty,    IntLookupTable,    IntLookupTable());
+mitkDefineGenericProperty(StringLookupTableProperty, StringLookupTable, StringLookupTable());

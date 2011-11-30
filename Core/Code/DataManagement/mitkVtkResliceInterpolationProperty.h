@@ -43,8 +43,6 @@ public:
   
   mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-  
   /**
    * Returns the current interpolation value as defined by VTK constants.
    */
@@ -64,6 +62,8 @@ public:
    * Sets the interpolation type to VTK_RESLICE_CUBIC.
    */
   virtual void SetInterpolationToCubic();
+
+  using BaseProperty::operator=;
   
 protected:
   
@@ -92,6 +92,12 @@ protected:
    * enumeration values.
    */
   virtual void AddInterpolationTypes();
+
+private:
+
+  // purposely not implemented
+  VtkResliceInterpolationProperty(const VtkResliceInterpolationProperty&);
+  VtkResliceInterpolationProperty& operator=(const VtkResliceInterpolationProperty&);
 };
 
 } // end of namespace mitk

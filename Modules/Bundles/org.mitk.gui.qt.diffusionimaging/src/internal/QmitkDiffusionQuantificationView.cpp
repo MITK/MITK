@@ -46,7 +46,7 @@ const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.di
 
 using namespace berry;
 
-const float QmitkDiffusionQuantificationView::m_ScaleDAIValues = 1.0;
+const float QmitkDiffusionQuantificationView::m_ScaleDAIValues = 100;
 
 struct DqSelListener : ISelectionListener
 {

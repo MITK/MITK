@@ -17,16 +17,16 @@
 
 
 #include "mitkFiberBundle.h"
-#include "mitkGeometry2D.h"
-#include "mitkVector.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkGeometry2D.h>
+#include <mitkVector.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkLine.h>
 
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarRectangle.h"
-#include "mitkPlanarPolygon.h"
-#include "mitkPlanarFigureComposite.h"
+
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarFigureComposite.h>
 
 #include <vtkPolygon.h>
 //#include <vtkPoints.h>
@@ -1383,7 +1383,7 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
 
 
     //create vtkPolygon using controlpoints from planarFigure polygon
-    vtkPolygon* polygonVtk = vtkPolygon::New();
+    vtkSmartPointer<vtkPolygon> polygonVtk = vtkPolygon::New();
 
 
     //get the control points from pf and insert them to vtkPolygon
@@ -1571,7 +1571,7 @@ void mitk::FiberBundle::debug_members()
 
 }
 
-vtkPolyData* mitk::FiberBundle::GeneratePolydata()
+vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GeneratePolydata()
 {
   MITK_INFO << "writing polydata";
   //extractn single fibers
@@ -1583,20 +1583,20 @@ vtkPolyData* mitk::FiberBundle::GeneratePolydata()
 
   /* ######## VTK FIBER REPRESENTATION  ######## */
   //create a vtkPoints object and store the all the brainFiber points in it
-  vtkPoints *vtkpoints =  vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkpoints =  vtkPoints::New();
 
   //in vtkcells all polylines are stored, actually all id's of them are stored
-  vtkCellArray *vtkcells = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> vtkcells = vtkCellArray::New();
 
   //in some cases a fiber includes just 1 point, so put it in here
-  vtkCellArray *vtkVrtxs = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> vtkVrtxs = vtkCellArray::New();
 
   //colors and alpha value for each single point, RGBA = 4 components
-  vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
+  vtkSmartPointer<vtkUnsignedCharArray> colorsT = vtkUnsignedCharArray::New();
   colorsT->SetNumberOfComponents(4);
   colorsT->SetName("ColorValues");
 
-  vtkDoubleArray *faColors = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> faColors = vtkDoubleArray::New();
   faColors->SetName("FaColors");
 
   //vtkDoubleArray *tubeRadius = vtkDoubleArray::New();
@@ -1625,7 +1625,7 @@ vtkPolyData* mitk::FiberBundle::GeneratePolydata()
 
     //create a new polyline for a dtiTract
     //smartpointer
-    vtkPolyLine *polyLine = vtkPolyLine::New();
+    vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
     polyLine->GetPointIds()->SetNumberOfIds(fibrNrPnts);
     unsigned char rgba[4] = {255,255,255,255};
 
@@ -1660,7 +1660,7 @@ vtkPolyData* mitk::FiberBundle::GeneratePolydata()
 
       if (fibrNrPnts == 1) {
         // if there ist just 1 point in a fiber...wtf, but however represent it as a point
-        vtkVertex *vrtx = vtkVertex::New();
+        vtkSmartPointer<vtkVertex> vrtx = vtkVertex::New();
         vrtx->GetPointIds()->SetNumberOfIds(1);
         vrtx->GetPointIds()->SetId(i,i+pntIdxHelper);
         colorsT->InsertNextTupleValue(rgba);

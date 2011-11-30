@@ -94,8 +94,8 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     //now create a writer and write it to the harddisc
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool";
-    
+    std::string filename = "TestTool.tool";
+
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool writer with first test tool (claron tool) ----");
     bool test = myWriter->DoWrite(filename,myNavigationTool);
     MITK_TEST_CONDITION_REQUIRED(test,"OK");
@@ -104,7 +104,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     static void TestRead()
     {
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead("TestTool.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader with first test tool (claron tool) ----");
 
     //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
@@ -160,8 +160,8 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     //now create a writer and write it to the harddisc
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool";
-    
+    std::string filename = "TestTool2.tool";
+
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool writer with second tool (aurora tool) ----");
     bool test = myWriter->DoWrite(filename,myNavigationTool);
     MITK_TEST_CONDITION_REQUIRED(test,"OK");
@@ -170,7 +170,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     static void TestRead2()
     {
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool");
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead("TestTool2.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader  with second tool (aurora tool) ----");
 
     //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
@@ -189,8 +189,8 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void CleanUp()
     {
-    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool").c_str());
-    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool").c_str());
+      std::remove("TestTool.tool");
+      std::remove("TestTool2.tool");
     }
 
     static void TestReadInvalidData()

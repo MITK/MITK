@@ -56,7 +56,6 @@ public:
   const Point3D &GetPosition() const;
   void SetPosition( const Point3D &position );
 
-  virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
   virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 
@@ -71,6 +70,15 @@ protected:
   AnnotationProperty( const std::string &label, const Point3D &position );
   AnnotationProperty( const char *label, ScalarType x, ScalarType y, ScalarType z );
   AnnotationProperty( const std::string &label, ScalarType x, ScalarType y, ScalarType z );
+
+private:
+
+  // purposely not implemented
+  AnnotationProperty(const AnnotationProperty&);
+  AnnotationProperty& operator=(const AnnotationProperty&);
+
+  virtual bool IsEqual(const BaseProperty& property) const;
+  virtual bool Assign(const BaseProperty & property);
 
 };
 

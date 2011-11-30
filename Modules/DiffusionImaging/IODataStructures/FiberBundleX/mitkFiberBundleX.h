@@ -65,39 +65,38 @@ namespace mitk {
     mitkClassMacro( FiberBundleX, BaseData );
     itkNewMacro( Self );
 
+    //custom constructor with passing argument
+    mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>)
+
 
     
     
     
     /*====FIBERBUNDLE I/O METHODS====*/
-    void SetFibers(vtkPolyData*); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
-    vtkPolyData* GetFibers();
-    vtkSmartPointer<vtkPolyData> GetVertices();
+    void SetFiberPolyData(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
+    vtkSmartPointer<vtkPolyData> GetFiberPolyData();
     char* getCurrentColorCoding();
     bool isFiberBundleXModified();
     void setFBXModificationDone();
+    void UpdateFiberGeometry();
     
     /*===FIBERBUNDLE PROCESSING METHODS====*/
     void DoColorCodingOrientationbased();
     void DoGenerateFiberIds();
     
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
-    // Compute Bounding Box of FiberStructure; needed for MITK Geometry
-    double* DoComputeFiberStructureBoundingBox();
+
 
 
 
   protected:
-    FiberBundleX();
+    FiberBundleX( vtkSmartPointer<vtkPolyData> fiberPolyData = NULL );
     virtual ~FiberBundleX();
 
+
+
   private:
-    
         
-////  ====TODO====================================
-//    bool doSelfHealingColorOrient( vtkPolyData* );
-////  ============================================
-    
     //      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
     //      FiberPolyData stores all brain fibers using polylines (in world coordinates)
     //    this variable hosts the smoothed fiber data, this data we generate, therefore a smartpointer structure is recommended
@@ -105,10 +104,7 @@ namespace mitk {
 //    
     //    this variable hosts the original fiber data, no smartpointer needed because who or whatever passes this data to FiberBundleX should use vtkSmartPointer structure
   
-    vtkPolyData* m_FiberStructureData; //this is a common pointer because fiberDataStructure gets passed to this class. m_FiberStructureData is destroyed in the destructor then.
-    
-    //    VertexPolyData stores all original points as vertices computed by tracking algorithms
-    vtkSmartPointer<vtkPolyData> m_VertexPolyData;
+    vtkSmartPointer<vtkPolyData> m_FiberPolyData; //this is a common pointer because fiberDataStructure gets passed to this class. m_FiberStructureData is destroyed in the destructor then.
     
     // this variable contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
@@ -116,6 +112,8 @@ namespace mitk {
 
     //this flag conzerns only visual representation.
     bool m_isModified;
+
+
     
     
   };

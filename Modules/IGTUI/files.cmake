@@ -12,6 +12,7 @@ SET(CPP_FILES
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.cpp
   Qmitk/QmitkIGTPlayerWidget.cpp
   Qmitk/QmitkIGTConnectionWidget.cpp
+  Qmitk/QmitkToolSelectionWidget.cpp
 )
 
 SET(UI_FILES
@@ -26,6 +27,7 @@ SET(UI_FILES
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidgetControls.ui
   Qmitk/QmitkIGTPlayerWidgetControls.ui
   Qmitk/QmitkIGTConnectionWidgetControls.ui
+  Qmitk/QmitkToolSelectionWidgetControls.ui
 )
 
 SET(MOC_H_FILES
@@ -42,6 +44,7 @@ SET(MOC_H_FILES
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.h
   Qmitk/QmitkIGTPlayerWidget.h
   Qmitk/QmitkIGTConnectionWidget.h
+  Qmitk/QmitkToolSelectionWidget.h
 )
 
 SET(QRC_FILES

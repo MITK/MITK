@@ -72,11 +72,8 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageIOFactory.cpp
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkTbssRoiImage.cpp
-  IODataStructures/TbssImages/mitkTbssGradientImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
-  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
-  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriter.cpp
-  IODataStructures/TbssImages/mitkNrrdTbssGradientImageWriterFactory.cpp
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp 
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
@@ -92,10 +89,10 @@ SET(CPP_FILES
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper2D.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
+  Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  Rendering/mitkTbssImageMapper.cpp
-  Rendering/mitkTbssGradientImageMapper.cpp
+  Rendering/mitkTbssImageMapper.cpp  
   Rendering/mitkPlanarCircleMapper3D.cpp
   Rendering/mitkPlanarPolygonMapper3D.cpp
   
@@ -105,6 +102,7 @@ SET(CPP_FILES
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
+  Algorithms/mitkTractAnalyzer.cpp
 
  # Tractography
  Tractography/itkStochasticTractographyFilter.h
@@ -114,11 +112,11 @@ SET(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
-  Rendering/mitkTbssGradientImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
   Rendering/mitkFiberBundleMapper2D.h
   Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
+  Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkPlanarCircleMapper3D.h
   Rendering/mitkPlanarPolygonMapper3D.h
@@ -169,6 +167,9 @@ SET(H_FILES
   Algorithms/itkDiffusionTensorPrincipleDirectionImageFilter.h
   Algorithms/itkCartesianToPolarVectorImageFilter.h
   Algorithms/itkPolarToCartesianVectorImageFilter.h
+  Algorithms/itkDistanceMapFilter.h
+  Algorithms/itkProjectionFilter.h
+  Algorithms/itkSkeletonizationFilter.h
 )
 
 SET( TOOL_FILES

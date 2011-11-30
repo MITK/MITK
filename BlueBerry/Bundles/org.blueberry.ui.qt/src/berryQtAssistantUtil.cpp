@@ -29,6 +29,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QCoreApplication>
+#include <QDebug>
 
 namespace berry
 {
@@ -36,7 +37,7 @@ namespace berry
 QProcess* QtAssistantUtil::assistantProcess = 0;
 QString QtAssistantUtil::helpCollectionFile;
 QString QtAssistantUtil::defaultHelpUrl;
-QStringList QtAssistantUtil::registeredBundles;
+QSet<QString> QtAssistantUtil::registeredBundles;
 
 void QtAssistantUtil::SetHelpCollectionFile(const QString& file)
 {
@@ -120,7 +121,9 @@ void QtAssistantUtil::CloseAssistant()
 bool QtAssistantUtil::RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles)
 {
   QStringList qchFiles = ExtractQCHFiles(bundles);
-  return CallQtAssistant(qchFiles);
+  // unregister old files
+  CallQtAssistant(qchFiles, false);
+  return CallQtAssistant(qchFiles, true);
 }
 
 bool QtAssistantUtil::RegisterQCHFiles(const QStringList& qchFiles)
@@ -157,7 +160,7 @@ QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>
 
     if (qchFileFound)
     {
-      registeredBundles.push_back(QString::fromStdString(bundles[i]->GetSymbolicName()));
+      registeredBundles.insert(QString::fromStdString(bundles[i]->GetSymbolicName()));
     }
   }
 
@@ -188,12 +191,17 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
       args << QLatin1String("-unregister");
     }
     args << qchFile;
+    // This is necessary on Windows to suppress the pop-up dialogs on registering
+    // or unregistering .qch files. Unfortunately, it also suppresses specific
+    // error messages.
     args << QLatin1String("-quiet");
     //BERRY_INFO << "Registering " << qchFile.toStdString() << " with " << helpCollectionFile.toStdString();
     argsVector.push_back(args);
   }
 
-  QProgressDialog progress("Registering help files...", "Abort Registration", 0, argsVector.size());
+  QString progressLabel(registerFile ? "Registering help files..." : "Unregistering help files...");
+  QString progressCancel(registerFile ? "Abort Registration" : "Abort Unregistration");
+  QProgressDialog progress(progressLabel, progressCancel, 0, argsVector.size());
   progress.setWindowModality(Qt::WindowModal);
 
   QString assistantExec = GetAssistantExecutable();
@@ -203,7 +211,7 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
   {
     const QStringList& args = argsVector[i];
     progress.setValue(i);
-    QString labelText = QString("Registering ") + args[3];
+    QString labelText = (registerFile ? QString("Registering ") : QString("Unregistering ")) + args[3];
     progress.setLabelText(labelText);
 
     if (progress.wasCanceled())
@@ -213,12 +221,25 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
     }
 
     QProcess* process = new QProcess;
+    //qDebug() << "***** " << assistantExec << args;
     process->start(assistantExec, args);
-    if (!process->waitForStarted())
+    BERRY_INFO << (registerFile ? "Registering " : "Unregistering ")
+               << "Qt compressed help file: " << qchFiles[i].toStdString();
+    if (!process->waitForFinished())
     {
       success = false;
-      BERRY_ERROR << "Registering compressed help file" << args[3].toStdString() << " failed";
+      if (registerFile)
+      {
+        BERRY_ERROR << "Registering compressed help file" << args[3].toStdString() << " failed";
+      }
+      else
+      {
+        BERRY_ERROR << "Unregistering compressed help file" << args[3].toStdString() << " failed";
+      }
+      errorString = process->errorString();
     }
+
+    //qDebug() << process->readAll();
 
     if (process->error() != QProcess::UnknownError)
     {
@@ -226,21 +247,64 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
       success = false;
     }
 
-    if (process->exitCode() != 0)
+    // Report errors only if we are registering files. If for example the plugin containing the
+    // original .qhc file has been updated, unregistering .qch files may fail but it should
+    // not be treated as an error.
+    if (process->exitCode() != 0 && registerFile)
+    {
       exitCode = process->exitCode();
+      errorString = process->readAllStandardError();
+    }
+
+    if (success && exitCode == 0)
+    {
+      // Use a hack to get the plug-in id from the qch path
+      QString strId = QFileInfo(qchFiles[i]).dir().dirName();
+      if (strId.isEmpty())
+      {
+        BERRY_ERROR << "Could not get last directory name from: " << qchFiles[i].toStdString();
+      }
+      else
+      {
+        bool okay = true;
+        long pluginId = strId.toLong(&okay);
+        if (okay)
+        {
+          QSharedPointer<ctkPlugin> plugin = berry::Platform::GetCTKPlugin(pluginId);
+          if (plugin)
+          {
+            if (registerFile)
+            {
+              registeredBundles.insert(plugin->getSymbolicName());
+            }
+            else
+            {
+              registeredBundles.remove(plugin->getSymbolicName());
+            }
+          }
+        }
+        else
+        {
+          BERRY_WARN << "Could convert last directory name into an integer (legacy BlueBerry plug-in?): " << qchFiles[i].toStdString();
+        }
+      }
+    }
   }
   progress.setValue(argsVector.size());
 
   if (!errorString.isEmpty() || exitCode)
   {
-    QString errText = "Registering one or more help files failed.";
+    QString errText;
     if (errorString.isEmpty())
     {
+      if (registerFile) errText += "Registering ";
+      else errText += "Unregistering ";
+      errText += "one or more help files failed.";
       errText += "\nYou may not have write permissions in " + QDir::toNativeSeparators(QDir::homePath());
     }
     else
     {
-      errText += " The last error was: " + errorString;
+      errText += errorString;
     }
     QMessageBox::warning(0, "Help System Error", errText);
   }

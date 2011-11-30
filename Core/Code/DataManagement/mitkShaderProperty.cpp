@@ -97,4 +97,11 @@ bool mitk::ShaderProperty::AddEnum( const std::string& name ,const IdType& /*id*
   return success;
 }
 
+bool mitk::ShaderProperty::Assign(const BaseProperty &property)
+{
+  Superclass::Assign(property);
+  this->shaderList = static_cast<const Self&>(property).shaderList;
+  return true;
+}
+
 

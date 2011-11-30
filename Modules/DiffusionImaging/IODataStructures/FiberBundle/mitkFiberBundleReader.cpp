@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataReader.h>
 #include <vtkCellArray.h>
 #include <mitkSurface.h>
+#include <vtkCellData.h>
 
 const char* mitk::FiberBundleReader::XML_GEOMETRY = "geometry";
 
@@ -284,27 +285,15 @@ namespace mitk
         if ( reader->GetOutput() != NULL )
         {
           vtkPolyData* output = reader->GetOutput();
-          output->ComputeBounds();
-          double bounds[3];
-          output->GetBounds(bounds);
-          double center[3];
-          output->GetCenter(center);
-          Point3D origin;
-          origin.SetElement(0, -center[0]);
-          origin.SetElement(1, -center[1]);
-          origin.SetElement(2, -center[2]);
+          double* center  = output->GetCenter();
+          MITK_INFO << "center: " << center[0] << ", "  << center[1] << ", " << center[2];
 
-          mitk::Surface::Pointer surf = mitk::Surface::New();
-          surf->SetVtkPolyData(output);
-          mitk::Geometry3D* geom  = surf->GetGeometry();
-          //geom->SetOrigin(origin);
-          geom->SetImageGeometry(true);
-          m_OutputCache->SetBounds(bounds);
-          m_OutputCache->SetGeometry(geom);
+          float min = itk::NumericTraits<float>::min();
+          float max = itk::NumericTraits<float>::max();
+          float b[] = {max, min, max, min, max, min};
+
           vtkCellArray* cells = output->GetLines();
-
           cells->InitTraversal();
-
           for (int i=0; i<output->GetNumberOfCells(); i++)
           {
             ContainerTractType::Pointer tract = ContainerTractType::New();
@@ -319,10 +308,36 @@ namespace mitk
               point[0] = p[0];
               point[1] = p[1];
               point[2] = p[2];
+
+              if (point[0]<b[0])
+                b[0]=point[0];
+              if (point[0]>b[1])
+                b[1]=point[0];
+
+              if (point[1]<b[2])
+                b[2]=point[1];
+              if (point[1]>b[3])
+                b[3]=point[1];
+
+              if (point[2]<b[4])
+                b[4]=point[2];
+              if (point[2]>b[5])
+                b[5]=point[2];
+
               tract->InsertElement(tract->Size(), point);
             }
             tractContainer->InsertElement(i, tract);
           }
+
+          float bounds[] = {0, 0, 0};
+          bounds[0] = b[1];
+          bounds[1] = b[3];
+          bounds[2] = b[5];
+          m_OutputCache->SetBounds(bounds);
+
+          geometry->SetImageGeometry(true);
+          geometry->SetFloatBounds(b);
+          m_OutputCache->SetGeometry(geometry);
         }
         reader->Delete();
       }

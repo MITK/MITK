@@ -71,14 +71,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
      */
     void ToFCameraDisconnected();
     /*!
-    \brief signal that is emitted when the ToF camera is started
-    */
-    void ToFCameraStart();
-    /*!
-    \brief signal that is emitted when the ToF camera is stopped
-    */
-    void ToFCameraStop();
-    /*!
     \brief signal that is emitted when a ToF camera is selected in the combo box
     */
     void ToFCameraSelected(const QString selectedText);
@@ -95,14 +87,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     \brief slot updating the GUI elements after the selection of the camera combo box has changed
     */
     void OnSelectCamera(const QString selectedText);
-    /*!
-    \brief slot updating the member m_IntegrationTime and the parameter "integration time" of the current ToFImageGrabber
-    */
-    //void OnChangeIntegrationTimeSpinBox(int value);
-    /*!
-    \brief slot updating the member m_ModulationFrequency and the parameter "modulation frequency" of the current ToFImageGrabber
-    */
-    //void OnChangeModulationFrequencySpinBox(int value);
 
   protected:
 

@@ -109,10 +109,6 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if ( !image || !planeGeometry ) return false;
-
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
   
     // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
     Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
@@ -130,36 +126,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
     FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
 
-    // 3. Write the modified 2D working data slice back into the image
-    if (affectedDimension != -1) {
-      OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( true );
-      slicewriter->SetSliceImage( slice );
-      slicewriter->SetSliceDimension( affectedDimension );
-      slicewriter->SetSliceIndex( affectedSlice );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-      if ( m_RememberContourPositions && m_PaintingPixelValue == 1)
-      {
-         this->AddContourmarker(positionEvent);
-      }
-    }
-    else {
-      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( false );
-      slicewriter->SetSliceImage( slice );
-      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-
-      if ( m_RememberContourPositions && m_PaintingPixelValue == 1)
-      {
-         this->AddContourmarker(positionEvent);
-      }
-      
-    }
+    this->WriteBackSegmentationResult(positionEvent, slice);
 
     // 4. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );

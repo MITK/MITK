@@ -761,9 +761,9 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkPolyData* threadO
   
   MITK_INFO << "lines: " << threadOutput->GetNumberOfLines() << "pnts: " << threadOutput->GetNumberOfPoints();
   //qthread mutex lock
-  mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New();
-  FB->SetFibers(threadOutput);
-  FB->SetGeometry(this->GenerateStandardGeometryForMITK());
+  mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New(threadOutput);
+//  FB->SetFiberPolyData();
+//  FB->SetGeometry(this->GenerateStandardGeometryForMITK());
   
   mitk::DataNode::Pointer FBNode;
   FBNode = mitk::DataNode::New();
@@ -1148,9 +1148,9 @@ void  QmitkFiberBundleDeveloperView::FeedFiberInfoWidget()
     m_Controls->infoAnalyseNumOfFibers->setEnabled(true);
   
   QString numOfFibers;
-  numOfFibers.setNum( m_FiberBundleX->GetFibers()->GetNumberOfLines() );
+  numOfFibers.setNum( m_FiberBundleX->GetFiberPolyData()->GetNumberOfLines() );
   QString numOfPoints;
-  numOfPoints.setNum( m_FiberBundleX->GetFibers()->GetNumberOfPoints() );
+  numOfPoints.setNum( m_FiberBundleX->GetFiberPolyData()->GetNumberOfPoints() );
   
   m_Controls->infoAnalyseNumOfFibers->setText( numOfFibers );
   m_Controls->infoAnalyseNumOfPoints->setText( numOfPoints );

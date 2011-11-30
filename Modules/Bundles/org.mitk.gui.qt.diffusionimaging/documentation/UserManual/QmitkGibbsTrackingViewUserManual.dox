@@ -1,0 +1,40 @@
+/**
+\page org_gibbstracking Gibbs Tracking View
+
+This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
+
+Available sections:
+  - \ref QmitkGibbsTrackingUserManualInputData
+  - \ref QmitkGibbsTrackingUserManualParameters
+  - \ref QmitkGibbsTrackingUserManualTrackingSurveillance
+  - \ref QmitkGibbsTrackingUserManualReferences
+
+\image html gibbstrackingview.png The Gibbs Tracking View
+
+\section QmitkGibbsTrackingUserManualInputData Input Data
+
+Mandatory Input:
+\li One Q-Ball image selected in the datamanager
+
+Optional Input:
+\li Mask Image: Float image used as probability mask for the generation of fiber segments. Usually used as binary brain mask to reduce the searchspace of the algorithm and to avoid fibers resulting from noise outside of the brain.
+\li GFA Image: Float image used to automatically determine the "particle weight" parameter.
+
+\section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
+
+\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Rcommended: 10⁷-10⁹ iterations.
+\li Particle length/width/weight controlling the contribution of each particle to the model M
+\li Start and end temperature controlling how fast the process reaches a stable state. (usually no change needed)
+\li Weighting between the internal (affinity of the model to long and straigt fibers) and external energy (affinity of the model towards the data). (usually no change needed).
+\li Minimum fiber length constraint. Fibers containing less segments are discarded after the tracking. (usually no change needed)
+
+\section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
+
+Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm. If enabled, the intermediate tracking results are displayed in the renderwindows each second. This live visualization should usually be disabled for performance reasons. It can be turned on and off during the tracking process via the according checkbox.
+
+\section QmitkGibbsTrackingUserManualReferences References
+
+[1] Reisert, M., Mader, I., Anastasopoulos, C., Weigel, M., Schnell, S., Kiselev, V.: Global fiber reconstruction becomes practical. Neuroimage 54 (2011) 955-962
+
+
+*/

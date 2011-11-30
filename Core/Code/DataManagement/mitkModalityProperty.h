@@ -39,7 +39,7 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
     mitkNewMacro1Param(ModalityProperty, const IdType&);
     mitkNewMacro1Param(ModalityProperty, const std::string&);
 
-    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+    using BaseProperty::operator=;
 
   protected:
     ModalityProperty();
@@ -48,6 +48,12 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
     
     virtual ~ModalityProperty();
     virtual void AddEnumerationTypes();
+
+  private:
+
+    // purposely not implemented
+    ModalityProperty(const ModalityProperty&);
+    const ModalityProperty& operator=(const ModalityProperty&);
 };
 
 } // namespace

@@ -121,6 +121,7 @@ namespace mitk
 
     int GetNumDirections();
     int GetNumB0();
+    std::vector<int> GetB0Indices();
     bool IsMultiBval();
 
   protected:

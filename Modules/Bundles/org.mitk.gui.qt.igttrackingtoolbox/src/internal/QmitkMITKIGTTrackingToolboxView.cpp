@@ -55,7 +55,9 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
-
+//remove the tracking volume
+this->GetDataStorage()->Remove(m_TrackingVolumeNode);
+this->GlobalReinit();
 }
 
 
@@ -77,6 +79,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
+	  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+    connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
 
     //initialize widgets
@@ -87,12 +91,24 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //initialize tracking volume node
     m_TrackingVolumeNode = mitk::DataNode::New();
     m_TrackingVolumeNode->SetName("TrackingVolume");
-    this->GetDataStorage()->Add(m_TrackingVolumeNode);
+    m_TrackingVolumeNode->SetOpacity(0.25);
+    mitk::Color red;
+    red.SetRed(1);
+    m_TrackingVolumeNode->SetColor(red);
+    GetDataStorage()->Add(m_TrackingVolumeNode);
 
     //initialize buttons
     m_Controls->m_StopTracking->setEnabled(false);
     m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
+
+	  //Update List of available models for selected tool.
+    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+    m_Controls->m_VolumeSelectionBox->clear();
+    for(int i = 0; i < Compatibles.size(); i++)
+	  {
+      m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+    }
   }
 }
 
@@ -149,7 +165,22 @@ else if (this->m_toolStorage->GetToolCount() == 0)
   }
 
 //build the IGT pipeline
-mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,this->m_Controls->m_configurationWidget->GetTrackingDevice());
+mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
+
+
+//Get Tracking Volume Data
+mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
+
+QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
+if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
+  std::string str = qstr.toStdString();
+  data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
+}
+
+
+
+
+mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 if (m_TrackingDeviceSource.IsNull())
   {
@@ -188,20 +219,8 @@ this->m_Controls->m_AutoDetectTools->setEnabled(false);
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
 //show tracking volume
-if (m_Controls->m_ShowTrackingVolume->isChecked())
-  {
-  mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
-  volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
-  volumeGenerator->Update();
+ this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
-  mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
-
-  m_TrackingVolumeNode->SetData(volumeSurface);
-  m_TrackingVolumeNode->SetOpacity(0.25);
-  mitk::Color red;
-  red.SetRed(1);
-  m_TrackingVolumeNode->SetColor(red);
-  }
 
 m_tracking = true;
 
@@ -226,7 +245,6 @@ this->m_Controls->m_LoadTools->setEnabled(true);
 this->m_Controls->m_AutoDetectTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-m_TrackingVolumeNode->SetData(NULL);
 m_tracking = false;
 
 //enable Buttons
@@ -237,12 +255,61 @@ EnableOptionsButtons();
 this->GlobalReinit();
 }
 
+
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
-if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
-  {m_Controls->m_AutoDetectTools->setVisible(true);}
-else
-  {m_Controls->m_AutoDetectTools->setVisible(false);}
+  mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
+	// Code to enable auto detection
+  if (Type == mitk::NDIAurora)
+    {m_Controls->m_AutoDetectTools->setVisible(true);}
+  else
+    {m_Controls->m_AutoDetectTools->setVisible(false);}
+
+// Code to select appropriate tracking volumes
+  std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
+  m_Controls->m_VolumeSelectionBox->clear();
+  for(int i = 0; i < Compatibles.size(); i++)
+  {
+    m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
+{
+	if (qstr.isNull()) return;
+	if (qstr.isEmpty()) return;
+  if (m_Controls->m_ShowTrackingVolume->isChecked())
+  {
+    mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
+	
+
+	  std::string str = qstr.toStdString();
+
+	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+
+	  volumeGenerator->SetTrackingDeviceData(data);
+    volumeGenerator->Update();
+
+    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
+
+    m_TrackingVolumeNode->SetData(volumeSurface);
+    
+    GlobalReinit();
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
+{
+  if (m_Controls->m_ShowTrackingVolume->isChecked())
+    {
+    OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
+    GetDataStorage()->Add(m_TrackingVolumeNode);
+    }
+  else
+    {
+    GetDataStorage()->Remove(m_TrackingVolumeNode);
+    GlobalReinit();
+    }
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()

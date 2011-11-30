@@ -22,30 +22,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTOFUIExports.h"
 #include "ui_QmitkToFVisualisationSettingsWidgetControls.h"
 
-//QT headers
+// QT headers
 #include <QWidget>
-#include <QTimer>
-#include <QString>
-
-//std headers
-
-//itk headers
-
-//mitk headers
-#include "mitkToFImageGrabber.h"
-#include <mitkDataNode.h>
-#include <mitkTransferFunctionProperty.h>
-
-//Qmitk headers
-#include "QmitkRenderWindow.h"
-#include "mitkToFVisualizationFilter.h"
-
+// vtk includes
 #include <vtkColorTransferFunction.h>
 
 class QmitkStdMultiWidget;
 
 /** Documentation:
-  *   \ingroup MBIIGTUI
+  * Widget controlling the visualization of Time-of-Flight image data. A color transfer function can be configured for
+  * a given distance, amplitude and intensity image. The pre-configured vtkColorTransferFunctions can be accessed as
+  * an output of the widget.
+  *
+  * \ingroup ToFUI
   */
 class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
 {
@@ -64,119 +53,109 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     virtual void CreateQtPartControl(QWidget *parent);
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
-    /* @brief This method is part of the widget an needs not to be called seperately. */
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    /* @brief This method is part of the widget an needs not to be called seperately. */
-    virtual void StdMultiWidgetNotAvailable();
+    /*!
+    \brief initialize the widget with the images to be shown
+    \param distanceImage image holding the range image of a ToF camera
+    \param amplitudeImage image holding the amplitude image of a ToF camera
+    \param intensityImage image holding the intensity image of a ToF camera
+    */
+    void Initialize(mitk::Image* distanceImage=NULL, mitk::Image* amplitudeImage=NULL, mitk::Image* intensityImage=NULL);
 
-    /* @brief initialize the Widget */
-    void Initialize(mitk::DataStorage* dataStorage, QmitkStdMultiWidget* multiWidget);
-
-    /* @brief set the required parameters
-     *
-     */
-    void SetParameter(mitk::ToFVisualizationFilter* ToFVisualizationFilter);
-
-    void InitializeTransferFunction(mitk::Image* distanceImage, mitk::Image* amplitudeImage, mitk::Image* intensityImage);
-
-    void InitMember();
-
-    void Reset();
-
-    void SetDataNode(mitk::DataNode* node);
-
-    mitk::ToFVisualizationFilter* GetToFVisualizationFilter();
-
-    mitk::TransferFunction::Pointer GetTransferFunction();
-
+    /*!
+    \brief Access the color transfer function of widget 1 (distance image)
+    \return vtkColorTransferFunction that can be used to define a TransferFunctionProperty
+    */
     vtkColorTransferFunction* GetWidget1ColorTransferFunction();
-
-    void SetWidget1ColorTransferFunction(vtkColorTransferFunction* colorTransferFunction);
-
+    /*!
+    \brief Access the color transfer function of widget 2 (distance image)
+    \return vtkColorTransferFunction that can be used to define a TransferFunctionProperty
+    */
     vtkColorTransferFunction* GetWidget2ColorTransferFunction();
-
-    void SetWidget2ColorTransferFunction(vtkColorTransferFunction* colorTransferFunction);
-
+    /*!
+    \brief Access the color transfer function of widget 3 (distance image)
+    \return vtkColorTransferFunction that can be used to define a TransferFunctionProperty
+    */
     vtkColorTransferFunction* GetWidget3ColorTransferFunction();
-
-    void SetWidget3ColorTransferFunction(vtkColorTransferFunction* colorTransferFunction);
-
-    //vtkColorTransferFunction* GetWidget4ColorTransferFunction();
-
-    //void SetWidget4ColorTransferFunction(vtkColorTransferFunction* colorTransferFunction);
-
-    vtkColorTransferFunction* GetColorTransferFunctionByImageType(char* imageType);
-
-    std::string GetWidget1ImageType();
-
-    std::string GetWidget2ImageType();
-
-    std::string GetWidget3ImageType();
-
-    //QString GetWidget4ImageType();
+    /*!
+    \brief Access the color transfer of the currently selected widget
+    \return vtkColorTransferFunction that can be used to define a TransferFunctionProperty
+    */
+    vtkColorTransferFunction* GetSelectedColorTransferFunction();
+    /*!
+    \brief Return the index of the selected image: 0 = Distance, 1 = Amplitude, 2 = Intensity
+    */
+    int GetSelectedImageIndex();
 
   protected slots:
   
-    /* @brief slot performing region growing and setting result for registration method  
-     *
-     */  
-    void SetXValueColor();
-    void OnUpdateCanvas();
-    void UpdateRanges();
+    void OnSetXValueColor();
+    /*!
+    \brief Slot invoking a reset of the RangeSlider to the minimal and maximal values of the according image
+    */
     void OnResetSlider();  
+    /*!
+    \brief Slot called when the range span has changed. 
+    */
     void OnSpanChanged (int lower, int upper);
+    /*!
+    \brief Resets the transfer function according to the currently selected widget / image
+    */
     void OnTransferFunctionReset();
+    /*!
+    \brief Updates the GUI according to the widget / image selection
+    */
     void OnWidgetSelected(int index);
-    void OnImageTypeSelected(int index);
+    /*!
+    \brief Slot called when the line edit of the maximal value of the range slider has changed. Leads to an update of the range slider.
+    */
     void OnRangeSliderMaxChanged();
+    /*!
+    \brief Slot called when the line edit of the minimal value of the range slider has changed. Leads to an update of the range slider.
+    */
     void OnRangeSliderMinChanged();
+    /*!
+    \brief Sets the TransferFunctionType members according to the selection of the widget and the transfer type.
+    */
     void OnTransferFunctionTypeSelected(int index);
 
   protected:
 
+    /*!
+    \brief Invokes an update of the ColorTransferFunctionCanvas. Called when the ColorTransferFunction has changed
+    */
+    void UpdateCanvas();
+    /*!
+    \brief Resets the ColorTransferFunctionCanvas according to the lower and upper value of the RangeSlider
+    */
+    void UpdateRanges();
+
     Ui::QmitkToFVisualisationSettingsWidgetControls* m_Controls;
-    QmitkStdMultiWidget* m_MultiWidget;
-    mitk::DataStorage* m_DataStorage;
 
-    mitk::ToFImageGrabber* m_ToFImageGrabber;
+    int m_RangeSliderMin; ///< Minimal value of the transfer function range. Initialized to the minimal value of the corresponding image.
+    int m_RangeSliderMax; ///< Maximal value of the transfer function range. Initialized to the maximal value of the corresponding image.
 
-    int m_Channel;
-    int m_Type;
-    QString m_NewImageName;
-    mitk::DataNode::Pointer m_CurrentImageNode;
+    mitk::Image::Pointer m_MitkDistanceImage; ///< Range image of the ToF camera as set by Initialize()
+    mitk::Image::Pointer m_MitkAmplitudeImage; ///< Amplitud image of the ToF camera as set by Initialize()
+    mitk::Image::Pointer m_MitkIntensityImage; ///< Intensity image of the ToF camera as set by Initialize()
 
-    mitk::TransferFunctionProperty::Pointer m_TfpToChange;
-    int m_RangeSliderMin;
-    int m_RangeSliderMax;
-    mitk::SimpleHistogramCache histogramCache;
+    vtkColorTransferFunction* m_Widget1ColorTransferFunction; ///< vtkColorTransferFunction of widget 1 (distance) that can be used to define a TransferFunctionProperty
+    vtkColorTransferFunction* m_Widget2ColorTransferFunction; ///< vtkColorTransferFunction of widget 2 (amplitude) that can be used to define a TransferFunctionProperty
+    vtkColorTransferFunction* m_Widget3ColorTransferFunction; ///< vtkColorTransferFunction of widget 3 (intensity) that can be used to define a TransferFunctionProperty
 
-    //vtkColorTransferFunction* m_Widget1ColorTransferFunction;
-    //vtkColorTransferFunction* m_Widget2ColorTransferFunction;
-    //vtkColorTransferFunction* m_Widget3ColorTransferFunction;
-    //vtkColorTransferFunction* m_Widget4ColorTransferFunction;
-
-    //QString m_Widget1ImageType;
-    //QString m_Widget2ImageType;
-    //QString m_Widget3ImageType;
-    //QString m_Widget4ImageType;
-
-    mitk::Image::Pointer m_MitkDistanceImage;
-    mitk::Image::Pointer m_MitkAmplitudeImage;
-    mitk::Image::Pointer m_MitkIntensityImage;
-
-    //int m_Widget1TransferFunctionType;
-    //int m_Widget2TransferFunctionType;
-    //int m_Widget3TransferFunctionType;
-
-    mitk::ToFVisualizationFilter::Pointer m_ToFVisualizationFilter;
+    int m_Widget1TransferFunctionType; ///< member holding the type of the transfer function applied to the image shown in widget 1 (distance image): 0 = gray scale, 1 = color
+    int m_Widget2TransferFunctionType; ///< member holding the type of the transfer function applied to the image shown in widget 2 (amplitude image): 0 = gray scale, 1 = color
+    int m_Widget3TransferFunctionType; ///< member holding the type of the transfer function applied to the image shown in widget 3 (intensity image): 0 = gray scale, 1 = color
 
   private:
 
-    std::string GetImageType(int index);
-    int GetImageTypeIndex(std::string imageType);
+    /*!
+    \brief Reset the color transfer function to the given type and range
+    \param colorTransferFunction vtkColorTransferfunction to be resetted
+    \param type type of the transfer function: 0 = gray scale, 1 = color
+    \param min minimal value to be set to the transfer function
+    \param max maximal value to be set to the transfer function
+    */
     void ResetTransferFunction(vtkColorTransferFunction* colorTransferFunction, int type, double min, double max);
-    void ComputeMinMax(float* data, int num, int& min, int& max);
-
 };
 
-#endif // _QMITKNEEDLESHAPEREGISTRATIONWIDGET_H_INCLUDED
+#endif // _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED

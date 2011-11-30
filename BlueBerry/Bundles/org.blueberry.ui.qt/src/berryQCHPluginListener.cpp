@@ -95,8 +95,13 @@ void QCHPluginListener::removePlugin(QSharedPointer<ctkPlugin> plugin)
   {
     QDir qchDir(qchDirInfo.absoluteFilePath());
     QStringList qchEntries = qchDir.entryList(QStringList("*.qch"));
+    QStringList qchFiles;
+    foreach(QString qchEntry, qchEntries)
+    {
+      qchFiles << qchDir.absoluteFilePath(qchEntry);
+    }
     // unregister the qch files
-    QtAssistantUtil::UnregisterQCHFiles(qchEntries);
+    QtAssistantUtil::UnregisterQCHFiles(qchFiles);
     // clean the directory
     foreach(QString qchEntry, qchEntries)
     {

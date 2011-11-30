@@ -50,6 +50,10 @@ FOREACH(_bundle_dir ${_bundle_dirs})
   ENDIF()
 ENDFOREACH()
 
+# Compile a doxygen input filter for processing CMake scripts
+INCLUDE(FunctionCMakeDoxygenFilterCompile)
+FunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
+
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
                

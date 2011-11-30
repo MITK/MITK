@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKTRACKINGTYPES_H_HEADER_INCLUDED_
 
 #include <itkPoint.h>
+#include <vector>
 //#include <mitkVector.h>
 
 namespace mitk 
@@ -78,7 +79,8 @@ namespace mitk
     };
 
     /**Documentation
-    * \brief identifier for tracking device
+    * \brief identifier for tracking device. The way it is currently used 
+	* represents a product line rather than an actal type. Refactoring is a future option.
     */
     enum TrackingDeviceType
     {
@@ -92,6 +94,8 @@ namespace mitk
       TrackingSystemInvalid      ///< entry for invalid state (mainly for testing)
     };
 
+	
+
     /**Documentation
     * \brief Error codes of NDI tracking devices
     */
@@ -103,21 +107,96 @@ namespace mitk
       HybridTracking
     };
 
- 
     /**
-    * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
+    * \brief This enum is deprecated. In future, please use the new TrackingDeviceData to model Specific tracking Volumes
+	* Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
     * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
-     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
+    * as defined by NDI API SFLIST (Aurora and Polaris API guide)
+	* 
     */
     enum NDITrackingVolume
     {
-      Standard,
+	  Standard,
       Pyramid,
       SpectraPyramid,
       VicraVolume,
       Cube,
       Dome
     };
+
+	/**
+	* /brief This structure defines key variables of a device model and type.
+	* It is specifically used to find out which models belong to which vendor, and what volume
+	* to use for a specific Model. Leaving VolumeModelLocation set to null will instruct the Generator
+	* to generate a field to the best of his ability
+	*/
+	struct TrackingDeviceData {
+      TrackingDeviceType Line;
+	  std::string Model;
+	  std::string VolumeModelLocation;
+    };	
+		
+
+	/**
+	* Here all supported devices are defined. Dont forget to introduce new Devices into the TrackingDeviceList Array at the bottom!
+	* If a model does not have a corresponding tracking volume yet, pass an empty string to denote "No Model". pass "cube" to render
+	* a default cube of 400x400 px. You can define additional magic strings in the TrackingVolumeGenerator.
+	*/
+	static TrackingDeviceData DeviceDataAuroraCompact = {NDIAurora, "Aurora Compact", "NDIAuroraCompactFG_Dome.stl"};
+	static TrackingDeviceData DeviceDataAuroraPlanarCube = {NDIAurora, "Aurora Planar - Cube Volume", "NDIAurora.stl"};
+	static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "Aurora Planar - Dome Volume","NDIAuroraPlanarFG_Dome.stl"};
+	static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl"};
+	// The following entry is for the tabletop prototype, which had an lower barrier of 8cm. The new version has a lower barrier of 12cm.
+	//static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
+	static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
+	static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolaris.stl"};
+	static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolaris.stl"};
+	static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl"};
+	static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", ""};
+	static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube"};
+	static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube"};
+	// Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
+	static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
+
+	static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
+	DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
+	DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataInvalid};
+
+	/**
+	* /brief Returns all devices compatibel to the given Line of Devices 
+	*/
+	static std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type){
+		std::vector<TrackingDeviceData> Result;
+		int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
+		for(int i=0; i < size; i++)
+		{			
+			if(TrackingDeviceList[i].Line == Type ) Result.push_back(TrackingDeviceList[i]);
+		} 
+		return Result;
+	}
+
+	/**
+	* /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
+	* with the old way to manage Devices
+	*/
+	static TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type){
+		
+		return GetDeviceDataForLine(Type).front();
+	}
+
+	/**
+	* /brief Returns the device Data set matching the model name or the invalid device, if none was found
+	*/
+	static TrackingDeviceData GetDeviceDataByName(std::string modelName){
+	
+		int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
+		for(int i=0; i < size; i++)
+		{			
+			if(TrackingDeviceList[i].Model == modelName) return TrackingDeviceList[i];
+		} 
+		return DeviceDataInvalid;
+	}
+
     /**Documentation
     * \brief activation rate of IR illuminator for NDI Polaris tracking device
     */
@@ -127,6 +206,7 @@ namespace mitk
       Hz30 = 30,
       Hz60 = 60
     };
+
     /**Documentation
     * \brief Data transfer mode for NDI tracking devices
     */

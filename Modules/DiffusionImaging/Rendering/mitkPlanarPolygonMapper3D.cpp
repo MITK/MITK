@@ -160,7 +160,8 @@ void mitk::PlanarPolygonMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
       return;
     
     //if there are 3 points available, draw current polygon in 3D
-    if (nrCtrlPnts == 3)
+
+    if (nrCtrlPnts > 2)
       this->GenerateData();
     
     //update points in polygon

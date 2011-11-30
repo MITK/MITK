@@ -3,6 +3,7 @@ SET(SRC_CPP_FILES
   QmitkODFRenderWidget.cpp
   QmitkPartialVolumeAnalysisWidget.cpp
   QmitkIVIMWidget.cpp
+  QmitkTbssRoiAnalysisWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -17,11 +18,14 @@ SET(INTERNAL_CPP_FILES
   QmitkODFDetailsView.cpp
   QmitkGibbsTrackingView.cpp
   QmitkStochasticFiberTrackingView.cpp
-  QmitkFiberBundleOperationsView.cpp
+  QmitkFiberProcessingView.cpp
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
   QmitkScreenshotMaker.cpp
+  QmitkTractbasedSpatialStatisticsView.cpp
+  QmitkTbssTableModel.cpp
+  QmitkTbssMetaTableModel.cpp
 )
 
 SET(UI_FILES
@@ -34,11 +38,12 @@ SET(UI_FILES
   src/internal/QmitkODFDetailsViewControls.ui
   src/internal/QmitkGibbsTrackingViewControls.ui
   src/internal/QmitkStochasticFiberTrackingViewControls.ui
-  src/internal/QmitkFiberBundleOperationsViewControls.ui
+  src/internal/QmitkFiberProcessingViewControls.ui
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkScreenshotMakerControls.ui
+  src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -55,12 +60,14 @@ SET(MOC_H_FILES
   src/QmitkODFDetailsWidget.h
   src/internal/QmitkGibbsTrackingView.h
   src/internal/QmitkStochasticFiberTrackingView.h
-  src/internal/QmitkFiberBundleOperationsView.h
+  src/internal/QmitkFiberProcessingView.h
   src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h
   src/internal/QmitkScreenshotMaker.h
+  src/internal/QmitkTractbasedSpatialStatisticsView.h
+  src/QmitkTbssRoiAnalysisWidget.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -83,11 +90,13 @@ SET(CACHED_RESOURCE_FILES
   resources/IVIM_48.png
   resources/screenshot_maker.png
   resources/stochFB.png
+  resources/tbss.png
 )
 
 SET(QRC_FILES
 # uncomment the following line if you want to use Qt resources
   resources/QmitkDiffusionImaging.qrc
+  #resources/QmitkTractbasedSpatialStatisticsView.qrc
 )
 
 SET(CPP_FILES )

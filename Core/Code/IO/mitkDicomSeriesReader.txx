@@ -119,6 +119,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       }
     }
 
+    // forward some image properties to node
+    node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
+
     node.SetData( image );
     setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);

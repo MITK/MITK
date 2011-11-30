@@ -427,7 +427,6 @@ void QmitkPreprocessingView::DoBrainMask
   mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
   mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
-  std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
   {
 

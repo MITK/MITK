@@ -147,6 +147,10 @@ bool mitk::LookupTable::operator==( const mitk::LookupTable& other ) const
   //}
   for (vtkIdType i=0; i < m_LookupTable->GetNumberOfTableValues(); i++)
   {
+    double v0_1 = m_LookupTable->GetTableValue(i)[0]; double v0_2 = olut->GetTableValue(i)[0];
+    double v1_1 = m_LookupTable->GetTableValue(i)[1]; double v1_2 = olut->GetTableValue(i)[1];
+    double v2_1 = m_LookupTable->GetTableValue(i)[2]; double v2_2 = olut->GetTableValue(i)[2];
+    double v3_1 = m_LookupTable->GetTableValue(i)[3]; double v3_2 = olut->GetTableValue(i)[3];
     bool tvequal = (m_LookupTable->GetTableValue(i)[0] == olut->GetTableValue(i)[0])
                 && (m_LookupTable->GetTableValue(i)[1] == olut->GetTableValue(i)[1])
                 && (m_LookupTable->GetTableValue(i)[2] == olut->GetTableValue(i)[2])
@@ -285,4 +289,10 @@ void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gr
   gradientFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
 
   free(alphasHead);
+}
+
+void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+  os << indent;
+  m_LookupTable->PrintHeader(os, vtkIndent());
 }

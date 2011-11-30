@@ -70,10 +70,16 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 //  mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
 
   mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
-//  if (FBX == NULL) {
-//    MITK_INFO << "FBX==NULL"; not allowed to be null ;-)
-//  }
-  vtkPolyData* FiberData = FBX->GetFibers();
+  if (FBX == NULL) {
+    return;
+  }
+  //todo smartpointer
+  vtkPolyData* FiberData = FBX->GetFiberPolyData();
+
+  if (FiberData == NULL) {
+    return;
+  }
+
   MITK_INFO << "NumOfFibs: " << FiberData->GetNumberOfLines();
   MITK_INFO << "NumOfPoints: " << FiberData->GetNumberOfPoints();
   

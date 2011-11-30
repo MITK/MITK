@@ -18,31 +18,41 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkWeakPointerProperty.h"
 
-bool mitk::WeakPointerProperty::operator==(const BaseProperty& property) const
+bool mitk::WeakPointerProperty::IsEqual(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
+    return this->m_WeakPointer == static_cast<const Self&>(property).m_WeakPointer;
+}
 
-    if(other==NULL) return false;
-
-    return other->m_WeakPointer==m_WeakPointer;
+bool mitk::WeakPointerProperty::Assign(const BaseProperty& property)
+{
+    this->m_WeakPointer = static_cast<const Self&>(property).m_WeakPointer;
+    return true;
 }
 
 mitk::WeakPointerProperty::WeakPointerProperty(itk::Object* pointer) : m_WeakPointer(pointer)
 {
-    Modified();
 }
 
 mitk::WeakPointerProperty::~WeakPointerProperty()
 {
 }
 
+std::string mitk::WeakPointerProperty::GetValueAsString() const
+{
+  std::stringstream ss;
+  ss << m_WeakPointer.GetPointer();
+  return ss.str();
+}
 
-itk::Object::Pointer mitk::WeakPointerProperty::GetWeakPointer() const
+mitk::WeakPointerProperty::ValueType mitk::WeakPointerProperty::GetWeakPointer() const
 {
     return m_WeakPointer.GetPointer();
 }
 
-
+mitk::WeakPointerProperty::ValueType mitk::WeakPointerProperty::GetValue() const
+{
+  return GetWeakPointer();
+}
 
 void mitk::WeakPointerProperty::SetWeakPointer(itk::Object* pointer)
 {
@@ -51,4 +61,9 @@ void mitk::WeakPointerProperty::SetWeakPointer(itk::Object* pointer)
         m_WeakPointer = pointer;
         Modified();
     }
+}
+
+void mitk::WeakPointerProperty::SetValue(const ValueType &value)
+{
+  SetWeakPointer(value.GetPointer());
 }

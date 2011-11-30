@@ -20,21 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkPlotWidget.h"
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
-
-#include "QmitkHistogram.h"
-#include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-
-#include <qlayout.h>
-#include <qtextedit.h>
-#include <qdialog.h>
-
-#include <itkHistogram.h>
-
-#include <vtkQtChartWidget.h>
-#include <vtkQtBarChart.h>
-
-#include <QStandardItemModel>
+#include <itkOrientationDistributionFunction.h>
 
 
 /**
@@ -47,10 +33,7 @@ Q_OBJECT
 
 public:
 
-  typedef mitk::Image::HistogramType HistogramType;
-  typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
-
-  void SetParameters( std::vector<double> odfVals );
+  void SetParameters( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf );
 
   QmitkODFDetailsWidget( QWidget * /*parent = 0 */);
   virtual ~QmitkODFDetailsWidget();
@@ -58,8 +41,6 @@ public:
   std::vector<double> m_Vals;
 
 private:
-
-  std::vector<double> vec(vnl_vector<double> vector);
 
 };
 

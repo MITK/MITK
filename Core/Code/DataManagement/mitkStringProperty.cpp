@@ -32,51 +32,18 @@ mitk::StringProperty::StringProperty( const std::string& s )
 
 }
 
-bool mitk::StringProperty::operator==(const BaseProperty& property ) const 
+bool mitk::StringProperty::IsEqual(const BaseProperty& property ) const
 {
-  const Self *other = dynamic_cast<const Self*>(&property);
+  return this->m_Value == static_cast<const Self&>(property).m_Value;
+}
 
-  if(other==NULL) return false;
-
-  return other->m_Value==m_Value;
+bool mitk::StringProperty::Assign(const BaseProperty& property )
+{
+  this->m_Value = static_cast<const Self&>(property).m_Value;
+  return true;
 }
 
 std::string mitk::StringProperty::GetValueAsString() const 
 {
   return m_Value;
 }
-
-bool mitk::StringProperty::Assignable(const BaseProperty& other) const
-{
-  try
-  {
-    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
-    return true;
-  }
-  catch (std::bad_cast)
-  {
-  }
-  return false;
-}
-
-mitk::BaseProperty& mitk::StringProperty::operator=(const BaseProperty& other)
-{
-  try
-  {
-    const Self& otherProp( dynamic_cast<const Self&>(other) );
-
-    if (this->m_Value != otherProp.m_Value)
-    {
-      this->m_Value = otherProp.m_Value;
-      this->Modified();
-    }
-  }
-  catch (std::bad_cast)
-  {
-    // nothing to do then
-  }
-
-  return *this;
-}
-
-

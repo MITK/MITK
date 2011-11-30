@@ -1,4 +1,3 @@
-
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 
@@ -20,8 +19,11 @@ mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStat
 
 mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen)
 
+# see bug 9882
+IF(NOT APPLE)
 ADD_TEST(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
 SET_PROPERTY(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
+ENDIF()
 ADD_TEST(mitkPicFileReaderTest_emptyGzipFile ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic.gz)
 SET_PROPERTY(TEST mitkPicFileReaderTest_emptyGzipFile PROPERTY LABELS MITK-Core)
 

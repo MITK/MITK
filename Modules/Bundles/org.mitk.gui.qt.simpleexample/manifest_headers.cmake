@@ -1,4 +1,4 @@
-set(Plugin-Name "Simple Example")
+set(Plugin-Name "MITK Simple Example")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "http://www.mitk.org")

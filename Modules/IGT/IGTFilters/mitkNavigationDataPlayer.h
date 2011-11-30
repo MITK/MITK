@@ -58,13 +58,6 @@ namespace mitk {
     */
     itkGetStringMacro(FileName);
 
-    /** @return Returns an error message if there was one (e.g. if the stream is invalid). 
-     *          Returns an empty string if there was no error in the current stream.
-     */
-    itkGetStringMacro(ErrorMessage);
-
-    /** @return Retruns if the current stream is valid or not. */
-    itkGetMacro(StreamValid,bool);
 
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
@@ -205,8 +198,6 @@ namespace mitk {
 
     bool m_StreamEnd; ///< stores if the input stream arrived at end
 
-    bool m_StreamValid;                       ///< stores if the input stream is valid or not
-    std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
     void StreamInvalid(std::string message);  ///< help method which sets the stream invalid and displays an error
    
   };

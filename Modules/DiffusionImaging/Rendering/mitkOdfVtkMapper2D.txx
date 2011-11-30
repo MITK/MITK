@@ -54,7 +54,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkMapper.h"
 
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
 
 #include "itkOrientationDistributionFunction.h"
 
@@ -89,46 +88,6 @@ float mitk::OdfVtkMapper2D<T,N>::m_IndexParam2;
 
 #define ODF_MAPPER_PI 3.1415926535897932384626433832795
 
-//#include "vtkSphereSource.h"
-//#include "vtkPolyDataMapper.h"
-//#include "vtkActor.h"
-//#include "vtkRenderWindow.h"
-//#include "vtkRenderer.h"
-//#include "vtkRenderWindowInteractor.h"
-//#include "vtkProperty.h"
-//
-//void bla(vtkPolyData* poly)
-//{
-//
-//  // map to graphics library
-//  vtkPolyDataMapper *map = vtkPolyDataMapper::New();
-//  map->SetInput(poly);
-//
-//  // actor coordinates geometry, properties, transformation
-//  vtkActor *aSphere = vtkActor::New();
-//  aSphere->SetMapper(map);
-//  aSphere->GetProperty()->SetColor(0,0,1); // sphere color blue
-//
-//  // a renderer and render window
-//  vtkRenderer *ren1 = vtkRenderer::New();
-//  vtkRenderWindow *renWin = vtkRenderWindow::New();
-//  renWin->AddRenderer(ren1);
-//
-//  // an interactor
-//  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-//  iren->SetRenderWindow(renWin);
-//
-//  // add the actor to the scene
-//  ren1->AddActor(aSphere);
-//  ren1->SetBackground(1,1,1); // Background color white
-//
-//  // render an image (lights and cameras are created automatically)
-//  renWin->Render();
-//
-//  // begin mouse interaction
-//  iren->Start();
-//}
-
 template<class T, int N>
 mitk::OdfVtkMapper2D<T,N>
 ::OdfVtkMapper2D()
@@ -158,11 +117,7 @@ mitk::OdfVtkMapper2D<T,N>
   m_OdfsMappers.push_back(vtkPolyDataMapper::New());
 
   vtkLookupTable *lut = vtkLookupTable::New();
-  //lut->SetMinimumTableValue(0,0,1,1);
-  //lut->SetMaximumTableValue(1,0,0,1);
-  //lut->SetWindow(0.1);
-  //lut->SetLevel(0.05);   <== not recognized or reset by mapper ??
-  //lut->Build();
+
   m_OdfsMappers[0]->SetLookupTable(lut);
   m_OdfsMappers[1]->SetLookupTable(lut);
   m_OdfsMappers[2]->SetLookupTable(lut);
@@ -216,15 +171,11 @@ mitk::OdfVtkMapper2D<T,N>
 
   m_TemplateOdf = itk::OrientationDistributionFunction<T,N>::GetBaseMesh();
 
-  //vtkPoints* points = m_TemplateOdf->GetPoints();
-
   m_OdfVals->Allocate(N);
   m_OdfSource->SetTemplateOdf(m_TemplateOdf);
   m_OdfSource->SetOdfVals(m_OdfVals);
 
   m_ShowMaxNumber = 500;
-
-  //vtkMapper::GlobalImmediateModeRenderingOn();
 }
 
 template<class T, int N>
@@ -379,60 +330,14 @@ void  mitk::OdfVtkMapper2D<T,N>
   for(int i=0; i<N; i++)
     m_OdfVals->SetComponent(0,i,0.5*odf[i]*m_Scaling);
 
-    //double max = -100000;
-    //double min = 100000;
-    //for( unsigned int i=0; i<N; i++)
-    //{
-    //  max = odf[i] > max ? odf[i] : max;
-    //  min = odf[i] < min ? odf[i] : min;
-    //}
 
   m_OdfSource->Modified();
-}
-
-template<class T, int N>
-void  mitk::OdfVtkMapper2D<T,N>
-::AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo )
-{
-
-  double viewAngle = renderer->GetVtkRenderer()->GetActiveCamera()->GetViewAngle();
-  viewAngle = viewAngle * (ODF_MAPPER_PI/180.0);
-  viewAngle /= 2;
-  double dist = dispGeo.d/tan(viewAngle);
-
-  mitk::Point3D mfoc;
-  mfoc[0]=dispGeo.M3D[0];
-  mfoc[1]=dispGeo.M3D[1];
-  mfoc[2]=dispGeo.M3D[2];
-
-  mitk::Point3D mpos;
-  mpos[0]=mfoc[0]+dist*dispGeo.normal[0];
-  mpos[1]=mfoc[1]+dist*dispGeo.normal[1];
-  mpos[2]=mfoc[2]+dist*dispGeo.normal[2];
-
-  mitk::Point3D mup;
-  mup[0]=dispGeo.O3D[0]-dispGeo.M3D[0];
-  mup[1]=dispGeo.O3D[1]-dispGeo.M3D[1];
-  mup[2]=dispGeo.O3D[2]-dispGeo.M3D[2];
-
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(dist/3.74);
-
-  vtkCamera*   camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  if (camera)
-  {
-    camera->SetPosition(mpos[0],mpos[1],mpos[2]);
-    camera->SetFocalPoint(mfoc[0], mfoc[1],mfoc[2]);
-    camera->SetViewUp(mup[0],mup[1],mup[2]);
-  }
-  renderer->GetVtkRenderer()->ResetCameraClippingRange();
 }
 
 template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  //vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
   Geometry2D::ConstPointer worldGeometry =
     renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry =
@@ -811,7 +716,6 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOverlay(mitk::BaseRenderer* renderer)
 {
-  //std::cout << "OdfVtkMapper2D::MitkRenderOverlay(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
@@ -825,7 +729,6 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
-  //std::cout << "OdfVtkMapper2D::MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
@@ -833,61 +736,8 @@ void  mitk::OdfVtkMapper2D<T,N>
   {
     // adapt cam pos
     OdfDisplayGeometry dispGeo = MeasureDisplayedGeometry( renderer);
-    //AdaptCameraPosition(renderer, dispGeo);
-
-    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
-    {
-      glMatrixMode( GL_PROJECTION );
-      glPushMatrix();
-      glLoadIdentity();
-
-      glMatrixMode( GL_MODELVIEW );
-      glPushMatrix();
-      glLoadIdentity();
-
-      renderer->GetVtkRenderer()->SetErase(false);
-      renderer->GetVtkRenderer()->GetActiveCamera()->Render(renderer->GetVtkRenderer());
-      renderer->GetVtkRenderer()->SetErase(true);
-
-      //GLfloat matrix[16];
-      //glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-
-      float LightPos[4] = {0,0,0,0};
-      int index = GetIndex(renderer);
-      if(index==0)
-      {
-        LightPos[2] = -1000;
-      }
-      if(index==1)
-      {
-        LightPos[0] = 1000;
-      }
-      if(index==2)
-      {
-        LightPos[1] = -1000;
-      }
-      glLightfv(GL_LIGHT0,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT1,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT2,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT3,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT4,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT5,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT6,GL_POSITION,LightPos);
-      glLightfv(GL_LIGHT7,GL_POSITION,LightPos);
-
-    }
 
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-
-    if(/*this->GetDataNode()->IsOn("DoRefresh",NULL)*/false)
-    {
-      glMatrixMode( GL_PROJECTION );
-      glPopMatrix();
-
-      glMatrixMode( GL_MODELVIEW );
-      glPopMatrix();
-    }
-
   }
 }
 
@@ -895,7 +745,6 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
 {
-  //std::cout << "OdfVtkMapper2D::MitkRenderTranslucentGeometry(" << renderer->GetName() << ")" << std::endl;
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
@@ -1111,15 +960,12 @@ void  mitk::OdfVtkMapper2D<T,N>
     OdfDisplayGeometry dispGeo =
       MeasureDisplayedGeometry( renderer);
 
-//    if(!dispGeo.Equals(m_LastDisplayGeometry))
-//    {
-      AdaptOdfScalingToImageSpacing(index);
-      SetRendererLightSources(renderer);
-      ApplyPropertySettings();
-      //AdaptCameraPosition(renderer, dispGeo);
-      Slice(renderer, dispGeo);
-      m_LastDisplayGeometry = dispGeo;
-//    }
+    AdaptOdfScalingToImageSpacing(index);
+    SetRendererLightSources(renderer);
+    ApplyPropertySettings();
+    Slice(renderer, dispGeo);
+    m_LastDisplayGeometry = dispGeo;
+
   }
 
   // Get the TimeSlicedGeometry of the input object
@@ -1160,7 +1006,6 @@ void  mitk::OdfVtkMapper2D<T,N>
   node->SetProperty( "VisibleOdfs_S", mitk::BoolProperty::New( false ) );
   node->SetProperty ("layer", mitk::IntProperty::New(100));
   node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
-  //node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );
 }
 
 #endif // __mitkOdfVtkMapper2D_txx__

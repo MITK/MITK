@@ -37,7 +37,7 @@ m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_Tools
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
 m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
-  this->m_Type = TrackingSystemNotSpecified; //NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
+  m_Data = mitk::DeviceDataUnspecified;
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -516,7 +516,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-        if (this->m_Type == NDIPolaris)
+		if (this->m_Data.Line == NDIPolaris)
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
@@ -551,7 +551,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
 
   /*POLARIS: set the illuminator activation rate */
-  if (this->m_Type == NDIPolaris)
+  if (this->m_Data.Line == NDIPolaris)
   {
     returnvalue = m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
     if (returnvalue != NDIOKAY)

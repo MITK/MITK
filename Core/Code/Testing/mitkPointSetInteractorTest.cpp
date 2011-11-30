@@ -149,6 +149,26 @@ public:
       MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(2) != pos3D,"Testing that the last addition didn't work.");
     }
 
+    //testing whether a point can be added to an already filled point set after deleting an unselected point
+    if (numberOfPointsAllowed>=0) //not number of points set to unlimited
+    {
+      //delesecting point; going from state 2 over state 10 to state 2
+      pos3D.Fill(-100.0);
+      pos2D.Fill(200.0);
+      this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none, pos2D, pos3D);
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(0) == false,"Testing deselection of a point.");
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetNumberOfSelected() == 0,"No selected points.");
+      //trying to delete a deselected point so going from state 2 over 30 to 1
+      mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
+      unsigned long nPts = pointSet->GetPointSet()->GetNumberOfPoints();
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==(unsigned long)numberOfPointsAllowed,"Checking that no unselected point can be deleted.");
+      //trying to add point to already filled point set
+      this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==(unsigned long)numberOfPointsAllowed,"Checking that no point can be added after hitting DEL on no selection.");
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(2) ,"Testing if the last point added is selected.");
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(2) != pos3D,"Testing that the last addition didn't work.");
+    }
+
     //selecting the first point and moving it to 0,0,0
     pos3D[0]= 1.0;  pos3D[1]= 2.0;  pos3D[2]= 3.0;
     pos2D[0]= 1;  pos2D[0]= 2;

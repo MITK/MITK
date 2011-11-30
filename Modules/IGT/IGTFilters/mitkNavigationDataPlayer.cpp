@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTimeStamp.h>
 #include <fstream>
 
-mitk::NavigationDataPlayer::NavigationDataPlayer() 
+mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerBase() 
 {
   m_NumberOfOutputs = 0;
   m_Pause = false;
@@ -40,8 +40,6 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_parentElement = NULL;
   m_currentNode = NULL;
   m_StreamEnd = false;
-  m_StreamValid = true;
-  m_ErrorMessage = "";
   m_StreamSetOutsideFromClass = false;
 
   //To get a start time

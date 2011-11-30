@@ -39,39 +39,55 @@ QmitkPythonVariableStackTreeWidget::~QmitkPythonVariableStackTreeWidget()
 
 bool QmitkPythonVariableStackTreeWidget::dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent )
 {
+    // Early exit, returning true, but not actually doing anything (ignoring data).
     if (action == Qt::IgnoreAction)
         return true;
 
-    if(data->hasFormat("application/x-mitk-datanode"))
+    // Note, we are returning true if we handled it, and false otherwise
+    bool returnValue = false;
+
+    if(data->hasFormat("application/x-mitk-datanodes"))
     {        
-        QString arg = QString(data->data("application/x-mitk-datanode").data());
-        long val = arg.toLong();
-        mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
-        itk::SmartPointer<mitk::DataNode > * resultptr;
-        resultptr = new itk::SmartPointer<mitk::DataNode >((itk::SmartPointer<mitk::DataNode > &)node);
+        returnValue = true;
 
-        if(resultptr)
+        QString arg = QString(data->data("application/x-mitk-datanodes").data());
+        QStringList listOfDataNodeAddressPointers = arg.split(",");
+
+        QStringList::iterator slIter;
+        for (slIter = listOfDataNodeAddressPointers.begin();
+             slIter != listOfDataNodeAddressPointers.end();
+             slIter++)
         {
-            int i = 0;
-            while(swig_types_initial[i] != 0)
-            {
-              if(swig_types_initial[i] == _swigt__p_itk__SmartPointerTmitk__DataNode_t)
-                SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t = SWIG_TypeRegister(swig_types_initial[i]);
-              i++;
-            }
+          long val = (*slIter).toLong();
+          mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
 
-            PyObject * resultObj = SWIG_NewPointerObj((void*)(resultptr), SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t, 1);
-            PyObject* dict = PyImport_GetModuleDict();
-            PyObject* object = PyDict_GetItemString(dict, "__main__");
+          itk::SmartPointer<mitk::DataNode > * resultptr;
+          resultptr = new itk::SmartPointer<mitk::DataNode >((itk::SmartPointer<mitk::DataNode > &)node);
 
-            if(object){
-                Py_INCREF(object);
-                PyModule_AddObject(object, node->GetName().c_str(), resultObj);
-            }
-            setVariableStack(QmitkPythonMediator::getAttributeList());
+          if(resultptr)
+          {
+              int i = 0;
+              while(swig_types_initial[i] != 0)
+              {
+                if(swig_types_initial[i] == _swigt__p_itk__SmartPointerTmitk__DataNode_t)
+                  SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t = SWIG_TypeRegister(swig_types_initial[i]);
+                i++;
+              }
+
+              PyObject * resultObj = SWIG_NewPointerObj((void*)(resultptr), SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t, 1);
+              PyObject* dict = PyImport_GetModuleDict();
+              PyObject* object = PyDict_GetItemString(dict, "__main__");
+
+              if(object){
+                  Py_INCREF(object);
+                  PyModule_AddObject(object, node->GetName().c_str(), resultObj);
+              }
+              setVariableStack(QmitkPythonMediator::getAttributeList());
+          }
         }
+
     }
-    return false;
+    return returnValue;
 }
 
 QVariant QmitkPythonVariableStackTreeWidget::headerData(int section, Qt::Orientation orientation,
@@ -156,50 +172,61 @@ QMimeData * QmitkPythonVariableStackTreeWidget::mimeData(const QModelIndexList &
 {
 
     QMimeData * ret = new QMimeData;
-    QString name = m_variableStack[indexes.at(0).row()][0];
-    QString type = m_variableStack[indexes.at(0).row()][2];
 
-    if(type != "DataNode_PointerPtr")
-        return NULL;
+    QString dataNodeAddresses("");
 
-    mitk::DataNode* node;
-    itk::SmartPointer<mitk::DataNode> *arg;
-
-    PyObject * obj = QmitkPythonMediator::getPyObjectString(&name);
-    int i = 0;
-    while(swig_types_initial[i] != 0)
+    for (int indexesCounter = 0; indexesCounter < indexes.size(); indexesCounter++)
     {
-      if(swig_types_initial[i] == _swigt__p_itk__SmartPointerTmitk__DataNode_t)
-        SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t = SWIG_TypeRegister(swig_types_initial[i]);
-      i++;
-    }
-    if ((SWIG_ConvertPtr(obj,(void **)(&arg),SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t,
-                         SWIG_POINTER_EXCEPTION | 0)) == -1) return NULL;
+      QString name = m_variableStack[indexes.at(indexesCounter).row()][0];
+      QString type = m_variableStack[indexes.at(indexesCounter).row()][2];
 
-    if(arg == NULL){
-        return NULL;
-    }
-    try {
-        node = (mitk::DataNode *)((itk::SmartPointer<mitk::DataNode > const *)arg)->GetPointer();
-    }
-    catch(std::exception &_e) {
-        {
-            std::cout << "Not a DataNode" << std::endl;
-        }
+      if(type != "DataNode_PointerPtr")
+          return NULL;
+
+      mitk::DataNode* node;
+      itk::SmartPointer<mitk::DataNode> *arg;
+
+      PyObject * obj = QmitkPythonMediator::getPyObjectString(&name);
+      int i = 0;
+      while(swig_types_initial[i] != 0)
+      {
+        if(swig_types_initial[i] == _swigt__p_itk__SmartPointerTmitk__DataNode_t)
+          SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t = SWIG_TypeRegister(swig_types_initial[i]);
+        i++;
+      }
+      if ((SWIG_ConvertPtr(obj,(void **)(&arg),SWIGTYPE_p_itk__SmartPointerTmitk__DataNode_t,
+                           SWIG_POINTER_EXCEPTION | 0)) == -1) return NULL;
+
+      if(arg == NULL){
+          return NULL;
+      }
+      try {
+          node = (mitk::DataNode *)((itk::SmartPointer<mitk::DataNode > const *)arg)->GetPointer();
+      }
+      catch(std::exception &_e) {
+          {
+              std::cout << "Not a DataNode" << std::endl;
+          }
+      }
+
+      long a = reinterpret_cast<long>(node);
+
+      if (dataNodeAddresses.size() != 0)
+      {
+        QTextStream(&dataNodeAddresses) << ",";
+      }
+      QTextStream(&dataNodeAddresses) << a;
+
+      ret->setData("application/x-mitk-datanodes", QByteArray(dataNodeAddresses.toAscii()));
     }
 
-    long a = reinterpret_cast<long>(node);
-
-    QString resultString;
-    QTextStream(&resultString) << a;
-    ret->setData("application/x-mitk-datanode", QByteArray(resultString.toAscii()));
     return ret;
 }
 
 QStringList QmitkPythonVariableStackTreeWidget::mimeTypes() const
 {
     QStringList types;
-    types << "application/x-mitk-datanode";
+    types << "application/x-mitk-datanodes";
     types << "application/x-qabstractitemmodeldatalist";
     return types;
 }

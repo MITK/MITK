@@ -65,6 +65,8 @@ std::string Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 std::string Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 std::string Platform::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
+std::string Platform::ARG_XARGS = "xargs";
+
 const Poco::Path& Platform::GetConfigurationPath()
 {
   return InternalPlatform::GetInstance()->GetConfigurationPath();
@@ -175,6 +177,11 @@ std::vector<std::string> Platform::GetApplicationArgs()
   return InternalPlatform::GetInstance()->GetApplicationArgs();
 }
 
+std::string Platform::GetExtendedApplicationArgs()
+{
+  return InternalPlatform::GetInstance()->GetConfiguration().getString(ARG_XARGS, "");
+}
+
 Poco::Util::LayeredConfiguration& Platform::GetConfiguration()
 {
   return InternalPlatform::GetInstance()->GetConfiguration();
@@ -206,6 +213,11 @@ QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)
       return plugin;
   }
   return QSharedPointer<ctkPlugin>(0);
+}
+
+QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(long id)
+{
+  return InternalPlatform::GetInstance()->GetCTKPluginFrameworkContext()->getPlugin(id);
 }
 
 }

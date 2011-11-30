@@ -70,12 +70,13 @@ namespace mitk
       amplitudeImage->ReleaseData();
       intensityImage->ReleaseData();
 
-      unsigned int dimensions[2];
+      unsigned int dimensions[3];
       dimensions[0] = this->m_ToFCameraDevice->GetCaptureWidth();
-      dimensions[1] = this->m_ToFCameraDevice->GetCaptureHeight();       
-      distanceImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, 1);
-      amplitudeImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, 1);
-      intensityImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, 1);
+      dimensions[1] = this->m_ToFCameraDevice->GetCaptureHeight();
+      dimensions[2] = 1;
+      distanceImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
+      amplitudeImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
+      intensityImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
     }
 
     if (m_DistanceArray&&m_AmplitudeArray&&m_IntensityArray)

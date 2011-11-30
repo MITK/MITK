@@ -109,12 +109,14 @@ protected slots:
   void BundleRepresentationColor();
   void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
+  void Fiber2DfadingEFX();
+  void FiberSlicingThickness2D();
+  void FiberSlicingUpdateLabel(int);
 
   void SetInteractor();
 
   void PFWidth(int);
   void PFColor();
-  void PFColor3D();
 
   void LineWidthChanged(int);
   void TubeRadiusChanged(int);
@@ -126,6 +128,8 @@ protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
+  virtual void NodeAdded(const mitk::DataNode *node);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 

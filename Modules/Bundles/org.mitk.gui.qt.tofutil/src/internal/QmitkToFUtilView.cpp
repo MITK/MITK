@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkToFUtilView.h"
 #include <QmitkStdMultiWidget.h>
+#include <QmitkTextOverlay.h>
 
 // Qt
 #include <QMessageBox>
@@ -25,98 +26,46 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK
 #include <mitkBaseRenderer.h>
-#include <mitkImageCast.h>
-#include <mitkITKImageImport.h>
-#include <mitkToFCompositeFilter.h>
-#include <mitkToFVisualizationFilter.h>
-#include <mitkVtkRepresentationProperty.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkToFDistanceImageToPointSetFilter.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
 
 // VTK
 #include <vtkCamera.h>
+
+// ITK
+#include <itkCommand.h>
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
 QmitkToFUtilView::QmitkToFUtilView()
 : QmitkFunctionality()
-, m_Controls(NULL)
-, m_MultiWidget( NULL )
-, m_DistanceImageNode(NULL)
-, m_AmplitudeImageNode(NULL)
-, m_IntensityImageNode(NULL)
-, m_SurfaceNode(NULL)
-, m_QmitkVideoBackground(NULL)
-, m_QmitkToFImageBackground1(NULL)
-, m_QmitkToFImageBackground2(NULL)
-, m_QmitkToFImageBackground3(NULL)
+, m_Controls(NULL), m_MultiWidget( NULL )
+, m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
+, m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_SurfaceNode(NULL)
+, m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
+, m_SurfaceDisplayCount(0), m_2DDisplayCount(0)
+, m_RealTimeClock(NULL)
+, m_StepsForFramerate(100)
+, m_2DTimeBefore(0.0)
+, m_2DTimeAfter(0.0)
+, m_VideoEnabled(false)
 {
-  //this->m_FrameRate = 0; 
   this->m_Frametimer = new QTimer(this);
 
-  this->m_MitkDistanceImage = mitk::Image::New();
-  this->m_MitkAmplitudeImage = mitk::Image::New();
-  this->m_MitkIntensityImage = mitk::Image::New();
-  this->m_MitkAllImage = mitk::Image::New();
-  this->m_MitkRawImage = mitk::Image::New();
-  this->m_SurfaceInputImage = mitk::Image::New();
-  this->m_SurfaceTextureImage = mitk::Image::New();
-  this->m_SurfaceIntensityImage = mitk::Image::New();
-  this->m_Surface = mitk::Surface::New();
-
-//  this->m_ToFSurfaceGenerationFilter = mitk::ToFSurfaceGenerationFilter::New();
   this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
-
-
-  this->m_ToFImageGrabber = NULL;
-  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-
-  this->m_DataNodesInitilized = false;
-  this->m_TransferFunctionInitialized = false;
-  this->m_SurfaceInitialized = false;
-  this->m_ImageSequence = 0;  
-
-  //this->m_DistLut = vtkLookupTable::New();
-  //this->m_AmplLut = vtkLookupTable::New();
-  //this->m_IntenLut = vtkLookupTable::New();
-  //PrepareColorLut(this->m_DistLut, 300.0, 1000.0);
-  //PrepareBinaryLut(this->m_AmplLut, 0.0, 100.0);
-  //PrepareBinaryLut(this->m_IntenLut, 0.0, 100.0);
-
-  this->m_DataBuffer = NULL;
-  this->m_DataBufferCurrentIndex = 0;
-  this->m_DataBufferMaxSize = 0;
-  this->m_IndexBuffer = NULL;
-  this->m_VideoEnabled = false;
-
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
-
   this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
-  this->m_ToFVisualizationFilter = mitk::ToFVisualizationFilter::New();
+  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
+  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-  // remove nodes
-  RemoveNode("ToF_Distance", this->m_DistanceImageNode);
-  RemoveNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  RemoveNode("ToF_Intensity", this->m_IntensityImageNode);
-  RemoveNode("ToF_Surface", this->m_SurfaceNode);
-  //RemoveBackground();
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
 }
-
-void QmitkToFUtilView::RemoveNode(const char* nodename, mitk::DataNode::Pointer node)
-{
-  if(this->GetDataStorage()->GetNamedNode(nodename) != NULL)
-  {
-    this->GetDataStorage()->Remove(node);
-  }
-}
-
-void QmitkToFUtilView::CreateNode(const char* nodename, mitk::DataNode::Pointer& node)
-{
-  node = mitk::DataNode::New();
-  node->SetProperty( "name", mitk::StringProperty::New(nodename));
-}
-
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
@@ -130,11 +79,11 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraStop()), this, SLOT(OnToFCameraStop()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
-    connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckBoxChecked(bool)) );
+    connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
+    connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
   }
@@ -155,11 +104,6 @@ void QmitkToFUtilView::StdMultiWidgetNotAvailable()
 void QmitkToFUtilView::Activated()
 {
   QmitkFunctionality::Activated();
-  // add necessary nodes
-  CreateNode("ToF_Distance", this->m_DistanceImageNode);
-  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
-  CreateNode("ToF_Surface", this->m_SurfaceNode);
   // configure views
   m_MultiWidget->SetWidgetPlanesVisibility(false);
   m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
@@ -169,13 +113,12 @@ void QmitkToFUtilView::Activated()
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOn();
 
-  //m_Controls->m_ToFImageConverterWidget->Initialize(this->GetDefaultDataStorage(), m_MultiWidget);
-  m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->GetDefaultDataStorage(), m_MultiWidget);
-  m_Controls->m_ToFVisualisationSettingsWidget->SetParameter(this->m_ToFVisualizationFilter);
+  this->UseToFVisibilitySettings(true);
 
   m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+  m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDefaultDataStorage());
 
-  if (this->m_ToFImageGrabber == NULL)
+  if (this->m_ToFImageGrabber.IsNull())
   {
     m_Controls->m_ToFRecorderWidget->setEnabled(false);
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
@@ -192,128 +135,28 @@ void QmitkToFUtilView::Deactivated()
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOff();
 
+  this->UseToFVisibilitySettings(false);
+
   mitk::RenderingManager::GetInstance()->InitializeViews();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-  RemoveBackground();
   QmitkFunctionality::Deactivated();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {
-  RemoveNode("ToF_Distance", this->m_DistanceImageNode);
-  RemoveNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  RemoveNode("ToF_Intensity", this->m_IntensityImageNode);
-  RemoveNode("ToF_Surface", this->m_SurfaceNode);
-
-  CreateNode("ToF_Distance", this->m_DistanceImageNode);
-  CreateNode("ToF_Amplitude", this->m_AmplitudeImageNode);
-  CreateNode("ToF_Intensity", this->m_IntensityImageNode);
-  CreateNode("ToF_Surface", this->m_SurfaceNode);
-
-  this->m_DistanceImageNode->SetData( NULL );
-  this->m_AmplitudeImageNode->SetData( NULL );
-  this->m_IntensityImageNode->SetData( NULL );
-  this->m_SurfaceNode->SetData( NULL );
-
-  this->m_DataNodesInitilized = false;
-  this->m_TransferFunctionInitialized = false;
-  this->m_SurfaceInitialized = false;
-  this->m_ImageSequence = 0;
-
-  //this->m_ToFImageGrabber = dynamic_cast<mitk::ToFImageGrabber*>(m_Controls->m_ToFConnectionWidget->GetToFImageGrabber());
-  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
-  this->m_ToFCaptureWidth = this->m_ToFImageGrabber->GetCaptureWidth();
-  this->m_ToFCaptureHeight = this->m_ToFImageGrabber->GetCaptureHeight();
-
-  this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
-
-  //this->m_MitkDistanceImage->ReleaseData();
-  //this->m_MitkAmplitudeImage->ReleaseData();
-  //this->m_MitkIntensityImage->ReleaseData();
-  //this->m_MitkAllImage->ReleaseData();
-  this->m_MitkDistanceImage = mitk::Image::New();
-  this->m_MitkAmplitudeImage = mitk::Image::New();
-  this->m_MitkIntensityImage = mitk::Image::New();
-  this->m_MitkAllImage = mitk::Image::New();
-
-  InitImage(this->m_MitkDistanceImage, 1);
-  InitImage(this->m_MitkAmplitudeImage, 1);
-  InitImage(this->m_MitkIntensityImage, 1);
-  InitImage(this->m_MitkAllImage, 3);
-
-  InitImage(this->m_SurfaceInputImage, 1);
-  InitImage(this->m_SurfaceIntensityImage, 1);
-
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
+  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
 
-  this->m_IplDistanceImage = cvCreateImageHeader(cvSize(this->m_ToFCaptureWidth, this->m_ToFCaptureHeight), IPL_DEPTH_32F, 1); // no allocation
-  this->m_IplIntensityImage = cvCreateImageHeader(cvSize(this->m_ToFCaptureWidth, this->m_ToFCaptureHeight), IPL_DEPTH_32F, 1); // no allocation
-  this->m_OutputIplImage = cvCreateImage(cvSize(this->m_ToFCaptureWidth, this->m_ToFCaptureHeight), IPL_DEPTH_32F, 1);
-
-  this->m_ItkInputImage = ItkImageType2D::New();
-  ItkImageType2D::IndexType startIndex;
-  startIndex[0] =   0;  // first index on X
-  startIndex[1] =   0;  // first index on Y
-  ItkImageType2D::SizeType  size;
-  size[0]  = this->m_ToFCaptureWidth;  // size along X
-  size[1]  = this->m_ToFCaptureHeight;  // size along Y
-  ItkImageType2D::RegionType region;
-  region.SetSize( size );
-  region.SetIndex( startIndex );
-  this->m_ItkInputImage->SetRegions( region );
-  this->m_ItkInputImage->Allocate();
-
-  if ( this->m_SurfaceNode.IsNotNull() )
-  {
-    this->m_SurfaceNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    this->m_SurfaceNode->SetProperty( "inRenWin4" , mitk::BoolProperty::New( true ));
-    this->m_SurfaceNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New("Surface"));
-    this->m_SurfaceNode->SetIntProperty("layer", 10);
-    this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
-    this->m_SurfaceNode->SetFloatProperty("ScalarsRangeMaximum", 20000);
-    this->m_SurfaceNode->SetFloatProperty("color_coefficient", 0);
-    this->m_SurfaceNode->SetBoolProperty("color mode", true);
-
-    this->m_SurfaceNode->SetData(mitk::Surface::New());
-    this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, this->m_ToFSurfaceVtkMapper3D);
-    this->GetDefaultDataStorage()->Add( this->m_SurfaceNode );
-  }
-  if(this->GetDataStorage()->GetNamedNode("ToF_Distance") == NULL)
-  {
-    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetProperty( "inRenWin2" , mitk::BoolProperty::New( true ));
-    //m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( false ));
-    this->m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-    this->m_DistanceImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-    //m_DistanceImageNode->SetIntProperty( "layer", 10);
-    //this->m_DistanceImageNode->SetData( this->m_MitkDistanceImage );
-
-    mitk::Image::Pointer myImage = mitk::Image::New();
-    unsigned int dimensions[2];
-    dimensions[0] = this->m_ToFImageGrabber->GetCaptureWidth();
-    dimensions[1] = this->m_ToFImageGrabber->GetCaptureHeight();       
-    myImage->Initialize(mitk::PixelType(mitkIpPicUInt, 24, 3), 2, dimensions); //unsigned char RGB
-
-    this->m_DistanceImageNode->SetData( myImage );
-    this->GetDataStorage()->Add( this->m_DistanceImageNode );
-  }
-
-  m_Controls->m_ToFRecorderWidget->SetParameter(dynamic_cast<mitk::ToFImageGrabber*>(this->m_ToFImageGrabber), this->m_ToFImageRecorder);
-
+  this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
+  m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
+  m_Controls->m_ToFRecorderWidget->setEnabled(true);
+  m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
+  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
-  this->m_StepsForFramerate = 100; 
-  this->m_TimeBefore = this->m_RealTimeClock->GetCurrentStamp();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-  this->m_SurfaceTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
 
   try
   {
@@ -345,10 +188,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
       unsigned int dimensions[2];
       dimensions[0] = this->m_VideoCaptureWidth;
       dimensions[1] = this->m_VideoCaptureHeight;       
-      this->m_SurfaceTextureImage->Initialize(mitk::PixelType(typeid(unsigned char), 3), 2, dimensions, 1);
-
-      //this->m_SurfaceWorkerThread.SetTextureImageWidth(this->m_VideoCaptureWidth);
-      //this->m_SurfaceWorkerThread.SetTextureImageHeight(this->m_VideoCaptureHeight);
 
       this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
       this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
@@ -358,8 +197,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
       this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
     }
     m_MultiWidget->DisableGradientBackground();
-
-    this->AddBackground();
   }
   catch (std::logic_error& e)
   {
@@ -368,24 +205,13 @@ void QmitkToFUtilView::OnToFCameraConnected()
     return;
   }
 
-  //this->m_SurfaceWorkerThread.SetAbort(false);
-  //this->m_SurfaceWorkerThread.SetFilterThread(&(this->m_FilterWorkerThread));
-  //this->m_FilterWorkerThread.SetAbort(false);
-
-
-  m_Controls->m_ToFRecorderWidget->setEnabled(true);
-  m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
-  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
 }
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
-  //this->m_SurfaceWorkerThread.SetAbort(true);
-  //this->m_SurfaceWorkerThread.quit();
-  //this->m_FilterWorkerThread.SetAbort(true);
-
+  m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
   if(this->m_VideoSource)
@@ -393,98 +219,59 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
     this->m_VideoSource->StopCapturing();
     this->m_VideoSource = NULL;
   }
-  RemoveBackground();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-  cvReleaseImage(&(this->m_IplDistanceImage));
-  cvReleaseImage(&(this->m_IplIntensityImage));
-  cvReleaseImage(&(this->m_OutputIplImage));
-
-  delete[] this->m_Widget1Texture;
-  delete[] this->m_Widget2Texture;
-  delete[] this->m_Widget3Texture;
-
-  //mitk::ToFImageGrabber* aToFImageGrabber = dynamic_cast<mitk::ToFImageGrabber*>(m_ToFImageGrabber);
-  //aToFImageGrabber->Delete();
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()
 {
-  //this->m_FilterWorkerThread.SetAbort(false);
-  //this->m_FilterWorkerThread.StartProcessing(this->m_ToFImageGrabber, this->m_MitkAllImage);
-  //this->m_SurfaceWorkerThread.SetAbort(false);
-  
-  // initial update of image grabber
-  this->m_ToFImageGrabber->Update();
-
-  this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-  this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-  this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-  // initial update of composite filter
-  this->m_ToFCompositeFilter->Update();
-  this->m_ToFVisualizationFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
-  this->m_ToFVisualizationFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
-  this->m_ToFVisualizationFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
-  // initial update of visualization filter
-  this->m_ToFVisualizationFilter->Update();
-  //this->m_MitkDistanceImage = m_ToFVisualizationFilter->GetOutput(0);
-  //this->m_MitkAmplitudeImage = m_ToFVisualizationFilter->GetOutput(1);
-  //this->m_MitkIntensityImage = m_ToFVisualizationFilter->GetOutput(2);
-  this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-  this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-  this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-  this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
-  this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
-  this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
-  this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-
-  this->m_Frametimer->start(0);
-
-  //if (m_Controls->m_AveragingFilterCheckBox->isChecked())
-  //{
-  //  OnAveragingFilterCheckBoxChecked(true);
-  //}
-  //if (m_Controls->m_ThresholdFilterCheckBox->isChecked())
-  //{
-  //  OnThresholdFilterCheckBoxChecked(true);
-  //}
-  //if (m_Controls->m_BilateralFilterCheckBox->isChecked())
-  //{
-  //  OnBilateralFilterCheckBoxChecked(true);
-  //}
-
-  m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-
-  if (m_Controls->m_SurfaceCheckBox->isChecked())
+  if (m_ToFImageGrabber.IsNotNull())
   {
-    OnSurfaceCheckBoxChecked(true);
-  }
-  if (m_Controls->m_TextureCheckBox->isChecked())
-  {
-    OnTextureCheckBoxChecked(true);
-  }
-  if (m_Controls->m_VideoTextureCheckBox->isChecked())
-  {
-    OnVideoTextureCheckBoxChecked(true);
-  }
+    // initial update of image grabber
+    this->m_ToFImageGrabber->Update();
 
-}
+    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+    // initial update of composite filter
+    this->m_ToFCompositeFilter->Update();
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+    this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+    this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
 
-void QmitkToFUtilView::OnToFCameraStop()
-{
-	
-  //this->m_Frametimer->stop();
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
 
-  //this->m_SurfaceWorkerThread.SetAbort(true);
-  //this->m_FilterWorkerThread.SetAbort(true);
-  m_Controls->m_ToFRecorderWidget->OnStop();
+    this->UseToFVisibilitySettings(true);
+
+    this->m_Frametimer->start(0);
+
+    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+    // initialize visualization widget
+    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
+
+    if (m_Controls->m_TextureCheckBox->isChecked())
+    {
+      OnTextureCheckBoxChecked(true);
+    }
+    if (m_Controls->m_VideoTextureCheckBox->isChecked())
+    {
+      OnVideoTextureCheckBoxChecked(true);
+    }
+  }
+  m_Controls->m_TextureCheckBox->setEnabled(true);
+  // initialize point set measurement
+  m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
   this->m_Frametimer->stop();
-  //this->m_SurfaceWorkerThread.SetAbort(true);
-  //this->m_FilterWorkerThread.SetAbort(true);
 }
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
@@ -507,122 +294,9 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
   }
 }
 
-void QmitkToFUtilView::InitImage(mitk::Image::Pointer image, int numOfChannel)
-{
-  unsigned int dimensions[4];
-  dimensions[0] = this->m_ToFImageGrabber->GetCaptureWidth();
-  dimensions[1] = this->m_ToFImageGrabber->GetCaptureHeight();       
-  dimensions[2] = 1;
-  dimensions[3] = 1;
-  image->Initialize(mitk::PixelType(typeid(float)), 2, dimensions, numOfChannel);
-}
-
-void QmitkToFUtilView::InitTexture(unsigned char* &image, int width, int height)
-{
-  int texSize = width * height * 3;
-  image = new unsigned char[ texSize ];
-  for(int i=0; i<texSize; i++)
-  {
-    image[i] = 0;
-  }
-}
-
-void QmitkToFUtilView::AddNodesToDataStorage()
-{
-
-  if(this->GetDataStorage()->GetNamedNode("ToF_Distance") == NULL)
-  {
-    //m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    //m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    //m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    //m_DistanceImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-    //m_DistanceImageNode->SetProperty( "inRenWin2" , mitk::BoolProperty::New( true ));
-    ////m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( false ));
-    //m_DistanceImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-    //m_DistanceImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-    //m_DistanceImageNode->SetIntProperty( "layer", 10);
-    //this->GetDataStorage()->Add( this->m_DistanceImageNode );
-  }
-  if(this->GetDataStorage()->GetNamedNode("ToF_Amplitude") == NULL)
-  {
-    //m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    //m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    //m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
-    //m_AmplitudeImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-    //m_AmplitudeImageNode->SetProperty( "inRenWin1" , mitk::BoolProperty::New( true ));
-    //m_AmplitudeImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-    //m_AmplitudeImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-    //m_AmplitudeImageNode->SetIntProperty( "layer", 10);
-    //this->GetDataStorage()->Add( this->m_AmplitudeImageNode );
-  }
-  if(this->GetDataStorage()->GetNamedNode("ToF_Intensity") == NULL)
-  {
-    //m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    //m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    //m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    //m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-    //m_IntensityImageNode->SetProperty( "inRenWin3" , mitk::BoolProperty::New( true ));
-    //m_IntensityImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-    //m_IntensityImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-    //m_IntensityImageNode->SetIntProperty( "layer", 10);
-    //this->GetDataStorage()->Add( this->m_IntensityImageNode );
-  }  
-
-  if(this->GetDataStorage()->GetNamedNode("ToF_All") == NULL)
-  {
-    //m_AllImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    /*
-    m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-    m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-    m_IntensityImageNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
-    m_IntensityImageNode->SetProperty( "inRenWin3" , mitk::BoolProperty::New( true ));
-    m_IntensityImageNode->SetProperty( "use color", mitk::BoolProperty::New( true ));
-    m_IntensityImageNode->SetProperty( "binary", mitk::BoolProperty::New( false ));
-    m_IntensityImageNode->SetIntProperty( "layer", 10);
-    */
-
-    //mitk::Mapper::Pointer aMapper = mitk::ToFImageMapper::New();
-    //m_AllImageNode->SetMapper(mitk::BaseRenderer::Standard2D, aMapper);
-    //this->GetDataStorage()->Add( this->m_AllImageNode );
-  }
-
-}
-
-void* QmitkToFUtilView::GetDataFromImage(std::string imageType)
-{
-  void* data;
-  if (imageType.compare("Distance")==0)
-  {
-    data = this->m_MitkDistanceImage->GetData();
-    //data = this->m_MitkAllImage->GetSliceData(0, 0, 0)->GetData();
-  }
-  else if (imageType.compare("Amplitude")==0)
-  {
-    data = this->m_MitkAmplitudeImage->GetData();
-    //data = this->m_MitkAllImage->GetSliceData(0, 0, 1)->GetData();
-  }
-  if (imageType.compare("Intensity")==0)
-  {
-    data = this->m_MitkIntensityImage->GetData();
-    //data = this->m_MitkAllImage->GetSliceData(0, 0, 2)->GetData();
-  }
-  return data;
-}
-
 void QmitkToFUtilView::OnUpdateCamera()
 {
   int currentImageSequence = 0;
-
-  // update pipeline
-  this->m_MitkDistanceImage->Update();
-  // update distance image node
-  this->m_DistanceImageNode->SetData(this->m_MitkDistanceImage);
-
-  if (!this->m_TransferFunctionInitialized)
-  {
-    m_Controls->m_ToFVisualisationSettingsWidget->InitializeTransferFunction(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
-    this->m_TransferFunctionInitialized = true;
-  }
 
   if (m_Controls->m_VideoTextureCheckBox->isChecked() && this->m_VideoEnabled && this->m_VideoSource)
   {
@@ -630,34 +304,33 @@ void QmitkToFUtilView::OnUpdateCamera()
     ProcessVideoTransform();
   }
 
-  vtkColorTransferFunction* colorTransferFunction;
-  std::string imageType;
-
-  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
-  imageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
-  RenderWidget(m_MultiWidget->mitkWidget1, this->m_QmitkToFImageBackground1, this->m_Widget1ImageType, imageType, 
-    colorTransferFunction, this->m_VideoTexture, this->m_Widget1Texture );
-
-  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ColorTransferFunction();
-  imageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ImageType();
-  RenderWidget(m_MultiWidget->mitkWidget2, this->m_QmitkToFImageBackground2, this->m_Widget2ImageType, imageType,
-    colorTransferFunction, this->m_VideoTexture, this->m_Widget2Texture );
-
-  colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ColorTransferFunction();
-  imageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ImageType();
-  RenderWidget(m_MultiWidget->mitkWidget3, this->m_QmitkToFImageBackground3, this->m_Widget3ImageType, imageType, 
-    colorTransferFunction, this->m_VideoTexture, this->m_Widget3Texture );
+  vtkColorTransferFunction* colorTransferFunction1;
+  colorTransferFunction1 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf1 = mitk::TransferFunction::New();
+  tf1->SetColorTransferFunction( colorTransferFunction1 );
+  m_DistanceImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf1));
+  vtkColorTransferFunction* colorTransferFunction2;
+  colorTransferFunction2 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
+  tf2->SetColorTransferFunction( colorTransferFunction2 );
+  m_AmplitudeImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf2));
+  vtkColorTransferFunction* colorTransferFunction3;
+  colorTransferFunction3 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ColorTransferFunction();
+  mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
+  tf3->SetColorTransferFunction( colorTransferFunction3 );
+  m_IntensityImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf3));
 
   if (m_Controls->m_SurfaceCheckBox->isChecked())
   {
     // update surface
+    m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
     this->m_Surface->Update();
 
-    colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Intensity");
+    vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();
  
     this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
 
-    if (this->m_SurfaceDisplayCount < 2)
+    if (this->m_SurfaceDisplayCount<2)
     {
       this->m_SurfaceNode->SetData(this->m_Surface);
       this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
@@ -675,30 +348,25 @@ void QmitkToFUtilView::OnUpdateCamera()
     this->m_SurfaceDisplayCount++;
 
   }
+  else
+  {
+    // update pipeline
+    this->m_MitkDistanceImage->Update();
+  }
 
-
-
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   this->m_2DDisplayCount++;
   if ((this->m_2DDisplayCount % this->m_StepsForFramerate) == 0)
   {
     this->m_2DTimeAfter = this->m_RealTimeClock->GetCurrentStamp() - this->m_2DTimeBefore;
-    MITK_INFO << " 2D-Display-framerate (fps): " << this->m_StepsForFramerate / (this->m_2DTimeAfter/1000) << " Sequence: " << this->m_ImageSequence;
+    MITK_INFO << " 2D-Display-framerate (fps): " << this->m_StepsForFramerate / (this->m_2DTimeAfter/1000);
     this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
   }
 }
 
 void QmitkToFUtilView::ProcessVideoTransform()
 {
-  /*
-  this->m_VideoTexture
-  this->m_IplIntensityImage->imageData = (char*)intensityFloatData;
-  this->m_IplIntensityImage = cvCreateImageHeader(cvSize(this->m_ToFCaptureWidth, this->m_ToFCaptureHeight), IPL_DEPTH_32F, 1); // no allocation
-  this->m_OutputIplImage = cvCreateImage(cvSize(this->m_ToFCaptureWidth, this->m_ToFCaptureHeight), IPL_DEPTH_32F, 1);
-*/
-
-
   IplImage *src, *dst;
   src = cvCreateImageHeader(cvSize(this->m_VideoCaptureWidth, this->m_VideoCaptureHeight), IPL_DEPTH_8U, 3);
   src->imageData = (char*)this->m_VideoTexture;
@@ -765,75 +433,18 @@ void QmitkToFUtilView::ProcessVideoTransform()
 
 }
 
-void QmitkToFUtilView::RenderWidget(QmitkRenderWindow* mitkWidget, QmitkToFImageBackground* imageBackground, 
-                                    std::string& oldImageType, std::string newImageType,
-                                    vtkColorTransferFunction* colorTransferFunction, unsigned char* videoTexture, unsigned char* tofTexture )
-{
-  if (newImageType.compare("Video") == 0)
-  {
-    if (this->m_VideoEnabled)
-    {
-      if (oldImageType.compare(newImageType)!=0)
-      {
-        imageBackground->AddRenderWindow(mitkWidget->GetRenderWindow(), this->m_VideoCaptureWidth, this->m_VideoCaptureHeight);
-        oldImageType = newImageType;
-      }
-      imageBackground->UpdateBackground(videoTexture);
-    }
-  }
-  else
-  {
-    if (oldImageType.compare(newImageType)!=0)
-    {
-      imageBackground->AddRenderWindow(mitkWidget->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-      oldImageType = newImageType;
-    }
-    void* data = GetDataFromImage(newImageType);
-    PrepareImageForBackground(colorTransferFunction, (float*)data, tofTexture);
-    imageBackground->UpdateBackground(tofTexture);
-  }
-}
-
-//void QmitkToFUtilView::CreateSurface()
-//{
-//  static int count = 0;
-//  //this->m_ToFSurfaceGenerationFilter = mitk::ToFSurfaceGenerationFilter::New();
-
-//  this->m_ToFSurfaceGenerationFilter->SetInput(this->m_MitkDistanceImage);
-//  this->m_ToFSurfaceGenerationFilter->Modified();
-//  this->m_ToFSurfaceGenerationFilter->Update();
-//  this->m_Surface->ReleaseData();
-//  vtkPolyData* polydata = this->m_ToFSurfaceGenerationFilter->GetOutput()->GetVtkPolyData();
-//  //this->m_Surface->GetVtkPolyData()->ReleaseData();
-//  this->m_Surface->SetVtkPolyData(polydata);
-//  //this->m_Surface = this->m_ToFSurfaceGenerationFilter->GetOutput();
-
-//  this->m_SurfaceNode->SetData(this->m_Surface);
-//  //if(!this->m_SurfaceInitialized)
-//  if (count < 1)
-//  {
-//    //mitk::RenderingManager::GetInstance()->InitializeViews(
-//    //  this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
-
-//    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->ResetCamera();
-//    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(-500,-120,-6000);
-//    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0,-1,0);
-//    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(-130,0,2300);
-//    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(40);
-//    //this->m_SurfaceInitialized = true;
-//    count++;
-//  }
-//}
-
 void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
 {
-  if (checked)
+  if(m_SurfaceNode.IsNotNull())
   {
-    this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
-  }
-  else
-  {
-    this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
+    if (checked)
+    {
+      this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
+    }
+    else
+    {
+      this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
+    }
   }
 }
 
@@ -843,7 +454,6 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
   {
     if (this->m_VideoEnabled)
     {
-      this->m_SurfaceTextureImage->SetSlice(this->m_VideoTexture, 0, 0, 0);
       this->m_ToFSurfaceVtkMapper3D->SetTexture(this->m_VideoTexture);
     }
     else
@@ -857,118 +467,58 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
   }
 }
 
-void QmitkToFUtilView::OnSurfaceCheckBoxChecked(bool checked)
+mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )
 {
-  //if (checked)
-  //{
-  //  void* surfaceInputdata = this->m_MitkAllImage->GetSliceData(0, 0, 0)->GetData();
 
-  //  this->m_SurfaceInputImage->SetSlice(surfaceInputdata, 0, 0, 0);
-
-  //  void* surfaceIntensitydata = this->m_MitkAllImage->GetSliceData(0, 0, 2)->GetData();
-  //  this->m_SurfaceIntensityImage->SetSlice(surfaceIntensitydata, 0, 0, 0);
-  //  if (m_Controls->m_VideoTextureCheckBox->isChecked())
-  //  {
-  //    OnVideoTextureCheckBoxChecked(true);
-  //  }
-  //  else
-  //  {
-  //    OnVideoTextureCheckBoxChecked(false);
-  //  }
-  //  if (m_Controls->m_TextureCheckBox->isChecked())
-  //  {
-  //    OnTextureCheckBoxChecked(true);
-  //  }
-  //  else
-  //  {
-  //    OnTextureCheckBoxChecked(false);
-  //  }
-  //  //this->m_SurfaceWorkerThread.SetAbort(false);
-  //  //this->m_SurfaceDisplayCount = 0;
-  //  //this->m_SurfaceWorkerThread.CreateSurface(this->m_SurfaceInputImage, this->m_SurfaceIntensityImage, this->m_SurfaceTextureImage, this->m_Surface);
-  //}
-  //else
-  //{
-  //  //this->m_SurfaceWorkerThread.SetAbort(true);
-  //}
+  mitk::DataNode::Pointer node = this->GetDefaultDataStorage()->GetNamedNode(nodeName);
+  if (node.IsNull())
+  {
+    node = mitk::DataNode::New();
+    node->SetData(data);
+    node->SetName(nodeName);
+    this->GetDefaultDataStorage()->Add(node);
+  }
+  else
+  {
+    node->SetData(data);
+  }
+  return node;
 }
 
-void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* floatData, unsigned char* image)
+void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
 {
-  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
-  floatArrayDist->Initialize();
-  int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
-  float* flippedFloatData = new float[numOfPixel];
-
-  for (int i=0; i<this->m_ToFCaptureHeight; i++)
+  // set node properties
+  if (m_DistanceImageNode.IsNotNull())
   {
-    for (int j=0; j<this->m_ToFCaptureWidth; j++)
-    {
-      flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
-    }
+    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
+    this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
-
-  floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
-  lut->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
-
-  delete[] flippedFloatData;
-}
-
-void QmitkToFUtilView::PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image)
-{
-  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
-  floatArrayDist->Initialize();
-  int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
-  float* flippedFloatData = new float[numOfPixel];
-
-  for (int i=0; i<this->m_ToFCaptureHeight; i++)
+  if (m_AmplitudeImageNode.IsNotNull())
   {
-    for (int j=0; j<this->m_ToFCaptureWidth; j++)
-    {
-      flippedFloatData[i*this->m_ToFCaptureWidth+j] = floatData[((this->m_ToFCaptureHeight-1-i)*this->m_ToFCaptureWidth)+j];
-    }
+    this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
+    this->m_AmplitudeImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
-
-  floatArrayDist->SetArray(flippedFloatData, numOfPixel, 0);
-  colorTransferFunction->MapScalarsThroughTable(floatArrayDist, image, VTK_RGB);
-
-  delete[] flippedFloatData;
-}
-
-void QmitkToFUtilView::RemoveBackground()
-{
-  if(this->m_QmitkToFImageBackground1)
+  if (m_IntensityImageNode.IsNotNull())
   {
-    this->m_QmitkToFImageBackground1->RemoveRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow());
+    this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
+    this->m_IntensityImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
-  if(this->m_QmitkToFImageBackground2)
+  // initialize images
+  if (m_MitkDistanceImage.IsNotNull())
   {
-    this->m_QmitkToFImageBackground2->RemoveRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow());
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+          this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
   }
-  if(this->m_QmitkToFImageBackground3)
-  {
-    this->m_QmitkToFImageBackground3->RemoveRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow());
-  }
-}
-
-void QmitkToFUtilView::AddBackground()
-{
-  InitTexture(this->m_Widget1Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  InitTexture(this->m_Widget2Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  InitTexture(this->m_Widget3Texture, this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-
-  this->m_QmitkToFImageBackground1 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground1->AddRenderWindow(m_MultiWidget->mitkWidget1->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground1->UpdateBackground(this->m_Widget1Texture);
-  this->m_Widget1ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ImageType();
-
-  this->m_QmitkToFImageBackground2 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground2->AddRenderWindow(m_MultiWidget->mitkWidget2->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground2->UpdateBackground(this->m_Widget2Texture);
-  this->m_Widget2ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ImageType();
-
-  this->m_QmitkToFImageBackground3 = new QmitkToFImageBackground();
-  this->m_QmitkToFImageBackground3->AddRenderWindow(m_MultiWidget->mitkWidget3->GetRenderWindow(), this->m_ToFCaptureWidth, this->m_ToFCaptureHeight);
-  this->m_QmitkToFImageBackground3->UpdateBackground(this->m_Widget3Texture);
-  this->m_Widget3ImageType = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ImageType();
 }

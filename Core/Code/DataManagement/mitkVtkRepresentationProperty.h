@@ -62,7 +62,7 @@ public:
    */
   virtual void SetRepresentationToSurface();
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
+  using BaseProperty::operator=;
   
 protected:
   
@@ -96,6 +96,12 @@ protected:
    * enumeration values.
    */
   virtual void AddRepresentationTypes();
+
+private:
+
+  // purposely not implemented
+  VtkRepresentationProperty(const VtkRepresentationProperty&);
+  VtkRepresentationProperty& operator=(const VtkRepresentationProperty&);
 };
 } // end of namespace mitk
 #endif

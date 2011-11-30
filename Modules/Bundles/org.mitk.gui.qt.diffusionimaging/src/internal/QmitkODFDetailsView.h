@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include <itkDiffusionTensor3D.h>
 
 /*!
   \brief QmitkODFDetailsView
@@ -63,6 +64,9 @@ public:
   typedef float TOdfPixelType;
   typedef itk::Vector<TOdfPixelType,QBALL_ODFSIZE> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
+
+  typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;
+  typedef itk::Image< TensorPixelType, 3 >         TensorImageType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -96,6 +100,7 @@ protected:
   vtkRenderWindowInteractor* m_RenderWindowInteractor;
   vtkCamera* m_Camera;
   std::vector<double> m_Values;
+  int m_OdfNormalization;
 };
 
 

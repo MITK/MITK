@@ -44,8 +44,6 @@ public:
 
   mitkNewMacro1Param(VtkVolumeRenderingProperty, const std::string&);
 
-  virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
-
   /**
    * Returns the current volume rendering type
    */
@@ -60,6 +58,8 @@ public:
    * Sets the rendering type to VTK_RAY_CAST_COMPOSITE_FUNCTION
    */
   virtual void SetRenderingTypeToComposite();
+
+  using BaseProperty::operator=;
 
  protected:
 
@@ -88,6 +88,12 @@ public:
    * enumeration values.
    */
   virtual void AddRenderingTypes();
+
+private:
+
+  // purposely not implemented
+  VtkVolumeRenderingProperty(const VtkVolumeRenderingProperty&);
+  VtkVolumeRenderingProperty& operator=(const VtkVolumeRenderingProperty&);
 };
 
 } // end of namespace mitk

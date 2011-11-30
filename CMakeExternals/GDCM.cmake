@@ -13,9 +13,10 @@ SET(GDCM_DEPENDS ${proj})
 
 IF(NOT DEFINED GDCM_DIR)
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/gdcm-2.0.14.tar.gz 
+     URL http://mitk.org/download/thirdparty/gdcm-2.0.18.tar.gz 
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
+     PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchGDCM-2.0.18.cmake 
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -26,9 +27,18 @@ IF(NOT DEFINED GDCM_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
   SET(GDCM_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
-  
+
+  SET(GDCM_IS_2_0_18 TRUE)
 ELSE()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+  FIND_PACKAGE(GDCM)
+  
+  IF( GDCM_BUILD_VERSION EQUAL "18")
+    SET(GDCM_IS_2_0_18 TRUE)
+  ELSE()
+    SET(GDCM_IS_2_0_18 FALSE)
+  ENDIF()
    
 ENDIF()

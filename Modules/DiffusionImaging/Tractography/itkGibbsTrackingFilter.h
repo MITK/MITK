@@ -9,6 +9,7 @@
 #include "GibbsTracking/auxilary_classes.cpp"
 
 #include <fstream>
+#include <QFile>
 
 namespace itk{
 
@@ -43,8 +44,8 @@ namespace itk{
     itkSetMacro( TempEnd, float );
     itkGetMacro( TempEnd, float );
 
-    itkSetMacro( NumIt, int );
-    itkGetMacro( NumIt, int );
+    itkSetMacro( NumIt, unsigned long );
+    itkGetMacro( NumIt, unsigned long );
 
     itkSetMacro( ParticleWeight, float );
     itkGetMacro( ParticleWeight, float );

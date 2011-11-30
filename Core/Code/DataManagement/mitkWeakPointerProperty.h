@@ -34,21 +34,35 @@ namespace mitk {
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);
 
+    itkNewMacro(WeakPointerProperty);
     mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
-
-    virtual bool operator==(const BaseProperty& property) const;
-
-    virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); }
 
     virtual ~WeakPointerProperty();
 
-    itk::Object::Pointer GetWeakPointer() const;
+    typedef itk::WeakPointer<itk::Object> ValueType;
+
+    ValueType GetWeakPointer() const;
+    ValueType GetValue() const;
 
     void SetWeakPointer(itk::Object* pointer);
+    void SetValue(const ValueType& value);
+
+    virtual std::string GetValueAsString() const;
+
+    using BaseProperty::operator=;
+
   protected:
     itk::WeakPointer<itk::Object> m_WeakPointer;
 
-    WeakPointerProperty(itk::Object* pointer);
+    WeakPointerProperty(itk::Object* pointer = 0);
+
+  private:
+    // purposely not implemented
+    WeakPointerProperty(const WeakPointerProperty&);
+    WeakPointerProperty& operator=(const WeakPointerProperty&);
+
+    virtual bool IsEqual(const BaseProperty& property) const;
+    virtual bool Assign(const BaseProperty& property);
   };
 
 } // namespace mitk

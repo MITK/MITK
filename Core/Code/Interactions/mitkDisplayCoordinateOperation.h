@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkVector.h"
 #include "mitkOperation.h"
+#include <mitkWeakPointer.h>
 
 #define mitkGetMacro(name,type) \
   virtual type Get##name () \
@@ -69,7 +70,7 @@ DisplayCoordinateOperation(mitk::OperationType operationType,
 
 
   private:
-    mitk::BaseRenderer::Pointer m_Renderer;
+    mitk::WeakPointer< mitk::BaseRenderer > m_Renderer;
 
     const mitk::Point2D m_StartDisplayCoordinate;
     const mitk::Point2D m_LastDisplayCoordinate;

@@ -45,7 +45,11 @@ bool ClippingProperty::GetClippingEnabled() const
 
 void ClippingProperty::SetClippingEnabled( bool enabled )
 {
-  m_ClippingEnabled = enabled;
+  if (m_ClippingEnabled != enabled)
+  {
+    m_ClippingEnabled = enabled;
+    this->Modified();
+  }
 }
 
 
@@ -57,7 +61,11 @@ const Point3D &ClippingProperty::GetOrigin() const
 
 void ClippingProperty::SetOrigin( const Point3D &origin )
 {
-  m_Origin = origin;
+  if (m_Origin != origin)
+  {
+    m_Origin = origin;
+    this->Modified();
+  }
 }
 
 
@@ -69,18 +77,27 @@ const Vector3D &ClippingProperty::GetNormal() const
 
 void ClippingProperty::SetNormal( const Vector3D &normal )
 {
-  m_Normal = normal;
+  if (m_Normal != normal)
+  {
+    m_Normal = normal;
+    this->Modified();
+  }
 }
 
 
-bool ClippingProperty::operator==( const BaseProperty &property ) const 
+bool ClippingProperty::IsEqual( const BaseProperty &property ) const
 {  
-  const Self *other = dynamic_cast< const Self * >( &property );
+  return ((this->m_ClippingEnabled == static_cast<const Self&>(property).m_ClippingEnabled) &&
+          (this->m_Origin == static_cast<const Self&>(property).m_Origin ) &&
+          (this->m_Normal == static_cast<const Self&>(property).m_Normal ) );
+}
 
-  if ( other == NULL ) return false;
-
-  return ( (other->m_Origin == m_Origin )
-    && (other->m_Normal == m_Normal ) );
+bool ClippingProperty::Assign( const BaseProperty &property )
+{
+  this->m_ClippingEnabled = static_cast<const Self&>(property).m_ClippingEnabled;
+  this->m_Origin = static_cast<const Self&>(property).m_Origin;
+  this->m_Normal = static_cast<const Self&>(property).m_Normal;
+  return true;
 }
 
 
@@ -88,7 +105,7 @@ std::string ClippingProperty::GetValueAsString() const
 {
   std::stringstream myStr;
 
-  myStr << this->GetOrigin() << this->GetNormal();
+  myStr << this->GetClippingEnabled() << this->GetOrigin() << this->GetNormal();
   return myStr.str(); 
 }
 } // namespace

@@ -4,17 +4,6 @@
 
 IF(MITK_USE_OpenCV)
 
-  if (UNIX AND NOT APPLE)
-
-    include(${MITK_SOURCE_DIR}/CMake/mitkMacroGetLinuxDistribution.cmake)
-    GetLinuxDistribution()
-
-    if("${LINUX_DISTRIBUTION}" MATCHES "^[Uu][Bb][Uu][Nn][Tt][Uu].*" AND "${LINUX_RELEASE}" MATCHES "11.04")
-      set(OpenCV_DIR "/usr/share/opencv/")
-    endif()
-
-  endif()
-
   # Sanity checks
   IF(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})
     MESSAGE(FATAL_ERROR "OpenCV_DIR variable is defined but corresponds to non-existing directory")

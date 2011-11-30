@@ -56,15 +56,21 @@ namespace mitk {
     
     mitkClassMacro(TimeStamp, itk::Object);
     
-    /**
-    * \brief creates and returns a new instance of mitkTimeStamp if necessary
+   /**
+    * \brief creates a new instance of mitkTimeStamp
+    *
+    * This method  returns a pointer to the currently existing TimeStamp.
+    * If there is no exisiting instance, a new one is created and returned automatically
+    *
+    * DECREPATED: Use GetInstance instead
     */
     static TimeStamp* CreateInstance();
 
-    /**
-    * \brief returns the current instance of mitkTimeStamp if one exists.
+   /**
+    * \brief returns a pointer to the current instance of mitkTimeStamp
     *
-    * If no instance exists, a new one is created.
+    * This method  returns a pointer to the currently existing TimeStamp.
+    * If there is no exisiting instance, a new one is created and returned automatically
     */
     static TimeStamp* GetInstance();
 
@@ -145,38 +151,37 @@ namespace mitk {
     */
     void SetRealTimeClock(mitk::RealTimeClock::Pointer Clock);
  
+    /**
+    * \brief creates a new RealTimeClock
+    *
+    * Instanciates a new RealTimeClock, that will be specific for the Operating System.
+    * This will only be called internally when no other RealTimeClock has been set
+    * by the user.
+    *
+    */
     void Initialize();
 
   protected:
+
     TimeStamp();
 
     virtual ~TimeStamp();
 
     double GetCurrentStamp();
 
-    /*
-      the current timestamp when GetCurrentStamp() is called.
-    */
+    /* the current timestamp when GetCurrentStamp() is called. */
     double m_Time;
 
-    /*
-      the timestamp in ms acquired when Start() was called.
-    */
+    /* the timestamp in ms acquired when Start() was called. */
     double m_ReferenceTime;
 
-    /*
-      pointer to the RealTimeClock used internally
-    */
+    /* pointer to the RealTimeClock used internally */
     mitk::RealTimeClock::Pointer m_RealTimeClock;
 
-    /*
-      pointer to the current instance
-    */
+    /* pointer to the current instance */
     static mitk::TimeStamp::Pointer s_Instance;
 
-    /*
-      map, in which pointer to all devices calling Start(), are saved
-    */
+    /* map, in which pointer to all devices calling Start(), are saved */
     std::map<itk::Object::Pointer, double> m_DeviceMap;
 
     std::map<itk::Object::Pointer, double>::iterator m_MapIterator;    

@@ -225,7 +225,7 @@ IF(BLUEBERRY_BUILD_TESTING)
     SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
   ENDIF()
 
-  LIST(APPEND _ctk_plugins
+  SET(_ctk_testinfrastructure_plugins
     Bundles/org.blueberry.test:ON
     Bundles/org.blueberry.uitest:ON
   )
@@ -250,7 +250,7 @@ SET(BLUEBERRY_TESTING_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerryTestin
 
 ADD_CUSTOM_TARGET(BlueBerry)
 
-ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
+ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
                              BUILD_OPTION_PREFIX BLUEBERRY_BUILD_
                              BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
                              COMPACT_OPTIONS)
@@ -258,15 +258,13 @@ ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
 SET(BLUEBERRY_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry.provisioning")
 FunctionCreateProvisioningFile(
   FILE ${BLUEBERRY_PROVISIONING_FILE}
-  PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
-  PLUGINS  ${_ctk_plugins}
+  PLUGINS ${_ctk_plugins}
 )
 
 FunctionCreateProvisioningFile(
   FILE ${BLUEBERRY_TESTING_PROVISIONING_FILE}
   INCLUDE ${BLUEBERRY_PROVISIONING_FILE}
-  PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_plugins"
-  PLUGINS ${_ctk_test_plugins}
+  PLUGINS ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
 )
 
 ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)

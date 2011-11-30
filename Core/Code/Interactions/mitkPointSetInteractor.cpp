@@ -849,14 +849,27 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         ok = true;
       }
       else if (pointSet->GetSize( m_TimeStep ) <= m_N || m_N <= -1)
-        //m_N is set to unlimited points allowed or more than 1 points in list, but not full, so stay in the state!
-      {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDSMALLERN, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent );
-        delete newStateEvent;
-        ok = true;
-      }
+       //m_N is set to unlimited points allowed or more than 1 points in list, but not full, so stay in the state!
+     {
+       // if the number of points equals m_N and no point of the point set is selected switch to state EIDEQUALSN
+       if ((pointSet->GetSize( m_TimeStep ) == m_N)&&(pointSet->GetNumberOfSelected()==0))
+       {
+         mitk::StateEvent* newStateEvent =
+           new mitk::StateEvent(EIDEQUALSN, stateEvent->GetEvent());
+         this->HandleEvent(newStateEvent );
+         delete newStateEvent;
+         ok = true;
+       }
+       // if the number of points is small than or equal m_N and point(s) are selected stay in state
+       else
+       {
+         mitk::StateEvent* newStateEvent =
+             new mitk::StateEvent(EIDSMALLERN, stateEvent->GetEvent());
+         this->HandleEvent(newStateEvent );
+         delete newStateEvent;
+         ok = true;
+       }
+     }
       else
         //pointSet->GetSize( m_TimeStep ) >=m_N. 
         // This can happen if the points were not added 

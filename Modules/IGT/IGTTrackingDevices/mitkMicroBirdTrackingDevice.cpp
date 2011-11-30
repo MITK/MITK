@@ -36,7 +36,7 @@ m_SensorConfig(NULL)
   // Mid-range transmitter needs measurement rate: 68.3;
 
   // Set the tracker type
-  this->m_Type = AscensionMicroBird;
+  this->m_Data = mitk::DeviceDataMicroBird;
 
   // Clear tools vector
   m_Tools.clear();

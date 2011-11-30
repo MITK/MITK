@@ -290,6 +290,11 @@ protected:
     \brief for internal sorting.
   */
   typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
+ 
+  /**
+    \brief Maps DICOM tags to MITK properties.
+  */
+  typedef std::map<std::string, std::string> TagToPropertyMapType;
 
   /**
     \brief Ensure an equal z-spacing for a group of files.
@@ -437,6 +442,16 @@ protected:
   */
   static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
   static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
+  
+  /**
+    \brief Map between DICOM tags and MITK properties.
+
+    Uses as a positive list for copying specified DICOM tags (from ITK's ImageIO)
+    to MITK properties. ITK provides MetaDataDictionary entries of form
+    "gggg|eeee" (g = group, e = element), e.g. "0028,0109" (Largest Pixel in Series),
+    which we want to sort as dicom.series.largest_pixel_in_series".
+  */
+  static const TagToPropertyMapType& GetDICOMTagsToMITKPropertyMap();
 };
 
 }

@@ -305,7 +305,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
               // then we have to determine the gap position of the main line
               // by finding the position at which the two lines cross
-              this->DetermineParametricCrossPositions( otherLine, mainLine, mainLineParams );
+              this->DetermineParametricCrossPositions( mainLine, otherLine, mainLineParams );
 
 
               // if the other line is also in thick slice mode, we have to determine the 
@@ -320,8 +320,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
                 gapSize = gapSize / displayGeometry->GetScaleFactorMMPerDisplayUnit();
 
                 // determine the gap positions for the helper lines as well
-                this->DetermineParametricCrossPositions( otherLine, primaryHelperLine, primaryHelperLineParams );
-                this->DetermineParametricCrossPositions( otherLine, secondaryHelperLine, secondaryHelperLineParams );
+                this->DetermineParametricCrossPositions( primaryHelperLine, otherLine, primaryHelperLineParams );
+                this->DetermineParametricCrossPositions( secondaryHelperLine, otherLine, secondaryHelperLineParams );
               }
             }
           }
@@ -506,19 +506,18 @@ void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::Data
   }
 }
 
-void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer, 
+void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer, 
                                             ScalarType lengthInDisplayUnits, 
-                                            Line< ScalarType, 2 > &line, 
-                                            std::vector< ScalarType > &lineParams, 
-                                            const PlaneGeometry * inputPlaneGeometry, 
+                                            Line<ScalarType,2> &line, 
+                                            std::vector<ScalarType> &gapPositions, 
+                                            const PlaneGeometry* inputPlaneGeometry, 
                                             bool drawDashed, 
                                             ScalarType gapSizeInPixel
                                             )
 {
   DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
   const PlaneGeometry *worldPlaneGeometry =
-    dynamic_cast< const PlaneGeometry* >( 
-    renderer->GetCurrentWorldGeometry2D() );
+    dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldGeometry2D() );
 
   // Apply color and opacity read from the PropertyList.
   this->ApplyProperties( renderer );
@@ -526,12 +525,12 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
   ScalarType gapSizeInParamUnits = 
     1.0 / lengthInDisplayUnits * gapSizeInPixel;
 
-  std::sort( lineParams.begin(), lineParams.end() );
+  std::sort( gapPositions.begin(), gapPositions.end() );
 
   Point2D p1, p2;
   ScalarType p1Param, p2Param; 
 
-  p1Param = lineParams[0];
+  p1Param = gapPositions[0];
   p1 = line.GetPoint( p1Param );
   displayGeometry->WorldToDisplay( p1, p1 );
 
@@ -540,12 +539,19 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
   //the crosshair with depth = 1 is always on top.
   float depthPosition = 1.0f;
 
+  if ( drawDashed )
+  {
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0xF0F0); 
+  }
+  glEnable(GL_DEPTH_TEST);
+
   // Iterate over all line segments and display each, with a gap
   // in between.
-  unsigned int i, preLastLineParam = lineParams.size() - 1;
+  unsigned int i, preLastLineParam = gapPositions.size() - 1;
   for ( i = 1; i < preLastLineParam; ++i )
   {
-    p2Param = lineParams[i] - gapSizeInParamUnits * 0.5;
+    p2Param = gapPositions[i] - gapSizeInParamUnits * 0.5;
     p2 = line.GetPoint( p2Param );
 
     if ( p2Param > p1Param )
@@ -555,20 +561,10 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
       displayGeometry->WorldToDisplay( p2, p2 );
 
       // draw
-      glEnable(GL_DEPTH_TEST);
-
-      if ( drawDashed )
-      {
-        glEnable(GL_LINE_STIPPLE);
-        glLineStipple(1, 0xF0F0); 
-      }
-
       glBegin (GL_LINES);
       glVertex3f(p1[0],p1[1], depthPosition);
       glVertex3f(p2[0],p2[1], depthPosition);
       glEnd ();
-
-
 
       if ( (i == 1) && (m_RenderOrientationArrows) )
       {
@@ -585,7 +581,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer * renderer,
   }
 
   // Draw last line segment
-  p2Param = lineParams[i];
+  p2Param = gapPositions[i];
   p2 = line.GetPoint( p2Param );
   displayGeometry->WorldToDisplay( p2, p2 );
   glBegin( GL_LINES );
@@ -634,7 +630,9 @@ int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &t
   return thickSlicesMode;
 }
 
-void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &otherLine, Line< mitk::ScalarType, 2 > &mainLine, std::vector< mitk::ScalarType > &lineParams )
+void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine, 
+                                                                     Line< mitk::ScalarType, 2 > &otherLine,
+                                                                     std::vector< mitk::ScalarType > &crossPositions )
 {
   Vector2D direction, dOrth;
   // By means of the dot product, calculate the gap position as
@@ -651,7 +649,7 @@ void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk
     gapPosition /= norm;
     if ( (gapPosition > 0.0) && (gapPosition < 1.0) )
     {
-      lineParams.push_back(gapPosition);
+      crossPositions.push_back(gapPosition);
     }
   }
 }

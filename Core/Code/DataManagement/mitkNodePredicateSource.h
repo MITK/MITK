@@ -45,8 +45,8 @@ namespace mitk {
       virtual ~NodePredicateSource();
 
       //##Documentation
-      //## @brief Checks, if the node is a source node of m_BaseNode (e.g. if m_BaseNode "was created from" node)
-      virtual bool CheckNode(const mitk::DataNode* node) const;
+      //## @brief Checks, if m_BaseNode is a source node of childNode  (e.g. if childNode "was created from" m_BaseNode)
+      virtual bool CheckNode(const mitk::DataNode* childNode) const;
 
     protected:
       //##Documentation

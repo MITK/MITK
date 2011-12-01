@@ -26,8 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateEvent.h"
 #include "mitkPositionEvent.h"
 
-//ContourSet - Test
-#include "mitkContourSet.h"
+#include "mitkPlanePositionManager.h"
+#include "mitkRestorePlanePositionOperation.h"
+#include "mitkInteractionConst.h"
 
 namespace mitk
 {
@@ -104,11 +105,13 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
+    void WriteBackSegmentationResult (const PositionEvent*, Image*);
+
     /**
-      \brief Adds a new node called @a contourmarker which holds a mitk::PlanarFigure. By selecting this node the slices will be oriented according to the planarGeometry
+      \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 
+             By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
     void AddContourmarker ( const PositionEvent* );
-    void AddContour ( const mitk::Contour::Pointer );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 
@@ -118,13 +121,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
 
     BaseRenderer*         m_LastEventSender;
     unsigned int          m_LastEventSlice;
-    //The prefix of the contourmarkernames. Suffix is a consecutive number
+    //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
-
-    /**
-      \brief Checks whether a marker for the currentGeometry already exists
-    */
-    bool ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* currentGeometry2D );
 };
 
 } // namespace

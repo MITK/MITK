@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkRenderingManager.h"
+#include "mitkPlanePositionManager.h"
 
 #include <mitkModuleActivator.h>
 
@@ -31,16 +32,22 @@ public:
   {
     //m_RenderingManager = mitk::RenderingManager::New();
     //context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
+      m_PlanePositionManager = mitk::PlanePositionManagerService::New();
+      m_PlanePositionManagerReg = context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager);
   }
 
   void Unload(mitk::ModuleContext* )
   {
+      m_PlanePositionManagerReg.Unregister();
+      m_PlanePositionManager = 0;
 
   }
 
 private:
 
   mitk::RenderingManager::Pointer m_RenderingManager;
+  mitk::PlanePositionManagerService::Pointer m_PlanePositionManager;
+  mitk::ServiceRegistration m_PlanePositionManagerReg;
 };
 
 MITK_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)

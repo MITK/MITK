@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>440</height>
+    <width>313</width>
+    <height>498</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -44,14 +44,14 @@
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Each input folder must only contain DICOM-images that can be combined into one vector-valued 3D output volume. Different patients must be loaded from different input-folders. The folders must not contain other acquisitions (e.g. T1,T2,localizer).&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In case many imports are performed at once, it is recommended to set the the optional output folder argument. This prevents the images from being kept in memory.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;Each input folder must only contain DICOM-images that can be combined into one vector-valued 3D output volume. Different patients must be loaded from different input-folders. The folders must not contain other acquisitions (e.g. T1,T2,localizer).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;In case many imports are performed at once, it is recommended to set the the optional output folder argument. This prevents the images from being kept in memory.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -150,13 +150,6 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="m_DicomLoadDKFZ">
-        <property name="text">
-         <string>Correct DKFZ Gradient Scheme</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -191,6 +184,42 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="value">
             <double>0.001000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_Advanced">
+        <property name="text">
+         <string>Advanced</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="m_AdvancedFrame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QCheckBox" name="m_DicomLoadDKFZ">
+           <property name="text">
+            <string>Correct DKFZ Gradient Scheme</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="m_DuplicateID">
+           <property name="toolTip">
+            <string>Select this option if you are sure that your DICOM dataset contains multiple Study Instance UID or Series Instance UID. It will ignore that fact and attempt to import all images as one.</string>
+           </property>
+           <property name="text">
+            <string>merge duplicate study IDs</string>
            </property>
           </widget>
          </item>

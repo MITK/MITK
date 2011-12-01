@@ -36,6 +36,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkResliceInterpolationProperty.h"
 
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+
 const std::string QmitkSegmentationView::VIEW_ID =
 "org.mitk.views.segmentation";
 
@@ -134,6 +138,15 @@ void QmitkSegmentationView::Deactivated()
       (*dataIter).first->GetProperty("visible")->RemoveObserver( (*dataIter).second );
     }
     m_WorkingDataObserverTags.clear();
+
+    // gets the context of the "Mitk" (Core) module (always has id 1)
+    // TODO Workaround until CTL plugincontext is available
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    // Workaround end
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    //mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+    service->RemoveAllPlanePositions();
   }
 }
 
@@ -330,6 +343,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
+            this->SetToolManagerSelection(node, emptySegmentation);
           }
           catch (std::bad_alloc)
           {
@@ -401,9 +415,13 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       numberOfSelectedSegmentations++;
 
       workingData = node;
-      referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+      if (this->GetDefaultDataStorage()->GetSources(node)->Size() != 0)
+      {
+        referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+      }
+
       //MITK_INFO<<"REFNew: "<<referenceDataNew->GetName();
-      if (workingNodeIsVisible)
+      if (workingNodeIsVisible && referenceDataNew)
         referenceDataNew->SetVisibility(true);
 
       //set comboBox to reference image
@@ -559,6 +577,7 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
   {
     m_Controls->refImageSelector->show();
     m_Controls->lblReferenceImageSelectionWarning->hide();
+
     bool isBinary(false);
     selectedNode->GetBoolProperty("binary", isBinary);
     if ( isBinary )
@@ -633,7 +652,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   // if the selected node is a contourmarker
   if ( !nodes.empty() )
   {
-        std::string markerName = "Contourmarker";
+    std::string markerName = "Position";
     unsigned int numberOfNodes = nodes.size();
     std::string nodeName = nodes.at( 0 )->GetName();
     if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
@@ -701,7 +720,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 
       referenceData = (*possibleParents)[0];
     }
-
     NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( workingData );
     if ( searchIter == m_WorkingDataObserverTags.end() )
     {
@@ -751,7 +769,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   }
   else 
   {
-
     //set comboBox to reference image
     disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
       this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
@@ -771,6 +788,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       m_Controls->CreateSegmentationFromSurface->setEnabled(true);
 
     SetToolManagerSelection(referenceData, workingData);
+
     FireNodeSelected(referenceData);
   }
 }
@@ -778,10 +796,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 //New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-
-    const mitk::PlaneGeometry* markerGeometry =
-            dynamic_cast<const mitk::PlaneGeometry*> ( node->GetData()->GetGeometry() );
-
+  //TODO renderWindow anders bestimmen, siehe CheckAlignment
   QmitkRenderWindow* selectedRenderWindow = 0;
   QmitkRenderWindow* RenderWindow1 =
     this->GetActiveStdMultiWidget()->GetRenderWindow1();
@@ -821,12 +836,21 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
   // make node visible
   if (selectedRenderWindow)
   {
-      mitk::Point3D centerP = markerGeometry->GetOrigin();
-       selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-          centerP);
-      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-          centerP, markerGeometry->GetNormal());
+    std::string nodeName = node->GetName();
+    unsigned int t = nodeName.find_last_of(" ");
+    unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
 
+    // gets the context of the "Mitk" (Core) module (always has id 1)
+    // TODO Workaround until CTL plugincontext is available
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    // Workaround end
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    //mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+    selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
+    selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

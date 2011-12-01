@@ -5,6 +5,8 @@
 
 The DTI Atlas Application is a viewer for MR, diffusion tensor and fibre images and contains no additional functionality. The welcome page allows the selection of which example data to examine.
 
+\isHtml
 For a basic guide to MITK see \ref MITKManualMainPage .
+\isHtmlend
 
 */

@@ -16,10 +16,11 @@
 #!     [TARGET_DEPENDS <list of additional dependencies>
 #!     [EXPORT_DEFINE <declspec macro name for dll exports>]
 #!     [QT_MODULE]
+#!     [HEADERS_ONLY]
 #! \endcode
 #!
 #! \param MODULE_NAME_IN The name for the new module
-#
+#! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE

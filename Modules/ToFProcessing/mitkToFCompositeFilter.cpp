@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImage.h>
 
-mitk::ToFCompositeFilter::ToFCompositeFilter() : m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
+mitk::ToFCompositeFilter::ToFCompositeFilter() : m_SegmentationMask(NULL), m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
 m_IplDistanceImage(NULL), m_IplOutputImage(NULL), m_ItkInputImage(NULL), m_ApplyTemporalMedianFilter(false), m_ApplyAverageFilter(false),
-m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyBilateralFilter(false), m_DataBuffer(NULL),
+  m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyMaskSegmentation(false), m_ApplyBilateralFilter(false), m_DataBuffer(NULL),
 m_DataBufferCurrentIndex(0), m_DataBufferMaxSize(0), m_TemporalMedianFilterNumOfFrames(10), m_ThresholdFilterMin(1),
 m_ThresholdFilterMax(7000), m_BilateralFilterDomainSigma(2), m_BilateralFilterRangeSigma(60), m_BilateralFilterKernelRadius(0)
 {
@@ -106,7 +106,7 @@ void mitk::ToFCompositeFilter::GenerateData()
     if (outputImage.IsNotNull()&&inputImage.IsNotNull())
     {
       outputImage->CopyInformation(inputImage);
-      outputImage->Initialize(inputImage);
+      outputImage->Initialize(*inputImage->GetPixelType().GetTypeId(),inputImage->GetDimension(),inputImage->GetDimensions());
       outputImage->SetSlice(inputImage->GetSliceData()->GetData());
     }
   }
@@ -118,13 +118,13 @@ void mitk::ToFCompositeFilter::GenerateData()
   // copy initial distance image to ipl image
   float* distanceFloatData = (float*)inputDistanceImage->GetSliceData(0, 0, 0)->GetData();
   memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
-  if (m_ApplyThresholdFilter)
+  if (m_ApplyThresholdFilter||m_ApplyMaskSegmentation)
   {
-    ProcessThresholdFilter(this->m_IplDistanceImage, this->m_ThresholdFilterMin, this->m_ThresholdFilterMax);
+    ProcessSegmentation(this->m_IplDistanceImage);
   }
   if (this->m_ApplyTemporalMedianFilter||this->m_ApplyAverageFilter)
   {
-    ProcessStreamedQuickSelectMedianImageFilter(this->m_IplDistanceImage, this->m_TemporalMedianFilterNumOfFrames);
+    ProcessStreamedQuickSelectMedianImageFilter(this->m_IplDistanceImage);
   }
   if (this->m_ApplyMedianFilter)
   {
@@ -135,8 +135,7 @@ void mitk::ToFCompositeFilter::GenerateData()
   {
       float* itkFloatData = this->m_ItkInputImage->GetBufferPointer();
       memcpy(itkFloatData, this->m_IplDistanceImage->imageData, this->m_ImageSize );
-      ItkImageType2D::Pointer itkOutputImage = ProcessItkBilateralFilter(this->m_ItkInputImage,
-        this->m_BilateralFilterDomainSigma, this->m_BilateralFilterRangeSigma, this->m_BilateralFilterKernelRadius);
+      ItkImageType2D::Pointer itkOutputImage = ProcessItkBilateralFilter(this->m_ItkInputImage);
       memcpy( this->m_IplDistanceImage->imageData, itkOutputImage->GetBufferPointer(), this->m_ImageSize );
 
     //ProcessCVBilateralFilter(this->m_IplDistanceImage, this->m_OutputIplImage, domainSigma, rangeSigma, kernelRadius);
@@ -168,43 +167,65 @@ void mitk::ToFCompositeFilter::GenerateOutputInformation()
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), *input->GetTimeSlicedGeometry());
-  output->SetPropertyList(input->GetPropertyList()->Clone());    
+  output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 
-void mitk::ToFCompositeFilter::ProcessThresholdFilter(IplImage* inputIplImage, int min, int max)
+void mitk::ToFCompositeFilter::ProcessSegmentation(IplImage* inputIplImage)
 {
+  char* segmentationMask;
+  if (m_SegmentationMask.IsNotNull())
+  {
+    segmentationMask = (char*)m_SegmentationMask->GetSliceData(0, 0, 0)->GetData();
+  }
+  else
+  {
+    segmentationMask = NULL;
+  }
+  float *f = (float*)inputIplImage->imageData;
   for(int i=0; i<this->m_ImageWidth*this->m_ImageHeight; i++)
   {
-    float *f = (float*)inputIplImage->imageData;
-    if (f[i]<=min)
+    if (this->m_ApplyThresholdFilter)
     {
-      f[i] = 0.0;
+      if (f[i]<=m_ThresholdFilterMin)
+      {
+        f[i] = 0.0;
+      }
+      else if (f[i]>=m_ThresholdFilterMax)
+      {
+        f[i] = 0.0;
+      }
     }
-    else if (f[i]>=max) 
+    if (this->m_ApplyMaskSegmentation)
     {
-      f[i] = 0.0;
+      if (segmentationMask)
+      {
+        if (segmentationMask[i]==0)
+        {
+          f[i] = 0.0;
+        }
+      }
     }
   }
 }
 
-ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage, double domainSigma, double rangeSigma, int kernelRadius)
+ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage)
 {
   ItkImageType2D::Pointer outputItkImage;
   BilateralFilterType::Pointer bilateralFilter = BilateralFilterType::New();
   bilateralFilter->SetInput(inputItkImage);
-  bilateralFilter->SetDomainSigma(domainSigma);
-  bilateralFilter->SetRangeSigma(rangeSigma);
-  //bilateralFilter->SetRadius(kernelRadius);
+  bilateralFilter->SetDomainSigma(m_BilateralFilterDomainSigma);
+  bilateralFilter->SetRangeSigma(m_BilateralFilterRangeSigma);
+  //bilateralFilter->SetRadius(m_BilateralFilterKernelRadius);
   outputItkImage = bilateralFilter->GetOutput();
   outputItkImage->Update();
   return outputItkImage;
 }
 
-void mitk::ToFCompositeFilter::ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage, double domainSigma, double rangeSigma, int kernelRadius)
+void mitk::ToFCompositeFilter::ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage)
 {
-  int diameter = kernelRadius;
-  double sigmaColor = rangeSigma;
-  double sigmaSpace = domainSigma;
+  int diameter = m_BilateralFilterKernelRadius;
+  double sigmaColor = m_BilateralFilterRangeSigma;
+  double sigmaSpace = m_BilateralFilterDomainSigma;
   cvSmooth(inputIplImage, outputIplImage, CV_BILATERAL, diameter, 0, sigmaColor, sigmaSpace);
 }
 
@@ -213,19 +234,19 @@ void mitk::ToFCompositeFilter::ProcessCVMedianFilter(IplImage* inputIplImage, Ip
   cvSmooth(inputIplImage, outputIplImage, CV_MEDIAN, radius, 0, 0, 0);
 }
 
-void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplImage* inputIplImage, int numOfImages) 
+void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplImage* inputIplImage)
 {
   float* data = (float*)inputIplImage->imageData;
 
   int imageSize = inputIplImage->width * inputIplImage->height;
   float* tmpArray;
 
-  if (numOfImages == 0)
+  if (this->m_TemporalMedianFilterNumOfFrames == 0)
   {
     return;
   }
 
-  if (numOfImages != this->m_DataBufferMaxSize) // reset
+  if (m_TemporalMedianFilterNumOfFrames != this->m_DataBufferMaxSize) // reset
   {
     //delete current buffer
     for( int i=0; i<this->m_DataBufferMaxSize; i++ ) {
@@ -236,7 +257,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
       delete[] this->m_DataBuffer;
     }
 
-    this->m_DataBufferMaxSize = numOfImages;
+    this->m_DataBufferMaxSize = m_TemporalMedianFilterNumOfFrames;
 
     // create new buffer with current size
     this->m_DataBuffer = new float*[this->m_DataBufferMaxSize];
@@ -333,51 +354,6 @@ float mitk::ToFCompositeFilter::quick_select(float arr[], int n)
   }
 }
 #undef ELEM_SWAP
-
-bool mitk::ToFCompositeFilter::GetApplyTemporalMedianFilter()
-{
-  return this->m_ApplyTemporalMedianFilter;
-}
-
-bool mitk::ToFCompositeFilter::GetApplyMedianFilter()
-{
-  return this->m_ApplyMedianFilter;
-}
-
-bool mitk::ToFCompositeFilter::GetApplyThresholdFilter()
-{
-  return this->m_ApplyThresholdFilter;
-}
-
-bool mitk::ToFCompositeFilter::GetApplyBilateralFilter()
-{
-  return this->m_ApplyBilateralFilter;
-}
-
-void mitk::ToFCompositeFilter::SetApplyTemporalMedianFilter(bool flag)
-{
-  this->m_ApplyTemporalMedianFilter = flag;
-}
-
-void mitk::ToFCompositeFilter::SetApplyAverageFilter(bool flag)
-{
-  this->m_ApplyAverageFilter = flag;
-}
-
-void mitk::ToFCompositeFilter::SetApplyMedianFilter(bool flag)
-{
-  this->m_ApplyMedianFilter = flag;
-}
-
-void mitk::ToFCompositeFilter::SetApplyThresholdFilter(bool flag)
-{
-  this->m_ApplyThresholdFilter = flag;
-}
-
-void mitk::ToFCompositeFilter::SetApplyBilateralFilter(bool flag)
-{
-  this->m_ApplyBilateralFilter = flag;
-}
 
 void mitk::ToFCompositeFilter::SetTemporalMedianFilterParameter(int tmporalMedianFilterNumOfFrames)
 {

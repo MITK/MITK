@@ -587,6 +587,14 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
       }
       break;
     }
+    case OpRESTOREPLANEPOSITION:
+      {
+        m_CreatedWorldGeometry->ExecuteOperation( operation );
+
+        this->SendCreatedWorldGeometryUpdate();
+
+        break;
+      }
     default:
     {
       // do nothing

@@ -531,6 +531,13 @@ if(MITK_USE_BLUEBERRY)
     list(APPEND mitk_ext_plugins_fullpath Modules/Bundles/${ext_plugin})
   endforeach()
 
+  if(EXISTS ${MITK_PRIVATE_MODULES}/PluginList.cmake)
+    include(${MITK_PRIVATE_MODULES}/PluginList.cmake)
+
+    foreach(ext_plugin ${MITK_PRIVATE_PLUGINS})
+      list(APPEND mitk_ext_plugins_fullpath ${MITK_PRIVATE_MODULES}/${ext_plugin})
+    endforeach()
+  endif() 
   ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
                                BUILD_OPTION_PREFIX MITK_BUILD_
                                BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}

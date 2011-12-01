@@ -21,6 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 //QT headers
 #include <QPlastiqueStyle>
 
+#include <mitkProperties.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+
 const std::string QmitkToFCompositeFilterWidget::VIEW_ID = "org.mitk.views.qmitktofcompositefilterwidget";
 
 QmitkToFCompositeFilterWidget::QmitkToFCompositeFilterWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
@@ -53,7 +58,6 @@ void QmitkToFCompositeFilterWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ThresholdFilterRangeSlider->setUpperValue(max);
     m_Controls->m_ThresholdFilterRangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     m_Controls->m_ThresholdFilterRangeSlider->setStyle(sliderStyle);
-
     this->CreateConnections();
   }
 }
@@ -72,6 +76,7 @@ void QmitkToFCompositeFilterWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_TemporalMedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTemporalMedianFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_AverageFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnAverageFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_ThresholdFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnThresholdFilterCheckBoxChecked(bool)) );
+    connect( (QObject*)(m_Controls->maskSegmentationCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMaskSegmentationCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_BilateralFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnBilateralFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_MedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMedianFilterCheckBoxChecked(bool)) );
 
@@ -95,6 +100,13 @@ mitk::ToFCompositeFilter* QmitkToFCompositeFilterWidget::GetToFCompositeFilter()
     this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
   }
   return this->m_ToFCompositeFilter;
+}
+
+void QmitkToFCompositeFilterWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+{
+  m_DataStorage = dataStorage;
+  m_Controls->maskImageComboBox->SetDataStorage(dataStorage);
+  m_Controls->maskImageComboBox->SetPredicate(mitk::NodePredicateAnd::New(mitk::NodePredicateDataType::New("Image"),mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))));
 }
 
 void QmitkToFCompositeFilterWidget::UpdateFilterParameter()
@@ -131,6 +143,20 @@ void QmitkToFCompositeFilterWidget::OnAverageFilterCheckBoxChecked(bool checked)
 void QmitkToFCompositeFilterWidget::OnThresholdFilterCheckBoxChecked(bool checked)
 {
   this->m_ToFCompositeFilter->SetApplyThresholdFilter(checked);
+}
+
+void QmitkToFCompositeFilterWidget::OnMaskSegmentationCheckBoxChecked(bool checked)
+{
+  this->m_ToFCompositeFilter->SetApplyMaskSegmentation(checked);
+  if (checked)
+  {
+    mitk::DataNode::Pointer maskImageNode = m_Controls->maskImageComboBox->GetSelectedNode();
+    if (maskImageNode.IsNotNull())
+    {
+      mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*>(maskImageNode->GetData());
+      this->m_ToFCompositeFilter->SetSegmentationMask(maskImage);
+    }
+  }
 }
 
 void QmitkToFCompositeFilterWidget::OnMedianFilterCheckBoxChecked(bool checked)

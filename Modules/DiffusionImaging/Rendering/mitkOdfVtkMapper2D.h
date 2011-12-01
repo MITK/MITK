@@ -38,11 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   //##Documentation
-  //## @brief Base class of all vtk-based 2D-Mappers
+  //## @brief Mapper for spherical object densitiy function representations
   //##
-  //## Those must implement the abstract
-  //## method vtkProp* GetProp().
-  //## @ingroup Mapper
   template<class TPixelType, int NrOdfDirections>
   class OdfVtkMapper2D : public VtkMapper2D
   {
@@ -86,7 +83,6 @@ namespace mitk {
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
     
     OdfDisplayGeometry MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
-    void AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo );
     void AdaptOdfScalingToImageSpacing( int index );
     void SetRendererLightSources( mitk::BaseRenderer *renderer );
     void ApplyPropertySettings();
@@ -128,8 +124,6 @@ namespace mitk {
     static float m_IndexParam2;
 
     int m_ShowMaxNumber;
-
-    //std::vector<mitk::TrackingCameraController::Pointer> m_TrackingCameraControllers;
 
     std::vector<vtkPlane*> m_Planes;
     std::vector<vtkCutter*> m_Cutters;

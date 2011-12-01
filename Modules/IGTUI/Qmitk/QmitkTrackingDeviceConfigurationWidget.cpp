@@ -285,6 +285,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
         m_Controls->m_portSpinBoxAurora->setValue(i);
         m_Controls->portTypeAurora->setCurrentIndex(1);
         break;
+      }
       
     }
     for(unsigned int i = 0; i <7; ++i)
@@ -303,6 +304,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
         m_Controls->m_portSpinBoxAurora->setValue(i);
         m_Controls->portTypeAurora->setCurrentIndex(0);
         break;
+      }
       
     }
   #endif

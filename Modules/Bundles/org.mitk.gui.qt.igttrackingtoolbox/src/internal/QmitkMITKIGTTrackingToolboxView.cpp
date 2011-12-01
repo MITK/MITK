@@ -82,6 +82,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 	  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
+    connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
 
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
@@ -148,6 +149,14 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   //update tool preview
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnResetTools()
+{
+  m_toolStorage = NULL;
+  m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
+  QString toolLabel = QString("Loaded Tools: <none>";
+  m_Controls->m_toolLabel->setText(toolLabel);
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
@@ -259,13 +268,20 @@ this->GlobalReinit();
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
   mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
-	// Code to enable auto detection
-  if (Type == mitk::NDIAurora)
-    {m_Controls->m_AutoDetectTools->setVisible(true);}
-  else
-    {m_Controls->m_AutoDetectTools->setVisible(false);}
+	
+  // Code to enable/disable device specific buttons
+  if (Type == mitk::NDIAurora) //Aurora
+  {
+    m_Controls->m_AutoDetectTools->setVisible(true);
+    m_Controls->m_AddSingleTool->setEnabled(false);
+  }
+  else //Polaris or Microntracker
+  {
+    m_Controls->m_AutoDetectTools->setVisible(false);
+    m_Controls->m_AddSingleTool->setEnabled(true);
+  }
 
-// Code to select appropriate tracking volumes
+  // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
   m_Controls->m_VolumeSelectionBox->clear();
   for(int i = 0; i < Compatibles.size(); i++)
@@ -282,7 +298,6 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 	
-
 	  std::string str = qstr.toStdString();
 
 	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);

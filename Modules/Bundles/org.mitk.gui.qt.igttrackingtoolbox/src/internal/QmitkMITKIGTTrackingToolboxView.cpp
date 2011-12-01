@@ -84,6 +84,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
 
+    connect( m_Controls->m_AddSingleTool, SIGNAL(clicked()), this, SLOT(OnAddSingleTool()));
+    connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
+    connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
+
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
@@ -460,6 +464,32 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     EnableLoggingButtons();
     }
   }
+
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
+  {
+  QString Identifier = "Tool#";
+  if (m_toolStorage.IsNotNull()) Identifier += QString::number(m_toolStorage->GetToolCount());
+  else Identifier += "0";
+  m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(),Identifier.toStdString());
+  m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(),false);
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
+  
+  }
+ 
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
+  {
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
+  if (this->m_toolStorage.IsNull()) m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
+  m_toolStorage->AddTool(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool());
+  m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+  QString toolLabel = QString("Loaded Tools: <manually added>");
+  }
+  
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolCanceled()
+  {
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
+  }
+
 
 void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
 {

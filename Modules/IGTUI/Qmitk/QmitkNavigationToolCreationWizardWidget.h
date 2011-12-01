@@ -23,16 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include "MitkIGTUIExports.h"
-#include "mitkNavigationTool.h"
+#include <mitkNavigationTool.h>
 #include <mitkNavigationToolStorage.h>
+#include <mitkNodePredicateDataType.h>
 
 //ui header
-#include "ui_QmitkNavigationToolCreationWizardWidgetControls.h"
+#include "ui_QmitkNavigationToolCreationWizardWidget.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to manage NavigationTools and
-  *			 NavigationToolStorages. This means a user may create, save and load
-  *  		 single NavigationTools and/or NavigationToolStorages with this widget.
+  *   \brief An object of this class offers an UI to create new NavigationTools 
   *
   *      Be sure to call the Initialize-methode before you start the widget
   *      otherwise some errors might occure.
@@ -46,14 +45,27 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
-    void Initialize(mitk::DataStorage* dataStorage);
+    /** @brief Initializes the widget.
+      * @param dataStorage  The data storage is needed to offer the possibility to choose surfaces from the data storage for tool visualization.
+      * @param supposedIdentifier This Identifier is supposed for the user. It is needed because every identifier in a navigation tool storage must be unique and we don't know the others.
+      */
+    void Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier);
+    
+    /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
+    void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true); 
 
     QmitkNavigationToolCreationWizardWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationWizardWidget();
 
-  public signals:
+    /** @return Returns the created tool. Returns NULL if no tool was created yet. */
+    itkGetConstMacro(CreatedTool,mitk::NavigationTool::Pointer);
 
+  signals:
+
+    /** @brief This signal is emited if the user finished the creation of the tool. */
     void NavigationToolFinished();
+
+    /** @brief This signal is emited if the user canceld the creation of the tool. */
     void Canceled();
 
   protected slots:
@@ -75,6 +87,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
 
     /** @brief holds the DataStorage */
     mitk::DataStorage* m_DataStorage;
+
+    /** @brief this pointer holds the tool which is created */
+    mitk::NavigationTool::Pointer m_CreatedTool;
     
     //############## private help methods #######################
     void MessageBox(std::string s);

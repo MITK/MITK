@@ -101,7 +101,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_ToolNameEdit"/>
+          <widget class="QLineEdit" name="m_ToolNameEdit">
+           <property name="text">
+            <string>NewTool</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -121,7 +125,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_CalibrationFileName"/>
+          <widget class="QLineEdit" name="m_CalibrationFileName">
+           <property name="text">
+            <string>&lt;not given&gt;</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="m_LoadCalibrationFile">
@@ -156,7 +164,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="page_2">
       <property name="geometry">
        <rect>
-        <x>-20</x>
+        <x>0</x>
         <y>0</y>
         <width>307</width>
         <height>72</height>
@@ -305,7 +313,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_IdentifierEdit"/>
+          <widget class="QLineEdit" name="m_IdentifierEdit">
+           <property name="text">
+            <string>&lt;not given&gt;</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -325,7 +337,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_SerialNumberEdit"/>
+          <widget class="QLineEdit" name="m_SerialNumberEdit">
+           <property name="text">
+            <string>&lt;not given&gt;</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -367,6 +383,13 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="m_finished">

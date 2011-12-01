@@ -80,12 +80,12 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id)
 {
   if( id > this->m_NumberOfChannels )
   {
-    return PixelType();
+    throw std::invalid_argument("The given id exceeds the number of active channel.");
   }
   else
   {
     mitk::ChannelDescriptor refDesc = this->m_ChannelDesc[id];
-    return refDesc.GetPixelType();//  .GetPixelType();
+    return refDesc.GetPixelType();//
   }
 }
 

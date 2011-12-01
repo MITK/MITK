@@ -66,30 +66,15 @@ PURPOSE.  See the above copyright notices for more information.
   }                                                                                     \
 
 
-
-mitk::PixelType::PixelType(void)
- : m_ComponentType(typeid(void)),
-   m_PixelType(typeid(void)),
-   m_ComponentTypeName(0)
-{
-  m_BytesPerComponent = 0;
-  m_NumberOfComponents = 0;
-}
-
 mitk::PixelType::PixelType( const mitk::PixelType& other )
   : m_ComponentType( other.m_ComponentType ),
     m_PixelType( other.m_PixelType),
     m_ComponentTypeName( other.m_ComponentTypeName ),
-    m_PixelTypeName( other.m_PixelTypeName )
+    m_PixelTypeName( other.m_PixelTypeName ),
+    m_BytesPerComponent( other.m_BytesPerComponent ),
+    m_NumberOfComponents( other.m_NumberOfComponents )
 {
-  m_BytesPerComponent = other.m_BytesPerComponent;
-  m_NumberOfComponents = other.m_NumberOfComponents;
-}
 
-mitk::PixelType& mitk::PixelType::operator =( const mitk::PixelType& other)
-{  
-  *this = PixelType(other);
-  return *this;
 }
 
 bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
@@ -163,93 +148,3 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
     }                                                                                 \
   }                                                                                   \
   else 
-
-void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfComponents, ItkIOPixelType anItkIoPixelType )
-{
-  /* //m_TypeId = &aTypeId;
-   m_NumberOfComponents = numberOfComponents;
-   if(m_NumberOfComponents == 1)
-     m_ItkTypeId = &aTypeId;
-   else
-     m_ItkTypeId = NULL;
-   /*SET_TYPE(double, mitkIpPicFloat)
-   SET_TYPE(float, mitkIpPicFloat)
-   SET_TYPE(long, mitkIpPicInt)
-   SET_TYPE(unsigned long, mitkIpPicUInt)
-   SET_TYPE(int, mitkIpPicInt)
-   SET_TYPE(unsigned int, mitkIpPicUInt)
-   SET_TYPE(short, mitkIpPicInt)
-   SET_TYPE(unsigned short, mitkIpPicUInt)
-   SET_TYPE(char, mitkIpPicInt)
-   SET_TYPE(unsigned char, mitkIpPicUInt)
-
-   
-   if ( *m_TypeId == typeid( itk::DiffusionTensor3D<float> ) )
-   {
-     m_TypeId = & typeid( float );
-     m_NumberOfComponents *= 6;
-     m_Type = mitkIpPicFloat;
-     m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
-     m_ItkTypeId = &typeid( itk::DiffusionTensor3D<float> );
-   }
-   else if ( *m_TypeId == typeid( itk::DiffusionTensor3D<double> ) )
-   {
-     m_TypeId = & typeid( double );
-     m_NumberOfComponents *= 6;
-     m_Type = mitkIpPicFloat;
-     m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
-     m_ItkTypeId = &typeid( itk::DiffusionTensor3D<double> );
-   }
-   else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
-   {
-     m_Type = mitkIpPicUInt;
-     m_NumberOfComponents = 3;
-     m_Bpe = sizeof(unsigned char) * 8 * m_NumberOfComponents;
-     m_ItkTypeId = &typeid( itk::RGBPixel<unsigned char> );
-   }
-   else if ( *m_TypeId == typeid( itk::RGBAPixel<unsigned char> ) )
-   {
-     m_Type = mitkIpPicUInt;
-     m_NumberOfComponents = 4;
-     m_Bpe = sizeof(unsigned char) * 8 * m_NumberOfComponents;
-     m_ItkTypeId = &typeid( itk::RGBAPixel<unsigned char> );
-   }
-   else
-   {
-     bool found = false;
-     
-     // the following lines allow for fixed-size vector images up to a certain size limit
-     // (commented out for shorter compile times)
-     //HUNDRED_VECS(000)
-     //HUNDRED_VECS(100)
-     //HUNDRED_VECS(200)
-     //HUNDRED_VECS(300)
-     //HUNDRED_VECS(400)
-     //HUNDRED_VECS(500)
-     //HUNDRED_VECS(600)
-     //HUNDRED_VECS(700)
-
-     // allow for fixed-size vectors of specific length
-     // (inspired by itkPointshell.cpp, precompiled q-ball configs)
-     //TEN_VECS(0)
-     //N_VEC(11)
-     //N_VEC(12)
-     if(false){}
-     N_VEC(2)
-     N_VEC(3)
-     N_VEC(6)
-     N_VEC(42)
-     N_VEC(92)
-     N_VEC(162)
-     N_VEC(252)
-     N_VEC(362)
-     N_VEC(492)
-     N_VEC(642)
-     N_VEC(812)
-     N_VEC(1002)
-
-     if(!found)
-       itkExceptionMacro( "Pixel type currently not supported." );
-   }
-   m_BitsPerComponent = m_Bpe / m_NumberOfComponents;*/
-}

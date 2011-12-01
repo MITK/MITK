@@ -60,8 +60,6 @@ public:
 
   typedef itk::ImageIOBase::IOPixelType ItkIOPixelType;
 
-  PixelType(void);
-
   PixelType(const mitk::PixelType & aPixelType);
 
   /** \brief Get the \a type_info of the scalar (!) type. Each element
@@ -141,17 +139,13 @@ public:
     return m_BytesPerComponent * 8;
   }
   
-  PixelType& operator=(const PixelType& other);
-
   bool operator==(const PixelType& rhs) const;
   bool operator!=(const PixelType& rhs) const;
 
   bool operator==(const std::type_info& typeId) const;
   bool operator!=(const std::type_info& typeId) const;
 
-  void Initialize(const std::type_info& aTypeId, int numberOfCompontents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
-
-  virtual ~PixelType() {}
+  ~PixelType() {}
 
 private:
 
@@ -173,6 +167,8 @@ private:
              const char* pixelTypeName = 0 )
     : m_ComponentType( componentType ),
       m_PixelType( pixelType ),
+      m_ComponentTypeName(NULL),
+      m_PixelTypeName(NULL),
       m_NumberOfComponents( numberOfComponents ),
       m_BytesPerComponent( bytesPerComponent )
   {
@@ -182,6 +178,12 @@ private:
     if(pixelTypeName) m_PixelTypeName = pixelTypeName;
     else m_PixelTypeName = pixelType.name();
   }
+
+  // default constructor is disabled on purpose
+  PixelType(void);
+
+  // assignment operator declared private on purpose
+  PixelType& operator=(const PixelType& other);
 
   /** \brief the \a type_info of the scalar (!) component type. Each element
     may contain m_NumberOfComponents (more than one) of these scalars.

@@ -87,6 +87,10 @@ protected:
       */
     unsigned char* m_Data;
 
+private:
+
+    ChannelDescriptor& operator=(const ChannelDescriptor &other);
+
 };
 
 } // end namespace mitk

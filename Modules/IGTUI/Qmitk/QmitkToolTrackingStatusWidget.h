@@ -103,6 +103,8 @@ public:
    */
   void PreShowTools(mitk::NavigationToolStorage::Pointer toolStorage);
 
+
+
 protected:
   void CreateConnections();
   void CreateQtPartControl( QWidget *parent );
@@ -127,6 +129,10 @@ private:
   QmitkToolTrackingStatusWidget::Style m_Style;
 
   void RemoveGuiLabels();
+
+  /** @brief Adds an empty label which tells the user that currently no tool is availiable. */
+  void AddEmptyLabel();
+
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED

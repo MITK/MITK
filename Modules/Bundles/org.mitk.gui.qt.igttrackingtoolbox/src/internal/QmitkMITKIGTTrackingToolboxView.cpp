@@ -155,7 +155,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 {
   m_toolStorage = NULL;
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
-  QString toolLabel = QString("Loaded Tools: <none>";
+  QString toolLabel = QString("Loaded Tools: <none>");
   m_Controls->m_toolLabel->setText(toolLabel);
 }
 
@@ -176,7 +176,6 @@ else if (this->m_toolStorage->GetToolCount() == 0)
 //build the IGT pipeline
 mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
 
-
 //Get Tracking Volume Data
 mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 
@@ -186,9 +185,6 @@ if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
   data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
 }
 
-
-
-
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 if (m_TrackingDeviceSource.IsNull())
@@ -196,6 +192,12 @@ if (m_TrackingDeviceSource.IsNull())
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
+
+//disable Buttons
+m_Controls->m_StopTracking->setEnabled(true);
+m_Controls->m_StartTracking->setEnabled(false);
+DisableOptionsButtons();
+DisableTrackingConfigurationButtons();
 
 //initialize tracking
 try
@@ -206,6 +208,11 @@ try
 catch (...)
   {
   MessageBox("Error while starting the tracking device!");
+  //enable Buttons
+  m_Controls->m_StopTracking->setEnabled(false);
+  m_Controls->m_StartTracking->setEnabled(true);
+  EnableOptionsButtons();
+  EnableTrackingConfigurationButtons();
   return;
   }
 m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
@@ -220,23 +227,13 @@ m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
 if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
 else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
-//disable loading new tools
-this->m_Controls->m_LoadTools->setEnabled(false);
-this->m_Controls->m_AutoDetectTools->setEnabled(false);
-
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
 //show tracking volume
- this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
-
+this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
 m_tracking = true;
-
-//disable Buttons
-m_Controls->m_StopTracking->setEnabled(true);
-m_Controls->m_StartTracking->setEnabled(false);
-DisableOptionsButtons();
 
 this->GlobalReinit();
 }
@@ -250,8 +247,6 @@ m_TrackingDeviceSource->Disconnect();
 this->m_Controls->m_configurationWidget->Reset();
 m_Controls->m_TrackingControlLabel->setText("Status: stopped");
 if (m_logging) StopLogging();
-this->m_Controls->m_LoadTools->setEnabled(true);
-this->m_Controls->m_AutoDetectTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 m_tracking = false;
@@ -260,6 +255,7 @@ m_tracking = false;
 m_Controls->m_StopTracking->setEnabled(false);
 m_Controls->m_StartTracking->setEnabled(true);
 EnableOptionsButtons();
+EnableTrackingConfigurationButtons();
 
 this->GlobalReinit();
 }
@@ -331,6 +327,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
 if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
     {
+    DisableTrackingConfigurationButtons();
     mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     currentDevice->OpenConnection();
     currentDevice->StartTracking();
@@ -368,6 +365,8 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     currentDevice->StopTracking();
     currentDevice->CloseConnection();
 
+    EnableTrackingConfigurationButtons();
+
     if (m_toolStorage->GetToolCount()>0)
       {
       //ask the user if he wants to save the detected tools
@@ -390,6 +389,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
         return;
         }
       }
+
     }
 }
 
@@ -512,6 +512,22 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
     m_Controls->m_UpdateRate->setEnabled(true);
     m_Controls->m_ShowToolQuaternions->setEnabled(true);
     m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
+{
+    m_Controls->m_AutoDetectTools->setEnabled(true);
+    if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(true);
+    m_Controls->m_LoadTools->setEnabled(true);
+    m_Controls->m_ResetTools->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
+{
+    m_Controls->m_AutoDetectTools->setEnabled(false);
+    if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(false);
+    m_Controls->m_LoadTools->setEnabled(false);
+    m_Controls->m_ResetTools->setEnabled(false);
 }
 
 

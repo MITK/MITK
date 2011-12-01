@@ -144,6 +144,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableLoggingButtons();
    void DisableOptionsButtons();
    void EnableOptionsButtons();
+   void EnableTrackingConfigurationButtons();
+   void DisableTrackingConfigurationButtons();
 
 };
 

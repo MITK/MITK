@@ -68,7 +68,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="m_TrackingToolsGoupBox">
          <property name="title">
           <string/>
          </property>
@@ -85,7 +85,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <layout class="QHBoxLayout" name="m_LoadedToolsLayout">
             <item>
              <widget class="QLabel" name="m_toolLabel">
               <property name="text">
@@ -119,7 +119,7 @@ p, li { white-space: pre-wrap; }
            <widget class="QmitkToolTrackingStatusWidget" name="m_TrackingToolsStatusWidget" native="true"/>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <layout class="QHBoxLayout" name="m_AddSingleToolLayout">
             <item>
              <spacer name="horizontalSpacer_9">
               <property name="orientation">
@@ -149,7 +149,7 @@ p, li { white-space: pre-wrap; }
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QHBoxLayout" name="m_LoadToolStorageLayout">
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
@@ -194,7 +194,7 @@ p, li { white-space: pre-wrap; }
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <layout class="QHBoxLayout" name="m_ResetLayout">
             <item>
              <spacer name="horizontalSpacer_8">
               <property name="orientation">
@@ -217,7 +217,7 @@ p, li { white-space: pre-wrap; }
                </size>
               </property>
               <property name="text">
-               <string>Reset Tools</string>
+               <string>Reset</string>
               </property>
              </widget>
             </item>

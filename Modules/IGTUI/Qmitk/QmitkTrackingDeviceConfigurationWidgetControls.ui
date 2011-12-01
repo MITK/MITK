@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>425</height>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -143,6 +143,13 @@
                      </property>
                      <property name="prefix">
                       <string>COM </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="m_AutoScanPolaris">
+                     <property name="text">
+                      <string>Auto Scan</string>
                      </property>
                     </widget>
                    </item>
@@ -370,6 +377,13 @@ p, li { white-space: pre-wrap; }
                     </widget>
                    </item>
                    <item>
+                    <widget class="QPushButton" name="m_AutoScanAurora">
+                     <property name="text">
+                      <string>Auto Scan</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <spacer name="horizontalSpacer_3">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -482,7 +496,7 @@ p, li { white-space: pre-wrap; }
                     </size>
                    </property>
                    <property name="text">
-                    <string>test connection</string>
+                    <string>Test Connection</string>
                    </property>
                   </widget>
                  </item>
@@ -716,8 +730,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>63</width>
-            <height>26</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">

@@ -129,10 +129,18 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     bool m_AdvancedUserControl;
 
+    // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
+    typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;  
+
     //######################### internal help methods #######################################
     void ResetOutput();
     void AddOutput(std::string s);
     mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+
+    /** @brief   Scans the given port for a NDI tracking device.
+      * @return  Returns the type of the device if one was found. Returns TrackingSystemNotSpecified if none was found.
+      */
+    mitk::TrackingDeviceType ScanPort(QString port);
     
 
   protected slots:
@@ -166,6 +174,12 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *         The type (which means Aurora/Polaris) will not be set in the returnvalue. You have to this later.
      */
     mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
+
+
+    /* @brief Scans the serial ports automatically for a connected tracking device. If the method finds a device 
+     *        it selects the right type and sets the corresponding port in the widget.
+     */
+    void AutoScanPorts();
 
 };
 #endif

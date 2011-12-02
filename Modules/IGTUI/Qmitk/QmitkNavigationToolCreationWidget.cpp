@@ -40,11 +40,6 @@ QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* pa
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
-  
-  //initialize UI components
-  m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
-  m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
-  m_Controls->m_SurfaceChooser->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 }
 
 
@@ -77,6 +72,11 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   {
   m_DataStorage = dataStorage;
   m_Controls->m_IdentifierEdit->setText(QString(supposedIdentifier.c_str()));
+
+  //initialize UI components
+  m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
+  m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
+  m_Controls->m_SurfaceChooser->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
   }
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)

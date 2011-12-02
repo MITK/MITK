@@ -103,6 +103,8 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     //MITK_INFO<<"Modified Contour";
     m_ListOfContourLists.at(m_CurrentContourListID).at(pos).contour = newContour;
     m_ReduceFilter->SetInput(pos, newContour);
+    m_NormalsFilter->SetInput(pos, m_ReduceFilter->GetOutput(pos));
+    m_InterpolateSurfaceFilter->SetInput(pos, m_NormalsFilter->GetOutput(pos));
   }
 
   this->Modified();

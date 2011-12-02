@@ -330,31 +330,53 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   unsigned int size = service->GetNumberOfPlanePositions();
   unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
+  mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
+  contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
+
+  std::stringstream markerStream;
+  mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
+
+  markerStream << m_Contourmarkername ;
+  markerStream << " ";
+  markerStream << id+1;
+
+  DataNode::Pointer rotatedContourNode = DataNode::New();
+
+  rotatedContourNode->SetData(contourMarker);
+  rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+  rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
+  rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
+  rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
+  rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(!m_ShowMarkerNodes));
+
   if (plane)
   {
 
     if ( id ==  size )
     {
-      //Creating PlanarFigure which currently serves as marker
-      mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
-      contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
-
-      std::stringstream markerStream;
-      mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
-
-      markerStream << m_Contourmarkername ;
-      markerStream << " ";
-      markerStream << id+1;
-
-      DataNode::Pointer rotatedContourNode = DataNode::New();
-
-      rotatedContourNode->SetData(contourMarker);
-      rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
-      rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
-      rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
-      rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
-      rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(!m_ShowMarkerNodes));
       m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+    }
+    else
+    {
+        mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
+
+        mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
+        MITK_INFO<<"Marker-Size: "<<markers->Size();
+
+        bool markerAlreadyExists(false);
+        for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
+          iter != markers->end();
+          ++iter)
+        {
+            std::string nodeName = (*iter)->GetName();
+            unsigned int t = nodeName.find_last_of(" ");
+            unsigned int markerId = atof(nodeName.substr(t+1).c_str())-1;
+            if(id == markerId)
+            {
+                return id;
+            }
+        }
+        m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }
   return id;

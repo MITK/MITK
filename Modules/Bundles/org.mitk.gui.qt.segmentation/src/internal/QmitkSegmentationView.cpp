@@ -647,14 +647,7 @@ void QmitkSegmentationView::On3DInterpolationEnabled (bool state)
 
     if (manualSegmentationTool)
     {
-      if(state == Qt::Checked)
-      {
-        manualSegmentationTool->Enable3DInterpolation( true );
-}
-      else
-      {
-        manualSegmentationTool->Enable3DInterpolation( false );
-      }
+        manualSegmentationTool->Enable3DInterpolation( state );
     }
   }
 }

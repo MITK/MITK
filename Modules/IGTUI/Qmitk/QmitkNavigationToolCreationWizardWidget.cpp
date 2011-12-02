@@ -179,10 +179,43 @@ void QmitkNavigationToolCreationWizardWidget::OnLoadCalibrationFile()
     m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
   }
 
+void QmitkNavigationToolCreationWizardWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
+  {
+    m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
+    m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
+    m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
+    switch(DefaultTool->GetTrackingDeviceType())
+      {
+      case mitk::NDIAurora:
+              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
+      case mitk::NDIPolaris:
+              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
+      case mitk::ClaronMicron:
+              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+      default:
+              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
+      }
+    m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
+    switch(DefaultTool->GetType())
+      {
+      case mitk::NavigationTool::Instrument:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
+      case mitk::NavigationTool::Fiducial:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
+      case mitk::NavigationTool::Skinmarker:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
+      case mitk::NavigationTool::Unknown:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
+      }
+
+    m_Controls->m_SurfaceChooser->SetSelectedNode(DefaultTool->GetDataNode());
+
+  }
+
 
 
 //##################################################################################
-//############################## private help methods ##############################
+//############################## internal help methods #############################
 //##################################################################################
 void QmitkNavigationToolCreationWizardWidget::MessageBox(std::string s)
   {

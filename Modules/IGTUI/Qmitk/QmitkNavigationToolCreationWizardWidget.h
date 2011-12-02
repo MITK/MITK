@@ -54,6 +54,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
     /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
     void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true); 
 
+    /** @brief Sets the default data of all input fields. The default data is used from the default tool which is given as parameter. */
+    void SetDefaultData(mitk::NavigationTool::Pointer DefaultTool);
+
     QmitkNavigationToolCreationWizardWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationWizardWidget();
 

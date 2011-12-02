@@ -191,6 +191,27 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
       // here we have a single slice that can be modified
       Image::Pointer slice = extractor->GetOutput();
 
+	  	    DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
+  if ( !referenceNode ) return NULL;
+
+  Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+  if ( !referenceImage ) return NULL;
+
+      ExtractDirectedPlaneImageFilter::Pointer newExtractor2 = ExtractDirectedPlaneImageFilter::New();
+	  newExtractor2->SetInput( referenceImage );
+    newExtractor2->SetTargetTimestep( timeStep );
+	newExtractor2->SetWorldGeometry( planeGeometry );
+    newExtractor2->Update();
+    Image::Pointer slice2 = newExtractor2->GetOutput();
+	//slice2->GetGeometry()->SetSpacing(planeGeometry->GetSpacing());
+
+  	//slice->GetGeometry()->SetBounds(planeGeometry->GetBounds());
+	//DataNode* parent (m_ToolManager->GetWorkingData(0));
+	DataNode::Pointer dn = DataNode::New();
+	dn->SetData(slice2);
+	dn->SetProperty("name", StringProperty::New("slice"));
+	m_ToolManager->GetDataStorage()->Add(dn);
+
       return slice;
     }
     catch(...)
@@ -201,12 +222,36 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   }
   else
   {
-    ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
-    newExtractor->SetInput( image );
-    newExtractor->SetActualInputTimestep( timeStep );
-    newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
+	  
+  	    DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
+  if ( !referenceNode ) return NULL;
+
+  Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+  if ( !referenceImage ) return NULL;
+
+      ExtractDirectedPlaneImageFilter::Pointer newExtractor2 = ExtractDirectedPlaneImageFilter::New();
+	newExtractor2->SetInput( referenceImage );
+    newExtractor2->SetTargetTimestep( timeStep );
+	newExtractor2->SetWorldGeometry( planeGeometry );
+    newExtractor2->Update();
+    Image::Pointer slice2 = newExtractor2->GetOutput();
+
+  	//slice->GetGeometry()->SetBounds(planeGeometry->GetBounds());
+	//DataNode* parent (m_ToolManager->GetWorkingData(0));
+	DataNode::Pointer dn = DataNode::New();
+	dn->SetData(slice2);
+	dn->SetProperty("name", StringProperty::New("slice"));
+	m_ToolManager->GetDataStorage()->Add(dn);
+
+	MITK_INFO<<"SegTool Spacing: "<<planeGeometry->GetSpacing();
+
+    ExtractDirectedPlaneImageFilter::Pointer newExtractor = ExtractDirectedPlaneImageFilter::New();
+	newExtractor->SetInput( image );
+    newExtractor->SetTargetTimestep( timeStep );
+	newExtractor->SetWorldGeometry( planeGeometry );
     newExtractor->Update();
     Image::Pointer slice = newExtractor->GetOutput();
+	
     return slice;
   }
 }

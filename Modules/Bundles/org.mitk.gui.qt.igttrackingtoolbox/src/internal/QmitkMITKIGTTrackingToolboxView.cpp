@@ -82,6 +82,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 	  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
+    connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
+
+    connect( m_Controls->m_AddSingleTool, SIGNAL(clicked()), this, SLOT(OnAddSingleTool()));
+    connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
+    connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
 
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
@@ -150,6 +155,14 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnResetTools()
+{
+  m_toolStorage = NULL;
+  m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
+  QString toolLabel = QString("Loaded Tools: <none>");
+  m_Controls->m_toolLabel->setText(toolLabel);
+}
+
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 {
 //check if everything is ready to start tracking
@@ -167,7 +180,6 @@ else if (this->m_toolStorage->GetToolCount() == 0)
 //build the IGT pipeline
 mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
 
-
 //Get Tracking Volume Data
 mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 
@@ -177,9 +189,6 @@ if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
   data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
 }
 
-
-
-
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 if (m_TrackingDeviceSource.IsNull())
@@ -187,6 +196,12 @@ if (m_TrackingDeviceSource.IsNull())
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
+
+//disable Buttons
+m_Controls->m_StopTracking->setEnabled(true);
+m_Controls->m_StartTracking->setEnabled(false);
+DisableOptionsButtons();
+DisableTrackingConfigurationButtons();
 
 //initialize tracking
 try
@@ -197,6 +212,11 @@ try
 catch (...)
   {
   MessageBox("Error while starting the tracking device!");
+  //enable Buttons
+  m_Controls->m_StopTracking->setEnabled(false);
+  m_Controls->m_StartTracking->setEnabled(true);
+  EnableOptionsButtons();
+  EnableTrackingConfigurationButtons();
   return;
   }
 m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
@@ -211,23 +231,13 @@ m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
 if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
 else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
-//disable loading new tools
-this->m_Controls->m_LoadTools->setEnabled(false);
-this->m_Controls->m_AutoDetectTools->setEnabled(false);
-
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
 //show tracking volume
- this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
-
+this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
 m_tracking = true;
-
-//disable Buttons
-m_Controls->m_StopTracking->setEnabled(true);
-m_Controls->m_StartTracking->setEnabled(false);
-DisableOptionsButtons();
 
 this->GlobalReinit();
 }
@@ -241,8 +251,6 @@ m_TrackingDeviceSource->Disconnect();
 this->m_Controls->m_configurationWidget->Reset();
 m_Controls->m_TrackingControlLabel->setText("Status: stopped");
 if (m_logging) StopLogging();
-this->m_Controls->m_LoadTools->setEnabled(true);
-this->m_Controls->m_AutoDetectTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 m_tracking = false;
@@ -251,6 +259,7 @@ m_tracking = false;
 m_Controls->m_StopTracking->setEnabled(false);
 m_Controls->m_StartTracking->setEnabled(true);
 EnableOptionsButtons();
+EnableTrackingConfigurationButtons();
 
 this->GlobalReinit();
 }
@@ -259,13 +268,20 @@ this->GlobalReinit();
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
   mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
-	// Code to enable auto detection
-  if (Type == mitk::NDIAurora)
-    {m_Controls->m_AutoDetectTools->setVisible(true);}
-  else
-    {m_Controls->m_AutoDetectTools->setVisible(false);}
+	
+  // Code to enable/disable device specific buttons
+  if (Type == mitk::NDIAurora) //Aurora
+  {
+    m_Controls->m_AutoDetectTools->setVisible(true);
+    m_Controls->m_AddSingleTool->setEnabled(false);
+  }
+  else //Polaris or Microntracker
+  {
+    m_Controls->m_AutoDetectTools->setVisible(false);
+    m_Controls->m_AddSingleTool->setEnabled(true);
+  }
 
-// Code to select appropriate tracking volumes
+  // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
   m_Controls->m_VolumeSelectionBox->clear();
   for(int i = 0; i < Compatibles.size(); i++)
@@ -282,7 +298,6 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 	
-
 	  std::string str = qstr.toStdString();
 
 	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
@@ -316,6 +331,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
 if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
     {
+    DisableTrackingConfigurationButtons();
     mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     currentDevice->OpenConnection();
     currentDevice->StartTracking();
@@ -353,6 +369,8 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     currentDevice->StopTracking();
     currentDevice->CloseConnection();
 
+    EnableTrackingConfigurationButtons();
+
     if (m_toolStorage->GetToolCount()>0)
       {
       //ask the user if he wants to save the detected tools
@@ -375,6 +393,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
         return;
         }
       }
+
     }
 }
 
@@ -446,6 +465,32 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     }
   }
 
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
+  {
+  QString Identifier = "Tool#";
+  if (m_toolStorage.IsNotNull()) Identifier += QString::number(m_toolStorage->GetToolCount());
+  else Identifier += "0";
+  m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(),Identifier.toStdString());
+  m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(),false);
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
+  
+  }
+ 
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
+  {
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
+  if (this->m_toolStorage.IsNull()) m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
+  m_toolStorage->AddTool(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool());
+  m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+  QString toolLabel = QString("Loaded Tools: <manually added>");
+  }
+  
+void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolCanceled()
+  {
+  m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
+  }
+
+
 void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
 {
 // get all nodes that have not set "includeInBoundingBox" to false
@@ -497,6 +542,22 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
     m_Controls->m_UpdateRate->setEnabled(true);
     m_Controls->m_ShowToolQuaternions->setEnabled(true);
     m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
+{
+    m_Controls->m_AutoDetectTools->setEnabled(true);
+    if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(true);
+    m_Controls->m_LoadTools->setEnabled(true);
+    m_Controls->m_ResetTools->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
+{
+    m_Controls->m_AutoDetectTools->setEnabled(false);
+    if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(false);
+    m_Controls->m_LoadTools->setEnabled(false);
+    m_Controls->m_ResetTools->setEnabled(false);
 }
 
 

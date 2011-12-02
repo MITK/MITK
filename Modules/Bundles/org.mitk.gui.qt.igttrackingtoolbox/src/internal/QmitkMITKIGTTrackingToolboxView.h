@@ -106,6 +106,17 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
     void UpdateTrackingTimer();
 
+    /** @brief Resets the Tracking Tools: this means all tools are removed. */
+    void OnResetTools();
+
+    /** @brief Opens a dialog where a new navigation tool can be created. */
+    void OnAddSingleTool();
+
+    /** @brief This slot is called if the user finishes the creation of a new tool. */
+    void OnAddSingleToolFinished();
+
+    /** @brief This slot is called if the user cancels the creation of a new tool. */
+    void OnAddSingleToolCanceled();
 	
 
 
@@ -141,6 +152,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableLoggingButtons();
    void DisableOptionsButtons();
    void EnableOptionsButtons();
+   void EnableTrackingConfigurationButtons();
+   void DisableTrackingConfigurationButtons();
 
 };
 

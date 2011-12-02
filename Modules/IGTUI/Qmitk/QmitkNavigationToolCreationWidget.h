@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkNavigationToolCreationWizardWidget_H
-#define QmitkNavigationToolCreationWizardWidget_H
+#ifndef QmitkNavigationToolCreationWidget_H
+#define QmitkNavigationToolCreationWidget_H
 
 //QT headers
 #include <QWidget>
@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateDataType.h>
 
 //ui header
-#include "ui_QmitkNavigationToolCreationWizardWidget.h"
+#include "ui_QmitkNavigationToolCreationWidget.h"
 
  /** Documentation:
   *   \brief An object of this class offers an UI to create new NavigationTools 
@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
+class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 {
   Q_OBJECT
 
@@ -57,8 +57,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
     /** @brief Sets the default data of all input fields. The default data is used from the default tool which is given as parameter. */
     void SetDefaultData(mitk::NavigationTool::Pointer DefaultTool);
 
-    QmitkNavigationToolCreationWizardWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkNavigationToolCreationWizardWidget();
+    QmitkNavigationToolCreationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    ~QmitkNavigationToolCreationWidget();
 
     /** @return Returns the created tool. Returns NULL if no tool was created yet. */
     itkGetConstMacro(CreatedTool,mitk::NavigationTool::Pointer);
@@ -86,7 +86,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWizardWidget : public QWidget
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    Ui::QmitkNavigationToolCreationWizardWidgetControls* m_Controls;
+    Ui::QmitkNavigationToolCreationWidgetControls* m_Controls;
 
     /** @brief holds the DataStorage */
     mitk::DataStorage* m_DataStorage;

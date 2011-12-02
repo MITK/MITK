@@ -245,7 +245,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QWidget" name="page_2">
              <layout class="QVBoxLayout" name="verticalLayout_10">
               <item>
-               <widget class="QmitkNavigationToolCreationWizardWidget" name="m_NavigationToolCreationWidget" native="true"/>
+               <widget class="QmitkNavigationToolCreationWidget" name="m_NavigationToolCreationWidget" native="true"/>
               </item>
              </layout>
             </widget>
@@ -619,9 +619,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkNavigationToolCreationWizardWidget</class>
+   <class>QmitkNavigationToolCreationWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkNavigationToolCreationWizardWidget.h</header>
+   <header>QmitkNavigationToolCreationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

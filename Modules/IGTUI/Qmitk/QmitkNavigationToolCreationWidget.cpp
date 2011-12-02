@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkNavigationToolCreationWizardWidget.h"
+#include "QmitkNavigationToolCreationWidget.h"
 
 //mitk headers
 #include "mitkTrackingTypes.h"
@@ -32,9 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 // vtk
 #include <vtkSphereSource.h>
 
-const std::string QmitkNavigationToolCreationWizardWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationwizardwidget";
+const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationwizardwidget";
 
-QmitkNavigationToolCreationWizardWidget::QmitkNavigationToolCreationWizardWidget(QWidget* parent, Qt::WindowFlags f)
+QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
   m_Controls = NULL;
@@ -48,21 +48,21 @@ QmitkNavigationToolCreationWizardWidget::QmitkNavigationToolCreationWizardWidget
 }
 
 
-QmitkNavigationToolCreationWizardWidget::~QmitkNavigationToolCreationWizardWidget()
+QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
 }
 
-void QmitkNavigationToolCreationWizardWidget::CreateQtPartControl(QWidget *parent)
+void QmitkNavigationToolCreationWidget::CreateQtPartControl(QWidget *parent)
   {
     if (!m_Controls)
     {
     // create GUI widgets
-    m_Controls = new Ui::QmitkNavigationToolCreationWizardWidgetControls;
+    m_Controls = new Ui::QmitkNavigationToolCreationWidgetControls;
     m_Controls->setupUi(parent);
     }
   }
 
-void QmitkNavigationToolCreationWizardWidget::CreateConnections()
+void QmitkNavigationToolCreationWidget::CreateConnections()
   {
     if ( m_Controls )
     {
@@ -73,13 +73,13 @@ void QmitkNavigationToolCreationWizardWidget::CreateConnections()
     }
   }
 
-void QmitkNavigationToolCreationWizardWidget::Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier)
+void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier)
   {
   m_DataStorage = dataStorage;
   m_Controls->m_IdentifierEdit->setText(QString(supposedIdentifier.c_str()));
   }
 
-void QmitkNavigationToolCreationWizardWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
+void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
   {
   switch(type)
       {
@@ -101,7 +101,7 @@ void QmitkNavigationToolCreationWizardWidget::SetTrackingDeviceType(mitk::Tracki
 //############################## slots                  ############################
 //##################################################################################
 
-void QmitkNavigationToolCreationWizardWidget::OnFinished()
+void QmitkNavigationToolCreationWidget::OnFinished()
   {
     //here we create a new tool
     m_CreatedTool = mitk::NavigationTool::New();
@@ -145,13 +145,13 @@ void QmitkNavigationToolCreationWizardWidget::OnFinished()
     emit NavigationToolFinished();
   }
 
-void QmitkNavigationToolCreationWizardWidget::OnCancel()
+void QmitkNavigationToolCreationWidget::OnCancel()
   {
     m_CreatedTool = NULL;
     emit Canceled();
   }
 
-void QmitkNavigationToolCreationWizardWidget::OnLoadSurface()
+void QmitkNavigationToolCreationWidget::OnLoadSurface()
   {
     std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", "*.stl").toLatin1().data();
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
@@ -174,12 +174,12 @@ void QmitkNavigationToolCreationWizardWidget::OnLoadSurface()
       }
   }
 
-void QmitkNavigationToolCreationWizardWidget::OnLoadCalibrationFile()
+void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
   {
     m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
   }
 
-void QmitkNavigationToolCreationWizardWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
+void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
   {
     m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
     m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
@@ -217,7 +217,7 @@ void QmitkNavigationToolCreationWizardWidget::SetDefaultData(mitk::NavigationToo
 //##################################################################################
 //############################## internal help methods #############################
 //##################################################################################
-void QmitkNavigationToolCreationWizardWidget::MessageBox(std::string s)
+void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
   {
   QMessageBox msgBox;
   msgBox.setText(s.c_str());

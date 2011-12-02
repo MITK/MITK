@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkNavigationToolCreationWizardWidgetControls</class>
- <widget class="QWidget" name="QmitkNavigationToolCreationWizardWidgetControls">
+ <class>QmitkNavigationToolCreationWidgetControls</class>
+ <widget class="QWidget" name="QmitkNavigationToolCreationWidgetControls">
   <property name="geometry">
    <rect>
     <x>0</x>

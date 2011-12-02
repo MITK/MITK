@@ -64,6 +64,27 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     \brief update parameters of ToFCompositeFilter according to current GUI setting
     */
     void UpdateFilterParameter();
+    /*!
+    \brief set the configuration of the widget specifying which filter is enabled on start
+    */
+    void SetWidgetConfiguration(bool threshold, bool mask, bool tempMedian, bool tempAverage, bool median, bool bilateral );
+    /*!
+    \brief sets the standard parameters used for the bilateral filter to the ComboBoxes used in the GUI
+    \param domainSigma Parameter controlling the smoothing effect of the bilateral filter. Default value: 2
+    \param rangeSigma Parameter controlling the edge preserving effect of the bilateral filter. Default value: 60
+    \param kernelRadius radius of the filter mask of the bilateral filter
+    */
+    void SetStandardParametersBilateralFilter(double domainSigma, double rangeSigma, int kernelRadius=0);
+    /*!
+    \brief set the standard parameters for the threshold filter to the combo boxes in the GUI
+    \param min lower threshold of the threshold filter
+    \param max upper threshold of the threshold filter
+    */
+    void SetStandardParametersThresholdFilter(int min, int max);
+    /*!
+    \brief set the standard value for the number of images to be averaged to the combo box in the GUI
+    */
+    void SetStandardParameterTemporalAveraging(int nImages);
 
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
   

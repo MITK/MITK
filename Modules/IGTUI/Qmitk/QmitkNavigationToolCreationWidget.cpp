@@ -77,6 +77,14 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
   m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
   m_Controls->m_SurfaceChooser->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+
+  //set default data
+  m_Controls->m_ToolNameEdit->setText("NewTool");
+  m_Controls->m_CalibrationFileName->setText("<not given>");
+  m_Controls->m_SerialNumberEdit->setText("<not given>");
+  m_Controls->m_Surface_Use_Sphere->setChecked(true);
+  m_Controls->m_ToolTypeChooser->setCurrentIndex(0);
+  
   }
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
@@ -196,6 +204,7 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
               m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
       }
     m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
+    m_Controls->m_Surface_Use_Other->setChecked(true);
     switch(DefaultTool->GetType())
       {
       case mitk::NavigationTool::Instrument:

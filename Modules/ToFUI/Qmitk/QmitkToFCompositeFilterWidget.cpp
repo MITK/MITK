@@ -118,6 +118,34 @@ void QmitkToFCompositeFilterWidget::UpdateFilterParameter()
   OnBilateralFilterCheckBoxChecked(m_Controls->m_BilateralFilterCheckBox->isChecked());
 }
 
+void QmitkToFCompositeFilterWidget::SetWidgetConfiguration(bool threshold, bool mask, bool tempMedian, bool tempAverage, bool median, bool bilateral )
+{
+  m_Controls->m_ThresholdFilterCheckBox->setChecked(threshold);
+  m_Controls->maskSegmentationCheckBox->setChecked(mask);
+  m_Controls->m_TemporalMedianFilterCheckBox->setChecked(tempMedian);
+  m_Controls->m_AverageFilterCheckBox->setChecked(tempAverage);
+  m_Controls->m_MedianFilterCheckBox->setChecked(median);
+  m_Controls->m_BilateralFilterCheckBox->setChecked(bilateral);
+}
+
+void QmitkToFCompositeFilterWidget::SetStandardParametersBilateralFilter(double domainSigma, double rangeSigma, int kernelRadius)
+{
+  m_Controls->m_BilateralFilterDomainSigmaSpinBox->setValue(domainSigma);
+  m_Controls->m_BilateralFilterRangeSigmaSpinBox->setValue(rangeSigma);
+  m_Controls->m_BilateralFilterKernelRadiusSpinBox->setValue(kernelRadius);
+}
+
+void QmitkToFCompositeFilterWidget::SetStandardParametersThresholdFilter(int min, int max)
+{
+  m_Controls->m_ThresholdFilterMinValueSpinBox->setValue(min);
+  m_Controls->m_ThresholdFilterMaxValueSpinBox->setValue(max);
+}
+
+void QmitkToFCompositeFilterWidget::SetStandardParameterTemporalAveraging(int nImages)
+{
+  m_Controls->m_TemporalMedianFilterNumOfFramesSpinBox->setValue(nImages);
+}
+
 void QmitkToFCompositeFilterWidget::OnTemporalMedianFilterCheckBoxChecked(bool checked)
 {
   this->m_ToFCompositeFilter->SetApplyTemporalMedianFilter(checked);

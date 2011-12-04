@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkModule.h"
 #include "mitkModuleInfo.h"
 #include "mitkModuleContext.h"
+#include "mitkModuleActivator.h"
 #include "mitkCoreModuleContext_p.h"
 #include "mitkStaticInit.h"
 
@@ -131,9 +132,18 @@ void ModuleRegistry::Register(ModuleInfo* info)
 
 void ModuleRegistry::UnRegister(const ModuleInfo* info)
 {
-  // If we are unregistering the mitkCore module, there is
-  // nothing to do.
-  if (info->id == 1) return;
+  // If we are unregistering the Mitk module, we just call
+  // the module activators Unload() method (if there is a
+  // module activator). Since we cannot be sure that the
+  // ModuleContext for the Mitk library is still valid, we
+  // just pass a null-pointer. Using the module context during
+  // static deinitalization time of the Mitk library makes
+  // no sense anyway.
+  if (info->id == 1 && info->activatorHook)
+  {
+    info->activatorHook()->Unload(0);
+    return;
+  }
 
   Module* curr = 0;
   {

@@ -38,6 +38,11 @@ public:
 
   void Unload(mitk::ModuleContext* )
   {
+    // The mitk::ModuleContext* argument of the Unload() method
+    // will always be 0 for the Mitk library. It makes no sense
+    // to use it at this stage anyway, since all libraries which
+    // know about the module system have already been unloaded.
+
       m_PlanePositionManagerReg.Unregister();
       m_PlanePositionManager = 0;
 

@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTestingMacros.h>
 #include <mitkLogMacros.h>
 
+#include "TestModules/libA/mitkTestModuleAService.h"
+
 class ModuleListener {
 
 public:
@@ -264,9 +266,16 @@ void frame030b(mitk::ModuleContext* mc, ModuleListener& listener, mitk::SharedLi
       = mc->GetServiceReference("org.mitk.TestModuleAService");
   MITK_TEST_CONDITION(sr1, "Test for valid service reference")
 
+  mitk::TestModuleAService* moduleAService = mc->GetService<mitk::TestModuleAService>(sr1);
+  MITK_TEST_CONDITION(moduleAService != 0, "Test for valid service object")
+
+  bool unloadCalled = false;
+  moduleAService->SetUnloadedFlag(&unloadCalled);
+
   try
   {
     libA.Unload();
+    MITK_TEST_CONDITION(unloadCalled == true, "Test if the mitk::ModuleActivator::Unload() method was called")
     MITK_TEST_CONDITION(moduleA->IsLoaded() == false, "Test for unloaded state")
   }
   catch (const std::exception& e)

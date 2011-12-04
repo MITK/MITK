@@ -29,11 +29,18 @@ namespace mitk {
 struct TestModuleA : public itk::LightObject, public TestModuleAService
 {
 
-  TestModuleA(ModuleContext* mc)
+  TestModuleA(ModuleContext* mc) : m_UnloadCalled(0)
   {
     MITK_INFO << "Registering TestModuleAService";
     mc->RegisterService<TestModuleAService>(this);
   }
+
+  void SetUnloadedFlag(bool* flag)
+  {
+    m_UnloadCalled = flag;
+  }
+
+  bool* m_UnloadCalled;
 
 };
 
@@ -48,7 +55,10 @@ public:
 
   void Unload(ModuleContext*)
   {
-
+    if (s->m_UnloadCalled)
+    {
+      *(s->m_UnloadCalled) = true;
+    }
   }
 
 private:

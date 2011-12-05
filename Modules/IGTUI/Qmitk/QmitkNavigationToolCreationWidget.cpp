@@ -103,7 +103,10 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
   m_Controls->m_TrackingDeviceTypeChooser->setEnabled(changeable);
   }
 
-
+mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
+{
+  return m_CreatedTool;
+}
 
 //##################################################################################
 //############################## slots                  ############################
@@ -231,4 +234,4 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
   QMessageBox msgBox;
   msgBox.setText(s.c_str());
   msgBox.exec();
-  }
+}

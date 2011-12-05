@@ -35,13 +35,13 @@ The pixel type is the single information that can differ among an image with mul
 class MITK_CORE_EXPORT ChannelDescriptor
 {
 public:
-    ChannelDescriptor(mitk::PixelType& type, size_t numOfElements, bool allocate = false);
+    ChannelDescriptor(mitk::PixelType type, size_t numOfElements, bool allocate = false);
 
     ~ChannelDescriptor(){}
 
     /** \brief Get the type of channel's elements */
     PixelType GetPixelType() const
-    { return m_PixelType; }
+    { return *m_PixelType; }
 
     /** \brief Get the size in bytes of the channel */
     size_t GetSize() const
@@ -75,7 +75,7 @@ protected:
     /** The type of each element of the channel
 
       \sa PixelType */
-    PixelType m_PixelType;
+    PixelType *m_PixelType;
 
     /** Size of the channel in bytes */
     size_t m_Size;
@@ -86,10 +86,6 @@ protected:
       \todo Replace in new memory management design
       */
     unsigned char* m_Data;
-
-private:
-
-    ChannelDescriptor& operator=(const ChannelDescriptor &other);
 
 };
 

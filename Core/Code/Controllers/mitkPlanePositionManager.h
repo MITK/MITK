@@ -30,6 +30,7 @@ class MitkCoreActivator;
 
 namespace mitk
 {
+
 /**
     The mitk::PlanePositionManagerService holds and manages a list of certain planepositions.
     To store a new position you need to specify the first slice of your slicestack and the
@@ -101,4 +102,3 @@ namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 
 #endif
-

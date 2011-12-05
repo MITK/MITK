@@ -325,10 +325,10 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 	if ( boundsInitialized )
 	{
 		// Calculate output extent (integer values)
-		xMin = static_cast< int >( sliceBounds[0] / mmPerPixel[0] ); //+ 0.5 );
-		xMax = static_cast< int >( sliceBounds[1] / mmPerPixel[0] ); //+ 0.5 );
-		yMin = static_cast< int >( sliceBounds[2] / mmPerPixel[1] ); //+ 0.5 );
-		yMax = static_cast< int >( sliceBounds[3] / mmPerPixel[1] ); //+ 0.5 ); 
+		xMin = static_cast< int >( sliceBounds[0] / mmPerPixel[0] + 0.5 );
+		xMax = static_cast< int >( sliceBounds[1] / mmPerPixel[0] + 0.5 );
+		yMin = static_cast< int >( sliceBounds[2] / mmPerPixel[1] + 0.5 );
+		yMax = static_cast< int >( sliceBounds[3] / mmPerPixel[1] + 0.5 ); 
 	}
 	else
 	{
@@ -336,9 +336,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 		// maximum plane size;
 		xMin = yMin = 0;
 		xMax = static_cast< int >( extent[0]
-		- pixelsPerMM[0] ); //+ 0.5 );
+		- pixelsPerMM[0] + 0.5 );
 		yMax = static_cast< int >( extent[1]
-		- pixelsPerMM[1] ); //+ 0.5 );
+		- pixelsPerMM[1] + 0.5 );
 	}
 
 	// Disallow huge dimensions

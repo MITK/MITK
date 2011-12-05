@@ -34,6 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
       } \
   } 
 
+#define getMacro(name,type) \
+  virtual type Get##name () \
+  { \
+	return m_##name; \
+  } 
+
 class vtkPoints;
 
 namespace mitk
@@ -83,6 +89,9 @@ namespace mitk
 	setMacro( ResliceInterpolationProperty, VtkResliceInterpolationProperty* );
 	itkGetMacro( ResliceInterpolationProperty, VtkResliceInterpolationProperty* );
 
+	setMacro( IsMapperMode, bool );
+	getMacro( IsMapperMode, bool );
+
   protected:
 
     ExtractDirectedPlaneImageFilter(); // purposely hidden
@@ -96,14 +105,15 @@ namespace mitk
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       vtkFloatingPointType *bounds );
 
-    const Geometry2D*		 		   m_WorldGeometry;
-    vtkImageReslice *		 		   m_Reslicer;
+    const Geometry2D*	m_WorldGeometry;
+    vtkImageReslice *	m_Reslicer;
 	
-    unsigned int					   m_TargetTimestep;
-    bool							   m_InPlaneResampleExtentByGeometry;
-	int								   m_ThickSlicesMode;
-	int								   m_ThickSlicesNum;
-	
+    unsigned int		m_TargetTimestep;
+    bool				m_InPlaneResampleExtentByGeometry;
+	int					m_ThickSlicesMode;
+	int					m_ThickSlicesNum;
+	bool				m_IsMapperMode;
+
 	VtkResliceInterpolationProperty* m_ResliceInterpolationProperty;
   };
 

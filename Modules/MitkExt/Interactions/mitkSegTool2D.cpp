@@ -36,8 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Includes for 3DSurfaceInterpolation
 #include "mitkImageToContourFilter.h"
-//#include "mitkReduceContourSetFilter.h"
-//#include "mitkComputeContourSetNormalsFilter.h"
 #include "mitkSurfaceInterpolationController.h"
 
 
@@ -361,9 +359,7 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
         mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
 
         mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
-        MITK_INFO<<"Marker-Size: "<<markers->Size();
 
-        bool markerAlreadyExists(false);
         for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
           iter != markers->end();
           ++iter)

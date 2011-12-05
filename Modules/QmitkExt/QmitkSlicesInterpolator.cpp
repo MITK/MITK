@@ -336,6 +336,7 @@ void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
 {
   On3DInterpolationActivated(status);
+  OnInterpolationActivated(!status);
 }
 
 void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
@@ -507,8 +508,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
 void QmitkSlicesInterpolator::SurfaceInterpolationFinished/*InterpolateSurface*/()
 {
-  //mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->Interpolate();
-    mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
+  mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 
   if(interpolatedSurface.IsNotNull())
   {
@@ -536,8 +536,6 @@ void QmitkSlicesInterpolator::SurfaceInterpolationFinished/*InterpolateSurface*/
       m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
     }
   }
-
-  //OnShowMarkers(m_CbHideMarkers->checkState());
 
   if (m_MultiWidget)
   {

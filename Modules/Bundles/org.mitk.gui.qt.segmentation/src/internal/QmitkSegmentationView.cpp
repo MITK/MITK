@@ -372,17 +372,12 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
 
   // The new selection behaviour is:
   // 
-  // 
-  //   TODO write comment
-  //   
-  //    
+  // When clicking on the checkbox of a segmentation the node will e selected and its reference node either
+  // The previous selected segmentation (if there is one) will be deselected. Additionally a reinit on the
+  // selected segmenation will be performed.
+  // If more than one segmentation is selected the tools will be disabled.
 
-  //MITK_INFO<<"PropertyChanged";
-//      mitk::DataNode* node = const_cast<mitk::DataNode*>(dynamic_cast<const mitk::DataNode*>(caller));
-//    if (node)
-//        MITK_INFO<<"Caller: "<<node->GetName();
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
-  mitk::DataNode::Pointer referenceData = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
   mitk::DataNode::Pointer referenceDataNew;
   mitk::DataNode::Pointer workingData;
 
@@ -391,9 +386,6 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
 
   unsigned int numberOfSelectedSegmentations (0);
 
-  // 1.
-  //if (referenceData.IsNotNull())
-  //{
   // iterate all images
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
 
@@ -408,10 +400,8 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
 
     bool isSegmentation(false);
     node->GetBoolProperty("binary", isSegmentation);
-    //Selected node = invoker -> do nothing
     if (node->IsSelected() && isSegmentation)
     {
-      //MITK_INFO<<"WorkingData: "<<node->GetName();
       workingNodeIsVisible =  node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
       if (!workingNodeIsVisible)
         return;
@@ -424,7 +414,6 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
         referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
       }
 
-      //MITK_INFO<<"REFNew: "<<referenceDataNew->GetName();
       if (workingNodeIsVisible && referenceDataNew)
         referenceDataNew->SetVisibility(true);
 
@@ -437,7 +426,6 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
         this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
-      //SetToolManagerSelection(referenceDataNew, workingData);
       continue;
     }
     if (workingData.IsNull() || (workingNodeIsVisible && node != referenceDataNew))
@@ -465,7 +453,6 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   if(node->GetBoolProperty("binary", isSeg) && !isHelperObject)
   {
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-    //MITK_INFO<<"Delete: "<<tempNode->GetName();
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);
     this->SetToolManagerSelection(NULL, NULL);
@@ -634,7 +621,6 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
   }
 }
 
-//to remember the contour positions
 void QmitkSegmentationView::On3DInterpolationEnabled (bool state)
 {
   mitk::SegTool2D::Pointer manualSegmentationTool;

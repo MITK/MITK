@@ -68,7 +68,7 @@ namespace mitk
     /*
      * Interpolates the 3D surface from the given extracted contours
      */
-    void/*Surface::Pointer*/ Interpolate ();
+    void Interpolate ();
 
     mitk::Surface::Pointer GetInterpolationResult();
 

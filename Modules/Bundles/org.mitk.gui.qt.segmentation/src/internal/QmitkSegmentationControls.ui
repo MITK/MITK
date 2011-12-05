@@ -214,8 +214,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
-        <height>374</height>
+        <width>259</width>
+        <height>316</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -332,7 +332,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Perform 'reinit' on patient image!</string>
+          <string>You are now working with rotated planes</string>
          </property>
         </widget>
        </item>
@@ -536,7 +536,7 @@
         <x>0</x>
         <y>0</y>
         <width>98</width>
-        <height>30</height>
+        <height>44</height>
        </rect>
       </property>
       <attribute name="label">
@@ -590,7 +590,7 @@
         <x>0</x>
         <y>0</y>
         <width>98</width>
-        <height>30</height>
+        <height>44</height>
        </rect>
       </property>
       <attribute name="label">
@@ -643,8 +643,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>195</width>
-        <height>92</height>
+        <width>273</width>
+        <height>116</height>
        </rect>
       </property>
       <attribute name="label">

@@ -1,4 +1,8 @@
 SET(CPP_FILES
+  Algorithms/mitkImageToContourFilter.cpp
+  Algorithms/mitkReduceContourSetFilter.cpp
+  Algorithms/mitkComputeContourSetNormalsFilter.cpp
+  Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
   Algorithms/mitkMaskAndCutRoiImageFilter.cpp
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
@@ -52,6 +56,7 @@ SET(CPP_FILES
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
+  Controllers/mitkSurfaceInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp

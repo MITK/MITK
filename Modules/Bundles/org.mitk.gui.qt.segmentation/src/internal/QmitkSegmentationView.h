@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkSegmentationControls.h"
 
+
 class QmitkRenderWindow;
 // class QmitkSegmentationPostProcessing;
 
@@ -96,9 +97,12 @@ protected slots:
   void OnSurfaceSelectionChanged();
   
   //called when the checkbox Remember Contour Positions is selected/deselected
-  void CheckboxRememberContourPositionsStateChanged(int state);
 
   void OnWorkingNodeVisibilityChanged();
+
+  void OnShowMarkerNodes(bool);
+
+  void On3DInterpolationEnabled(bool);
 
 protected:
   
@@ -162,7 +166,6 @@ protected:
   unsigned long m_VisibilityChangedObserverTag;
 
   NodeTagMapType  m_WorkingDataObserverTags;
-
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

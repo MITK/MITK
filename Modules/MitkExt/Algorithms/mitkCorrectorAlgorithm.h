@@ -62,7 +62,7 @@ class MitkExt_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     /**
      * \brief Calculated difference image.
      */
-    itkGetObjectMacro(DifferenceImage, Image);
+    //itkGetObjectMacro(DifferenceImage, Image);
 
   protected:
 

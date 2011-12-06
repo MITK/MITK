@@ -168,8 +168,6 @@ private:
              const char* pixelTypeName = 0 )
     : m_ComponentType( componentType ),
       m_PixelType( pixelType ),
-      m_ComponentTypeName(NULL),
-      m_PixelTypeName(NULL),
       m_NumberOfComponents( numberOfComponents ),
       m_BytesPerComponent( bytesPerComponent )
   {

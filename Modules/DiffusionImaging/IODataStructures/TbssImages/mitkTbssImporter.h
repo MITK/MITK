@@ -43,19 +43,13 @@ namespace mitk
     typedef itk::Image<float, 3> FloatImage3DType;
     typedef itk::ImageFileReader<FloatImage3DType> FileReaderType3D;
 
-    TbssImporter();
+
 
     mitkClassMacro( TbssImporter, Object )
     itkNewMacro(Self)
 
 
 
-    TbssImporter(std::string path);
-
-    void SetInputFile(std::string f)
-    {
-      m_File = f;
-    }
 
     mitk::TbssImage::Pointer Import();
 
@@ -88,13 +82,16 @@ namespace mitk
     }
 
 
+    void SetImportVolume(mitk::Image::Pointer inputVolume)
+    {
+      m_InputVolume = inputVolume;
+    }
+
   protected:
 
 
 
     virtual ~TbssImporter(){}
-
-    std::string m_File;
 
     DataImageType::Pointer m_Data;
     std::vector< std::pair<std::string, int> > m_Groups;
@@ -103,6 +100,8 @@ namespace mitk
     std::string m_MeasurementInfo;
 
 
+    mitk::Image::Pointer m_InputVolume;
+    
 
     mitk::TbssImage::MetaDataFunction RetrieveTbssFunction(std::string s);
 

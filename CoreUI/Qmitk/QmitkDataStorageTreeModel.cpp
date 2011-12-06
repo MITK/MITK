@@ -33,6 +33,8 @@
 #include <QMimeData>
 #include <QTextStream>
 
+#include <map>
+
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage
                                                       , bool _PlaceNewNodesOnTop
                                                       , bool _ShowHelperObjects
@@ -54,6 +56,13 @@ QmitkDataStorageTreeModel::~QmitkDataStorageTreeModel()
   // set data storage to 0 = remove all listeners
   this->SetDataStorage(0);
   m_Root->Delete(); m_Root = 0;
+
+  //Removing all observers
+  for ( NodeTagMapType::iterator dataIter = m_HelperObjectObserverTags.begin(); dataIter != m_HelperObjectObserverTags.end(); ++dataIter )
+  {
+      (*dataIter).first->GetProperty("helper object")->RemoveObserver( (*dataIter).second );
+  }
+  m_HelperObjectObserverTags.clear();
 }
 
 mitk::DataNode::Pointer QmitkDataStorageTreeModel::GetNode( const QModelIndex &index ) const
@@ -334,6 +343,14 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
     || !m_Predicate->CheckNode(node)
     || m_Root->Find(node) != 0)
     return;
+
+    bool isHelperObject (false);
+    NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
+    if (node->GetBoolProperty("helper object", isHelperObject) && searchIter == m_HelperObjectObserverTags.end()) {
+        itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::Pointer command = itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::New();
+        command->SetCallbackFunction(this, &QmitkDataStorageTreeModel::UpdateNodeVisibility);
+         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
+    }
 
   // find out if we have a root node
   TreeItem* parentTreeItem = m_Root;

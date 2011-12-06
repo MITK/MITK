@@ -117,7 +117,6 @@ protected slots:
 
   void PFWidth(int);
   void PFColor();
-  void PFColor3D();
 
   void LineWidthChanged(int);
   void TubeRadiusChanged(int);

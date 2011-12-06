@@ -114,10 +114,6 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if ( !image || !planeGeometry ) return false;
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
-
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
   m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
@@ -139,42 +135,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
       MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
   }
 
-  if ( affectedDimension != -1 )
-  {
-    // 5. Write the modified 2D working data slice back into the image
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( algorithm->GetOutput() );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-
-    if( m_RememberContourPositions )
-    {
-      this->AddContourmarker( positionEvent );
-    }
-  }
-  else if ( affectedDimension == -1 )
-  {
-      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-      slicewriter->SetInput( image );
-      slicewriter->SetCreateUndoInformation( false );
-      slicewriter->SetSliceImage( m_WorkingSlice );
-      slicewriter->SetPlaneGeometry3D( m_WorkingSlice->GetGeometry() );
-      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-      slicewriter->Update();
-
-      if( m_RememberContourPositions )
-      {
-        this->AddContourmarker( positionEvent );
-      }
-  }
-  else
-  {
-    InteractiveSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
-  }
+  this->WriteBackSegmentationResult(positionEvent, algorithm->GetOutput());
 
   // 6. Make sure the result is drawn again --> is visible then. 
   assert( positionEvent->GetSender()->GetRenderWindow() );

@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkTractbasedSpatialStatisticsViewControls</class>
+ <widget class="QWidget" name="QmitkTractbasedSpatialStatisticsViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>431</width>
+    <height>811</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_9">
+   <item>
+    <widget class="QGroupBox" name="m_ImportGroupBox">
+     <property name="title">
+      <string>FSL import</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="toolTip">
+         <string>Here subject data and tbss meta data can be imported from FSL into the MITK TBSS module</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_3">
+         <attribute name="title">
+          <string>Subject data</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QFrame" name="frame_6">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QTableView" name="m_GroupInfo">
+               <property name="toolTip">
+                <string>Group information</string>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QFrame" name="frame_5">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <widget class="QPushButton" name="m_AddGroup">
+                  <property name="toolTip">
+                   <string>Add group entry. After that give the group a name and the correct number</string>
+                  </property>
+                  <property name="text">
+                   <string>Add</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="m_RemoveGroup">
+                  <property name="toolTip">
+                   <string>Remove selected entries</string>
+                  </property>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="m_ImportFsl">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Import a 4D image containing group data after group information has been set</string>
+                  </property>
+                  <property name="text">
+                   <string>Import subject data</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_7">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Diffusion measure</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="m_MeasurementInfo">
+               <property name="toolTip">
+                <string>Measurement in the to be imported 4D image</string>
+               </property>
+               <property name="text">
+                <string>Fractional Anisotropy</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Meta data</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QTableView" name="m_MetaInfo">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Meta data </string>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_4">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QComboBox" name="m_MetaFileSelector">
+               <property name="toolTip">
+                <string>Select the function of the tbss image</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Add skeleton mask</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Add mean FA Skeleton</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Add gradient image</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Add tubular structure</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Add distance map</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="m_RemoveMetaEntry">
+               <property name="toolTip">
+                <string>Remove meta data entries</string>
+               </property>
+               <property name="text">
+                <string>Remove</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="m_CreateMetaFile">
+               <property name="toolTip">
+                <string>Create a tbss meta image with the images in the table.</string>
+               </property>
+               <property name="text">
+                <string>Create TBSS meta  file</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_Workspace">
+     <property name="title">
+      <string>Tract-specific analysis</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QTabWidget" name="m_TabWidget">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>To create a roi first load a tbss meta image into the datamanager</string>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="m_RoiTab">
+         <attribute name="title">
+          <string>ROIs</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="m_TbssImageLabel">
+            <property name="toolTip">
+             <string>current selection</string>
+            </property>
+            <property name="text">
+             <string>mean FA skeleton:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Points on Roi</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QmitkPointListWidget" name="m_PointWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>100</horstretch>
+              <verstretch>100</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Use this widget to create points on the ROI by shift-leftclick on the right positions on the skeleton. Then click Create Roi. The Roi that will be created will pass through the points in the order of occurence in this list</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QPushButton" name="m_CreateRoi">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>No suitable tbss meta image selected yet. The meta image needs to contain a mean FA skeleton and a skeleton mask</string>
+            </property>
+            <property name="text">
+             <string>Create ROI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPlainTextEdit" name="m_PathTextEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Points on the ROI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="m_RoiName">
+            <property name="toolTip">
+             <string>Give a name to the region of interest</string>
+            </property>
+            <property name="text">
+             <string>roiname</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Structure info</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="m_Structure">
+            <property name="toolTip">
+             <string>On what anatomical structure lies the ROI?</string>
+            </property>
+            <property name="text">
+             <string>Structure</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="m_MeasureTAB">
+         <attribute name="title">
+          <string>Measuring</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QmitkTbssRoiAnalysisWidget" name="m_RoiPlotWidget" native="true">
+            <property name="toolTip">
+             <string>To plot, load a tbss image with subject information and a region of interest corresponding to the study and select them both</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="m_Clipboard">
+            <property name="text">
+             <string>Copy to clipboard</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkPointListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkPointListWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkTbssRoiAnalysisWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkTbssRoiAnalysisWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

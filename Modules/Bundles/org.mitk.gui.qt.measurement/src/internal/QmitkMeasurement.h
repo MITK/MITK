@@ -141,6 +141,9 @@ class QmitkMeasurement : public QmitkFunctionality
 
     bool AssertDrawingIsPossible(bool checked);
 
+    void EnableCrosshairNavigation();
+    void DisableCrosshairNavigation();
+
   protected slots:
     ///# draw actions
     void ActionDrawLineTriggered( bool checked = false );
@@ -194,6 +197,8 @@ protected:
   unsigned int m_PolygonCounter;
   unsigned int m_EndPlacementObserverTag;
   unsigned int m_SelectObserverTag;
+  unsigned int m_StartInteractionObserverTag;
+  unsigned int m_EndInteractionObserverTag;
   bool m_Visible;
   bool m_CurrentFigureNodeInitialized;
 

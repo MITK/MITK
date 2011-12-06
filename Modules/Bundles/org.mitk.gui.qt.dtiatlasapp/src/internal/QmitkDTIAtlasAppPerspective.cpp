@@ -33,11 +33,11 @@ void QmitkDTIAtlasAppPerspective::CreateInitialLayout(berry::IPageLayout::Pointe
 
 
 //  berry::IFolderLayout::Pointer left =
-//    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+//    layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
 //    berry::IPageLayout::BOTTOM, 0.2f, "org.mitk.views.controlvisualizationpropertiesview");
 
 //  layout->AddStandaloneView("org.mitk.views.perspectiveswitcher",
-//    false, berry::IPageLayout::BOTTOM, 0.99f, "org.mitk.diffusionimaginginternal.leftcontrols");
+//    false, berry::IPageLayout::BOTTOM, 0.99f, "org.mbi.diffusionimaginginternal.leftcontrols");
 
   ////////////////////////////////////////
   // public views go here
@@ -72,7 +72,7 @@ void QmitkDTIAtlasAppPerspective::CreateInitialLayout(berry::IPageLayout::Pointe
 
 
 //  berry::IFolderLayout::Pointer right =
-//    layout->CreateFolder("org.mitk.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
+//    layout->CreateFolder("org.mbi.diffusionimaginginternal.rightcontrols", berry::IPageLayout::RIGHT, 0.5f, editorArea);
 
   ////////////////////////////////////////
   // internal views go here

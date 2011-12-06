@@ -5,6 +5,8 @@
 
 The Diffusion Imaging Application contains selected views for the analysis of images of the human brain. These encompass the views developed by the <a href="http://www.dkfz.de/en/mbi/projects/neuroimaging.html">Neuroimaging Group</a> of the Division Medical and Biological Informatics as well as basic image processing views such as segmentation and volumevisualization.
 
+\isHtml
 For a basic guide to MITK see \ref MITKManualMainPage .
+\isHtmlend
 
 */

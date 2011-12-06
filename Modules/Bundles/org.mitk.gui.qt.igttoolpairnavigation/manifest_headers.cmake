@@ -1,4 +1,4 @@
-set(Plugin-Name "ToolPairNavigation")
+set(Plugin-Name "MITK-IGT ToolPairNavigation")
 set(Plugin-Version "1.0.0")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "http://www.mitk.org")

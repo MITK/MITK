@@ -63,6 +63,7 @@ SET(MODULE_TESTS
 
 # test with image filename as an extra command line parameter
 SET(MODULE_IMAGE_TESTS
+  mitkPlanePositionManagerTest.cpp
   mitkSurfaceVtkWriterTest.cpp
   mitkPicFileWriterTest.cpp
   #mitkImageSliceSelectorTest.cpp

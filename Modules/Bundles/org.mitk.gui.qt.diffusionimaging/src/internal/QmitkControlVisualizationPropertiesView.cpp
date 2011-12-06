@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 #include "mitkTbssImage.h"
-#include "mitkTbssGradientImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
@@ -161,8 +160,6 @@ struct CvpSelListener : ISelectionListener
           styleSheet.append(",");
           styleSheet.append(QString::number(color[2]*255.0));
           styleSheet.append(")");
-          m_View->m_Controls->m_PFColor3D->setAutoFillBackground(true);
-          m_View->m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
 
           m_View->PlanarFigureFocus();
         }
@@ -180,7 +177,7 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_Crosshair->setEnabled(true);
           }
-          
+
           float val;
           node->GetFloatProperty("TubeRadius", val);
           m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
@@ -196,7 +193,7 @@ struct CvpSelListener : ISelectionListener
           label = "Width %1";
           label = label.arg(width);
           m_View->m_Controls->label_linewidth->setText(label);
-          
+
           float range;
           node->GetFloatProperty("Fiber2DSliceThickness",range);
           label = "Range %1";
@@ -304,35 +301,7 @@ struct CvpSelListener : ISelectionListener
               m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
             }
 
-            if(QString("TbssGradientImage").compare(node->GetData()->GetNameOfClass())==0)
-            {
-              foundTbssImage = true;
-              bool tex_int;
-              node->GetBoolProperty("texture interpolation", tex_int);
-              if(tex_int)
-              {
-                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexON);
-                m_View->m_Controls->m_TextureIntON->setChecked(true);
-                m_View->m_TexIsOn = true;
-              }
-              else
-              {
-                m_View->m_Controls->m_TextureIntON->setIcon(*m_View->m_IconTexOFF);
-                m_View->m_Controls->m_TextureIntON->setChecked(false);
-                m_View->m_TexIsOn = false;
-              }
-              int val;
-              node->GetIntProperty("DisplayChannel", val);
-              m_View->m_Controls->m_DisplayIndex->setValue(val);
 
-              QString label = "Channel %1";
-              label = label.arg(val);
-              m_View->m_Controls->label_channel->setText(label);
-
-              int maxVal = (dynamic_cast<mitk::TbssGradientImage* >(node->GetData()))->GetImage()->GetVectorLength();
-              m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
-
-            }
             else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
             {
               foundMultipleOdfImages = foundQBIVolume || foundTensorVolume;
@@ -374,14 +343,6 @@ struct CvpSelListener : ISelectionListener
           }
         }
       }
-
-
-      if(foundDiffusionImage || foundTbssImage)
-      {
-        m_View->m_Controls->m_DisplayIndex->setVisible(true);
-        m_View->m_Controls->label_channel->setVisible(true);
-      }
-
 
       m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                       && !foundMultipleOdfImages;
@@ -584,21 +545,19 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon iconColor(":/QmitkDiffusionImaging/color24.gif");
     m_Controls->m_PFColor->setIcon(iconColor);
-    m_Controls->m_PFColor3D->setIcon(iconColor);
     m_Controls->m_Color->setIcon(iconColor);
 
     QIcon iconReset(":/QmitkDiffusionImaging/reset.png");
     m_Controls->m_ResetColoring->setIcon(iconReset);
 
     m_Controls->m_PFColor->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    m_Controls->m_PFColor3D->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
 // was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
-    
+
     QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
     m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
 
@@ -767,7 +726,6 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
     connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
-    connect((QObject*) m_Controls->m_PFColor3D, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor3D()));
 
     connect((QObject*) m_Controls->m_TDI, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateTdi()));
 
@@ -838,13 +796,14 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     return;
   }
 
-  // deactivate channel slider if no diffusion weighted image is selected
+  // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->label_channel->setVisible(false);
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if (node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||                             
+                             dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData())))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
       m_Controls->label_channel->setVisible(true);
@@ -1005,7 +964,6 @@ void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
   std::vector<std::string> sets;
   sets.push_back("DiffusionImage");
   sets.push_back("TbssImage");
-  sets.push_back("TbssGradientImage");
 
   std::vector<std::string>::iterator it = sets.begin();
   while(it != sets.end())
@@ -1298,22 +1256,22 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
     bool currentMode;
     m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
     m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
-  
+
 }
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-  if (m_SelectedNode) 
+  if (m_SelectedNode)
   {
-    
-    
+
+
     float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
     m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -1373,6 +1331,8 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
   if(m_SelectedNode)
   {
     QColor color = QColorDialog::getColor();
+    if (!color.isValid())
+      return;
 
     m_Controls->m_Color->setAutoFillBackground(true);
     QString styleSheet = "background-color:rgb(";
@@ -1597,6 +1557,8 @@ void QmitkControlVisualizationPropertiesView::PFColor()
 {
 
   QColor color = QColorDialog::getColor();
+  if (!color.isValid())
+    return;
 
   m_Controls->m_PFColor->setAutoFillBackground(true);
   QString styleSheet = "background-color:rgb(";
@@ -1617,33 +1579,6 @@ void QmitkControlVisualizationPropertiesView::PFColor()
   m_SelectedNode->SetProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
   m_SelectedNode->SetProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
   m_SelectedNode->SetProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(0.0,1.0,0.0)  );
-
-//  m_SelectedNode->SetProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-//  m_SelectedNode->SetProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkControlVisualizationPropertiesView::PFColor3D()
-{
-
-  QColor color = QColorDialog::getColor();
-
-  m_Controls->m_PFColor3D->setAutoFillBackground(true);
-  QString styleSheet = "background-color:rgb(";
-  styleSheet.append(QString::number(color.red()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.green()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.blue()));
-  styleSheet.append(")");
-  m_Controls->m_PFColor3D->setStyleSheet(styleSheet);
-
   m_SelectedNode->SetProperty( "color", mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1695,20 +1630,18 @@ void QmitkControlVisualizationPropertiesView::GenerateTdi()
 
 void QmitkControlVisualizationPropertiesView::LineWidthChanged(int w)
 {
-  m_SelectedNode->SetIntProperty("LineWidth", w);
-
   QString label = "Width %1";
   label = label.arg(w);
   m_Controls->label_linewidth->setText(label);
+  BundleRepresentationWire();
 }
 
 void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
 {
-  m_SelectedNode->SetFloatProperty("TubeRadius", (float) r / 100.0);
-
   QString label = "Radius %1";
   label = label.arg(r / 100.0);
   m_Controls->label_tuberadius->setText(label);
+  this->BundleRepresentationTube();
 }
 
 void QmitkControlVisualizationPropertiesView::Welcome()

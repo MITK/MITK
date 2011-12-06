@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>597</width>
-    <height>166</height>
+    <width>611</width>
+    <height>199</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -109,7 +109,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="2" column="0" colspan="2">
+    <widget class="QCheckBox" name="maskSegmentationCheckBox">
+     <property name="text">
+      <string>Mask segmentation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QCheckBox" name="m_TemporalMedianFilterCheckBox">
      <property name="enabled">
       <bool>true</bool>
@@ -119,55 +126,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="3">
+   <item row="3" column="1" colspan="2">
     <widget class="QCheckBox" name="m_AverageFilterCheckBox">
      <property name="text">
       <string>Average Filter </string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="m_MedianFilterCheckBox">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Median Filter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCheckBox" name="m_BilateralFilterCheckBox">
-     <property name="text">
-      <string>Bilateral Filter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Domain σ: </string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Range σ:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="5">
-    <widget class="QLabel" name="label_12">
-     <property name="text">
-      <string>Kernel Radius:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="6">
-    <widget class="QSpinBox" name="m_BilateralFilterKernelRadiusSpinBox"/>
-   </item>
-   <item row="2" column="6">
+   <item row="3" column="6">
     <widget class="QSpinBox" name="m_TemporalMedianFilterNumOfFramesSpinBox">
      <property name="maximum">
       <number>100</number>
@@ -177,19 +143,63 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="m_MedianFilterCheckBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Median Filter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="m_BilateralFilterCheckBox">
+     <property name="text">
+      <string>Bilateral Filter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Domain σ: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
     <widget class="QDoubleSpinBox" name="m_BilateralFilterDomainSigmaSpinBox">
      <property name="value">
       <double>2.000000000000000</double>
      </property>
     </widget>
    </item>
-   <item row="4" column="4">
+   <item row="5" column="3">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Range σ:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
     <widget class="QDoubleSpinBox" name="m_BilateralFilterRangeSigmaSpinBox">
      <property name="value">
       <double>60.000000000000000</double>
      </property>
     </widget>
+   </item>
+   <item row="5" column="5">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>Kernel Radius:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <widget class="QSpinBox" name="m_BilateralFilterKernelRadiusSpinBox"/>
+   </item>
+   <item row="2" column="2" colspan="5">
+    <widget class="QmitkDataStorageComboBox" name="maskImageComboBox"/>
    </item>
   </layout>
  </widget>
@@ -199,6 +209,11 @@
    <class>QxtSpanSlider</class>
    <extends>QSlider</extends>
    <header location="global">qxtspanslider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include <mitkIpPicTypeMultiplex.h>
 #include <sstream>
+#include "mitkRestorePlanePositionOperation.h"
 
 
 namespace mitk {
@@ -406,7 +407,6 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      */
     void ReorientSlices( 
       const mitk::Point3D &point, const mitk::Vector3D &normal );
-
 
     virtual bool ExecuteAction( 
       Action* action, mitk::StateEvent const* stateEvent);

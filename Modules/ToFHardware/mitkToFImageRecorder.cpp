@@ -64,9 +64,11 @@ namespace mitk
 
   void ToFImageRecorder::StopRecording()
   {
+
     this->m_AbortMutex->Lock();
     this->m_Abort = true;
     this->m_AbortMutex->Unlock();
+
   }
 
   void ToFImageRecorder::StartRecording()

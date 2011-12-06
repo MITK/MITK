@@ -147,12 +147,16 @@ void QmitkToFRecorderWidget::StartCamera()
 
 void QmitkToFRecorderWidget::StopCamera()
 {
-  m_ToFImageGrabber->StopCamera();
+  if( m_ToFImageGrabber.IsNotNull() )
+    m_ToFImageGrabber->StopCamera();
 }
 
 void QmitkToFRecorderWidget::StopRecorder()
 {
-  this->m_ToFImageRecorder->StopRecording();
+  if( m_ToFImageRecorder.IsNotNull() )
+  {
+    this->m_ToFImageRecorder->StopRecording();
+  }
 }
 
 void QmitkToFRecorderWidget::OnStartRecorder()
@@ -251,6 +255,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       this->m_ToFImageRecorder->SetRecordMode(this->m_RecordMode);
       this->m_ToFImageRecorder->SetNumOfFrames(numOfFrames);
 
+      emit RecordingStarted();
       this->m_ToFImageRecorder->StartRecording();
     }
     else

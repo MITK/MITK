@@ -79,98 +79,98 @@ void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::ComputeFiberCorrelation(){
 
-    //    float bD = 15;
+    float bD = 15;
 
-    //    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
-    //        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
+    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
+        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
 
-    //    const int N = QBALL_ODFSIZE;
+    const int N = QBALL_ODFSIZE;
 
-    //    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
-    //    vnl_matrix_fixed<double, N, N> C = temp*bDir;
-    //    vnl_matrix_fixed<double, N, N> Q = C;
-    //    vnl_vector_fixed<double, N> mean;
-    //    for(int i=0; i<N; i++)
-    //    {
-    //      double tempMean = 0;
-    //      for(int j=0; j<N; j++)
-    //      {
-    //        C(i,j) = abs(C(i,j));
-    //        Q(i,j) = exp(-bD * C(i,j) * C(i,j));
-    //        tempMean += Q(i,j);
-    //      }
-    //      mean[i] = tempMean/N;
-    //    }
+    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
+    vnl_matrix_fixed<double, N, N> C = temp*bDir;
+    vnl_matrix_fixed<double, N, N> Q = C;
+    vnl_vector_fixed<double, N> mean;
+    for(int i=0; i<N; i++)
+    {
+      double tempMean = 0;
+      for(int j=0; j<N; j++)
+      {
+        C(i,j) = abs(C(i,j));
+        Q(i,j) = exp(-bD * C(i,j) * C(i,j));
+        tempMean += Q(i,j);
+      }
+      mean[i] = tempMean/N;
+    }
 
-    //    vnl_matrix_fixed<double, N, N> repMean;
-    //    for (int i=0; i<N; i++)
-    //      repMean.set_row(i, mean);
-    //    Q -= repMean;
+    vnl_matrix_fixed<double, N, N> repMean;
+    for (int i=0; i<N; i++)
+      repMean.set_row(i, mean);
+    Q -= repMean;
 
-    //    vnl_matrix_fixed<double, N, N> P = Q*Q;
+    vnl_matrix_fixed<double, N, N> P = Q*Q;
 
-    //    std::vector<const double *> pointer;
-    //    pointer.reserve(N*N);
-    //    double * start = C.data_block();
-    //    double * end =  start + N*N;
-    //    for (double * iter = start; iter != end; ++iter)
-    //    {
-    //      pointer.push_back(iter);
-    //    }
-    //    std::sort(pointer.begin(), pointer.end(), LessDereference());
+    std::vector<const double *> pointer;
+    pointer.reserve(N*N);
+    double * start = C.data_block();
+    double * end =  start + N*N;
+    for (double * iter = start; iter != end; ++iter)
+    {
+      pointer.push_back(iter);
+    }
+    std::sort(pointer.begin(), pointer.end(), LessDereference());
 
-    //    vnl_vector_fixed<double,N*N> alpha;
-    //    vnl_vector_fixed<double,N*N> beta;
-    //    for (int i=0; i<N*N; i++) {
-    //      alpha(i) = *pointer[i];
-    //      beta(i)  = *(P.data_block()+(pointer[i]-start));
-    //    }
+    vnl_vector_fixed<double,N*N> alpha;
+    vnl_vector_fixed<double,N*N> beta;
+    for (int i=0; i<N*N; i++) {
+      alpha(i) = *pointer[i];
+      beta(i)  = *(P.data_block()+(pointer[i]-start));
+    }
 
-    //    double nfac = sqrt(beta(N*N-1));
-    //    beta = beta / (nfac*nfac);
-    //    Q = Q / nfac;
+    double nfac = sqrt(beta(N*N-1));
+    beta = beta / (nfac*nfac);
+    Q = Q / nfac;
 
-    //    double sum = 0;
-    //    for(int i=0; i<N; i++)
-    //    {
-    //      sum += Q(0,i);
-    //    }
-    //    // if left to default 0
-    //    // then mean is not substracted in order to correct odf integral
-    //    // this->m_Meanval_sq = (sum*sum)/N;
+    double sum = 0;
+    for(int i=0; i<N; i++)
+    {
+      sum += Q(0,i);
+    }
+    // if left to default 0
+    // then mean is not substracted in order to correct odf integral
+    // this->m_Meanval_sq = (sum*sum)/N;
 
-    //    vnl_vector_fixed<double,N*N> alpha_0;
-    //    vnl_vector_fixed<double,N*N> alpha_2;
-    //    vnl_vector_fixed<double,N*N> alpha_4;
-    //    vnl_vector_fixed<double,N*N> alpha_6;
-    //    for(int i=0; i<N*N; i++)
-    //    {
-    //      alpha_0(i) = 1;
-    //      alpha_2(i) = alpha(i)*alpha(i);
-    //      alpha_4(i) = alpha_2(i)*alpha_2(i);
-    //      alpha_6(i) = alpha_4(i)*alpha_2(i);
-    //    }
+    vnl_vector_fixed<double,N*N> alpha_0;
+    vnl_vector_fixed<double,N*N> alpha_2;
+    vnl_vector_fixed<double,N*N> alpha_4;
+    vnl_vector_fixed<double,N*N> alpha_6;
+    for(int i=0; i<N*N; i++)
+    {
+      alpha_0(i) = 1;
+      alpha_2(i) = alpha(i)*alpha(i);
+      alpha_4(i) = alpha_2(i)*alpha_2(i);
+      alpha_6(i) = alpha_4(i)*alpha_2(i);
+    }
 
-    //    vnl_matrix_fixed<double, N*N, 4> T;
-    //    T.set_column(0,alpha_0);
-    //    T.set_column(1,alpha_2);
-    //    T.set_column(2,alpha_4);
-    //    T.set_column(3,alpha_6);
+    vnl_matrix_fixed<double, N*N, 4> T;
+    T.set_column(0,alpha_0);
+    T.set_column(1,alpha_2);
+    T.set_column(2,alpha_4);
+    T.set_column(3,alpha_6);
 
-    //    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
+    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
 
-    //    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
+    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
 
     BESSEL_APPROXCOEFF = new float[4];
 
-    //    BESSEL_APPROXCOEFF[0] = coeff(0);
-    //    BESSEL_APPROXCOEFF[1] = coeff(1);
-    //    BESSEL_APPROXCOEFF[2] = coeff(2);
-    //    BESSEL_APPROXCOEFF[3] = coeff(3);
-    BESSEL_APPROXCOEFF[0] = -0.1714;
-    BESSEL_APPROXCOEFF[1] = 0.5332;
-    BESSEL_APPROXCOEFF[2] = -1.4889;
-    BESSEL_APPROXCOEFF[3] = 2.0389;
+    BESSEL_APPROXCOEFF[0] = coeff(0);
+    BESSEL_APPROXCOEFF[1] = coeff(1);
+    BESSEL_APPROXCOEFF[2] = coeff(2);
+    BESSEL_APPROXCOEFF[3] = coeff(3);
+//    BESSEL_APPROXCOEFF[0] = -0.1714;
+//    BESSEL_APPROXCOEFF[1] = 0.5332;
+//    BESSEL_APPROXCOEFF[2] = -1.4889;
+//    BESSEL_APPROXCOEFF[3] = 2.0389;
 }
 
 // build fibers from tracking result

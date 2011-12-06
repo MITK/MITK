@@ -235,8 +235,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
         // Determine if we should draw the area covered by the thick slicing, default is false.
         // This will also show the area of slices that do not have thick slice mode enabled
-        bool showAreaOfThickSlicing = true;
-        showAreaOfThickSlicing &= dataNodeOfInputPlaneGeometry->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
+        bool showAreaOfThickSlicing = false;
+        dataNodeOfInputPlaneGeometry->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
 
         // get the normal of the inputPlaneGeometry
         Vector3D normal = inputPlaneGeometry->GetNormal();

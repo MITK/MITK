@@ -794,11 +794,13 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
     if(num==0)
     {
       m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
     }
     else
     {
       m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
       m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( num > 1 ) );
     }
     m_TSLabel->setText(QString::number(num*2+1));
     m_Renderer->SendUpdateSlice();

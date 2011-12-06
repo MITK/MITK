@@ -152,6 +152,7 @@ private:
   friend class ItkImageFileReader;
 
   friend class NrrdTbssImageReader;
+  friend class NrrdTbssRoiImageReader;
 
   template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
     friend PixelType MakePixelType();

@@ -61,7 +61,6 @@ public:
 
   virtual void Paint( BaseRenderer *renderer );
 
-
   virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 
   /** Applies properties specific to this mapper */
@@ -74,6 +73,34 @@ protected:
   virtual ~Geometry2DDataMapper2D();
 
   virtual void GenerateData();
+
+  /**
+  * \brief Returns the thick slice mode for the given datanode.
+  * 
+  * This method returns the value of the 'reslice.thickslices' property for 
+  * the given datanode. 
+  *   '0': thick slice mode disabled
+  *   '1': thick slice mode enabled
+  *   
+  * The variable 'thickSlicesNum' contains the value of the 'reslice.thickslices.num' 
+  * property that defines how many slices are shown at once.
+  */
+  int DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum );
+
+  /**
+  * \brief Determines the cross position of two lines and stores them as parametric coordinates
+  * 
+  * This method determines the parametric position at which a line 'otherLine' crosses another line
+  * 'mainLine'. The result is stored in 'crossPositions'.
+  */
+  void DetermineParametricCrossPositions( Line<ScalarType,2> &mainLine, Line<ScalarType,2> &otherLine, std::vector<ScalarType> &crossPositions );
+
+  void DrawLine( BaseRenderer * renderer, ScalarType lengthInDisplayUnits, 
+                 Line< ScalarType, 2 > &line, std::vector< ScalarType > &gapPositions,
+                 const PlaneGeometry * inputPlaneGeometry, bool drawDashed,
+                 ScalarType gapSizeInPixel
+                 );
+
 
   void DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
                             const PlaneGeometry *planeGeometry, 

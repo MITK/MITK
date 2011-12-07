@@ -1,7 +1,7 @@
 #ifndef __itkShortestPathNode_h_
 #define __itkShortestPathNode_h_
 
-#include "mitkGraphAlgorithmsExports.h" 
+#include "MitkGraphAlgorithmsExports.h"
 
 namespace itk 
 {

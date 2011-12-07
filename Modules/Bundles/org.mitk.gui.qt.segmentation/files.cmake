@@ -9,11 +9,13 @@ SET(INTERNAL_CPP_FILES
   QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
   QmitkStatisticsAction.cpp
-  QmitkAutocropAction.cpp  
+  QmitkAutocropAction.cpp
+  QmitkDeformableClippingPlaneView.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkSegmentationControls.ui
+  src/internal/QmitkDeformableClippingPlaneViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -25,10 +27,12 @@ SET(MOC_H_FILES
   src/internal/QmitkCreatePolygonModelAction.h
   src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
+  src/internal/QmitkDeformableClippingPlaneView.h
 )
 
 SET(CACHED_RESOURCE_FILES
   resources/segmentation.png
+  resources/deformablePlane.png
   plugin.xml
 )
 

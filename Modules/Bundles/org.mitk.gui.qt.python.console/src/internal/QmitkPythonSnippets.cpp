@@ -263,6 +263,7 @@ void QmitkPythonSnippets::on_PasteNow_clicked()
   QString name = m_Controls->Name->currentText();
   QString snippet = QString::fromStdString(m_Snippets[name.toStdString()]);
   QmitkPythonMediator::getInstance()->paste( snippet );
+  QmitkPythonMediator::getInstance()->update();
 }
 
 void QmitkPythonSnippets::on_Content_textChanged()

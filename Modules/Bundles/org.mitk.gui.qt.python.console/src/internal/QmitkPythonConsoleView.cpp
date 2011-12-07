@@ -163,7 +163,7 @@ void QmitkPythonConsoleView::OpenEditor()
 void QmitkPythonConsoleView::SetCommandHistory(const QString& command)
 {
   QmitkPythonMediator::getInstance()->SetCommandHistory(command);
-  QmitkPythonMediator::getInstance()->update();
+//  QmitkPythonMediator::getInstance()->update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

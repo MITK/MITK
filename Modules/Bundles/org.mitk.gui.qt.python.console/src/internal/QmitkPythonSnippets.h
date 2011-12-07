@@ -79,15 +79,17 @@ protected slots:
   void on_AddNewSnippet_clicked();
   void on_RemoveSnippet_clicked();
   void on_PasteNow_clicked();
+  void on_RestoreDefaultSnippets_clicked();
   void on_Content_textChanged();
 
 protected:
+  void Update();
   void CreateUniqueName( QString& name );
   QmitkStdMultiWidget* m_MultiWidget;
   QTableWidget *m_tableWidget;
   Ui::QmitkPythonSnippets* m_Controls;
   std::map<std::string, std::string> m_Snippets;
-  QString m_CurrentName;
+  QString m_NameToSelect;
 };
 
 

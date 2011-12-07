@@ -69,6 +69,7 @@ void QmitkPythonVariableStack::CreateQtPartControl(QWidget *parent)
   mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(
       this->GetActiveStdMultiWidget()->GetRenderWindow4()->GetVtkRenderWindow() );
   mitk::RendererAccess::Set3DRenderer( renderer->GetVtkRenderer() );
+  m_treeModel->update();
 }
 
 QmitkPythonVariableStackTreeWidget* QmitkPythonVariableStack::getModel()

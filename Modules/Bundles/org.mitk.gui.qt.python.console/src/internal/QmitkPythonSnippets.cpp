@@ -45,9 +45,29 @@ std::map<std::string, std::string> QmitkPythonSnippets::CreateDefaultSnippets()
 {
   std::map<std::string, std::string> defaultSnippets;
 
-  defaultSnippets["Cast mitk to itk image"] =
-      "itk.Image itkImage;"
-      "mitk.ImageCaster.Cast(mitkImage, itkImage);";
+  defaultSnippets["itk image processing"] =
+      "import itk\n"
+      "import mitkCast\n\n"
+      "print 'using ITK ' + itk.Version.GetITKVersion()\n"
+      "itkImage = mitkCast.node2itk( Pic3D, itk.Image.US3 )\n"
+      "kernel = itk.strel( 3, 3 )\n"
+      "filter  = itk.GrayscaleDilateImageFilter[itkImage,itkImage,kernel].New( itkImage, Kernel=kernel )\n"
+      "filter.Update()\n"
+      "Pic3DFiltered = mitkCast.itk2node( filter.GetOutput(), 'Pic3DFiltered' )\n";
+
+  defaultSnippets["itk batch image processing"] =
+      "import itk\n"
+      "import mitkCast\n\n"
+      "print 'using ITK ' + itk.Version.GetITKVersion()\n"
+      "itkImage = mitkcast.node2itk( Pic3D, itk.Image.US3 )\n"
+      "for s in range(5):\n"
+        "kernel = itk.strel( 3, s+1 )\n"
+        "filter  = itk.GrayscaleDilateImageFilter[itkImage,itkImage,kernel].New( itkImage, Kernel=kernel )\n"
+        "filter.Update()\n"
+        "exec( \"newnode_\" + str(s+1) + \" = mitkcast.itk2node( filter.GetOutput(), 'demo_\" + str(s+1) + \"')\" )\n";
+
+  defaultSnippets["Import itk and vtk"] =
+      "import itk, vtk";
 
   return defaultSnippets;
 }
@@ -73,8 +93,10 @@ QmitkPythonSnippets::~QmitkPythonSnippets()
   node->Clear();
   while( it != m_Snippets.end() )
   {
-//    std::cout << "adding " << it->first << std::endl;
-    node->Put( it->first, it->second );
+    QString snippet = QString::fromStdString(it->second);
+    snippet = snippet.replace("\n", "<br />");
+//    std::cout << "adding " << it->first << ": " << snippet.toStdString() << std::endl;
+    node->Put( it->first, snippet.toStdString() );
     ++it;
   }
   node->Flush();
@@ -107,27 +129,26 @@ void QmitkPythonSnippets::CreateQtPartControl(QWidget *parent)
     std::string snippet;
     for( size_t i = 0; i < keys.size(); ++i)
     {
+//      std::cout << "inserting " << keys.at(i) << std::endl;
       snippet = node->Get( keys.at(i), "" );
-      m_Snippets[keys.at(i)] = snippet;
+      QString qsnippet = QString::fromStdString(snippet);
+      qsnippet = qsnippet.replace("<br />", "\n");
+//      std::cout << "inserting " << keys.at(i) << ": " << qsnippet.toStdString() << std::endl;
+      m_Snippets[keys.at(i)] = qsnippet.toStdString();
     }
   }
 
-  connect( m_Controls->Name, SIGNAL(currentIndexChanged(int)), this, SLOT(on_Name_currentIndexChanged(int)) );
-  std::map<std::string, std::string>::iterator it
-      = m_Snippets.begin();
+  this->Update();
 
-  while( it != m_Snippets.end() )
-  {
-    m_Controls->Name->addItem( QString::fromStdString( it->first ) );
-    ++it;
-  }
-  m_Controls->Name->setCurrentIndex( m_Controls->Name->count()-1 );
+  connect( m_Controls->Name, SIGNAL(currentIndexChanged(int)), this, SLOT(on_Name_currentIndexChanged(int)) );
   connect( m_Controls->AddNewSnippet, SIGNAL(clicked()), this, SLOT(on_AddNewSnippet_clicked()) );
   connect( m_Controls->RemoveSnippet, SIGNAL(clicked()), this, SLOT(on_RemoveSnippet_clicked()) );
   connect( m_Controls->PasteNow, SIGNAL(clicked()), this, SLOT(on_PasteNow_clicked()) );
   connect( m_Controls->Content, SIGNAL(textChanged()), this, SLOT(on_Content_textChanged()) );
   connect( m_Controls->RenameSnippet, SIGNAL(clicked()),
            this, SLOT(on_RenameSnippet_clicked()) );
+  connect( m_Controls->RestoreDefaultSnippets, SIGNAL(clicked()),
+           this, SLOT(on_RestoreDefaultSnippets_clicked()) );
 }
 
 void QmitkPythonSnippets::SetFocus ()
@@ -166,7 +187,6 @@ void QmitkPythonSnippets::on_Name_currentIndexChanged(int i)
     return;
   QString name = m_Controls->Name->currentText();
   m_Controls->Content->setText( QString::fromStdString(m_Snippets[name.toStdString()]) );
-  m_CurrentName = name;
 }
 
 void QmitkPythonSnippets::CreateUniqueName( QString& name )
@@ -180,14 +200,35 @@ void QmitkPythonSnippets::CreateUniqueName( QString& name )
   }
 }
 
+void QmitkPythonSnippets::on_RestoreDefaultSnippets_clicked()
+{
+  QString question = QString("Really restore default Snippets?");
+  int remove = QMessageBox::question( QApplication::topLevelWidgets().at(0),
+                                      QString("Confirm restoring"),
+                                      question,
+                                      QMessageBox::Yes | QMessageBox::No,
+                                      QMessageBox::No );
+  if( remove == QMessageBox::Yes || remove == QMessageBox::Ok )
+  {
+    std::map<std::string, std::string>::const_iterator it
+        = DEFAULT_SNIPPETS.begin();
+    while( it != DEFAULT_SNIPPETS.end() )
+    {
+      m_Snippets[it->first] = it->second;
+      ++it;
+    }
+    this->Update();
+  }
+
+}
+
 void QmitkPythonSnippets::on_AddNewSnippet_clicked()
 {
   QString name = "newSnippet";
   CreateUniqueName(name);
   m_Snippets[name.toStdString()] = "";
-  m_Controls->Name->insertItem( m_Controls->Name->count(), name );
-  m_Controls->Name->setCurrentIndex( m_Controls->Name->count()-1 );
-  this->on_RenameSnippet_clicked();
+  m_NameToSelect = name;
+  this->Update();
 }
 
 void QmitkPythonSnippets::on_RemoveSnippet_clicked()
@@ -210,8 +251,7 @@ void QmitkPythonSnippets::on_RemoveSnippet_clicked()
 //      std::cout << "removing " << it->first << std::endl;
       m_Snippets.erase(it);
     }
-    m_Controls->Content->setText("");
-    m_Controls->Name->removeItem( m_Controls->Name->currentIndex() );
+    this->Update();
   }
 }
 
@@ -249,8 +289,9 @@ void QmitkPythonSnippets::on_RenameSnippet_clicked()
   {
     newName = QInputDialog::getText( QApplication::topLevelWidgets().at(0),
                                            "Name the Snippet", "Name:", QLineEdit::Normal,
-                                           m_CurrentName, &repeat );
-    if( newName != m_CurrentName )
+                                           m_NameToSelect, &repeat );
+
+    if( newName != m_Controls->Name->currentText() )
     {
       repeat = m_Snippets.find(newName.toStdString()) != m_Snippets.end()
           || newName.isEmpty();
@@ -266,14 +307,55 @@ void QmitkPythonSnippets::on_RenameSnippet_clicked()
 
 
   // name changed
-  if( newName != m_CurrentName )
+  if( newName != m_Controls->Name->currentText() )
   {
     std::map<std::string, std::string>::iterator it
-        = m_Snippets.find( m_CurrentName.toStdString() );
+        = m_Snippets.find( m_NameToSelect.toStdString() );
     std::string snippet = it->second;
     m_Snippets.erase(it);
     m_Snippets[newName.toStdString()] = snippet;
-    m_CurrentName = newName;
-    m_Controls->Name->setItemText( m_Controls->Name->currentIndex(), newName );
+    m_NameToSelect = newName;
+    this->Update();
   }
+}
+
+void QmitkPythonSnippets::Update()
+{
+  if( m_NameToSelect.isEmpty() )
+  {
+    QString name = m_Controls->Name->currentText();
+    m_NameToSelect = name;
+  }
+
+  m_Controls->Name->clear();
+  std::map<std::string, std::string>::iterator it
+      = m_Snippets.begin();
+
+  while( it != m_Snippets.end() )
+  {
+    m_Controls->Name->addItem( QString::fromStdString( it->first ) );
+    ++it;
+  }
+
+  // reselect previous or last one if there are elements or nothing if there are no snippets
+  std::string current = m_NameToSelect.toStdString();
+  int index = -1;
+  if( m_Snippets.find(current) != m_Snippets.end() )
+  {
+    index = m_Controls->Name->findText( m_NameToSelect );
+  }
+  else if( m_Snippets.size() > 0 )
+  {
+    index = m_Controls->Name->count()-1;
+  }
+
+  if( index >= 0 )
+  {
+    m_Controls->Name->setCurrentIndex(index);
+    current = m_Controls->Name->itemText( index ).toStdString();
+    m_Controls->Content->setPlainText( QString::fromStdString(m_Snippets[current]) );
+  }
+
+  // clear the current name
+  m_NameToSelect.clear();
 }

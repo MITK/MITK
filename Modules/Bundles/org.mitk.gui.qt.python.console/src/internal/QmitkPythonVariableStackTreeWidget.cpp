@@ -216,5 +216,6 @@ Qt::DropActions QmitkPythonVariableStackTreeWidget::supportedDragActions() const
 
 void QmitkPythonVariableStackTreeWidget::update()
 {
+//  std::cout << "QmitkPythonVariableStackTreeWidget::update()" << std::endl;
   setVariableStack(QmitkPythonMediator::getAttributeList());
 }

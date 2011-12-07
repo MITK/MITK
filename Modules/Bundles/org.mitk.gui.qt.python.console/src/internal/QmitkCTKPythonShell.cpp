@@ -76,4 +76,6 @@ bool QmitkCTKPythonShell::canInsertFromMimeData( const QMimeData *source ) const
 void QmitkCTKPythonShell::executeCommand(const QString& command)
 {
   emit this->executeCommandSignal(command);
+  ctkPythonConsole::executeCommand(command);
+  QmitkPythonMediator::getInstance()->update();
 }

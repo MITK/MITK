@@ -13,6 +13,8 @@ IF(MITK_USE_CTK)
   SET(proj_DEPENDENCIES )
   SET(CTK_DEPENDS ${proj})
 
+
+
   IF(NOT DEFINED CTK_DIR)
     
     SET(revision_tag 107ffad7)
@@ -21,6 +23,12 @@ IF(MITK_USE_CTK)
     ENDIF()
     
     SET(ctk_optional_cache_args )
+    IF(MITK_USE_Python)
+	  LIST(APPEND ctk_optional_cache_args
+	       -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
+	      )
+    ENDIF()
+
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})

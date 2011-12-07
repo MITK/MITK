@@ -42,6 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkPythonVariableStack.h"
 #include "QmitkPythonCommandHistory.h"
+#include "mitkPythonPath.h"
 
 
 const std::string QmitkPythonConsoleView::VIEW_ID = "org.mitk.views.pythonconsole"; 
@@ -52,7 +53,33 @@ QmitkPythonConsoleView::QmitkPythonConsoleView()
 , m_MultiWidget( NULL )
 ,m_ctkPythonManager( NULL )
 ,m_ctkPythonShell( NULL )
-{
+{  
+  // TODO: take it to the activator
+//  std::cout << "running PYTHON PATH COMMANDS" << std::endl;
+
+  QmitkPythonMediator::getInstance()->runSimpleString("import sys");
+
+  std::string cmd ( "sys.path.append('" MITK_PYTHONPATH_MITK_LIBRARY_DIRS "');" );
+  QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+
+  cmd = "sys.path.append('" MITK_PYTHONPATH_ITK_LIBRARY_DIRS "');";
+  QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+
+  cmd = "sys.path.append('" MITK_PYTHONPATH_WRAP_ITK_DIR "');";
+  QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+
+  cmd = "sys.path.append('" MITK_PYTHONPATH_VTK_LIBRARY_DIRS "');";
+  QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+
+  cmd = "sys.path.append('" MITK_PYTHONPATH_VTK_PYTHON_WRAPPING_DIR "');";
+  QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+
+  if( strcmp("", MITK_PYTHONPATH_OPEN_CV_LIBRARY_DIRS) != 0 )
+  {
+//    std::cout << "setting opencv PYTHON PATH" << std::endl;
+    cmd = "sys.path.append('" MITK_PYTHONPATH_OPEN_CV_LIBRARY_DIRS "');";
+    QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
+  }
 }
 
 QmitkPythonConsoleView::~QmitkPythonConsoleView()
@@ -88,7 +115,8 @@ void QmitkPythonConsoleView::CreateQtPartControl( QWidget *parent )
     QmitkPythonMediator::getInstance()->setClient(this);
     QmitkPythonMediator::getInstance()->update();
 
-    connect( m_ctkPythonShell, SIGNAL(executedCommand(const QString&)), this, SLOT(SetCommandHistory(const QString&)));
+    connect( m_ctkPythonShell, SIGNAL(executeCommandSignal(const QString&)),
+             this, SLOT(SetCommandHistory(const QString&)));
     connect( m_ButtonOpenEditor, SIGNAL(clicked()), this, SLOT(OpenEditor()) );
 }
 
@@ -135,7 +163,7 @@ void QmitkPythonConsoleView::OpenEditor()
 void QmitkPythonConsoleView::SetCommandHistory(const QString& command)
 {
   QmitkPythonMediator::getInstance()->SetCommandHistory(command);
-  QmitkPythonMediator::getInstance()->update();
+//  QmitkPythonMediator::getInstance()->update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

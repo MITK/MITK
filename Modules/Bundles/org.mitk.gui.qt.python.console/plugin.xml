@@ -17,6 +17,13 @@
   </extension>
 
   <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pythonsnippets"
+          name="Python Snippets"
+          class="::QmitkPythonSnippets"
+          icon="resources/py.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pythoncommandhistory"
           name="Python Command History"
           class="QmitkPythonCommandHistory"
@@ -35,7 +42,8 @@
   <extension point="org.blueberry.ui.perspectives">
     <perspective name="Python"
         class="QmitkPythonPerspective"
-        id="org.blueberry.ui.articles.perspective.Python">
+        id="org.blueberry.ui.articles.perspective.Python"
+        icon="resources/py.png" >
     </perspective>
   </extension>
 

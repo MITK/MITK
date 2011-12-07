@@ -7,6 +7,10 @@ IF(MITK_USE_BLUEBERRY)
 
   )
 
+  IF(MITK_USE_Python)
+    LIST(APPEND _mitk_bundles_default org.mitk.gui.qt.python.console)
+  ENDIF()
+  
   IF(QT4_FOUND)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.imagenavigator")
 

@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 #include "QmitkPythonMediator.h"
 
-class QmitkPythonScriptEditor : public QWidget//, berry::QtEditorPart
+class QmitkPythonScriptEditor : public QWidget, public QmitkPythonPasteClient //, berry::QtEditorPart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -46,6 +46,7 @@ public:
   static const std::string EDITOR_ID;
 
   QmitkPythonScriptEditor(QWidget *parent = 0);
+  virtual void paste(const QString& command);
   ~QmitkPythonScriptEditor();
 
 signals:

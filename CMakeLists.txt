@@ -124,6 +124,7 @@ option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
   
 mark_as_advanced(MITK_BUILD_ALL_PLUGINS
                  MITK_USE_CTK
@@ -612,8 +613,8 @@ add_subdirectory(Applications)
 
 set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
 set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig)." OFF)
-if(MITK_USE_PYTHON)
+option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
+if(MITK_USE_Python)
   add_subdirectory(Wrapping)
 endif()
 

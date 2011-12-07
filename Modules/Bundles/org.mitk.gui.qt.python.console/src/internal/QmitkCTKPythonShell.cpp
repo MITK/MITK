@@ -38,18 +38,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkCTKPythonShell::QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent)
-: ctkPythonShell(pythonManager)
 {
-  m_PythonManager = pythonManager;
+  this->initialize( pythonManager );
+  m_PythonManager = pythonManager;  
+
+  QmitkPythonMediator::getInstance()->registerPasteCommandClient( this );
 }
 
 QmitkCTKPythonShell::~QmitkCTKPythonShell()
 {
+  QmitkPythonMediator::getInstance()->unregisterPasteCommandClient( this );
 }
 
 void QmitkCTKPythonShell::dragEnterEvent(QDragEnterEvent *event)
 {
   event->accept();
+}
+void QmitkCTKPythonShell::paste(const QString& command)
+{
+  m_PythonManager->executeString( command );
 }
 
 void QmitkCTKPythonShell::dropEvent(QDropEvent *event)
@@ -64,4 +71,11 @@ void QmitkCTKPythonShell::dropEvent(QDropEvent *event)
 bool QmitkCTKPythonShell::canInsertFromMimeData( const QMimeData *source ) const
 {
   return true;
+}
+
+void QmitkCTKPythonShell::executeCommand(const QString& command)
+{
+  emit this->executeCommandSignal(command);
+  ctkPythonConsole::executeCommand(command);
+  QmitkPythonMediator::getInstance()->update();
 }

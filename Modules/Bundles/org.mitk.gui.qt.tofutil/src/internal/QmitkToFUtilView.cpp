@@ -112,6 +112,9 @@ void QmitkToFUtilView::Activated()
   m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SliceLockedOn();
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOn();
+  m_MultiWidget->ResetCrosshair();
+  mitk::RenderingManager::GetInstance()->InitializeViews();
+  
 
   this->UseToFVisibilitySettings(true);
 
@@ -134,11 +137,11 @@ void QmitkToFUtilView::Deactivated()
   m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SliceLockedOff();
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOff();
+  m_MultiWidget->ResetCrosshair();
 
   this->UseToFVisibilitySettings(false);
 
   mitk::RenderingManager::GetInstance()->InitializeViews();
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   QmitkFunctionality::Deactivated();
 }
 

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.qballreconstruction"
+          name="Q-Balls"
+          icon="resources/reconodf.png"
+          class="QmitkQBallReconstructionView" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusiondicomimport"
+          name="DICOM Import"
+          class="QmitkDiffusionDicomImport"
+          icon="resources/dwiimport.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusionpreprocessing"
+          name="Preprocessing"
+          class="QmitkPreprocessingView"
+          icon="resources/preprocessing.png" />
+  </extension>
+
+    <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusionquantification"
+          name="Quantification"
+          class="QmitkDiffusionQuantificationView"
+          icon="resources/quantification.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.tensorreconstruction"
+          name="Tensors"
+          icon="resources/recontensor.png"
+          class="QmitkTensorReconstructionView" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.controlvisualizationpropertiesview"
+          name="Visualization"
+          icon="resources/vizControls.png"
+          class="QmitkControlVisualizationPropertiesView" />
+  </extension>
+
+   <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.ivim"
+          name="IVIM"
+          class="QmitkIVIMView"
+          icon="resources/IVIM_48.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.perspectives.publicdiffusionimaging"
+                 name="Diffusion Imaging Public"
+                 class="QmitkDiffusionImagingPublicPerspective"
+                 icon="resources/reconodf.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.odfdetails"
+          name="ODF Details"
+          class="QmitkODFDetailsView"
+          icon="resources/OdfDetails.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.gibbstracking"
+          name="Gibbs Tracking"
+          class="QmitkGibbsTrackingView"
+          icon="resources/GibbsTracking.png" />
+  </extension>
+
+     <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.stochasticfibertracking"
+          name="Stochastic Tracking"
+          class="QmitkStochasticFiberTrackingView"
+          icon="resources/stochFB.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fiberprocessing"
+          name="Fiber Processing"
+          class="QmitkFiberProcessingView"
+          icon="resources/FiberBundleOperations.png" />
+  </extension>
+
+    <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fiberbundledeveloper"
+          name="FiberDevTool"
+          class="QmitkFiberBundleDeveloperView"
+          icon="resources/FiberBundleOperations.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.partialvolumeanalysisview"
+          name="PV Analysis"
+          class="QmitkPartialVolumeAnalysisView"
+          icon="resources/PartialVolumeAnalysis_24.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.screenshotmaker"
+          name="Screenshot Maker"
+          class="QmitkScreenshotMaker"
+          icon="resources/screenshot_maker.png" />
+  </extension>
+
+</plugin>

@@ -209,6 +209,6 @@ namespace itk
 } // end of namespace itk
 
 
-#include "itkShortestPathImageFilter.cpp"
+#include "itkShortestPathImageFilter.txx"
 
 #endif

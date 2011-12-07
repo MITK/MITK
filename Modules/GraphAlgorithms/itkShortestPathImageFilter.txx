@@ -1,4 +1,3 @@
-#include "itkShortestPathImageFilter.h"
 #include "time.h"
 #include "mitkMemoryUtilities.h"
 #include <iostream>

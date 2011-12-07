@@ -1,9 +1,8 @@
 #ifndef __itkShortestPathCostFunctionTbss_cpp
 #define __itkShortestPathCostFunctionTbss_cpp
 
-#include "itkShortestPathCostFunctionTbss.h"
-#include <limits>
 
+#include <limits>
 
 
 namespace itk

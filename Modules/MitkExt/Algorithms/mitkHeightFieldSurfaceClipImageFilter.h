@@ -48,12 +48,18 @@ namespace mitk {
 class MitkExt_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
 {
 public:
+
+    typedef std::vector<mitk::Surface*> ClippingPlaneList;
+
   mitkClassMacro(HeightFieldSurfaceClipImageFilter, ImageToImageFilter);
 
   itkNewMacro(Self);
 
   /** \brief Set/Get the surface defining a height field as a triangle mesh */
   void SetClippingSurface( Surface *clippingSurface );
+
+  /** \brief Set/Get the surfaces defining a height field as a triangle mesh */
+  void SetClippingSurfaces( ClippingPlaneList planeList );
 
   /** \brief Set/Get the surface defining a height field as a triangle mesh */
   const Surface *GetClippingSurface() const;
@@ -62,6 +68,7 @@ public:
   {
     CLIPPING_MODE_CONSTANT = 0,
     CLIPPING_MODE_MULTIPLYBYFACTOR,
+    CLIPPING_MODE_MULTIPLANE
   };
 
   /** \brief Specifies whether clipped part of the image shall be replaced
@@ -79,6 +86,9 @@ public:
   /** \brief Specifies whether clipped part of the image shall be replaced
   * by a constant or multiplied by a user-set factor */
   void SetClippingModeToMultiplyByFactor();
+
+
+  void SetClippingModeToMultiPlaneValue();
 
   /** \brief Set/Get constant gray-value for clipping in CONSTANT mode */
   itkSetMacro( ClippingConstant, ScalarType );
@@ -129,6 +139,7 @@ protected:
   
   ScalarType m_ClippingConstant;
   ScalarType m_MultiplicationFactor;
+  unsigned m_MultiPlaneValue;
 
   unsigned int m_HeightFieldResolutionX;
   unsigned int m_HeightFieldResolutionY;

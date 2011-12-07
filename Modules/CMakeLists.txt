@@ -23,6 +23,7 @@ SET(module_dirs
     ToFHardware
     ToFProcessing
     ToFUI
+	ClippingTools
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

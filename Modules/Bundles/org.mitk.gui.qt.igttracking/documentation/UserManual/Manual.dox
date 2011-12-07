@@ -1,0 +1,15 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.igttracking} Igttracking
+
+This bundle offers basic tracking functionalities. This includes connecting to a tracking system, logging and recording of tracking data, managing tracking tools and playing recorded tracking data.
+
+The bundle includes different views, which are described in different pages in detail:
+
+<ul>
+<li> Tracking Toolbox: Allows for connecting to a tracking system and logging/recording of the tracked data.
+<li> Navigation Tool Manager: This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
+<li> Navigation Data Player: Plays navigation data which was recorded with the Tracking Toolbox for example.
+</ul>
+
+*/
+

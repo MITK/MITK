@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org_navigationdataplayer} NavigationData Player
 
-\image html icon.png "Icon of NavigationData Player"
+\image html iconNavigationDataPlayer.png "Icon of NavigationData Player"
 
 Available sections:
   - \ref NavigationDataPlayerOverview

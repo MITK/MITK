@@ -2,7 +2,7 @@
 
 \bundlemainpage{org_igttrackingtoolbox} The MITK-IGT Tracking Toolbox
 
-\image html icon.png "Icon of the module"
+\image html iconTrackingToolbox.png "Icon of the module"
 
 Available sections:
   - \ref QmitkMITKIGTTrackingToolboxIntroduction

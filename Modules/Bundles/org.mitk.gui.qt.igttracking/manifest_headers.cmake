@@ -1,5 +1,5 @@
-set(Plugin-Name "MITK-IGT Navigation Tool Manager")
+set(Plugin-Name "IGT Tracking")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
-set(Plugin-ContactAddress "http://www.mitk.org")
+set(Plugin-ContactAddress "")
 set(Require-Plugin org.mitk.gui.qt.common)

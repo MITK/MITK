@@ -4,6 +4,7 @@
 #include "QmitkPythonVariableStack.h"
 #include "QmitkPythonCommandHistory.h"
 #include "QmitkPythonEditor.h"
+#include "QmitkPythonSnippets.h"
 #include "QmitkPythonPerspective.h"
 
 #include <QtPlugin>
@@ -16,6 +17,7 @@ namespace mitk {
     BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonVariableStack, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonCommandHistory, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonEditor, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonSnippets, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonPerspective, context)
   }
 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.colourimageprocessing"
+          name="Colour Image Processing"
+          class="QmitkColourImageProcessingView" 
+          icon="resources/ColorImageProcessing.png" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view
+      id="org.mitk.views.isosurface"
+      name="IsoSurface"
+      category="org.mitk.views.general"
+      icon="resources/isoSurface.xpm"
+      class="QmitkIsoSurface" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view
+      id="org.mitk.views.regiongrowing"
+      name="RegionGrowing"
+      category="org.mitk.views.general"
+      icon="resources/regiongrowing.xpm"
+      class="QmitkRegionGrowingView" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <category 
+      id="org.mitk.views.general" 
+      name="MITK General"/> 
+    <view 
+      id="org.mitk.views.simplemeasurement" 
+      name="SimpleMeasurement" 
+      category="org.mitk.views.general" 
+      icon="resources/SimpleMeasurement.png"
+      class="QmitkSimpleMeasurement" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.simpleexample"
+          name="Simple Example"
+          class="QmitkSimpleExampleView"
+          icon="resources/SimpleExample.png" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.viewinitialization"
+          name="ViewInitialization"
+          class="QmitkViewInitializationView" 
+          icon="resources/viewInitializationIcon.xpm"/>
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.volumetry"
+          name="Volumetry"
+          class="QmitkVolumetryView" 
+          icon="resources/volumetryIcon.xpm" />
+  </extension>
+
+</plugin>

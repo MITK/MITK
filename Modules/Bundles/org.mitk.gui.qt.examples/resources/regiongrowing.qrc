@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/regiongrowing">
+     <file>regiongrowing.xpm</file>
+ </qresource>
+ </RCC>

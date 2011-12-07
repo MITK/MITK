@@ -3,6 +3,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.core.jobs:OFF
   org.mitk.planarfigure:ON
   org.mitk.diffusionimaging:OFF
+  org.mitk.gui.qt.examples:OFF
   org.mitk.gui.qt.ext:ON
   org.mitk.gui.qt.extapplication:ON
   org.mitk.gui.qt.datamanager:ON
@@ -14,11 +15,9 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.igttoolpairnavigation:OFF
   org.mitk.gui.qt.igttrackinglab:OFF
   org.mitk.gui.qt.igttrackingtoolbox:OFF
-  org.mitk.gui.qt.regiongrowing:OFF
   org.mitk.gui.qt.navigationdataplayer:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.igttutorial:OFF
-  org.mitk.gui.qt.colourimageprocessing:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.imagenavigator:ON
@@ -26,15 +25,11 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.deformableregistration:OFF
   org.mitk.gui.qt.rigidregistration:OFF
   org.mitk.gui.qt.imagestatistics:OFF
-  org.mitk.gui.qt.volumetry:OFF
   org.mitk.gui.qt.materialeditor:OFF
-  org.mitk.gui.qt.simpleexample:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.measurement:OFF
-  org.mitk.gui.qt.simplemeasurement:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.pointbasedregistration:OFF
-  org.mitk.gui.qt.viewinitialization:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.videoplayer:OFF

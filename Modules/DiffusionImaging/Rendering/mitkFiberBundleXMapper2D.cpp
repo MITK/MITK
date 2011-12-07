@@ -169,14 +169,15 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
 
 
-///THIS GET INPUT
+    ///THIS GET INPUT
     mitk::FiberBundleX* fbx = this->GetInput();
     
     vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
     lut->Build();
     localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
-    //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
-    localStorage->m_PointMapper->SelectColorArray("ColorValues");
+
+    localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding() );
+
     localStorage->m_PointMapper->SetLookupTable(lut);  //apply the properties after the slice was set
 
 

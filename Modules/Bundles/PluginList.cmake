@@ -23,8 +23,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.moviemaker:OFF
-  org.mitk.gui.qt.deformableregistration:OFF
-  org.mitk.gui.qt.rigidregistration:OFF
   org.mitk.gui.qt.imagestatistics:OFF
   org.mitk.gui.qt.volumetry:OFF
   org.mitk.gui.qt.materialeditor:OFF
@@ -33,10 +31,10 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.measurement:OFF
   org.mitk.gui.qt.simplemeasurement:OFF
   org.mitk.gui.qt.imagecropper:OFF
-  org.mitk.gui.qt.pointbasedregistration:OFF
   org.mitk.gui.qt.viewinitialization:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.videoplayer:OFF
   org.mitk.gui.qt.python.console:OFF
+  org.mitk.gui.qt.registration:OFF
   )

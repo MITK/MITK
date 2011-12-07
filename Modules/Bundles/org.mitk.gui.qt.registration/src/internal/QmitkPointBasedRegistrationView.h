@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "QmitkMessageBoxHelper.h"
 #include "ui_QmitkPointBasedRegistrationViewControls.h"
 
-#include <org_mitk_gui_qt_pointbasedregistration_Export.h>
+#include <org_mitk_gui_qt_registration_Export.h>
 
 /*!
 \brief The PointBasedRegistration functionality is used to perform point based registration.
@@ -51,7 +51,7 @@ For more informations see: \ref QmitkPointBasedRegistrationUserManual
 \ingroup PointBasedRegistration
 */
 
-class POINTBASEDREGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkFunctionality
+class REGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkFunctionality
 {
 
   friend struct SelListenerPointBasedRegistration;

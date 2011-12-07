@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
 #include "qobject.h"
-#include <org_mitk_gui_qt_rigidregistration_Export.h>
+#include <org_mitk_gui_qt_registration_Export.h>
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationSelectorView : public QWidget
+class REGISTRATION_EXPORT QmitkRigidRegistrationSelectorView : public QWidget
 {
   Q_OBJECT
 

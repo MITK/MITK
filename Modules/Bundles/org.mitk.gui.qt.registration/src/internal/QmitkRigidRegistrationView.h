@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
 
-#include <org_mitk_gui_qt_rigidregistration_Export.h>
+#include <org_mitk_gui_qt_registration_Export.h>
 
 // Time Slider related
 #include <QmitkStepperAdapter.h>
@@ -44,7 +44,7 @@ Registration results will directly be applied to the Moving Image.
 \author Daniel Stein
 */
 
-class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
+class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
 {
 
   friend struct SelListenerRigidRegistration;

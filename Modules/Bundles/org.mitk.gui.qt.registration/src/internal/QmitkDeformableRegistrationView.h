@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "ui_QmitkDeformableRegistrationViewControls.h"
 
-#include <org_mitk_gui_qt_deformableregistration_Export.h>
+#include <org_mitk_gui_qt_registration_Export.h>
 
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
@@ -42,7 +42,7 @@ For more informations see: \ref QmitkDeformableRegistrationUserManual
 \ingroup DeformableRegistration
 */
 
-class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunctionality
+class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunctionality
 {  
 
   friend struct SelListenerDeformableRegistration;

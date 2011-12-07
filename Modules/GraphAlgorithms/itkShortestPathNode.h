@@ -1,13 +1,14 @@
 #ifndef __itkShortestPathNode_h_
 #define __itkShortestPathNode_h_
 
+#include "mitkGraphAlgorithmsExports.h" 
 
 namespace itk 
 {
 	typedef double                 DistanceType; // Type to declare the costs
     typedef unsigned int           NodeNumType;  // Type for Node Numeration: unsignend int for up to 4.2 billion pixel in 32Bit system
 
-	class ShortestPathNode
+	class MitkGraphAlgorithms_EXPORT ShortestPathNode
 	{
 	public: 
       DistanceType distance;      // minimal costs from StartPoint to this pixel

@@ -1,12 +1,11 @@
-#ifndef __itkShortestPathImageFilter_h_
-#define __itkShortestPathImageFilter_h_
+#ifndef __itkShortestPathImageFilter_h
+#define __itkShortestPathImageFilter_h
 
 #include "itkImageToImageFilter.h"
 #include "itkShortestPathCostFunction.h"
 #include "itkShortestPathNode.h"
 #include <itkImageRegionIteratorWithIndex.h>
 
-#include <MitkGraphAlgorithmsExports.h>
 #include <itkMacro.h>
 
 // ------- INFORMATION ----------
@@ -29,9 +28,6 @@
 //
 // EXAMPLE USE
 // pleae see qmitkmitralvalvesegmentation4dtee bundle
-
-
-
 
 
 namespace itk 

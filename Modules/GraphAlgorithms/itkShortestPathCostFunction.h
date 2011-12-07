@@ -5,16 +5,14 @@
 #include "itkObjectFactory.h"
 #include "itkShapedNeighborhoodIterator.h"
 #include <itkImageRegionConstIterator.h>
-
-#include <MitkGraphAlgorithmsExports.h>
-
+ 
 
 namespace itk
 {
 
   // \brief this is a pure virtual superclass for all cost function for the itkShortestPathImageFilter
   template <class TInputImageType>            
-  class MitkGraphAlgorithms_EXPORT ShortestPathCostFunction : public Object
+  class ShortestPathCostFunction : public Object
   {
   public:
 
@@ -25,9 +23,7 @@ namespace itk
     typedef SmartPointer<const Self>  ConstPointer;
     typedef ShapedNeighborhoodIterator< TInputImageType > itkShapedNeighborhoodIteratorType;
 
-
-
-
+	
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunction, Object);
 

@@ -32,10 +32,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 
+#include "QmitkMouseModeSwitcher.h"
+
 const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
- : m_StdMultiWidget(0)
+:m_StdMultiWidget(NULL)
+,m_MouseModeToolbar(NULL)
 {
 
 }
@@ -79,10 +82,21 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     layout->addWidget(m_DndFrameWidget);
     layout->setContentsMargins(0,0,0,0); 
 
-    m_StdMultiWidget = new QmitkStdMultiWidget(m_DndFrameWidget);
-    QVBoxLayout* layout2 = new QVBoxLayout(m_DndFrameWidget);
-    layout2->addWidget(m_StdMultiWidget);
+    QHBoxLayout* layout2 = new QHBoxLayout(m_DndFrameWidget);
     layout2->setContentsMargins(0,0,0,0); 
+
+    if (m_MouseModeToolbar == NULL)
+    {
+      m_MouseModeToolbar = new QmitkMouseModeSwitcher(m_DndFrameWidget); // delete by Qt via parent
+      layout2->addWidget(m_MouseModeToolbar);
+    }
+
+    m_StdMultiWidget = new QmitkStdMultiWidget(m_DndFrameWidget);
+    /*
+       TODO let multiwidget create a switcher and communicate it here
+    m_MouseModeToolbar->setMouseModeSwitcher( m_StdMultiWidget->GetMouseModeSwitcher() );
+    */
+    layout2->addWidget(m_StdMultiWidget);
 
     mitk::DataStorage::Pointer ds = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
       ->GetDataStorageReference()->GetDataStorage();
@@ -220,6 +234,11 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   {
     m_StdMultiWidget->DisableStandardLevelWindow();
   }
+
+  // mouse modes toolbar
+  bool newMode = prefs->GetBool("PACS like mouse interaction", false);
+  m_MouseModeToolbar->setVisible( newMode );
+  //m_MouseModeToolbar->setInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
 }
 
 

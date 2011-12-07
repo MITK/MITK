@@ -75,6 +75,7 @@ protected:
   QCheckBox* m_ShowLevelWindowWidget;
   QCheckBox* m_UseGradientBackground;
   QCheckBox* m_ChangeBackgroundColors;
+  QCheckBox* m_PACSLikeMouseMode;
   QPushButton* m_ColorButton1;
   QPushButton* m_ColorButton2;
   std::string m_FirstColor;

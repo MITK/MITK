@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPartListener.h>
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
-	
+
 #include <berryISelection.h>
 #include <berryISelectionProvider.h>
 #include <berryISelectionListener.h>
@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDnDFrameWidget.h>
 
 #include <org_mitk_gui_qt_common_Export.h>
+
+class QmitkMouseModeSwitcher;
 
 class MITK_QT_COMMON QmitkStdMultiWidgetEditor :
   public berry::QtEditorPart, virtual public berry::IPartListener
@@ -76,6 +78,7 @@ protected:
 private:
 
   QmitkStdMultiWidget* m_StdMultiWidget;
+  QmitkMouseModeSwitcher* m_MouseModeToolbar;
   QmitkDnDFrameWidget* m_DndFrameWidget;
   std::string m_FirstBackgroundColor;
   std::string m_SecondBackgroundColor;

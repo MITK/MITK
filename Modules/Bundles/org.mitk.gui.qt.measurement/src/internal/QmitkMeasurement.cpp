@@ -645,7 +645,14 @@ void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
   if(!this->AssertDrawingIsPossible(checked))
     return;
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
-  this->AddFigureToDataStorage(figure, QString("Line%1").arg(++m_LineCounter));
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_LineCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Line%1").arg(++m_LineCounter);
+  }
+  else{
+	  qString = QString("Line%1").arg(m_LineCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarLine initialized...";
 }
@@ -659,8 +666,16 @@ void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
   figure->ClosedOff();
 
   mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
-  this->AddFigureToDataStorage(figure, QString("Path%1").arg(++m_PathCounter),
-    "ClosedPlanarPolygon", closedProperty);
+
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_PathCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Path%1").arg(++m_PathCounter);
+  }
+  else{
+	  qString = QString("Path%1").arg(m_PathCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString,
+	  "ClosedPlanarPolygon", closedProperty);
 
   MITK_INFO << "PlanarPath initialized...";
 }
@@ -671,7 +686,14 @@ void QmitkMeasurement::ActionDrawAngleTriggered(bool checked)
     return;
 
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
-  this->AddFigureToDataStorage(figure, QString("Angle%1").arg(++m_AngleCounter));
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_AngleCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Angle%1").arg(++m_AngleCounter);
+  }
+  else{
+	  qString = QString("Angle%1").arg(m_AngleCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarAngle initialized...";
 }
@@ -682,8 +704,15 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered(bool checked)
     return;
 
   mitk::PlanarFourPointAngle::Pointer figure =
-    mitk::PlanarFourPointAngle::New();
-  this->AddFigureToDataStorage(figure, QString("Four Point Angle%1").arg(++m_FourPointAngleCounter));
+	  mitk::PlanarFourPointAngle::New();
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_FourPointAngleCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Four Point Angle%1").arg(++m_FourPointAngleCounter);
+  }
+  else{
+	  qString = QString("Four Point Angle%1").arg(m_FourPointAngleCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarFourPointAngle initialized...";
 }
@@ -694,7 +723,14 @@ void QmitkMeasurement::ActionDrawEllipseTriggered(bool checked)
     return;
 
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
-  this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_EllipseCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Circle%1").arg(++m_EllipseCounter);
+  }
+  else{
+	  qString = QString("Circle%1").arg(m_EllipseCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarCircle initialized...";
 }
@@ -705,7 +741,14 @@ void QmitkMeasurement::ActionDrawRectangleTriggered(bool checked)
     return;
 
   mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
-  this->AddFigureToDataStorage(figure, QString("Rectangle%1").arg(++m_RectangleCounter));
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_RectangleCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Rectangle%1").arg(++m_RectangleCounter);
+  }
+  else{
+	  qString = QString("Rectangle%1").arg(m_RectangleCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarRectangle initialized...";
 }
@@ -717,7 +760,14 @@ void QmitkMeasurement::ActionDrawPolygonTriggered(bool checked)
 
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
-  this->AddFigureToDataStorage(figure, QString("Polygon%1").arg(++m_PolygonCounter));
+	QString qString;
+	if(m_CurrentFigureNode.IsNull() || m_PolygonCounter == 0 || m_CurrentFigureNodeInitialized){
+	  qString = QString("Polygon%1").arg(++m_PolygonCounter);
+  }
+  else{
+	  qString = QString("Polygon%1").arg(m_PolygonCounter);
+  }
+  this->AddFigureToDataStorage(figure, qString);
 
   MITK_INFO << "PlanarPolygon initialized...";
 }

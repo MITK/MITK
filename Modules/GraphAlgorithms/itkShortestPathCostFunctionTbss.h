@@ -9,11 +9,12 @@
 #include <MitkGraphAlgorithmsExports.h>
 #include <itkMacro.h>
 
+
 namespace itk
 {
 
   template <class TInputImageType>            
-  class ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
+  class MitkGraphAlgorithms_EXPORT ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
   {
   public:
     /** Standard class typedefs. */
@@ -68,7 +69,6 @@ namespace itk
 
 } // end namespace itk
 
-
-#include "itkShortestPathCostFunctionTbss.cpp"
+#include "itkShortestPathCostFunctionTbss.txx"
 
 #endif /* __itkShortestPathCostFunctionTbss_h */

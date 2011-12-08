@@ -108,8 +108,12 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     mitk::DataNode::Pointer node = it->Value();
     if (node.IsNull() || (removedNode != NULL && node == removedNode))
       continue;
+
+    node->SetBoolProperty( "imageForLevelWindow", false );
+
     if (node->IsVisible(NULL) == false)
       continue;
+    
     int layer = 0;
     node->GetIntProperty("layer", layer);
     if ( layer < maxLayer )
@@ -119,6 +123,8 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
       continue;
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
+    node->SetBoolProperty( "imageForLevelWindow", true );
+    
     maxLayer = layer;
   }
   Modified();
@@ -152,6 +158,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
     itkExceptionMacro("No Image in DataStorage that belongs to LevelWindow property " << m_LevelWindowProperty);
   }
   m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());
+  n->SetBoolProperty( "imageForLevelWindow", true );
   this->Modified();
 }
 
@@ -268,13 +275,18 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     mitk::DataNode::Pointer node = it->Value();
     if (node.IsNull())
       continue;
+
+    node->SetBoolProperty( "imageForLevelWindow", false );
+
     if (node->IsVisible(NULL) == false)
       continue;
+
     mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
     if (levelWindowProperty.IsNull())
       continue;
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
+    node->SetBoolProperty( "imageForLevelWindow", true );
     if (m_LevelWindowProperty.IsNull() && m_LevelWindowProperty.GetPointer() == levelWindowProperty) // we found our m_LevelWindowProperty
     {
       return;

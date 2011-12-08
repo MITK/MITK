@@ -97,9 +97,9 @@ bool BundleDirectory::IsDirectory(const std::string& path) const
   Poco::Path fullPath(m_RootPath);
   fullPath.append(path);
   Poco::File file(fullPath.makeDirectory());
-  BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) <<
-    "Testing " << file.path() << " for directory: " <<
-    (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
+  //BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) <<
+  //  "Testing " << file.path() << " for directory: " <<
+  //  (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
   return file.exists() && file.isDirectory();
 }
 

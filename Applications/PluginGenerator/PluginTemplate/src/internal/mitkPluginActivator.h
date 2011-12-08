@@ -1,13 +1,13 @@
 $(license)
 
-#ifndef MITKPLUGINACTIVATOR_H
-#define MITKPLUGINACTIVATOR_H
+#ifndef $(activator-file-name)_h
+#define $(activator-file-name)_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
 
-class PluginActivator :
+class $(activator-class-name) :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
@@ -18,8 +18,8 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
-}; // PluginActivator
+}; // $(activator-class-name)
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif // $(activator-file-name)_h

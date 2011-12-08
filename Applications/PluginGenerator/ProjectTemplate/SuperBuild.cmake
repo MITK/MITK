@@ -146,7 +146,7 @@ set(proj ${MY_PROJECT_NAME}-Configure)
 ExternalProject_Add(${proj}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
-  CMAKE_ARGS
+  CMAKE_CACHE_ARGS
     ${ep_common_args}
     ${my_superbuild_boolean_args}
     -D${MY_PROJECT_NAME}_USE_SUPERBUILD:BOOL=OFF
@@ -171,28 +171,31 @@ ExternalProject_Add(${proj}
 # Project
 #-----------------------------------------------------------------------------
 
+if(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
+  set(_build_cmd "$(MAKE)")
+else()
+  set(_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/${MY_PROJECT_NAME}-build --config ${CMAKE_CFG_INTDIR})
+endif()
+
 # The variable SUPERBUILD_EXCLUDE_${MY_PROJECT_NAME}BUILD_TARGET should be set when submitting to a dashboard
 if(NOT DEFINED SUPERBUILD_EXCLUDE_${MY_PROJECT_NAME}BUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_${MY_PROJECT_NAME}BUILD_TARGET)
-  set(proj ${MY_PROJECT_NAME}-build)
-  ExternalProject_Add(${proj}
-    DOWNLOAD_COMMAND ""
-    CONFIGURE_COMMAND ""
-    CMAKE_GENERATOR ${gen}
-    BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/${MY_PROJECT_NAME}-build --config ${CMAKE_CFG_INTDIR}
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    BINARY_DIR ${MY_PROJECT_NAME}-build
-    INSTALL_COMMAND ""
-    DEPENDS
-      "${MY_PROJECT_NAME}-Configure"
-    )
+  set(_target_all_option "ALL")
+else()
+  set(_target_all_option "")
 endif()
+
+add_custom_target(${MY_PROJECT_NAME}-build ${_target_all_option}
+  COMMAND ${_build_cmd}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${MY_PROJECT_NAME}-build
+  DEPENDS ${MY_PROJECT_NAME}-Configure
+  )
 
 #-----------------------------------------------------------------------------
 # Custom target allowing to drive the build of the project itself
 #-----------------------------------------------------------------------------
 
 add_custom_target(${MY_PROJECT_NAME}
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/${MY_PROJECT_NAME}-build --config ${CMAKE_CFG_INTDIR}
+  COMMAND ${_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${MY_PROJECT_NAME}-build
 )
 

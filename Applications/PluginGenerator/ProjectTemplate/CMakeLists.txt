@@ -328,9 +328,9 @@ macro(GetMyTargetLibraries all_target_libraries varname)
 endmacro()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Plugins.cmake)
-ctkMacroSetupExternalPlugins(${PROJECT_PLUGINS}
-                             BUILD_OPTION_PREFIX ${MY_PROJECT_NAME}_
-                             BUILD_ALL ${${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS})
+ctkMacroSetupPlugins(${PROJECT_PLUGINS}
+                     BUILD_OPTION_PREFIX ${MY_PROJECT_NAME}_
+                     BUILD_ALL ${${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS})
 
 #-----------------------------------------------------------------------------
 # Add subdirectories

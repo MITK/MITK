@@ -116,7 +116,6 @@ ENDIF()
 CMAKE_POLICY(SET CMP0012 NEW)
 
 FIND_PACKAGE(CTK REQUIRED)
-SET(CTK_PLUGIN_LIBRARIES "${CTK_PLUGIN_LIBRARIES}" CACHE INTERNAL "CTK plugins" FORCE)
 
 # Extract all library names starting with org_blueberry_
 MACRO(GetMyTargetLibraries all_target_libraries varname)
@@ -191,14 +190,14 @@ ENDIF()
 
 SET(_ctk_plugins
   Bundles/org.blueberry.osgi:ON
-  Bundles/org.blueberry.compat:ON
-  Bundles/org.blueberry.core.runtime:ON
-  Bundles/org.blueberry.core.expressions:ON
-  Bundles/org.blueberry.solstice.common:ON
-  Bundles/org.blueberry.core.commands:ON
+  Bundles/org.blueberry.compat:OFF
+  Bundles/org.blueberry.core.runtime:OFF
+  Bundles/org.blueberry.core.expressions:OFF
+  Bundles/org.blueberry.solstice.common:OFF
+  Bundles/org.blueberry.core.commands:OFF
   Bundles/org.blueberry.core.jobs:OFF
-  Bundles/org.blueberry.ui:ON
-  Bundles/org.blueberry.ui.qt:ON
+  Bundles/org.blueberry.ui:OFF
+  Bundles/org.blueberry.ui.qt:OFF
   Bundles/org.blueberry.ui.qt.log:OFF
   Bundles/org.blueberry.ui.qt.objectinspector:OFF
 )
@@ -250,10 +249,10 @@ SET(BLUEBERRY_TESTING_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerryTestin
 
 ADD_CUSTOM_TARGET(BlueBerry)
 
-ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
-                             BUILD_OPTION_PREFIX BLUEBERRY_BUILD_
-                             BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
-                             COMPACT_OPTIONS)
+ctkMacroSetupPlugins(${_ctk_plugins} ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
+                     BUILD_OPTION_PREFIX BLUEBERRY_BUILD_
+                     BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
+                     COMPACT_OPTIONS)
 
 SET(BLUEBERRY_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry.provisioning")
 FunctionCreateProvisioningFile(
@@ -267,17 +266,22 @@ FunctionCreateProvisioningFile(
   PLUGINS ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
 )
 
-ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)
-add_dependencies(BlueBerry ${_enabled_plugin_targets})
-set_property(TARGET ${_enabled_plugin_targets} PROPERTY LABELS BlueBerry)
+if(${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES)
+  add_dependencies(BlueBerry ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES})
+endif()
+set_property(TARGET ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES} PROPERTY LABELS BlueBerry)
 
-                             
 SET(BB_PLUGIN_USE_FILE "${BlueBerry_BINARY_DIR}/BlueBerryPluginUseFile.cmake")
-ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
+IF(${PROJECT_NAME}_PLUGIN_LIBRARIES)
+  ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
+ELSE()
+  FILE(REMOVE ${BB_PLUGIN_USE_FILE})
+  SET(BB_PLUGIN_USE_FILE )
+ENDIF()
 
 # CTK Plugin Exports
 SET(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
-GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" my_plugin_targets)
+GetMyTargetLibraries("${${PROJECT_NAME}_PLUGIN_LIBRARIES}" my_plugin_targets)
 SET(additional_export_targets mbilog PocoFoundation PocoUtil PocoXML)
 IF(BLUEBERRY_BUILD_TESTING)
   LIST(APPEND additional_export_targets CppUnit)

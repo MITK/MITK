@@ -500,6 +500,8 @@ add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
 
+  find_package(BlueBerry REQUIRED)
+
   set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Bundles/PluginList.cmake")
@@ -539,32 +541,42 @@ if(MITK_USE_BLUEBERRY)
       list(APPEND mitk_ext_plugins_fullpath ${MITK_PRIVATE_MODULES}/${ext_plugin})
     endforeach()
   endif() 
-  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
-                               BUILD_OPTION_PREFIX MITK_BUILD_
-                               BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
-                               COMPACT_OPTIONS)
 
-  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON MITK_CORE_ENABLED_PLUGINS)
-  ctkFunctionExtractPluginTargets("${mitk_ext_plugins_fullpath}" ON MITK_EXT_ENABLED_PLUGINS)
-  list(APPEND MITK_EXT_ENABLED_PLUGINS ${MITK_CORE_ENABLED_PLUGINS})
+  # Specify which plug-ins belong to this project
+  MACRO(GetMyTargetLibraries all_target_libraries varname)
+    SET(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
+    SET(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
+    SET(_tmp_list)
+    LIST(APPEND _tmp_list ${all_target_libraries})
+    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
+  ENDMACRO()
 
-  set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
-  FunctionCreateProvisioningFile(
-    FILE ${MITK_COREAPP_PROVISIONING_FILE}
-    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
-    PLUGINS ${mitk_core_plugins_fullpath}
-  )
+  # Add the BlueBerry plugins to the set of core plugins
+  set(MITK_CORE_ENABLED_PLUGINS ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES})
 
-  set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
-  FunctionCreateProvisioningFile(
-    FILE ${MITK_EXTAPP_PROVISIONING_FILE}
-  )
+  # Get infos about application directories and build options
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
+  set(mitk_apps_fullpath )
+  foreach(mitk_app ${MITK_APPS})
+    list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+  endforeach()
+
+  ctkMacroSetupPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
+                       BUILD_OPTION_PREFIX MITK_BUILD_
+                       APPS ${mitk_apps_fullpath}
+                       BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
+                       COMPACT_OPTIONS)
+
+  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON _coreui_plugins)
+  list(APPEND MITK_CORE_ENABLED_PLUGINS ${_coreui_plugins})
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
-  ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
-
-  # Used in the export command further below
-  GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" MITK_PLUGIN_TARGETS)
+  if(${PROJECT_NAME}_PLUGIN_LIBRARIES)
+    ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
+  else()
+    file(REMOVE ${MITK_PLUGIN_USE_FILE})
+    set(MITK_PLUGIN_USE_FILE )
+  endif()
 
   # add legacy BlueBerry bundles
   add_subdirectory(Modules/Bundles)
@@ -658,22 +670,15 @@ set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})
 
 if(MITK_USE_BLUEBERRY)
-  set(enabled_plugins
-    ${BLUEBERRY_PLUGIN_TARGETS}
-    ${MITK_PLUGIN_TARGETS}
-    ${MITK_MODULES_ENABLED_PLUGINS}
-    )
-
   # This is for installation support of external projects depending on
   # MITK plugins. The export file should not be used for linking to MITK
   # libraries without using LINK_DIRECTORIES, since the exports are incomplete
   # yet(depending libraries are not exported).
-  foreach(plugin ${enabled_plugins})
-    string(REPLACE "." "_" plugin_target ${plugin})
-    export(TARGETS ${plugin_target}
+  if(MITK_PLUGIN_LIBRARIES)
+    export(TARGETS ${MITK_PLUGIN_LIBRARIES}
            APPEND
            FILE ${MITK_EXPORTS_FILE})
-  endforeach()
+  endif()
 endif()
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in

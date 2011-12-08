@@ -176,6 +176,13 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
   }
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG))
+  {
+    fwProps.insert("org.commontk.pluginfw.debug.errors", true);
+    fwProps.insert("org.commontk.pluginfw.debug.pluginfw", true);
+    fwProps.insert("org.commontk.pluginfw.debug.lazy_activation", true);
+    fwProps.insert("org.commontk.pluginfw.debug.resolve", true);
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
@@ -360,19 +367,29 @@ void InternalPlatform::Launch()
 
 void InternalPlatform::Shutdown()
 {
-  Poco::Mutex::ScopedLock lock(m_Mutex);
+  QSharedPointer<ctkPluginFramework> ctkPluginFW;
 
-  AssertInitialized();
+  {
+    Poco::Mutex::ScopedLock lock(m_Mutex);
+    AssertInitialized();
+    DebugUtil::SaveState();
+    ctkPluginFW = m_ctkPluginFrameworkFactory->getFramework();
+    m_Initialized = false;
+  }
 
-  DebugUtil::SaveState();
-
-  m_Initialized = false;
+  ctkPluginFW->stop();
 
   this->uninitialize();
 
-  delete m_ServiceRegistry;
-  delete m_BundleLoader;
-  delete m_CodeCache;
+  // wait 10 seconds for the CTK plugin framework to stop
+  ctkPluginFW->waitForStop(30000);
+
+  {
+    Poco::Mutex::ScopedLock lock(m_Mutex);
+    delete m_ServiceRegistry;
+    delete m_BundleLoader;
+    delete m_CodeCache;
+  }
 }
 
 

@@ -3,7 +3,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  mitkPluginActivator.cpp
+  $(activator-file-name).cpp
   $(view-file-name).cpp
 )
 
@@ -12,7 +12,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/mitkPluginActivator.h
+  src/internal/$(activator-file-name).h
   src/internal/$(view-file-name).h
 )
 

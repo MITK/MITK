@@ -19,48 +19,48 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 #define MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 
-#include <MitkExports.h>
+#include "MitkExports.h"
 #include "mitkGlobalInteraction.h"
 
-#include "itkObject.h"
+#include <itkObject.h>
 
 namespace mitk {
 
-  /***********************************************************************
-  *
-  * \brief Class that offers a convenient way to switch between different 
-  * interaction schemes
-  * 
-  * This class offers the possibility to swtch between the two different 
-  * interaction schemes that are available:
-  * - MITK : The original interaction scheme 
-  *   - left mouse button   : setting the cross position in the MPR view
-  *   - middle mouse button : panning
-  *   - right mouse button  : zooming
-  * 
-  * 
-  * - PACS : an alternative interaction scheme that behaves more like a
-  *          PACS workstation
-  *   - left mouse button   : behaviour depends on current MouseMode
-  *   - middle mouse button : fast scrolling 
-  *   - right mouse button  : level-window
-  *   - ctrl + right button : zooming
-  *   - shift+ right button : panning
-  *   
-  *   There are 5 different MouseModes that are available in the PACS scheme.
-  *   Each MouseMode defines the interaction that is performed on a left 
-  *   mouse button click:
-  *   - Pointer : sets the cross position for the MPR
-  *   - Scroll
-  *   - Level-Window
-  *   - Zoom
-  *   - Pan
-  * 
-  * When the interaction scheme or the MouseMode is changed, this class
-  * manages the adding and removing of the relevant listeners offering 
-  * a convenient way to modify the interaction behaviour.
-  * 
-  ***********************************************************************/
+/***********************************************************************
+*
+* \brief Class that offers a convenient way to switch between different 
+* interaction schemes
+* 
+* This class offers the possibility to swtch between the two different 
+* interaction schemes that are available:
+* - MITK : The original interaction scheme 
+*   - left mouse button   : setting the cross position in the MPR view
+*   - middle mouse button : panning
+*   - right mouse button  : zooming
+* 
+* 
+* - PACS : an alternative interaction scheme that behaves more like a
+*          PACS workstation
+*   - left mouse button   : behaviour depends on current MouseMode
+*   - middle mouse button : fast scrolling 
+*   - right mouse button  : level-window
+*   - ctrl + right button : zooming
+*   - shift+ right button : panning
+*   
+*   There are 5 different MouseModes that are available in the PACS scheme.
+*   Each MouseMode defines the interaction that is performed on a left 
+*   mouse button click:
+*   - Pointer : sets the cross position for the MPR
+*   - Scroll
+*   - Level-Window
+*   - Zoom
+*   - Pan
+* 
+* When the interaction scheme or the MouseMode is changed, this class
+* manages the adding and removing of the relevant listeners offering 
+* a convenient way to modify the interaction behaviour.
+* 
+***********************************************************************/
   class MITK_CORE_EXPORT MouseModeSwitcher : public itk::Object
   {
   public:
@@ -70,13 +70,10 @@ namespace mitk {
 #pragma GCC visibility pop
 
     /**
-    * @brief Default Constructor
+    * \brief Constructor takes GlobalInteraction, MUST NOT be NULL.
     **/
-    MouseModeSwitcher( mitk::GlobalInteraction* );
+    MouseModeSwitcher( GlobalInteraction* );
     
-    /**
-    * @brief Default Destructor
-    **/
     virtual ~MouseModeSwitcher();
 
     // enum of the different interaction schemes that are available
@@ -121,7 +118,7 @@ namespace mitk {
     */
     void InitializeListeners();
    
-    mitk::GlobalInteraction::Pointer m_GlobalInteraction;
+    GlobalInteraction::Pointer m_GlobalInteraction;
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
@@ -130,7 +127,7 @@ namespace mitk {
     ListenerList m_ListenersForMITK;
     ListenerList m_ListenersForPACS;
 
-    StateMachine::Pointer m_ActiveListener;
+    StateMachine::Pointer m_LeftButtonHandler;
 
   };
 

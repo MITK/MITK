@@ -92,10 +92,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     }
 
     m_StdMultiWidget = new QmitkStdMultiWidget(m_DndFrameWidget);
-    /*
-       TODO let multiwidget create a switcher and communicate it here
+    
     m_MouseModeToolbar->setMouseModeSwitcher( m_StdMultiWidget->GetMouseModeSwitcher() );
-    */
+    connect( m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ), 
+      m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
+
     layout2->addWidget(m_StdMultiWidget);
 
     mitk::DataStorage::Pointer ds = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
@@ -122,9 +123,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     m_StdMultiWidget->EnableNavigationControllerEventListening();
 
-    mitk::GlobalInteraction::GetInstance()->AddListener(
-        m_StdMultiWidget->GetMoveAndZoomInteractor()
-      );
     this->GetSite()->GetPage()->AddPartListener(berry::IPartListener::Pointer(this));
 
     // enable change of logo

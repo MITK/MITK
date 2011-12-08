@@ -217,6 +217,7 @@ SET(CPP_FILES
   Interactions/mitkEventMapper.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp
+  Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveSurfaceInteractor.cpp
   Interactions/mitkNodeDepententPointSetInteractor.cpp

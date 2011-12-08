@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkMouseModeSwitcher.h"
 
+
 QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
 :QToolBar(parent)
 ,m_ActionGroup(new QActionGroup(this))
@@ -30,14 +31,14 @@ QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
   /*
      TODO change int to enum of MouseModeSwitcher
   */
-  addButton( 0, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true ); // toggle ON
-  addButton( 1, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png") );
-  addButton( 2, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png") );
-  addButton( 3, tr("Zoom"), QIcon(":/Qmitk/mm_zoom.png") );
-  addButton( 4, tr("Pan"), QIcon(":/Qmitk/mm_pan.png") );
+  addButton( mitk::MouseModeSwitcher::Pointer, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true ); // toggle ON
+  addButton( mitk::MouseModeSwitcher::Scroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png") );
+  addButton( mitk::MouseModeSwitcher::LevelWindow, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png") );
+  addButton( mitk::MouseModeSwitcher::Zoom, tr("Zoom"), QIcon(":/Qmitk/mm_zoom.png") );
+  addButton( mitk::MouseModeSwitcher::Pan, tr("Pan"), QIcon(":/Qmitk/mm_pan.png") );
 }
 
-void QmitkMouseModeSwitcher::addButton( int id, const QString& toolName, const QIcon& icon, bool on)
+void QmitkMouseModeSwitcher::addButton( MouseMode id, const QString& toolName, const QIcon& icon, bool on)
 {
   QAction* action = new QAction( icon, toolName, this );
   action->setCheckable(true);
@@ -65,14 +66,15 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
 
   if (action)
   {
-    qDebug() << "Mouse mode '" << qPrintable(action->text()) << "' selected, trigger mode id " << action->data().toInt();
-    /* TODO
+    MouseMode id = static_cast<MouseMode>( action->data().toInt() );
+    qDebug() << "Mouse mode '" << qPrintable(action->text()) << "' selected, trigger mode id " << id;
+
     if (m_MouseModeSwitcher)
     {
-      m_MouseModeSwitcher->ModeSelected( id );
+      m_MouseModeSwitcher->SelectMouseMode( id );
     }
-    emit ModeSelected( id );
-    */
+    emit MouseModeSelected( id );
+   
   }
 }
 

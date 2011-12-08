@@ -26,6 +26,41 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /***********************************************************************
+  *
+  * \brief Class that offers a convenient way to switch between different 
+  * interaction schemes
+  * 
+  * This class offers the possibility to swtch between the two different 
+  * interaction schemes that are available:
+  * - MITK : The original interaction scheme 
+  *   - left mouse button   : setting the cross position in the MPR view
+  *   - middle mouse button : panning
+  *   - right mouse button  : zooming
+  * 
+  * 
+  * - PACS : an alternative interaction scheme that behaves more like a
+  *          PACS workstation
+  *   - left mouse button   : behaviour depends on current MouseMode
+  *   - middle mouse button : fast scrolling 
+  *   - right mouse button  : level-window
+  *   - ctrl + right button : zooming
+  *   - shift+ right button : panning
+  *   
+  *   There are 5 different MouseModes that are available in the PACS scheme.
+  *   Each MouseMode defines the interaction that is performed on a left 
+  *   mouse button click:
+  *   - Pointer : sets the cross position for the MPR
+  *   - Scroll
+  *   - Level-Window
+  *   - Zoom
+  *   - Pan
+  * 
+  * When the interaction scheme or the MouseMode is changed, this class
+  * manages the adding and removing of the relevant listeners offering 
+  * a convenient way to modify the interaction behaviour.
+  * 
+  ***********************************************************************/
   class MITK_CORE_EXPORT MouseModeSwitcher : public itk::Object
   {
   public:
@@ -44,13 +79,14 @@ namespace mitk {
     **/
     virtual ~MouseModeSwitcher();
 
-
+    // enum of the different interaction schemes that are available
     enum InteractionScheme
     {
       PACS = 0,
       MITK = 1
     };
 
+    // enum of available mouse modes for PACS interaction scheme
     enum MouseMode
     {
       Pointer = 0,
@@ -60,14 +96,29 @@ namespace mitk {
       Pan
     };
 
+    /**
+    * \brief Setter for interaction scheme
+    */
     void SetInteractionScheme( InteractionScheme );
     
+    /**
+    * \brief Setter for mouse mode
+    */
     void SelectMouseMode( MouseMode mode );
     
+    /**
+    * \brief Returns the current mouse mode
+    */
     MouseMode GetCurrentMouseMode() const;
 
   private:
 
+    /**
+    * \brief Initializes the listeners for the different interaction schemes
+    * 
+    * This method creates all listeners that are required for the different 
+    * interaction schemes. These are stored in two lists.
+    */
     void InitializeListeners();
    
     mitk::GlobalInteraction::Pointer m_GlobalInteraction;
@@ -76,7 +127,6 @@ namespace mitk {
     MouseMode         m_ActiveMouseMode;
 
     typedef std::vector<StateMachine::Pointer>  ListenerList;
-
     ListenerList m_ListenersForMITK;
     ListenerList m_ListenersForPACS;
 

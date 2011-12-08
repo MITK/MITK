@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi ) 
 : m_GlobalInteraction( gi )
-, m_ActiveInteractionScheme( PACS )
+, m_ActiveInteractionScheme( MITK )
 , m_ActiveMouseMode( Pointer )
 , m_ActiveListener( NULL )
 {

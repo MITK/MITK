@@ -107,6 +107,46 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
     return EXIT_FAILURE;
   }
 
+  unsigned char data_channel1[8] = {0,1,2,3,4,5,6,7};
+  unsigned char data_channel2[8] = {10,11,12,13,14,15,16,17};
+
+  unsigned int dims[2] = {4,2};
+
+  // create a two-channel test image
+  mitk::Image::Pointer mcImage = mitk::Image::New();
+  mcImage->Initialize( mitk::PixelType( typeid(unsigned char)), 2, dims, 2);
+  mcImage->SetChannel( data_channel1, 0);
+  mcImage->SetChannel( data_channel2, 1);
+
+  std::stringstream filename_stream;
+
+#ifdef WIN32
+  filename_stream << "test" << _getpid();
+#else
+  filename_stream << "test" << getpid();
+#endif
+
+  std::string filename = filename_stream.str() + ".pic";
+
+  MITK_TEST_CONDITION_REQUIRED(mcImage.IsNotNull(),"The multi-channel image for testing is not NULL")
+
+  try{
+    // test for exception handling
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+
+    mitk::PicFileWriter::Pointer myPicFileWriter2 = mitk::PicFileWriter::New();
+
+    myPicFileWriter2->SetInputImage(mcImage);
+    myPicFileWriter2->SetFileName(filename);
+    myPicFileWriter2->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  }
+  catch(...) {
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
+    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // always end with this!
   MITK_TEST_END()
 }

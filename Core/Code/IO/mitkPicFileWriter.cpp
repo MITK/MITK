@@ -58,6 +58,12 @@ void mitk::PicFileWriter::GenerateData()
     itkExceptionMacro(<< "Nothing to write: Input is NULL." );
   }
 
+  if( input->GetNumberOfChannels() > 1)
+  {
+    std::cout << "Multiple channel. Cannot write. Will throw...";
+    itkExceptionMacro(<< "The PicFileWriter does not support multiple channel data. Nothing will be written." );
+  }
+
   mitkIpPicDescriptor * picImage = input->GetPic();
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
@@ -149,6 +155,7 @@ const mitk::Image* mitk::PicFileWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
+    MITK_ERROR << "No input image present.";
     return NULL;
   }
   else

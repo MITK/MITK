@@ -367,19 +367,29 @@ void InternalPlatform::Launch()
 
 void InternalPlatform::Shutdown()
 {
-  Poco::Mutex::ScopedLock lock(m_Mutex);
+  QSharedPointer<ctkPluginFramework> ctkPluginFW;
 
-  AssertInitialized();
+  {
+    Poco::Mutex::ScopedLock lock(m_Mutex);
+    AssertInitialized();
+    DebugUtil::SaveState();
+    ctkPluginFW = m_ctkPluginFrameworkFactory->getFramework();
+    m_Initialized = false;
+  }
 
-  DebugUtil::SaveState();
-
-  m_Initialized = false;
+  ctkPluginFW->stop();
 
   this->uninitialize();
 
-  delete m_ServiceRegistry;
-  delete m_BundleLoader;
-  delete m_CodeCache;
+  // wait 10 seconds for the CTK plugin framework to stop
+  ctkPluginFW->waitForStop(30000);
+
+  {
+    Poco::Mutex::ScopedLock lock(m_Mutex);
+    delete m_ServiceRegistry;
+    delete m_BundleLoader;
+    delete m_CodeCache;
+  }
 }
 
 

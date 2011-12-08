@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
 
+#include "mitkTestingConfig.h"
 /**
 *  Simple example for a test for the (non-existent) class "PicFileWriter".
 *  
@@ -118,15 +119,9 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
   mcImage->SetChannel( data_channel1, 0);
   mcImage->SetChannel( data_channel2, 1);
 
-  std::stringstream filename_stream;
 
-#ifdef WIN32
-  filename_stream << "test" << _getpid();
-#else
-  filename_stream << "test" << getpid();
-#endif
-
-  std::string filename = filename_stream.str() + ".pic";
+  // create a file name that can be saved so that the writer does not throw exception because of unwriteable location
+  std::string filename = std::string( MITK_TEST_OUTPUT_DIR ) + "MultiChannel.pic";
 
   MITK_TEST_CONDITION_REQUIRED(mcImage.IsNotNull(),"The multi-channel image for testing is not NULL")
 

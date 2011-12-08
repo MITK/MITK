@@ -29,8 +29,9 @@ mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi )
 : m_GlobalInteraction( gi )
 , m_ActiveInteractionScheme( MITK )
 , m_ActiveMouseMode( Pointer )
-, m_ActiveListener( NULL )
+, m_LeftMouseButtonHandler( NULL )
 {
+  assert(gi);
 
   this->InitializeListeners();
   this->SetInteractionScheme( m_ActiveInteractionScheme );
@@ -46,7 +47,7 @@ void mitk::MouseModeSwitcher::InitializeListeners()
 {
   mitk::DisplayVectorInteractor::Pointer moveAndZoomInteractor = mitk::DisplayVectorInteractor::New(
     "moveNzoom", new mitk::DisplayInteractor() );
-  mitk::StateMachine::Pointer listener = moveAndZoomInteractor;
+  mitk::StateMachine::Pointer listener = moveAndZoomInteractor.GetPointer();
   m_ListenersForMITK.push_back( listener );
 
 
@@ -122,54 +123,54 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
   {
   case Pointer :
     {
-      m_GlobalInteraction->RemoveListener( m_ActiveListener );
+      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
       break;
     } // case 0
   case Scroll :
     {
-      m_GlobalInteraction->RemoveListener( m_ActiveListener );
+      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
         "LeftClickScroll", new mitk::DisplayInteractor() );
-      m_ActiveListener = scrollInteractor;
+      m_LeftMouseButtonHandler = scrollInteractor;
 
-      m_GlobalInteraction->AddListener( m_ActiveListener );
+      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
 
       break;
     } // case 1
   case LevelWindow :
     {
-      m_GlobalInteraction->RemoveListener( m_ActiveListener );
+      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New( 
         "LeftClickLevelWindow" );
-      m_ActiveListener = lwInteractor;
+      m_LeftMouseButtonHandler = lwInteractor;
 
-      m_GlobalInteraction->AddListener( m_ActiveListener );
+      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
 
       break;
     } // case 2
   case Zoom :
     {
-      m_GlobalInteraction->RemoveListener( m_ActiveListener );
+      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractor::Pointer zoomInteractor = mitk::DisplayVectorInteractor::New( 
         "Zoom", new mitk::DisplayInteractor() );
-      m_ActiveListener = zoomInteractor;
+      m_LeftMouseButtonHandler = zoomInteractor;
 
-      m_GlobalInteraction->AddListener( m_ActiveListener );
+      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
 
       break;
     } // case 3
   case Pan :
     {
-      m_GlobalInteraction->RemoveListener( m_ActiveListener );
+      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New( 
         "Pan", new mitk::DisplayInteractor() );
-      m_ActiveListener = panInteractor;
+      m_LeftMouseButtonHandler = panInteractor;
 
-      m_GlobalInteraction->AddListener( m_ActiveListener );
+      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
 
       break;
     } // case 4

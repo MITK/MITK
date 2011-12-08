@@ -1817,6 +1817,9 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
 {
   MITK_DEBUG << "Changing crosshair mode to " << userMode;
 
+  // first of all reset left mouse button interaction to default if PACS interaction style is active
+  m_MouseModeSwitcher->SelectMouseMode( mitk::MouseModeSwitcher::Pointer );
+
   emit WidgetNotifyNewCrossHairMode( userMode );
   
   int mode = m_PlaneMode;
@@ -2140,3 +2143,4 @@ void QmitkStdMultiWidget::MouseModeSelected( mitk::MouseModeSwitcher::MouseMode 
     this->DisableNavigationControllerEventListening();
   }
 }
+

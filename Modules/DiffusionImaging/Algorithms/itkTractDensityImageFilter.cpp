@@ -15,6 +15,8 @@ namespace itk{
     : m_BinaryOutput(false)
     , m_InvertImage(false)
     , m_UpsamplingFactor(1)
+    , m_InputImage(NULL)
+    , m_UseImageGeometry(false)
   {
 
   }
@@ -42,24 +44,41 @@ namespace itk{
     typename OutputImageType::Pointer outImage = this->GetOutput();
 
     // calculate new image parameters
-    mitk::Vector3D newSpacing = geometry->GetSpacing()/m_UpsamplingFactor;
-    mitk::Point3D newOrigin = geometry->GetOrigin();
-    mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
-    newOrigin[0] += bounds.GetElement(0);
-    newOrigin[1] += bounds.GetElement(2);
-    newOrigin[2] += bounds.GetElement(4);
-
+    mitk::Vector3D newSpacing;
+    mitk::Point3D newOrigin;
     itk::Matrix<double, 3, 3> newDirection;
-    for (int i=0; i<3; i++)
-      for (int j=0; j<3; j++)
-        newDirection[j][i] = geometry->GetMatrixColumn(i)[j];
     ImageRegion<3> upsampledRegion;
-    upsampledRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
-    upsampledRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
-    upsampledRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
+    if (m_UseImageGeometry && !m_InputImage.IsNull())
+    {
+      newSpacing = m_InputImage->GetSpacing()/m_UpsamplingFactor;
+      upsampledRegion = m_InputImage->GetLargestPossibleRegion();
+      newOrigin = m_InputImage->GetOrigin();
+      typename OutputImageType::RegionType::SizeType size = upsampledRegion.GetSize();
+      size[0] *= m_UpsamplingFactor;
+      size[1] *= m_UpsamplingFactor;
+      size[2] *= m_UpsamplingFactor;
+      upsampledRegion.SetSize(size);
+      newDirection = m_InputImage->GetDirection();
+    }
+    else
+    {
+      newSpacing = geometry->GetSpacing()/m_UpsamplingFactor;
+      newOrigin = geometry->GetOrigin();
+      mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+      newOrigin[0] += bounds.GetElement(0);
+      newOrigin[1] += bounds.GetElement(2);
+      newOrigin[2] += bounds.GetElement(4);
+
+      for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+          newDirection[j][i] = geometry->GetMatrixColumn(i)[j];
+      upsampledRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
+      upsampledRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
+      upsampledRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
+    }
     typename OutputImageType::RegionType::SizeType upsampledSize = upsampledRegion.GetSize();
 
-    // aply new image parameters
+    // apply new image parameters
     outImage->SetSpacing( newSpacing );
     outImage->SetOrigin( newOrigin );
     outImage->SetDirection( newDirection );

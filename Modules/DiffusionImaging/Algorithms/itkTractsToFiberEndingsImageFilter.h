@@ -33,6 +33,11 @@ public:
   itkGetMacro( InvertImage, bool);
 
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
+  itkSetMacro( InputImage, typename OutputImageType::Pointer);
+
+  /** Use input image geometry to initialize output image **/
+  itkSetMacro( UseImageGeometry, bool);
+  itkGetMacro( UseImageGeometry, bool);
 
   void GenerateData();
 
@@ -46,6 +51,8 @@ protected:
   mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
   bool m_InvertImage;
+  bool m_UseImageGeometry;
+  typename OutputImageType::Pointer m_InputImage;
 };
 
 }

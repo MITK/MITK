@@ -20,6 +20,7 @@ public:
   typedef SmartPointer< const Self > ConstPointer;
 
   typedef typename OutputImageType::PixelType OutPixelType;
+  typedef itk::Image<unsigned char, 3> InputImageType;
 
   itkNewMacro(Self);
   itkTypeMacro( TractsToRgbaImageFilter, ImageSource );
@@ -37,6 +38,12 @@ public:
   itkGetMacro( BinaryOutput, bool);
 
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
+  itkSetMacro( InputImage, typename InputImageType::Pointer);
+
+  /** Use input image geometry to initialize output image **/
+  itkSetMacro( UseImageGeometry, bool);
+  itkGetMacro( UseImageGeometry, bool);
+
 
   void GenerateData();
 
@@ -51,6 +58,8 @@ protected:
   unsigned int m_UpsamplingFactor;
   bool m_InvertImage;
   bool m_BinaryOutput;
+  bool m_UseImageGeometry;
+  typename InputImageType::Pointer m_InputImage;
 };
 
 }

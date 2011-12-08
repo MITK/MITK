@@ -36,7 +36,12 @@ public:
   itkSetMacro( BinaryOutput, bool);
   itkGetMacro( BinaryOutput, bool);
 
+  /** Use input image geometry to initialize output image **/
+  itkSetMacro( UseImageGeometry, bool);
+  itkGetMacro( UseImageGeometry, bool);
+
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
+  itkSetMacro( InputImage, typename OutputImageType::Pointer);
 
   void GenerateData();
 
@@ -47,10 +52,12 @@ protected:
   TractDensityImageFilter();
   virtual ~TractDensityImageFilter();
 
+  typename OutputImageType::Pointer m_InputImage;
   mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
   bool m_InvertImage;
   bool m_BinaryOutput;
+  bool m_UseImageGeometry;
 };
 
 }

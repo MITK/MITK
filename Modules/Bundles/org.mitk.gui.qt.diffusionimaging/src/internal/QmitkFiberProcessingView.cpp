@@ -1633,6 +1633,13 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
   generator->SetFiberBundle(fib);
   generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
+  if (m_SelectedImage.IsNotNull())
+  {
+    OutImageType::Pointer itkImage = OutImageType::New();
+    CastToItkImage(m_SelectedImage, itkImage);
+    generator->SetInputImage(itkImage);
+    generator->SetUseImageGeometry(true);
+  }
   generator->Update();
 
   // get output image
@@ -1656,6 +1663,13 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
   ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
   generator->SetFiberBundle(fib);
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
+  if (m_SelectedImage.IsNotNull())
+  {
+    itk::Image<unsigned char, 3>::Pointer itkImage = itk::Image<unsigned char, 3>::New();
+    CastToItkImage(m_SelectedImage, itkImage);
+    generator->SetInputImage(itkImage);
+    generator->SetUseImageGeometry(true);
+  }
   generator->Update();
 
   // get output image
@@ -1682,6 +1696,13 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
   generator->SetBinaryOutput(binary);
   generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
+  if (m_SelectedImage.IsNotNull())
+  {
+    OutImageType::Pointer itkImage = OutImageType::New();
+    CastToItkImage(m_SelectedImage, itkImage);
+    generator->SetInputImage(itkImage);
+    generator->SetUseImageGeometry(true);
+  }
   generator->Update();
 
   // get output image

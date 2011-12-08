@@ -102,6 +102,8 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
   int maxLayer = itk::NumericTraits<int>::min();
   m_LevelWindowProperty = NULL;
 
+  mitk::DataNode::Pointer topLevelNode;
+
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
@@ -123,11 +125,23 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
       continue;
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
-    node->SetBoolProperty( "imageForLevelWindow", true );
+    topLevelNode = node;
     
     maxLayer = layer;
   }
-  Modified();
+
+  if (topLevelNode.IsNotNull())
+  {
+    topLevelNode->SetBoolProperty( "imageForLevelWindow", true );
+  }
+   
+  this->SetLevelWindowProperty( m_LevelWindowProperty );
+
+  if ( m_LevelWindowProperty.IsNull() )
+  {
+    Modified();
+  }
+  // else SetLevelWindowProperty will call Modified();
 }
 
 // sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.

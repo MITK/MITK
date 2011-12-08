@@ -66,6 +66,9 @@ namespace mitk {
   public:
 
 #pragma GCC visibility push(default)
+    /**
+      \brief Can be observed by GUI class to update button states when mode is changed programatically.
+    */
     itkEventMacro( MouseModeChangedEvent, itk::AnyEvent );
 #pragma GCC visibility pop
 

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi ) 
 : m_GlobalInteraction( gi )
 , m_ActiveInteractionScheme( MITK )
-, m_ActiveMouseMode( Pointer )
+, m_ActiveMouseMode( MousePointer )
 , m_LeftMouseButtonHandler( NULL )
 {
   assert(gi);
@@ -105,7 +105,7 @@ void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
         m_GlobalInteraction->AddListener( (*iter) );
       }
 
-      this->SelectMouseMode( Pointer );
+      this->SelectMouseMode( MousePointer );
       break;
     } // case PACS
   } // switch
@@ -121,7 +121,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
 
   switch ( mode )
   {
-  case Pointer :
+  case MousePointer :
     {
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
       break;

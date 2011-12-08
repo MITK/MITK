@@ -356,7 +356,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
 
-  m_MouseModeSwitcher = new mitk::MouseModeSwitcher( mitk::GlobalInteraction::GetInstance() );
+  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New( mitk::GlobalInteraction::GetInstance() );
 
   m_LastLeftClickPositionSupplier =
     mitk::CoordinateSupplier::New("navigation", NULL);
@@ -1818,7 +1818,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
   MITK_DEBUG << "Changing crosshair mode to " << userMode;
 
   // first of all reset left mouse button interaction to default if PACS interaction style is active
-  m_MouseModeSwitcher->SelectMouseMode( mitk::MouseModeSwitcher::Pointer );
+  m_MouseModeSwitcher->SelectMouseMode( mitk::MouseModeSwitcher::MousePointer );
 
   emit WidgetNotifyNewCrossHairMode( userMode );
   

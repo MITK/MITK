@@ -153,7 +153,7 @@ public:
   //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
-   * geometry. PLATFORM SPECIFIC. */
+   * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
   virtual bool InitializeViews( const Geometry3D *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 

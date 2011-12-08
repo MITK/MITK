@@ -209,6 +209,8 @@ int main(int argc, char** argv)
   QString pluginTarget(pluginSymbolicName);
   pluginTarget.replace('.', '_');
 
+  QString activatorClass = pluginTarget + "_Activator";
+
   QString outDir = QDir::fromNativeSeparators(parsedArgs["out-dir"].toString());
   QString licensePath = QDir::fromNativeSeparators(parsedArgs["license"].toString());
   QString pluginExportDirective = pluginSymbolicName.split('.').last().toUpper() + "_EXPORT";
@@ -381,6 +383,8 @@ int main(int argc, char** argv)
   parameters["$(view-name)"] = viewName;
   parameters["$(view-file-name)"] = viewClass;
   parameters["$(view-class-name)"] = viewClass;
+  parameters["$(activator-file-name)"] = activatorClass;
+  parameters["$(activator-class-name)"] = activatorClass;
 
   if (createProject)
   {
@@ -393,6 +397,7 @@ int main(int argc, char** argv)
 
   QHash<QString,QString> pluginFileNameMapping;
   pluginFileNameMapping["QmitkTemplateView"] = viewClass;
+  pluginFileNameMapping["mitkPluginActivator"] = activatorClass;
 
   if (createProject)
   {

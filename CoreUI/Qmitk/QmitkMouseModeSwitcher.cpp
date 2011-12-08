@@ -30,7 +30,7 @@ QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
   QToolBar::setIconSize( QSize(17, 17) );
   m_ActionGroup->setExclusive(true); // only one selectable
 
-  addButton( mitk::MouseModeSwitcher::Pointer, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true ); // toggle ON
+  addButton( mitk::MouseModeSwitcher::MousePointer, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true ); // toggle ON
   addButton( mitk::MouseModeSwitcher::Scroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png") );
   addButton( mitk::MouseModeSwitcher::LevelWindow, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png") );
   addButton( mitk::MouseModeSwitcher::Zoom, tr("Zoom"), QIcon(":/Qmitk/mm_zoom.png") );

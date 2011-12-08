@@ -69,12 +69,8 @@ namespace mitk {
     itkEventMacro( MouseModeChangedEvent, itk::AnyEvent );
 #pragma GCC visibility pop
 
-    /**
-    * \brief Constructor takes GlobalInteraction, MUST NOT be NULL.
-    **/
-    MouseModeSwitcher( GlobalInteraction* );
-    
-    virtual ~MouseModeSwitcher();
+    mitkClassMacro( MouseModeSwitcher, itk::Object );
+    mitkNewMacro1Param( Self, GlobalInteraction* );
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -86,7 +82,7 @@ namespace mitk {
     // enum of available mouse modes for PACS interaction scheme
     enum MouseMode
     {
-      Pointer = 0,
+      MousePointer = 0,
       Scroll,
       LevelWindow,
       Zoom,
@@ -107,6 +103,16 @@ namespace mitk {
     * \brief Returns the current mouse mode
     */
     MouseMode GetCurrentMouseMode() const;
+
+  protected:
+
+    /**
+    * \brief Constructor takes GlobalInteraction, MUST NOT be NULL.
+    **/
+    MouseModeSwitcher( GlobalInteraction* );
+    
+    virtual ~MouseModeSwitcher();
+
 
   private:
 

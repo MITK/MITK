@@ -15,9 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <org.blueberry.osgi/src/application/berryStarter.h>
+#include <application/berryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
-#include <mitkCoreExtObjectFactory.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -74,7 +73,6 @@ int main(int argc, char** argv)
   qSafeApp.setApplicationName("ExtApp");
   qSafeApp.setOrganizationName("DKFZ");
 
-  RegisterCoreExtObjectFactory();
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration

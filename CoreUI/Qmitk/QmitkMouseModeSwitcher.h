@@ -45,6 +45,17 @@ class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
     QmitkMouseModeSwitcher( QWidget* parent = 0 );
     virtual ~QmitkMouseModeSwitcher();
 
+  public slots:
+    
+    /**
+      \brief Connect to non-GUI class.
+
+      When a button is pressed, given mitk::MouseModeSwitcher is informed to adapt interactors.
+
+      \todo QmitkMouseModeSwitcher could be enhanced to actively observe mitk::MouseModeSwitcher and change available actions or visibility appropriately.
+    */
+    void setMouseModeSwitcher( mitk::MouseModeSwitcher* );
+
   signals:
 
     /**
@@ -61,7 +72,6 @@ class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
 
     void modeSelectedByUser();
     void addButton( int id, const QString& toolName, const QIcon& icon, bool on = false ); // TODO change int to enum of MouseModeSwitcher
-    void setMouseModeSwitcher( mitk::MouseModeSwitcher* );
 
   protected:
 

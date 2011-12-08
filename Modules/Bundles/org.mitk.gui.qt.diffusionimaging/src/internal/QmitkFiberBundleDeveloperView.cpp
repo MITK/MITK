@@ -846,8 +846,8 @@ void QmitkFiberBundleDeveloperView::DoExtractFibers()
     //connections
     connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_ExtractFibers() ));
     connect(m_hostThread, SIGNAL(started()), m_FiberExtractor, SLOT( run() ));
-    connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
-    connect(m_hostThread, SIGNAL(started()), this, SLOT( AfterThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(finished()), this, SLOT( AfterThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(terminated()), this, SLOT( AfterThread_ExtractFibers() ));
 
     m_hostThread->start(QThread::HighestPriority) ;
 }
@@ -879,6 +879,8 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberExtraction()
     }
     disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
+//    m_FiberExtractor->disconnect();
+//    delete m_FiberExtractor;
 
 }
 

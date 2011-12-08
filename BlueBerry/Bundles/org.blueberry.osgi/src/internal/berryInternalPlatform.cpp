@@ -176,6 +176,13 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
   }
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG))
+  {
+    fwProps.insert("org.commontk.pluginfw.debug.errors", true);
+    fwProps.insert("org.commontk.pluginfw.debug.pluginfw", true);
+    fwProps.insert("org.commontk.pluginfw.debug.lazy_activation", true);
+    fwProps.insert("org.commontk.pluginfw.debug.resolve", true);
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();

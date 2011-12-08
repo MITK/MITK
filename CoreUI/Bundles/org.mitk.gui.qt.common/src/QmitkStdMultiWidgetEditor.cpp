@@ -238,7 +238,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // mouse modes toolbar
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   m_MouseModeToolbar->setVisible( newMode );
-  //m_MouseModeToolbar->setInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
+  // TODO m_StdMultiWidget->GetMouseModeSwitcher()->setInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
 }
 
 

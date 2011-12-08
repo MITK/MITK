@@ -127,7 +127,7 @@ namespace mitk {
     ListenerList m_ListenersForMITK;
     ListenerList m_ListenersForPACS;
 
-    StateMachine::Pointer m_LeftButtonHandler;
+    StateMachine::Pointer m_LeftMouseButtonHandler;
 
   };
 

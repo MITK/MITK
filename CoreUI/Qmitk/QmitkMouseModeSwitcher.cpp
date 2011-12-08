@@ -85,7 +85,7 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
   if (action)
   {
     MouseMode id = static_cast<MouseMode>( action->data().toInt() );
-    qDebug() << "Mouse mode '" << qPrintable(action->text()) << "' selected, trigger mode id " << id;
+    //qDebug() << "Mouse mode '" << qPrintable(action->text()) << "' selected, trigger mode id " << id;
 
     if (m_MouseModeSwitcher)
     {

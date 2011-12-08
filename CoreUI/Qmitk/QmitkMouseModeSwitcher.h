@@ -74,8 +74,14 @@ class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
 
   protected:
 
+    void OnMouseModeChanged(const itk::EventObject&);
+
     QActionGroup* m_ActionGroup;
     mitk::MouseModeSwitcher* m_MouseModeSwitcher;
+
+    unsigned long m_ObserverTag;
+
+    bool m_InObservationReaction;
 };
 
 #endif

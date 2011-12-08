@@ -23,14 +23,13 @@ QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
 :QToolBar(parent)
 ,m_ActionGroup(new QActionGroup(this))
 ,m_MouseModeSwitcher(NULL)
+,m_ObserverTag(0)
+,m_InObservationReaction(false)
 {
   QToolBar::setOrientation( Qt::Vertical );
   QToolBar::setIconSize( QSize(17, 17) );
   m_ActionGroup->setExclusive(true); // only one selectable
 
-  /*
-     TODO change int to enum of MouseModeSwitcher
-  */
   addButton( mitk::MouseModeSwitcher::Pointer, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true ); // toggle ON
   addButton( mitk::MouseModeSwitcher::Scroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png") );
   addButton( mitk::MouseModeSwitcher::LevelWindow, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png") );
@@ -52,16 +51,35 @@ void QmitkMouseModeSwitcher::addButton( MouseMode id, const QString& toolName, c
 
 QmitkMouseModeSwitcher::~QmitkMouseModeSwitcher()
 {
+  if (m_MouseModeSwitcher)
+  {
+    m_MouseModeSwitcher->RemoveObserver( m_ObserverTag );
+  }
 }
 
 void QmitkMouseModeSwitcher::setMouseModeSwitcher( mitk::MouseModeSwitcher* mms )
 {
-  /* TODO put any goodbye / welcome ceremonies here, e.g. get current mode */
+  // goodbye / welcome ceremonies
+  if (m_MouseModeSwitcher)
+  {
+    m_MouseModeSwitcher->RemoveObserver( m_ObserverTag );
+  }
+
   m_MouseModeSwitcher = mms;
+
+  if ( m_MouseModeSwitcher )
+  {
+    itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::Pointer command = 
+      itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::New();
+    command->SetCallbackFunction(this, &QmitkMouseModeSwitcher::OnMouseModeChanged);
+    m_ObserverTag = m_MouseModeSwitcher->AddObserver( mitk::MouseModeSwitcher::MouseModeChangedEvent(), command );
+  }
 }
 
 void QmitkMouseModeSwitcher::modeSelectedByUser()
 {
+  if (m_InObservationReaction) return; // this was NOT actually by the user but by ourselves
+
   QAction* action = dynamic_cast<QAction*>(sender());
 
   if (action)
@@ -76,5 +94,25 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
     emit MouseModeSelected( id );
    
   }
+}
+
+void QmitkMouseModeSwitcher::OnMouseModeChanged(const itk::EventObject&)
+{
+  m_InObservationReaction = true;
+
+  // push button graphically
+  assert( m_MouseModeSwitcher );
+
+  MouseMode activeMode = m_MouseModeSwitcher->GetCurrentMouseMode();
+
+  foreach(QAction* action, m_ActionGroup->actions())
+  {
+    if ( action->data().toInt() == activeMode )
+    {
+      action->setChecked( true );
+    }
+  }
+  
+  m_InObservationReaction = false;
 }
 

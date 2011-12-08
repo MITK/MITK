@@ -6,7 +6,6 @@
 #include "itkShapedNeighborhoodIterator.h"
 #include "itkShortestPathCostFunction.h" // Superclass of Metrics
 #include <itkImageRegionConstIterator.h>
-#include <MitkGraphAlgorithmsExports.h>
 #include <itkMacro.h>
 
 namespace itk
@@ -68,7 +67,6 @@ namespace itk
 
 } // end namespace itk
 
-
-#include "itkShortestPathCostFunctionTbss.cpp"
+#include "itkShortestPathCostFunctionTbss.txx"
 
 #endif /* __itkShortestPathCostFunctionTbss_h */

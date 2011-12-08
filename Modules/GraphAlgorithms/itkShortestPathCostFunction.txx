@@ -1,8 +1,6 @@
 #ifndef __itkShortestPathCostFunction_cpp
 #define __itkShortestPathCostFunction_cpp
 
-#include "itkShortestPathCostFunction.h"
-
 
 namespace itk
 { 

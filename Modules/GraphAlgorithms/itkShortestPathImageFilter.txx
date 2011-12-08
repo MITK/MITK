@@ -1,9 +1,14 @@
-#include "itkShortestPathImageFilter.h"
+#ifndef __itkShortestPathImageFilter_txx
+#define __itkShortestPathImageFilter_txx
+
+
 #include "time.h"
 #include "mitkMemoryUtilities.h"
 #include <iostream>
 #include <algorithm>
 #include <vector>
+
+
 
 namespace itk 
 {
@@ -915,3 +920,5 @@ namespace itk
 	}
 
 } /* end namespace itk */
+
+#endif

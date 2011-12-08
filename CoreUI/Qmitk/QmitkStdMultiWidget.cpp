@@ -356,9 +356,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
 
-  // instantiate display interactor
-  m_MoveAndZoomInteractor = mitk::DisplayVectorInteractor::New(
-    "moveNzoom", new mitk::DisplayInteractor() );
+  m_MouseModeSwitcher = new mitk::MouseModeSwitcher( mitk::GlobalInteraction::GetInstance() );
 
   m_LastLeftClickPositionSupplier =
     mitk::CoordinateSupplier::New("navigation", NULL);
@@ -2129,4 +2127,22 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
   m_RectangleRendering2->Disable();
   m_RectangleRendering3->Disable();
   m_RectangleRendering4->Disable();
+}
+
+
+mitk::MouseModeSwitcher* QmitkStdMultiWidget::GetMouseModeSwitcher()
+{
+  return m_MouseModeSwitcher;
+}
+
+void QmitkStdMultiWidget::MouseModeSelected( mitk::MouseModeSwitcher::MouseMode mouseMode )
+{
+  if ( mouseMode == 0 )
+  {
+    this->EnableNavigationControllerEventListening();
+  }
+  else
+  {
+    this->DisableNavigationControllerEventListening();
+  }
 }

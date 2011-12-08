@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
 
+#include "mitkMouseModeSwitcher.h"
+
 #include <qwidget.h>
 #include <qsplitter.h>
 #include <QFrame>
@@ -64,6 +66,9 @@ public:
   void ForceImmediateUpdate();
 
   mitk::DisplayVectorInteractor* GetMoveAndZoomInteractor();
+
+  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
+
 
   QmitkRenderWindow* GetRenderWindow1() const;
 
@@ -215,6 +220,9 @@ public slots:
 
   void ResetCrosshair();
 
+  void MouseModeSelected( mitk::MouseModeSwitcher::MouseMode mouseMode );
+
+
 signals:
 
   void LeftMouseClicked(mitk::Point3D pointValue);
@@ -278,6 +286,10 @@ protected:
   mitk::GradientBackground::Pointer m_GradientBackground3;
   bool m_GradientBackgroundFlag;
   
+
+  mitk::MouseModeSwitcher* m_MouseModeSwitcher;
+
+
   mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
   mitk::PositionTracker::Pointer m_PositionTracker;

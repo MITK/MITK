@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkExports.h>
 
 #include "mitkPositionTracker.h"
-#include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
 #include "mitkRenderWindowFrame.h"
@@ -64,8 +63,6 @@ public:
   void RequestUpdate();
 
   void ForceImmediateUpdate();
-
-  mitk::DisplayVectorInteractor* GetMoveAndZoomInteractor();
 
   mitk::MouseModeSwitcher* GetMouseModeSwitcher();
 
@@ -288,9 +285,6 @@ protected:
   
 
   mitk::MouseModeSwitcher* m_MouseModeSwitcher;
-
-
-  mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
   mitk::PositionTracker::Pointer m_PositionTracker;
   mitk::SliceNavigationController::Pointer m_TimeNavigationController;

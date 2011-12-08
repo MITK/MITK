@@ -1410,12 +1410,6 @@ void QmitkStdMultiWidget::leaveEvent ( QEvent * /*e*/  )
   m_SlicesRotator->ResetMouseCursor();
 }
 
-mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
-{
-  return m_MoveAndZoomInteractor.GetPointer();
-}
-
-
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
 {
   return mitkWidget1;

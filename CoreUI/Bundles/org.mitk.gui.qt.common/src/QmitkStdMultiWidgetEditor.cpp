@@ -122,9 +122,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     m_StdMultiWidget->EnableNavigationControllerEventListening();
 
-    mitk::GlobalInteraction::GetInstance()->AddListener(
-        m_StdMultiWidget->GetMoveAndZoomInteractor()
-      );
     this->GetSite()->GetPage()->AddPartListener(berry::IPartListener::Pointer(this));
 
     // enable change of logo

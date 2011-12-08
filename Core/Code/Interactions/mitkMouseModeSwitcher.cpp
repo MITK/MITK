@@ -177,6 +177,8 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
 
   } // switch (mode)
 
+  m_ActiveMouseMode = mode;
+
   this->InvokeEvent( MouseModeChangedEvent() );
 
 }

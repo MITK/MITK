@@ -68,6 +68,7 @@ m_PendingCrosshairPositionEvent(false)
 
   //create Layouts
   QmitkStdMultiWidgetLayout = new QHBoxLayout( this ); 
+  QmitkStdMultiWidgetLayout->setContentsMargins(0,0,0,0);
 
   //Set Layout to widget
   this->setLayout(QmitkStdMultiWidgetLayout);

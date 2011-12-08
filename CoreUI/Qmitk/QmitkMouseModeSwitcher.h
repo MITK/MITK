@@ -21,12 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkExports.h"
 
-#include <QtGui>
+#include "mitkMouseModeSwitcher.h"
 
-namespace mitk
-{
-  class MouseModeSwitcher;
-}
+#include <QtGui>
 
 /**
   \brief Qt toolbar representing mitk::MouseModeSwitcher.
@@ -44,6 +41,8 @@ class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
 
     QmitkMouseModeSwitcher( QWidget* parent = 0 );
     virtual ~QmitkMouseModeSwitcher();
+
+    typedef mitk::MouseModeSwitcher::MouseMode MouseMode;
 
   public slots:
     
@@ -66,12 +65,12 @@ class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
       because this must enable/disable automatic reaction of SliceNavigationControllers
       to mouse clicks - depending on which mode is active.
     */
-    void modeActivated(int id); // TODO change int to enum of MouseModeSwitcher
+    void MouseModeSelected(mitk::MouseModeSwitcher::MouseMode id); // TODO change int to enum of MouseModeSwitcher
 
   protected slots:
 
     void modeSelectedByUser();
-    void addButton( int id, const QString& toolName, const QIcon& icon, bool on = false ); // TODO change int to enum of MouseModeSwitcher
+    void addButton( MouseMode id, const QString& toolName, const QIcon& icon, bool on = false ); // TODO change int to enum of MouseModeSwitcher
 
   protected:
 

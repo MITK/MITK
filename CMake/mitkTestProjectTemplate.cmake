@@ -19,6 +19,7 @@ if(BUILD_TESTING)
       -DMITK_DIR:PATH=${MITK_BINARY_DIR}
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
+      -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
   )
                          
   if(CMAKE_CONFIGURATION_TYPES)

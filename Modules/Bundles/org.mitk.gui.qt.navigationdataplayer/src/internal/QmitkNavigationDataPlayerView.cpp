@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
+
 // Qt
 #include <QMessageBox>
 
@@ -470,6 +471,7 @@ mitk::PointSetVtkMapper3D::Pointer QmitkNavigationDataPlayerView::GetTrajectoryM
   else
     return NULL;
 }
+
 
 
 

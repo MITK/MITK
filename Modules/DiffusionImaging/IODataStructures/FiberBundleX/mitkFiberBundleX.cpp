@@ -592,60 +592,60 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         long numOfLineCells = clipperlines->GetNumberOfCells();
 
         // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
-//        for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
-//        { //ic is the index counter for the cells hosting the desired information
+        for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
+        { //ic is the index counter for the cells hosting the desired information
 
-//            vtkIdType npts;
-//            vtkIdType *pts;
-//            clipperlines->GetCell(ic, npts, pts);
+            vtkIdType npts;
+            vtkIdType *pts;
+            clipperlines->GetCell(ic, npts, pts);
 
-//            // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i.
-//            for (long j=0; j<npts; j++)
-//            {
+            // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i.
+            for (long j=0; j<npts; j++)
+            {
 
-//                //  std::cout << "pointWalker: subline " << i << " point idx: " << j << " hosting point id: " << pts[j] << endl;
+                //  std::cout << "pointWalker: subline " << i << " point idx: " << j << " hosting point id: " << pts[j] << endl;
 
-//                for (long k = 0; k < PointsInROI.size(); k++)
-//                { // k corresponds to index in PointsInRoi vector
-//                    /* ====================
-//                 *  check if current point occurs in ROI
-//                 ======================*/
-//                    if (pts[j] == PointsInROI[k]) {
-//                        //figure out which line does it belong to
-//                        if (clipperout->GetCellData()->HasArray("FB_IDs"))
-//                        {
-//                            int originalFibId = clipperout->GetCellData()->GetArray("FB_IDs")->GetTuple(i)[0];
-//                            std::cout << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
+                for (long k = 0; k < PointsInROI.size(); k++)
+                { // k corresponds to index in PointsInRoi vector
+                    /* ====================
+                 *  check if current point occurs in ROI
+                 ======================*/
+                    if (pts[j] == PointsInROI[k]) {
+                        //figure out which line does it belong to
+                        if (clipperout->GetCellData()->HasArray("FB_IDs"))
+                        {
+                            int originalFibId = clipperout->GetCellData()->GetArray("FB_IDs")->GetTuple(i)[0];
+                            MITK_INFO << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
 
-//                            // do something to avoid duplicates
-//                            int oldFibInRoiSize = FibersInROI.size();
-//                            if (oldFibInRoiSize != 0) {
-
-
-//                                for (int f=0; f<oldFibInRoiSize; f++)
-//                                {
-//                                    if (FibersInROI[f] == originalFibId ) {
-//                                        break;
-//                                    } else if (f == FibersInROI.size() -1){ //if there was no break until last entry, then write it in.
-//                                        FibersInROI.push_back(originalFibId);
-
-//                                    }
-//                                }
-//                            } else {
-//                                FibersInROI.push_back(originalFibId);
-//                            }
-//                        }
-//                        // for performance in data overhead reason, set id of found point to -1 in ROI-set. sublines can host this id one or more times for the same fiber, therefore we do not need this information anymore.
-//                        PointsInROI[k] = -1;
+                            // do something to avoid duplicates
+                            int oldFibInRoiSize = FibersInROI.size();
+                            if (oldFibInRoiSize != 0) {
 
 
-//                    }
-//                }
+                                for (int f=0; f<oldFibInRoiSize; f++)
+                                {
+                                    if (FibersInROI[f] == originalFibId ) {
+                                        break;
+                                    } else if (f == FibersInROI.size() -1){ //if there was no break until last entry, then write it in.
+                                        FibersInROI.push_back(originalFibId);
 
-//            }
+                                    }
+                                }
+                            } else {
+                                FibersInROI.push_back(originalFibId);
+                            }
+                        }
+                        // for performance in data overhead reason, set id of found point to -1 in ROI-set. sublines can host this id one or more times for the same fiber, therefore we do not need this information anymore.
+                        PointsInROI[k] = -1;
 
 
-//        }
+                    }
+                }
+
+            }
+
+
+        }
 
         MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
         std::vector<int>::iterator finIt = FibersInROI.begin();

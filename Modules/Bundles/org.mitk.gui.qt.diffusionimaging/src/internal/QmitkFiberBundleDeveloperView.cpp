@@ -110,7 +110,7 @@ void QmitkFiberExtractorWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
+    std::vector<int> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
 
     //generate new fiberbundle by fiber iDs
 //    m_itemPackage.st_FBX->CreateNewFiberbundleByIds(std::vector<int> desiredFiberIds);
@@ -844,10 +844,10 @@ void QmitkFiberBundleDeveloperView::DoExtractFibers()
     m_FiberExtractor->moveToThread(m_hostThread);
 
     //connections
-    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberExtraction() ));
     connect(m_hostThread, SIGNAL(started()), m_FiberExtractor, SLOT( run() ));
-    connect(m_hostThread, SIGNAL(finished()), this, SLOT( AfterThread_ExtractFibers() ));
-    connect(m_hostThread, SIGNAL(terminated()), this, SLOT( AfterThread_ExtractFibers() ));
+    connect(m_hostThread, SIGNAL(finished()), this, SLOT( AfterThread_FiberExtraction() ));
+    connect(m_hostThread, SIGNAL(terminated()), this, SLOT( AfterThread_FiberExtraction() ));
 
     m_hostThread->start(QThread::HighestPriority) ;
 }
@@ -877,10 +877,11 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberExtraction()
         m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
         m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
     }
-    disconnect(m_hostThread, 0, 0, 0);
+//    disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
+
 //    m_FiberExtractor->disconnect();
-//    delete m_FiberExtractor;
+    delete m_FiberExtractor;
 
 }
 
@@ -1062,8 +1063,9 @@ void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
         m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
         m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
     }
-    disconnect(m_hostThread, 0, 0, 0);
+//    disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
+    delete m_GeneratorFibersRandom;
 
 
 }

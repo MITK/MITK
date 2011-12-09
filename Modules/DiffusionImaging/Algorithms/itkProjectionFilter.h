@@ -47,6 +47,7 @@ public:
   typedef itk::Image<char,3> CharImageType;
 
   typedef itk::Image<float, 4> Float4DImageType;
+  typedef itk::Image<float, 3> FloatImageType;
 
  // typedef itk::VectorImageType<float, 3> SubjectVolumesType;
 

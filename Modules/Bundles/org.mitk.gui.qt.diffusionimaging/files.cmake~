@@ -26,6 +26,7 @@ SET(INTERNAL_CPP_FILES
   QmitkTractbasedSpatialStatisticsView.cpp
   QmitkTbssTableModel.cpp
   QmitkTbssMetaTableModel.cpp
+  QmitkTbssSkeletonizationView.cpp
 )
 
 SET(UI_FILES
@@ -44,6 +45,7 @@ SET(UI_FILES
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkScreenshotMakerControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
+  src/internal/QmitkTbssSkeletonizationViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -67,6 +69,8 @@ SET(MOC_H_FILES
   src/internal/QmitkIVIMView.h
   src/internal/QmitkScreenshotMaker.h
   src/internal/QmitkTractbasedSpatialStatisticsView.h
+  src/internal/QmitkTbssSkeletonizationView.h
+  src/QmitkTbssRoiAnalysisWidget.h
 )
 
 SET(CACHED_RESOURCE_FILES
@@ -90,6 +94,7 @@ SET(CACHED_RESOURCE_FILES
   resources/screenshot_maker.png
   resources/stochFB.png
   resources/tbss.png
+  resources/tbss2.png
 )
 
 SET(QRC_FILES

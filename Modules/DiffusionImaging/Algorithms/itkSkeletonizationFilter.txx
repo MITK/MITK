@@ -261,7 +261,7 @@ namespace itk
 
   
   template< class TInputImage, class TOutputImage >
-  itk::VectorImage<int, 3>::Pointer SkeletonizationFilter<TInputImage, TOutputImage>::GetDirectionImage()
+  itk::VectorImage<int, 3>::Pointer SkeletonizationFilter<TInputImage, TOutputImage>::GetGradientImage()
   {
     GradientImageType::Pointer gradImg = GradientImageType::New();
 

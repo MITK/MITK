@@ -615,8 +615,7 @@ if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
   set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
 endif()
 
-# Add applications directory
-add_subdirectory(Applications)
+
 
 #-----------------------------------------------------------------------------
 # Python Wrapping
@@ -716,3 +715,13 @@ if(WIN32)
       ${VS_BUILD_TYPE})
   endforeach()
 endif(WIN32)
+
+
+#-----------------------------------------------------------------------------
+# MITK Applications
+#-----------------------------------------------------------------------------
+
+# This must come after MITKConfig.h was generated, since applications
+# might do a find_package(MITK REQUIRED).
+add_subdirectory(Applications)
+

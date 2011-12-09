@@ -538,7 +538,6 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         PointsInROI.reserve(PointsOnPlane.size());
         /*=======STEP 2=====
      * extract ROI relevant pointIds */
-        //ToDo
 
         mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
         mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
@@ -555,21 +554,21 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
                            (V2w[1] - V1w[1]) * (V2w[1] - V1w[1]) +
                            (V2w[2] - V1w[2]) * (V2w[2] - V1w[2]));
 
-            MITK_INFO << "Circle Radius: " << distPF;
+            //MITK_INFO << "Circle Radius: " << distPF;
 
             for (int i=0; i<PointsOnPlane.size(); i++)
             {
 
-                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[0] << " - " << V1w[0];
-                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[1] << " - " << V1w[1];
-                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[2] << " - " << V1w[2];
+//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[0] << " - " << V1w[0];
+//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[1] << " - " << V1w[1];
+//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[2] << " - " << V1w[2];
 
                 //distance between circle radius and given point
                 double XdistPnt =  sqrt((double) (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) * (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) +
                                         (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) * (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) +
                                         (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2]) * (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2])) ;
 
-                MITK_INFO << "PntDistance to Radius: " << XdistPnt;
+             //   MITK_INFO << "PntDistance to Radius: " << XdistPnt;
                 if( XdistPnt <= distPF)
                 {
                     MITK_INFO << "point in Circle";

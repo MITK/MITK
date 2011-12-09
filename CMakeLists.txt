@@ -460,6 +460,36 @@ include(mitkSetupVariables)
 add_subdirectory(Utilities)
 
 if(MITK_USE_BLUEBERRY)
+
+  # We need to hack a little bit because MITK applications may need
+  # to enable certain BlueBerry plug-ins. However, these plug-ins
+  # are validated separately from the MITK plug-ins and know nothing
+  # about potential MITK plug-in dependencies of the applications. Hence
+  # we cannot pass the MITK application list to the BlueBerry
+  # ctkMacroSetupPlugins call but need to extract the BlueBerry dependencies
+  # from the applications and set them explicitly.
+
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
+
+  foreach(mitk_app ${MITK_APPS})
+    # extract target_dir and option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 0 target_dir)
+    list(GET target_info_list 1 option_name)
+    # check if the application is enabled and if target_libraries.cmake exists
+    if (${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+      include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+      foreach(_target_dep ${target_libraries})
+        if(_target_dep MATCHES org_blueberry_)
+          string(REPLACE _ . _app_bb_dep ${_target_dep})
+          # explicitly set the build option for the BlueBerry plug-in
+          set(BLUEBERRY_BUILD_${_app_bb_dep} ON CACHE BOOL "Build the ${_app_bb_dep} plug-in")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+
   include(mitkSetupBlueBerry)
 endif()
 
@@ -616,8 +646,7 @@ if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
   set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
 endif()
 
-# Add applications directory
-add_subdirectory(Applications)
+
 
 #-----------------------------------------------------------------------------
 # Python Wrapping
@@ -717,3 +746,13 @@ if(WIN32)
       ${VS_BUILD_TYPE})
   endforeach()
 endif(WIN32)
+
+
+#-----------------------------------------------------------------------------
+# MITK Applications
+#-----------------------------------------------------------------------------
+
+# This must come after MITKConfig.h was generated, since applications
+# might do a find_package(MITK REQUIRED).
+add_subdirectory(Applications)
+

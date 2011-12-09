@@ -152,6 +152,7 @@ mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::CreateLand
 
     // set orientation to quaternion transform
     vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
+
     m_QuaternionTransform->SetRotation(vnlQuatIn);
 
     // transform each point
@@ -172,6 +173,7 @@ mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::CreateLand
     pointC[1] += nd->GetPosition()[1];
     pointC[2] += nd->GetPosition()[2];
 
+
     int currSize = landmarkContainer->GetSize();
     // insert transformed points in landmark container
     landmarkContainer->InsertPoint(currSize++,pointA);
@@ -184,13 +186,11 @@ mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::CreateLand
 
 const mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::GetSourceLandmarks()
 {
-  int size = m_SourceLandmarksFromNavigationDatas->GetSize();
   return m_SourceLandmarksFromNavigationDatas;
 }
 
 const mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::GetTargetLandmarks()
 {
-  int size = m_TargetLandmarksFromNavigationDatas->GetSize();
   return m_TargetLandmarksFromNavigationDatas;
 }
 

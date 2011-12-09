@@ -466,7 +466,7 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         clipper->SetClipFunction(plane);
         clipper->GenerateClipScalarsOn();
         clipper->GenerateClippedOutputOn();
-        vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
+        vtkSmartPointer<vtkPolyData> clipperout1 = clipper->GetClippedOutput();
         MITK_INFO << "end clipping";
 
         /* for some reason clipperoutput is not initialized for futher processing
@@ -480,20 +480,20 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         writerC->Write();
         MITK_INFO << "writing done";
 
-        //        MITK_INFO << "start clippingRecursive";
-        //        vtkSmartPointer<vtkClipPolyData> Rclipper = vtkSmartPointer<vtkClipPolyData>::New();
-        //        Rclipper->SetInput(clipperout1);
-        //        Rclipper->SetClipFunction(planeR);
-        //        Rclipper->GenerateClipScalarsOn();
-        //        Rclipper->GenerateClippedOutputOn();
-        //        vtkSmartPointer<vtkPolyData> clipperout = Rclipper->GetClippedOutput();
-        //        MITK_INFO << "end clipping recursive";
+                MITK_INFO << "start clippingRecursive";
+                vtkSmartPointer<vtkClipPolyData> Rclipper = vtkSmartPointer<vtkClipPolyData>::New();
+                Rclipper->SetInput(clipperout1);
+                Rclipper->SetClipFunction(planeR);
+                Rclipper->GenerateClipScalarsOn();
+                Rclipper->GenerateClippedOutputOn();
+                vtkSmartPointer<vtkPolyData> clipperout = Rclipper->GetClippedOutput();
+                MITK_INFO << "end clipping recursive";
 
-        //        vtkSmartPointer<vtkPolyDataWriter> writerC1 = vtkSmartPointer<vtkPolyDataWriter>::New();
-        //        writerC1->SetInput(clipperout);
-        //        writerC1->SetFileName("/vtkOutput/FbId_clipLineId0+1+2-tests.vtk");
-        //        writerC1->SetFileTypeToASCII();
-        //        writerC1->Write();
+                vtkSmartPointer<vtkPolyDataWriter> writerC1 = vtkSmartPointer<vtkPolyDataWriter>::New();
+                writerC1->SetInput(clipperout);
+                writerC1->SetFileName("/vtkOutput/FbId_clipLineId0+1+2-tests.vtk");
+                writerC1->SetFileTypeToASCII();
+                writerC1->Write();
 
 
         MITK_INFO << "STEP 1: find all points which have distance 0 to the given plane";
@@ -571,12 +571,12 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
              //   MITK_INFO << "PntDistance to Radius: " << XdistPnt;
                 if( XdistPnt <= distPF)
                 {
-                    MITK_INFO << "point in Circle";
+                   // MITK_INFO << "point in Circle";
                     PointsInROI.push_back(PointsOnPlane[i]);
                 }
 
             }//end for(i)
-            MITK_INFO << "Points inside circle radius: " << PointsInROI.size();
+           // MITK_INFO << "Points inside circle radius: " << PointsInROI.size();
         }
 
         MITK_INFO << "Step3: Identify fibers";
@@ -610,11 +610,11 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
                  *  check if current point occurs in ROI
                  ======================*/
                     if (pts[j] == PointsInROI[k]) {
-                        //figure out which line does it belong to
-                        if (clipperout->GetCellData()->HasArray("FB_IDs"))
+//                        MITK_INFO << "Matching Point found";
+                        if (clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
                         {
-                            int originalFibId = clipperout->GetCellData()->GetArray("FB_IDs")->GetTuple(i)[0];
-                            MITK_INFO << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
+                            int originalFibId = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
+//                            MITK_INFO << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
 
                             // do something to avoid duplicates
                             int oldFibInRoiSize = FibersInROI.size();
@@ -648,11 +648,11 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
 
         MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
         std::vector<int>::iterator finIt = FibersInROI.begin();
-        while ( finIt != FibersInROI.end() )
-        {
-            MITK_INFO << *finIt << endl;
-            ++finIt;
-        }
+//        while ( finIt != FibersInROI.end() )
+//        {
+//            MITK_INFO << *finIt << endl;
+//            ++finIt;
+//        }
         MITK_INFO << "=====================\n";
 
     }

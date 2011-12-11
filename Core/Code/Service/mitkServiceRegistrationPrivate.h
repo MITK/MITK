@@ -126,6 +126,12 @@ public:
 
   virtual itk::LightObject* GetService();
 
+private:
+
+  // disable copy constructor and assignment operator
+  ServiceRegistrationPrivate(const ServiceRegistrationPrivate&);
+  ServiceRegistrationPrivate& operator=(const ServiceRegistrationPrivate&);
+
 };
 
 }

@@ -104,6 +104,12 @@ public:
    * Link to registration object for this reference.
    */
   ServiceRegistrationPrivate* const registration;
+
+private:
+
+  // disable copy constructor and assignment operator
+  ServiceReferencePrivate(const ServiceReferencePrivate&);
+  ServiceReferencePrivate& operator=(const ServiceReferencePrivate&);
 };
 
 }

@@ -190,7 +190,8 @@ void ServiceRegistration::Unregister()
       d->module = 0;
       d->dependents.clear();
       d->service = 0;
-      d->serviceInstances.clear();;
+      d->serviceInstances.clear();
+      d->reference = 0;
       d->unregistering = false;
     }
   }

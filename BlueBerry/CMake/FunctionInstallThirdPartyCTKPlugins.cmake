@@ -1,3 +1,30 @@
+#! \brief Install external CTK plug-ins.
+#!
+#! Use this macro to call MACRO_INSTALL_CTK_PLUGIN() for all known
+#! or given external CTK plug-ins. The arguments given until a known argument name
+#! are treated as plug-in target names. If none are given, all known
+#! external plug-ins will be installed.
+#!
+#! This macro supports multiple MacOSX Bundles by checking the variable
+#! MACOSX_BUNDLE_NAMES. If it exists, each plug-in will be installed
+#! in each given bundle (under <bundle_name>/Contents/MacOS/plugins), otherwise
+#! it will be installed in "bin/plugins".
+#!
+#! Typical usage (will install all known external plug-ins):
+#! \code
+#! FunctionInstallThirdPartyCTKPlugins()
+#! \endcode
+#!
+#! To install only the org.commontk.eventadmin plug-in for example, call:
+#! \code
+#! FunctionInstallThirdPartyCTKPlugins(org.commontk.eventadmin)
+#! \endcode
+#!
+#! \note If you provide specific plug-in names as arguments, you must
+#! make sure that your list includes the transitive closure of all plug-in
+#! dependencies. Use the ctkFunctionGetPluginDependencies() macro to obtain
+#! all dependencies of a specified set of plug-ins.
+#!
 function(FunctionInstallThirdPartyCTKPlugins)
 
   macro_parse_arguments(_INSTALL "EXCLUDE" "" ${ARGN})

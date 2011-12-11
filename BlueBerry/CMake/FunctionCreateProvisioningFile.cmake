@@ -15,19 +15,33 @@
 #!
 #! This function creates a provisioning file which can be used to provision a BlueBerry
 #! application. The syntax of entries in the file is
-#! \verbatim
+#! \code
 #! (READ|INSTALL|START) <file-url>
-#! \endverbatim
+#! \endcode
 #! READ includes the file at <file-url> and interprets it as a provisioning file, INSTALL installs <file-url>,
-#! and START installs and starts <file-url> as a plug-in the framework.
+#! and START installs and starts <file-url> as a plug-in in the framework.
 #!
 #! <p>
 #! For example the following provisioning file instructs the BlueBerry framework to read the entries in
 #! a file called SomeApp.provisioning and subsequently INSTALL and START the plug-in com.mycompany.plugin
-#! \verbatim
+#! \code
 #! READ file:///opt/etc/SomeApp.provisioning
 #! START file:///opt/mycompany/plugins/libcom_mycompany_plugin.so
-#! \endverbatim
+#! \endcode
+#!
+#! <p>
+#! An example invocation of this macro may look like:
+#! \code
+#! set(_my_prov_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MyApp.provisioning")
+#! set(_my_plugins
+#!   com.mycompany.plugin
+#!   org.mitk.gui.qt.extapplication
+#! )
+#! FunctionCreateProvisioningFile(FILE ${_my_prov_file} PLUGINS ${_my_plugins})
+#! \endcode
+#!
+#! \note This function will automatically create entries for all plug-in
+#! dependencies of the specified plug-ins.
 #!
 function(FunctionCreateProvisioningFile)
 
@@ -136,6 +150,8 @@ function(FunctionCreateProvisioningFile)
 
       set(out_var "${out_var}START ${plugin_url}\n")
       set(out_var_install "${out_var_install}START ${plugin_url_install}\n")
+    else()
+      #message(WARNING "Ignoring unknown plug-in target \"${plugin}\" for provisioning.")
     endif()
 
   endforeach()

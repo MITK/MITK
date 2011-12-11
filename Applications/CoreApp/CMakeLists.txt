@@ -5,22 +5,21 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
+set(_plugins
+  org.mitk.gui.qt.application
+)
+
 # Plug-ins listed below will not be
 #  - added as a build-time dependency to the executable
 #  - listed in the provisioning file for the executable
 #  - installed if they are external plug-ins
 
-set(_exclude_plugins
-  org.blueberry.test
-  org.blueberry.uitest
-  org.mitk.gui.qt.extapplication
-)
+set(_exclude_plugins )
 
 FunctionCreateBlueBerryApplication(
   NAME CoreApp
   DESCRIPTION "MITK - CoreApp Application"
-  PLUGINS ${MITK_CORE_ENABLED_PLUGINS}
-  EXCLUDE_PLUGINS ${_exclude_plugins}
+  PLUGINS ${_plugins}
   ${_app_options}
 )
 

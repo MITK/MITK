@@ -1,17 +1,30 @@
 #!
-#! Extracts target names from a string containing CMake option values.
+#! Create a BlueBerry application.
 #!
-#! Example usage:
+#! \brif This function will create a BlueBerry application together with all
+#! necessary provisioning and configuration data and install support.
+#!
+#! \param NAME (required) The name of the executable.
+#! \param DESCRIPTION (optional) A human-readable description of your application.
+#!        The usage depends on the CPack generator (on Windows, this is a descriptive
+#!        text for the created shortcuts).
+#! \param SOURCES (optional) A list of source files to compile into your executable. Defaults
+#!        to <name>.cpp.
+#! \param PLUGINS (optional) A list of required plug-ins. Defaults to all known plug-ins.
+#! \param EXCLUDE_PLUGINS (optional) A list of plug-ins which should not be used. Mainly
+#!        useful if PLUGINS was not used.
+#! \param SHOW_CONSOLE (option) Show the console output window (on Windows).
+#! \param NO_PROVISIONING (option) Do not create provisioning files.
+#!
+#! Assuming that there exists a file called <code>MyApp.cpp</code>, an example call looks like:
 #! \code
-#! set(build_options Plugins/org.mydomain.core:ON Plugins/org.mydomain.logic:ON)
-#! ctkFunctionExtractPluginTargets("${build_options}" ALL target_names)
-#! message("targets: ${target_names}")
+#! FunctionCreateBlueBerryApplication(
+#!   NAME MyApp
+#!   DESCRIPTION "MyApp - New ways to explore medical data"
+#!   EXCLUDE_PLUGINS org.mitk.gui.qt.extapplication
+#!   SHOW_CONSOLE
+#! )
 #! \endcode
-#! will print <code>targets: org_mydomain_core;org_mydomain_logic</code>.
-#!
-#! \param my_opts A string containing a list of options.
-#! \param my_filter One of ON, OFF or ALL. Checks the actual build option of the plugin.
-#! \param var_targets A variable name containing the output.
 #!
 function(FunctionCreateBlueBerryApplication)
 

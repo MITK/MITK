@@ -1,3 +1,16 @@
+
+#! \brief Install CTK plug-ins.
+#!
+#! Installs the given list of CTK plug-in targets in the given
+#! <code>DESTINATION</code>. If an entry in <code>TARGETS</code>
+#! is not a known target, a warning will be issued. This macro
+#! can also install imported plug-in targets.
+#!
+#! \note This macro is usually not called directly. It is used in
+#! MACRO_CREATE_CTK_PLUGIN() and FunctionInstallThirdPartyCTKPlugins().
+#!
+#! \param TARGETS (optional) A list of plug-ins (target names) to install.
+#! \param DESTINATION (optional) The install destination. Defaults to "bin/".
 MACRO(MACRO_INSTALL_CTK_PLUGIN)
 
   MACRO_PARSE_ARGUMENTS(_INSTALL "TARGETS;DESTINATION" "" ${ARGN})

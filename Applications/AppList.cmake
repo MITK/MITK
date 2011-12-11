@@ -2,12 +2,8 @@
 # This file is included in the top-level MITK CMakeLists.txt file to
 # allow early dependency checking
 
-option(MITK_BUILD_ALL_APPS "Build all available MITK applications" OFF)
-mark_as_advanced(MITK_BUILD_ALL_APPS)
-
 option(MITK_BUILD_APP_CoreApp "Build the MITK CoreApp" OFF)
 option(MITK_BUILD_APP_ExtApp "Build the MITK ExtApp" ON)
-
 
 # This variable is fed to ctkFunctionSetupPlugins() macro in the
 # top-level MITK CMakeLists.txt file. This allows to automatically

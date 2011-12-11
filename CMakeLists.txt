@@ -114,6 +114,7 @@ if(MITK_USE_QT)
 endif()
 
 option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
+option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 if(MITK_USE_Boost)
@@ -127,6 +128,7 @@ option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
   
 mark_as_advanced(MITK_BUILD_ALL_PLUGINS
+                 MITK_BUILD_ALL_APPS
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )

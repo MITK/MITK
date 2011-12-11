@@ -688,6 +688,7 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \
                          Register* \
                          */files.cmake \
+                         */.git/* \
                          @BLUEBERRY_BINARY_DIR@/*.cmake
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names

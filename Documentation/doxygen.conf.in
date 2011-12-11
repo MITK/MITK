@@ -709,6 +709,7 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \
                          Register* \
                          */files.cmake \
+                         */.git/* \
                          @MITK_BINARY_DIR@/*.cmake \
                          @MITK_DOXYGEN_EXCLUDE_PATTERNS@
 

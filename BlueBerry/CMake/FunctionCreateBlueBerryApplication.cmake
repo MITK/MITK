@@ -34,6 +34,11 @@ else()
     string(REPLACE "." "_" _plugin_target ${_plugin})
     list(APPEND _APP_PLUGINS ${_plugin_target})
   endforeach()
+  
+  # get all plug-in dependencies
+  ctkFunctionGetPluginDependencies(_plugin_deps PLUGINS ${_APP_PLUGINS} ALL)
+  # add the dependencies to the list of application plug-ins
+  list (APPEND _APP_PLUGINS ${_plugin_deps})
 endif()
 
 #------------------------------------------------------------------------

@@ -712,7 +712,7 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
     return;
 
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
-  QString filename = QFileDialog::getSaveFileName(NULL, "Save NDI-Tool", QString(QDir::currentPath()+QString(m_Tracker->GetTool(currId)->GetToolName())),"NDI Tracking Tool file(*.ntf)");
+  QString filename = QFileDialog::getSaveFileName(NULL, "Save NDI-Tool", QString(QString(m_Tracker->GetTool(currId)->GetToolName())),"NDI Tracking Tool file(*.ntf)");
   
   mitk::TrackingTool* selectedTool = m_Tracker->GetTool(currId);
   

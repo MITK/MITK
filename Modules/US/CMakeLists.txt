@@ -1,0 +1,9 @@
+MITK_CREATE_MODULE(MitkUS
+  SUBPROJECTS
+  INCLUDE_DIRS
+  DEPENDS
+)
+
+## create US config
+CONFIGURE_FILE(mitkUSConfig.h.in ${PROJECT_BINARY_DIR}/mitkUSConfig.h @ONLY)
+

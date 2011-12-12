@@ -23,11 +23,108 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QBuffer>
+
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 
 #include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <cctype>
+
+int compareVersions(const QString& v1, const QString& v2)
+{
+  QList<int> t1;
+  foreach(QString t, v1.split('.'))
+  {
+    t1.append(t.toInt());
+  }
+
+  QList<int> t2;
+  foreach(QString t, v2.split('.'))
+  {
+    t2.append(t.toInt());
+  }
+
+  // pad with 0
+  if (t1.size() < t2.size())
+  {
+    for(int i = 0; i < t2.size() - t1.size(); ++i)
+    t1.append(0);
+  }
+  else
+  {
+    for(int i = 0; i < t1.size() - t2.size(); ++i)
+    t2.append(0);
+  }
+
+  for(int i = 0; i < t1.size(); ++i)
+  {
+    if (t1.at(i) < t2.at(i)) return -1;
+    else if (t1.at(i) > t2.at(i)) return 1;
+  }
+  return 0;
+}
+
+int checkUpdates(QTextStream& out)
+{
+  out << "Checking for updates... "; out.flush();
+  QNetworkAccessManager manager;
+  QNetworkReply* reply = manager.get(QNetworkRequest(QUrl("http://www.mitk.org/wiki/PluginGeneratorUpdate?action=raw")));
+
+  QEventLoop eventLoop;
+  reply->connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+  eventLoop.exec();
+
+  QByteArray data = reply->readAll();
+  delete reply;
+
+  if (data.isEmpty())
+  {
+    qCritical() << "A network error occured:" << reply->errorString();
+    return EXIT_FAILURE;
+  }
+
+  QBuffer buffer(&data);
+  buffer.open(QIODevice::ReadOnly);
+  bool versionFound = false;
+  while(buffer.canReadLine())
+  {
+    QString line = buffer.readLine();
+    if (!versionFound)
+    {
+      line = line.trimmed();
+      if (line.isEmpty()) continue;
+
+      if (compareVersions(PLUGIN_GENERATOR_VERSION, line) < 0)
+      {
+        versionFound = true;
+        out << "New version " << line << " available.\n";
+      }
+      else
+      {
+        // no update available
+        out << "No update available.\n"; out.flush();
+        return EXIT_SUCCESS;
+      }
+    }
+    else
+    {
+      out << line;
+    }
+  }
+
+  if (!versionFound)
+  {
+    qCritical() << "Update information not readable.";
+    return EXIT_FAILURE;
+  }
+
+  out << '\n'; out.flush();
+
+  return EXIT_SUCCESS;
+}
 
 bool readAnswer(char defaultAnswer)
 {
@@ -140,27 +237,29 @@ int main(int argc, char** argv)
   parser.setStrictModeEnabled(true);
 
   // Add command line argument names
-  parser.addArgument("help", "h", QVariant::Bool, "Show this help text");
-  parser.addArgument("out-dir", "o", QVariant::String, "Output directory", QDir::tempPath());
-  parser.addArgument("license", "l", QVariant::String, "Path to a file containing license information", ":/MITKLicense.txt");
-  parser.addArgument("vendor", "v", QVariant::String, "The vendor of the generated code", "DKFZ, Medical and Biological Informatics");
-  parser.addArgument("quiet", "q", QVariant::Bool, "Do not print additional information");
-  parser.addArgument("confirm-all", "y", QVariant::Bool, "Answer all questions with 'yes'");
+  parser.addArgument("help", "h", QVariant::Bool, "  Show this help text");
+  parser.addArgument("out-dir", "o", QVariant::String, "  Output directory", QDir::tempPath());
+  parser.addArgument("license", "l", QVariant::String, "  Path to a file containing license information", ":/MITKLicense.txt");
+  parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "DKFZ, Medical and Biological Informatics");
+  parser.addArgument("quiet", "q", QVariant::Bool, "  Do not print additional information");
+  parser.addArgument("confirm-all", "y", QVariant::Bool, "  Answer all questions with 'yes'");
+  parser.addArgument("check-update", "u", QVariant::Bool, "  Check for updates and exit");
+  parser.addArgument("no-networking", "n", QVariant::Bool, "  Disable all network requests");
 
   parser.beginGroup("Plug-in options");
-  parser.addArgument("plugin-symbolic-name", "ps", QVariant::String, "The plugin's symbolic name");
+  parser.addArgument("plugin-symbolic-name", "ps", QVariant::String, "* The plugin's symbolic name");
   parser.setExactMatchRegularExpression("-ps", "^[a-zA-Z]+\\.[a-zA-Z0-9._]+[^\\.]$", "Symbolic name invalid");
-  parser.addArgument("plugin-name", "pn", QVariant::String, "The plug-in's human readable name");
+  parser.addArgument("plugin-name", "pn", QVariant::String, "  The plug-in's human readable name");
 
   parser.beginGroup("Plug-in View options");
-  parser.addArgument("view-class", "vc", QVariant::String, "The View's' class name");
-  parser.addArgument("view-name", "vn", QVariant::String, "The View's human readable name");
+  parser.addArgument("view-class", "vc", QVariant::String, "  The View's' class name");
+  parser.addArgument("view-name", "vn", QVariant::String, "* The View's human readable name");
 
   parser.beginGroup("Project options");
-  parser.addArgument("project-copyright", "", QVariant::String, "Path to a file containing copyright information", ":/MITKCopyright.txt");
-  parser.addArgument("project-name", "", QVariant::String, "The project name");
+  parser.addArgument("project-copyright", "", QVariant::String, "  Path to a file containing copyright information", ":/MITKCopyright.txt");
+  parser.addArgument("project-name", "", QVariant::String, "  The project name");
   parser.setExactMatchRegularExpression("--project-name", "^[a-zA-Z_\\-]+$", "Project name invalid");
-  parser.addArgument("project-app-name", "", QVariant::String, "The application name");
+  parser.addArgument("project-app-name", "", QVariant::String, "  The application name");
   parser.setExactMatchRegularExpression("--project-app-name", "^[a-zA-Z_\\-]+$", "Project application name invalid");
   parser.endGroup();
 
@@ -181,8 +280,32 @@ int main(int argc, char** argv)
   if (parsedArgs.contains("help"))
   {
     out << "A CTK plug-in generator for MITK (version " PLUGIN_GENERATOR_VERSION ")\n\n"
-        << parser.helpText();
+        << parser.helpText()
+        << "\n[* - options are required]\n";
     return EXIT_SUCCESS;
+  }
+
+  bool noNetwork = parsedArgs.contains("no-networking");
+
+  if (parsedArgs.contains("check-update"))
+  {
+    if (noNetwork)
+    {
+      out << "Network support disabled. Cannot check for updates.\n";
+      out.flush();
+    }
+    else
+    {
+      return checkUpdates(out);
+    }
+  }
+  else
+  {
+    // always check for updates if no-networking is not given
+    if (!noNetwork)
+    {
+      checkUpdates(out);
+    }
   }
  
   // Check arguments

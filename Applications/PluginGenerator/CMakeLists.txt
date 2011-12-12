@@ -19,6 +19,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(QT_DONT_USE_QTGUI 1)
+set(QT_USE_QTNETWORK 1)
 find_package(Qt 4.6.2 REQUIRED)
 
 include(${QT_USE_FILE})

@@ -67,7 +67,7 @@ int compareVersions(const QString& v1, const QString& v2)
   return 0;
 }
 
-int checkUpdates(QTextStream& out, bool verbose = false)
+int checkUpdates(QTextStream& out)
 {
   out << "Checking for updates... "; out.flush();
   QNetworkAccessManager manager;
@@ -105,10 +105,7 @@ int checkUpdates(QTextStream& out, bool verbose = false)
       else
       {
         // no update available
-        if (verbose)
-        {
-          out << "No update available.\n"; out.flush();
-        }
+        out << "No update available.\n"; out.flush();
         return EXIT_SUCCESS;
       }
     }
@@ -299,7 +296,7 @@ int main(int argc, char** argv)
     }
     else
     {
-      return checkUpdates(out, true);
+      return checkUpdates(out);
     }
   }
   else

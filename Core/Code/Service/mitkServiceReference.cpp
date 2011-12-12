@@ -56,7 +56,7 @@ ServiceReference& ServiceReference::operator=(int null)
 {
   if (null == 0)
   {
-    if (d && !d->ref.Deref())
+    if (!d->ref.Deref())
       delete d;
     d = new ServiceReferencePrivate(0);
   }

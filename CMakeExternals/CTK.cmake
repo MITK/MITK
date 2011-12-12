@@ -17,7 +17,7 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 107ffad7)
+    SET(revision_tag 282be3d)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()
@@ -47,7 +47,9 @@ IF(MITK_USE_CTK)
         ${ctk_optional_cache_args}
         -DDESIRED_QT_VERSION:STRING=4
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+        -DCTK_LIB_PluginFramework:BOOL=ON
         -DCTK_LIB_DICOM/Widgets:BOOL=ON
+        -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
       DEPENDS ${proj_DEPENDENCIES}
      )

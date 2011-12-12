@@ -1,12 +1,21 @@
-# MACRO_CREATE_CTK_PLUGIN()
-#
-# Creates a CTK plugin.
-# This macro should be called from the plugins CMakeLists.txt file.
-# The target name is available after the macro call as ${PROJECT_NAME}
-# to add additional libraries in your CMakeLists.txt. Include paths and link
-# libraries are set depending on the value of the Required-Plugins header
-# in your manifest_headers.cmake file.
-#
+
+#! \brief Creates a CTK plugin.
+#!
+#! This macro should be called from the plugins CMakeLists.txt file.
+#! The target name is available after the macro call as ${PLUGIN_TARGET}
+#! to add additional libraries in your CMakeLists.txt. Include paths and link
+#! libraries are set depending on the value of the Required-Plugins header
+#! in your manifest_headers.cmake file.
+#!
+#! This macro internally calls ctkMacroBuildPlugin() and adds support
+#! for Qt Help files and installers.
+#!
+#! \param EXPORT_DIRECTIVE (required) The export directive to use in the generated
+#!        <plugin_target>_Exports.h file.
+#! \param EXPORTED_INCLUDE_SUFFIXES (optional) a list of sub-directories which should
+#!        be added to the current source directory. The resulting directories
+#!        will be available in the set of include directories of depending plug-ins.
+#! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
 MACRO(MACRO_CREATE_CTK_PLUGIN)
 
   MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES" "TEST_PLUGIN" ${ARGN})

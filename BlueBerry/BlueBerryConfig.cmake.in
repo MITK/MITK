@@ -1,4 +1,25 @@
 
+# -------------------------------------------------------------------------
+# Package requirements
+# -------------------------------------------------------------------------
+
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@BLUEBERRY_SOURCE_DIR@/CMake")
+
+SET(CTK_DIR "@CTK_DIR@")
+FIND_PACKAGE(CTK REQUIRED)
+
+SET(mbilog_DIR "@mbilog_DIR@")
+FIND_PACKAGE(mbilog REQUIRED)
+
+FIND_PACKAGE(Poco REQUIRED)
+
+FIND_PACKAGE(Doxygen)
+
+
+# -------------------------------------------------------------------------
+# BlueBerry directory vars
+# -------------------------------------------------------------------------
+
 SET(BLUEBERRY_PLUGINS_SOURCE_DIR "@BLUEBERRY_PLUGINS_SOURCE_DIR@")
 SET(BLUEBERRY_PLUGINS_BINARY_DIR "@BLUEBERRY_PLUGINS_BINARY_DIR@")
 
@@ -9,38 +30,47 @@ SET(BLUEBERRY_SOURCE_DIR "@BLUEBERRY_SOURCE_DIR@")
 SET(BlueBerry_SOURCE_DIR "@BLUEBERRY_SOURCE_DIR@")
 SET(BLUEBERRY_BINARY_DIR "@BLUEBERRY_BINARY_DIR@")
 
-INCLUDE("@BB_PLUGIN_USE_FILE@")
+
+# -------------------------------------------------------------------------
+# BlueBerry CMake file includes
+# -------------------------------------------------------------------------
+
+SET(BLUEBERRY_PLUGIN_USE_FILE @BB_PLUGIN_USE_FILE@)
+IF(BLUEBERRY_PLUGIN_USE_FILE)
+  IF(EXISTS ${BLUEBERRY_PLUGIN_USE_FILE})
+    INCLUDE(${BLUEBERRY_PLUGIN_USE_FILE})
+  ENDIF()
+ENDIF()
 
 IF(NOT BB_PLUGIN_EXPORTS_FILE_INCLUDED AND NOT CMAKE_PROJECT_NAME STREQUAL "MITK")
   INCLUDE("@BB_PLUGIN_EXPORTS_FILE@")
   SET(BB_PLUGIN_EXPORTS_FILE_INCLUDED 1)
 ENDIF()
 
+
+# -------------------------------------------------------------------------
+# BlueBerry CMake variables
+# -------------------------------------------------------------------------
+
 SET(BLUEBERRY_DEBUG_POSTFIX @BLUEBERRY_DEBUG_POSTFIX@)
 
 SET(BLUEBERRY_USE_QT_HELP @BLUEBERRY_USE_QT_HELP@)
+
 SET(QT_HELPGENERATOR_EXECUTABLE "@QT_HELPGENERATOR_EXECUTABLE@")
 SET(QT_COLLECTIONGENERATOR_EXECUTABLE "@QT_COLLECTIONGENERATOR_EXECUTABLE@")
 SET(QT_ASSISTANT_EXECUTABLE "@QT_ASSISTANT_EXECUTABLE@")
 
-SET(CTK_DIR "@CTK_DIR@")
-FIND_PACKAGE(CTK REQUIRED)
-
-FIND_PACKAGE(Doxygen)
-
 SET(BLUEBERRY_PLUGIN_TARGETS @my_plugin_targets@)
 SET(BLUEBERRY_ENABLED_PLUGINS @my_plugin_targets@)
-SET(CTK_PLUGIN_LIBRARIES ${CTK_PLUGIN_LIBRARIES} @my_plugin_targets@)
 
 SET(BLUEBERRY_PLUGIN_PROVISIONING_FILE "@BLUEBERRY_PROVISIONING_FILE@")
 
 SET(BLUEBERRY_DOXYGEN_TAGFILE_NAME @BLUEBERRY_DOXYGEN_TAGFILE_NAME@)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@BLUEBERRY_SOURCE_DIR@/CMake")
-FIND_PACKAGE(Poco REQUIRED)
 
-SET(mbilog_DIR "@mbilog_DIR@")
-FIND_PACKAGE(mbilog REQUIRED)
+# -------------------------------------------------------------------------
+# BlueBerry CMake macros
+# -------------------------------------------------------------------------
 
 INCLUDE(MacroParseArguments)
 INCLUDE(MacroConvertSchema)
@@ -56,3 +86,4 @@ INCLUDE(MacroInstallCTKPlugin)
 INCLUDE(MacroInstallThirdPartyPlugins)
 INCLUDE(FunctionInstallThirdPartyCTKPlugins)
 INCLUDE(FunctionCreateProvisioningFile)
+INCLUDE(FunctionCreateBlueBerryApplication)

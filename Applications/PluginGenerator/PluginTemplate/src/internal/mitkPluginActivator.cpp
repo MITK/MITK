@@ -1,6 +1,6 @@
 $(license)
 
-#include "mitkPluginActivator.h"
+#include "$(activator-file-name).h"
 
 #include <QtPlugin>
 
@@ -8,16 +8,16 @@ $(license)
 
 namespace mitk {
 
-void PluginActivator::start(ctkPluginContext* context)
+void $(activator-class-name)::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS($(view-class-name), context)
 }
 
-void PluginActivator::stop(ctkPluginContext* context)
+void $(activator-class-name)::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 }
 
-Q_EXPORT_PLUGIN2($(plugin-target), mitk::PluginActivator)
+Q_EXPORT_PLUGIN2($(plugin-target), mitk::$(activator-class-name))

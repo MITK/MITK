@@ -1,18 +1,5 @@
 SET(CPP_FILES
- 
+USFilters/mitkUSImage.cpp
 )
-
-SET(UI_FILES
-
-)
-
-SET(MOC_H_FILES
-
-)
-
-SET(QRC_FILES
-
-)
-
 
 

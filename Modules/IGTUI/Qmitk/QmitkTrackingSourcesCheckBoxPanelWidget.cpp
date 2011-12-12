@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkTrackingSourcesCheckBoxPanelWidget.h"
 
-
+#include <QMessageBox>
 
 
 QmitkTrackingSourcesCheckBoxPanelWidget::QmitkTrackingSourcesCheckBoxPanelWidget(QWidget* parent)  
@@ -62,13 +62,16 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::SetNavigationDatas(std::vector<mit
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::AddNavigationData(mitk::NavigationData::Pointer nd)
 {
-   if(m_NavigationDatas == NULL)
-     m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
+  if(m_NavigationDatas == NULL)
+    m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
 
-   if( nd.IsNotNull() )
-     m_NavigationDatas->push_back(nd);
+  if( nd.IsNotNull() )
+    m_NavigationDatas->push_back(nd);
 }
 
+bool QmitkTrackingSourcesCheckBoxPanelWidget::IsActionButtonChecked(){
+  return m_Controls->m_ActionButton->isChecked();
+}
 
 
 const std::vector<int>* QmitkTrackingSourcesCheckBoxPanelWidget::GetSelectedTrackingSourcesIDs()
@@ -101,8 +104,8 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::ClearPanel()
 
   if(m_NavigationDatas != NULL)
     m_NavigationDatas->clear();
-  
-  
+
+
 }
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::ClearSelectedIDs()
@@ -191,7 +194,7 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::OnCheckboxClicked(bool checked)
   {
     if(sender == m_SourceCheckboxes->at(i))
     {   idx=i;
-      break;
+    break;
     }    
   }
 
@@ -235,13 +238,40 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::SetActionPerformButtonCheckable(bo
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::OnPerformActionClicked(bool toggled)
 {
+  if(this->GetSelectedTrackingSourcesIDs()->empty())
+  {
+    m_Controls->m_ActionButton->setChecked(false);   
+    return;
+  }
+
   if(toggled)
+  {
+    bool invalidND = false;
+
+    for(int i=0; i < this->GetSelectedTrackingSourcesIDs()->size(); ++i)
+    {
+      if(!(m_NavigationDatas->at(this->GetSelectedTrackingSourcesIDs()->at(i))->IsDataValid()))
+        invalidND = true;
+    }
+
+    if(invalidND)
+    {
+      QMessageBox::warning(NULL, "Invalid Tracking Data", "One or more instruments are in invalid tracking state! Requested action can not be performed!");
+      m_Controls->m_ActionButton->setChecked(false);
+      return;
+    }
     emit PerformAction();
+  }
   else
     emit StopAction();
 }
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::OnPerformActionClicked()
 {
+  if(this->GetSelectedTrackingSourcesIDs()->empty()){
+    m_Controls->m_ActionButton->setChecked(false);
+    return;   
+  }
+
   emit Action();
 }

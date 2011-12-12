@@ -140,15 +140,15 @@ void QmitkToolTrackingStatusWidget::Refresh()
       quat = " / [qx:" + QString::number(quaternion.x()) + ";qy:" + QString::number(quaternion.y()) + ";qz:" + QString::number(quaternion.z()) + ";qr:" + QString::number(quaternion.r()) + "]";
       }
 
-    if(name.compare(m_StatusLabels->at(i)->objectName()) == 0)
-      {
-      m_StatusLabels->at(i)->setText(name+pos+quat);
+    
+     if(!(m_StatusLabels->at(i)->text() == name+pos+quat))
+        m_StatusLabels->at(i)->setText(name+pos+quat);
+     
       if(navData->IsDataValid())
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #8bff8b }");
-      
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
-      }
+      
   }
 }
 

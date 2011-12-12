@@ -172,3 +172,9 @@ void QmitkFiducialRegistrationWidget::HideImageFiducialButton( bool on )
 {
   m_Controls->m_AddImageFiducialBtn->setHidden(on);
 }
+
+void QmitkFiducialRegistrationWidget::HideTrackingFiducialButton( bool on )
+{
+  m_Controls->m_AddTrackingFiducialBtn->setHidden(on);
+}
+

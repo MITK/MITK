@@ -70,7 +70,9 @@ public:
   */
   void SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas);
 
-
+  /*!
+  \brief Adds the NavigationData to the existing ones.
+  */
   void AddNavigationData(mitk::NavigationData::Pointer nd);
 
   /*!  

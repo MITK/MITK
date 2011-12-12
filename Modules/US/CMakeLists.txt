@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE(MitkUS
   SUBPROJECTS
   INCLUDE_DIRS
-  DEPENDS
+  DEPENDS mitkOpenCVVideoSupport
 )
 
 ## create US config

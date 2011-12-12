@@ -1,5 +1,23 @@
 This is the change log for the MITK Plugin Generator
 
+Changes since version 1.1.1
+======================================================================
+
+Changes in the MITKPluginGenerator executable
+----------------------------------------------------------------------
+
+- Added a visual clue in the help text about required arguments.
+- Added support for checking for new versions online.
+
+Changes in the generated files
+----------------------------------------------------------------------
+
+- The plug-in activator class and file name are now derived from
+  the plug-in symbolic name.
+- Adapted to changes in CTK CMake macros.
+- Improved generated superbuild script to correctly pass -j options.
+- Using new BlueBerry FunctionCreateBlueBerryApplication() macro
+  to create the demo application.
 
 Changes since version 1.0.0
 ======================================================================

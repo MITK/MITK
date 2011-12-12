@@ -150,7 +150,7 @@ namespace mitk
 	//static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
 	static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
 	static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolaris.stl"};
-	static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolaris.stl"};
+	static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl"};
 	static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl"};
 	static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", ""};
 	static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube"};

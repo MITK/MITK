@@ -32,9 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QSqlDatabase>
 
 //CTK
-#include "ctkDICOMModel.h"
-#include "ctkDICOMAppWidget.h"
-#include "ctkDICOMQueryWidget.h"
+#include <ctkDICOMModel.h>
+#include <ctkDICOMAppWidget.h>
 
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";

@@ -47,11 +47,6 @@
     </spacer>
    </item>
    <item>
-    <widget class="ctkDICOMQueryWidget" name="verticalWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2"/>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -72,12 +67,6 @@
    <class>ctkDICOMAppWidget</class>
    <extends>QWidget</extends>
    <header>ctkdicomappwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ctkDICOMQueryWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkdicomquerywidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

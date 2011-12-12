@@ -264,7 +264,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
   projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
   projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
-  if ( sliceGeometry->IsIndexInside( projectedPointIn2D ) )
+  if ( sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
     MITK_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
@@ -285,27 +285,14 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       LevelWindow lw(0, 500);
       m_ToolManager->GetReferenceData(0)->GetLevelWindow(lw); // will fill lw if levelwindow property is present, otherwise won't touch it.
 
-      //m_VisibleWindow = lw.GetWindow();
-      // necessary for limiting the upper and lower threshold to the maximum gray values
-      //m_DefaultWindow = lw.GetDefaultWindow();
-
       ScalarType currentVisibleWindow = lw.GetWindow();
-      ScalarType currentDefaultWindow = lw.GetDefaultWindow();
-      //static bool initializedAlready = false; // just evaluated once
 
-      MITK_INFO<<"Visible: "<<currentVisibleWindow<<" Default: "<<currentDefaultWindow;
-
-      MITK_INFO<<"Pixeltype: "<<dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData())->GetPixelValueByWorldCoordinate(positionEvent->GetWorldPosition());
-      //if (!initializedAlready)
       if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
       {
-          MITK_INFO<<"Setting threshold....";
         m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 20% of the visible gray values
         m_InitialUpperThreshold = currentVisibleWindow / 10.0;
 
         m_VisibleWindow = currentVisibleWindow;
-
-        //initializedAlready = true;
       }
       
       m_LowerThreshold = m_InitialLowerThreshold;
@@ -315,7 +302,6 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       if (displayGeometry)
       {
         m_MouseDistanceScaleFactor = m_VisibleWindow / ( 3.0 * displayGeometry->GetDisplayHeight() );
-        MITK_INFO<<"VisibleWindow: "<<m_VisibleWindow<<" DisplayHeight: "<<displayGeometry->GetDisplayHeight();
       }
 
       // 3.2.3. Actually perform region growing
@@ -353,14 +339,10 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         cursor->SetCursorPosition( m_LastScreenPosition );
 
         m_LowerThreshold = m_InitialLowerThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
-//        if (m_LowerThreshold < 1) m_LowerThreshold = 1;
-//        if (m_LowerThreshold > m_VisibleWindow / 2) m_LowerThreshold = m_VisibleWindow / 2;
         
         m_UpperThreshold = m_InitialUpperThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
-//        if (m_UpperThreshold < 1) m_UpperThreshold = 1;
-//        if (m_UpperThreshold > m_VisibleWindow / 2) m_UpperThreshold = m_VisibleWindow / 2;
 
-        MITK_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << "MouseScaleFactor: "<<m_MouseDistanceScaleFactor << std::endl;
+        //MITK_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << "MouseScaleFactor: "<<m_MouseDistanceScaleFactor << std::endl;
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
@@ -428,8 +410,8 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
                   if ( m_RememberContourPositions )
                   {
                       this->AddContourmarker(positionEvent);
-                  }
-              }
+            }
+          }
               else
               {
                   OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
@@ -443,7 +425,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
                   if ( m_RememberContourPositions )
                   {
                       this->AddContourmarker(positionEvent);
-                  }
+        }
               }
             }
           }

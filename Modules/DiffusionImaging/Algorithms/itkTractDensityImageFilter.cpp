@@ -126,31 +126,29 @@ namespace itk{
         outImage->TransformPhysicalPointToIndex(vertex, index);
         outImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
-        int ix = Math::Round(contIndex[0]);
-        int iy = Math::Round(contIndex[1]);
-        int iz = Math::Round(contIndex[2]);
+        float frac_x = contIndex[0] - index[0];
+        float frac_y = contIndex[1] - index[1];
+        float frac_z = contIndex[2] - index[2];
 
-        float frac_x = contIndex[0] - ix;
-        float frac_y = contIndex[1] - iy;
-        float frac_z = contIndex[2] - iz;
-
-        int px = (int)contIndex[0];
+        int px = index[0];
         if (frac_x<0)
         {
           px -= 1;
-          frac_x *= -1;
+          frac_x += 1;
         }
-        int py = (int)contIndex[1];
+
+        int py = index[1];
         if (frac_y<0)
         {
           py -= 1;
-          frac_y *= -1;
+          frac_y += 1;
         }
-        int pz = (int)contIndex[2];
+
+        int pz = index[2];
         if (frac_z<0)
         {
           pz -= 1;
-          frac_z *= -1;
+          frac_z += 1;
         }
 
         // int coordinates inside image?
@@ -174,14 +172,14 @@ namespace itk{
         }
         else
         {
-          outImageBufferPointer[( px   + w*(py  + h*pz  ))] += (1-frac_x)*(1-frac_y)*(1-frac_z);
-          outImageBufferPointer[( px   + w*(py+1+ h*pz  ))] += (1-frac_x)*(  frac_y)*(1-frac_z);
-          outImageBufferPointer[( px   + w*(py  + h*pz+h))] += (1-frac_x)*(1-frac_y)*(  frac_z);
-          outImageBufferPointer[( px   + w*(py+1+ h*pz+h))] += (1-frac_x)*(  frac_y)*(  frac_z);
-          outImageBufferPointer[( px+1 + w*(py  + h*pz  ))] += (  frac_x)*(1-frac_y)*(1-frac_z);
-          outImageBufferPointer[( px+1 + w*(py  + h*pz+h))] += (  frac_x)*(1-frac_y)*(  frac_z);
-          outImageBufferPointer[( px+1 + w*(py+1+ h*pz  ))] += (  frac_x)*(  frac_y)*(1-frac_z);
-          outImageBufferPointer[( px+1 + w*(py+1+ h*pz+h))] += (  frac_x)*(  frac_y)*(  frac_z);
+          outImageBufferPointer[( px   + w*(py  + h*pz  ))] += (  frac_x)*(  frac_y)*(  frac_z);
+          outImageBufferPointer[( px   + w*(py+1+ h*pz  ))] += (  frac_x)*(1-frac_y)*(  frac_z);
+          outImageBufferPointer[( px   + w*(py  + h*pz+h))] += (  frac_x)*(  frac_y)*(1-frac_z);
+          outImageBufferPointer[( px   + w*(py+1+ h*pz+h))] += (  frac_x)*(1-frac_y)*(1-frac_z);
+          outImageBufferPointer[( px+1 + w*(py  + h*pz  ))] += (1-frac_x)*(  frac_y)*(  frac_z);
+          outImageBufferPointer[( px+1 + w*(py  + h*pz+h))] += (1-frac_x)*(  frac_y)*(1-frac_z);
+          outImageBufferPointer[( px+1 + w*(py+1+ h*pz  ))] += (1-frac_x)*(1-frac_y)*(  frac_z);
+          outImageBufferPointer[( px+1 + w*(py+1+ h*pz+h))] += (1-frac_x)*(1-frac_y)*(1-frac_z);
         }
       }
     }

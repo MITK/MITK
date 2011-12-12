@@ -162,6 +162,11 @@ struct TbssSelListener : ISelectionListener
         m_View->InitPointsets();
       }
 
+      if(foundTbss && foundTbssRoi)
+      {
+        m_View->Plot(image, roiImage);
+      }
+
     }
   }
 
@@ -465,7 +470,7 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
         mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
         if(img->GetDimension() == 4)
         {
-          //importer->SetImportVolume(img);
+          importer->SetImportVolume(img);
           name = node->GetName();
         }
       }

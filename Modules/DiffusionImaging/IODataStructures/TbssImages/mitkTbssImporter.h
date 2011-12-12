@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTbssImage.h"
 
 
+
+
 namespace mitk
 {
   //template<class TPixelType>
@@ -110,5 +112,5 @@ namespace mitk
 
 }
 
-//#include "mitkTbssImporter.cpp"
+#include "mitkTbssImporter.cpp"
 #endif // __mitkTbssImporter_h

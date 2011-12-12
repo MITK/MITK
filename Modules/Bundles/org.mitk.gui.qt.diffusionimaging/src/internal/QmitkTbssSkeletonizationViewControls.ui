@@ -39,6 +39,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="m_OutputMask">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Output binary mask</string>
      </property>
@@ -49,6 +52,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="m_OutputDistanceMap">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Output distance map</string>
      </property>

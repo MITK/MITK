@@ -105,7 +105,8 @@ struct TbssSkeletonizationSelListener : ISelectionListener
 
       m_View->m_Controls->m_Skeletonize->setEnabled(found3dImage);
       m_View->m_Controls->m_Project->setEnabled(found3dImage && found4dImage);
-
+      m_View->m_Controls->m_OutputMask->setEnabled(found3dImage && found4dImage);
+      m_View->m_Controls->m_OutputDistanceMap->setEnabled(found3dImage && found4dImage);
     }
   }
 

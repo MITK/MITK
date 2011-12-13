@@ -19,6 +19,7 @@
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
 #include "src/internal/QmitkScreenshotMaker.h"
+#include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
 
 namespace mitk {
 
@@ -40,6 +41,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkScreenshotMaker, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

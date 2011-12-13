@@ -53,7 +53,7 @@ typedef itk::Image<unsigned char, 3> UCharImageType;
 typedef itk::Image<float, 4> Float4DImageType;
 typedef itk::Image<float, 3> FloatImageType;
 typedef itk::Vector<int, 3> IntVectorType;
-typedef itk::VectorImage<int, 3> DirectionImageType;
+//typedef itk::VectorImage<int, 3> DirectionImageType;
 typedef itk::VectorImage<float, 3> VectorImageType;
 
 

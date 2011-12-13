@@ -20,6 +20,7 @@
 #include "src/internal/QmitkIVIMView.h"
 #include "src/internal/QmitkScreenshotMaker.h"
 #include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
+#include "src/internal/QmitkTbssSkeletonizationView.h"
 
 namespace mitk {
 
@@ -42,6 +43,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkScreenshotMaker, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkTbssSkeletonizationView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

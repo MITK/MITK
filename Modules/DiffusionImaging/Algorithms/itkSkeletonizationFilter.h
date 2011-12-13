@@ -75,9 +75,12 @@ public:
   virtual void GenerateData();
 
   
-  GradientImageType::Pointer GetDirectionImage();
+  GradientImageType::Pointer GetGradientImage();
 
-
+  VectorImageType::Pointer GetVectorImage()
+  {
+    return m_DirectionImage;
+  }
 
 
   

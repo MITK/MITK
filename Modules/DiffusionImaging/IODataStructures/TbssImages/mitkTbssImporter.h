@@ -25,14 +25,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorImage.h"
 #include "itkImageFileReader.h"
 #include "mitkTbssImage.h"
-
+#include "MitkDiffusionImagingExports.h".h"
 
 
 
 namespace mitk
 {
   //template<class TPixelType>
-  class TbssImporter : public itk::Object {
+  class MitkDiffusionImaging_EXPORT TbssImporter : public itk::Object {
 
   public:
    // typedef TPixelType PixelType;
@@ -91,7 +91,7 @@ namespace mitk
 
   protected:
 
-
+    TbssImporter(){}
 
     virtual ~TbssImporter(){}
 
@@ -112,5 +112,5 @@ namespace mitk
 
 }
 
-#include "mitkTbssImporter.cpp"
+//#include "mitkTbssImporter.cpp"
 #endif // __mitkTbssImporter_h

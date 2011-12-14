@@ -62,11 +62,6 @@ PURPOSE.  See the above copyright notices for more information.
     */
     virtual void GenerateData( mitk::PropertyList::Pointer );
 
-    /**
-    * \brief returns the QLabel* that internally represents the TextOverlay
-    */
-    virtual QWidget* GetWidget();
-
   protected:
 
     /**
@@ -84,7 +79,7 @@ PURPOSE.  See the above copyright notices for more information.
     void SetScaleFactor();
 
     /** \brief QWidget internally representing the TextOverlay */
-    QmitkScalarBar* m_Widget;  
+    QmitkScalarBar* m_ScalarBar;  
 
     mitk::PropertyList::Pointer m_PropertyList;
     unsigned long m_ObserverTag;

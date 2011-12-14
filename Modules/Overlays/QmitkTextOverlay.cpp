@@ -23,21 +23,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkCommand.h>
 
-#include <QLayout>
-
-
-QmitkTextOverlay::QmitkTextOverlay( const char* id ): 
-QmitkOverlay(id), m_Widget( NULL ), m_ObserverTag(0)
+QmitkTextOverlay::QmitkTextOverlay( const char* id )
+: QmitkOverlay(id)
+, m_ObserverTag(0)
 {
-  m_Widget = new QLabel();
-  m_Widget->setStyleSheet("");
+  m_Widget = m_Label = new QLabel();
+  QmitkOverlay::AddDropShadow( m_Widget );
 }
 
 QmitkTextOverlay::~QmitkTextOverlay()
 {
-  m_Widget->deleteLater();
-  m_Widget = NULL;
-
   m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
 }
 
@@ -52,8 +47,8 @@ void QmitkTextOverlay::GenerateData( mitk::PropertyList::Pointer pl )
   {
     this->SetupCallback( m_PropertyList->GetProperty( m_Id ) );
 
-    this->GetTextProperties( pl );
-    this->SetText();
+    this->UpdateFontProperties( pl );
+    this->UpdateDisplayedTextFromProperties();
   }
   else
   {
@@ -62,19 +57,19 @@ void QmitkTextOverlay::GenerateData( mitk::PropertyList::Pointer pl )
 
 }
 
-void QmitkTextOverlay::SetText()
+void QmitkTextOverlay::UpdateDisplayedTextFromProperties()
 {
-  std::string text = "";
+  std::string text;
   if ( m_PropertyList.IsNull() || !m_PropertyList->GetStringProperty( m_Id, text ) )
   {
     MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
-  m_Widget->setText( text.c_str() );
-  m_Widget->repaint();
+  m_Label->setText( text.c_str() );
+  m_Label->repaint();
 }
 
 
-void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
+void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
 {
   if ( pl.IsNull() )
     return;
@@ -95,7 +90,7 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
   mitk::Color color = colorProp->GetColor();
   palette.setColor( QPalette::Foreground, QColor( color[0],color[1],color[2],255 ) );
   palette.setColor( QPalette::Window, Qt::transparent);
-  m_Widget->setPalette( palette );
+  m_Label->setPalette( palette );
 
   // get the desired opacity of the overlays
   //mitk::FloatProperty::Pointer opacityProperty =
@@ -103,11 +98,11 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
 
   //if ( opacityProperty.IsNull() )
   //{
-  //  m_Widget->setWindowOpacity( 1 );
+  //  m_Label->setWindowOpacity( 1 );
   //} 
   //else
   //{
-  //  m_Widget->setWindowOpacity( opacityProperty->GetValue() );
+  //  m_Label->setWindowOpacity( opacityProperty->GetValue() );
   //}
   
    //set the desired font-size of the overlays
@@ -132,15 +127,8 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
   }
   font.setFamily(  QString(fontFamily.c_str()) );
 
-  m_Widget->setFont( font );
-  
+  m_Label->setFont( font );
 }
-
-QLabel* QmitkTextOverlay::GetWidget()
-{
-  return m_Widget;
-}
-
 
 void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {
@@ -149,7 +137,7 @@ void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
     typedef itk::SimpleMemberCommand< QmitkTextOverlay > MemberCommandType;
     MemberCommandType::Pointer propModifiedCommand;
     propModifiedCommand = MemberCommandType::New();
-    propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::SetText );
+    propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::UpdateDisplayedTextFromProperties );
     m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
   }
   else

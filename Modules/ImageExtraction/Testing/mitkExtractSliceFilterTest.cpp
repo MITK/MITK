@@ -15,14 +15,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkExtractSliceFilterTest.h>
+#include <mitkExtractSliceFilter.h>
+#include "mitkTestingMacros.h"
 
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
-#include <mitkItkImageFileReader.h>
 #include <vtkActor.h>
 #include <vtkRenderWindowInteractor.h>
-
 #include <vtkRenderWindow.h>
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderer.h>
@@ -37,44 +36,59 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkItkImageFileReader.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkRotationOperation.h>
+#include "mitkInteractionConst.h"
+
 
 int mitkExtractSliceFilterTest(int argc, char* argv[])
 {
 	// always start with this!
 	MITK_TEST_BEGIN("mitkExtractSliceFilterTest")
 
-    //mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
+
 	mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-	//reader->SetFileName("C:\home\Pics\Pic3D.nrrd");
+
 	std::string filename = "C:\\home\\Pics\\Pic3D.nrrd";//"C:\\home\\schroedt\\bin_mitk\\CMakeExternals\\Source\\MITK-Data\\NrrdWritingTestImage.jpg";
 	reader->SetFileName(filename);
-	MITK_INFO <<  mitk::ItkImageFileReader::CanReadFile(filename, "", ".jpg");
-	//reader->SetFileName("C:\home\schroedt\bin_mitk\CMakeExternals\Source\MITK-Data\Png2D-bw.png");
+	
 	reader->Update();
 
 	mitk::Image::Pointer image = reader->GetOutput();
 
-	//TODO vtkIMageREslice setup
-	vtkSmartPointer<vtkImageReslice> reslicer = vtkImageReslice::New();
 
-	reslicer->SetInput(image->GetVtkImageData());	
-	reslicer->SetResliceAxesOrigin(0.0, 0.0, 0.0);
+	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
 
-	double cosines[9] = {
-		1.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,
-		0.0, 0.0, -1.0
-	};
+	mitk::PlaneGeometry::Pointer geometry = mitk::PlaneGeometry::New();
 
-	reslicer->SetResliceAxesDirectionCosines(cosines);	
+	mitk::Vector3D right, bottom, normal;
+	mitk::Point3D origin;
 
-	reslicer->SetOutputDimensionality(2);
-    reslicer->SetInterpolationModeToNearestNeighbor();
-	reslicer->Update();
+	mitk::FillVector3D(origin, 0.0, 0.0, 0.0);
+
+	/*mitk::FillVector3D(right, 1.0, 0.0, 0.0);
+	mitk::FillVector3D(bottom, 0.0, -1.0, 0.0);
+
+	normal = itk::CrossProduct(right, bottom);*/
+
+	geometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Transversal, 24, false, true);
+	geometry->SetOrigin(origin);
+	
+	/*mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
+	mitk::RotationOperation* rotation = new mitk::RotationOperation( mitk::OpROTATE, geometry->GetCenter(), rotationVector, 180.0);
+	geometry->ExecuteOperation(rotation);
+	delete rotation;*/
+
+	MITK_INFO << "axis 0: " << geometry->GetAxisVector(0) << " |> aixs 1: " << geometry->GetAxisVector(1) << " |> center: " << geometry->GetCenter();
+
+	slicer->SetInput(image);
+	slicer->SetWorldGeometry(geometry);
+
+	slicer->Update();
+
+	MITK_TEST_CONDITION(slicer->GetOutput() != NULL, " Testing resliced Image returned");
 
 
-
+/*************** #BEGIN vtk render code ************************/
 	vtkSmartPointer<vtkPlaneSource> m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
 	m_Plane->SetOrigin(0.0, 0.0, 0.0);
 	//These two points define the axes of the plane in combination with the origin.
@@ -100,7 +114,8 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 	m_LookupTable->SetRange(-1022.0, 1184.0);
 
 	vtkSmartPointer<vtkTexture> m_Texture = vtkSmartPointer<vtkTexture>::New();
-	m_Texture->SetInput(reslicer->GetOutput());
+
+	m_Texture->SetInput(slicer->GetOutput()->GetVtkImageData());
 	//m_Texture->SetInput(image->GetVtkImageData());
 	m_Texture->SetLookupTable(m_LookupTable);
 

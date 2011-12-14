@@ -27,25 +27,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-	  class ImageExtraction_EXPORT ExtractSliceFilter : public ImageToImageFilter
-  {
-  public:
+	class ImageExtraction_EXPORT ExtractSliceFilter : public ImageToImageFilter
+	{
+	public:
 
-	  mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
-	  itkNewMacro(ExtractSliceFilter);
+		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
+		itkNewMacro(ExtractSliceFilter);
 
-	  itkSetMacro( WorldGeometry, Geometry2D* );
+		itkSetMacro( WorldGeometry, Geometry2D* );
 
-  protected:
-	  ExtractSliceFilter();
-	  virtual ~ExtractSliceFilter();
+	protected:
+		ExtractSliceFilter();
+		virtual ~ExtractSliceFilter();
 
-	  virtual void GenerateData();
+		virtual void GenerateData();
 
-	  const Geometry2D*	m_WorldGeometry;
-	  vtkSmartPointer<vtkImageReslice>	m_Reslicer;
+		const Geometry2D* m_WorldGeometry;
+		vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
-	  }
+	};
 }
 
 #endif // mitkExtractSliceFilter_h_Included

@@ -15,41 +15,56 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "mitkExtractSliceFilter.h"
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
-	m_Reslicer->Delete();
-	m_WorldGeometry->Delete();
+	
 }
 
 void mitk::ExtractSliceFilter::GenerateData(){
 
 	mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
 
-	if ( !input || !m_WorldGeometry) return;
+	if ( !input){
+		MITK_ERROR << "mitk::ExtractSliceFilter: No input image available. Please set the input!" << std::endl;
+        itkExceptionMacro("mitk::ExtractSliceFilter: No input image available. Please set the input!");
+        return;
+    }
 
-	vtkImageData* inputData = input->GetVtkImageData();// todo at timestep 
+	if(!m_WorldGeometry){
+		MITK_ERROR << "mitk::ExtractSliceFilter: No Geometry for reslicing available." << std::endl;
+        itkExceptionMacro("mitk::ExtractSliceFilter: No Geometry for reslicing available.");
+        return;
+    }
 
+	
 
 
 /********** #BEGIN setup vtkImageRslice properties***********/
 
-	m_Reslicer->SetInput(image->GetVtkImageData());
+	m_Reslicer->SetInput(input->GetVtkImageData());
 
-	//setup the plane where vktImageReslice extracts the slice
+
+	/*setup the plane where vktImageReslice extracts the slice*/
+
 	//ResliceAxesOrigin is the ancor point of the plane
-	m_Reslicer->SetResliceAxesOrigin(0.0, 0.0, 0.0);
+	double origin[3];
+	itk2vtk(m_WorldGeometry->GetOrigin(), origin);
+	m_Reslicer->SetResliceAxesOrigin(origin);
 
 	//the cosines define the plane: x and y are the direction vectors, n is the planes normal
 	double cosines[9] = {
-		1.0, 0.0, 0.0, //x
-		0.0, 1.0, 0.0, //y
-		0.0, 0.0, -1.0 //n
+		1.0, 0.0, 0.0,  //x
+		0.0, -1.0, 0.0, //y
+		0.0, 0.0, 1.0   //n
 	};
 	m_Reslicer->SetResliceAxesDirectionCosines(cosines);	
+
 
 	//we only have one slice, not a volume
 	m_Reslicer->SetOutputDimensionality(2);

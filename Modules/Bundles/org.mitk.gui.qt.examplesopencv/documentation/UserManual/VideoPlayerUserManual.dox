@@ -5,8 +5,8 @@
 
 Available sections:
   - \ref QmitkVideoPlayerUserManualOverview 
-  - \ref QmitkVideoPlayerUserManualFeatures 
-  - \ref QmitkVideoPlayerUserManualUsage 
+<!-- - \ref QmitkVideoPlayerUserManualFeatures -->
+<!--  - \ref QmitkVideoPlayerUserManualUsage  -->
 
 \section QmitkVideoPlayerUserManualOverview Overview
 

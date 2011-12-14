@@ -8,8 +8,8 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
-  src/internal/videoplayer/mitkPluginActivator.h
-  src/internal/QmitkVideoPlayer.h
+  src/internal/mitkPluginActivator.h
+  src/internal/videoplayer/QmitkVideoPlayer.h
 )
 
 SET(CACHED_RESOURCE_FILES

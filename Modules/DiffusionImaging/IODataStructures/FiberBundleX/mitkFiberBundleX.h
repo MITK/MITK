@@ -50,6 +50,7 @@ namespace mitk {
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
     static const char* FIBER_ID_ARRAY;
+    static const char* FA_VALUE_ARRAY;
 
     virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
@@ -78,7 +79,7 @@ namespace mitk {
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
     void ResampleFibers();
-    std::vector<int> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
+    std::vector<unsigned long> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
     mitk::FiberBundleX::Pointer GenerateNewFiberBundleByIds( std::vector<unsigned long> );
 
 

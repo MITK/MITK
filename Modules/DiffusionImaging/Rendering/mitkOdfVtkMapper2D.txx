@@ -62,6 +62,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGL.h>
 #include "vtkOpenGLRenderer.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 template<class T, int N>
 vtkSmartPointer<vtkTransform> mitk::OdfVtkMapper2D<T,N>::m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
 
@@ -86,7 +89,7 @@ float mitk::OdfVtkMapper2D<T,N>::m_IndexParam1;
 template<class T, int N>
 float mitk::OdfVtkMapper2D<T,N>::m_IndexParam2;
 
-#define ODF_MAPPER_PI 3.1415926535897932384626433832795
+#define ODF_MAPPER_PI M_PI
 
 template<class T, int N>
 mitk::OdfVtkMapper2D<T,N>

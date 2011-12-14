@@ -1,7 +1,10 @@
 
 #include "mex.h"
 #include "matrix.h"
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+
 #include <map>
 #include <string.h>
 #include <time.h>
@@ -9,7 +12,7 @@
 using namespace std;
 
 #define REAL float
-#define PI 3.1415926536
+#define PI M_PI
 
 
 

@@ -5,6 +5,8 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "itkImageRegionConstIterator.h"
@@ -16,7 +18,7 @@
 
 namespace itk {
 
-  //#define QBALL_RECON_PI       3.14159265358979323846
+  //#define QBALL_RECON_PI       M_PI
 
   template< class TOdfPixelType, 
   class TGfaPixelType,

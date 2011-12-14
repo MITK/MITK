@@ -14,9 +14,12 @@
 #include "vnl/vnl_vector.h"
 #include "itkOrientationDistributionFunction.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 namespace itk {
 
-  //#define QBALL_RECON_PI       3.14159265358979323846
+  //#define QBALL_RECON_PI       M_PI
 
   template< class TOdfPixelType, int NrOdfDirections>
     DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType, NrOdfDirections>

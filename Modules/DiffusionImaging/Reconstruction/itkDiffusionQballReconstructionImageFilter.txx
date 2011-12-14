@@ -25,9 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vnl/vnl_vector.h"
 #include "itkPointShell.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 namespace itk {
 
-#define QBALL_RECON_PI       3.14159265358979323846
+#define QBALL_RECON_PI       M_PI
 
   template< class TReferenceImagePixelType, 
   class TGradientImagePixelType,

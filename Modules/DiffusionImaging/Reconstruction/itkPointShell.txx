@@ -21,11 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/vnl_matrix_fixed.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 namespace itk
 {
-
-#define DIST_POINTSHELL_PI 3.14159265358979323846
-
+  #define DIST_POINTSHELL_PI M_PI
 
   template<int NPoints, class TMatrixType >
   TMatrixType * 

@@ -44,10 +44,9 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.toftutorial
     org.mitk.gui.qt.imagenavigator
     org.mitk.gui.qt.moviemaker
-    org.mitk.gui.qt.imagestatistics
     org.mitk.gui.qt.materialeditor
     org.mitk.gui.qt.ugvisualization
-    org.mitk.gui.qt.measurement
+    org.mitk.gui.qt.measurementtoolbox
     org.mitk.gui.qt.imagecropper
     org.mitk.gui.qt.volumevisualization
     org.mitk.gui.qt.pointsetinteraction

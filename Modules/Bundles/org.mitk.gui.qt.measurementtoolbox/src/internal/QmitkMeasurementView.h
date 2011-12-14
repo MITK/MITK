@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#if !defined(QMITK_MEASUREMENT_H__INCLUDED)
+#ifndef QMITK_MEASUREMENT_H__INCLUDED
 #define QMITK_MEASUREMENT_H__INCLUDED
 
 #include <berryIPartListener.h>
@@ -54,7 +54,7 @@ class vtkCornerAnnotation;
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurement : public QmitkFunctionality
+class QmitkMeasurementView : public QmitkFunctionality
 {
   Q_OBJECT
 
@@ -67,9 +67,9 @@ class QmitkMeasurement : public QmitkFunctionality
     ///
     /// Initialize pointers to 0. The rest is done in CreateQtPartControl()
     ///
-    QmitkMeasurement();
+    QmitkMeasurementView();
 
-  QmitkMeasurement(const QmitkMeasurement& other)
+  QmitkMeasurementView(const QmitkMeasurementView& other)
   {
     Q_UNUSED(other)
     throw std::runtime_error("Copy constructor not implemented");
@@ -78,7 +78,7 @@ class QmitkMeasurement : public QmitkFunctionality
     ///
     /// Remove all event listener from DataStorage, DataStorageSelection, Selection Service
     ///
-    virtual ~QmitkMeasurement();
+    virtual ~QmitkMeasurementView();
 
     static const std::string VIEW_ID;
 
@@ -177,7 +177,7 @@ protected:
 
   // Selection service
   /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
-  friend struct berry::SelectionChangedAdapter<QmitkMeasurement>;
+  friend struct berry::SelectionChangedAdapter<QmitkMeasurementView>;
   berry::ISelectionListener::Pointer m_SelectionListener;
 
   mitk::DataStorageSelection::Pointer m_SelectedPlanarFigures;
@@ -212,4 +212,4 @@ protected:
 
 };
 
-#endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)
+#endif // QMITK_MEASUREMENT_H__INCLUDED

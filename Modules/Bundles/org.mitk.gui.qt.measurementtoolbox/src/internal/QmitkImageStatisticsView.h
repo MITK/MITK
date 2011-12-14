@@ -15,11 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#if !defined(QmitkImageStatisticsView_H__INCLUDED)
+#ifndef QmitkImageStatisticsView_H__INCLUDED
 #define QmitkImageStatisticsView_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include <org_mitk_gui_qt_imagestatistics_Export.h>
 #include "ui_QmitkImageStatisticsViewControls.h"
 
 #include "QmitkStepperAdapter.h"
@@ -35,12 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /*!
-\brief QmitkImageStatistics
+\brief QmitkImageStatisticsView
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class IMAGESTATISTICS_EXPORT QmitkImageStatistics : public QmitkFunctionality
+class QmitkImageStatisticsView : public QmitkFunctionality
 {
   Q_OBJECT
 
@@ -56,8 +55,8 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkImageStatistics(QObject *parent=0, const char *name=0);
-  QmitkImageStatistics(const QmitkImageStatistics& other)
+  QmitkImageStatisticsView(QObject *parent=0, const char *name=0);
+  QmitkImageStatisticsView(const QmitkImageStatisticsView& other)
   {
      Q_UNUSED(other)
      throw std::runtime_error("Copy constructor not implemented");
@@ -66,7 +65,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkImageStatistics();
+  virtual ~QmitkImageStatisticsView();
 
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
@@ -167,4 +166,4 @@ protected:
 };
 
 
-#endif // !defined(QmitkImageStatistics_H__INCLUDED)
+#endif // QmitkImageStatisticsView_H__INCLUDED

@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "QmitkPlanarFiguresTableModel.h"
 
-#include "QmitkMeasurement.h"
+#include "QmitkMeasurementView.h"
 #include <QmitkRenderWindow.h>
 
 #include <QGridLayout>
@@ -62,10 +62,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCornerAnnotation.h>
 #include <mitkVtkLayerController.h>
 
-const std::string QmitkMeasurement::VIEW_ID =
+const std::string QmitkMeasurementView::VIEW_ID =
 "org.mitk.views.measurement";
 
-QmitkMeasurement::QmitkMeasurement() :
+QmitkMeasurementView::QmitkMeasurementView() :
 m_Layout(0), m_DrawActionsToolBar(0),
 m_DrawActionsGroup(0), m_MeasurementInfoRenderer(0),
 m_MeasurementInfoAnnotation(0), m_SelectedPlanarFigures(0),
@@ -78,35 +78,35 @@ m_CurrentFigureNodeInitialized(false), m_LastRenderWindow(0)
 
 }
 
-QmitkMeasurement::~QmitkMeasurement()
+QmitkMeasurementView::~QmitkMeasurementView()
 {
 
   m_MeasurementInfoRenderer->Delete();
 
-  this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage );
+  this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeAddedInDataStorage );
 
-  m_SelectedPlanarFigures->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
+  m_SelectedPlanarFigures->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeChanged ) );
 
-  m_SelectedPlanarFigures->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+  m_SelectedPlanarFigures->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeRemoved ) );
 
-  m_SelectedPlanarFigures->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+  m_SelectedPlanarFigures->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurementView
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
 
-  m_SelectedImageNode->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
+  m_SelectedImageNode->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeChanged ) );
 
-  m_SelectedImageNode->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+  m_SelectedImageNode->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeRemoved ) );
 
-  m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+  m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurementView
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
 
 }
 
-void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
+void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
   m_MeasurementInfoRenderer = vtkRenderer::New();
   m_MeasurementInfoAnnotation = vtkCornerAnnotation::New();
@@ -211,32 +211,32 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
 
   m_SelectedPlanarFigures = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
 
-  m_SelectedPlanarFigures->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
+  m_SelectedPlanarFigures->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeChanged ) );
 
-  m_SelectedPlanarFigures->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+  m_SelectedPlanarFigures->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeRemoved ) );
 
-  m_SelectedPlanarFigures->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+  m_SelectedPlanarFigures->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurementView
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
 
   m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
 
-  m_SelectedImageNode->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+  m_SelectedImageNode->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurementView
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
 
-  m_SelectedImageNode->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
+  m_SelectedImageNode->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeChanged ) );
 
-  m_SelectedImageNode->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+  m_SelectedImageNode->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeRemoved ) );
 
-  this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage ) );
+  this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkMeasurementView
+    , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeAddedInDataStorage ) );
 
 }
 
-void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkMeasurementView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   if ( nodes.empty() ) return;
 
@@ -293,7 +293,7 @@ void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::PlanarFigureSelectionChanged()
+void QmitkMeasurementView::PlanarFigureSelectionChanged()
 {
   if ( !this->IsActivated() ) return;
 
@@ -447,7 +447,7 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataNode* node)
+void QmitkMeasurementView::NodeAddedInDataStorage(const mitk::DataNode* node)
 {
   if(!m_Visible)
     return;
@@ -476,7 +476,7 @@ void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataNode* node)
 }
 
 
-void QmitkMeasurement::PlanarFigureInitialized()
+void QmitkMeasurementView::PlanarFigureInitialized()
 {
   if(m_CurrentFigureNode.IsNull())
     return;
@@ -497,7 +497,7 @@ void QmitkMeasurement::PlanarFigureInitialized()
 }
 
 
-void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::EventObject& event )
+void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk::EventObject& event )
 {
   // Mark to-be-edited PlanarFigure as selected
   mitk::PlanarFigure* figure = dynamic_cast< mitk::PlanarFigure* >( object );
@@ -530,7 +530,7 @@ void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::Eve
 }
 
 
-mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
+mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
 {
   // get all images from the data storage
   mitk::DataStorage::SetOfObjects::ConstPointer Images = this->GetDefaultDataStorage()->GetSubset( mitk::NodePredicateDataType::New("Image") );
@@ -557,7 +557,7 @@ mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
   return currentNode;
 }
 
-void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
+void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                               const char *propertyKey, mitk::BaseProperty *property )
 {
   if ( m_CurrentFigureNode.IsNotNull() )
@@ -576,25 +576,25 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   }
 
   // add observer for event when figure has been placed
-  typedef itk::SimpleMemberCommand< QmitkMeasurement > SimpleCommandType;
+  typedef itk::SimpleMemberCommand< QmitkMeasurementView > SimpleCommandType;
   SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
-  initializationCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureInitialized );
+  initializationCommand->SetCallbackFunction( this, &QmitkMeasurementView::PlanarFigureInitialized );
   m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
 
   // add observer for event when figure is picked (selected)
-  typedef itk::MemberCommand< QmitkMeasurement > MemberCommandType;
+  typedef itk::MemberCommand< QmitkMeasurementView > MemberCommandType;
   MemberCommandType::Pointer selectCommand = MemberCommandType::New();
-  selectCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureSelected );
+  selectCommand->SetCallbackFunction( this, &QmitkMeasurementView::PlanarFigureSelected );
   m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
 
   // add observer for event when interaction with figure starts
   SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
-  startInteractionCommand->SetCallbackFunction( this, &QmitkMeasurement::DisableCrosshairNavigation);
+  startInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::DisableCrosshairNavigation);
   m_StartInteractionObserverTag = figure->AddObserver( mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand );
 
   // add observer for event when interaction with figure starts
   SimpleCommandType::Pointer endInteractionCommand = SimpleCommandType::New();
-  endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurement::EnableCrosshairNavigation);
+  endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::EnableCrosshairNavigation);
   m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
 
 
@@ -621,7 +621,7 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-bool QmitkMeasurement::AssertDrawingIsPossible(bool checked)
+bool QmitkMeasurementView::AssertDrawingIsPossible(bool checked)
 {
   if (m_SelectedImageNode->GetNode().IsNull())
   {
@@ -640,7 +640,7 @@ bool QmitkMeasurement::AssertDrawingIsPossible(bool checked)
   return checked;
 }
 
-void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -657,7 +657,7 @@ void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
   MITK_INFO << "PlanarLine initialized...";
 }
 
-void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -680,7 +680,7 @@ void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
   MITK_INFO << "PlanarPath initialized...";
 }
 
-void QmitkMeasurement::ActionDrawAngleTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -698,7 +698,7 @@ void QmitkMeasurement::ActionDrawAngleTriggered(bool checked)
   MITK_INFO << "PlanarAngle initialized...";
 }
 
-void QmitkMeasurement::ActionDrawFourPointAngleTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -717,7 +717,7 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered(bool checked)
   MITK_INFO << "PlanarFourPointAngle initialized...";
 }
 
-void QmitkMeasurement::ActionDrawEllipseTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -735,7 +735,7 @@ void QmitkMeasurement::ActionDrawEllipseTriggered(bool checked)
   MITK_INFO << "PlanarCircle initialized...";
 }
 
-void QmitkMeasurement::ActionDrawRectangleTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -753,7 +753,7 @@ void QmitkMeasurement::ActionDrawRectangleTriggered(bool checked)
   MITK_INFO << "PlanarRectangle initialized...";
 }
 
-void QmitkMeasurement::ActionDrawPolygonTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -772,7 +772,7 @@ void QmitkMeasurement::ActionDrawPolygonTriggered(bool checked)
   MITK_INFO << "PlanarPolygon initialized...";
 }
 
-void QmitkMeasurement::ActionDrawArrowTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawArrowTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -780,7 +780,7 @@ void QmitkMeasurement::ActionDrawArrowTriggered(bool checked)
   MITK_WARN << "Draw Arrow not implemented yet.";
 }
 
-void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
+void QmitkMeasurementView::ActionDrawTextTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
@@ -788,7 +788,7 @@ void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
   MITK_WARN << "Draw Text not implemented yet.";
 }
 
-void QmitkMeasurement::Activated()
+void QmitkMeasurementView::Activated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
@@ -821,7 +821,7 @@ void QmitkMeasurement::Activated()
 
 }
 
-void QmitkMeasurement::Deactivated()
+void QmitkMeasurementView::Deactivated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
@@ -853,22 +853,22 @@ void QmitkMeasurement::Deactivated()
 }
 
 
-void QmitkMeasurement::PropertyChanged(const mitk::DataNode* /*node*/, const mitk::BaseProperty* /*prop*/)
+void QmitkMeasurementView::PropertyChanged(const mitk::DataNode* /*node*/, const mitk::BaseProperty* /*prop*/)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeChanged(const mitk::DataNode* /*node*/)
+void QmitkMeasurementView::NodeChanged(const mitk::DataNode* /*node*/)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeRemoved(const mitk::DataNode* /*node*/)
+void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* /*node*/)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::CopyToClipboard(bool)
+void QmitkMeasurementView::CopyToClipboard(bool)
 {
   std::vector<QString> headerRow;
   std::vector<std::vector<QString> > rows;
@@ -934,7 +934,7 @@ void QmitkMeasurement::CopyToClipboard(bool)
 
 }
 
-void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
+void QmitkMeasurementView::SetMeasurementInfoToRenderWindow(const QString& text,
                                                         QmitkRenderWindow* _RenderWindow)
 {
   if(m_LastRenderWindow != _RenderWindow)
@@ -972,13 +972,13 @@ void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
   }
 }
 
-void QmitkMeasurement::EnableCrosshairNavigation()
+void QmitkMeasurementView::EnableCrosshairNavigation()
 {
   // enable the crosshair navigation
   this->GetActiveStdMultiWidget()->EnableNavigationControllerEventListening();
 }
 
-void QmitkMeasurement::DisableCrosshairNavigation()
+void QmitkMeasurementView::DisableCrosshairNavigation()
 {
     // disable the crosshair navigation during the drawing
   this->GetActiveStdMultiWidget()->DisableNavigationControllerEventListening();
@@ -986,7 +986,7 @@ void QmitkMeasurement::DisableCrosshairNavigation()
 
 
 
-void QmitkMeasurement::OnRenderWindowDelete(QObject * obj)
+void QmitkMeasurementView::OnRenderWindowDelete(QObject * obj)
 {
   if(obj == m_LastRenderWindow)
     m_LastRenderWindow = 0;

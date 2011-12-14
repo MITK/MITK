@@ -53,7 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkVectorImage.h>
 
-const std::string QmitkImageStatistics::VIEW_ID =
+const std::string QmitkImageStatisticsView::VIEW_ID =
 "org.mitk.views.imagestatistics";
 
 class QmitkRequestStatisticsUpdateEvent : public QEvent
@@ -87,7 +87,7 @@ inline bool my_isnan(float x)
 
  }
 
-QmitkImageStatistics::QmitkImageStatistics(QObject* /*parent*/, const char* /*name*/)
+QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
 : QmitkFunctionality(),
   m_Controls( NULL ),
   m_TimeStepperAdapter( NULL ),
@@ -105,7 +105,7 @@ QmitkImageStatistics::QmitkImageStatistics(QObject* /*parent*/, const char* /*na
 }
 
 
-QmitkImageStatistics::~QmitkImageStatistics()
+QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
   if ( m_SelectedImage != NULL )
     m_SelectedImage->RemoveObserver( m_ImageObserverTag );
@@ -116,7 +116,7 @@ QmitkImageStatistics::~QmitkImageStatistics()
 }
 
 
-void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
+void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   if (m_Controls == NULL)
   {
@@ -133,7 +133,7 @@ void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
 
 
 
-void QmitkImageStatistics::CreateConnections()
+void QmitkImageStatisticsView::CreateConnections()
 {
   if ( m_Controls )
   {
@@ -143,18 +143,18 @@ void QmitkImageStatistics::CreateConnections()
   }
 }
 
-void QmitkImageStatistics::IgnoreZerosCheckboxClicked(  )
+void QmitkImageStatisticsView::IgnoreZerosCheckboxClicked(  )
 {
   UpdateStatistics();
 }
 
-void QmitkImageStatistics::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkImageStatisticsView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
 {
   QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
 }
 
 
-void QmitkImageStatistics::ClipboardHistogramButtonClicked()
+void QmitkImageStatisticsView::ClipboardHistogramButtonClicked()
 {
   if ( m_CurrentStatisticsValid && (m_CurrentStatisticsCalculator.IsNotNull()) )
   {
@@ -181,7 +181,7 @@ void QmitkImageStatistics::ClipboardHistogramButtonClicked()
 }
 
 
-void QmitkImageStatistics::ClipboardStatisticsButtonClicked()
+void QmitkImageStatisticsView::ClipboardStatisticsButtonClicked()
 {
   if ( m_CurrentStatisticsValid && (m_CurrentStatisticsCalculator.IsNotNull()) )
   {
@@ -210,7 +210,7 @@ void QmitkImageStatistics::ClipboardStatisticsButtonClicked()
 }
 
 
-void QmitkImageStatistics::FillStatisticsTableView(
+void QmitkImageStatisticsView::FillStatisticsTableView(
   const mitk::ImageStatisticsCalculator::Statistics &s,
   const mitk::Image *image )
 {
@@ -248,7 +248,7 @@ void QmitkImageStatistics::FillStatisticsTableView(
 }
 
 
-void QmitkImageStatistics::InvalidateStatisticsTableView()
+void QmitkImageStatisticsView::InvalidateStatisticsTableView()
 {
   for ( unsigned int i = 0; i < 7; ++i )
   {
@@ -257,7 +257,7 @@ void QmitkImageStatistics::InvalidateStatisticsTableView()
 }
 
 
-void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkImageStatisticsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   // Clear any unreferenced images
   this->RemoveOrphanImages();
@@ -433,10 +433,10 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
   }
 
 
-  typedef itk::SimpleMemberCommand< QmitkImageStatistics > ITKCommandType;
+  typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   ITKCommandType::Pointer changeListener;
   changeListener = ITKCommandType::New();
-  changeListener->SetCallbackFunction( this, &QmitkImageStatistics::RequestStatisticsUpdate );
+  changeListener->SetCallbackFunction( this, &QmitkImageStatisticsView::RequestStatisticsUpdate );
 
   // Add change listeners to selected objects
   if ( m_SelectedImage != NULL )
@@ -477,7 +477,7 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
 }
 
 
-void QmitkImageStatistics::UpdateStatistics()
+void QmitkImageStatisticsView::UpdateStatistics()
 {
 
   // Remove any cached images that are no longer referenced elsewhere
@@ -584,10 +584,10 @@ void QmitkImageStatistics::UpdateStatistics()
     mitk::ProgressBar::GetInstance()->AddStepsToDo( 100 );
 
     // Install listener for progress events and initialize progress bar
-    typedef itk::SimpleMemberCommand< QmitkImageStatistics > ITKCommandType;
+    typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
     ITKCommandType::Pointer progressListener;
     progressListener = ITKCommandType::New();
-    progressListener->SetCallbackFunction( this, &QmitkImageStatistics::UpdateProgressBar );
+    progressListener->SetCallbackFunction( this, &QmitkImageStatisticsView::UpdateProgressBar );
     unsigned long progressObserverTag = m_CurrentStatisticsCalculator
       ->AddObserver( itk::ProgressEvent(), progressListener );
 
@@ -687,13 +687,13 @@ void QmitkImageStatistics::UpdateStatistics()
   }
 }
 
-void QmitkImageStatistics::UpdateProgressBar()
+void QmitkImageStatisticsView::UpdateProgressBar()
 {
   mitk::ProgressBar::GetInstance()->Progress();
 }
 
 
-void QmitkImageStatistics::RequestStatisticsUpdate()
+void QmitkImageStatisticsView::RequestStatisticsUpdate()
 {
   if ( !m_StatisticsUpdatePending )
   {
@@ -703,7 +703,7 @@ void QmitkImageStatistics::RequestStatisticsUpdate()
 }
 
 
-void QmitkImageStatistics::RemoveOrphanImages()
+void QmitkImageStatisticsView::RemoveOrphanImages()
 {
   ImageStatisticsMapType::iterator it = m_ImageStatisticsMap.begin();
 
@@ -732,7 +732,7 @@ void QmitkImageStatistics::RemoveOrphanImages()
 }
 
 
-bool QmitkImageStatistics::event( QEvent *event )
+bool QmitkImageStatisticsView::event( QEvent *event )
 {
   if ( event->type() == (QEvent::Type) QmitkRequestStatisticsUpdateEvent::StatisticsUpdateRequest )
   {
@@ -747,7 +747,7 @@ bool QmitkImageStatistics::event( QEvent *event )
   return false;
 }
 
-void QmitkImageStatistics::ComputeIntensityProfile( mitk::PlanarLine* line )
+void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
 {
   double sampling = 300;
   QmitkVtkHistogramWidget::HistogramType::Pointer histogram = QmitkVtkHistogramWidget::HistogramType::New();
@@ -772,12 +772,12 @@ void QmitkImageStatistics::ComputeIntensityProfile( mitk::PlanarLine* line )
 
 }
 
-bool QmitkImageStatistics::IsExclusiveFunctionality() const
+bool QmitkImageStatisticsView::IsExclusiveFunctionality() const
 {
   return false;
 }
 
-void QmitkImageStatistics::Visible()
+void QmitkImageStatisticsView::Visible()
 {
   this->OnSelectionChanged( this->GetDataManagerSelection() );
 }

@@ -76,22 +76,31 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<unsigned long> fiberIds)
 {
-    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New();
+
     vtkSmartPointer<vtkPolyData> newFiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newLineSet = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkPoints> newPointSet = vtkSmartPointer<vtkPoints>::New();
 
     MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
+    MITK_INFO << "Number of new Fibers: " << fiberIds.size();
+    // iterate through the vectorcontainer hosting all desired fiber Ids
+
     std::vector<unsigned long>::iterator finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
     {
-        MITK_INFO << *finIt;
+//        MITK_INFO << *finIt;
         vtkSmartPointer<vtkCell> fiber = m_FiberIdDataSet->GetCell(*finIt);//->DeepCopy(fiber);
         vtkSmartPointer<vtkPoints> fibPoints = fiber->GetPoints();
 
+        vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
+        newFiber->GetPointIds()->SetNumberOfIds( fibPoints->GetNumberOfPoints() );
+
         for(int i=0; i<fibPoints->GetNumberOfPoints(); i++)
         {
-            MITK_INFO << "id: " << fiber->GetPointId(i);
-            MITK_INFO << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
+//            MITK_INFO << "id: " << fiber->GetPointId(i);
+//            MITK_INFO << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
+            newFiber->GetPointIds()->SetId(i, newPointSet->GetNumberOfPoints());
+            newPointSet->InsertNextPoint(fibPoints->GetPoint(i)[0], fibPoints->GetPoint(i)[1], fibPoints->GetPoint(i)[2]);
 
             if (m_FiberIdDataSet->GetPointData()->HasArray(FA_VALUE_ARRAY)){
                 MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(FA_VALUE_ARRAY)->GetTuple(fiber->GetPointId(i));
@@ -100,19 +109,20 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GenerateNewFiberBundleByIds(std:
             if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)){
                 MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetTuple(fiber->GetPointId(i));
             }
-
         }
 
-
-
-        //        newLineSet->InsertNextCell(fiber);
-
-
+        newLineSet->InsertNextCell(newFiber);
         ++finIt;
     }
+
+    newFiberPolyData->SetPoints(newPointSet);
+    newFiberPolyData->SetLines(newLineSet);
+    MITK_INFO << "new fiberbundle polydata points: " << newFiberPolyData->GetNumberOfPoints();
+    MITK_INFO << "new fiberbundle polydata lines: " << newFiberPolyData->GetNumberOfLines();
     MITK_INFO << "=====================\n";
 
-
+    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
+    return newFib;
 }
 
 // merge two fiber bundles

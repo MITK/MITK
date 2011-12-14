@@ -1,4 +1,3 @@
-
 # tests with no extra command line parameter
 SET(MODULE_TESTS
   mitkAccessByItkTest.cpp
@@ -59,6 +58,8 @@ SET(MODULE_TESTS
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
+  mitkRenderingTest.cpp
+  #QmitkRenderingTestHelper.cpp
 )
 
 # test with image filename as an extra command line parameter

@@ -9,6 +9,8 @@
 #include "mitkDataNode.h"
 #include "mitkImage.h"
 
+class QmitkStdMultiWidget;
+
 class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
@@ -27,6 +29,7 @@ public:
   //interface methods
   void Run( const std::vector<mitk::DataNode*>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);

@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryQtViewPart.h>
 #include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
+#include <QmitkFunctionality.h>
 
 #include <berryIWorkbenchPartReference.h>
 #include <berryIPartListener.h>
@@ -58,7 +59,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public berry::QtViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkFunctionality
 {
   Q_OBJECT
 
@@ -80,6 +81,7 @@ public:
   /// \brief Returns all selected nodes in a vector
   ///
   std::vector<mitk::DataNode*> GetSelectedNodes() const;
+
 public slots:
   ///
   /// Invoked when the opacity slider changed

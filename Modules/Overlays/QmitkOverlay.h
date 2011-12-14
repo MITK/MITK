@@ -104,8 +104,12 @@ public:
   */
   virtual QWidget* GetWidget();
 
-
 protected:
+
+  /**
+    \brief Add drop shadow effect via QGraphicsEffect
+  */
+  void AddDropShadow( QWidget* widget );
 
   /** \brief ID of the overlay */
   const char* m_Id;

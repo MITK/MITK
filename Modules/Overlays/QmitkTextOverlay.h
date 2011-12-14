@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKTEXTOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKTEXTOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
-// MITK-Stuff
+// MITK
 #include "mitkCommon.h"
 #include "mitkPropertyList.h"
 #include "QmitkOverlay.h"
 
+// Qt
 #include <QLabel>
 
 #include "OverlaysExports.h"
@@ -84,29 +85,24 @@ PURPOSE.  See the above copyright notices for more information.
     */
     void GenerateData( mitk::PropertyList::Pointer );
 
-    /**
-    * \brief returns the QLabel* that internally represents the TextOverlay
-    */
-    QLabel* GetWidget();
-
   protected:
 
     /**
     * \brief internal helper class to determine text-properties
     *
-    * This method is only used internally to apply the text specific properties that can be set 
+    * This method is only used internally to apply the font specific properties that can be set 
     * using a mitk::PropertyList. If a property cannot be found, a default value is used.
     *
-    * The values of these properties are then attributed to the label using QFont and QPalette.
+    * The values of these properties are then attributed to the QLabel using QFont and QPalette.
     */ 
-    void GetTextProperties( mitk::PropertyList::Pointer );
+    void UpdateFontProperties( mitk::PropertyList::Pointer );
    
     void SetupCallback( mitk::BaseProperty::Pointer prop );
    
-    void SetText();
+    void UpdateDisplayedTextFromProperties();
 
     /** \brief QLabel internally representing the TextOverlay */
-    QLabel* m_Widget;  
+    QLabel* m_Label;  
 
     mitk::PropertyList::Pointer m_PropertyList;
 

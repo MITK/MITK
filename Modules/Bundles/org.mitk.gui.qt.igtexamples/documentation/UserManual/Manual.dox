@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.igttrackinglab} Igttrackinglab
+\page{org.mitk.gui.qt.igttrackinglab} Igttrackinglab
 
 \image html icon.png "Icon of Igttrackinglab"
 

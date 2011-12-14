@@ -73,6 +73,8 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
    
     // let the point set widget know about the multi widget (crosshair updates)
     m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
+
+    connect(m_Controls->lstPoints, SIGNAL(PointSelectionChanged()), this, SLOT(OnSeedPointAdded()));
     
     // create a new DataNode containing a PointSet with some interaction
     m_PointSet = mitk::PointSet::New();
@@ -125,6 +127,103 @@ void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->lblWarning->setVisible( true );
 }
 
+void QmitkRegionGrowingView::OnSeedPointAdded()
+{
+    MITK_INFO<<"YEEEEEEEEEEEHAAAAAAAAAAAA .... .... new point -_-";
+    //m_Controls->sliderOffsetValue->setRange(0,10);
+    mitk::Point3D seedPoint = m_PointSet->GetPointSet(0)->GetPoints()->ElementAt(0);
+
+    std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+    if (nodes.empty()) return;
+
+    mitk::DataNode* node = nodes.front();
+
+    if (!node)
+    {
+      // Nothing selected. Inform the user and return
+      QMessageBox::information( NULL, "Region growing functionality", "Please load and select an image before region growing.");
+      return;
+    }
+
+    // here we have a valid mitk::DataNode
+
+    // a node itself is not very useful, we need its data item (the image)
+    mitk::BaseData* data = node->GetData();
+    if (data)
+    {
+      // test if this data item is an image or not (could also be a surface or something totally different)
+      mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+      if (image)
+      {
+          mitk::Index3D seedPointInIndex;
+          mitk::Index3D currentIndex;
+          mitk::ScalarType pixelValues[125];
+          unsigned int pos (0);
+          image->GetGeometry()->WorldToIndex(seedPoint, seedPointInIndex);
+
+          MITK_INFO<<"SeedPoint at: ["<<seedPointInIndex[0]<<", "<<seedPointInIndex[1]<<", "<<seedPointInIndex[2]<<"]";
+          for(int i = seedPointInIndex[0]-2; i <= seedPointInIndex[0]+2; i++)
+          {
+              for(int j = seedPointInIndex[1]-2; j <= seedPointInIndex[1]+2; j++)
+              {
+                  for(int k = seedPointInIndex[2]-2; k <= seedPointInIndex[2]+2; k++)
+                  {
+                      MITK_INFO<<"CurrentIndex: ["<<i<<", "<<j<<", "<<k<<"]";
+                      currentIndex[0] = i;
+                      currentIndex[1] = j;
+                      currentIndex[2] = k;
+                      if(image->GetGeometry()->IsIndexInside(currentIndex))
+                      {
+                          pixelValues[pos] = image->GetPixelValueByIndex(currentIndex);
+                          pos++;
+                      }
+                      else
+                      {
+                          pixelValues[pos] = -10000000;
+                          pos++;
+                      }
+                  }
+              }
+          }
+
+          //Now calculation mean and deviation of the pixelValues
+          mitk::ScalarType mean(0);
+          unsigned int numberOfValues(0);
+          for (unsigned int i = 0; i < 125; i++)
+          {
+              if(pixelValues[i] > -10000000)
+              {
+                  mean += pixelValues[i];
+                  numberOfValues++;
+              }
+          }
+
+          mean = mean/numberOfValues;
+          MITK_INFO<<"Mean: "<<mean;
+
+          m_InitialThreshold = mean;
+
+          mitk::ScalarType deviation(0);
+
+          MITK_INFO<<"POW 2^3: "<<pow(2,3);
+
+          for (unsigned int i = 0; i < 125; i++)
+          {
+              if(pixelValues[i] > -10000000)
+              {
+                  deviation += pow((mean - pixelValues[i]),2);
+              }
+          }
+          deviation = deviation/(numberOfValues-1);
+          deviation = sqrt(deviation);
+
+          m_Controls->sliderOffsetValue->setRange(0,deviation*3);
+          m_Controls->sliderOffsetValue->setValue(1.5*deviation);
+
+          MITK_INFO<<"Deviation: "<<deviation;
+      }
+    }
+}
 
 void QmitkRegionGrowingView::DoImageProcessing()
 {
@@ -237,15 +336,19 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
     regionGrower->AddSeed( seedIndex );
   }
 
-  std::cout << "Values between " << min << " and " << max << std::endl;
+//  std::cout << "Values between " << min << " and " << max << std::endl;
 
+  std::cout << "Values between " << m_InitialThreshold-m_Controls->sliderOffsetValue->value() << " and " << m_InitialThreshold+m_Controls->sliderOffsetValue->value() << std::endl;
 
   min -= thresholdOffset;
   max += thresholdOffset;
 
   // set thresholds and execute filter
-  regionGrower->SetLower( min );
-  regionGrower->SetUpper( max );
+//  regionGrower->SetLower( min );
+//  regionGrower->SetUpper( max );
+
+  regionGrower->SetLower( m_InitialThreshold-m_Controls->sliderOffsetValue->value() );
+  regionGrower->SetUpper( m_InitialThreshold+m_Controls->sliderOffsetValue->value() );
 
   regionGrower->Update();
 

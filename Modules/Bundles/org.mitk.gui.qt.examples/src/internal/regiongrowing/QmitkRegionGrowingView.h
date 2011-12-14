@@ -67,6 +67,8 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
 
+    void OnSeedPointAdded();
+
   protected:
 
     /*!
@@ -86,6 +88,8 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     Ui::QmitkRegionGrowingViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
+
+    mitk::ScalarType m_InitialThreshold;
 };
 
 

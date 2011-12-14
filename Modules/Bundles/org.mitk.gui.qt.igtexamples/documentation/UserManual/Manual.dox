@@ -1,18 +1,11 @@
 /**
-\page{org.mitk.gui.qt.igttrackinglab} Igttrackinglab
+\bundlemainpage{org.mitk.gui.qt.igtexample} IgtExample
 
-\image html icon.png "Icon of Igttrackinglab"
+This bundle includes views with examples and help applications for IGT. The different views are described on the pages below:
 
-Available sections:
-  - \ref org.mitk.gui.qt.igttrackinglabOverview
-
-\section org.mitk.gui.qt.igttrackinglabOverview
-Describe the features of your awesome plugin here
 <ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
+<li> \subpage org_igttrackinglab
+<li> \subpage org_imageguidedtherapytutorial
 </ul>
 
 */

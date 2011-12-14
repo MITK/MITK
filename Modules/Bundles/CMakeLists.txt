@@ -29,11 +29,10 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.regiongrowing
     org.mitk.gui.qt.segmentation
     org.mitk.planarfigure
-    org.mitk.gui.qt.igtnavigationtoolmanager
-    org.mitk.gui.qt.igttrackingtoolbox
+    org.mitk.gui.qt.igttracking
 	org.mitk.gui.qt.igttrackinglab
     org.mitk.gui.qt.igttutorial
-    org.mitk.gui.qt.igttoolpairnavigation
+    org.mitk.gui.qt.igtnavigation
     org.mitk.gui.qt.basicimageprocessing
     org.mitk.gui.qt.colourimageprocessing
     org.mitk.gui.qt.navigationdataplayer

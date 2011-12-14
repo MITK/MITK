@@ -58,11 +58,21 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	m_Reslicer->SetResliceAxesOrigin(origin);
 
 	//the cosines define the plane: x and y are the direction vectors, n is the planes normal
-	double cosines[9] = {
-		1.0, 0.0, 0.0,  //x
-		0.0, -1.0, 0.0, //y
-		0.0, 0.0, 1.0   //n
-	};
+	double cosines[9];//	 = {		1.0, 0.0, 0.0, 		0.0, -1.0, 0.0, 	0.0, 0.0, 1.0  };
+	Vector3D right, bottom;
+
+	right = m_WorldGeometry->GetAxisVector(0);
+	right.Normalize();
+	vnl2vtk(right.GetVnlVector(), cosines);
+
+	bottom = m_WorldGeometry->GetAxisVector(1);
+	bottom.Normalize();
+	vnl2vtk(bottom.GetVnlVector(), cosines + 3);
+
+	Vector3D normalVector = CrossProduct(m_WorldGeometry->GetAxisVector(0), m_WorldGeometry->GetAxisVector(1));
+	normalVector.Normalize();
+	vnl2vtk(normalVector.GetVnlVector(), cosines + 6);
+
 	m_Reslicer->SetResliceAxesDirectionCosines(cosines);	
 
 

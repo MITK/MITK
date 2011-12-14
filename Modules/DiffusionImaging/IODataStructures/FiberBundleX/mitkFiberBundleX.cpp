@@ -74,7 +74,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
     return newFib;
 }
 
-mitk::FiberBundleX::Pointer mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<unsigned long> fiberIds)
+vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<unsigned long> fiberIds)
 {
 
     vtkSmartPointer<vtkPolyData> newFiberPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -121,8 +121,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GenerateNewFiberBundleByIds(std:
     MITK_INFO << "new fiberbundle polydata lines: " << newFiberPolyData->GetNumberOfLines();
     MITK_INFO << "=====================\n";
 
-    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
-    return newFib;
+//    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
+    return newFiberPolyData;
 }
 
 // merge two fiber bundles

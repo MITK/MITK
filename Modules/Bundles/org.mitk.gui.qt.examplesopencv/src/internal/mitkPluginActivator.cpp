@@ -1,6 +1,6 @@
 #include "mitkPluginActivator.h"
 
-#include "QmitkVideoPlayer.h"
+#include "src/internal/videoplayer/QmitkVideoPlayer.h"
 
 #include <QtPlugin>
 
@@ -18,4 +18,4 @@ namespace mitk {
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_videoplayer, mitk::PluginActivator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_examplesopencv, mitk::PluginActivator)

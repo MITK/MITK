@@ -2,7 +2,7 @@
 \bundlemainpage{org_mitkexamples} Examples for the use of MITK
 
 
-\section QmitkSimpleExampleViewUserManualSummary Summary
+\section QmitkExamplesUserManualSummary Summary
 
 This module is a collection of examples for developing with mitk. The following examples are included:
 

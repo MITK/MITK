@@ -1,0 +1,12 @@
+/**
+\bundlemainpage{org_mitkexamplesopencv} OpenCV Examples for the use of MITK
+
+
+\section QmitkExamplesOpenCVUserManualSummary Summary
+
+This module is a collection of examples for developing with mitk and openCV. The following examples are included:
+
+<ul>
+ <li> \subpage org_videoplayer
+</ul>
+*/

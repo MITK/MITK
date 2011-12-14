@@ -3,12 +3,12 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkVideoPlayer.cpp
+  videoplayer/QmitkVideoPlayer.cpp
   mitkPluginActivator.cpp
 )
 
 SET(MOC_H_FILES
-  src/internal/mitkPluginActivator.h
+  src/internal/videoplayer/mitkPluginActivator.h
   src/internal/QmitkVideoPlayer.h
 )
 

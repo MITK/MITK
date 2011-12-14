@@ -35,9 +35,6 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.planarfigure
     org.mitk.gui.qt.igttracking
     org.mitk.gui.qt.igtnavigation
-    org.mitk.gui.qt.igtnavigationtoolmanager
-    org.mitk.gui.qt.igttrackingtoolbox
-    org.mitk.gui.qt.igttoolpairnavigation
     org.mitk.gui.qt.igtexamples
     org.mitk.gui.qt.basicimageprocessing
     org.mitk.gui.qt.navigationdataplayer

@@ -13,7 +13,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.dtiatlasapp:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.igtnavigation:OFF
-  org.mitk.gui.qt.igttoolpairnavigation:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF

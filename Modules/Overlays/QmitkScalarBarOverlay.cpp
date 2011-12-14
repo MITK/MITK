@@ -26,18 +26,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLayout>
 
 
-QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id ): 
-QmitkOverlay(id), m_Widget( NULL ), m_ObserverTag(0)
+QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id ) 
+:QmitkOverlay(id)
+, m_ScalarBar( NULL )
+, m_ObserverTag(0)
 {
-  m_Widget = new QmitkScalarBar();
-  m_Widget->setStyleSheet("");
+  m_Widget = m_ScalarBar = new QmitkScalarBar();
+  QmitkOverlay::AddDropShadow( m_ScalarBar );
 }
 
 QmitkScalarBarOverlay::~QmitkScalarBarOverlay()
 {
-  m_Widget->deleteLater();
-  m_Widget = NULL;
-
   m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
 }
 
@@ -69,7 +68,7 @@ void QmitkScalarBarOverlay::SetScaleFactor()
   {
     MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
-  m_Widget->SetScaleFactor( scale );
+  m_ScalarBar->SetScaleFactor( scale );
 }
 
 
@@ -100,14 +99,8 @@ void QmitkScalarBarOverlay::GetProperties( mitk::PropertyList::Pointer pl )
   pen.setCapStyle( Qt::FlatCap );
   pen.setJoinStyle( Qt::MiterJoin );
 
-  m_Widget->SetPen( pen );
+  m_ScalarBar->SetPen( pen );
 }
-
-QWidget* QmitkScalarBarOverlay::GetWidget()
-{
-  return m_Widget;
-}
-
 
 void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {

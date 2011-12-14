@@ -110,10 +110,10 @@ void QmitkFiberExtractorWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    std::vector<int> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
+    std::vector<unsigned long> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
 
     //generate new fiberbundle by fiber iDs
-//    m_itemPackage.st_FBX->CreateNewFiberbundleByIds(std::vector<int> desiredFiberIds);
+    m_itemPackage.st_FBX->GenerateNewFiberBundleByIds(fibIds);
 
     /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
     clock.Stop();

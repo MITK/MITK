@@ -36,6 +36,7 @@
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
+const char* mitk::FiberBundleX::FA_VALUE_ARRAY = "FA_Values";
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_currentColorCoding(NULL)
@@ -71,6 +72,47 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
     newFib->UpdateFiberGeometry();
 
     return newFib;
+}
+
+mitk::FiberBundleX::Pointer mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<unsigned long> fiberIds)
+{
+    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New();
+    vtkSmartPointer<vtkPolyData> newFiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkCellArray> newLineSet = vtkSmartPointer<vtkCellArray>::New();
+
+    MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
+    std::vector<unsigned long>::iterator finIt = fiberIds.begin();
+    while ( finIt != fiberIds.end() )
+    {
+        MITK_INFO << *finIt;
+        vtkSmartPointer<vtkCell> fiber = m_FiberIdDataSet->GetCell(*finIt);//->DeepCopy(fiber);
+        vtkSmartPointer<vtkPoints> fibPoints = fiber->GetPoints();
+
+        for(int i=0; i<fibPoints->GetNumberOfPoints(); i++)
+        {
+            MITK_INFO << "id: " << fiber->GetPointId(i);
+            MITK_INFO << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
+
+            if (m_FiberIdDataSet->GetPointData()->HasArray(FA_VALUE_ARRAY)){
+                MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(FA_VALUE_ARRAY)->GetTuple(fiber->GetPointId(i));
+            }
+
+            if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)){
+                MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetTuple(fiber->GetPointId(i));
+            }
+
+        }
+
+
+
+        //        newLineSet->InsertNextCell(fiber);
+
+
+        ++finIt;
+    }
+    MITK_INFO << "=====================\n";
+
+
 }
 
 // merge two fiber bundles
@@ -259,7 +301,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     unsigned char rgba[4] = {0,0,0,0};
     int componentSize = sizeof(rgba);
 
-    vtkUnsignedCharArray * colorsT = vtkUnsignedCharArray::New();
+    vtkSmartPointer<vtkUnsignedCharArray> colorsT = vtkUnsignedCharArray::New();
     colorsT->Allocate(numOfPoints * componentSize);
     colorsT->SetNumberOfComponents(componentSize);
     colorsT->SetName(COLORCODING_ORIENTATION_BASED);
@@ -409,14 +451,14 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 
 
 //temporarely include only
-#include <vtkPolyDataWriter.h>
+//#include <vtkPolyDataWriter.h>
 //==========================
-std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
+std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
 {
 
     MITK_INFO << "Extracting fibers!";
     // vector which is returned, contains all extracted FiberIds
-    std::vector<int> FibersInROI;
+    std::vector<unsigned long> FibersInROI;
 
     /* Handle type of planarfigure */
     // if incoming pf is a pfc
@@ -425,8 +467,6 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         // process requested boolean operation of PFC
     } else
     {
-
-
 
         mitk::Geometry2D::ConstPointer pfgeometry = pf->GetGeometry2D();
         const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
@@ -446,8 +486,6 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         std::vector<int> PointsInROI;
 
 
-
-
         /* Define cutting plane by ROI (PlanarFigure) */
         vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
         plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
@@ -455,9 +493,19 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
 
         //same plane but opposite normal direction. so point cloud will be reduced -> better performance
         vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
-        planeR->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
-        planeR->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
+        //define new origin along the normal but close to the original one
+        // OriginNew = OriginOld + 1*Normal
+        //        Vector3D extendedNormal;
+        //        int multiplyFactor = 1;
+        //        extendedNormal[0] = planeNormal[0] * multiplyFactor;
+        //        extendedNormal[1] = planeNormal[1] * multiplyFactor;
+        //        extendedNormal[2] = planeNormal[2] * multiplyFactor;
+        //        Point3D RplaneOrigin = planeOrigin - extendedNormal;
+        //        planeR->SetOrigin(RplaneOrigin[0],RplaneOrigin[1],RplaneOrigin[2]);
+        //        planeR->SetNormal(-planeNormal[0],-planeNormal[1],-planeNormal[2]);
+        //        MITK_INFO << "RPlaneOrigin: " << RplaneOrigin[0] << " | " << RplaneOrigin[1]
+        //                  << " | " << RplaneOrigin[2];
 
         /* get all points/fibers cutting the plane */
         MITK_INFO << "start clipping";
@@ -472,13 +520,18 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         /* for some reason clipperoutput is not initialized for futher processing
       * so far only writing out clipped polydata provides requested
       */
-        MITK_INFO << "writing clipper output";
-        vtkSmartPointer<vtkPolyDataWriter> writerC = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writerC->SetInput(clipperout);
-        writerC->SetFileName("/vtkOutput/Cout1_FbId_clipLineId0+1+2-tests.vtk");
-        writerC->SetFileTypeToASCII();
-        writerC->Write();
-        MITK_INFO << "writing done";
+        //        MITK_INFO << "writing clipper output";
+        //        vtkSmartPointer<vtkPolyDataWriter> writerC = vtkSmartPointer<vtkPolyDataWriter>::New();
+        //        writerC->SetInput(clipperout1);
+        //        writerC->SetFileName("/vtkOutput/Clipping.vtk");
+        //        writerC->SetFileTypeToASCII();
+        //        writerC->Write();
+        //        MITK_INFO << "writing done";
+
+        MITK_INFO << "init and update clipperoutput";
+        clipperout->GetPointData()->Initialize();
+        clipperout->Update();
+        MITK_INFO << "init and update clipperoutput completed";
 
         //        MITK_INFO << "start clippingRecursive";
         //        vtkSmartPointer<vtkClipPolyData> Rclipper = vtkSmartPointer<vtkClipPolyData>::New();
@@ -489,12 +542,16 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
         //        vtkSmartPointer<vtkPolyData> clipperout = Rclipper->GetClippedOutput();
         //        MITK_INFO << "end clipping recursive";
 
+        //        MITK_INFO << "writing clipper output 2";
         //        vtkSmartPointer<vtkPolyDataWriter> writerC1 = vtkSmartPointer<vtkPolyDataWriter>::New();
         //        writerC1->SetInput(clipperout);
-        //        writerC1->SetFileName("/vtkOutput/FbId_clipLineId0+1+2-tests.vtk");
+        //        writerC1->SetFileName("/vtkOutput/RClipping.vtk");
         //        writerC1->SetFileTypeToASCII();
         //        writerC1->Write();
-
+        //        MITK_INFO << "init and update clipperoutput";
+        //        clipperout->GetPointData()->Initialize();
+        //        clipperout->Update();
+        //        MITK_INFO << "init and update clipperoutput completed";
 
         MITK_INFO << "STEP 1: find all points which have distance 0 to the given plane";
         /*======STEP 1======
@@ -559,101 +616,83 @@ std::vector<int> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Point
             for (int i=0; i<PointsOnPlane.size(); i++)
             {
 
-//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[0] << " - " << V1w[0];
-//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[1] << " - " << V1w[1];
-//                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[2] << " - " << V1w[2];
+                //                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[0] << " - " << V1w[0];
+                //                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[1] << " - " << V1w[1];
+                //                MITK_INFO << clipperout->GetPoint(PointsOnPlane[i])[2] << " - " << V1w[2];
 
                 //distance between circle radius and given point
                 double XdistPnt =  sqrt((double) (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) * (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) +
                                         (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) * (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) +
                                         (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2]) * (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2])) ;
 
-             //   MITK_INFO << "PntDistance to Radius: " << XdistPnt;
+                //   MITK_INFO << "PntDistance to Radius: " << XdistPnt;
                 if( XdistPnt <= distPF)
                 {
-                    MITK_INFO << "point in Circle";
+                    // MITK_INFO << "point in Circle";
                     PointsInROI.push_back(PointsOnPlane[i]);
                 }
 
             }//end for(i)
-            MITK_INFO << "Points inside circle radius: " << PointsInROI.size();
+            // MITK_INFO << "Points inside circle radius: " << PointsInROI.size();
         }
 
         MITK_INFO << "Step3: Identify fibers";
 
         /*======STEP 3=======
      * identify fiberIds for points in ROI */
-        //prepare resulting vector
-        FibersInROI.reserve(PointsInROI.size());
 
+        // we need to access the fiberId Array, so make sure that this array is available
+        if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
+        {
+            MITK_INFO << "ERROR: FiberID array does not exist, no correlation between points and fiberIds possible! Make sure calling GenerateFiberIds()";
+            return FibersInROI; // FibersInRoi is empty then
+        }
+
+        // prepare a structure where each point id is represented as an indexId.
+        // vector looks like: | pntId | fiberIdx |
+        std::vector< unsigned long > pointindexFiberMap;
+
+        // walk through the whole subline section and create an vector sorted by point index
         vtkCellArray *clipperlines = clipperout->GetLines();
         clipperlines->InitTraversal();
         long numOfLineCells = clipperlines->GetNumberOfCells();
+        unsigned long numofClippedPoints = clipperout->GetNumberOfPoints();
+        pointindexFiberMap.reserve(numofClippedPoints);
+
+
+        //prepare resulting vector
+        FibersInROI.reserve(PointsInROI.size());
+
+        MITK_INFO << "\n===== Pointindex based structure initialized ======\n";
 
         // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
         for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
-        { //ic is the index counter for the cells hosting the desired information
+        { //ic is the index counter for the cells hosting the desired information, eg. 2 | 45 | 46. each cell consits of 3 items.
 
             vtkIdType npts;
             vtkIdType *pts;
             clipperlines->GetCell(ic, npts, pts);
 
-            // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i.
+            // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i. eg. idx[0]=45; idx[1]=46
             for (long j=0; j<npts; j++)
             {
-
-                //  std::cout << "pointWalker: subline " << i << " point idx: " << j << " hosting point id: " << pts[j] << endl;
-
-                for (long k = 0; k < PointsInROI.size(); k++)
-                { // k corresponds to index in PointsInRoi vector
-                    /* ====================
-                 *  check if current point occurs in ROI
-                 ======================*/
-                    if (pts[j] == PointsInROI[k]) {
-                        //figure out which line does it belong to
-                        if (clipperout->GetCellData()->HasArray("FB_IDs"))
-                        {
-                            int originalFibId = clipperout->GetCellData()->GetArray("FB_IDs")->GetTuple(i)[0];
-                            MITK_INFO << "found pointid " << PointsInROI[k] << ": " << clipperout->GetPoint(PointsInROI[k])[0] << " | " << clipperout->GetPoint(PointsInROI[k])[1] << " | " << clipperout->GetPoint(PointsInROI[k])[2] << " in subline: " << i << " which belongs to fiber id: " << originalFibId << "\n" << endl;
-
-                            // do something to avoid duplicates
-                            int oldFibInRoiSize = FibersInROI.size();
-                            if (oldFibInRoiSize != 0) {
-
-
-                                for (int f=0; f<oldFibInRoiSize; f++)
-                                {
-                                    if (FibersInROI[f] == originalFibId ) {
-                                        break;
-                                    } else if (f == FibersInROI.size() -1){ //if there was no break until last entry, then write it in.
-                                        FibersInROI.push_back(originalFibId);
-
-                                    }
-                                }
-                            } else {
-                                FibersInROI.push_back(originalFibId);
-                            }
-                        }
-                        // for performance in data overhead reason, set id of found point to -1 in ROI-set. sublines can host this id one or more times for the same fiber, therefore we do not need this information anymore.
-                        PointsInROI[k] = -1;
-
-
-                    }
-                }
-
+                // MITK_INFO << "writing fiber id: " << clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0] << " to pointId: " << pts[j];
+                pointindexFiberMap[ pts[j] ] = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
+                // MITK_INFO << "in array: " << pointindexFiberMap[ pts[j] ];
             }
 
-
         }
 
-        MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
-        std::vector<int>::iterator finIt = FibersInROI.begin();
-        while ( finIt != FibersInROI.end() )
+        MITK_INFO << "\n===== Pointindex based structure finalized ======\n";
+
+        // get all Points in ROI with according fiberID
+        for (long k = 0; k < PointsInROI.size(); k++)
         {
-            MITK_INFO << *finIt << endl;
-            ++finIt;
+            // MITK_INFO << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
+            FibersInROI.push_back(pointindexFiberMap[ PointsInROI[k] ]);
         }
-        MITK_INFO << "=====================\n";
+
+
 
     }
 

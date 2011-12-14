@@ -73,7 +73,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vnl/vnl_vector.h>
 
-#define PVA_PI 3.141592653589793238462643383
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#define PVA_PI M_PI
 
 const std::string QmitkPartialVolumeAnalysisView::VIEW_ID =
 "org.mitk.views.partialvolumeanalysisview";

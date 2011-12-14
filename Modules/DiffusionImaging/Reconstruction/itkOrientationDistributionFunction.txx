@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/algo/vnl_matrix_inverse.h>
 #include "itkPointShell.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 namespace itk
 {
@@ -59,7 +61,7 @@ namespace itk
   itk::SimpleFastMutexLock itk::OrientationDistributionFunction<T,N>::m_MutexAngularRange;
 
 
-#define ODF_PI       3.14159265358979323846
+#define ODF_PI       M_PI
 
   /**
   * Assignment Operator

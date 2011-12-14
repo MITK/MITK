@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdio.h>
 #include <locale>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #if BOOST_VERSION / 100000 > 0
 #if BOOST_VERSION / 100 % 1000 > 34
 #include <boost/math/special_functions/legendre.hpp>
@@ -38,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace itk {
 
-#define QBALL_ANAL_RECON_PI       3.14159265358979323846
+#define QBALL_ANAL_RECON_PI       M_PI
 
   template< class T, class TG, class TO, int L, int NODF>
   AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>

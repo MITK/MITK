@@ -1,8 +1,11 @@
 #include <mitkParticle.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 using namespace std;
 
-#define PI 3.1415926536
+#define PI M_PI
 
 float squareNorm( vnl_vector_fixed<float, 3> v )
 {

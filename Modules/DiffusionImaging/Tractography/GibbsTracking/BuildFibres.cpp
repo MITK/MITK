@@ -2,14 +2,16 @@
 #define _BUILDFIBRES
 
 //#include "matrix.h"
+#define _USE_MATH_DEFINES
 #include <math.h>
+
 #include <map>
 #include <vector>
 #include <string.h>
 
 using namespace std;
 
-#define PI 3.1415926536
+#define PI M_PI
 
 
 

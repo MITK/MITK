@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataEvaluationFilter.h"
 #include <mitkPointSetStatisticsCalculator.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 mitk::NavigationDataEvaluationFilter::NavigationDataEvaluationFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
@@ -280,7 +283,7 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
 
 std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAnglesGrad(std::vector<mitk::Quaternion> quaterions)
 {
-  double PI = 3.1415926535897932384626433832795028841971;
+  double PI = M_PI;
   std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
   std::vector<mitk::Vector3D> eulerAnglesRadians = QuaternionsToEulerAngles(quaterions);
   for (int i=0; i<eulerAnglesRadians.size(); i++)

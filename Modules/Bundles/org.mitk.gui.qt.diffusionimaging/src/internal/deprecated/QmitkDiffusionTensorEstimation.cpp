@@ -102,7 +102,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DIFF_EST_PI       3.14159265358979323846
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#define DIFF_EST_PI   M_PI
 
 typedef float TTensorPixelType;
 typedef itk::DiffusionTensor3D< TTensorPixelType >    TensorPixelType;

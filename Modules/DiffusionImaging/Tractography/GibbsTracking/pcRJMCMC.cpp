@@ -3,7 +3,9 @@
 
 //#include "mex.h"
 //#include "matrix.h"
+#define _USE_MATH_DEFINES
 #include <math.h>
+
 #include <map>
 #include <string.h>
 #include <time.h>
@@ -11,7 +13,7 @@
 using namespace std;
 
 #define float float
-#define PI 3.1415926536
+#define PI M_PI
 //#define INFINITY 99999999999.0
 
 //#define TIMING

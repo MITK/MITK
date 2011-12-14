@@ -41,7 +41,10 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 #include <new>
 
-#define PI 3.14159265;
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#define PI M_PI;
 #define cAir 299704944;
 #define fMod 20000000;
 

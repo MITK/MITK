@@ -3568,6 +3568,19 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
+  <stateMachine NAME="LeftClickLevelWindow">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="levelwindow" ID="1" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="1014" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+    </state>
+  </stateMachine>
   <stateMachine NAME="ToolCallbackInteraction">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">

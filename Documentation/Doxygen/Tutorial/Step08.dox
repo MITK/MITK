@@ -16,7 +16,7 @@
  
  \dontinclude Step8.cpp 
  \skipline Part Ia
- \until GetMoveAndZoomInteractor
+ \until EnableNavigationControllerEventListening
  
  
  \ref Step07Page "[Previous step]" \ref Step09Page "[Next step]"

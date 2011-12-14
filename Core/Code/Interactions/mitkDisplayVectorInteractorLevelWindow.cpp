@@ -67,7 +67,7 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
       for ( unsigned int i = 0; i < allImageNodes->size() ; i++ )
       {
         bool isActiveImage = false;
-        bool propFound = allImageNodes->at( i )->GetBoolProperty( "activeImage", isActiveImage );
+        bool propFound = allImageNodes->at( i )->GetBoolProperty( "imageForLevelWindow", isActiveImage );
 
         if ( propFound && isActiveImage )
         { 
@@ -96,6 +96,8 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
 
       lv.SetLevelWindow( level, window );
       dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow( lv );
+
+      m_Sender->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;

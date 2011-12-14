@@ -83,10 +83,6 @@ void Step8::SetupWidgets()
 
 	// Moving the cut-planes to click-point
 	multiWidget->EnableNavigationControllerEventListening();
-
-	// Zooming and panning
-	mitk::GlobalInteraction::GetInstance()->AddListener(
-			multiWidget->GetMoveAndZoomInteractor());
 }
 /**
  \example Step8.cpp

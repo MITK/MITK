@@ -13,8 +13,6 @@ IF(MITK_USE_CTK)
   SET(proj_DEPENDENCIES )
   SET(CTK_DEPENDS ${proj})
 
-
-
   IF(NOT DEFINED CTK_DIR)
     
     SET(revision_tag 282be3d)

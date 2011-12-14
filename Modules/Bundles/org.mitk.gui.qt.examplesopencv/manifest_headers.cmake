@@ -1,4 +1,4 @@
-set(Plugin-Name "MITK Video Player")
+set(Plugin-Name "MITK Examples OpenCV")
 set(Plugin-Version "1.0")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "http://www.mitk.org")

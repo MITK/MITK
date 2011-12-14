@@ -4,6 +4,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.diffusionimaging:OFF
   org.mitk.gui.qt.examples:OFF
+  org.mitk.gui.qt.examplesopencv:OFF
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
   org.mitk.gui.qt.datamanager:ON
@@ -27,7 +28,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
-  org.mitk.gui.qt.videoplayer:OFF
   org.mitk.gui.qt.python.console:OFF
   org.mitk.gui.qt.registration:OFF
   )

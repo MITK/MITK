@@ -27,6 +27,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.dtiatlasapp
     org.mitk.gui.qt.diffusionimagingapp
     org.mitk.gui.qt.examples
+	org.mitk.gui.qt.examplesopencv
     org.mitk.gui.qt.ext
     org.mitk.gui.qt.extapplication
     org.mitk.gui.qt.datamanager
@@ -50,7 +51,6 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.imagecropper
     org.mitk.gui.qt.volumevisualization
     org.mitk.gui.qt.pointsetinteraction
-    org.mitk.gui.qt.videoplayer
     org.mitk.gui.qt.python.console
 	org.mitk.gui.qt.registration
  )

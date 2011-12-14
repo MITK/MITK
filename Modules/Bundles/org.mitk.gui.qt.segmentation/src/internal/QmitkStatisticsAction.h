@@ -8,6 +8,8 @@
 
 #include "org_mitk_gui_qt_segmentation_Export.h"
 
+class QmitkStdMultiWidget;
+
 class MITK_QT_SEGMENTATION QmitkStatisticsAction: public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
@@ -26,6 +28,7 @@ public:
   //interface methods
   void Run( const std::vector<mitk::DataNode*>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);

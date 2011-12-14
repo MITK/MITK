@@ -86,6 +86,10 @@ void QmitkThresholdAction::SetDataStorage(DataStorage *dataStorage)
   m_DataStorage = dataStorage;
 }
 
+void QmitkThresholdAction::SetStdMultiWidget(QmitkStdMultiWidget *)
+{
+}
+
 void QmitkThresholdAction::SetSmoothed(bool)
 {
 }

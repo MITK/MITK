@@ -11,7 +11,14 @@
       name="Measurement" 
       category="org.mitk.views.general" 
       icon="resources/measurement.png"
-      class="QmitkMeasurement" />
+      class="QmitkMeasurementView" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.imagestatistics"
+          name="Statistics"
+          class="QmitkImageStatisticsView"
+          icon="resources/ImageStatistic_24.png" />
   </extension>
   
 </plugin>

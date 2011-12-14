@@ -25,12 +25,11 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.deformableregistration:OFF
   org.mitk.gui.qt.rigidregistration:OFF
-  org.mitk.gui.qt.imagestatistics:OFF
   org.mitk.gui.qt.volumetry:OFF
   org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.simpleexample:OFF
   org.mitk.gui.qt.ugvisualization:OFF
-  org.mitk.gui.qt.measurement:OFF
+  org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.simplemeasurement:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.pointbasedregistration:OFF

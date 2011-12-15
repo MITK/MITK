@@ -317,6 +317,7 @@ private:
   
   
   //contains the selected FiberBundle, PlanarFigure
+  mitk::DataNode::Pointer m_FiberBundleNode;
   mitk::WeakPointer<mitk::FiberBundleX> m_FiberBundleX;
   mitk::PlanarFigure::Pointer m_PlanarFigure;
   

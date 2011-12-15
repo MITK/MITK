@@ -110,7 +110,7 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std
     std::vector<unsigned long>::iterator finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
     {
-//        MITK_INFO << *finIt;
+        //        MITK_INFO << *finIt;
         vtkSmartPointer<vtkCell> fiber = m_FiberIdDataSet->GetCell(*finIt);//->DeepCopy(fiber);
         vtkSmartPointer<vtkPoints> fibPoints = fiber->GetPoints();
 
@@ -119,18 +119,18 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std
 
         for(int i=0; i<fibPoints->GetNumberOfPoints(); i++)
         {
-//            MITK_INFO << "id: " << fiber->GetPointId(i);
-//            MITK_INFO << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
+            //            MITK_INFO << "id: " << fiber->GetPointId(i);
+            //            MITK_INFO << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
             newFiber->GetPointIds()->SetId(i, newPointSet->GetNumberOfPoints());
             newPointSet->InsertNextPoint(fibPoints->GetPoint(i)[0], fibPoints->GetPoint(i)[1], fibPoints->GetPoint(i)[2]);
 
 
             if (m_FiberIdDataSet->GetPointData()->HasArray(FA_VALUE_ARRAY)){
-//                MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(FA_VALUE_ARRAY)->GetTuple(fiber->GetPointId(i));
+                //                MITK_INFO << m_FiberIdDataSet->GetPointData()->GetArray(FA_VALUE_ARRAY)->GetTuple(fiber->GetPointId(i));
             }
 
             if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)){
-//                MITK_INFO << "ColorValue: " << m_FiberIdDataSet->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetTuple(fiber->GetPointId(i))[0];
+                //                MITK_INFO << "ColorValue: " << m_FiberIdDataSet->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetTuple(fiber->GetPointId(i))[0];
             }
         }
 
@@ -144,7 +144,7 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std
     MITK_INFO << "new fiberbundle polydata lines: " << newFiberPolyData->GetNumberOfLines();
     MITK_INFO << "=====================\n";
 
-//    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
+    //    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
     return newFiberPolyData;
 }
 
@@ -447,7 +447,7 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
       - this is more relevant for renderer than for fiberbundleX datastructure
       - think about sourcing this to a explicit method which coordinates colorcoding */
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-    m_isModified = true;
+    //m_isModified = true;
     //  ===========================
 
     //mini test, shall be ported to MITK TESTINGS!
@@ -498,6 +498,45 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
     mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf.GetPointer());
     if (!pfcomp.IsNull()) {
         // process requested boolean operation of PFC
+        switch (pfcomp->getOperationType()) {
+        case 0:
+        {
+            //AND
+            //temporarly store results of the child in this vector, we need that to accumulate the
+            std::vector<unsigned long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
+            std::sort(childResults.begin(), childResults.end());
+
+            std::vector<unsigned long> AND_Assamblage;
+            AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
+
+            std::vector<unsigned long>::iterator it;
+            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
+            {
+                std::vector<unsigned long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
+                sort(tmpChild.begin(), tmpChild.end());
+                it = std::set_intersection(childResults.begin(), childResults.end(),
+                                           tmpChild.begin(), tmpChild.end(),
+                                           AND_Assamblage.begin() );
+            }
+
+
+            return AND_Assamblage;
+            break;
+
+        }
+        case 1:
+        {
+            //OR
+        }
+        case 2:
+        {
+            //NOT
+        }
+        default:
+            MITK_INFO << "we have an UNDEFINED composition... ERROR" ;
+            break;
+
+        }
     } else
     {
 

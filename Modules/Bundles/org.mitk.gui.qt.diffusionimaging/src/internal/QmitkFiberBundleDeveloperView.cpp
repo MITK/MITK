@@ -627,6 +627,8 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
     , m_MultiWidget( NULL )
     , m_FiberIDGenerator( NULL)
     , m_GeneratorFibersRandom( NULL )
+    , m_FiberColoringSlave(NULL)
+    , m_FiberExtractor(NULL)
     , m_fiberMonitorIsOn( false )
     , m_CircleCounter( 0 )
 {
@@ -643,8 +645,8 @@ QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
     if (m_FiberIDGenerator != NULL)
         delete m_FiberIDGenerator;
 
-//    if (m_GeneratorFibersRandom != NULL)
-//        delete m_GeneratorFibersRandom;
+    //    if (m_GeneratorFibersRandom != NULL)
+    //        delete m_GeneratorFibersRandom;
 
 }
 
@@ -881,11 +883,14 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberExtraction()
         m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
         m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
     }
-//    disconnect(m_hostThread, 0, 0, 0);
+    //    disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
 
-//    m_FiberExtractor->disconnect();
+    //    m_FiberExtractor->disconnect();
     delete m_FiberExtractor;
+
+    m_FiberBundleNode->Modified();
+    m_MultiWidget->RequestUpdate();
 
 }
 
@@ -902,7 +907,7 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkP
     FBNode->SetVisibility(true);
 
     GetDataStorage()->Add(FBNode);
-    //output->Delete();
+    FBNode->Modified();
 
     const mitk::PlaneGeometry * tsgeo = m_MultiWidget->GetTimeNavigationController()->GetCurrentPlaneGeometry();
     if (tsgeo == NULL) {
@@ -1067,7 +1072,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_GenerateFibersRandom()
         m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
         m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
     }
-//    disconnect(m_hostThread, 0, 0, 0);
+    //    disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
     delete m_GeneratorFibersRandom;
 
@@ -1192,11 +1197,14 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
     disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
     //update renderer
+    m_FiberBundleNode->Modified();
     m_MultiWidget->RequestUpdate();
 
 
     //update QComboBox(dropDown menu) in view of available ColorCodings
     DoGatherColorCodings();
+
+    delete m_FiberColoringSlave;
 }
 
 
@@ -1368,6 +1376,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_IdGenerate()
     }
     disconnect(m_hostThread, 0, 0, 0);
     m_hostThread->disconnect();
+    delete m_FiberIDGenerator;
 
 }
 
@@ -1565,6 +1574,7 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
    * - variable m_FiberBundleX
    * - visualization of analysed fiberbundle
    */
+    m_FiberBundleNode = NULL;
     m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
     m_PlanarFigure = NULL;
     ResetFiberInfoWidget();
@@ -1588,10 +1598,12 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
         /* CHECKPOINT: FIBERBUNDLE*/
         if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
+            m_FiberBundleNode = node;
             m_FiberBundleX = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-            if (m_FiberBundleX.IsNull())
+            if (m_FiberBundleX.IsNull()){
                 MITK_INFO << "========ATTENTION=========\n unable to load selected FiberBundleX to FiberBundleDeveloper-plugin \n";
-
+                m_FiberBundleNode = NULL;
+            }
             // ==== FIBERBUNDLE_INFO ELEMENTS ====
             if ( m_Controls->page_FiberInfo->isVisible() )
                 FeedFiberInfoWidget();

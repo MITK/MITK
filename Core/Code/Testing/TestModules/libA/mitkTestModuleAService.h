@@ -26,6 +26,8 @@ namespace mitk {
 struct TestModuleAService
 {
   virtual ~TestModuleAService() {}
+
+  virtual void SetUnloadedFlag(bool* flag) = 0;
 };
 
 }

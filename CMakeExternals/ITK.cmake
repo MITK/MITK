@@ -9,6 +9,10 @@ ENDIF()
 
 SET(proj ITK)
 SET(proj_DEPENDENCIES GDCM)
+IF(MITK_USE_Python)
+  LIST(APPEND proj_DEPENDENCIES CableSwig)
+ENDIF()
+
 SET(ITK_DEPENDS ${proj})
 
 IF(NOT DEFINED ITK_DIR)
@@ -18,6 +22,16 @@ IF(NOT DEFINED ITK_DIR)
     SET(additional_cmake_args
         -DCMAKE_USE_WIN32_THREADS:BOOL=ON
         -DCMAKE_USE_PTHREADS:BOOL=OFF)
+  ENDIF()
+
+  IF(MITK_USE_Python)
+    LIST(APPEND additional_cmake_args
+         -DUSE_WRAP_ITK:BOOL=ON
+         -DITK_USE_REVIEW:BOOL=ON
+         -DCableSwig_DIR:PATH=${CableSwig_DIR}
+         -DWRAP_ITK_JAVA:BOOL=OFF
+         -DWRAP_ITK_TCL:BOOL=OFF
+        )
   ENDIF()
 
   IF(GDCM_IS_2_0_18)

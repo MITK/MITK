@@ -5,9 +5,7 @@
 #include "itkObjectFactory.h"
 #include "itkShapedNeighborhoodIterator.h"
 #include <itkImageRegionConstIterator.h>
-
-#include <MitkGraphAlgorithmsExports.h>
-
+ 
 
 namespace itk
 {
@@ -25,9 +23,7 @@ namespace itk
     typedef SmartPointer<const Self>  ConstPointer;
     typedef ShapedNeighborhoodIterator< TInputImageType > itkShapedNeighborhoodIteratorType;
 
-
-
-
+	
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunction, Object);
 
@@ -80,6 +76,7 @@ namespace itk
 
 } // end namespace itk
 
-#include "itkShortestPathCostFunction.cpp"
+
+#include "itkShortestPathCostFunction.txx"
 
 #endif /* __itkShortestPathCostFunction_h */

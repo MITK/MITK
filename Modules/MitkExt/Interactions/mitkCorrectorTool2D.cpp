@@ -135,7 +135,11 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
       MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
   }
 
-  this->WriteBackSegmentationResult(positionEvent, algorithm->GetOutput());
+  mitk::Image::Pointer resultSlice = mitk::Image::New();
+  resultSlice->Initialize(algorithm->GetOutput());
+  resultSlice->SetVolume(algorithm->GetOutput()->GetData());
+
+  this->WriteBackSegmentationResult(positionEvent, resultSlice);
 
   // 6. Make sure the result is drawn again --> is visible then. 
   assert( positionEvent->GetSender()->GetRenderWindow() );

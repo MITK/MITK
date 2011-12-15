@@ -34,6 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGetModuleContext.h"
 
+//Includes for 3DSurfaceInterpolation
+#include "mitkImageToContourFilter.h"
+#include "mitkSurfaceInterpolationController.h"
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -42,7 +46,8 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_RememberContourPositions (false)
+ m_ShowMarkerNodes (true),
+ m_3DInterpolationEnabled (true)
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -191,6 +196,31 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
       // here we have a single slice that can be modified
       Image::Pointer slice = extractor->GetOutput();
 
+      //Workaround because of bug #7079
+      Point3D origin = slice->GetGeometry()->GetOrigin();
+
+      int affectedDimension(-1);
+
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
+      {
+          affectedDimension = 2;
+      }
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
+      {
+          affectedDimension = 0;
+      }
+      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+      {
+          affectedDimension = 1;
+      }
+
+      if (affectedDimension != -1)
+      {
+          origin[affectedDimension] = planeGeometry->GetOrigin()[affectedDimension];
+          slice->GetGeometry()->SetOrigin(origin);
+      }
+      //Workaround end
+
       return slice;
     }
     catch(...)
@@ -244,7 +274,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   int affectedSlice( -1 );
   DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
 
-  //TODO hier die 3D Interpolation integrieren
   if (affectedDimension != -1) {
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
     slicewriter->SetInput( image );
@@ -254,10 +283,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-    if ( m_RememberContourPositions )
-    {
-      this->AddContourmarker(positionEvent);
-    }
   }
   else {
     OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
@@ -267,21 +292,33 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
-
-    if ( m_RememberContourPositions )
-    {
-      this->AddContourmarker(positionEvent);
-    }
-
+  }
+  if ( m_3DInterpolationEnabled )
+  {
+    slice->DisconnectPipeline();
+    unsigned int pos = this->AddContourmarker(positionEvent);
+    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+    contourExtractor->SetInput(slice);
+    contourExtractor->Update();
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+    contour->DisconnectPipeline();
   }
 }
 
-void mitk::SegTool2D::SetRememberContourPositions(bool status)
+void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
-  m_RememberContourPositions = status;
+    m_ShowMarkerNodes = status;
 }
 
-void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
+void mitk::SegTool2D::Enable3DInterpolation(bool status)
+{
+    m_3DInterpolationEnabled = status;
+}
+
+unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
@@ -291,33 +328,54 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
   unsigned int size = service->GetNumberOfPlanePositions();
   unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
+  mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
+  contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
+
+  std::stringstream markerStream;
+  mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
+
+  markerStream << m_Contourmarkername ;
+  markerStream << " ";
+  markerStream << id+1;
+
+  DataNode::Pointer rotatedContourNode = DataNode::New();
+
+  rotatedContourNode->SetData(contourMarker);
+  rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+  rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
+  rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
+  rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
+  rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(!m_ShowMarkerNodes));
+
   if (plane)
   {
 
     if ( id ==  size )
     {
-      //Creating PlanarFigure which currently serves as marker
-      mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
-      contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
-
-      std::stringstream markerStream;
-      mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
-
-      markerStream << m_Contourmarkername ;
-      markerStream << " ";
-      markerStream << id+1;
-
-      DataNode::Pointer rotatedContourNode = DataNode::New();
-
-      rotatedContourNode->SetData(contourMarker);
-      rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
-      rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
-      rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
-      rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
       m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
+    else
+    {
+        mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
+
+        mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
+
+        for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
+          iter != markers->end();
+          ++iter)
+        {
+            std::string nodeName = (*iter)->GetName();
+            unsigned int t = nodeName.find_last_of(" ");
+            unsigned int markerId = atof(nodeName.substr(t+1).c_str())-1;
+            if(id == markerId)
+            {
+                return id;
+            }
+        }
+        m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+    }
   }
-  //return id;
+  return id;
 }
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )

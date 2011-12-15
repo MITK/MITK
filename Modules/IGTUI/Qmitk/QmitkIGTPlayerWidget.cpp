@@ -45,6 +45,8 @@ QmitkIGTPlayerWidget::QmitkIGTPlayerWidget(QWidget* parent, Qt::WindowFlags f)
   CreateQtPartControl(this);
   CreateConnections();
 
+  m_Controls->samplePositionHorizontalSlider->setVisible(false);
+
   this->ResetLCDNumbers(); // reset lcd numbers at start
 }
 

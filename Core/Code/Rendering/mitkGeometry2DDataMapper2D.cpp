@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLine.h"
 #include "mitkNodePredicateDataType.h"
 
+#include "mitkResliceMethodProperty.h"
+
 
 mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
 : m_SurfaceMapper( NULL ), m_DataStorage(NULL), m_ParentNode(NULL),
@@ -99,7 +101,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
   const PlaneGeometry *worldPlaneGeometry =
     dynamic_cast< const PlaneGeometry* >( 
-      renderer->GetCurrentWorldGeometry2D() );
+    renderer->GetCurrentWorldGeometry2D() );
 
   if ( worldPlaneGeometry && inputPlaneGeometry 
     && inputPlaneGeometry->GetReferenceGeometry() )
@@ -157,23 +159,40 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         worldPlaneGeometry->Map( 
           transform->TransformPoint( point2 ), lineTo );
 
-        Line< ScalarType, 2 > line, otherLine;
-        line.SetPoints( lineFrom, lineTo );
+        Line< ScalarType, 2 > mainLine, otherLine;
+        Line< ScalarType, 2 > primaryHelperLine, secondaryHelperLine;
+        mainLine.SetPoints( lineFrom, lineTo );
+        primaryHelperLine.SetPoints( lineFrom, lineTo );
+        secondaryHelperLine.SetPoints( lineFrom, lineTo );
 
         displayGeometry->WorldToDisplay( lineFrom, lineFrom );
         displayGeometry->WorldToDisplay( lineTo, lineTo );
 
         ScalarType lengthInDisplayUnits = (lineTo - lineFrom).GetNorm();
 
+        Vector2D mainLineDirectionOrthogonal; 
+        mainLineDirectionOrthogonal[0] = -mainLine.GetDirection()[1];
+        mainLineDirectionOrthogonal[1] = mainLine.GetDirection()[0];
+
+
         // lineParams stores the individual segments of the line, which are
         // separated by a gap each (to mark the intersection with another
         // displayed line)
-        std::vector< ScalarType > lineParams;
-        lineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
-        lineParams.push_back( 0.0 );
-        lineParams.push_back( 1.0 );
+        std::vector< ScalarType > mainLineParams;
+        std::vector< ScalarType > primaryHelperLineParams;
+        std::vector< ScalarType > secondaryHelperLineParams;
+        mainLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        mainLineParams.push_back( 0.0 );
+        mainLineParams.push_back( 1.0 );
 
-        Vector2D d, dOrth;
+        primaryHelperLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        primaryHelperLineParams.push_back( 0.0 );
+        primaryHelperLineParams.push_back( 1.0 );
+
+        secondaryHelperLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        secondaryHelperLineParams.push_back( 0.0 );
+        secondaryHelperLineParams.push_back( 1.0 );
+
         
         // Now iterate through all other lines displayed in this window and
         // calculate the positions of intersection with the line to be
@@ -181,18 +200,103 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         // gap afterwards.
         NodesVectorType::iterator otherPlanesIt = m_OtherGeometry2Ds.begin();
         NodesVectorType::iterator otherPlanesEnd = m_OtherGeometry2Ds.end();
+
+        int mainLineThickSlicesMode = 0;
+        int mainLineThickSlicesNum = 1;
+
+        DataNode* dataNodeOfInputPlaneGeometry = NULL;
+
+        // Now we have to find the DataNode that contains the inputPlaneGeometry
+        // in order to determine the state of the thick-slice rendering
+        while ( otherPlanesIt != otherPlanesEnd )
+        {
+          PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
+            static_cast< Geometry2DData * >(
+            (*otherPlanesIt)->GetData() )->GetGeometry2D() );
+
+          // if we have found the correct node
+          if ( (otherPlane == inputPlaneGeometry)
+            && worldPlaneGeometry->IntersectionLine( 
+            otherPlane, otherCrossLine ) )
+          {
+            dataNodeOfInputPlaneGeometry = (*otherPlanesIt);
+            if( dataNodeOfInputPlaneGeometry )
+            {
+              mainLineThickSlicesMode = this->DetermineThickSliceMode(dataNodeOfInputPlaneGeometry, mainLineThickSlicesNum);
+            }
+            break;
+          }
+          otherPlanesIt++;
+        }
+
+        // if we did not find a dataNode for the inputPlaneGeometry there is nothing we can do from here
+        if ( dataNodeOfInputPlaneGeometry == NULL )
+          return;
+
+        // Determine if we should draw the area covered by the thick slicing, default is false.
+        // This will also show the area of slices that do not have thick slice mode enabled
+        bool showAreaOfThickSlicing = false;
+        dataNodeOfInputPlaneGeometry->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
+
+        // get the normal of the inputPlaneGeometry
+        Vector3D normal = inputPlaneGeometry->GetNormal();
+        // determine the pixelSpacing in that direction
+        double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+
+        // As the inputPlaneGeometry cuts through the center of the slice in the middle
+        // we have to add 0.5 pixel in order to compensate.
+        thickSliceDistance *= mainLineThickSlicesNum+0.5;
+
+        // not the nicest place to do it, but we have the width of the visible bloc in MM here
+        // so we store it in this fancy property
+        dataNodeOfInputPlaneGeometry->SetFloatProperty( "reslice.thickslices.sizeinmm", thickSliceDistance*2 );
+
+        if ( showAreaOfThickSlicing )
+        {
+          // vectorToHelperLine defines how to reach the helperLine from the mainLine
+          Vector2D vectorToHelperLine;
+          vectorToHelperLine = mainLineDirectionOrthogonal;
+          vectorToHelperLine.Normalize();
+          // got the right direction, so we multiply the width
+          vectorToHelperLine *= thickSliceDistance;
+
+          // and create the corresponding points
+          primaryHelperLine.SetPoints( primaryHelperLine.GetPoint1() - vectorToHelperLine,
+            primaryHelperLine.GetPoint2() - vectorToHelperLine );
+
+          secondaryHelperLine.SetPoints( secondaryHelperLine.GetPoint1() + vectorToHelperLine,
+            secondaryHelperLine.GetPoint2() + vectorToHelperLine );
+        }
+
+
+        int otherLineThickSlicesMode = 0;
+        int otherLineThickSlicesNum = 1;
+
+        // by default, there is no gap for the helper lines
+        ScalarType gapSize = 0.0;
+
+        otherPlanesIt = m_OtherGeometry2Ds.begin();
         while ( otherPlanesIt != otherPlanesEnd )
         {
           PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
             static_cast< Geometry2DData * >(
               (*otherPlanesIt)->GetData() )->GetGeometry2D() );
 
-          // Just as with the original line, calculate the intersaction with
+
+          // Just as with the original line, calculate the intersection with
           // the world geometry...
           if ( (otherPlane != inputPlaneGeometry)
             && worldPlaneGeometry->IntersectionLine( 
                  otherPlane, otherCrossLine ) )
           {
+            otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
+            Vector3D normal = otherPlane->GetNormal();
+
+            double otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+            otherLineThickSliceDistance *= (otherLineThickSlicesNum+0.5)*2;
+
+            Point2D otherLineFrom, otherLineTo;
+
             // ... and clip the resulting line segment with the reference 
             // geometry bounding box.
             otherCrossLine.Transform( *inverseTransform );
@@ -203,112 +307,71 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
               point1, point2 ) == 2 )
             {
               worldPlaneGeometry->Map( 
-                transform->TransformPoint( point1 ), lineFrom );
+                transform->TransformPoint( point1 ), otherLineFrom );
               worldPlaneGeometry->Map( 
-                transform->TransformPoint( point2 ), lineTo );
+                transform->TransformPoint( point2 ), otherLineTo );
 
-              // By means of the dot product, calculate the gap position as
-              // parametric value in the range [0, 1]
-              otherLine.SetPoints( lineFrom, lineTo );
-              d = otherLine.GetDirection();
-              dOrth[0] = -d[1]; dOrth[1] = d[0];
-              
-              ScalarType t, norm; 
-              t = ( otherLine.GetPoint1() - line.GetPoint1() ) * dOrth;
-              norm = line.GetDirection() * dOrth;
+              otherLine.SetPoints( otherLineFrom, otherLineTo );
 
-              if ( fabs( norm ) > eps )
+              // then we have to determine the gap position of the main line
+              // by finding the position at which the two lines cross
+              this->DetermineParametricCrossPositions( mainLine, otherLine, mainLineParams );
+
+
+              // if the other line is also in thick slice mode, we have to determine the 
+              // gapsize considering the width of that other line and the spacing in its direction
+              if ( showAreaOfThickSlicing )
               {
-                t /= norm;
-                if ( (t > 0.0) && (t < 1.0) )
-                {
-                  lineParams.push_back(t);
-                }
+                Vector2D otherLineDirection = otherLine.GetDirection();
+                otherLineDirection.Normalize();
+                mainLineDirectionOrthogonal.Normalize();
+
+                // determine the gapsize
+                gapSize = fabs( otherLineThickSliceDistance / ( otherLineDirection*mainLineDirectionOrthogonal ) );
+                gapSize = gapSize / displayGeometry->GetScaleFactorMMPerDisplayUnit();
+
+                // determine the gap positions for the helper lines as well
+                this->DetermineParametricCrossPositions( primaryHelperLine, otherLine, primaryHelperLineParams );
+                this->DetermineParametricCrossPositions( secondaryHelperLine, otherLine, secondaryHelperLineParams );
               }
             }
           }
           ++otherPlanesIt;
         }
 
-        // Apply color and opacity read from the PropertyList.
-        this->ApplyProperties( renderer );
+        // If we have to draw the helperlines, the mainline will be drawn as a dashed line
+        // with a fixed gapsize of 10 pixels
+        this->DrawLine(renderer,
+          lengthInDisplayUnits,
+          mainLine,
+          mainLineParams,
+          inputPlaneGeometry,
+          showAreaOfThickSlicing,
+          10.0
+          );
 
-        ScalarType gapSizeInPixel = 10.0;
-        ScalarType gapSizeInParamUnits = 
-          1.0 / lengthInDisplayUnits * gapSizeInPixel;
 
-        std::sort( lineParams.begin(), lineParams.end() );
-
-        Point2D p1, p2;
-        ScalarType p1Param, p2Param; 
-        
-        p1Param = lineParams[0];
-        p1 = line.GetPoint( p1Param );
-        displayGeometry->WorldToDisplay( p1, p1 );
-
-        //Work arround to show the crosshair always on top of a 2D render window
-        //The image is usually located at depth = 0 or negative depth values, and thus,
-        //the crosshair with depth = 1 is always on top.
-        float depthPosition = 1.0f;
-
-        // Iterate over all line segments and display each, with a gap
-        // inbetween.
-        unsigned int i, preLastLineParam = lineParams.size() - 1;
-        for ( i = 1; i < preLastLineParam; ++i )
+        // If drawn, the helperlines are drawn as a solid line. The gapsize depends on the 
+        // width of the crossed line.
+        if ( showAreaOfThickSlicing )
         {
-          p2Param = lineParams[i] - gapSizeInParamUnits * 0.5;
-          p2 = line.GetPoint( p2Param );
+          this->DrawLine(renderer,
+            lengthInDisplayUnits,
+            primaryHelperLine,
+            primaryHelperLineParams,
+            inputPlaneGeometry,
+            false,
+            gapSize
+            );
 
-          if ( p2Param > p1Param )
-          {
-            // Convert intersection points (until now mm) to display 
-            // coordinates (units).
-            displayGeometry->WorldToDisplay( p2, p2 );
-
-            // draw
-            glEnable(GL_DEPTH_TEST);
-            glBegin (GL_LINES);
-            glVertex3f(p1[0],p1[1], depthPosition);
-            glVertex3f(p2[0],p2[1], depthPosition);
-            glEnd ();
-
-            if ( (i == 1) && (m_RenderOrientationArrows) )
-            {
-              // Draw orientation arrow for first line segment
-              this->DrawOrientationArrow( p1, p2, 
-                inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
-                m_ArrowOrientationPositive );
-            }
-          }
-
-          p1Param = p2Param + gapSizeInParamUnits;
-          p1 = line.GetPoint( p1Param );
-          displayGeometry->WorldToDisplay( p1, p1 );
-        }
-
-        // Draw last line segment
-        p2Param = lineParams[i];
-        p2 = line.GetPoint( p2Param );
-        displayGeometry->WorldToDisplay( p2, p2 );
-        glBegin( GL_LINES );
-        glVertex3f( p1[0], p1[1], depthPosition);
-        glVertex3f( p2[0], p2[1], depthPosition);
-        glEnd();
-
-
-        // Draw orientation arrows
-        if ( m_RenderOrientationArrows )
-        {
-          this->DrawOrientationArrow( p2, p1, 
-            inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
-            m_ArrowOrientationPositive );
-          if ( preLastLineParam < 2 )
-          {
-            // If we only have one line segment, draw other arrow, too
-            this->DrawOrientationArrow( p1, p2, 
-              inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
-              m_ArrowOrientationPositive );
-          }
+          this->DrawLine(renderer,
+            lengthInDisplayUnits,
+            secondaryHelperLine,
+            secondaryHelperLineParams,
+            inputPlaneGeometry,
+            false,
+            gapSize
+            );
         }
       }
     }
@@ -448,5 +511,156 @@ void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::Data
   if (parent.IsNotNull())
   {
     m_ParentNode = parent;
+  }
+}
+
+void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer, 
+                                            ScalarType lengthInDisplayUnits, 
+                                            Line<ScalarType,2> &line, 
+                                            std::vector<ScalarType> &gapPositions, 
+                                            const PlaneGeometry* inputPlaneGeometry, 
+                                            bool drawDashed, 
+                                            ScalarType gapSizeInPixel
+                                            )
+{
+  DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+  const PlaneGeometry *worldPlaneGeometry =
+    dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldGeometry2D() );
+
+  // Apply color and opacity read from the PropertyList.
+  this->ApplyProperties( renderer );
+
+  ScalarType gapSizeInParamUnits = 
+    1.0 / lengthInDisplayUnits * gapSizeInPixel;
+
+  std::sort( gapPositions.begin(), gapPositions.end() );
+
+  Point2D p1, p2;
+  ScalarType p1Param, p2Param; 
+
+  p1Param = gapPositions[0];
+  p1 = line.GetPoint( p1Param );
+  displayGeometry->WorldToDisplay( p1, p1 );
+
+  //Workaround to show the crosshair always on top of a 2D render window
+  //The image is usually located at depth = 0 or negative depth values, and thus,
+  //the crosshair with depth = 1 is always on top.
+  float depthPosition = 1.0f;
+
+  if ( drawDashed )
+  {
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0xF0F0); 
+  }
+  glEnable(GL_DEPTH_TEST);
+
+  // Iterate over all line segments and display each, with a gap
+  // in between.
+  unsigned int i, preLastLineParam = gapPositions.size() - 1;
+  for ( i = 1; i < preLastLineParam; ++i )
+  {
+    p2Param = gapPositions[i] - gapSizeInParamUnits * 0.5;
+    p2 = line.GetPoint( p2Param );
+
+    if ( p2Param > p1Param )
+    {
+      // Convert intersection points (until now mm) to display 
+      // coordinates (units).
+      displayGeometry->WorldToDisplay( p2, p2 );
+
+      // draw
+      glBegin (GL_LINES);
+      glVertex3f(p1[0],p1[1], depthPosition);
+      glVertex3f(p2[0],p2[1], depthPosition);
+      glEnd ();
+
+      if ( (i == 1) && (m_RenderOrientationArrows) )
+      {
+        // Draw orientation arrow for first line segment
+        this->DrawOrientationArrow( p1, p2, 
+          inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+          m_ArrowOrientationPositive );
+      }
+    }
+
+    p1Param = p2Param + gapSizeInParamUnits;
+    p1 = line.GetPoint( p1Param );
+    displayGeometry->WorldToDisplay( p1, p1 );
+  }
+
+  // Draw last line segment
+  p2Param = gapPositions[i];
+  p2 = line.GetPoint( p2Param );
+  displayGeometry->WorldToDisplay( p2, p2 );
+  glBegin( GL_LINES );
+  glVertex3f( p1[0], p1[1], depthPosition);
+  glVertex3f( p2[0], p2[1], depthPosition);
+  glEnd();
+
+  if ( drawDashed )
+  {
+    glDisable(GL_LINE_STIPPLE);
+  }
+
+  // Draw orientation arrows
+  if ( m_RenderOrientationArrows )
+  {
+    this->DrawOrientationArrow( p2, p1, 
+      inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+      m_ArrowOrientationPositive );
+    if ( preLastLineParam < 2 )
+    {
+      // If we only have one line segment, draw other arrow, too
+      this->DrawOrientationArrow( p1, p2, 
+        inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+        m_ArrowOrientationPositive );
+    }
+  }
+
+}
+
+int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
+{
+  int thickSlicesMode = 0;
+  // determine the state and the extend of the thick-slice mode
+  mitk::ResliceMethodProperty *resliceMethodEnumProperty=0;
+  if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+    thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
+
+  IntProperty *intProperty=0;
+  if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+  {
+    thickSlicesNum = intProperty->GetValue();
+    if(thickSlicesNum < 1) thickSlicesNum=0;
+    if(thickSlicesNum > 10) thickSlicesNum=10;
+  }
+
+  if ( thickSlicesMode == 0 )
+    thickSlicesNum = 0;
+
+  return thickSlicesMode;
+}
+
+void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine, 
+                                                                     Line< mitk::ScalarType, 2 > &otherLine,
+                                                                     std::vector< mitk::ScalarType > &crossPositions )
+{
+  Vector2D direction, dOrth;
+  // By means of the dot product, calculate the gap position as
+  // parametric value in the range [0, 1]
+  direction = otherLine.GetDirection();
+  dOrth[0] = -direction[1]; dOrth[1] = direction[0];
+
+
+  ScalarType gapPosition = ( otherLine.GetPoint1() - mainLine.GetPoint1() ) * dOrth;
+  ScalarType norm = mainLine.GetDirection() * dOrth;
+
+  if ( fabs( norm ) > eps )
+  {
+    gapPosition /= norm;
+    if ( (gapPosition > 0.0) && (gapPosition < 1.0) )
+    {
+      crossPositions.push_back(gapPosition);
+    }
   }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igttutorial"
+          name="Image Guided Therapy Tutorial"
+          class="QmitkImageGuidedTherapyTutorialView"
+          icon="resources/ImageGuidedTherapyTutorial.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igttrackinglab"
+          name="IGT Tracking Lab"
+          class="QmitkIGTTrackingLabView"
+          icon="resources/IgtTrackingLab.png" />
+  </extension>
+
+</plugin>

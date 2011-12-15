@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <QStringList>
 #include <dPython.h>
 #include "mitkCommon.h"
@@ -31,6 +32,12 @@ class QmitkPythonClient
     virtual void update() = 0;
 };
 
+class QmitkPythonPasteClient
+{
+  public:
+    virtual ~QmitkPythonPasteClient(){};
+    virtual void paste(const QString&) = 0;
+};
 
 class QmitkPythonMediator
 {  
@@ -45,6 +52,9 @@ class QmitkPythonMediator
 
     void setClient(QmitkPythonClient *);
     void unregisterClient(QmitkPythonClient *);
+    void registerPasteCommandClient(QmitkPythonPasteClient *);
+    void unregisterPasteCommandClient(QmitkPythonPasteClient *);
+    void paste(const QString& pasteCommand);
     std::vector<QStringList> GetCommandHistory();
     void SetCommandHistory(const QString&);
     void Initialize();
@@ -55,10 +65,10 @@ class QmitkPythonMediator
     virtual ~QmitkPythonMediator();
 
   private:
-    std::vector<QmitkPythonClient *> m_clients;
+    std::set<QmitkPythonClient *> m_clients;
+    std::set<QmitkPythonPasteClient *> m_PasteClients;
     std::vector<QStringList> m_commandHistory;
     std::vector<QStringList> m_variableStack;
-    static QmitkPythonMediator *m_mediatorInstance;
 };
 
 #endif // _QMITKPYTHONCONSOLEVIEW_H_INCLUDED

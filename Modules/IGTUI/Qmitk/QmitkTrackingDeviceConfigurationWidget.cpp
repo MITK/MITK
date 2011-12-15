@@ -16,10 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkTrackingDeviceConfigurationWidget.h"
-#include "mitkClaronTrackingDevice.h"
-#include "mitkNDITrackingDevice.h"
-#include "mitkSerialCommunication.h"
-#include "qscrollbar.h"
+#include <mitkClaronTrackingDevice.h>
+#include <mitkNDITrackingDevice.h>
+#include <mitkSerialCommunication.h>
+#include <qscrollbar.h>
+#include <qmessagebox.h>
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
@@ -141,6 +142,8 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
+    connect( (QObject*)(m_Controls->m_AutoScanPolaris), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
+    connect( (QObject*)(m_Controls->m_AutoScanAurora), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
 
     //set a few UI components depending on Windows / Linux
     #ifdef WIN32
@@ -187,6 +190,8 @@ void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)
 
 void QmitkTrackingDeviceConfigurationWidget::TestConnection()
 {
+this->setEnabled(false);
+
 //#### Step 1: construct a tracking device:
 mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
@@ -205,6 +210,8 @@ if (testTrackingDevice->OpenConnection())
   if (!testTrackingDevice->CloseConnection())AddOutput("<br>ERROR while closing connection<br>");
   }
 else AddOutput(" ERROR!");
+
+this->setEnabled(true);
 }
 
 void QmitkTrackingDeviceConfigurationWidget::Finished()
@@ -232,6 +239,81 @@ void QmitkTrackingDeviceConfigurationWidget::Reset()
 void QmitkTrackingDeviceConfigurationWidget::ResetByUser()
   {
   Reset();
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
+  {
+  this->setEnabled(false);
+  AddOutput("<br>Scanning...");
+
+  QString result = "<br>Found Devices:";
+  int resultSize = result.size(); //remember size of result: if it stays the same no device were found
+
+  #ifdef WIN32
+    QString devName;
+    for (unsigned int i = 1; i < 20; ++i)
+    {
+      if (i<10) devName = QString("COM%1").arg(i);
+      else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        m_Controls->m_portSpinBoxAurora->setValue(i);
+        break;
+      }
+    }
+  #else //linux systems
+    for(unsigned int i = 1; i < 6; ++i)
+    {
+      QString devName = QString("/dev/ttyS%1").arg(i);
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        m_Controls->portTypePolaris->setCurrentIndex(1);
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        m_Controls->m_portSpinBoxAurora->setValue(i);
+        m_Controls->portTypeAurora->setCurrentIndex(1);
+        break;
+      }
+      
+    }
+    for(unsigned int i = 0; i <7; ++i)
+    {
+      QString devName = QString("/dev/ttyUSB%1").arg(i);
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        m_Controls->portTypePolaris->setCurrentIndex(0);
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        m_Controls->m_portSpinBoxAurora->setValue(i);
+        m_Controls->portTypeAurora->setCurrentIndex(0);
+        break;
+      }
+      
+    }
+  #endif
+      
+  if ( result.size() == resultSize) result += "<br>none";
+
+  AddOutput(result.toStdString());
+
+  this->setEnabled(true);
   }
 
 //######################### internal help methods #######################################
@@ -343,4 +425,11 @@ void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enab
   m_Controls->m_resetButton->setVisible(enable);
   m_Controls->m_finishedButton->setVisible(enable);
   }
+
+mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QString port)
+{
+  mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
+  tracker->SetDeviceName(port.toStdString());
+  return tracker->TestConnection();
+}
 

@@ -476,6 +476,13 @@ void QmitkDataStorageTreeModel::SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop)
 
 void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
 {
+    bool isHelperObject (false);
+    NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
+    if (node->GetBoolProperty("helper object", isHelperObject) && searchIter != m_HelperObjectObserverTags.end()) {
+        (*searchIter).first->GetProperty("helper object")->RemoveObserver( (*searchIter).second );
+        m_HelperObjectObserverTags.erase(const_cast<mitk::DataNode*>(node));
+    }
+
   if(!m_Root) return;
 
   TreeItem* treeItem = m_Root->Find(node);

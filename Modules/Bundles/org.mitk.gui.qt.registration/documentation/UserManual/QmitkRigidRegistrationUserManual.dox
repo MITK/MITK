@@ -1,0 +1,214 @@
+/**
+\page org_rigid_regis The Rigid Registration Module
+
+\image html rigidRegistrationIcon.png "Icon of the Module"
+
+Available sections:
+  - \ref QmitkRigidRegistrationUserManualOverview 
+  - \ref QmitkRigidRegistrationUserManualIssues 
+  - \ref QmitkRigidRegistrationUserManualDetails
+  - \ref QmitkRigidRegistrationUserManualReferences 
+
+\section QmitkRigidRegistrationUserManualOverview Overview
+
+This module allows you to register 2D as well as 3D images in a rigid manner. If the Moving Image is an image with multiple timesteps you can select one timestep for registration. 
+Register means to align two images, so that they become as similar as possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will 
+directly be applied to the Moving Image. Also binary images as image masks can be used to restrict the metric evaluation only to the masked area.
+
+\image html RigidRegistration_small.png "MITK with the QmitkRigidRegistration module"
+
+This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
+multi-widget.
+
+\section QmitkRigidRegistrationUserManualIssues Known Issues
+
+Depending on your system the registration can fail to allocate memory for calculating the gradient image for registration. In this case you can try to select another optimizer which is not based 
+on a gradient image and uncheck the checkbox for "Compute Gradient".
+
+\section QmitkRigidRegistrationUserManualDetails Details
+
+First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
+first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. 
+
+\image html ImageArea.png "The Image area"
+
+While there aren't two images for registration a message is viewed on top of the module saying that registration needs two images. If two images are selected the message disappears and the 
+interaction areas for the fixed and moving data appears. If both selected images have a binary image as childnode a selection box appears which allows, when checked, to use the binary images as 
+image mask to restrict the registration on this certain area. If an image has more than one binary image as child, the upper one from the DataManager list is used. If the Moving Image is a 
+dynamic images with several timesteps a slider appears to select a specific timestep for registration. 
+
+On default only the fixed and moving image are shown in the render windows. If you want to have other images visible you have to set the visibility 
+via the Data Manager. Also if you want to perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.
+
+The colour of the images can be changed between grey values and red/green and the opacity of the moving image can be changed.
+With the "Moving Image Opacity:" slider you can change the opacity of the moving dataset. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, 
+the fixed dataset will be displayed in red-values and the moving dataset in green-values to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
+both datasets will be displayed in grey-values.
+
+\image html RegistrationArea.png "The Registration area"
+
+In the "Register" area you can start the registration by clicking the "Calculate Transform" button. The optimizer value for every iteration step is diplayed as LCD number next to the 
+"Optimizer Value:" label. Many of the registration methods can be canceled during their iteration steps by clicking the "Stop Optimization" button. During the calculation, a progress bar 
+indicates the progress of the registration process. The render widgets are updated for every single iteration step, so that the user has the chance to supervise how good the registration 
+process works with the selected methods and parameters. If the registration process does not lead to a sufficient result, it is possible to undo the transformation and restart the registration 
+process with some changes in parameters. The differences in transformation due to the changed parameters can be seen in every iteration step and help the user understand the parameters.
+Also the optimizer value is updated for every single iteration step and shown in the GUI. The optimizer value is an indicator for the misalignment between the two images. The real time 
+visualization of the registration as well as the optimizer value provides the user with information to trace the improvement through the optimization process.
+The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
+you have performed an undo to redo the transformation without to recalculate it.
+
+\image html ManualRegistrationArea.png "The Manual Registration area"
+
+In the "Manual Registration" area, shown by checking the checkbox Manual Registration, you can manually allign the images by moving sliders for translation and scaling in x-, y- and z-axis as 
+well as for rotation around the x-, y- and z-Axis. Additionally you can automatically allign the image centers with the button "Automatic Allign Image Centers".
+
+\image html Tab2.png "The Advanced Mode tab"
+
+In the "Advanced Mode" tab you can choose a transform, a metric, an optimizer and an interpolator and you have to set the corresponding parameters to specify the registration 
+method you want to perform. With the topmost button you can also load testpresets. These presets contain all parametersets which were saved using the "Save as Testpreset" button. The "Save as 
+Preset" button makes the preset available from the "Automatic Registration" tab. This button should be used when a preset is not intended for finding good parameters anymore but can be used as 
+standard preset.
+
+To show the current transform and its parameters for the registration process, the Transform checkbox has to be checked. Currently, the following transforms are implemented 
+(for detailed information see [1] and [2]):
+
+\li <b>Translation:</b> Transformation by a simple translation for every dimension.
+
+\li <b>Scale:</b> Transformation by a certain scale factor for each dimension.
+
+\li <b>ScaleLogarithmic:</b> Transformation by a certain scale factor for each dimension. The parameter factors are passed as logarithms.
+
+\li <b>Affine:</b> Represents an affine transform composed of rotation, scaling, shearing and translation.
+
+\li <b>FixedCenterOfRotationAffine:</b> Represents an affine transform composed of rotation around a user provided center, scaling, shearing and translation.
+
+\li <b>Rigid3D:</b> Represents a 3D rotation followed by a 3D translation.
+
+\li <b>Euler3D:</b> Represents a rigid rotation in 3D space. That is, a rotation followed by a 3D translation.
+
+\li <b>CenteredEuler3D:</b> Represents a rigid rotation in 3D space around a user provided center. That is, a rotation followed by a 3D translation.
+
+\li <b>QuaternionRigid:</b> Represents a 3D rotation and a 3D translation. The rotation is specified as a quaternion.
+
+\li <b>Versor:</b> Represents a 3D rotation. The rotation is specified by a versor or unit quaternion.
+
+\li <b>VersorRigid3D:</b> Represents a 3D rotation and a 3D translation. The rotation is specified by a versor or unit quaternion.
+
+\li <b>ScaleSkewVersor3D:</b> Represents a 3D translation, scaling, shearing and rotation. The rotation is specified by a versor or unit quaternion.
+
+\li <b>Similarity3D:</b> Represents a 3D rotation, a 3D translation and homogeneous scaling.
+
+\li <b>Rigid2D:</b> Represents a 2D rotation followed by a 2D translation.
+
+\li <b>CenteredRigid2D:</b> Represents a 2D rotation around a user provided center followed by a 2D translation.
+
+\li <b>Euler2D:</b> Represents a 2D rotation and a 2D translation.
+
+\li <b>Similarity2D:</b> Represents a 2D rotation, homogeneous scaling and a 2D translation.
+
+\li <b>CenteredSimilarity2D:</b> Represents a 2D rotation around a user provided center, homogeneous scaling and a 2D translation.
+
+The desired transform can be chosen from a combo box. All parameters defining the selected transform have to be specified within the line edits and checkboxes underneath the transform combo box.
+To show the current metric and its parameters for the registration process, the Metric checkbox has to be checked. Currently, the following metrics are implemented 
+(for detailed information see [1] and [2]):
+
+\li <b>MeanSquares:</b> Computes the mean squared pixel-wise difference in intensity between image A and B.
+
+\li <b>NormalizedCorrelation:</b> Computes pixel-wise cross correlation and normalizes it by the square root of the autocorrelation of the images.
+
+\li <b>GradientDifference:</b> Evaluates the difference in the derivatives of the moving and fixed images.
+
+\li <b>KullbackLeiblerCompareHistogram</b>[3]<b>:</b> Measures the relative entropy between two discrete probability distributions.
+
+\li <b>CorrelationCoefficientHistogram:</b> Computes the cross correlation coefficient between the intensities.
+
+\li <b>MeanSquaresHistogram:</b> The joint histogram of the fixed and the mapped moving image is built first. Then the mean squared pixel-wise difference in intensity between image A and B is 
+calculated.
+
+\li <b>MutualInformationHistogram:</b> Computes the mutual information between image A and image B.
+
+\li <b>NormalizedMutualInformationHistogram:</b> Computes the mutual information between image A and image B.
+
+\li <b>MattesMutualInformation</b>[4, 5]<b>:</b> The method of Mattes et al. is used to compute the mutual information between two images to be registered.
+
+\li <b>MeanReciprocalSquareDifference:</b> Computes pixel-wise differences and adds them after passing them through a bell-shaped function 1 / (1+x^2).
+
+\li <b>MutualInformation</b>[6]<b>:</b> Computes the mutual information between image A and image B.
+
+\li <b>MatchCardinality:</b> Computes cardinality of the set of pixels that match exactly between the moving and fixed images.
+
+\li <b>KappaStatistic</b>[7]<b>:</b> Computes spatial intersection of two binary images.
+
+The desired metric can be chosen from a combo box. All parameters defining the selected metric have to be specified within the line edits and checkboxes underneath the metric combo box.
+To show the current optimizer and its parameters for the registration process, the Optimizer checkbox has to be checked. Currently, the following optimizers are implemented 
+(for detailed information see [1] and [2]):
+
+\li <b>Exhaustive:</b> Fully samples a grid on the parametric space.
+
+\li <b>GradientDescent:</b> A simple gradient descent optimizer.
+
+\li <b>QuaternionRigidTransformGradientDescent:</b> Variant of a gradient descent optimizer.
+
+\li <b>LBFGSB</b>[8, 9]<b>:</b> Limited memory Broyden Fletcher Goldfarb Shannon minimization with simple bounds.
+
+\li <b>OnePlusOneEvolutionary</b>[10]<b>:</b> 1+1 evolutionary strategy.
+
+\li <b>Powell:</b> Implements Powell optimization using Brent line search.
+
+\li <b>FRPR:</b> Fletch-Reeves & Polak-Ribiere optimization using dBrent line search.
+
+\li <b>RegularStepGradientDescent:</b> Variant of a gradient descent optimizer.
+
+\li <b>VersorTransform:</b> Variant of a gradient descent optimizer.
+
+\li <b>Amoeba:</b> Implementation of the Nelder-Meade downhill simplex algorithm.
+
+\li <b>ConjugateGradient:</b> Used to solve unconstrained optimization problems.
+
+\li <b>LBFGS:</b> Limited memory Broyden Fletcher Goldfarb Shannon minimization.
+
+\li <b>SPSA</b>[11]<b>:</b> Based on simultaneous perturbation.
+
+\li <b>VersorRigid3DTransform:</b> Variant of a gradient descent optimizer for the VersorRigid3DTransform parameter space.
+
+The desired optimizer can be chosen from a combo box. All parameters defining the selected optimizer have to be specified within the line edits and checkboxes underneath the optimizer combo box.
+To show the current interpolator for the registration process, just check the Interpolator checkbox. Currently, the following interpolators are implemented 
+(for detailed information see [1] and [2]):
+
+\li <b>Linear:</b> Intensity varies linearly between grid positions.
+
+\li <b>NearestNeighbor:</b> Uses the intensity of the nearest grid position.
+
+You can show and hide the parameters for the selection by checking or unchecking the corresponding area. You can save the current sets of parameters with the "Save as Testpreset" or "Save as 
+Preset" buttons.
+
+\section QmitkRigidRegistrationUserManualReferences References:
+
+1. L. Ibanez, W. Schroeder and K. Ng, The ITK Software Guide, Kitware Inc, New York, 2005.
+
+2. http://www.itk.org/Doxygen/
+
+3. Albert C.S. Chung, William M. Wells III, Alexander Norbash, and W. Eric L. Grimson, Multi-modal Image Registration by Minimising Kullback-Leibler Distance, In Medical Image Computing and 
+Computer-Assisted Intervention - MICCAI 2002, LNCS 2489, pp. 525 - 532.
+
+4. D. Mattes, D. R. Haynor, H. Vesselle, T. Lewellen and W. Eubank, "Nonrigid multimodality image registration", Medical Imaging 2001: Image Processing, 2001, pp. 1609-1620.
+
+5. D. Mattes, D. R. Haynor, H. Vesselle, T. Lewellen and W. Eubank, "PET-CT Image Registration in the Chest Using Free-form Deformations", IEEE Transactions in Medical Imaging. 
+Vol.22, No.1, January 2003, pp.120-128.
+
+6. Viola, P. and Wells III, W. (1997). "Alignment by Maximization of Mutual Information" International Journal of Computer Vision, 24(2):137-154.
+
+7. AP Zijdenbos, BM Dawant, RA Margolin , AC Palmer, Morphometric analysis of white matter lesions in MR images: Method and validation, IEEE Transactions on Medical Imaging, 
+13(4):716-724, Dec. 1994.
+
+8. R. H. Byrd, P. Lu and J. Nocedal. A Limited Memory Algorithm for Bound Constrained Optimization, (1995), SIAM Journal on Scientific and Statistical Computing , 16, 5, pp. 1190-1208.
+
+9. C. Zhu, R. H. Byrd and J. Nocedal. L-BFGS-B: Algorithm 778: L-BFGS-B, FORTRAN routines for large scale bound constrained optimization (1997), ACM Transactions on Mathematical Software, 
+Vol 23, Num. 4, pp. 550 - 560. 
+
+10. Martin Styner, G. Gerig, Christian Brechbuehler, Gabor Szekely, "Parametric estimate of intensity inhomogeneities applied to MRI", IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165,
+ 2000.
+
+11. Spall, J.C. (1998), "An Overview of the Simultaneous Perturbation Method for Efficient Optimization," Johns Hopkins APL Technical Digest, vol. 19, pp. 482-492.
+
+*/

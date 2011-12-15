@@ -47,7 +47,7 @@ ServiceRegistration::ServiceRegistration(const ServiceRegistration& reg)
 ServiceRegistration::ServiceRegistration(ServiceRegistrationPrivate* registrationPrivate)
   : d(registrationPrivate)
 {
-  d->ref.Ref();
+  if (d) d->ref.Ref();
 }
 
 ServiceRegistration::ServiceRegistration(ModulePrivate* module, itk::LightObject* service,
@@ -190,7 +190,8 @@ void ServiceRegistration::Unregister()
       d->module = 0;
       d->dependents.clear();
       d->service = 0;
-      d->serviceInstances.clear();;
+      d->serviceInstances.clear();
+      d->reference = 0;
       d->unregistering = false;
     }
   }
@@ -211,7 +212,7 @@ ServiceRegistration& ServiceRegistration::operator=(const ServiceRegistration& r
 {
   ServiceRegistrationPrivate* curr_d = d;
   d = registration.d;
-  d->ref.Ref();
+  if (d) d->ref.Ref();
 
   if (curr_d && !curr_d->ref.Deref())
     delete curr_d;

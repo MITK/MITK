@@ -10,6 +10,8 @@
 // Data members
 #include <mitkDataNode.h>
 
+class QmitkStdMultiWidget;
+
 class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
@@ -22,6 +24,7 @@ public:
   // IContextMenuAction
   void Run(const std::vector<mitk::DataNode *> &selectedNodes);
   void SetDataStorage(mitk::DataStorage *dataStorage);
+  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart *functionality);
@@ -33,6 +36,7 @@ private:
   QmitkCreatePolygonModelAction & operator=(const QmitkCreatePolygonModelAction &);
 
   mitk::DataStorage::Pointer m_DataStorage;
+  QmitkStdMultiWidget *m_StdMultiWidget;
   bool m_IsSmoothed;
   bool m_IsDecimated;
 };

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <org.blueberry.osgi/src/application/berryStarter.h>
+#include <application/berryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
 
 #include <QMessageBox>

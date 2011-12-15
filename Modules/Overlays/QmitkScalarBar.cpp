@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QPainter>
 #include <QPaintEvent>
 
-QmitkScalarBar::QmitkScalarBar(QWidget* parent): 
-QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(NULL)
+QmitkScalarBar::QmitkScalarBar(QWidget* parent)
+: QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(NULL)
 {
   m_NumberOfSubDivisions = 7;
 
@@ -44,7 +44,6 @@ QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_
   this->resize( 10,61 );
   this->setFixedWidth( 10 );
   this->setFixedHeight( 61 );
-
 
   m_Pen = QPen( Qt::red, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin );
 }

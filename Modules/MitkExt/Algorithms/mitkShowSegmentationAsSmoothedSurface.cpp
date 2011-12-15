@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGeometry3D.h>
 #include <mitkProgressBar.h>
 #include <mitkStatusBar.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <itkImageRegionIteratorWithIndex.h>
@@ -96,9 +97,16 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   float decimation;
   GetParameter("Decimation", decimation);
 
-  MITK_INFO << "CREATING SMOOTHED POLYGON MODEL" << endl;
-  MITK_INFO << "  Smoothing = " << smoothing << endl;
-  MITK_INFO << "  Decimation = " << decimation << endl;
+  int timeNr = 0;
+  GetParameter("TimeNr", timeNr);
+
+  if (image->GetDimension() == 4)
+    MITK_INFO << "CREATING SMOOTHED POLYGON MODEL (t = " << timeNr << ')';
+  else
+    MITK_INFO << "CREATING SMOOTHED POLYGON MODEL";
+
+  MITK_INFO << "  Smoothing = " << smoothing;
+  MITK_INFO << "  Decimation = " << decimation;
  
   Geometry3D::Pointer geometry = dynamic_cast<Geometry3D *>(image->GetGeometry()->Clone().GetPointer());
   
@@ -107,6 +115,15 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   typedef itk::Image<unsigned char, 3> CharImageType;
   typedef itk::Image<unsigned short, 3> ShortImageType;
   typedef itk::Image<float, 3> FloatImageType;
+
+  if (image->GetDimension() == 4)
+  {
+    ImageTimeSelector::Pointer imageTimeSelector = ImageTimeSelector::New();
+    imageTimeSelector->SetInput(image);
+    imageTimeSelector->SetTimeNr(timeNr);
+    imageTimeSelector->UpdateLargestPossibleRegion();
+    image = imageTimeSelector->GetOutput();
+  }
 
   ImageToItk<CharImageType>::Pointer imageToItkFilter = ImageToItk<CharImageType>::New();
   
@@ -128,7 +145,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Get bounding box and relabel
 
-  MITK_INFO << "Extracting VOI..." << endl;
+  MITK_INFO << "Extracting VOI...";
 
   int imageLabel = 1;
   bool roiFound = false;
@@ -229,7 +246,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Median
 
-  MITK_INFO << "Median..." << endl;
+  MITK_INFO << "Median...";
 
   typedef itk::BinaryMedianImageFilter<CharImageType, CharImageType> MedianFilterType;
 
@@ -248,7 +265,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Intelligent closing
 
-  MITK_INFO << "Intelligent closing..." << endl;
+  MITK_INFO << "Intelligent closing...";
 
   unsigned int surfaceRatio = 70;
 
@@ -273,7 +290,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Gaussian blur
 
-  MITK_INFO << "Gauss..." << endl;
+  MITK_INFO << "Gauss...";
 
   typedef itk::BinaryThresholdImageFilter<ShortImageType, FloatImageType> BinaryThresholdToFloatFilterType;
 
@@ -322,7 +339,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Fill holes
 
-  MITK_INFO << "Filling cavities..." << endl;
+  MITK_INFO << "Filling cavities...";
 
   typedef itk::ConnectedThresholdImageFilter<CharImageType, CharImageType> ConnectedThresholdFilterType;
 
@@ -368,7 +385,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Surface extraction
 
-  MITK_INFO << "Surface extraction..." << endl;
+  MITK_INFO << "Surface extraction...";
 
   Image::Pointer filteredImage = Image::New();
   CastToMitkImage(addFilter->GetOutput(), filteredImage);
@@ -390,7 +407,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   if (decimation > 0.0f && decimation < 1.0f)
   {
-    MITK_INFO << "Quadric mesh decimation..." << endl;
+    MITK_INFO << "Quadric mesh decimation...";
 
     vtkQuadricDecimation *quadricDecimation = vtkQuadricDecimation::New();
     quadricDecimation->SetInput(m_Surface->GetVtkPolyData());

@@ -28,6 +28,11 @@ void QmitkStatisticsAction::SetDataStorage(mitk::DataStorage* dataStorage)
   //not needed
 }
 
+void QmitkStatisticsAction::SetStdMultiWidget(QmitkStdMultiWidget *)
+{
+  // not needed
+}
+
 void QmitkStatisticsAction::SetSmoothed(bool smoothed)
 {
   //not needed

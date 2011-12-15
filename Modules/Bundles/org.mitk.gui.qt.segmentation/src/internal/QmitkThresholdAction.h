@@ -12,6 +12,7 @@
 #include <mitkToolManager.h>
 
 class QDialog;
+class QmitkStdMultiWidget;
 
 class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::IContextMenuAction
 {
@@ -25,6 +26,7 @@ public:
   // IContextMenuAction
   void Run(const std::vector<mitk::DataNode *> &selectedNodes);
   void SetDataStorage(mitk::DataStorage *dataStorage);
+  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart *functionality);

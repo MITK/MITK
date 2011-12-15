@@ -64,6 +64,8 @@
 #include <limits.h>
 #include <stdio.h>
 #include <time.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 class MTRand {
@@ -212,7 +214,7 @@ inline double MTRand::randNorm( const double& mean, const double& variance )
   // Return a real number from a normal (Gaussian) distribution with given
   // mean and variance by Box-Muller method
   double r = sqrt( -2.0 * log( 1.0-randDblExc()) ) * variance;
-  double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
+  double phi = 2.0 * M_PI * randExc();
   return mean + r * cos(phi);
 }
 
@@ -221,7 +223,7 @@ inline float MTRand::frandn()
   // Return a real number from a normal (Gaussian) distribution with given
   // mean and variance by Box-Muller method
   float r = sqrt( -2.0 * log( 1.0-randDblExc()) );
-  double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
+  double phi = 2.0 * M_PI * randExc();
   return r * cos(phi);
 }
 

@@ -108,10 +108,19 @@
   </extension>
   
   <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.tbssskeletonization"
+          name="Tbss Skeletonization"
+          class="QmitkTbssSkeletonizationView"
+          icon="resources/tbss.png" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tractbasedspatialstatistics"
           name="Tract-based spatial statistics"
           class="QmitkTractbasedSpatialStatisticsView"
           icon="resources/tbss.png" />
   </extension>
+  
+
 
 </plugin>

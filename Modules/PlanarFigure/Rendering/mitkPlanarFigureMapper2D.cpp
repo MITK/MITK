@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkVtkPropRenderer.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 // offset which moves the planarfigures on top of the other content
 // the crosshair is rendered into the z = 1 layer. 
 static const float PLANAR_OFFSET = 0.5f;
@@ -494,7 +497,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       float radius = 4.0;
       for ( int angle = 0; angle < 8; ++angle )
       {
-        float angleRad = angle * (float) 3.14159 / 4.0;
+        float angleRad = angle * (float) M_PI / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex3f(x,y,PLANAR_OFFSET);
@@ -506,7 +509,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       glBegin( GL_LINE_LOOP );
       for ( int angle = 0; angle < 8; ++angle )
       {
-        float angleRad = angle * (float) 3.14159 / 4.0;
+        float angleRad = angle * (float) M_PI / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex3f(x,y,PLANAR_OFFSET);

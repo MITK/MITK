@@ -70,6 +70,8 @@ public:
   void HideContinousRegistrationRadioButton(bool on); ///< show or hide  "hybrid continuous Fiducial Registration" radio button in the UI
   void HideUseICPRegistrationCheckbox(bool on); ///< show or hide  "Find fiducial correspondences (needs 6+ fiducial pairs)" check box in the UI
   void HideImageFiducialButton(bool on); ///< show or hide  "Add image fiducial" button in the UI
+  void HideTrackingFiducialButton(bool on); ///< show or hide  "Add tracking fiducial" button in the UI
+
 
   signals:
     void AddedTrackingFiducial();      ///< signal if a world instrument position was added to a tracking space fiducial

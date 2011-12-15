@@ -47,24 +47,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <limits>
 
-//#include <itkSkeletonizationFilter.h>
-//#include <itkBinaryThresholdImageFilter.h>
-//#include <itkDistanceMapFilter.h>
-//#include <itkProjectionFilter.h>
+
 #include <itkMultiplyImageFilter.h>
-//#include <itkBatchRegistration.h>
-//#include <itkProbabilisticAtlasGenerator.h>
-//#include <itkAtrophyAssessor.h>
-//#include <itkBatchMaskExtraction.h>
-//#include <itkMergeImageFilter.h>
-//#include <itkBatchDiffusionQuantifier.h>
 #include <mitkTractAnalyzer.h>
-//#include <itkClusterBatch.h>
 #include <mitkTbssImporter.h>
 
-
-#include "mitkPartialVolumeAnalysisClusteringCalculator.h"
-#include "mitkPartialVolumeAnalysisHistogramCalculator.h"
 
 #include <mitkVectorImageMapper2D.h>
 #include "vtkFloatArray.h"
@@ -173,6 +160,11 @@ struct TbssSelListener : ISelectionListener
       if(found3dImage)
       {
         m_View->InitPointsets();
+      }
+
+      if(foundTbss && foundTbssRoi)
+      {
+        m_View->Plot(image, roiImage);
       }
 
     }
@@ -478,7 +470,7 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
         mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
         if(img->GetDimension() == 4)
         {
-          //importer->SetImportVolume(img);
+          importer->SetImportVolume(img);
           name = node->GetName();
         }
       }
@@ -786,7 +778,7 @@ void QmitkTractbasedSpatialStatisticsView::Clustering()
 
 
 
-
+/*
 
 
 
@@ -926,7 +918,7 @@ void QmitkTractbasedSpatialStatisticsView::Clustering()
         ++it;
       }
 
-    }
+    }*/
 }
 
 
@@ -1223,80 +1215,6 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
     ++outputIt;
   }  
 }
-/*
-void QmitkTractbasedSpatialStatisticsView::Project()
-{
-
-  typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonizationFilter;
-  SkeletonizationFilter::Pointer skeletonizer = SkeletonizationFilter::New();
-
-  if (m_CurrentSelection)
-  {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
-
-
-    mitk::Image::Pointer vol4d;
-    mitk::TbssImage::Pointer tbssImg;
-    bool containsSkeleton = false;
-    bool containsSkeletonMask = false;
-    bool containsDistanceMap = false;
-    bool containsGradient = false;
-
-
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
-    {
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-      {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-        if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-        {
-          mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-          if(img->GetDimension() == 4)
-          {
-            // 4d volume
-            vol4d = img;
-          }
-        }
-        else if(QString("TbssImage").compare(node->GetData()->GetNameOfClass())==0)
-        {
-          mitk::TbssImage::Pointer tempTbss = static_cast<mitk::TbssImage*>(node->GetData());
-          if(tempTbss->GetIsMeta())
-          {
-            containsDistanceMap = tempTbss->GetContainsDistanceMap();
-            containsSkeleton = tempTbss->GetContainsDistanceMap();
-            containsSkeletonMask = tempTbss->GetContainsSkeletonMask();
-            containsGradient = tempTbss->GetContainsGradient();
-
-
-            if(containsDistanceMap && containsSkeleton && containsSkeletonMask && containsGradient)
-            {
-              tbssImg = tempTbss;
-            }
-          }
-        }
-      }
-    }
-
-    if(vol4d.IsNotNull() && tbssImg.IsNotNull())
-    {
-      typedef itk::ProjectionFilter ProjectionFilterType;
-      ProjectionFilterType::Pointer projector = ProjectionFilterType::New();
-
-      VectorImageType::Pointer vecImg = ConvertToVectorImage(vol4d);
-
-
-
-    }
-  }
-
-
-
-}
-*/
 
 
 VectorImageType::Pointer QmitkTractbasedSpatialStatisticsView::ConvertToVectorImage(mitk::Image::Pointer mitkImage)
@@ -1357,103 +1275,7 @@ VectorImageType::Pointer QmitkTractbasedSpatialStatisticsView::ConvertToVectorIm
   return vecImg;
 
 }
-/*
-void QmitkTractbasedSpatialStatisticsView::Skeletonize()
-{
 
-  typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonizationFilter;
-  SkeletonizationFilter::Pointer skeletonizer = SkeletonizationFilter::New();
-
-  if (m_CurrentSelection)
-  {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
-
-
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
-    {
-
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-      {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-        {
-          mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-          if(img->GetDimension() == 3)
-          {
-            FloatImageType::Pointer itkImg = FloatImageType::New();
-            mitk::CastToItkImage(img, itkImg);
-            skeletonizer->SetInput(itkImg);
-            skeletonizer->Update();
-
-
-            // Retrieve skeletonize image and put it in the datamanager
-            FloatImageType::Pointer skeletonizedImg = skeletonizer->GetOutput();
-            mitk::Image::Pointer mitkSkeleton = mitk::Image::New();
-            mitk::CastToMitkImage(skeletonizedImg, mitkSkeleton);
-            AddTbssToDataStorage(mitkSkeleton, "Skeletonized");
-
-            double threshold = -1.0;
-            while(threshold == -1.0)
-            {
-             // threshold = QInputDialog::getDouble(m_Controls->m_Skeletonize, tr("Specify the FA threshold"),
-             //                                       tr("Threshold:"), QLineEdit::Normal,
-              //                                      0.2);
-
-              if(threshold < 0.0 || threshold > 1.0)
-              {
-                QMessageBox msgBox;
-                msgBox.setText("Please choose a value between 0 and 1");
-                msgBox.exec();
-                threshold = -1.0;
-              }
-            }
-
-            typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> ThresholdFilterType;
-            CharImageType::Pointer thresholded = CharImageType::New();
-            ThresholdFilterType::Pointer thresholder = ThresholdFilterType::New();
-            thresholder->SetInput(skeletonizedImg);
-            thresholder->SetLowerThreshold(threshold);
-            thresholder->SetUpperThreshold(std::numeric_limits<float>::max());
-            thresholder->SetOutsideValue(0);
-            thresholder->SetInsideValue(1);
-            thresholder->Update();
-
-
-            CharImageType::Pointer thresholdedImg = thresholder->GetOutput();
-            mitk::Image::Pointer mitkThresholded = mitk::Image::New();
-            mitk::CastToMitkImage(thresholdedImg, mitkThresholded);
-            AddTbssToDataStorage(mitkThresholded, "Skeleton mask");
-
-
-            typedef itk::DistanceMapFilter<CharImageType, FloatImageType> DistanceMapFilterType;
-            DistanceMapFilterType::Pointer distanceMapper = DistanceMapFilterType::New();
-            distanceMapper->SetInput(thresholdedImg);
-            distanceMapper->Update();
-
-            FloatImageType::Pointer distanceMap = distanceMapper->GetOutput();
-            mitk::Image::Pointer mitkDistMap = mitk::Image::New();
-            mitk::CastToMitkImage(distanceMap, mitkDistMap);
-            AddTbssToDataStorage(mitkDistMap, "Distance map");
-
-            DirectionImageType::Pointer dirImage = skeletonizer->GetDirectionImage();
-
-            mitk::TbssGradientImage::Pointer tbssGradImg = mitk::TbssGradientImage::New();
-            tbssGradImg->SetImage(dirImage);
-            tbssGradImg->InitializeFromVectorImage();
-            AddTbssToDataStorage(tbssGradImg, "Gradient image");
-
-          }
-        }
-      }
-    }
-  }
-
-
-
-}
 
 /*
 void QmitkTractbasedSpatialStatisticsView::InitializeGridByVectorImage()

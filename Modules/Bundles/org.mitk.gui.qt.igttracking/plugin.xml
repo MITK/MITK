@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+     <view id="org.mitk.views.mitkigtnavigationtoolmanager"
+          name="IGT Navigation Tool Manager"
+          class="QmitkMITKIGTNavigationToolManagerView"
+          icon="resources/iconNavigationToolManager.xpm" />
+     <view id="org.mitk.views.navigationdataplayer"
+          name="IGT Navigation Data Player"
+          class="QmitkNavigationDataPlayerView"
+          icon="resources/iconNavigationDataPlayer.png" />
+     <view id="org.mitk.views.mitkigttrackingtoolbox"
+          name="IGT Tracking Toolbox"
+          class="QmitkMITKIGTTrackingToolboxView"
+          icon="resources/iconTrackingToolBox.xpm" />
+  </extension>
+
+</plugin>

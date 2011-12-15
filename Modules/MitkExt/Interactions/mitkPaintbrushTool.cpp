@@ -327,30 +327,30 @@ bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
-        //Workaround because of bug #7079
-        Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
+//        //Workaround because of bug #7079
+//        Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
 
-        int affectedDimension(-1);
+//        int affectedDimension(-1);
 
-        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-        {
-            affectedDimension = 2;
-        }
-        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-        {
-            affectedDimension = 0;
-        }
-        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-        {
-            affectedDimension = 1;
-        }
+//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
+//        {
+//            affectedDimension = 2;
+//        }
+//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
+//        {
+//            affectedDimension = 0;
+//        }
+//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+//        {
+//            affectedDimension = 1;
+//        }
 
-        if (affectedDimension != -1)
-        {
-            origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
-            m_WorkingSlice->GetGeometry()->SetOrigin(origin);
-        }
-        //Workaround end
+//        if (affectedDimension != -1)
+//        {
+//            origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
+//            m_WorkingSlice->GetGeometry()->SetOrigin(origin);
+//        }
+//        //Workaround end
 
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
@@ -370,28 +370,28 @@ bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
             m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
            //Workaround because of bug #7079
-           Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
+//           Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
 
-           int affectedDimension(-1);
+//           int affectedDimension(-1);
 
-           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-           {
-               affectedDimension = 2;
-           }
-           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-           {
-               affectedDimension = 0;
-           }
-           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-           {
-               affectedDimension = 1;
-           }
+//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
+//           {
+//               affectedDimension = 2;
+//           }
+//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
+//           {
+//               affectedDimension = 0;
+//           }
+//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+//           {
+//               affectedDimension = 1;
+//           }
 
-           if (affectedDimension != -1)
-           {
-               origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
-               m_WorkingSlice->GetGeometry()->SetOrigin(origin);
-           }
+//           if (affectedDimension != -1)
+//           {
+//               origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
+//               m_WorkingSlice->GetGeometry()->SetOrigin(origin);
+//           }
            //Workaround end
 
            m_WorkingNode = mitk::DataNode::New();

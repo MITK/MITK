@@ -387,6 +387,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
+    contextMenuAction->SetStdMultiWidget(this->GetActiveStdMultiWidget());
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);

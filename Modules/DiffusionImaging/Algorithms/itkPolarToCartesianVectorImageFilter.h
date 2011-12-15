@@ -20,7 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkUnaryFunctorImageFilter.h"
 
-#define P2C_PI 3.14159265358979323846
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#define P2C_PI M_PI
 
 namespace itk
 {

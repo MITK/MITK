@@ -6,7 +6,7 @@ SET(WRAP_SOURCES_TEST
 	#wrap_itkMITKScalarImageToHistogramGenerator //Template: can be wrapped; TODO: instantiate the needed templates
 	#wrap_itkTotalVariationDenoisingImageFilter //Template: can be wrapped; TODO: instantiate the needed templates
 	#wrap_itkTotalVariationSingleIterationImageFilter //Template: can be wrapped; TODO: instantiate the needed templates
-    wrap_mitkBaseDataSource
+  wrap_mitkBaseDataSource
 	wrap_mitkBaseProcess
 	wrap_mitkCoreObjectFactory
 	wrap_mitkCoreObjectFactoryBase

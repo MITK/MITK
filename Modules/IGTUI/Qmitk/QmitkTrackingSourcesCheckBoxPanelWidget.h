@@ -121,6 +121,11 @@ public:
   */
   void ClearSelectedIDs();
 
+  /**
+  \brief Returns whether this widgets "perform action" button is checked
+  */
+  bool IsActionButtonChecked();
+
 signals:
   void Selected(int id); /// when a checkbox is selected
   void Deselected(int id); /// when a checkbox is deselected

@@ -114,6 +114,7 @@ if(MITK_USE_QT)
 endif()
 
 option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
+option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 if(MITK_USE_Boost)
@@ -124,8 +125,10 @@ option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
   
 mark_as_advanced(MITK_BUILD_ALL_PLUGINS
+                 MITK_BUILD_ALL_APPS
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
@@ -459,6 +462,36 @@ include(mitkSetupVariables)
 add_subdirectory(Utilities)
 
 if(MITK_USE_BLUEBERRY)
+
+  # We need to hack a little bit because MITK applications may need
+  # to enable certain BlueBerry plug-ins. However, these plug-ins
+  # are validated separately from the MITK plug-ins and know nothing
+  # about potential MITK plug-in dependencies of the applications. Hence
+  # we cannot pass the MITK application list to the BlueBerry
+  # ctkMacroSetupPlugins call but need to extract the BlueBerry dependencies
+  # from the applications and set them explicitly.
+
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
+
+  foreach(mitk_app ${MITK_APPS})
+    # extract target_dir and option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 0 target_dir)
+    list(GET target_info_list 1 option_name)
+    # check if the application is enabled and if target_libraries.cmake exists
+    if (${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+      include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+      foreach(_target_dep ${target_libraries})
+        if(_target_dep MATCHES org_blueberry_)
+          string(REPLACE _ . _app_bb_dep ${_target_dep})
+          # explicitly set the build option for the BlueBerry plug-in
+          set(BLUEBERRY_BUILD_${_app_bb_dep} ON CACHE BOOL "Build the ${_app_bb_dep} plug-in")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+
   include(mitkSetupBlueBerry)
 endif()
 
@@ -499,6 +532,8 @@ add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
 
+  find_package(BlueBerry REQUIRED)
+
   set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Bundles/PluginList.cmake")
@@ -538,32 +573,42 @@ if(MITK_USE_BLUEBERRY)
       list(APPEND mitk_ext_plugins_fullpath ${MITK_PRIVATE_MODULES}/${ext_plugin})
     endforeach()
   endif() 
-  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
-                               BUILD_OPTION_PREFIX MITK_BUILD_
-                               BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
-                               COMPACT_OPTIONS)
 
-  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON MITK_CORE_ENABLED_PLUGINS)
-  ctkFunctionExtractPluginTargets("${mitk_ext_plugins_fullpath}" ON MITK_EXT_ENABLED_PLUGINS)
-  list(APPEND MITK_EXT_ENABLED_PLUGINS ${MITK_CORE_ENABLED_PLUGINS})
+  # Specify which plug-ins belong to this project
+  MACRO(GetMyTargetLibraries all_target_libraries varname)
+    SET(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
+    SET(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
+    SET(_tmp_list)
+    LIST(APPEND _tmp_list ${all_target_libraries})
+    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
+  ENDMACRO()
 
-  set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
-  FunctionCreateProvisioningFile(
-    FILE ${MITK_COREAPP_PROVISIONING_FILE}
-    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
-    PLUGINS ${mitk_core_plugins_fullpath}
-  )
+  # Add the BlueBerry plugins to the set of core plugins
+  set(MITK_CORE_ENABLED_PLUGINS ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES})
 
-  set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
-  FunctionCreateProvisioningFile(
-    FILE ${MITK_EXTAPP_PROVISIONING_FILE}
-  )
+  # Get infos about application directories and build options
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
+  set(mitk_apps_fullpath )
+  foreach(mitk_app ${MITK_APPS})
+    list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+  endforeach()
+
+  ctkMacroSetupPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
+                       BUILD_OPTION_PREFIX MITK_BUILD_
+                       APPS ${mitk_apps_fullpath}
+                       BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
+                       COMPACT_OPTIONS)
+
+  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON _coreui_plugins)
+  list(APPEND MITK_CORE_ENABLED_PLUGINS ${_coreui_plugins})
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
-  ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
-
-  # Used in the export command further below
-  GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" MITK_PLUGIN_TARGETS)
+  if(${PROJECT_NAME}_PLUGIN_LIBRARIES)
+    ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
+  else()
+    file(REMOVE ${MITK_PLUGIN_USE_FILE})
+    set(MITK_PLUGIN_USE_FILE )
+  endif()
 
   # add legacy BlueBerry bundles
   add_subdirectory(Modules/Bundles)
@@ -603,8 +648,7 @@ if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
   set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
 endif()
 
-# Add applications directory
-add_subdirectory(Applications)
+
 
 #-----------------------------------------------------------------------------
 # Python Wrapping
@@ -612,8 +656,8 @@ add_subdirectory(Applications)
 
 set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
 set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig)." OFF)
-if(MITK_USE_PYTHON)
+option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
+if(MITK_USE_Python)
   add_subdirectory(Wrapping)
 endif()
 
@@ -657,22 +701,15 @@ set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})
 
 if(MITK_USE_BLUEBERRY)
-  set(enabled_plugins
-    ${BLUEBERRY_PLUGIN_TARGETS}
-    ${MITK_PLUGIN_TARGETS}
-    ${MITK_MODULES_ENABLED_PLUGINS}
-    )
-
   # This is for installation support of external projects depending on
   # MITK plugins. The export file should not be used for linking to MITK
   # libraries without using LINK_DIRECTORIES, since the exports are incomplete
   # yet(depending libraries are not exported).
-  foreach(plugin ${enabled_plugins})
-    string(REPLACE "." "_" plugin_target ${plugin})
-    export(TARGETS ${plugin_target}
+  if(MITK_PLUGIN_LIBRARIES)
+    export(TARGETS ${MITK_PLUGIN_LIBRARIES}
            APPEND
            FILE ${MITK_EXPORTS_FILE})
-  endforeach()
+  endif()
 endif()
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
@@ -711,3 +748,13 @@ if(WIN32)
       ${VS_BUILD_TYPE})
   endforeach()
 endif(WIN32)
+
+
+#-----------------------------------------------------------------------------
+# MITK Applications
+#-----------------------------------------------------------------------------
+
+# This must come after MITKConfig.h was generated, since applications
+# might do a find_package(MITK REQUIRED).
+add_subdirectory(Applications)
+

@@ -71,8 +71,9 @@ class MitkExt_EXPORT SegTool2D : public Tool
     */
     static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
 
-    void SetRememberContourPositions(bool);
+    void SetShowMarkerNodes(bool);
 
+    void Enable3DInterpolation(bool);
 
   protected:
 
@@ -111,11 +112,11 @@ class MitkExt_EXPORT SegTool2D : public Tool
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
-    void AddContourmarker ( const PositionEvent* );
+
+    unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 
-    bool m_RememberContourPositions;
  
   private:
 
@@ -123,6 +124,9 @@ class MitkExt_EXPORT SegTool2D : public Tool
     unsigned int          m_LastEventSlice;
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
+
+    bool m_ShowMarkerNodes;
+    bool m_3DInterpolationEnabled;
 };
 
 } // namespace

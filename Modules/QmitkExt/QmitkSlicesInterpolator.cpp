@@ -36,6 +36,7 @@
 #include "mitkDiffImageApplier.h"
 #include "mitkSegTool2D.h"
 #include "mitkCoreObjectFactory.h"
+#include "mitkSurfaceToImageFilter.h"
 
 #include <itkCommand.h>
 
@@ -45,6 +46,7 @@
 #include <QCursor>
 #include <QHBoxLayout>
 #include <QMessageBox>
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -67,23 +69,62 @@ m_ToolManager(NULL),
 m_Initialized(false),
 m_LastSliceDimension(2),
 m_LastSliceIndex(0),
-m_InterpolationEnabled(false)
+m_2DInterpolationEnabled(false),
+m_3DInterpolationEnabled(false)
 {
+
+  m_SurfaceInterpolator = mitk::SurfaceInterpolationController::GetInstance();
+  //Changes due to intergration of 3D interpolation
   QHBoxLayout* layout = new QHBoxLayout(this);
-  
+
+  QGridLayout* grid = new QGridLayout(this);
+
+  m_CbShowMarkers = new QCheckBox("Show Position Nodes", this);
+  m_CbShowMarkers->setChecked(true);
+  connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
+  grid->addWidget(m_CbShowMarkers,0,2);
+
+  m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
+  m_BtnAccept3DInterpolation->setEnabled(false);
+  connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
+
   m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
-  layout->addWidget( m_BtnAcceptInterpolation, 1 );
-  
+  grid->addWidget(m_BtnAcceptInterpolation,1,1);
+
   m_BtnAcceptAllInterpolations = new QPushButton("... for all slices", this);
   m_BtnAcceptAllInterpolations->setEnabled( false );
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
-  layout->addWidget( m_BtnAcceptAllInterpolations );
+  grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
+
+  m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(Signal3DInterpolationEnabled(bool)));
+  m_RBtnEnable3DInterpolation->setChecked(true);
+  grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
+
+  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
+  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
+  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
+
+  m_RBtnDisableInterpolation = new QRadioButton("Disable Interpolation", this);
+  m_RBtnDisableInterpolation->setEnabled(true);
+  grid->addWidget(m_RBtnDisableInterpolation, 2,0,1,2);
+
+  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
+  m_GroupBoxEnableExclusiveInterpolationMode->setLayout(grid);
+  layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);
   
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnInterpolationInfoChanged );
   InterpolationInfoChangedObserverTag = m_Interpolator->AddObserver( itk::ModifiedEvent(), command );
+
+  itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command2 = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
+  command2->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged );
+  SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command2 );
   
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
@@ -91,24 +132,55 @@ m_InterpolationEnabled(false)
   
   m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
   m_FeedbackNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
-  m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 1.0) );
+  m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
   m_FeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
   m_FeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
   m_FeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
   m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+
+  m_InterpolatedSurfaceNode = mitk::DataNode::New();
+  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
+  m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
+  m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
+  m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  m_InterpolatedSurfaceNode->SetVisibility(false);
+
+  m_3DContourNode = mitk::DataNode::New();
+  m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
+  m_3DContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
+  m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+  m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
+  m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
+  m_3DContourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+  m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
   
   QWidget::setContentsMargins(0, 0, 0, 0);
   if ( QWidget::layout() != NULL )
   {
     QWidget::layout()->setContentsMargins(0, 0, 0, 0);
   }
+
+  //For running 3D Interpolation in background
+  // create a QFuture and a QFutureWatcher
+
+  connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
+  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(SurfaceInterpolationFinished()));
+  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
+  m_Timer = new QTimer(this);
+  connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
 }
 
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage& storage )
 {
   m_DataStorage = &storage;
+  m_SurfaceInterpolator->SetDataStorage(storage);
 }
 
 mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()
@@ -248,16 +320,65 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
       slicer->RemoveObserver( FTimeObserverTag );
     }
   }
+  if(m_DataStorage->Exists(m_3DContourNode))
+      m_DataStorage->Remove(m_3DContourNode);
+  if(m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+      m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+  delete m_Timer;
+}
+
+void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
+{
+    OnInterpolationActivated(status);
+    On3DInterpolationActivated(!status);
+}
+
+void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
+{
+  On3DInterpolationActivated(status);
+  OnInterpolationActivated(!status);
+}
+
+void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
+{
+  OnInterpolationActivated(!status);
+  On3DInterpolationActivated(!status);
+}
+
+void QmitkSlicesInterpolator::OnShowMarkers(bool state)
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("isContourMarker"
+    , mitk::BoolProperty::New(true)));
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
+  {
+    it->Value()->SetProperty("helper object", mitk::BoolProperty::New(!state));
+  }
 }
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  OnInterpolationActivated( m_InterpolationEnabled ); // re-initialize if needed
+  if (m_2DInterpolationEnabled)
+  {
+    OnInterpolationActivated( true ); // re-initialize if needed
+  }
+  if (m_3DInterpolationEnabled)
+  {
+    On3DInterpolationActivated( true);
+  }
 }
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
-  OnInterpolationActivated( m_InterpolationEnabled ); // re-initialize if needed
+  if (m_2DInterpolationEnabled)
+  {
+    OnInterpolationActivated( true ); // re-initialize if needed
+  }
+  if (m_3DInterpolationEnabled)
+  {
+      m_InterpolatedSurfaceNode->SetVisibility(false);
+      m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+  }
 }
 
 
@@ -270,7 +391,6 @@ void QmitkSlicesInterpolator::OnTransversalTimeChanged(itk::Object* sender, cons
   {
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
     if (snc) snc->SendSlice(); // will trigger a new interpolation
-    //mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RequestUpdate(); // done in SendSlice
   }
 }
 
@@ -283,7 +403,6 @@ void QmitkSlicesInterpolator::OnSagittalTimeChanged(itk::Object* sender, const i
   {
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
     if (snc) snc->SendSlice(); // will trigger a new interpolation
-    //mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate(); // done in SendSlice
   }
 }
 
@@ -296,7 +415,6 @@ void QmitkSlicesInterpolator::OnFrontalTimeChanged(itk::Object* sender, const it
   {
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
     if (snc) snc->SendSlice(); // will trigger a new interpolation
-    //mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RequestUpdate(); // done in SendSlice
   }
 }
 
@@ -336,7 +454,7 @@ void QmitkSlicesInterpolator::OnFrontalSliceChanged(const itk::EventObject& e)
 
 bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, unsigned int windowID)
 {
-  if (!m_InterpolationEnabled) return false;
+  if (!m_2DInterpolationEnabled) return false;
   
   try
   {
@@ -349,7 +467,8 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       if (slicedGeometry)
       {
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
-        Interpolate( plane, m_TimeStep[windowID] );
+        if (plane)
+          Interpolate( plane, m_TimeStep[windowID] );
         return true;
       }    
     }
@@ -384,6 +503,43 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         m_LastSliceIndex = clickedSliceIndex;
       }
     }
+  }
+}
+
+void QmitkSlicesInterpolator::SurfaceInterpolationFinished/*InterpolateSurface*/()
+{
+  mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
+
+  if(interpolatedSurface.IsNotNull())
+  {
+    m_BtnAccept3DInterpolation->setEnabled(true);
+    m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
+    m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+
+    m_InterpolatedSurfaceNode->SetVisibility(true);
+    m_3DContourNode->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
+    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
+    {
+      m_DataStorage->Add(m_3DContourNode);
+      m_DataStorage->Add(m_InterpolatedSurfaceNode);
+
+    }
+  }
+  else if (interpolatedSurface.IsNull())
+  {
+    m_BtnAccept3DInterpolation->setEnabled(false);
+
+    if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+    {
+      m_InterpolatedSurfaceNode->SetVisibility(false);
+      m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    }
+  }
+
+  if (m_MultiWidget)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -483,6 +639,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
+
 void QmitkSlicesInterpolator::FinishInterpolation(int windowID)
 {
   //this redirect is for calling from outside
@@ -503,6 +660,32 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   connect( &orientationPopup, SIGNAL(triggered(QAction*)), this, SLOT(OnAcceptAllPopupActivated(QAction*)) );
   
   orientationPopup.exec( QCursor::pos() );
+}
+
+void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
+{
+  if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
+  {
+    mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
+    s2iFilter->MakeOutputBinaryOn();
+    s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
+    s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
+    s2iFilter->Update();
+
+    mitk::DataNode* refImageNode = m_ToolManager->GetReferenceData(0);
+
+    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+    std::string nameOfResultImage = refImageNode->GetName();
+    nameOfResultImage.append(m_InterpolatedSurfaceNode->GetName());
+    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
+    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+    resultNode->SetProperty("3DInterpolationResult", mitk::BoolProperty::New(true));
+    resultNode->SetData( s2iFilter->GetOutput() );
+
+    this->GetDataStorage()->Add(resultNode, refImageNode);
+
+    m_RBtnDisableInterpolation->toggle();
+  }
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
@@ -533,20 +716,20 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 {
-  m_InterpolationEnabled = on;
+  m_2DInterpolationEnabled = on;
   
   try
   {
     if ( m_DataStorage.IsNotNull() )
     {
-      if (on)
+      if (on && !m_DataStorage->Exists(m_FeedbackNode))
       {
         m_DataStorage->Add( m_FeedbackNode );
       }
-      else
-      {
-        m_DataStorage->Remove( m_FeedbackNode );
-      }
+      //else
+      //{
+      //  m_DataStorage->Remove( m_FeedbackNode );
+      //}
     }
   }
   catch(...)
@@ -572,12 +755,11 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     
     if (workingNode)
     {
-      m_FeedbackNode->ReplaceProperty( "color", workingNode->GetProperty("color") ); // use the same color as the original image (but outline - see constructor)
       mitk::Image* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
       if (segmentation)
       {
         m_Interpolator->SetSegmentationVolume( segmentation );
-        
+
         if (referenceNode)
         {
           mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
@@ -586,8 +768,119 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       }
     }
   }
-  
+
   UpdateVisibleSuggestion();
+}
+
+void QmitkSlicesInterpolator::Run3DInterpolation()
+{
+    m_SurfaceInterpolator->Interpolate();
+}
+
+void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
+{
+    m_Timer->start(500);
+}
+
+void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
+{
+    m_Timer->stop();
+    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
+    mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+}
+
+void QmitkSlicesInterpolator::ChangeSurfaceColor()
+{
+    float currentColor[3];
+    m_InterpolatedSurfaceNode->GetColor(currentColor);
+
+    float yellow[3] = {255.0,255.0,0.0};
+
+    if( currentColor[2] == yellow[2])
+    {
+        m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,255.0));
+    }
+    else
+    {
+        m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(yellow));
+    }
+    m_InterpolatedSurfaceNode->Update();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+}
+
+void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
+{
+  m_3DInterpolationEnabled = on;
+
+  try
+  {
+    if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
+    {
+      mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
+      if (workingNode)
+      {
+        int listID;
+        bool isInterpolationResult(false);
+        workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+        if ((workingNode->IsSelected() &&
+             workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
+             !isInterpolationResult)
+        {
+          if (workingNode->GetIntProperty("3DInterpolationListID", listID))
+          {
+            m_SurfaceInterpolator->SetCurrentListID(listID);
+
+            if (m_Watcher.isRunning())
+                m_Watcher.waitForFinished();
+            m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+            m_Watcher.setFuture(m_Future);
+          }
+          else
+          {
+            listID = m_SurfaceInterpolator->CreateNewContourList();
+            workingNode->SetIntProperty("3DInterpolationListID", listID);
+            m_InterpolatedSurfaceNode->SetVisibility(false);
+            m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+            m_BtnAccept3DInterpolation->setEnabled(false);
+          }
+          
+          mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
+          double minSpacing (100);
+          double maxSpacing (0);
+          for (int i =0; i < 3; i++)
+          {
+            if (spacing[i] < minSpacing)
+            {
+              minSpacing = spacing[i];
+            }
+            else if (spacing[i] > maxSpacing)
+            {
+              maxSpacing = spacing[i];
+            }
+          }
+
+          m_SurfaceInterpolator->SetWorkingImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+          m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
+          m_SurfaceInterpolator->SetMinSpacing(minSpacing);
+          m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+        }
+      }
+      QWidget::setEnabled( workingNode != NULL );
+      m_CbShowMarkers->setEnabled(m_3DInterpolationEnabled);
+    }
+    else if (!m_3DInterpolationEnabled)
+    {
+      m_InterpolatedSurfaceNode->SetVisibility(false);
+      m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      m_BtnAccept3DInterpolation->setEnabled(m_3DInterpolationEnabled);
+    }
+  }
+  catch(...)
+  {
+      MITK_ERROR<<"Error with 3D surface interpolation!";
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::EnableInterpolation(bool on)
@@ -597,9 +890,16 @@ void QmitkSlicesInterpolator::EnableInterpolation(bool on)
   OnInterpolationActivated(on);
 }
 
+void QmitkSlicesInterpolator::Enable3DInterpolation(bool on)
+{
+  // only to be called from the outside world
+  // just a redirection to OnInterpolationActivated
+  On3DInterpolationActivated(on);
+}
+
 void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
 {
-  if (m_InterpolationEnabled)
+  if (m_2DInterpolationEnabled)
   {
     // determine which one is the current view, try to do an initial interpolation
     mitk::BaseRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus();
@@ -637,6 +937,17 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject&
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   UpdateVisibleSuggestion();
+}
+
+void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject& /*e*/)
+{
+  if(m_3DInterpolationEnabled)
+  {
+      if (m_Watcher.isRunning())
+          m_Watcher.waitForFinished();
+      m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+      m_Watcher.setFuture(m_Future);
+  }
 }
 
 bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex)

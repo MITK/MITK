@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: Iso Surface
-Bundle-SymbolicName: org.mitk.gui.qt.isosurface
-Bundle-Version: 1.0.0
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.mitk.gui.qt.common

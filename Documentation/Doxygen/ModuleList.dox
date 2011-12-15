@@ -10,30 +10,25 @@ The distinction between developer and end user use is for convenience only and m
 \section ModuleListPageEndUserModuleList List of Modules for End User Use
 
   \li \subpage org_basicimageprocessing
-  \li \subpage org_colourimageprocessing
   \li \subpage org_datamanager
   \li \subpage org_diffusion
   \li \subpage IGTGeneralModulePage
   \li \subpage org_imagecropper
   \li \subpage org_imagenavigator
   \li \subpage org_imagestatistics
-  \li \subpage org_isosurface
   \li \subpage org_measure
   \li \subpage org_moviemaker
   \li \subpage org_pointsetinteraction
   \li \subpage RegistrationModuleOverviewPage
   \li \subpage org_segment
-  \li \subpage org_simplemeasurement
   \li \subpage org_volvis
   
 \section ModuleListPageDevModuleList List of Modules for Developer Use and Examples
 
-  \li \subpage org_regiongrowing
-  \li \subpage org_simpleexample
   \li \subpage org_surfacematerialeditor
   \li \subpage org_toftutorial
   \li \subpage org_videoplayer
-  \li \subpage org_viewinitialitzation
+  \li \subpage org_mitkexamples
 
   
 */

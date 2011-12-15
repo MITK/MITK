@@ -1,6 +1,6 @@
 # The project name must correspond to the directory name of your plug-in
 # and must not contain periods.
-IF(MITK_USE_PYTHON)
+IF(MITK_USE_Python)
   PROJECT(org_mitk_gui_qt_python_console)
 
   set(SWIG_PYTHON_WRAPPER _mitkCorePython SwigRuntimePython)

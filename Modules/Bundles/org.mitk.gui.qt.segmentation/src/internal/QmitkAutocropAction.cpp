@@ -135,6 +135,11 @@ void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* dataStorage)
   //not needed
 }
 
+void QmitkAutocropAction::SetStdMultiWidget(QmitkStdMultiWidget *)
+{
+  //not needed
+}
+
 void QmitkAutocropAction::SetFunctionality(berry::QtViewPart *functionality)
 {
   //not needed

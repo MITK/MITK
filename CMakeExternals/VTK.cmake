@@ -36,8 +36,15 @@ IF(NOT DEFINED VTK_DIR)
         )
   ENDIF()
 
+  OPTION(MITK_USE_VTK_5_8_IN_SUPERBUILD OFF)
+  IF(MITK_USE_VTK_5_8_IN_SUPERBUILD)
+    SET(VTK_URL http://mitk.org/download/thirdparty/vtk-5.8.0.tar.gz)
+  ELSE()
+    SET(VTK_URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz)
+  ENDIF()
+
   ExternalProject_Add(${proj}
-    URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz
+    URL ${VTK_URL}
     BINARY_DIR ${proj}-build
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
@@ -50,6 +57,7 @@ IF(NOT DEFINED VTK_DIR)
         -DBUILD_SHARED_LIBS:BOOL=ON 
         -DVTK_USE_PARALLEL:BOOL=ON
         -DVTK_USE_CHARTS:BOOL=OFF
+        -DVTK_USE_QTCHARTS:BOOL=ON
         -DVTK_USE_GEOVIS:BOOL=OFF
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         ${vtk_QT_ARGS}

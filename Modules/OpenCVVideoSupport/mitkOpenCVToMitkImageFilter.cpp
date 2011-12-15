@@ -141,6 +141,8 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
 
     importFilter->SetImportPointer( localBuffer, numberOfPixels,
       importImageFilterWillOwnTheBuffer );
+
+    delete[] localBuffer;
   }
   else
   {

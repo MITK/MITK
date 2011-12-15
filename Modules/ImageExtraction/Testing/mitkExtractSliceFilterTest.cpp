@@ -70,15 +70,16 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	normal = itk::CrossProduct(right, bottom);*/
 
-	geometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Transversal, 24, false, true);
-	geometry->SetOrigin(origin);
+	geometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Sagittal, 0, true, false);
+	geometry->SetImageGeometry(true);
+	//geometry->SetOrigin(origin);
 	
 	/*mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
 	mitk::RotationOperation* rotation = new mitk::RotationOperation( mitk::OpROTATE, geometry->GetCenter(), rotationVector, 180.0);
 	geometry->ExecuteOperation(rotation);
 	delete rotation;*/
 
-	MITK_INFO << "axis 0: " << geometry->GetAxisVector(0) << " |> aixs 1: " << geometry->GetAxisVector(1) << " |> center: " << geometry->GetCenter();
+	MITK_INFO << "axis 0: " << geometry->GetAxisVector(0) << " |> aixs 1: " << geometry->GetAxisVector(1) << "spacing: " << geometry->GetSpacing()   << " |> origin: " << geometry->GetOrigin() << " |> center: " << geometry->GetCenter() << "|> isImageGeometry: "<<geometry->GetImageGeometry();
 
 	slicer->SetInput(image);
 	slicer->SetWorldGeometry(geometry);
@@ -89,41 +90,43 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 
 /*************** #BEGIN vtk render code ************************/
-	vtkSmartPointer<vtkPlaneSource> m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-	m_Plane->SetOrigin(0.0, 0.0, 0.0);
+	vtkSmartPointer<vtkPlaneSource> vtkPlane = vtkSmartPointer<vtkPlaneSource>::New();
+	vtkPlane->SetOrigin(0.0, 0.0, 0.0);
 	//These two points define the axes of the plane in combination with the origin.
 	//Point 1 is the x-axis and point 2 the y-axis.
 	//Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-	m_Plane->SetPoint1(1.0, 0.0, 0.0); //P1: (xMax, yMin, depth)
-	m_Plane->SetPoint2(0.0, 1.0, 0.0); //P2: (xMin, yMax, depth)
+	vtkPlane->SetPoint1(1.0, 0.0, 0.0); //P1: (xMax, yMin, depth)
+	vtkPlane->SetPoint2(0.0, 1.0, 0.0); //P2: (xMin, yMax, depth)
 
 
 	vtkSmartPointer<vtkPolyDataMapper> imageMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	imageMapper->SetInputConnection(m_Plane->GetOutputPort());
+	imageMapper->SetInputConnection(vtkPlane->GetOutputPort());
 
-	vtkSmartPointer<vtkLookupTable> m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+	vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
 
 	//built a default lookuptable
-	m_LookupTable->SetRampToLinear();
-	m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-	m_LookupTable->SetHueRange( 0.0, 0.0 );
-	m_LookupTable->SetValueRange( 0.0, 1.0 );
-	m_LookupTable->Build();
+	lookupTable->SetRampToLinear();
+	lookupTable->SetSaturationRange( 0.0, 0.0 );
+	lookupTable->SetHueRange( 0.0, 0.0 );
+	lookupTable->SetValueRange( 0.0, 1.0 );
+	lookupTable->Build();
 	//map all black values to transparent
-	m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-	m_LookupTable->SetRange(-1022.0, 1184.0);
+	lookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+	lookupTable->SetRange(-1022.0, 1184.0);
 
-	vtkSmartPointer<vtkTexture> m_Texture = vtkSmartPointer<vtkTexture>::New();
+	vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
 
-	m_Texture->SetInput(slicer->GetOutput()->GetVtkImageData());
-	//m_Texture->SetInput(image->GetVtkImageData());
-	m_Texture->SetLookupTable(m_LookupTable);
+	MITK_INFO << "spacing: " << slicer->GetOutput()->GetGeometry()->GetSpacing() << " |> origin: " << slicer->GetOutput()->GetGeometry()->GetOrigin() << "|> isImageGeometry: " << slicer->GetOutput()->GetGeometry()->GetImageGeometry();
 
-	m_Texture->SetMapColorScalarsThroughLookupTable(true);
+	texture->SetInput(slicer->GetOutput()->GetVtkImageData());
+	//texture->SetInput(image->GetVtkImageData());
+	texture->SetLookupTable(lookupTable);
+
+	texture->SetMapColorScalarsThroughLookupTable(true);
 
 	vtkSmartPointer<vtkActor> imageActor = vtkSmartPointer<vtkActor>::New();
 	imageActor->SetMapper(imageMapper);
-	imageActor->SetTexture(m_Texture);
+	imageActor->SetTexture(texture);
 	
 
 	// Setup renderers

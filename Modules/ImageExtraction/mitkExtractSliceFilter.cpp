@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
+	m_TimeStep = 0;
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -44,10 +45,31 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 	
 
+	const TimeSlicedGeometry *inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
+	if ( ( inputTimeGeometry == NULL )
+		|| ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+	{
+		itkWarningMacro(<<"Error reading input image geometry.");
+		return;
+	}
+
+	if ( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
+	 {
+		itkWarningMacro(<<"This is not a valid timestep: "<< m_TimeStep );
+		return;
+	 }
+
+	 // check if there is something to display.
+	 if ( ! input->IsVolumeSet( m_TimeStep ) ) 
+	 {
+		itkWarningMacro(<<"No volume data existent at given timestep "<< m_TimeStep ); 
+		return;
+	 }
+
 
 /********** #BEGIN setup vtkImageRslice properties***********/
 
-	m_Reslicer->SetInput(input->GetVtkImageData());
+	m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
 
 
 	/*setup the plane where vktImageReslice extracts the slice*/
@@ -58,7 +80,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	m_Reslicer->SetResliceAxesOrigin(origin);
 
 	//the cosines define the plane: x and y are the direction vectors, n is the planes normal
-	double cosines[9];//	 = {		1.0, 0.0, 0.0, 		0.0, -1.0, 0.0, 	0.0, 0.0, 1.0  };
+	double cosines[9];
 	Vector3D right, bottom;
 
 	right = m_WorldGeometry->GetAxisVector(0);

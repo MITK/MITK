@@ -36,6 +36,9 @@ namespace mitk
 
 		itkSetMacro( WorldGeometry, Geometry2D* );
 
+		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
+		unsigned int GetTimeStep(){ return this->m_TimeStep; }
+
 	protected:
 		ExtractSliceFilter();
 		virtual ~ExtractSliceFilter();
@@ -44,6 +47,8 @@ namespace mitk
 
 		const Geometry2D* m_WorldGeometry;
 		vtkSmartPointer<vtkImageReslice> m_Reslicer;
+
+		unsigned int m_TimeStep;
 
 	};
 }

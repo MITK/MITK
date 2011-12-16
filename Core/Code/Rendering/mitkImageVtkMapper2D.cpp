@@ -644,7 +644,14 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   float blackOpacity = 0.0;
-  this->GetDataNode()->GetFloatProperty( "black opacity", blackOpacity, renderer);
+  bool isBinary = false;
+  bool foundBinaryProperty = false;
+
+  foundBinaryProperty = this->GetDataNode()->GetBoolProperty("binary", isBinary, renderer);
+  if (foundBinaryProperty && !isBinary)
+  {
+    this->GetDataNode()->GetFloatProperty( "black opacity", blackOpacity, renderer);
+  }
   localStorage->m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, blackOpacity);
 
   //default lookuptable

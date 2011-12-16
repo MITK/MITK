@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 //CTK
 #include <ctkDICOMModel.h>
 #include <ctkDICOMAppWidget.h>
+#include <ctkDICOMQueryWidget.h>
 
 
 const std::string MITKDICOM::VIEW_ID = "org.mitk.views.mitkdicom";
@@ -51,7 +52,7 @@ void MITKDICOM::CreateQtPartControl( QWidget *parent )
 {   
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
+    //connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
 }
 
 void MITKDICOM::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -78,50 +79,50 @@ void MITKDICOM::onSeriesModelSelected(QModelIndex index){
     QModelIndex studyIndex = index.parent();
     QModelIndex seriesIndex = index;
 
-    ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
+    //ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
 
-    if(model)
-    {
-        model->fetchMore(seriesIndex);
+    //if(model)
+    //{
+    //    model->fetchMore(seriesIndex);
 
-        int imageCount = model->rowCount(seriesIndex);
+    //    int imageCount = model->rowCount(seriesIndex);
 
-        MITK_INFO<< "Series Index:"<< imageCount << "\n";
+    //    MITK_INFO<< "Series Index:"<< imageCount << "\n";
 
-        QString filePath = m_Controls.m_ctkDICOMAppWidget->databaseDirectory() +
-            "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString() + "/";
+    //    QString filePath = m_Controls.m_ctkDICOMAppWidget->databaseDirectory() +
+    //        "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString() + "/";
 
-        MITK_INFO << "filepath: "<< filePath.toStdString() << "\n";
+    //    MITK_INFO << "filepath: "<< filePath.toStdString() << "\n";
 
-        QString series_uid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
+    //    QString series_uid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
 
-        MITK_INFO << "series_uid: " << series_uid.toStdString() << "\n";
+    //    MITK_INFO << "series_uid: " << series_uid.toStdString() << "\n";
 
-        if(QFile(filePath).exists())
-        {
-            filePath.replace(0,1,"");
-            QString absolutFilePath("C:/home/bauerm/bin/MITK/MITK-build/Applications/ExtApp/ctkDICOM-Database/dicom/");
-            absolutFilePath.append(model->data(studyIndex ,ctkDICOMModel::UIDRole).toString());
-            absolutFilePath.append("/");
-            //add all fienames from series to strin container
-            mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(absolutFilePath.toStdString(),series_uid.toStdString());
-            mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
+    //    if(QFile(filePath).exists())
+    //    {
+    //        filePath.replace(0,1,"");
+    //        QString absolutFilePath("C:/home/bauerm/bin/MITK/MITK-build/Applications/ExtApp/ctkDICOM-Database/dicom/");
+    //        absolutFilePath.append(model->data(studyIndex ,ctkDICOMModel::UIDRole).toString());
+    //        absolutFilePath.append("/");
+    //        //add all fienames from series to strin container
+    //        mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(absolutFilePath.toStdString(),series_uid.toStdString());
+    //        mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
 
-            if (node.IsNull())
-            {
-                MITK_ERROR << "Could not load series: " << series_uid.toStdString();
-            }
-            else
-            {
-                node->SetName(series_uid.toStdString());
-                this->GetDefaultDataStorage()->Add(node);
+    //        if (node.IsNull())
+    //        {
+    //            MITK_ERROR << "Could not load series: " << series_uid.toStdString();
+    //        }
+    //        else
+    //        {
+    //            node->SetName(series_uid.toStdString());
+    //            this->GetDefaultDataStorage()->Add(node);
 
-                this->GetActiveStdMultiWidget();
+    //            this->GetActiveStdMultiWidget();
 
-                mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-                mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-            }
+    //            mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    //            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //        }
 
-        }
-    }
+    //    }
+    //}
 }

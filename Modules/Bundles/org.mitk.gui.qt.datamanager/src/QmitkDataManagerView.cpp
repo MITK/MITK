@@ -387,7 +387,24 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
-    contextMenuAction->SetStdMultiWidget(this->GetActiveStdMultiWidget());
+    QmitkStdMultiWidget* activeStdMultiWidget = 0;
+    berry::IEditorPart::Pointer editor =
+      this->GetSite()->GetPage()->GetActiveEditor();
+
+    if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
+    {
+      activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    }
+    else
+    {
+      mitk::DataStorageEditorInput::Pointer editorInput;
+      editorInput = new mitk::DataStorageEditorInput();
+      // open a new multi-widget editor, but do not give it the focus
+      berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
+      activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    }
+
+    contextMenuAction->SetStdMultiWidget(activeStdMultiWidget);
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);

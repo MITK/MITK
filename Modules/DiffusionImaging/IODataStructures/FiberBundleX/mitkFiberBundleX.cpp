@@ -652,9 +652,6 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
                 //std::cout << "adding " << i << endl;
                 PointsOnPlane.push_back(i); //push back in combination with reserve is fastest way to fill vector with various values
 
-                //optimize: here also check if point is inside radius
-
-
             }
 
         }

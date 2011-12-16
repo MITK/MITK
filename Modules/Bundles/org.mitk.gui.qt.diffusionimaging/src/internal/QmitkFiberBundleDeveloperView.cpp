@@ -642,8 +642,8 @@ QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
     //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
     delete m_hostThread;
-    if (m_FiberIDGenerator != NULL)
-        delete m_FiberIDGenerator;
+//    if (m_FiberIDGenerator != NULL)
+//        delete m_FiberIDGenerator;
 
     //    if (m_GeneratorFibersRandom != NULL)
     //        delete m_GeneratorFibersRandom;

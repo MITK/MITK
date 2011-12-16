@@ -501,27 +501,34 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
         switch (pfcomp->getOperationType()) {
         case 0:
         {
+            MITK_INFO << "AND PROCESSING";
             //AND
             //temporarly store results of the child in this vector, we need that to accumulate the
             std::vector<unsigned long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
+            MITK_INFO << "first roi got fibers in ROI: " << childResults.size();
+            MITK_INFO << "sorting...";
             std::sort(childResults.begin(), childResults.end());
+            MITK_INFO << "sorting done";
+            std::vector<unsigned long> AND_Assamblage(childResults.size());
+            fill(AND_Assamblage.begin(), AND_Assamblage.end(), -1);
+            //AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
 
-            std::vector<unsigned long> AND_Assamblage;
-            AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
 
             std::vector<unsigned long>::iterator it;
             for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
             {
                 std::vector<unsigned long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
+                MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
                 sort(tmpChild.begin(), tmpChild.end());
+
                 it = std::set_intersection(childResults.begin(), childResults.end(),
                                            tmpChild.begin(), tmpChild.end(),
                                            AND_Assamblage.begin() );
             }
 
-
+            MITK_INFO << "returning AND vector, size: " << AND_Assamblage.size();
             return AND_Assamblage;
-            break;
+//            break;
 
         }
         case 1:
@@ -564,7 +571,7 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
         plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
         //same plane but opposite normal direction. so point cloud will be reduced -> better performance
-        vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
+//        vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
 
         //define new origin along the normal but close to the original one
         // OriginNew = OriginOld + 1*Normal

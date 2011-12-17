@@ -110,7 +110,7 @@ void QmitkFiberExtractorWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    std::vector<unsigned long> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
+    std::vector<long> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
 
     //generate new fiberbundle by fiber iDs
     vtkSmartPointer<vtkPolyData> newFBPolyData = m_itemPackage.st_FBX->GenerateNewFiberBundleByIds(fibIds);
@@ -223,14 +223,14 @@ void QmitkFiberGenerateRandomWorker::run()
     /* GENERATE VTK POLYLINES OUT OF FIBERSTORAGE */
     vtkSmartPointer<vtkCellArray> linesCell = vtkSmartPointer<vtkCellArray>::New(); // Host vtkPolyLines
     linesCell->Allocate(pnts->GetNumberOfPoints()*2); //allocate for each cellindex also space for the pointId, e.g. [idx | pntID]
-    for (unsigned long i=0; i<fiberStorage.size(); ++i)
+    for (long i=0; i<fiberStorage.size(); ++i)
     {
         std::vector<int> singleFiber = fiberStorage.at(i);
         vtkSmartPointer<vtkPolyLine> fiber = vtkSmartPointer<vtkPolyLine>::New();
         fiber->GetPointIds()->SetNumberOfIds((int)singleFiber.size());
 
-        for (unsigned long si=0; si<singleFiber.size(); ++si)
-        {  //hopefully unsigned long to double works fine in VTK ;-)
+        for (long si=0; si<singleFiber.size(); ++si)
+        {  //hopefully long to double works fine in VTK ;-)
             fiber->GetPointIds()->SetId( si, singleFiber.at(si) );
         }
 

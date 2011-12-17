@@ -75,7 +75,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
     return newFib;
 }
 
-vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<unsigned long> fiberIds)
+vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std::vector<long> fiberIds)
 {
     MITK_INFO << "\n=====FINAL RESULT: fib_id ======\n";
     MITK_INFO << "Number of new Fibers: " << fiberIds.size();
@@ -107,7 +107,7 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std
 
 
 
-    std::vector<unsigned long>::iterator finIt = fiberIds.begin();
+    std::vector<long>::iterator finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
     {
         //        MITK_INFO << *finIt;
@@ -486,12 +486,12 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 //temporarely include only
 //#include <vtkPolyDataWriter.h>
 //==========================
-std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
+std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Pointer pf)
 {
 
     MITK_INFO << "Extracting fibers!";
     // vector which is returned, contains all extracted FiberIds
-    std::vector<unsigned long> FibersInROI;
+    std::vector<long> FibersInROI;
 
     /* Handle type of planarfigure */
     // if incoming pf is a pfc
@@ -504,22 +504,30 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
             MITK_INFO << "AND PROCESSING";
             //AND
             //temporarly store results of the child in this vector, we need that to accumulate the
-            std::vector<unsigned long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
+            std::vector<long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
             MITK_INFO << "first roi got fibers in ROI: " << childResults.size();
             MITK_INFO << "sorting...";
             std::sort(childResults.begin(), childResults.end());
             MITK_INFO << "sorting done";
-            std::vector<unsigned long> AND_Assamblage(childResults.size());
+            std::vector<long> AND_Assamblage(childResults.size());
+//std::vector<unsigned long> AND_Assamblage;
             fill(AND_Assamblage.begin(), AND_Assamblage.end(), -1);
             //AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
 
+            MITK_INFO << "AND Ass shall be -1 " << AND_Assamblage.at(0);
+            MITK_INFO << "AND Ass shall be -1 " << AND_Assamblage.at(1);
+            MITK_INFO << "child " << childResults.at(0);
+            MITK_INFO << "child " << childResults.at(1);
 
-            std::vector<unsigned long>::iterator it;
+            std::vector<long>::iterator it;
             for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
             {
-                std::vector<unsigned long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
+                std::vector<long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
                 MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
                 sort(tmpChild.begin(), tmpChild.end());
+
+                MITK_INFO << tmpChild.at(0);
+                MITK_INFO << tmpChild.at(1);
 
                 it = std::set_intersection(childResults.begin(), childResults.end(),
                                            tmpChild.begin(), tmpChild.end(),
@@ -726,13 +734,13 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
 
         // prepare a structure where each point id is represented as an indexId.
         // vector looks like: | pntId | fiberIdx |
-        std::vector< unsigned long > pointindexFiberMap;
+        std::vector< long > pointindexFiberMap;
 
         // walk through the whole subline section and create an vector sorted by point index
         vtkCellArray *clipperlines = clipperout->GetLines();
         clipperlines->InitTraversal();
         long numOfLineCells = clipperlines->GetNumberOfCells();
-        unsigned long numofClippedPoints = clipperout->GetNumberOfPoints();
+        long numofClippedPoints = clipperout->GetNumberOfPoints();
         pointindexFiberMap.reserve(numofClippedPoints);
 
 
@@ -764,7 +772,7 @@ std::vector<unsigned long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFig
         // get all Points in ROI with according fiberID
         for (long k = 0; k < PointsInROI.size(); k++)
         {
-            // MITK_INFO << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
+             //MITK_INFO << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
             FibersInROI.push_back(pointindexFiberMap[ PointsInROI[k] ]);
         }
 

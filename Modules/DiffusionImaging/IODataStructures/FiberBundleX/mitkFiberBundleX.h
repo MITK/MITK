@@ -79,9 +79,9 @@ namespace mitk {
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
     void ResampleFibers();
-    std::vector<unsigned long> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
+    std::vector<long> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
 //    mitk::FiberBundleX::Pointer GenerateNewFiberBundleByIds( std::vector<unsigned long> );
-    vtkSmartPointer<vtkPolyData> GenerateNewFiberBundleByIds( std::vector<unsigned long> );
+    vtkSmartPointer<vtkPolyData> GenerateNewFiberBundleByIds( std::vector<long> );
 
     itkGetMacro(NumFibers, int);
 

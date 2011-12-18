@@ -33,11 +33,6 @@
 #include <QTime>
 
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
-    :m_FiberMapperGLSP(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New()),
-      m_FiberMapperGLWP(vtkOpenGLPolyDataMapper::New()),
-      m_FiberActorSP(vtkSmartPointer<vtkOpenGLActor>::New()),
-      m_FiberActorWP(vtkOpenGLActor::New()),
-      m_FiberAssembly(vtkPropAssembly::New())
 {
 
 }
@@ -45,7 +40,7 @@ mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 
 mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 {
-    m_FiberAssembly->Delete();
+
 }
 
 
@@ -60,68 +55,55 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXMapper3D::GenerateData()
+void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 {
+
     //MITK_INFO << "GENERATE DATA FOR FBX :)";
     //=====timer measurement====
     QTime myTimer;
     myTimer.start();
     //==========================
 
-    //  mitk::FiberBundleX::Pointer FBX = dynamic_cast< mitk::FiberBundleX* > (this->GetData());
 
     mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
-    if (FBX == NULL) {
+    if (FBX == NULL)
         return;
-    }
-    //todo smartpointer
-    vtkPolyData* FiberData = FBX->GetFiberPolyData();
 
-    if (FiberData == NULL) {
+    vtkSmartPointer<vtkPolyData> FiberData = FBX->GetFiberPolyData();
+    if (FiberData == NULL)
         return;
-    }
 
 
-    m_FiberMapperGLSP->SetInput(FiberData);
-    //  m_FiberMapperGLWP->SetInput(FiberData);
-
+    FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
+    localStorage->m_FiberMapper->SetInput(FiberData);
 
     if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
-    {
+            localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
 
-        m_FiberMapperGLSP->SelectColorArray( FBX->GetCurrentColorCoding() );
-    }
-    
-    m_FiberMapperGLSP->ScalarVisibilityOn();
-    //    m_FiberMapperGLWP->ScalarVisibilityOn();
-    m_FiberMapperGLSP->SetScalarModeToUsePointFieldData();
-    //    m_FiberMapperGLWP->SetScalarModeToUsePointFieldData();
-
-
-
-    m_FiberActorSP->SetMapper(m_FiberMapperGLSP);
-    //  m_FiberActorWP->SetMapper(m_FiberMapperGLWP);
+    localStorage->m_FiberMapper->ScalarVisibilityOn();
+    localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
+    localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
 
     // set Opacity
     float tmpopa;
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
-    m_FiberActorSP->GetProperty()->SetOpacity((double) tmpopa);
+    localStorage->m_FiberActor->GetProperty()->SetOpacity((double) tmpopa);
 
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
-        m_FiberMapperGLSP->SelectColorArray(FBX->GetCurrentColorCoding());
+        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
         if(FBX->GetCurrentColorCoding() == "custom"){
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
-            m_FiberActorSP->GetProperty()->SetColor(trgb);
+            localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
     }
-    m_FiberAssembly->AddPart(m_FiberActorSP);
-
+    localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
+    localStorage->m_LastUpdateTime.Modified();
     //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.
-    FBX->setFBXModificationDone();
+
     //====timer measurement========
     MITK_INFO << "Execution Time GenerateData() (nmiliseconds): " << myTimer.elapsed();
     //=============================
@@ -133,15 +115,23 @@ void mitk::FiberBundleXMapper3D::GenerateData()
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
     if ( !this->IsVisible( renderer ) )
-    {
         return;
+
+    // Calculate time step of the input data for the specified renderer (integer value)
+    // this method is implemented in mitkMapper
+    this->CalculateTimeStep( renderer );
+
+    //check if updates occured in the node or on the display
+    FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
+    const DataNode *node = this->GetDataNode();
+    if ( (localStorage->m_LastUpdateTime < node->GetMTime())
+         || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+         || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+    {
+            MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+             this->GenerateData(renderer);
     }
 
-    //MITK_INFO << "FiberBundleXxXXMapper3D()DataForRenderer";
-    //ToDo do update checks
-    mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
-    if(FBX->isFiberBundleXModified())
-        this->GenerateData();
 }
 
 
@@ -179,28 +169,29 @@ vtkProp* mitk::FiberBundleXMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
     //MITK_INFO << "FiberBundleXxXXMapper3D()GetVTKProp";
     //this->GenerateData();
-    return m_FiberAssembly;
+    return m_LSH.GetLocalStorage(renderer)->m_FiberAssembly;
 
 }
 
 void mitk::FiberBundleXMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-    //  MITK_INFO << "FiberBundleXXXXMapper3D ApplyProperties(renderer)";
+
 }
 
 void mitk::FiberBundleXMapper3D::UpdateVtkObjects()
 {
-    //  MITK_INFO << "FiberBundleXxxXMapper3D UpdateVtkObjects()";
-
 
 }
 
 void mitk::FiberBundleXMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
 {
 
-
-
 }
 
-
+mitk::FiberBundleXMapper3D::FBXLocalStorage3D::FBXLocalStorage3D()
+{
+    m_FiberActor = vtkSmartPointer<vtkActor>::New();
+    m_FiberMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    m_FiberAssembly = vtkSmartPointer<vtkPropAssembly>::New();
+}
 

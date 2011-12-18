@@ -37,13 +37,13 @@ class vtkPropAssembly;
 
 namespace mitk {
 
-  //##Documentation
-  //## @brief Mapper for FiberBundleX
-  //## @ingroup Mapper
+//##Documentation
+//## @brief Mapper for FiberBundleX
+//## @ingroup Mapper
 
-  class MitkDiffusionImaging_EXPORT FiberBundleXMapper3D : public VtkMapper3D
-  {
-  public:
+class MitkDiffusionImaging_EXPORT FiberBundleXMapper3D : public VtkMapper3D
+{
+public:
 
     mitkClassMacro(FiberBundleXMapper3D, VtkMapper3D);
     itkNewMacro(Self);
@@ -55,26 +55,43 @@ namespace mitk {
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void GenerateData();
     //=========================================================
-    
-  protected:
+    virtual void GenerateData(mitk::BaseRenderer *renderer);
+
+    class  FBXLocalStorage3D : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+        /** \brief Point Actor of a 3D render window. */
+        vtkSmartPointer<vtkActor> m_FiberActor;
+        /** \brief Point Mapper of a 3D render window. */
+        vtkSmartPointer<vtkPolyDataMapper> m_FiberMapper;
+
+        vtkSmartPointer<vtkPropAssembly> m_FiberAssembly;
+
+        /** \brief Timestamp of last update of stored data. */
+        itk::TimeStamp m_LastUpdateTime;
+        /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
+        FBXLocalStorage3D(); //if u copy&paste from this 2Dmapper, be aware that the implementation of this constructor is in the cpp file
+
+        ~FBXLocalStorage3D()
+        {
+        }
+    };
+
+    /** \brief This member holds all three LocalStorages for the 3D render window(s). */
+    mitk::Mapper::LocalStorageHandler<FBXLocalStorage3D> m_LSH;
+
+
+protected:
 
     FiberBundleXMapper3D();
     virtual ~FiberBundleXMapper3D();
 
     void UpdateVtkObjects(); //??
 
-    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_FiberMapperGLSP;
-    vtkOpenGLPolyDataMapper* m_FiberMapperGLWP;
-    
-    vtkSmartPointer<vtkActor> m_FiberActorSP;
-    vtkOpenGLActor* m_FiberActorWP;
-    
-    vtkPropAssembly* m_FiberAssembly;
     
 
-  };
+};
 
 } // end namespace mitk
 

@@ -92,7 +92,7 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
 {
     FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-    // MITK_INFO << "uSERWAAAAAAAS, da shader brauchat a poor neue zoin";
+
     //get information about current position of views
     mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
     mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
@@ -164,10 +164,6 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
         return;
     }
     ///////////////////////////////////
-
-
-
-
 
     ///THIS GET INPUT
     mitk::FiberBundleX* fbx = this->GetInput();

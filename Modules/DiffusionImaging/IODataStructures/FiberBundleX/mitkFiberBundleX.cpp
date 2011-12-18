@@ -510,14 +510,9 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
             std::sort(childResults.begin(), childResults.end());
             MITK_INFO << "sorting done";
             std::vector<long> AND_Assamblage(childResults.size());
-//std::vector<unsigned long> AND_Assamblage;
+            //std::vector<unsigned long> AND_Assamblage;
             fill(AND_Assamblage.begin(), AND_Assamblage.end(), -1);
             //AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
-
-            MITK_INFO << "AND Ass shall be -1 " << AND_Assamblage.at(0);
-            MITK_INFO << "AND Ass shall be -1 " << AND_Assamblage.at(1);
-            MITK_INFO << "child " << childResults.at(0);
-            MITK_INFO << "child " << childResults.at(1);
 
             std::vector<long>::iterator it;
             for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
@@ -526,17 +521,21 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
                 MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
                 sort(tmpChild.begin(), tmpChild.end());
 
-                MITK_INFO << tmpChild.at(0);
-                MITK_INFO << tmpChild.at(1);
-
                 it = std::set_intersection(childResults.begin(), childResults.end(),
                                            tmpChild.begin(), tmpChild.end(),
                                            AND_Assamblage.begin() );
             }
 
+            MITK_INFO << "resize Vector";
+            long i=0;
+            while (AND_Assamblage[i] != -1){ //-1 represents a placeholder in the array
+                ++i;
+            }
+            AND_Assamblage.resize(i);
+
             MITK_INFO << "returning AND vector, size: " << AND_Assamblage.size();
             return AND_Assamblage;
-//            break;
+            //            break;
 
         }
         case 1:
@@ -579,7 +578,7 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
         plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
         //same plane but opposite normal direction. so point cloud will be reduced -> better performance
-//        vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
+        //        vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
 
         //define new origin along the normal but close to the original one
         // OriginNew = OriginOld + 1*Normal
@@ -772,12 +771,28 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
         // get all Points in ROI with according fiberID
         for (long k = 0; k < PointsInROI.size(); k++)
         {
-             //MITK_INFO << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
+            //MITK_INFO << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
             FibersInROI.push_back(pointindexFiberMap[ PointsInROI[k] ]);
         }
 
+    }
 
+    //  detecting fiberId duplicates
+    MITK_INFO << "check for duplicates";
 
+    sort(FibersInROI.begin(), FibersInROI.end());
+    bool hasDuplicats = false;
+    for(long i=0; i<FibersInROI.size()-1; ++i)
+    {
+        if(FibersInROI[i] == FibersInROI[i+1])
+            hasDuplicats = true;
+    }
+
+    if(hasDuplicats)
+    {
+        std::vector<long>::iterator it;
+        it = unique (FibersInROI.begin(), FibersInROI.end());
+        FibersInROI.resize( it - FibersInROI.begin() );
     }
 
     return FibersInROI;

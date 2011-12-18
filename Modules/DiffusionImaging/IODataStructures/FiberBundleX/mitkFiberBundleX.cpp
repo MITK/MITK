@@ -889,15 +889,12 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
     if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )
     {
         this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
-        this->m_isModified = true;
 
     } else if(strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
         this->m_currentColorCoding = (char*) COLORCODING_FA_BASED;
-        this->m_isModified = true;
     } else {
         MITK_INFO << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
-        this->m_currentColorCoding = "---"; //will cause blank colorcoding of fibers
-        this->m_isModified = true;
+        this->m_currentColorCoding = "custom"; //will cause blank colorcoding of fibers
     }
 }
 

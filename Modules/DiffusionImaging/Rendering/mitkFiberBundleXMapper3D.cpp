@@ -102,12 +102,21 @@ void mitk::FiberBundleXMapper3D::GenerateData()
     m_FiberActorSP->SetMapper(m_FiberMapperGLSP);
     //  m_FiberActorWP->SetMapper(m_FiberMapperGLWP);
 
-    m_FiberActorSP->GetProperty()->SetOpacity(1.0);
-    //  m_FiberActorWP->GetProperty()->SetOpacity(1.0);
+    // set Opacity
+    float tmpopa;
+    this->GetDataNode()->GetOpacity(tmpopa, NULL);
+    m_FiberActorSP->GetProperty()->SetOpacity((double) tmpopa);
 
+    // set color
     if (FBX->GetCurrentColorCoding() != NULL){
         m_FiberMapperGLSP->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
+        if(FBX->GetCurrentColorCoding() == "custom"){
+            float temprgb[3];
+            this->GetDataNode()->GetColor( temprgb, NULL );
+            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
+            m_FiberActorSP->GetProperty()->SetColor(trgb);
+        }
     }
     m_FiberAssembly->AddPart(m_FiberActorSP);
 
@@ -144,7 +153,7 @@ void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
 
     //MITK_INFO << "FiberBundleMapperX3D SetDefault Properties(...)";
     //   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
-    //  node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
+      node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
     //  node->AddProperty( "ColorCoding", mitk::IntProperty::New( 0 ), renderer, overwrite);
     //  node->AddProperty( "VertexOpacity_1", mitk::BoolProperty::New( false ), renderer, overwrite);
     //  node->AddProperty( "Set_FA_VertexAlpha", mitk::BoolProperty::New( false ), renderer, overwrite);

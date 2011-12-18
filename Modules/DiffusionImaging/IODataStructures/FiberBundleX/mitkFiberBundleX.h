@@ -87,6 +87,9 @@ namespace mitk {
 
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
+//    /** \brief Timestamp of last update of stored data. */
+//    itk::TimeStamp m_LastUpdateTime;
+
   protected:
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();

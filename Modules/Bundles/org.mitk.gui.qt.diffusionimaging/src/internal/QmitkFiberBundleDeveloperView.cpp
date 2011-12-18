@@ -905,6 +905,7 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkP
     FBNode->SetName("FiberBundleX");
     FBNode->SetData(FB);
     FBNode->SetVisibility(true);
+    FBNode->SetOpacity(1.0);
 
     GetDataStorage()->Add(FBNode);
     FBNode->Modified();
@@ -1198,7 +1199,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
     m_hostThread->disconnect();
     //update renderer
     m_FiberBundleNode->Modified();
-    m_MultiWidget->RequestUpdate();
+    m_MultiWidget->ForceImmediateUpdate();
 
 
     //update QComboBox(dropDown menu) in view of available ColorCodings
@@ -1220,7 +1221,7 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
         m_Controls->ddAvailableColorcodings->removeItem(i);
     }
     //fill new data into menu
-    m_Controls->ddAvailableColorcodings->addItem("---");
+    m_Controls->ddAvailableColorcodings->addItem("custom");
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
 
 
@@ -1237,7 +1238,8 @@ void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
     QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
     m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
     // update rendering
-    m_MultiWidget->RequestUpdate();
+    m_FiberBundleNode->Modified();
+    m_MultiWidget->ForceImmediateUpdate();
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

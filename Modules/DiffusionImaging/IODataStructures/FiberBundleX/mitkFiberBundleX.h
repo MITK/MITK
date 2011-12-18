@@ -71,8 +71,8 @@ namespace mitk {
 
     char* GetCurrentColorCoding();
     void SetColorCoding(const char*);
-    bool isFiberBundleXModified();
-    void setFBXModificationDone();
+//    bool isFiberBundleXModified();
+//    void setFBXModificationDone();
 
     QStringList GetAvailableColorCodings();
     void DoColorCodingOrientationbased();
@@ -105,7 +105,7 @@ namespace mitk {
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
 
     char* m_currentColorCoding;
-    bool m_isModified;
+//    bool m_isModified;
     int m_NumFibers;
   };
 } // namespace mitk

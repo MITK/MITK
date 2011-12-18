@@ -41,7 +41,6 @@ const char* mitk::FiberBundleX::FA_VALUE_ARRAY = "FA_Values";
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_currentColorCoding(NULL)
-    , m_isModified(false)
     , m_NumFibers(0)
 {
     if (fiberPolyData == NULL)
@@ -68,7 +67,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
     newFib->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     newFib->m_FiberPolyData->DeepCopy(m_FiberPolyData);
     newFib->SetColorCoding(m_currentColorCoding);
-    newFib->m_isModified = m_isModified;
+//    newFib->m_isModified = m_isModified;
     newFib->m_NumFibers = m_NumFibers;
     newFib->UpdateFiberGeometry();
 
@@ -294,7 +293,7 @@ void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, 
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
 
-    m_isModified = true;
+//    m_isModified = true;
 }
 
 /*
@@ -898,14 +897,14 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
     }
 }
 
-bool mitk::FiberBundleX::isFiberBundleXModified()
-{
-    return m_isModified;
-}
-void mitk::FiberBundleX::setFBXModificationDone()
-{
-    m_isModified = false;
-}
+//bool mitk::FiberBundleX::isFiberBundleXModified()
+//{
+//    return m_isModified;
+//}
+//void mitk::FiberBundleX::setFBXModificationDone()
+//{
+//    m_isModified = false;
+//}
 
 void mitk::FiberBundleX::ResampleFibers()
 {

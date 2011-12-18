@@ -36,6 +36,7 @@
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
+const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 const char* mitk::FiberBundleX::FA_VALUE_ARRAY = "FA_Values";
 
@@ -50,7 +51,14 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
 
-    UpdateFiberGeometry();
+    this->UpdateFiberGeometry();
+
+    //generate colorcoding
+    this->DoColorCodingOrientationbased();
+    this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
+    this->DoGenerateFiberIds();
+
+
 }
 
 mitk::FiberBundleX::~FiberBundleX()
@@ -885,12 +893,12 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
     if (requestedColorCoding==NULL)
         return;
 
-    if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )
-    {
+    if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )    {
         this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
-
     } else if(strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
         this->m_currentColorCoding = (char*) COLORCODING_FA_BASED;
+    } else if(strcmp (COLORCODING_CUSTOM,requestedColorCoding) ) {
+        this->m_currentColorCoding = (char*) COLORCODING_CUSTOM;
     } else {
         MITK_INFO << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
         this->m_currentColorCoding = "custom"; //will cause blank colorcoding of fibers

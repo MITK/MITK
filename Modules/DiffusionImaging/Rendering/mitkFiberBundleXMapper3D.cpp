@@ -144,7 +144,7 @@ void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
     //MITK_INFO << "FiberBundleMapperX3D SetDefault Properties(...)";
     //   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
       node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
-    //  node->AddProperty( "ColorCoding", mitk::IntProperty::New( 0 ), renderer, overwrite);
+      node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
     //  node->AddProperty( "VertexOpacity_1", mitk::BoolProperty::New( false ), renderer, overwrite);
     //  node->AddProperty( "Set_FA_VertexAlpha", mitk::BoolProperty::New( false ), renderer, overwrite);
     //  node->AddProperty( "pointSize", mitk::FloatProperty::New(0.5), renderer, overwrite);

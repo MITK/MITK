@@ -87,6 +87,7 @@ namespace mitk {
     /*===FIBERBUNDLE ASSESSMENT METHODS====*/
 
 
+    itkGetMacro(NumFibers, int);
 
 
   protected:
@@ -114,6 +115,7 @@ namespace mitk {
     bool m_isModified;
 
 
+    int m_NumFibers;
     
     
   };

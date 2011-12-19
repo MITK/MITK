@@ -551,37 +551,22 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
         case 1:
         {
             //OR
-            //temporarly store results of the child in this vector, we need that to accumulate the
-            std::vector<long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
-            MITK_INFO << "first roi got fibers in ROI: " << childResults.size();
-            MITK_INFO << "sorting...";
-            std::sort(childResults.begin(), childResults.end());
-            MITK_INFO << "sorting done";
-            std::vector<long> OR_Assamblage;
-            OR_Assamblage.resize(childResults.size(), -1);
-        MITK_INFO << OR_Assamblage.size();
-
+            std::vector<long> OR_Assamblage = this->DoExtractFiberIds(pfcomp->getChildAt(0));
             std::vector<long>::iterator it;
-            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
-            {
+            MITK_INFO << OR_Assamblage.size();
+
+            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i) {
+                it = OR_Assamblage.end();
                 std::vector<long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
-                MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
-                sort(tmpChild.begin(), tmpChild.end());
-                OR_Assamblage.resize(tmpChild.size(), -1);
-                it = std::set_union(childResults.begin(), childResults.end(),
-                                    tmpChild.begin(), tmpChild.end(),
-                                    OR_Assamblage.begin() );
+                OR_Assamblage.insert(it, tmpChild.begin(), tmpChild.end());
+                MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size() << " OR Assamblage: " << OR_Assamblage.size();
             }
 
-
-            //            MITK_INFO << "resize Vector";
-            //            long i=0;
-            //            while (i < OR_Assamblage.size() && OR_Assamblage[i] != -1){ //-1 represents a placeholder in the array
-            //                ++i;
-            //            }
-            //            OR_Assamblage.resize(i);
-
+            sort(OR_Assamblage.begin(), OR_Assamblage.end());
+            it = unique(OR_Assamblage.begin(), OR_Assamblage.end());
+            OR_Assamblage.resize( it - OR_Assamblage.begin() );
             MITK_INFO << "returning OR vector, size: " << OR_Assamblage.size();
+
             return OR_Assamblage;
         }
         case 2:
@@ -594,7 +579,7 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
             MITK_INFO << "m_NumOfFib: " << this->GetNumFibers() << " cellIdNum: " << idSet->GetNumberOfTuples();
             for(long i=0; i<this->GetNumFibers(); i++)
             {
-                MITK_INFO << "i: " << i << " idset: " << idSet->GetTuple(i);
+                MITK_INFO << "i: " << i << " idset: " << idSet->GetTuple(i)[0];
                 childResults.push_back(idSet->GetTuple(i)[0]);
             }
 

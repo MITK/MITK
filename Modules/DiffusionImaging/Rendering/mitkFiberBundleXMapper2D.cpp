@@ -139,10 +139,14 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     if (!fiberfading)
         fiberfading_i = 0;
 
+    // set Opacity
+    float fiberOpacity;
+    this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
 
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("slicingPlane",4, plane1);
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, &thickness);
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberFadingON",1,  &fiberfading_i);
+    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberOpacity", 1, &fiberOpacity);
 
 
 }
@@ -172,10 +176,6 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     lut->Build();
     localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
 
-    // set Opacity
-    float tmpopa;
-    this->GetDataNode()->GetOpacity(tmpopa, NULL);
-    localStorage->m_PointActor->GetProperty()->SetOpacity((double) tmpopa);
 
     // set color
     if (fbx->GetCurrentColorCoding() != NULL){

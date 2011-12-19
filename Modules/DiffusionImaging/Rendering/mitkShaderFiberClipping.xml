@@ -23,6 +23,7 @@
   uniform vec4 slicingPlane;
   uniform float fiberThickness;
   uniform int fiberFadingON;
+  uniform float fiberOpacity;
   
   varying vec3 positionWorld;
   varying vec3 color;
@@ -38,9 +39,9 @@
      {
         float x = (r1+fiberThickness)/(fiberThickness*2.0);
         x = 1.0 - x;
-        gl_FragColor = vec4(color*x, 1.0); 
+        gl_FragColor = vec4(color*x, fiberOpacity); 
      }else{
-       gl_FragColor = vec4(color, 1.0);
+       gl_FragColor = vec4(color, fiberOpacity);
        }
   
   }
@@ -48,6 +49,7 @@
   <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>
   <Uniform type="float" name="fiberThickness" number_of_elements="1" > </Uniform>
   <Uniform type="int" name="fiberFadingON" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="fiberOpacity" number_of_elements="1" > </Uniform>
 
    
   </Shader>

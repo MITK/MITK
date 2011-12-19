@@ -75,7 +75,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
     newFib->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     newFib->m_FiberPolyData->DeepCopy(m_FiberPolyData);
     newFib->SetColorCoding(m_currentColorCoding);
-//    newFib->m_isModified = m_isModified;
+    //    newFib->m_isModified = m_isModified;
     newFib->m_NumFibers = m_NumFibers;
     newFib->UpdateFiberGeometry();
 
@@ -117,7 +117,10 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GenerateNewFiberBundleByIds(std
     std::vector<long>::iterator finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
     {
-        //        MITK_INFO << *finIt;
+        if (*finIt < 0){
+            MITK_INFO << "!!!!!! ERROR !!!!!! ERROR !!!!!\n=======================\nERROR, fiberID can not be negative!!! check id Extraction!" << *finIt;
+            break;
+        }
         vtkSmartPointer<vtkCell> fiber = m_FiberIdDataSet->GetCell(*finIt);//->DeepCopy(fiber);
         vtkSmartPointer<vtkPoints> fibPoints = fiber->GetPoints();
 
@@ -301,7 +304,7 @@ void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, 
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
 
-//    m_isModified = true;
+    //    m_isModified = true;
 }
 
 /*
@@ -535,7 +538,7 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
 
             MITK_INFO << "resize Vector";
             long i=0;
-            while (AND_Assamblage[i] != -1){ //-1 represents a placeholder in the array
+            while (i < AND_Assamblage.size() && AND_Assamblage[i] != -1){ //-1 represents a placeholder in the array
                 ++i;
             }
             AND_Assamblage.resize(i);
@@ -548,10 +551,78 @@ std::vector<long> mitk::FiberBundleX::DoExtractFiberIds(mitk::PlanarFigure::Poin
         case 1:
         {
             //OR
+            //temporarly store results of the child in this vector, we need that to accumulate the
+            std::vector<long> childResults = this->DoExtractFiberIds(pfcomp->getChildAt(0));
+            MITK_INFO << "first roi got fibers in ROI: " << childResults.size();
+            MITK_INFO << "sorting...";
+            std::sort(childResults.begin(), childResults.end());
+            MITK_INFO << "sorting done";
+            std::vector<long> OR_Assamblage;
+            OR_Assamblage.resize(childResults.size(), -1);
+        MITK_INFO << OR_Assamblage.size();
+
+            std::vector<long>::iterator it;
+            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
+            {
+                std::vector<long> tmpChild = this->DoExtractFiberIds(pfcomp->getChildAt(i));
+                MITK_INFO << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
+                sort(tmpChild.begin(), tmpChild.end());
+                OR_Assamblage.resize(tmpChild.size(), -1);
+                it = std::set_union(childResults.begin(), childResults.end(),
+                                    tmpChild.begin(), tmpChild.end(),
+                                    OR_Assamblage.begin() );
+            }
+
+
+            //            MITK_INFO << "resize Vector";
+            //            long i=0;
+            //            while (i < OR_Assamblage.size() && OR_Assamblage[i] != -1){ //-1 represents a placeholder in the array
+            //                ++i;
+            //            }
+            //            OR_Assamblage.resize(i);
+
+            MITK_INFO << "returning OR vector, size: " << OR_Assamblage.size();
+            return OR_Assamblage;
         }
         case 2:
         {
             //NOT
+            //get IDs of all fibers
+            std::vector<long> childResults;
+            childResults.reserve(this->GetNumFibers());
+            vtkSmartPointer<vtkDataArray> idSet = m_FiberIdDataSet->GetCellData()->GetArray(FIBER_ID_ARRAY);
+            MITK_INFO << "m_NumOfFib: " << this->GetNumFibers() << " cellIdNum: " << idSet->GetNumberOfTuples();
+            for(long i=0; i<this->GetNumFibers(); i++)
+            {
+                MITK_INFO << "i: " << i << " idset: " << idSet->GetTuple(i);
+                childResults.push_back(idSet->GetTuple(i)[0]);
+            }
+
+            std::sort(childResults.begin(), childResults.end());
+            std::vector<long> NOT_Assamblage(childResults.size());
+            //fill it with -1, otherwise 0 will be stored and 0 can also be an ID of fiber!
+            fill(NOT_Assamblage.begin(), NOT_Assamblage.end(), -1);
+            std::vector<long>::iterator it;
+
+            for (long i=0; i<pfcomp->getNumberOfChildren(); ++i)
+            {
+                std::vector<long> tmpChild = DoExtractFiberIds(pfcomp->getChildAt(i));
+                sort(tmpChild.begin(), tmpChild.end());
+
+                it = std::set_difference(childResults.begin(), childResults.end(),
+                                         tmpChild.begin(), tmpChild.end(),
+                                         NOT_Assamblage.begin() );
+
+            }
+
+            MITK_INFO << "resize Vector";
+            long i=0;
+            while (NOT_Assamblage[i] != -1){ //-1 represents a placeholder in the array
+                ++i;
+            }
+            NOT_Assamblage.resize(i);
+
+            return NOT_Assamblage;
         }
         default:
             MITK_INFO << "we have an UNDEFINED composition... ERROR" ;

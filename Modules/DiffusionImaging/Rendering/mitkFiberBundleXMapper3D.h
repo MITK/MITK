@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSmartPointer.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLActor.h>
+#include <vtkLookupTable.h>
 
 
 
@@ -89,6 +90,8 @@ protected:
 
     void UpdateVtkObjects(); //??
 
+private:
+    vtkSmartPointer<vtkLookupTable> m_lut;
     
 
 };

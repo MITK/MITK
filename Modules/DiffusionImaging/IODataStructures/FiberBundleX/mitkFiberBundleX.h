@@ -27,6 +27,7 @@
 //includes for MITK datastructure
 #include <mitkBaseData.h>
 #include "MitkDiffusionImagingExports.h"
+#include <mitkImage.h>
 
 
 //includes storing fiberdata
@@ -72,24 +73,21 @@ namespace mitk {
 
     char* GetCurrentColorCoding();
     void SetColorCoding(const char*);
-//    bool isFiberBundleXModified();
-//    void setFBXModificationDone();
 
     QStringList GetAvailableColorCodings();
     void DoColorCodingOrientationbased();
+    void SetFAMap(mitk::Image::Pointer);
+    void DoUseFAasColorOpacity();
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
     void ResampleFibers();
     std::vector<long> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
-//    mitk::FiberBundleX::Pointer GenerateNewFiberBundleByIds( std::vector<unsigned long> );
     vtkSmartPointer<vtkPolyData> GenerateNewFiberBundleByIds( std::vector<long> );
 
     itkGetMacro(NumFibers, int);
 
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
-//    /** \brief Timestamp of last update of stored data. */
-//    itk::TimeStamp m_LastUpdateTime;
 
   protected:
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
@@ -98,7 +96,6 @@ namespace mitk {
     itk::Point<float, 3> GetItkPoint(double point[3]);
 
   private:
-
     // actual fiber container
     vtkSmartPointer<vtkPolyData> m_FiberPolyData;
 
@@ -106,9 +103,10 @@ namespace mitk {
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
 
     char* m_currentColorCoding;
-//    bool m_isModified;
     int m_NumFibers;
+
   };
+
 } // namespace mitk
 
 #endif /*  _MITK_FiberBundleX_H */

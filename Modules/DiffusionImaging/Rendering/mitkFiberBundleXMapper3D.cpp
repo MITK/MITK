@@ -18,23 +18,21 @@
 
 
 #include "mitkFiberBundleXMapper3D.h"
-
 #include <mitkProperties.h>
 //#include <mitkFiberBundleInteractor.h>
 //#include <mitkGlobalInteraction.h>
 
-
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
-#include <vtkLookupTable.h>
 
 //not essential for mapper
 #include <QTime>
 
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 {
-
+    m_lut = vtkLookupTable::New();
+    m_lut->Build();
 }
 
 
@@ -93,13 +91,16 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     if (FBX->GetCurrentColorCoding() != NULL){
         localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
-        if(FBX->GetCurrentColorCoding() == "custom"){
+
+        if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM){
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
     }
+
+    localStorage->m_FiberMapper->SetLookupTable(m_lut);
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();
     //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.

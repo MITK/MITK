@@ -36,6 +36,7 @@
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
+const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
 const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FA_VALUE_ARRAY = "FA_Values";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";

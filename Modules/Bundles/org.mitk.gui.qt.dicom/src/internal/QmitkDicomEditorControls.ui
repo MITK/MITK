@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MITKDICOMControls</class>
- <widget class="QWidget" name="MITKDICOMControls">
+ <class>QmitkDicomEditorControls</class>
+ <widget class="QWidget" name="QmitkDicomEditorControls">
   <property name="geometry">
    <rect>
     <x>0</x>

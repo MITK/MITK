@@ -19,6 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryUIException.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include <berryIPartListener.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkDataStorageEditorInput.h>
+#include "berryFileEditorInput.h"
 
 // Qmitk
 #include "QmitkDicomEditor.h"
@@ -30,6 +37,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QWidget>
 #include <QtSql>
 #include <QSqlDatabase>
+#include <QtCore/QVariant>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QGridLayout>
+#include <QtGui/QHeaderView>
+#include <QtGui/QPushButton>
+#include <QtGui/QTextEdit>
+#include <QtGui/QWidget>
 
 //CTK
 #include <ctkDICOMModel.h>
@@ -39,11 +55,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkDICOMQueryRetrieveWidget.h>
 
 
-const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.mitkdicomeditor";
+const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 
 
 QmitkDicomEditor::QmitkDicomEditor()
-: QmitkFunctionality()
 {
 }
 
@@ -139,4 +154,22 @@ void QmitkDicomEditor::openImportDialog(){
 }
 void QmitkDicomEditor::openQueryDialog(){
 
+}
+
+void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
+{
+  if (input.Cast<berry::FileEditorInput>().IsNull())
+     throw berry::PartInitException("Invalid Input: Must be FileEditorInput");
+
+  this->SetSite(site);
+  this->SetInput(input);
+}
+
+void QmitkDicomEditor::SetFocus()
+{
+}
+
+berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
+{
+  return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }

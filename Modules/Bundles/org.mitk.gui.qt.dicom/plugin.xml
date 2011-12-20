@@ -2,7 +2,7 @@
 <plugin>
   <extension point="org.blueberry.ui.editors">
     <editor
-      id="org.mitk.editors.mitkdicomeditor"
+      id="org.mitk.editors.dicomeditor"
       name="MITK DICOM Editor"
       class="QmitkDicomEditor"
       icon="resources/icon.xpm" >

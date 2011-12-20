@@ -50,9 +50,10 @@ namespace mitk {
 
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
+    static const char* COLORCODING_FA_AS_OPACITY;
     static const char* COLORCODING_CUSTOM;
-    static const char* FIBER_ID_ARRAY;
     static const char* FA_VALUE_ARRAY;
+    static const char* FIBER_ID_ARRAY;
 
     virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
@@ -78,6 +79,7 @@ namespace mitk {
     void DoColorCodingOrientationbased();
     void SetFAMap(mitk::Image::Pointer);
     void DoUseFAasColorOpacity();
+    void ResetFiberColorOpacity();
     void DoGenerateFiberIds();
     void ResampleFibers(float len);
     void ResampleFibers();

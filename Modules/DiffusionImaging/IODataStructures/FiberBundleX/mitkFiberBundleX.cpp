@@ -487,6 +487,13 @@ void mitk::FiberBundleX::DoUseFAasColorOpacity()
 
 }
 
+void mitk::FiberBundleX::ResetFiberColorOpacity() {
+    vtkUnsignedCharArray* ColorArray = dynamic_cast<vtkUnsignedCharArray*>  (m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED));
+    for(long i=0; i<ColorArray->GetNumberOfTuples(); i++) {
+      ColorArray->SetComponent(i,3, 255.0 );
+    }
+}
+
 void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 {
 

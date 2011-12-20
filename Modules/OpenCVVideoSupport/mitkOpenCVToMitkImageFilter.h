@@ -52,6 +52,9 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     itkSetObjectMacro(OpenCVImage, const IplImage);
     itkGetMacro(OpenCVImage, const IplImage*);
 
+    itkSetMacro(CopyBuffer, bool);
+    itkGetMacro(CopyBuffer, bool);
+
     virtual DataObjectPointer MakeOutput(unsigned int idx);
     OutputImageType* GetOutput(unsigned int idx);
 
@@ -65,6 +68,7 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
 protected:
     mitk::Image::Pointer m_Image;
     const IplImage* m_OpenCVImage;
+    bool m_CopyBuffer;
 };
 
 } // namespace

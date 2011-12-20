@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkITKImageImport.txx>
 
 mitk::OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
-: m_OpenCVImage(0)
+: m_OpenCVImage(0), m_CopyBuffer(true)
 {
 }
 
@@ -47,31 +47,31 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
 
   // now convert rgb image
   if( (m_OpenCVImage->depth>=0) && ((unsigned int)m_OpenCVImage->depth == IPL_DEPTH_8S) && (m_OpenCVImage->nChannels == 1) )
-    m_Image = ConvertIplToMitkImage< char, 2>( m_OpenCVImage );
+    m_Image = ConvertIplToMitkImage< char, 2>( m_OpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_8U && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned char, 2>( m_OpenCVImage );
+    m_Image = ConvertIplToMitkImage< unsigned char, 2>( m_OpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_8U && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( rgbOpenCVImage );
+    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( rgbOpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_16U && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned short, 2>( m_OpenCVImage );
+    m_Image = ConvertIplToMitkImage< unsigned short, 2>( m_OpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_16U && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( rgbOpenCVImage );
+    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( rgbOpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_32F && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< float, 2>( m_OpenCVImage );
+    m_Image = ConvertIplToMitkImage< float, 2>( m_OpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_32F && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( rgbOpenCVImage );
+    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( rgbOpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< double, 2>( m_OpenCVImage );
+    m_Image = ConvertIplToMitkImage< double, 2>( m_OpenCVImage, m_CopyBuffer );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( rgbOpenCVImage );
+    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( rgbOpenCVImage, m_CopyBuffer );
 
   cvReleaseImage(&rgbOpenCVImage);
 }
@@ -131,16 +131,19 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
   const unsigned int numberOfPixels = size[0] * size[1];
   const unsigned int numberOfBytes = numberOfPixels * sizeof( TPixel );
 
+   
+
   if( copyBuffer )
   {
     const bool importImageFilterWillOwnTheBuffer = false;
 
-    TPixel * localBuffer = new TPixel[numberOfPixels];
+     TPixel * localBuffer = new TPixel[numberOfPixels];
 
     memcpy(localBuffer, input->imageData, numberOfBytes);
 
     importFilter->SetImportPointer( localBuffer, numberOfPixels,
       importImageFilterWillOwnTheBuffer );
+
   }
   else
   {

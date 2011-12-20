@@ -35,6 +35,13 @@ namespace mitk {
     public:
       mitkClassMacro(USImageMetadata,itk::Object);
       itkNewMacro(Self);
+    
+      //## getter and setter ##
+      //NavigationToolType:
+      itkGetMacro(Device,std::string);
+      itkSetMacro(Device,std::string);
+      itkGetMacro(Probe,std::string);
+      itkSetMacro(Probe,std::string);
 
     protected:
       USImageMetadata();
@@ -43,12 +50,7 @@ namespace mitk {
       std::string m_Device;
       std::string m_Probe;
 
-    //## getter and setter ##
-    //NavigationToolType:
-    itkGetMacro(Device,std::string);
-    itkSetMacro(Device,std::string);
-    itkGetMacro(Probe,std::string);
-    itkSetMacro(Probe,std::string);
+    
 
     };
 } // namespace mitk

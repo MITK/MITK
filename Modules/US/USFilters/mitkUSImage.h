@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include <mitkImage.h>
+#include <mitkUSImageMetadata.h>
 
 namespace mitk {
 
@@ -38,6 +39,12 @@ namespace mitk {
     protected:
       USImage();
       virtual ~USImage();
+      USImageMetadata m_Metadata;
+      
+      
+      //itkGetMacro(Metadata,USImageMetadata);   
+      //itkSetMacro(Metadata,USImageMetadata);
+
 
     };
 } // namespace mitk

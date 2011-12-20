@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKUSIMAGE_H_HEADER_INCLUDED_
-#define MITKUSIMAGE_H_HEADER_INCLUDED_
+#ifndef MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
+#define MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>

@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MITKDICOMControls</class>
+ <widget class="QWidget" name="MITKDICOMControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>752</width>
+    <height>696</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout_2">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QFrame" name="importControlFrame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="folderButton">
+           <property name="text">
+            <string>Folder</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cdButton">
+           <property name="text">
+            <string>CD</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="queryRetrieveButton">
+           <property name="text">
+            <string>Query/Retrieve</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="externalDataFrame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="1" column="1">
+          <widget class="QDockWidget" name="externalDataDockWidget">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="features">
+            <set>QDockWidget::AllDockWidgetFeatures</set>
+           </property>
+           <widget class="QWidget" name="externalDataDockWidgetContents">
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QGroupBox" name="externalFilesGroupBox">
+               <property name="title">
+                <string>External Dicom Data</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_10">
+                <item>
+                 <widget class="QFrame" name="itemOperationsFrame">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <widget class="QPushButton" name="viewButton">
+                     <property name="text">
+                      <string>View</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="downloadButton">
+                     <property name="text">
+                      <string>Download</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButton_2">
+                     <property name="text">
+                      <string>Cancel</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_3">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="QueryLayout_2" stretch="1,0">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>12</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>12</number>
+                  </property>
+                  <item>
+                   <widget class="QTreeView" name="TreeView_2">
+                    <property name="alternatingRowColors">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="searchOptionLayout_2">
+                    <property name="spacing">
+                     <number>6</number>
+                    </property>
+                    <item>
+                     <widget class="QDockWidget" name="SearchDockWidget_2">
+                      <property name="floating">
+                       <bool>false</bool>
+                      </property>
+                      <property name="features">
+                       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+                      </property>
+                      <property name="windowTitle">
+                       <string/>
+                      </property>
+                      <widget class="QWidget" name="dockWidgetContents_2">
+                       <layout class="QVBoxLayout" name="verticalLayout_6">
+                        <item>
+                         <widget class="ctkDICOMQueryWidget" name="SearchOption_2" native="true">
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="VerticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDockWidget" name="queryRetrieveDockWidget">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="features">
+            <set>QDockWidget::AllDockWidgetFeatures</set>
+           </property>
+           <widget class="QWidget" name="queryRetrieveDockWidgetContents">
+            <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="ctkDICOMQueryRetrieveWidget" name="m_ctkDICOMQueryRetrieveWidget" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="internalDataFrame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QGroupBox" name="localFilesGroupBox">
+           <property name="title">
+            <string>Local Dicom Storage</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <layout class="QHBoxLayout" name="QueryLayout" stretch="1,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>12</number>
+              </property>
+              <property name="rightMargin">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QTreeView" name="TreeView">
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="searchOptionLayout">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <item>
+                 <widget class="QDockWidget" name="SearchDockWidget">
+                  <property name="floating">
+                   <bool>false</bool>
+                  </property>
+                  <property name="features">
+                   <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+                  </property>
+                  <property name="windowTitle">
+                   <string/>
+                  </property>
+                  <widget class="QWidget" name="dockWidgetContents">
+                   <layout class="QVBoxLayout" name="verticalLayout_5">
+                    <item>
+                     <widget class="ctkDICOMQueryWidget" name="SearchOption" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="VerticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ctkDICOMQueryRetrieveWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkdicomqueryretrievewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkDICOMQueryWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkdicomquerywidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cdButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>externalDataDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>415</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>folderButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>externalDataDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>415</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>queryRetrieveButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>queryRetrieveDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>117</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

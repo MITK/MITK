@@ -4,16 +4,16 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  MITKDICOM.cpp
+  QmitkDicomEditor.cpp
 )
 
 set(UI_FILES
-  src/internal/MITKDICOMControls.ui
+  src/internal/QmitkDicomEditorControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/MITKDICOM.h
+  src/internal/QmitkDicomEditor.h
 )
 
 # list of resource files which can be used by the plug-in

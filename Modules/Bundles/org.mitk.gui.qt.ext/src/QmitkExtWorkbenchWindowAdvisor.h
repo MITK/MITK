@@ -156,6 +156,7 @@ private:
   QAction* imageNavigatorAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
+  QAction* openDicomEditorAction;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtPlugin>
 
-#include "MITKDICOM.h"
+#include "QmitkDicomEditor.h"
 
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(MITKDICOM, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomEditor, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

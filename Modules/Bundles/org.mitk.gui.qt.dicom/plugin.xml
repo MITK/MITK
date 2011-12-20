@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
-
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.mitkdicom"
-          name="MITK DICOM"
-          class="MITKDICOM"
-          icon="resources/icon.xpm" />
+  <extension point="org.blueberry.ui.editors">
+    <editor
+      id="org.mitk.editors.mitkdicomeditor"
+      name="MITK DICOM Editor"
+      class="QmitkDicomEditor"
+      icon="resources/icon.xpm" >
+    </editor>
   </extension>
-
 </plugin>

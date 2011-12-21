@@ -111,6 +111,7 @@ static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::
 
   image->SetProperty("image type", mitk::StringProperty::New("test image") );
   image->SetProperty("greetings", mitk::StringProperty::New("to mom") );
+  image->SetProperty("test_float_property", mitk::FloatProperty::New(-2.57f));
 
   mitk::DataNode::Pointer imagenode = mitk::DataNode::New();
   imagenode->SetData( image );
@@ -148,16 +149,22 @@ static void VerifyStorage(mitk::DataStorage* storage)
   mitk::DataNode::Pointer imagenode = storage->GetNamedNode("Pic3D");
   MITK_TEST_CONDITION_REQUIRED(imagenode.IsNotNull(),"Get previously stored image node");
 
-  //Image
-  std::string testString("");
-  imagenode->GetStringProperty("image type", testString);
-  MITK_TEST_CONDITION_REQUIRED(!(testString == "test image") ,"Get StringProperty from previously stored image node");
-
-  imagenode->GetStringProperty("greetings", testString);
-  MITK_TEST_CONDITION_REQUIRED(!(testString == "to mom") ,"Get another StringProperty from previously stored image node");
-
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(imagenode->GetData());
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image from Datastorage");
+
+  //Image
+  std::string testString("");
+  float testFloatValue = 0.0f;
+  mitk::PropertyList::Pointer imagePropList = image->GetPropertyList();
+
+  imagePropList->GetStringProperty("image type", testString);
+  MITK_TEST_CONDITION(testString == "test image" ,"Get StringProperty from previously stored image");
+
+  imagePropList->GetStringProperty("greetings", testString);
+  MITK_TEST_CONDITION(testString == "to mom" ,"Get another StringProperty from previously stored image");
+
+  imagePropList->GetFloatProperty("test_float_property", testFloatValue);
+  MITK_TEST_CONDITION(testFloatValue == -2.57f, "Get FloatProperty from previously stored image.")
 
   //Get Image child node
   mitk::DataNode::Pointer imagechildnode = storage->GetNamedNode("Pic3D again");
@@ -173,15 +180,16 @@ static void VerifyStorage(mitk::DataStorage* storage)
   mitk::DataNode::Pointer surfacenode = storage->GetNamedNode("binary");
   MITK_TEST_CONDITION_REQUIRED(surfacenode.IsNotNull(),"Get previously stored surface node");
 
-  surfacenode->GetStringProperty("surface type", testString);
-  MITK_TEST_CONDITION_REQUIRED(!(testString.compare("test surface") == 0) ,"Get StringProperty from previously stored surface node");
-
-  surfacenode->GetStringProperty("greetings", testString);
-  MITK_TEST_CONDITION_REQUIRED(!(testString.compare("to dad") == 0) ,"Get another StringProperty from previously stored surface node");
-
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(surfacenode->GetData());
   MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Loading test surface from Datastorage");
 
+  // Get the property list and test the properties
+  mitk::PropertyList::Pointer surfacePropList = surface->GetPropertyList();
+  surfacePropList->GetStringProperty("surface type", testString);
+  MITK_TEST_CONDITION((testString.compare("test surface") == 0) ,"Get StringProperty from previously stored surface node");
+
+  surfacePropList->GetStringProperty("greetings", testString);
+  MITK_TEST_CONDITION((testString.compare("to dad") == 0) ,"Get another StringProperty from previously stored surface node");
 
   //PointSet
   mitk::DataNode::Pointer pointsnode = storage->GetNamedNode("points");

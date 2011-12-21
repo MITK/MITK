@@ -49,7 +49,6 @@ private:
   void init ( berry::IWorkbenchWindow::Pointer window );
   berry::IWorkbenchWindow::Pointer m_Window;
   berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
-  berry::SmartPointer<QmitkPythonEditor> m_DicomEditor;
 };
 
 

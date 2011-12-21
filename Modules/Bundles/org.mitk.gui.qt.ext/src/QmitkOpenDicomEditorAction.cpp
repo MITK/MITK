@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkStdMultiWidgetEditor.h"
-#include "QmitkDicomEditor.h"
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
@@ -110,6 +109,6 @@ void QmitkOpenDicomEditorAction::Run()
         multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
     }
 
-    m_DicomEditor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkDicomEditor::EDITOR_ID, true, berry::IWorkbenchPage::MATCH_NONE).Cast<QmitkDicomEditor>();
+    this->GetSite()->GetPage()->OpenEditor(editorInput, "org.mitk.editors.pythoneditor", true, berry::IWorkbenchPage::MATCH_NONE);
 }
 

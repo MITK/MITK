@@ -51,6 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
+#include <QmitkOpenDicomEditorAction.h>
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
@@ -439,9 +440,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QMenu* fileMenu = menuBar->addMenu("&File");
  fileMenu->setObjectName("FileMenu");
 
- openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
- openDicomEditorAction->setIcon(QIcon(":/org.mitk.gui.qt.dicomeditor/resources/icon.xpm"));
- fileMenu->addAction(openDicomEditorAction);
  QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
  fileMenu->addAction(fileOpenAction);
  fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
@@ -454,6 +452,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QAction* fileExitAction = new QmitkFileExitAction(window);
  fileExitAction->setObjectName("QmitkFileExitAction");
  fileMenu->addAction(fileExitAction);
+
+  QAction* openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ openDicomEditorAction->setIcon(QIcon(":/org.mitk.gui.qt.dicomeditor/resources/icon.xpm"));
+ fileMenu->addAction(openDicomEditorAction);
 
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();

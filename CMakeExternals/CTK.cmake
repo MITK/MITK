@@ -15,7 +15,7 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag c84cfa3c)
+    SET(revision_tag 436795b904f69929149d3cdb7c4352516a1a85cd)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()
@@ -26,7 +26,6 @@ IF(MITK_USE_CTK)
 	       -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
 	      )
     ENDIF()
-
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})

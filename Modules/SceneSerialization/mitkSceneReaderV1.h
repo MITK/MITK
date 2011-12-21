@@ -43,6 +43,13 @@ class SceneReaderV1 : public SceneReader
     */
     bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
 
+    /**
+      \brief reads all properties assigned to a base data element and assigns the list to the base data object
+
+      The baseDataNodeElem is supposed to be the <properties file="..."> element.
+    */
+    bool DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement* baseDataNodeElem, const std::string& workingDir);
+
     typedef std::map<DataNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;

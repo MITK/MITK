@@ -41,7 +41,13 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - if serializer could be created, use it to read the file into a BaseData object
     //        - if successful, call the new node's SetData(..)
     DataNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
-   
+
+    TiXmlElement *baseDataElement = element->FirstChildElement("data")->FirstChildElement("properties");
+    if( baseDataElement )
+    {
+      DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
+    }
+
     //   2. check child nodes
     const char* uida = element->Attribute("UID");
     std::string uid("");
@@ -248,6 +254,49 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
       MITK_ERROR << "Found properties for renderer " << renderwindow << " but there is no such renderer in current application. Ignoring those properties";
       error = true;
     }
+  }
+
+  return !error;
+}
+
+bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement *baseDataNodeElem, const std::string &workingDir)
+{
+  // check given variables, initialize error variable
+  assert(baseDataNodeElem);
+  bool error(false);
+
+  // get the file name stored in the <properties ...> tag
+  const char* baseDataPropertyFile( baseDataNodeElem->Attribute("file") );
+  // check if the filename was found
+  if(baseDataPropertyFile)
+  {
+    //PropertyList::Pointer dataPropList = data->GetPropertyList();
+
+    PropertyListDeserializer::Pointer propertyDeserializer = PropertyListDeserializer::New();
+
+    // initialize the property reader
+    propertyDeserializer->SetFilename(workingDir + Poco::Path::separator() + baseDataPropertyFile);
+    bool ioSuccess = propertyDeserializer->Deserialize();
+    error = !ioSuccess;
+
+    // get the output
+    PropertyList::Pointer inProperties = propertyDeserializer->GetOutput();
+
+    // store the read-in properties to the given node or throw error otherwise
+    if( inProperties.IsNotNull() )
+    {
+      data->SetPropertyList( inProperties );
+    }
+    else
+    {
+      MITK_ERROR << "The property deserializer did not return a (valid) property list.";
+      error = true;
+    }
+  }
+  else
+  {
+    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element does not contain a 'file' attribute. \n";
+    error = true;
   }
 
   return !error;

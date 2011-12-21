@@ -184,6 +184,11 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     fwProps.insert("org.commontk.pluginfw.debug.lazy_activation", true);
     fwProps.insert("org.commontk.pluginfw.debug.resolve", true);
   }
+  if (this->GetConfiguration().hasProperty(Platform::ARG_PRELOAD_LIBRARY))
+  {
+    QString preloadLibs = QString::fromStdString(this->GetConfiguration().getString(Platform::ARG_PRELOAD_LIBRARY));
+    fwProps.insert(ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES, preloadLibs.split(',', QString::SkipEmptyParts));
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
@@ -524,6 +529,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   forcePluginOption.binding(Platform::ARG_FORCE_PLUGIN_INSTALL);
   options.addOption(forcePluginOption);
 
+  Poco::Util::Option preloadLibsOption(Platform::ARG_PRELOAD_LIBRARY, "", "preload a library");
+  preloadLibsOption.argument("<library>").repeatable(true).callback(Poco::Util::OptionCallback<InternalPlatform>(this, &InternalPlatform::handlePreloadLibraryOption));
+  options.addOption(preloadLibsOption);
+
   Poco::Util::Option testPluginOption(Platform::ARG_TESTPLUGIN, "", "the plug-in to be tested");
   testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);
   options.addOption(testPluginOption);
@@ -537,6 +546,16 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   options.addOption(xargsOption);
 
   Poco::Util::Application::defineOptions(options);
+}
+
+void InternalPlatform::handlePreloadLibraryOption(const std::string& name, const std::string& value)
+{
+  std::string oldVal;
+  if (this->config().hasProperty(Platform::ARG_PRELOAD_LIBRARY))
+  {
+    oldVal = this->config().getString(Platform::ARG_PRELOAD_LIBRARY);
+  }
+  this->config().setString(Platform::ARG_PRELOAD_LIBRARY, oldVal + "," + value);
 }
 
 int InternalPlatform::main(const std::vector<std::string>& args)

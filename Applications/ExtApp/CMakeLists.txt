@@ -5,6 +5,11 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
+# Create a cache entry for the provisioning file which is used to export
+# the file name in the MITKConfig.cmake file. This will keep external projects
+# which rely on this file happy.
+set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning" CACHE INTERNAL "ExtApp provisioning file" FORCE)
+
 # Plug-ins listed below will not be
 #  - added as a build-time dependency to the executable
 #  - listed in the provisioning file for the executable
@@ -29,7 +34,3 @@ if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(ExtApp ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
 
-# Create a cache entry for the provisioning file which is used to export
-# the file name in the MITKConfig.cmake file. This will keep external projects
-# which rely on this file happy.
-set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning" CACHE INTERNAL "ExtApp provisioning file" FORCE)

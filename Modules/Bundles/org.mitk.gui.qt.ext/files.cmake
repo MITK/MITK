@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
   QmitkExtFileOpenAction.cpp
   QmitkExtDnDFrameWidget.cpp
   QmitkExtFileSaveProjectAction.cpp
+  QmitkOpenDicomEditorAction.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -29,6 +30,7 @@ SET(MOC_H_FILES
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
   src/internal/QmitkInputDevicesPrefPage.h
   src/internal/QmitkModuleView.h
+  src/QmitkOpenDicomEditorAction.h
 )
 
 SET(CACHED_RESOURCE_FILES

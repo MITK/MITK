@@ -394,7 +394,7 @@ void InternalPlatform::Shutdown()
   this->uninitialize();
 
   // wait 10 seconds for the CTK plugin framework to stop
-  ctkPluginFW->waitForStop(30000);
+  ctkPluginFW->waitForStop(10000);
 
   {
     Poco::Mutex::ScopedLock lock(m_Mutex);

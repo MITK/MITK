@@ -228,7 +228,7 @@ public:
      {
       i.next()->setEnabled(true);
      }
-
+     windowAdvisor->openDicomEditorAction->setEnabled(true);
      windowAdvisor->fileSaveProjectAction->setEnabled(true);
      windowAdvisor->closeProjectAction->setEnabled(true);
      windowAdvisor->undoAction->setEnabled(true);
@@ -265,6 +265,7 @@ public:
       i.next()->setEnabled(false);
      }
 
+     windowAdvisor->openDicomEditorAction->setEnabled(false);
      windowAdvisor->fileSaveProjectAction->setEnabled(false);
      windowAdvisor->closeProjectAction->setEnabled(false);
      windowAdvisor->undoAction->setEnabled(false);
@@ -438,6 +439,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QMenu* fileMenu = menuBar->addMenu("&File");
  fileMenu->setObjectName("FileMenu");
 
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ openDicomEditorAction->setIcon(QIcon(":/org.mitk.gui.qt.dicomeditor/resources/icon.xpm"));
+ fileMenu->addAction(openDicomEditorAction);
  QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
  fileMenu->addAction(fileOpenAction);
  fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
@@ -505,6 +509,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
+  mainActionsToolBar->addAction(openDicomEditorAction);
  if (imageNavigatorViewFound)
  {
    mainActionsToolBar->addAction(imageNavigatorAction);

@@ -42,9 +42,13 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - if successful, call the new node's SetData(..)
     DataNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
 
-    TiXmlElement *baseDataElement = element->FirstChildElement("data")->FirstChildElement("properties");
-    if( baseDataElement )
+    // create a node for the tag "data" and test if node was created
+    // in case dataXmlElement is valid test whether it containts the "properties" child tag
+    // and process further if and only if yes
+    TiXmlElement *dataXmlElement = element->FirstChildElement("data");
+    if( dataXmlElement && dataXmlElement->FirstChildElement("properties") )
     {
+      TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
       DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
     }
 

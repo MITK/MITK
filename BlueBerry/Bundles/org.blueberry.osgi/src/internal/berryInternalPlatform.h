@@ -88,6 +88,9 @@ private:
 
   // Poco::Application method overrides
   void defineOptions(Poco::Util::OptionSet& options);
+
+  void handlePreloadLibraryOption(const std::string &name, const std::string &value);
+
   int main(const std::vector<std::string>& args);
 
   void uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext);

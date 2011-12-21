@@ -5,7 +5,13 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
+# Create a cache entry for the provisioning file which is used to export
+# the file name in the MITKConfig.cmake file. This will keep external projects
+# which rely on this file happy.
+set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning" CACHE INTERNAL "CoreApp provisioning file" FORCE)
+
 set(_plugins
+  org.blueberry.compat
   org.mitk.gui.qt.application
 )
 
@@ -22,11 +28,6 @@ FunctionCreateBlueBerryApplication(
   PLUGINS ${_plugins}
   ${_app_options}
 )
-
-# Create a cache entry for the provisioning file which is used to export
-# the file name in the MITKConfig.cmake file. This will keep external projects
-# which rely on this file happy.
-set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning" CACHE INTERNAL "CoreApp provisioning file" FORCE)
 
 # subproject support
 ADD_DEPENDENCIES(MITK-CoreUI CoreApp)

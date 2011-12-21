@@ -43,9 +43,21 @@ typename S::Pointer ServiceRegistry::GetServiceById(const std::string& id)
   {
     // Try to get the service from the CTK Service Registry
     ctkPluginContext* context = CTKPluginActivator::getPluginContext();
+    if (context == 0)
+    {
+      // The org.blueberry.osgi plug-in was not started by the CTK Plugin Framework.
+      // This is considered a fatal error.
+      BERRY_FATAL << "The org.blueberry.osgi plug-in is not started. "
+                     "Check that your application loads the correct provisioning "
+                     "file and that it contains an entry for the org.blueberry.osgi plug-in.";
+      return SmartPointer<S>();
+    }
+
     try
     {
       ctkServiceReference serviceRef = context->getServiceReference<S>();
+      if (!serviceRef) return SmartPointer<S>();
+
       S* service = context->getService<S>(serviceRef);
       if (!service)
       {

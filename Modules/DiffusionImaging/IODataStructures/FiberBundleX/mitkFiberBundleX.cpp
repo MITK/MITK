@@ -35,10 +35,9 @@
 #include <vtkDoubleArray.h>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
-const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "Color_FA";
 const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
-const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FA_VALUE_ARRAY = "FA_Values";
+const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
 
@@ -459,14 +458,21 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
       - this is more relevant for renderer than for fiberbundleX datastructure
       - think about sourcing this to a explicit method which coordinates colorcoding */
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-    //m_isModified = true;
     //  ===========================
 
     //mini test, shall be ported to MITK TESTINGS!
-    if (colorsT->GetSize() != numOfPoints*componentSize) {
+    if (colorsT->GetSize() != numOfPoints*componentSize)
         MITK_INFO << "ALLOCATION ERROR IN INITIATING COLOR ARRAY";
-    }
 
+
+}
+
+void mitk::FiberBundleX::DoColorCodingFAbased()
+{
+    if(!m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
+        return;
+
+    this->SetColorCoding(FA_VALUE_ARRAY);
 }
 
 void mitk::FiberBundleX::DoUseFAasColorOpacity()
@@ -486,6 +492,7 @@ void mitk::FiberBundleX::DoUseFAasColorOpacity()
       ColorArray->SetComponent(i,3, faValue );
     }
 
+    this->SetColorCoding(COLORCODING_FA_AS_OPACITY);
 }
 
 void mitk::FiberBundleX::ResetFiberColorOpacity() {
@@ -520,6 +527,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
     }
 
     m_FiberPolyData->GetPointData()->AddArray(faValues);
+    this->DoGenerateFiberIds();
 }
 
 void mitk::FiberBundleX::DoGenerateFiberIds()
@@ -1001,29 +1009,26 @@ char* mitk::FiberBundleX::GetCurrentColorCoding()
 
 void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
 {
+
     if (requestedColorCoding==NULL)
         return;
+    MITK_INFO << "SetColorCoding:" << requestedColorCoding;
 
-    if(strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )    {
+    if( strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )    {
         this->m_currentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
-    } else if(strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
-        this->m_currentColorCoding = (char*) COLORCODING_FA_BASED;
-    } else if(strcmp (COLORCODING_CUSTOM,requestedColorCoding) ) {
+
+    } else if( strcmp (FA_VALUE_ARRAY,requestedColorCoding) == 0 ) {
+        this->m_currentColorCoding = (char*) FA_VALUE_ARRAY;
+
+    } else if( strcmp (COLORCODING_CUSTOM,requestedColorCoding) == 0 ) {
         this->m_currentColorCoding = (char*) COLORCODING_CUSTOM;
+
     } else {
         MITK_INFO << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
-        this->m_currentColorCoding = "custom"; //will cause blank colorcoding of fibers
+        this->m_currentColorCoding = (char*) COLORCODING_CUSTOM; //will cause blank colorcoding of fibers
     }
 }
 
-//bool mitk::FiberBundleX::isFiberBundleXModified()
-//{
-//    return m_isModified;
-//}
-//void mitk::FiberBundleX::setFBXModificationDone()
-//{
-//    m_isModified = false;
-//}
 
 void mitk::FiberBundleX::ResampleFibers()
 {

@@ -101,6 +101,8 @@ namespace mitk {
     
     void UpdateShaderParameter(mitk::BaseRenderer*);
    
+  private:
+    vtkSmartPointer<vtkLookupTable> m_lut;
 
   };
 

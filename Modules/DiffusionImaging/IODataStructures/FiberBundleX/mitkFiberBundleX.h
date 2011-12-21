@@ -49,10 +49,9 @@ namespace mitk {
   public:
 
     static const char* COLORCODING_ORIENTATION_BASED;
-    static const char* COLORCODING_FA_BASED;
     static const char* COLORCODING_FA_AS_OPACITY;
-    static const char* COLORCODING_CUSTOM;
     static const char* FA_VALUE_ARRAY;
+    static const char* COLORCODING_CUSTOM;
     static const char* FIBER_ID_ARRAY;
 
     virtual void UpdateOutputInformation();
@@ -74,10 +73,11 @@ namespace mitk {
 
     char* GetCurrentColorCoding();
     void SetColorCoding(const char*);
+    void SetFAMap(mitk::Image::Pointer);
 
     QStringList GetAvailableColorCodings();
     void DoColorCodingOrientationbased();
-    void SetFAMap(mitk::Image::Pointer);
+    void DoColorCodingFAbased();
     void DoUseFAasColorOpacity();
     void ResetFiberColorOpacity();
     void DoGenerateFiberIds();

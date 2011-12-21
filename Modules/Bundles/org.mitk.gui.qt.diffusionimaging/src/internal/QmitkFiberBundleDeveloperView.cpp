@@ -152,8 +152,15 @@ void QmitkFiberColoringWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    //TODO check which colorcoding option is checked!
-    m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+    if(m_itemPackage.st_Controls->radioButton_ColorOrient->isChecked()) {
+        m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+
+    } else if(m_itemPackage.st_Controls->radioButton_ColorFA) {
+        m_itemPackage.st_FBX->DoColorCodingFAbased();
+
+    } else if(m_itemPackage.st_Controls->radioButton_OpacityFA) {
+        m_itemPackage.st_FBX->DoUseFAasColorOpacity();
+    }
 
 
     /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
@@ -642,8 +649,8 @@ QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
     //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
     delete m_hostThread;
-//    if (m_FiberIDGenerator != NULL)
-//        delete m_FiberIDGenerator;
+    //    if (m_FiberIDGenerator != NULL)
+    //        delete m_FiberIDGenerator;
 
     //    if (m_GeneratorFibersRandom != NULL)
     //        delete m_GeneratorFibersRandom;
@@ -1137,7 +1144,6 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
     return PDY;
 }
 
-
 vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDirectionZ()
 {
     vtkSmartPointer<vtkPolyData> PDZ = vtkSmartPointer<vtkPolyData>::New();
@@ -1147,7 +1153,6 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
 
     return PDZ;
 }
-
 
 void QmitkFiberBundleDeveloperView::DoColorFibers()
 {
@@ -1221,21 +1226,22 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
         m_Controls->ddAvailableColorcodings->removeItem(i);
     }
     //fill new data into menu
-    m_Controls->ddAvailableColorcodings->addItem("custom");
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
+    m_Controls->ddAvailableColorcodings->addItem(m_FiberBundleX->COLORCODING_CUSTOM);
 
 
     //highlight current colorcoding
     QString cc = m_FiberBundleX->GetCurrentColorCoding();
-    MITK_INFO << "current idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
+    MITK_INFO << cc.toStdString().c_str() << " is at idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
     m_Controls->ddAvailableColorcodings->setCurrentIndex( m_Controls->ddAvailableColorcodings->findText(cc) );
-
+    m_Controls->ddAvailableColorcodings->update();
 }
 
 
 void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
 {
     QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
+    MITK_INFO << "SetCurrentCC: " << selectedColorCoding.toStdString().c_str();
     m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
     // update rendering
     m_FiberBundleNode->Modified();
@@ -1435,7 +1441,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
 
         if (m_FiberBundleX.IsNotNull())
         {
-            if (m_Controls->tabColoring->isVisible()){
+            if (m_Controls->tabColoring->isVisible() ){
                 //show button colorCoding
                 m_Controls->buttonColorFibers->setEnabled(true);
                 m_Controls->ddAvailableColorcodings->setEnabled(true);
@@ -1610,9 +1616,9 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
             if ( m_Controls->page_FiberInfo->isVisible() )
                 FeedFiberInfoWidget();
 
-
             // enable FiberBundleX related Gui Elements, such as buttons etc.
-            FBXDependendGUIElementsConfigurator();
+            this->FBXDependendGUIElementsConfigurator();
+            this->DoGatherColorCodings();
 
         }
         /* CHECKPOINT: PLANARFIGURE */

@@ -40,7 +40,8 @@
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
 {
-
+    m_lut = vtkLookupTable::New();
+    m_lut->Build();
 
 }
 
@@ -171,16 +172,12 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
     ///THIS GET INPUT
     mitk::FiberBundleX* fbx = this->GetInput();
-    
-    vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
-    lut->Build();
-    localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
-
 
     // set color
     if (fbx->GetCurrentColorCoding() != NULL){
         localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX 2D: " << fbx->GetCurrentColorCoding();
+
         if(fbx->GetCurrentColorCoding() == fbx->COLORCODING_CUSTOM){
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
@@ -189,19 +186,14 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
         }
     }
 
-    localStorage->m_PointMapper->SetLookupTable(lut);  //apply the properties after the slice was set
-
-    //  feed the vtk fiber mapper with point data ...TODO do in constructor
+    localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
+    localStorage->m_PointMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
     localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
 
     // Applying shading properties
     {
-        //Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
-        // VTK Properties
-        //ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-        // Shaders
         mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
     }
 

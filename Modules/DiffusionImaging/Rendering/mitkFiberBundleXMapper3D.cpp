@@ -92,12 +92,14 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
         localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
 
-        if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM){
+        if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM) {
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
+
+
     }
 
     localStorage->m_FiberMapper->SetLookupTable(m_lut);

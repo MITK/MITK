@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>467</width>
-    <height>966</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,8 +31,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>500</width>
-        <height>449</height>
+        <width>428</width>
+        <height>540</height>
        </rect>
       </property>
       <attribute name="label">
@@ -466,8 +466,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>443</width>
-        <height>403</height>
+        <width>445</width>
+        <height>472</height>
        </rect>
       </property>
       <attribute name="label">
@@ -477,7 +477,7 @@
        <item row="0" column="1">
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabColoring">
           <attribute name="title">
@@ -512,7 +512,14 @@
                  <item row="1" column="0">
                   <widget class="QRadioButton" name="radioButton_ColorFA">
                    <property name="text">
-                    <string>FA based</string>
+                    <string>FA as Color</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QRadioButton" name="radioButton_OpacityFA">
+                   <property name="text">
+                    <string>FA as Opacity</string>
                    </property>
                   </widget>
                  </item>
@@ -1044,8 +1051,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>515</width>
-        <height>348</height>
+        <width>443</width>
+        <height>156</height>
        </rect>
       </property>
       <attribute name="label">

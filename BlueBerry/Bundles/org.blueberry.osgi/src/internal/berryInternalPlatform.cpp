@@ -178,6 +178,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   }
   if (this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG))
   {
+    fwProps.insert("org.commontk.pluginfw.debug.framework", true);
     fwProps.insert("org.commontk.pluginfw.debug.errors", true);
     fwProps.insert("org.commontk.pluginfw.debug.pluginfw", true);
     fwProps.insert("org.commontk.pluginfw.debug.lazy_activation", true);
@@ -191,6 +192,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   std::string provisioningFile = this->GetConfiguration().getString(Platform::ARG_PROVISIONING);
   if (!provisioningFile.empty())
   {
+    BERRY_INFO(m_ConsoleLog) << "Using provisioning file: " << provisioningFile;
     ProvisioningInfo provInfo(QString::fromStdString(provisioningFile));
     foreach(QString pluginPath, provInfo.getPluginDirs())
     {
@@ -207,6 +209,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       }
       try
       {
+        BERRY_INFO(m_ConsoleLog) << "Installing CTK plug-in from: " << pluginUrl.toString().toStdString();
         QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
         if (pluginsToStart.contains(pluginUrl))
         {
@@ -218,6 +221,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
         BERRY_ERROR << "Failed to install: " << pluginUrl.toString().toStdString() << ",\n" << e.what();
       }
     }
+  }
+  else
+  {
+    BERRY_INFO << "No provisioning file set.";
   }
 
   m_BaseStatePath = m_UserPath;
@@ -549,6 +556,8 @@ int InternalPlatform::main(const std::vector<std::string>& args)
   m_ctkPluginFrameworkFactory->getFramework()->start();
   foreach(long pluginId, m_CTKPluginsToStart)
   {
+    BERRY_INFO(m_ConsoleLog) << "Starting CTK plug-in: " << context->getPlugin(pluginId)->getSymbolicName().toStdString()
+                             << " [" << pluginId << "]";
     // do not change the autostart setting of this plugin
     context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
   }

@@ -41,7 +41,8 @@ mitk::PlanarFigureInteractor
 ::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
 : Interactor( type, dataNode ),
 m_Precision( 6.5 ),
-m_IsHovering( false )
+m_MinimumPointDistance( 25.0 ),
+m_IsHovering( false ),
 {
 }
 
@@ -53,6 +54,13 @@ void mitk::PlanarFigureInteractor::SetPrecision( mitk::ScalarType precision )
 {
   m_Precision = precision;
 }
+
+
+void mitk::PlanarFigureInteractor::SetMinimumPointDistance( ScalarType minimumDistance )
+{
+  m_MinimumPointDistance = minimumDistance;
+}
+
 
 // Overwritten since this class can handle it better!
 float mitk::PlanarFigureInteractor
@@ -920,7 +928,7 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
         double b = currentDisplayPosition[1] - previousDisplayPosition[1];
 
         // If point is to close, do not set a new point
-        tooClose = (a * a + b * b < 25.0);
+        tooClose = (a * a + b * b < m_MinimumPointDistance );
       }
       if ( tooClose )
         return false; // abort loop early

@@ -39,8 +39,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
   vtkSmartPointer<vtkPoints> newPoints;
 
   //For the purpose of evaluation
-  unsigned int numberOfPointsBefore (0);
-  unsigned int numberOfPointsAfter (0);
+//  unsigned int numberOfPointsBefore (0);
+//  unsigned int numberOfPointsAfter (0);
 
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
@@ -85,8 +85,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
       }
 
       //Again for evaluation
-      numberOfPointsBefore += cellSize;
-      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
+//      numberOfPointsBefore += cellSize;
+//      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
 
     }
 
@@ -102,7 +102,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
     }
 
   }
-  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
+//  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfOutputs(numberOfOutputs);
 }
 
@@ -222,7 +222,6 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
 
   vtkIdType pointId (0);
   //Add the start index to the reduced points. From now on just the end indices will be added
-//  MITK_INFO<<"Inserting START: "<<cell[0];
   pointId = reducedPoints->InsertNextPoint(points->GetPoint(cell[0]));
   reducedPolygon->GetPointIds()->InsertNextId(pointId);
 

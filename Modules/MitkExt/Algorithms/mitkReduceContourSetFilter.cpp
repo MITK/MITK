@@ -39,8 +39,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
   vtkSmartPointer<vtkPoints> newPoints;
 
   //For the purpose of evaluation
-  //unsigned int numberOfPointsBefore (0);
-  //unsigned int numberOfPointsAfter (0);
+//  unsigned int numberOfPointsBefore (0);
+//  unsigned int numberOfPointsAfter (0);
 
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
@@ -85,8 +85,8 @@ void mitk::ReduceContourSetFilter::GenerateData()
       }
 
       //Again for evaluation
-      //numberOfPointsBefore += cellSize;
-      //numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
+//      numberOfPointsBefore += cellSize;
+//      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
 
     }
 
@@ -102,7 +102,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
     }
 
   }
-  //MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
+//  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfOutputs(numberOfOutputs);
 }
 
@@ -290,21 +290,25 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
         m_MaxSegmentLenght = segmentLenght;
       }
 
-      //MITK_INFO<<"Lenght: "<<abs(segmentLenght);
-      if (abs(segmentLenght) > 20)
+//      MITK_INFO<<"Lenght: "<<abs(segmentLenght);
+      if (abs(segmentLenght) > 25)
       {
-          unsigned int divisions = abs(segmentLenght)%20;
-        //MITK_INFO<<"Divisions: "<<divisions<<" Start: "<<currentSegment.StartIndex<<" End: "<<currentSegment.EndIndex<<endl;
-        for (unsigned int i = 0; i<divisions; ++i)
+          unsigned int newLenght(segmentLenght);
+          while (newLenght > 25)
+          {
+              newLenght = newLenght*0.5;
+          }
+          unsigned int divisions = abs(segmentLenght)/newLenght;
+//          MITK_INFO<<"Divisions: "<<divisions;
+
+        for (unsigned int i = 1; i<=divisions; ++i)
         {
-            if(currentSegment.EndIndex > (currentSegment.StartIndex + 20*i))
-            {
-                //MITK_INFO<<"Inserting Index: "<<(currentSegment.StartIndex + 20*i);
-                pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + 20*i));
+//                MITK_INFO<<"Inserting MIDDLE: "<<(currentSegment.StartIndex + newLenght*i);
+                pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.StartIndex + newLenght*i));
                 reducedPolygon->GetPointIds()->InsertNextId(pointId);
-            }
         }
       }
+//      MITK_INFO<<"Inserting END: "<<currentSegment.EndIndex;
       pointId = reducedPoints->InsertNextPoint(points->GetPoint(currentSegment.EndIndex));
       reducedPolygon->GetPointIds()->InsertNextId(pointId);
     }

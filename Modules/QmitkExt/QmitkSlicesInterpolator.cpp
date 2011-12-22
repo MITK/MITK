@@ -506,7 +506,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   }
 }
 
-void QmitkSlicesInterpolator::SurfaceInterpolationFinished/*InterpolateSurface*/()
+void QmitkSlicesInterpolator::SurfaceInterpolationFinished()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 
@@ -774,7 +774,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
 void QmitkSlicesInterpolator::Run3DInterpolation()
 {
-    m_SurfaceInterpolator->Interpolate();
+  m_SurfaceInterpolator->Interpolate();
 }
 
 void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
@@ -833,6 +833,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 
             if (m_Watcher.isRunning())
                 m_Watcher.waitForFinished();
+
             m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
             m_Watcher.setFuture(m_Future);
           }

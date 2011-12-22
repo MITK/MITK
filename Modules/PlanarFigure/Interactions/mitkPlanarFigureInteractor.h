@@ -69,6 +69,9 @@ public:
   /** \brief Sets the amount of precision */
   void SetPrecision( ScalarType precision );
 
+  /** \brief Sets the minimal distance between two control points. */
+  void SetMinimumPointDistance( ScalarType minimumDistance );
+
   /**
     * \brief calculates how good the data, this statemachine handles, is hit
     * by the event.
@@ -142,6 +145,9 @@ private:
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
+
+  /** \brief Store the minimal distance between two control points. */
+  ScalarType m_MinimumPointDistance;
 
   /** \brief True if the mouse is currently hovering over the image. */
   bool m_IsHovering;

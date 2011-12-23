@@ -82,33 +82,33 @@ void QmitkOpenDicomEditorAction::Run()
     }
 
     mitk::DataStorageEditorInput::Pointer editorInput;
-    mitk::DataStorage::Pointer dataStorage;
-    QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+    //mitk::DataStorage::Pointer dataStorage;
+    //QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
+    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
    
 
    
-    if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
-    {
+    //if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
+    //{
         editorInput = new mitk::DataStorageEditorInput();
-        dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
-    }
-    else
-    {
-        multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-        dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
-    }
+    //    dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
+    //}
+    //else
+    //{
+    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
+    //    dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
+    //}
 
-    if (multiWidgetEditor.IsNull())
-    {
-        berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-        multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-    }
-    else
-    {
-        multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-    }
+    //if (multiWidgetEditor.IsNull())
+    //{
+    //    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
+    //}
+    //else
+    //{
+    //    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
+    //}
 
-    this->GetSite()->GetPage()->OpenEditor(editorInput, "org.mitk.editors.pythoneditor", true, berry::IWorkbenchPage::MATCH_NONE);
+    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.dicomeditor");
 }
 

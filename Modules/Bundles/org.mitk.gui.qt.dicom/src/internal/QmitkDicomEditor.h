@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorageEditorInput.h>
 
 #include "ui_QmitkDicomEditorControls.h"
+#include <ctkFileDialog.h>
 
 /*!
   \brief QmitkDicomEditor
@@ -66,16 +67,25 @@ class QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPart
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
 
-  public slots:
-    void openImportDialog();
-    void openQueryDialog();
-
   protected slots:
+
+    void onImportDirectory(QString directory);
       
     /// \brief Called when series in TreeView is double clicked.
     void onSeriesModelSelected(QModelIndex index);
 
+    /// \brief Called when Import CD or Import Folder was clicked.
+    void onFolderCDImport();
+
+    /// \brief Called when Query Retrieve or Import Folder was clicked.
+    void onQueryRetrieve();
+
+    /// \brief Called when LocalStorageButton was clicked.
+    void onLocalStorage();
+
   protected:
+
+    ctkFileDialog* m_ImportDialog;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );

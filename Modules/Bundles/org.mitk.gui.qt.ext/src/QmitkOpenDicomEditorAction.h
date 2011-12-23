@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QMITKEXTFILEOPENACTION_H_
-#define QMITKEXTFILEOPENACTION_H_
+#ifndef QMITKOPENDICOMEDITORACTION_H_
+#define QMITKOPENDICOMEDITORACTION_H_
 
 #ifdef __MINGW32__
 // We need to inlclude winbase.h here in order to declare
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif /*QMITKEXTFILEOPENACTION_H_*/
+#endif /*QMITKOPENDICOMEDITORACTION_H_*/

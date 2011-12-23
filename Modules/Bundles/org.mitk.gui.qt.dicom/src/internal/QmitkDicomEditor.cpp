@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDicomSeriesReader.h>
 
 // Qt
+#include <QCheckBox>
 #include <QMessageBox>
 #include <QWidget>
 #include <QtSql>
@@ -64,6 +65,7 @@ QmitkDicomEditor::QmitkDicomEditor()
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
+    delete m_ImportDialog;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
@@ -71,8 +73,24 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
 
-    m_Controls.queryRetrieveDockWidget->setVisible(false);
-    m_Controls.externalDataDockWidget->setVisible(false);
+
+
+    //connections for base controls
+    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(onFolderCDImport()));
+    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(onFolderCDImport()));
+    connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(onQueryRetrieve()));
+    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(onLocalStorage()));
+
+    //Initialize import widget
+    m_ImportDialog = new ctkFileDialog();
+    QCheckBox* importCheckbox = new QCheckBox("Copy on import", m_ImportDialog);
+    m_ImportDialog->setBottomWidget(importCheckbox);
+    m_ImportDialog->setFileMode(QFileDialog::Directory);
+    m_ImportDialog->setLabelText(QFileDialog::Accept,"Import");
+    m_ImportDialog->setWindowTitle("Import DICOM files from directory ...");
+    m_ImportDialog->setWindowModality(Qt::ApplicationModal);
+    connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(onImportDirectory(QString)));
+
     //connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
 }
 
@@ -148,21 +166,13 @@ void QmitkDicomEditor::onSeriesModelSelected(QModelIndex index){
     //}
 }
 
-
-void QmitkDicomEditor::openImportDialog(){
-
-}
-void QmitkDicomEditor::openQueryDialog(){
-
-}
-
 void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
-  if (input.Cast<berry::FileEditorInput>().IsNull())
-     throw berry::PartInitException("Invalid Input: Must be FileEditorInput");
+    //if (input.Cast<berry::FileEditorInput>().IsNull())
+    //   throw berry::PartInitException("Invalid Input: Must be FileEditorInput");
 
-  this->SetSite(site);
-  this->SetInput(input);
+    this->SetSite(site);
+    this->SetInput(input);
 }
 
 void QmitkDicomEditor::SetFocus()
@@ -171,5 +181,42 @@ void QmitkDicomEditor::SetFocus()
 
 berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
 {
-  return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+    return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+}
+
+void QmitkDicomEditor::onFolderCDImport()
+{
+    m_ImportDialog->show();
+    m_ImportDialog->raise();
+
+}
+
+void QmitkDicomEditor::onQueryRetrieve()
+{
+    m_Controls.stackedWidget->setCurrentIndex(2);
+}
+
+void QmitkDicomEditor::onLocalStorage()
+{
+    m_Controls.stackedWidget->setCurrentIndex(0);
+}
+
+void QmitkDicomEditor::onImportDirectory(QString directory)
+{
+    if (QDir(directory).exists())
+    {
+        QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(m_ImportDialog->bottomWidget());
+        QString targetDirectory;
+        if (copyOnImport->isChecked())
+        {
+            //targetDirectory = d->DICOMDatabase->databaseDirectory();
+            MBI_INFO<<directory.toStdString();
+            
+        }else{
+            m_Controls.stackedWidget->setCurrentIndex(1);
+        }
+        //d->DICOMIndexer->addDirectory(*d->DICOMDatabase,directory,targetDirectory);
+        //d->DICOMModel.reset();
+    }
+
 }

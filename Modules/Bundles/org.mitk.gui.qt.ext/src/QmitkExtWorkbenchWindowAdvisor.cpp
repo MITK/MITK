@@ -453,8 +453,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  fileExitAction->setObjectName("QmitkFileExitAction");
  fileMenu->addAction(fileExitAction);
 
-  QAction* openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
- openDicomEditorAction->setIcon(QIcon(":/org.mitk.gui.qt.dicomeditor/resources/icon.xpm"));
+ QAction* openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.editors.dicomeditor/resources/icon.xpm"), window);
  fileMenu->addAction(openDicomEditorAction);
 
  berry::IViewRegistry* viewRegistry =

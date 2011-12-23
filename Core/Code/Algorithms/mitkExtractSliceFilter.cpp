@@ -21,11 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
 	m_TimeStep = 0;
+	m_Reslicer->ReleaseDataFlagOn();//todo check 
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 	
 }
+
+
 
 void mitk::ExtractSliceFilter::GenerateData(){
 

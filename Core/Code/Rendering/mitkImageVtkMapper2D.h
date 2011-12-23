@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 //MITK Rendering
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper2D.h"
+#include "mitkExtractSliceFilter.h"
 
 //VTK
 #include <vtkSmartPointer.h>
@@ -145,7 +146,7 @@ namespace mitk {
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
-      vtkSmartPointer<vtkImageReslice> m_Reslicer;
+	  mitk::ExtractSliceFilter::Pointer m_Reslicer;
       /** \brief Thickslices post filtering.  */
       vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief Using unit spacing for resampling makes life easier TODO improve docu ...*/
@@ -210,7 +211,7 @@ namespace mitk {
     * in the XY-plane (even if they depict a YZ-slice of the volume).
     *
     */
-    void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
+    void GeneratePlane(mitk::BaseRenderer* renderer/*, vtkFloatingPointType planeBounds[6]*/);
 
     /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
       \param binarySlice - The binary image slice. (Volumes are not supported.)

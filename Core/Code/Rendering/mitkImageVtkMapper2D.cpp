@@ -62,18 +62,18 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
-void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer/*, vtkFloatingPointType planeBounds[6]*/)
+void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   float depth = this->CalculateLayerDepth(renderer);
   //Set the origin to (xMin; yMin; depth) of the plane. This is necessary for obtaining the correct
   //plane size in crosshair rotation and swivel mode.
-  localStorage->m_Plane->SetOrigin(0.0, 0.0, depth);
+  localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-  localStorage->m_Plane->SetPoint1(1.0/**localStorage->m_mmPerPixel[0]*/, 0.0, depth); //P1: (xMax, yMin, depth)
-  localStorage->m_Plane->SetPoint2(0.0, 1.0/**localStorage->m_mmPerPixel[1]*/, depth); //P2: (xMin, yMax, depth)
+  localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], depth); //P1: (xMax, yMin, depth)
+  localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depth); //P2: (xMin, yMax, depth)
 }
 
 float mitk::ImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer* renderer)
@@ -231,6 +231,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
 	  localStorage->m_mmPerPixel[0] = widthInMM / extent[0];
 	  localStorage->m_mmPerPixel[1] = heightInMM / extent[1];
+
+	  // Calculate the actual bounds of the transformed plane clipped by the
+	  // dataset bounding box; this is required for drawing the texture at the
+	  // correct position during 3D mapping.
+	  boundsInitialized = this->CalculateClippedPlaneBounds(
+		  worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
   }
 
 
@@ -358,7 +364,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   else
   { //Connect the mapper with the input texture. This is the standard case.
     //setup the textured plane
-    this->GeneratePlane( renderer/*, sliceBounds*/ );
+    this->GeneratePlane( renderer, sliceBounds );
     //set the plane as input for the mapper
     localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
     //set the texture for the actor

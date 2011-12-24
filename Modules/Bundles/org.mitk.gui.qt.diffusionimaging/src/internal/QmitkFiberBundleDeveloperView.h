@@ -342,6 +342,9 @@ private:
 
   // counters for ROI nodes
   int m_CircleCounter;
+
+  // flag to bypass signal from qcombobox "index changed(int)"
+  bool m_suppressSignal;
   
 };
 

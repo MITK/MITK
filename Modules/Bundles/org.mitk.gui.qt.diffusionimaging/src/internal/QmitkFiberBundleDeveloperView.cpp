@@ -638,6 +638,7 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
     , m_FiberExtractor(NULL)
     , m_fiberMonitorIsOn( false )
     , m_CircleCounter( 0 )
+    , m_suppressSignal(false)
 {
     m_hostThread = new QThread;
     m_threadInProgress = false;
@@ -695,6 +696,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
 
         connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( ActionDrawEllipseTriggered() ) );
         connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
+        //        connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
         connect( m_Controls->ddAvailableColorcodings, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentColorCoding(int) ));
 
         connect( m_Controls->checkBoxMonitorFiberThreads, SIGNAL(stateChanged(int)), this, SLOT(DoMonitorFiberThreads(int)) );
@@ -1220,32 +1222,40 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
 
     //update dropDown Menu
     //remove all items from menu
+    m_suppressSignal = true;
     int ddItems = m_Controls->ddAvailableColorcodings->count();
     for(int i=ddItems-1; i>=0; i--)
-    {   //note, after each item remove, index in QComboBox is updated, therefore we start from the back which causes less update calculation
+    {   //note, after each item remove, index in QComboBox is updated. sending signal: index changed
         m_Controls->ddAvailableColorcodings->removeItem(i);
     }
     //fill new data into menu
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
     m_Controls->ddAvailableColorcodings->addItem(m_FiberBundleX->COLORCODING_CUSTOM);
 
+    MITK_INFO << "count: " << m_Controls->ddAvailableColorcodings->count();
+
+    //    for(int i=0; i<m_Controls->ddAvailableColorcodings->count(); i++) {
+    //        MITK_INFO << m_Controls->ddAvailableColorcodings->itemText(i).toStdString().c_str();
+    //    }
 
     //highlight current colorcoding
     QString cc = m_FiberBundleX->GetCurrentColorCoding();
     MITK_INFO << cc.toStdString().c_str() << " is at idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
     m_Controls->ddAvailableColorcodings->setCurrentIndex( m_Controls->ddAvailableColorcodings->findText(cc) );
     m_Controls->ddAvailableColorcodings->update();
+    m_suppressSignal = false;
 }
 
 
 void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
 {
-    QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
-    MITK_INFO << "SetCurrentCC: " << selectedColorCoding.toStdString().c_str();
-    m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
-    // update rendering
-    m_FiberBundleNode->Modified();
-    m_MultiWidget->ForceImmediateUpdate();
+    if(!m_suppressSignal){
+        QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
+        m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
+        // update rendering
+        m_FiberBundleNode->Modified();
+        m_MultiWidget->ForceImmediateUpdate();
+    }
 }
 
 /* === OutSourcedMethod: THIS METHOD GENERATES ESSENTIAL GEOMETRY PARAMETERS FOR THE MITK FRAMEWORK ===

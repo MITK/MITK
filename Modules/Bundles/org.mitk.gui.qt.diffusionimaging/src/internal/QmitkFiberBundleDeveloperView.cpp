@@ -1232,12 +1232,6 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
     m_Controls->ddAvailableColorcodings->addItem(m_FiberBundleX->COLORCODING_CUSTOM);
 
-    MITK_INFO << "count: " << m_Controls->ddAvailableColorcodings->count();
-
-    //    for(int i=0; i<m_Controls->ddAvailableColorcodings->count(); i++) {
-    //        MITK_INFO << m_Controls->ddAvailableColorcodings->itemText(i).toStdString().c_str();
-    //    }
-
     //highlight current colorcoding
     QString cc = m_FiberBundleX->GetCurrentColorCoding();
     MITK_INFO << cc.toStdString().c_str() << " is at idx: " << m_Controls->ddAvailableColorcodings->findText(cc);

@@ -504,7 +504,7 @@ void mitk::FiberBundleX::ResetFiberColorOpacity() {
 
 void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 {
-
+    MITK_INFO << "SetFAMap";
     vtkSmartPointer<vtkDoubleArray> faValues = vtkDoubleArray::New();
     faValues->SetName(FA_VALUE_ARRAY);
     faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
@@ -522,12 +522,16 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
         px[0] = pointSet->GetPoint(i)[0];
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
-        double faPixelValue = FAimage->GetPixelValueByWorldCoordinate(px);
+        double faPixelValue = FAimage->GetPixelValueByWorldCoordinate(px) * 0.01;
         faValues->InsertNextValue(faPixelValue);
+//        MITK_INFO << faPixelValue;
     }
 
     m_FiberPolyData->GetPointData()->AddArray(faValues);
-    this->DoGenerateFiberIds();
+//    this->DoGenerateFiberIds();
+
+    if(m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
+        MITK_INFO << "FA VALUE ARRAY SET";
 }
 
 void mitk::FiberBundleX::DoGenerateFiberIds()

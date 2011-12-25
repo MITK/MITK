@@ -32,6 +32,24 @@
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 {
     m_lut = vtkLookupTable::New();
+    m_lut->SetTableRange(0.0,100.0);
+     double color[3];
+    m_lut->GetColor(0.1, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(0.5, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(1.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(5.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(10.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(20.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(50.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
+    m_lut->GetColor(100.0, color);
+    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
     m_lut->Build();
 }
 

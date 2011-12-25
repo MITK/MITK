@@ -130,7 +130,7 @@ void QmitkFiberExtractorWorker::run()
 
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
- * --do color coding--*/
+ * --set FA values to fiberbundle--*/
 QmitkFiberColoringWorker::QmitkFiberColoringWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
     : m_itemPackage(itemPackage)
     , m_hostingThread(hostingThread)
@@ -171,6 +171,43 @@ void QmitkFiberColoringWorker::run()
     m_hostingThread->quit();
 
 }
+
+
+QmitkFiberFeederFAWorker::QmitkFiberFeederFAWorker(QThread* hostingThread, Package4WorkingThread itemPackage)
+    : m_itemPackage(itemPackage),
+      m_hostingThread(hostingThread)
+{
+
+}
+void QmitkFiberFeederFAWorker::run()
+{
+    if(m_itemPackage.st_Controls->checkBoxMonitorFiberThreads->isChecked())
+        m_itemPackage.st_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_RUNNING);
+
+    /* MEASUREMENTS AND FANCY GUI EFFECTS
+     * accurate time measurement using ITK timeProbe */
+    itk::TimeProbe clock;
+    clock.Start();
+    //set GUI representation of timer to 0, is essential for correct timer incrementation
+    m_itemPackage.st_Controls->infoTimerSetFA->setText(QString::number(0));
+    m_itemPackage.st_FancyGUITimer1->start();
+
+    //do processing
+    mitk::Image::Pointer FAImg = dynamic_cast<mitk::Image*>(m_itemPackage.st_PassedDataNode->GetData());
+    if(FAImg.IsNotNull())
+        m_itemPackage.st_FBX->SetFAMap(FAImg);
+
+    /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
+    clock.Stop();
+    m_itemPackage.st_FancyGUITimer1->stop();
+    m_itemPackage.st_Controls->infoTimerSetFA->setText( QString::number(clock.GetTotal()) );
+
+    disconnect(m_itemPackage.st_FancyGUITimer1);
+    delete m_itemPackage.st_FancyGUITimer1; // fancy timer is not needed anymore
+    m_hostingThread->quit();
+
+}
+
 
 /*===================================================================================
  * THIS METHOD IMPLEMENTS THE ACTIONS WHICH SHALL BE EXECUTED by the according THREAD
@@ -634,6 +671,7 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
     , m_MultiWidget( NULL )
     , m_FiberIDGenerator( NULL)
     , m_GeneratorFibersRandom( NULL )
+    , m_FiberFeederFASlave( NULL )
     , m_FiberColoringSlave(NULL)
     , m_FiberExtractor(NULL)
     , m_fiberMonitorIsOn( false )
@@ -650,12 +688,6 @@ QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
     //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
     delete m_hostThread;
-    //    if (m_FiberIDGenerator != NULL)
-    //        delete m_FiberIDGenerator;
-
-    //    if (m_GeneratorFibersRandom != NULL)
-    //        delete m_GeneratorFibersRandom;
-
 }
 
 
@@ -677,6 +709,7 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
         m_Controls->buttonColorFibers->setEnabled(false);
         m_Controls->ddAvailableColorcodings->setEnabled(false);
         m_Controls->buttonExtractFibers->setEnabled(false);
+        m_Controls->button_FAMap->setEnabled(true);
 
         m_Controls->buttonSMFibers->setEnabled(false);//not yet implemented
         m_Controls->buttonVtkDecimatePro->setEnabled(false);//not yet implemented
@@ -685,14 +718,16 @@ void QmitkFiberBundleDeveloperView::CreateQtPartControl( QWidget *parent )
 
 
         connect( m_Controls->buttonGenerateFibers, SIGNAL(clicked()), this, SLOT(DoGenerateFibers()) );
-        connect( m_Controls->buttonGenerateFiberIds, SIGNAL(pressed()), this, SLOT(DoGenerateFiberIDs()) );
-        connect(  m_Controls->buttonExtractFibers, SIGNAL(clicked()), this, SLOT(DoExtractFibers()) );
+        connect( m_Controls->buttonGenerateFiberIds, SIGNAL(clicked()), this, SLOT(DoGenerateFiberIDs()) );
+        connect( m_Controls->button_FAMapExecute, SIGNAL(clicked()), this, SLOT(DoSetFAValues()) );
+        connect( m_Controls->button_FAMap, SIGNAL(clicked()), this, SLOT(DoSetFAMap()) );
+        connect( m_Controls->buttonExtractFibers, SIGNAL(clicked()), this, SLOT(DoExtractFibers()) );
         connect( m_Controls->radioButton_directionRandom, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->radioButton_directionX, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->radioButton_directionY, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->radioButton_directionZ, SIGNAL(clicked()), this, SLOT(DoUpdateGenerateFibersWidget()) );
         connect( m_Controls->toolBox, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) );
-        connect( m_Controls->tabWidget, SIGNAL(currentChanged ( int ) ), this, SLOT(SelectionChangedToolBox(int)) ); //needed to update GUI elements when tab selection of fiberProcessing page changes
+
 
         connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( ActionDrawEllipseTriggered() ) );
         connect( m_Controls->buttonColorFibers, SIGNAL(clicked()), this, SLOT(DoColorFibers()) );
@@ -1066,6 +1101,16 @@ void QmitkFiberBundleDeveloperView::UpdateGenerateRandomFibersTimer()
 
 }
 
+void QmitkFiberBundleDeveloperView::UpdateSetFAValuesTimer()
+{
+    // Make sure that thread has set according info-label to number! here we do not check if value is numeric!
+    QString crntValue = m_Controls->infoTimerSetFA->text();
+    int tmpVal = crntValue.toInt();
+    m_Controls->infoTimerSetFA->setText(QString::number(++tmpVal));
+    m_Controls->infoTimerSetFA->update();
+
+}
+
 void QmitkFiberBundleDeveloperView::BeforeThread_GenerateFibersRandom()
 {
     m_threadInProgress = true;
@@ -1156,6 +1201,88 @@ vtkSmartPointer<vtkPolyData> QmitkFiberBundleDeveloperView::GenerateVtkFibersDir
     return PDZ;
 }
 
+void QmitkFiberBundleDeveloperView::DoSetFAValues()
+{
+
+    QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
+    localTimer->setInterval( 10 );
+    connect( localTimer, SIGNAL(timeout()), this, SLOT( UpdateSetFAValuesTimer() ) );
+
+    // pack items which are needed by thread processing
+    struct Package4WorkingThread ItemPackageToSetFAMap;
+    ItemPackageToSetFAMap.st_FBX = m_FiberBundleX;
+    ItemPackageToSetFAMap.st_FancyGUITimer1 = localTimer;
+    ItemPackageToSetFAMap.st_PassedDataNode = m_FANode;
+    ItemPackageToSetFAMap.st_Controls = m_Controls;
+
+    if (m_fiberMonitorIsOn)
+        ItemPackageToSetFAMap.st_fiberThreadMonitorWorker = m_fiberThreadMonitorWorker;
+
+    if (m_threadInProgress)
+        return; //maybe popup window saying, working thread still in progress...pls wait
+
+    m_FiberFeederFASlave = new QmitkFiberFeederFAWorker(m_hostThread, ItemPackageToSetFAMap);
+    m_FiberFeederFASlave->moveToThread(m_hostThread);
+
+    connect(m_hostThread, SIGNAL(started()), this, SLOT( BeforeThread_FiberSetFA()) );
+    connect(m_hostThread, SIGNAL(started()), m_FiberFeederFASlave, SLOT(run()) );
+    connect(m_hostThread, SIGNAL(finished()), this, SLOT(AfterThread_FiberSetFA()));
+    connect(m_hostThread, SIGNAL(terminated()), this, SLOT(AfterThread_FiberSetFA()));
+    m_hostThread->start(QThread::LowestPriority);
+}
+
+void QmitkFiberBundleDeveloperView::DoSetFAMap()
+{
+    std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+    if (nodes.empty())
+    {
+        m_Controls->lineEdit_FAMap->setText("N/A");
+        return;
+    }
+
+    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+         it != nodes.end();
+         ++it )
+    {
+        mitk::DataNode::Pointer node = *it;
+
+        if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
+        {
+            // this node is what we want
+            m_FANode = node;
+            m_Controls->lineEdit_FAMap->setText(node->GetName().c_str());
+            return;
+        }
+    }
+}
+
+void QmitkFiberBundleDeveloperView::BeforeThread_FiberSetFA()
+{
+    m_threadInProgress = true;
+    if (m_fiberMonitorIsOn){
+        m_fiberThreadMonitorWorker->threadForFiberProcessingStarted();
+    }
+}
+
+void QmitkFiberBundleDeveloperView::AfterThread_FiberSetFA()
+{
+    m_threadInProgress = false;
+    if (m_fiberMonitorIsOn){
+        m_fiberThreadMonitorWorker->threadForFiberProcessingFinished();
+        m_fiberThreadMonitorWorker->setThreadStatus(FBX_STATUS_IDLE);
+    }
+    disconnect(m_hostThread, 0, 0, 0);
+    m_hostThread->disconnect();
+    //update renderer
+    m_FiberBundleNode->Modified();
+    m_MultiWidget->ForceImmediateUpdate();
+
+    //update QComboBox(dropDown menu) in view of available ColorCodings
+    this->DoGatherColorCodings();
+
+    delete m_FiberFeederFASlave;
+}
+
 void QmitkFiberBundleDeveloperView::DoColorFibers()
 {
     //
@@ -1210,7 +1337,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
 
 
     //update QComboBox(dropDown menu) in view of available ColorCodings
-    DoGatherColorCodings();
+    this->DoGatherColorCodings();
 
     delete m_FiberColoringSlave;
 }

@@ -69,6 +69,7 @@ struct Package4WorkingThread
   QmitkFiberThreadMonitorWorker *st_fiberThreadMonitorWorker;
   mitk::FiberBundleXThreadMonitor::Pointer st_FBX_Monitor; //needed for direct access do animation/fancy methods
   mitk::DataNode::Pointer st_ThreadMonitorDataNode; //needed for renderer to recognize node modifications
+  mitk::DataNode::Pointer st_PassedDataNode; //put an extra node if needed
   mitk::DataStorage::Pointer st_DataStorage; //well that is discussable if needed ;-) probably not
   QmitkStdMultiWidget* st_MultiWidget; //needed for rendering update
   mitk::PlanarFigure::Pointer st_PlanarFigure; //needed for fiberextraction
@@ -138,6 +139,26 @@ private:
   QThread* m_hostingThread;
   
   
+};
+
+// ====================================================================
+// ============= WORKER WHICH IS PASSED TO THREAD =====================
+// ====================================================================
+class QmitkFiberFeederFAWorker : public QObject
+{
+  Q_OBJECT
+
+public:
+  QmitkFiberFeederFAWorker( QThread*, Package4WorkingThread );
+
+  public slots:
+  void run();
+
+private:
+  Package4WorkingThread m_itemPackage;
+  QThread* m_hostingThread;
+
+
 };
 
 // ====================================================================
@@ -260,6 +281,8 @@ public:
   void DoUpdateGenerateFibersWidget();
   void SelectionChangedToolBox(int);
   void DoMonitorFiberThreads(int);
+  void DoSetFAValues();
+  void DoSetFAMap();
   void DoColorFibers();
   void DoGatherColorCodings();
   void SetCurrentColorCoding(int);
@@ -270,6 +293,8 @@ public:
   void AfterThread_IdGenerate();
   void BeforeThread_GenerateFibersRandom();
   void AfterThread_GenerateFibersRandom();
+  void BeforeThread_FiberSetFA();
+  void AfterThread_FiberSetFA();
   void BeforeThread_FiberColorCoding();
   void AfterThread_FiberColorCoding();
   void BeforeThread_FiberExtraction();
@@ -280,6 +305,7 @@ public:
   void UpdateGenerateRandomFibersTimer();
   void UpdateColorFibersTimer();
   void UpdateExtractFibersTimer();
+  void UpdateSetFAValuesTimer();
   
   
   
@@ -330,6 +356,7 @@ private:
   // Thread based Workers which do some processing of fibers
   QmitkFiberIDWorker* m_FiberIDGenerator;
   QmitkFiberGenerateRandomWorker* m_GeneratorFibersRandom;
+  QmitkFiberFeederFAWorker* m_FiberFeederFASlave;
   QmitkFiberColoringWorker* m_FiberColoringSlave;
   QmitkFiberExtractorWorker* m_FiberExtractor;
   
@@ -342,6 +369,8 @@ private:
 
   // counters for ROI nodes
   int m_CircleCounter;
+
+  mitk::DataNode::Pointer m_FANode;
 
   // flag to bypass signal from qcombobox "index changed(int)"
   bool m_suppressSignal;

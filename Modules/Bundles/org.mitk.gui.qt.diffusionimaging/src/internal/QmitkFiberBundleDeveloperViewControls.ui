@@ -467,7 +467,7 @@
         <x>0</x>
         <y>0</y>
         <width>445</width>
-        <height>472</height>
+        <height>409</height>
        </rect>
       </property>
       <attribute name="label">
@@ -475,10 +475,112 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_9">
        <item row="0" column="1">
-        <widget class="QTabWidget" name="tabWidget">
+        <widget class="QTabWidget" name="tab_5">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
+         <widget class="QWidget" name="tabFeeder">
+          <attribute name="title">
+           <string>Feeder</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_21">
+           <item row="1" column="0">
+            <spacer name="verticalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="1">
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_14">
+             <property name="title">
+              <string>Add FA Values to FiberBundle</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_6">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_FAMap">
+                <property name="text">
+                 <string>FA Map</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QFrame" name="frame_8">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <property name="margin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QToolButton" name="button_FAMap">
+                   <property name="text">
+                    <string>=&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_FAMap">
+                   <property name="text">
+                    <string>N/A</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="button_FAMapExecute">
+                   <property name="text">
+                    <string>execute</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="infoTimerSetFA">
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelTimerSetFA">
+                <property name="text">
+                 <string>Timer:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="tabColoring">
           <attribute name="title">
            <string>Colors</string>
@@ -520,6 +622,13 @@
                   <widget class="QRadioButton" name="radioButton_OpacityFA">
                    <property name="text">
                     <string>FA as Opacity</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QRadioButton" name="radioButton_ColorCustom">
+                   <property name="text">
+                    <string>Custom</string>
                    </property>
                   </widget>
                  </item>

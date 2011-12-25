@@ -326,8 +326,8 @@ void mitk::FiberBundleMapper3D::GenerateData()
   m_VtkFiberDataMapperGL->ScalarVisibilityOn();
   
   m_VtkFiberDataMapperGL->SetScalarModeToUsePointFieldData();
-  //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
-  m_VtkFiberDataMapperGL->SelectColorArray("ColorValues");
+  m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
+  //m_VtkFiberDataMapperGL->SelectColorArray("ColorValues");
   m_VtkFiberDataMapperGL->SetLookupTable(lut);
 
   

@@ -69,19 +69,19 @@ class QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPart
 
   protected slots:
 
-    void onImportDirectory(QString directory);
+    void OnImportDirectory(QString directory);
       
     /// \brief Called when series in TreeView is double clicked.
-    void onSeriesModelSelected(QModelIndex index);
+    void OnSeriesModelSelected(QModelIndex index);
 
     /// \brief Called when Import CD or Import Folder was clicked.
-    void onFolderCDImport();
+    void OnFolderCDImport();
 
     /// \brief Called when Query Retrieve or Import Folder was clicked.
-    void onQueryRetrieve();
+    void OnQueryRetrieve();
 
     /// \brief Called when LocalStorageButton was clicked.
-    void onLocalStorage();
+    void OnLocalStorage();
 
   protected:
 

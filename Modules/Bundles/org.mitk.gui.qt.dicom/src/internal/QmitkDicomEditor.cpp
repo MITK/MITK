@@ -76,10 +76,10 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
 
     //connections for base controls
-    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(onFolderCDImport()));
-    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(onFolderCDImport()));
-    connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(onQueryRetrieve()));
-    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(onLocalStorage()));
+    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
+    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
+    connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
+    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
 
     //Initialize import widget
     m_ImportDialog = new ctkFileDialog();
@@ -89,7 +89,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     m_ImportDialog->setLabelText(QFileDialog::Accept,"Import");
     m_ImportDialog->setWindowTitle("Import DICOM files from directory ...");
     m_ImportDialog->setWindowModality(Qt::ApplicationModal);
-    connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(onImportDirectory(QString)));
+    connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnImportDirectory(QString)));
 
     //connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
 }
@@ -114,7 +114,7 @@ void QmitkDicomEditor::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
     //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
-void QmitkDicomEditor::onSeriesModelSelected(QModelIndex index){
+void QmitkDicomEditor::OnSeriesModelSelected(QModelIndex index){
     QModelIndex studyIndex = index.parent();
     QModelIndex seriesIndex = index;
 
@@ -184,24 +184,24 @@ berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkDicomEditor::onFolderCDImport()
+void QmitkDicomEditor::OnFolderCDImport()
 {
     m_ImportDialog->show();
     m_ImportDialog->raise();
 
 }
 
-void QmitkDicomEditor::onQueryRetrieve()
+void QmitkDicomEditor::OnQueryRetrieve()
 {
     m_Controls.stackedWidget->setCurrentIndex(2);
 }
 
-void QmitkDicomEditor::onLocalStorage()
+void QmitkDicomEditor::OnLocalStorage()
 {
     m_Controls.stackedWidget->setCurrentIndex(0);
 }
 
-void QmitkDicomEditor::onImportDirectory(QString directory)
+void QmitkDicomEditor::OnImportDirectory(QString directory)
 {
     if (QDir(directory).exists())
     {
@@ -210,7 +210,7 @@ void QmitkDicomEditor::onImportDirectory(QString directory)
         if (copyOnImport->isChecked())
         {
             //targetDirectory = d->DICOMDatabase->databaseDirectory();
-            MBI_INFO<<directory.toStdString();
+            MBI_DEBUG<<directory.toStdString();
             
         }else{
             m_Controls.stackedWidget->setCurrentIndex(1);

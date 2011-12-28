@@ -155,10 +155,10 @@ void QmitkFiberColoringWorker::run()
     if(m_itemPackage.st_Controls->radioButton_ColorOrient->isChecked()) {
         m_itemPackage.st_FBX->DoColorCodingOrientationbased();
 
-    } else if(m_itemPackage.st_Controls->radioButton_ColorFA) {
+    } else if(m_itemPackage.st_Controls->radioButton_ColorFA->isChecked()) {
         m_itemPackage.st_FBX->DoColorCodingFAbased();
 
-    } else if(m_itemPackage.st_Controls->radioButton_OpacityFA) {
+    } else if(m_itemPackage.st_Controls->radioButton_OpacityFA->isChecked()) {
         m_itemPackage.st_FBX->DoUseFAasColorOpacity();
     }
 
@@ -1263,9 +1263,7 @@ void QmitkFiberBundleDeveloperView::BeforeThread_FiberSetFA()
         m_fiberThreadMonitorWorker->threadForFiberProcessingStarted();
     }
 }
-#include <vtkPointData.h>
-#include <vtkPoints.h> // my be replaced by class
-#include <vtkDataSet.h>
+
 void QmitkFiberBundleDeveloperView::AfterThread_FiberSetFA()
 {
     m_threadInProgress = false;
@@ -1278,13 +1276,6 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberSetFA()
     //update renderer
     m_FiberBundleNode->Modified();
     m_MultiWidget->ForceImmediateUpdate();
-    mitk::FiberBundleX::Pointer fbx = dynamic_cast<mitk::FiberBundleX*>(m_FiberBundleNode->GetData());
-    vtkPolyData* fbxPd = fbx->GetFiberPolyData();
-
-
-
-   if(fbxPd->GetPointData()->HasArray(mitk::FiberBundleX::FA_VALUE_ARRAY))
-       MITK_INFO << "FA VALUE SET";
 
     //update QComboBox(dropDown menu) in view of available ColorCodings
     this->DoGatherColorCodings();

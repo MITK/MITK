@@ -32,24 +32,6 @@
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 {
     m_lut = vtkLookupTable::New();
-    m_lut->SetTableRange(0.0,100.0);
-    double color[3];
-    m_lut->GetColor(0.1, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(0.5, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(1.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(5.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(10.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(20.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(50.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
-    m_lut->GetColor(100.0, color);
-    MITK_INFO << color[0] << " " << color[1] << " " << color[2];
     m_lut->Build();
 }
 
@@ -59,7 +41,7 @@ mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 
 }
 
-#include <vtkDoubleArray.h>
+
 const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 {
     MITK_INFO << "FiberBundleXxXXMapper3D() GetInput()";
@@ -99,25 +81,9 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
+    localStorage->m_FiberActor->GetProperty()->SetOpacity(0.9);
+    localStorage->m_FiberMapper->SetLookupTable(m_lut);
 
-    vtkLookupTable* lut = vtkLookupTable::New();
-    lut->Build();
-    localStorage->m_FiberMapper->SetLookupTable(lut);
-
-
-    if(FBX->GetFiberPolyData()->GetPointData()->HasArray(mitk::FiberBundleX::FA_VALUE_ARRAY))
-    {
-        vtkSmartPointer<vtkDoubleArray> favals = (vtkDoubleArray*) FBX->GetFiberPolyData()->GetPointData()->GetArray(mitk::FiberBundleX::FA_VALUE_ARRAY);
-        for(int i=0;i<FBX->GetFiberPolyData()->GetNumberOfPoints();i++)
-        {
-
-            double value = favals->GetValue(i);
-            double color[3];
-            lut->GetColor(value, color);
-            MITK_INFO << "Value: " << value << " Color: " << color[0] << " " << color[1] << " " << color[2];
-
-        }
-    }
     // set Opacity
     float tmpopa;
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
@@ -125,10 +91,8 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
-        //        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
-        localStorage->m_FiberMapper->SelectColorArray(mitk::FiberBundleX::FA_VALUE_ARRAY);
+        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
-
 
         if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM) {
             float temprgb[3];

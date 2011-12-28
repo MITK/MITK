@@ -173,6 +173,10 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     ///THIS GET INPUT
     mitk::FiberBundleX* fbx = this->GetInput();
 
+    localStorage->m_PointMapper->ScalarVisibilityOn();
+    localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
+    localStorage->m_PointMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+
     // set color
     if (fbx->GetCurrentColorCoding() != NULL){
         localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding());
@@ -186,8 +190,8 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
         }
     }
 
-    localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
-    localStorage->m_PointMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+
+
     localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();

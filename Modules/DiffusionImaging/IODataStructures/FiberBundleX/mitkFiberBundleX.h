@@ -1,4 +1,3 @@
-
 /*=========================================================================
 
  Program:   Medical Imaging & Interaction Toolkit
@@ -17,9 +16,6 @@
 
  =========================================================================*/
 
-/* =============== IMPORTANT TODO ===================
- * ==== USE vtkSmartPointer<> when necessary ONLY!!!!
- */
 
 #ifndef _MITK_FiberBundleX_H
 #define _MITK_FiberBundleX_H
@@ -49,7 +45,7 @@ namespace mitk {
   public:
 
     static const char* COLORCODING_ORIENTATION_BASED;
-    static const char* COLORCODING_FA_AS_OPACITY;
+//    static const char* COLORCODING_FA_AS_OPACITY;
     static const char* FA_VALUE_ARRAY;
     static const char* COLORCODING_CUSTOM;
     static const char* FIBER_ID_ARRAY;

@@ -121,7 +121,6 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 
   // tracking status
   m_ToolStatusWidget = new QmitkToolTrackingStatusWidget( parent );
- 
   m_Controls.m_VBoxLayout->addWidget(m_ToolStatusWidget);
 
   // update timer
@@ -130,7 +129,6 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
   m_RenderingTimerWidget->SetTimerInterval( 50 );  // set rendering timer at 20Hz (updating every 50msec)
 
   m_Controls.m_VBoxLayout->addWidget(m_RenderingTimerWidget);
-
 }
 
 
@@ -352,8 +350,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials( )
   }
 
   unsigned int minFiducialCount = 3; // \Todo: move to view option
-  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount)
-    || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
+  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
   {
     QMessageBox::warning(NULL, "Registration not possible", QString("Not enough fiducial pairs found. At least %1 fiducial must "
       "exist for the image and the tracking system respectively.\n"
@@ -950,7 +947,13 @@ void QmitkIGTTrackingLabView::OnVirtualCamera(int toolNr, bool on)
     return;
 
    if(on)
+   {
      m_VirtualView->SetInput(m_FiducialRegistrationFilter->GetOutput(toolNr));
+     this->GetActiveStdMultiWidget()->SetWidgetPlaneModeToRotation(true);
+   }
+   else
+     this->GetActiveStdMultiWidget()->SetWidgetPlaneModeToSlicing(true);
+
 }
 
 

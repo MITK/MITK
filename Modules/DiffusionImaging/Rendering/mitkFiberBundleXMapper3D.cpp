@@ -33,7 +33,7 @@ mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 {
     m_lut = vtkLookupTable::New();
     m_lut->SetTableRange(0.0,100.0);
-     double color[3];
+    double color[3];
     m_lut->GetColor(0.1, color);
     MITK_INFO << color[0] << " " << color[1] << " " << color[2];
     m_lut->GetColor(0.5, color);
@@ -59,7 +59,7 @@ mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 
 }
 
-
+#include <vtkDoubleArray.h>
 const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 {
     MITK_INFO << "FiberBundleXxXXMapper3D() GetInput()";
@@ -94,12 +94,30 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberMapper->SetInput(FiberData);
 
     if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
-            localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
+        localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
 
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
 
+    vtkLookupTable* lut = vtkLookupTable::New();
+    lut->Build();
+    localStorage->m_FiberMapper->SetLookupTable(lut);
+
+
+    if(FBX->GetFiberPolyData()->GetPointData()->HasArray(mitk::FiberBundleX::FA_VALUE_ARRAY))
+    {
+        vtkSmartPointer<vtkDoubleArray> favals = (vtkDoubleArray*) FBX->GetFiberPolyData()->GetPointData()->GetArray(mitk::FiberBundleX::FA_VALUE_ARRAY);
+        for(int i=0;i<FBX->GetFiberPolyData()->GetNumberOfPoints();i++)
+        {
+
+            double value = favals->GetValue(i);
+            double color[3];
+            lut->GetColor(value, color);
+            MITK_INFO << "Value: " << value << " Color: " << color[0] << " " << color[1] << " " << color[2];
+
+        }
+    }
     // set Opacity
     float tmpopa;
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
@@ -107,8 +125,10 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
-        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
+        //        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
+        localStorage->m_FiberMapper->SelectColorArray(mitk::FiberBundleX::FA_VALUE_ARRAY);
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
+
 
         if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM) {
             float temprgb[3];
@@ -120,7 +140,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
     }
 
-    localStorage->m_FiberMapper->SetLookupTable(m_lut);
+
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();
     //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.
@@ -149,8 +169,8 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
          || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
          || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
-            MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
-             this->GenerateData(renderer);
+        MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+        this->GenerateData(renderer);
     }
 
 }
@@ -164,8 +184,8 @@ void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
 
     //MITK_INFO << "FiberBundleMapperX3D SetDefault Properties(...)";
     //   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
-      node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
-      node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
+    node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
+    node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
     //  node->AddProperty( "VertexOpacity_1", mitk::BoolProperty::New( false ), renderer, overwrite);
     //  node->AddProperty( "Set_FA_VertexAlpha", mitk::BoolProperty::New( false ), renderer, overwrite);
     //  node->AddProperty( "pointSize", mitk::FloatProperty::New(0.5), renderer, overwrite);

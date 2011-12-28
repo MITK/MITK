@@ -469,18 +469,19 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
 void mitk::FiberBundleX::DoColorCodingFAbased()
 {
-    if(!m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
+    if(m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY) != 1 )
         return;
 
     this->SetColorCoding(FA_VALUE_ARRAY);
+    MITK_INFO << "FBX: done CC FA based";
 }
 
 void mitk::FiberBundleX::DoUseFAasColorOpacity()
 {
-    if(!m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
+    if(m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY) != 1 )
         return;
 
-    if(!m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED))
+    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) != 1 )
         return;
 
     vtkDoubleArray* FAValArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(FA_VALUE_ARRAY);
@@ -493,6 +494,7 @@ void mitk::FiberBundleX::DoUseFAasColorOpacity()
     }
 
     this->SetColorCoding(COLORCODING_FA_AS_OPACITY);
+    MITK_INFO << "FBX: done CC OPACITY";
 }
 
 void mitk::FiberBundleX::ResetFiberColorOpacity() {
@@ -523,15 +525,24 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
         double faPixelValue = FAimage->GetPixelValueByWorldCoordinate(px) * 0.01;
-        faValues->InsertNextValue(faPixelValue);
+//        faValues->InsertNextTuple1(faPixelValue);
+        faValues->InsertValue(i, faPixelValue);
 //        MITK_INFO << faPixelValue;
+//        MITK_INFO << faValues->GetValue(i);
+
     }
 
     m_FiberPolyData->GetPointData()->AddArray(faValues);
-//    this->DoGenerateFiberIds();
+    this->DoGenerateFiberIds();
 
     if(m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
         MITK_INFO << "FA VALUE ARRAY SET";
+
+//    vtkDoubleArray* valueArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(FA_VALUE_ARRAY);
+//    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); i++)
+//    {
+//        MITK_INFO << "value at pos "<<  i << ": " << valueArray->GetValue(i);
+//    }
 }
 
 void mitk::FiberBundleX::DoGenerateFiberIds()

@@ -159,7 +159,11 @@ void QmitkFiberColoringWorker::run()
         m_itemPackage.st_FBX->DoColorCodingFAbased();
 
     } else if(m_itemPackage.st_Controls->radioButton_OpacityFA->isChecked()) {
+        //        m_itemPackage.st_FBX->SetColorCoding("");
+        m_itemPackage.st_PassedDataNode->SetOpacity(0.999);
         m_itemPackage.st_FBX->DoUseFAasColorOpacity();
+    } else if(m_itemPackage.st_Controls->radioButton_ColorCustom->isChecked()){
+        m_itemPackage.st_FBX->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
     }
 
 
@@ -1294,6 +1298,7 @@ void QmitkFiberBundleDeveloperView::DoColorFibers()
     // pack items which are needed by thread processing
     struct Package4WorkingThread ItemPackageForFiberColoring;
     ItemPackageForFiberColoring.st_FBX = m_FiberBundleX;
+    ItemPackageForFiberColoring.st_PassedDataNode = m_FiberBundleNode;
     ItemPackageForFiberColoring.st_FancyGUITimer1 = localTimer;
     ItemPackageForFiberColoring.st_Controls = m_Controls; //needed to catch up some selections and set options in GUI
 
@@ -1572,23 +1577,15 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
 
         if (m_FiberBundleX.IsNotNull())
         {
-            if (m_Controls->tabColoring->isVisible() ){
-                //show button colorCoding
-                m_Controls->buttonColorFibers->setEnabled(true);
-                m_Controls->ddAvailableColorcodings->setEnabled(true);
-                MITK_INFO << "Color";
+            //show button colorCoding
+            m_Controls->buttonColorFibers->setEnabled(true);
+            m_Controls->ddAvailableColorcodings->setEnabled(true);
+            m_Controls->buttonGenerateFiberIds->setEnabled(true);
 
-            }else if(m_Controls->tabCutting->isVisible()){
-                m_Controls->buttonGenerateFiberIds->setEnabled(true);
-
-
-            }else if(m_Controls->tabShape->isVisible()){
-                //       m_Controls->buttonSMFibers->setEnabled(true);
-                //       m_Controls->buttonVtkDecimatePro->setEnabled(true);
-                //       m_Controls->buttonVtkSmoothPD->setEnabled(true);
-                //       m_Controls->buttonGenerateTubes->setEnabled(true);
-            }
-
+            //       m_Controls->buttonSMFibers->setEnabled(true);
+            //       m_Controls->buttonVtkDecimatePro->setEnabled(true);
+            //       m_Controls->buttonVtkSmoothPD->setEnabled(true);
+            //       m_Controls->buttonGenerateTubes->setEnabled(true);
 
         } else {
             m_Controls->buttonColorFibers->setEnabled(false);

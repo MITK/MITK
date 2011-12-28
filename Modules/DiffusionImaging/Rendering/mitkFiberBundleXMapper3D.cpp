@@ -81,8 +81,9 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
-    localStorage->m_FiberActor->GetProperty()->SetOpacity(0.9);
+//    localStorage->m_FiberActor->GetProperty()->SetOpacity(0.999);
     localStorage->m_FiberMapper->SetLookupTable(m_lut);
+
 
     // set Opacity
     float tmpopa;
@@ -91,6 +92,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
+//        localStorage->m_FiberMapper->SelectColorArray("");
         localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
         MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
 
@@ -100,8 +102,6 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
-
-
     }
 
 

@@ -72,7 +72,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
 {
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New();
 
-//    newFib->m_FiberIdDataSet = vtkSmartPointer<vtkDataSet>::New();
+    //    newFib->m_FiberIdDataSet = vtkSmartPointer<vtkDataSet>::New();
     newFib->m_FiberIdDataSet->DeepCopy(m_FiberIdDataSet);
     newFib->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     newFib->m_FiberPolyData->DeepCopy(m_FiberPolyData);
@@ -334,6 +334,8 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
     {
         // fiberstructure is already colorcoded
         MITK_INFO << " NO NEED TO REGENERATE COLORCODING! " ;
+        this->ResetFiberColorOpacity();
+        this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
         return;
     }
 
@@ -343,7 +345,8 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
     //colors and alpha value for each single point, RGBA = 4 components
     unsigned char rgba[4] = {0,0,0,0};
-    int componentSize = sizeof(rgba);
+    //    int componentSize = sizeof(rgba);
+    int componentSize = 4;
 
     vtkSmartPointer<vtkUnsignedCharArray> colorsT = vtkUnsignedCharArray::New();
     colorsT->Allocate(numOfPoints * componentSize);
@@ -474,6 +477,7 @@ void mitk::FiberBundleX::DoColorCodingFAbased()
 
     this->SetColorCoding(FA_VALUE_ARRAY);
     MITK_INFO << "FBX: done CC FA based";
+    this->DoGenerateFiberIds();
 }
 
 void mitk::FiberBundleX::DoUseFAasColorOpacity()
@@ -488,31 +492,20 @@ void mitk::FiberBundleX::DoUseFAasColorOpacity()
     vtkUnsignedCharArray* ColorArray = dynamic_cast<vtkUnsignedCharArray*>  (m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED));
 
     for(long i=0; i<ColorArray->GetNumberOfTuples(); i++) {
-      double faValue = FAValArray->GetValue(i);
-//      MITK_INFO << faValue;
-//      faValue = faValue * 255.0;
-//      MITK_INFO << "--------";
-//     MITK_INFO << ColorArray->GetComponent(i,0);
-//     MITK_INFO << ColorArray->GetComponent(i,1);
-//     MITK_INFO << ColorArray->GetComponent(i,2);
-//     MITK_INFO << ColorArray->GetComponent(i,3);
-//     ColorArray->SetComponent(i,3, faValue );
-     ColorArray->SetComponent(i,3, 0.0 );
-//     MITK_INFO << ColorArray->GetComponent(i,0);
-//     MITK_INFO << ColorArray->GetComponent(i,1);
-//     MITK_INFO << ColorArray->GetComponent(i,2);
-//     MITK_INFO << ColorArray->GetComponent(i,3);
-
+        double faValue = FAValArray->GetValue(i);
+        faValue = faValue * 255.0;
+        ColorArray->SetComponent(i,3, (unsigned char) faValue );
     }
 
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
     MITK_INFO << "FBX: done CC OPACITY";
+    this->DoGenerateFiberIds();
 }
 
 void mitk::FiberBundleX::ResetFiberColorOpacity() {
     vtkUnsignedCharArray* ColorArray = dynamic_cast<vtkUnsignedCharArray*>  (m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED));
     for(long i=0; i<ColorArray->GetNumberOfTuples(); i++) {
-      ColorArray->SetComponent(i,3, 255.0 );
+        ColorArray->SetComponent(i,3, 255.0 );
     }
 }
 
@@ -522,12 +515,12 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
     vtkSmartPointer<vtkDoubleArray> faValues = vtkDoubleArray::New();
     faValues->SetName(FA_VALUE_ARRAY);
     faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
-//    MITK_INFO << faValues->GetNumberOfTuples();
-//    MITK_INFO << faValues->GetSize();
+    //    MITK_INFO << faValues->GetNumberOfTuples();
+    //    MITK_INFO << faValues->GetSize();
 
     faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
-//    MITK_INFO << faValues->GetNumberOfTuples();
-//    MITK_INFO << faValues->GetSize();
+    //    MITK_INFO << faValues->GetNumberOfTuples();
+    //    MITK_INFO << faValues->GetSize();
 
     vtkPoints* pointSet = m_FiberPolyData->GetPoints();
     for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
@@ -537,10 +530,10 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
         double faPixelValue = FAimage->GetPixelValueByWorldCoordinate(px) * 0.01;
-//        faValues->InsertNextTuple1(faPixelValue);
+        //        faValues->InsertNextTuple1(faPixelValue);
         faValues->InsertValue(i, faPixelValue);
-//        MITK_INFO << faPixelValue;
-//        MITK_INFO << faValues->GetValue(i);
+        //        MITK_INFO << faPixelValue;
+        //        MITK_INFO << faValues->GetValue(i);
 
     }
 
@@ -550,11 +543,11 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
     if(m_FiberPolyData->GetPointData()->HasArray(FA_VALUE_ARRAY))
         MITK_INFO << "FA VALUE ARRAY SET";
 
-//    vtkDoubleArray* valueArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(FA_VALUE_ARRAY);
-//    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); i++)
-//    {
-//        MITK_INFO << "value at pos "<<  i << ": " << valueArray->GetValue(i);
-//    }
+    //    vtkDoubleArray* valueArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(FA_VALUE_ARRAY);
+    //    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); i++)
+    //    {
+    //        MITK_INFO << "value at pos "<<  i << ": " << valueArray->GetValue(i);
+    //    }
 }
 
 void mitk::FiberBundleX::DoGenerateFiberIds()

@@ -240,7 +240,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
         rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
         rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
         rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
-        rgba[3] = (unsigned char) (255.0); 
+        rgba[3] = (unsigned char) (255.0);
         
         
         
@@ -259,7 +259,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
         rgba[0] = (unsigned char) (255.0 * std::abs(diff1[0]));
         rgba[1] = (unsigned char) (255.0 * std::abs(diff1[1]));
         rgba[2] = (unsigned char) (255.0 * std::abs(diff1[2]));
-        rgba[3] = (unsigned char) (255.0); 
+        rgba[3] = (unsigned char) (255.0);
         
 //        MITK_INFO << "first point color: " << rgba[0] << " " << rgba[1] << " " << rgba[2]; 
         
@@ -278,7 +278,7 @@ void mitk::FiberBundleMapper3D::GenerateData()
         rgba[0] = (unsigned char) (255.0 * std::abs(diff2[0]));
         rgba[1] = (unsigned char) (255.0 * std::abs(diff2[1]));
         rgba[2] = (unsigned char) (255.0 * std::abs(diff2[2]));
-        rgba[3] = (unsigned char) (255.0); 
+        rgba[3] = (unsigned char) (255.0);
 //        
 //        MITK_INFO << "last point color: " << rgba[0] << " " << rgba[1] << " " << rgba[2]; 
       } //end colorcoding
@@ -326,14 +326,14 @@ void mitk::FiberBundleMapper3D::GenerateData()
   m_VtkFiberDataMapperGL->ScalarVisibilityOn();
   
   m_VtkFiberDataMapperGL->SetScalarModeToUsePointFieldData();
-  m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
-  //m_VtkFiberDataMapperGL->SelectColorArray("ColorValues");
+  //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
+  m_VtkFiberDataMapperGL->SelectColorArray("ColorValues");
   m_VtkFiberDataMapperGL->SetLookupTable(lut);
 
   
   //m_FiberActor = vtkOpenGLActor::New();
   m_FiberActor->SetMapper(m_VtkFiberDataMapperGL);
-  m_FiberActor->GetProperty()->SetOpacity(1.0);
+  m_FiberActor->GetProperty()->SetOpacity(0.9);
   m_FiberActor->GetProperty()->SetPointSize(4.0f);
   // m_FiberActor->GetProperty()->SetColor(255.0, 0.0, 0.0);
   
@@ -343,8 +343,8 @@ void mitk::FiberBundleMapper3D::GenerateData()
   
   //setting color and opacity in the fiberActor itself is not recommended 
   //here cuz color and opacity of dataNode will be considered in GetData(baserenderer*) anyway
-  this->GetDataNode()->SetColor(255.0,0,0);
-  this->GetDataNode()->SetOpacity(1.0);  
+  //this->GetDataNode()->SetColor(255.0,0,0);
+  this->GetDataNode()->SetOpacity(0.9);
   
   
 }

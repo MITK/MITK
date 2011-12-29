@@ -885,3 +885,7 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
 void QmitkNDIConfigurationWidget::EnableAddToolsButton(bool enable) {
   m_Controls->m_AddToolBtn->setEnabled(enable);
 }
+
+void QmitkNDIConfigurationWidget::EnableDiscoverNewToolsButton(bool enable) {
+  m_Controls->m_DiscoverToolsBtn->setEnabled(enable);
+}

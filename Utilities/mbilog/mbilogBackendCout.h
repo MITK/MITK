@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mbilogExports.h"
 #include "mbilogAbstractBackend.h"
 #include "mbilogLogMessage.h"
-#include "mbilogConfig.h"
+#include "mbilogLoggingTypes.h"
 
 namespace mbilog{
 

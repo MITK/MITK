@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mbilogAbstractBackend.h"
 #include "mbilogBackendCout.h"
 #include "mbilogLogMessage.h"
+#include "mbilogLoggingTypes.h"
 #include "mbilogConfig.h"
 
 

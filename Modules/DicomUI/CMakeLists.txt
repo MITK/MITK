@@ -9,6 +9,4 @@ MITK_CREATE_MODULE(mitkDicomUI
   EXPORT_DEFINE MITK_DICOMUI_EXPORT
   )
 
-target_link_libraries(${MODULE_TARGET} ${CTK_LIBRARIES})
-
 # Mitk MitkExt to make linux happy

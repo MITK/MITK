@@ -91,7 +91,16 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     m_ImportDialog->setWindowModality(Qt::ApplicationModal);
     connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnImportDirectory(QString)));
 
+    m_Controls.ExternalDataTreeView->setSortingEnabled(true);
+    m_Controls.ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    //m_Controls.ExternalDataTreeView->setModel();
+
+    m_Controls.InternalDataTreeView->setSortingEnabled(true);
+    m_Controls.InternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    //m_Controls.InternalDataTreeView->setModel();
     //connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
+
+
 }
 
 void QmitkDicomEditor::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -114,7 +123,7 @@ void QmitkDicomEditor::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
     //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
-void QmitkDicomEditor::OnSeriesModelSelected(QModelIndex index){
+void QmitkDicomEditor::OnSeriesModelDoubleClicked(QModelIndex index){
     QModelIndex studyIndex = index.parent();
     QModelIndex seriesIndex = index;
 

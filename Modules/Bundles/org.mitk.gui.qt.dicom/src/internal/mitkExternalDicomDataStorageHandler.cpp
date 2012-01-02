@@ -12,19 +12,5 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notices for more information.
 =========================================================================*/
 
-#include "ExternalDicomDataStorageHandler.h"
+#include "mitkExternalDicomDataStorageHandler.h"
 
-namespace mitk
-{
-class ExternalDicomDataStorageHandler
-{
-
-
-//Methods
-
-//Signals
-
-//Slots
-
-}
-}

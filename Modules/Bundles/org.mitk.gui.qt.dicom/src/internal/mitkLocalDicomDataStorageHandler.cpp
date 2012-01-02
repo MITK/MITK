@@ -13,19 +13,5 @@ PURPOSE. See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "LocalDicomDataStorageHandler.h"
+#include "mitkLocalDicomDataStorageHandler.h"
 
-namespace mitk
-{
-class LocalDicomDataStorageHandler
-{
-
-
-//Methods
-
-//Signals
-
-//Slots
-
-}
-}

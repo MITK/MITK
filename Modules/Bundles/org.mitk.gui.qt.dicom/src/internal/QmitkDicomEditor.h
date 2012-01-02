@@ -30,23 +30,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorageEditorInput.h>
 
 #include "ui_QmitkDicomEditorControls.h"
+
+#include <QModelIndex>
+
 #include <ctkFileDialog.h>
 
 /*!
-  \brief QmitkDicomEditor
+\brief QmitkDicomEditor
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-  \sa QmitkFunctionality
-  \ingroup ${plugin_target}_internal
+\sa QmitkFunctionality
+\ingroup ${plugin_target}_internal
 */
 class QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
-  Q_OBJECT
+    // this is needed for all Qt objects that should have a Qt meta-object
+    // (everything that derives from QObject and wants to have signal/slots)
+    Q_OBJECT
 
-  public:
+public:
 
     berryObjectMacro(QmitkDicomEditor);
     static const std::string EDITOR_ID;
@@ -67,23 +70,29 @@ class QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPart
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
 
-  protected slots:
+    protected slots:
 
-    void OnImportDirectory(QString directory);
-      
-    /// \brief Called when series in TreeView is double clicked.
-    void OnSeriesModelSelected(QModelIndex index);
+        void OnImportDirectory(QString directory);
 
-    /// \brief Called when Import CD or Import Folder was clicked.
-    void OnFolderCDImport();
+        /// \brief Called when series in TreeView is double clicked.
+        void OnSeriesModelDoubleClicked(QModelIndex index);
 
-    /// \brief Called when Query Retrieve or Import Folder was clicked.
-    void OnQueryRetrieve();
+        /// \brief Called when Import CD or Import Folder was clicked.
+        void OnFolderCDImport();
 
-    /// \brief Called when LocalStorageButton was clicked.
-    void OnLocalStorage();
+        /// \brief Called when Query Retrieve or Import Folder was clicked.
+        void OnQueryRetrieve();
 
-  protected:
+        /// \brief Called when LocalStorageButton was clicked.
+        void OnLocalStorage();
+
+        /// To be called when an entry of the tree list is collapsed
+        //void OnTreeCollapsed(const QModelIndex& index);
+
+        /// To be called when an entry of the tree list is expanded
+        //void OnTreeExpanded(const QModelIndex& index);
+
+protected:
 
     ctkFileDialog* m_ImportDialog;
 

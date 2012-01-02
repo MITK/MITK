@@ -15,7 +15,7 @@ PURPOSE. See the above copyright notices for more information.
 #ifndef __LocalDicomDataStorageHandler_h
 #define __LocalDicomDataStorageHandler_h
 
-#include "AbstractDicomDataStorageHandler.h"
+#include "mitkAbstractDicomDataStorageHandler.h"
 
 namespace mitk
 {

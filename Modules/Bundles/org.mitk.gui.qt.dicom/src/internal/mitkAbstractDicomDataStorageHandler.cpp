@@ -13,19 +13,48 @@ PURPOSE. See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "AbstractDicomDataStorageHandler.h"
+#include "mitkAbstractDicomDataStorageHandler.h"
 
-namespace mitk
-{
-class AbstractDicomDataStorageHandler
-{
+namespace mitk {
+
+    AbstractDicomDataStorageHandler::AbstractDicomDataStorageHandler()
+    {
+    }
+
+    AbstractDicomDataStorageHandler::~AbstractDicomDataStorageHandler()
+    {
+    }
 
 
-//Methods
+    void AbstractDicomDataStorageHandler::SuspendModel()
+    {
+        //m_DICOMModel.setDatabase(m_EmptyDatabase);
+    }
 
-//Signals
+    void AbstractDicomDataStorageHandler::ResumeModel()
+    {
+        //m_DICOMModel.setDatabase(m_DICOMDatabase->database());
+    }
 
-//Slots
+    void AbstractDicomDataStorageHandler::ResetModel()
+    {
+        m_DICOMModel.reset();
+    }
 
-}
+    void AbstractDicomDataStorageHandler::SetDatabase(std::string databaseDirectory)
+    {
+    }
+
+    const QSharedPointer<ctkDICOMDatabase> AbstractDicomDataStorageHandler::GetDatabase()
+    {
+    }
+
+    const QSharedPointer<ctkDICOMIndexer> AbstractDicomDataStorageHandler::GetIndexer()
+    {
+    }
+
+    const QSharedPointer<ctkDICOMModel> AbstractDicomDataStorageHandler::GetModel()
+    {
+    }
+
 }

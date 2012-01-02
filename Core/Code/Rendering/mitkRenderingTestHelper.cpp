@@ -25,30 +25,33 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkGlobalInteraction.h>
 #include <vtkRenderWindowInteractor.h>
+#include <mitkSliceNavigationController.h>
 
 
-mitkRenderingTestHelper::mitkRenderingTestHelper(int argc, char * argv[],int width,int height,mitk::DataStorage *ds)
+mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, mitk::DataStorage *ds)
 {
-
-//  m_VtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-
   // Global interaction must(!) be initialized if used
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   m_RenderWindow = mitk::RenderWindow::New();
 
   m_RenderWindow->GetRenderer()->SetDataStorage(ds);
+  m_RenderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   ds->Print(std::cout);
 
   this->GetVtkRenderWindow()->SetSize( width, height );
-//  m_VtkRenderWindow->SetSize( width, height );
 
-  mitk::RenderingManager::GetInstance()->InitializeViews();
+//  mitk::RenderingManager::GetInstance()->InitializeViews();
+  mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+  mitk::TimeSlicedGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
 
-  this->GetVtkRenderWindow()->Render();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetVtkRenderWindow());
+//  mitk::RenderingManager::GetInstance()->InitializeViews();
+//  mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController()->SetViewDirection(mitk::SliceNavigationController::Transversal);
+
+//  this->GetVtkRenderWindow()->Render();
 //  this->GetVtkRenderWindow()->GetInteractor()->Start();
-
-//  m_VtkRenderWindow->Show();
 }
 
 mitkRenderingTestHelper::~mitkRenderingTestHelper()

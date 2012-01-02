@@ -34,10 +34,7 @@ namespace mitk
 class MITK_CORE_EXPORT mitkRenderingTestHelper
 {
   public:
-
-    mitkRenderingTestHelper( int argc, char* argv[],
-                              int width, int height,
-                              mitk::DataStorage* ds);
+    mitkRenderingTestHelper(int width, int height, mitk::DataStorage* ds);
 
     ~mitkRenderingTestHelper();
 
@@ -46,8 +43,6 @@ class MITK_CORE_EXPORT mitkRenderingTestHelper
     void SaveAsPNG(std::string fileName);
 
   protected:
-
-//    vtkSmartPointer<vtkRenderWindow> m_VtkRenderWindow;
     mitk::RenderWindow::Pointer m_RenderWindow;
 
 };

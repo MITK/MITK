@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 #include "mitkRenderingTestHelper.h"
+#include <mitkLevelWindow.h>
 
 class mitkRenderingTestHelperClass
 {
@@ -102,8 +103,8 @@ int mitkRenderingTest(int argc, char* argv[])
 
     // create a QmitkRenderWindow, let it render the scene and get the vtkRenderWindow
     mitkRenderingTestHelper renderingHelper( 300, 300, mitkRenderingTestHelperClass::s_DataStorage );
-    //use this to generate a reference screenshot:
-    //        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+    //use this to generate a reference screenshot or save the file:
+    renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)
@@ -111,9 +112,8 @@ int mitkRenderingTest(int argc, char* argv[])
     //1 = test passed
     //2 = test not run
     //3 = something with vtkInteraction
+    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
 
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" )
-
-            MITK_TEST_END()
+    MITK_TEST_END();
 }
 

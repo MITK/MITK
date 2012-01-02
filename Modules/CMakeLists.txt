@@ -12,6 +12,7 @@ SET(module_dirs
     QmitkExt
     GraphAlgorithms
     DiffusionImaging
+    DicomUI
     GPGPU
     IGT
     CameraCalibration

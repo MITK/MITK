@@ -6,7 +6,6 @@ MITK_CREATE_MODULE(mitkDicomUI
   GENERATED_CPP ${TOOL_GUI_CPPS} ${TOOL_CPPS}
   EXPORT_DEFINE MITK_DICOMUI_EXPORT
   )
-ADD_SUBDIRECTORY(Testing)
 
  
 # Mitk MitkExt to make linux happy

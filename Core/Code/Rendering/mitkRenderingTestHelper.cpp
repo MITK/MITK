@@ -37,7 +37,6 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, mitk::Da
 
   m_RenderWindow->GetRenderer()->SetDataStorage(ds);
   m_RenderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
-  ds->Print(std::cout);
 
   this->GetVtkRenderWindow()->SetSize( width, height );
 
@@ -50,7 +49,7 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, mitk::Da
 //  mitk::RenderingManager::GetInstance()->InitializeViews();
 //  mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController()->SetViewDirection(mitk::SliceNavigationController::Transversal);
 
-//  this->GetVtkRenderWindow()->Render();
+  this->GetVtkRenderWindow()->Render();
 //  this->GetVtkRenderWindow()->GetInteractor()->Start();
 }
 

@@ -85,9 +85,12 @@ int mitkRenderingTest(int argc, char* argv[])
     std::vector<std::string> inputFileNames;
     for (int i = 1; i < argc-1; ++i)
     {
+        //add everything to a list but -T and -V
         std::string tmp = argv[i];
-        if(!(tmp.compare("-T")) && !(tmp.compare("-V")))
-            inputFileNames.push_back( argv[i] );
+        if((tmp.compare("-T")) && (tmp.compare("-V")))
+        {
+            inputFileNames.push_back( tmp );
+        }
     }
     //    std::string outputFileName( argv[argc-1] );
 
@@ -99,10 +102,17 @@ int mitkRenderingTest(int argc, char* argv[])
 
     // create a QmitkRenderWindow, let it render the scene and get the vtkRenderWindow
     mitkRenderingTestHelper renderingHelper( 300, 300, mitkRenderingTestHelperClass::s_DataStorage );
-//    renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+    //use this to generate a reference screenshot:
+    //        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
-    MITK_TEST_CONDITION( !retVal, "Returning VTK test result" )
+    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
+    //0 = test failed
+    //1 = test passed
+    //2 = test not run
+    //3 = something with vtkInteraction
+
+    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" )
 
             MITK_TEST_END()
 }

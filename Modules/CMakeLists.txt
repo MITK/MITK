@@ -27,6 +27,7 @@ SET(module_dirs
     ToFProcessing
     ToFUI
 	ClippingTools
+    DicomUI
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

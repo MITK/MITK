@@ -19,93 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <sstream>
 
+#include "mbilogExports.h"
+#include "mbilogAbstractBackend.h"
+#include "mbilogBackendCout.h"
+#include "mbilogLogMessage.h"
 #include "mbilogConfig.h"
 
-#ifndef MBILOG_MODULENAME
-  #if defined(_CMAKE_MODULENAME)
-    #define MBILOG_MODULENAME _CMAKE_MODULENAME
-  #else
-    #define MBILOG_MODULENAME "n/a"
-  #endif
-#endif
 
-#if defined(_WIN32)
-  #ifdef mbilog_EXPORTS
-    #define MBILOG_DLL_API __declspec(dllexport)
-  #else
-    #define MBILOG_DLL_API __declspec(dllimport)
-  #endif
-#else
-  #define MBILOG_DLL_API
-#endif
 
 namespace mbilog {
 
-  enum {
-    Info,
-    Warn,
-    Error,
-    Fatal,
-    Debug
-  };
-
-  class MBILOG_DLL_API LogMessage {
-
-    public:
-
-      const int level;
-      const char* filePath;
-      const int lineNumber;
-      const char* functionName;
-      
-      const char* moduleName;
-      std::string category;
-      std::string message;
-
-      LogMessage(
-        const int _level,
-        const char* _filePath,
-        const int _lineNumber,
-        const char* _functionName
-      )
-        : level(_level)
-        , filePath(_filePath)
-        , lineNumber(_lineNumber)
-        , functionName(_functionName)
-      {
-      }
-  };
-
-  struct MBILOG_DLL_API AbstractBackend
-  {
-    virtual ~AbstractBackend(){}
-    virtual void ProcessMessage(const mbilog::LogMessage& )=0;
-  };
-
-  class MBILOG_DLL_API BackendCout : public AbstractBackend
-  {
-    public:
-
-      BackendCout();
-      ~BackendCout();
-      virtual void ProcessMessage(const mbilog::LogMessage &l );
-
-      void SetFull(bool full);
-
-      static void FormatSmart(const LogMessage &l,int threadID=0);
-      static void FormatFull(const LogMessage &l,int threadID=0);
-
-      static void FormatSmart(std::ostream &out, const LogMessage &l,int threadID=0);
-      static void FormatFull(std::ostream &out, const LogMessage &l,int threadID=0);
-
-    private:
-
-      static void AppendTimeStamp(std::ostream& out);
-      static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/);
-
-      bool useFullOutput;
-
-  };
+  
 
   void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
@@ -141,7 +65,7 @@ namespace mbilog {
         }
       }
 
-      template <class T> inline PseudoStream& operator<<(const T& data) 
+      template <class T> inline PseudoStream& operator<<(const T& data)
       {
         if(!disabled)
         {
@@ -155,7 +79,7 @@ namespace mbilog {
         }
         return *this;
       }
-      
+
       template <class T> inline PseudoStream& operator<<(T& data)
       {
         if(!disabled)

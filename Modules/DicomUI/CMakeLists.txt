@@ -1,3 +1,5 @@
+include_directories(${CTK_INCLUDE_DIRS})
+
 MITK_CREATE_MODULE(mitkDicomUI
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   INCLUDE_DIRS Qmitk
@@ -7,5 +9,5 @@ MITK_CREATE_MODULE(mitkDicomUI
   EXPORT_DEFINE MITK_DICOMUI_EXPORT
   )
 
- 
+target_link_libraries(${PLUGIN_TARGET} ${CTK_LIBRARIES})
 # Mitk MitkExt to make linux happy

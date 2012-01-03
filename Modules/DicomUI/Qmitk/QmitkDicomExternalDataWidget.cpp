@@ -16,39 +16,39 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 // Qmitk
-#include "QmitkDicomLocalStorageWidget.h"
+#include "QmitkDicomExternalDataWidget.h"
 
 // Qt
 #include <QMessageBox>
 
 
 
-const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
+const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
-QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
+QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
 :  m_Controls( 0 )
 {
    CreateQtPartControl(this);
 }
 
-QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
+QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
 {
 }
 
 
-void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
+void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
 {
    // build up qt Widget, unless already done
    if ( !m_Controls )
    {
       // create GUI widgets from the Qt Designer's .ui file
-       m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
+       m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
       m_Controls->setupUi( parent );
 
    }
 }
 
-void QmitkDicomLocalStorageWidget::Initialize()
+void QmitkDicomExternalDataWidget::Initialize()
 {
 
 }

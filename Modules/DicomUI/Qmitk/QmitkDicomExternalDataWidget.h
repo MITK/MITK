@@ -15,24 +15,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkDicomLocalStorageWidget_h
-#define QmitkDicomLocalStorageWidget_h
+#ifndef QmitkDicomExternalDataWidget_h
+#define QmitkDicomExternalDataWidget_h
 
 // #include <QmitkFunctionality.h>
-#include "ui_QmitkDicomLocalStorageWidgetControls.h"
+#include "ui_QmitkDicomExternalDataWidgetControls.h"
 #include "mitkDicomUIExports.h"
 #include <QWidget>
 
 
 /*!
-\brief QmitkDicomLocalStorageWidget 
+\brief QmitkDicomExternalDataWidget 
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class MITK_DICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
+class MITK_DICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
 {  
    // this is needed for all Qt objects that should have a Qt meta-object
    // (everything that derives from QObject and wants to have signal/slots)
@@ -42,8 +42,8 @@ public:
 
    static const std::string Widget_ID;
 
-   QmitkDicomLocalStorageWidget(QWidget *parent);
-   virtual ~QmitkDicomLocalStorageWidget();
+   QmitkDicomExternalDataWidget(QWidget *parent);
+   virtual ~QmitkDicomExternalDataWidget();
 
    virtual void CreateQtPartControl(QWidget *parent);
 
@@ -62,7 +62,7 @@ public:
 protected:
 
 
-    Ui::QmitkDicomLocalStorageWidgetControls* m_Controls;
+    Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
 
    // Performs a starbust on inputimage, which results in outputimage. Only workds with 3D and 4D Ultrasound images (char Pixeltype)
    //void PerformStarburst(mitk::Image::Pointer inputImage, mitk::Image::Pointer &outputImage, mitk::Point3D startPoint, bool doubleStarburst, bool thinStarburst);
@@ -73,5 +73,5 @@ protected:
 
 
 
-#endif // _QmitkDicomLocalStorageWidget_H_INCLUDED
+#endif // _QmitkDicomExternalDataWidget_H_INCLUDED
 

@@ -1,14 +1,14 @@
 
 SET(CPP_FILES ${CPP_FILES}
-  Qmitk/QmitDicomLocalStorageWidget.cpp
+  Qmitk/QmitkDicomLocalStorageWidget.cpp
 )
 
 SET(UI_FILES ${UI_FILES}
-  Qmitk/QmitDicomLocalStorageWidgetControls.ui
+  Qmitk/QmitkDicomLocalStorageWidgetControls.ui
 )
 
 SET(MOC_H_FILES ${MOC_H_FILES}
-  Qmitk/QmitDicomLocalStorageWidget.h
+  Qmitk/QmitkDicomLocalStorageWidget.h
 
 )
 

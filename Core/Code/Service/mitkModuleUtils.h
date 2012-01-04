@@ -31,7 +31,7 @@ namespace mitk {
  */
 struct MITK_CORE_EXPORT ModuleUtils
 {
-  static std::string GetLibraryPath(const std::string& libName, const void* symbol);
+  static std::string GetLibraryPath(const std::string& libName, void* symbol);
 
   static void* GetSymbol(const std::string& libName, const char* symbol);
 };

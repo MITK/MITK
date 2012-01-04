@@ -26,7 +26,7 @@ namespace mitk {
 #define _GNU_SOURCE
 #include <dlfcn.h>
 
-std::string GetLibraryPath_impl(const std::string& /*libName*/, const void* symbol)
+std::string GetLibraryPath_impl(const std::string& /*libName*/, void* symbol)
 {
   Dl_info info;
   if (dladdr(symbol, &info))
@@ -97,7 +97,7 @@ void PrintLastError_impl(const std::string& context)
       MITK_DEBUG(true) << errMsg;
 }
 
-std::string GetLibraryPath_impl(const std::string& libName, const void *symbol)
+std::string GetLibraryPath_impl(const std::string& libName, void* /*symbol*/)
 {
   HMODULE handle = 0;
   if (libName.empty())
@@ -152,7 +152,7 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
   return addr;
 }
 #else
-std::string GetLibraryPath_impl(const std::string& libName, const void* symbol)
+std::string GetLibraryPath_impl(const std::string& libName, void* symbol)
 {
   return "";
 }
@@ -163,7 +163,7 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
 }
 #endif
 
-std::string ModuleUtils::GetLibraryPath(const std::string& libName, const void* symbol)
+std::string ModuleUtils::GetLibraryPath(const std::string& libName, void* symbol)
 {
   return GetLibraryPath_impl(libName, symbol);
 }

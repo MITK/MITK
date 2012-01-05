@@ -305,11 +305,22 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
     mitk::DataNode::Pointer node;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(3*nrFolders);
 
+
+
+
+
     while(m_Controls->listWidget->count())
     {
       // RETREIVE FOLDERNAME
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
+
+      size_t found = folderName.toStdString().find_last_of("/\\");
+      std::string folder = folderName.toStdString().substr(0,found);
+      folder.append("\log.txt");
+
+      ofstream logfile;
+      logfile.open(folder.c_str());
 
       // PARSING DIRECTORY
       PrintMemoryUsage();
@@ -369,6 +380,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nvalues>1)
       {
         Error("Multiple sSeries tudies found. Please limit to 1 study per folder");
+        logfile << "Multiple series found. Limit to one. If you are convinced this is an error use the merge duplicate study IDs option \n";
         continue;
       }
 
@@ -411,6 +423,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nfiles % nSeries != 0)
       {
         Error("Number of files in series not equal, ABORTING");
+
+        logfile << "Number of files in series not equal, Some volumes are probably incomplete. ABORTING \n";
+
         continue;
       }
 
@@ -462,6 +477,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(filesPerSeries % nAcquis != 0)
         {
           Error("Number of files per acquisition not equal, ABORTING");
+          logfile << "Number of files per acquisition not equal, ABORTING \n";
           continue;
         }
 
@@ -644,6 +660,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       PrintMemoryUsage();
       clock.Stop(folderName.toAscii());
       mitk::ProgressBar::GetInstance()->Progress();
+      int lwidget = m_Controls->listWidget->count();
+      std::cout << lwidget <<std::endl;
+
+      logfile.close();
     }
 
     Status("Timing information");

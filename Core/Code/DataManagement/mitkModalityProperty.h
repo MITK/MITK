@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
   \brief Enumerates all known modalities
 
@@ -55,6 +60,10 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
     ModalityProperty(const ModalityProperty&);
     const ModalityProperty& operator=(const ModalityProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace
 

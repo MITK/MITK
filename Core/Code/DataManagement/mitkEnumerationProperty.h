@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * This class may be used to store properties similar to enumeration values.
  * Each enumeration value is identified via a string representation and a
@@ -210,6 +215,9 @@ private:
 
 };
 
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace
 

@@ -29,11 +29,7 @@
 #include <vtkOpenGLActor.h>
 #include <vtkPropAssembly.h>
 #include <vtkCellArray.h>
-#include <vtkPolyData.h>;
-
-
-
-
+#include <vtkPolyData.h>
 
 namespace mitk {
   

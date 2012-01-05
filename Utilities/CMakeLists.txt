@@ -1,4 +1,3 @@
-SUPPRESS_VC8_DEPRECATED_WARNINGS()
 SUPPRESS_ALL_WARNINGS()
 
 # most stuff of these uses itk_zlib.h (via mitkIpPic.h)

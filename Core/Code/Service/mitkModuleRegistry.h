@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 class Module;
-class ModuleInfo;
+struct ModuleInfo;
 
 /**
  * \ingroup MicroServices

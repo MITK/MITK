@@ -1,8 +1,8 @@
 
 # suppress some warnings in VC8 about using unsafe/deprecated c functions
-function(SUPPRESS_VC8_DEPRECATED_WARNINGS)
-  if(MSVC80)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS)
+function(SUPPRESS_VC_DEPRECATED_WARNINGS)
+  if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
   endif()
 endfunction()
 

@@ -217,7 +217,7 @@ namespace mitk
       throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
     }
     catch(...)
-    {http://www.wetter.com/deutschland/heidelberg/DE0004329.html
+    {
       MITK_INFO << "Exception while reading file!!";
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
     }

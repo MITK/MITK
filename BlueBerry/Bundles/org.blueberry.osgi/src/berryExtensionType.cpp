@@ -153,7 +153,7 @@ bool ExtensionType::isRegistered(int type)
 
 int ExtensionType::type(const char *typeName)
 {
-  int length = std::strlen(typeName);
+  int length = static_cast<int>(std::strlen(typeName));
   if (!length) return 0;
 
   QReadLocker locker(customTypesLock());

@@ -23,6 +23,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
 	m_TimeStep = 0;
 	m_Reslicer->ReleaseDataFlagOn();//todo check 
+	interpolationMode = ExtractSliceFilter::ResliceInterpolation::RESLICE_NEAREST;
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -84,9 +85,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
 /*================#BEGIN setup vtkImageRslice properties================*/
 
 	m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
-	
-	m_Reslicer->SetResliceTransform(
-		m_WorldGeometry->GetVtkTransform()->GetLinearInverse() );
 
 	/*setup the plane where vktImageReslice extracts the slice*/
 
@@ -117,8 +115,21 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	//we only have one slice, not a volume
 	m_Reslicer->SetOutputDimensionality(2);
 
-	//the default interpolation used by mitk
-	m_Reslicer->SetInterpolationModeToNearestNeighbor();
+
+	//set the interpolation mode for slicing
+	switch(this->interpolationMode){
+		case ResliceInterpolation::RESLICE_NEAREST:
+			m_Reslicer->SetInterpolationModeToNearestNeighbor();
+			break;
+		case ResliceInterpolation::RESLICE_LINEAR:
+			m_Reslicer->SetInterpolationModeToLinear();
+			break;
+		case ResliceInterpolation::RESLICE_CUBIC:
+			m_Reslicer->SetInterpolationModeToCubic();
+		default:
+			//the default interpolation used by mitk
+			m_Reslicer->SetInterpolationModeToNearestNeighbor();
+	}
 
 	//start the pipeline
 	m_Reslicer->Modified();

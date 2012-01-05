@@ -39,7 +39,7 @@ namespace mitk
 		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
 		itkNewMacro(ExtractSliceFilter);
 
-		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); };
+		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }
 
 		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
 		unsigned int GetTimeStep(){ return this->m_TimeStep; }
@@ -47,6 +47,10 @@ namespace mitk
 		vtkMatrix4x4* GetResliceAxes(){
 			return this->m_Reslicer->GetResliceAxes();
 		}
+
+		enum ResliceInterpolation { RESLICE_NEAREST, RESLICE_LINEAR, RESLICE_CUBIC };
+		
+		void SetInterPolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->interpolationMode = interpolation; }
 
 	protected:
 		ExtractSliceFilter();
@@ -59,6 +63,7 @@ namespace mitk
 
 		unsigned int m_TimeStep;
 
+		ResliceInterpolation interpolationMode;
 	};
 }
 

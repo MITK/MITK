@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExtractSliceFilter.h"
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
+#include <vtkLinearTransform.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
@@ -46,6 +47,16 @@ void mitk::ExtractSliceFilter::GenerateData(){
         return;
     }
 
+
+	if(input->GetDimension() == 2){
+		//if the image is already 2D, we have nothing to resice and we can set the input image as the output
+
+		/*Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+		resultImage = const_cast<Image*>(input);
+		ImageToImageFilter::SetNthOutput( 0, resultImage );
+		return;*/
+	}
+
 	
 
 	const TimeSlicedGeometry *inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
@@ -70,10 +81,12 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	 }
 
 
-/********** #BEGIN setup vtkImageRslice properties***********/
+/*================#BEGIN setup vtkImageRslice properties================*/
 
 	m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
-
+	
+	m_Reslicer->SetResliceTransform(
+		m_WorldGeometry->GetVtkTransform()->GetLinearInverse() );
 
 	/*setup the plane where vktImageReslice extracts the slice*/
 
@@ -111,12 +124,12 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	m_Reslicer->Modified();
 	m_Reslicer->Update();
 
-/********** #END setup vtkImageRslice properties***********/
+/*================ #END setup vtkImageRslice properties================*/
 
 
 
 
-/********** #BEGIN Get the slice from vtkImageReslice and convert it to mitk Image***********/
+/*================ #BEGIN Get the slice from vtkImageReslice and convert it to mitk Image================*/
 	vtkImageData* reslicedImage;
 	reslicedImage = m_Reslicer->GetOutput();
 
@@ -143,9 +156,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	originalGeometry->ChangeImageGeometryConsideringOriginOffset(true);
     resultImage->SetGeometry( originalGeometry );
 
-	resultImage->GetGeometry()->TransferItkToVtkTransform();
+	//resultImage->GetGeometry()->TransferItkToVtkTransform();
 
 	
 	resultImage->GetGeometry()->Modified();
-/********** #END Get the slice from vtkImageReslice and convert it to mitk Image***********/
+/*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
 }

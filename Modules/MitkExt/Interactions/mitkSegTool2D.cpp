@@ -203,15 +203,15 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 			ExtractSliceFilter::Pointer newExtractor2 = ExtractSliceFilter::New();
 			newExtractor2->SetInput( referenceImage );
-			newExtractor2->SetWorldGeometry( planeGeometry );
 			newExtractor2->SetTimeStep( timeStep );
+			newExtractor2->SetWorldGeometry( planeGeometry );
 			newExtractor2->Update();
 			Image::Pointer slice2 = newExtractor2->GetOutput();
 
 			DataNode::Pointer dn = DataNode::New();
 			dn->SetData(slice2);
 			dn->SetProperty("name", StringProperty::New("slice"));
-			m_ToolManager->GetDataStorage()->Add(dn, referenceNode);
+			m_ToolManager->GetDataStorage()->Add(dn);
 
 
 

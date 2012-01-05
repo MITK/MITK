@@ -239,9 +239,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 		  worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
   }
 
-
   ////Code for curved planes
-  //{
+  // else{
   //  // Do we have an AbstractTransformGeometry?
   //  // This is the case for AbstractTransformGeometry's (e.g. a thin-plate-spline transform)
   //  const mitk::AbstractTransformGeometry* abstractGeometry =

@@ -630,8 +630,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           QString fullpath = QString("%1/%2.dwi")
                              .arg(m_OutputFolderName)
                              .arg(descr);
-          std::string pathstring = itksys::SystemTools::ConvertToOutputPath(fullpath.toStdString().c_str());
-          writer->SetFileName(pathstring);
+          //std::string pathstring = itksys::SystemTools::ConvertToOutputPath(fullpath.toStdString().c_str());
+
+          writer->SetFileName(fullpath.toStdString());
           writer->SetInput(diffImage);
           try
           {

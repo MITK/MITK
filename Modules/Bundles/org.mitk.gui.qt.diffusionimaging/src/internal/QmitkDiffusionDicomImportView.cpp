@@ -307,7 +307,16 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
 
     std::string folder = m_Controls->m_OutputLabel->text().toStdString();
-    folder.append("/import.log");
+
+
+    if(berry::Platform::IsWindows())
+    {
+      folder.append("\\import.log");
+    }
+    else
+    {
+      folder.append("/import.log");
+    }
 
     ofstream logfile;
     if(m_OutputFolderNameSet) logfile.open(folder.c_str());

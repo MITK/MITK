@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRegionGrowingView.h"
 #include "QmitkPointListWidget.h"
 #include "QmitkStdMultiWidget.h"
+#include "mitkGlobalInteraction.h"
 
 // Qt
 #include <QMessageBox>
@@ -53,11 +54,20 @@ QmitkRegionGrowingView::QmitkRegionGrowingView(const QmitkRegionGrowingView& oth
 
 QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_PointSetInteractor );
+    m_PointSetInteractor = NULL;
+    m_PointSetNode->RemoveObserver(m_NodeDeleteObserverTag);
+    m_PointSetNode->RemoveObserver(m_NodeModifyObserverTag);
+    m_PointSet->RemoveObserver(m_PointSetAddObserverTag);
+    m_PointSet->RemoveObserver(m_PointSetMovedObserverTag);
 }
 
 void QmitkRegionGrowingView::Deactivated()
 {
-  m_Controls->lstPoints->DeactivateInteractor(true);
+  //m_Controls->lstPoints->DeactivateInteractor(true);
+  //TODO Deactivate Pointsetinteractor an remove observers
+    m_PointSetInteractor = NULL;
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_PointSetInteractor );
 }
 
 void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
@@ -70,41 +80,100 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
  
     connect( m_Controls->btnPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
+    connect( m_Controls->btnSetSeedpoint, SIGNAL(clicked()), this, SLOT(ActivatePointSetInteractor()));
    
     // let the point set widget know about the multi widget (crosshair updates)
-    m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
+    //m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
 
-    connect(m_Controls->lstPoints, SIGNAL(PointSelectionChanged()), this, SLOT(OnSeedPointAdded()));
+    //connect(m_Controls->lstPoints, SIGNAL(PointSelectionChanged()), this, SLOT(OnSeedPointAdded()));
+
+    //Replaced functionality of QmitkPointListWidget
+
     
     // create a new DataNode containing a PointSet with some interaction
     m_PointSet = mitk::PointSet::New();
 
-    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-    pointSetNode->SetData( m_PointSet );
-    pointSetNode->SetName("seed points for region growing");
-    pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
-    pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024) );
+//    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+//    pointSetNode->SetData( m_PointSet );
+//    pointSetNode->SetName("seed points for region growing");
+//    pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
+//    pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024) );
+    m_PointSetNode = mitk::DataNode::New();
+    m_PointSetNode->SetData( m_PointSet );
+    m_PointSetNode->SetName("seed points for region growing");
+    m_PointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
+    m_PointSetNode->SetProperty("layer", mitk::IntProperty::New(1024) );
+
+    itk::SimpleMemberCommand<QmitkRegionGrowingView>::Pointer deleteCommand = itk::SimpleMemberCommand<QmitkRegionGrowingView>::New();
+    deleteCommand->SetCallbackFunction( this, &QmitkRegionGrowingView::OnNodeDeleted );
+    m_NodeDeleteObserverTag = m_PointSetNode->AddObserver( itk::DeleteEvent(), deleteCommand );
+
+    itk::SimpleMemberCommand<QmitkRegionGrowingView>::Pointer modifyCommand = itk::SimpleMemberCommand<QmitkRegionGrowingView>::New();
+    modifyCommand->SetCallbackFunction( this, &QmitkRegionGrowingView::OnNodeModified );
+    m_NodeModifyObserverTag = m_PointSetNode->AddObserver( itk::ModifiedEvent(), modifyCommand );
+
+    itk::SimpleMemberCommand<QmitkRegionGrowingView>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkRegionGrowingView>::New();
+    pointAddedCommand->SetCallbackFunction(this, &QmitkRegionGrowingView::OnPointAdded);
+    m_PointSetAddObserverTag = m_PointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
+
+    itk::SimpleMemberCommand<QmitkRegionGrowingView>::Pointer pointMovedCommand = itk::SimpleMemberCommand<QmitkRegionGrowingView>::New();
+    pointMovedCommand->SetCallbackFunction(this, &QmitkRegionGrowingView::OnPointMoved);
+    m_PointSetMovedObserverTag = m_PointSet->AddObserver( mitk::PointSetMoveEvent(), pointMovedCommand);
 
     // add the pointset to the data tree (for rendering and access by other modules)
-    GetDefaultDataStorage()->Add( pointSetNode );
+    GetDefaultDataStorage()->Add( m_PointSetNode );
 
     // tell the GUI widget about out point set
-    m_Controls->lstPoints->SetPointSetNode( pointSetNode );
+    //m_Controls->lstPoints->SetPointSetNode( pointSetNode );
   }
 }
 
+void QmitkRegionGrowingView::OnNodeDeleted()
+{
+     MITK_INFO<<"Deleted....";
+}
+
+void QmitkRegionGrowingView::OnNodeModified()
+{
+    MITK_INFO<<"Modified....";
+//    m_Controls->btnSetSeedpoint->setDown(false);
+//    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_PointSetInteractor );
+//    m_PointSetInteractor = NULL;
+    //this->OnSeedPointAdded();
+}
+
+void QmitkRegionGrowingView::OnPointAdded()
+{
+    if (m_PointSet->GetSize() == 2)
+    {
+        MITK_INFO<<"Before swap: [0]: "<<m_PointSet->GetPoint(0)[0]<<", "<<m_PointSet->GetPoint(0)[1]<<", "<<m_PointSet->GetPoint(0)[2];
+        MITK_INFO<<"Before swap: [1]: "<<m_PointSet->GetPoint(1)[0]<<", "<<m_PointSet->GetPoint(1)[1]<<", "<<m_PointSet->GetPoint(1)[2];
+        mitk::PointOperation* swapOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, m_PointSet->GetPoint(1), 1);
+        m_PointSet->ExecuteOperation(swapOp);
+        mitk::PointOperation* removeOp = new mitk::PointOperation(mitk::OpREMOVE, m_PointSet->GetPoint(1), 1);
+        m_PointSet->ExecuteOperation(removeOp);
+        MITK_INFO<<"After swap: Size: "<<m_PointSet->GetSize();
+        MITK_INFO<<"Before swap: [0]: "<<m_PointSet->GetPoint(0)[0]<<", "<<m_PointSet->GetPoint(0)[1]<<", "<<m_PointSet->GetPoint(0)[2];
+    }
+    this->OnSeedPointAdded();
+}
+
+void QmitkRegionGrowingView::OnPointMoved()
+{
+    this->OnSeedPointAdded();
+}
 
 void QmitkRegionGrowingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
-  m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
+  //m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
 }
 
 
 void QmitkRegionGrowingView::StdMultiWidgetNotAvailable()
 {
   m_MultiWidget = NULL;
-  m_Controls->lstPoints->SetMultiWidget( NULL );
+  //m_Controls->lstPoints->SetMultiWidget( NULL );
 }
 
 
@@ -120,11 +189,40 @@ void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_Controls->lblWarning->setVisible( false );
+      m_Controls->btnSetSeedpoint->setEnabled(true);
       return;
     }
   }
 
   m_Controls->lblWarning->setVisible( true );
+  m_Controls->btnSetSeedpoint->setEnabled(false);
+}
+
+void QmitkRegionGrowingView::ActivatePointSetInteractor()
+{
+    MITK_INFO<<"ButtonIsDown: "<<m_Controls->btnSetSeedpoint->isDown();
+    if (m_PointSetNode)
+    {
+        if(!m_Controls->btnSetSeedpoint->isDown())
+        {
+            m_Controls->btnSetSeedpoint->setDown(true);
+
+            m_PointSetInteractor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
+
+            if (m_PointSetInteractor.IsNull())//if not present, instanciate one
+              m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+
+            mitk::GlobalInteraction::GetInstance()->AddInteractor( m_PointSetInteractor );
+        }
+        else
+        {
+            m_Controls->btnSetSeedpoint->setDown(false);
+
+            m_PointSetInteractor = NULL;
+            mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_PointSetInteractor );
+        }
+    }
+    MITK_INFO<<"ButtonIsDown: "<<m_Controls->btnSetSeedpoint->isDown();
 }
 
 void QmitkRegionGrowingView::OnSeedPointAdded()
@@ -168,7 +266,7 @@ void QmitkRegionGrowingView::OnSeedPointAdded()
               {
                   for(int k = seedPointInIndex[2]-2; k <= seedPointInIndex[2]+2; k++)
                   {
-                      MITK_INFO<<"CurrentIndex: ["<<i<<", "<<j<<", "<<k<<"]";
+                      //MITK_INFO<<"CurrentIndex: ["<<i<<", "<<j<<", "<<k<<"]";
                       currentIndex[0] = i;
                       currentIndex[1] = j;
                       currentIndex[2] = k;
@@ -216,6 +314,9 @@ void QmitkRegionGrowingView::OnSeedPointAdded()
           }
           deviation = deviation/(numberOfValues-1);
           deviation = sqrt(deviation);
+
+          MITK_INFO<<"SliderRange: "<<deviation*3;
+          MITK_INFO<<"SliderValue: "<<deviation*1.5;
 
           m_Controls->sliderOffsetValue->setRange(0,deviation*3);
           m_Controls->sliderOffsetValue->setValue(1.5*deviation);

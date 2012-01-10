@@ -31,18 +31,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkPointListWidget" name="lstPoints">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
+    <widget class="QPushButton" name="btnSetSeedpoint">
+     <property name="text">
+      <string>Set Seedpoint</string>
      </property>
     </widget>
    </item>
@@ -97,6 +88,19 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="cbOverwritePrevious">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Overwrite previous result</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="spacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -115,13 +119,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QmitkPointListWidget</class>
-   <extends>QListView</extends>
-   <header>QmitkPointListWidget.h</header>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>

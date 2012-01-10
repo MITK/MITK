@@ -28,6 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkRegionGrowingViewControls.h"
 
+#include "mitkPointSetInteractor.h"
+#include "mitkPointSet.h"
+#include "mitkInteractionConst.h"
+
 
 
 /*!
@@ -69,6 +73,8 @@ class QmitkRegionGrowingView : public QmitkFunctionality
 
     void OnSeedPointAdded();
 
+    void ActivatePointSetInteractor();
+
   protected:
 
     /*!
@@ -82,6 +88,12 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
+    void OnNodeDeleted();
+    void OnNodeModified();
+
+    void OnPointAdded();
+    void OnPointMoved();
+
     /// \brief This is the actual seed point data object
     mitk::PointSet::Pointer m_PointSet;
 
@@ -90,6 +102,14 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     QmitkStdMultiWidget* m_MultiWidget;
 
     mitk::ScalarType m_InitialThreshold;
+
+    mitk::PointSetInteractor::Pointer m_PointSetInteractor;
+    mitk::DataNode::Pointer m_PointSetNode;
+
+    long m_NodeDeleteObserverTag;
+    long m_NodeModifyObserverTag;
+    long m_PointSetAddObserverTag;
+    long m_PointSetMovedObserverTag;
 };
 
 

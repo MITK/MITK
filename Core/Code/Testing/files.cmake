@@ -114,7 +114,7 @@ SET(MODULE_QT_BOOL "false")
 
 SET(testdriver_init_file "${CMAKE_CURRENT_BINARY_DIR}/MitkTestDriver_init.cpp")
 CONFIGURE_FILE("${MITK_SOURCE_DIR}/CMake/mitkModuleInit.cpp" ${testdriver_init_file} @ONLY)
-SET(TEST_CPP_FILES ${testdriver_init_file})
+SET(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
 
 SET(MODULE_NAME ${module_name_orig})
 SET(MODULE_LIBNAME ${module_libname_orig})

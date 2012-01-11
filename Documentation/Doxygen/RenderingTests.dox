@@ -1,20 +1,41 @@
 namespace mitk{
 /**
-\page RenderingTests Automatic rendering tests
+\page RenderingTests Automatic Rendering Tests
 
 Available sections:
 
--# \ref Section_1 "What is an automatic rendering test?"
--# \ref Section_2 "How to create a rendering test"
+-# \ref WhatIsARenderingTest "What is an automatic rendering test?"
+-# \ref HowToCreateATest "How to create a rendering test"
 
-\section Section_1 What is an automatic rendering test?
+\section WhatIsARenderingTest What is an automatic rendering test?
 
+An automatic rendering test is a powerful tool to test rendering results automatically via dashboard. Regarding rendering lots of different sources influence the output on the screen (e.g. different mappers, renderes, camera settings or the algorithm creating the data). Thus, during the rendering process of an image many different classes are involved and can have impact on the output. A minor change in an important class (e.g. mitkVtkPropRenderer) can have major impact on the actual rendering. An automatic rendering test takes an abitrary object as input (e.g. image, surface, point set), renders this into an mitkRenderWindow, makes a screenshot of that renderwindow and finally compares that screenshot to a given reference. Of course, the reference has to be defined by the user. Internally, a VTK test method is used to compare both screenshots and measure differences. In case of failure, a difference can be generated to show exactly which pixels are rendered incorrectly. Implementing automatic rendering tests for algorithms ensures that algorithms deliver the same output as they used to do in previous version of MITK.
 
-testgdrkvbghnfdlkxbklfdxg
+\section HowToCreateATest How to create your own automatic rendering test
 
-\section Section_2 How to create a rendering test
+To create an automatic rendering test you should use an existing test as example (e.g. mitkImageVtkMapper2DTest). 
 
-hgfdjhftghkjzguiokuzhgkzguf
+1. Like adding any test with parameters to CMake, you have to add a custom test to the files.cmake and the corresponding CMakeLists.txt:
+
+For instance a test for the mitkImageVtkMapper2D has to be added like this:
+
+files.cmake
+\code
+SET(MODULE_CUSTOM_TESTS
+    ...
+    mitkImageVtkMapper2D.cpp
+)
+\endcode
+
+CMakeLists.txt
+\code
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D #custom name of the test and executable
+                        ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
+)
+\endcode
+
+The option -V defines the path to the reference screenshot and is internally used by VTK. 
 
 
 */

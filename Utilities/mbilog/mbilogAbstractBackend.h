@@ -20,10 +20,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mbilog{
 
-  struct MBILOG_DLL_API AbstractBackend
+
+  /** Documentation
+   *  \brief This class is an interface for logging backends that can be registered in the mbi logging mechanism.
+   *
+   *  \ingroup mbilog
+   */
+  struct MBILOG_DLL_API AbstractBackend //TODO: convert to class
   {
-    virtual ~AbstractBackend(){}
-    virtual void ProcessMessage(const mbilog::LogMessage& )=0;
+    virtual ~AbstractBackend()
+	
+	/** \brief This method is called by the mbi logging mechanism if the object is registered in 
+	 *         the mbi logging mechanism and a logging message is emitted.
+	 *
+	 *  \param logMessage Logging message which was emitted.
+	 *
+	 */
+    virtual void ProcessMessage(const mbilog::LogMessage& logMessage)=0;
   };
   
 }

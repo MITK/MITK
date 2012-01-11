@@ -30,12 +30,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mbilog {
 
-  
-
+  /** \brief Registeres a backend to the mbi logging mechanism. If a backend is registered here, all mbilog messages
+   *         are relayed to this backend through the method ProcessMessage. If no backend is registered the default
+   *         backend is used.
+   */
   void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
+  
+  /** \brief Unregisters a backend.
+   */
   void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
+  
+  /** \brief Distributes the given message to all registered backends. Should only be called by objects 
+    *        of the class pseudo stream.
+    */
   void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
 
+  /** Documentation
+    * \brief An object of this class simulates a std::cout stream. This means messages can be added by
+	*        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
+	*  \ingroup mbilog
+	*/
   class MBILOG_DLL_API PseudoStream {
 
     protected:
@@ -56,6 +70,7 @@ namespace mbilog {
       {
       }
 
+	  /** \brief The message which is stored in the member ss is written to the backend. */
       inline ~PseudoStream()
       {
         if(!disabled)
@@ -66,6 +81,7 @@ namespace mbilog {
         }
       }
 
+	  /** \brief Definition of the bit shift operator for this class.*/
       template <class T> inline PseudoStream& operator<<(const T& data)
       {
         if(!disabled)
@@ -81,6 +97,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Definition of the bit shift operator for this class (for non const data).*/
       template <class T> inline PseudoStream& operator<<(T& data)
       {
         if(!disabled)
@@ -96,6 +113,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Definition of the bit shift operator for this class (for functions).*/
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
@@ -111,6 +129,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Sets the category of this PseudoStream object. If there already is a category it is appended, seperated by a dot.*/
       inline PseudoStream& operator()(const char *category)
       {
         if(!disabled)
@@ -122,6 +141,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Enables/disables the PseudoStream. If set to false parsing and output is suppressed. */
       inline PseudoStream& operator()(bool enabled)
       {
         disabled|=!enabled;
@@ -129,6 +149,11 @@ namespace mbilog {
       }
   };
 
+  /** Documentation 
+    * \brief An object of this class simulates a std::cout stream but does nothing. This class is for dummy objects, bit shift
+	*        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
+	* \ingroup mbilog
+    */
   class MBILOG_DLL_API NullStream {
 
     public:
@@ -155,7 +180,7 @@ namespace mbilog {
       }
   };
 
-//
+//  /** \brief templated backend: one can define a class and a method to create a new backend. */
 //  template<typename T>
 //  struct DelegateBackend : public AbstractBackend
 //  {
@@ -180,16 +205,20 @@ namespace mbilog {
 
 }
 
-
+/** \brief Macros for different message levels. Creates an instance of class PseudoStream with the corresponding message level.
+  *        Other parameters are the name of the source file, line of the source code and function name which are generated
+  *        by the compiler.
+  */
 #define MBI_INFO mbilog::PseudoStream(mbilog::Info,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
 
+/** \brief Macro for the debug messages. The messages are disabled if the cmake variable MBILOG_ENABLE_DEBUG is false. */
 #ifdef MBILOG_ENABLE_DEBUG
 #define MBI_DEBUG mbilog::PseudoStream(mbilog::Debug,__FILE__,__LINE__,__FUNCTION__)
 #else
-#define MBI_DEBUG true ? mbilog::NullStream() : mbilog::NullStream()
+#define MBI_DEBUG true ? mbilog::NullStream() : mbilog::NullStream() //this is magic by markus
 #endif
 
 

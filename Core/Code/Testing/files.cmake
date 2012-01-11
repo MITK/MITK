@@ -58,7 +58,6 @@ SET(MODULE_TESTS
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
-  mitkRenderingTest.cpp
   #QmitkRenderingTestHelper.cpp
 )
 
@@ -98,6 +97,7 @@ SET(MODULE_CUSTOM_TESTS
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
     mitkImageWriterTest.cpp
+    mitkRenderingTest.cpp
 )
 
 # Create an artificial module initializing class for

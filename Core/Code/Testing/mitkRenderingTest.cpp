@@ -69,7 +69,7 @@ mitk::DataStorage::Pointer mitkRenderingTestHelperClass::s_DataStorage;
 int mitkRenderingTest(int argc, char* argv[])
 {
     // load all arguments into a datastorage, take last argument as reference rendering
-    // setup a renderwindow of fixed size 800x800
+    // setup a renderwindow of fixed size X*Y
     // render the datastorage
     // compare rendering to reference image
     MITK_TEST_BEGIN("RenderingTest")
@@ -102,7 +102,7 @@ int mitkRenderingTest(int argc, char* argv[])
     std::for_each( inputFileNames.begin(), inputFileNames.end(), mitkRenderingTestHelperClass::AddToStorage );
 
     // create a QmitkRenderWindow, let it render the scene and get the vtkRenderWindow
-    mitkRenderingTestHelper renderingHelper( 300, 300, mitkRenderingTestHelperClass::s_DataStorage );
+    mitkRenderingTestHelper renderingHelper( 640, 480, mitkRenderingTestHelperClass::s_DataStorage );
     //use this to generate a reference screenshot or save the file:
     renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );

@@ -97,7 +97,7 @@ SET(MODULE_CUSTOM_TESTS
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
     mitkImageWriterTest.cpp
-    mitkRenderingTest.cpp
+    mitkImageVtkMapper2DTest.cpp
 )
 
 # Create an artificial module initializing class for

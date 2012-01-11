@@ -66,13 +66,13 @@ public:
 
 mitk::DataStorage::Pointer mitkRenderingTestHelperClass::s_DataStorage;
 
-int mitkRenderingTest(int argc, char* argv[])
+int mitkImageVtkMapper2DTest(int argc, char* argv[])
 {
     // load all arguments into a datastorage, take last argument as reference rendering
     // setup a renderwindow of fixed size X*Y
     // render the datastorage
     // compare rendering to reference image
-    MITK_TEST_BEGIN("RenderingTest")
+    MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
             // enough parameters?
             if ( argc < 2 )

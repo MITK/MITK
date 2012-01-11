@@ -41,15 +41,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTbssImageMapper.h"
 #include "mitkTbssGradientImageMapper.h"
 
-//====depricated fiberstructure=====
-#include "mitkFiberBundle.h"
-#include "mitkFiberBundleMapper2D.h"
-#include "mitkFiberBundleMapper3D.h"
-#include "mitkFiberBundleIOFactory.h"
-#include "mitkFiberBundleWriterFactory.h"
-#include "mitkFiberBundleWriter.h"
-//==================================
-
 //modernized fiberbundle datastrucutre
 #include "mitkFiberBundleX.h"
 #include "mitkFiberBundleXIOFactory.h"
@@ -101,7 +92,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdDiffusionImageIOFactory::RegisterOneFactory();
     mitk::NrrdQBallImageIOFactory::RegisterOneFactory();
     mitk::NrrdTensorImageIOFactory::RegisterOneFactory();
-    mitk::FiberBundleIOFactory::RegisterOneFactory();
     mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
@@ -110,7 +100,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
-    mitk::FiberBundleWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
@@ -119,7 +108,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
-    m_FileWriters.push_back( mitk::FiberBundleWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
@@ -168,13 +156,6 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
-    classname = "FiberBundle";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::FiberBundleMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
-
     classname = "FiberBundleX";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
@@ -215,12 +196,6 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-    classname = "FiberBundle";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::FiberBundleMapper3D::New();
       newMapper->SetDataNode(node);
     }
 
@@ -300,13 +275,6 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
-  }
-
-  classname = "FiberBundle";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::FiberBundleMapper3D::SetDefaultProperties(node);
-    mitk::FiberBundleMapper2D::SetDefaultProperties(node);
   }
 
   classname = "FiberBundleX";

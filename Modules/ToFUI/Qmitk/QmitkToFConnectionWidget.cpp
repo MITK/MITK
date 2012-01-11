@@ -304,7 +304,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
       if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
-        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw"))
+        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
       }

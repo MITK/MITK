@@ -92,9 +92,16 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
     connect( m_Controls->m_Advanced, SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
+    connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
   }
 }
 
+
+void QmitkDiffusionDicomImport::Remove()
+{
+  int i = m_Controls->listWidget->currentRow();
+  m_Controls->listWidget->takeItem(i);
+}
 
 void QmitkDiffusionDicomImport::AdvancedCheckboxClicked()
 {
@@ -697,6 +704,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       int lwidget = m_Controls->listWidget->count();
       std::cout << lwidget <<std::endl;
 
+      logfile << "\n";
 
     }
 

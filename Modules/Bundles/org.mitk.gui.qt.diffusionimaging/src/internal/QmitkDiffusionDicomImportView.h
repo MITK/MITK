@@ -84,6 +84,8 @@ protected slots:
 
   void AdvancedCheckboxClicked();
 
+  void Remove();
+
 protected: 
 
   void Status(QString status);

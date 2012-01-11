@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPicFileReader.h"
+#include "mitkPicHelper.h"
 #include <itkImageFileReader.h>
 
 extern "C" 
@@ -87,7 +88,23 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
-        output->Initialize(header, channels);
+        // First initialize the geometry of the output image by the pic-header
+        SlicedGeometry3D::Pointer slicedGeometry = mitk::SlicedGeometry3D::New();
+        PicHelper::InitializeEvenlySpaced(header, header->n[2], slicedGeometry);
+
+        // if pic image only 3D, the n[3] value is not initialized
+        unsigned int timesteps = 1;
+        if( header->dim > 3 )
+            timesteps = header->n[3];
+
+        TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+        timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, timesteps);
+        timeSliceGeometry->ImageGeometryOn();
+
+        // Cast the pic descriptor to ImageDescriptor and initialize the output
+
+        output->Initialize( CastToImageDescriptor(header));
+        output->SetGeometry( timeSliceGeometry );
         mitkIpPicFree ( header );
     }
     else
@@ -146,7 +163,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         }
 
         printf(" \ninitialisize output\n");
-        output->Initialize(header);
+        output->Initialize( CastToImageDescriptor(header) );
         mitkIpPicFree ( header );
     }
 
@@ -198,7 +215,10 @@ void mitk::PicFileReader::GenerateData()
 
     if( m_FileName != "")
     {
-        mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
+        mitkIpPicDescriptor* outputPic = mitkIpPicNew();
+        outputPic = CastToIpPicDescriptor(output, outputPic);
+        mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()),
+                                              outputPic);
         // comes upside-down (in MITK coordinates) from PIC file
         ConvertHandedness(pic);
 
@@ -272,11 +292,11 @@ void mitk::PicFileReader::GenerateData()
             {
                 itkDebugMacro("Pic file '" << fullName << "' does not exist."); 
             }
-            else
+            /* FIXME else
             if(output->SetPicSlice(pic, position)==false)
             {
                 itkDebugMacro("Image '" << fullName << "' could not be added to Image."); 
-            }
+            }*/
        }
        if(pic!=NULL)
          mitkIpPicFree(pic);

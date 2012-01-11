@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageCast.h>
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
-
+#include <itkRGBPixel.h>
 #include <itkVector.h>
 #include <itkDiffusionTensor3D.h>
 

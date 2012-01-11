@@ -8,7 +8,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${P
 
 MITK_CREATE_MODULE( MitkExt
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
-               DEPENDS Mitk ipSegmentation PlanarFigure ImageStatistics
+               DEPENDS Mitk LegacyAdaptors IpPicSupport ipSegmentation mitkIpFunc PlanarFigure ImageStatistics
                DEPENDS_INTERNAL pic2vtk IIL4MITK
 )
 

@@ -18,9 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindow.h"
 #include "mitkImageSliceSelector.h"
+#include "mitkImageStatisticsHolder.h"
 
-#include <ipFunc/mitkIpFunc.h>
-#include <mitkIpPic.h>
 #include <algorithm>
 
 void mitk::LevelWindow::EnsureConsistency()
@@ -248,48 +247,49 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     image = sliceSelector->GetOutput();
     if ( image == NULL || !image->IsInitialized() ) return;
 
-    minValue    = image->GetScalarValueMin();
-    maxValue    = image->GetScalarValueMaxNoRecompute();
-    min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
-    max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+    minValue    = image->GetStatistics()->GetScalarValueMin();
+    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     if ( minValue == maxValue )
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
-      minValue    = image->GetScalarValueMin();                   
-      maxValue    = image->GetScalarValueMaxNoRecompute();
-      min2ndValue = image->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+      minValue    = image->GetStatistics()->GetScalarValueMin();
+      maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
+      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     }
   }
   else
   {
     const_cast<Image*>(image)->Update();
-    minValue    = image->GetScalarValueMin(0);
-    maxValue    = image->GetScalarValueMaxNoRecompute(0);
-    min2ndValue = image->GetScalarValue2ndMinNoRecompute(0);
-    max2ndValue = image->GetScalarValue2ndMaxNoRecompute(0);
+    minValue    = image->GetStatistics()->GetScalarValueMin(0);
+    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
-      ScalarType minValueTemp = image->GetScalarValueMin(i);
+      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i);
       if (minValue > minValueTemp)
         minValue    = minValueTemp;
-      ScalarType maxValueTemp = image->GetScalarValueMaxNoRecompute(i);
+      ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
       if (maxValue < maxValueTemp)
         maxValue = maxValueTemp;
-      ScalarType min2ndValueTemp = image->GetScalarValue2ndMinNoRecompute(i);
+      ScalarType min2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
       if (min2ndValue > min2ndValueTemp)
         min2ndValue = min2ndValueTemp; 
-      ScalarType max2ndValueTemp = image->GetScalarValue2ndMaxNoRecompute(i);
+      ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
       if (max2ndValue > max2ndValueTemp)
         max2ndValue = max2ndValueTemp; 
     }
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType().GetType() == mitkIpPicInt && image->GetPixelType().GetBpe() >= 8)
+  if (image->GetPixelType()== typeid(int)  && image->GetPixelType().GetBpe() >= 8)
   {
-    if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
+    // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
+    if (minValue == -( pow( (double) 2.0, static_cast<int>(image->GetPixelType().GetBpe()/2) ) ) )
     {
       minValue = min2ndValue;
     }
@@ -303,7 +303,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
-
+/*
   if ( tryPicTags ) // level and window will be set by informations provided directly by the mitkIpPicDescriptor
   {
     if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
@@ -311,12 +311,12 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
       return;
     }
   }
-   
+ */
    
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
-  unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
-  unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
+  unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
+  unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
   float minCountFraction = minCount/float(numPixelsInDataset);
   float maxCountFraction = maxCount/float(numPixelsInDataset);
 
@@ -361,45 +361,6 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
   SetWindowBounds(minValue, maxValue);
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
-}
-
-bool mitk::LevelWindow::SetAutoByPicTags(const mitkIpPicDescriptor* aPic)
-{
-  if ( IsFixed() )
-    return false;
-  
-  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
-  if ( pic == NULL )
-  {
-    return false;
-  }
-  mitkIpPicTSV_t *tsv = mitkIpPicQueryTag( pic, "LEVEL/WINDOW" );
-  if( tsv != NULL )
-  {
-    double level = 0;
-    double window = 0;
-    #define GET_C_W( type, tsv, C, W )    \
-      level = ((type *)tsv->value)[0];    \
-      window = ((type *)tsv->value)[1];
-
-    mitkIpPicFORALL_2( GET_C_W, tsv, level, window );
-    
-    ScalarType min = GetRangeMin();
-    ScalarType max = GetRangeMax();
-    if ((double)(GetRangeMin()) > (level - window/2))
-    {
-      min = level - window/2;
-    }
-    if ((double)(GetRangeMax()) < (level + window/2))
-    {
-      max = level + window/2;
-    }
-    SetRangeMinMax(min, max);
-    SetDefaultBoundaries(min, max);
-    SetLevelWindow( level, window );
-    return true;
-  }
-  return false;
 }
 
 void mitk::LevelWindow::SetFixed( bool fixed )

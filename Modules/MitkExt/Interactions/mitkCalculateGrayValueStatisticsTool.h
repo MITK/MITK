@@ -22,6 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkExtExports.h"
 #include "mitkSegmentationsProcessingTool.h"
 
+#ifndef __itkHistogram_h
+#include <itkHistogram.h>
+#endif
+
 #include <itkImage.h>
 #include <sstream>
 

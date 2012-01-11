@@ -20,10 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkLegacyAdaptors.h"
 
 #include <iostream>
 #include <string>
 #include <ipFunc/mitkIpFunc.h>
+
 
 void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 {
@@ -91,7 +93,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
   picStrainRate = mitkIpPicNew();
   picStrainRate->dim=3;
   picStrainRate->bpe  = output->GetPixelType().GetBpe();
-  picStrainRate->type = output->GetPixelType().GetType();
+  //picStrainRate->type = output->GetPixelType().GetType();
   picStrainRate->n[0] = output->GetDimension(0);
   picStrainRate->n[1] = output->GetDimension(1);
   picStrainRate->n[2] = output->GetDimension(2);
@@ -143,8 +145,12 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
       timeSelector->SetTimeNr(t);
       timeSelector->Update();
 
+      // Cast to pic descriptor for the timeSelector image
+      mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
+      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+
       _mitkIpPicFreeTags(picStrainRate->info->tags_head);
-      picStrainRate->info->tags_head = _mitkIpPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
+      picStrainRate->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
 
 //#define       WRITE_ANGLE_PIC
 #ifdef WRITE_ANGLE_PIC
@@ -160,7 +166,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
       anglePic->data = (mitkIpInt1_t *)calloc(xDim*yDim,sizeof(mitkIpInt1_t));
 #endif
 
-      picDoppler = timeSelector->GetOutput()->GetPic();
+      picDoppler = timeSelectorPic;
       picDoppler = mitkIpFuncGausF( picDoppler, 5,2 , mitkIpFuncBorderOld )  ;
 
 
@@ -312,7 +318,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
       ((mitkIpUInt1_t *)picStrainRate->data)[0]=0;
       ((mitkIpUInt1_t *)picStrainRate->data)[1]=255;
 
-      output->SetPicVolume(picStrainRate, t, n);
+      output->SetVolume(picStrainRate->data, t, n);
     }
   }
 
@@ -320,7 +326,10 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
 #define WRITE_STRAIN_PIC
 #ifdef WRITE_STRAIN_PIC
-      picStrainRate = output->GetPic();
+      // Get the StrainRate ipPic descriptor
+      picStrainRate = mitkIpPicNew();
+      CastToIpPicDescriptor( output, picStrainRate );
+
       std::string filename;
       filename ="strain.pic";
       mitkIpPicPut(const_cast<char *>(filename.c_str()),picStrainRate);

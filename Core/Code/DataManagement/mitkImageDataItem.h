@@ -19,13 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGEDATAITEM_H
 #define IMAGEDATAITEM_H
 
+#include "mitkCommon.h"
 #include <MitkExports.h>
-#include <mitkCommon.h>
-#include "mitkPixelType.h"
+//#include <mitkIpPic.h>
+//#include "mitkPixelType.h"
+#include "mitkImageDescriptor.h"
 
 class vtkImageData;
 
 namespace mitk {
+
+  class PixelType;
 
   //##Documentation
   //## @brief Internal class for managing references on sub-images
@@ -46,11 +50,14 @@ namespace mitk {
   public:
     mitkClassMacro(ImageDataItem, itk::LightObject);
 
-    ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data = NULL, bool manageMemory = false, size_t offset = 0);
+    ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc, unsigned int dimension, void *data = NULL, bool manageMemory = false, size_t offset = 0);
 
     ~ImageDataItem();
 
-    ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory);
+    ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory);
+
+    ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int* dimensions, void* data, bool manageMemory);
+
     ImageDataItem(const ImageDataItem &other);
 
     void* GetData() const
@@ -74,17 +81,28 @@ namespace mitk {
 
     PixelType GetPixelType() const
     {
-      return m_PixelType;    
+      return *m_PixelType;
+    }
+
+    int GetDimension() const
+    {
+      return m_Dimension;
+    }
+
+    int GetDimension(int i) const
+    {
+      int returnValue = 0;
+
+      // return the true size if dimension available
+      if (i< (int) m_Dimension)
+        returnValue = m_Dimensions[i];
+
+      return returnValue;
     }
 
     ImageDataItem::ConstPointer GetParent() const
     {
       return m_Parent;
-    }
-
-    mitkIpPicDescriptor* GetPicDescriptor() const
-    {
-      return m_PicDescriptor;
     }
 
     //## Returns a vtkImageData; if non is present, a new one is constructed.
@@ -113,11 +131,10 @@ namespace mitk {
   protected:
     unsigned char* m_Data;
 
-    PixelType m_PixelType;
+    PixelType *m_PixelType;
 
     bool m_ManageMemory;
 
-    mitkIpPicDescriptor* m_PicDescriptor;
     mutable vtkImageData* m_VtkImageData;
     int m_Offset;
 
@@ -126,10 +143,16 @@ namespace mitk {
     unsigned long m_Size;
 
   private:
+    void ComputeItemSize( const unsigned int* dimensions, unsigned int dimension);
+
     ImageDataItem::ConstPointer m_Parent;
 
     template <class TPixeltype>
     unsigned char *ConvertTensorsToRGB() const;
+
+    unsigned int m_Dimension;
+
+    unsigned int m_Dimensions[MAX_IMAGE_DIMENSIONS];
 
   };
 

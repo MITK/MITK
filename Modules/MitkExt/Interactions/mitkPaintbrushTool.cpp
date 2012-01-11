@@ -89,7 +89,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   Image::Pointer temporarySlice = Image::New();
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
 

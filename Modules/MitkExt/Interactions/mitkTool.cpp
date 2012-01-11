@@ -119,7 +119,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   if (!original) return NULL;
 
   // actually create a new empty segmentation
-  PixelType pixelType( typeid(DefaultSegmentationDataType) );
+  PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
   Image::Pointer segmentation = Image::New();
  
   segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );

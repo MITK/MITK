@@ -21,15 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include "mitkSlicedData.h"
-#include "mitkPixelType.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkImageDataItem.h"
+#include "mitkImageDescriptor.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
-#endif 
+#endif
+
 
 class vtkImageData;
 
@@ -37,6 +38,8 @@ namespace mitk {
 
 class SubImageSelector;
 class ImageTimeSelector;
+
+class ImageStatisticsHolder;
 
 //##Documentation
 //## @brief Image class for storing images
@@ -64,7 +67,7 @@ class MITK_CORE_EXPORT Image : public SlicedData
   friend class SubImageSelector;
 
 public:
-  mitkClassMacro(Image, SlicedData);    
+  mitkClassMacro(Image, SlicedData);
 
   itkNewMacro(Self);
 
@@ -72,6 +75,8 @@ public:
 
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
+  typedef itk::Statistics::Histogram<double> HistogramType;
+  typedef mitk::ImageStatisticsHolder* StatisticsHolderPointer;
 
   //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.
   //## The different options are: 
@@ -87,12 +92,10 @@ public:
   //## See documentation of ImageDataItem for details. 
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
-  typedef itk::Statistics::Histogram<double> HistogramType;
-
 public:
   //##Documentation
   //## @brief Returns the PixelType of channel @a n.
-  const mitk::PixelType& GetPixelType(int n = 0) const;
+  const mitk::PixelType GetPixelType(int n = 0) const;
 
   //##Documentation
   //## @brief Get dimension of the image
@@ -131,7 +134,7 @@ public:
   //##
   //## If you only want to access a slice, volume at a specific time or single channel
   //## use one of the SubImageSelector classes.
-  virtual mitkIpPicDescriptor* GetPic();
+  //virtual mitkIpPicDescriptor* GetPic();
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is set
@@ -215,42 +218,9 @@ public:
   virtual bool SetImportChannel(void *data, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
-  //## @brief Set @a pic as slice @a s at time @a t in channel @a n. 
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  virtual bool SetPicSlice(const mitkIpPicDescriptor *pic, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-
-  //##Documentation
-  //## @brief Set @a pic as volume at time @a t in channel @a n.
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  virtual bool SetPicVolume(const mitkIpPicDescriptor *pic, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-
-  //##Documentation
-  //## @brief Set @a pic in channel @a n. 
-  //##
-  //## The data is copied to an array managed by the image. 
-  //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
-  //## are updated according to the information provided in the tags of @a pic.
-  //## @return @a false : dimensions and/or data-type of @a pic does not
-  //## comply with image 
-  //## @a true success
-  virtual bool SetPicChannel(const mitkIpPicDescriptor *pic, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-
-  //##Documentation
   //## initialize new (or re-initialize) image information
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-  virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
+  virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry3D
@@ -275,6 +245,8 @@ public:
   //##
   virtual void Initialize(const mitk::Image* image);
 
+  virtual void Initialize(const mitk::ImageDescriptor::Pointer inDesc);
+
   //##Documentation
   //## initialize new (or re-initialize) image information by @a pic. 
   //## Dimensions and @a Geometry3D /@a Geometry2D are set according 
@@ -285,7 +257,7 @@ public:
   //## @param tDim override time dimension (@a n[3]) in @a pic (if >0)
   //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0)
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-  virtual void Initialize(const mitkIpPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
+  //virtual void Initialize(const mitkIpPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a vtkimagedata,
@@ -330,7 +302,10 @@ public:
       tmpDimensions[3]=tDim;
 
     // rough initialization of Image
-    Initialize(mitk::PixelType(typeid(typename itkImageType::PixelType)), 
+   // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
+
+
+    Initialize(MakePixelType<itkImageType>(),
       m_Dimension, 
       tmpDimensions,
       channels);
@@ -355,7 +330,7 @@ public:
     if(m_Dimension>=3)
       origin[2]=itkorigin[2];
 
-    // access direction of itk::Image and include spacing
+    // access direction of itk::Imagm_PixelType = new mitk::PixelType(type);e and include spacing
     const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();  
     MITK_DEBUG << "ITK direction " << itkdirection;
     mitk::Matrix3D matrix;
@@ -460,104 +435,125 @@ public:
   //## @sa GetDimension(int i);
   unsigned int* GetDimensions() const;
 
-  //##Documentation
-  //## @brief Sets a geometry to an image.
+  ImageDescriptor::Pointer GetImageDescriptor() const
+  { return m_ImageDescriptor; }
+
+  ChannelDescriptor GetChannelDescriptor( int id = 0 ) const
+  { return m_ImageDescriptor->GetChannelDescriptor(id); }
+
+  /** \brief Sets a geometry to an image.
+    */
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  virtual const HistogramType* GetScalarHistogram(int t=0) const;
-
-  //##Documentation
-  //## \brief Get the minimum for scalar images
-  virtual ScalarType GetScalarValueMin(int t=0) const;
-
-  //##Documentation
-  //## \brief Get the maximum for scalar images
-  virtual ScalarType GetScalarValueMax(int t=0) const;
-
-  //##Documentation
-  //## \brief Get the second smallest value for scalar images
-  virtual ScalarType GetScalarValue2ndMin(int t=0) const;
-
-  //##Documentation
-  //## \brief Get the smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_ScalarMin.size() )
-      return m_ScalarMin[t];
-    else return itk::NumericTraits<ScalarType>::max();
-  }
-
-  //##Documentation
-  //## \brief Get the second smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_Scalar2ndMin.size() )
-      return m_Scalar2ndMin[t];
-    else return itk::NumericTraits<ScalarType>::max();
-  }
-
-  //##Documentation
-  //## \brief Get the second largest value for scalar images
-  virtual ScalarType GetScalarValue2ndMax(int t=0) const;
-
-  //##Documentation
-  //## \brief Get the largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_ScalarMax.size() )
-      return m_ScalarMax[t];
-    else return itk::NumericTraits<ScalarType>::NonpositiveMin();
-  }
-
-  //##Documentation
-  //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_Scalar2ndMax.size() )
-      return m_Scalar2ndMax[t];
-    else return itk::NumericTraits<ScalarType>::NonpositiveMin();
-  }
-
-  //##Documentation
-  //## \brief Get the count of voxels with the smallest scalar value in the dataset
-  mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0) const;
-
-  //##Documentation
-  //## \brief Get the count of voxels with the largest scalar value in the dataset
-  mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0) const;
-
-  //##Documentation
-  //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_CountOfMaxValuedVoxels.size() )
-      return m_CountOfMaxValuedVoxels[t];
-    else return 0;
-  }
-
-  //##Documentation
-  //## \brief Get the count of voxels with the smallest scalar value in the dataset
-  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const
-  {
-    if ( t < m_CountOfMinValuedVoxels.size() )
-      return m_CountOfMinValuedVoxels[t];
-    else return 0;
-  }
-
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##Documentation
-  //## @warning for internal use only
+  /**
+  * @warning for internal use only
+  */
   virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  template < typename ItkImageType >
-    friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
+  /**
+  \brief (DEPRECATED) Get the minimum for scalar images
+  */
+  DEPRECATED (ScalarType GetScalarValueMin(int t=0) const);
+
+
+  /**
+  \brief (DEPRECATED) Get the maximum for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValueMax(int t=0) const);
+
+  /**
+  \brief (DEPRECATED) Get the second smallest value for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValue2ndMin(int t=0) const);
+
+
+  /**
+  \brief (DEPRECATED) Get the smallest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const);
+
+  /**
+  \brief (DEPRECATED) Get the second smallest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const);
+
+  /**
+  \brief (DEPRECATED) Get the second largest value for scalar images
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValue2ndMax(int t=0) const);
+
+  /**
+  \brief (DEPRECATED) Get the largest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ) const );
+
+  /**
+  \brief (DEPRECATED) Get the second largest value for scalar images, but do not recompute it first
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ) const);
+
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetCountOfMinValuedVoxels(int t = 0) const);
+
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (ScalarType GetCountOfMaxValuedVoxels(int t = 0) const);
+
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
+
+  /**
+  \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
+
+  \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
+  */
+  DEPRECATED (unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const);
+
+  /**
+    \brief Returns a pointer to the ImageStatisticsHolder object that holds all statistics information for the image.
+
+    All Get-methods for statistics properties formerly accessible directly from an Image object are now moved to the
+    new \a ImageStatisticsHolder object.
+    */
+  StatisticsHolderPointer GetStatistics() const
+  {
+    return m_ImageStatistics;
+  }
 
 protected:
   
@@ -567,13 +563,9 @@ protected:
 
   void ComputeOffsetTable();
 
-  virtual void Expand( unsigned int timeSteps );
-
   virtual bool IsValidTimeStep(int t) const;
 
-  virtual void ResetImageStatistics() const;
-
-  virtual void ComputeImageStatistics(int t=0) const;
+  virtual void Expand( unsigned int timeSteps );
 
   virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
@@ -592,8 +584,6 @@ protected:
   //## @warning Has to be called by every Initialize method!
   virtual void Initialize();
 
-  ImageTimeSelector* GetTimeSelector() const;
-
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   mutable ImageDataItemPointerArray m_Channels;
@@ -601,22 +591,17 @@ protected:
   mutable ImageDataItemPointerArray m_Slices;
 
   unsigned int m_Dimension;
-  unsigned int *m_Dimensions;
+
+  unsigned int* m_Dimensions;
+
+  ImageDescriptor::Pointer m_ImageDescriptor;
+
   size_t *m_OffsetTable;
   ImageDataItemPointer m_CompleteData;
-  PixelType m_PixelType;
 
-  mutable itk::Object::Pointer m_HistogramGeneratorObject;
-
-  mutable itk::Object::Pointer m_TimeSelectorForExtremaObject;
-  mutable std::vector<unsigned int> m_CountOfMinValuedVoxels;
-  mutable std::vector<unsigned int> m_CountOfMaxValuedVoxels;
-  mutable std::vector<ScalarType> m_ScalarMin;
-  mutable std::vector<ScalarType> m_ScalarMax;
-  mutable std::vector<ScalarType> m_Scalar2ndMin;
-  mutable std::vector<ScalarType> m_Scalar2ndMax;
-
-  itk::TimeStamp m_LastRecomputeTimeStamp;
+  // Image statistics Holder replaces the former implementation directly inside this class
+  friend class ImageStatisticsHolder;
+  StatisticsHolderPointer m_ImageStatistics;
 
 };
 

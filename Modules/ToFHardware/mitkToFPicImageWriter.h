@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFHardwareExports.h"
 #include "mitkToFImageWriter.h"
 
+#include <mitkIpPic.h>
+
 namespace mitk
 {
   /**

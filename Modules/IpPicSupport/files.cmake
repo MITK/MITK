@@ -1,0 +1,9 @@
+SET(CPP_FILES
+  mitkIpPicGet.c
+  mitkPicFileWriter.cpp
+  mitkPicFileReader.cpp
+  mitkPicFileIOFactory.cpp
+  mitkPicHelper.cpp
+  mitkPicVolumeTimeSeriesIOFactory.cpp
+  mitkPicVolumeTimeSeriesReader.cpp
+)

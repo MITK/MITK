@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
-
+#include <itkRGBPixel.h>
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 

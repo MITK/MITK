@@ -67,7 +67,7 @@ class MitkExt_EXPORT CompressedImageContainer : public itk::Object
     CompressedImageContainer(); // purposely hidden
     virtual ~CompressedImageContainer();
 
-    PixelType m_PixelType;
+    PixelType *m_PixelType;
 
     unsigned int m_ImageDimension;
     std::vector<unsigned int> m_ImageDimensions;

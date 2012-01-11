@@ -64,7 +64,9 @@ void mitk::PicFileWriter::GenerateData()
     itkExceptionMacro(<< "The PicFileWriter does not support multiple channel data. Nothing will be written." );
   }
 
-  mitkIpPicDescriptor * picImage = input->GetPic();
+  mitkIpPicDescriptor * picImage = mitkIpPicNew();
+  picImage = CastToIpPicDescriptor(input, picImage);
+  
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
   {

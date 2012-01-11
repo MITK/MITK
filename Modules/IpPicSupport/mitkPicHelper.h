@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 #define MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 
-#include <MitkExports.h>
+#include <IpPicSupportExports.h>
 #include "mitkVector.h"
 #include <mitkIpPic.h>
 
@@ -30,7 +30,7 @@ class SlicedGeometry3D;
 //##Documentation
 //## @brief Internal class for managing references on sub-images
 //## @ingroup Data
-class MITK_CORE_EXPORT PicHelper
+class IpPicSupport_EXPORT PicHelper
 {
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }

@@ -53,7 +53,8 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
   {
     ImageWriter::Pointer writer = ImageWriter::New();
     writer->SetFileName( fullname );
-    writer->SetExtension(".pic");
+    // was previously .pic, but due to IpPic-removal from core, the current standard file ending ist .nrrd
+    writer->SetExtension(".nrrd");
     writer->SetInput( const_cast<Image*>(image) ); // bad writer design??
     writer->Write();
     fullname = writer->GetFileName();

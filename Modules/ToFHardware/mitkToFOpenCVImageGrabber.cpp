@@ -51,14 +51,20 @@ namespace mitk
     dimensions[1] = this->m_ImageGrabber->GetCaptureHeight();
     dimensions[2] = 1;
     dimensions[3] = 1;
+
+    // create single component float pixel type
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
+
     mitk::Image::Pointer currentMITKIntensityImage = mitk::Image::New();
-    currentMITKIntensityImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
+    currentMITKIntensityImage->Initialize(FloatType, 2, dimensions);
     currentMITKIntensityImage->SetSlice((float*)m_ImageGrabber->GetOutput(2)->GetSliceData()->GetData(),0,0,0);
+
     mitk::Image::Pointer currentMITKAmplitudeImage = mitk::Image::New();
-    currentMITKAmplitudeImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
+    currentMITKAmplitudeImage->Initialize(FloatType, 2, dimensions);
     currentMITKAmplitudeImage->SetSlice((float*)m_ImageGrabber->GetOutput(1)->GetSliceData()->GetData(),0,0,0);
+
     mitk::Image::Pointer currentMITKDistanceImage = mitk::Image::New();
-    currentMITKDistanceImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);    
+    currentMITKDistanceImage->Initialize(FloatType, 2, dimensions);
     currentMITKDistanceImage->SetSlice((float*)m_ImageGrabber->GetOutput(0)->GetSliceData()->GetData(),0,0,0);
     // copy mitk images to OpenCV images
     if (m_ImageDepth==IPL_DEPTH_32F)

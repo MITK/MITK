@@ -41,12 +41,12 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char* /*argv*/[])
 
   //Create Image out of nowhere
   mitk::Image::Pointer image;
-  mitk::PixelType pt(typeid(int));
+  mitk::PixelType pt(mitk::MakeScalarPixelType<int>() );
   unsigned int dim[]={100,100,20};
 
   MITK_TEST_OUTPUT(<< "Creating Image as imput for cutting: ");
   image=mitk::Image::New();
-  image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  image->Initialize(mitk::MakeScalarPixelType<int>(), 3, dim);
   int *p = (int*)image->GetData();
   unsigned int i;
   unsigned int size = dim[0]*dim[1]*dim[2];

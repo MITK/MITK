@@ -77,7 +77,7 @@ public:
   // Use this method to manually set a region
   void SetCroppingRegion(RegionType overrideRegion);
 
-  virtual const std::type_info& GetOutputPixelType();
+  virtual const PixelType GetOutputPixelType();
 
 protected:
 

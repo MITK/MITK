@@ -65,6 +65,7 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+  
   float depth = this->CalculateLayerDepth(renderer);
   //Set the origin to (xMin; yMin; depth) of the plane. This is necessary for obtaining the correct
   //plane size in crosshair rotation and swivel mode.
@@ -72,7 +73,7 @@ void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloa
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-  localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], depth); //P1: (xMax, yMin, depth)
+  localStorage->m_Plane->SetPoint1(planeBounds[1] , planeBounds[2], depth); //P1: (xMax, yMin, depth)
   localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depth); //P2: (xMin, yMax, depth)
 }
 
@@ -165,128 +166,29 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   input->Update();
 
-  //localStorage->m_Reslicer = mitk::ExtractSliceFilter::New();
   localStorage->m_Reslicer->SetInput(input);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
-  localStorage->m_Reslicer->Update();
+  localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
 
-  
-  // how big the area is in physical coordinates: widthInMM x heightInMM pixels
-  mitk::ScalarType widthInMM, heightInMM;
 
-  // take transform of input image into account
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
+  bool inPlaneResampleExtentByGeometry = false;
+  GetDataNode()->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
+  localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
+
+  localStorage->m_Reslicer->UpdateLargestPossibleRegion();
+
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
+  MITK_INFO<<"ViewDirection: "<<renderer->GetSliceNavigationController()->GetViewDirection()<<"World-Origin: "<<worldGeometry->GetOrigin();
   vtkFloatingPointType sliceBounds[6];
-  bool boundsInitialized = false;
   for ( int i = 0; i < 6; ++i )
   {
 	  sliceBounds[i] = 0.0;
   }
 
-  //Extent (in pixels) of the image
-  Vector2D extent;
-
-  // Do we have a simple PlaneGeometry?
-  // This is the "regular" case (e.g. slicing through an image axis-parallel or even oblique)
-  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
-  if ( planeGeometry != NULL )
-  {
-	  localStorage->m_Origin = planeGeometry->GetOrigin();
-	  localStorage->m_Right  = planeGeometry->GetAxisVector( 0 ); // right = Extent of Image in mm (worldspace)
-	  localStorage->m_Bottom = planeGeometry->GetAxisVector( 1 );
-	  localStorage->m_Normal = planeGeometry->GetNormal();
-
-	  bool inPlaneResampleExtentByGeometry = false;
-	  GetDataNode()->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
-
-	  if ( inPlaneResampleExtentByGeometry )
-	  {
-		  // Resampling grid corresponds to the current world geometry. This
-		  // means that the spacing of the output 2D image depends on the
-		  // currently selected world geometry, and *not* on the image itself.
-		  extent[0] = worldGeometry->GetExtent( 0 );
-		  extent[1] = worldGeometry->GetExtent( 1 );
-	  }
-	  else
-	  {
-		  // Resampling grid corresponds to the input geometry. This means that
-		  // the spacing of the output 2D image is directly derived from the
-		  // associated input image, regardless of the currently selected world
-		  // geometry.
-		  Vector3D rightInIndex, bottomInIndex;
-		  inputGeometry->WorldToIndex( localStorage->m_Right, rightInIndex );
-		  inputGeometry->WorldToIndex( localStorage->m_Bottom, bottomInIndex );
-		  extent[0] = rightInIndex.GetNorm();
-		  extent[1] = bottomInIndex.GetNorm();
-	  }
-
-	  // Get the extent of the current world geometry and calculate resampling
-	  // spacing therefrom.
-	  widthInMM = worldGeometry->GetExtentInMM( 0 );
-	  heightInMM = worldGeometry->GetExtentInMM( 1 );
-
-	  localStorage->m_mmPerPixel[0] = widthInMM / extent[0];
-	  localStorage->m_mmPerPixel[1] = heightInMM / extent[1];
-
-	  // Calculate the actual bounds of the transformed plane clipped by the
-	  // dataset bounding box; this is required for drawing the texture at the
-	  // correct position during 3D mapping.
-	  boundsInitialized = this->CalculateClippedPlaneBounds(
-		  worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
-  }
-
-  ////Code for curved planes
-  // else{
-  //  // Do we have an AbstractTransformGeometry?
-  //  // This is the case for AbstractTransformGeometry's (e.g. a thin-plate-spline transform)
-  //  const mitk::AbstractTransformGeometry* abstractGeometry =
-  //      dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
-
-  //  if(abstractGeometry != NULL)
-  //  {
-
-  //    extent[0] = abstractGeometry->GetParametricExtent(0);
-  //    extent[1] = abstractGeometry->GetParametricExtent(1);
-
-  //    widthInMM = abstractGeometry->GetParametricExtentInMM(0);
-  //    heightInMM = abstractGeometry->GetParametricExtentInMM(1);
-
-  //    localStorage->m_mmPerPixel[0] = widthInMM / extent[0];
-  //    localStorage->m_mmPerPixel[1] = heightInMM / extent[1];
-
-  //    localStorage->m_Origin = abstractGeometry->GetPlane()->GetOrigin();
-
-  //    localStorage->m_Right = abstractGeometry->GetPlane()->GetAxisVector(0);
-  //    localStorage->m_Right.Normalize();
-
-  //    localStorage->m_Bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
-  //    localStorage->m_Bottom.Normalize();
-
-  //    localStorage->m_Normal = abstractGeometry->GetPlane()->GetNormal();
-  //    localStorage->m_Normal.Normalize();
-
-  //    // Use a combination of the InputGeometry *and* the possible non-rigid
-  //    // AbstractTransformGeometry for reslicing the 3D Image
-  //    vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
-  //    composedResliceTransform->Identity();
-  //    composedResliceTransform->Concatenate(
-  //        inputGeometry->GetVtkTransform()->GetLinearInverse() );
-  //    composedResliceTransform->Concatenate(
-  //        abstractGeometry->GetVtkAbstractTransform()
-  //        );
-
-  //    localStorage->m_Reslicer->SetResliceTransform( composedResliceTransform );
-  //    composedResliceTransform->UnRegister( NULL ); // decrease RC
-
-  //    // Set background level to BLACK instead of translucent, to avoid
-  //    // boundary artifacts (see Geometry2DDataVtkMapper3D)
-  //    localStorage->m_Reslicer->SetBackgroundLevel( -1023 );
-  //  }
-  //}
+  localStorage->m_Reslicer->GetBounds(sliceBounds);
+ 
 
   localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetOutput()->GetVtkImageData();
   //get the number of scalar components to distinguish between different image types
@@ -365,7 +267,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     //setup the textured plane
     this->GeneratePlane( renderer, sliceBounds );
     //set the plane as input for the mapper
-    localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+	localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
     //set the texture for the actor
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
   }
@@ -522,113 +424,7 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* rend
   }
 }
 
-bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
-                                                vtkFloatingPointType *bounds )
-{
-  vtkFloatingPointType point1[3];
-  vtkFloatingPointType point2[3];
-  points->GetPoint( p1, point1 );
-  points->GetPoint( p2, point2 );
 
-  if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
-  {
-    double x, y;
-    x = ( point1[0] * point2[2] - point1[2] * point2[0] ) / ( point2[2] - point1[2] );
-    y = ( point1[1] * point2[2] - point1[2] * point2[1] ) / ( point2[2] - point1[2] );
-
-    if ( x < bounds[0] ) { bounds[0] = x; }
-    if ( x > bounds[1] ) { bounds[1] = x; }
-    if ( y < bounds[2] ) { bounds[2] = y; }
-    if ( y > bounds[3] ) { bounds[3] = y; }
-    bounds[4] = bounds[5] = 0.0;
-    return true;
-  }
-  return false;
-}
-
-bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                                                          const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
-{
-  // Clip the plane with the bounding geometry. To do so, the corner points
-  // of the bounding box are transformed by the inverse transformation
-  // matrix, and the transformed bounding box edges derived therefrom are
-  // clipped with the plane z=0. The resulting min/max values are taken as
-  // bounds for the image reslicer.
-  const mitk::BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
-
-  mitk::BoundingBox::PointType bbMin = boundingBox->GetMinimum();
-  mitk::BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-
-  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  if(boundingGeometry->GetImageGeometry())
-  {
-    points->InsertPoint( 0, bbMin[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 1, bbMin[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 2, bbMin[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 3, bbMin[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 4, bbMax[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 5, bbMax[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 6, bbMax[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 7, bbMax[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
-  }
-  else
-  {
-    points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
-    points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
-    points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
-    points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
-    points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
-    points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
-    points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
-    points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
-  }
-
-  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
-
-  vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-  transform->Identity();
-  transform->Concatenate( planeGeometry->GetVtkTransform()->GetLinearInverse() );
-
-  transform->Concatenate( boundingGeometry->GetVtkTransform() );
-
-  transform->TransformPoints( points, newPoints );
-
-  bounds[0] = bounds[2] = 10000000.0;
-  bounds[1] = bounds[3] = -10000000.0;
-  bounds[4] = bounds[5] = 0.0;
-
-  this->LineIntersectZero( newPoints, 0, 1, bounds );
-  this->LineIntersectZero( newPoints, 1, 2, bounds );
-  this->LineIntersectZero( newPoints, 2, 3, bounds );
-  this->LineIntersectZero( newPoints, 3, 0, bounds );
-  this->LineIntersectZero( newPoints, 0, 4, bounds );
-  this->LineIntersectZero( newPoints, 1, 5, bounds );
-  this->LineIntersectZero( newPoints, 2, 6, bounds );
-  this->LineIntersectZero( newPoints, 3, 7, bounds );
-  this->LineIntersectZero( newPoints, 4, 5, bounds );
-  this->LineIntersectZero( newPoints, 5, 6, bounds );
-  this->LineIntersectZero( newPoints, 6, 7, bounds );
-  this->LineIntersectZero( newPoints, 7, 4, bounds );
-
-  if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
-    || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
-    {
-    return false;
-  }
-  else
-  {
-    // The resulting bounds must be adjusted by the plane spacing, since we
-    // we have so far dealt with index coordinates
-    const float *planeSpacing = planeGeometry->GetFloatSpacing();
-    bounds[0] *= planeSpacing[0];
-    bounds[1] *= planeSpacing[0];
-    bounds[2] *= planeSpacing[1];
-    bounds[3] *= planeSpacing[1];
-    bounds[4] *= planeSpacing[2];
-    bounds[5] *= planeSpacing[2];
-    return true;
-  }
-}
 
 void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer )
 {
@@ -921,7 +717,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
-  localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+  //localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()

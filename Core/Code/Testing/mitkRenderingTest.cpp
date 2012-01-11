@@ -101,10 +101,15 @@ int mitkRenderingTest(int argc, char* argv[])
 
     std::for_each( inputFileNames.begin(), inputFileNames.end(), mitkRenderingTestHelperClass::AddToStorage );
 
-    // create a QmitkRenderWindow, let it render the scene and get the vtkRenderWindow
+    // create a mitkRenderWindow, let it render the scene and get the vtkRenderWindow
     mitkRenderingTestHelper renderingHelper( 640, 480, mitkRenderingTestHelperClass::s_DataStorage );
+
     //use this to generate a reference screenshot or save the file:
-    renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+    bool generateReferenceScreenshot = false;
+    if(generateReferenceScreenshot)
+    {
+        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+    }
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

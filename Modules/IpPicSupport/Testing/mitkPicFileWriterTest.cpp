@@ -115,7 +115,7 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
 
   // create a two-channel test image
   mitk::Image::Pointer mcImage = mitk::Image::New();
-  mcImage->Initialize( mitk::PixelType( typeid(unsigned char)), 2, dims, 2);
+  mcImage->Initialize( mitk::MakeScalarPixelType<unsigned char>(), 2, dims, 2);
   mcImage->SetChannel( data_channel1, 0);
   mcImage->SetChannel( data_channel2, 1);
 

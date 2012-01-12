@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * Encapsulates the enumeration for volume rendering. Valid values are
  * (VTK constant/Id/string representation):
@@ -95,6 +100,10 @@ private:
   VtkVolumeRenderingProperty(const VtkVolumeRenderingProperty&);
   VtkVolumeRenderingProperty& operator=(const VtkVolumeRenderingProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // end of namespace mitk
 

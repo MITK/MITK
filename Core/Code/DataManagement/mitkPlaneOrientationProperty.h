@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * Property which controls whether 2D line representation of a PlaneGeometry
  * should have small arrows at both ends to indicate the orientation of
@@ -114,6 +119,10 @@ private:
   PlaneOrientationProperty(const PlaneOrientationProperty&);
   PlaneOrientationProperty& operator=(const PlaneOrientationProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // end of namespace mitk
 

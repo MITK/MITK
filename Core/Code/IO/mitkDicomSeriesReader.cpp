@@ -899,7 +899,7 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
     sorter.Sort(unsortedFilenames);
     return sorter.GetFilenames();
   }
-  catch(std::logic_error& e)
+  catch(std::logic_error&)
   {
     MITK_WARN << "Sorting error. Leaving series unsorted."; 
     return unsortedFilenames;

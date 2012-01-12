@@ -588,13 +588,10 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::extractFibersById(std::vector<int>
 //mitk::FiberBundle::Pointer mitk::FiberBundle::extractFibersPF(mitk::PlanarFigure::Pointer pf)
 std::vector<int> mitk::FiberBundle::extractFibersByPF(mitk::PlanarFigure::Pointer pf, std::vector<int>* smaller_set)
 {
-
   // if incoming pf is a pfc
   mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf.GetPointer());
   if (!pfcomp.IsNull()) {
     //PFC
-
-
     switch (pfcomp->getOperationType()) {
       case 0:
       {
@@ -666,10 +663,7 @@ std::vector<int> mitk::FiberBundle::extractFibersByPF(mitk::PlanarFigure::Pointe
       default:
         MITK_INFO << "we have an UNDEFINED composition... ERROR" ;
         break;
-
-
     }
-
   } else {
 
     mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
@@ -1136,21 +1130,11 @@ std::vector<int> mitk::FiberBundle::extractFibersByPF(mitk::PlanarFigure::Pointe
 
 
     } else {
-
       MITK_INFO << "[ERROR] unhandled PlanarFigureType found!";
     }
-
   }
 
-
-
-
-
-
-
-
-
-
+  return std::vector<int>();
 }
 
 
@@ -1244,9 +1228,7 @@ mitk::Point3D mitk::FiberBundle::calculateCrossingPoint(mitk::Point3D pntFrnt, m
   // z adoption, take xy ratio to plane intersection and adopt it to z coordinate
   // z_intersx =  (x1 - intersX)/(x1 - x0) * (z1 - z0) + z1
 
-  double y;
   double k; //slope
-  double d;
 
   double x0 = pntFrnt[0];
   double y0 = pntFrnt[1];
@@ -1330,7 +1312,6 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
 {
   /* TODO needs to be redesigned.... each time because in planarPolygonsection VTK object will be initialized for each point!...PERFORMANCE LACK!!!!!!! */
 
-
   //calculate distances
   mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
   mitk::PlanarRectangle::Pointer rectName = mitk::PlanarRectangle::New();
@@ -1358,33 +1339,21 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
                             (pnt3D[1] - V1w[1]) * (pnt3D[1] - V1w[1]) +
                             (pnt3D[2] - V1w[2]) * (pnt3D[2] - V1w[2])) ;
 
-
-
     if ( (distPF > XdistPnt) ) {
       return true;
-
     }
 
     return false;
-
     //compare the result to the distance of all points an a fiber
-
-
   }
-
-
-
   else if (pf->GetNameOfClass() == rectName->GetNameOfClass() ){
 
     MITK_INFO << "We have a rectangle :-) " ;
 
-
   } else if (pf->GetNameOfClass() == polyName->GetNameOfClass() ) {
-
 
     //create vtkPolygon using controlpoints from planarFigure polygon
     vtkSmartPointer<vtkPolygon> polygonVtk = vtkPolygon::New();
-
 
     //get the control points from pf and insert them to vtkPolygon
     unsigned int nrCtrlPnts = pf->GetNumberOfControlPoints();
@@ -1393,8 +1362,6 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
     for (int i=0; i<nrCtrlPnts; ++i)
     {
       polygonVtk->GetPoints()->InsertNextPoint((double)pf->GetWorldControlPoint(i)[0], (double)pf->GetWorldControlPoint(i)[1], (double)pf->GetWorldControlPoint(i)[2] );
-
-
     }
 
     //prepare everything for using pointInPolygon function
@@ -1418,25 +1385,16 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
     {
       //     MITK_INFO << "return true";
       return true;
-
-
     } else if (isInPolygon == 0)
     {
       //   MITK_INFO << "return false";
       return false;
-
     } else {
-
       MITK_INFO << "&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*& \n YOUR DRAWN POLYGON DOES IS DEGENERATED AND NOT ACCEPTED \n DRAW A NEW ONE!! HAI CAPITO \n &*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&";
     }
-
-
-
-
-
   }
 
-
+  return false;
 }
 
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 class CoreModuleContext;
-class ModuleInfo;
+struct ModuleInfo;
 class ModuleContext;
 class ModulePrivate;
 
@@ -205,7 +205,7 @@ namespace __gnu_cxx {
 namespace itk {
 #endif
 
-template<typename _Key> class hash;
+template<typename _Key> struct hash;
 
 template<> class hash<mitk::Module*>
 {

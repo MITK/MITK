@@ -30,7 +30,7 @@ namespace __gnu_cxx {
 namespace itk {
 #endif
 
-template<class key> class hash;
+template<class key> struct hash;
 
 }
 

@@ -604,15 +604,15 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
   unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetTools().size();
 
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
-{
+  {
     manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetToolById(i));
 
     if (manualSegmentationTool)
     {
-      if(state == Qt::Checked)
+      if(state == true)
       {
         manualSegmentationTool->SetShowMarkerNodes( true );
-}
+      }
       else
       {
         manualSegmentationTool->SetShowMarkerNodes( false );

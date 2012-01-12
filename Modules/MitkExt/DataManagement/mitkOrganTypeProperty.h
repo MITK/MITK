@@ -26,6 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
   \brief Enumerates all known organs :-)
 
@@ -60,6 +65,10 @@ class MitkExt_EXPORT OrganTypeProperty : public EnumerationProperty
     OrganTypeProperty(const OrganTypeProperty&);
     OrganTypeProperty& operator=(const OrganTypeProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace
 

@@ -68,6 +68,9 @@ set(CMAKE_MODULE_PATH
 
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
+include(mitkFunctionSuppressWarnings)
+
+SUPPRESS_VC_DEPRECATED_WARNINGS()
 
 #-----------------------------------------------------------------------------
 # Output directories.

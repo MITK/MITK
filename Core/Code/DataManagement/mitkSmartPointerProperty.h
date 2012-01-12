@@ -29,6 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 //##Documentation
 //## @brief Property containing a smart-pointer
 //## @ingroup DataManagement
@@ -89,6 +94,10 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     /// to generate unique IDs for the objects pointed at (during XML writing)
     static UIDGenerator m_UIDGenerator;
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace mitk
 

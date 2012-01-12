@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+  
 class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
 {
 public:
@@ -59,6 +64,10 @@ private:
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty& property);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace mitk  
 

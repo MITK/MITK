@@ -15,8 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MBILOG_H
 #define _MBILOG_H
 
-#include <string>
-#include <iostream>
 #include <sstream>
 
 #include "mbilogExports.h"

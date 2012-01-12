@@ -41,6 +41,35 @@ namespace mbilog{
 	 *
 	 */
     virtual void ProcessMessage(const mbilog::LogMessage& logMessage)=0;
+
+  protected:
+
+    /** \brief Method formats the given LogMessage in the smart/short format and writes it to std::cout.
+	    * \param threadID Can be set to the threadID where the logging message was emitted. Is 0 by default.
+		  */
+	  void FormatSmart(const LogMessage &l,int threadID=0);
+
+	  /** \brief Method formats the given LogMessage in the full/long format and writes it to std::cout.
+	    * \param threadID Can be set to the threadID where the logging message was emitted. Is 0 by default.
+		  */
+	  void FormatFull(const LogMessage &l,int threadID=0);
+
+	  /** \brief Method formats the given LogMessage in the smart/short format and writes it to the given std::ostream.
+	    * \param threadID Can be set to the threadID where the logging message was emitted. Is 0 by default.
+		  */
+    void FormatSmart(std::ostream &out, const LogMessage &l,int threadID=0);
+
+	  /** \brief Method formats the given LogMessage in the full/long format and writes it to the given std::ostream.
+	    * \param threadID Can be set to the threadID where the logging message was emitted. Is 0 by default.
+		  */
+	  void FormatFull(std::ostream &out, const LogMessage &l,int threadID=0);
+
+    /** \brief Writes the system time to the given stream.*/
+    void AppendTimeStamp(std::ostream& out);
+
+	  /** \brief Special variant of method FormatSmart which uses colored messages (only for windows).*/
+	  //TODO: implement for linux?
+	  void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/);
   };
 
 }

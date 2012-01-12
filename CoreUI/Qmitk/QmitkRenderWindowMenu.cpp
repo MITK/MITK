@@ -726,7 +726,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
 #else
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 #endif
 {
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFProcessingCommon.h"
 
 mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
-: m_CameraIntrinsics(), m_Subset(NULL), m_InterPixelDistance()
+: m_Subset(NULL), m_CameraIntrinsics(), m_InterPixelDistance()
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -95,7 +95,7 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<mitk::Index3D
 void mitk::ToFDistanceImageToPointSetFilter::SetSubset( mitk::PointSet::Pointer pointSet)
 {
   std::vector<mitk::Index3D> subset;
-  for (unsigned int i=0; i<pointSet->GetSize(); i++)
+  for (int i=0; i<pointSet->GetSize(); i++)
   {
     mitk::Point3D currentPoint = pointSet->GetPoint(i);
     mitk::Index3D currentIndex;
@@ -134,8 +134,8 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   }
   else //compute PointSet holding cartesian coordinates for every image point
   {
-    unsigned int xDimension = input->GetDimension(0);
-    unsigned int yDimension = input->GetDimension(1);
+    int xDimension = (int)input->GetDimension(0);
+    int yDimension = (int)input->GetDimension(1);
     int pointCount = 0;
     for (int j=0; j<yDimension; j++)
     {

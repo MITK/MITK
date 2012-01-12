@@ -494,7 +494,6 @@ public:
   {
 
     T *P2 = 0;
-    int ep2;
     if (ep1 == 1)
     {
       P2 = ID_2_address[P1->pID];

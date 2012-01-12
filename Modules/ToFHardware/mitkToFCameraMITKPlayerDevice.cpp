@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice() : 
-  m_DistanceDataBuffer(NULL), m_IntensityDataBuffer(NULL), m_AmplitudeDataBuffer(NULL)
+  m_DistanceDataBuffer(NULL), m_AmplitudeDataBuffer(NULL), m_IntensityDataBuffer(NULL)
   {
     m_Controller = ToFCameraMITKPlayerController::New();
   }
@@ -244,7 +244,7 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
-  void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
+  void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* /*sourceDataArray*/,
     int requiredImageSequence, int& capturedImageSequence)
   {
     /*!!!!!!!!!!!!!!!!!!!!!!

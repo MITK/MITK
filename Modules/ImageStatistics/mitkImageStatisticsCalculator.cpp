@@ -64,8 +64,8 @@ namespace mitk
 ImageStatisticsCalculator::ImageStatisticsCalculator()
 : m_MaskingMode( MASKING_MODE_NONE ),
   m_MaskingModeChanged( false ),
-  m_DoIgnorePixelValue(false),
   m_IgnorePixelValue(0.0),
+  m_DoIgnorePixelValue(false),
   m_IgnorePixelValueChanged(false)
 { 
   m_EmptyHistogram = HistogramType::New();
@@ -945,7 +945,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   bool outOfBounds = false;
   vtkSmartPointer<vtkPoints> points = vtkPoints::New();
   typename PlanarFigure::PolyLineType::const_iterator it;
-  const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
   for ( it = planarFigurePolyline.begin();
         it != planarFigurePolyline.end();
         ++it )

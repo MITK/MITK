@@ -111,7 +111,7 @@ namespace mitk
     */
     ToFCameraPMDController::Pointer GetController();
 
-    virtual void GetChannelSourceData(short* sourceData, vtkShortArray* vtkChannelArray ){}; 
+    virtual void GetChannelSourceData(short* /*sourceData*/, vtkShortArray* /*vtkChannelArray*/ ){}; 
 
     /*!
     \brief set a BaseProperty

@@ -31,7 +31,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   context->registerService<mitk::IDataStorageService>(service);
 }
 
-void org_mitk_core_services_Activator::stop(ctkPluginContext* context)
+void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
 {
   dataStorageService = 0;
 }

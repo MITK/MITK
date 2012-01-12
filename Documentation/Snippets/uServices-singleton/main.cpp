@@ -28,7 +28,7 @@ public:
   //![0]
   
   //![1]
-  void Unload(mitk::ModuleContext* context)
+  void Unload(mitk::ModuleContext* /*context*/)
   {
     // Services are automatically unregistered during unloading of
     // the shared library after the call to Unload(mitk::ModuleContext*)
@@ -60,7 +60,6 @@ private:
 
 MITK_EXPORT_MODULE_ACTIVATOR(uServices_singleton, MyActivator)
 
-int main(int argc, char* argv[])
+int main()
 {
-  return 0;
 }

@@ -64,7 +64,7 @@ double mitk::PointSetStatisticsCalculator::GetStabw(std::vector<double> list)
 if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
-for(int i=0; i<list.size(); i++)
+for(std::vector<double>::size_type i=0; i<list.size(); i++)
   {
   returnValue += pow((list.at(i)-mean),2);
   }
@@ -79,7 +79,7 @@ double mitk::PointSetStatisticsCalculator::GetSampleStabw(std::vector<double> li
 if (list.empty()) return 0;
 double returnValue = 0;
 double mean = GetMean(list);
-for(int i=0; i<list.size(); i++)
+for(std::vector<double>::size_type i=0; i<list.size(); i++)
   {
   returnValue += pow((list.at(i)-mean),2);
   }
@@ -93,7 +93,7 @@ double mitk::PointSetStatisticsCalculator::GetMean(std::vector<double> list)
 {
 if (list.empty()) return 0;
 double mean = 0;
-for(int i=0; i<list.size(); i++)
+for(std::vector<double>::size_type i=0; i<list.size(); i++)
   {
   mean += list.at(i);
   }
@@ -130,7 +130,7 @@ if (list.empty())
 mitk::Point3D mean;
 mean.Fill(0);
 
-for (int i=0; i<list.size(); i++)
+for (std::vector<mitk::Point3D>::size_type i=0; i<list.size(); i++)
   {
   mean[0] += list.at(i)[0];
   mean[1] += list.at(i)[1];
@@ -156,7 +156,7 @@ if (pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 
-for(int i=0; i<pSet.size(); i++)
+for(std::vector<mitk::Point3D>::size_type i=0; i<pSet.size(); i++)
   {
   returnValue += mean.EuclideanDistanceTo(pSet.at(i));
   }
@@ -188,7 +188,7 @@ if(pSet.empty()) return 0;
 
 mitk::Point3D mean = GetMean(pSet);
 
-for(int i=0; i<pSet.size(); i++)
+for(std::vector<mitk::Point3D>::size_type i=0; i<pSet.size(); i++)
   {
   returnValue += pow(mean.EuclideanDistanceTo(pSet.at(i)),2);
   }
@@ -217,8 +217,8 @@ std::vector<double> mitk::PointSetStatisticsCalculator::GetErrorList(std::vector
 {
 std::vector<double> errorList = std::vector<double>();
 mitk::Point3D mean = GetMean(list);
-if (CheckIfAllPositionsAreEqual()) for(int i=0; i<list.size(); i++) {errorList.push_back(0.0);}
-else for(int i=0; i<list.size(); i++) {errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));}
+if (CheckIfAllPositionsAreEqual()) for(std::vector<mitk::Point3D>::size_type i=0; i<list.size(); i++) {errorList.push_back(0.0);}
+else for(std::vector<mitk::Point3D>::size_type i=0; i<list.size(); i++) {errorList.push_back(mean.EuclideanDistanceTo(list.at(i)));}
 return errorList;
 }
 
@@ -238,7 +238,7 @@ std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
 std::vector<double> listZ = std::vector<double>();
-for (int i=0; i<pSet.size(); i++)
+for (std::vector<mitk::Point3D>::size_type i=0; i<pSet.size(); i++)
   {
   listX.push_back(pSet.at(i)[0]);
   listY.push_back(pSet.at(i)[1]);
@@ -266,7 +266,7 @@ std::vector<mitk::Point3D> pSet = PointSetToVector(m_PointSet);
 std::vector<double> listX = std::vector<double>();
 std::vector<double> listY = std::vector<double>();
 std::vector<double> listZ = std::vector<double>();
-for (int i=0; i<pSet.size(); i++)
+for (std::vector<mitk::Point3D>::size_type i=0; i<pSet.size(); i++)
   {
   listX.push_back(pSet.at(i)[0]);
   listY.push_back(pSet.at(i)[1]);

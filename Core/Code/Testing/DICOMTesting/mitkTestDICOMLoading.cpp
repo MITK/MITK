@@ -247,7 +247,7 @@ mitk::TestDICOMLoading::reduce(const std::string& pString,
 bool
 mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference, 
                                                   const std::string& test,
-                                                  double eps )
+                                                  double /*eps*/ )
 {
   bool result(true);
 

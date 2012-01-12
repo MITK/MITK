@@ -19,7 +19,7 @@ int mitkDICOMTestingSanityTest(int argc, char** const argv)
   */
 
   // load files from commandline
-  int numberOfExpectedImages = 0;
+  unsigned int numberOfExpectedImages = 0;
   if (argc > 1) numberOfExpectedImages = atoi(argv[1]);
   for (int arg = 2; arg < argc; ++arg) files.push_back( argv[arg] );
 

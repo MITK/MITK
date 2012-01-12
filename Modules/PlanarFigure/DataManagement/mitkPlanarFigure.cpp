@@ -24,14 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarFigure::PlanarFigure()
-: m_FigurePlaced( false ),
-m_PreviewControlPointVisible( false ),
-m_SelectedControlPoint( -1 ),
-m_Geometry2D( NULL ),
-m_PolyLineUpToDate(false),
-m_HelperLinesUpToDate(false),
-m_FeaturesUpToDate(false),
-m_FeaturesMTime( 0 )
+: m_SelectedControlPoint( -1 ),
+  m_PreviewControlPointVisible( false ),
+  m_FigurePlaced( false ),
+  m_Geometry2D( NULL ),
+  m_PolyLineUpToDate(false),
+  m_HelperLinesUpToDate(false),
+  m_FeaturesUpToDate(false),
+  m_FeaturesMTime( 0 )
 {
 
 
@@ -96,7 +96,7 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     // if position has not been defined or position would be the last control point, just append the new one
     // we also append a new point if we click onto the line between the first two control-points if the second control-point is selected
     // -> special case for PlanarCross
-    if ( position == -1 || position > m_NumberOfControlPoints-1 || (position == 1 && m_SelectedControlPoint == 2) )
+    if ( position == -1 || position > (int)m_NumberOfControlPoints-1 || (position == 1 && m_SelectedControlPoint == 2) )
     {
       if ( m_ControlPoints.size() > this->GetMaximumNumberOfControlPoints()-1 )
       {
@@ -232,7 +232,6 @@ bool mitk::PlanarFigure::IsPreviewControlPointVisible()
 
 mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 {
-  int i = m_ControlPoints.size();
   if ( index < m_NumberOfControlPoints )
   {
     return m_ControlPoints.at( index );
@@ -277,7 +276,7 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index) const
 
 void mitk::PlanarFigure::ClearPolyLines()
 {
-  for ( int i=0; i<m_PolyLines.size(); i++ )
+  for ( std::vector<PolyLineType>::size_type i=0; i<m_PolyLines.size(); i++ )
   {
     m_PolyLines.at( i ).clear();
   }
@@ -311,7 +310,7 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( un
 
 void mitk::PlanarFigure::ClearHelperPolyLines()
 {
-  for ( int i=0; i<m_HelperPolyLines.size(); i++ )
+  for ( std::vector<PolyLineType>::size_type i=0; i<m_HelperPolyLines.size(); i++ )
   {
     m_HelperPolyLines.at(i).clear();
   }

@@ -245,6 +245,8 @@ public:
         return y;
       case 2:
         return z;
+      default:
+        return 0.0f;
     }
   }
 

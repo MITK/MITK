@@ -179,15 +179,13 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     m_DifferencesVector = differencesVector;
     mean = mean/numberOfPoints;
     rms = sqrt(rms/numberOfPoints);
-    for (int i=0; i<differencesVector.size(); i++)
+    for (std::vector<double>::size_type i=0; i<differencesVector.size(); i++)
     {
       sd+=(differencesVector.at(i)-mean)*(differencesVector.at(i)-mean);
     }
     double variance = sd/numberOfPoints;
     sd = sqrt(variance);
     std::sort(differencesVector.begin(),differencesVector.end());
-    double min = differencesVector.at(0);
-    double max = differencesVector.at(numberOfPoints-1);
     double median = 0.0;
     if (numberOfPoints%2 == 0)
     {

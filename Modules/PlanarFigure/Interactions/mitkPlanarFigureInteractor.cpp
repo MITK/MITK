@@ -750,10 +750,9 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   // Point is inside encompassing rectangle IF
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
-  if ( (crossPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
-    && ( l1 > 0.0 ) && ( l2 > 0.0 ) 
-    || endPoint.SquaredEuclideanDistanceTo( point ) < 20.0 
-    || startPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
+  if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
+      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0 
+      || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
   {
     return true;
   }
@@ -786,7 +785,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
 
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
-  int previousControlPoint = -1;
 
   for ( unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop )
   {
@@ -919,7 +917,7 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   // Check if a previous point has been set
   bool tooClose = false;
 
-  for( int i=0; i<planarFigure->GetNumberOfControlPoints(); i++ )
+  for( int i=0; i < (int)planarFigure->GetNumberOfControlPoints(); i++ )
   {
     if ( i != planarFigure->GetSelectedControlPoint() )
     {

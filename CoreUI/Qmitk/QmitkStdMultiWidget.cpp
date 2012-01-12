@@ -55,11 +55,11 @@ mitkWidget1(NULL),
 mitkWidget2(NULL),
 mitkWidget3(NULL),
 mitkWidget4(NULL),
+m_GradientBackgroundFlag(true),
 m_PlaneNode1(NULL), 
 m_PlaneNode2(NULL), 
 m_PlaneNode3(NULL), 
 m_Node(NULL),
-m_GradientBackgroundFlag(true),
 m_PendingCrosshairPositionEvent(false)
 {
   /*******************************/

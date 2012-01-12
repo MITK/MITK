@@ -210,7 +210,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 }
 }; // end test helper class
   
-int mitkSceneIOTest(int  argc, char* argv[])
+int mitkSceneIOTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("SceneIO")
   std::string sceneFileName;

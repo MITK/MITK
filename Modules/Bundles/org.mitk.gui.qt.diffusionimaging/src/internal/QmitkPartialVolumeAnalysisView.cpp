@@ -112,7 +112,7 @@ inline bool my_isnan(float x)
 
 }
 
-QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject */*parent*/, const char */*name*/)
+QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*parent*/, const char * /*name*/)
   : QmitkFunctionality(),
   m_Controls( NULL ),
   m_TimeStepperAdapter( NULL ),

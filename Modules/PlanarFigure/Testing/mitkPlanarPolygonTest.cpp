@@ -91,7 +91,7 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
 
 static void TestPlanarPolygonEditing( mitk::PlanarPolygon::Pointer planarPolygon )
 {
-  int initialNumberOfControlPoints = planarPolygon->GetNumberOfControlPoints();
+  unsigned int initialNumberOfControlPoints = planarPolygon->GetNumberOfControlPoints();
 
   mitk::Point2D pnt;
   pnt[0] = 75.0; pnt[1] = 25.0;

@@ -247,7 +247,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QCommandLinkButton" name="m_GenerateROIImage">
+          <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -318,6 +318,36 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCommandLinkButton" name="m_Extract3dButton">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string comment="Extract fibers passing through selected surface mesh" extracomment="Extract fibers passing through selected surface mesh">Extract fibers passing through selected surface mesh</string>
+           </property>
+           <property name="text">
+            <string>Extract 3D</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -481,12 +511,12 @@
          <number>10</number>
         </property>
         <property name="value">
-         <number>4</number>
+         <number>2</number>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_GenerationStartButton">
+       <widget class="QCommandLinkButton" name="m_ProcessFiberBundleButton">
         <property name="enabled">
          <bool>false</bool>
         </property>

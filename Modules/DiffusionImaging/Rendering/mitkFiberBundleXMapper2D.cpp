@@ -40,7 +40,8 @@
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
 {
-
+    m_lut = vtkLookupTable::New();
+    m_lut->Build();
 
 }
 
@@ -49,9 +50,9 @@ mitk::FiberBundleXMapper2D::~FiberBundleXMapper2D()
 }
 
 
-const mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
+mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 {
-    return dynamic_cast<const mitk::FiberBundleX * > ( GetData() );
+    return dynamic_cast< mitk::FiberBundleX * > ( GetData() );
 }
 
 
@@ -92,7 +93,7 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
 {
     FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-    // MITK_INFO << "uSERWAAAAAAAS, da shader brauchat a poor neue zoin";
+
     //get information about current position of views
     mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
     mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
@@ -139,10 +140,14 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     if (!fiberfading)
         fiberfading_i = 0;
 
+    // set Opacity
+    float fiberOpacity;
+    this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
 
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("slicingPlane",4, plane1);
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, &thickness);
     localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberFadingON",1,  &fiberfading_i);
+    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberOpacity", 1, &fiberOpacity);
 
 
 }
@@ -165,34 +170,36 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     }
     ///////////////////////////////////
 
+    ///THIS GET INPUT
+    mitk::FiberBundleX* fbx = this->GetInput();
 
-
-
-
-///THIS GET INPUT
-    const mitk::FiberBundleX* fbx = this->GetInput();
-//extract polydata
-    //todo
-    
-    vtkSmartPointer<vtkLookupTable> lut = vtkLookupTable::New();
-    lut->Build();
+    localStorage->m_PointMapper->ScalarVisibilityOn();
     localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
-    //m_VtkFiberDataMapperGL->SelectColorArray("FaColors");
-    localStorage->m_PointMapper->SelectColorArray("ColorValues");
-    localStorage->m_PointMapper->SetLookupTable(lut);  //apply the properties after the slice was set
+    localStorage->m_PointMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+    localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
+
+    // set color
+    if (fbx->GetCurrentColorCoding() != NULL){
+//        localStorage->m_PointMapper->SelectColorArray("");
+        localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding());
+        MITK_INFO << "MapperFBX 2D: " << fbx->GetCurrentColorCoding();
+
+        if(fbx->GetCurrentColorCoding() == fbx->COLORCODING_CUSTOM){
+            float temprgb[3];
+            this->GetDataNode()->GetColor( temprgb, NULL );
+            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
+            localStorage->m_PointActor->GetProperty()->SetColor(trgb);
+        }
+    }
 
 
-    //  feed the vtk fiber mapper with point data ...TODO do in constructor
-    localStorage->m_PointMapper->SetInput(localStorage->m_SlicedResult);   // in optimized version, mapper is feeded by localStorage->m_cutter->GetOutput();
+
+    localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
 
     // Applying shading properties
     {
-        //Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
-        // VTK Properties
-        //ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-        // Shaders
         mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
     }
 

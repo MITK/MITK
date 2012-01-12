@@ -39,15 +39,8 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
-  # DataStructures -> FiberBundle
-  IODataStructures/FiberBundle/mitkFiberBundle.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleWriter.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleReader.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
-  IODataStructures/FiberBundle/mitkParticle.cpp
-  IODataStructures/FiberBundle/mitkParticleGrid.cpp
+  IODataStructures/mitkParticle.cpp
+  IODataStructures/mitkParticleGrid.cpp
 
 # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
@@ -58,10 +51,8 @@ SET(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
-
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
-
 
   # DataStructures -> Tbss
   IODataStructures/TbssImages/mitkTbssImageSource.cpp
@@ -78,7 +69,6 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
 
-
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -87,15 +77,13 @@ SET(CPP_FILES
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
-  Rendering/mitkFiberBundleMapper2D.cpp
-  Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp  
   Rendering/mitkPlanarCircleMapper3D.cpp
   Rendering/mitkPlanarPolygonMapper3D.cpp
-  
+
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -113,8 +101,6 @@ SET(H_FILES
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
-  Rendering/mitkFiberBundleMapper2D.h
-  Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
@@ -133,8 +119,7 @@ SET(H_FILES
   Reconstruction/itkRegularizedIVIMReconstructionSingleIteration.h
 
   # IO Datastructures
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h  
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h 
   IODataStructures/TbssImages/mitkTbssImporter.h
 
   # DataStructures -> FiberBundleX
@@ -145,8 +130,6 @@ SET(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
-
-
 
   # Tractography
   Tractography/itkGibbsTrackingFilter.h
@@ -160,8 +143,9 @@ SET(H_FILES
   Algorithms/itkB0ImageExtractionImageFilter.h
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
-  Algorithms/itkTractsToProbabilityImageFilter.h
+  Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
+  Algorithms/itkTractsToRgbaImageFilter.h
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h

@@ -1,5 +1,5 @@
-#ifndef __itkTractsToFiberEndingsImageFilter_h__
-#define __itkTractsToFiberEndingsImageFilter_h__
+#ifndef __itkTractDensityImageFilter_h__
+#define __itkTractDensityImageFilter_h__
 
 #include <itkImageSource.h>
 #include <itkImage.h>
@@ -10,11 +10,11 @@
 namespace itk{
 
 template< class OutputImageType >
-class TractsToFiberEndingsImageFilter : public ImageSource< OutputImageType >
+class TractDensityImageFilter : public ImageSource< OutputImageType >
 {
 
 public:
-  typedef TractsToFiberEndingsImageFilter Self;
+  typedef TractDensityImageFilter Self;
   typedef ProcessObject Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
@@ -22,7 +22,7 @@ public:
   typedef typename OutputImageType::PixelType OutPixelType;
 
   itkNewMacro(Self);
-  itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource );
+  itkTypeMacro( TractDensityImageFilter, ImageSource );
 
   /** Upsampling factor **/
   itkSetMacro( UpsamplingFactor, unsigned int);
@@ -32,12 +32,16 @@ public:
   itkSetMacro( InvertImage, bool);
   itkGetMacro( InvertImage, bool);
 
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
-  itkSetMacro( InputImage, typename OutputImageType::Pointer);
+  /** Binary Output **/
+  itkSetMacro( BinaryOutput, bool);
+  itkGetMacro( BinaryOutput, bool);
 
   /** Use input image geometry to initialize output image **/
   itkSetMacro( UseImageGeometry, bool);
   itkGetMacro( UseImageGeometry, bool);
+
+  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
+  itkSetMacro( InputImage, typename OutputImageType::Pointer);
 
   void GenerateData();
 
@@ -45,20 +49,21 @@ protected:
 
   itk::Point<float, 3> GetItkPoint(double point[3]);
 
-  TractsToFiberEndingsImageFilter();
-  virtual ~TractsToFiberEndingsImageFilter();
+  TractDensityImageFilter();
+  virtual ~TractDensityImageFilter();
 
+  typename OutputImageType::Pointer m_InputImage;
   mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
   bool m_InvertImage;
+  bool m_BinaryOutput;
   bool m_UseImageGeometry;
-  typename OutputImageType::Pointer m_InputImage;
 };
 
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTractsToFiberEndingsImageFilter.cpp"
+#include "itkTractDensityImageFilter.cpp"
 #endif
 
-#endif // __itkTractsToFiberEndingsImageFilter_h__
+#endif // __itkTractDensityImageFilter_h__

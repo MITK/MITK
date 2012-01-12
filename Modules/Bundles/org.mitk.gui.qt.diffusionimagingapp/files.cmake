@@ -17,6 +17,7 @@ SET(INTERNAL_CPP_FILES
   QmitkDIAppScreenshotsMoviesPerspective.cpp
   QmitkDIAppTBSSPerspective.cpp
   QmitkDIAppVolumeVisualizationPerspective.cpp
+  QmitkDIAppTrackingEvaluationPerspective.cpp
 )
 
 SET(UI_FILES
@@ -38,6 +39,7 @@ SET(MOC_H_FILES
   src/internal/QmitkDIAppScreenshotsMoviesPerspective.h
   src/internal/QmitkDIAppTBSSPerspective.h
   src/internal/QmitkDIAppVolumeVisualizationPerspective.h
+  src/internal/QmitkDIAppTrackingEvaluationPerspective.h
 )
 
 SET(CACHED_RESOURCE_FILES

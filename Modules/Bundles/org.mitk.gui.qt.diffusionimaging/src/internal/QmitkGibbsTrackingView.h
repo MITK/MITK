@@ -25,9 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkQBallImage.h>
 #include <QThread>
-#include <mitkFiberBundle.h>
+#include <mitkFiberBundleX.h>
 #include <QTime>
 #include <itkImage.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
 
 class QmitkGibbsTrackingView;
 
@@ -131,7 +133,7 @@ private:
   QmitkStdMultiWidget* m_MultiWidget;
 
   // data objects
-  mitk::FiberBundle::Pointer  m_FiberBundle;
+  mitk::FiberBundleX::Pointer m_FiberBundle;
   MaskImgType::Pointer        m_MaskImage;
   MaskImgType::Pointer        m_GfaImage;
   mitk::QBallImage::Pointer   m_QBallImage;

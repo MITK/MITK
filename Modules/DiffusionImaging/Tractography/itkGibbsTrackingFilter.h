@@ -10,6 +10,11 @@
 
 #include <fstream>
 #include <QFile>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyLine.h>
 
 namespace itk{
 
@@ -32,8 +37,7 @@ namespace itk{
     typedef TInputROIImage MaskImageType;
     typedef typename MaskImageType::Pointer MaskImageTypePointer;
 
-    typedef std::vector< itk::Point<float, 3> > FiberTractType;
-    typedef std::vector< FiberTractType > FiberBundleType;
+    typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
     typedef Image< float, 3 >                  GfaImageType;
     typedef typename GfaImageType::Pointer     GfaImageTypePointer;
@@ -117,7 +121,7 @@ namespace itk{
       this->GenerateData();
     }
 
-    FiberBundleType* GetFiberBundle();
+    FiberPolyDataType GetFiberBundle();
     float GetMemoryUsage();
     bool EstimateParticleWeight();
 
@@ -159,7 +163,7 @@ namespace itk{
     float   m_ProposalAcceptance;
 
     RJMCMC* m_Sampler;
-    FiberBundleType m_FiberBundle;
+    FiberPolyDataType m_FiberPolyData;
     unsigned long m_NumParticles;
     unsigned long m_NumConnections;
   };

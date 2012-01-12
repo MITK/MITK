@@ -326,7 +326,7 @@ static void CheckPlanesOutsideOfBoundingBox(mitk::Geometry3D::Pointer geometry3D
 }
 
 
-int mitkClippedSurfaceBoundsCalculatorTest(int, char**)
+int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("ClippedSurfaceBoundsCalculator");

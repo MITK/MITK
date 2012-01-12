@@ -429,7 +429,7 @@ static mitk::Image::Pointer GetTestImage()
 
 };
 
-int mitkImageStatisticsCalculatorTest(int, char**)
+int mitkImageStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkImageStatisticsCalculatorTest")

@@ -152,7 +152,7 @@ static void TestComplexCase()
 
 };
 
-int mitkPointSetStatisticsCalculatorTest(int, char**)
+int mitkPointSetStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkPointSetStatisticsCalculatorTest")

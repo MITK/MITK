@@ -244,7 +244,7 @@ int testRemoveAll()
     return EXIT_SUCCESS;
 }
 
-int mitkPlanePositionManagerTest(int, char**)
+int mitkPlanePositionManagerTest(int, char* [])
 {
     MITK_TEST_OUTPUT(<<"Starting Test PlanePositionManager");
     SetUpBeforeTest();

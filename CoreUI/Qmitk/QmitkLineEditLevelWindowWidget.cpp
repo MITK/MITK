@@ -70,7 +70,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   m_WindowInput->setValidator(validatorWindowInput);
 
   //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
+  //QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
   //m_LevelInput->setValidator(validatorLevelInput);
   
   this->hide();

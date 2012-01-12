@@ -160,7 +160,6 @@ public:
       MITK_TEST_CONDITION_REQUIRED(pointSet->GetNumberOfSelected() == 0,"No selected points.");
       //trying to delete a deselected point so going from state 2 over 30 to 1
       mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
-      unsigned long nPts = pointSet->GetPointSet()->GetNumberOfPoints();
       MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==(unsigned long)numberOfPointsAllowed,"Checking that no unselected point can be deleted.");
       //trying to add point to already filled point set
       this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);

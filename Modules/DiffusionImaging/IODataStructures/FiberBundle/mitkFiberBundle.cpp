@@ -144,7 +144,7 @@ void mitk::FiberBundle::InsertBundle(mitk::FiberBundle::Pointer bundle)
   }
 
   ContainerType::Pointer container = bundle->GetTractContainer();
-  for(int i=0; i<container->Size();i++)
+  for(unsigned long i=0; i<container->Size();i++)
   {
     this->PushTract(container->ElementAt(i));
   }
@@ -268,7 +268,7 @@ int mitk::FiberBundle::GetNumTracts()
 
 int mitk::FiberBundle::GetNumPoints(int tractIndex)
 {
-  if ((unsigned)tractIndex>=0 && (unsigned)tractIndex<m_TractContainer->Size())
+  if (tractIndex>=0 && (unsigned long)tractIndex<m_TractContainer->Size())
   {
     return m_TractContainer->GetElement(tractIndex)->Size();
 
@@ -456,7 +456,7 @@ void mitk::FiberBundle::fiberPostprocessing_FA(DTITubePointType *dtiP)
 
 
 /* methods for high speed perfoermance dispay or live-monitoring of fiber results */
-void mitk::FiberBundle::addContainer4speedDisplay(ContainerType::Pointer speedTractContainer)
+void mitk::FiberBundle::addContainer4speedDisplay(ContainerType::Pointer /*speedTractContainer*/)
 {
 
 }
@@ -526,7 +526,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::extractFibersById(std::vector<int>
   FiberList = fiberGroup->GetChildren();
   MITK_INFO << "writing fibers into datastructure:....";
 
-  for (int cg=0; cg<idSet.size(); ++cg) {
+  for (std::vector<int>::size_type cg=0; cg<idSet.size(); ++cg) {
 
     if(cg % 200 == 0){
       MITK_INFO << "stored: " << cg << " of " << idSet.size();
@@ -1210,7 +1210,7 @@ bool mitk::FiberBundle::checkForGap(int crntPntFacing, int prevPntFacing)
 
 }
 
-mitk::Point3D mitk::FiberBundle::calculateCrossingPoint(mitk::Point3D pntFrnt, mitk::Point3D pntbck, mitk::PlanarFigure::Pointer pf)
+mitk::Point3D mitk::FiberBundle::calculateCrossingPoint(mitk::Point3D pntFrnt, mitk::Point3D pntbck, mitk::PlanarFigure::Pointer /*pf*/)
 {
 
   mitk::Point3D pntXing;
@@ -1232,10 +1232,10 @@ mitk::Point3D mitk::FiberBundle::calculateCrossingPoint(mitk::Point3D pntFrnt, m
 
   double x0 = pntFrnt[0];
   double y0 = pntFrnt[1];
-  double z0 = pntFrnt[2];
+  //double z0 = pntFrnt[2];
   double x1 = pntbck[0];
   double y1 = pntbck[1];
-  double z1 = pntbck[2];
+  //double z1 = pntbck[2];
 
   k = (y1 - y0) / (x1 - x0);
 
@@ -1359,7 +1359,7 @@ bool mitk::FiberBundle::isPointInSelection(mitk::Point3D pnt3D, mitk::PlanarFigu
     unsigned int nrCtrlPnts = pf->GetNumberOfControlPoints();
     //  MITK_INFO << "We have a polygon with " << nrCtrlPnts << " controlpoints: " ;
 
-    for (int i=0; i<nrCtrlPnts; ++i)
+    for (unsigned int i=0; i<nrCtrlPnts; ++i)
     {
       polygonVtk->GetPoints()->InsertNextPoint((double)pf->GetWorldControlPoint(i)[0], (double)pf->GetWorldControlPoint(i)[1], (double)pf->GetWorldControlPoint(i)[2] );
     }
@@ -1740,7 +1740,7 @@ bool mitk::FiberBundle::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::FiberBundle::SetRequestedRegion( itk::DataObject *data )
+void mitk::FiberBundle::SetRequestedRegion( itk::DataObject * /*data*/ )
 {
 
 }

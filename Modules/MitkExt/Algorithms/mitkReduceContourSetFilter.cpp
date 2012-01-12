@@ -285,9 +285,9 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
 
       //double temp[3];
       int segmentLenght = currentSegment.EndIndex - currentSegment.StartIndex;
-      if (segmentLenght > m_MaxSegmentLenght)
+      if (segmentLenght > (int)m_MaxSegmentLenght)
       {
-        m_MaxSegmentLenght = segmentLenght;
+        m_MaxSegmentLenght = (unsigned int)segmentLenght;
       }
 
 //      MITK_INFO<<"Lenght: "<<abs(segmentLenght);

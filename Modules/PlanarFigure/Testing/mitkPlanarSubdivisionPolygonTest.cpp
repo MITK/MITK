@@ -132,7 +132,7 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
 
 static void TestPlanarSubdivisionPolygonEditing( mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygon )
 {
-  int initialNumberOfControlPoints = planarSubdivisionPolygon->GetNumberOfControlPoints();
+  unsigned int initialNumberOfControlPoints = planarSubdivisionPolygon->GetNumberOfControlPoints();
 
   mitk::Point2D pnt;
   pnt[0] = 75.0; pnt[1] = 25.0;

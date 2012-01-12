@@ -182,7 +182,7 @@ void QmitkRenderWindow::leaveEvent( QEvent *e )
   QVTKWidget::leaveEvent(e);
 }
 
-void QmitkRenderWindow::paintEvent(QPaintEvent* event)
+void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
 {
   //We are using our own interaction and thus have to call the rendering manually.
   mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderWindow());
@@ -243,7 +243,7 @@ void QmitkRenderWindow::ActivateMenuWidget( bool state )
   }
 }
 
-void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
+void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& /*pos*/ )
 {
   if( m_MenuWidget )
   {

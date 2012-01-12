@@ -68,7 +68,7 @@ void mitk::PlanarPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();
 
-  for ( int i=0; i<m_ControlPoints.size(); i++ )
+  for ( ControlPointListType::size_type i=0; i<m_ControlPoints.size(); i++ )
   {
     Point2D pnt = m_ControlPoints.at( i );
     PolyLineElement elem(pnt,i);
@@ -256,7 +256,7 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
     polyLinePoints.push_back((*iter).Point);
   }
 
-  for ( int i=0; i<polyLinePoints.size()-1; i++ )
+  for ( ControlPointListType::size_type i=0; i<polyLinePoints.size()-1; i++ )
   {
     mitk::Point2D pnt1 = polyLinePoints[i];
     mitk::Point2D pnt2 = polyLinePoints[i+1];

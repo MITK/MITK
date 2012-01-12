@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  ToFCameraDevice::ToFCameraDevice():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_SourceDataSize(0),m_CameraActive(false),
-  m_ThreadID(0),m_CameraConnected(false),m_MaxBufferSize(100),m_BufferSize(1),m_CurrentPos(-1),m_FreePos(0),m_ImageSequence(0)
+  ToFCameraDevice::ToFCameraDevice():m_BufferSize(1),m_MaxBufferSize(100),m_CurrentPos(-1),m_FreePos(0),
+    m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_SourceDataSize(0),
+    m_ThreadID(0),m_CameraActive(false),m_CameraConnected(false),m_ImageSequence(0)
   {
     this->m_AmplitudeArray = NULL;
     this->m_IntensityArray = NULL;

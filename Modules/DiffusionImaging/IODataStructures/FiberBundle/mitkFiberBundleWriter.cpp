@@ -177,7 +177,7 @@ void mitk::FiberBundleWriter::GenerateData()
       TiXmlElement* fiberBundleXML = new TiXmlElement(mitk::FiberBundleWriter::XML_FIBER_BUNDLE);
       fiberBundleXML->SetAttribute(mitk::FiberBundleWriter::XML_NUM_FIBERS, tractContainer->size());
       int numParticles = 0;
-      for (int i=0; i<tractContainer->Size(); i++)
+      for (unsigned long i=0; i<tractContainer->Size(); i++)
       {
         ContainerTractType::Pointer tract = tractContainer->GetElement(i);
         TiXmlElement* fiberXML = new TiXmlElement(mitk::FiberBundleWriter::XML_FIBER);

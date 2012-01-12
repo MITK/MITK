@@ -248,7 +248,7 @@ int testRestorePlanePostionOperation ()
     geometry->SetIndexToWorldTransform(slicedgeometry1->GetIndexToWorldTransform());
 
     //Initialize planes
-    for (int i=0; i < numSlices; i++)
+    for (int i=0; i < (int)numSlices; i++)
     {
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();
@@ -256,7 +256,7 @@ int testRestorePlanePostionOperation ()
       slicedgeometry1->SetGeometry2D(geo2d,i);
     }
 
-    for (int i=0; i < numSlices; i++)
+    for (int i=0; i < (int)numSlices; i++)
     {
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();

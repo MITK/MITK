@@ -101,7 +101,7 @@ namespace mitk {
     * 
     *\warning This method is not tested yet. It is not save to use!
     */
-    const bool IsAtEnd();
+    bool IsAtEnd();
 
     /**
     * \brief The PlayerMode is used for generating a presetted output stream. You do not need to

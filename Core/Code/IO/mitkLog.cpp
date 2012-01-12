@@ -40,17 +40,17 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
 {
   logMutex.Lock();
   #ifdef _WIN32
-    mbilog::BackendCout::FormatSmart( l, (int)GetCurrentThreadId() );
+    FormatSmart( l, (int)GetCurrentThreadId() );
   #else
-    mbilog::BackendCout::FormatSmart( l );
+    FormatSmart( l );
   #endif
   
   if(logFile)
   {
     #ifdef _WIN32
-      mbilog::BackendCout::FormatFull( *logFile, l, (int)GetCurrentThreadId() );
+      FormatFull( *logFile, l, (int)GetCurrentThreadId() );
     #else
-      mbilog::BackendCout::FormatFull( *logFile, l );
+      FormatFull( *logFile, l );
     #endif
   }
   if(logOutputWindow)
@@ -60,9 +60,9 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
     outputWindow->str("");
     outputWindow->clear();
     #ifdef _WIN32
-      mbilog::BackendCout::FormatFull( *outputWindow, l, (int)GetCurrentThreadId() );
+      FormatFull( *outputWindow, l, (int)GetCurrentThreadId() );
     #else
-      mbilog::BackendCout::FormatFull( *outputWindow, l );
+      FormatFull( *outputWindow, l );
     #endif
     itk::OutputWindow::GetInstance()->DisplayText(outputWindow->str().c_str());
   }

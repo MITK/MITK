@@ -3,6 +3,7 @@ PROJECT(mbilog)
 SET(MBILOG_HEADERS
   mbilog.h
   mbilogLoggingTypes.h
+  mbilogTextDictionary.h
   mbilogExports.h
   mbilogLogMessage.h
   mbilogBackendBase.h

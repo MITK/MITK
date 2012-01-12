@@ -28,7 +28,7 @@ namespace mbilog{
    */
   struct MBILOG_DLL_API AbstractBackend //TODO: convert to class
   {
-    virtual ~AbstractBackend()
+    virtual ~AbstractBackend();
 	
 	/** \brief This method is called by the mbi logging mechanism if the object is registered in 
 	 *         the mbi logging mechanism and a logging message is emitted.

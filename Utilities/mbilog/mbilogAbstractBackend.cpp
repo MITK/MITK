@@ -14,7 +14,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mbilogAbstractBackend.h"
 
-virtual mbilog::AbstractBackend::~AbstractBackend()
+mbilog::AbstractBackend::~AbstractBackend()
 	{}
 
 

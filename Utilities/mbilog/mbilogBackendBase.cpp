@@ -12,10 +12,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mbilogAbstractBackend.h"
+#include "mbilogBackendBase.h"
 
-mbilog::AbstractBackend::~AbstractBackend()
+mbilog::BackendBase::~BackendBase()
 	{}
-
 
 

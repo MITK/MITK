@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 
 #include "mbilogExports.h"
-#include "mbilogAbstractBackend.h"
+#include "mbilogBackendBase.h"
 #include "mbilogBackendCout.h"
 #include "mbilogLogMessage.h"
 #include "mbilogLoggingTypes.h"
@@ -34,11 +34,11 @@ namespace mbilog {
    *         are relayed to this backend through the method ProcessMessage. If no backend is registered the default
    *         backend is used.
    */
-  void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
+  void MBILOG_DLL_API RegisterBackend(BackendBase* backend);
   
   /** \brief Unregisters a backend.
    */
-  void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
+  void MBILOG_DLL_API UnregisterBackend(BackendBase* backend);
   
   /** \brief Distributes the given message to all registered backends. Should only be called by objects 
     *        of the class pseudo stream.

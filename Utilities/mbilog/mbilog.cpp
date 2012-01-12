@@ -25,19 +25,19 @@ PURPOSE.  See the above copyright notices for more information.
  #include <windows.h>
 #endif
 
-static std::list<mbilog::AbstractBackend*> backends;
+static std::list<mbilog::BackendBase*> backends;
 
 
 namespace mbilog {
 static const std::string NA_STRING = "n/a";
 }
 
-void mbilog::RegisterBackend(mbilog::AbstractBackend* backend)
+void mbilog::RegisterBackend(mbilog::BackendBase* backend)
 {
   backends.push_back(backend);
 }
 
-void mbilog::UnregisterBackend(mbilog::AbstractBackend* backend)
+void mbilog::UnregisterBackend(mbilog::BackendBase* backend)
 {
   backends.remove(backend);
 }
@@ -57,7 +57,7 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
     return;
   }
 
-  std::list<mbilog::AbstractBackend*>::iterator i;
+  std::list<mbilog::BackendBase*>::iterator i;
 
   for(i = backends.begin(); i != backends.end(); i++)
     (*i)->ProcessMessage(l);

@@ -5,15 +5,17 @@ SET(MBILOG_HEADERS
   mbilogLoggingTypes.h
   mbilogExports.h
   mbilogLogMessage.h
-  mbilogAbstractBackend.h
+  mbilogBackendBase.h
+  mbilogTextBackendBase.h
   mbilogBackendCout.h
 )
 
 SET(MBILOG_SOURCES
   mbilog.cpp
-  mbilogAbstractBackend.cpp
   mbilogLogMessage.cpp
   mbilogBackendCout.cpp
+  mbilogBackendBase.cpp
+  mbilogTextBackendBase.cpp
 )
 
 OPTION(MBILOG_ENABLE_DEBUG_MESSAGES "Enable extra debug log output" OFF)

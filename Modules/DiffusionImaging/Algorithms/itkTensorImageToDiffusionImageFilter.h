@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _itk_TensorImageToDiffusionImageFilter_h_
 
 #include "itkImageToImageFilter.h"
-
+#include <itkDiffusionTensor3D.h>
 
 namespace itk
 {

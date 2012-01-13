@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.igtnavigation} Igt Navigation
+\bundlemainpage{org_mitk_gui_qt_igtnavigation} Igt Navigation
 
 This Bundle includes views of specific navigation software. At the moment there is only one navigation software availiable:
 

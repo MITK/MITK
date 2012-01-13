@@ -192,6 +192,11 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		//	m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
 
 	}  
+	else
+	{
+		itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
+        return;
+    }
   ////Code for curved planes
   // else{
   //  // Do we have an AbstractTransformGeometry?
@@ -241,14 +246,19 @@ void mitk::ExtractSliceFilter::GenerateData(){
   //  }
   //}
 
-	vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
-	unitSpacingImageFilter->ReleaseDataFlagOn();
-	
-	unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-	unitSpacingImageFilter->SetInput( input->GetVtkImageData(m_TimeStep) );
+	if(m_ResliceTransform){
+		vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
+		unitSpacingImageFilter->ReleaseDataFlagOn();
 
-	m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput() );
-	/*m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));*/
+		unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
+		unitSpacingImageFilter->SetInput( input->GetVtkImageData(m_TimeStep) );
+
+		m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput() );
+	}
+	else
+	{
+		m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
+	}
 
 
 	/*setup the plane where vktImageReslice extracts the slice*/

@@ -23,7 +23,8 @@ SET(module_dirs
     InputDevices
     ToFHardware
     ToFProcessing
-    ToFUI    
+    ToFUI
+	ClippingTools
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

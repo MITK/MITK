@@ -14,6 +14,13 @@
       class="QmitkSegmentationView" />
   </extension>
   
+  <extension point="org.blueberry.ui.views">
+     <view id="org.mitk.views.deformableclippingplane"
+           name="Clipping Plane"
+           class="QmitkDeformableClippingPlaneView"
+           icon="resources/deformablePlane.png" />
+  </extension>
+
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.SegmentationPreferencePage" name="Segmentation" class="QmitkSegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>

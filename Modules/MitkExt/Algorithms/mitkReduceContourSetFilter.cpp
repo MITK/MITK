@@ -369,7 +369,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
 
       //The plane vectors
       double v1[3];
-      double v2[3];
+      double v2[3] = { 0 };
       //The plane normal
       double normal[3];
 

@@ -334,6 +334,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   double prevPixelVal = 1;
 
+  unsigned int _size[3] = { (unsigned int)(size[0] - 1), (unsigned int)(size[1] - 1), (unsigned int)(size[2] - 1) };
+
   //Set every pixel inside the surface to -10 except the edge point (so that the received surface is closed)
   while (!imgRegionIterator.IsAtEnd()) {
 
@@ -342,8 +344,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
       while (imgRegionIterator.Get() == 10)
       {
-        if (imgRegionIterator.GetIndex()[0] == size[0]-1 || imgRegionIterator.GetIndex()[1] == size[1]-1 || imgRegionIterator.GetIndex()[2] == size[2]-1 
-            || imgRegionIterator.GetIndex()[0] == 0 || imgRegionIterator.GetIndex()[1] == 0 || imgRegionIterator.GetIndex()[2] == 0 )
+        if (imgRegionIterator.GetIndex()[0] == _size[0] || imgRegionIterator.GetIndex()[1] == _size[1] || imgRegionIterator.GetIndex()[2] == _size[2] 
+            || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U )
         {
           imgRegionIterator.Set(10);
           prevPixelVal = 10;
@@ -360,8 +362,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
       }
 
     }
-    else if (imgRegionIterator.GetIndex()[0] == size[0]-1 || imgRegionIterator.GetIndex()[1] == size[1]-1 || imgRegionIterator.GetIndex()[2] == size[2]-1 
-            || imgRegionIterator.GetIndex()[0] == 0 || imgRegionIterator.GetIndex()[1] == 0 || imgRegionIterator.GetIndex()[2] == 0)
+    else if (imgRegionIterator.GetIndex()[0] == _size[0] || imgRegionIterator.GetIndex()[1] == _size[1] || imgRegionIterator.GetIndex()[2] == _size[2] 
+            || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U)
     {
       imgRegionIterator.Set(10);
       prevPixelVal = 10;

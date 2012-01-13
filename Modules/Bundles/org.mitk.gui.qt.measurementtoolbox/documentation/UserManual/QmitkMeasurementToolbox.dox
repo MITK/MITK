@@ -6,7 +6,7 @@
 This bundle contains all views that provide measurement and statistics functionality.
 
 <ul>
-	<li> \subpage org_measurement
+	<li> \subpage org_measure
 	<li> \subpage org_imagestatistics
-<\ul>
+</ul>
 */

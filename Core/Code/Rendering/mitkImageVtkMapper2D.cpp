@@ -177,10 +177,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   localStorage->m_Reslicer->UpdateLargestPossibleRegion();
 
+  localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutPutSpacing();
+
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
-  MITK_INFO<<"ViewDirection: "<<renderer->GetSliceNavigationController()->GetViewDirection()<<"World-Origin: "<<worldGeometry->GetOrigin();
   vtkFloatingPointType sliceBounds[6];
   for ( int i = 0; i < 6; ++i )
   {

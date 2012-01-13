@@ -63,6 +63,8 @@ namespace mitk
 
 		bool GetBounds(vtkFloatingPointType bounds[6]);
 
+		mitk::ScalarType* GetOutPutSpacing();
+
 		vtkMatrix4x4* GetResliceAxes(){
 			return this->m_Reslicer->GetResliceAxes();
 		}
@@ -90,6 +92,8 @@ namespace mitk
 		const Geometry3D* m_ResliceTransform;
 
 		bool m_InPlaneResampleExtentByGeometry;
+
+		mitk::ScalarType* m_OutPutSpacing;
 
 		bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 		bool LineIntersectZero( vtkPoints *points, int p1, int p2, vtkFloatingPointType *bounds );

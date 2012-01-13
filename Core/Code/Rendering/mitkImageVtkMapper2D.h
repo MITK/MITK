@@ -168,7 +168,7 @@ namespace mitk {
       /** \brief Normal of the 2D geometry. */
       mitk::Vector3D m_Normal;
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
-      mitk::ScalarType m_mmPerPixel[2];
+      mitk::ScalarType* m_mmPerPixel;
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;

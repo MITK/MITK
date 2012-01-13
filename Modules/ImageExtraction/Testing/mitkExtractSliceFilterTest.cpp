@@ -448,43 +448,52 @@ public:
 		writer->SetFileName(file);
 		writer->Update();*/
 
+		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Frontal);
+		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Sagittal);
+		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Transversal);
 
+	}
+
+	static void TestPerPixelOrthogonalPlane(mitk::Image* imageInMitk, mitk::PlaneGeometry::PlaneOrientation orientation){
+
+		typedef itk::Image<unsigned short, 3> ImageType;
 
 		//set the seed of the rand function
 		srand((unsigned)time(0));
 		
 		/* setup a random orthogonal plane */
-		int sliceindex = rand() % 32;
-		int planeOrientation = rand() % 3;
+		int sliceindex = 17;//rand() % 32;
 		bool isFrontside = true; 
 		bool isRotated = false;
 
-		//sagittal
-		mitk::PlaneGeometry::PlaneOrientation orientation = mitk::PlaneGeometry::PlaneOrientation::Sagittal;
 
-		if( planeOrientation == 0) //transversal
+		if( orientation == mitk::PlaneGeometry::PlaneOrientation::Transversal)
 		{
-			isFrontside = false;
-			isRotated = true;
-			orientation = mitk::PlaneGeometry::PlaneOrientation::Transversal;
-		}else if( planeOrientation == 2) //coronal
-		{
-			orientation = mitk::PlaneGeometry::PlaneOrientation::Frontal;
+			/*isFrontside = false;
+			isRotated = true;	*/
 		}
 
-		
 
 		
 		mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
 		 
 		plane->InitializeStandardPlane(imageInMitk->GetGeometry(), orientation, sliceindex, isFrontside, isRotated);
-
-		plane->ChangeImageGeometryConsideringOriginOffset(true);
-
-
 		
-		mitk::Vector3D rotationVector;
+		//plane->SetPlaneToCenterOfVoxelInDirection(orientation);
+		mitk::Point3D origin = plane->GetOrigin();
+		mitk::Vector3D normal;
+		normal = plane->GetNormal();
+		
+
+		normal.Normalize();
+		
+		origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+		
+		plane->SetOrigin(origin);
+		
+		//we dont need this any more, because we are only testing orthogonal planes
+		/*mitk::Vector3D rotationVector;
 		rotationVector[0] = randFloat();
 		rotationVector[1] = randFloat();
 		rotationVector[2] = randFloat();
@@ -492,8 +501,7 @@ public:
 
 		float degree = randFloat() * 180.0;
 
-		//we dont need this any more, because we are only testing orthogonal planes
-		/*mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, plane->GetCenter(), rotationVector, degree);
+		mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, plane->GetCenter(), rotationVector, degree);
 		plane->ExecuteOperation(op);
 		delete op;*/
 
@@ -502,7 +510,7 @@ public:
 
 		/* define a point in the 3D volume.
 		 * add the two axis vectors of the plane (each multiplied with a
-		 * random number) to the origin. now the the two random numbers
+		 * random number) to the origin. now the two random numbers
 		 * become our index coordinates in the 2D image, because the
 		 * length of the axis vectors is 1.
 		 */
@@ -514,8 +522,8 @@ public:
 		axis1.Normalize();
 
 
-		unsigned char n1 = rand() % 32;
-		unsigned char n2 = rand() % 32;
+		unsigned char n1 = 7;// rand() % 32;
+		unsigned char n2 = 13;// rand() % 32;
 		
 
 		mitk::Point3D testPoint3DInWorld;
@@ -542,18 +550,18 @@ public:
 		slice->GetGeometry()->WorldToIndex(testPoint3DInWorld,testPoint2DInIndex);
 		
 
-		mitk::Point3D p, pp;
+		mitk::Point3D p, sliceIndexToWorld, imageIndexToWorld;
 		p[0] = testPoint2DInIndex[0];
 		p[1] = testPoint2DInIndex[1];
 		p[2] = testPoint2DInIndex[2];
-		slice->GetGeometry()->IndexToWorld(p, pp);
-		MITK_INFO << pp;
+		slice->GetGeometry()->IndexToWorld(p, sliceIndexToWorld);
+		MITK_INFO << sliceIndexToWorld;
 
 		p[0] = testPoint3DInIndex[0];
 		p[1] = testPoint3DInIndex[1];
 		p[2] = testPoint3DInIndex[2];
-		imageInMitk->GetGeometry()->IndexToWorld(p, pp);
-		MITK_INFO << pp;
+		imageInMitk->GetGeometry()->IndexToWorld(p, imageIndexToWorld);
+		MITK_INFO << imageIndexToWorld;
 
 
 		//compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
@@ -566,15 +574,26 @@ public:
 		MITK_TEST_CONDITION(valueAt3DVolume == valueAtSlice, "comparing pixelvalues for orthogonal plane");
 
 
-#ifdef DEBUG
-		MITK_INFO << "index: " << sliceindex << " orientation: " << planeOrientation << " frontside: " << isFrontside << " rotated: " << isRotated;
-		
-		MITK_INFO << "\n" << "point" << testPoint3DInWorld << " is " << testPoint2DInIndex << " in 2D";
+		vtkImageData* imageInVtk = imageInMitk->GetVtkImageData();
+		vtkImageData* sliceInVtk = slice->GetVtkImageData();
 
-		MITK_INFO << "\n" << "inside plane: " << plane->IsInside(testPoint3DInWorld) << " and volume: " << imageInMitk->GetGeometry()->IsInside(testPoint3DInWorld);
+		double valueVTKinSlice = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
+		double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
+
+		
+
+
+#ifdef DEBUG
+		MITK_INFO << "\n" << "TESTINFO index: " << sliceindex << " orientation: " << orientation << " frontside: " << isFrontside << " rotated: " << isRotated;
+		
+		MITK_INFO  << "\n" << "vtk: slice: " << valueVTKinSlice << ", image: "<< valueVTKinImage;
+
+		MITK_INFO << "\n" << "testPoint3D InWorld" << testPoint3DInWorld << " is " << testPoint2DInIndex << " in 2D";
+		MITK_INFO << "\n" << "randoms: " << ((int)n1) << ", " << ((int)n2);
+		MITK_INFO << "\n" << "point is inside plane: " << plane->IsInside(testPoint3DInWorld) << " and volume: " << imageInMitk->GetGeometry()->IsInside(testPoint3DInWorld);
 		
 		MITK_INFO << "\n" << "volume idx: " << testPoint3DInIndex << " = " << valueAt3DVolume ;
-		MITK_INFO << "\n" << "volume w: " << testPoint3DInWorld << " = " << valueAt3DVolumeByWorld ;
+		MITK_INFO << "\n" << "volume world: " << testPoint3DInWorld << " = " << valueAt3DVolumeByWorld ;
 		MITK_INFO << "\n" << "slice idx: " << testPoint2DInIndex << " = " << valueAtSlice ;
 
 		mitk::Index3D curr;

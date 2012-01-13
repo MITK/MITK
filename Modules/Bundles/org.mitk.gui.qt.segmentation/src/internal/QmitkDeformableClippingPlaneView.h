@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED
 
 
-#include "Ui_QmitkDeformableClippingPlaneViewControls.h"
+#include "ui_QmitkDeformableClippingPlaneViewControls.h"
 
 #include <QmitkFunctionality.h>
 

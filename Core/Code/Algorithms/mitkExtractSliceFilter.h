@@ -33,8 +33,26 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 	/**
-	*	\brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
-	*	
+		\brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
+		The convinient workflow is:
+			1. Set an image as input.
+			2. Set the worlgeometry2D. This defines a grid where the slice is being extracted
+			3. And then start the pipeline.
+		
+		There are a few more properties that can be set to modify the behavior of the slicing.
+		The properties are:
+			- interpolation mode	either Nearestneighbor, Linear or Cubic.
+			- a transform			this is a convinient way to adapt the reslice axis for the case
+									that the image is transformed e.g. rotated.
+			- time step				the time step in a timesliced volume.
+			- resample by geometry	wether the resampling grid corresponds to the specs of the
+									worldgeometry or is directly derived from the input image
+
+		By default the properties are set to:
+			- interpolation mode	Nearestneighbor.
+			- a transform			NULL (No transform is set).
+			- time step				0.
+			- resample by geometry	false (Corresponds to input image).
 	*/
 	class MITK_CORE_EXPORT ExtractSliceFilter : public ImageToImageFilter
 	{
@@ -45,26 +63,30 @@ namespace mitk
 
 		int* GetPlaneBounds(){ return this->m_Reslicer->GetOutput()->GetWholeExtent();}
 
+		/** \brief Set the axis where to reslice at.*/
 		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }
 
-		
+		/** \brief Set the time step in the 4D volume */
 		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
 		unsigned int GetTimeStep(){ return this->m_TimeStep; }
 
 		/**
-		* \brief Set a transform for the reslice axes.
-		*
-		* This transform is needed if the image volume itself is transformed.
+		  \brief Set a transform for the reslice axes.
+		 
+		  This transform is needed if the image volume itself is transformed. Effects the reslice axis.
 		*/
 		void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
 
-
+		/** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
 		void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
 
+		/** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
 		bool GetBounds(vtkFloatingPointType bounds[6]);
 
+		/** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
 		mitk::ScalarType* GetOutPutSpacing();
 
+		/** \brief Get the reslices axis matrix.*/
 		vtkMatrix4x4* GetResliceAxes(){
 			return this->m_Reslicer->GetResliceAxes();
 		}

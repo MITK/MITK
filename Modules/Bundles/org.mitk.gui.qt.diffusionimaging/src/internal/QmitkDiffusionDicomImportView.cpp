@@ -92,9 +92,16 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
     connect( m_Controls->m_Advanced, SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
+    connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
   }
 }
 
+
+void QmitkDiffusionDicomImport::Remove()
+{
+  int i = m_Controls->listWidget->currentRow();
+  m_Controls->listWidget->takeItem(i);
+}
 
 void QmitkDiffusionDicomImport::AdvancedCheckboxClicked()
 {
@@ -307,7 +314,16 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
 
     std::string folder = m_Controls->m_OutputLabel->text().toStdString();
-    folder.append("/import.log");
+
+
+    if(berry::Platform::IsWindows())
+    {
+      folder.append("\\import.log");
+    }
+    else
+    {
+      folder.append("/import.log");
+    }
 
     ofstream logfile;
     if(m_OutputFolderNameSet) logfile.open(folder.c_str());
@@ -688,6 +704,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       int lwidget = m_Controls->listWidget->count();
       std::cout << lwidget <<std::endl;
 
+      logfile << "\n";
 
     }
 

@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryQtViewPart.h>
 #include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
-#include <QmitkFunctionality.h>
 
 #include <berryIWorkbenchPartReference.h>
 #include <berryIPartListener.h>
@@ -59,7 +58,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkFunctionality
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public berry::QtViewPart
 {
   Q_OBJECT
 

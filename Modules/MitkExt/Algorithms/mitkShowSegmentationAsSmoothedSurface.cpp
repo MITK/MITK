@@ -251,7 +251,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   typedef itk::BinaryMedianImageFilter<CharImageType, CharImageType> MedianFilterType;
 
   MedianFilterType::Pointer medianFilter = MedianFilterType::New();
-  CharImageType::SizeType radius = { 1, 1, 1 };
+  CharImageType::SizeType radius = { 0 };
 
   medianFilter->SetRadius(radius);
   medianFilter->SetBackgroundValue(0);

@@ -92,9 +92,16 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
     connect( m_Controls->m_Advanced, SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
+    connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
   }
 }
 
+
+void QmitkDiffusionDicomImport::Remove()
+{
+  int i = m_Controls->listWidget->currentRow();
+  m_Controls->listWidget->takeItem(i);
+}
 
 void QmitkDiffusionDicomImport::AdvancedCheckboxClicked()
 {
@@ -305,11 +312,32 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
     mitk::DataNode::Pointer node;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(3*nrFolders);
 
+
+    std::string folder = m_Controls->m_OutputLabel->text().toStdString();
+
+
+    if(berry::Platform::IsWindows())
+    {
+      folder.append("\\import.log");
+    }
+    else
+    {
+      folder.append("/import.log");
+    }
+
+    ofstream logfile;
+    if(m_OutputFolderNameSet) logfile.open(folder.c_str());
+
     while(m_Controls->listWidget->count())
     {
       // RETREIVE FOLDERNAME
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
+
+
+
+
+      if(m_OutputFolderNameSet) logfile << "Reading " << folderName.toStdString() << '\n';
 
       // PARSING DIRECTORY
       PrintMemoryUsage();
@@ -318,13 +346,18 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       std::vector<std::vector<std::string> > seriesFilenames(0);
 
       Status("== Initial Directory Scan ==");
+      if(m_OutputFolderNameSet) logfile << "== Initial Directory Scan ==\n";
+
       gdcm::Directory d;
       d.Load( folderName.toStdString().c_str(), true ); // recursive !
       const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
       const unsigned int ntotalfiles = l1.size();
       Status(QString(" ... found %1 different files").arg(ntotalfiles));
+      if(m_OutputFolderNameSet)logfile << "...found " << ntotalfiles << " different files\n";
 
       Status("Scanning Headers");
+      if(m_OutputFolderNameSet) logfile << "Scanning Headers\n";
+
       gdcm::Scanner s;
       const gdcm::Tag t1(0x0020,0x000d); // Study Instance UID
       const gdcm::Tag t2(0x0020,0x000e); // Series Instance UID
@@ -339,6 +372,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if( !b )
       {
         Error("Scanner failed");
+        if(m_OutputFolderNameSet )logfile << "ERROR: scanner failed\n";
         continue;
       }
 
@@ -348,11 +382,14 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nfiles < 1)
       {
         Error("No DICOM files found");
+        if(m_OutputFolderNameSet)logfile << "ERROR: No DICOM files found\n";
         continue;
       }
       Status(QString(" ... successfully scanned %1 headers.").arg(nfiles));
+      if(m_OutputFolderNameSet) logfile << "...succesfully scanned " << nfiles << " headers\n";
 
       Status("Sorting");
+      if(m_OutputFolderNameSet) logfile << "Sorting\n";
 
       const gdcm::Scanner::ValuesType &values1 = s.GetValues(t1);
 
@@ -369,6 +406,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nvalues>1)
       {
         Error("Multiple sSeries tudies found. Please limit to 1 study per folder");
+        if(m_OutputFolderNameSet) logfile << "Multiple series found. Limit to one. If you are convinced this is an error use the merge duplicate study IDs option \n";
         continue;
       }
 
@@ -377,6 +415,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(values5.size()>1 || values6.size()>1)
       {
         Error("Folder contains images of unequal dimensions that cannot be combined in one 3d volume. ABORTING.");
+        if(m_OutputFolderNameSet) logfile << "Folder contains images of unequal dimensions that cannot be combined in one 3d volume. ABORTING\n.";
         continue;
       }
 
@@ -411,6 +450,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nfiles % nSeries != 0)
       {
         Error("Number of files in series not equal, ABORTING");
+        if(m_OutputFolderNameSet) logfile << "Number of files in series not equal, Some volumes are probably incomplete. ABORTING \n";
         continue;
       }
 
@@ -435,6 +475,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if( !b )
         {
           Error("Scanner failed");
+          if(m_OutputFolderNameSet) logfile << "Scanner failed\n";
           continue;
         }
 
@@ -462,6 +503,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(filesPerSeries % nAcquis != 0)
         {
           Error("Number of files per acquisition not equal, ABORTING");
+          if(m_OutputFolderNameSet) logfile << "Number of files per acquisition not equal, ABORTING \n";
           continue;
         }
 
@@ -478,6 +520,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           if( !ippsorter.Sort( ipplist ) )
           {
             Error(QString("Failed to sort acquisition %1, ABORTING").arg(identifier.c_str()));
+            if(m_OutputFolderNameSet) logfile << "Failed to sort acquisition " << identifier.c_str() << " , Aborting\n";
             continue;
           }
           const std::vector<std::string> & list = ippsorter.GetFilenames();
@@ -490,15 +533,18 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(nfiles % nTotalAcquis != 0)
       {
         Error("Number of files per acquisition differs between series, ABORTING");
+        if(m_OutputFolderNameSet) logfile << "Number of files per acquisition differs between series, ABORTING \n";
         continue;
       }
 
       int slices = nfiles/nTotalAcquis;
       Status(QString("Series is composed of %1 different 3D volumes with %2 slices.").arg(nTotalAcquis).arg(slices));
+      if(m_OutputFolderNameSet) logfile << "Series is composed of " << nTotalAcquis << " different 3D volumes with " << slices << " slices\n";
 
       // READING HEADER-INFOS
       PrintMemoryUsage();
       Status(QString("Reading Headers %1").arg(folderName));
+      if(m_OutputFolderNameSet) logfile << "Reading Headers "<< folderName.toStdString() << "\n";
 
       mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
       mitk::GroupDiffusionHeadersFilter::InputType inHeaders;
@@ -524,6 +570,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       // READ VOLUMES
       PrintMemoryUsage();
+      if(m_OutputFolderNameSet) logfile << "Loading volumes\n";
       Status(QString("Loading Volumes %1").arg(folderName));
       typedef short PixelValueType;
       typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
@@ -569,6 +616,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         // DWI TO DATATREE
         PrintMemoryUsage();
         Status(QString("Initializing Diffusion Image"));
+        if(m_OutputFolderNameSet) logfile << "Initializing Diffusion Image\n";
         typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
         DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
         diffImage->SetDirections(directions);
@@ -581,11 +629,13 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
         Status(QString("Diffusion Image initialized"));
+        if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 
         if(m_Controls->m_DicomLoadAverageDuplicatesCheckbox->isChecked())
         {
           PrintMemoryUsage();
           Status(QString("Averaging gradient directions"));
+          logfile << "Averaging gradient directions\n";
           diffImage->AverageRedundantGradients(m_Controls->m_Blur->value());
         }
 
@@ -614,8 +664,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           QString fullpath = QString("%1/%2.dwi")
                              .arg(m_OutputFolderName)
                              .arg(descr);
-          std::string pathstring = itksys::SystemTools::ConvertToOutputPath(fullpath.toStdString().c_str());
-          writer->SetFileName(pathstring);
+          //std::string pathstring = itksys::SystemTools::ConvertToOutputPath(fullpath.toStdString().c_str());
+
+          writer->SetFileName(fullpath.toStdString());
           writer->SetInput(diffImage);
           try
           {
@@ -625,26 +676,39 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           {
             imageSuccessfullySaved = false;
             Error(QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
+            logfile << QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()).toStdString() << "\n";
+
             node=mitk::DataNode::New();
             node->SetData( diffImage );
             GetDefaultDataStorage()->Add(node);
             SetDwiNodeProperties(node, descr.toStdString().c_str());
             Status(QString("Image %1 added to datastorage").arg(descr));
+            logfile << "Image " << descr.toStdString() << " added to datastorage\n";
             continue ;
           }
           Status(QString("Image %1 written to disc (%1)").arg(fullpath.toStdString().c_str()));
+          logfile << "Image " << fullpath.toStdString() << "\n";
         }
       }
       else
       {
         Status(QString("No diffusion information found (%1)").arg(folderName));
+        if(m_OutputFolderNameSet) logfile << "No diffusion information found  "<< folderName.toStdString();
       }
 
       Status(QString("Finished processing %1 with memory:").arg(folderName));
+      if(m_OutputFolderNameSet) logfile << "Finished processing " << folderName.toStdString() << "\n";
       PrintMemoryUsage();
       clock.Stop(folderName.toAscii());
       mitk::ProgressBar::GetInstance()->Progress();
+      int lwidget = m_Controls->listWidget->count();
+      std::cout << lwidget <<std::endl;
+
+      logfile << "\n";
+
     }
+
+    logfile.close();
 
     Status("Timing information");
     clock.Report();
@@ -680,6 +744,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
   if (!imageSuccessfullySaved)
     QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
   Status(QString("Finished import with memory:"));
+
   PrintMemoryUsage();
 }
 

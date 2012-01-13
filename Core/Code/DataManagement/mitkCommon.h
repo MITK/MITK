@@ -102,6 +102,7 @@ calling object*/
   virtual Pointer Clone() const \
 { \
   Pointer smartPtr = new classname(*this); \
+  smartPtr->UnRegister(); \
   return smartPtr;  \
 }
 

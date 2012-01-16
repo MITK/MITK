@@ -38,7 +38,7 @@ namespace mitk
 		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
 		itkNewMacro(ExtractSliceFilter);
 
-		itkSetMacro( WorldGeometry, Geometry2D* );
+		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; };
 
 		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
 		unsigned int GetTimeStep(){ return this->m_TimeStep; }

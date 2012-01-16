@@ -49,7 +49,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	if ( ( inputTimeGeometry == NULL )
 		|| ( inputTimeGeometry->GetTimeSteps() == 0 ) )
 	{
-		itkWarningMacro(<<"Error reading input image geometry.");
+		itkWarningMacro(<<"Error reading input image TimeSlicedGeometry.");
 		return;
 	}
 
@@ -131,7 +131,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	//initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
 	resultImage->Initialize(reslicedImage);
 
-	////transfer the voxel data
+	//transfer the voxel data
 	resultImage->SetVolume(reslicedImage->GetScalarPointer());	
 
 	//set the geometry from current worldgeometry for the reusultimage

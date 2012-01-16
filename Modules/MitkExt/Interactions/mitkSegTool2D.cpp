@@ -182,26 +182,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 		try
 		{
 
-			DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
-			if ( !referenceNode ) return NULL;
-
-			Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
-			if ( !referenceImage ) return NULL;
-
-			ExtractSliceFilter::Pointer newExtractor2 = ExtractSliceFilter::New();
-			newExtractor2->SetInput( referenceImage );
-			//newExtractor2->SetTargetTimestep( timeStep );
-			newExtractor2->SetWorldGeometry( planeGeometry );
-			newExtractor2->Update();
-			Image::Pointer slice2 = newExtractor2->GetOutput();
-
-			DataNode::Pointer dn = DataNode::New();
-			dn->SetData(slice2);
-			dn->SetProperty("name", StringProperty::New("slice"));
-			m_ToolManager->GetDataStorage()->Add(dn);
-
-
-
 			// now we extract the correct slice from the volume, resulting in a 2D image
 			ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
 			extractor->SetInput( image );
@@ -212,6 +192,29 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 			// here we have a single slice that can be modified
 			Image::Pointer slice = extractor->GetOutput();
+
+
+
+			DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
+			if ( !referenceNode ) return NULL;
+
+			Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+			if ( !referenceImage ) return NULL;
+
+			ExtractSliceFilter::Pointer newExtractor2 = ExtractSliceFilter::New();
+			newExtractor2->SetInput( referenceImage );
+			newExtractor2->SetWorldGeometry( planeGeometry );
+			newExtractor2->SetTimeStep( timeStep );
+			newExtractor2->Update();
+			Image::Pointer slice2 = newExtractor2->GetOutput();
+
+			DataNode::Pointer dn = DataNode::New();
+			dn->SetData(slice2);
+			dn->SetProperty("name", StringProperty::New("slice"));
+			m_ToolManager->GetDataStorage()->Add(dn, referenceNode);
+
+
+
 			return slice;
 		}
 		catch(...)
@@ -223,7 +226,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 	else
 	{
 
-		DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
+		DataNode* referenceNode( m_ToolManager->GetWorkingData(0) );
 		if ( !referenceNode ) return NULL;
 
 		Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
@@ -231,7 +234,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 		ExtractSliceFilter::Pointer newExtractor2 = ExtractSliceFilter::New();
 		newExtractor2->SetInput( referenceImage );
-		//newExtractor2->SetTargetTimestep( timeStep );
+		newExtractor2->SetTimeStep( timeStep );
 		newExtractor2->SetWorldGeometry( planeGeometry );
 		newExtractor2->Update();
 		Image::Pointer slice2 = newExtractor2->GetOutput();

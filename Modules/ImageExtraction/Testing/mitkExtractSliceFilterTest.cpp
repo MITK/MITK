@@ -55,10 +55,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-//#define CREATE_VOLUME
+#define CREATE_VOLUME
+//#define SAVE_VOLUME
 //#define CALC_TESTFAILURE_DEVIATION
 //#define SHOW_SLICE_IN_RENDER_WINDOW
-#define DEBUG
+//#define EXTRACTOR_DEBUG
 
 
 /*these are the deviations calculated by the function CalcTestFailureDeviation (see for details)*/
@@ -123,11 +124,11 @@ public:
 		else{devArea = Testfailure_Deviation_Volume_128; devDiameter = Testfailure_Deviation_Diameter_128;}
 	
 
-		//do think about the deviation
-		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageAreaCalcToPixel) < (std::sqrt(devArea)), "testing area");
-		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageRadiusToPixel) < (2 * devDiameter), "testing diameter");
+		//TODO think about the deviation, 1% makes no sense at all
+		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageAreaCalcToPixel) < 1, "testing area");
+		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageRadiusToPixel) < 1, "testing diameter");
 	
-	#ifdef DEBUG
+	#ifdef EXTRACTOR_DEBUG
 		MITK_INFO << TestName << ">>> " << "planeDistanceToSphereCenter: " << testResults.planeDistanceToSphereCenter;
 		MITK_INFO << "area in pixels: " << testResults.areaInPixel << " <-> area in mm: " << testResults.areaCalculated << " = " << testResults.percentageAreaCalcToPixel << "%";
 		
@@ -555,13 +556,12 @@ public:
 		p[1] = testPoint2DInIndex[1];
 		p[2] = testPoint2DInIndex[2];
 		slice->GetGeometry()->IndexToWorld(p, sliceIndexToWorld);
-		MITK_INFO << sliceIndexToWorld;
-
+		
 		p[0] = testPoint3DInIndex[0];
 		p[1] = testPoint3DInIndex[1];
 		p[2] = testPoint3DInIndex[2];
 		imageInMitk->GetGeometry()->IndexToWorld(p, imageIndexToWorld);
-		MITK_INFO << imageIndexToWorld;
+		
 
 
 		//compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
@@ -583,9 +583,11 @@ public:
 		
 
 
-#ifdef DEBUG
+#ifdef EXTRACTOR_DEBUG
 		MITK_INFO << "\n" << "TESTINFO index: " << sliceindex << " orientation: " << orientation << " frontside: " << isFrontside << " rotated: " << isRotated;
-		
+		MITK_INFO << "\n" << "slice index to world: " << sliceIndexToWorld;
+		MITK_INFO << "\n" << "image index to world: "  << imageIndexToWorld;
+
 		MITK_INFO  << "\n" << "vtk: slice: " << valueVTKinSlice << ", image: "<< valueVTKinImage;
 
 		MITK_INFO << "\n" << "testPoint3D InWorld" << testPoint3DInWorld << " is " << testPoint2DInIndex << " in 2D";
@@ -624,7 +626,7 @@ public:
 			
 			++iter;
 		}
-#endif //DEBUG
+#endif //EXTRACTOR_DEBUG
 	}
 
 
@@ -644,24 +646,24 @@ public:
 		//do sphere creation
 		ItkVolumeGeneration();
 
-		//save in file
-		mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
-		writer->SetInput(TestVolume);
+		#ifdef SAVE_VOLUME
+			//save in file
+			mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
+			writer->SetInput(TestVolume);
 
-		
-		std::string file;/* = "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\sphere_";
-		file += TestvolumeSize;
-		file += ".nrrd";*/
+			
+			std::string file;
 
-		std::ostringstream filename;
-		filename << "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\sphere_";
-		filename << TestvolumeSize;
-		filename << ".nrrd";
+			std::ostringstream filename;
+			filename << "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\sphere_";
+			filename << TestvolumeSize;
+			filename << ".nrrd";
 
-		file = filename.str();
-		 
-		writer->SetFileName(file);
-		writer->Update();
+			file = filename.str();
+			 
+			writer->SetFileName(file);
+			writer->Update();
+		#endif//SAVE_VOLUME
 
 	#endif
 
@@ -837,7 +839,7 @@ private:
 
 /*================#BEGIN Instanciation of members ================*/
 mitk::Image::Pointer mitkExtractSliceFilterTestClass::TestVolume = mitk::Image::New();
-double mitkExtractSliceFilterTestClass::TestvolumeSize = 512.0;
+double mitkExtractSliceFilterTestClass::TestvolumeSize = 256.0;
 mitk::PlaneGeometry::Pointer mitkExtractSliceFilterTestClass::TestPlane = mitk::PlaneGeometry::New();
 std::string mitkExtractSliceFilterTestClass::TestName = "";
 unsigned char mitkExtractSliceFilterTestClass::pixelValueSet = 255;

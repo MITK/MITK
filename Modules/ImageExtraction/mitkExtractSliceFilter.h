@@ -27,6 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+	/**
+	*	\brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
+	*	
+	*/
 	class ImageExtraction_EXPORT ExtractSliceFilter : public ImageToImageFilter
 	{
 	public:

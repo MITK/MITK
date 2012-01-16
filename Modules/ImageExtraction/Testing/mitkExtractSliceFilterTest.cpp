@@ -40,56 +40,115 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 
 
+static bool TestSlice(mitk::Image* imageVolume, mitk::PlaneGeometry* planeGeometry, std::string referenceFileName ){
+
+	bool slicesAreEqual = false;
+
+	mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
+	reader->SetFileName(referenceFileName);	
+	reader->Update();
+
+	mitk::Image::Pointer referenceImage = reader->GetOutput();
+	MITK_TEST_CONDITION(referenceImage.IsNotNull(), "Reference image read");
+
+
+	//feed ExtractSliceFilter
+	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
+
+	slicer->SetInput(imageVolume);
+	slicer->SetWorldGeometry(planeGeometry);
+	slicer->Update();
+
+	MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, " Testing resliced Image returned");
+
+	mitk::Image::Pointer reslicedImage = slicer->GetOutput();
+	
+
+	//the current index we are comparing the images at
+	mitk::Point3D currentIndex = planeGeometry->GetOrigin();
+	imageVolume->GetGeometry()->WorldToIndex(currentIndex, currentIndex);
+
+
+	//calculate the direction vectors for iteration
+	mitk::Vector3D right, bottom;
+	right = planeGeometry->GetAxisVector(0);
+	bottom = planeGeometry->GetAxisVector(1);
+	imageVolume->GetGeometry()->WorldToIndex(right, right);
+	imageVolume->GetGeometry()->WorldToIndex(bottom, bottom);
+	right.Normalize();
+	bottom.Normalize();
+
+
+	double epsilon = 0.05; //TODO think about the value
+
+	//loop through colums
+	while( imageVolume->GetGeometry()->IsIndexInside(currentIndex) ){
+		//loop through rows
+		while( imageVolume->GetGeometry()->IsIndexInside(currentIndex) ){
+
+			mitk::Index3D idx;
+			idx.CopyWithCast(currentIndex);
+
+			if((referenceImage->GetPixelValueByIndex( idx ) / reslicedImage->GetPixelValueByIndex( idx ) ) < epsilon){
+
+				slicesAreEqual = true;
+				currentIndex += right;
+
+			}
+			else{
+				slicesAreEqual = false;
+				break;
+			}
+		}
+		
+		currentIndex += bottom;
+	}
+
+	
+	return slicesAreEqual;
+}
+
+
+
 int mitkExtractSliceFilterTest(int argc, char* argv[])
 {
-	// always start with this!
+
 	MITK_TEST_BEGIN("mitkExtractSliceFilterTest")
 
 
 	mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
 
-	std::string filename = "C:\\home\\Pics\\Pic3D.nrrd";//"C:\\home\\schroedt\\bin_mitk\\CMakeExternals\\Source\\MITK-Data\\NrrdWritingTestImage.jpg";
+	std::string filename =  "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\Pic3D.nrrd";
 	reader->SetFileName(filename);
 	
 	reader->Update();
 
-	mitk::Image::Pointer image = reader->GetOutput();
+	mitk::Image::Pointer imageVolume = reader->GetOutput();
+	MITK_TEST_CONDITION_REQUIRED(imageVolume.IsNotNull(), "Image required");
 
 
-	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
+	mitk::PlaneGeometry::Pointer geometryTransversal = mitk::PlaneGeometry::New();
 
-	mitk::PlaneGeometry::Pointer geometry = mitk::PlaneGeometry::New();
+	geometryTransversal->InitializeStandardPlane(imageVolume->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Transversal, 0, false, true);
+	geometryTransversal->SetImageGeometry(true);
 
-	mitk::Vector3D right, bottom, normal;
-	mitk::Point3D origin;
+	//bool testTransversal = TestSlice(imageVolume, geometryTransversal, "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\img.nrrd");//pic3d-transversal-(0.0.0).pic");
+	//MITK_TEST_CONDITION( testTransversal, "Testing slice extraction");
 
-	mitk::FillVector3D(origin, 0.0, 0.0, 0.0);
 
-	/*mitk::FillVector3D(right, 1.0, 0.0, 0.0);
-	mitk::FillVector3D(bottom, 0.0, -1.0, 0.0);
-
-	normal = itk::CrossProduct(right, bottom);*/
-
-	geometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Sagittal, 0, true, false);
-	geometry->SetImageGeometry(true);
-	//geometry->SetOrigin(origin);
-	
-	/*mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
-	mitk::RotationOperation* rotation = new mitk::RotationOperation( mitk::OpROTATE, geometry->GetCenter(), rotationVector, 180.0);
-	geometry->ExecuteOperation(rotation);
-	delete rotation;*/
-
-	MITK_INFO << "axis 0: " << geometry->GetAxisVector(0) << " |> aixs 1: " << geometry->GetAxisVector(1) << "spacing: " << geometry->GetSpacing()   << " |> origin: " << geometry->GetOrigin() << " |> center: " << geometry->GetCenter() << "|> isImageGeometry: "<<geometry->GetImageGeometry();
-
-	slicer->SetInput(image);
-	slicer->SetWorldGeometry(geometry);
-
-	slicer->Update();
-
-	MITK_TEST_CONDITION(slicer->GetOutput() != NULL, " Testing resliced Image returned");
 
 
 /*************** #BEGIN vtk render code ************************/
+	
+//set reslicer for renderwindow
+	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
+	slicer->SetInput(imageVolume);
+	slicer->SetWorldGeometry(geometryTransversal);
+
+	slicer->Update();
+
+
+//set vtk renderwindow
 	vtkSmartPointer<vtkPlaneSource> vtkPlane = vtkSmartPointer<vtkPlaneSource>::New();
 	vtkPlane->SetOrigin(0.0, 0.0, 0.0);
 	//These two points define the axes of the plane in combination with the origin.
@@ -97,7 +156,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 	//Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
 	vtkPlane->SetPoint1(1.0, 0.0, 0.0); //P1: (xMax, yMin, depth)
 	vtkPlane->SetPoint2(0.0, 1.0, 0.0); //P2: (xMin, yMax, depth)
-
+	//these are not the correct values for all slices, only a square plane by now
 
 	vtkSmartPointer<vtkPolyDataMapper> imageMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	imageMapper->SetInputConnection(vtkPlane->GetOutputPort());
@@ -119,7 +178,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 	MITK_INFO << "spacing: " << slicer->GetOutput()->GetGeometry()->GetSpacing() << " |> origin: " << slicer->GetOutput()->GetGeometry()->GetOrigin() << "|> isImageGeometry: " << slicer->GetOutput()->GetGeometry()->GetImageGeometry();
 
 	texture->SetInput(slicer->GetOutput()->GetVtkImageData());
-	//texture->SetInput(image->GetVtkImageData());
+	
 	texture->SetLookupTable(lookupTable);
 
 	texture->SetMapColorScalarsThroughLookupTable(true);

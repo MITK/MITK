@@ -34,9 +34,14 @@ namespace mitk
 {
 	/**
 		\brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
+		
+		The filter can reslice in all orthogonal planes such as sagittal, coronal and transversal,
+		and is also able to reslice a abitrary oriented oblique plane.
+		Curved planes are specified via an AbstractTransformGeometry as the input worldgeometry.
+
 		The convinient workflow is:
 			1. Set an image as input.
-			2. Set the worlgeometry2D. This defines a grid where the slice is being extracted
+			2. Set the worldGeometry2D. This defines a grid where the slice is being extracted
 			3. And then start the pipeline.
 		
 		There are a few more properties that can be set to modify the behavior of the slicing.
@@ -73,7 +78,7 @@ namespace mitk
 		/**
 		  \brief Set a transform for the reslice axes.
 		 
-		  This transform is needed if the image volume itself is transformed. Effects the reslice axis.
+		  This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
 		*/
 		void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
 
@@ -81,12 +86,14 @@ namespace mitk
 		void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
 
 		/** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
-		bool GetBounds(vtkFloatingPointType bounds[6]);
+		bool GetBounds(double bounds[6]);
 
 		/** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
-		mitk::ScalarType* GetOutPutSpacing();
+		mitk::ScalarType* GetOutputSpacing();
 
-		/** \brief Get the reslices axis matrix.*/
+		/** \brief Get the reslices axis matrix.
+			Note: the axis are recalculated when calling SetResliceTransformByGeometry.
+		*/
 		vtkMatrix4x4* GetResliceAxes(){
 			return this->m_Reslicer->GetResliceAxes();
 		}
@@ -113,7 +120,7 @@ namespace mitk
 
 		const Geometry3D* m_ResliceTransform;
 
-		bool m_InPlaneResampleExtentByGeometry;
+		bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 
 		mitk::ScalarType* m_OutPutSpacing;
 

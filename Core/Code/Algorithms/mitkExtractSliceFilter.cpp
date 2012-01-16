@@ -19,12 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSmartPointer.h>
 #include <vtkLinearTransform.h>
 #include <vtkImageChangeInformation.h>
+#include <mitkAbstractTransformGeometry.h>
+#include <vtkGeneralTransform.h>
 
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(){
 	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
 	m_TimeStep = 0;
-	m_Reslicer->ReleaseDataFlagOn();//todo check what it does
+	m_Reslicer->ReleaseDataFlagOn();
 	m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
 	m_ResliceTransform = NULL;
 	m_InPlaneResampleExtentByGeometry = false;
@@ -38,7 +40,7 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 }
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation(){
-	
+	//TODO try figure out how to set the specs of the slice before it is actually extracted
 	/*Image::Pointer output = this->GetOutput();
 	Image::ConstPointer input = this->GetInput();
 	if (input.IsNull()) return;
@@ -49,16 +51,18 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation(){
 }
 
 void mitk::ExtractSliceFilter::GenerateInputRequestedRegion(){
+	//As we want all pixel information fo the image in our plane, the requested region
+	//is set to the largest possible region in the image.
+	//This is needed because an oblique plane has a larger extent then the image
+	//and the in pipeline it is checked via PropagateResquestedRegion(). But the
+	//extent of the slice is actually fitting because it is oblique within the image. 
 	ImageToImageFilter::InputImagePointer input =  const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
 	input->SetRequestedRegionToLargestPossibleRegion();
 }
 
 
-mitk::ScalarType* mitk::ExtractSliceFilter::GetOutPutSpacing(){
-	mitk::ScalarType tmpSpacing[2];
-	tmpSpacing[0] = m_OutPutSpacing[0];
-	tmpSpacing[1] = m_OutPutSpacing[1];
-	return tmpSpacing;
+mitk::ScalarType* mitk::ExtractSliceFilter::GetOutputSpacing(){
+	return m_OutPutSpacing;
 }
 
 
@@ -66,13 +70,15 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	
 	mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
 	
-	if ( !input){
+	if (!input)
+	{
 		MITK_ERROR << "mitk::ExtractSliceFilter: No input image available. Please set the input!" << std::endl;
         itkExceptionMacro("mitk::ExtractSliceFilter: No input image available. Please set the input!");
         return;
     }
 
-	if(!m_WorldGeometry){
+	if(!m_WorldGeometry)
+	{
 		MITK_ERROR << "mitk::ExtractSliceFilter: No Geometry for reslicing available." << std::endl;
         itkExceptionMacro("mitk::ExtractSliceFilter: No Geometry for reslicing available.");
         return;
@@ -87,11 +93,12 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		return;
 	}
 
+	// is it a valid timeStep?
 	if ( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
-	 {
+	{
 		itkWarningMacro(<<"This is not a valid timestep: "<< m_TimeStep );
 		return;
-	 }
+	}
 
 	 // check if there is something to display.
 	 if ( ! input->IsVolumeSet( m_TimeStep ) ) 
@@ -110,7 +117,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	Vector3D right, bottom, normal;
 	double widthInMM, heightInMM;
 	Vector2D extent;
-	double mmPerPixel[2];
 	
 	
 
@@ -119,9 +125,10 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	
 	if ( planeGeometry )
 	{
+		//if the worldGeomatry is a PlaneGeometry everthing is straight forward
 		
 		origin = planeGeometry->GetOrigin();
-		right  = planeGeometry->GetAxisVector( 0 ); // right = Extent of Image in mm (worldspace)
+		right  = planeGeometry->GetAxisVector( 0 );
 		bottom = planeGeometry->GetAxisVector( 1 );
 		normal = planeGeometry->GetNormal();
 
@@ -184,69 +191,67 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		// else the background of the image turns out gray
 		m_Reslicer->SetBackgroundLevel( -32768 );
 
-
-		// Calculate the actual bounds of the transformed plane clipped by the
-		// dataset bounding box; this is required for drawing the texture at the
-		// correct position during 3D mapping.
-		//boundsInitialized = this->CalculateClippedPlaneBounds(
-		//	m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
-
 	}  
-	else
-	{
-		itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
-        return;
-    }
-  ////Code for curved planes
-  // else{
-  //  // Do we have an AbstractTransformGeometry?
-  //  // This is the case for AbstractTransformGeometry's (e.g. a thin-plate-spline transform)
-  //  const mitk::AbstractTransformGeometry* abstractGeometry =
-  //      dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+	else{
+		//Code for curved planes, mostly taken 1:1 from imageVtkMapper2D and not tested yet.
+		// Do we have an AbstractTransformGeometry?
+		// This is the case for AbstractTransformGeometry's (e.g. a ThinPlateSplineCurvedGeometry )
+		const mitk::AbstractTransformGeometry* abstractGeometry =
+			dynamic_cast< const AbstractTransformGeometry * >(m_WorldGeometry);
 
-  //  if(abstractGeometry != NULL)
-  //  {
+		if(abstractGeometry != NULL)
+		{
+			m_ResliceTransform = abstractGeometry;
 
-  //    extent[0] = abstractGeometry->GetParametricExtent(0);
-  //    extent[1] = abstractGeometry->GetParametricExtent(1);
+			extent[0] = abstractGeometry->GetParametricExtent(0);
+			extent[1] = abstractGeometry->GetParametricExtent(1);
 
-  //    widthInMM = abstractGeometry->GetParametricExtentInMM(0);
-  //    heightInMM = abstractGeometry->GetParametricExtentInMM(1);
+			widthInMM = abstractGeometry->GetParametricExtentInMM(0);
+			heightInMM = abstractGeometry->GetParametricExtentInMM(1);
 
-  //    m_OutPutSpacing[0] = widthInMM / extent[0];
-  //    m_OutPutSpacing[1] = heightInMM / extent[1];
+			m_OutPutSpacing[0] = widthInMM / extent[0];
+			m_OutPutSpacing[1] = heightInMM / extent[1];
 
-  //    m_Origin = abstractGeometry->GetPlane()->GetOrigin();
+			origin = abstractGeometry->GetPlane()->GetOrigin();
 
-  //    m_Right = abstractGeometry->GetPlane()->GetAxisVector(0);
-  //    m_Right.Normalize();
+			right = abstractGeometry->GetPlane()->GetAxisVector(0);
+			right.Normalize();
 
-  //    m_Bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
-  //    m_Bottom.Normalize();
+			bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
+			bottom.Normalize();
 
-  //    m_Normal = abstractGeometry->GetPlane()->GetNormal();
-  //    m_Normal.Normalize();
+			normal = abstractGeometry->GetPlane()->GetNormal();
+			normal.Normalize();
 
-  //    // Use a combination of the InputGeometry *and* the possible non-rigid
-  //    // AbstractTransformGeometry for reslicing the 3D Image
-  //    vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
-  //    composedResliceTransform->Identity();
-  //    composedResliceTransform->Concatenate(
-  //        inputGeometry->GetVtkTransform()->GetLinearInverse() );
-  //    composedResliceTransform->Concatenate(
-  //        abstractGeometry->GetVtkAbstractTransform()
-  //        );
+			// Use a combination of the InputGeometry *and* the possible non-rigid
+			// AbstractTransformGeometry for reslicing the 3D Image
+			vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
+			composedResliceTransform->Identity();
+			composedResliceTransform->Concatenate(
+				inputTimeGeometry->GetGeometry3D( m_TimeStep )->GetVtkTransform()->GetLinearInverse() );
+			composedResliceTransform->Concatenate(
+				abstractGeometry->GetVtkAbstractTransform()
+				);
 
-  //    m_Reslicer->SetResliceTransform( composedResliceTransform );
-  //    composedResliceTransform->UnRegister( NULL ); // decrease RC
+			m_Reslicer->SetResliceTransform( composedResliceTransform );
+			composedResliceTransform->UnRegister( NULL ); // decrease RC
 
-  //    // Set background level to BLACK instead of translucent, to avoid
-  //    // boundary artifacts (see Geometry2DDataVtkMapper3D)
-  //    m_Reslicer->SetBackgroundLevel( -1023 );
-  //  }
-  //}
+			// Set background level to BLACK instead of translucent, to avoid
+			// boundary artifacts (see Geometry2DDataVtkMapper3D)
+			m_Reslicer->SetBackgroundLevel( -1023 );
+		} 
+		else
+		{
+			itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
+			return;
+		}
+
+	}
 
 	if(m_ResliceTransform){
+		//if the resliceTransform is set the reslice axis are recalculated.
+		//Thus the geometry information is not fitting. Therefor a unitSpacingFilter
+		//is used to set up a global spacing of 1 and compensate the transform.
 		vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
 		unitSpacingImageFilter->ReleaseDataFlagOn();
 
@@ -257,6 +262,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	}
 	else
 	{
+		//if no tranform is set the image can be used directly
 		m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
 	}
 
@@ -264,9 +270,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	/*setup the plane where vktImageReslice extracts the slice*/
 
 	//ResliceAxesOrigin is the ancor point of the plane
-	double originArray[3];
-	itk2vtk(origin, originArray);
-	m_Reslicer->SetResliceAxesOrigin(originArray);
+	double originInVtk[3];
+	itk2vtk(origin, originInVtk);
+	m_Reslicer->SetResliceAxesOrigin(originInVtk);
 
 
 	//the cosines define the plane: x and y are the direction vectors, n is the planes normal
@@ -280,8 +286,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 	vnl2vtk(bottom.GetVnlVector(), cosines + 3);//y
 
-	Vector3D normalVector = CrossProduct(m_WorldGeometry->GetAxisVector(0), m_WorldGeometry->GetAxisVector(1));
-	normalVector.Normalize();
 	vnl2vtk(normal.GetVnlVector(), cosines + 6);//n
 
 	m_Reslicer->SetResliceAxesDirectionCosines(cosines);	
@@ -307,6 +311,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	}
 	
 
+	/*========== BEGIN setup extent of the slice ==========*/
 	int xMin, xMax, yMin, yMax;
 	bool boundsInitialized = false;
 	if(m_WorldGeometry->GetReferenceGeometry()){
@@ -334,15 +339,13 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	}
 
 	m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, 0, 0 );
-
+	/*========== END setup extent of the slice ==========*/
 
 	
 	m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
+
 	m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], 1.0 );
-	//m_Reslicer->SetOutputSpacing(m_WorldGeometry->GetSpacing()[0],m_WorldGeometry->GetSpacing()[1], 1.0);
-	//m_Reslicer->SetOutputSpacing( 1.0, 1.0, 1.0 );
-
-
+	
 
 	//start the pipeline
 	m_Reslicer->Modified();
@@ -352,7 +355,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 
 
-/*================ #BEGIN Get the slice from vtkImageReslice and convert it to mitk Image================*/
+/*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
 	vtkImageData* reslicedImage;
 	reslicedImage = m_Reslicer->GetOutput();
 
@@ -380,8 +383,13 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
 	Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
 	
+	//the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
 	Point3D sliceOrigin = originalGeometry->GetOrigin();
-	
+
+	sliceOrigin += right * ( m_OutPutSpacing[0] * 0.5 );
+	sliceOrigin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+
+	//a worldGeometry is no imageGeometry, thus it is manually set to true
 	originalGeometry->ImageGeometryOn();
 	originalGeometry->SetOrigin(sliceOrigin);
 

@@ -166,32 +166,75 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   input->Update();
 
+
+  //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
+
+
+  //set the transformation of the image to adapt reslice axis
   localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
 
 
+  //is the geometry of the slice based on the input image or the worldgeometry?
   bool inPlaneResampleExtentByGeometry = false;
   GetDataNode()->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
   localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
 
+
+  // Initialize the interpolation mode for resampling; switch to nearest
+  // neighbor if the input image is too small.
+  if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
+  {
+    VtkResliceInterpolationProperty *resliceInterpolationProperty;
+    this->GetDataNode()->GetProperty(
+        resliceInterpolationProperty, "reslice interpolation" );
+
+    int interpolationMode = VTK_RESLICE_NEAREST;
+    if ( resliceInterpolationProperty != NULL )
+    {
+      interpolationMode = resliceInterpolationProperty->GetInterpolation();
+    }
+ 
+    switch ( interpolationMode )
+    {
+    case VTK_RESLICE_NEAREST:
+      localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+      break;
+    case VTK_RESLICE_LINEAR:
+	  localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_LINEAR);
+      break;
+    case VTK_RESLICE_CUBIC:
+ 	  localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_CUBIC);
+      break;
+    }
+  }
+  else
+  {
+    localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+  }
+
+
+  //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
   localStorage->m_Reslicer->UpdateLargestPossibleRegion();
 
-  localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutPutSpacing();
+  //get the spacing of the slice
+  localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();
 
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
+  //this used for generating a vtkPLaneSource with the right size
   vtkFloatingPointType sliceBounds[6];
   for ( int i = 0; i < 6; ++i )
   {
 	  sliceBounds[i] = 0.0;
   }
-
   localStorage->m_Reslicer->GetBounds(sliceBounds);
  
 
   localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetOutput()->GetVtkImageData();
+
   //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
@@ -718,7 +761,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
-  //localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+  localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
@@ -730,17 +773,10 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
-  m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
-  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
-
-  //the following actions are always the same and thus can be performed
-  //in the constructor for each image (i.e. the image-corresponding local storage)
-  m_TSFilter->ReleaseDataFlagOn();
   
 
-  m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   //built a default lookuptable
   m_LookupTable->SetRampToLinear();

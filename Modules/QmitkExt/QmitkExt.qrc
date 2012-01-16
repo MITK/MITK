@@ -7,5 +7,6 @@
         <file>PlanarPolygon_48.png</file>
         <file>PlanarRectangle_48.png</file>
         <file>PlanarCircle_48.png</file>
+        <file>icon_seedpoint.png</file>
     </qresource>
 </RCC>

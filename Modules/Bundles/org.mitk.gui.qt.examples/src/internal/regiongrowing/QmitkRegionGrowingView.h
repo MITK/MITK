@@ -73,7 +73,7 @@ class QmitkRegionGrowingView : public QmitkFunctionality
 
     void OnSeedPointAdded();
 
-    void ActivatePointSetInteractor();
+    void ActivatePointSetInteractor(bool);
 
   protected:
 
@@ -88,8 +88,8 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-    void OnNodeDeleted();
-    void OnNodeModified();
+    void NodeRemoved(const mitk::DataNode *node);
+   // void OnNodeModified();
 
     void OnPointAdded();
     void OnPointMoved();

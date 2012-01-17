@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkITKImageImport.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
+#include <mitkVector.h>
 
 #include <ctime> 
 #include <cstdlib>
@@ -58,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CREATE_VOLUME
 //#define SAVE_VOLUME
 //#define CALC_TESTFAILURE_DEVIATION
-//#define SHOW_SLICE_IN_RENDER_WINDOW
+#define SHOW_SLICE_IN_RENDER_WINDOW
 //#define EXTRACTOR_DEBUG
 
 
@@ -942,38 +943,79 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 		//set reslicer for renderwindow
 		mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
 
-		std::string filename =  "C:\\home\\schroedt\\MITK\\Modules\\ImageExtraction\\Testing\\Data\\Pic3D.nrrd";
+		std::string filename =  "C:\\home\\Pics\\Pic3D.nrrd";
 		reader->SetFileName(filename);
 		
 		reader->Update();
 
 		mitk::Image::Pointer pic = reader->GetOutput();
-		mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
-		slicer->SetInput(pic);//mitkExtractSliceFilterTestClass::TestVolume);
+		vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
+		
+		slicer->SetInput(pic->GetVtkImageData());
 
 
 		mitk::PlaneGeometry::Pointer obliquePl = mitk::PlaneGeometry::New();
-		obliquePl->InitializeStandardPlane(pic->GetGeometry()->get, mitk::PlaneGeometry::PlaneOrientation::Sagittal, pic->GetGeometry()->GetCenter(),, true, false);
+		obliquePl->InitializeStandardPlane(pic->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Sagittal, pic->GetGeometry()->GetCenter()[0], true, false);
 		obliquePl->ChangeImageGeometryConsideringOriginOffset(true);
 
-		mitk::Vector3D rotationVector;
-		rotationVector[0] = mitkExtractSliceFilterTestClass::randFloat();
-		rotationVector[1] = mitkExtractSliceFilterTestClass::randFloat();
-		rotationVector[2] = mitkExtractSliceFilterTestClass::randFloat();
+		mitk::Point3D or = obliquePl->GetOrigin();
+		mitk::Vector3D n;
+		n = obliquePl->GetNormal();
+		
 
-		float degree = mitkExtractSliceFilterTestClass::randFloat() * 180;
+		n.Normalize();
+		
+		or += n * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+		
+		obliquePl->SetOrigin(or);
 
-		mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, obliquePl->GetCenter(), rotationVector, degree);
-		obliquePl->ExecuteOperation(op);
-		delete op;
-		slicer->SetWorldGeometry(geometryCoronal);
+		mitk::Vector3D rotation;
+		rotation[0] = 0.534307;
+		rotation[1] = 0.000439605;
+		rotation[2] = 0.423017;
+		MITK_INFO << rotation;
 
+		float rotateDegree = 70;
+
+		mitk::RotationOperation* operation = new mitk::RotationOperation(mitk::OpROTATE, obliquePl->GetCenter(), rotationVector, degree);
+		obliquePl->ExecuteOperation(operation);
+		delete operation;
+		
+
+		double origin[3];
+		origin[0] = obliquePl->GetOrigin()[0];
+		origin[1] = obliquePl->GetOrigin()[1];
+		origin[2] = obliquePl->GetOrigin()[2];
+		slicer->SetResliceAxesOrigin(origin);
+
+		
+		mitk::Vector3D right, bottom, normal;
+		right  = obliquePl->GetAxisVector( 0 );
+		bottom = obliquePl->GetAxisVector( 1 );
+		normal = obliquePl->GetNormal();
+
+		right.Normalize();
+		bottom.Normalize();
+		normal.Normalize();
+		
+		double cosines[9];
+
+		mitk::vnl2vtk(right.GetVnlVector(), cosines);//x
+
+		mitk::vnl2vtk(bottom.GetVnlVector(), cosines + 3);//y
+
+		mitk::vnl2vtk(normal.GetVnlVector(), cosines + 6);//n
+
+		slicer->SetResliceAxesDirectionCosines(cosines);	
+
+		slicer->SetOutputDimensionality(2);
 		slicer->Update();
 
 
 		//set vtk renderwindow
 		vtkSmartPointer<vtkPlaneSource> vtkPlane = vtkSmartPointer<vtkPlaneSource>::New();
 		vtkPlane->SetOrigin(0.0, 0.0, 0.0);
+
 		//These two points define the axes of the plane in combination with the origin.
 		//Point 1 is the x-axis and point 2 the y-axis.
 		//Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
@@ -1001,7 +1043,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 		vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
 
 
-		texture->SetInput(slicer->GetOutput()->GetVtkImageData());
+		texture->SetInput(slicer->GetOutput());
 		
 		texture->SetLookupTable(lookupTable);
 

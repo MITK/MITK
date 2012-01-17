@@ -66,8 +66,7 @@ namespace mitk
 		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
 		itkNewMacro(ExtractSliceFilter);
 
-		int* GetPlaneBounds(){ return this->m_Reslicer->GetOutput()->GetWholeExtent();}
-
+		
 		/** \brief Set the axis where to reslice at.*/
 		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }
 

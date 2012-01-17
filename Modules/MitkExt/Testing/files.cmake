@@ -31,14 +31,10 @@ SET(MODULE_CUSTOM_TESTS
   mitkLabeledImageToSurfaceFilterTest.cpp
 )
 SET(MODULE_TESTIMAGES
- # US4DCyl.pic.gz
- # Pic3D.pic.gz
- # Pic2DplusT.pic.gz
- # BallBinary30x30x30.pic.gz
-  /localdata/dartclient/NewTestImages/US4DCyl.nrrd
-  /localdata/dartclient/NewTestImages/Pic3D.nrrd
-  /localdata/dartclient/NewTestImages/Pic2DplusT.nrrd
-  /localdata/dartclient/NewTestImages/BallBinary30x30x30.nrrd
+  US4DCyl.nrrd
+  Pic3D.nrrd
+  Pic2DplusT.nrrd
+  BallBinary30x30x30.nrrd
   Png2D-bw.png
   binary.stl
   ball.stl

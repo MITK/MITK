@@ -341,7 +341,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationbased()
 
     /* Finally, execute color calculation */
     vtkPoints* extrPoints = m_FiberPolyData->GetPoints();
-    int numOfPoints = extrPoints->GetNumberOfPoints();
+    int numOfPoints = 0;
+    if (!extrPoints)
+      numOfPoints = extrPoints->GetNumberOfPoints();
 
     //colors and alpha value for each single point, RGBA = 4 components
     unsigned char rgba[4] = {0,0,0,0};

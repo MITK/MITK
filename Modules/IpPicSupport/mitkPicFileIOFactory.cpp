@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicFileIOFactory.h"
 #include "mitkIOAdapter.h"
 #include "mitkPicFileReader.h"
+#include "mitkCoreObjectFactory.h"
 
 #include "itkVersion.h"
 
@@ -48,3 +49,21 @@ const char* PicFileIOFactory::GetDescription() const
 }
 
 } // end namespace mitk
+
+struct RegisterIpPicIOFactory{
+  RegisterIpPicIOFactory()
+    : m_Factory( mitk::PicFileIOFactory::New() )
+  {
+    MITK_INFO << "Registering PicFileIOFactory ";
+    itk::ObjectFactoryBase::RegisterFactory( m_Factory );
+  }
+
+  ~RegisterIpPicIOFactory()
+  {
+    itk::ObjectFactoryBase::UnRegisterFactory( m_Factory );
+  }
+
+  mitk::PicFileIOFactory::Pointer m_Factory;
+};
+
+static RegisterIpPicIOFactory registerIpPicIOFactory;

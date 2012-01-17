@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFeedbackContourTool.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
+#include "mitkLegacyAdaptors.h"
 
 namespace mitk
 {

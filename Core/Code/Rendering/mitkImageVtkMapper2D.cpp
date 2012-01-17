@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPixelType.h>
 //#include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
+#include "mitkImageStatisticsHolder.h"
 
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
@@ -932,18 +933,18 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     centralSliceImage = sliceSelector->GetOutput();
     if ( centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized() )
     {
-      minValue    = centralSliceImage->GetScalarValueMin();
-      maxValue    = centralSliceImage->GetScalarValueMax();
-      min2ndValue = centralSliceImage->GetScalarValue2ndMin();
-      max2ndValue = centralSliceImage->GetScalarValue2ndMax();
+      minValue    = centralSliceImage->GetStatistics()->GetScalarValueMin();
+      maxValue    = centralSliceImage->GetStatistics()->GetScalarValueMax();
+      min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
+      max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
     }
     if ( minValue == maxValue )
     {
       // centralSlice is strange, lets look at all data
-      minValue    = image->GetScalarValueMin();
-      maxValue    = image->GetScalarValueMaxNoRecompute();
-      min2ndValue = image->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+      minValue    = image->GetStatistics()->GetScalarValueMin();
+      maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
+      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     }
     isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
   }
@@ -1003,7 +1004,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
-      && (image->GetPixelType().GetItkTypeId() && *(image->GetPixelType().GetItkTypeId()) == typeid(itk::RGBAPixel<unsigned char>)))
+      && image->GetPixelType().GetPixelTypeId() == typeid(itk::RGBAPixel<unsigned char>))
       {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0,255);

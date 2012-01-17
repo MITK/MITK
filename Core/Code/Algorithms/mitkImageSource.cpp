@@ -260,12 +260,6 @@ void* mitk::ImageSource::GetData()
     return GetOutput()->GetData();
 }
 
-mitkIpPicDescriptor* mitk::ImageSource::GetPic()
-{
-    Update();
-    return GetOutput()->GetPic();
-}
-
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
     Update();

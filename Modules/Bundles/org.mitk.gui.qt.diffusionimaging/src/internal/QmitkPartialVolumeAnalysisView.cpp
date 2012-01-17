@@ -1292,7 +1292,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     {
 
       mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
-      std::cout << pixelType.GetType() << std::endl;
+      std::cout << pixelType.GetItkTypeAsString() << std::endl;
 
       if(pixelType.GetBitsPerComponent() == 16)
       {

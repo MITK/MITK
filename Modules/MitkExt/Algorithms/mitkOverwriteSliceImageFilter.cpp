@@ -105,7 +105,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
        m_SliceDifferenceImage->GetDimension(1) != m_SliceImage->GetDimension(1) )
   {
     m_SliceDifferenceImage = mitk::Image::New();
-    mitk::PixelType pixelType( typeid(short signed int) );
+    mitk::PixelType pixelType( mitk::MakeScalarPixelType<short signed int>() );
     m_SliceDifferenceImage->Initialize( pixelType, 2, m_SliceImage->GetDimensions() );
   }
 
@@ -167,7 +167,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::OverwriteSliceImageFilter::ItkImageSwitch( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=*(m_SliceImage->GetPixelType().GetTypeId());
+  const std::type_info& typeId=m_SliceImage->GetPixelType().GetTypeId();
 
   myMITKOverwriteSliceImageFilterAccessAllTypesByItk( m_SliceImage, ItkImageProcessing, 2, itkImage );
 }

@@ -320,7 +320,7 @@ struct CvpSelListener : ISelectionListener
             {
               foundImage = true;
               mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
-              if(img.IsNotNull() && img->GetPixelType().GetItkTypeId() == &typeid(itk::RGBAPixel<unsigned char>) )
+              if(img.IsNotNull() && img->GetPixelType().GetPixelTypeId() == typeid(itk::RGBAPixel<unsigned char>) )
               {
                 foundRGBAImage = true;
               }

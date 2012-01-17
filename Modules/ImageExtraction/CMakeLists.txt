@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE( ImageExtraction
-               DEPENDS Mitk PlanarFigure
+               DEPENDS Mitk mitkIpPic PlanarFigure
                DEPENDS_INTERNAL pic2vtk
 )
 

@@ -19,8 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_PIC_FILE_WRITER__H_
 #define _MITK_PIC_FILE_WRITER__H_
 
+#include "IpPicSupportExports.h"
 #include <mitkFileWriter.h>
 #include <mitkIpPic.h>
+
+#include "mitkLegacyAdaptors.h"
 
 
 namespace mitk
@@ -30,7 +33,7 @@ class Image;
  * @brief Writer for mitk::Image
  * @ingroup IO
  */
-class MITK_CORE_EXPORT PicFileWriter : public mitk::FileWriter
+class IpPicSupport_EXPORT PicFileWriter : public mitk::FileWriter
 {
 public:
 

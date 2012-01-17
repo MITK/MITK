@@ -53,14 +53,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
-#include "mitkPicFileIOFactory.h"
+//#include "mitkPicFileIOFactory.h"
 #include "mitkPointSetIOFactory.h"
 #include "mitkItkImageFileIOFactory.h"
 #include "mitkSTLFileIOFactory.h"
 #include "mitkVtkSurfaceIOFactory.h"
 #include "mitkVtkImageIOFactory.h"
 #include "mitkVtiFileIOFactory.h"
-#include "mitkPicVolumeTimeSeriesIOFactory.h"
+//#include "mitkPicVolumeTimeSeriesIOFactory.h"
 
 #include "mitkImageWriterFactory.h"
 #include "mitkPointSetWriterFactory.h"
@@ -136,14 +136,14 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   {
     MITK_DEBUG << "CoreObjectFactory c'tor" << std::endl;
 
-    itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
 
     mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
     mitk::PointSetWriterFactory::RegisterOneFactory();

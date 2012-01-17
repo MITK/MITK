@@ -106,7 +106,7 @@ void mitk::ToFCompositeFilter::GenerateData()
     if (outputImage.IsNotNull()&&inputImage.IsNotNull())
     {
       outputImage->CopyInformation(inputImage);
-      outputImage->Initialize(*inputImage->GetPixelType().GetTypeId(),inputImage->GetDimension(),inputImage->GetDimensions());
+      outputImage->Initialize(inputImage->GetPixelType(),inputImage->GetDimension(),inputImage->GetDimensions());
       outputImage->SetSlice(inputImage->GetSliceData()->GetData());
     }
   }

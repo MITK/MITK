@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTestingMacros.h>
 
+#include <mitkImageStatisticsHolder.h>
+
 
 int mitkImageTest(int argc, char* argv[])
 {
@@ -37,126 +39,67 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_BEGIN(mitkImageTest);
 
   //Create Image out of nowhere
-  mitk::Image::Pointer imgMem;
-  mitk::PixelType pt(typeid(int));
+  mitk::Image::Pointer imgMem = mitk::Image::New();
+  mitk::PixelType pt = mitk::MakeScalarPixelType<int>();
   unsigned int dim[]={100,100,20};
 
-  std::cout << "Testing creation of Image: ";
-  imgMem=mitk::Image::New();
-  if(imgMem.IsNull())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED( imgMem.IsNotNull(), "An image was created. ");
 
-  std::cout << "Testing Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
-  imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
-  std::cout<<"[PASSED]"<<std::endl;
+  // Initialize image
+  imgMem->Initialize( pt, 3, dim);
 
-  std::cout << "Testing IsInitialized(): ";
-  if(imgMem->IsInitialized()==false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED( imgMem->IsInitialized(), "Image::IsInitialized() ?");
+  MITK_TEST_CONDITION( imgMem->GetPixelType() == pt, " PixelType was set correctly.");
 
-  std::cout << "Testing GetData(): ";
   int *p = (int*)imgMem->GetData();
-  if(p==NULL)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION( p != NULL, "GetData() returned not-NULL pointer.");
 
-  std::cout << "Filling image: ";
-  unsigned int i;
-  unsigned int size = dim[0]*dim[1]*dim[2];
-  for(i=0; i<size; ++i, ++p)
+  // FIXME: this is directly changing the image data
+  // filling image
+  const unsigned int size = dim[0]*dim[1]*dim[2];
+  for(unsigned int i=0; i<size; ++i, ++p)
     *p= (signed int)i;
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Getting it again and compare with filled values: ";
+  // Getting it again and compare with filled values:
   int *p2 = (int*)imgMem->GetData();
-  if(p2==NULL)
+  MITK_TEST_CONDITION( p2 != NULL, "GetData() returned not-NULL pointer.");
+
+  bool isEqual = true;
+  for(unsigned int i=0; i<size; ++i, ++p2)
   {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  for(i=0; i<size; ++i, ++p2)
-  {
-    if(*p2!= (signed int)i )
+    if(*p2 != (signed int) i )
     {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
+      isEqual = false;
     }
   }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION( isEqual, "The values previously set as Data are correct [pixelwise comparison].");
 
-  std::cout << "Testing IsInitialized(): ";
-  if(imgMem->IsInitialized()==false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-  
-  std::cout << "Testing GetSliceData() and compare with filled values: ";
+  // Testing GetSliceData() and compare with filled values:
   p2 = (int*)imgMem->GetSliceData(dim[2]/2)->GetData();
+  MITK_TEST_CONDITION_REQUIRED( p2 != NULL, "Valid slice data returned");
+
   unsigned int xy_size = dim[0]*dim[1];
   unsigned int start_mid_slice = (dim[2]/2)*xy_size;
-  for(i=0; i<xy_size; ++i, ++p2)
+  isEqual = true;
+  for(unsigned int i=0; i<xy_size; ++i, ++p2)
   {
     if(*p2!=(signed int)(i+start_mid_slice))
     {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
+      isEqual = false;
     }
   }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION( isEqual, "The SliceData are correct [pixelwise comparison]. ");
 
   //----
-  mitkIpPicDescriptor *pic_slice=mitkIpPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
+  //mitkIpPicDescriptor *pic_slice=mitkIpPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
   imgMem=mitk::Image::New();
 
   std::cout << "Testing reinitializing via Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
-  imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  imgMem->Initialize( mitk::MakePixelType<int, int, 1>() , 3, dim);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing slice-wise filling via SetPicSlice(): ";
-  for(i=0;i<dim[2];++i)
-  {
-    imgMem->SetPicSlice(pic_slice, i, 0, 0);
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Getting it again and compare with filled values: ";
-  p2 = (int*)imgMem->GetData();
-  if(p2==NULL)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  for(i=0; i<size; ++i, ++p2)
-  {
-    if(*p2!= (signed int)((i%xy_size)+start_mid_slice))
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Testing IsInitialized(): ";
-  if(imgMem->IsInitialized()==false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
+  MITK_TEST_CONDITION( imgMem->IsInitialized(), "Image is initialized.");
+/*
   std::cout << "Setting a copy of the volume once again: ";
   imgMem->SetPicVolume(mitkIpPicClone(imgMem->GetVolumeData(0)->GetPicDescriptor()),0);
   std::cout<<"[PASSED]"<<std::endl;
@@ -183,12 +126,11 @@ int mitkImageTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-
-  std::cout << "Setting volume again: ";
+*/
+  // Setting volume again:
   imgMem->SetVolume(imgMem->GetData());
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Set a slice with different content via SetSlice(): ";
+ /* std::cout << "Set a slice with different content via SetSlice(): ";
   memset(pic_slice->data,0,xy_size*sizeof(int));
   imgMem->SetSlice(pic_slice->data, 0);
 
@@ -208,14 +150,14 @@ int mitkImageTest(int argc, char* argv[])
     }
   }
   std::cout<<"[PASSED]"<<std::endl;
-
+*/
 
 
   //std::cout << "Testing SetVolume(): ";
   //imgMem->SetVolume(data);
   //std::cout<<"[PASSED]"<<std::endl;
 
-  mitkIpPicFree(pic_slice);
+ // mitkIpPicFree(pic_slice);
 
   //-----------------
   // geometry information for image
@@ -233,72 +175,33 @@ int mitkImageTest(int argc, char* argv[])
   planegeometry->SetOrigin(origin);
   std::cout << "done" << std::endl;
 
-  std::cout << "Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
-  imgMem->Initialize(mitk::PixelType(typeid(int)), *planegeometry);
-  p = (int*)imgMem->GetData();
-  if(p==NULL)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  // Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
+  imgMem->Initialize( mitk::MakePixelType<int, int, 1>(), *planegeometry);
 
-  std::cout << "Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData(): ";
-  imgMem->Initialize(mitk::PixelType(typeid(int)), 40, *planegeometry);
   p = (int*)imgMem->GetData();
-  if(p==NULL)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED( p!=NULL, "GetData() returned valid pointer.");
+
+
+  // Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData(): ";
+  imgMem->Initialize( mitk::MakePixelType<int, int, 1>() , 40, *planegeometry);
+
+  p = (int*)imgMem->GetData();
+  MITK_TEST_CONDITION_REQUIRED( p!=NULL, "GetData() returned valid pointer.");
 
   //-----------------
   // testing origin information and methods
-  std::cout << "Testing correctness of origin via GetGeometry()->GetOrigin(): ";
-  if( mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetGeometry()->GetOrigin(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ");
 
-  std::cout << "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ";
-  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
+  // Setting origin via SetOrigin(origin): ";
   mitk::FillVector3D(origin, 37.0, 17.92, 27.83);
-  std::cout << "Setting origin via SetOrigin(origin): ";
   imgMem->SetOrigin(origin);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ";
-  if( mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  // Test origin
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
 
-  std::cout << "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ";
-  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ";
-  if( mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
 
   //-----------------
   // testing spacing information and methods
@@ -323,34 +226,14 @@ int mitkImageTest(int argc, char* argv[])
   imgMem->SetSpacing(spacing);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ";
-  if( mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ";
-  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ";
-  if( mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ");
 
   //-----------------
   MITK_TEST_OUTPUT(<< "Testing SetImportChannel");
   mitk::Image::Pointer vecImg = mitk::Image::New();
-  vecImg->Initialize(*imgMem->GetPixelType().GetTypeId(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
+  vecImg->Initialize( imgMem->GetPixelType(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
   vecImg->SetImportChannel(imgMem->GetData(), 0, mitk::Image::CopyMemory );
   vecImg->SetImportChannel(imgMem->GetData(), 1, mitk::Image::CopyMemory );
   std::cout<<"[PASSED]"<<std::endl;
@@ -432,30 +315,19 @@ int mitkImageTest(int argc, char* argv[])
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
-    return NULL;
+    return 0;
   }  
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-    
-  // test by index coordinates
-  mitk::Index3D index;
-  mitk::FillVector3D(index, 55, 39, 50);
-  MITK_TEST_OUTPUT(<< "Testing mitk::Image::GetPixelValueByIndex");
-  double val = image->GetPixelValueByIndex(index);
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,112.22475433349609), "");
-  
-  //test by world coordinates
-  MITK_TEST_OUTPUT(<< "Testing mitk::Image::GetPixelValueByWorldCoordinate");
   mitk::Point3D point;
   mitk::FillVector3D(point, -5.93752, 18.7199, 6.74218);
-  val = image->GetPixelValueByWorldCoordinate(point);
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,94.456184387207031), "");
 
-  MITK_TEST_OUTPUT(<< "Convert to index and access value by mitk::Image::GetPixelValueByIndex again");
-  mitk::Index3D index2;
-  image->GetGeometry()->WorldToIndex(point, index2);
-  float val2 = image->GetPixelValueByIndex(index2);
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val2,94.456184387207031), "");
+  // test values and max/min
+  mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
+  mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
+  mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
+
+  MITK_TEST_CONDITION( (value>=imageMin && value <=imageMax), "Value returned is between max/min");
 
   //access via itk
   MITK_TEST_OUTPUT(<< "Test conversion to itk::Image");
@@ -464,20 +336,19 @@ int mitkImageTest(int argc, char* argv[])
   mitk::CastToItkImage(image, itkimage);
   std::cout<<"[PASSED]"<<std::endl;
  
-  MITK_TEST_OUTPUT(<< "Testing world->itk-physical->world consistency");
+
   mitk::Point3D itkPhysicalPoint;
   image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
-
   mitk::Point3D backTransformedPoint;
   image->GetGeometry()->ItkPhysicalPointToWorld(itkPhysicalPoint, backTransformedPoint);
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(point,backTransformedPoint), "");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(point,backTransformedPoint), "Testing world->itk-physical->world consistency");
 
-  MITK_TEST_OUTPUT(<< "Compare value of pixel returned by mitk in comparison to itk");
+
   itk::Index<3> idx;  
   itkimage->TransformPhysicalPointToIndex(itkPhysicalPoint, idx);
   float valByItk = itkimage->GetPixel(idx);
 
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk,94.456184387207031), "");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk, value), "Compare value of pixel returned by mitk in comparison to itk");
 
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");

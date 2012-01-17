@@ -74,9 +74,12 @@ namespace mitk
       dimensions[0] = this->m_ToFCameraDevice->GetCaptureWidth();
       dimensions[1] = this->m_ToFCameraDevice->GetCaptureHeight();
       dimensions[2] = 1;
-      distanceImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
-      amplitudeImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
-      intensityImage->Initialize(mitk::PixelType(typeid(float)), 3, dimensions, 1);
+      
+      mitk::PixelType FloatType = MakeScalarPixelType<float>();
+
+      distanceImage->Initialize(FloatType, 3, dimensions, 1);
+      amplitudeImage->Initialize(FloatType, 3, dimensions, 1);
+      intensityImage->Initialize(FloatType, 3, dimensions, 1);
     }
 
     if (m_DistanceArray&&m_AmplitudeArray&&m_IntensityArray)

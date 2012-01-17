@@ -138,7 +138,14 @@ namespace mitk
         ndim = 3;
       if((ndim==3) && (dimensions[2]<=1))
         ndim = 2;
-      mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents(), imageIO->GetPixelType() );
+
+      mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), imageIO->GetComponentTypeInfo(),
+                                                  imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
+                                                  imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
+                                                  imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );
+
+      //pixelType.Initialize( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents(), imageIO->GetPixelType() );
+
       static_cast<OutputType*>(this->GetOutput())->Initialize( pixelType, ndim, dimensions );
       static_cast<OutputType*>(this->GetOutput())->SetImportChannel( buffer, 0, Image::ManageMemory );
 

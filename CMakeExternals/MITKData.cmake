@@ -13,7 +13,7 @@ SET(MITK-Data_DEPENDS ${proj})
 
 IF(BUILD_TESTING)
 
-  SET(revision_tag 4fa450c29ebd819419)
+  SET(revision_tag a2065ce186967682b2)
   IF(${proj}_REVISION_TAG)
     SET(revision_tag ${${proj}_REVISION_TAG})
   ENDIF()

@@ -21,7 +21,18 @@ PURPOSE.  See the above copyright notices for more information.
 // #include <QmitkFunctionality.h>
 #include "ui_QmitkDicomExternalDataWidgetControls.h"
 #include "mitkDicomUIExports.h"
+
+// include ctk
+#include <ctkDICOMDatabase.h>
+#include <ctkDICOMModel.h>
+#include <ctkDICOMIndexer.h>
+#include <ctkFileDialog.h>
+
+//include QT
 #include <QWidget>
+#include <QString>
+#include <QStringList>
+#include <QModelIndex>
 
 
 /*!
@@ -54,19 +65,40 @@ public:
    */
    void Initialize();
 
+signals:
+    void SignalChangePage(int);
+    void SignalAddDicomDirectory(QString);
+    void SignalAddDicomPatientFiles(QStringList);
 
+   public slots:
 
-   protected slots:
+       /// \brief Called when Import CD or Import Folder was clicked.
+       void OnFolderCDImport();
 
+       /// \brief Called when Import Directory was selected.
+       void OnFileSelectedAddExternalData(QString);
+
+       /// \brief Called when Import CD or Import Folder was clicked.
+       void OnDownloadButtonClicked();
+
+       /// \brief Called when Import CD or Import Folder was clicked.
+       void OnViewButtonClicked();
+    
+       /// \brief Called when Import CD or Import Folder was clicked.
+       void OnCancelButtonClicked();
 
 protected:
 
+    /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
+    void GetFileNamesFromIndex(QStringList& filePaths);
+
+    ctkDICOMDatabase* m_ExternalDatabase;
+    ctkDICOMModel* m_ExternalModel;
+    ctkDICOMIndexer* m_ExternalIndexer;
+    
+    ctkFileDialog* m_ImportDialog;
 
     Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
-
-   // Performs a starbust on inputimage, which results in outputimage. Only workds with 3D and 4D Ultrasound images (char Pixeltype)
-   //void PerformStarburst(mitk::Image::Pointer inputImage, mitk::Image::Pointer &outputImage, mitk::Point3D startPoint, bool doubleStarburst, bool thinStarburst);
-
 
 
 };

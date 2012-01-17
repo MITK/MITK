@@ -21,8 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 // #include <QmitkFunctionality.h>
 #include "ui_QmitkDicomLocalStorageWidgetControls.h"
 #include "mitkDicomUIExports.h"
-#include <QWidget>
 
+// include ctk
+#include <ctkDICOMDatabase.h>
+#include <ctkDICOMModel.h>
+#include <ctkDICOMIndexer.h>
+#include <ctkFileDialog.h>
+
+//include QT
+#include <QWidget>
+#include <QString>
+#include <QStringList>
 
 /*!
 \brief QmitkDicomLocalStorageWidget 
@@ -52,17 +61,32 @@ public:
    * @param multiWidget The corresponding multiwidget were the ct Image is displayed and the user should define his path.
    * @param imageNode  The image node which will be the base of mitral processing
    */
-   void Initialize();
+
+   void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 
+   public slots:
+
+       /// @brief   Called when adding a dicom directory.
+       void OnAddDICOMData(QString directory);
+
+       /// @brief   Called when adding a list of dicom files from a patient.
+       void OnAddDICOMData(QStringList patientFiles);
+
+       /// @brief   Called delete button was clicked.
+       void OnDeleteButtonClicked();
 
    protected slots:
 
 
 protected:
 
-
+    ctkDICOMDatabase* m_LocalDatabase;
+    ctkDICOMModel* m_LocalModel;
+    ctkDICOMIndexer* m_LocalIndexer;
     Ui::QmitkDicomLocalStorageWidgetControls* m_Controls;
+
+    QString m_LocalDatabaseDirectory;
 
    // Performs a starbust on inputimage, which results in outputimage. Only workds with 3D and 4D Ultrasound images (char Pixeltype)
    //void PerformStarburst(mitk::Image::Pointer inputImage, mitk::Image::Pointer &outputImage, mitk::Point3D startPoint, bool doubleStarburst, bool thinStarburst);

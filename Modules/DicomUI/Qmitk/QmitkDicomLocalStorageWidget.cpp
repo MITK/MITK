@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
+#include <mitklogmacros.h>
 
 // Qt
 #include <QMessageBox>
@@ -26,30 +27,108 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
-:  m_Controls( 0 )
+:  m_Controls( 0 ), m_LocalDatabase(new ctkDICOMDatabase(QString("./ctkDICOM-Database/ctkDICOM.sql"))),m_LocalIndexer(new ctkDICOMIndexer()),
+m_LocalModel(new ctkDICOMModel()),m_LocalDatabaseDirectory(QString(m_LocalDatabase->databaseDirectory()))
 {
-   CreateQtPartControl(this);
+    CreateQtPartControl(this);
 }
 
 QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
 {
+    delete m_LocalDatabase;
+    delete m_LocalIndexer;
+    delete m_LocalModel;
+    delete m_Controls;
 }
 
 
 void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
 {
-   // build up qt Widget, unless already done
-   if ( !m_Controls )
-   {
-      // create GUI widgets from the Qt Designer's .ui file
-       m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
-      m_Controls->setupUi( parent );
+    // build up qt Widget, unless already done
+    if ( !m_Controls )
+    {
+        // create GUI widgets from the Qt Designer's .ui file
+        m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
+        m_Controls->setupUi( parent );
 
-   }
+        m_LocalModel->setEndLevel(ctkDICOMModel::SeriesType);
+        m_LocalModel->setDatabase(m_LocalDatabase->database());
+
+        m_Controls->InternalDataTreeView->setSortingEnabled(true);
+        m_Controls->InternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+        m_Controls->InternalDataTreeView->setModel(m_LocalModel);
+
+        connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
+
+    }
 }
 
-void QmitkDicomLocalStorageWidget::Initialize()
+
+void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDirectory)
 {
-
+    m_LocalDatabase->closeDatabase();
+    m_LocalDatabaseDirectory = newDatatbaseDirectory;
+    QString databaseFileName = m_LocalDatabaseDirectory + QString("/ctkDICOM.sql");
+    //m_ExternalDatabase->initializeDatabase();
+    try{
+        m_LocalDatabase->openDatabase(databaseFileName,QString("LOCAL-DB"));
+    }catch(std::exception e){
+        MITK_ERROR <<"Database error: "<< m_LocalDatabase->lastError().toStdString();
+        m_LocalDatabase->closeDatabase();
+        return;
+    }  
+    m_LocalDatabase->closeDatabase();
 }
 
+void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString directory)
+{
+    /*
+    m_LocalDatabase->closeDatabase();
+    QString databaseFileName = m_LocalDatabaseDirectory + QString("/ctkDICOM.sql");
+    try{
+        m_LocalDatabase->openDatabase(databaseFileName,QString("LOCAL-DB"));
+    }catch(std::exception e){
+        MITK_ERROR <<"Database error: "<< m_LocalDatabase->lastError().toStdString();
+        m_LocalDatabase->closeDatabase();
+        return;
+    }*/
+    if(m_LocalDatabase->isOpen())
+    {
+        m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabaseDirectory);
+    }
+    m_LocalModel->setDatabase(m_LocalDatabase->database());
+}
+
+void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList patientFiles)
+{
+    if(m_LocalDatabase->isOpen())
+    {
+        for (QStringList::iterator currentPatientFilePath = patientFiles.begin();
+            currentPatientFilePath != patientFiles.end(); ++currentPatientFilePath) 
+        { 
+            m_LocalIndexer->addFile(*m_LocalDatabase,*currentPatientFilePath,m_LocalDatabaseDirectory);
+        }
+
+    }
+    m_LocalModel->setDatabase(m_LocalDatabase->database());
+}
+
+void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
+{
+    QModelIndex currentIndex = m_Controls->InternalDataTreeView->currentIndex();
+    QString currentUID = m_LocalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
+
+    if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
+    {
+        m_LocalDatabase->removeSeries(currentUID);
+    }
+    else if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::StudyType))
+    {
+        m_LocalDatabase->removeStudy(currentUID);
+    }
+    else if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::PatientType))
+    {
+        m_LocalDatabase->removePatient(currentUID);
+    }
+    m_LocalModel->reset();
+}

@@ -32,8 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkDicomEditorControls.h"
 
 #include <QModelIndex>
+#include <QString>
 
-#include <ctkFileDialog.h>
+
 
 /*!
 \brief QmitkDicomEditor
@@ -70,15 +71,11 @@ public:
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
 
-    protected slots:
 
-        void OnImportDirectory(QString directory);
+    protected slots:
 
         /// \brief Called when series in TreeView is double clicked.
         void OnSeriesModelDoubleClicked(QModelIndex index);
-
-        /// \brief Called when Import CD or Import Folder was clicked.
-        void OnFolderCDImport();
 
         /// \brief Called when Query Retrieve or Import Folder was clicked.
         void OnQueryRetrieve();
@@ -86,6 +83,7 @@ public:
         /// \brief Called when LocalStorageButton was clicked.
         void OnLocalStorage();
 
+        void OnChangePage(int);
         /// To be called when an entry of the tree list is collapsed
         //void OnTreeCollapsed(const QModelIndex& index);
 
@@ -93,8 +91,6 @@ public:
         //void OnTreeExpanded(const QModelIndex& index);
 
 protected:
-
-    ctkFileDialog* m_ImportDialog;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
@@ -104,6 +100,9 @@ protected:
     Events::Types GetPartEventTypes() const;
 
     Ui::QmitkDicomEditorControls m_Controls;
+
+private:
+
 };
 
 #endif // QmitkDicomEditor_h

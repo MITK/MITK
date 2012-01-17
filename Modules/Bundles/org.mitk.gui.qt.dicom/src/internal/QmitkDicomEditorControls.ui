@@ -93,139 +93,14 @@
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="qmitkDicomLocalStorageWidget" name="internalDataWidget" native="true"/>
+           <widget class="QmitkDicomLocalStorageWidget" name="internalDataWidget" native="true"/>
           </item>
          </layout>
         </widget>
         <widget class="QWidget" name="importWidgetPage">
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
-           <widget class="QGroupBox" name="externalFilesGroupBox">
-            <property name="title">
-             <string>External Dicom Data</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_10">
-             <item>
-              <widget class="QFrame" name="itemOperationsFrame">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QPushButton" name="viewExternalDataButton">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>View</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="downloadButton">
-                  <property name="text">
-                   <string>Download</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="cancelButton">
-                  <property name="text">
-                   <string>Cancel</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="QueryLayout_2" stretch="1,0">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <item>
-                <widget class="QTreeView" name="ExternalDataTreeView">
-                 <property name="alternatingRowColors">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="searchOptionLayout_2">
-                 <property name="spacing">
-                  <number>6</number>
-                 </property>
-                 <item>
-                  <widget class="QDockWidget" name="ExternalSearchDockWidget">
-                   <property name="floating">
-                    <bool>false</bool>
-                   </property>
-                   <property name="features">
-                    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-                   </property>
-                   <property name="windowTitle">
-                    <string/>
-                   </property>
-                   <widget class="QWidget" name="dockWidgetContents_2">
-                    <layout class="QVBoxLayout" name="verticalLayout_6">
-                     <item>
-                      <widget class="ctkDICOMQueryWidget" name="SearchOption_2" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="VerticalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
+           <widget class="QmitkDicomExternalDataWidget" name="externalDataWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -248,22 +123,32 @@
   <customwidget>
    <class>ctkDICOMQueryRetrieveWidget</class>
    <extends>QWidget</extends>
-   <header>ctkdicomqueryretrievewidget.h</header>
+   <header>ctkDICOMQueryRetrieveWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ctkDICOMQueryWidget</class>
+   <class>QmitkDicomLocalStorageWidget</class>
    <extends>QWidget</extends>
-   <header>ctkdicomquerywidget.h</header>
+   <header>Qmitk/QmitkDicomLocalStorageWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>qmitkDicomLocalStorageWidget</class>
+   <class>QmitkDicomExternalDataWidget</class>
    <extends>QWidget</extends>
-   <header>qmitkdicomlocalstoragewidget.h</header>
+   <header>Qmitk/QmitkDicomExternalDataWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+    <sender>QmitkDicomExternalDataWidget</sender>
+    <signal>SignalChangePage(int)</signal>
+    <receiver>QmitkDicomEditor</receiver>
+    <slot>OnChangePage(int)</slot>
+  </connection>
+  </connections>
+  <slots>
+    <slot>OnChangePage(int)</slot>
+  </slots>
 </ui>

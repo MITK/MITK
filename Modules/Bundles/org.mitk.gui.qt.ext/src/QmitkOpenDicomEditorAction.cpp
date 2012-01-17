@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
 #include <berryPlatform.h>
+#include <berryFileEditorInput.h>
 
 #include "mitkProperties.h"
 #include "mitkNodePredicateData.h"
@@ -90,7 +91,7 @@ void QmitkOpenDicomEditorAction::Run()
    
     //if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
     //{
-        editorInput = new mitk::DataStorageEditorInput();
+    //    editorInput = new mitk::DataStorageEditorInput();
     //    dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
     //}
     //else
@@ -109,6 +110,7 @@ void QmitkOpenDicomEditorAction::Run()
     //    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
     //}
 
-    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.dicomeditor");
+    berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(Poco::Path()));
+    m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
 }
 

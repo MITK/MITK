@@ -29,13 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk
 #include "QmitkDicomEditor.h"
-#include "QmitkStdMultiWidget.h"
 #include <mitkDicomSeriesReader.h>
 
 // Qt
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QWidget>
+#include <QString>
+#include <QStringList>
 #include <QtSql>
 #include <QSqlDatabase>
 #include <QtCore/QVariant>
@@ -56,6 +57,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkDICOMQueryRetrieveWidget.h>
 
 
+//Qmitk
+
+
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 
 
@@ -65,7 +69,7 @@ QmitkDicomEditor::QmitkDicomEditor()
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
-    delete m_ImportDialog;
+    
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
@@ -76,20 +80,14 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
 
     //connections for base controls
-    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
-    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
+    connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
+    connect(m_Controls.FolderButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
 
-    //Initialize import widget
-    m_ImportDialog = new ctkFileDialog();
-    QCheckBox* importCheckbox = new QCheckBox("Copy on import", m_ImportDialog);
-    m_ImportDialog->setBottomWidget(importCheckbox);
-    m_ImportDialog->setFileMode(QFileDialog::Directory);
-    m_ImportDialog->setLabelText(QFileDialog::Accept,"Import");
-    m_ImportDialog->setWindowTitle("Import DICOM files from directory ...");
-    m_ImportDialog->setWindowModality(Qt::ApplicationModal);
-    connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnImportDirectory(QString)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomDirectory(QString)),m_Controls.internalDataWidget,SLOT(OnAddDICOMData(QString)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomPatientFiles(QStringList)),m_Controls.internalDataWidget,SLOT(OnAddDICOMData(QStringList)));
 
     //m_Controls.ExternalDataTreeView->setSortingEnabled(true);
     //m_Controls.ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -193,39 +191,24 @@ berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkDicomEditor::OnFolderCDImport()
-{
-    m_ImportDialog->show();
-    m_ImportDialog->raise();
 
-}
 
 void QmitkDicomEditor::OnQueryRetrieve()
 {
-    m_Controls.stackedWidget->setCurrentIndex(2);
+    OnChangePage(2);
 }
 
 void QmitkDicomEditor::OnLocalStorage()
 {
-    m_Controls.stackedWidget->setCurrentIndex(0);
+    OnChangePage(0);
 }
 
-void QmitkDicomEditor::OnImportDirectory(QString directory)
+void QmitkDicomEditor::OnChangePage(int page)
 {
-    if (QDir(directory).exists())
-    {
-        QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(m_ImportDialog->bottomWidget());
-        QString targetDirectory;
-        if (copyOnImport->isChecked())
-        {
-            //targetDirectory = d->DICOMDatabase->databaseDirectory();
-            MBI_DEBUG<<directory.toStdString();
-            
-        }else{
-            m_Controls.stackedWidget->setCurrentIndex(1);
-        }
-        //d->DICOMIndexer->addDirectory(*d->DICOMDatabase,directory,targetDirectory);
-        //d->DICOMModel.reset();
+    try{
+        m_Controls.stackedWidget->setCurrentIndex(page);
+    }catch(std::exception e){
+        MITK_ERROR <<"error: "<< e.what();
+        return;
     }
-
 }

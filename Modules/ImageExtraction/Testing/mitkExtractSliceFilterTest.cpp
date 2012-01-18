@@ -163,8 +163,8 @@ public:
 
 
 		//storage for the index marks
-		std::vector<InputImageType::IndexType> indicesX;
-		std::vector<InputImageType::IndexType> indicesY;
+                std::vector<typename InputImageType::IndexType> indicesX;
+                std::vector<typename InputImageType::IndexType> indicesY;
 
 
 		/*Get four indices on the edge of the circle*/
@@ -254,7 +254,7 @@ public:
 
 		long sumpixels = 0;
 
-		std::vector<InputImageType::IndexType> diameterIndices;
+                std::vector<typename InputImageType::IndexType> diameterIndices;
 
 		//move up
 		while(currentIndex[1] < TestvolumeSize)
@@ -450,9 +450,9 @@ public:
 		writer->SetFileName(file);
 		writer->Update();*/
 
-		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Frontal);
-		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Sagittal);
-		TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::PlaneOrientation::Transversal);
+                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Frontal);
+                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
+                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Transversal);
 
 	}
 
@@ -469,7 +469,7 @@ public:
 		bool isRotated = false;
 
 
-		if( orientation == mitk::PlaneGeometry::PlaneOrientation::Transversal)
+                if( orientation == mitk::PlaneGeometry::Transversal)
 		{
 			/*isFrontside = false;
 			isRotated = true;	*/
@@ -878,7 +878,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* transversal plane */
 	mitk::PlaneGeometry::Pointer geometryTransversal = mitk::PlaneGeometry::New();
-	geometryTransversal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::PlaneOrientation::Transversal, sphereCenter, false, true);
+        geometryTransversal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Transversal, sphereCenter, false, true);
 	geometryTransversal->ChangeImageGeometryConsideringOriginOffset(true);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometryTransversal, "Testing transversal plane");
@@ -888,7 +888,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* sagittal plane */
 	mitk::PlaneGeometry::Pointer geometrySagital = mitk::PlaneGeometry::New();
-	geometrySagital->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::PlaneOrientation::Sagittal, sphereCenter, true, false);
+        geometrySagital->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
 	geometrySagital->ChangeImageGeometryConsideringOriginOffset(true);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometrySagital, "Testing sagittal plane");
@@ -898,7 +898,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* sagittal shifted plane */
 	mitk::PlaneGeometry::Pointer geometrySagitalShifted = mitk::PlaneGeometry::New();
-	geometrySagitalShifted->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::PlaneOrientation::Sagittal, (sphereCenter - 14), true, false);
+        geometrySagitalShifted->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, (sphereCenter - 14), true, false);
 	geometrySagitalShifted->ChangeImageGeometryConsideringOriginOffset(true);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometrySagitalShifted, "Testing sagittal plane shifted");
@@ -908,7 +908,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* coronal plane */
 	mitk::PlaneGeometry::Pointer geometryCoronal = mitk::PlaneGeometry::New();
-	geometryCoronal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::PlaneOrientation::Frontal, sphereCenter, true, false);
+        geometryCoronal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Frontal, sphereCenter, true, false);
 	geometryCoronal->ChangeImageGeometryConsideringOriginOffset(true);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometryCoronal, "Testing coronal plane");
@@ -918,7 +918,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* oblique plane */
 	mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
-	obliquePlane->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::PlaneOrientation::Sagittal, sphereCenter, true, false);
+        obliquePlane->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
 	obliquePlane->ChangeImageGeometryConsideringOriginOffset(true);
 
 	mitk::Vector3D rotationVector;
@@ -955,19 +955,19 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 
 		mitk::PlaneGeometry::Pointer obliquePl = mitk::PlaneGeometry::New();
-		obliquePl->InitializeStandardPlane(pic->GetGeometry(), mitk::PlaneGeometry::PlaneOrientation::Sagittal, pic->GetGeometry()->GetCenter()[0], true, false);
+                obliquePl->InitializeStandardPlane(pic->GetGeometry(), mitk::PlaneGeometry::Sagittal, pic->GetGeometry()->GetCenter()[0], true, false);
 		obliquePl->ChangeImageGeometryConsideringOriginOffset(true);
 
-		mitk::Point3D or = obliquePl->GetOrigin();
+               mitk::Point3D origin2 = obliquePl->GetOrigin();
 		mitk::Vector3D n;
 		n = obliquePl->GetNormal();
 		
 
 		n.Normalize();
 		
-		or += n * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+                origin2 += n * 0.5;//pixelspacing is 1, so half the spacing is 0.5
 		
-		obliquePl->SetOrigin(or);
+                obliquePl->SetOrigin(origin2);
 
 		mitk::Vector3D rotation;
 		rotation[0] = 0.534307;

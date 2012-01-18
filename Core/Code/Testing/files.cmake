@@ -1,4 +1,3 @@
-
 # tests with no extra command line parameter
 SET(MODULE_TESTS
   mitkAccessByItkTest.cpp
@@ -59,6 +58,7 @@ SET(MODULE_TESTS
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
+  #QmitkRenderingTestHelper.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -96,6 +96,7 @@ SET(MODULE_CUSTOM_TESTS
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
     mitkImageWriterTest.cpp
+    mitkImageVtkMapper2DTest.cpp
 )
 
 # Create an artificial module initializing class for
@@ -112,7 +113,7 @@ SET(MODULE_QT_BOOL "false")
 
 SET(testdriver_init_file "${CMAKE_CURRENT_BINARY_DIR}/MitkTestDriver_init.cpp")
 CONFIGURE_FILE("${MITK_SOURCE_DIR}/CMake/mitkModuleInit.cpp" ${testdriver_init_file} @ONLY)
-SET(TEST_CPP_FILES ${testdriver_init_file})
+SET(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
 
 SET(MODULE_NAME ${module_name_orig})
 SET(MODULE_LIBNAME ${module_libname_orig})

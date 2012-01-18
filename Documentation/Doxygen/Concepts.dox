@@ -10,4 +10,5 @@ If you want to start using MITK, you also want to see \ref Development
 \li \subpage OverviewPage
 \li \subpage PropertiesPage
 \li \subpage Rendering
+\li \subpage RenderingTests
 */

@@ -17,6 +17,14 @@ mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStat
 mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen)
 
 mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest ${MITK_DATA_DIR}/PointSetReaderTestData.mps)
+
+IF(MITK_ENABLE_GUI_TESTING)
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
+                        ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
+)
+ENDIF()
+
 # see bug 9882
 IF(NOT APPLE)
 ADD_TEST(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)

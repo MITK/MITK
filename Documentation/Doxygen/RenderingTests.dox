@@ -1,0 +1,97 @@
+namespace mitk{
+/**
+\page RenderingTests Automatic Rendering Tests
+
+Available sections:
+
+-# \ref WhatIsARenderingTest "What is an automatic rendering test?"
+-# \ref HowToCreateATest "How to create a rendering test"
+
+\section WhatIsARenderingTest What is an automatic rendering test?
+
+An automatic rendering test is a powerful tool to test rendering results automatically via dashboard.
+Regarding rendering lots of different sources influence the output on the screen (e.g. different
+mappers, renderes, camera settings or the algorithm creating the data). Thus, during the rendering
+process of an image many different classes are involved and can have impact on the output. A minor
+change in an important class (e.g. mitkVtkPropRenderer) can have major impact on the actual rendering.
+An automatic rendering test takes an arbitrary object as input (e.g. image, surface, point set),
+renders this into an mitkRenderWindow, makes a screen shot of that renderwindow and finally compares
+that screen shot to a given reference. Of course, the reference has to be defined by the user.
+Internally, a VTK test method is used to compare both screen shots and measure differences. In case
+of failure, a difference can be generated to show exactly which pixels are rendered incorrectly.
+Implementing automatic rendering tests for algorithms ensures that algorithms deliver the same output
+as they used to do in previous version of MITK.
+
+\section HowToCreateATest How to create your own automatic rendering test
+
+To create an automatic rendering test you should use an existing test as example
+(e.g. mitkImageVtkMapper2DTest).
+
+1. Adding the test to CMake
+Like adding any test with parameters to CMake, you have to add a custom test to
+the files.cmake and the corresponding CMakeLists.txt:
+
+For instance a test for the mitkImageVtkMapper2D has to be added like this:
+
+files.cmake
+\code
+SET(MODULE_CUSTOM_TESTS
+    ...
+    mitkImageVtkMapper2D.cpp
+)
+\endcode
+
+CMakeLists.txt
+\code
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D #custom name of the test and executable
+                        ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
+)
+\endcode
+
+The first parameter defines a name for the test on the dashboard. This is a feature to distinguish
+between tests with different inputs. In this example the test is named
+<em>mitkImageVtkMapper2D_rgbaImage640x480</em> to show that this test is using the test image
+<em>rbgaImage640x480</em> as input.
+
+The next parameters sets test name (i.e. the name of the test class). Here: <em>mitkImageVtkMapper2D</em>.
+
+The next parameter(s) are used to pass the input to the test. For instance, it is possible to set
+multiple objects as input for a test (e.g. /path/to/img1.jpg /path/to/img2.pic /path/to/pointset.mps).
+All test data for core tests should be placed into the MITK-DATA repository inside the folder:
+${MITK_DATA_DIR}/RenderingTestData/
+It is possible to create another folders for other modules/bundles.
+
+The option -V defines the path to the reference screen shot and is internally used by VTK. The reference
+screen shot is highly important and has to be triple-checked if is correct!!! The
+<em>mitkRenderingTestHelper</em> offers means to capture a screen shot of a renderwindow.
+Capturing a reference screen shot should happen just once and NOT be a permanent part of the test.
+
+It is also possible to set the option -T /path/to/directory/. This option is internally used by VTK
+to save a difference image. This is meant for debugging and should not be used on the dashboard.
+
+
+2. Coding the test
+Writing the test code is pretty straight forward. In the example of the <em>mitkImageVtkMapper2DTest</em>
+the input parameters are added to a datastorage and rendered into a render window via the
+<em>mitkRenderingTestHelper</em>. Last, the vtkTesting macro is called to compare the given reference to
+the data rendered in the renderwindow:
+
+\code
+int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
+
+//retVal meanings: (see VTK/Rendering/vtkTesting.h)
+//0 = test failed
+//1 = test passed
+//2 = test not run
+//3 = something with vtkInteraction
+MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
+\endcode
+
+If the content of the previously filled renderwindow does not equal the reference, the test will fail.
+
+Feel free to modify the data before rendering. E.g. create a surface from the loaded image and render
+that surface afterwards or add compute QBalls for an image and render those. Happy testing!
+
+*/
+}

@@ -66,6 +66,18 @@ namespace mitk
 		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
 		itkNewMacro(ExtractSliceFilter);
 
+		static Pointer New(vtkImageReslice* reslice){
+			Pointer smartPointer= ::itk::ObjectFactory<ExtractSliceFilter>::Create();
+
+			if(smartPointer.GetPointer() == NULL)
+				smartPointer = new ExtractSliceFilter;
+
+			smartPointer->UnRegister();
+
+			smartPointer->m_Reslicer = reslice;
+
+			return smartPointer;
+		}
 		
 		/** \brief Set the axis where to reslice at.*/
 		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }

@@ -86,8 +86,8 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomDirectory(QString)),m_Controls.internalDataWidget,SLOT(OnAddDICOMData(QString)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomPatientFiles(QStringList)),m_Controls.internalDataWidget,SLOT(OnAddDICOMData(QStringList)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QString&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
 
     //m_Controls.ExternalDataTreeView->setSortingEnabled(true);
     //m_Controls.ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);

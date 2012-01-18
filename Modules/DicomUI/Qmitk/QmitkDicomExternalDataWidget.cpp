@@ -119,7 +119,7 @@ void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directo
         {
             //targetDirectory = d->DICOMDatabase->databaseDirectory();
             MBI_DEBUG<<directory.toStdString();
-            emit SignalAddDicomDirectory(directory);
+            emit SignalAddDicomData(directory);
 
         }else{
 
@@ -137,7 +137,7 @@ void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
 {
     QStringList* filePaths= new QStringList();
     GetFileNamesFromIndex(*filePaths);
-    emit SignalAddDicomPatientFiles(*filePaths);
+    emit SignalAddDicomData(*filePaths);
 }
 
 //TODO

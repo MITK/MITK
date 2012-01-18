@@ -67,8 +67,8 @@ public:
 
 signals:
     void SignalChangePage(int);
-    void SignalAddDicomDirectory(QString);
-    void SignalAddDicomPatientFiles(QStringList);
+    void SignalAddDicomData(QString&);
+    void SignalAddDicomData(QStringList&);
 
    public slots:
 

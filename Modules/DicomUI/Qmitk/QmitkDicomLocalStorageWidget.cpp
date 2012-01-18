@@ -39,6 +39,7 @@ QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
     delete m_LocalIndexer;
     delete m_LocalModel;
     delete m_Controls;
+    delete m_Timer;
 }
 
 
@@ -60,6 +61,10 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
 
         connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
 
+        //connect(&m_Watcher, SIGNAL(started()), this, SLOT());
+        connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnImportFinished()));
+
+
     }
 }
 
@@ -71,7 +76,7 @@ void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDire
     QString databaseFileName = m_LocalDatabaseDirectory + QString("/ctkDICOM.sql");
     //m_ExternalDatabase->initializeDatabase();
     try{
-        m_LocalDatabase->openDatabase(databaseFileName,QString("LOCAL-DB"));
+        m_LocalDatabase->openDatabase(databaseFileName);
     }catch(std::exception e){
         MITK_ERROR <<"Database error: "<< m_LocalDatabase->lastError().toStdString();
         m_LocalDatabase->closeDatabase();
@@ -80,18 +85,8 @@ void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDire
     m_LocalDatabase->closeDatabase();
 }
 
-void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString directory)
+void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString& directory)
 {
-    /*
-    m_LocalDatabase->closeDatabase();
-    QString databaseFileName = m_LocalDatabaseDirectory + QString("/ctkDICOM.sql");
-    try{
-        m_LocalDatabase->openDatabase(databaseFileName,QString("LOCAL-DB"));
-    }catch(std::exception e){
-        MITK_ERROR <<"Database error: "<< m_LocalDatabase->lastError().toStdString();
-        m_LocalDatabase->closeDatabase();
-        return;
-    }*/
     if(m_LocalDatabase->isOpen())
     {
         m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabaseDirectory);
@@ -99,7 +94,7 @@ void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString directory)
     m_LocalModel->setDatabase(m_LocalDatabase->database());
 }
 
-void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList patientFiles)
+void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList& patientFiles)
 {
     if(m_LocalDatabase->isOpen())
     {
@@ -131,4 +126,23 @@ void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
         m_LocalDatabase->removePatient(currentUID);
     }
     m_LocalModel->reset();
+}
+
+void QmitkDicomLocalStorageWidget::StartDicomImport(QString& dicomData)
+{
+    if (m_Watcher.isRunning()){
+        m_Watcher.waitForFinished();
+    }
+    m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(QString&)) &QmitkDicomLocalStorageWidget::OnAddDICOMData,dicomData);
+    m_Watcher.setFuture(m_Future);
+}
+
+void QmitkDicomLocalStorageWidget::StartDicomImport(QStringList& dicomData)
+{
+    if (m_Watcher.isRunning())
+    {
+        m_Watcher.waitForFinished();
+    }
+    m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(QStringList&)) &QmitkDicomLocalStorageWidget::OnAddDICOMData,dicomData);
+    m_Watcher.setFuture(m_Future);
 }

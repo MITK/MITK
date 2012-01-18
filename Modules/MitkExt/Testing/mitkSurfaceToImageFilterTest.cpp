@@ -105,7 +105,8 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 #ifdef WIN32     // Unix based systems do not seem to resolve pixel type correctly
 
   std::cout << "Testing if result image is of type unsigned char: " << std::flush;
-  std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetItkTypeAsString();
+  //std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetItkTypeAsString();
+  std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetComponentTypeAsString();
   std::cout << std::endl << "XXX: " << typeId << std::endl;
   if( typeId != "unsigned char" )
   {

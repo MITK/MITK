@@ -84,9 +84,6 @@ public:
   virtual void StdMultiWidgetNotAvailable();
 
   signals:
-  void StartBlockControls();
-  void EndBlockControls();
-  void EndBlockControlsMovieDeactive();
 
 protected slots:
 

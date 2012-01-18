@@ -18,7 +18,6 @@
 #include "src/internal/QmitkFiberBundleDeveloperView.h"
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
-#include "src/internal/QmitkScreenshotMaker.h"
 #include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
 #include "src/internal/QmitkTbssSkeletonizationView.h"
 
@@ -41,7 +40,6 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkScreenshotMaker, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTbssSkeletonizationView, context)
 }

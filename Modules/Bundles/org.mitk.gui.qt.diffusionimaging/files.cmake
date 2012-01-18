@@ -22,7 +22,6 @@ SET(INTERNAL_CPP_FILES
   QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
-  QmitkScreenshotMaker.cpp
   QmitkTractbasedSpatialStatisticsView.cpp
   QmitkTbssTableModel.cpp
   QmitkTbssMetaTableModel.cpp
@@ -43,7 +42,6 @@ SET(UI_FILES
   src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
-  src/internal/QmitkScreenshotMakerControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
   src/internal/QmitkTbssSkeletonizationViewControls.ui
 )
@@ -67,7 +65,6 @@ SET(MOC_H_FILES
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h
-  src/internal/QmitkScreenshotMaker.h
   src/internal/QmitkTractbasedSpatialStatisticsView.h
   src/internal/QmitkTbssSkeletonizationView.h
   src/QmitkTbssRoiAnalysisWidget.h
@@ -91,7 +88,6 @@ SET(CACHED_RESOURCE_FILES
   resources/FiberBundleOperations.png
   resources/PartialVolumeAnalysis_24.png
   resources/IVIM_48.png
-  resources/screenshot_maker.png
   resources/stochFB.png
   resources/tbss.png
 )

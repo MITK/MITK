@@ -86,21 +86,11 @@ void QmitkScreenshotMaker::CreateConnections()
     connect((QObject*) m_Controls->m_View3, SIGNAL(clicked()), (QObject*) this, SLOT(View3()));
     connect((QObject*) m_Controls->m_Shot, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateMultiplanarScreenshots()));
     connect((QObject*) m_Controls->m_BackgroundColor, SIGNAL(clicked()), (QObject*) this, SLOT(SelectBackgroundColor()));
+    connect((QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()), this, SLOT(GenerateScreenshot()));
+    connect((QObject*) m_Controls->m_HRScreenshot, SIGNAL(clicked()), this, SLOT(Generate3DHighresScreenshot()));
 
-    connect((QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()), this, SLOT(
-        GenerateScreenshot()));
-    connect((QObject*) m_Controls->m_HRScreenshot, SIGNAL(clicked()), this, SLOT(
-        Generate3DHighresScreenshot()));
-
-    // blocking of ui elements during movie generation
-    connect((QObject*) this, SIGNAL(StartBlockControls()), (QObject*) this, SLOT(BlockControls()));
-
-    connect((QObject*) this, SIGNAL(EndBlockControls()), (QObject*) this, SLOT(UnBlockControls()));
-
-    connect((QObject*) this, SIGNAL(EndBlockControlsMovieDeactive()), (QObject*) this, SLOT(
-        UnBlockControlsMovieDeactive()));
-
-
+    QString styleSheet = "background-color:rgb(0,0,0)";
+    m_Controls->m_BackgroundColor->setStyleSheet(styleSheet);
   }
 }
 
@@ -116,16 +106,12 @@ void QmitkScreenshotMaker::Deactivated()
 
 void QmitkScreenshotMaker::GenerateScreenshot()
 {
-  emit StartBlockControls();
-
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath()+"/screenshot.jpg", "JPEG file (*.jpg);;PNG file (*.png)");
 
   vtkRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetVtkRenderer();
   if (renderer == NULL)
     return;
   this->TakeScreenshot(renderer, 1, fileName);
-
-  emit EndBlockControlsMovieDeactive();
 }
 
 void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
@@ -137,7 +123,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     return;
   }
 
-  emit StartBlockControls();
+  //emit StartBlockControls();
 
   mitk::DataNode* n;
   n = GetDataStorage()->GetNamedNode("widget1Plane");
@@ -164,15 +150,15 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   // only works correctly for 3D RenderWindow
   vtkRenderer* renderer = m_MultiWidget->mitkWidget1->GetRenderer()->GetVtkRenderer();
   if (renderer != NULL)
-    this->TakeScreenshot(renderer, 1, fileName+"/widget_1.png");
+    this->TakeScreenshot(renderer, 1, fileName+"/transversal.png");
 
   renderer = m_MultiWidget->mitkWidget2->GetRenderer()->GetVtkRenderer();
   if (renderer != NULL)
-    this->TakeScreenshot(renderer, 1, fileName+"/widget_2.png");
+    this->TakeScreenshot(renderer, 1, fileName+"/sagittal.png");
 
   renderer = m_MultiWidget->mitkWidget3->GetRenderer()->GetVtkRenderer();
   if (renderer != NULL)
-    this->TakeScreenshot(renderer, 1, fileName+"/widget_3.png");
+    this->TakeScreenshot(renderer, 1, fileName+"/coronal.png");
 
   n = GetDataStorage()->GetNamedNode("widget1Plane");
   if(n)
@@ -194,13 +180,11 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );
 //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
   }
-
-  emit EndBlockControlsMovieDeactive();
 }
 
 void QmitkScreenshotMaker::Generate3DHighresScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath()+"/3D_screenshot.jpg", "JPEG file (*.jpg);;PNG file (*.png)");
   GenerateHR3DAtlasScreenshots(fileName);
 }
 
@@ -215,30 +199,25 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 
   GetCam()->Azimuth( -7.5 );
   GetCam()->Roll(-4);
-  GenerateHR3DAtlasScreenshots(fileName+"/screen1.png");
+  GenerateHR3DAtlasScreenshots(fileName+"/3D_1.png");
   GetCam()->Roll(4);
 
   GetCam()->Azimuth( 90 );
   GetCam()->Elevation( 4 );
-  GenerateHR3DAtlasScreenshots(fileName+"/screen2.png");
+  GenerateHR3DAtlasScreenshots(fileName+"/3D_2.png");
 
   GetCam()->Elevation( 90 );
   GetCam()->Roll( -2.5 );
-  GenerateHR3DAtlasScreenshots(fileName+"/screen3.png");
-
+  GenerateHR3DAtlasScreenshots(fileName+"/3D_3.png");
 }
 
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName)
 {
-  emit StartBlockControls();
-
   // only works correctly for 3D RenderWindow
   vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
   if (renderer == NULL)
     return;
   this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName);
-
-  emit EndBlockControlsMovieDeactive();
 }
 
 vtkCamera* QmitkScreenshotMaker::GetCam()
@@ -267,28 +246,19 @@ vtkCamera* QmitkScreenshotMaker::GetCam()
 
 void QmitkScreenshotMaker::View1()
 {
-//  GetCam()->Azimuth( -7.5 );
-//  GetCam()->Roll(-4);
+  GetCam()->Elevation( 45 );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::View2()
 {
-//  GetCam()->Azimuth( -7.5 );
-//  GetCam()->Roll(-4);
-  GetCam()->Azimuth( 90 );
-//  GetCam()->Elevation( 4 );
+  GetCam()->Azimuth(45);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::View3()
 {
-//  GetCam()->Azimuth( -7.5 );
-//  GetCam()->Roll(-4);
-  GetCam()->Azimuth( 90 );
-//  GetCam()->Elevation( 4 );
-  GetCam()->Elevation( 90 );
-//  GetCam()->Roll( -2.5 );
+  GetCam()->Roll(45);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -357,7 +327,7 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
   fileWriter->SetInput(magnifier->GetOutput());
   fileWriter->SetFileName(fileName.toLatin1());
 
-  // vtkRenderLargeImage has problems with different layers, therefore we have to 
+  // vtkRenderLargeImage has problems with different layers, therefore we have to
   // temporarily deactivate all other layers.
   // we set the background to white, because it is nicer than black...
   double oldBackground[3];
@@ -378,7 +348,7 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
   m_MultiWidget->mitkWidget4->ActivateMenuWidget( false );
 
   fileWriter->Write();
-  fileWriter->Delete();  
+  fileWriter->Delete();
 
   m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
   m_MultiWidget->mitkWidget2->ActivateMenuWidget( true );
@@ -389,7 +359,7 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
   m_MultiWidget->EnableDepartmentLogo();
   m_MultiWidget->EnableGradientBackground();
   renderer->SetBackground(oldBackground);
-  
+
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }
 

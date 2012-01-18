@@ -16,6 +16,7 @@ mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStat
 
 mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen)
 
+mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest ${MITK_DATA_DIR}/PointSetReaderTestData.mps)
 # see bug 9882
 IF(NOT APPLE)
 ADD_TEST(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)

@@ -3,7 +3,6 @@
 SET(MODULE_TESTS
   mitkAccessByItkTest.cpp
   mitkCoreObjectFactoryTest.cpp
-  mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
   mitkEnumerationPropertyTest.cpp
@@ -31,6 +30,8 @@ SET(MODULE_TESTS
   mitkPlaneGeometryTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
+  mitkPointSetWriterTest.cpp
+  mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp

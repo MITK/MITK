@@ -148,11 +148,11 @@ public:
 		
 
 		//set the index to the middle of the image's edge at x and y axis
-		InputImageType::IndexType currentIndexX;
+		typename InputImageType::IndexType currentIndexX;
 		currentIndexX[0] = (int)(TestvolumeSize / 2.0);
 		currentIndexX[1] = 0;
 
-		InputImageType::IndexType currentIndexY;
+		typename InputImageType::IndexType currentIndexY;
 		currentIndexY[0] = 0;
 		currentIndexY[1] = (int)(TestvolumeSize / 2.0);
 

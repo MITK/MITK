@@ -150,6 +150,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     dataLocation += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
     m_UserPath.assign(dataLocation.toStdString());
   }
+  BERRY_INFO(m_ConsoleLog) << "Framework storage dir: " << m_UserPath.toString();
 
   Poco::File userFile(m_UserPath);
   

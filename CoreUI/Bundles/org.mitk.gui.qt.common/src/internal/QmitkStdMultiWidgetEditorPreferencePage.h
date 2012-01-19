@@ -20,7 +20,6 @@
 #define QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
 
 #include "berryIQtPreferencePage.h"
-#include <org_mitk_gui_qt_common_Export.h>
 #include <berryIPreferences.h>
 
 class QWidget;
@@ -28,7 +27,7 @@ class QCheckBox;
 class QPushButton;
 class QWidgetAction;
 
-struct MITK_QT_COMMON QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
+struct QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)

@@ -279,7 +279,7 @@ void QmitkGibbsTrackingView::SetIterations(int value)
   switch(value)
   {
   case 0:
-    m_Controls->m_IterationsLabel->setText("Iterations: 10^4");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^4");
     m_Iterations = 10000;
     break;
   case 1:
@@ -287,7 +287,7 @@ void QmitkGibbsTrackingView::SetIterations(int value)
     m_Iterations = 50000;
     break;
   case 2:
-    m_Controls->m_IterationsLabel->setText("Iterations: 10^5");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^5");
     m_Iterations = 100000;
     break;
   case 3:
@@ -295,7 +295,7 @@ void QmitkGibbsTrackingView::SetIterations(int value)
     m_Iterations = 500000;
     break;
   case 4:
-    m_Controls->m_IterationsLabel->setText("Iterations: 10^6");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^6");
     m_Iterations = 1000000;
     break;
   case 5:
@@ -303,7 +303,7 @@ void QmitkGibbsTrackingView::SetIterations(int value)
     m_Iterations = 5000000;
     break;
   case 6:
-    m_Controls->m_IterationsLabel->setText("Iterations: 10^7");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^7");
     m_Iterations = 10000000;
     break;
   case 7:
@@ -311,7 +311,7 @@ void QmitkGibbsTrackingView::SetIterations(int value)
     m_Iterations = 50000000;
     break;
   case 8:
-    m_Controls->m_IterationsLabel->setText("10^8");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^8");
     m_Iterations = 100000000;
     break;
   case 9:
@@ -319,12 +319,8 @@ void QmitkGibbsTrackingView::SetIterations(int value)
     m_Iterations = 500000000;
     break;
   case 10:
-    m_Controls->m_IterationsLabel->setText("Iterations: 10^9");
+    m_Controls->m_IterationsLabel->setText("Iterations: 1x10^9");
     m_Iterations = 1000000000;
-    break;
-  case 11:
-    m_Controls->m_IterationsLabel->setText("Iterations: 5x10^9");
-    m_Iterations = 5000000000;
     break;
   }
 

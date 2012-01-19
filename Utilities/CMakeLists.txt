@@ -8,7 +8,20 @@ INCLUDE(${ITK_USE_FILE})
 # like #include <ipPic/mitkIpPic.h>
 INCLUDE_DIRECTORIES(.)
 
-SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt qxt mbilog glew vecmath)
+SUBDIRS(
+  ann
+  ipSegmentation
+  IIL4MITK
+  pic2vtk
+  tinyxml
+  Poco
+  qwt
+  qxt
+  mbilog
+  glew
+  vecmath
+  qtsingleapplication
+)
 
 # mbilog is independent of mitk, and cant use mitk macros
 # configuring happens through mbilog/mbilogConfig.cmake.in

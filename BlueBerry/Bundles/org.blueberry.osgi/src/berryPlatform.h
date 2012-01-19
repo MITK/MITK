@@ -163,6 +163,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "service/berryServiceRegistry.h"
 
 #include <Poco/Util/LayeredConfiguration.h>
+#include <Poco/Util/OptionSet.h>
 
 namespace berry {
 
@@ -217,6 +218,7 @@ public:
   static int ARCH_AMD64;
   static int ARCH_ARM;
 
+  static std::string ARG_NEWINSTANCE;
   static std::string ARG_CLEAN;
   static std::string ARG_APPLICATION;
   static std::string ARG_HOME;
@@ -318,8 +320,7 @@ public:
 
   /**
    * Returns the applications command line arguments which
-   * have not been consumed by the platform. The first
-   * argument still is the application name
+   * have not been consumed by the platform.
    */
   static std::vector<std::string> GetApplicationArgs();
 
@@ -328,6 +329,8 @@ public:
    * just the string given as argument to the "--xargs" option.
    */
   static std::string GetExtendedApplicationArgs();
+
+  static void GetOptionSet(Poco::Util::OptionSet &os);
 
   static ServiceRegistry& GetServiceRegistry();
 

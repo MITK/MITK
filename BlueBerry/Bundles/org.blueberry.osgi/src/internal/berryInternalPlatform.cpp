@@ -506,6 +506,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   helpOption.callback(Poco::Util::OptionCallback<InternalPlatform>(this, &InternalPlatform::PrintHelp));
   options.addOption(helpOption);
 
+  Poco::Util::Option newInstanceOption(Platform::ARG_NEWINSTANCE, "", "forces a new instance of this application");
+  newInstanceOption.binding(Platform::ARG_NEWINSTANCE);
+  options.addOption(newInstanceOption);
+
   Poco::Util::Option cleanOption(Platform::ARG_CLEAN, "", "cleans the plugin cache");
   cleanOption.binding(Platform::ARG_CLEAN);
   options.addOption(cleanOption);

@@ -13,6 +13,7 @@
 #! \param PLUGINS (optional) A list of required plug-ins. Defaults to all known plug-ins.
 #! \param EXCLUDE_PLUGINS (optional) A list of plug-ins which should not be used. Mainly
 #!        useful if PLUGINS was not used.
+#! \param LINK_LIBRARIES A list of libraries to be linked with the executable.
 #! \param SHOW_CONSOLE (option) Show the console output window (on Windows).
 #! \param NO_PROVISIONING (option) Do not create provisioning files.
 #!
@@ -28,7 +29,7 @@
 #!
 function(FunctionCreateBlueBerryApplication)
 
-macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS" "SHOW_CONSOLE;NO_PROVISIONING" ${ARGN})
+macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES" "SHOW_CONSOLE;NO_PROVISIONING" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -84,7 +85,7 @@ else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES})
 endif()
 
-target_link_libraries(${_APP_NAME} org_blueberry_osgi)
+target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
   target_link_libraries(${_APP_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
 endif()

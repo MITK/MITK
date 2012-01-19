@@ -23,14 +23,28 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkGeneralTransform.h>
 
 
-mitk::ExtractSliceFilter::ExtractSliceFilter(){
-	m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
+mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
+
+	if(reslicer == NULL){
+		m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
+	}
+	else
+	{
+		m_Reslicer = reslicer;
+	}
+
 	m_TimeStep = 0;
 	m_Reslicer->ReleaseDataFlagOn();
 	m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
 	m_ResliceTransform = NULL;
 	m_InPlaneResampleExtentByGeometry = false;
 	m_OutPutSpacing = new mitk::ScalarType[2];
+	m_OutputDimension = 2;
+	m_ZSpacing = 1.0;
+	m_ZMin = 0;
+	m_ZMax = 0;
+	m_VtkOutputRequested = false;
+	
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -292,7 +306,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 
 	//we only have one slice, not a volume
-	m_Reslicer->SetOutputDimensionality(2);
+	m_Reslicer->SetOutputDimensionality(m_OutputDimension);
 
 
 	//set the interpolation mode for slicing
@@ -338,13 +352,13 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		yMax = static_cast< int >( extent[1]);
 	}
 	
-	m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, 0, 0 );
+	m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
 	/*========== END setup extent of the slice ==========*/
 
 	
 	m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
 
-	m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], 1.0 );
+	m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], m_ZSpacing );
 	
 
 	//start the pipeline
@@ -353,53 +367,59 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 /*================ #END setup vtkImageRslice properties================*/
 
-
-
-/*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
-	vtkImageData* reslicedImage;
-	reslicedImage = m_Reslicer->GetOutput();
-
-
-
-	if(!reslicedImage)
-	{
-		itkWarningMacro(<<"Reslicer returned empty image");
+	if(m_VtkOutputRequested){
 		return;
+		//no converting to mitk
+		//no mitk geometry will be set, as the output is vtkImageData only!!!
 	}
+	else
+	{
+		/*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
+		vtkImageData* reslicedImage;
+		reslicedImage = m_Reslicer->GetOutput();
 
 
-	mitk::Image::Pointer resultImage = this->GetOutput();
 
-	//initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
-	resultImage->Initialize(reslicedImage);
-
-	//transfer the voxel data
-	resultImage->SetVolume(reslicedImage->GetScalarPointer());	
-
-
-	//set the geometry from current worldgeometry for the reusultimage
-	//this is needed that the image has the correct mitk geometry
-	//the originalGeometry is the Geometry of the result slice
-	AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
-	Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
-	
-	//the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
-	Point3D sliceOrigin = originalGeometry->GetOrigin();
-
-	sliceOrigin += right * ( m_OutPutSpacing[0] * 0.5 );
-	sliceOrigin += bottom * ( m_OutPutSpacing[1] * 0.5 );
-
-	//a worldGeometry is no imageGeometry, thus it is manually set to true
-	originalGeometry->ImageGeometryOn();
-	originalGeometry->SetOrigin(sliceOrigin);
+		if(!reslicedImage)
+		{
+			itkWarningMacro(<<"Reslicer returned empty image");
+			return;
+		}
 
 
-    resultImage->SetGeometry( originalGeometry );
+		mitk::Image::Pointer resultImage = this->GetOutput();
 
-	//resultImage->GetGeometry()->TransferItkToVtkTransform();
-	resultImage->GetGeometry()->Modified();
-	
-/*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
+		//initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
+		resultImage->Initialize(reslicedImage);
+
+		//transfer the voxel data
+		resultImage->SetVolume(reslicedImage->GetScalarPointer());	
+
+
+		//set the geometry from current worldgeometry for the reusultimage
+		//this is needed that the image has the correct mitk geometry
+		//the originalGeometry is the Geometry of the result slice
+		AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
+		Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
+
+		//the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
+		Point3D sliceOrigin = originalGeometry->GetOrigin();
+
+		sliceOrigin += right * ( m_OutPutSpacing[0] * 0.5 );
+		sliceOrigin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+
+		//a worldGeometry is no imageGeometry, thus it is manually set to true
+		originalGeometry->ImageGeometryOn();
+		originalGeometry->SetOrigin(sliceOrigin);
+
+
+		resultImage->SetGeometry( originalGeometry );
+
+		//resultImage->GetGeometry()->TransferItkToVtkTransform();
+		resultImage->GetGeometry()->Modified();
+
+		/*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
+	}
 }
 
 

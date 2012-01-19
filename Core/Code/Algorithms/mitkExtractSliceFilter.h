@@ -66,18 +66,7 @@ namespace mitk
 		mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
 		itkNewMacro(ExtractSliceFilter);
 
-		static Pointer New(vtkImageReslice* reslice){
-			Pointer smartPointer= ::itk::ObjectFactory<ExtractSliceFilter>::Create();
-
-			if(smartPointer.GetPointer() == NULL)
-				smartPointer = new ExtractSliceFilter;
-
-			smartPointer->UnRegister();
-
-			smartPointer->m_Reslicer = reslice;
-
-			return smartPointer;
-		}
+		mitkNewMacro1Param(Self, vtkImageReslice*);
 		
 		/** \brief Set the axis where to reslice at.*/
 		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }
@@ -96,11 +85,27 @@ namespace mitk
 		/** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
 		void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
 
+		/** \brief Sets the output dimension of the slice*/
+		void SetOutputDimensionality(unsigned int dimension){ this->m_OutputDimension = dimension; }
+
+		/** \brief Set the spacing in z direction manually.
+			Required if the outputDimension is > 2.
+		*/
+		void SetOutputSpacingZDirection(double zSpacing){ this->m_ZSpacing = zSpacing; }
+
+		/** \brief Set the extent in pixel for direction z manualy.
+			Required if the output dimension is > 2.
+		*/
+		void SetOutputExtentZDirection(int zMin, int zMax) { this->m_ZMin = zMin; this->m_ZMax = zMax; }
+
 		/** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
 		bool GetBounds(double bounds[6]);
 
 		/** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
 		mitk::ScalarType* GetOutputSpacing();
+
+		/** \brief Get Output as vtkImageData. */
+		vtkImageData* GetVtkOutput(){ return m_Reslicer->GetOutput(); m_VtkOutputRequested = true;}
 
 		/** \brief Get the reslices axis matrix.
 			Note: the axis are recalculated when calling SetResliceTransformByGeometry.
@@ -114,7 +119,7 @@ namespace mitk
 		void SetInterPolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->m_InterpolationMode = interpolation; }
 
 	protected:
-		ExtractSliceFilter();
+		ExtractSliceFilter(vtkImageReslice* reslicer = NULL);
 		virtual ~ExtractSliceFilter();
 
 		virtual void GenerateData();
@@ -127,6 +132,14 @@ namespace mitk
 
 		unsigned int m_TimeStep;
 
+		unsigned int m_OutputDimension;
+
+		double m_ZSpacing;
+
+		int m_ZMin;
+
+		int m_ZMax;
+
 		ResliceInterpolation m_InterpolationMode;
 
 		const Geometry3D* m_ResliceTransform;
@@ -134,6 +147,9 @@ namespace mitk
 		bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 
 		mitk::ScalarType* m_OutPutSpacing;
+
+		
+		bool m_VtkOutputRequested;
 
 		bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 		bool LineIntersectZero( vtkPoints *points, int p1, int p2, vtkFloatingPointType *bounds );

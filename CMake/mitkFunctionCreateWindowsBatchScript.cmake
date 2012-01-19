@@ -19,7 +19,7 @@ function(mitkFunctionCreateWindowsBatchScript in out build_type)
   endif()
   
   set(VS_BUILD_TYPE ${build_type})
+  string(REPLACE "%VS_BUILD_TYPE%" "${VS_BUILD_TYPE}" MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH}")
   configure_file(${in} ${out} @ONLY)
-  # substitute again
-  configure_file(${out} ${out} @ONLY)
+
 endfunction()

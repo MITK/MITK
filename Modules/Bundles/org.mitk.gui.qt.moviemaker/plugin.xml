@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?BlueBerry version="0.1"?>
 <plugin>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.moviemaker"
-          name="MovieMaker"
+          name="Movie Maker"
           class="QmitkMovieMaker"
           icon="resources/icon.xpm" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.screenshotmaker"
+          name="Screenshot Maker"
+          class="QmitkScreenshotMaker"
+          icon="resources/screenshot_maker.png" />
   </extension>
 
 </plugin>

@@ -15,28 +15,12 @@
 
  =========================================================================*/
 
+
 #include "QmitkMovieMaker.h"
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkCommonFunctionality.h"
-/*=========================================================================
-
- Program:   Medical Imaging & Interaction Toolkit
- Language:  C++
- Date:      $Date$
- Version:   $Revision: 16947 $
-
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
-
- =========================================================================*/
-
 #include "QmitkMovieMaker.h"
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
@@ -197,7 +181,10 @@ void QmitkMovieMaker::CreateConnections()
 
     // allow for change of spatialtime relation
     connect((QObject*) m_Controls->spatialTimeRelation, SIGNAL(valueChanged ( int ) ), this, SLOT( DeleteMStepper() ) );
-    
+
+
+    m_Controls->btnScreenshot->setVisible(false);
+    m_Controls->m_HRScreenshot->setVisible(false);
   }
 }
 
@@ -451,7 +438,7 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
     return this->GetTemporalController()->GetTime();
   }
   else if (m_Aspect == 2)
-  {   
+  {
     if (m_Stepper.IsNull())
     {
       int rel = m_Controls->spatialTimeRelation->value();
@@ -520,7 +507,7 @@ void QmitkMovieMaker::GenerateScreenshot()
   emit StartBlockControls();
 
   QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
-  
+
   vtkRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetVtkRenderer();
   if (renderer == NULL)
     return;
@@ -537,7 +524,7 @@ void QmitkMovieMaker::GenerateHR3DScreenshot()
   emit StartBlockControls();
 
   QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
-  
+
   // only works correctly for 3D RenderWindow
   vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
   if (renderer == NULL)
@@ -591,10 +578,32 @@ void QmitkMovieMaker::CreateQtPartControl(QWidget *parent)
     unsigned int i = 0;
     for (iter = rwv.begin(); iter != rwv.end(); ++iter)
     {
-      m_Controls->cmbSelectedStepperWindow->insertItem(i,
-          mitk::BaseRenderer::GetInstance((*iter))->GetName());
-      m_Controls->cmbSelectedRecordingWindow->insertItem(i++, mitk::BaseRenderer::GetInstance(
-          (*iter))->GetName());
+      QString name(mitk::BaseRenderer::GetInstance((*iter))->GetName());
+      if (name=="stdmulti.widget1")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Transversal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Transversal");
+      }
+      else if (name=="stdmulti.widget2")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Sagittal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Sagittal");
+      }
+      else if (name=="stdmulti.widget3")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Coronal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Coronal");
+      }
+      else if (name=="stdmulti.widget4")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "3D Window");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "3D Window");
+      }
+      else
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, name);
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, name);
+      }
     }
 
     m_Controls->btnPause->setHidden(true);
@@ -724,7 +733,7 @@ void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnifi
   fileWriter->SetInput(magnifier->GetOutput());
   fileWriter->SetFileName(fileName.toLatin1());
 
-  // vtkRenderLargeImage has problems with different layers, therefore we have to 
+  // vtkRenderLargeImage has problems with different layers, therefore we have to
   // temporarily deactivate all other layers.
   // we set the background to white, because it is nicer than black...
   double oldBackground[3];
@@ -752,7 +761,7 @@ void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnifi
   m_MultiWidget->EnableDepartmentLogo();
   m_MultiWidget->EnableGradientBackground();
   renderer->SetBackground(oldBackground);
-  
+
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }
 

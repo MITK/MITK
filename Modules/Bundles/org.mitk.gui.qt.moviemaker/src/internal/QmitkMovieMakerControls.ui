@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
+    <width>423</width>
     <height>665</height>
    </rect>
   </property>
@@ -129,12 +129,15 @@
           <property name="font">
            <font/>
           </property>
+          <property name="toolTip">
+           <string>Start stepper</string>
+          </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../../resources/QmitkMovieMaker.qrc">
-            <normaloff>:/QmitkMovieMakerView/play.xpm</normaloff>:/QmitkMovieMakerView/play.xpm</iconset>
+           <iconset resource="../../../../../../../mitkBinaryCTK/MITK-superbuild/MITK-build/Modules/Bundles/org.mitk.gui.qt.moviemaker/org_mitk_gui_qt_moviemaker_cached.qrc">
+            <normaloff>:/org.mitk.gui.qt.moviemaker/resources/play.xpm</normaloff>:/org.mitk.gui.qt.moviemaker/resources/play.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -149,12 +152,15 @@
           <property name="font">
            <font/>
           </property>
+          <property name="toolTip">
+           <string>Pause stepper</string>
+          </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../../resources/QmitkMovieMaker.qrc">
-            <normaloff>:/QmitkMovieMakerView/pause.xpm</normaloff>:/QmitkMovieMakerView/pause.xpm</iconset>
+           <iconset resource="../../../../../../../mitkBinaryCTK/MITK-superbuild/MITK-build/Modules/Bundles/org.mitk.gui.qt.moviemaker/org_mitk_gui_qt_moviemaker_cached.qrc">
+            <normaloff>:/org.mitk.gui.qt.moviemaker/resources/pause.xpm</normaloff>:/org.mitk.gui.qt.moviemaker/resources/pause.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -169,12 +175,15 @@
           <property name="font">
            <font/>
           </property>
+          <property name="toolTip">
+           <string>Stop stepper</string>
+          </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../../resources/QmitkMovieMaker.qrc">
-            <normaloff>:/QmitkMovieMakerView/stop.xpm</normaloff>:/QmitkMovieMakerView/stop.xpm</iconset>
+           <iconset resource="../../../../../../../mitkBinaryCTK/MITK-superbuild/MITK-build/Modules/Bundles/org.mitk.gui.qt.moviemaker/org_mitk_gui_qt_moviemaker_cached.qrc">
+            <normaloff>:/org.mitk.gui.qt.moviemaker/resources/stop.xpm</normaloff>:/org.mitk.gui.qt.moviemaker/resources/stop.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -439,8 +448,7 @@
   <tabstop>cmbSelectedStepperWindow</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/QmitkMovieMaker.qrc"/>
-  <include location="../../resources/QmitkMovieMaker.qrc"/>
+  <include location="../../../../../../../mitkBinaryCTK/MITK-superbuild/MITK-build/Modules/Bundles/org.mitk.gui.qt.moviemaker/org_mitk_gui_qt_moviemaker_cached.qrc"/>
  </resources>
  <connections/>
 </ui>

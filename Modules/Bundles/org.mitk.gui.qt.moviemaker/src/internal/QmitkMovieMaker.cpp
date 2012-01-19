@@ -578,10 +578,32 @@ void QmitkMovieMaker::CreateQtPartControl(QWidget *parent)
     unsigned int i = 0;
     for (iter = rwv.begin(); iter != rwv.end(); ++iter)
     {
-      m_Controls->cmbSelectedStepperWindow->insertItem(i,
-          mitk::BaseRenderer::GetInstance((*iter))->GetName());
-      m_Controls->cmbSelectedRecordingWindow->insertItem(i++, mitk::BaseRenderer::GetInstance(
-          (*iter))->GetName());
+      QString name(mitk::BaseRenderer::GetInstance((*iter))->GetName());
+      if (name=="stdmulti.widget1")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Transversal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Transversal");
+      }
+      else if (name=="stdmulti.widget2")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Sagittal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Sagittal");
+      }
+      else if (name=="stdmulti.widget3")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Coronal");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Coronal");
+      }
+      else if (name=="stdmulti.widget4")
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "3D Window");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "3D Window");
+      }
+      else
+      {
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, name);
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, name);
+      }
     }
 
     m_Controls->btnPause->setHidden(true);

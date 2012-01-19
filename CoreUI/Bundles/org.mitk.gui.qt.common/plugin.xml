@@ -8,9 +8,23 @@
       class="QmitkStdMultiWidgetEditor">
     </editor>
   </extension>
+
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.StdMultiWidgetEditorPreferencePage" name="StdMultiWidgetEditor" class="QmitkStdMultiWidgetEditorPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.application.StdMultiWidgetEditorPreferencePageKeywords"></keywordreference>
-    </page>    	
+    <page id="org.mitk.GeneralPreferencePage" name="General" class="QmitkGeneralPreferencePage"/>
+    <page id="org.mitk.EditorsPreferencePage" name="Editors" class="QmitkEditorsPreferencePage"/>
+
+    <page id="org.mitk.StdMultiWidgetEditorPreferencePage" name="Standard Multi Widget"
+      class="QmitkStdMultiWidgetEditorPreferencePage" category="org.mitk.EditorsPreferencePage">
+      <keywordreference id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="padding"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="level window"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="PACS"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="mouse"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="background"/>
   </extension>
 </plugin>

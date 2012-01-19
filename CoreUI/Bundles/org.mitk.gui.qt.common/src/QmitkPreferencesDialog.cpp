@@ -93,9 +93,12 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
           if(keywordId == keywordRefId) // if referenced id is equals the current keyword id
           {
             //# collect all keywords from label attribute with a tokenizer
-            (*keywordExtsIt)->GetAttribute("label", keywordLabels);
+            std::string currLabel;
+            (*keywordExtsIt)->GetAttribute("label", currLabel);
+            std::transform(currLabel.begin(), currLabel.end(), currLabel.begin(), ::tolower);
+            if (!currLabel.empty()) keywordLabels += std::string(" ") + currLabel;
 
-            break; // break here; possibly search for other referenced keywords
+            //break; // break here; possibly search for other referenced keywords
           }
         }
       }
@@ -433,12 +436,12 @@ void QmitkPreferencesDialog::UpdateTree()
     return;
 
   //m_PreferencesTree->clear();
-  string keyword = m_Keyword->text().toStdString();
+  string keyword = m_Keyword->text().toLower().toStdString();
 
   map<std::string, QTreeWidgetItem*> items;
 
   for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-  it != m_PrefPages.end(); ++it)
+      it != m_PrefPages.end(); ++it)
   {
     if(it->treeWidgetItem == 0)
     {

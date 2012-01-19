@@ -59,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CREATE_VOLUME
 //#define SAVE_VOLUME
 //#define CALC_TESTFAILURE_DEVIATION
-#define SHOW_SLICE_IN_RENDER_WINDOW
+//#define SHOW_SLICE_IN_RENDER_WINDOW
 //#define EXTRACTOR_DEBUG
 
 

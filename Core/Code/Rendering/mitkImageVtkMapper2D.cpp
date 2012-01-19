@@ -297,7 +297,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_Reslicer->Modified();
     //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
     localStorage->m_Reslicer->UpdateLargestPossibleRegion();
-    localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
+	localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
   }
 
 

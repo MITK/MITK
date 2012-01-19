@@ -19,8 +19,8 @@
 
 #include <QmitkExtRegisterClasses.h>
 
-#include "../QmitkExtPreferencePage.h"
-#include "../QmitkInputDevicesPrefPage.h"
+#include "QmitkAppInstancesPreferencePage.h"
+#include "QmitkInputDevicesPrefPage.h"
 
 #include "QmitkModuleView.h"
 
@@ -34,7 +34,7 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   QmitkExtRegisterClasses();
   
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkExtPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkInputDevicesPrefPage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)

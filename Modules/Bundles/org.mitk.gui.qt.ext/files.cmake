@@ -1,7 +1,5 @@
 SET(SRC_CPP_FILES
   QmitkCommonWorkbenchWindowAdvisor.cpp
-  QmitkExtPreferencePage.cpp
-  QmitkInputDevicesPrefPage.cpp
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileOpenAction.cpp
@@ -10,24 +8,27 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  QmitkAppInstancesPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
+  QmitkInputDevicesPrefPage.cpp
   QmitkModuleView.cpp
 )
 
 SET(UI_FILES
-
+  src/internal/QmitkAppInstancesPreferencePage.ui
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkCommonExtPlugin.h
-  src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
-  src/internal/QmitkModuleView.h
   src/QmitkExtFileOpenAction.h
   src/QmitkExtFileSaveProjectAction.h
   src/QmitkExtDnDFrameWidget.h
-  src/QmitkExtPreferencePage.h
   src/QmitkExtWorkbenchWindowAdvisor.h
-  src/QmitkInputDevicesPrefPage.h
+  
+  src/internal/QmitkAppInstancesPreferencePage.h
+  src/internal/QmitkCommonExtPlugin.h
+  src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
+  src/internal/QmitkInputDevicesPrefPage.h
+  src/internal/QmitkModuleView.h
 )
 
 SET(CACHED_RESOURCE_FILES

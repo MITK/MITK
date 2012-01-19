@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
+
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.ext.ExtPreferencePage" name="ExtPreferences" class="QmitkExtPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.ext.ExtPreferencePageKeywords"></keywordreference>
+    <page id="org.mitk.InputDevicesPreferencePage" name="Input Devices" class="QmitkInputDevicesPrefPage">
+      <keywordreference id="org.mitk.InputDevicesPreferencePageKeywords"/>
     </page>
-    <page id="org.mitk.gui.qt.ext.InputDevicesPrefPage" name="InputDevices" class="QmitkInputDevicesPrefPage" category="org.mitk.gui.qt.ext.ExtPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.ext.InputDevicesPrefPage"></keywordreference>
+    <page id="org.mitk.AppInstancesPreferencePage" name="Application Instances"
+          class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
+      <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
     </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.ext.ExtPreferencePageKeywords" label="3D mouse"></keyword>
-    <keyword id="org.mitk.gui.qt.ext.ExtPreferencePageKeywords" label="WiiMote"></keyword>
-    <keyword id="org.mitk.gui.qt.ext.ExtPreferencePageKeywords" label="Input Devices"></keyword>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
+    
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances"/>
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene"/>
   </extension>
 
   <extension point="org.blueberry.ui.views">

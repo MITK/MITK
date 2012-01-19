@@ -1206,14 +1206,14 @@ mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
 //## \brief Get the maximum for scalar images
 mitk::ScalarType mitk::Image::GetScalarValueMax(int t) const
 {
-  return m_ImageStatistics->GetScalarValueMin(t);
+  return m_ImageStatistics->GetScalarValueMax(t);
 }
 
 //##Documentation
 //## \brief Get the second smallest value for scalar images
 mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t) const
 {
-  return m_ImageStatistics->GetScalarValueMin(t);
+  return m_ImageStatistics->GetScalarValue2ndMin(t);
 }
 
 mitk::ScalarType mitk::Image::GetScalarValueMinNoRecompute( unsigned int t ) const
@@ -1228,7 +1228,7 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute( unsigned int t ) 
 
 mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
 {
-  return m_ImageStatistics->GetScalarValueMin(t);
+  return m_ImageStatistics->GetScalarValue2ndMax(t);
 }
 
 mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute( unsigned int t) const

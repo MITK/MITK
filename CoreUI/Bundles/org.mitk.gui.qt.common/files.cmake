@@ -36,7 +36,7 @@ SET(MOC_H_FILES
 )
 
 SET(UI_FILES
-
+  src/QmitkPreferencesDialog.ui
 )
 
 SET(CACHED_RESOURCE_FILES

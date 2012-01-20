@@ -105,7 +105,7 @@ namespace mitk
 		mitk::ScalarType* GetOutputSpacing();
 
 		/** \brief Get Output as vtkImageData. */
-		vtkImageData* GetVtkOutput(){ return m_Reslicer->GetOutput(); m_VtkOutputRequested = true;}
+		vtkImageData* GetVtkOutput(){ m_VtkOutputRequested = true; return m_Reslicer->GetOutput(); }
 
 		/** \brief Get the reslices axis matrix.
 			Note: the axis are recalculated when calling SetResliceTransformByGeometry.

@@ -16,23 +16,17 @@
 #include "QmitkPreferencesDialog.h"
 
 #include "berryPlatform.h"
-#include "berryIPreferencePage.h"
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionPointService.h"
 #include "berryIExtension.h"
+#include <berryIBerryPreferencesService.h>
+#include <berryIQtPreferencePage.h>
 
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QTreeWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QSplitter>
-#include <QEvent>
-#include <QTreeWidgetItem>
-#include <QIcon>
-#include <QStackedWidget>
+#include <ui_QmitkPreferencesDialog.h>
+
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include <algorithm>
 
@@ -40,186 +34,140 @@
 
 using namespace std;
 
-QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
-  : QDialog(parent, f), m_CurrentPage(0)
+class QmitkPreferencesDialogPrivate : public Ui::QmitkPreferencesDialog
 {
-  // m_PreferencesService
-  m_PreferencesService = 
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+public:
 
-  // m_PrefPages
-  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
-  berry::IConfigurationElement::vector prefPages(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.preferencePages"));
-  berry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));      
-  berry::IConfigurationElement::vector::iterator prefPagesIt;
-  std::string id;
-  std::string name;
-  std::string category;
-  std::string className;
-  std::vector<std::string> keywords;
-  vector<berry::IConfigurationElement::Pointer> keywordRefs;
-  berry::IConfigurationElement::vector::iterator keywordRefsIt;
-  berry::IConfigurationElement::vector::iterator keywordExtsIt;
-  string keywordRefId;
-  string keywordId;
-  string keywordLabels;
-
-  for (prefPagesIt = prefPages.begin(); prefPagesIt != prefPages.end(); ++prefPagesIt)
+  ///
+  /// Just a stub class for holding information on prefpages (metadata)
+  ///
+  struct PrefPage
   {
-    keywords.clear();
-    id.clear();
-    name.clear();
-    className.clear();
-    category.clear();
-    keywordRefId.clear();
-    keywordId.clear();
-    keywordLabels.clear();
+    PrefPage(std::string _id, std::string _name, std::string _category
+      , std::string _className, std::string _keywords, berry::IConfigurationElement::Pointer _confElem)
+      : id(_id), name(_name), category(_category), className(_className), keywords(_keywords),
+        prefPage(0), confElem(_confElem), treeWidgetItem(0)
+    {}
 
-    if((*prefPagesIt)->GetAttribute("id", id)
-      && (*prefPagesIt)->GetAttribute("name", name)
-      && (*prefPagesIt)->GetAttribute("class", className))
+    bool operator==(const PrefPage& other)
+    { return id == other.id; }
+
+    bool operator<(const PrefPage& other)
+    { return name < other.name; }
+
+    std::string id;
+    std::string name;
+    std::string category;
+    std::string className;
+    std::string keywords;
+    berry::IQtPreferencePage* prefPage;
+    berry::IConfigurationElement::Pointer confElem;
+    QTreeWidgetItem* treeWidgetItem;
+  };
+
+  QmitkPreferencesDialogPrivate()
+    : m_CurrentPage(0)
+  {
+    // m_PreferencesService
+    m_PreferencesService =
+      berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+
+    // m_PrefPages
+    berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+    berry::IConfigurationElement::vector prefPages(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.preferencePages"));
+    berry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));
+    berry::IConfigurationElement::vector::iterator prefPagesIt;
+    std::string id;
+    std::string name;
+    std::string category;
+    std::string className;
+    std::vector<std::string> keywords;
+    vector<berry::IConfigurationElement::Pointer> keywordRefs;
+    berry::IConfigurationElement::vector::iterator keywordRefsIt;
+    berry::IConfigurationElement::vector::iterator keywordExtsIt;
+    string keywordRefId;
+    string keywordId;
+    string keywordLabels;
+
+    for (prefPagesIt = prefPages.begin(); prefPagesIt != prefPages.end(); ++prefPagesIt)
     {
-      (*prefPagesIt)->GetAttribute("category", category);
-      //# collect keywords
-      keywordRefs = (*prefPagesIt)->GetChildren("keywordreference"); // get all keyword references
-      for (keywordRefsIt = keywordRefs.begin()
-        ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+      keywords.clear();
+      id.clear();
+      name.clear();
+      className.clear();
+      category.clear();
+      keywordRefId.clear();
+      keywordId.clear();
+      keywordLabels.clear();
+
+      if((*prefPagesIt)->GetAttribute("id", id)
+        && (*prefPagesIt)->GetAttribute("name", name)
+        && (*prefPagesIt)->GetAttribute("class", className))
       {
-        (*keywordRefsIt)->GetAttribute("id", keywordRefId); // get referenced id
-
-        for (keywordExtsIt = keywordExts.begin(); keywordExtsIt != keywordExts.end(); ++keywordExtsIt) // iterate over all keywords
+        (*prefPagesIt)->GetAttribute("category", category);
+        //# collect keywords
+        keywordRefs = (*prefPagesIt)->GetChildren("keywordreference"); // get all keyword references
+        for (keywordRefsIt = keywordRefs.begin()
+          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
         {
-          (*keywordExtsIt)->GetAttribute("id", keywordId); // get keyword id
-          if(keywordId == keywordRefId) // if referenced id is equals the current keyword id
-          {
-            //# collect all keywords from label attribute with a tokenizer
-            std::string currLabel;
-            (*keywordExtsIt)->GetAttribute("label", currLabel);
-            std::transform(currLabel.begin(), currLabel.end(), currLabel.begin(), ::tolower);
-            if (!currLabel.empty()) keywordLabels += std::string(" ") + currLabel;
+          (*keywordRefsIt)->GetAttribute("id", keywordRefId); // get referenced id
 
-            //break; // break here; possibly search for other referenced keywords
+          for (keywordExtsIt = keywordExts.begin(); keywordExtsIt != keywordExts.end(); ++keywordExtsIt) // iterate over all keywords
+          {
+            (*keywordExtsIt)->GetAttribute("id", keywordId); // get keyword id
+            if(keywordId == keywordRefId) // if referenced id is equals the current keyword id
+            {
+              //# collect all keywords from label attribute with a tokenizer
+              std::string currLabel;
+              (*keywordExtsIt)->GetAttribute("label", currLabel);
+              std::transform(currLabel.begin(), currLabel.end(), currLabel.begin(), ::tolower);
+              if (!currLabel.empty()) keywordLabels += std::string(" ") + currLabel;
+
+              //break; // break here; possibly search for other referenced keywords
+            }
           }
         }
+
+        // add information as PrefPage
+        m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt)));
       }
 
-      // add information as PrefPage
-      m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt)));
     }
-    
   }
 
-  //#QWidget
+  ///
+  /// The Preferences Service to retrieve and store preferences.
+  ///
+  berry::IPreferencesService::WeakPtr m_PreferencesService;
 
-  //# m_Keyword
-  m_Keyword = new QLineEdit("");
-  //m_Keyword->installEventFilter(this);
-  QObject::connect(m_Keyword, SIGNAL(editingFinished()), this, SLOT(OnKeywordEditingFinished()));
-  QObject::connect(m_Keyword, SIGNAL(textChanged ( const QString & )), this, SLOT(OnKeywordTextChanged(const QString &)));
+  ///
+  /// Saves all treewidgetitems in a map, the key is the id of the preferencepage.
+  ///
+  std::vector<PrefPage> m_PrefPages;
+  std::size_t m_CurrentPage;
+};
 
-  //# m_PreferencesTree
-  m_PreferencesTree = new QTreeWidget;
-  m_PreferencesTree->setHeaderHidden(true);
-  QObject::connect(m_PreferencesTree, SIGNAL(itemSelectionChanged()), this, SLOT(OnPreferencesTreeItemSelectionChanged()));
+QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
+  : QDialog(parent, f), d(new QmitkPreferencesDialogPrivate)
+{
+  d->setupUi(this);
 
-  //# m_LeftLayout
-  m_LeftLayout = new QGridLayout;
-  m_LeftLayout->setContentsMargins(0,0,0,0);
-  m_LeftLayout->setSpacing(0);
-  m_LeftLayout->addWidget(m_Keyword, 0, 0);
-  m_LeftLayout->addWidget(m_PreferencesTree, 1, 0);
+  QObject::connect(d->m_Keyword, SIGNAL(editingFinished()), this, SLOT(OnKeywordEditingFinished()));
+  QObject::connect(d->m_Keyword, SIGNAL(textChanged(QString)), this, SLOT(OnKeywordTextChanged(QString)));
 
-  //# m_LeftPanel
-  m_LeftPanel = new QWidget;
-  m_LeftPanel->setLayout(m_LeftLayout);
+  QObject::connect(d->m_PreferencesTree, SIGNAL(itemSelectionChanged()), this, SLOT(OnPreferencesTreeItemSelectionChanged()));
 
-  //# m_Headline
-  m_Headline = new QLabel("");
-  m_Headline->setStyleSheet("background-color:   silver; "
-    "border-style: solid; border-width: 1px;"
-    "border-color: white; font: bold 13px; color: white;");
+  QPushButton* importButton = d->buttonBox->addButton("Import...", QDialogButtonBox::ActionRole);
+  QObject::connect(importButton, SIGNAL(clicked()), this, SLOT(OnImportButtonClicked()));
 
-  //# m_PreferencesPanel
-  m_PreferencesPanel = new QStackedWidget;
+  QPushButton* exportButton = d->buttonBox->addButton("Export...", QDialogButtonBox::ActionRole);
+  QObject::connect(exportButton, SIGNAL(clicked()), this, SLOT(OnExportButtonClicked()));
 
-  //# m_RightLayout
-  m_RightLayout = new QGridLayout;
-  m_RightLayout->setRowStretch(0, 1);
-  m_RightLayout->setRowStretch(1, 20);
-  m_RightLayout->setContentsMargins(0,0,0,0);
-  m_RightLayout->setSpacing(0);
-  m_RightLayout->addWidget(m_Headline, 0, 0);
-  m_RightLayout->addWidget(m_PreferencesPanel, 1, 0);
+  QObject::connect(this, SIGNAL(accepted()), this, SLOT(OnDialogAccepted()));
+  QObject::connect(this, SIGNAL(rejected()), this, SLOT(OnDialogRejected()));
 
-  //# m_RightPanel
-  m_RightPanel = new QWidget;
-  m_RightPanel->setLayout(m_RightLayout);
+  d->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
 
-  //# m_Splitter
-  m_Splitter = new QSplitter(Qt::Horizontal);
-  m_Splitter->setContentsMargins(0,0,0,0);
-  //m_Splitter->setFrameStyle(QFrame::Plain | QFrame::Sunken);
-  m_Splitter->setLineWidth(2);
-  m_Splitter->addWidget(m_LeftPanel);
-  m_Splitter->addWidget(m_RightPanel);
-  //QList<int> sizes; sizes.push_back(this->width()*(1/3)); sizes.push_back(this->width()*(2/3));
-  //m_Splitter->setSizes(sizes);
-  m_Splitter->setStretchFactor(0,0);
-  m_Splitter->setStretchFactor(1,2);
-
-  //# m_ImportButton
-  m_ImportButton = new QPushButton(QString(tr("Import ...")));
-  QObject::connect(m_ImportButton, SIGNAL(clicked(bool)), this, SLOT(OnImportButtonClicked(bool)));
-  m_ImportButton->setIcon(QIcon(":/org.mitk.gui.qt.common/edit-redo.png"));
-  m_ImportButton->setFlat(true);
-  m_ImportButton->setDefault(false);
-
-  //# m_ExportButton
-  m_ExportButton = new QPushButton(QString(tr("Export ...")), this);
-  QObject::connect(m_ExportButton, SIGNAL(clicked(bool)), this, SLOT(OnExportButtonClicked(bool)));
-  m_ExportButton->setIcon(QIcon(":/org.mitk.gui.qt.common/edit-undo.png"));
-  m_ExportButton->setFlat(true);
-  m_ExportButton->setDefault(false);
-
-  //# m_ApplyButton
-  m_ApplyButton = new QPushButton(QString(tr("OK")), this);
-  QObject::connect(m_ApplyButton, SIGNAL(clicked(bool)), this, SLOT(OnApplyButtonClicked(bool)));
-  m_ApplyButton->setIcon(QIcon(":/org.mitk.gui.qt.common/document-save.png"));
-  m_ApplyButton->setFlat(true);
-  m_ApplyButton->setDefault(false);
-
-  //# m_CloseButton
-  m_CloseButton = new QPushButton(QString(tr("Close")), this);
-  QObject::connect(m_CloseButton, SIGNAL(clicked(bool)), this, SLOT(OnCloseButtonClicked(bool)));
-  m_CloseButton->setIcon(QIcon(":/org.mitk.gui.qt.common/system-log-out.png"));
-  m_CloseButton->setFlat(true);
-  m_CloseButton->setDefault(true);
-  m_CloseButton->setFocus();
-
-  //# m_Layout
-  m_Layout = new QGridLayout;
-  //m_Layout->setContentsMargins(0,0,0,0);
-  //m_Layout->setSpacing(2);
-  //m_Layout->setRowStretch(0, 20);
-  //m_Layout->setRowStretch(1, 1);
-  m_Layout->addWidget(m_Splitter, 0, 0, 1, 4);
-  m_Layout->addWidget(m_ImportButton, 2, 0);
-  m_Layout->addWidget(m_ExportButton, 2, 1);
-  m_Layout->addWidget(m_ApplyButton, 2, 2);
-  m_Layout->addWidget(m_CloseButton, 2, 3);
-
-  // this
-  this->setModal(true);
-  this->setSizeGripEnabled(true);
-  this->setWhatsThis("Dialog to set application wide preferences");
-  this->setWindowIcon(QIcon(":/org.mitk.gui.qt.common/preferences-system.png"));
-  QRect parentGeometry = parent->geometry();
-  int w = parentGeometry.width()/2; int h = parentGeometry.height()/2;
-  int x = parentGeometry.x()+(parentGeometry.width()-w)/2; 
-  int y = parentGeometry.y()+(parentGeometry.height()-h)/2;
-  this->setGeometry(x,y,w,h);
-  this->setWindowTitle("Preferences");
-  this->setLayout(m_Layout);
   this->UpdateTree();
 }
 
@@ -229,17 +177,17 @@ QmitkPreferencesDialog::~QmitkPreferencesDialog()
 
 void QmitkPreferencesDialog::SetSelectedPage(const std::string& id)
 {
-  for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it)
+  for(vector<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
   {
     if(it->id == id)
     {
-      m_PreferencesTree->setCurrentItem(it->treeWidgetItem);
+      d->m_PreferencesTree->setCurrentItem(it->treeWidgetItem);
       break;
     }
   }
 }
 
-void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
+void QmitkPreferencesDialog::OnImportButtonClicked()
 {  
   int answer = QMessageBox::question(this, "Importing Preferences"
     , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
@@ -248,7 +196,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
 
   try
   { 
-    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+    berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
       berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
@@ -263,7 +211,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
           importDir = QFileInfo(fileName).absoluteDir().path();
           Poco::File f(fileName.toLocal8Bit().data());
           berryPrefService->ImportPreferences(f, "");
-          berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
+          berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
           if(prefPage)
             prefPage->Update();
 
@@ -284,11 +232,11 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
   }
 }
 
-void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
+void QmitkPreferencesDialog::OnExportButtonClicked()
 {
   try
   { 
-    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+    berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
       berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
@@ -329,7 +277,7 @@ void QmitkPreferencesDialog::SavePreferences()
 {
   berry::IQtPreferencePage* prefPage = 0;
 
-  for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it)
+  for(vector<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
   {
     prefPage = it->prefPage;
     if(prefPage) {
@@ -343,73 +291,69 @@ void QmitkPreferencesDialog::SavePreferences()
    * performed and confirmed.
    *
    */
-  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
   if (prefService)
   {
     prefService->GetSystemPreferences()->Flush();
   }
 }
 
-void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
+void QmitkPreferencesDialog::OnDialogAccepted()
 {  
   this->SavePreferences();
-  this->done(QDialog::Accepted);
 }
 
-void QmitkPreferencesDialog::OnCloseButtonClicked( bool  /*triggered*/ )
+void QmitkPreferencesDialog::OnDialogRejected()
 {
-  berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
+  berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
   if(prefPage)
     prefPage->PerformCancel();
-
-  this->done(QDialog::Accepted);
 }
 
 void QmitkPreferencesDialog::OnKeywordTextChanged(const QString &  /*s*/)
 {
   // search for text
   this->UpdateTree();
-
 }
 
 void QmitkPreferencesDialog::OnKeywordEditingFinished()
 {
 }
 
-bool QmitkPreferencesDialog::eventFilter( QObject *obj, QEvent *event )
-{
-  if(obj == m_Keyword)
-  {
-    if(event->type() == QEvent::FocusIn && m_Keyword->text() == "search ...")
-    {
-      m_Keyword->setText("");
-      m_Keyword->setStyleSheet("color: black;");
-    }
-    else if(event->type() == QEvent::FocusOut && m_Keyword->text() == "")
-    {
-      m_Keyword->setText("search ...");
-      m_Keyword->setStyleSheet("color: gray;");
-    }
-  }
-  return true;
-}
+//bool QmitkPreferencesDialog::eventFilter( QObject *obj, QEvent *event )
+//{
+//  if(obj == d->m_Keyword)
+//  {
+//    if(event->type() == QEvent::FocusIn && d->m_Keyword->text() == "search ...")
+//    {
+//      d->m_Keyword->setText("");
+//      d->m_Keyword->setStyleSheet("color: black;");
+//    }
+//    else if(event->type() == QEvent::FocusOut && d->m_Keyword->text() == "")
+//    {
+//      d->m_Keyword->setText("search ...");
+//      d->m_Keyword->setStyleSheet("color: gray;");
+//    }
+//  }
+//  return true;
+//}
 
 void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 {
-  if(m_PreferencesTree == 0)
+  if(d->m_PreferencesTree == 0)
     return;
 
   // TODO: create page and show it
-  QList<QTreeWidgetItem *> selectedItems = m_PreferencesTree->selectedItems();
+  QList<QTreeWidgetItem *> selectedItems = d->m_PreferencesTree->selectedItems();
   if(selectedItems.size()>0)
   {
 
-    m_CurrentPage = 0;
-    for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it, ++m_CurrentPage)
+    d->m_CurrentPage = 0;
+    for(vector<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it, ++d->m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
       {
-        m_Headline->setText(QString::fromStdString(it->name));
+        d->m_Headline->setText(QString::fromStdString(it->name));
         if(it->prefPage == 0)
         {
           berry::IPreferencePage* page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
@@ -419,10 +363,10 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
             page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class", berry::IPreferencePage::GetManifestName());
           }
           it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(page);
-          it->prefPage->CreateQtControl(m_PreferencesPanel);
-          m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
+          it->prefPage->CreateQtControl(d->m_PreferencesPanel);
+          d->m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }
-        m_PreferencesPanel->setCurrentWidget(it->prefPage->GetQtControl());
+        d->m_PreferencesPanel->setCurrentWidget(it->prefPage->GetQtControl());
         
         break;
       }
@@ -432,23 +376,23 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 
 void QmitkPreferencesDialog::UpdateTree()
 {
-  if(m_PreferencesTree == 0)
+  if(d->m_PreferencesTree == 0)
     return;
 
   //m_PreferencesTree->clear();
-  string keyword = m_Keyword->text().toLower().toStdString();
+  string keyword = d->m_Keyword->text().toLower().toStdString();
 
   map<std::string, QTreeWidgetItem*> items;
 
-  for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-      it != m_PrefPages.end(); ++it)
+  for(vector<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
+      it != d->m_PrefPages.end(); ++it)
   {
     if(it->treeWidgetItem == 0)
     {
 
       if(it->category.empty())
       {
-        it->treeWidgetItem = new QTreeWidgetItem(m_PreferencesTree);
+        it->treeWidgetItem = new QTreeWidgetItem(d->m_PreferencesTree);
       }
       else
       {
@@ -489,35 +433,10 @@ void QmitkPreferencesDialog::UpdateTree()
     }
   }
 
-  if(m_PrefPages.size()>0)
+  if(d->m_PrefPages.size()>0)
   {
-    if(m_PrefPages.front().treeWidgetItem != 0)
-      m_PrefPages.front().treeWidgetItem->setSelected(true);
+    if(d->m_PrefPages.front().treeWidgetItem != 0)
+      d->m_PrefPages.front().treeWidgetItem->setSelected(true);
   }
-
-}
-
-bool QmitkPreferencesDialog::PrefPage::operator==( const PrefPage& other )
-{
-  return id == other.id;
-}
-
-bool QmitkPreferencesDialog::PrefPage::operator<( const PrefPage& other )
-{
-  return name < other.name;
-}
-
-QmitkPreferencesDialog::PrefPage::PrefPage( std::string _id, std::string _name, std::string _category
-                                            , std::string _className, std::string _keywords
-                                            , berry::IConfigurationElement::Pointer _confElem )
-                                              : id(_id)
-                                              , name(_name)
-                                              , category(_category)
-                                              , className(_className)
-                                              , keywords(_keywords)
-                                              , prefPage(0)
-                                              , confElem(_confElem)
-                                              , treeWidgetItem(0)
-{
 
 }

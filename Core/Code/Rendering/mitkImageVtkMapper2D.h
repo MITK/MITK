@@ -64,6 +64,7 @@ namespace mitk {
  * Properties that can be set for images and influence the imageMapper2D are:
  *
  *   - \b "opacity": (FloatProperty) Opacity of the image
+ *   - \b "black opacity": (FloatProperty) The opacity of black (first index in lookup tables)
  *   - \b "color": (ColorProperty) Color of the image
  *   - \b "use color": (BoolProperty) Use the color of the image or not
  *   - \b "binary": (BoolProperty) is the image a binary image or not
@@ -80,6 +81,7 @@ namespace mitk {
  * The default properties are:
 
  *   - \b "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite )
+ *   - \b "black opacity", mitk::FloatProperty::New(0.0f), renderer, overwrite )
  *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
  *   - \b "use color", mitk::BoolProperty::New( true ), renderer, overwrite )
  *   - \b "binary", mitk::BoolProperty::New( true ), renderer, overwrite )

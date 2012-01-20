@@ -469,11 +469,22 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 #include "mitkImageWriter.h"
 #include <itksys/SystemTools.hxx>
 
+void CommonFunctionality::HandleGZExtension(std::string &baseFileName, std::string &extension)
+{
+  if (extension == ".gz")
+  {
+    std::string filenameWithoutGZ = baseFileName;
+    baseFileName = itksys::SystemTools::GetFilenameWithoutLastExtension( filenameWithoutGZ );
+    extension = itksys::SystemTools::GetFilenameLastExtension( filenameWithoutGZ ) + ".gz";
+  }
+}
+
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
 
   std::string fileName;
+
   if(aFileName == NULL || askForDifferentFilename)
   {
     QString initialFilename(aFileName);
@@ -482,27 +493,36 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     QString qfileName = GetSaveFileNameStartingInLastDirectory("Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
     MITK_INFO<<qfileName.toLocal8Bit().constData();
     if (qfileName.isEmpty() )
+    {
       return "";
+    }
     fileName = qfileName.toLocal8Bit().constData();
   }
   else
+  {
     fileName = aFileName;
+  }
 
   try
   {
     std::string dir = itksys::SystemTools::GetFilenamePath( fileName );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+    HandleGZExtension(baseFilename, extension);
 
     if (extension == "") // if no extension has been entered manually into the filename
     {
       // get from combobox selected file extension
-      extension = itksys::SystemTools::GetFilenameLastExtension( selected_suffix.toLocal8Bit().constData());
+      std::string selectedSuffix = selected_suffix.toLocal8Bit().constData();
+      std::string baseSelectedSuffix = itksys::SystemTools::GetFilenameWithoutLastExtension( selectedSuffix );
+      extension = itksys::SystemTools::GetFilenameLastExtension( selectedSuffix );
       extension = extension.substr(0, extension.size()-1);
+
+      HandleGZExtension(baseSelectedSuffix, extension);
       fileName += extension;
     }
 
-    if (extension == ".gz")
+    if (extension == ".pic.gz")
     {
       QMessageBox::critical( NULL, "SaveDialog", "Warning: You can not save an image in the compressed \n"
         ".pic.gz format. You must save as a normal .pic file.\n"

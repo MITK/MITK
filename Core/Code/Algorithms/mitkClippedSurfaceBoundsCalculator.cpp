@@ -180,7 +180,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
 
   EdgesVector edgesOf3DBox;
 
-  edgesOf3DBox.push_back(std::make_pair(leftBottomBack,     // x = left=xfront, y=bottom=yfront, z=front=zfront
+  edgesOf3DBox.push_back(std::make_pair(leftBottomFront,     // x = left=xfront, y=bottom=yfront, z=front=zfront
                                         leftTopFront));     // left, top, front
 
   edgesOf3DBox.push_back(std::make_pair(leftBottomFront,    // left, bottom, front

@@ -290,6 +290,7 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".gipl.gz");
   possibleFileExtensions.push_back(".mha");
   possibleFileExtensions.push_back(".nii");
+  possibleFileExtensions.push_back(".nii.gz");
   possibleFileExtensions.push_back(".nrrd");
   possibleFileExtensions.push_back(".nhdr");
   possibleFileExtensions.push_back(".png");
@@ -299,6 +300,8 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".vtk");
   possibleFileExtensions.push_back(".vti");
   possibleFileExtensions.push_back(".hdr");
+  possibleFileExtensions.push_back(".img");
+  possibleFileExtensions.push_back(".img.gz");
   possibleFileExtensions.push_back(".png");
   possibleFileExtensions.push_back(".tif");
   possibleFileExtensions.push_back(".jpg");

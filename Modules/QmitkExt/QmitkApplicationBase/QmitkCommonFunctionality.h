@@ -128,6 +128,12 @@ namespace CommonFunctionality
 
   QmitkExt_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 
+  /**
+   * @brief Used by SaveImage to handle the case when extension=.gz.
+   * So, if input baseFileName="tmp.nii" and extension=".gz", output will be baseFileName="tmp" and extension=".nii.gz".
+   */
+  QmitkExt_EXPORT void HandleGZExtension(std::string &baseFileName, std::string &extension);
+
   QmitkExt_EXPORT std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
   
   /**

@@ -217,7 +217,27 @@
     <!-- Y-->
     <event NAME="Y" ID="4018" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Y" />                    
     <!-- Z-->
-    <event NAME="Z" ID="4019" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Z" />                        
+    <event NAME="Z" ID="4019" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Z" />
+    <!-- 1-->
+    <event NAME="1" ID="4020" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_1" />                    
+    <!-- 2-->
+    <event NAME="2" ID="4021" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_2" />                    
+    <!-- 3-->
+    <event NAME="3" ID="4022" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_3" />                    
+    <!-- 4-->
+    <event NAME="4" ID="4023" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_4" />                    
+    <!-- 5-->
+    <event NAME="5" ID="4024" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_5" />                    
+    <!-- 6-->
+    <event NAME="6" ID="4025" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_6" />                    
+    <!-- 7-->
+    <event NAME="7" ID="4026" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_7" />                    
+    <!-- 8-->
+    <event NAME="8" ID="4027" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_8" />                    
+    <!-- 9-->
+    <event NAME="9" ID="4028" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_9" />
+    <!-- 0 (zero) -->
+    <event NAME="0" ID="4029" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_0" />                                                                
   </events>
   <!-- Beginning of state machine patterns-->
   <!-- TutorialStep10Begin -->

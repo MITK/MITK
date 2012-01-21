@@ -17,11 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkBooleanOperationsView.h"
+#include <QmitkStdMultiWidget.h>
 #include <mitkProperties.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
 #include <itkAndImageFilter.h>
 #include <itkNotImageFilter.h>
 #include <itkOrImageFilter.h>
@@ -61,6 +63,67 @@ void QmitkBooleanOperationsView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.btnIntersection, SIGNAL(clicked()), this, SLOT(OnIntersectionButtonClicked()));
 }
 
+bool QmitkBooleanOperationsView::CheckSegmentationImages()
+{
+  mitk::Image::Pointer image1 = dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage1->GetSelectedNode()->GetData());
+  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage2->GetSelectedNode()->GetData());
+
+  if (image1.IsNull() || image2.IsNull())
+  {
+    MITK_ERROR << "At least one input segmentation image is invalid!";
+    return false;
+  }
+
+  if (image1->GetDimension() != image2->GetDimension())
+  {
+    MITK_ERROR << "Dimensions of input segmentation images are different!";
+    return false;
+  }
+
+  if (image1->GetDimension() == 4)
+  {
+    unsigned int time = GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime()->GetPos();
+
+    if (time >= image1->GetDimension(3) || time >= image2->GetDimension(3))
+    {
+      MITK_ERROR << "At least one input segmentation image has no data for current time slice!";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+mitk::Image::Pointer QmitkBooleanOperationsView::To3D(const mitk::Image::Pointer &image)
+{
+  if (image->GetDimension() == 4)
+  {
+    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+
+    imageTimeSelector->SetInput(image);
+    imageTimeSelector->SetTimeNr(static_cast<int>(GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime()->GetPos()));
+    
+    imageTimeSelector->UpdateLargestPossibleRegion();
+
+    return imageTimeSelector->GetOutput();
+  }
+  else
+  {
+    return image;
+  }
+}
+
+void QmitkBooleanOperationsView::AddToDataStorage(const mitk::Image::Pointer &image, const std::string &prefix) const
+{
+  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+
+  dataNode->SetBoolProperty("binary", true);
+  dataNode->SetName(prefix + m_Controls.cmbSegmentationImage2->GetSelectedNode()->GetName());
+  dataNode->SetData(image);
+
+  GetDefaultDataStorage()->Add(dataNode, m_Controls.cmbSegmentationImage1->GetSelectedNode());
+}
+
 void QmitkBooleanOperationsView::EnableButtons(bool enable)
 {
   m_Controls.lblInputImagesWarning->setVisible(!enable);
@@ -69,7 +132,7 @@ void QmitkBooleanOperationsView::EnableButtons(bool enable)
   m_Controls.btnIntersection->setEnabled(enable);
 }
 
-void QmitkBooleanOperationsView::DisableButtons(bool disable)
+void QmitkBooleanOperationsView::DisableButtons()
 {
   EnableButtons(false);
 }
@@ -92,11 +155,11 @@ void QmitkBooleanOperationsView::OnSegmentationImage2Changed(const mitk::DataNod
 
 void QmitkBooleanOperationsView::OnDifferenceButtonClicked()
 {
-  mitk::DataNode::Pointer dataNode1 = m_Controls.cmbSegmentationImage1->GetSelectedNode();
-  mitk::DataNode::Pointer dataNode2 = m_Controls.cmbSegmentationImage2->GetSelectedNode();
-  
-  mitk::Image::Pointer image1 = dynamic_cast<mitk::Image *>(dataNode1->GetData());
-  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image *>(dataNode2->GetData());
+  if (!CheckSegmentationImages())
+    return;
+
+  mitk::Image::Pointer image1 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage1->GetSelectedNode()->GetData()));
+  mitk::Image::Pointer image2 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage2->GetSelectedNode()->GetData()));
 
   typedef itk::Image<unsigned char, 3> ImageType;
 
@@ -119,21 +182,16 @@ void QmitkBooleanOperationsView::OnDifferenceButtonClicked()
 
   image3->DisconnectPipeline();
 
-  mitk::DataNode::Pointer dataNode3 = mitk::DataNode::New();
-  dataNode3->SetBoolProperty("binary", true);
-  dataNode3->SetName(std::string("Difference_") + dataNode2->GetName());
-  dataNode3->SetData(image3);
-
-  GetDefaultDataStorage()->Add(dataNode3, dataNode1);
+  AddToDataStorage(image3, "Difference_");
 }
 
 void QmitkBooleanOperationsView::OnUnionButtonClicked()
 {
-  mitk::DataNode::Pointer dataNode1 = m_Controls.cmbSegmentationImage1->GetSelectedNode();
-  mitk::DataNode::Pointer dataNode2 = m_Controls.cmbSegmentationImage2->GetSelectedNode();
-  
-  mitk::Image::Pointer image1 = dynamic_cast<mitk::Image *>(dataNode1->GetData());
-  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image *>(dataNode2->GetData());
+  if (!CheckSegmentationImages())
+    return;
+
+  mitk::Image::Pointer image1 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage1->GetSelectedNode()->GetData()));
+  mitk::Image::Pointer image2 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage2->GetSelectedNode()->GetData()));
 
   typedef itk::Image<unsigned char, 3> ImageType;
 
@@ -153,21 +211,16 @@ void QmitkBooleanOperationsView::OnUnionButtonClicked()
 
   image3->DisconnectPipeline();
 
-  mitk::DataNode::Pointer dataNode3 = mitk::DataNode::New();
-  dataNode3->SetBoolProperty("binary", true);
-  dataNode3->SetName(std::string("Union_") + dataNode2->GetName());
-  dataNode3->SetData(image3);
-
-  GetDefaultDataStorage()->Add(dataNode3, dataNode1);
+  AddToDataStorage(image3, "Union_");
 }
 
 void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
 {
-  mitk::DataNode::Pointer dataNode1 = m_Controls.cmbSegmentationImage1->GetSelectedNode();
-  mitk::DataNode::Pointer dataNode2 = m_Controls.cmbSegmentationImage2->GetSelectedNode();
-  
-  mitk::Image::Pointer image1 = dynamic_cast<mitk::Image *>(dataNode1->GetData());
-  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image *>(dataNode2->GetData());
+  if (!CheckSegmentationImages())
+    return;
+
+  mitk::Image::Pointer image1 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage1->GetSelectedNode()->GetData()));
+  mitk::Image::Pointer image2 = To3D(dynamic_cast<mitk::Image *>(m_Controls.cmbSegmentationImage2->GetSelectedNode()->GetData()));
 
   typedef itk::Image<unsigned char, 3> ImageType;
 
@@ -187,10 +240,5 @@ void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
 
   image3->DisconnectPipeline();
 
-  mitk::DataNode::Pointer dataNode3 = mitk::DataNode::New();
-  dataNode3->SetBoolProperty("binary", true);
-  dataNode3->SetName(std::string("Intersection_") + dataNode2->GetName());
-  dataNode3->SetData(image3);
-
-  GetDefaultDataStorage()->Add(dataNode3, dataNode1);
+  AddToDataStorage(image3, "Intersection_");
 }

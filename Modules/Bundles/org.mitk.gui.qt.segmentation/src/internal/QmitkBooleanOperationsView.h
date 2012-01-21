@@ -41,8 +41,11 @@ private slots:
   void OnIntersectionButtonClicked();
 
 private:
+  bool CheckSegmentationImages();
+  mitk::Image::Pointer To3D(const mitk::Image::Pointer &image);
+  void AddToDataStorage(const mitk::Image::Pointer &image, const std::string &prefix) const;
   void EnableButtons(bool enable = true);
-  void DisableButtons(bool disable = true);
+  void DisableButtons();
 
   QWidget *m_Parent;
   Ui::QmitkBooleanOperationsView m_Controls;

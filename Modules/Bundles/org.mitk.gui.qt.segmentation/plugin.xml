@@ -6,19 +6,18 @@
     <category 
       id="org.mitk.views.general" 
       name="MITK General"/> 
-    <view 
-      id="org.mitk.views.segmentation" 
+    <view id="org.mitk.views.segmentation" 
       name="Segmentation" 
-      category="org.mitk.views.general" 
       icon="resources/segmentation.png"
       class="QmitkSegmentationView" />
-  </extension>
-  
-  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.segmentationboolean"
+      name="Boolean Operations"
+      class="QmitkBooleanOperationsView"
+      icon="resources/boolean.png" />
      <view id="org.mitk.views.deformableclippingplane"
-           name="Clipping Plane"
-           class="QmitkDeformableClippingPlaneView"
-           icon="resources/deformablePlane.png" />
+       name="Clipping Plane"
+       class="QmitkDeformableClippingPlaneView"
+       icon="resources/deformablePlane.png" />
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/boolean">
+    <file>btnDifference.png</file>
+    <file>btnIntersection.png</file>
+    <file>btnUnion.png</file>
+  </qresource>
+</RCC>

@@ -413,6 +413,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     quadricDecimation->SetInput(m_Surface->GetVtkPolyData());
     quadricDecimation->SetTargetReduction(decimation);
     quadricDecimation->AttributeErrorMetricOn();
+    quadricDecimation->GlobalWarningDisplayOff();
     quadricDecimation->Update();
 
     vtkCleanPolyData* cleaner = vtkCleanPolyData::New();

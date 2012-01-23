@@ -351,7 +351,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		xMax = static_cast< int >( extent[0]);
 		yMax = static_cast< int >( extent[1]);
 	}
-	m_Reslicer->UpdateWholeExtent();
+	
 	
 	m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
 	/*========== END setup extent of the slice ==========*/
@@ -363,7 +363,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	
 
 	//start the pipeline
-	m_Reslicer->Modified();
+	//m_Reslicer->UpdateWholeExtent();
+	m_Reslicer->GetOutput()->UpdateInformation();
+	m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
 	m_Reslicer->Update();
 
 /*================ #END setup vtkImageRslice properties================*/

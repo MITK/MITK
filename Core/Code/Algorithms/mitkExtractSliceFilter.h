@@ -107,6 +107,9 @@ namespace mitk
 		/** \brief Get Output as vtkImageData. */
 		vtkImageData* GetVtkOutput(){ m_VtkOutputRequested = true; return m_Reslicer->GetOutput(); }
 
+		/** */
+		void SetVtkOutputRequest(bool isRequested){ m_VtkOutputRequested = isRequested; }
+
 		/** \brief Get the reslices axis matrix.
 			Note: the axis are recalculated when calling SetResliceTransformByGeometry.
 		*/

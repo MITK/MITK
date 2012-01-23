@@ -216,7 +216,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_NEAREST);
   }
 
- 
+  //set the vtk output property to true, makes sure that no unneeded mitk image convertion
+  //is done.
+  localStorage->m_Reslicer->SetVtkOutputRequest(true);
   
 
   //Thickslicing

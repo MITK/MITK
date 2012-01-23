@@ -402,7 +402,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
     if(m_Dimensions[3]<=1)
     {
       vol=GetVolumeData(0,n,data,importMemoryManagement);
-      ch=new ImageDataItem(*vol, m_ImageDescriptor, 3, data, importMemoryManagement == ManageMemory);
+      ch=new ImageDataItem(*vol, m_ImageDescriptor, m_ImageDescriptor->GetNumberOfDimensions(), data, importMemoryManagement == ManageMemory);
       ch->SetComplete(true);
     }
     else

@@ -126,7 +126,7 @@ protected:
 
       ImageTimeSelector* GetTimeSelector();
 
-      mitk::Image::Pointer m_Image;
+      mitk::Image* m_Image;
 
       mutable itk::Object::Pointer m_HistogramGeneratorObject;
 

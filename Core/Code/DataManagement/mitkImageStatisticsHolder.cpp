@@ -16,7 +16,7 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
 
-  m_Image = image;
+  m_Image = image.GetPointer();
 
   // create time selector
   this->GetTimeSelector();

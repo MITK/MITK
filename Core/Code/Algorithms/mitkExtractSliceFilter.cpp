@@ -137,7 +137,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(m_WorldGeometry);
 
 	
-	if ( planeGeometry )
+	if ( planeGeometry != NULL )
 	{
 		//if the worldGeomatry is a PlaneGeometry everthing is straight forward
 		
@@ -197,7 +197,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		//set the tranform for reslicing.
 		// Use inverse transform of the input geometry for reslicing the 3D image.
 		// This is needed if the image volume already transformed 
-		if(m_ResliceTransform)
+		if(m_ResliceTransform != NULL)
 			m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
 
@@ -262,11 +262,11 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 	}
 
-	if(m_ResliceTransform){
+	if(m_ResliceTransform != NULL){
 		//if the resliceTransform is set the reslice axis are recalculated.
 		//Thus the geometry information is not fitting. Therefor a unitSpacingFilter
 		//is used to set up a global spacing of 1 and compensate the transform.
-		vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
+		vtkSmartPointer<vtkImageChangeInformation> unitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New() ;
 		unitSpacingImageFilter->ReleaseDataFlagOn();
 
 		unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
@@ -362,10 +362,12 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], m_ZSpacing );
 	
 
+	//TODO check the following lines, they are responsible wether vtk error outputs appear or not
+	m_Reslicer->UpdateWholeExtent(); //this produces a bad allocation error for 2D images
+	//m_Reslicer->GetOutput()->UpdateInformation();
+	//m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
+	
 	//start the pipeline
-	//m_Reslicer->UpdateWholeExtent();
-	m_Reslicer->GetOutput()->UpdateInformation();
-	m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
 	m_Reslicer->Update();
 
 /*================ #END setup vtkImageRslice properties================*/

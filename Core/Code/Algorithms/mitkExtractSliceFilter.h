@@ -69,7 +69,7 @@ namespace mitk
 		mitkNewMacro1Param(Self, vtkImageReslice*);
 		
 		/** \brief Set the axis where to reslice at.*/
-		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; this->Modified(); }
+		void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; }
 
 		/** \brief Set the time step in the 4D volume */
 		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }

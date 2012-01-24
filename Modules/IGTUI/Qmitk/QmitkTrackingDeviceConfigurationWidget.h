@@ -124,6 +124,8 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     std::stringstream m_output;
 
     mitk::TrackingDevice::Pointer m_TrackingDevice;
+
+    std::string m_MTCalibrationFile;
     
     bool m_TrackingDeviceConfigurated;
 
@@ -180,6 +182,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *        it selects the right type and sets the corresponding port in the widget.
      */
     void AutoScanPorts();
+
+    /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
+    void SetMTCalibrationFileClicked();
 
 };
 #endif

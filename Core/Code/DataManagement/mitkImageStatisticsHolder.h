@@ -3,6 +3,7 @@
 
 #include <MitkExports.h>
 #include "mitkImage.h"
+#include "mitkImageTimeSelector.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -24,7 +25,7 @@ class MITK_CORE_EXPORT ImageStatisticsHolder
 {
 public:
     /** Constructor */
-    ImageStatisticsHolder(mitk::Image::Pointer image);
+  ImageStatisticsHolder(mitk::Image* image);
 
     /** Desctructor */
     virtual ~ImageStatisticsHolder();
@@ -124,7 +125,7 @@ protected:
 
       virtual void Expand( unsigned int timeSteps );
 
-      ImageTimeSelector* GetTimeSelector();
+      ImageTimeSelector::Pointer GetTimeSelector();
 
       mitk::Image* m_Image;
 

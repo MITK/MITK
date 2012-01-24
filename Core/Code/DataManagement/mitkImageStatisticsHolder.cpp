@@ -1,10 +1,10 @@
 #include "mitkImageStatisticsHolder.h"
 
 #include "mitkHistogramGenerator.h"
-#include "mitkImageTimeSelector.h"
+//#include "mitkImageTimeSelector.h"
 
-mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
-  : m_Image(NULL), m_TimeSelectorForExtremaObject(NULL)
+mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image* image)
+  : m_Image(image)/*, m_TimeSelectorForExtremaObject(NULL)*/
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -16,17 +16,17 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image::Pointer image)
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
 
-  m_Image = image.GetPointer();
+  //m_Image = image;
 
   // create time selector
-  this->GetTimeSelector();
-
+  //this->GetTimeSelector();
 }
 
 mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 {
   m_HistogramGeneratorObject = NULL;
-  m_TimeSelectorForExtremaObject = NULL;
+  //m_TimeSelectorForExtremaObject = NULL;
+  //m_Image = NULL;
 }
 
 const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::GetScalarHistogram(int t)
@@ -50,18 +50,17 @@ bool mitk::ImageStatisticsHolder::IsValidTimeStep( int t) const
     return m_Image->IsValidTimeStep(t);
 }
 
-mitk::ImageTimeSelector* mitk::ImageStatisticsHolder::GetTimeSelector()
+mitk::ImageTimeSelector::Pointer mitk::ImageStatisticsHolder::GetTimeSelector()
 {
-  if(m_TimeSelectorForExtremaObject.IsNull())
-  {
-    m_TimeSelectorForExtremaObject = ImageTimeSelector::New();
+  //if(m_TimeSelectorForExtremaObject.IsNull())
+  //{
+  //  m_TimeSelectorForExtremaObject = ImageTimeSelector::New();
 
-    ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+  ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();//static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
     timeSelector->SetInput(m_Image);
-    m_Image->UnRegister();
-  }
+  //}
 
-  return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+  return timeSelector; //static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
 }
 
 void mitk::ImageStatisticsHolder::Expand( unsigned int timeSteps )
@@ -198,8 +197,8 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
   if(pType.GetNumberOfComponents() == 1)
   {
     // recompute
-    mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
-    if(timeSelector!=NULL)
+    mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();
+    if(timeSelector.IsNotNull())
     {
       timeSelector->SetTimeNr(t);
       timeSelector->UpdateLargestPossibleRegion();

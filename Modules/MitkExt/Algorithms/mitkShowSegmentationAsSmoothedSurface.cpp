@@ -69,6 +69,10 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
   // increase decimation, especially when very close to 1.
   // A value of 0 disables decimation.
   SetParameter("Decimation", 0.5f);
+
+  // Valid range for closing value is [0, 1]. Higher values
+  // increase closing. A value of 0 disables closing.
+  SetParameter("Closing", 0.0f);
 }
 
 bool ShowSegmentationAsSmoothedSurface::ReadyToRun()
@@ -97,6 +101,9 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   float decimation;
   GetParameter("Decimation", decimation);
 
+  float closing;
+  GetParameter("Closing", closing);
+
   int timeNr = 0;
   GetParameter("TimeNr", timeNr);
 
@@ -105,8 +112,9 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   else
     MITK_INFO << "CREATING SMOOTHED POLYGON MODEL";
 
-  MITK_INFO << "  Smoothing = " << smoothing;
+  MITK_INFO << "  Smoothing  = " << smoothing;
   MITK_INFO << "  Decimation = " << decimation;
+  MITK_INFO << "  Closing    = " << closing;
  
   Geometry3D::Pointer geometry = dynamic_cast<Geometry3D *>(image->GetGeometry()->Clone().GetPointer());
   
@@ -267,7 +275,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   MITK_INFO << "Intelligent closing...";
 
-  unsigned int surfaceRatio = 70;
+  unsigned int surfaceRatio = (unsigned int)((1.0f - closing) * 100.0f);
 
   typedef itk::IntelligentBinaryClosingFilter<CharImageType, ShortImageType> ClosingFilterType;
 

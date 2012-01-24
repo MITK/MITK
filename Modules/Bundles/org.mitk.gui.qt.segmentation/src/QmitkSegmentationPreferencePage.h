@@ -78,6 +78,7 @@ protected:
   QCheckBox* m_SmoothingCheckBox;
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
+  QDoubleSpinBox* m_ClosingSpinBox;
 
   bool m_Initializing;
 

@@ -471,7 +471,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
         representation->SetRepresentationToWireframe();
     }
 
-    node->SetProperty("opacity", FloatProperty::New(0.3));
+    node->SetProperty("opacity", FloatProperty::New(1.0));
     node->SetProperty("line width", IntProperty::New(1));
     node->SetProperty("scalar visibility", BoolProperty::New(false));
 
@@ -502,7 +502,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
       if (colorProperty != NULL)
         node->ReplaceProperty("color", colorProperty);
       else
-        node->SetProperty("color", ColorProperty::New(1.0f, 1.0f, 0.0f));
+        node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
 
       bool showResult = true;
       GetParameter("Show result", showResult);

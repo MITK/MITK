@@ -94,6 +94,14 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_DecimationSpinBox->setToolTip("Valid range is [0, 1). High values increase decimation, especially when very close to 1. A value of 0 disables decimation.");
   surfaceLayout->addRow("Decimation rate", m_DecimationSpinBox);
 
+  m_ClosingSpinBox = new QDoubleSpinBox(m_MainControl);
+  m_ClosingSpinBox->setMinimum(0.0);
+  m_ClosingSpinBox->setMaximum(1.0);
+  m_ClosingSpinBox->setSingleStep(0.1);
+  m_ClosingSpinBox->setValue(0.0);
+  m_ClosingSpinBox->setToolTip("Valid range is [0, 1]. Higher values increase closing. A value of 0 disables closing.");
+  surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
+
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
   
   m_MainControl->setLayout(formLayout);
@@ -113,6 +121,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   m_SegmentationPreferencesNode->PutBool("smoothing hint", m_SmoothingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
+  m_SegmentationPreferencesNode->PutDouble("closing ratio", m_ClosingSpinBox->value());
   return true;
 }
 
@@ -148,6 +157,7 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
+  m_ClosingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 }
 
 void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)

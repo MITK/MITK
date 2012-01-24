@@ -87,6 +87,7 @@ void QmitkCreatePolygonModelAction::Run(const vector<DataNode *> &selectedNodes)
       bool smoothingHint = segPref->GetBool("smoothing hint", true);
       float smoothing = (float)segPref->GetDouble("smoothing value", 1.0);
       float decimation = (float)segPref->GetDouble("decimation rate", 0.5);
+      float closing = (float)segPref->GetDouble("closing ratio", 0.0);
       
       if (smoothingHint)
       {
@@ -99,6 +100,7 @@ void QmitkCreatePolygonModelAction::Run(const vector<DataNode *> &selectedNodes)
 
       surfaceFilter->SetParameter("Smoothing", smoothing);
       surfaceFilter->SetParameter("Decimation", decimation);
+      surfaceFilter->SetParameter("Closing", closing);
 
       ProgressBar::GetInstance()->AddStepsToDo(8);
       StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");

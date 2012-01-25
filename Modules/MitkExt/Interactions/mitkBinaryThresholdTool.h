@@ -41,8 +41,8 @@ namespace mitk
   {
   public:
 
-    Message2<int,int> IntervalBordersChanged;
-    Message1<int>     ThresholdingValueChanged;
+    Message3<double,double, bool> IntervalBordersChanged;
+    Message1<double>     ThresholdingValueChanged;
 
     mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdTool);
@@ -53,7 +53,7 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual void SetThresholdValue(int value);
+    virtual void SetThresholdValue(double value);
     virtual void AcceptCurrentThresholdValue(const std::string& organName, const Color& color);
     virtual void CancelThresholding();
 
@@ -76,9 +76,9 @@ namespace mitk
     DataNode::Pointer m_OriginalImageNode;
     DataNode::Pointer m_NodeForThresholding;
 
-    int m_SensibleMinimumThresholdValue;
-    int m_SensibleMaximumThresholdValue;
-    int m_CurrentThresholdValue;
+    double m_SensibleMinimumThresholdValue;
+    double m_SensibleMaximumThresholdValue;
+    double m_CurrentThresholdValue;
     bool m_IsFloatImage;
 
   };

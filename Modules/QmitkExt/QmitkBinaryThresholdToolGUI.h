@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkExtExports.h"
 #include "mitkBinaryThresholdTool.h"
 
-#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 class QSlider;
 /**
@@ -42,9 +42,7 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(int lower, int upper);
-    void OnThresholdingValueChanged(int current);
-    void OnThresholdingIntervalBordersChanged(double lower, double upper);
+    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
     void OnThresholdingValueChanged(double current);
 
   signals:
@@ -63,8 +61,18 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     QmitkBinaryThresholdToolGUI();
     virtual ~QmitkBinaryThresholdToolGUI();
 
+
+    double SliderIntToDouble(int val);
+
+    int DoubleToSliderInt(double val);
+
     QSlider* m_Slider;
-    QSpinBox* m_Spinner;
+    QDoubleSpinBox* m_Spinner;
+
+    bool m_isFloat;
+    double m_RangeMin;
+    double m_RangeMax;
+    double m_RangeStep;
 
     mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };

@@ -93,7 +93,7 @@
          <item row="0" column="1">
           <widget class="QFrame" name="m_MaskFrame">
            <property name="toolTip">
-            <string>Mask image. Particles will be sampled with a probability according to the voxel value.</string>
+            <string>Binary mask image to reduce the algorithms search space.</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -131,7 +131,7 @@
            </layout>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="m_IterationsLabel">
            <property name="toolTip">
             <string/>
@@ -147,10 +147,32 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="1" column="1">
+          <widget class="QSlider" name="m_IterationsSlider">
+           <property name="toolTip">
+            <string>Specify number of iterations for the tracking algorithm.</string>
+           </property>
+           <property name="maximum">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>6</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksBelow</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
           <widget class="QCheckBox" name="m_VisualizationCheckbox">
            <property name="enabled">
             <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>Activate continuous visualization of intermediate results.</string>
            </property>
            <property name="text">
             <string>Visualize Tractography</string>
@@ -160,14 +182,14 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="5" column="0">
           <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
            <property name="text">
             <string>Advanced Settings</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="0" colspan="2">
+         <item row="6" column="0" colspan="2">
           <widget class="QFrame" name="m_AdvancedFrame">
            <property name="enabled">
             <bool>true</bool>
@@ -434,7 +456,7 @@
                <string/>
               </property>
               <property name="text">
-               <string>10</string>
+               <string>40mm</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -444,7 +466,7 @@
             <item row="6" column="2">
              <widget class="QSlider" name="m_FiberLengthSlider">
               <property name="toolTip">
-               <string>Only fibers containing more than the specified number of particles are accepted.</string>
+               <string>Only fibers longer than specified are accepted.</string>
               </property>
               <property name="maximum">
                <number>100</number>
@@ -453,7 +475,7 @@
                <number>1</number>
               </property>
               <property name="value">
-               <number>10</number>
+               <number>40</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -589,10 +611,67 @@
               </property>
              </spacer>
             </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="m_CurvatureThresholdLabel_2">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="text">
+               <string>Curvature Threshold:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLabel" name="m_CurvatureThresholdLabel">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="text">
+               <string>45°</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="2">
+             <widget class="QSlider" name="m_CurvatureThresholdSlider">
+              <property name="toolTip">
+               <string>Allow only fiber curvature values smaller than the selected threshold.</string>
+              </property>
+              <property name="maximum">
+               <number>180</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>45</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::NoTicks</enum>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="7" column="0">
           <widget class="QCommandLinkButton" name="m_SaveTrackingParameters">
            <property name="enabled">
             <bool>true</bool>
@@ -612,7 +691,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="7" column="1">
           <widget class="QCommandLinkButton" name="m_LoadTrackingParameters">
            <property name="enabled">
             <bool>true</bool>
@@ -632,26 +711,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QSlider" name="m_IterationsSlider">
-           <property name="toolTip">
-            <string>Specify number of iterations for the tracking algorithm.</string>
-           </property>
-           <property name="maximum">
-            <number>10</number>
-           </property>
-           <property name="value">
-            <number>6</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBelow</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
+         <item row="8" column="0">
           <widget class="QCommandLinkButton" name="m_TrackingStart">
            <property name="enabled">
             <bool>false</bool>
@@ -671,7 +731,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="8" column="1">
           <widget class="QCommandLinkButton" name="m_TrackingStop">
            <property name="enabled">
             <bool>false</bool>
@@ -691,52 +751,21 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>GFA Image</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QFrame" name="m_GfaFrame">
+         <item row="2" column="1">
+          <widget class="QToolButton" name="m_VisualizeOnceButton">
            <property name="toolTip">
-            <string>Only needed for automatic particle weight estimation.</string>
+            <string>Visualize intermediate result.</string>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+           <property name="text">
+            <string/>
            </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/Refresh_48.png</normaloff>:/QmitkDiffusionImaging/Refresh_48.png</iconset>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <property name="margin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QToolButton" name="m_SetGfaButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>=&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="m_GfaImageEdit">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>N/A</string>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
         </layout>
@@ -990,6 +1019,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
   <include location="../../../../QmitkExt/resources/QmitkResources.qrc"/>
  </resources>
  <connections/>

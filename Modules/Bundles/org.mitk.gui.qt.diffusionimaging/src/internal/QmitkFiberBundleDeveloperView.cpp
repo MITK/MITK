@@ -110,10 +110,10 @@ void QmitkFiberExtractorWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    std::vector<long> fibIds = m_itemPackage.st_FBX->DoExtractFiberIds(m_itemPackage.st_PlanarFigure);
+    std::vector<long> fibIds = m_itemPackage.st_FBX->ExtractFiberIdSubset(m_itemPackage.st_PlanarFigure);
 
     //generate new fiberbundle by fiber iDs
-    vtkSmartPointer<vtkPolyData> newFBPolyData = m_itemPackage.st_FBX->GenerateNewFiberBundleByIds(fibIds);
+    vtkSmartPointer<vtkPolyData> newFBPolyData = m_itemPackage.st_FBX->GeneratePolyDataByIds(fibIds);
 
     // call function to convert fiberstructure into fiberbundleX and pass it to datastorage
     (m_itemPackage.st_host->*m_itemPackage.st_pntr_to_Method_PutFibersToDataStorage)(newFBPolyData);

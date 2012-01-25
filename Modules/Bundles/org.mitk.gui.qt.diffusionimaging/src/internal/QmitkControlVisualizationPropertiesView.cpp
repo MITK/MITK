@@ -802,7 +802,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
-    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||                             
+    if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(node->GetData()) ||
                              dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData())))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
@@ -1345,26 +1345,23 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
     m_Controls->m_Color->setStyleSheet(styleSheet);
 
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
-    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(14));
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(3));
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+    fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring()
 {
-    if(m_SelectedNode)
+  if(m_SelectedNode)
   {
     m_Controls->m_Color->setAutoFillBackground(true);
     QString styleSheet = "background-color:rgb(255,255,255)";
     m_Controls->m_Color->setStyleSheet(styleSheet);
+    m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(1.0, 1.0, 1.0));
 
-    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(4));
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+    fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED);
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }

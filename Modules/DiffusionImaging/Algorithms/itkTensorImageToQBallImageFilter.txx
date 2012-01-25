@@ -38,6 +38,7 @@ namespace itk
     outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
     outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
     outImage->Allocate();
+    outImage->FillBuffer(0.0);
 
     this->SetNumberOfRequiredOutputs (1);
     this->SetNthOutput (0, outImage);

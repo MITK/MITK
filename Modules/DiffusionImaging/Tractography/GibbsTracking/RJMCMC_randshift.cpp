@@ -93,7 +93,7 @@ public:
     T_prop = 0.5;
     dthres *= dthres;
     stopprobability = exp(-1/T_prop);
-    del_prob = 0.1;
+     del_prob = 0.1;
   }
 
   void SetTemperature(float temp)

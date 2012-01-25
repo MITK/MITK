@@ -64,23 +64,17 @@ public:
 
   float particle_length_sq;
   float curv_hard;
-  ofstream ee_file, ie_file;
 
 
   EnergyComputer(float *data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid<Particle> *pcon, float *spimg, int spmult, vnl_matrix_fixed<double, 3, 3> rotMatrix) : EnergyComputerBase(data,dsz,cellsize,sp,pcon,spimg,spmult,rotMatrix)
   {
-//    ee_file.open("eeFile.txt");
-//    ie_file.open("ieFile.txt");
+
   }
 
-//  ~EnergyComputer(){
-//    ee_file.close();
-//    ie_file.close();
-//  }
-
-  void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2)
+  void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv)
   {
     this->chempot2 = chempot2;
+    meanval_sq = meanv;
 
     eigencon_energy = chempot_connection;
     eigen_energy = 0;
@@ -129,6 +123,7 @@ public:
         float dpos = (p->R-R).norm_square();
         float w = mexp(dpos*gamma_s);
         Sn += w*(bw+chempot2)*p->cap ;
+        //Sn += w*(bw-meanval_sq)*p->cap ;
         w = mexp(dpos*gamma_reg_s);
         Pn += w*bw;
       }
@@ -136,6 +131,7 @@ public:
 
     float energy = 0;
     energy += (2*(Dn/particle_weight-Sn) - (mbesseli0(1.0)+chempot2)*cap)*cap;
+    //energy += (2*(Dn/particle_weight-Sn) - (mbesseli0(1.0)-meanval_sq)*cap)*cap;
 
     return energy*ex_strength;
   }

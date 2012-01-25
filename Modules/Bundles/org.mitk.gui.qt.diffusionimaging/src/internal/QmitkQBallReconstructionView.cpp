@@ -194,7 +194,7 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     this->CreateConnections();
 
     QStringList items;
-    items << "2" << "4" << "6" << "8";
+    items << "2" << "4" << "6" << "8" << "10" << "12";
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->addItems(items);
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->setCurrentIndex(1);
     MethodChoosen(m_Controls->m_QBallReconstructionMethodComboBox->currentIndex());
@@ -590,6 +590,16 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
         case 3:
           {
             TemplatedAnalyticalQBallReconstruction<8>(vols, currentLambda, nodename, nodes, normalization);
+            break;
+          }
+        case 4:
+          {
+            TemplatedAnalyticalQBallReconstruction<10>(vols, currentLambda, nodename, nodes, normalization);
+            break;
+          }
+        case 5:
+          {
+            TemplatedAnalyticalQBallReconstruction<12>(vols, currentLambda, nodename, nodes, normalization);
             break;
           }
         }

@@ -161,7 +161,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
 
       if (image.GetPointer() == originalImage.GetPointer())
       {
-        if (originalImage->GetPixelType().GetType() == mitkIpPicFloat)
+        if (originalImage->GetPixelType().GetPixelTypeId() == typeid(float))
            m_IsFloatImage = true;
         else
            m_IsFloatImage = false;

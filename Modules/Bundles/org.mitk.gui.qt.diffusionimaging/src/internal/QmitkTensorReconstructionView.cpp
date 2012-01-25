@@ -79,7 +79,8 @@ struct TrSelListener : ISelectionListener
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 
     // do something with the selected items
-    if(m_View->m_CurrentSelection)
+  
+
     {
       bool foundDwiVolume = false;
       bool foundTensorVolume = false;

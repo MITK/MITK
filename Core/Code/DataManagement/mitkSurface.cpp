@@ -99,6 +99,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   }
   this->Modified();
   m_CalculateBoundingBox = true;
+  this->UpdateOutputInformation();
 }
 
 bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const

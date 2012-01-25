@@ -422,6 +422,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   {
   QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), "/", "*.*");
+  if (filename == "") return;
   this->m_Controls->m_LoggingFileName->setText(filename);
   }
 

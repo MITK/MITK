@@ -109,6 +109,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
     ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i) );
   }
 
+  //use compression if available
+  imageIO->UseCompressionOn();
+
   imageIO->SetIORegion(ioRegion);
   imageIO->SetFileName(fileName);
 

@@ -125,7 +125,7 @@ void QmitkNavigationToolCreationWidget::OnFinished()
       //create small sphere and use it as surface
       mitk::Surface::Pointer mySphere = mitk::Surface::New();
       vtkSphereSource *vtkData = vtkSphereSource::New();
-      vtkData->SetRadius(3.0f);
+      vtkData->SetRadius(6.0f);
       vtkData->SetCenter(0.0, 0.0, 0.0);
       vtkData->Update();
       mySphere->SetVtkPolyData(vtkData->GetOutput());

@@ -42,7 +42,7 @@ class QmitkAdaptiveRegionGrowingViewControls;
 *
 */
 
-class /*mitkVesselSegmentationUI_EXPORT*/ QmitkAdaptiveRegionGrowingView : public QWidget
+class QmitkAdaptiveRegionGrowingView : public QWidget
 {
 
   Q_OBJECT
@@ -62,32 +62,15 @@ public:
   virtual void CreateConnections();
 
   ///** \brief Method to set the default data storage.*/
-  virtual void SetDataStorage(mitk::DataStorage* dataStorage)
-  {
-    m_DataStorage = dataStorage;
-  }
+  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget)
-  {
-    m_MultiWidget = multiWidget;
-  }
+  void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
   void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface, std::string seedPoint);
 
   void EnableControls(bool enable);
 
-  void SetInputImageNode(mitk::DataNode* node)
-  {
-    m_InputImageNode = node;
-  }
-
-  //void SetOrganType(int type);
-  
-  ///** \brief Defines fixed threshold for region growing (true = LOWERTHRESHOLD fixed, false = UPPERTHRESHOLD fixed)
-  void SetRegionGrowingDirectionUpwards(bool upwards)
-  {
-    m_CurrentRGDirectionIsUpwards=upwards;
-  }
+  void SetInputImageNode(mitk::DataNode* node);
 
   void Deactivated();
   void Activated();
@@ -100,28 +83,34 @@ public:
 
 
  // itkSetMacro(labledSegmentation,std::string);
-//  void ChangeBronchialVesselView(int typeID); // switch from bronchial segmentaion view to blood vessel segmentation view ...
 
-signals:
-//  void EnableBoostAndCleaningWidget(bool on);
-//  void EntireVesselTreeDeleted(bool vesselTreeDeleted);
+//signals:
 
-  protected slots:
+protected slots:
+
     void SetSeedPointToggled(bool toggled);
+
     void RunSegmentation();
+
     void ChangeLevelWindow(int newValue);//called, when the Level Window is changed via the slider in the ControlWidget
-    void IncreaseSlider();//called, when the slider-position is modified via the +/- buttons
+
+    //****called, when the slider-position is modified via the +/- buttons
+    void IncreaseSlider();
+
     void DecreaseSlider();
+    //***
+
     void ConfirmSegmentation();
+
     void UseVolumeRendering(bool on);
-//    void SetAutomaticSeedPointDetection();
+
+    void OnDefineThresholdBoundaries(bool);
+
     void SetLowerThresholdValue(int lowerThreshold);
 
     void SetUpperThresholdValue(int upperThreshold);
 
-
-
-    
+    void SetRegionGrowingDirectionUpwards(bool);
 
 protected:
 
@@ -131,7 +120,6 @@ protected:
   mitk::DataStorage* m_DataStorage;
 
   mitk::DataNode::Pointer m_InputImageNode;
-
 
   void DeactivateSeedPointMode();
   void ActivateSeedPointMode();
@@ -144,17 +132,17 @@ private:
   std::string m_NAMEFORSEEDPOINT;
   std::string m_NAMEFORLABLEDSEGMENTATIONIMAGE;
   std::string m_NAMEFORBINARYIMAGE;
-  std::string m_NAMEFORVESSELTREE;
   std::string m_NAMEFORSURFACE;
 
-  int m_OrganType;
   mitk::ScalarType m_LOWERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_UPPERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_SeedPointValueMean;
+
+  int m_DetectedLeakagePoint;
+
   bool m_CurrentRGDirectionIsUpwards; // defines fixed threshold (true = LOWERTHRESHOLD fixed, false = UPPERTHRESHOLD fixed)
 
   int m_SeedpointValue;
-  int m_DetectedLeakagePoint;
   bool m_SliderInitialized;
   bool m_UseVolumeRendering;
   bool m_UpdateSuggestedThreshold;
@@ -170,10 +158,7 @@ private:
   void EnableVolumeRendering(bool enable);
 
   void UpdateVolumeRenderingThreshold(int thValue);
-  
-//  void DefaultSettingsEnable(bool val);
-  
-  
+
 };
 
 

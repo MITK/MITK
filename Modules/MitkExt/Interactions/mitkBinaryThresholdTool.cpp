@@ -208,7 +208,6 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
             timeSelector->SetTimeNr( timeStep );
             timeSelector->UpdateLargestPossibleRegion();
             Image::Pointer image3D = timeSelector->GetOutput();
-
             AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
           }
           catch(...)
@@ -266,6 +265,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
 
   while (!outputIterator.IsAtEnd())
   {
+     // WHY SIGNED CASTNG??? pixeltype could be negatvie as well ..
       if ( (signed)inputIterator.Get() >= m_CurrentThresholdValue )
         outputIterator.Set( 1 );
       else

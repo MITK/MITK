@@ -72,7 +72,11 @@ mitk::Image::~Image()
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
-  delete [] m_OffsetTable;
+  if(m_OffsetTable != NULL)
+    delete [] m_OffsetTable;
+
+  if(m_ImageStatistics != NULL)
+    delete m_ImageStatistics;
 }
 
 const mitk::PixelType mitk::Image::GetPixelType(int n) const
@@ -320,12 +324,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
     }
     else
     {
-      mitk::PixelType *chPixelType = new mitk::PixelType(this->m_ImageDescriptor->GetChannelTypeById(n));
+      mitk::PixelType chPixelType = this->m_ImageDescriptor->GetChannelTypeById(n);
 
       vol=m_Volumes[pos];
       // ok, let's combine the slices!
       if(vol.GetPointer()==NULL)
-        vol=new ImageDataItem(*chPixelType, 3, m_Dimensions, NULL, true);
+        vol=new ImageDataItem( chPixelType, 3, m_Dimensions, NULL, true);
       vol->SetComplete(true);
       size_t size=m_OffsetTable[2]*(ptypeSize);
       for(s=0;s<m_Dimensions[2];++s)
@@ -402,7 +406,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
     if(m_Dimensions[3]<=1)
     {
       vol=GetVolumeData(0,n,data,importMemoryManagement);
-      ch=new ImageDataItem(*vol, m_ImageDescriptor, 3, data, importMemoryManagement == ManageMemory);
+      ch=new ImageDataItem(*vol, m_ImageDescriptor, m_ImageDescriptor->GetNumberOfDimensions(), data, importMemoryManagement == ManageMemory);
       ch->SetComplete(true);
     }
     else
@@ -1074,18 +1078,18 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, 
     return m_Volumes[pos]=vol;
   }
 
-  const mitk::PixelType *chPixelType = new mitk::PixelType( this->m_ImageDescriptor->GetChannelTypeById(n) );
+  mitk::PixelType chPixelType = this->m_ImageDescriptor->GetChannelTypeById(n);
 
   // allocate new volume
   if(importMemoryManagement == CopyMemory)
   {
-    vol=new ImageDataItem(*chPixelType, 3, m_Dimensions, NULL, true);
+    vol=new ImageDataItem( chPixelType, 3, m_Dimensions, NULL, true);
     if(data != NULL)
       std::memcpy(vol->GetData(), data, m_OffsetTable[3]*(ptypeSize));
   }
   else
   {
-    vol=new ImageDataItem(*chPixelType, 3, m_Dimensions, data, importMemoryManagement == ManageMemory);
+    vol=new ImageDataItem( chPixelType, 3, m_Dimensions, data, importMemoryManagement == ManageMemory);
   }
   m_Volumes[pos]=vol;
   return vol;
@@ -1148,13 +1152,13 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 
     for(unsigned int ch=0; ch < this->m_ImageDescriptor->GetNumberOfChannels(); ch++)
     {
-      mitk::PixelType *chPixelType = new mitk::PixelType(this->m_ImageDescriptor->GetChannelTypeById(ch));
+      mitk::PixelType chPixelType = this->m_ImageDescriptor->GetChannelTypeById(ch);
 
       os << indent << " Channel: " << this->m_ImageDescriptor->GetChannelName(ch) << std::endl;
-      os << indent << " PixelType: " << chPixelType->GetTypeId().name() << std::endl;
-      os << indent << " BitsPerElement: " << chPixelType->GetSize() << std::endl;
-      os << indent << " NumberOfComponents: " << chPixelType->GetNumberOfComponents() << std::endl;
-      os << indent << " BitsPerComponent: " << chPixelType->GetBitsPerComponent() << std::endl;
+      os << indent << " PixelType: " << chPixelType.GetTypeId().name() << std::endl;
+      os << indent << " BitsPerElement: " << chPixelType.GetSize() << std::endl;
+      os << indent << " NumberOfComponents: " << chPixelType.GetNumberOfComponents() << std::endl;
+      os << indent << " BitsPerComponent: " << chPixelType.GetBitsPerComponent() << std::endl;
     }
 
   }

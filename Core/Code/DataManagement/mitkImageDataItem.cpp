@@ -45,9 +45,8 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   const unsigned int *dims = desc->GetDimensions();
   m_Dimension = dimension;
   for( unsigned int i=0; i<dimension; i++)
-    m_Dimensions[i] = dims[i];
-
-  this->ComputeItemSize(dims,dimension);
+    m_Dimensions[i] = desc->GetDimensions()[i];
+  this->ComputeItemSize(m_Dimensions,dimension);
 
   if(data != NULL)
   {
@@ -57,7 +56,6 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
       delete [] (unsigned char*) data;
     }
   }
-
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
@@ -72,6 +70,7 @@ mitk::ImageDataItem::~ImageDataItem()
     if(m_ManageMemory)
       delete [] m_Data;
   }
+  delete m_PixelType;
 }
 
 mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory)
@@ -86,7 +85,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, vo
   for( unsigned int i=0; i<m_Dimension; i++)
     m_Dimensions[i] = dimensions[i];
 
-  this->ComputeItemSize(dimensions, m_Dimension );
+  this->ComputeItemSize(m_Dimensions, m_Dimension );
 
   if(m_Data == NULL)
   {

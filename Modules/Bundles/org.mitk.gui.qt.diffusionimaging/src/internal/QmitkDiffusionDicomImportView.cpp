@@ -310,7 +310,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
     PrintMemoryUsage();
     QString status;
     mitk::DataNode::Pointer node;
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(3*nrFolders);
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(2*nrFolders);
 
 
     std::string folder = m_Controls->m_OutputLabel->text().toStdString();

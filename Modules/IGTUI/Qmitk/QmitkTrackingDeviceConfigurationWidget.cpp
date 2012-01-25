@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 
-//poco headers
+#include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
@@ -382,7 +382,12 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
         
         mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
         if(this->m_MTCalibrationFile=="") AddOutput("<br>Warning: Calibration file is not set!");
-        else newDevice->SetCalibrationDir(m_MTCalibrationFile);
+		    else 
+		      {
+          //extract path from calibration file and set the calibration dir of the device
+          std::string path =  itksys::SystemTools::GetFilenamePath(m_MTCalibrationFile);
+          newDevice->SetCalibrationDir(path);
+		      }
         returnValue = newDevice;
         }
   return returnValue;

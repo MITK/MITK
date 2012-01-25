@@ -51,9 +51,11 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Delete();
   MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData");
 
+  cloneSurface= NULL;
   cloneSurface = surface->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData of cloned surface!");
- 
+  cloneSurface = NULL;
+  
     vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     polys->ComputeBounds();
     polys->GetBounds( bounds );
@@ -142,6 +144,9 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   dummy->Graft(surface);
   MITK_TEST_CONDITION_REQUIRED( dummy->GetVtkPolyData() != NULL, "Testing copying a Surface with Graft()!");
   MITK_TEST_CONDITION_REQUIRED( dummy->GetTimeSteps() == numberoftimesteps, "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps());
+  
+  surface = NULL;
+  MITK_TEST_CONDITION_REQUIRED( surface.IsNull(), "Testing destruction of surface!");
 
   MITK_TEST_END();
 }

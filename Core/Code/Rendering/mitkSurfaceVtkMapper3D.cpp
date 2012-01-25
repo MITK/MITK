@@ -106,6 +106,16 @@ void mitk::SurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
 
 void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer)
 {
+  // Backface culling
+  {
+    mitk::BoolProperty::Pointer p;
+    node->GetProperty(p, "Backface Culling", renderer);
+    bool useCulling = false;
+    if(p.IsNotNull())
+      useCulling = p->GetValue();
+    property->SetBackfaceCulling(useCulling);
+  }
+  
   // Colors
   {
     double ambient [3] = { 0.5,0.5,0.0 };
@@ -443,6 +453,10 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
       node->AddProperty( "color mode", mitk::BoolProperty::New(true), renderer, overwrite );
     }
   }
+
+  // Backface culling
+  node->AddProperty( "Backface Culling", mitk::BoolProperty::New(false), renderer, overwrite );
+  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

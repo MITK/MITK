@@ -28,7 +28,12 @@ MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkBinaryThresholdToolGUI, "")
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
  m_Slider(NULL),
- m_Spinner(NULL)
+ m_Spinner(NULL),
+ m_isFloat(false),
+ m_RangeMin(0),
+ m_RangeMax(0),
+ m_ChangingSlider(false),
+ m_ChangingSpinner(false)
 {
   // create the visible widgets
   QBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -42,12 +47,12 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 
   QBoxLayout* layout = new QHBoxLayout();
 
-  m_Spinner = new QSpinBox();
+  m_Spinner = new QDoubleSpinBox();
   m_Spinner->setMaximum(20);
   m_Spinner->setMinimum(5);
   m_Spinner->setValue(1);
 
-  connect(m_Spinner, SIGNAL(valueChanged(int)), this, SLOT(OnSpinnerValueChanged()) );
+  connect(m_Spinner, SIGNAL(valueChanged(double)), this, SLOT(OnSpinnerValueChanged()) );
   layout->addWidget(m_Spinner);
 
   //m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
@@ -74,8 +79,8 @@ QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
   // !!!
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
 
 }
@@ -84,26 +89,44 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
 
   m_BinaryThresholdTool = dynamic_cast<mitk::BinaryThresholdTool*>( tool );
 
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged += mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
+}
+
+void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
+{
+   if (m_BinaryThresholdTool.IsNotNull())
+   {
+      m_ChangingSpinner = true;
+      double doubleVal = m_Spinner->value();
+      int intVal = this->DoubleToSliderInt(doubleVal);
+      m_BinaryThresholdTool->SetThresholdValue( doubleVal );
+      if (m_ChangingSlider == false)
+         m_Slider->setValue( intVal );
+      m_ChangingSpinner = false;
+   }
 }
 
 void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
 {
   if (m_BinaryThresholdTool.IsNotNull())
-  {
-    m_BinaryThresholdTool->SetThresholdValue( value );
+  {    
+     m_ChangingSlider = true;
+    double doubleVal = SliderIntToDouble(value);
+    if (m_ChangingSpinner == false)
+      m_Spinner->setValue(doubleVal);
+    m_ChangingSlider = false;
   }
-  m_Spinner->setValue(value);
+  
 }
 
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
@@ -130,19 +153,59 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
   }
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(int lower, int upper)
+void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat)
 {
-  m_Slider->setRange(lower, upper);
+  m_isFloat = isFloat;
+  m_RangeMin = lower;
+  m_RangeMax = upper;
+
   m_Spinner->setRange(lower, upper);
+  if (!m_isFloat)
+  {
+     m_Slider->setRange(int(lower), int(upper));
+     m_Spinner->setDecimals(0);
+     m_Spinner->setSingleStep(1);     
+  }
+  else
+  {
+     m_Slider->setRange(0, 99);
+     m_Spinner->setDecimals(2);
+     m_Range = upper-lower; 
+     m_Spinner->setSingleStep(m_Range/100);
+  }
+
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(int current)
+void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(double current)
 {
-  m_Slider->setValue(current);
+  m_Slider->setValue(DoubleToSliderInt(current));
   m_Spinner->setValue(current);
 }
 
-void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
+
+
+
+double QmitkBinaryThresholdToolGUI::SliderIntToDouble(int val)
 {
-  m_Slider->setValue(m_Spinner->value());
+   if (!m_isFloat)
+   {
+      return double(val);
+   }
+   else
+   {
+      return double(val*(m_Range)/100 + m_RangeMin);
+   }
+}
+
+int QmitkBinaryThresholdToolGUI::DoubleToSliderInt(double val)
+{
+   if (!m_isFloat)
+   {
+      return int(val);
+   }
+   else
+   {
+      int intVal = int( ((val-m_RangeMin) / m_Range)*100);
+      return intVal;
+   }
 }

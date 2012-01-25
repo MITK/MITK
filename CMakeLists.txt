@@ -355,6 +355,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
+  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
 
   if(MITK_USE_C++0x)
     mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)

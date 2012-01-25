@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkCoreExtActivator.h"
+#include "mitkPicFileReader.h"
 
 #include <mitkCoreExtObjectFactory.h>
 #include "mitkCoreExtConstants.h"
@@ -32,11 +33,15 @@ namespace mitk
   void CoreExtActivator::start(ctkPluginContext* context)
   {
     Q_UNUSED(context)
-    
+
+    // see bug 10816
+    // don't let the linker optimize the dependency away
+    mitk::PicFileReader::New();
+
     RegisterCoreExtObjectFactory();
     this->StartInputDeviceModules();
   }
-  
+
   void CoreExtActivator::stop(ctkPluginContext* context)
   {
     Q_UNUSED(context)

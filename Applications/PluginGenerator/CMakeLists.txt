@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.4)
 project(MITKPluginGenerator)
 
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 2)
+set(VERSION_MINOR 3)
 set(VERSION_PATCH 0)
 
 set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
@@ -15,7 +15,7 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
-# Prerequesites
+# Prerequisites
 #-----------------------------------------------------------------------------
 
 set(QT_DONT_USE_QTGUI 1)

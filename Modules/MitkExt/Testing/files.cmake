@@ -25,7 +25,7 @@ SET(MODULE_IMAGE_TESTS
   #mitkExtractImageFilterTest.cpp
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp
-  #mitkSurfaceToImageFilterTest.cpp
+  mitkSurfaceToImageFilterTest.cpp
 )
 SET(MODULE_CUSTOM_TESTS
   mitkLabeledImageToSurfaceFilterTest.cpp

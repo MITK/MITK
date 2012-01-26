@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkPicFileWriter.h"
+#include <mitkSTLFileReader.h>
 
 #include <vtkPolyData.h>
 
@@ -45,32 +46,20 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     std::cout<<"no file specified [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  mitk::Surface::Pointer surface = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-  try
-  {
-    std::cout<<argv[1]<<std::endl;
-    factory->SetFileName( argv[1] );
-    factory->Update();
 
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    surface = dynamic_cast<mitk::Surface*>(node->GetData());
-    if(surface.IsNull())
-    {
-      std::cout<<"file not a surface - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-  }
-  catch ( itk::ExceptionObject & ex )
+  mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
+  reader->SetFileName(argv[1]);
+  reader->Update();
+
+  mitk::Surface::Pointer surface = NULL;
+
+  surface = reader->GetOutput();
+
+  if(surface.IsNull())
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    std::cout<<"file not a surface - test will not be applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
   }
 
   std::cout << "Testing number of points of surface: " << std::flush;

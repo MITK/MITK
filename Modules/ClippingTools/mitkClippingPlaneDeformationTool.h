@@ -1,10 +1,10 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitk.cpp,v $
+Module:    $RCSfile: $
 Language:  C++
-Date:      $Date: 2009-04-18 20:20:25 +0200 (Sa, 18 Apr 2009) $
-Version:   $Revision: 12952 $
+Date:      $Date: $
+Version:   $Revision: $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -19,51 +19,48 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkClippingPlaneDeformationTool_h_Included
 #define mitkClippingPlaneDeformationTool_h_Included
 
-#include "mitkCommon.h"
-#include "mitkVector.h"
-#include "mitkTool.h"
-#include "mitkDataNode.h"
-#include "mitkSurfaceDeformationInteractor3D.h"
 #include "ClippingToolsExports.h"
 
+#include "mitkCommon.h"
+#include "mitkDataNode.h"
+#include "mitkSurfaceDeformationInteractor3D.h"
+#include "mitkTool.h"
+#include "mitkVector.h"
 
 namespace mitk
 {
+  /**
+  \brief A tool with whom you can deform planes.
+  */
+  class ClippingTools_EXPORT ClippingPlaneDeformationTool : public Tool
+  {
+  public:
 
-/**
-\brief 
-*/
-class ClippingTools_EXPORT ClippingPlaneDeformationTool : public Tool
-{
-public:
+    mitkClassMacro(ClippingPlaneDeformationTool, Tool);
+    itkNewMacro(ClippingPlaneDeformationTool);
 
-  mitkClassMacro(ClippingPlaneDeformationTool, Tool);
-  itkNewMacro(ClippingPlaneDeformationTool);
-
-  virtual const char** GetXPM() const;
-  virtual const char* GetName() const;
-  virtual const char* GetGroup() const;
+    virtual const char** GetXPM() const;
+    virtual const char* GetName() const;
+    virtual const char* GetGroup() const;
 
 
-protected:
+  protected:
 
-  ClippingPlaneDeformationTool(); // purposely hidden
-  virtual ~ClippingPlaneDeformationTool();
+    ClippingPlaneDeformationTool(); // purposely hidden
+    virtual ~ClippingPlaneDeformationTool();
 
-  virtual void Activated();
-  virtual void Deactivated();
+    virtual void Activated();
+    virtual void Deactivated();
 
-  mitk::DataNode::Pointer m_ClippingPlaneNode;
-  mitk::SurfaceDeformationInteractor3D::Pointer m_SurfaceInteractor;  
+    mitk::DataNode::Pointer                       m_ClippingPlaneNode;
+    mitk::SurfaceDeformationInteractor3D::Pointer m_SurfaceInteractor;  
 
   private:
 
-  void ClippingPlaneChanged();
-};
+    void ClippingPlaneChanged();
+  };
 
 } //end namespace mitk
-
-
 
 #endif
 

@@ -881,49 +881,59 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
       m_Dimension = 4;
   }
 
-  mitk::PixelType pixelType = MakeScalarPixelType<int>();
-/* FIXME
+
   switch ( vtkimagedata->GetScalarType() ) 
   {
   case VTK_BIT: 
   case VTK_CHAR: 
-    pixelType.Initialize(typeid(char), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(char), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<char>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_UNSIGNED_CHAR: 
-    pixelType.Initialize(typeid(unsigned char), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(unsigned char), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<unsigned char>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_SHORT: 
-    pixelType.Initialize(typeid(short), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(short), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<short>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_UNSIGNED_SHORT: 
-    pixelType.Initialize(typeid(unsigned short), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(unsigned short), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<unsigned short>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_INT: 
-    pixelType.Initialize(typeid(int), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(int), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<int>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_UNSIGNED_INT: 
-    pixelType.Initialize(typeid(unsigned int), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(unsigned int), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<unsigned int>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_LONG: 
-    pixelType.Initialize(typeid(long), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(long), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<long>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_UNSIGNED_LONG: 
-    pixelType.Initialize(typeid(unsigned long), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(unsigned long), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<unsigned long>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_FLOAT:
-    pixelType.Initialize(typeid(float), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(float), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<float>(), m_Dimension, tmpDimensions, channels);
     break;
   case VTK_DOUBLE: 
-    pixelType.Initialize(typeid(double), vtkimagedata->GetNumberOfScalarComponents());
+    //pixelType.Initialize(typeid(double), vtkimagedata->GetNumberOfScalarComponents());
+    Initialize(mitk::MakeScalarPixelType<double>(), m_Dimension, tmpDimensions, channels);
     break;
   default:
     break;
-  }*/
+  }
+  /*
   Initialize(pixelType, 
     m_Dimension, 
     tmpDimensions,
     channels);
-
+*/
 
   const double *spacinglist = vtkimagedata->GetSpacing();
   Vector3D spacing;

@@ -1,10 +1,10 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitk.cpp,v $
+Module:    $RCSfile: $
 Language:  C++
-Date:      $Date: 2009-04-18 20:20:25 +0200 (Sa, 18 Apr 2009) $
-Version:   $Revision: 12952 $
+Date:      $Date: $
+Version:   $Revision: $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -19,20 +19,19 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkClippingPlaneRotationTool_h_Included
 #define mitkClippingPlaneRotationTool_h_Included
 
-#include "mitkCommon.h"
-#include "mitkVector.h"
-#include "mitkTool.h"
-#include "mitkDataNode.h"
-#include "mitkAffineInteractor3D.h"
-//#include "MitkExtExports.h"
 #include "ClippingToolsExports.h"
 
+#include "mitkAffineInteractor3D.h"
+#include "mitkCommon.h"
+#include "mitkDataNode.h"
+#include "mitkTool.h"
+#include "mitkVector.h"
 
 namespace mitk
 {
 
   /**
-  \brief 
+  \brief A tool which allows you to rotate planes.
   */
   class ClippingTools_EXPORT ClippingPlaneRotationTool : public Tool
   {
@@ -54,7 +53,7 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    mitk::DataNode::Pointer m_ClippingPlaneNode;
+    mitk::DataNode::Pointer           m_ClippingPlaneNode;
     mitk::AffineInteractor3D::Pointer m_AffineInteractor;
 
   private:
@@ -63,8 +62,6 @@ namespace mitk
   };
 
 } //end namespace mitk
-
-
 
 #endif
 

@@ -1,15 +1,13 @@
 #include "mitkClippingPlaneDeformationTool.h"
-
 #include "mitkClippingPlaneDeformationTool.xpm"
 
+#include "mitkBaseRenderer.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
 
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
-#include "mitkGlobalInteraction.h"
-
 namespace mitk{
-  MITK_TOOL_MACRO(ClippingTools_EXPORT, ClippingPlaneDeformationTool, "Clipping Plane Deformation");
+  MITK_TOOL_MACRO(ClippingTools_EXPORT, ClippingPlaneDeformationTool, "Clipping Tool Deformation");
 }
 
 mitk::ClippingPlaneDeformationTool::ClippingPlaneDeformationTool()
@@ -33,7 +31,7 @@ const char* mitk::ClippingPlaneDeformationTool::GetName() const
 
 const char* mitk::ClippingPlaneDeformationTool::GetGroup() const
 {
-  return "ClippingPlane";
+  return "ClippingTool";
 }
 
 void mitk::ClippingPlaneDeformationTool::Activated()
@@ -41,20 +39,20 @@ void mitk::ClippingPlaneDeformationTool::Activated()
   Superclass::Activated();
 
   //check if the Clipping plane is changed.
-  if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData( 0 ))
+  if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData(0))
   {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_SurfaceInteractor );
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SurfaceInteractor);
     this->ClippingPlaneChanged();
   }
 
-  mitk::GlobalInteraction::GetInstance()->AddInteractor( m_SurfaceInteractor );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SurfaceInteractor);
 }
 
 void mitk::ClippingPlaneDeformationTool::Deactivated()
 {
   Superclass::Deactivated();
 
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_SurfaceInteractor );
+  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SurfaceInteractor);
 }
 
 //Checks the working data node, if it has an interactor. Otherwise initial a new one.
@@ -64,11 +62,5 @@ void mitk::ClippingPlaneDeformationTool::ClippingPlaneChanged()
   m_SurfaceInteractor = dynamic_cast<mitk::SurfaceDeformationInteractor3D*>(m_ClippingPlaneNode->GetInteractor());
 
   if (m_SurfaceInteractor.IsNull())
-  {
-    m_SurfaceInteractor = mitk::SurfaceDeformationInteractor3D::New( 
-      "AffineInteractor3D", m_ClippingPlaneNode );
-  }
+    m_SurfaceInteractor = mitk::SurfaceDeformationInteractor3D::New("AffineInteractor3D", m_ClippingPlaneNode);
 }
-
-
-

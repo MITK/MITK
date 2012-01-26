@@ -43,13 +43,13 @@ const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.de
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
 : QmitkFunctionality()
 , m_MultiWidget(NULL)
-,m_ToolManager(NULL)
+, m_ToolManager(NULL)
 {
-  //fast fix
-  //itk::Object::Pointer o;
-  /* o = mitk::ClippingPlaneRotationTool::New();
+  //Current fix for bug 10707. Waiting for a solution of bug 10834.
+  itk::Object::Pointer o;
+  o = mitk::ClippingPlaneRotationTool::New();
   o = mitk::ClippingPlaneDeformationTool::New();
-  o = mitk::ClippingPlaneTranslationTool::New(); */
+  o = mitk::ClippingPlaneTranslationTool::New();
 }
 
 QmitkDeformableClippingPlaneView::~QmitkDeformableClippingPlaneView()
@@ -86,7 +86,7 @@ void QmitkDeformableClippingPlaneView::CreateConnections()
 
   //Shows and set the tool buttons
   m_Controls.interactionToolSelectionBox->SetGenerateAccelerators(true);
-  m_Controls.interactionToolSelectionBox->SetDisplayedToolGroups("ClippingPlane");
+  m_Controls.interactionToolSelectionBox->SetDisplayedToolGroups("ClippingTool");
   m_Controls.interactionToolSelectionBox->SetLayoutColumns(3);
   m_Controls.interactionToolSelectionBox->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingData);
 

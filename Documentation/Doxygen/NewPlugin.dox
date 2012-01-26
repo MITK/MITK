@@ -9,27 +9,31 @@ The Plugin Generator takes the following command line arguments:
 
 \verbatim
 ./MITKPluginGenerator -h
-A CTK plug-in generator for MITK
+A CTK plug-in generator for MITK (version 1.2.0)
 
-  -h, --help                    Show this help text
-  -o, --out-dir                 Output directory (default: /tmp)
-  -l, --license                 Path to a file containing license information (default: :/MITKLicense.txt)
-  -v, --vendor                  The vendor of the generated code (default: DKFZ, Medical and Biological Informatics)
-  -q, --quiet                   Do not print additional information
-  -y, --confirm-all             Answer all questions with 'yes'
+  -h, --help                      Show this help text
+  -o, --out-dir                   Output directory (default: /tmp)
+  -l, --license                   Path to a file containing license information (default: :/MITKLicense.txt)
+  -v, --vendor                    The vendor of the generated code (default: DKFZ, Medical and Biological Informatics)
+  -q, --quiet                     Do not print additional information
+  -y, --confirm-all               Answer all questions with 'yes'
+  -u, --check-update              Check for updates and exit
+  -n, --no-networking             Disable all network requests
 
 Plug-in View options
-  -vc, --view-class             The View's' class name
-  -vn, --view-name              The View's human readable name
+  -vc, --view-class               The View's' class name
+  -vn, --view-name              * The View's human readable name
 
 Plug-in options
-  -ps, --plugin-symbolic-name   The plugin's symbolic name
-  -pn, --plugin-name            The plug-in's human readable name
+  -ps, --plugin-symbolic-name   * The plugin's symbolic name
+  -pn, --plugin-name              The plug-in's human readable name
 
 Project options
-  --project-copyright           Path to a file containing copyright information (default: :/MITKCopyright.txt)
-  --project-name                The project name
-  --project-app-name            The application name
+  --project-copyright             Path to a file containing copyright information (default: :/MITKCopyright.txt)
+  --project-name                  The project name
+  --project-app-name              The application name
+
+[* - options are required]
 \endverbatim
 
 If a project name is provided via the <tt>--project-name</tt> argument, the new plug-in will be generated
@@ -52,11 +56,8 @@ plug-in in your project's build system (usually in the file <tt>&lt;your-project
 
 \subsection NewPluginProjectPrerequisites Prerequisites
 
-You need:
-  -# Git from http://git-scm.com (there are also numerous third-party graphical clients available)
-  -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
-  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
-  (version 4.5 or above is recommended, we cannot guarantee compatibility with lower versions)
+MITK-based projects creating with the Plugin Generator need the same prerequisites as MITK itself. See the
+\ref BuildInstructionsPage for MITK for details.
 
 Here is an example call to the Plugin Generator, creating the same plug-in as above but integrated in a new project:
 
@@ -66,10 +67,11 @@ Here is an example call to the Plugin Generator, creating the same plug-in as ab
 
 The generated project is completely self-contained and can be configured via CMake immediately. When building the
 generated project, it will first download all required dependencies (like MITK itself). For an explanation of the
-project's build directory layout, see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">SetupAMITKBasedProject</a>.
+project's build directory layout and how to configure MITK from your project's superbuild CMake configuration,
+see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">SetupAMITKBasedProject</a>.
 
 
-\section  NewPluginLimitations
+\subsection NewPluginLimitations Limitations
 
 The Plugin Generator supports only a very limited set of possible configuration options. For more customizations of your
 project or plug-in, you must familiarize yourself with CMake and the generated build system.

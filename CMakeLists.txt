@@ -108,33 +108,50 @@ option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
-# some targets in Utilities also depend on Qt. Use this option
-# to decide if they should be build
-option(MITK_USE_QT "Use Trolltech's Qt library" ON)
+option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
+option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
+option(MITK_USE_Boost "Use the Boost C++ library" OFF)
+option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
+option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
+option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
+option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
+set(MITK_USE_CableSwig ${MITK_USE_Python})
+
+mark_as_advanced(MITK_BUILD_ALL_APPS
+                 MITK_USE_CTK
+                 MITK_USE_DCMTK
+                )
+
+
+if(MITK_USE_Boost)
+  option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+  set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+endif()
+
+if(MITK_USE_BLUEBERRY)
+  option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
+  mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
+  
+  if(NOT MITK_USE_CTK)
+    message("Forcing MITK_USE_CTK to ON because of MITK_USE_BLUEBERRY")
+    set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
+  endif()
+endif()
+  
+if(MITK_USE_CTK AND NOT MITK_USE_QT)
+  message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
+  set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
+endif()
+
 if(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
   find_package(Qt4 4.6.0 REQUIRED)
 endif()
 
-option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
-option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
-option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
-option(MITK_USE_Boost "Use the Boost C++ library" OFF)
-if(MITK_USE_Boost)
-  option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
-  set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-endif()
-option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
-option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
-option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
-option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
-  
-mark_as_advanced(MITK_BUILD_ALL_PLUGINS
-                 MITK_BUILD_ALL_APPS
-                 MITK_USE_CTK
-                 MITK_USE_DCMTK
-                 )
+
+# Customize the default pixel types for multiplex macros
 
 set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
     "int, unsigned int, short, unsigned short, char, unsigned char"
@@ -159,9 +176,6 @@ mark_as_advanced(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
                 )
 
 # consistency checks
-if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
-  MESSAGE(FATAL_ERROR "BlueBerry depends on CTK. Please set MITK_USE_CTK to ON.")
-endif()
 
 if(NOT MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES)
   set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES

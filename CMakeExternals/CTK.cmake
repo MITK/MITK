@@ -44,6 +44,8 @@ IF(MITK_USE_CTK)
         ${ctk_optional_cache_args}
         -DDESIRED_QT_VERSION:STRING=4
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+        -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
+        -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_PluginFramework:BOOL=ON
         -DCTK_LIB_DICOM/Widgets:BOOL=ON
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON

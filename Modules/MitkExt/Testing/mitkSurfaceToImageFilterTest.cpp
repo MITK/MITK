@@ -47,7 +47,14 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (!mitk::STLFileReader::CanReadFile(argv[1], "", ""))
+  {
+    std::cout << "Input file not a valid .stl file [PASSED]\n[TEST DONE]" << std::endl;
+    return EXIT_SUCCESS;
+  }
+
   mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
+
   reader->SetFileName(argv[1]);
   reader->Update();
 

@@ -119,13 +119,22 @@ int mitkImageWriterTest(int  argc , char* argv[])
       myImageWriter->Update();
       std::fstream fin, fin2;
       fin.open(AppendExtension(filename, ".mhd").c_str(),std::ios::in);
+
+      std::string rawExtension = ".raw";
       fin2.open(AppendExtension(filename, ".raw").c_str(),std::ios::in);
+      if( !fin2.is_open() )
+      {
+        rawExtension = ".zraw";
+        fin2.open(AppendExtension(filename, ".zraw").c_str(),std::ios::in);
+      }
+
       MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
       MITK_TEST_CONDITION_REQUIRED(fin2.is_open(),"Write .raw file");
+
       fin.close();
       fin2.close();
       remove(AppendExtension(filename, ".mhd").c_str());
-      remove(AppendExtension(filename, ".raw").c_str());
+      remove(AppendExtension(filename, rawExtension.c_str()).c_str());
     }
     catch (...)
     {

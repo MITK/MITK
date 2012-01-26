@@ -53,14 +53,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlaneSource.h>
 
 
-
-
-
+//use this to create the test volume on the fly
 #define CREATE_VOLUME
+
+//use this to save the created volume
 //#define SAVE_VOLUME
+
+//use this to calculate the error from the sphere mathematical model to our pixel based one
 //#define CALC_TESTFAILURE_DEVIATION
+
+//use this to render an oblique slice through a specified image
 //#define SHOW_SLICE_IN_RENDER_WINDOW
-//#define EXTRACTOR_DEBUG
+
+//use this to have infos printed the mbilog
+#define EXTRACTOR_DEBUG
 
 
 /*these are the deviations calculated by the function CalcTestFailureDeviation (see for details)*/
@@ -111,7 +117,7 @@ public:
 		slicer->SetWorldGeometry(TestPlane);
 		slicer->Update();
 
-		MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "resliced Image returned");
+		MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "Extractor returned a slice");
 
 		mitk::Image::Pointer reslicedImage = slicer->GetOutput();
 
@@ -125,12 +131,15 @@ public:
 		else{devArea = Testfailure_Deviation_Volume_128; devDiameter = Testfailure_Deviation_Diameter_128;}
 	
 
+		std::string areatestName = TestName.append(" area");
+		std::string diametertestName = TestName.append(" testing diameter");
+
 		//TODO think about the deviation, 1% makes no sense at all
-		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageAreaCalcToPixel) < 1, "testing area");
-		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageRadiusToPixel) < 1, "testing diameter");
+		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageAreaCalcToPixel) < 1, areatestName );
+		MITK_TEST_CONDITION(std::abs(100 - testResults.percentageRadiusToPixel) < 1, diametertestName );
 	
 	#ifdef EXTRACTOR_DEBUG
-		MITK_INFO << TestName << ">>> " << "planeDistanceToSphereCenter: " << testResults.planeDistanceToSphereCenter;
+		MITK_INFO << TestName << " >>> " << "planeDistanceToSphereCenter: " << testResults.planeDistanceToSphereCenter;
 		MITK_INFO << "area in pixels: " << testResults.areaInPixel << " <-> area in mm: " << testResults.areaCalculated << " = " << testResults.percentageAreaCalcToPixel << "%";
 		
 		MITK_INFO << "calculated diameter: " << testResults.diameterCalculated << " <-> diameter in mm: " << testResults.diameterInMM << " <-> diameter in pixel: " << testResults.diameterInPixel << " = " << testResults.percentageRadiusToPixel << "%";
@@ -398,7 +407,7 @@ public:
 	 * worldcoordinate is not corrresponding to the index in the 2D image. and so the pixel values are not the same as
 	 * expected.
 	 */
-	static void TestPerPixelOrthogonal()
+	static void PixelvalueBasedTest()
 	{
 		/* setup itk image */
 		typedef itk::Image<unsigned short, 3> ImageType;
@@ -450,13 +459,13 @@ public:
 		writer->SetFileName(file);
 		writer->Update();*/
 
-                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Frontal);
-                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
-                TestPerPixelOrthogonalPlane(imageInMitk, mitk::PlaneGeometry::Transversal);
+                PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Frontal);
+                PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
+                PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Transversal);
 
 	}
 
-	static void TestPerPixelOrthogonalPlane(mitk::Image* imageInMitk, mitk::PlaneGeometry::PlaneOrientation orientation){
+	static void PixelvalueBasedTestByPlane(mitk::Image* imageInMitk, mitk::PlaneGeometry::PlaneOrientation orientation){
 
 		typedef itk::Image<unsigned short, 3> ImageType;
 
@@ -482,7 +491,6 @@ public:
 		 
 		plane->InitializeStandardPlane(imageInMitk->GetGeometry(), orientation, sliceindex, isFrontside, isRotated);
 		
-		//plane->SetPlaneToCenterOfVoxelInDirection(orientation);
 		mitk::Point3D origin = plane->GetOrigin();
 		mitk::Vector3D normal;
 		normal = plane->GetNormal();
@@ -544,6 +552,7 @@ public:
 		mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
 		slicer->SetInput(imageInMitk);
 		slicer->SetWorldGeometry(plane);
+		
 		slicer->Update();
 
 		mitk::Image::Pointer slice = slicer->GetOutput();
@@ -575,21 +584,39 @@ public:
 		MITK_TEST_CONDITION(valueAt3DVolume == valueAtSlice, "comparing pixelvalues for orthogonal plane");
 
 
-		vtkImageData* imageInVtk = imageInMitk->GetVtkImageData();
-		vtkImageData* sliceInVtk = slice->GetVtkImageData();
+		vtkSmartPointer<vtkImageData> imageInVtk = vtkSmartPointer<vtkImageData>::New();
+		imageInVtk = imageInMitk->GetVtkImageData();
+		vtkSmartPointer<vtkImageData> sliceInVtk = vtkSmartPointer<vtkImageData>::New();
+		sliceInVtk = slice->GetVtkImageData();
 
-		double valueVTKinSlice = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
+		double PixelvalueByMitkOutput = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
 		double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
 
+
+		/* Test that everything is working equally if vtkoutput is used instead of the default output 
+		 * from mitk ImageToImageFilter
+		 */
+		mitk::ExtractSliceFilter::Pointer slicerWithVtkOutput = mitk::ExtractSliceFilter::New();
+		slicerWithVtkOutput->SetInput(imageInMitk);
+		slicerWithVtkOutput->SetWorldGeometry(plane);
+		slicerWithVtkOutput->SetVtkOutputRequest(true);
 		
+		slicerWithVtkOutput->Update();
+		vtkSmartPointer<vtkImageData> vtkImageByVtkOutput = vtkSmartPointer<vtkImageData>::New();
+		vtkImageByVtkOutput = slicerWithVtkOutput->GetVtkOutput();
+		double PixelvalueByVtkOutput = vtkImageByVtkOutput->GetScalarComponentAsDouble(n1, n2, 0, 0);
+
+		MITK_TEST_CONDITION(PixelvalueByMitkOutput == PixelvalueByVtkOutput, "testing convertion of image output vtk->mitk by reslicer");
 
 
+
+/*================ mbilog outputs ===========================*/
 #ifdef EXTRACTOR_DEBUG
 		MITK_INFO << "\n" << "TESTINFO index: " << sliceindex << " orientation: " << orientation << " frontside: " << isFrontside << " rotated: " << isRotated;
 		MITK_INFO << "\n" << "slice index to world: " << sliceIndexToWorld;
 		MITK_INFO << "\n" << "image index to world: "  << imageIndexToWorld;
 
-		MITK_INFO  << "\n" << "vtk: slice: " << valueVTKinSlice << ", image: "<< valueVTKinImage;
+		MITK_INFO  << "\n" << "vtk: slice: " << PixelvalueByMitkOutput << ", image: "<< valueVTKinImage;
 
 		MITK_INFO << "\n" << "testPoint3D InWorld" << testPoint3DInWorld << " is " << testPoint2DInIndex << " in 2D";
 		MITK_INFO << "\n" << "randoms: " << ((int)n1) << ", " << ((int)n2);
@@ -860,7 +887,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 
 	//pixelvalue based testing
-	mitkExtractSliceFilterTestClass::TestPerPixelOrthogonal();
+	mitkExtractSliceFilterTestClass::PixelvalueBasedTest();
 
 	//initialize sphere test volume
 	mitkExtractSliceFilterTestClass::InitializeTestVolume();
@@ -881,6 +908,17 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
         geometryTransversal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Transversal, sphereCenter, false, true);
 	geometryTransversal->ChangeImageGeometryConsideringOriginOffset(true);
 
+	mitk::Point3D origin = geometryTransversal->GetOrigin();
+	mitk::Vector3D normal;
+	normal = geometryTransversal->GetNormal();
+
+
+	normal.Normalize();
+
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+
+	//geometryTransversal->SetOrigin(origin);
+
 	mitkExtractSliceFilterTestClass::TestSlice(geometryTransversal, "Testing transversal plane");
 	/* end transversal plane */
 
@@ -888,8 +926,18 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* sagittal plane */
 	mitk::PlaneGeometry::Pointer geometrySagital = mitk::PlaneGeometry::New();
-        geometrySagital->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
+	geometrySagital->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
 	geometrySagital->ChangeImageGeometryConsideringOriginOffset(true);
+
+	origin = geometrySagital->GetOrigin();
+	normal = geometrySagital->GetNormal();
+
+
+	normal.Normalize();
+
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+
+	//geometrySagital->SetOrigin(origin);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometrySagital, "Testing sagittal plane");
 	/* sagittal plane */
@@ -898,8 +946,18 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* sagittal shifted plane */
 	mitk::PlaneGeometry::Pointer geometrySagitalShifted = mitk::PlaneGeometry::New();
-        geometrySagitalShifted->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, (sphereCenter - 14), true, false);
+	geometrySagitalShifted->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, (sphereCenter - 14), true, false);
 	geometrySagitalShifted->ChangeImageGeometryConsideringOriginOffset(true);
+
+	origin = geometrySagitalShifted->GetOrigin();
+	normal = geometrySagitalShifted->GetNormal();
+
+
+	normal.Normalize();
+
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+
+	//geometrySagitalShifted->SetOrigin(origin);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometrySagitalShifted, "Testing sagittal plane shifted");
 	/* end sagittal shifted plane */
@@ -908,30 +966,50 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 	/* coronal plane */
 	mitk::PlaneGeometry::Pointer geometryCoronal = mitk::PlaneGeometry::New();
-        geometryCoronal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Frontal, sphereCenter, true, false);
+	geometryCoronal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Frontal, sphereCenter, true, false);
 	geometryCoronal->ChangeImageGeometryConsideringOriginOffset(true);
+
+	origin = geometryCoronal->GetOrigin();
+	normal = geometryCoronal->GetNormal();
+
+
+	normal.Normalize();
+
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+
+	//geometryCoronal->SetOrigin(origin);
 
 	mitkExtractSliceFilterTestClass::TestSlice(geometryCoronal, "Testing coronal plane");
 	/* end coronal plane */
-	
+
 
 
 	/* oblique plane */
 	mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
-        obliquePlane->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
+	obliquePlane->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
 	obliquePlane->ChangeImageGeometryConsideringOriginOffset(true);
 
-	mitk::Vector3D rotationVector;
-	rotationVector[0] = mitkExtractSliceFilterTestClass::randFloat();
-	rotationVector[1] = mitkExtractSliceFilterTestClass::randFloat();
-	rotationVector[2] = mitkExtractSliceFilterTestClass::randFloat();
+	origin = obliquePlane->GetOrigin();
+	normal = obliquePlane->GetNormal();
 
-	float degree = mitkExtractSliceFilterTestClass::randFloat() * 180;
+
+	normal.Normalize();
+
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
+
+	//obliquePlane->SetOrigin(origin);
+
+	mitk::Vector3D rotationVector;
+	rotationVector[0] = 0.2;
+	rotationVector[1] = 0.4;
+	rotationVector[2] = 0.62;
+
+	float degree = 37.0;
 
 	mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, obliquePlane->GetCenter(), rotationVector, degree);
 	obliquePlane->ExecuteOperation(op);
 	delete op;
-	
+
 	mitkExtractSliceFilterTestClass::TestSlice(obliquePlane, "Testing oblique plane");
 	/* end oblique plane */
 

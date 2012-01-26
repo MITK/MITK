@@ -1,5 +1,14 @@
 This is the change log for the MITK Plugin Generator
 
+Changes since version 1.2.0
+======================================================================
+
+Changes in the generated files
+----------------------------------------------------------------------
+
+- Added gcc linker flag --as-needed to get same behavior as on Windows
+- Improved MITK superbuild configuration options
+
 Changes since version 1.1.1
 ======================================================================
 

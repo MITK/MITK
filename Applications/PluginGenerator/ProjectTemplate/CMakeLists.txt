@@ -211,6 +211,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
+  # Enable link dependency optimization to only link libraries which satisfy undefined
+  # symbol references. This aligns the link behavior with the one from the Windows linker.
+  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
 
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so

@@ -17,38 +17,81 @@ ENDMACRO()
 #-----------------------------------------------------------------------------
 
 if(UNIX AND NOT APPLE)
-#----------------------------- libxt-dev --------------------
-INCLUDE(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+  #----------------------------- libxt-dev --------------------
+  INCLUDE(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 
-set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
-CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
-if(NOT STRING_DEFS_H)
-MESSAGE(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
+  set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
+  CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
+  if(NOT STRING_DEFS_H)
+    message(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
+  endif()
+
+  set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
+  CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
+  if(NOT TIFF_H)
+    message(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
+  endif()
+
+  CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
+  if(NOT LIB_WRAP)
+    message(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+  endif()
+
 endif()
 
-set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
-CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
-if(NOT TIFF_H)
-MESSAGE(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
+
+#-----------------------------------------------------------------------------
+# ExternalProjects
+#-----------------------------------------------------------------------------
+
+SET(external_projects
+  VTK
+  GDCM
+  CableSwig
+  ITK
+  Boost
+  DCMTK
+  CTK
+  OpenCV
+  MITKData
+  )
+
+
+set(MITK_USE_CableSwig ${MITK_USE_Python})
+set(MITK_USE_GDCM 1)
+set(MITK_USE_ITK 1)
+set(MITK_USE_VTK 1)
+  
+foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV)
+  if(MITK_USE_${proj})
+    set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
+    mark_as_advanced(EXTERNAL_${proj}_DIR)
+    if(EXTERNAL_${proj}_DIR)
+      set(${proj}_DIR ${EXTERNAL_${proj}_DIR})
+    endif()
+  endif()
+endforeach()
+
+if(MITK_USE_Boost)
+  set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+  mark_as_advanced(EXTERNAL_BOOST_ROOT)
+  if(EXTERNAL_BOOST_ROOT)
+    set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
+  endif()
 endif()
 
-CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
-if(NOT LIB_WRAP)
-MESSAGE(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+if(BUILD_TESTING)
+  set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
+  mark_as_advanced(EXTERNAL_MITK_DATA_DIR)
+  if(EXTERNAL_MITK_DATA_DIR)
+    set(MITK_DATA_DIR ${EXTERNAL_MITK_DATA_DIR})
+  endif()
 endif()
 
-endif()
-
-#----------------------------- Qt ---------------------------
-if(MITK_USE_QT)
-  find_package(Qt4 REQUIRED)
-  set(vtk_QT_ARGS
-      -DDESIRED_QT_VERSION:STRING=4
-      -DVTK_USE_GUISUPPORT:BOOL=ON
-      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
-      -DVTK_USE_QT:BOOL=ON
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-     )
+# Look for git early on, if needed
+if((BUILD_TESTING AND NOT EXTERNAL_MITK_DATA_DIR) OR
+   (MITK_USE_CTK AND NOT EXTERNAL_CTK_DIR))
+  find_package(Git REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -106,22 +149,6 @@ SET(ep_common_args
   -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
   -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_C_FLAGS_RELWITHDEBINFO}
 )
-
-#-----------------------------------------------------------------------------
-# ExternalProjects
-#-----------------------------------------------------------------------------
-
-SET(external_projects
-  VTK
-  GDCM
-  CableSwig
-  ITK
-  Boost
-  DCMTK
-  CTK
-  OpenCV
-  MITKData
-  )
 
 # Include external projects
 FOREACH(p ${external_projects})

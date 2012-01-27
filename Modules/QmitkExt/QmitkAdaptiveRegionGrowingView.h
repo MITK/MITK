@@ -159,6 +159,8 @@ private:
 
   void UpdateVolumeRenderingThreshold(int thValue);
 
+//  void TimeStepChanged();
+
 };
 
 

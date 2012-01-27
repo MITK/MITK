@@ -63,6 +63,7 @@ MACRO(MITK_INSTALL_HELPER_APP)
 
     FOREACH(_target_location ${_target_locations})
       IF(NOT _qt_is_system_qt)
+        INSTALL(CODE "FILE(RPATH_REMOVE FILE \"\${CMAKE_INSTALL_PREFIX}/${_target_location}\")")
         IF(QT_PLUGINS_DIR)
           IF(WIN32)
             INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"

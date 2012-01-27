@@ -2,6 +2,12 @@
 
 mitk::ImageDescriptor::ImageDescriptor()
 {
+  //initialize the dimensions array
+  for(unsigned int i=0; i<MAX_IMAGE_DIMENSIONS; i++)
+  {
+    m_Dimensions[i] = 1;
+  }
+
   this->m_NumberOfChannels = 0;
 }
 

@@ -59,6 +59,12 @@ MACRO(MITK_INSTALL_HELPER_APP)
       SET(${_target_locations}_qt_plugins_install_dir bin)
       SET(_qt_conf_install_dirs bin)
       INSTALL(PROGRAMS ${_target} DESTINATION bin)
+      IF(UNIX)
+        # Remove the rpath from helper applications. We assume that all dependencies
+        # are installed into the same location as the helper application.
+        INSTALL(CODE "FILE(RPATH_REMOVE
+                           FILE \"\${CMAKE_INSTALL_PREFIX}/${_target_location}\")")
+      ENDIF()
     ENDIF() 
 
     FOREACH(_target_location ${_target_locations})

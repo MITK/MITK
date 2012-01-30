@@ -293,7 +293,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
 	//this is needed when thick mode was enable bevore. These variable have to be reset to default values
 	localStorage->m_Reslicer->SetOutputDimensionality( 2 );
-	localStorage->m_Reslicer->SetOutputSpacingZDirection(0.0);
+	localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
     localStorage->m_Reslicer->SetOutputExtentZDirection( 0, 0 );
 
 

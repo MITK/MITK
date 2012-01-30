@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImage.h"
 #include "mitkGeometry3D.h"
 #include "mitkPointSet.h"
-//#include "mitkVesselSegmentationUIExports.h"
 
 #include "qwidget.h"
 #include "ui_QmitkAdaptiveRegionGrowingViewControls.h"
@@ -81,11 +80,6 @@ public:
   */
   Ui::QmitkAdaptiveRegionGrowingViewControls m_Controls;
 
-
- // itkSetMacro(labledSegmentation,std::string);
-
-//signals:
-
 protected slots:
 
     void SetSeedPointToggled(bool toggled);
@@ -110,8 +104,6 @@ protected slots:
 
     void SetUpperThresholdValue(int upperThreshold);
 
-    void SetRegionGrowingDirectionUpwards(bool);
-
 protected:
 
   //Pointer to the main widget to be able to reach the renderer
@@ -123,8 +115,6 @@ protected:
 
   void DeactivateSeedPointMode();
   void ActivateSeedPointMode();
-
-  void OnPointAdded();
 
 private:
 
@@ -158,8 +148,6 @@ private:
   void EnableVolumeRendering(bool enable);
 
   void UpdateVolumeRenderingThreshold(int thValue);
-
-//  void TimeStepChanged();
 
 };
 

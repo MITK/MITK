@@ -38,10 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
-//#include "Algorithms/mitkLabeledSegmentationImageToVesselTreeWrapper.h"
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkTransferFunctionProperty.h"
-//#include "mitkImageToTracheaSeedPointSetFilter.h"
 #include "mitkImageTimeSelector.h"
 
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
@@ -64,7 +62,7 @@ QmitkAdaptiveRegionGrowingView::~QmitkAdaptiveRegionGrowingView()
     if (node != NULL)
     {
         this->DeactivateSeedPointMode();
-        dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
+        //dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
     }    
 }
 
@@ -78,7 +76,6 @@ void QmitkAdaptiveRegionGrowingView::CreateConnections()
     connect( (QObject*) (m_Controls.m_IncreaseTH), SIGNAL(clicked()), this,SLOT(IncreaseSlider()));
     connect( (QObject*) (m_Controls.m_pbConfirmSegementation), SIGNAL(clicked()), this, SLOT(ConfirmSegmentation()));
     connect( (QObject*) (m_Controls.m_cbVolumeRendering), SIGNAL(toggled(bool)), this, SLOT(UseVolumeRendering(bool) ));
-    connect( (QObject*) (m_Controls.rb_Upwards), SIGNAL(toggled(bool)), this, SLOT(SetRegionGrowingDirectionUpwards(bool)));
     connect( (QObject*) (m_Controls.cb_DefineThresholdBoundaries), SIGNAL(toggled(bool)), this, SLOT(OnDefineThresholdBoundaries(bool)));
 
     connect( m_Controls.m_LowerThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(SetLowerThresholdValue(int)));
@@ -101,12 +98,6 @@ void QmitkAdaptiveRegionGrowingView::SetDataStorage(mitk::DataStorage* dataStora
 void QmitkAdaptiveRegionGrowingView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 {
   m_MultiWidget = multiWidget;
-//  itk::SimpleMemberCommand< QmitkAdaptiveRegionGrowingView >::Pointer timeStepperChangedCommand = itk::SimpleMemberCommand< QmitkAdaptiveRegionGrowingView >::New();
-
-//  timeStepperChangedCommand->SetCallbackFunction(
-//    this, &QmitkAdaptiveRegionGrowingView::TimeStepChanged );
-
-//  m_Time->AddObserver( itk::ModifiedEvent(), timeStepperChangedCommand );
 }
 
 void QmitkAdaptiveRegionGrowingView::SetInputImageNode(mitk::DataNode* node)
@@ -141,11 +132,6 @@ void QmitkAdaptiveRegionGrowingView::SetSeedPointToggled(bool toggled)
 
     //add to DataStorage
     m_DataStorage->Add(pointSetNode, m_InputImageNode);
-
-    //Watch for point added or modified
-//    itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingView>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingView>::New();
-//    pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingView::OnPointAdded);
-//    m_PointSetAddObserverTag = pointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
   }
 
   mitk::NodePredicateDataType::Pointer imagePred = mitk::NodePredicateDataType::New("Image");
@@ -183,137 +169,6 @@ void QmitkAdaptiveRegionGrowingView::SetSeedPointToggled(bool toggled)
   }
 }
 
-void QmitkAdaptiveRegionGrowingView::OnPointAdded()
-{
-    mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-
-    if (node != NULL) //no pointSet present
-    {
-        mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
-
-        if (pointSet.IsNull())
-        {
-            QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingView", "PointSetNode does not contain a pointset");
-            return;
-        }
-
-        mitk::Point3D seedPoint = pointSet->GetPointSet(0)->GetPoints()->ElementAt(0);
-
-        if (!m_Controls.cb_DefineThresholdBoundaries->isChecked())
-        {
-            // a node itself is not very useful, we need its data item (the image)
-            mitk::BaseData* data = m_InputImageNode->GetData();
-            if (data)
-            {
-              // test if this data item is an image or not (could also be a surface or something totally different)
-              mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-              if (image)
-              {
-                  mitk::Index3D seedPointInIndex;
-                  mitk::Index3D currentIndex;
-                  mitk::ScalarType pixelValues[125];
-                  unsigned int pos (0);
-                  image->GetGeometry()->WorldToIndex(seedPoint, seedPointInIndex);
-
-                  for(int i = seedPointInIndex[0]-2; i <= seedPointInIndex[0]+2; i++)
-                  {
-                      for(int j = seedPointInIndex[1]-2; j <= seedPointInIndex[1]+2; j++)
-                      {
-                          for(int k = seedPointInIndex[2]-2; k <= seedPointInIndex[2]+2; k++)
-                          {
-                              currentIndex[0] = i;
-                              currentIndex[1] = j;
-                              currentIndex[2] = k;
-                              if(image->GetGeometry()->IsIndexInside(currentIndex))
-                              {
-                                  pixelValues[pos] = image->GetPixelValueByIndex(currentIndex);
-                                  pos++;
-                              }
-                              else
-                              {
-                                  pixelValues[pos] = -10000000;
-                                  pos++;
-                              }
-                          }
-                      }
-                  }
-
-                  //Now calculation mean and deviation of the pixelValues
-                  unsigned int numberOfValues(0);
-                  for (unsigned int i = 0; i < 125; i++)
-                  {
-                      if(pixelValues[i] > -10000000)
-                      {
-                          m_SeedPointValueMean += pixelValues[i];
-                          numberOfValues++;
-                      }
-                  }
-
-                  m_SeedPointValueMean = m_SeedPointValueMean/numberOfValues;
-                  MITK_INFO<<"Mean: "<<m_SeedPointValueMean;
-
-                  mitk::ScalarType deviation(0);
-
-                  for (unsigned int i = 0; i < 125; i++)
-                  {
-                      if(pixelValues[i] > -10000000)
-                      {
-                          deviation += pow((m_SeedPointValueMean - pixelValues[i]),2);
-                      }
-                  }
-
-                  deviation = deviation/(numberOfValues-1);
-                  deviation = sqrt(deviation);
-
-                  //MITK_INFO<<"Deviation: "<<deviation
-                  if (image->GetDimension() == 4)
-                  {
-                      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-                      timeSelector->SetInput(image);
-                      timeSelector->SetTimeNr( m_MultiWidget->GetTimeNavigationController()->GetTime()->GetPos() );
-                      timeSelector->UpdateLargestPossibleRegion();
-                      //MITK_INFO<<"Time= "<<timeStep;
-                      //image = timeSelector->GetOutput();
-                  }
-
-                  //mitk::ScalarType value = timeSelector->GetOutput()->GetPixelValueByWorldCoordinate(seedPoint);
-//                  m_Controls.m_LowerThresholdSpinBox->setValue((value-(3*deviation)));
-//                  m_Controls.m_UpperThresholdSpinBox->setValue((value+(3*deviation)));
-//                  m_UPPERTHRESHOLD = (value+(3*deviation));
-//                  m_LOWERTHRESHOLD = (value-(3*deviation));
-
-//                  mitk::ScalarType windowSize =  timeSelector->GetOutput()->GetScalarValueMax()*0.15;
-
-//                  m_UPPERTHRESHOLD = value+windowSize;
-
-//                  if (m_UPPERTHRESHOLD > timeSelector->GetOutput()->GetScalarValueMax())
-//                      m_UPPERTHRESHOLD = timeSelector->GetOutput()->GetScalarValueMax();
-
-//                  m_LOWERTHRESHOLD = value-windowSize;
-
-//                  if (m_LOWERTHRESHOLD < timeSelector->GetOutput()->GetScalarValueMin())
-//                      m_LOWERTHRESHOLD = timeSelector->GetOutput()->GetScalarValueMin();
-
-//                  MITK_INFO<<"PointAdded: Value: "<<value<<", Mean: "<<m_SeedPointValueMean<<", Lower/Upper: "<<m_LOWERTHRESHOLD<<", "<<m_UPPERTHRESHOLD;
-              }
-            }
-        }
-        else
-        {
-            if (m_InputImageNode.IsNotNull())
-            {
-
-                m_LOWERTHRESHOLD = m_Controls.m_LowerThresholdSpinBox->value();
-                m_UPPERTHRESHOLD = m_Controls.m_UpperThresholdSpinBox->value();
-            }
-        }
-    }
-}
-
-//void QmitkAdaptiveRegionGrowingView::TimeStepChanged()
-//{
-
-//}
 
 void QmitkAdaptiveRegionGrowingView::RunSegmentation()
 {
@@ -394,11 +249,6 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
   typedef itk::MinimumMaximumImageCalculator<InputImageType> MinMaxValueFilterType;
 
-    IndexType seedIndex2;
-    imageGeometry->WorldToIndex( seedPoint, seedIndex2);
-
-    MITK_INFO<<"Worldpoint: "<<seedPoint<<", IndexPoint: "<<seedIndex2;
-
   if ( !imageGeometry->IsInside(seedPoint) )
   {
     QApplication::restoreOverrideCursor();//reset cursor to be able to click ok with the regular mouse cursor
@@ -409,42 +259,87 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   IndexType seedIndex;
   imageGeometry->WorldToIndex( seedPoint, seedIndex);// convert world coordinates to image indices
 
-  mitk::ScalarType seedValue = itkImage->GetPixel(seedIndex);
-  typename MinMaxValueFilterType::Pointer minMaxFilter = MinMaxValueFilterType::New();
-  minMaxFilter->SetImage(itkImage);
-  minMaxFilter->ComputeMinimum();
-  minMaxFilter->ComputeMaximum();
-
-  mitk::ScalarType min = minMaxFilter->GetMinimum();
-  mitk::ScalarType max = minMaxFilter->GetMaximum();
-  mitk::ScalarType windowSize = max - min;
-  mitk::LevelWindow window;
-  m_InputImageNode->GetLevelWindow(window, NULL, "levelwindow");
-  MITK_INFO << "Range by window: " << window.GetRangeMax() << " Range by ITK: " <<windowSize;
-  windowSize = 0.15*windowSize;
-
-  if (seedValue - 0.5*windowSize < min)
+  //If no custom threshold is defined then calculate the threshold automatically
+  //Therefor the mean of the intensities surrounding the seedpoint is calculated. A certain windowsize is applied around this meanvalue
+  if (m_Controls.cb_DefineThresholdBoundaries->isChecked())
   {
-      m_LOWERTHRESHOLD = min;
+      m_LOWERTHRESHOLD = m_Controls.m_LowerThresholdSpinBox->value();
+      m_UPPERTHRESHOLD = m_Controls.m_UpperThresholdSpinBox->value();
+
   }
   else
   {
-      m_LOWERTHRESHOLD = seedValue - 0.5*windowSize;
+      typename MinMaxValueFilterType::Pointer minMaxFilter = MinMaxValueFilterType::New();
+      minMaxFilter->SetImage(itkImage);
+      minMaxFilter->ComputeMinimum();
+      minMaxFilter->ComputeMaximum();
+
+      mitk::ScalarType min = minMaxFilter->GetMinimum();
+      mitk::ScalarType max = minMaxFilter->GetMaximum();
+      mitk::ScalarType windowSize = max - min;
+
+      windowSize = 0.25*windowSize;
+
+      IndexType currentIndex;
+      mitk::ScalarType pixelValues[125];
+      unsigned int pos (0);
+
+      for(int i = seedIndex[0]-2; i <= seedIndex[0]+2; i++)
+      {
+          for(int j = seedIndex[1]-2; j <= seedIndex[1]+2; j++)
+          {
+              for(int k = seedIndex[2]-2; k <= seedIndex[2]+2; k++)
+              {
+                  currentIndex[0] = i;
+                  currentIndex[1] = j;
+                  currentIndex[2] = k;
+                  if(imageGeometry->IsIndexInside(currentIndex))
+                  {
+                      pixelValues[pos] = itkImage->GetPixel(currentIndex);
+                      pos++;
+                  }
+                  else
+                  {
+                      pixelValues[pos] = -10000000;
+                      pos++;
+                  }
+              }
+          }
+      }
+
+      //Now calculation mean of the pixelValues
+      unsigned int numberOfValues(0);
+      for (unsigned int i = 0; i < 125; i++)
+      {
+          if(pixelValues[i] > -10000000)
+          {
+              m_SeedPointValueMean += pixelValues[i];
+              numberOfValues++;
+          }
+      }
+
+      m_SeedPointValueMean = m_SeedPointValueMean/numberOfValues;
+
+      if (m_SeedPointValueMean - 0.5*windowSize < min)
+      {
+          m_LOWERTHRESHOLD = min;
+      }
+      else
+      {
+          m_LOWERTHRESHOLD = m_SeedPointValueMean - 0.5*windowSize;
+      }
+
+      if (m_SeedPointValueMean + 0.5*windowSize > max)
+      {
+          m_UPPERTHRESHOLD = max;
+      }
+      else
+      {
+          m_UPPERTHRESHOLD = m_SeedPointValueMean + 0.5*windowSize;
+      }
   }
 
-  if (seedValue + 0.5*windowSize > max)
-  {
-      m_UPPERTHRESHOLD = max;
-  }
-  else
-  {
-      m_UPPERTHRESHOLD = seedValue + 0.5*windowSize;
-  }
-
-
-
-  MITK_INFO<<"SeedpointValue: "<<seedValue<<", Lower/Upper: "<<m_LOWERTHRESHOLD<<"/"<<m_UPPERTHRESHOLD;
-  if (seedValue>m_UPPERTHRESHOLD || seedValue<m_LOWERTHRESHOLD)
+  if (m_SeedPointValueMean>m_UPPERTHRESHOLD || m_SeedPointValueMean<m_LOWERTHRESHOLD)
   {
     QApplication::restoreOverrideCursor();//reset cursor to be able to click ok with the regular mouse cursor
     QMessageBox::information( NULL, "Segmentation functionality", "The seed point is outside the defined thresholds! Please set a new seed point or adjust the thresholds.");
@@ -455,6 +350,17 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   regionGrower->AddSeed( seedIndex );
   regionGrower->SetLower( m_LOWERTHRESHOLD );
   regionGrower->SetUpper( m_UPPERTHRESHOLD );
+
+  //Determine the direction of the regiongrowing. For dark structures e.g. the lung the regiongrowing
+  //is performed starting at the upper value going to the lower one
+  mitk::ScalarType seedValue = itkImage->GetPixel(seedIndex);
+  m_CurrentRGDirectionIsUpwards = true;
+
+  //In this case the seedpoint is placed e.g. in the lung or bronchialtree
+  if (seedValue < -500)
+  {
+      m_CurrentRGDirectionIsUpwards = false;
+  }
   regionGrower->SetGrowingDirectionIsUpwards( m_CurrentRGDirectionIsUpwards );
 
   try
@@ -464,7 +370,7 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
     catch(itk::ExceptionObject &exc)
   {
     QMessageBox errorInfo;
-    errorInfo.setWindowTitle("Vesseltree Segmentation Functionality");
+    errorInfo.setWindowTitle("Adaptive RG Segmentation Functionality");
     errorInfo.setIcon(QMessageBox::Critical);
     errorInfo.setText("An error occurred during region growing!");
     errorInfo.setDetailedText(exc.what());
@@ -473,7 +379,7 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   }
   catch( ... )
   {
-    QMessageBox::critical( NULL, "Vesseltree Segmentation Functionality", "An error occurred during region growing!");
+    QMessageBox::critical( NULL, "Adaptive RG Segmentation Functionality", "An error occurred during region growing!");
     return;
   }
 
@@ -492,7 +398,6 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   }
   this->m_SliderInitialized = true;
   this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
-  MITK_INFO<<"Detected LeakagePoint: "<<m_DetectedLeakagePoint;
 
   mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
 
@@ -502,7 +407,7 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
 
   // set some properties
   newNode->SetProperty("name", mitk::StringProperty::New(m_NAMEFORLABLEDSEGMENTATIONIMAGE));
-  //newNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  newNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
@@ -520,6 +425,8 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
     this->EnableVolumeRendering(true);
 
   m_UpdateSuggestedThreshold = true;// reset first stored threshold value
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
 
@@ -603,8 +510,6 @@ void QmitkAdaptiveRegionGrowingView::ChangeLevelWindow(int newValue)
       tempLevelWindow.SetLevelWindow(level, *window);
     }
 
-    //MITK_INFO<<"Lower/Upper/Level Window Bounds: "<<tempLevelWindow.GetLowerWindowBound()<<", "<<tempLevelWindow.GetUpperWindowBound()<<", "<<tempLevelWindow.GetLevel();
-
     newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
 
     if (m_UseVolumeRendering)
@@ -659,70 +564,8 @@ void QmitkAdaptiveRegionGrowingView::ConfirmSegmentation()
     return;
   }
 
+  //mitk::Tool::CreateEmptySegmentationNode(orgImage, "RGSegmentation", mitk::Color(255.0,0.0,0.0) );
 
-//  mitk::LabeledSegmentationImageToVesselTreeWrapper::Pointer wrapper = mitk::LabeledSegmentationImageToVesselTreeWrapper::New();
-//  //mitk::LabeledSegmentationImageToSurfaceWrapper::Pointer wrapper = mitk::LabeledSegmentationImageToSurfaceWrapper::New();
-
-//  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
-//  mitk::Image::Pointer labledSegementationImage = dynamic_cast<mitk::Image*> (node->GetData());
-
-//  std::string name = m_InputImageNode->GetPropertyList()->GetProperty("name")->GetValueAsString();
-//  const char* orgImageName;
-//  orgImageName = name.c_str();
-//  wrapper->SetDataNodeNamesSetDataNodeNames(m_NAMEFORLABLEDSEGMENTATIONIMAGE,  m_NAMEFORBINARYIMAGE, m_NAMEFORSURFACE, m_NAMEFORVESSELTREE, m_NAMEFORSEEDPOINT, orgImageName);
-//  //wrapper->SetDataNodeNamesSetDataNodeNames(m_NAMEFORLABLEDSEGMENTATIONIMAGE, m_NAMEFORBINARYIMAGE, m_NAMEFORSURFACE);
-//  wrapper->SetDataStorage(m_DataStorage);
-
-//  mitk::LevelWindow tempLevelWindow;
-//  m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE)->GetLevelWindow( tempLevelWindow, NULL, "levelWindow");
-//  int upperThresholdLabeledImage = (short int) tempLevelWindow.GetRangeMax();
-//  int lowerThresholdLabeledImage = (short int) tempLevelWindow.GetLowerWindowBound() + 1;
-//  node->SetFloatProperty("lowerThreshold", lowerThresholdLabeledImage);
-//  node->SetFloatProperty("upperThreshold", upperThresholdLabeledImage);
-//  wrapper->SetThresholdsLabeledImage(lowerThresholdLabeledImage, upperThresholdLabeledImage);
-//  wrapper->SetOrganType(m_OrganType);
-
-//  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));//change the cursor to waiting
-
-//  try
-//  {
-//    wrapper->GenerateData();
-//  }
-//  catch(itk::ExceptionObject &exc)
-//  {
-//    QMessageBox errorInfo;
-//    errorInfo.setWindowTitle("Segmentation functionality");
-//    errorInfo.setIcon(QMessageBox::Critical);
-//    errorInfo.setText("An error occurred during vessel tree or surface generation!");
-//    errorInfo.setDetailedText(exc.what());
-//    errorInfo.exec();
-    
-//    QApplication::restoreOverrideCursor(); //reset the cursor
-//    mitk::ProgressBar::GetInstance()->AddStepsToDo(1);
-//    mitk::ProgressBar::GetInstance()->Progress(1);
-
-//    return; // can't work
-//  }
-//  catch (...)
-//  {
-//    QMessageBox::critical(NULL, "Segmentation functionality", "An error occurred during vessel tree or surface generation!");
-    
-//    QApplication::restoreOverrideCursor(); //reset the cursor
-//    mitk::ProgressBar::GetInstance()->AddStepsToDo(1);
-//    mitk::ProgressBar::GetInstance()->Progress(1);
-//    return;
-//  }
-
-//  QApplication::restoreOverrideCursor(); //reset the cursor
-
-//  this->EnableVolumeRendering(false);
-
-//  m_Controls.m_cbVolumeRendering->setChecked(false);
-
-//  if(m_MultiWidget)
-//    m_MultiWidget->SetWidgetPlanesVisibility(false); // hide planes in 3D widget
-
-//  emit EntireVesselTreeDeleted(true); //notify boosting view to reset thresholds
 
 }
 
@@ -843,11 +686,11 @@ void QmitkAdaptiveRegionGrowingView::SetUpperThresholdValue( int upperThreshold)
   m_UPPERTHRESHOLD = upperThreshold;
 }
 
-void QmitkAdaptiveRegionGrowingView::SetRegionGrowingDirectionUpwards(bool status)
-{
-    this->m_CurrentRGDirectionIsUpwards = status;
-    //MITK_INFO<<"DirectionUp: "<<status;
-}
+//void QmitkAdaptiveRegionGrowingView::SetRegionGrowingDirectionUpwards(bool status)
+//{
+//    this->m_CurrentRGDirectionIsUpwards = status;
+//    //MITK_INFO<<"DirectionUp: "<<status;
+//}
 
 void QmitkAdaptiveRegionGrowingView::Deactivated()
 {

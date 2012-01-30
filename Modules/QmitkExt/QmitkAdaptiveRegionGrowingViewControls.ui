@@ -24,40 +24,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="lb_Direction">
-       <property name="text">
-        <string>Regiongrowing Direction:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="rb_Downwards">
-       <property name="layoutDirection">
-        <enum>Qt::RightToLeft</enum>
-       </property>
-       <property name="text">
-        <string>Downwards</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="rb_Upwards">
-       <property name="text">
-        <string>Upwards</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <widget class="QCheckBox" name="cb_DefineThresholdBoundaries">
      <property name="text">
-      <string>Define threshold boundaries</string>
+      <string>Define custom threshold boundaries</string>
      </property>
     </widget>
    </item>
@@ -103,7 +72,7 @@ p, li { white-space: pre-wrap; }
           <number>-3000</number>
          </property>
          <property name="maximum">
-          <number>3000</number>
+          <number>4000</number>
          </property>
         </widget>
        </item>
@@ -137,7 +106,7 @@ p, li { white-space: pre-wrap; }
           <number>-3000</number>
          </property>
          <property name="maximum">
-          <number>3000</number>
+          <number>4000</number>
          </property>
         </widget>
        </item>

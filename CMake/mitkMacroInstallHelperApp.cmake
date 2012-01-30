@@ -59,7 +59,7 @@ MACRO(MITK_INSTALL_HELPER_APP)
       SET(${_target_locations}_qt_plugins_install_dir bin)
       SET(_qt_conf_install_dirs bin)
       INSTALL(PROGRAMS ${_target} DESTINATION bin)
-      IF(UNIX)
+      IF(UNIX AND NOT WIN32)
         # Remove the rpath from helper applications. We assume that all dependencies
         # are installed into the same location as the helper application.
         INSTALL(CODE "FILE(RPATH_REMOVE

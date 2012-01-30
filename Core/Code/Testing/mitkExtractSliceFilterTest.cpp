@@ -65,8 +65,8 @@ PURPOSE.  See the above copyright notices for more information.
 //use this to render an oblique slice through a specified image
 //#define SHOW_SLICE_IN_RENDER_WINDOW
 
-//use this to have infos printed the mbilog
-#define EXTRACTOR_DEBUG
+//use this to have infos printed in mbilog
+//#define EXTRACTOR_DEBUG
 
 
 /*these are the deviations calculated by the function CalcTestFailureDeviation (see for details)*/

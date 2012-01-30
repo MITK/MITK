@@ -9,11 +9,13 @@ SET(INTERNAL_CPP_FILES
   QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
   QmitkStatisticsAction.cpp
-  QmitkAutocropAction.cpp  
+  QmitkAutocropAction.cpp 
+  regiongrowing/QmitkRegionGrowingView.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkSegmentationControls.ui
+  src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -25,15 +27,18 @@ SET(MOC_H_FILES
   src/internal/QmitkCreatePolygonModelAction.h
   src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
+  src/internal/regiongrowing/QmitkRegionGrowingView.h
 )
 
 SET(CACHED_RESOURCE_FILES
   resources/segmentation.png
+  resources/regiongrowing.xpm
   plugin.xml
 )
 
 SET(QRC_FILES
   resources/segmentation.qrc
+  resources/regiongrowing.qrc
 )
 
 

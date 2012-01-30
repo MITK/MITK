@@ -7,7 +7,6 @@ SET(INTERNAL_CPP_FILES
   colourimageprocessing/QmitkColourImageProcessingView.cpp
   colourimageprocessing/mitkColourImageProcessor.cpp
   isosurface/QmitkIsoSurface.cpp
-  regiongrowing/QmitkRegionGrowingView.cpp
   simpleexample/QmitkSimpleExampleView.cpp
   simplemeasurement/QmitkSimpleMeasurement.cpp
   viewinitialization/QmitkViewInitializationView.cpp
@@ -17,7 +16,6 @@ SET(INTERNAL_CPP_FILES
 SET(UI_FILES
   src/internal/colourimageprocessing/QmitkColourImageProcessingViewControls.ui
   src/internal/isosurface/QmitkIsoSurfaceControls.ui
-  src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
   src/internal/simpleexample/QmitkSimpleExampleViewControls.ui
   src/internal/simplemeasurement/QmitkSimpleMeasurementControls.ui
   src/internal/viewinitialization/QmitkViewInitializationViewControls.ui
@@ -28,7 +26,6 @@ SET(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/colourimageprocessing/QmitkColourImageProcessingView.h
   src/internal/isosurface/QmitkIsoSurface.h
-  src/internal/regiongrowing/QmitkRegionGrowingView.h
   src/internal/simpleexample/QmitkSimpleExampleView.h
   src/internal/simplemeasurement/QmitkSimpleMeasurement.h
   src/internal/viewinitialization/QmitkViewInitializationView.h
@@ -39,7 +36,6 @@ SET(CACHED_RESOURCE_FILES
   plugin.xml
   resources/ColorImageProcessing.png
   resources/isoSurface.xpm
-  resources/regiongrowing.xpm
   resources/SimpleExample.png
   resources/SimpleMeasurement.png
   resources/viewInitializationIcon.xpm
@@ -49,7 +45,6 @@ SET(CACHED_RESOURCE_FILES
 SET(QRC_FILES
   resources/QmitkColourImageProcessingView.qrc
   resources/isosurface.qrc
-  resources/regiongrowing.qrc
   resources/QmitkVolumetryView.qrc
 )
 

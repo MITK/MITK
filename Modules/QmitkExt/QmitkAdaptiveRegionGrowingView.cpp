@@ -44,6 +44,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include "mitkTool.h"
+#include "mitkPixelType.h"
 
 QmitkAdaptiveRegionGrowingView::QmitkAdaptiveRegionGrowingView(QWidget * parent) :
 QWidget(parent), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0)
@@ -425,9 +428,6 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
     this->EnableVolumeRendering(true);
 
   m_UpdateSuggestedThreshold = true;// reset first stored threshold value
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
 
 void QmitkAdaptiveRegionGrowingView::InitializeLevelWindow()
@@ -452,23 +452,24 @@ void QmitkAdaptiveRegionGrowingView::InitializeLevelWindow()
   }
 
   tempLevelWindow.SetRangeMinMax(mitk::ScalarType(0), mitk::ScalarType(upper));
-  tempLevelWindow.SetLevelWindow(*level, *window);
-
-  newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
-  //update the widgets
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   //get the suggested threshold from the detected leakage-point and adjust the slider
 
   if (m_CurrentRGDirectionIsUpwards)
   {
     this->m_Controls.m_Slider->setValue(this->m_SeedpointValue + this->m_DetectedLeakagePoint -1);
+    *level = m_UPPERTHRESHOLD - (this->m_SeedpointValue + this->m_DetectedLeakagePoint -1) /*+ 0.5*/;
   }
   else
   {
     this->m_Controls.m_Slider->setValue(this->m_SeedpointValue - this->m_DetectedLeakagePoint +1);
+    *level = (this->m_SeedpointValue + this->m_DetectedLeakagePoint -1) - m_LOWERTHRESHOLD /*+ 0.5*/;
   }
 
+  tempLevelWindow.SetLevelWindow(*level, *window);
+  newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
+  //update the widgets
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   m_SliderInitialized = true;
 
@@ -510,6 +511,7 @@ void QmitkAdaptiveRegionGrowingView::ChangeLevelWindow(int newValue)
       tempLevelWindow.SetLevelWindow(level, *window);
     }
 
+    MITK_INFO<<"Level/Window: "<<level<<"/"<<*window;
     newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
 
     if (m_UseVolumeRendering)
@@ -564,9 +566,52 @@ void QmitkAdaptiveRegionGrowingView::ConfirmSegmentation()
     return;
   }
 
-  //mitk::Tool::CreateEmptySegmentationNode(orgImage, "RGSegmentation", mitk::Color(255.0,0.0,0.0) );
+  mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  if (newNode.IsNull())
+    return;
+
+  mitk::Image* img = dynamic_cast<mitk::Image*>(newNode->GetData());
+  AccessByItk(img, ITKThresholding);
 
 
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void QmitkAdaptiveRegionGrowingView::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
+{
+    typedef itk::Image<TPixel, VImageDimension> InputImageType;
+    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+    typedef itk::BinaryThresholdImageFilter<InputImageType, SegmentationType> ThresholdFilterType;
+
+    typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+    filter->SetInput(itkImage);
+    filter->SetInsideValue(1);
+    filter->SetOutsideValue(0);
+
+    mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+    if (newNode.IsNull())
+      return;
+
+    mitk::LevelWindow tempLevelWindow;
+
+    newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); //get the levelWindow associated with the preview
+
+    filter->SetUpperThreshold(tempLevelWindow.GetRangeMax());
+    filter->SetLowerThreshold(tempLevelWindow.GetLevel());
+    filter->Update();
+    mitk::Image::Pointer new_image = mitk::Image::New();
+    mitk::CastToMitkImage(filter->GetOutput(), new_image);
+
+    mitk::DataNode::Pointer segNode = mitk::DataNode::New();
+    segNode->SetData(new_image);
+    segNode->SetName("RegionGrowing_Result");
+    segNode->SetBoolProperty("binary", mitk::BoolProperty::New(true));
+
+    //delete the old image, if there was one:
+    mitk::DataNode::Pointer prevSegNode = m_DataStorage->GetNamedNode("RegionGrowing_Result");
+    m_DataStorage->Remove(prevSegNode);
+
+    m_DataStorage->Add(segNode, m_InputImageNode);
 }
 
 void QmitkAdaptiveRegionGrowingView::EnableControls(bool enable)

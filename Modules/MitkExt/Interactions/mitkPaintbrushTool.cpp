@@ -162,6 +162,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   m_MasterContour = contourInImageIndexCoordinates;
 
+  // The PicDescriptor is only REFERENCING(!) the data, the temporarySlice takes care of deleting the data also the descriptor is pointing on
+  // because they got allocated by the ImageDataItem, not the descriptor.
+  stupidClone->data = NULL;
   mitkIpPicFree( stupidClone );
 }
 

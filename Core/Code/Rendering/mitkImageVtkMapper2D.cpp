@@ -1041,24 +1041,35 @@ mitk::ImageVtkMapper2D::LocalStorage* mitk::ImageVtkMapper2D::GetLocalStorage(mi
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer ){
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
+  //get the min and max index values of each direction
+  int* extent = localStorage->m_ReslicedImage->GetExtent();
+  int xMin = extent[0];
+  int xMax = extent[1];
+  int yMin = extent[2];
+  int yMax = extent[3];
+
   int* dims = localStorage->m_ReslicedImage->GetDimensions(); //dimensions of the image
   int line = dims[0]; //how many pixels per line?
-  int x = 0; //pixel index x
-  int y = 0; //pixel index y
+  int x = xMin; //pixel index x
+  int y = yMin; //pixel index y
   char* currentPixel;
-  int nn = dims[0]*dims[1]; //max pixel(n,n)
+  
 
   //get the depth for each contour
   float depth = CalculateLayerDepth(renderer);
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
-  for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
+  while (y <= yMax) { //current pixel(i,i)
     currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x, y, 0));
     //if the current pixel value is set to something
     if ((currentPixel) && (*currentPixel != 0)) {
       //check in which direction a line is necessary
-      if (ii >= line && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
+	  //a line is added if the neighbor of the current pixel has the value 0
+	  //and if the pixel is located at the edge of the image
+
+	  //if   vvvvv  not the first line vvvvv
+      if (y > yMin && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
         //add the 2 points
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -1067,22 +1078,64 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
       }
-      if (ii <= nn-line && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
+
+	  //if   vvvvv  not the last line vvvvv
+      if (y < yMax && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
       }
-      if (ii > 1 && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
+
+	  //if   vvvvv  not the first pixel vvvvv
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
       }
-      if (ii < nn-1 && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
+
+	  //if   vvvvv  not the last pixel vvvvv
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+
+	  //if   vvvvv  left edge of image vvvvv
+      if (x == xMin) {
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+
+	  //if   vvvvv  right edge of image vvvvv
+      if (x == xMax) {
+        vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+
+	  //if   vvvvv  bottom edge of image vvvvv
+      if (y == yMin) { //y direction - right edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
+
+	  //if   vvvvv  top edge of image vvvvv
+      if (y == yMax) { //y direction - right edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
@@ -1092,8 +1145,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
     //reached end of line
     x++;
-    if (x >= line) {
-      x = 0;
+    if (x > xMax) {
+      x = xMin;
       y++;
     }
   }

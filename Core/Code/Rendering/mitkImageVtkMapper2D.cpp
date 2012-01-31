@@ -1060,16 +1060,21 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
-  while (y <= yMax) { //current pixel(i,i)
+
+  while (y <= yMax) 
+  { 
     currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x, y, 0));
+
     //if the current pixel value is set to something
-    if ((currentPixel) && (*currentPixel != 0)) {
+    if ((currentPixel) && (*currentPixel != 0)) 
+	{
       //check in which direction a line is necessary
 	  //a line is added if the neighbor of the current pixel has the value 0
 	  //and if the pixel is located at the edge of the image
 
 	  //if   vvvvv  not the first line vvvvv
-      if (y > yMin && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
+      if (y > yMin && *(currentPixel-line) == 0) 
+	  { //x direction - bottom edge of the pixel
         //add the 2 points
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -1080,7 +1085,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  not the last line vvvvv
-      if (y < yMax && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
+      if (y < yMax && *(currentPixel+line) == 0) 
+	  { //x direction - top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1089,7 +1095,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  not the first pixel vvvvv
-      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0) 
+	  { //y direction - left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1098,7 +1105,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  not the last pixel vvvvv
-      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0) 
+	  { //y direction - right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1106,8 +1114,11 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
         lines->InsertCellPoint(p2);
       }
 
+	  /*  now consider pixels at the edge of the image  */
+
 	  //if   vvvvv  left edge of image vvvvv
-      if (x == xMin) {
+      if (x == xMin) 
+	  { //draw left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1116,7 +1127,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  right edge of image vvvvv
-      if (x == xMax) {
+      if (x == xMax) 
+	  { //draw right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1125,7 +1137,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  bottom edge of image vvvvv
-      if (y == yMin) { //y direction - right edge of the pixel
+      if (y == yMin) 
+	  { //draw bottom edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
@@ -1134,22 +1147,26 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
 	  //if   vvvvv  top edge of image vvvvv
-      if (y == yMax) { //y direction - right edge of the pixel
+      if (y == yMax) 
+	  { //draw top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
       }
-    }
+    }//end if currentpixel is set
 
-    //reached end of line
     x++;
-    if (x > xMax) {
+
+    if (x > xMax) 
+	{ //reached end of line
       x = xMin;
       y++;
     }
-  }
+  }//end of while
+
+
   // Create a polydata to store everything in
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   // Add the points to the dataset

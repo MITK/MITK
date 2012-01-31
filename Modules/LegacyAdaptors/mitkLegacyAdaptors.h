@@ -28,6 +28,10 @@ namespace mitk
 
   /**
     \brief Constructs a legacy mitkIpPicDescriptor form mitk::ImageDataItem
+
+    \warning The returned IpPicDescriptor is only referencing the memory block with the data managed by the given ImageDataItem parameter.
+    Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
+    deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
   */
   LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc );
 

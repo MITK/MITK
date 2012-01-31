@@ -455,6 +455,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // SetOutputExtent wants an inclusive bound. Thus, we need
   // to subtract 1.
 
+  //Make sure the updateExtent is equal to the wholeExtent of vtkImageReslice,
+  //else the updateExtent is one step ahead of the wholeExtent and vtk errors
+  //are thrown.
+  localStorage->m_Reslicer->UpdateWholeExtent();
+
   // Do the reslicing. Modified() is called to make sure that the reslicer is
   // executed even though the input geometry information did not change; this
   // is necessary when the input /em data, but not the /em geometry changes.

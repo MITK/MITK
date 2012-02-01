@@ -69,8 +69,16 @@ public:
 
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
+signals:
+    /// @brief emitted when import of a file or directory is finished
+    void FinishedImport(QString);
+    /// @brief emitted during the import process to show the process state
+    void ProcessImport(float,QString);
 
     public slots:
+
+       /// @brief Called when cancel button was clicked.
+       void OnCancelButtonClicked();
 
         /// @brief   Called delete button was clicked.
         void OnDeleteButtonClicked();

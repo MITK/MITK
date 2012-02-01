@@ -27,8 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
-:  m_Controls( 0 ), m_LocalDatabase(new ctkDICOMDatabase(QString("./ctkDICOM-Database/ctkDICOM.sql"))),m_LocalIndexer(new ctkDICOMIndexer()),
-m_LocalModel(new ctkDICOMModel()),m_LocalDatabaseDirectory(QString(m_LocalDatabase->databaseDirectory()))
+:  m_Controls( 0 )
+,m_LocalDatabase(new ctkDICOMDatabase(QString("./ctkDICOM-Database/ctkDICOM.sql")))
+,m_LocalIndexer(new ctkDICOMIndexer())
+,m_LocalModel(new ctkDICOMModel())
+,m_LocalDatabaseDirectory(QString(m_LocalDatabase->databaseDirectory()))
 {
     CreateQtPartControl(this);
 }
@@ -92,20 +95,27 @@ void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString& directory)
         m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabaseDirectory);
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
+    emit FinishedImport(directory);
 }
 
 void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList& patientFiles)
 {
     if(m_LocalDatabase->isOpen())
     {
+        float length=static_cast<float>(patientFiles.length());
+        float i(0);
         for (QStringList::iterator currentPatientFilePath = patientFiles.begin();
             currentPatientFilePath != patientFiles.end(); ++currentPatientFilePath) 
-        { 
-            m_LocalIndexer->addFile(*m_LocalDatabase,*currentPatientFilePath,m_LocalDatabaseDirectory);
+        {   ++i;
+        emit ProcessImport(i/length,*currentPatientFilePath);
+        m_LocalIndexer->addFile(*m_LocalDatabase,*currentPatientFilePath,m_LocalDatabaseDirectory);
+
+        emit FinishedImport(*currentPatientFilePath);
         }
 
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
+
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
@@ -134,7 +144,7 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(QString& dicomData)
         m_Watcher.waitForFinished();
     }
     m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(QString&)) &QmitkDicomLocalStorageWidget::OnAddDICOMData,dicomData);
-    m_Watcher.setFuture(m_Future);
+    m_Watcher.setFuture(m_Future); 
 }
 
 void QmitkDicomLocalStorageWidget::StartDicomImport(QStringList& dicomData)
@@ -145,4 +155,10 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(QStringList& dicomData)
     }
     m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(QStringList&)) &QmitkDicomLocalStorageWidget::OnAddDICOMData,dicomData);
     m_Watcher.setFuture(m_Future);
+}
+
+void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
+{
+    m_Watcher.cancel();
+    m_Watcher.waitForFinished();
 }

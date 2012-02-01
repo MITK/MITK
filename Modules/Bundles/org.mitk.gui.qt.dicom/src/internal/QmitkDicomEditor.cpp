@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 #include <QWidget>
 #include <QString>
+#include <QFile>
 #include <QStringList>
 #include <QtSql>
 #include <QSqlDatabase>
@@ -63,13 +64,18 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 
 
-QmitkDicomEditor::QmitkDicomEditor()
+QmitkDicomEditor::QmitkDicomEditor(): m_Timer(new QTimer())
+,m_DicomDirectoryListener(new QFileSystemWatcher())
+,m_RetrievedFile(new QStringList())
 {
+    m_DicomDirectoryListener->addPath("C:/DICOMListenerDirectory");
 }
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
-    
+    delete m_DicomDirectoryListener;
+    delete m_Timer;
+    delete m_RetrievedFile;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
@@ -89,6 +95,11 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
 
+    m_Timer->setSingleShot(true);
+    connect(m_Timer,SIGNAL(timeout()),this,SIGNAL(ImportIncomingDicomFile(*m_RetrievedFile)));
+    connect(m_DicomDirectoryListener,SIGNAL(directoryChanged(QString)),this,SLOT(StartThreadObservingDicomImportDirectory(QString)));
+    connect(this,SIGNAL(ImportIncomingDicomFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
+    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
     //m_Controls.ExternalDataTreeView->setSortingEnabled(true);
     //m_Controls.ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
     //m_Controls.ExternalDataTreeView->setModel();
@@ -210,5 +221,71 @@ void QmitkDicomEditor::OnChangePage(int page)
     }catch(std::exception e){
         MITK_ERROR <<"error: "<< e.what();
         return;
+    }
+}
+
+void QmitkDicomEditor::StartThreadObservingDicomImportDirectory(QString changedFile)
+{
+
+    if (!m_Watcher.isRunning()){
+        m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
+        m_Watcher.setFuture(m_Future);
+    }else{
+        if(m_Timer->isActive())
+        {
+            m_Timer->stop();
+        }
+        m_Watcher.waitForFinished();
+        m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
+        m_Watcher.setFuture(m_Future);
+    }
+
+}
+
+void QmitkDicomEditor::ObserveDicomImportDirectory(QString changedFile)
+{
+    //set the filepath of the current changed file false if there is no new file
+    GetRetrievedFileName(changedFile);
+    if(!m_RetrievedFile->isEmpty())
+    {
+        //wait 30sec till the file download is completed
+
+    }            
+}
+
+
+void QmitkDicomEditor::OnDicomImportFinished(QString path)
+{
+    QFile file(path);
+    if(file.remove());
+}
+
+void QmitkDicomEditor::GetRetrievedFileName(QString changedFile)
+{
+    m_RetrievedFile->clear();
+    QDir listenerDirectory(changedFile);
+    //if the listenordirectory is empty you have deleted the last file
+    if(!listenerDirectory.entryList().isEmpty())
+    {
+        QFileInfoList fileInfoList;
+        fileInfoList = listenerDirectory.entryInfoList();
+        QFileInfoList::iterator it;
+        it=fileInfoList.begin();
+        QStringList temp;
+
+        //filter files, no directories wanted
+        while(it!=fileInfoList.end())
+        {
+            if((*it).isFile()){
+                temp.append((*it).absoluteFilePath());
+            }
+            ++it;
+        }
+
+        //check if there is an existing new file
+        if(!temp.isEmpty())
+        {
+            m_RetrievedFile=new QStringList(temp);
+        }
     }
 }

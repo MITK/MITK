@@ -20,10 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkDicomEditor_h
 
 #include <berryISelectionListener.h>
-
 #include <berryQtEditorPart.h>
 #include <berryIPartListener.h>
-#include <QTextEdit>
 
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
@@ -31,8 +29,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkDicomEditorControls.h"
 
+#include <QTextEdit>
 #include <QModelIndex>
 #include <QString>
+#include <QStringList>
+#include <QFileSystemWatcher>
+//For running dicom import in background
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QTimer>
 
 
 
@@ -71,8 +77,22 @@ public:
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
 
+signals:
+    void ImportIncomingDicomFile(QStringList&);
 
     protected slots:
+
+        /// \brief Called when m_DicomListenerDirectory changes
+        void GetRetrievedFileName(QString changedFile);
+
+        /// \brief Called when import is finished
+        void OnDicomImportFinished(QString path);
+
+        /// \brief Observes a diccom directory for incoming files e.g. from a dicom retrieve
+        void ObserveDicomImportDirectory(QString changedFile);
+
+        /// \brief start dicom directory listener as a thread
+        void StartThreadObservingDicomImportDirectory(QString changedFile);
 
         /// \brief Called when series in TreeView is double clicked.
         void OnSeriesModelDoubleClicked(QModelIndex index);
@@ -99,10 +119,18 @@ protected:
 
     Events::Types GetPartEventTypes() const;
 
+
+
     Ui::QmitkDicomEditorControls m_Controls;
 
 private:
+    QFileSystemWatcher* m_DicomDirectoryListener;
+    QTimer* m_Timer;
+    QStringList* m_RetrievedFile;
+    QFuture<void> m_Future;
+    QFutureWatcher<void> m_Watcher;
 
+    
 };
 
 #endif // QmitkDicomEditor_h

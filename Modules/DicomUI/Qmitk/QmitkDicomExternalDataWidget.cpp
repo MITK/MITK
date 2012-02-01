@@ -46,6 +46,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
     delete m_ExternalModel;
     delete m_ExternalIndexer;
     delete m_Controls;
+    //delete m_Timer;
 }
 
 
@@ -78,6 +79,8 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
         connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
         connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+
+        connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnImportFinished()));
     }
 }
 
@@ -123,16 +126,18 @@ void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directo
 
         }else{
 
-            MBI_DEBUG<<directory.toStdString();
-            m_ExternalIndexer->addDirectory(*m_ExternalDatabase,directory);
-            m_ExternalModel->reset();
+            if (m_Watcher.isRunning()){
+                m_Watcher.waitForFinished();
+            }
+            m_Future = QtConcurrent::run(this,(void (QmitkDicomExternalDataWidget::*)(QString)) &QmitkDicomExternalDataWidget::AddDicomTemporary,directory);
+            m_Watcher.setFuture(m_Future);
+
             emit SignalChangePage(1);
         }
     }
 
 }
 
-//TODO
 void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
 {
     QStringList* filePaths= new QStringList();
@@ -148,6 +153,8 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 //TODO
 void QmitkDicomExternalDataWidget::OnCancelButtonClicked()
 {
+    m_Watcher.cancel();
+    m_Watcher.waitForFinished();
 }
 
 //TODO
@@ -191,4 +198,10 @@ void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
         }
     }
 
+}
+
+void QmitkDicomExternalDataWidget::AddDicomTemporary(QString directory)
+{
+    m_ExternalIndexer->addDirectory(*m_ExternalDatabase,directory);
+    m_ExternalModel->reset();
 }

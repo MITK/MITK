@@ -33,7 +33,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QString>
 #include <QStringList>
 #include <QModelIndex>
-
+//For running dicom import in background
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QTimer>
 
 /*!
 \brief QmitkDicomExternalDataWidget 
@@ -72,25 +76,27 @@ signals:
 
    public slots:
 
-       /// \brief Called when Import CD or Import Folder was clicked.
+       /// @brief Called when import CD or import Folder was clicked.
        void OnFolderCDImport();
 
-       /// \brief Called when Import Directory was selected.
+       /// @brief Called when import directory was selected.
        void OnFileSelectedAddExternalData(QString);
 
-       /// \brief Called when Import CD or Import Folder was clicked.
+       /// @brief Called when download button was clicked.
        void OnDownloadButtonClicked();
 
-       /// \brief Called when Import CD or Import Folder was clicked.
+       /// @brief Called when view button was clicked.
        void OnViewButtonClicked();
     
-       /// \brief Called when Import CD or Import Folder was clicked.
+       /// @brief Called when cancel button was clicked.
        void OnCancelButtonClicked();
 
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
     void GetFileNamesFromIndex(QStringList& filePaths);
+
+    void AddDicomTemporary(QString directory);
 
     ctkDICOMDatabase* m_ExternalDatabase;
     ctkDICOMModel* m_ExternalModel;
@@ -100,6 +106,9 @@ protected:
 
     Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
 
+    QFuture<void> m_Future;
+    QFutureWatcher<void> m_Watcher;
+    QTimer* m_Timer;
 
 };
 

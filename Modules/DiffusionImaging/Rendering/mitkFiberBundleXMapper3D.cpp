@@ -4,15 +4,15 @@
  Language:  C++
  Date:      $Date: 2009-05-12 19:56:03 +0200 (Di, 12 Mai 2009) $
  Version:   $Revision: 17179 $
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 
@@ -49,7 +49,7 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 }
 
 
-/* 
+/*
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
@@ -94,7 +94,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     if (FBX->GetCurrentColorCoding() != NULL){
 //        localStorage->m_FiberMapper->SelectColorArray("");
         localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
-        MITK_INFO << "MapperFBX: " << FBX->GetCurrentColorCoding();
+        MITK_DEBUG << "MapperFBX: " << FBX->GetCurrentColorCoding();
 
         if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM) {
             float temprgb[3];

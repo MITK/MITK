@@ -20,6 +20,8 @@ using namespace std;
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
+#include <vtkCleanPolyData.h>
+
 #include <itkVector.h>
 #include <itkImage.h>
 
@@ -38,9 +40,12 @@ public:
   typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
   typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
   ItkQBallImgType::Pointer                    m_ItkQBallImage;
+  float m_FiberLength;
+  itk::Point<float> m_LastPoint;
 
   FiberBuilder(float *points, int numPoints, double spacing[], ItkQBallImgType::Pointer image)
   {
+    m_FiberLength = 0;
     m_ItkQBallImage = image;
     particles = (Particle*) malloc(sizeof(Particle)*numPoints);
     pcnt = numPoints;
@@ -66,10 +71,11 @@ public:
     free(particles);
   }
 
-  vtkSmartPointer<vtkPolyData> iterate(int minSize)
+  vtkSmartPointer<vtkPolyData> iterate(int minFiberLength)
   {
     int cur_label = 1;
     int numFibers = 0;
+    m_FiberLength = 0;
     for (int k = 0; k < pcnt;k++)
     {
       Particle *dp =  &(particles[k]);
@@ -81,21 +87,31 @@ public:
         labelPredecessors(dp, container);
         labelSuccessors(dp, container);
         cur_label++;
-        if(container->GetPointIds()->GetNumberOfIds()>minSize)
+        if(m_FiberLength >= minFiberLength)
         {
           m_VtkCellArray->InsertNextCell(container);
           numFibers++;
         }
+        m_FiberLength = 0;
       }
     }
     vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     fiberPolyData->SetPoints(m_VtkPoints);
     fiberPolyData->SetLines(m_VtkCellArray);
+    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleaner->SetInput(fiberPolyData);
+    cleaner->Update();
+    fiberPolyData = cleaner->GetOutput();
     return fiberPolyData;
   }
 
   void AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
   {
+    if (dp->inserted)
+      return;
+
+    dp->inserted = true;
+
     itk::ContinuousIndex<float, 3> index;
     index[0] = dp->R[0];
     index[1] = dp->R[1];
@@ -104,6 +120,11 @@ public:
     m_ItkQBallImage->TransformContinuousIndexToPhysicalPoint( index, point );
     vtkIdType id = m_VtkPoints->InsertNextPoint(point.GetDataPointer());
     container->GetPointIds()->InsertNextId(id);
+
+    if(container->GetNumberOfPoints()>1)
+      m_FiberLength += m_LastPoint.EuclideanDistanceTo(point);
+
+    m_LastPoint = point;
   }
 
   void labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container)

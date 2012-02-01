@@ -45,8 +45,7 @@ namespace mitk {
   public:
 
     static const char* COLORCODING_ORIENTATION_BASED;
-//    static const char* COLORCODING_FA_AS_OPACITY;
-    static const char* FA_VALUE_ARRAY;
+    static const char* COLORCODING_FA_BASED;
     static const char* COLORCODING_CUSTOM;
     static const char* FIBER_ID_ARRAY;
 
@@ -77,32 +76,38 @@ namespace mitk {
     void DoUseFAasColorOpacity();
     void ResetFiberColorOpacity();
     void DoGenerateFiberIds();
+
     void ResampleFibers(float len);
     void ResampleFibers();
-    std::vector<long> DoExtractFiberIds(mitk::PlanarFigure::Pointer );
-    vtkSmartPointer<vtkPolyData> GenerateNewFiberBundleByIds( std::vector<long> );
+    void DoFiberSmoothing(int pointsPerCm);
+
+    mitk::FiberBundleX::Pointer ExtractFiberSubset(mitk::PlanarFigure::Pointer pf);
+    std::vector<long> ExtractFiberIdSubset(mitk::PlanarFigure::Pointer pf);
+    vtkSmartPointer<vtkPolyData> GeneratePolyDataByIds( std::vector<long> );
+    mitk::FiberBundleX::Pointer GetDeepCopy();
 
     itkGetMacro(NumFibers, int);
 
-    mitk::FiberBundleX::Pointer GetDeepCopy();
-
-
   protected:
+
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();
-    void UpdateFiberGeometry();
+
     itk::Point<float, 3> GetItkPoint(double point[3]);
 
+    void UpdateFiberGeometry();
+    void UpdateColorCoding();
+
   private:
+
     // actual fiber container
     vtkSmartPointer<vtkPolyData> m_FiberPolyData;
 
-    // contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
+    // contains fiber ids
     vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
 
     char* m_currentColorCoding;
     int m_NumFibers;
-
   };
 
 } // namespace mitk

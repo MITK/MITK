@@ -50,6 +50,8 @@
 #include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
 
+#include <math.h>
+
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -84,9 +86,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     m_Controls->PFCompoANDButton->setDisabled(true);
     m_Controls->PFCompoORButton->setDisabled(true);
     m_Controls->PFCompoNOTButton->setDisabled(true);
-    m_Controls->m_CircleButton->setEnabled(false);
-    m_Controls->m_PolygonButton->setEnabled(false);
-    m_Controls->m_RectangleButton->setEnabled(false);
+    m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
     m_Controls->m_RectangleButton->setVisible(false);
 
     connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
@@ -715,6 +715,7 @@ void QmitkFiberProcessingView::UpdateGui()
   }
   else
   {
+    m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
     m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
 
     // one bundle and one planar figure needed to extract fibers
@@ -1027,12 +1028,11 @@ void QmitkFiberProcessingView::DoFiberExtraction()
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
     mitk::PlanarFigure::Pointer roi = dynamic_cast<mitk::PlanarFigure*> (m_SelectedPF.at(0)->GetData());
 
-//    std::vector<int> extFBset = fib->extractFibersByPF(roi);
-//    mitk::FiberBundleX::Pointer extFB = fib->extractFibersById(extFBset);
+    mitk::FiberBundleX::Pointer extFB = fib->ExtractFiberSubset(roi);
 
     mitk::DataNode::Pointer node;
     node = mitk::DataNode::New();
-    //fbNode->SetData(extFB);
+    node->SetData(extFB);
     QString name(m_SelectedFB.at(0)->GetName().c_str());
     name += "_extracted";
     node->SetName(name.toStdString());
@@ -1471,19 +1471,18 @@ void QmitkFiberProcessingView::GenerateStats()
         float l=0;
         for (unsigned int j=0; j<numPoints-1; j++)
         {
-          double p1[3] = {0,0,0};
-          fiberPolyData->GetPoint(points[j], p1);
-          double p2[3] = {0,0,0};
-          fiberPolyData->GetPoint(points[j+1], p2);
+          itk::Point<double> p1;
+          itk::Point<double> p2;
+          fiberPolyData->GetPoint(points[j], p1.GetDataPointer());
+          fiberPolyData->GetPoint(points[j+1], p2.GetDataPointer());
 
-          float a = p1[0]-p2[0];
-          float b = p1[1]-p2[1];
-          float c = p1[2]-p2[2];
-
-          float dist = std::sqrt(a*a+b*b+c*c);
+          float dist = p1.EuclideanDistanceTo(p2);
           length += dist;
           l += dist;
         }
+        itk::Point<double> p2;
+        fiberPolyData->GetPoint(points[numPoints-1], p2.GetDataPointer());
+
         lengths.push_back(l);
       }
 
@@ -1504,28 +1503,28 @@ void QmitkFiberProcessingView::GenerateStats()
         float l=0;
         for (unsigned int j=0; j<numPoints-1; j++)
         {
-          double p1[3] = {0,0,0};
-          fiberPolyData->GetPoint(points[j], p1);
-          double p2[3] = {0,0,0};
-          fiberPolyData->GetPoint(points[j+1], p2);
+          itk::Point<double> p1;
+          itk::Point<double> p2;
+          fiberPolyData->GetPoint(points[j], p1.GetDataPointer());
+          fiberPolyData->GetPoint(points[j+1], p2.GetDataPointer());
 
-          float a = p1[0]-p2[0];
-          float b = p1[1]-p2[1];
-          float c = p1[2]-p2[2];
-
-          float dist = std::sqrt(a*a+b*b+c*c);
+          float dist = p1.EuclideanDistanceTo(p2);
           l += dist;
         }
         dev += (length-l)*(length-l);
         count++;
       }
 
-      if (numberOfLines>0)
-        dev /= numberOfLines;
+      if (numberOfLines>1)
+        dev /= (numberOfLines-1);
+      else
+        dev = 0;
 
-      stats += "Mean fiber length: "+ QString::number(length/10) + "cm\n";
-      stats += "Median fiber length: "+ QString::number(lengths.at(lengths.size()/2)/10) + "cm\n";
-      stats += "Standard deviation: "+ QString::number(dev/10) + "cm\n";
+      stats += "Min. length:         "+ QString::number(lengths.front(),'f',1) + " mm\n";
+      stats += "Max. length:         "+ QString::number(lengths.back(),'f',1) + " mm\n";
+      stats += "Mean length:         "+ QString::number(length,'f',1) + " mm\n";
+      stats += "Median length:       "+ QString::number(lengths.at(lengths.size()/2),'f',1) + " mm\n";
+      stats += "Standard deviation:  "+ QString::number(sqrt(dev),'f',1) + " mm\n";
     }
   }
   this->m_Controls->m_StatsTextEdit->setText(stats);

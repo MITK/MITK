@@ -324,7 +324,8 @@ namespace itk
         + g1 * (t1*g0+t3*g1+t4*g2)
         + g2 * (t2*g0+t4*g1+t5*g2);
 
-      (*this)[i] = (*this)[i] < 0 ? 0 : (*this)[i];
+      if ((*this)[i]<0 || (*this)[i]!=(*this)[i])
+        (*this)[i] = 0;
     }
   }
 

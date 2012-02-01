@@ -15,13 +15,13 @@
 #include <vnl/vnl_matrix_fixed.h>
 #include <vnl/vnl_vector_fixed.h>
 
-#include "GibbsTracking/reparametrize_arclen2.cpp"
 #include <fstream>
 #include <QCoreApplication>
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkOrientationDistributionFunction.h>
 #include <itkImageDuplicator.h>
 #include <mitkStandardFileLocations.h>
+#include <itkDiffusionQballGeneralizedFaImageFilter.h>
 
 struct LessDereference {
     template <class T>
@@ -57,7 +57,9 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     m_Steps(10),
     m_Memory(0),
     m_ProposalAcceptance(0),
-    m_GfaImage(NULL)
+    m_GfaImage(NULL),
+    m_CurvatureHardThreshold(0.7),
+    m_Meanval_sq(0.0)
 {
     //this->m_MeasurementFrame.set_identity();
     this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image + a Mask Image
@@ -74,100 +76,186 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 template< class TInputOdfImage, class TInputROIImage >
 void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
+::ComputeFiberCorrelationOriginal(){
+  float bD = 15;
+
+  vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
+      *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
+
+  const int N = QBALL_ODFSIZE;
+
+  vnl_matrix_fixed<double, N, N> C = bDir.transpose()*bDir;
+  vnl_matrix_fixed<double, N, N> Q = C;
+  for(int i=0; i<N; i++)
+  {
+    for(int j=0; j<N; j++)
+    {
+      C(i,j) = abs(C(i,j));
+      Q(i,j) = exp(-bD * C(i,j) * C(i,j));
+    }
+  }
+
+  vnl_matrix_fixed<double, N, N> P = Q*Q;
+
+  std::vector<const double *> pointer;
+  pointer.reserve(N*N);
+  double * start = C.data_block();
+  double * end =  start + N*N;
+  for (double * iter = start; iter != end; ++iter)
+  {
+    pointer.push_back(iter);
+  }
+  std::sort(pointer.begin(), pointer.end(), LessDereference());
+
+  vnl_vector_fixed<double,N*N> alpha;
+  vnl_vector_fixed<double,N*N> beta;
+  for (int i=0; i<N*N; i++) {
+    alpha(i) = *pointer[i];
+    beta(i)  = *(P.data_block()+(pointer[i]-start));
+  }
+
+  double nfac = sqrt(beta(N*N-1));
+  beta = beta / (nfac*nfac);
+  Q = Q / nfac;
+
+  double sum = 0;
+  for(int i=0; i<N; i++)
+  {
+    sum += Q(0,i);
+  }
+  // if left to default 0
+  // then mean is not substracted in order to correct odf integral
+  m_Meanval_sq = (sum*sum)/N;
+
+  vnl_vector_fixed<double,N*N> alpha_0;
+  vnl_vector_fixed<double,N*N> alpha_2;
+  vnl_vector_fixed<double,N*N> alpha_4;
+  vnl_vector_fixed<double,N*N> alpha_6;
+  for(int i=0; i<N*N; i++)
+  {
+    alpha_0(i) = 1;
+    alpha_2(i) = alpha(i)*alpha(i);
+    alpha_4(i) = alpha_2(i)*alpha_2(i);
+    alpha_6(i) = alpha_4(i)*alpha_2(i);
+  }
+
+  vnl_matrix_fixed<double, N*N, 4> T;
+  T.set_column(0,alpha_0);
+  T.set_column(1,alpha_2);
+  T.set_column(2,alpha_4);
+  T.set_column(3,alpha_6);
+
+  vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
+  BESSEL_APPROXCOEFF = new float[4];
+  BESSEL_APPROXCOEFF[0] = coeff(0);
+  BESSEL_APPROXCOEFF[1] = coeff(1);
+  BESSEL_APPROXCOEFF[2] = coeff(2);
+  BESSEL_APPROXCOEFF[3] = coeff(3);
+
+//  // OLD
+//  BESSEL_APPROXCOEFF[0] = 0,1982;
+//  BESSEL_APPROXCOEFF[1] = 0.3415;
+//  BESSEL_APPROXCOEFF[2] = -0.9515;
+//  BESSEL_APPROXCOEFF[3] = 1.3423;
+}
+
+template< class TInputOdfImage, class TInputROIImage >
+void
+GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::ComputeFiberCorrelation(){
 
-    float bD = 15;
+//    float bD = 15;
 
-    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
-        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
+//    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
+//        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
 
-    const int N = QBALL_ODFSIZE;
+//    const int N = QBALL_ODFSIZE;
 
-    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
-    vnl_matrix_fixed<double, N, N> C = temp*bDir;
-    vnl_matrix_fixed<double, N, N> Q = C;
-    vnl_vector_fixed<double, N> mean;
-    for(int i=0; i<N; i++)
-    {
-      double tempMean = 0;
-      for(int j=0; j<N; j++)
-      {
-        C(i,j) = abs(C(i,j));
-        Q(i,j) = exp(-bD * C(i,j) * C(i,j));
-        tempMean += Q(i,j);
-      }
-      mean[i] = tempMean/N;
-    }
+//    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
+//    vnl_matrix_fixed<double, N, N> C = temp*bDir;
+//    vnl_matrix_fixed<double, N, N> Q = C;
+//    vnl_vector_fixed<double, N> mean;
+//    for(int i=0; i<N; i++)
+//    {
+//      double tempMean = 0;
+//      for(int j=0; j<N; j++)
+//      {
+//        C(i,j) = abs(C(i,j));
+//        Q(i,j) = exp(-bD * C(i,j) * C(i,j));
+//        tempMean += Q(i,j);
+//      }
+//      mean[i] = tempMean/N;
+//    }
 
-    vnl_matrix_fixed<double, N, N> repMean;
-    for (int i=0; i<N; i++)
-      repMean.set_row(i, mean);
-    Q -= repMean;
+//    vnl_matrix_fixed<double, N, N> repMean;
+//    for (int i=0; i<N; i++)
+//      repMean.set_row(i, mean);
+//    Q -= repMean;
 
-    vnl_matrix_fixed<double, N, N> P = Q*Q;
+//    vnl_matrix_fixed<double, N, N> P = Q*Q;
 
-    std::vector<const double *> pointer;
-    pointer.reserve(N*N);
-    double * start = C.data_block();
-    double * end =  start + N*N;
-    for (double * iter = start; iter != end; ++iter)
-    {
-      pointer.push_back(iter);
-    }
-    std::sort(pointer.begin(), pointer.end(), LessDereference());
+//    std::vector<const double *> pointer;
+//    pointer.reserve(N*N);
+//    double * start = C.data_block();
+//    double * end =  start + N*N;
+//    for (double * iter = start; iter != end; ++iter)
+//    {
+//      pointer.push_back(iter);
+//    }
+//    std::sort(pointer.begin(), pointer.end(), LessDereference());
 
-    vnl_vector_fixed<double,N*N> alpha;
-    vnl_vector_fixed<double,N*N> beta;
-    for (int i=0; i<N*N; i++) {
-      alpha(i) = *pointer[i];
-      beta(i)  = *(P.data_block()+(pointer[i]-start));
-    }
+//    vnl_vector_fixed<double,N*N> alpha;
+//    vnl_vector_fixed<double,N*N> beta;
+//    for (int i=0; i<N*N; i++) {
+//      alpha(i) = *pointer[i];
+//      beta(i)  = *(P.data_block()+(pointer[i]-start));
+//    }
 
-    double nfac = sqrt(beta(N*N-1));
-    beta = beta / (nfac*nfac);
-    Q = Q / nfac;
+//    double nfac = sqrt(beta(N*N-1));
+//    beta = beta / (nfac*nfac);
+//    Q = Q / nfac;
 
-    double sum = 0;
-    for(int i=0; i<N; i++)
-    {
-      sum += Q(0,i);
-    }
-    // if left to default 0
-    // then mean is not substracted in order to correct odf integral
-    // this->m_Meanval_sq = (sum*sum)/N;
+//    double sum = 0;
+//    for(int i=0; i<N; i++)
+//    {
+//      sum += Q(0,i);
+//    }
+//    // if left to default 0
+//    // then mean is not substracted in order to correct odf integral
+//    // this->m_Meanval_sq = (sum*sum)/N;
 
-    vnl_vector_fixed<double,N*N> alpha_0;
-    vnl_vector_fixed<double,N*N> alpha_2;
-    vnl_vector_fixed<double,N*N> alpha_4;
-    vnl_vector_fixed<double,N*N> alpha_6;
-    for(int i=0; i<N*N; i++)
-    {
-      alpha_0(i) = 1;
-      alpha_2(i) = alpha(i)*alpha(i);
-      alpha_4(i) = alpha_2(i)*alpha_2(i);
-      alpha_6(i) = alpha_4(i)*alpha_2(i);
-    }
+//    vnl_vector_fixed<double,N*N> alpha_0;
+//    vnl_vector_fixed<double,N*N> alpha_2;
+//    vnl_vector_fixed<double,N*N> alpha_4;
+//    vnl_vector_fixed<double,N*N> alpha_6;
+//    for(int i=0; i<N*N; i++)
+//    {
+//      alpha_0(i) = 1;
+//      alpha_2(i) = alpha(i)*alpha(i);
+//      alpha_4(i) = alpha_2(i)*alpha_2(i);
+//      alpha_6(i) = alpha_4(i)*alpha_2(i);
+//    }
 
-    vnl_matrix_fixed<double, N*N, 4> T;
-    T.set_column(0,alpha_0);
-    T.set_column(1,alpha_2);
-    T.set_column(2,alpha_4);
-    T.set_column(3,alpha_6);
+//    vnl_matrix_fixed<double, N*N, 4> T;
+//    T.set_column(0,alpha_0);
+//    T.set_column(1,alpha_2);
+//    T.set_column(2,alpha_4);
+//    T.set_column(3,alpha_6);
 
-    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
+//    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
 
-    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
+//    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
 
     BESSEL_APPROXCOEFF = new float[4];
 
-    BESSEL_APPROXCOEFF[0] = coeff(0);
-    BESSEL_APPROXCOEFF[1] = coeff(1);
-    BESSEL_APPROXCOEFF[2] = coeff(2);
-    BESSEL_APPROXCOEFF[3] = coeff(3);
-//    BESSEL_APPROXCOEFF[0] = -0.1714;
-//    BESSEL_APPROXCOEFF[1] = 0.5332;
-//    BESSEL_APPROXCOEFF[2] = -1.4889;
-//    BESSEL_APPROXCOEFF[3] = 2.0389;
+//    BESSEL_APPROXCOEFF[0] = coeff(0);
+//    BESSEL_APPROXCOEFF[1] = coeff(1);
+//    BESSEL_APPROXCOEFF[2] = coeff(2);
+//    BESSEL_APPROXCOEFF[3] = coeff(3);
+    BESSEL_APPROXCOEFF[0] = -0.1714;
+    BESSEL_APPROXCOEFF[1] = 0.5332;
+    BESSEL_APPROXCOEFF[2] = -1.4889;
+    BESSEL_APPROXCOEFF[3] = 2.0389;
 }
 
 // build fibers from tracking result
@@ -176,8 +264,6 @@ void
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 ::BuildFibers(float* points, int numPoints)
 {
-  MITK_INFO << "itkGibbsTrackingFilter: Building fibers ...";
-
   double spacing[3];
   spacing[0] = m_ItkQBallImage->GetSpacing().GetElement(0);
   spacing[1] = m_ItkQBallImage->GetSpacing().GetElement(1);
@@ -223,13 +309,15 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 template< class TInputOdfImage, class TInputROIImage >
 bool
 GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
-::EstimateParticleWeight(){
-
-    if (m_GfaImage.IsNull())
-    {
-        MITK_INFO << "no gfa image found";
-        return false;
-    }
+::EstimateParticleWeight()
+{
+    MITK_INFO << "itkGibbsTrackingFilter: estimating particle weight";
+    typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
+    GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
+    gfaFilter->SetInput(m_ItkQBallImage);
+    gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
+    gfaFilter->Update();
+    m_GfaImage = gfaFilter->GetOutput();
 
     float samplingStart = 1.0;
     float samplingStop = 0.66;
@@ -310,10 +398,12 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 
     // input qball image
     m_ItkQBallImage = dynamic_cast<InputQBallImageType*>(this->GetInput(0));
+    m_NumAcceptedFibers = 0;
 
     // approximationscoeffizienten der
     // teilchenkorrelationen im orientierungsraum
     // 4er vektor
+    //ComputeFiberCorrelationOriginal();
     ComputeFiberCorrelation();
 
     // image sizes and spacing
@@ -460,16 +550,15 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     if(m_ParticleWeight == 0)
         if (!EstimateParticleWeight())
         {
-            MITK_INFO << "could not estimate particle weight!";
+            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight!";
             m_ParticleWeight = 0.0001;
         }
-    MITK_INFO << "Particle Weight: " << m_ParticleWeight;
-    MITK_INFO << "Iterations: " << m_NumIt;
+    MITK_INFO << "itkGibbsTrackingFilter: particle Weight: " << m_ParticleWeight;
+    MITK_INFO << "itkGibbsTrackingFilter: iterations: " << m_NumIt;
     m_CurrentStep = 0;
     m_Memory = 0;
 
     float cellsize = 2*m_ParticleLength;
-    float curvatureHardThreshold = 0.7;
     float alpha = log(m_TempEnd/m_TempStart);
     m_Steps = m_NumIt/10000;
     if (m_Steps<10)
@@ -479,7 +568,11 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
         m_AbortTracking = true;
     }
-    MITK_INFO << "Steps: " << m_Steps;
+    MITK_INFO << "itkGibbsTrackingFilter: steps: " << m_Steps;
+
+    if (m_CurvatureHardThreshold < mitk::eps)
+      m_CurvatureHardThreshold = 0;
+    MITK_INFO << "itkGibbsTrackingFilter: curvature threshold: " << m_CurvatureHardThreshold;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
     // setup metropolis hastings sampler
@@ -491,9 +584,9 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     // setup energy computer
     MITK_INFO << "itkGibbsTrackingFilter: setting up Energy-computer";
     EnergyComputer encomp(workingQballImage,qBallImageSize,qBallImageSpacing,sinterp,&(m_Sampler->m_ParticleGrid),mask,mask_oversamp_mult, directionMatrix);
-    encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,curvatureHardThreshold,m_InexBalance,m_Chempot2);
+    encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
     m_Sampler->SetEnergyComputer(&encomp);
-    m_Sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,curvatureHardThreshold,m_ChempotParticle);
+    m_Sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,m_CurvatureHardThreshold,m_ChempotParticle);
 
     // main loop
     for( int step = 0; step < m_Steps; step++ )
@@ -503,7 +596,6 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
 
       m_CurrentStep = step+1;
       float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-      MITK_INFO << "itkGibbsTrackingFilter: iterating step " << m_CurrentStep;
 
       m_Sampler->SetTemperature(temperature);
       m_Sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);

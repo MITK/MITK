@@ -61,22 +61,8 @@ void QmitkTrackingWorker::run()
   resampler->Update();
   m_View->m_MaskImage = resampler->GetOutput();
 
-  if (m_View->m_GfaImage.IsNotNull())
-  {
-    ResamplerType::Pointer resampler = ResamplerType::New();
-    resampler->SetOutputSpacing( m_View->m_ItkQBallImage->GetSpacing() );
-    resampler->SetOutputOrigin( m_View->m_ItkQBallImage->GetOrigin() );
-    resampler->SetOutputDirection( m_View->m_ItkQBallImage->GetDirection() );
-    resampler->SetSize( m_View->m_ItkQBallImage->GetLargestPossibleRegion().GetSize() );
-    resampler->SetInput( m_View->m_GfaImage );
-    resampler->SetDefaultPixelValue(0);
-    resampler->Update();
-    m_View->m_GfaImage = resampler->GetOutput();
-  }
-
   m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
-  m_View->m_GlobalTracker->SetGfaImage(m_View->m_GfaImage);
   m_View->m_GlobalTracker->SetTempStart((float)m_View->m_Controls->m_StartTempSlider->value()/100);
   m_View->m_GlobalTracker->SetTempEnd((float)m_View->m_Controls->m_EndTempSlider->value()/10000);
   m_View->m_GlobalTracker->SetNumIt(m_View->m_Iterations);
@@ -86,6 +72,7 @@ void QmitkTrackingWorker::run()
   m_View->m_GlobalTracker->SetParticleLength((float)(m_View->m_Controls->m_ParticleLengthSlider->value())/10);
   m_View->m_GlobalTracker->SetInexBalance((float)m_View->m_Controls->m_InExBalanceSlider->value()/10);
   m_View->m_GlobalTracker->SetFiberLength(m_View->m_Controls->m_FiberLengthSlider->value());
+  m_View->m_GlobalTracker->SetCurvatureHardThreshold(cos((float)m_View->m_Controls->m_CurvatureThresholdSlider->value()*3.14159265/180));
 
   m_View->m_GlobalTracker->Update();
   m_View->m_TrackingThread.quit();
@@ -102,8 +89,6 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_GlobalTracker(NULL)
   , m_QBallImage(NULL)
   , m_MaskImage(NULL)
-  , m_GfaImage(NULL)
-  , m_GfaImageNode(NULL)
   , m_QBallImageNode(NULL)
   , m_ItkQBallImage(NULL)
   , m_FiberBundleNode(NULL)
@@ -128,10 +113,11 @@ QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 // update tracking status and generate fiber bundle
 void QmitkGibbsTrackingView::TimerUpdate()
 {
-  mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetCurrentStep()-m_LastStep);
-  m_LastStep = m_GlobalTracker->GetCurrentStep();
+  int currentStep = m_GlobalTracker->GetCurrentStep();
+  mitk::ProgressBar::GetInstance()->Progress(currentStep-m_LastStep);
   UpdateTrackingStatus();
-  GenerateFiberBundle();
+  GenerateFiberBundle(false);
+  m_LastStep = currentStep;
 }
 
 // tell global tractography filter to stop after current step
@@ -140,7 +126,7 @@ void QmitkGibbsTrackingView::StopGibbsTracking()
   if (m_GlobalTracker.IsNull())
     return;
 
-  mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep);
+  //mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
   m_GlobalTracker->SetAbortTracking(true);
   m_Controls->m_TrackingStop->setEnabled(false);
   m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
@@ -152,9 +138,10 @@ void QmitkGibbsTrackingView::AfterThread()
   m_ThreadIsRunning = false;
   m_TrackingTimer->stop();
 
+  mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
   UpdateGUI();
   UpdateTrackingStatus();
-  GenerateFiberBundle();
+  GenerateFiberBundle(true);
   QString paramMessage;
   if(m_Controls->m_ParticleWeightSlider->value()==0)
   {
@@ -209,7 +196,6 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_TrackingStop, SIGNAL(clicked()), this, SLOT(StopGibbsTracking()) );
     connect( m_Controls->m_TrackingStart, SIGNAL(clicked()), this, SLOT(StartGibbsTracking()) );
     connect( m_Controls->m_SetMaskButton, SIGNAL(clicked()), this, SLOT(SetMask()) );
-    connect( m_Controls->m_SetGfaButton, SIGNAL(clicked()), this, SLOT(SetGfaImage()) );
     connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
     connect( m_Controls->m_SaveTrackingParameters, SIGNAL(clicked()), this, SLOT(SaveTrackingParameters()) );
     connect( m_Controls->m_LoadTrackingParameters, SIGNAL(clicked()), this, SLOT(LoadTrackingParameters()) );
@@ -221,6 +207,7 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ParticleWeightSlider, SIGNAL(valueChanged(int)), this, SLOT(SetParticleWeight(int)) );
     connect( m_Controls->m_StartTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetStartTemp(int)) );
     connect( m_Controls->m_EndTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetEndTemp(int)) );
+    connect( m_Controls->m_CurvatureThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(SetCurvatureThreshold(int)) );
   }
 }
 
@@ -231,21 +218,15 @@ void QmitkGibbsTrackingView::SetInExBalance(int value)
 
 void QmitkGibbsTrackingView::SetFiberLength(int value)
 {
-  m_Controls->m_FiberLengthLabel->setText(QString::number(value));
+  m_Controls->m_FiberLengthLabel->setText(QString::number(value)+"mm");
 }
 
 void QmitkGibbsTrackingView::SetParticleWeight(int value)
 {
   if (value>0)
-  {
     m_Controls->m_ParticleWeightLabel->setText(QString::number((float)value/10000));
-    m_Controls->m_GfaFrame->setEnabled(false);
-  }
   else
-  {
     m_Controls->m_ParticleWeightLabel->setText("auto");
-    m_Controls->m_GfaFrame->setEnabled(true);
-  }
 }
 
 void QmitkGibbsTrackingView::SetStartTemp(int value)
@@ -272,6 +253,11 @@ void QmitkGibbsTrackingView::SetParticleLength(int value)
     m_Controls->m_ParticleLengthLabel->setText(QString::number((float)value/10)+" mm");
   else
     m_Controls->m_ParticleLengthLabel->setText("auto");
+}
+
+void QmitkGibbsTrackingView::SetCurvatureThreshold(int value)
+{
+  m_Controls->m_CurvatureThresholdLabel->setText(QString::number(value)+"°");
 }
 
 void QmitkGibbsTrackingView::SetIterations(int value)
@@ -386,7 +372,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(true);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
-    m_Controls->m_GfaFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -399,7 +384,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
     m_Controls->m_MaskFrame->setEnabled(true);
-    m_Controls->m_GfaFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -412,7 +396,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(false);
     m_Controls->m_MaskFrame->setEnabled(false);
-    m_Controls->m_GfaFrame->setEnabled(false);
     m_Controls->m_IterationsSlider->setEnabled(false);
     m_Controls->m_AdvancedFrame->setEnabled(false);
     m_Controls->m_AdvancedFrame->setVisible(false);
@@ -449,32 +432,6 @@ void QmitkGibbsTrackingView::SetMask()
     {
       m_MaskImageNode = node;
       m_Controls->m_MaskImageEdit->setText(node->GetName().c_str());
-      return;
-    }
-  }
-}
-
-// set gfa image data node
-void QmitkGibbsTrackingView::SetGfaImage()
-{
-  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
-  if (nodes.empty())
-  {
-    m_GfaImageNode = NULL;
-    m_Controls->m_GfaImageEdit->setText("N/A");
-    return;
-  }
-
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-      it != nodes.end();
-      ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-
-    if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
-    {
-      m_GfaImageNode = node;
-      m_Controls->m_GfaImageEdit->setText(node->GetName().c_str());
       return;
     }
   }
@@ -560,27 +517,11 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     }
   }
 
-  // gfa image found?
-  // catch exceptions thrown by the itkAccess macros
-  try{
-    if(m_Controls->m_GfaImageEdit->text().compare("N/A") != 0)
-    {
-      m_GfaImage = 0;
-      if (dynamic_cast<mitk::Image*>(m_GfaImageNode->GetData()))
-        mitk::CastToItkImage<MaskImgType>(dynamic_cast<mitk::Image*>(m_GfaImageNode->GetData()), m_GfaImage);
-    }
-  }
-  catch(...)
-  {
-    QMessageBox::warning(NULL, "Warning", "Incompatible GFA image chosen. Processing without GFA image.");
-    m_GfaImage = NULL;
-  }
-
   unsigned int steps = m_Iterations/10000;
   if (steps<10)
     steps = 10;
 
-  m_LastStep = 0;
+  m_LastStep = 1;
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
   // start worker thread
@@ -588,29 +529,21 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
 }
 
 // generate mitkFiberBundle from tracking filter output
-void QmitkGibbsTrackingView::GenerateFiberBundle()
+void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
 {
-  if (m_GlobalTracker.IsNull() || m_ItkQBallImage.IsNull() || m_QBallImage.IsNull() || (!m_Controls->m_VisualizationCheckbox->isChecked() && m_ThreadIsRunning))
+  if (m_GlobalTracker.IsNull() || (!(m_Controls->m_VisualizationCheckbox->isChecked() || m_Controls->m_VisualizeOnceButton->isChecked()) && m_ThreadIsRunning))
     return;
 
-
-  typedef std::vector< itk::Point<float, 3> > FiberTractType;
-  typedef std::vector< FiberTractType > FiberBundleType;
+  if (m_Controls->m_VisualizeOnceButton->isChecked())
+    m_Controls->m_VisualizeOnceButton->setChecked(false);
 
   vtkSmartPointer<vtkPolyData> fiberBundle = m_GlobalTracker->GetFiberBundle();
-
+  if ( fiberBundle->GetNumberOfLines()==0 )
+    return;
   m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
-  double qBallImageSpacing[3] = {m_ItkQBallImage->GetSpacing().GetElement(0),m_ItkQBallImage->GetSpacing().GetElement(1),m_ItkQBallImage->GetSpacing().GetElement(2)};
-  float minSpacing;
-  if(qBallImageSpacing[0]<qBallImageSpacing[1] && qBallImageSpacing[0]<qBallImageSpacing[2])
-      minSpacing = qBallImageSpacing[0];
-  else if (qBallImageSpacing[1] < qBallImageSpacing[2])
-      minSpacing = qBallImageSpacing[1];
-  else
-      minSpacing = qBallImageSpacing[2];
-
-  m_FiberBundle->ResampleFibers(minSpacing);
+  if (smoothFibers)
+    m_FiberBundle->DoFiberSmoothing(10);
 
   if (m_FiberBundleNode.IsNotNull()){
     GetDefaultDataStorage()->Remove(m_FiberBundleNode);
@@ -650,6 +583,7 @@ void QmitkGibbsTrackingView::SaveTrackingParameters()
   paramXML->SetAttribute("temp_end", QString::number((float)m_Controls->m_EndTempSlider->value()/10000).toStdString());
   paramXML->SetAttribute("inexbalance", QString::number((float)m_Controls->m_InExBalanceSlider->value()/10).toStdString());
   paramXML->SetAttribute("fiber_length", QString::number(m_Controls->m_FiberLengthSlider->value()).toStdString());
+  paramXML->SetAttribute("curvature_threshold", QString::number(m_Controls->m_CurvatureThresholdSlider->value()).toStdString());
   mainXML->LinkEndChild(paramXML);
   QString filename = QFileDialog::getSaveFileName(
         0,
@@ -774,9 +708,12 @@ void QmitkGibbsTrackingView::LoadTrackingParameters()
   m_Controls->m_InExBalanceSlider->setValue(inExBalance.toFloat()*10);
   m_Controls->m_InExBalanceLabel->setText(inExBalance);
 
-
   QString fiberLength(pElem->Attribute("fiber_length"));
   m_Controls->m_FiberLengthSlider->setValue(fiberLength.toInt());
-  m_Controls->m_FiberLengthLabel->setText(fiberLength);
+  m_Controls->m_FiberLengthLabel->setText(fiberLength+"mm");
+
+  QString curvThres(pElem->Attribute("curvature_threshold"));
+  m_Controls->m_CurvatureThresholdSlider->setValue(curvThres.toInt());
+  m_Controls->m_CurvatureThresholdLabel->setText(curvThres+"°");
 }
 

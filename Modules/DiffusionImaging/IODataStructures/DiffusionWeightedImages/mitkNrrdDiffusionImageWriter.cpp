@@ -216,9 +216,11 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 
     // create copy of file with correct ending for mitk
     std::string fname3 = m_FileName;
-    std::string newext = ext == ".fsl" ? "nii" : "nii.gz";
     std::string::iterator itend = fname3.end();
-    fname3.replace( itend-3, itend, newext);
+    if (ext == ".fsl")
+      fname3.replace( itend-3, itend, "nii");
+    else
+      fname3.replace( itend-5, itend, "nii.gz");
 
     itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
 

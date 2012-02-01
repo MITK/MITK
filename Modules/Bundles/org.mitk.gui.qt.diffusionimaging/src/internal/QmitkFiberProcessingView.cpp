@@ -38,7 +38,6 @@
 #include <mitkGlobalInteraction.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
-#include <mitkSurface.h>
 #include <mitkDiffusionImage.h>
 
 // ITK
@@ -102,6 +101,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
 
     connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
     connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
+    connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
   }
 }
 
@@ -712,11 +712,17 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_SubstractBundles->setEnabled(false);
     m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
     m_Controls->doExtractFibersButton->setEnabled(false);
+    m_Controls->m_Extract3dButton->setEnabled(false);
+    m_Controls->m_ResampleFibersButton->setEnabled(false);
   }
   else
   {
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
     m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
+    m_Controls->m_ResampleFibersButton->setEnabled(true);
+
+    if (m_Surfaces.size()>0)
+      m_Controls->m_Extract3dButton->setEnabled(true);
 
     // one bundle and one planar figure needed to extract fibers
     if (!m_SelectedPF.empty())
@@ -774,6 +780,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
   m_SelectedFB.clear();
   m_SelectedPF.clear();
+  m_Surfaces.clear();
   m_SelectedImage = NULL;
 
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -785,6 +792,8 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
       m_SelectedPF.push_back(node);
     else if (dynamic_cast<mitk::Image*>(node->GetData()))
       m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
+    else if (dynamic_cast<mitk::Surface*>(node->GetData()))
+      m_Surfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
   }
   UpdateGui();
   GenerateStats();
@@ -1715,5 +1724,15 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(img);
   return node;
+}
+
+void QmitkFiberProcessingView::ResampleSelectedBundles()
+{
+  int factor = this->m_Controls->m_ResampleFibersSpinBox->value();
+  for (int i=0; i<m_SelectedFB.size(); i++)
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+    fib->DoFiberSmoothing(factor);
+  }
 }
 

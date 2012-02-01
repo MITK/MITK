@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPlanarFigureComposite.h>
 #include <mitkFiberBundleX.h>
 #include <mitkDataNode.h>
+#include <mitkSurface.h>
 
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
@@ -93,6 +94,7 @@ public:
   void SubstractBundles();
   void GenerateRoiImage();
   void ProcessSelectedBundles();
+  void ResampleSelectedBundles();
 
   void Extract3d();
 
@@ -179,6 +181,7 @@ private:
   float                           m_UpsamplingFactor;
   UCharImageType::Pointer         m_InternalImageMask3D;
   UCharImageType::Pointer         m_PlanarFigureImage;
+  std::vector<mitk::Surface::Pointer> m_Surfaces;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );

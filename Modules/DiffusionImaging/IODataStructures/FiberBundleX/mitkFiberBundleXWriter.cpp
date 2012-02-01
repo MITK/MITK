@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFiberBundleXWriter.h"
 #include <vtkSmartPointer.h>
+#include <vtkCleanPolyData.h>
 
 mitk::FiberBundleXWriter::FiberBundleXWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
@@ -51,7 +52,12 @@ void mitk::FiberBundleXWriter::GenerateData()
         return ;
     }
     vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-    writer->SetInput(input->GetFiberPolyData());
+
+    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleaner->SetInput(input->GetFiberPolyData());
+    cleaner->Update();
+
+    writer->SetInput(cleaner->GetOutput());
     writer->SetFileName(m_FileName.c_str());
     writer->SetFileTypeToASCII();
     writer->Write();

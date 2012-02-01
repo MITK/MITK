@@ -378,7 +378,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   // If more than one segmentation is selected the tools will be disabled.
 
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
-  mitk::DataNode::Pointer referenceDataNew;
+  mitk::DataNode::Pointer referenceDataNew = mitk::DataNode::New();
   mitk::DataNode::Pointer workingData;
 
   bool workingNodeIsVisible (true);
@@ -410,14 +410,30 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
 
       if (this->GetDefaultDataStorage()->GetSources(node)->Size() != 0)
       {
-        referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+          referenceDataNew = this->GetDefaultDataStorage()->GetSources(node)->ElementAt(0);
+      }
+
+      bool isBinary(false);
+
+      //Find topmost source or first source which is no binary image
+      while (referenceDataNew && this->GetDefaultDataStorage()->GetSources(referenceDataNew)->Size() != 0)
+      {
+        referenceDataNew = this->GetDefaultDataStorage()->GetSources(referenceDataNew)->ElementAt(0);
+
+        referenceDataNew->GetBoolProperty("binary",isBinary);
+        if (!isBinary)
+            break;
       }
 
       if (workingNodeIsVisible && referenceDataNew)
       {
+          //Since the binary property of a segmentation can be set to false and afterwards you can create a new segmentation out of it
+          //->could lead to a deadloop
           NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( referenceDataNew );
-          if ( searchIter != m_WorkingDataObserverTags.end() )
+          if ( searchIter != m_WorkingDataObserverTags.end())
+          {
               referenceDataNew->GetProperty("visible")->RemoveObserver( (*searchIter).second );
+          }
           referenceDataNew->SetVisibility(true);
       }
 

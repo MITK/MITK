@@ -147,7 +147,7 @@ endif()
 
 if(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
-  find_package(Qt4 4.6.0 REQUIRED)
+  find_package(Qt4 4.6.2 REQUIRED)
 endif()
 
 

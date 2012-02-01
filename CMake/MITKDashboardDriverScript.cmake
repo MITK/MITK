@@ -247,7 +247,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
     
-    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res)
+    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res OPTIONS "${SUPERBUILD_CONFIG_OPTIONS}")
     
     if(res)
       math(EXPR build_errors "${build_errors} + 1") 

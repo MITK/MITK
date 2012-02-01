@@ -141,17 +141,14 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
 
 void QmitkCommonExtPlugin::startNewInstance(const QStringList &args, const QStringList& files)
 {
-  if (!files.empty())
-  {
-    QStringList newArgs(args);
+  QStringList newArgs(args);
 #ifdef Q_OS_UNIX
-    newArgs << QString("--") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("--") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
 #else
-    newArgs << QString("/") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("/") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
 #endif
-    newArgs << files;
-    QProcess::startDetached(qApp->applicationFilePath(), newArgs);
-  }
+  newArgs << files;
+  QProcess::startDetached(qApp->applicationFilePath(), newArgs);
 }
 
 void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)

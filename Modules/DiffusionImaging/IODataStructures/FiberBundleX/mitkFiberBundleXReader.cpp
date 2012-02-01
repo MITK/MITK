@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCellArray.h>
 #include <itksys/SystemTools.hxx>
 #include <tinyxml.h>
+#include <vtkCleanPolyData.h>
 
 namespace mitk
 {
@@ -71,6 +72,12 @@ namespace mitk
         if ( reader->GetOutput() != NULL )
         {
           vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
+
+          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+          cleaner->SetInput(fiberPolyData);
+          cleaner->Update();
+          fiberPolyData = cleaner->GetOutput();
+
           m_OutputCache = OutputType::New(fiberPolyData);
         }
       }
@@ -183,6 +190,12 @@ namespace mitk
           }
           fiberPolyData->SetPoints(points);
           fiberPolyData->SetLines(cellArray);
+
+          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+          cleaner->SetInput(fiberPolyData);
+          cleaner->Update();
+          fiberPolyData = cleaner->GetOutput();
+
           m_OutputCache = OutputType::New(fiberPolyData);
         }
         else

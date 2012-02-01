@@ -210,6 +210,8 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
   {
     m_ScalarMin[t] = 0;
     m_ScalarMax[t] = 255;
+    m_Scalar2ndMin[t] = 0;
+    m_Scalar2ndMax[t] = 255;
   }
 }
 

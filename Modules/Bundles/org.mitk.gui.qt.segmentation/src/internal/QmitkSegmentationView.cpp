@@ -382,7 +382,6 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   mitk::DataNode::Pointer workingData;
 
   bool workingNodeIsVisible (true);
-  mitk::DataNode::Pointer refTemp;
 
   unsigned int numberOfSelectedSegmentations (0);
 
@@ -415,7 +414,12 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       }
 
       if (workingNodeIsVisible && referenceDataNew)
-        referenceDataNew->SetVisibility(true);
+      {
+          NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( referenceDataNew );
+          if ( searchIter != m_WorkingDataObserverTags.end() )
+              referenceDataNew->GetProperty("visible")->RemoveObserver( (*searchIter).second );
+          referenceDataNew->SetVisibility(true);
+      }
 
       //set comboBox to reference image
       disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
@@ -738,11 +742,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
       m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
       workingData->GetProperty("visible")->Modified();
-        
-//        itk::MemberCommand<QmitkSegmentationView>::Pointer command = itk::MemberCommand<QmitkSegmentationView>::New();
-//        command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-//        m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-//        workingData->GetProperty("visible")->Modified();
 
       return;
     }

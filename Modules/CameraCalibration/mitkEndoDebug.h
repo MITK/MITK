@@ -26,6 +26,11 @@ namespace mitk
     static EndoDebug& GetInstance();
 
     ///
+    /// helper function getting unique file name
+    ///
+    static std::string GetUniqueFileName( const std::string& dir, const std::string& ext="jpg" );
+
+    ///
     /// set if debug is enabled at all
     ///
     void SetDebugEnabled(bool _DebugEnabled);
@@ -54,6 +59,17 @@ namespace mitk
     /// \return true if debug should be enabled
     ///
     bool GetShowImagesTimeOut();
+
+    ///
+    /// sets an output directory. if set all images that are shown are also written to that
+    /// output dir
+    ///
+    void SetDebugImagesOutputDirectory(const std::string& _DebugImagesOutputDirectory);
+
+    ///
+    /// \return true if debug should be enabled
+    ///
+    std::string GetDebugImagesOutputDirectory() const;
 
     ///
     /// \return the basename of a file without path
@@ -179,12 +195,19 @@ namespace mitk
   ///
   #define endodebugimg(imgVariableName)\
     if( mitk::EndoDebug::GetInstance().Debug(__FILE__) \
-        && mitk::EndoDebug::GetInstance().GetShowImagesInDebug()) \
+        && mitk::EndoDebug::GetInstance().GetShowImagesInDebug() \
+        && (imgVariableName).cols > 0 && (imgVariableName).rows > 0 && (imgVariableName).data) \
     { \
       std::ostringstream ___ostringstream; \
       ___ostringstream << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " << __LINE__\
         << ": Showing " #imgVariableName << std::endl; \
       mitk::EndoDebug::GetInstance().ShowMessage( ___ostringstream.str() ); \
+      std::string outputFile = mitk::EndoDebug::GetInstance().GetDebugImagesOutputDirectory(); \
+      if( !outputFile.empty() ) \
+      {\
+        outputFile =  mitk::EndoDebug::GetInstance().GetUniqueFileName(outputFile, "jpg");\
+        cv::imwrite(outputFile, imgVariableName);\
+      }\
       cv::imshow( "Debug", imgVariableName ); \
       cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
     }

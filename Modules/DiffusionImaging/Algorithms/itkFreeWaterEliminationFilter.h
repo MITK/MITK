@@ -119,6 +119,7 @@ namespace itk
       return m_GradientDirectionContainer->ElementAt( idx+1 );
       }
 
+  itkSetMacro( BValue, TTensorPixelType);
 
   protected:
 
@@ -149,6 +150,12 @@ namespace itk
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer           m_GradientDirectionContainer;
 
+
+    /** b-value */
+    TTensorPixelType                                  m_BValue;
+
+    /** Number of baseline images */
+    unsigned int                                      m_NumberOfBaselineImages;
 
 
   };    

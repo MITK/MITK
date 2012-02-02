@@ -321,8 +321,14 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
 
       typedef itk::FreeWaterEliminationFilter<
         DiffusionPixelType, TTensorPixelType > FreeWaterEliminationFilterType;
-      FreeWaterEliminationFilterType::Pointer tensorReconstructionFilter =
+      FreeWaterEliminationFilterType::Pointer fweFilter =
         FreeWaterEliminationFilterType::New();
+
+      fweFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
+      fweFilter->SetBValue(vols->GetB_Value());
+
+      fweFilter->Update();
+
 
     }
 

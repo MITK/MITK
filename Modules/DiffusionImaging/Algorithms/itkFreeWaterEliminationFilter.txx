@@ -39,7 +39,7 @@ namespace itk
     FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
     ::GenerateData ( )
   {
-
+    std::cout << "Start FWE" << std::endl;
 
   }
 

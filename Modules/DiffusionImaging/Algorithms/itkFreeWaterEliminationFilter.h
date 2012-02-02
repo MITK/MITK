@@ -125,10 +125,8 @@ namespace itk
     FreeWaterEliminationFilter();
     ~FreeWaterEliminationFilter() {};
 
-    void BeforeThreadedGenerateData( void );
 
-    void ThreadedGenerateData( const 
-      OutputImageRegionType &outputRegionForThread, int);
+    void GenerateData();
   
 
     typedef enum

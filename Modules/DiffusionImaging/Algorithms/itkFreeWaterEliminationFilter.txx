@@ -32,20 +32,12 @@ namespace itk
 
   }
 
-  template <class TDiffusionPixelType, class TTensorPixelType>
-  void
-    FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-    ::BeforeThreadedGenerateData()
-  {
 
-
-
-  }
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
     FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-    ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
+    ::GenerateData ( )
   {
 
 

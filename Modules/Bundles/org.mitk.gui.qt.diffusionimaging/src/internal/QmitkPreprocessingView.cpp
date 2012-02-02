@@ -114,6 +114,7 @@ struct PrpSelListener : ISelectionListener
       m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
+      m_View->m_Controls->m_ButtonFWE->setEnabled(foundDwiVolume);
 
       if (foundDwiVolume)
       {

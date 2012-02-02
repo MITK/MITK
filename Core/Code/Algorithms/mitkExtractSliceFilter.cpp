@@ -44,7 +44,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
 	m_ZMin = 0;
 	m_ZMax = 0;
 	m_VtkOutputRequested = false;
-	
+
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -81,23 +81,23 @@ mitk::ScalarType* mitk::ExtractSliceFilter::GetOutputSpacing(){
 
 
 void mitk::ExtractSliceFilter::GenerateData(){
-	
+
 	mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
-	
+
 	if (!input)
 	{
 		MITK_ERROR << "mitk::ExtractSliceFilter: No input image available. Please set the input!" << std::endl;
-        itkExceptionMacro("mitk::ExtractSliceFilter: No input image available. Please set the input!");
-        return;
-    }
+		itkExceptionMacro("mitk::ExtractSliceFilter: No input image available. Please set the input!");
+		return;
+	}
 
 	if(!m_WorldGeometry)
 	{
 		MITK_ERROR << "mitk::ExtractSliceFilter: No Geometry for reslicing available." << std::endl;
-        itkExceptionMacro("mitk::ExtractSliceFilter: No Geometry for reslicing available.");
-        return;
-    }
-	
+		itkExceptionMacro("mitk::ExtractSliceFilter: No Geometry for reslicing available.");
+		return;
+	}
+
 
 	const TimeSlicedGeometry *inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
 	if ( ( inputTimeGeometry == NULL )
@@ -114,33 +114,33 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		return;
 	}
 
-	 // check if there is something to display.
-	 if ( ! input->IsVolumeSet( m_TimeStep ) ) 
-	 {
+	// check if there is something to display.
+	if ( ! input->IsVolumeSet( m_TimeStep ) ) 
+	{
 		itkWarningMacro(<<"No volume data existent at given timestep "<< m_TimeStep ); 
 		return;
-	 }
+	}
 
 
-	 
 
-/*================#BEGIN setup vtkImageRslice properties================*/
 
-	
+	/*================#BEGIN setup vtkImageRslice properties================*/
+
+
 	Point3D origin;
 	Vector3D right, bottom, normal;
 	double widthInMM, heightInMM;
 	Vector2D extent;
-	
-	
+
+
 
 	const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(m_WorldGeometry);
 
-	
+
 	if ( planeGeometry != NULL )
 	{
 		//if the worldGeomatry is a PlaneGeometry everthing is straight forward
-		
+
 		origin = planeGeometry->GetOrigin();
 		right  = planeGeometry->GetAxisVector( 0 );
 		bottom = planeGeometry->GetAxisVector( 1 );
@@ -171,7 +171,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		// spacing therefrom.
 		widthInMM = m_WorldGeometry->GetExtentInMM( 0 );
 		heightInMM = m_WorldGeometry->GetExtentInMM( 1 );
-		
+
 
 		m_OutPutSpacing[0] = widthInMM / extent[0];
 		m_OutPutSpacing[1] = heightInMM / extent[1];
@@ -181,19 +181,19 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		bottom.Normalize();
 		normal.Normalize();
 
-		
+
 		/*
-		 * Transform the origin to center based coordinates.
-		 * Note:
-		 * This is needed besause vtk's origin is center based too (!!!) ( see 'The VTK book' page 88 )
-		 * and the worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
-		 * has its origin at the corner of the voxel and needs to be transformed.
-		 */
+		* Transform the origin to center based coordinates.
+		* Note:
+		* This is needed besause vtk's origin is center based too (!!!) ( see 'The VTK book' page 88 )
+		* and the worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
+		* has its origin at the corner of the voxel and needs to be transformed.
+		*/
 		origin += right * ( m_OutPutSpacing[0] * 0.5 );
 		origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
 
-		
-		
+
+
 		//set the tranform for reslicing.
 		// Use inverse transform of the input geometry for reslicing the 3D image.
 		// This is needed if the image volume already transformed 
@@ -323,26 +323,26 @@ void mitk::ExtractSliceFilter::GenerateData(){
 			//the default interpolation used by mitk
 			m_Reslicer->SetInterpolationModeToNearestNeighbor();
 	}
-	
+
 
 	/*========== BEGIN setup extent of the slice ==========*/
 	int xMin, xMax, yMin, yMax;
 	bool boundsInitialized = false;
 	if(m_WorldGeometry->GetReferenceGeometry()){
 		vtkFloatingPointType sliceBounds[6];
-		
+
 		for ( int i = 0; i < 6; ++i )
 		{
 			sliceBounds[i] = 0.0;
 		}
 		this->CalculateClippedPlaneBounds( m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
-		
+
 		// Calculate output extent (integer values)
 		xMin = static_cast< int >( sliceBounds[0] / m_OutPutSpacing[0] + 0.5 );
 		xMax = static_cast< int >( sliceBounds[1] / m_OutPutSpacing[0] + 0.5 );
 		yMin = static_cast< int >( sliceBounds[2] / m_OutPutSpacing[1] + 0.5 );
 		yMax = static_cast< int >( sliceBounds[3] / m_OutPutSpacing[1] + 0.5 );
-		
+
 	}else
 	{
 		// If no reference geometry is available, we also don't know about the
@@ -351,26 +351,26 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		xMax = static_cast< int >( extent[0]);
 		yMax = static_cast< int >( extent[1]);
 	}
-	
-	
+
+
 	m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
 	/*========== END setup extent of the slice ==========*/
 
-	
+
 	m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
 
 	m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], m_ZSpacing );
-	
+
 
 	//TODO check the following lines, they are responsible wether vtk error outputs appear or not
 	m_Reslicer->UpdateWholeExtent(); //this produces a bad allocation error for 2D images
 	//m_Reslicer->GetOutput()->UpdateInformation();
 	//m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
-	
+
 	//start the pipeline
 	m_Reslicer->Update();
 
-/*================ #END setup vtkImageRslice properties================*/
+	/*================ #END setup vtkImageRslice properties================*/
 
 	if(m_VtkOutputRequested){
 		return;
@@ -428,14 +428,25 @@ void mitk::ExtractSliceFilter::GenerateData(){
 }
 
 
-bool mitk::ExtractSliceFilter::GetBounds(vtkFloatingPointType bounds[6]){
-	
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds[6]){
+
+	if(!m_WorldGeometry || !this->GetInput())
+		return false;
+
 	return this->CalculateClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ), bounds); 
 }
 
+
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+																										 const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+{
+	return this->CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds); 
+}
+
+
 bool mitk::ExtractSliceFilter
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
-							  const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+															const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
 	// Clip the plane with the bounding geometry. To do so, the corner points 
 	// of the bounding box are transformed by the inverse transformation 
@@ -528,7 +539,7 @@ bool mitk::ExtractSliceFilter
 
 bool mitk::ExtractSliceFilter
 ::LineIntersectZero( vtkPoints *points, int p1, int p2,
-					vtkFloatingPointType *bounds )
+										vtkFloatingPointType *bounds )
 {
 	vtkFloatingPointType point1[3];
 	vtkFloatingPointType point2[3];

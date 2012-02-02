@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriterWithInformation.h>
 #include "mitkFiberBundleX.h"
 #include <vtkPolyDataWriter.h>
+#include <MitkDiffusionImagingExports.h>
 
 
 namespace mitk
@@ -31,11 +32,13 @@ namespace mitk
  * Writes fiber bundles to a file
  * @ingroup Process
  */
-class FiberBundleXWriter : public mitk::FileWriterWithInformation
+class MitkDiffusionImaging_EXPORT FiberBundleXWriter : public mitk::FileWriterWithInformation
 {
 public:
 
     mitkClassMacro( FiberBundleXWriter, mitk::FileWriterWithInformation );
+
+    itkNewMacro( Self );
 
     //mitkWriterMacro;
 
@@ -57,8 +60,6 @@ public:
     {
       Write();
     }
-
-    itkNewMacro( Self );
 
     typedef mitk::FiberBundleX InputType;
 

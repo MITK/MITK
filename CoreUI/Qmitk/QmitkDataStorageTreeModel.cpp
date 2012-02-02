@@ -58,10 +58,6 @@ QmitkDataStorageTreeModel::~QmitkDataStorageTreeModel()
   m_Root->Delete(); m_Root = 0;
 
   //Removing all observers
-  for ( NodeTagMapType::iterator dataIter = m_HelperObjectObserverTags.begin(); dataIter != m_HelperObjectObserverTags.end(); ++dataIter )
-  {
-      (*dataIter).first->GetProperty("helper object")->RemoveObserver( (*dataIter).second );
-  }
   m_HelperObjectObserverTags.clear();
 }
 
@@ -424,7 +420,7 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
     if (node->GetBoolProperty("helper object", isHelperObject) && searchIter == m_HelperObjectObserverTags.end()) {
         itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::Pointer command = itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::New();
         command->SetCallbackFunction(this, &QmitkDataStorageTreeModel::UpdateNodeVisibility);
-         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
+        m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
     }
 
   // find out if we have a root node
@@ -476,13 +472,6 @@ void QmitkDataStorageTreeModel::SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop)
 
 void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
 {
-    bool isHelperObject (false);
-    NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
-    if (node->GetBoolProperty("helper object", isHelperObject) && searchIter != m_HelperObjectObserverTags.end()) {
-        (*searchIter).first->GetProperty("helper object")->RemoveObserver( (*searchIter).second );
-        m_HelperObjectObserverTags.erase(const_cast<mitk::DataNode*>(node));
-    }
-
   if(!m_Root) return;
 
   TreeItem* treeItem = m_Root->Find(node);

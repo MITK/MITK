@@ -530,7 +530,6 @@ void QmitkSegmentationView::ManualToolSelected(int id)
     if (id >= 0)
     {
       m_MultiWidget->DisableNavigationControllerEventListening();
-      m_MultiWidget->SetWidgetPlaneMode(0);
     }
     else
     {

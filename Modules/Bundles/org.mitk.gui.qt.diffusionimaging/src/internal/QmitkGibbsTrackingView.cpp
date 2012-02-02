@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageToItk.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
+#include <mitkFiberBundleXWriter.h>
 
 // ITK
 #include <itkGibbsTrackingFilter.h>
@@ -208,6 +209,7 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetStartTemp(int)) );
     connect( m_Controls->m_EndTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetEndTemp(int)) );
     connect( m_Controls->m_CurvatureThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(SetCurvatureThreshold(int)) );
+    connect( m_Controls->m_OutputFileButton, SIGNAL(clicked()), this, SLOT(SetOutputFile()) );
   }
 }
 
@@ -557,10 +559,44 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
   m_FiberBundleNode->SetName(name.toStdString());
   m_FiberBundleNode->SetVisibility(true);
 
-  if(m_QBallImageNode.IsNull())
-    GetDataStorage()->Add(m_FiberBundleNode);
+  if (!m_OutputFileName.isEmpty())
+  {
+    mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
+    writer->SetFileName(m_OutputFileName.toStdString());
+    writer->SetInputFiberBundleX(m_FiberBundle.GetPointer());
+    try
+    {
+      MITK_INFO << "Saving " << m_OutputFileName.toStdString();
+      writer->Update();
+    }
+    catch (itk::ExceptionObject &ex)
+    {
+      MITK_ERROR << QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()).toStdString();
+      if(m_QBallImageNode.IsNull())
+        GetDataStorage()->Add(m_FiberBundleNode);
+      else
+        GetDataStorage()->Add(m_FiberBundleNode, m_QBallImageNode);
+    }
+  }
+  else {
+    if(m_QBallImageNode.IsNull())
+      GetDataStorage()->Add(m_FiberBundleNode);
+    else
+      GetDataStorage()->Add(m_FiberBundleNode, m_QBallImageNode);
+  }
+}
+
+void QmitkGibbsTrackingView::SetOutputFile()
+{
+  // SELECT FOLDER DIALOG
+  m_OutputFileName = QFileDialog::getSaveFileName(0,
+        tr("Set file name"),
+        QDir::currentPath()+"/FiberBundle.fib",
+        tr("Fiber Bundle (*.fib)") );
+  if (m_OutputFileName.isEmpty())
+    m_Controls->m_OutputFileLabel->setText("N/A");
   else
-    GetDataStorage()->Add(m_FiberBundleNode, m_QBallImageNode);
+    m_Controls->m_OutputFileLabel->setText(m_OutputFileName);
 }
 
 // save current tracking paramters as xml file (.gtp)

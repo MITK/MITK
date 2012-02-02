@@ -113,6 +113,7 @@ protected slots:
   void SetStartTemp(int value);
   void SetEndTemp(int value);
   void SetCurvatureThreshold(int value);
+  void SetOutputFile();
 
 private:
 
@@ -152,6 +153,7 @@ private:
   bool            m_FibSelected;
   unsigned long   m_Iterations;
   int             m_LastStep;
+  QString         m_OutputFileName;
 
   // global tracker and friends
   itk::SmartPointer<GibbsTrackingFilterType> m_GlobalTracker;

@@ -60,7 +60,7 @@ mitkIpPicType_t mitk::CastToIpPicType( const std::type_info& intype )
 {
   //const std::type_info& intype = ptype.GetTypeId();
 
-  MITK_INFO << "Casting to PicType from " << intype.name() << std::endl;
+  //MITK_INFO << "Casting to PicType from " << intype.name() << std::endl;
 
   const bool isSignedIntegralType = (   intype == typeid(int)
                                  || intype == typeid(short)

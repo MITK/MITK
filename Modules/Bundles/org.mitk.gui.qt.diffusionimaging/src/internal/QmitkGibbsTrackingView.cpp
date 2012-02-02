@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 // ITK
 #include <itkGibbsTrackingFilter.h>
 #include <itkResampleImageFilter.h>
+#include <itksys/SystemTools.hxx>
 
 // MISC
 #include <tinyxml.h>
@@ -97,6 +98,7 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_QBallSelected(false)
   , m_Iterations(10000000)
   , m_LastStep(0)
+  , m_SaveCounter(0)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -526,6 +528,8 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   m_LastStep = 1;
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
+  m_SaveCounter = 0;
+
   // start worker thread
   m_TrackingThread.start(QThread::LowestPriority);
 }
@@ -561,13 +565,20 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
 
   if (!m_OutputFileName.isEmpty())
   {
+    QString filename = m_OutputFileName;
+    if (m_SaveCounter>0 && m_Controls->m_SaveIntermediateCheckbox->isChecked())
+    {
+      filename = QString(itksys::SystemTools::GetFilenamePath(filename.toStdString()).c_str())+"/"+QString(itksys::SystemTools::GetFilenameWithoutExtension(filename.toStdString()).c_str());
+      filename += "_"+QString::number(m_SaveCounter)+".fib";
+    }
     mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-    writer->SetFileName(m_OutputFileName.toStdString());
+    writer->SetFileName(filename.toStdString());
     writer->SetInputFiberBundleX(m_FiberBundle.GetPointer());
     try
     {
-      MITK_INFO << "Saving " << m_OutputFileName.toStdString();
+      MITK_INFO << "Saving " << filename.toStdString();
       writer->Update();
+      m_SaveCounter++;
     }
     catch (itk::ExceptionObject &ex)
     {
@@ -597,6 +608,7 @@ void QmitkGibbsTrackingView::SetOutputFile()
     m_Controls->m_OutputFileLabel->setText("N/A");
   else
     m_Controls->m_OutputFileLabel->setText(m_OutputFileName);
+  m_SaveCounter = 0;
 }
 
 // save current tracking paramters as xml file (.gtp)

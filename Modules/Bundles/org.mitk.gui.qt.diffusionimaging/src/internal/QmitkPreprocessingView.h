@@ -88,6 +88,9 @@ protected slots:
 
   void ApplyMesurementFrame();
 
+  void FreeWaterElimination();
+  void DoFreeWaterElimination(mitk::DataStorage::SetOfObjects::Pointer inImages);
+
 protected:
 
   Ui::QmitkPreprocessingViewControls* m_Controls;

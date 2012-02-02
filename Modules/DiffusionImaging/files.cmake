@@ -155,6 +155,7 @@ SET(H_FILES
   Algorithms/itkDistanceMapFilter.h
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
+  Algorithms/itkFreeWaterEliminationFilter.h
 )
 
 SET( TOOL_FILES

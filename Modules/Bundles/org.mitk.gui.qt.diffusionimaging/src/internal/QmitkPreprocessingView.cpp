@@ -50,6 +50,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkB0ImageExtractionImageFilter.h"
 #include "itkBrainMaskExtractionImageFilter.h"
 #include "itkCastImageFilter.h"
+#include "itkFreeWaterEliminationFilter.h"
 
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
@@ -113,6 +114,7 @@ struct PrpSelListener : ISelectionListener
       m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
+      m_View->m_Controls->m_ButtonFWE->setEnabled(foundDwiVolume);
 
       if (foundDwiVolume)
       {
@@ -227,6 +229,7 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
     connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );
     connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(ApplyMesurementFrame()) );
+    connect( (QObject*)(m_Controls->m_ButtonFWE), SIGNAL(clicked()), this, SLOT(FreeWaterElimination()) );
   }
 }
 
@@ -259,6 +262,93 @@ void QmitkPreprocessingView::ApplyMesurementFrame()
       mf[r][c] = item->text().toDouble();
     }
   m_DiffusionImage->SetMeasurementFrame(mf);
+}
+
+void QmitkPreprocessingView::FreeWaterElimination()
+{
+  if (m_CurrentSelection)
+  {
+    mitk::DataStorage::SetOfObjects::Pointer set =
+      mitk::DataStorage::SetOfObjects::New();
+
+    int at = 0;
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
+      ++i)
+    {
+
+      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      {
+        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+        {
+          set->InsertElement(at++, node);
+        }
+      }
+    }
+
+    DoFreeWaterElimination(set);
+  }
+}
+
+void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObjects::Pointer inImages)
+{
+
+  try
+  {
+    itk::TimeProbe clock;
+
+    int nrFiles = inImages->size();
+    if (!nrFiles) return;
+
+    QString status;
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
+
+    std::vector<mitk::DataNode::Pointer> nodes;
+    while ( itemiter != itemiterend ) // for all items
+    {
+
+      mitk::DiffusionImage<DiffusionPixelType>* vols =
+        static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+        (*itemiter)->GetData());
+
+      std::string nodename;
+      (*itemiter)->GetStringProperty("name", nodename);
+      ++itemiter;
+
+
+      typedef itk::FreeWaterEliminationFilter<
+        DiffusionPixelType, TTensorPixelType > FreeWaterEliminationFilterType;
+      FreeWaterEliminationFilterType::Pointer fweFilter =
+        FreeWaterEliminationFilterType::New();
+
+      fweFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
+      fweFilter->SetBValue(vols->GetB_Value());
+
+      fweFilter->Update();
+
+
+    }
+
+    std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
+    for(nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+      GetDefaultDataStorage()->Add(*nodeIt);
+
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+    m_MultiWidget->RequestUpdate();
+
+  }
+  catch (itk::ExceptionObject &ex)
+  {
+    MBI_INFO << ex ;
+    return ;
+  }
+
+
+
 }
 
 void QmitkPreprocessingView::ExtractB0()

@@ -280,6 +280,10 @@ protected:
   TreeItem* m_Root;
 
   NodeTagMapType  m_HelperObjectObserverTags;
+
+private:
+  void AddNodeInternal(const mitk::DataNode*);
+  void RemoveNodeInternal(const mitk::DataNode*);
 };
 
 #endif /* QMITKDATASTORAGETREEMODEL_H_ */

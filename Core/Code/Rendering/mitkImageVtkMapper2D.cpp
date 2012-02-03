@@ -314,7 +314,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
 	  sliceBounds[i] = 0.0;
   }
-  localStorage->m_Reslicer->GetBounds(sliceBounds);
+  localStorage->m_Reslicer->GetClippedPlaneBounds(sliceBounds);
 
   //get the spacing of the slice
   localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();

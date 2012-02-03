@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "mitkOverwriteSliceFilter.h"
-
+#include <vtkTemplateAliasMacro.h>
 
 
 mitk::OverwriteSliceFilter::OverwriteSliceFilter(){
@@ -48,8 +48,65 @@ void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
 	input->SetRequestedRegionToLargestPossibleRegion();
 }
 
+
+
+
+template<class F>
+static void GetOverwritefunc(int dataType, void (**overwritefunc)(F *inPtr, F *outPtr, F *mapPtr, int todo)){
+
+	switch (dataType)
+	{
+		vtkTemplateAliasMacro(*((void (**)(VTK_TT *outPtr, VTK_TT *inPtr,
+			VTK_TT *mapPtr, int todo))overwritefunc) = \
+			&Overwrite);
+	default:
+		overwritefunc = 0;
+	}
+}
+
+
+template<class T>
+static void Overwrite(T *inPtr, T *outPtr, T *mapPtr, int todo){
+	
+	do{
+		unsigned int shift = (unsigned int)*mapPtr;
+		mapPtr++;
+		*(outPtr + shift) = *inPtr++;
+	}while(--todo);
+
+}
+
+
+
+
 void mitk::OverwriteSliceFilter::GenerateData()
 {
+	vtkSmartPointer<vtkImageData> inputVolume = (const_cast< mitk::Image * >(ImageToImageFilter::GetInput()))->GetVtkImageData(m_TimeStep);
+
+	int* extentSlice = m_Slice->GetExtent();
+	void* inPtr = m_Slice->GetScalarPointerForExtent(extentSlice);
+
+	void* outPtr = inputVolume->GetScalarPointer();
+
+
+	int* extentMap = m_Map->GetExtent();
+	void* mapPtr = m_Map->GetScalarPointerForExtent(extentMap);
+
+
+	int* dimensions = m_Slice->GetDimensions();
+	int todo = dimensions[0] * dimensions[1];
+
+  void (*overwritefunc)(void *inPtr, void *outPtr, void *mapPtr, int todo);
+	GetOverwritefunc(m_Slice->GetScalarType(),&overwritefunc);
+
+	overwritefunc(inPtr, outPtr, mapPtr, todo);
 	
-	//this->SetOutput( const_cast<ImageToImageFilter::OutputImageType>(GetInput()) );
+	mitk::Image::Pointer resultImage = this->GetOutput();
+
+	//initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
+	resultImage->Initialize(inputVolume);
+
+	//transfer the voxel data
+	resultImage->SetVolume(inputVolume->GetScalarPointer());	
+
 }

@@ -60,6 +60,7 @@ SET(MODULE_TESTS
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   #QmitkRenderingTestHelper.cpp
   mitkExtractSliceFilterTest.cpp
+  mitkOverwriteSliceFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter

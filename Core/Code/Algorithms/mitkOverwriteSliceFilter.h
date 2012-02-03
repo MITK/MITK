@@ -41,7 +41,8 @@ namespace mitk
 		void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
 		unsigned int GetTimeStep(){ return this->m_TimeStep; }
 
-		void SetInputSlice(mitk::Image* slice){ this->m_Slice = slice; }
+		void SetInputSlice(vtkImageData* slice){ this->m_Slice = slice; }
+		void SetInputSlice(mitk::Image* slice);
 
 		void SetInputMap(vtkImageData* map){ this->m_Map = map; }
 		void SetInputMap(mitk::Image* map);
@@ -54,7 +55,7 @@ namespace mitk
 
 		virtual void GenerateInputRequestedRegion();
 
-		mitk::Image* m_Slice;
+		vtkSmartPointer<vtkImageData> m_Slice;
 		vtkSmartPointer<vtkImageData> m_Map;
 
 		unsigned int m_TimeStep;

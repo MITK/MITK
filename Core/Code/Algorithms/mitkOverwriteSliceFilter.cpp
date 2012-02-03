@@ -34,6 +34,10 @@ void mitk::OverwriteSliceFilter::SetInputMap(mitk::Image* map){
 	this->m_Map = map->GetVtkImageData(this->m_TimeStep);
 }
 
+void mitk::OverwriteSliceFilter::SetInputSlice(mitk::Image* slice){
+	this->m_Slice = slice->GetVtkImageData(this->m_TimeStep); 
+}
+
 void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
 	//As we want all pixel information fo the image in our plane, the requested region
 	//is set to the largest possible region in the image.
@@ -46,5 +50,6 @@ void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
 
 void mitk::OverwriteSliceFilter::GenerateData()
 {
+	
 	//this->SetOutput( const_cast<ImageToImageFilter::OutputImageType>(GetInput()) );
 }

@@ -96,7 +96,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
 
     m_Timer->setSingleShot(true);
-    connect(m_Timer,SIGNAL(timeout()),this,SIGNAL(ImportIncomingDicomFile(*m_RetrievedFile)));
+    //connect(m_Timer,SIGNAL(timeout()),this,SIGNAL(ImportIncomingDicomFile(*m_RetrievedFile)));
     connect(m_DicomDirectoryListener,SIGNAL(directoryChanged(QString)),this,SLOT(StartThreadObservingDicomImportDirectory(QString)));
     connect(this,SIGNAL(ImportIncomingDicomFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
     connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
@@ -231,10 +231,7 @@ void QmitkDicomEditor::StartThreadObservingDicomImportDirectory(QString changedF
         m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
         m_Watcher.setFuture(m_Future);
     }else{
-        if(m_Timer->isActive())
-        {
-            m_Timer->stop();
-        }
+        m_Watcher.
         m_Watcher.waitForFinished();
         m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
         m_Watcher.setFuture(m_Future);
@@ -244,13 +241,17 @@ void QmitkDicomEditor::StartThreadObservingDicomImportDirectory(QString changedF
 
 void QmitkDicomEditor::ObserveDicomImportDirectory(QString changedFile)
 {
+     QTimer *timer = new QTimer(this);
+     timer->setSingleShot(true);
     //set the filepath of the current changed file false if there is no new file
     GetRetrievedFileName(changedFile);
     if(!m_RetrievedFile->isEmpty())
     {
         //wait 30sec till the file download is completed
-
-    }            
+        timer->start(30000);
+        emit ImportIncomingDicomFile(m_RetrievedFile);
+    }
+    delete timer;
 }
 
 

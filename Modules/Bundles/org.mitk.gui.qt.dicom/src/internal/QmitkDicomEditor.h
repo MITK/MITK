@@ -82,6 +82,8 @@ signals:
 
     protected slots:
 
+        // @brief Called when
+
         /// \brief Called when m_DicomListenerDirectory changes
         void GetRetrievedFileName(QString changedFile);
 

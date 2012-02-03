@@ -162,3 +162,4 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
     m_Watcher.cancel();
     m_Watcher.waitForFinished();
 }
+

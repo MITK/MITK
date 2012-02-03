@@ -51,6 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
 //ITK
 #include <itkRGBAPixel.h>
 
+#include <mitkVtkImageMapReslice.h>
+
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
@@ -926,7 +928,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
-  m_Reslicer = mitk::ExtractSliceFilter::New();
+  vtkSmartPointer<mitkVtkImageMapReslice> reslice = vtkSmartPointer<mitkVtkImageMapReslice>::New();
+  m_Reslicer = mitk::ExtractSliceFilter::New(reslice);
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();

@@ -410,62 +410,74 @@ void QmitkDataStorageTreeModel::SetDataStorageDeleted( const itk::Object* /*_Dat
   this->SetDataStorage(0);
 }
 
+void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
+{
+    if(node == 0
+      || m_DataStorage.IsNull()
+      || !m_DataStorage->Exists(node)
+      || !m_Predicate->CheckNode(node)
+      || m_Root->Find(node) != 0)
+      return;
+
+    // find out if we have a root node
+    TreeItem* parentTreeItem = m_Root;
+    QModelIndex index;
+    mitk::DataNode* parentDataNode = this->GetParentNode(node);
+
+    if(parentDataNode) // no top level data node
+    {
+      parentTreeItem = m_Root->Find(parentDataNode); // find the corresponding tree item
+      if(!parentTreeItem)
+      {
+        this->AddNode(parentDataNode);
+        parentTreeItem = m_Root->Find(parentDataNode);
+        if(!parentTreeItem)
+          return;
+      }
+
+      // get the index of this parent with the help of the grand parent
+      index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
+    }
+
+    // add node
+    if(m_PlaceNewNodesOnTop)
+    {
+      // emit beginInsertRows event
+      beginInsertRows(index, 0, 0);
+      parentTreeItem->InsertChild(new TreeItem(
+          const_cast<mitk::DataNode*>(node)), 0);
+    }
+    else
+    {
+      beginInsertRows(index, parentTreeItem->GetChildCount()
+                      , parentTreeItem->GetChildCount());
+      new TreeItem(const_cast<mitk::DataNode*>(node), parentTreeItem);
+    }
+
+    // emit endInsertRows event
+    endInsertRows();
+
+    this->AdjustLayerProperty();
+}
+
 void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
 {
-  if(node == 0
-    || m_DataStorage.IsNull()
-    || !m_DataStorage->Exists(node)
-    || !m_Predicate->CheckNode(node)
-    || m_Root->Find(node) != 0)
-    return;
+    if(node == 0
+      || m_DataStorage.IsNull()
+      || !m_DataStorage->Exists(node)
+      || !m_Predicate->CheckNode(node)
+      || m_Root->Find(node) != 0)
+      return;
 
     bool isHelperObject (false);
     NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
     if (node->GetBoolProperty("helper object", isHelperObject) && searchIter == m_HelperObjectObserverTags.end()) {
         itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::Pointer command = itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::New();
         command->SetCallbackFunction(this, &QmitkDataStorageTreeModel::UpdateNodeVisibility);
-         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
+        m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
     }
 
-  // find out if we have a root node
-  TreeItem* parentTreeItem = m_Root;
-  QModelIndex index;
-  mitk::DataNode* parentDataNode = this->GetParentNode(node);
-
-  if(parentDataNode) // no top level data node
-  {
-    parentTreeItem = m_Root->Find(parentDataNode); // find the corresponding tree item
-    if(!parentTreeItem)
-    {
-      this->AddNode(parentDataNode);
-      parentTreeItem = m_Root->Find(parentDataNode);
-      if(!parentTreeItem)
-        return;
-    }
-
-    // get the index of this parent with the help of the grand parent
-    index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
-  }
-
-  // add node
-  if(m_PlaceNewNodesOnTop)
-  {
-    // emit beginInsertRows event
-    beginInsertRows(index, 0, 0);
-    parentTreeItem->InsertChild(new TreeItem(
-        const_cast<mitk::DataNode*>(node)), 0);
-  }
-  else
-  {
-    beginInsertRows(index, parentTreeItem->GetChildCount()
-                    , parentTreeItem->GetChildCount());
-    new TreeItem(const_cast<mitk::DataNode*>(node), parentTreeItem);
-  }
-
-  // emit endInsertRows event
-  endInsertRows();
-
-  this->AdjustLayerProperty();
+    this->AddNodeInternal(node);
 }
 
 
@@ -474,8 +486,50 @@ void QmitkDataStorageTreeModel::SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop)
   m_PlaceNewNodesOnTop = _PlaceNewNodesOnTop;
 }
 
+void QmitkDataStorageTreeModel::RemoveNodeInternal( const mitk::DataNode* node )
+{
+    if(!m_Root) return;
+
+    TreeItem* treeItem = m_Root->Find(node);
+    if(!treeItem)
+      return; // return because there is no treeitem containing this node
+
+    TreeItem* parentTreeItem = treeItem->GetParent();
+    QModelIndex parentIndex = this->IndexFromTreeItem(parentTreeItem);
+
+    // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
+    this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());
+
+    // remove node
+    std::vector<TreeItem*> children = treeItem->GetChildren();
+    delete treeItem;
+
+    // emit endRemoveRows event
+    endRemoveRows();
+
+    // move all children of deleted node into its parent
+    for ( std::vector<TreeItem*>::iterator it = children.begin()
+      ; it != children.end(); it++)
+    {
+      // emit beginInsertRows event
+      beginInsertRows(parentIndex, parentTreeItem->GetChildCount(), parentTreeItem->GetChildCount());
+
+      // add nodes again
+      parentTreeItem->AddChild(*it);
+
+      // emit endInsertRows event
+      endInsertRows();
+    }
+
+    this->AdjustLayerProperty();
+}
+
 void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
 {
+    if (node == 0)
+        return;
+
+    //Removing Observer
     bool isHelperObject (false);
     NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
     if (node->GetBoolProperty("helper object", isHelperObject) && searchIter != m_HelperObjectObserverTags.end()) {
@@ -483,40 +537,7 @@ void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
         m_HelperObjectObserverTags.erase(const_cast<mitk::DataNode*>(node));
     }
 
-  if(!m_Root) return;
-
-  TreeItem* treeItem = m_Root->Find(node);
-  if(!treeItem)
-    return; // return because there is no treeitem containing this node
-
-  TreeItem* parentTreeItem = treeItem->GetParent();
-  QModelIndex parentIndex = this->IndexFromTreeItem(parentTreeItem);
-
-  // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
-  this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());
-
-  // remove node
-  std::vector<TreeItem*> children = treeItem->GetChildren();
-  delete treeItem;
-
-  // emit endRemoveRows event
-  endRemoveRows();
-
-  // move all children of deleted node into its parent
-  for ( std::vector<TreeItem*>::iterator it = children.begin()
-    ; it != children.end(); it++)
-  {
-    // emit beginInsertRows event
-    beginInsertRows(parentIndex, parentTreeItem->GetChildCount(), parentTreeItem->GetChildCount());
-
-    // add nodes again
-    parentTreeItem->AddChild(*it);
-
-    // emit endInsertRows event
-    endInsertRows();
-  }
-
-  this->AdjustLayerProperty();
+    this->RemoveNodeInternal(node);
 }
 
 void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataNode* node )
@@ -825,7 +846,7 @@ void QmitkDataStorageTreeModel::Update()
     for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end(); it++)
     {
       // save node
-      this->AddNode(*it);
+      this->AddNodeInternal(*it);
     }
 
     mitk::DataStorage::SetOfObjects::ConstPointer _NotNodeSet = m_DataStorage->GetSubset(mitk::NodePredicateNot::New(m_Predicate));
@@ -833,7 +854,7 @@ void QmitkDataStorageTreeModel::Update()
     for(mitk::DataStorage::SetOfObjects::const_iterator it=_NotNodeSet->begin(); it!=_NotNodeSet->end(); it++)
     {
       // remove node
-      this->RemoveNode(*it);
+      this->RemoveNodeInternal(*it);
     }
 
   }

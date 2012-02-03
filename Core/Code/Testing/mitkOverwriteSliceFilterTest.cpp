@@ -98,7 +98,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 		slicer->SetInput(imageInMitk);
 		slicer->SetWorldGeometry(plane);
 		slicer->SetVtkOutputRequest(true);
-		
+		slicer->Modified();
 		slicer->Update();
 
 		vtkSmartPointer<vtkImageData> slice = vtkSmartPointer<vtkImageData>::New();
@@ -111,7 +111,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 		slicerMap->SetInput(imageInMitk);
 		slicerMap->SetWorldGeometry(plane);
 		slicerMap->SetVtkOutputRequest(true);
-		
+		slicerMap->Modified();
 		slicerMap->Update();
 
 		vtkSmartPointer<vtkImageData> map = vtkSmartPointer<vtkImageData>::New();
@@ -123,6 +123,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 		overwriter->SetInput(imageInMitk);
 		overwriter->SetInputSlice(slice);
 		overwriter->SetInputMap(map);
+		overwriter->Modified();
 		overwriter->Update();
 
 		mitk::Image::Pointer overwritedImage = overwriter->GetOutput();
@@ -136,7 +137,6 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 				id[1] = y;
 				for (int z = 0; z < VolumeSize; ++z){
 					id[2] = z;
-
 					areSame = imageInMitk->GetPixelValueByIndex(id) == overwritedImage->GetPixelValueByIndex(id);
 					if(!areSame)
 						goto stop;
@@ -145,6 +145,38 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 		}
 stop:
 		MITK_TEST_CONDITION(areSame,"comparing images");
+
+
+
+		slice->SetScalarComponentFromDouble(2,3,4,0,0.0);
+		overwriter->SetInput(overwritedImage);
+		overwriter->SetInputSlice(slice);
+		overwriter->Modified();
+		overwriter->Update();
+
+		mitk::Image::Pointer overwr = overwriter->GetOutput();
+
+		areSame = true;
+		
+		int x,y,z;
+		
+		for ( x = 0; x < VolumeSize; ++x){
+			id[0]  = x;
+			for ( y = 0; y < VolumeSize; ++y){
+				id[1] = y;
+				for ( z = 0; z < VolumeSize; ++z){
+					id[2] = z;
+					MITK_INFO << imageInMitk->GetPixelValueByIndex(id);
+					MITK_INFO << overwr->GetPixelValueByIndex(id);
+					areSame = imageInMitk->GetPixelValueByIndex(id) == overwr->GetPixelValueByIndex(id);
+					if(!areSame)
+						goto stop2;
+				}
+			}
+		}
+stop2:
+		MITK_INFO << x << " " << y << " " << z; 
+		MITK_TEST_CONDITION(x==2 && y==3 && z==4,"overwrited the right index");
 
 
 	MITK_TEST_END()

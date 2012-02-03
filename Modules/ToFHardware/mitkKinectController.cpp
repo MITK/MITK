@@ -33,58 +33,55 @@ namespace mitk
   {
   }
 
-  bool KinectController::OpenCameraConnection()
+  bool KinectController::OpenCameraConnection() 
   {
     if (!m_ConnectionCheck)
     {
-      MITK_INFO<<"Before init";
       // Initialize the OpenNI status
-      m_ConnectionCheck = !ErrorText(m_Context.Init());
-      MITK_INFO<<"After init";
-
-      MITK_INFO<<"Before depthgen";
+      m_ConnectionCheck = !ErrorText(m_Context.InitFromXmlFile("C:/Temp/SamplesConfig.xml"));
+      //m_ConnectionCheck = !ErrorText(m_Context.Init());
       // Create a depth map generator and set its resolution
-      m_ConnectionCheck = !ErrorText(m_DepthGenerator.Create(m_Context));
-      MITK_INFO<<"After depthgen";
-      XnMapOutputMode DepthMode;
-      m_DepthGenerator.GetMapOutputMode(DepthMode);
-      DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
-      DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-      m_ConnectionCheck = !ErrorText(m_DepthGenerator.SetMapOutputMode(DepthMode));
-      {
-        XnUInt32 NumModes = 10;
-        XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
-        m_ConnectionCheck = !ErrorText(m_DepthGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
-        for ( unsigned int i = 0; i < NumModes; i++ )
-        {
-          std::cout << "DepthModes #" << i << std::endl;
-          std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
-        }
-        delete[] SupportedModes;
-      }
+      m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_DEPTH, m_DepthGenerator));
+      //m_ConnectionCheck = !ErrorText(m_DepthGenerator.Create(m_Context));
+      //XnMapOutputMode DepthMode;
+      //m_DepthGenerator.GetMapOutputMode(DepthMode);
+      //DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
+      //DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
+      //m_ConnectionCheck = !ErrorText(m_DepthGenerator.SetMapOutputMode(DepthMode));
+      //{
+      //  XnUInt32 NumModes = 10;
+      //  XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
+      //  m_ConnectionCheck = !ErrorText(m_DepthGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
+      //  for ( unsigned int i = 0; i < NumModes; i++ )
+      //  {
+      //    std::cout << "DepthModes #" << i << std::endl;
+      //    std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
+      //    std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
+      //    std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
+      //  }
+      //  delete[] SupportedModes;
+      //}
 
       // Create an image generator and set its resolution
-      m_ConnectionCheck = !ErrorText(m_ImageGenerator.Create(m_Context));
-      XnMapOutputMode ImageMode;
-      m_ImageGenerator.GetMapOutputMode(ImageMode);
-      ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
-      ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-      m_ConnectionCheck = !ErrorText(m_ImageGenerator.SetMapOutputMode(ImageMode));
-      {
-        XnUInt32 NumModes = 10;
-        XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
-        m_ConnectionCheck = !ErrorText(m_ImageGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
-        for ( unsigned int i = 0; i < NumModes; i++ )
-        {
-          std::cout << "ImageModes #" << i << std::endl;
-          std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
-        }
-        delete[] SupportedModes;
-      }
+      m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_IMAGE, m_ImageGenerator));
+      //XnMapOutputMode ImageMode;
+      //m_ImageGenerator.GetMapOutputMode(ImageMode);
+      //ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
+      //ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
+      //m_ConnectionCheck = !ErrorText(m_ImageGenerator.SetMapOutputMode(ImageMode));
+      //{
+      //  XnUInt32 NumModes = 10;
+      //  XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
+      //  m_ConnectionCheck = !ErrorText(m_ImageGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
+      //  for ( unsigned int i = 0; i < NumModes; i++ )
+      //  {
+      //    std::cout << "ImageModes #" << i << std::endl;
+      //    std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
+      //    std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
+      //    std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
+      //  }
+      //  delete[] SupportedModes;
+      //}
 
       // Camera registration
       if ( m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
@@ -105,6 +102,7 @@ namespace mitk
       // Update the connected flag
       m_ConnectionCheck = true;
     }
+    MITK_INFO<<"Controller connect?"<<m_ConnectionCheck;
     return m_ConnectionCheck;
   }
 
@@ -116,7 +114,7 @@ namespace mitk
 
   bool KinectController::UpdateCamera()
   {
-    bool updateSuccessful = !ErrorText(m_Context.WaitAndUpdateAll());
+    bool updateSuccessful = ErrorText(m_Context.WaitAndUpdateAll());
     xn::DepthMetaData DepthMD;
     m_DepthGenerator.GetMetaData(DepthMD);
     m_CaptureWidth = DepthMD.XRes();
@@ -130,10 +128,24 @@ namespace mitk
     xn::DepthMetaData DepthMD;
     m_DepthGenerator.GetMetaData(DepthMD);
     const XnDepthPixel* DepthData = DepthMD.Data();
-    for (unsigned int i=0; i<m_CaptureWidth*m_CaptureHeight; i++, ++DepthData, ++distances)
+    //for (unsigned int i=0; i<m_CaptureWidth*m_CaptureHeight; i++)
+    //{
+    //  MITK_INFO<<DepthData[i];
+    //}
+    for (unsigned int i=0; i<m_CaptureWidth*m_CaptureHeight; i++)
     {
-      *distances = *DepthData;
+      distances[i] = DepthData[i];
     }
+  }
+
+  void KinectController::GetIntensities(float* intensities)
+  {
+
+  }
+
+  void KinectController::GetAmplitudes(float* amplitudes)
+  {
+
   }
 
   bool KinectController::ErrorText(unsigned int error)

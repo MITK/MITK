@@ -96,6 +96,11 @@ namespace mitk
     */
     ToFImageGrabber::Pointer GetMESASR4000ImageGrabber();
 
+    /*!
+    \brief Create a ImageGrabber object with a Kinect Camera 
+    */
+    ToFImageGrabber::Pointer GetKinectImageGrabber();
+
   protected:
 
     static ToFImageGrabberCreator::Pointer s_Instance; ///< Instance to the singleton ToFImageGrabberCreator. Can be accessed by GetInstance()

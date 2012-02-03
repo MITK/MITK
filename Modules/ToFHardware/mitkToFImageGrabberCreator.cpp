@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
 #include "mitkToFCameraMESASR4000Device.h"
+#include "mitkKinectDevice.h"
 
 namespace mitk
 {
@@ -113,4 +114,10 @@ namespace mitk
     return m_ToFImageGrabber;
   }
 
+  ToFImageGrabber::Pointer ToFImageGrabberCreator::GetKinectImageGrabber()
+  {
+    m_ToFCameraDevice = mitk::KinectDevice::New();
+    m_ToFImageGrabber->SetCameraDevice(m_ToFCameraDevice);
+    return m_ToFImageGrabber;
+  }
 }

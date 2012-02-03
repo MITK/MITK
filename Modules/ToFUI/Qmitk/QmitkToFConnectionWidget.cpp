@@ -192,6 +192,10 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     {//MESA SR4000
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMESASR4000ImageGrabber();
     }
+    else if (selectedCamera == "Microsoft Kinect")
+    {//KINECT
+      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetKinectImageGrabber();
+    }
     else if (selectedCamera == "PMD Player")
     {//PMD player
       playerMode = true;

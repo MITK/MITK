@@ -63,6 +63,10 @@ namespace mitk
     */
     void GetDistances(float* distances);
 
+    void GetIntensities(float* intensities);
+
+    void GetAmplitudes(float* amplitudes);
+
   protected:
 
     KinectController();

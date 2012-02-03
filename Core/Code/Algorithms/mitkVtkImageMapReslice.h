@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkImageReslice.h"
 #include "MitkExports.h"
 
-
+	/** \brief A Filter based on vtkImageReslice that extracts Coordinates in the 3D volume not pixel values.
+	 * 
+	 */
 	class MITK_CORE_EXPORT mitkVtkImageMapReslice : public vtkImageReslice
 	{
 	public:
@@ -39,7 +41,6 @@ PURPOSE.  See the above copyright notices for more information.
  																		 vtkImageData ***inData,
  																		 vtkImageData **outData,
  																		 int outExt[6], int id);
-
 	};
 
 

@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QObject>
 
+class ctkPluginContext;
 class QmitkPreferencesDialog;
 
 class QmitkExtWorkbenchWindowAdvisorHack : public QObject
@@ -37,9 +38,12 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onIntro();
     
     /**
-     * @brief This slot is called if the user klicks the menu "item help->active bundle" or presses F1. In this case a new window is opened which shows a help page.
+     * @brief This slot is called if the user klicks the menu item "help->context help" or presses F1.
+     * The help page is shown in a workbench editor.
      */
     void onHelp();
+
+    void onHelpContents();
     
     /**
      * @brief This slot is called if the user clicks in help menu the about button
@@ -52,5 +56,4 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     ~QmitkExtWorkbenchWindowAdvisorHack();
 
     static QmitkExtWorkbenchWindowAdvisorHack* undohack;
-    
 };

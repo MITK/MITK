@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTextStream>
 #include <QSettings>
 
+#include <ctkPluginException.h>
+#include <service/event/ctkEventAdmin.h>
+
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIWorkbenchWindow.h>
@@ -662,7 +665,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  // ===== Help menu ====================================
  QMenu* helpMenu = menuBar->addMenu("Help");
  helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-  helpMenu->addAction("&Help Contents",this, SLOT(onHelp()),  QKeySequence("F1"));
+ helpMenu->addAction("&Contents", this, SLOT(onHelpContents()));
+  helpMenu->addAction("Context &Help",this, SLOT(onHelp()),  QKeySequence("F1"));
  helpMenu->addAction("&About",this, SLOT(onAbout()));
  // =====================================================
 
@@ -722,6 +726,11 @@ void QmitkExtWorkbenchWindowAdvisor::onIntro()
 void QmitkExtWorkbenchWindowAdvisor::onHelp()
 {
   QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onHelpContents()
+{
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpContents();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onAbout()
@@ -870,7 +879,56 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
- berry::QtAssistantUtil::OpenActivePartHelp();
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  if (context == 0)
+  {
+    MITK_WARN << "Plugin context not set, unable to open context help";
+    return;
+  }
+
+  // Check if the org.blueberry.ui.qt.help plug-in is installed and started
+  QList<QSharedPointer<ctkPlugin> > plugins = context->getPlugins();
+  foreach(QSharedPointer<ctkPlugin> p, plugins)
+  {
+    if (p->getSymbolicName() == "org.blueberry.ui.qt.help")
+    {
+      if (p->getState() != ctkPlugin::ACTIVE)
+      {
+        // try to activate the plug-in explicitly
+        try
+        {
+          p->start(ctkPlugin::START_TRANSIENT);
+        }
+        catch (const ctkPluginException& pe)
+        {
+          MITK_ERROR << "Activating org.blueberry.ui.qt.help failed: " << pe.what();
+          return;
+        }
+      }
+    }
+  }
+
+  ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
+  ctkEventAdmin* eventAdmin = 0;
+  if (eventAdminRef)
+  {
+    eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
+  }
+  if (eventAdmin == 0)
+  {
+    MITK_WARN << "ctkEventAdmin service not found. Unable to open context help";
+  }
+  else
+  {
+    ctkEvent ev("org/blueberry/ui/help/CONTEXTHELP_REQUESTED");
+    eventAdmin->postEvent(ev);
+  }
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onHelpContents()
+{
+  berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
+                                                     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()

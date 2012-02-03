@@ -81,6 +81,7 @@ protected slots:
 
     virtual void onIntro();
     virtual void onHelp();
+    virtual void onHelpContents();
     virtual void onAbout();
 
 private:

@@ -97,6 +97,8 @@ struct PropertyChangeAdapter: public IPropertyChangeListener
     poco_assert(callback);
   }
 
+  using IPropertyChangeListener::PropertyChange;
+
   void PropertyChange(PropertyChangeEvent::Pointer event)
   {
     (listener->*callback)(event);
@@ -122,6 +124,8 @@ struct PropertyChangeIntAdapter: public IPropertyChangeListener
     poco_assert(listener);
     poco_assert(callback);
   }
+
+  using IPropertyChangeListener::PropertyChange;
 
   void PropertyChange(Object::Pointer source, int propId)
   {

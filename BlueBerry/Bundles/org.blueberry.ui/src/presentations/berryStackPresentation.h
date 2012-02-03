@@ -76,6 +76,8 @@ protected:
    */
   StackPresentation(IStackPresentationSite::Pointer stackSite);
 
+  ~StackPresentation();
+
   /**
    * Returns the presentation site (not null).
    * @return  IStackPresentationSite

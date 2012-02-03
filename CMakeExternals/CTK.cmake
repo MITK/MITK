@@ -15,7 +15,7 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 6f26c34)
+    SET(revision_tag 34a638b)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()
@@ -49,6 +49,7 @@ IF(MITK_USE_CTK)
         -DCTK_LIB_PluginFramework:BOOL=ON
         -DCTK_LIB_DICOM/Widgets:BOOL=ON
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
+        -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
       DEPENDS ${proj_DEPENDENCIES}
      )

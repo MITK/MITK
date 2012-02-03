@@ -19,7 +19,7 @@ MACRO(_MACRO_CREATE_QT_COMPRESSED_HELP qch_file)
        
 ENDMACRO()
 
-FUNCTION(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
+FUNCTION(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file use_xsl)
 
   SET(_manifest_path "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
   IF(NOT EXISTS ${_manifest_path})
@@ -33,14 +33,25 @@ FUNCTION(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
                  ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                  )
 
-  SET(_generated_qch_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/qch/${Plugin-Name}.qch")
-  SET(${qch_file} "${CMAKE_CURRENT_BINARY_DIR}/resources/${Plugin-SymbolicName}.qch")
+  SET(_qhp_xsl_file "${BlueBerry_SOURCE_DIR}/CMake/qhp_toc.xsl")
+  SET(_generated_qhp_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/html/index.qhp")
+  SET(_transformed_qhp_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/html/${PLUGIN_TARGET}.qhp")
+  SET(${qch_file} "${CMAKE_CURRENT_BINARY_DIR}/resources/${PLUGIN_TARGET}.qch")
 
-  FILE(GLOB _file_dependencies "${PLUGIN_DOXYGEN_INPUT_DIR}/*.dox")
+  SET(_xsl_command )
+  IF(use_xsl)
+    SET(_xsl_command COMMAND ${QT_XMLPATTERNS_EXECUTABLE} ${_qhp_xsl_file} ${_generated_qhp_file} -output ${_transformed_qhp_file})
+  ENDIF()
+
+  FILE(GLOB _file_dependencies "${PLUGIN_DOXYGEN_INPUT_DIR}/*")
 
   ADD_CUSTOM_COMMAND(OUTPUT ${${qch_file}}
+                     # Generate a Qt help project (index.qhp) with doxygen
                      COMMAND ${DOXYGEN_EXECUTABLE} ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
-                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_generated_qch_file} ${${qch_file}}
+                     # Use a XSL transformation to get rid of the top-level entry
+                     ${_xsl_command}
+                     # Generate the final Qt compressed help file (.qch)
+                     COMMAND ${QT_HELPGENERATOR_EXECUTABLE} ${_transformed_qhp_file} -o ${${qch_file}}
                      DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies}
                      )
 

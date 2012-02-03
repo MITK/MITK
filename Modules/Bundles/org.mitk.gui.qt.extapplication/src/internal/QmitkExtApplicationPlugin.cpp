@@ -20,7 +20,11 @@
 #include "../QmitkExtApplication.h"
 
 #include <mitkVersion.h>
+#include <mitkLogMacros.h>
 #include <berryQtAssistantUtil.h>
+
+#include <service/cm/ctkConfigurationAdmin.h>
+#include <service/cm/ctkConfiguration.h>
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -29,14 +33,12 @@
 QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::inst = 0;
 
 QmitkExtApplicationPlugin::QmitkExtApplicationPlugin()
-  : pluginListener(0)
 {
   inst = this;
 }
 
 QmitkExtApplicationPlugin::~QmitkExtApplicationPlugin()
 {
-  delete pluginListener;
 }
 
 QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::GetDefault()
@@ -53,64 +55,32 @@ void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtDefaultPerspective, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtApplication, context);
 
-  QString collectionFile = GetQtHelpCollectionFile();
 
-  berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
-  berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.extapplication/bundle/index.html");
+  ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
+  ctkConfigurationAdmin* configAdmin = 0;
+  if (cmRef)
+  {
+    configAdmin = context->getService<ctkConfigurationAdmin>(cmRef);
+  }
 
-  delete pluginListener;
-  pluginListener = new berry::QCHPluginListener(context);
-  context->connectPluginListener(pluginListener, SLOT(pluginChanged(ctkPluginEvent)), Qt::DirectConnection);
-
-  // register all QCH files from all the currently installed plugins
-  pluginListener->processPlugins();
+  // Use the CTK Configuration Admin service to configure the BlueBerry help system
+  if (configAdmin)
+  {
+    ctkConfigurationPtr conf = configAdmin->getConfiguration("org.blueberry.services.help", QString());
+    ctkDictionary helpProps;
+    helpProps.insert("homePage", "qthelp://org.mitk.gui.qt.extapplication/bundle/index.html");
+    conf->update(helpProps);
+    context->ungetService(cmRef);
+  }
+  else
+  {
+    MITK_WARN << "Configuration Admin service unavailable, cannot set home page url.";
+  }
 }
 
 ctkPluginContext* QmitkExtApplicationPlugin::GetPluginContext() const
 {
   return context;
-}
-
-QString QmitkExtApplicationPlugin::GetQtHelpCollectionFile() const
-{
-  if (!helpCollectionFile.isEmpty())
-  {
-    return helpCollectionFile;
-  }
-
-  QString collectionFilename;
-  QString na("n/a");
-  if (na != MITK_REVISION)
-    collectionFilename = "MitkExtQtHelpCollection_" MITK_REVISION ".qhc";
-  else
-    collectionFilename = "MitkExtQtHelpCollection.qhc";
-
-  QFileInfo collectionFileInfo = context->getDataFile(collectionFilename);
-  QFileInfo pluginFileInfo = QFileInfo(QUrl(context->getPlugin()->getLocation()).toLocalFile());
-  if (!collectionFileInfo.exists() ||
-      pluginFileInfo.lastModified() > collectionFileInfo.lastModified())
-  {
-    // extract the qhc file from the plug-in
-    QByteArray content = context->getPlugin()->getResource(collectionFilename);
-    if (content.isEmpty())
-    {
-      BERRY_WARN << "Could not get plug-in resource: " << collectionFilename.toStdString();
-    }
-    else
-    {
-      QFile file(collectionFileInfo.absoluteFilePath());
-      file.open(QIODevice::WriteOnly);
-      file.write(content);
-      file.close();
-    }
-  }
-
-  if (QFile::exists(collectionFileInfo.absoluteFilePath()))
-  {
-    helpCollectionFile = collectionFileInfo.absoluteFilePath();
-  }
-
-  return helpCollectionFile;
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_extapplication, QmitkExtApplicationPlugin)

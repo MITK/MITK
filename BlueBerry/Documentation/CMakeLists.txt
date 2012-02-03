@@ -2,6 +2,8 @@
 # Variables:
 #  BLUEBERRY_DOCS_OUTPUT_DIR: documentation output directory (optional)
 
+ADD_SUBDIRECTORY(snippets)
+
 FIND_PACKAGE(Doxygen)
 
 IF(DOXYGEN_FOUND)

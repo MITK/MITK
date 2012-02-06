@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkImageReslice.h>
 #include "MitkExports.h"
-#include <cstdlib>
 
 	/** \brief A Filter based on vtkImageReslice that extracts Coordinates in the 3D volume not pixel values.
 	 * 
@@ -30,8 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 	public:
 		static mitkVtkImageIdxReslice *New();
 		vtkTypeMacro(mitkVtkImageIdxReslice, vtkImageReslice);
-		
-		//std::vector<unsigned int*> GetPointerShifts(){ return this->pointerShift;}
+
+		void SetOverwriteMode(bool b);
+
+		void SetInputSlice(vtkImageData* slice);
 
 	protected:
 		
@@ -44,8 +45,6 @@ PURPOSE.  See the above copyright notices for more information.
  																		 vtkImageData ***inData,
  																		 vtkImageData **outData,
  																		 int outExt[6], int id);
-								
-		//std::vector<unsigned int*> m_PointerShifts;
 	};
 
 

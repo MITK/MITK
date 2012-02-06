@@ -39,9 +39,7 @@
 
 vtkStandardNewMacro(mitkVtkImageMapReslice);
 
-
-bool Overwrite_Mode = false;
-
+static void* START_INDEX;
 
 //--------------------------------------------------------------------------
 // The 'floor' function on x86 and mips is many times slower than these
@@ -439,15 +437,8 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-			if(!Overwrite_Mode)
-			{
-				*outPtr++ = *inPtr++;				
-			}
-			else
-			{
-				*(const_cast<T*>(inPtr)) = *outPtr++;
-				inPtr++;
-			}
+			*outPtr++ = (unsigned int) (inPtr - ((T*)START_INDEX) );
+			inPtr++;
     }
   while (--numscalars);
 
@@ -848,10 +839,6 @@ void vtkImageResliceExecute(mitkVtkImageMapReslice *self,
 }
 
 
-void mitkVtkImageMapReslice::SetOverwriteMode(bool b){
-	Overwrite_Mode = b;
-}
-
 
 //----------------------------------------------------------------------------
 // This method is passed a input and output region, and executes the filter
@@ -903,6 +890,7 @@ void mitkVtkImageMapReslice::ThreadedRequestData(
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
+	START_INDEX = (static_cast<vtkImageData*>(this->GetInput())->GetScalarPointer());
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }

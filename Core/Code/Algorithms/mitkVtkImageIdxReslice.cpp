@@ -39,7 +39,9 @@
 
 vtkStandardNewMacro(mitkVtkImageIdxReslice);
 
-static void* START_INDEX;
+
+
+bool Overwrite_Mode = false;
 //mitkVtkImageIdxReslice* self_obj;
 
 
@@ -440,8 +442,16 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-			*outPtr++ = (unsigned int) (inPtr - ((T*)START_INDEX) );
-			inPtr++;
+			
+			if(!Overwrite_Mode)
+			{
+				*outPtr++ = *inPtr++;				
+			}
+			else
+			{
+				*(const_cast<T*>(inPtr)) = *outPtr++;
+				inPtr++;
+			}
     }
   while (--numscalars);
 
@@ -842,6 +852,15 @@ static void vtkImageResliceExecute(mitkVtkImageIdxReslice *self,
 }
 
 
+void mitkVtkImageIdxReslice::SetOverwriteMode(bool b){
+	Overwrite_Mode = b;
+}
+
+
+void mitkVtkImageIdxReslice::SetInputSlice(vtkImageData* slice){
+	this->SetOutput(slice);
+}
+
 
 //----------------------------------------------------------------------------
 // This method is passed a input and output region, and executes the filter
@@ -892,7 +911,9 @@ void mitkVtkImageIdxReslice::ThreadedRequestData(
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
-	START_INDEX = (static_cast<vtkImageData*>(this->GetInput())->GetScalarPointer());
+	
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }
+
+

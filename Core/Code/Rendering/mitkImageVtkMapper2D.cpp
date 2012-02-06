@@ -928,8 +928,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
-  vtkSmartPointer<mitkVtkImageMapReslice> reslice = vtkSmartPointer<mitkVtkImageMapReslice>::New();
-  m_Reslicer = mitk::ExtractSliceFilter::New(reslice);
+  m_Reslicer = mitk::ExtractSliceFilter::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();

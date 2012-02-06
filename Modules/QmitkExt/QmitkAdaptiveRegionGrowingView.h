@@ -100,9 +100,9 @@ protected slots:
 
     void OnDefineThresholdBoundaries(bool);
 
-    void SetLowerThresholdValue(int lowerThreshold);
+    void SetLowerThresholdValue(double lowerThreshold);
 
-    void SetUpperThresholdValue(int upperThreshold);
+    void SetUpperThresholdValue(double upperThreshold);
 
 protected:
 
@@ -115,6 +115,7 @@ protected:
 
   void DeactivateSeedPointMode();
   void ActivateSeedPointMode();
+  void OnPointAdded();
 
 private:
 

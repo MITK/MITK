@@ -24,20 +24,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCheckBox" name="cb_DefineThresholdBoundaries">
-     <property name="text">
-      <string>Define custom threshold boundaries</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="lb_LowerTh">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -58,9 +51,9 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="m_LowerThresholdSpinBox">
+        <widget class="QDoubleSpinBox" name="m_LowerThresholdSpinBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -68,11 +61,14 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
          <property name="minimum">
-          <number>-3000</number>
+          <double>-3000.000000000000000</double>
          </property>
          <property name="maximum">
-          <number>4000</number>
+          <double>4000.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -83,7 +79,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="lb_UpperTh">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="toolTip">
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -98,15 +94,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="m_UpperThresholdSpinBox">
+        <widget class="QDoubleSpinBox" name="m_UpperThresholdSpinBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>1</number>
          </property>
          <property name="minimum">
-          <number>-3000</number>
+          <double>-3000.000000000000000</double>
          </property>
          <property name="maximum">
-          <number>4000</number>
+          <double>4000.000000000000000</double>
          </property>
         </widget>
        </item>

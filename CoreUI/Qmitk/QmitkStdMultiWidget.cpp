@@ -72,7 +72,7 @@ m_PendingCrosshairPositionEvent(false)
   }
   else
   {
-    m_RenderingManager->mitk::RenderingManager::GetInstance();
+    m_RenderingManager = mitk::RenderingManager::GetInstance();
   }
 
   /*******************************/

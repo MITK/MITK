@@ -68,7 +68,7 @@ static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* re
 
 
   /* ============= extract map ============*/
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceMap = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageMapReslice> resliceMap = vtkSmartPointer<mitkVtkImageMapReslice>::New();
 	mitk::ExtractSliceFilter::Pointer slicerMap = mitk::ExtractSliceFilter::New(resliceMap);
 	slicerMap->SetInput(workingImage);
 	slicerMap->SetWorldGeometry(plane);
@@ -173,24 +173,24 @@ static void OverwriteByPointerTest(mitk::Image* workingImage, mitk::Image* refIm
 
 
 	/* ============= extract slice ============*/
-	vtkSmartPointer<mitkVtkImageMapReslice> resliceMap = vtkSmartPointer<mitkVtkImageMapReslice>::New();
-	mitk::ExtractSliceFilter::Pointer slicerMap = mitk::ExtractSliceFilter::New(resliceMap);
-	slicerMap->SetInput(workingImage);
-	slicerMap->SetWorldGeometry(plane);
-	slicerMap->SetVtkOutputRequest(true);
-	slicerMap->Modified();
-	slicerMap->Update();
+	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New(resliceIdx);
+	slicer->SetInput(workingImage);
+	slicer->SetWorldGeometry(plane);
+	slicer->SetVtkOutputRequest(true);
+	slicer->Modified();
+	slicer->Update();
 
 	vtkSmartPointer<vtkImageData> slice = vtkSmartPointer<vtkImageData>::New();
-	slice = slicerMap->GetVtkOutput();
+	slice = slicer->GetVtkOutput();
 
 
 
 	/* ============= overwrite slice ============*/
-	resliceMap->SetOverwriteMode(true);
-	resliceMap->Modified();
-	slicerMap->Modified();
-	slicerMap->Update();//implicit overwrite
+	resliceIdx->SetOverwriteMode(true);
+	resliceIdx->Modified();
+	slicer->Modified();
+	slicer->Update();//implicit overwrite
 
 
 
@@ -227,9 +227,17 @@ stop:
 
 
 	/* ============= overwrite slice ============*/
-	resliceMap->Modified();
-	slicerMap->Modified();
-	slicerMap->Update();
+
+	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx2 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	resliceIdx2->SetOverwriteMode(true);
+	resliceIdx2->SetInputSlice(slice);
+	mitk::ExtractSliceFilter::Pointer slicer2 = mitk::ExtractSliceFilter::New(resliceIdx2);
+	slicer2->SetInput(workingImage);
+	slicer2->SetWorldGeometry(plane);
+	slicer2->SetVtkOutputRequest(true);
+	slicer2->Modified();
+	slicer2->Update();
+	
 
 
 

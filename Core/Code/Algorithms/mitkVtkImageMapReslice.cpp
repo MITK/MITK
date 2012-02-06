@@ -39,7 +39,7 @@
 
 vtkStandardNewMacro(mitkVtkImageMapReslice);
 
-void* START_INDEX;
+
 bool Overwrite_Mode = false;
 
 
@@ -439,7 +439,6 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-			//*outPtr++ = (unsigned int) (inPtr - ((T*)START_INDEX) );inPtr++;
 			if(!Overwrite_Mode)
 			{
 				*outPtr++ = *inPtr++;				
@@ -904,7 +903,6 @@ void mitkVtkImageMapReslice::ThreadedRequestData(
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
-	START_INDEX = (static_cast<vtkImageData*>(this->GetInput())->GetScalarPointer());
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }

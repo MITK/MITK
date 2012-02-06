@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 
+class QDragEnterEvent;
+class QDropEvent;
+
 /**
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
@@ -125,6 +128,9 @@ signals:
 
   void resized();
 
+  /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
+  void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
+
 protected slots:  
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
@@ -132,6 +138,14 @@ protected slots:
   void OnWidgetPlaneModeChanged( int );
 
   void DeferredHideMenu();
+
+protected:
+
+  /// \brief Simply says we accept the event type.
+  virtual void dragEnterEvent( QDragEnterEvent *event );
+
+  /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
+  virtual void dropEvent( QDropEvent * event );
 
 private:
   

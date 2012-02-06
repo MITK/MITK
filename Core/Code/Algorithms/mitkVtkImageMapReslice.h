@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 		static mitkVtkImageMapReslice *New();
 		vtkTypeMacro(mitkVtkImageMapReslice, vtkImageReslice);
 
+		void SetOverwriteMode(bool b);
+
 	protected:
 		
 		mitkVtkImageMapReslice();

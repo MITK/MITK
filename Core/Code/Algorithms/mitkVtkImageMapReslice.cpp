@@ -36,7 +36,11 @@
 #include <float.h>
 #include <math.h>
 
+
 vtkStandardNewMacro(mitkVtkImageMapReslice);
+
+void* START_INDEX;
+bool Overwrite_Mode = false;
 
 
 //--------------------------------------------------------------------------
@@ -432,431 +436,25 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
     }
 
   inPtr += inIdX0*inInc[0]+inIdY0*inInc[1]+inIdZ0*inInc[2];
+
   do
     {
-    *outPtr++ = *inPtr++;
+			//*outPtr++ = (unsigned int) (inPtr - ((T*)START_INDEX) );inPtr++;
+			if(!Overwrite_Mode)
+			{
+				*outPtr++ = *inPtr++;				
+			}
+			else
+			{
+				*(const_cast<T*>(inPtr)) = *outPtr++;
+				inPtr++;
+			}
     }
   while (--numscalars);
 
   return 1;
 } 
 
-//----------------------------------------------------------------------------
-// Do trilinear interpolation of the input data 'inPtr' of extent 'inExt'
-// at the 'point'.  The result is placed at 'outPtr'.  
-// If the lookup data is beyond the extent 'inExt', set 'outPtr' to
-// the background color 'background'.  
-// The number of scalar components in the data is 'numscalars'
-template <class F, class T>
-int vtkTrilinearInterpolation(T *&outPtr, const T *inPtr,
-                              const int inExt[6], const vtkIdType inInc[3],
-                              int numscalars, const F point[3],
-                              int mode, const T *background)
-{
-  F fx, fy, fz;
-  int floorX = vtkResliceFloor(point[0], fx);
-  int floorY = vtkResliceFloor(point[1], fy);
-  int floorZ = vtkResliceFloor(point[2], fz);
-
-  int inIdX0 = floorX - inExt[0];
-  int inIdY0 = floorY - inExt[2];
-  int inIdZ0 = floorZ - inExt[4];
-
-  int inIdX1 = inIdX0 + (fx != 0);
-  int inIdY1 = inIdY0 + (fy != 0);
-  int inIdZ1 = inIdZ0 + (fz != 0);
-
-  int inExtX = inExt[1] - inExt[0] + 1;
-  int inExtY = inExt[3] - inExt[2] + 1;
-  int inExtZ = inExt[5] - inExt[4] + 1;
-
-  if (inIdX0 < 0 || inIdX1 >= inExtX ||
-      inIdY0 < 0 || inIdY1 >= inExtY ||
-      inIdZ0 < 0 || inIdZ1 >= inExtZ)
-    {
-    if (mode == VTK_RESLICE_BORDER)
-      {
-      if (vtkInterpolateBorder(inIdX0, inIdX1, inExtX, fx) ||
-          vtkInterpolateBorder(inIdY0, inIdY1, inExtY, fy) ||
-          vtkInterpolateBorder(inIdZ0, inIdZ1, inExtZ, fz))
-        {
-        do
-          {
-          *outPtr++ = *background++;
-          }
-        while (--numscalars);
-        return 0;
-        }
-      }
-    else if (mode == VTK_RESLICE_WRAP)
-      {
-      inIdX0 = vtkInterpolateWrap(inIdX0, inExtX);
-      inIdY0 = vtkInterpolateWrap(inIdY0, inExtY);
-      inIdZ0 = vtkInterpolateWrap(inIdZ0, inExtZ);
-
-      inIdX1 = vtkInterpolateWrap(inIdX1, inExtX);
-      inIdY1 = vtkInterpolateWrap(inIdY1, inExtY);
-      inIdZ1 = vtkInterpolateWrap(inIdZ1, inExtZ);
-      }
-    else if (mode == VTK_RESLICE_MIRROR)
-      {
-      inIdX0 = vtkInterpolateMirror(inIdX0, inExtX);
-      inIdY0 = vtkInterpolateMirror(inIdY0, inExtY);
-      inIdZ0 = vtkInterpolateMirror(inIdZ0, inExtZ);
-
-      inIdX1 = vtkInterpolateMirror(inIdX1, inExtX);
-      inIdY1 = vtkInterpolateMirror(inIdY1, inExtY);
-      inIdZ1 = vtkInterpolateMirror(inIdZ1, inExtZ);
-      }
-    else if (mode == VTK_RESLICE_BACKGROUND)
-      {
-      do
-        {
-        *outPtr++ = *background++;
-        }
-      while (--numscalars);
-      return 0;
-      }
-    else
-      {
-      return 0;
-      }
-    }
-
-  vtkIdType factX0 = inIdX0*inInc[0];
-  vtkIdType factX1 = inIdX1*inInc[0];
-  vtkIdType factY0 = inIdY0*inInc[1];
-  vtkIdType factY1 = inIdY1*inInc[1];
-  vtkIdType factZ0 = inIdZ0*inInc[2];
-  vtkIdType factZ1 = inIdZ1*inInc[2];
-
-  vtkIdType i00 = factY0 + factZ0;
-  vtkIdType i01 = factY0 + factZ1;
-  vtkIdType i10 = factY1 + factZ0;
-  vtkIdType i11 = factY1 + factZ1;
-
-  F rx = 1 - fx;
-  F ry = 1 - fy;
-  F rz = 1 - fz;
-
-  F ryrz = ry*rz;
-  F fyrz = fy*rz;
-  F ryfz = ry*fz;
-  F fyfz = fy*fz;
-
-  const T *inPtr0 = inPtr + factX0;
-  const T *inPtr1 = inPtr + factX1;
-
-  do
-    {
-    F result = (rx*(ryrz*inPtr0[i00] + ryfz*inPtr0[i01] +
-                    fyrz*inPtr0[i10] + fyfz*inPtr0[i11]) +
-                fx*(ryrz*inPtr1[i00] + ryfz*inPtr1[i01] +
-                    fyrz*inPtr1[i10] + fyfz*inPtr1[i11]));
-
-    vtkResliceRound(result, *outPtr++);
-    inPtr0++;
-    inPtr1++;
-    }
-  while (--numscalars);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-// Do tricubic interpolation of the input data 'inPtr' of extent 'inExt' 
-// at the 'point'.  The result is placed at 'outPtr'.  
-// The number of scalar components in the data is 'numscalars'
-// The tricubic interpolation ensures that both the intensity and
-// the first derivative of the intensity are smooth across the
-// image.  The first derivative is estimated using a 
-// centered-difference calculation.
-
-
-// helper function: set up the lookup indices and the interpolation 
-// coefficients
-
-template <class T>
-void vtkTricubicInterpCoeffs(T F[4], int l, int h, T f)
-{
-  static const T half = T(0.5);
-
-  int order = h - l;
-
-  if (order == 0)
-    { // no interpolation
-    F[0] = 0;
-    F[1] = 1;
-    F[2] = 0;
-    F[3] = 0;
-    return;
-    }
-  if (order == 3)
-    { // cubic interpolation
-    T fm1 = f - 1;
-    T fd2 = f*half;
-    T ft3 = f*3; 
-    F[0] = -fd2*fm1*fm1;
-    F[1] = ((ft3 - 2)*fd2 - 1)*fm1;
-    F[2] = -((ft3 - 4)*f - 1)*fd2;
-    F[3] = f*fd2*fm1;
-    return;
-    }
-  if (order == 1)
-    { // linear interpolation
-    F[0] = 0;
-    F[1] = 1 - f;
-    F[2] = f;
-    F[3] = 0;
-    return;
-    }
-  if (l == 0)
-    { // quadratic interpolation
-    T fp1 = f + 1;
-    T fm1 = f - 1; 
-    T fd2 = f*half;
-    F[0] = fd2*fm1;
-    F[1] = -fp1*fm1;
-    F[2] = fp1*fd2;
-    F[3] = 0;
-    return;
-    }
-  // else
-    { // quadratic interpolation
-    T fm1 = f - 1;
-    T fm2 = fm1 - 1;
-    T fm1d2 = fm1*half;
-    F[0] = 0;
-    F[1] = fm1d2*fm2;
-    F[2] = -f*fm2;
-    F[3] = f*fm1d2;
-    return;
-    }
-}
-
-// tricubic interpolation
-template <class F, class T>
-int vtkTricubicInterpolation(T *&outPtr, const T *inPtr,
-                             const int inExt[6], const vtkIdType inInc[3],
-                             int numscalars, const F point[3],
-                             int mode, const T *background)
-{
-  F fx, fy, fz;
-  int floorX = vtkResliceFloor(point[0], fx);
-  int floorY = vtkResliceFloor(point[1], fy);
-  int floorZ = vtkResliceFloor(point[2], fz);
-
-  int fxIsNotZero = (fx != 0);
-  int fyIsNotZero = (fy != 0);
-  int fzIsNotZero = (fz != 0);
-
-  int inIdX0 = floorX - inExt[0];
-  int inIdY0 = floorY - inExt[2];
-  int inIdZ0 = floorZ - inExt[4];
-
-  int inIdX1 = inIdX0 + fxIsNotZero;
-  int inIdY1 = inIdY0 + fyIsNotZero;
-  int inIdZ1 = inIdZ0 + fzIsNotZero;
-
-  int inExtX = inExt[1] - inExt[0] + 1;
-  int inExtY = inExt[3] - inExt[2] + 1;
-  int inExtZ = inExt[5] - inExt[4] + 1;
-
-  vtkIdType inIncX = inInc[0];
-  vtkIdType inIncY = inInc[1];
-  vtkIdType inIncZ = inInc[2];
-
-  vtkIdType factX[4], factY[4], factZ[4];
-
-  if (inIdX0 < 0 || inIdX1 >= inExtX ||
-      inIdY0 < 0 || inIdY1 >= inExtY ||
-      inIdZ0 < 0 || inIdZ1 >= inExtZ)
-    {
-    if (mode == VTK_RESLICE_BORDER)
-      {
-      if (vtkInterpolateBorderCheck(inIdX0, inIdX1, inExtX, fx) ||
-          vtkInterpolateBorderCheck(inIdY0, inIdY1, inExtY, fy) ||
-          vtkInterpolateBorderCheck(inIdZ0, inIdZ1, inExtZ, fz))
-        {
-        do
-          {
-          *outPtr++ = *background++;
-          }
-        while (--numscalars);
-        return 0;
-        }
-      }
-    else if (mode != VTK_RESLICE_WRAP && mode != VTK_RESLICE_MIRROR)
-      {
-      if (mode == VTK_RESLICE_BACKGROUND)
-        {
-        do
-          {
-          *outPtr++ = *background++;
-          }
-        while (--numscalars);
-        return 0;
-        }
-      else
-        {
-        return 0;
-        }
-      }
-    }
-
-  F fX[4], fY[4], fZ[4];
-  int k1, k2, j1, j2, i1, i2;
-
-  if (mode == VTK_RESLICE_WRAP || mode == VTK_RESLICE_MIRROR)
-    {
-    i1 = 0;
-    i2 = 3;
-    vtkTricubicInterpCoeffs(fX, i1, i2, fx);
-
-    j1 = 1 - fyIsNotZero;
-    j2 = 1 + (fyIsNotZero<<1);
-    vtkTricubicInterpCoeffs(fY, j1, j2, fy);
-
-    k1 = 1 - fzIsNotZero;
-    k2 = 1 + (fzIsNotZero<<1);
-    vtkTricubicInterpCoeffs(fZ, k1, k2, fz);
-
-    if (mode == VTK_RESLICE_WRAP)
-      {
-      for (int i = 0; i < 4; i++)
-        {
-        factX[i] = vtkInterpolateWrap(inIdX0 + i - 1, inExtX)*inIncX;
-        factY[i] = vtkInterpolateWrap(inIdY0 + i - 1, inExtY)*inIncY;
-        factZ[i] = vtkInterpolateWrap(inIdZ0 + i - 1, inExtZ)*inIncZ;
-        }
-      }
-    else
-      {
-      for (int i = 0; i < 4; i++)
-        {
-        factX[i] = vtkInterpolateMirror(inIdX0 + i - 1, inExtX)*inIncX;
-        factY[i] = vtkInterpolateMirror(inIdY0 + i - 1, inExtY)*inIncY;
-        factZ[i] = vtkInterpolateMirror(inIdZ0 + i - 1, inExtZ)*inIncZ;
-        }
-      }
-    }
-  else if (mode == VTK_RESLICE_BORDER)
-    {
-    // clamp to the border of the input extent
-   
-    i1 = 1 - fxIsNotZero;
-    j1 = 1 - fyIsNotZero;
-    k1 = 1 - fzIsNotZero;
-
-    i2 = 1 + 2*fxIsNotZero;
-    j2 = 1 + 2*fyIsNotZero;
-    k2 = 1 + 2*fzIsNotZero;
-    
-    vtkTricubicInterpCoeffs(fX, i1, i2, fx);
-    vtkTricubicInterpCoeffs(fY, j1, j2, fy);
-    vtkTricubicInterpCoeffs(fZ, k1, k2, fz);
-
-    int tmpExt = inExtX - 1;
-    int tmpId = tmpExt - inIdX0 - 1;
-    factX[0] = (inIdX0 - 1)*(inIdX0 - 1 >= 0)*inIncX;
-    factX[1] = (inIdX0)*(inIdX0 >= 0)*inIncX;
-    factX[2] = (tmpExt - (tmpId)*(tmpId >= 0))*inIncX;
-    factX[3] = (tmpExt - (tmpId - 1)*(tmpId - 1 >= 0))*inIncX;
-
-    tmpExt = inExtY - 1;
-    tmpId = tmpExt - inIdY0 - 1;
-    factY[0] = (inIdY0 - 1)*(inIdY0 - 1 >= 0)*inIncY;
-    factY[1] = (inIdY0)*(inIdY0 >= 0)*inIncY;
-    factY[2] = (tmpExt - (tmpId)*(tmpId >= 0))*inIncY;
-    factY[3] = (tmpExt - (tmpId - 1)*(tmpId - 1 >= 0))*inIncY;
-
-    tmpExt = inExtZ - 1;
-    tmpId = tmpExt - inIdZ0 - 1;
-    factZ[0] = (inIdZ0 - 1)*(inIdZ0 - 1 >= 0)*inIncZ;
-    factZ[1] = (inIdZ0)*(inIdZ0 >= 0)*inIncZ;
-    factZ[2] = (tmpExt - (tmpId)*(tmpId >= 0))*inIncZ;
-    factZ[3] = (tmpExt - (tmpId - 1)*(tmpId - 1 >= 0))*inIncZ;
-    }
-  else
-    {
-    // depending on whether we are at the edge of the 
-    // input extent, choose the appropriate interpolation
-    // method to use
-
-    i1 = 1 - (inIdX0 > 0)*fxIsNotZero;
-    j1 = 1 - (inIdY0 > 0)*fyIsNotZero;
-    k1 = 1 - (inIdZ0 > 0)*fzIsNotZero;
-
-    i2 = 1 + (1 + (inIdX0 + 2 < inExtX))*fxIsNotZero;
-    j2 = 1 + (1 + (inIdY0 + 2 < inExtY))*fyIsNotZero;
-    k2 = 1 + (1 + (inIdZ0 + 2 < inExtZ))*fzIsNotZero;
-
-    vtkTricubicInterpCoeffs(fX, i1, i2, fx);
-    vtkTricubicInterpCoeffs(fY, j1, j2, fy);
-    vtkTricubicInterpCoeffs(fZ, k1, k2, fz);
-
-    factX[1] = inIdX0*inIncX;
-    factX[0] = factX[1] - inIncX;
-    factX[2] = factX[1] + inIncX;
-    factX[3] = factX[2] + inIncX;
-
-    factY[1] = inIdY0*inIncY;
-    factY[0] = factY[1] - inIncY;
-    factY[2] = factY[1] + inIncY;
-    factY[3] = factY[2] + inIncY;
-    
-    factZ[1] = inIdZ0*inIncZ;
-    factZ[0] = factZ[1] - inIncZ;
-    factZ[2] = factZ[1] + inIncZ;
-    factZ[3] = factZ[2] + inIncZ;
-
-    // this little bit of wierdness allows us to unroll the x loop
-    if (i1 > 0)
-      {
-      factX[0] = factX[1];
-      }
-    if (i2 < 3)
-      {
-      factX[3] = factX[1];
-      if (i2 < 2)
-        {
-        factX[2] = factX[1];
-        }
-      }
-    }
-  
-  do // loop over components
-    {
-    F val = 0;
-    int k = k1;
-    do // loop over z
-      {
-      F ifz = fZ[k];
-      vtkIdType factz = factZ[k];
-      int j = j1;
-      do // loop over y
-        {
-        F ify = fY[j];
-        F fzy = ifz*ify;
-        vtkIdType factzy = factz + factY[j];
-        const T *tmpPtr = inPtr + factzy;
-        // loop over x is unrolled (significant performance boost)
-        val += fzy*(fX[0]*tmpPtr[factX[0]] +
-                    fX[1]*tmpPtr[factX[1]] +
-                    fX[2]*tmpPtr[factX[2]] +
-                    fX[3]*tmpPtr[factX[3]]);
-        }
-      while (++j <= j2);
-      }
-    while (++k <= k2);
-
-    vtkResliceClamp(val, *outPtr++);
-    inPtr++;
-    }
-  while (--numscalars);
-
-  return 1;
-}                   
 
 //--------------------------------------------------------------------------
 // get appropriate interpolation function according to interpolation mode
@@ -872,57 +470,20 @@ void vtkGetResliceInterpFunc(mitkVtkImageMapReslice *self,
                                                  int mode,
                                                  const void *background))
 {
-  int dataType = self->GetOutput()->GetScalarType();
-  int interpolationMode = self->GetInterpolationMode();
-  
-  switch (interpolationMode)
-    {
-    case VTK_RESLICE_NEAREST:
-      switch (dataType)
-        {
-        vtkTemplateAliasMacro(*((int (**)(VTK_TT *&outPtr, const VTK_TT *inPtr,
-                                     const int inExt[6],
-                                     const vtkIdType inInc[3],
-                                     int numscalars, const F point[3],
-                                     int mode,
-                                     const VTK_TT *background))interpolate) = \
-                         &vtkNearestNeighborInterpolation);
-        default:
-          interpolate = 0;
-        }
-      break;
-    case VTK_RESLICE_LINEAR:
-    case VTK_RESLICE_RESERVED_2:
-      switch (dataType)
-        {
-        vtkTemplateAliasMacro(*((int (**)(VTK_TT *&outPtr, const VTK_TT *inPtr,
-                                     const int inExt[6],
-                                     const vtkIdType inInc[3],
-                                     int numscalars, const F point[3],
-                                     int mode,
-                                     const VTK_TT *background))interpolate) = \
-                         &vtkTrilinearInterpolation);
-        default:
-          interpolate = 0;
-        }
-      break;
-    case VTK_RESLICE_CUBIC:
-      switch (dataType)
-        {
-        vtkTemplateAliasMacro(*((int (**)(VTK_TT *&outPtr, const VTK_TT *inPtr,
-                                     const int inExt[6],
-                                     const vtkIdType inInc[3],
-                                     int numscalars, const F point[3],
-                                     int mode,
-                                     const VTK_TT *background))interpolate) = \
-                         &vtkTricubicInterpolation);
-        default:
-          interpolate = 0;
-        }
-      break;
-    default:
-      interpolate = 0;
-    }
+	int dataType = self->GetOutput()->GetScalarType();
+
+	switch (dataType)
+	{
+		vtkTemplateAliasMacro(*((int (**)(VTK_TT *&outPtr, const VTK_TT *inPtr,
+			const int inExt[6],
+			const vtkIdType inInc[3],
+			int numscalars, const F point[3],
+			int mode,
+			const VTK_TT *background))interpolate) = \
+			&vtkNearestNeighborInterpolation);
+	default:
+		interpolate = 0;
+	}
 }
 
 
@@ -1288,6 +849,9 @@ void vtkImageResliceExecute(mitkVtkImageMapReslice *self,
 }
 
 
+void mitkVtkImageMapReslice::SetOverwriteMode(bool b){
+	Overwrite_Mode = b;
+}
 
 
 //----------------------------------------------------------------------------
@@ -1340,7 +904,7 @@ void mitkVtkImageMapReslice::ThreadedRequestData(
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
-  
+	START_INDEX = (static_cast<vtkImageData*>(this->GetInput())->GetScalarPointer());
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }

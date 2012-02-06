@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
 #include "mitkRenderWindowFrame.h"
+#include "mitkRenderingManager.h"
 #include "mitkManufacturerLogo.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
@@ -54,7 +55,7 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 
 public:
 
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -267,6 +268,8 @@ protected:
   int m_Layout;
   int m_PlaneMode;
 
+  mitk::RenderingManager*  m_RenderingManager;
+
   mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
@@ -317,6 +320,5 @@ protected:
   } m_CornerAnnotaions[3];
 
   bool m_PendingCrosshairPositionEvent;
-    
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

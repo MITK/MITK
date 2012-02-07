@@ -40,6 +40,9 @@ namespace berry {
  * points, we need to ensure that they are in the registry before the
  * plugin start is called. By listening sync we are able to ensure that
  * happens.
+ *
+ * \deprecated Use the org.blueberry.ui.qt.help plug-in instead.
+ * \see org_blueberry_ui_qt_help
  */
 class BERRY_UI_QT QCHPluginListener : public QObject {
 

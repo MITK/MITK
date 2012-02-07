@@ -39,7 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPerspectiveRegistry.h>
 #include <berryIPerspectiveDescriptor.h>
 #include <berryIWorkbenchPartConstants.h>
-#include <berryQtAssistantUtil.h>
 
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>

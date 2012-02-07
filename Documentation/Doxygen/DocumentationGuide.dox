@@ -29,7 +29,7 @@ While the usage of your view/perspective/application might seem obvious and acce
 
 It is advisable to use a dedicated .dox file for a manual, helps keeping things clean and tidy. For MITK purposes you should put your documentation in BUNDLEPATH/documentation/UserManual/ .
 
-The nightly generated HTML documentation and the QtAssistant documentation can contain different content using the isHTML command. 
+The nightly generated HTML documentation and the Qt Help System documentation can contain different content using the isHTML command.
 
 \subsection DocumentationGuideManualHints Helpful hints:
 <ul>
@@ -41,6 +41,7 @@ The nightly generated HTML documentation and the QtAssistant documentation can c
  <li> Use visual help like remark, paragraph and warning
  <li> Use the /** or /*! style, so as not to be forced to comment out every line
  <li> BLUEBERRY_USE_QT_HELP should be set to ON
+ <li> The plug-in org.blueberry.ui.qt.help should be set to ON
 </ul>
 
 */

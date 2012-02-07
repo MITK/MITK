@@ -18,7 +18,6 @@
 #include "QmitkExtAppWorkbenchAdvisor.h"
 #include "internal/QmitkExtApplicationPlugin.h"
 
-#include <berryQtAssistantUtil.h>
 #include <QmitkExtWorkbenchWindowAdvisor.h>
 
 const std::string QmitkExtAppWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID =
@@ -30,14 +29,6 @@ QmitkExtAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer con
   berry::QtWorkbenchAdvisor::Initialize(configurer);
 
   configurer->SetSaveAndRestore(true);
-
-  if (!berry::QtAssistantUtil::GetHelpCollectionFile().isEmpty())
-  {
-    typedef std::vector<berry::IBundle::Pointer> BundleContainer;
-    BundleContainer bundles = berry::Platform::GetBundles();
-    berry::QtAssistantUtil::RegisterQCHFiles(bundles);
-  }
-
 }
 
 berry::WorkbenchWindowAdvisor*

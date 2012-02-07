@@ -21,7 +21,6 @@
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
-#include <berryQtAssistantUtil.h>
 
 #include <service/cm/ctkConfigurationAdmin.h>
 #include <service/cm/ctkConfiguration.h>

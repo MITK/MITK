@@ -66,10 +66,6 @@ public:
 
   QHelpEngineWrapper& getQHelpEngine();
 
-public Q_SLOTS:
-
-  void contextHelpRequested(const ctkEvent& event);
-
 private:
 
   Q_DISABLE_COPY(HelpPluginActivator)

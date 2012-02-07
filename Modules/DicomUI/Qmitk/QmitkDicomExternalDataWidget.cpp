@@ -80,7 +80,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
         connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
 
-        connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnImportFinished()));
+        //connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnImportFinished()));
     }
 }
 
@@ -150,14 +150,12 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 {
 }
 
-//TODO
 void QmitkDicomExternalDataWidget::OnCancelButtonClicked()
 {
     m_Watcher.cancel();
     m_Watcher.waitForFinished();
 }
 
-//TODO
 void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
 {
     QModelIndex currentIndex = m_Controls->ExternalDataTreeView->currentIndex();

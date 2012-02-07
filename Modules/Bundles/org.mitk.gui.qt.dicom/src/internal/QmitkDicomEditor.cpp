@@ -30,14 +30,13 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkDicomEditor.h"
 #include <mitkDicomSeriesReader.h>
+//#include "mitkProgressBar.h"
 
 // Qt
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QWidget>
-#include <QString>
-#include <QFile>
-#include <QStringList>
+
 #include <QtSql>
 #include <QSqlDatabase>
 #include <QtCore/QVariant>
@@ -58,31 +57,34 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkDICOMQueryRetrieveWidget.h>
 
 
-//Qmitk
+
 
 
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 
 
-QmitkDicomEditor::QmitkDicomEditor(): m_Timer(new QTimer())
-,m_DicomDirectoryListener(new QFileSystemWatcher())
-,m_RetrievedFile(new QStringList())
+QmitkDicomEditor::QmitkDicomEditor()
+: m_Thread(new QThread())
+, m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
 {
-    m_DicomDirectoryListener->addPath("C:/DICOMListenerDirectory");
 }
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
+    m_Thread->terminate();
+    delete m_Thread;
     delete m_DicomDirectoryListener;
-    delete m_Timer;
-    delete m_RetrievedFile;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {   
+
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
 
+    QString directory("C:/DICOMListenerDirectory");
+    StartDicomDirectoryListener(directory);
+    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
 
 
     //connections for base controls
@@ -93,22 +95,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QString&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
-
-    m_Timer->setSingleShot(true);
-    //connect(m_Timer,SIGNAL(timeout()),this,SIGNAL(ImportIncomingDicomFile(*m_RetrievedFile)));
-    connect(m_DicomDirectoryListener,SIGNAL(directoryChanged(QString)),this,SLOT(StartThreadObservingDicomImportDirectory(QString)));
-    connect(this,SIGNAL(ImportIncomingDicomFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));
-    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
-    //m_Controls.ExternalDataTreeView->setSortingEnabled(true);
-    //m_Controls.ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    //m_Controls.ExternalDataTreeView->setModel();
-
-    //m_Controls.InternalDataTreeView->setSortingEnabled(true);
-    //m_Controls.InternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    //m_Controls.InternalDataTreeView->setModel();
-    //connect( m_Controls.m_ctkDICOMAppWidget, SIGNAL(seriesDoubleClicked( QModelIndex )), this, SLOT(onSeriesModelSelected( QModelIndex )) );
-
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));   
 
 }
 
@@ -224,36 +211,6 @@ void QmitkDicomEditor::OnChangePage(int page)
     }
 }
 
-void QmitkDicomEditor::StartThreadObservingDicomImportDirectory(QString changedFile)
-{
-
-    if (!m_Watcher.isRunning()){
-        m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
-        m_Watcher.setFuture(m_Future);
-    }else{
-        m_Watcher.
-        m_Watcher.waitForFinished();
-        m_Future = QtConcurrent::run(this,(void (QmitkDicomEditor::*)(QString)) &QmitkDicomEditor::ObserveDicomImportDirectory,changedFile);
-        m_Watcher.setFuture(m_Future);
-    }
-
-}
-
-void QmitkDicomEditor::ObserveDicomImportDirectory(QString changedFile)
-{
-     QTimer *timer = new QTimer(this);
-     timer->setSingleShot(true);
-    //set the filepath of the current changed file false if there is no new file
-    GetRetrievedFileName(changedFile);
-    if(!m_RetrievedFile->isEmpty())
-    {
-        //wait 30sec till the file download is completed
-        timer->start(30000);
-        emit ImportIncomingDicomFile(m_RetrievedFile);
-    }
-    delete timer;
-}
-
 
 void QmitkDicomEditor::OnDicomImportFinished(QString path)
 {
@@ -261,32 +218,16 @@ void QmitkDicomEditor::OnDicomImportFinished(QString path)
     if(file.remove());
 }
 
-void QmitkDicomEditor::GetRetrievedFileName(QString changedFile)
-{
-    m_RetrievedFile->clear();
-    QDir listenerDirectory(changedFile);
-    //if the listenordirectory is empty you have deleted the last file
-    if(!listenerDirectory.entryList().isEmpty())
-    {
-        QFileInfoList fileInfoList;
-        fileInfoList = listenerDirectory.entryInfoList();
-        QFileInfoList::iterator it;
-        it=fileInfoList.begin();
-        QStringList temp;
-
-        //filter files, no directories wanted
-        while(it!=fileInfoList.end())
-        {
-            if((*it).isFile()){
-                temp.append((*it).absoluteFilePath());
-            }
-            ++it;
-        }
-
-        //check if there is an existing new file
-        if(!temp.isEmpty())
-        {
-            m_RetrievedFile=new QStringList(temp);
-        }
-    }
+void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
+{   
+    m_DicomDirectoryListener->SetDicomListenerDirectory(directory);
+    connect(m_DicomDirectoryListener,SIGNAL(StartImportingFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)),Qt::DirectConnection);
+    //m_FileSystemWatcher->addPath(directory);
+    m_DicomDirectoryListener->moveToThread(m_Thread);
+    m_Thread->start();
+    
+    //QmitkDicomDirectoryListener* listener = new QmitkDicomDirectoryListener();
+    //QThread* thread = new QThread();
+    //listener->moveToThread(thread);
+    //thread->start();
 }

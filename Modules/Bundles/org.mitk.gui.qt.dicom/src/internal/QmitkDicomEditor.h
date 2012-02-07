@@ -28,19 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorageEditorInput.h>
 
 #include "ui_QmitkDicomEditorControls.h"
+#include "QmitkDicomDirectoryListener.h"
 
 #include <QTextEdit>
 #include <QModelIndex>
 #include <QString>
 #include <QStringList>
-#include <QFileSystemWatcher>
-//For running dicom import in background
-#include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QTimer>
-
-
+#include <QThread.h>
 
 /*!
 \brief QmitkDicomEditor
@@ -78,23 +72,12 @@ public:
     bool IsSaveAsAllowed() const { return false; }
 
 signals:
-    void ImportIncomingDicomFile(QStringList&);
+
 
     protected slots:
 
-        // @brief Called when
-
-        /// \brief Called when m_DicomListenerDirectory changes
-        void GetRetrievedFileName(QString changedFile);
-
         /// \brief Called when import is finished
         void OnDicomImportFinished(QString path);
-
-        /// \brief Observes a diccom directory for incoming files e.g. from a dicom retrieve
-        void ObserveDicomImportDirectory(QString changedFile);
-
-        /// \brief start dicom directory listener as a thread
-        void StartThreadObservingDicomImportDirectory(QString changedFile);
 
         /// \brief Called when series in TreeView is double clicked.
         void OnSeriesModelDoubleClicked(QModelIndex index);
@@ -104,6 +87,8 @@ signals:
 
         /// \brief Called when LocalStorageButton was clicked.
         void OnLocalStorage();
+
+        void StartDicomDirectoryListener(QString& directory);
 
         void OnChangePage(int);
         /// To be called when an entry of the tree list is collapsed
@@ -121,18 +106,13 @@ protected:
 
     Events::Types GetPartEventTypes() const;
 
-
-
     Ui::QmitkDicomEditorControls m_Controls;
 
-private:
-    QFileSystemWatcher* m_DicomDirectoryListener;
-    QTimer* m_Timer;
-    QStringList* m_RetrievedFile;
-    QFuture<void> m_Future;
-    QFutureWatcher<void> m_Watcher;
+    QThread* m_Thread;
+    QmitkDicomDirectoryListener* m_DicomDirectoryListener;
 
-    
+private:
+ 
 };
 
 #endif // QmitkDicomEditor_h

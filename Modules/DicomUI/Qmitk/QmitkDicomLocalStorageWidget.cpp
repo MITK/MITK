@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
 #include <mitklogmacros.h>
-
+//#include <mitkProgressBar.h>
 // Qt
 #include <QMessageBox>
 
@@ -51,9 +51,12 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
     // build up qt Widget, unless already done
     if ( !m_Controls )
     {
+        
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
         m_Controls->setupUi( parent );
+
+        m_Controls->groupBox->setVisible(false);
 
         m_LocalModel->setEndLevel(ctkDICOMModel::SeriesType);
         m_LocalModel->setDatabase(m_LocalDatabase->database());
@@ -66,6 +69,9 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
 
         //connect(&m_Watcher, SIGNAL(started()), this, SLOT());
         connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnImportFinished()));
+
+        connect(m_Controls->CancelButton, SIGNAL(clicked()), this , SLOT(OnCancelButtonClicked()));
+        connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
 
 
     }
@@ -90,12 +96,12 @@ void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDire
 
 void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString& directory)
 {
+    //mitk::ProgressBar::GetInstance()->AddStepsToDo(1); 
     if(m_LocalDatabase->isOpen())
     {
         m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabaseDirectory);
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
-    emit FinishedImport(directory);
 }
 
 void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList& patientFiles)
@@ -107,12 +113,9 @@ void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList& patientFiles)
         for (QStringList::iterator currentPatientFilePath = patientFiles.begin();
             currentPatientFilePath != patientFiles.end(); ++currentPatientFilePath) 
         {   ++i;
-        emit ProcessImport(i/length,*currentPatientFilePath);
         m_LocalIndexer->addFile(*m_LocalDatabase,*currentPatientFilePath,m_LocalDatabaseDirectory);
 
-        emit FinishedImport(*currentPatientFilePath);
         }
-
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
 
@@ -162,4 +165,7 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
     m_Watcher.cancel();
     m_Watcher.waitForFinished();
 }
-
+//TODO
+void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
+{
+}

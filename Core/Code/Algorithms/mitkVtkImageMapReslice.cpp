@@ -41,6 +41,7 @@ vtkStandardNewMacro(mitkVtkImageMapReslice);
 
 static void* START_INDEX;
 
+
 //--------------------------------------------------------------------------
 // The 'floor' function on x86 and mips is many times slower than these
 // and is used a lot in this code, optimize for different CPU architectures
@@ -94,6 +95,7 @@ mitkVtkImageMapReslice::mitkVtkImageMapReslice()
 //----------------------------------------------------------------------------
 mitkVtkImageMapReslice::~mitkVtkImageMapReslice()
 {
+	START_INDEX = NULL;
 }
 
 
@@ -437,7 +439,7 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-			*outPtr++ = (unsigned int) (inPtr - ((T*)START_INDEX) );
+			*outPtr++ = (int) (inPtr - ((T*)START_INDEX) );
 			inPtr++;
     }
   while (--numscalars);

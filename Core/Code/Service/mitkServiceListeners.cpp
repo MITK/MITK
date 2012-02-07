@@ -144,7 +144,7 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
     }
   }
 
-  MITK_INFO << "Notified " << n << " listeners";
+  MITK_DEBUG << "Notified " << n << " listeners";
 }
 
 void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& set,
@@ -165,7 +165,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, S
     }
   }
 
-  MITK_INFO << "Added " << set.size() << " out of " << n
+  MITK_DEBUG << "Added " << set.size() << " out of " << n
             << " listeners with complicated filters";
 
   // Check the cache
@@ -242,7 +242,7 @@ void ServiceListeners::RemoveFromCache(const ServiceListenerEntry& sle)
      }
      else
      {
-       MITK_INFO << "Too complicated filter: " << sle.GetFilter();
+       MITK_DEBUG << "Too complicated filter: " << sle.GetFilter();
        complicatedListeners.push_back(sle);
      }
    }
@@ -254,7 +254,7 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
   std::list<ServiceListenerEntry>& l = cache[cache_ix][val];
   if (!l.empty())
   {
-    MITK_INFO << hashedServiceKeys[cache_ix] << " matches " << l.size();
+    MITK_DEBUG << hashedServiceKeys[cache_ix] << " matches " << l.size();
 
     for (std::list<ServiceListenerEntry>::const_iterator entry = l.begin();
          entry != l.end(); ++entry)
@@ -264,7 +264,7 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
   }
   else
   {
-    MITK_INFO << hashedServiceKeys[cache_ix] << " matches none";
+    MITK_DEBUG << hashedServiceKeys[cache_ix] << " matches none";
   }
 }
 

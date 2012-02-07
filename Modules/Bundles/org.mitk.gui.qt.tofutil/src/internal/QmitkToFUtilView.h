@@ -128,6 +128,7 @@ class QmitkToFUtilView : public QmitkFunctionality
     mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode holding the distance image of the selected camera
     mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode holding the amplitude image of the selected camera
     mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode holding the intensity image of the selected camera
+    mitk::DataNode::Pointer m_RGBImageNode; ///< DataNode holding the rgb image of the selected camera
     mitk::DataNode::Pointer m_SurfaceNode; ///< DataNode holding the surface generated from the distanc image of the selected camera
 
     // ToF processing and recording filter

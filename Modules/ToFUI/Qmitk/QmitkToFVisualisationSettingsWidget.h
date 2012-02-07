@@ -59,7 +59,7 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param amplitudeImage image holding the amplitude image of a ToF camera
     \param intensityImage image holding the intensity image of a ToF camera
     */
-    void Initialize(mitk::Image* distanceImage=NULL, mitk::Image* amplitudeImage=NULL, mitk::Image* intensityImage=NULL);
+    void Initialize(mitk::Image* distanceImage=NULL, mitk::Image* amplitudeImage=NULL, mitk::Image* intensityImage=NULL, mitk::Image* rgbImage=NULL);
 
     /*!
     \brief Access the color transfer function of widget 1 (distance image)
@@ -137,6 +137,7 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     mitk::Image::Pointer m_MitkDistanceImage; ///< Range image of the ToF camera as set by Initialize()
     mitk::Image::Pointer m_MitkAmplitudeImage; ///< Amplitud image of the ToF camera as set by Initialize()
     mitk::Image::Pointer m_MitkIntensityImage; ///< Intensity image of the ToF camera as set by Initialize()
+    mitk::Image::Pointer m_RGBImage; ///< RGB image as e.g. provided by the Kinect camera
 
     vtkColorTransferFunction* m_Widget1ColorTransferFunction; ///< vtkColorTransferFunction of widget 1 (distance) that can be used to define a TransferFunctionProperty
     vtkColorTransferFunction* m_Widget2ColorTransferFunction; ///< vtkColorTransferFunction of widget 2 (amplitude) that can be used to define a TransferFunctionProperty

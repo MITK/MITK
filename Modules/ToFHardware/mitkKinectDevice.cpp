@@ -68,6 +68,11 @@ namespace mitk
         {
           this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
         }
+        this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
+        for (int i=0; i<this->m_MaxBufferSize; i++)
+        {
+          this->m_RGBDataBuffer[i] = new unsigned char[this->m_PixelNumber*3];
+        }
 
         m_CameraConnected = true;
       }
@@ -92,18 +97,14 @@ namespace mitk
         for(int i=0; i<this->m_MaxBufferSize; i++)
         {
           delete[] this->m_DistanceDataBuffer[i];
+          delete[] this->m_AmplitudeDataBuffer[i];
+          delete[] this->m_IntensityDataBuffer[i];
+          delete[] this->m_RGBDataBuffer[i];
         }
         delete[] this->m_DistanceDataBuffer;
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          delete[] this->m_AmplitudeDataBuffer[i];
-        }
         delete[] this->m_AmplitudeDataBuffer;
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          delete[] this->m_IntensityDataBuffer[i];
-        }
         delete[] this->m_IntensityDataBuffer;
+        delete[] this->m_RGBDataBuffer;
 
         m_CameraConnected = false;
       }
@@ -119,9 +120,11 @@ namespace mitk
       // get the first image
       this->m_Controller->UpdateCamera();
       this->m_ImageMutex->Lock();
+      //this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_Controller->GetDistances(this->m_DistanceDataBuffer[this->m_FreePos]);
       this->m_Controller->GetAmplitudes(this->m_AmplitudeDataBuffer[this->m_FreePos]);
       this->m_Controller->GetIntensities(this->m_IntensityDataBuffer[this->m_FreePos]);
+      this->m_Controller->GetRgb(this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
       this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
       this->m_ImageSequence++;
@@ -198,9 +201,11 @@ namespace mitk
         toFCameraDevice->UpdateCamera();
         // get the image data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
+        //toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_Controller->GetRgb(toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
@@ -351,7 +356,7 @@ namespace mitk
   }
 
   void KinectDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-    int requiredImageSequence, int& capturedImageSequence)
+    int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
     {
@@ -394,6 +399,11 @@ namespace mitk
         distanceArray[i] = this->m_DistanceDataBuffer[pos][i] /* * 1000 */;
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+        rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+      }
+      for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
+      {
+        rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
       }
 
 

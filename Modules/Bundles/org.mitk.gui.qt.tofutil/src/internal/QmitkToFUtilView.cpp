@@ -44,7 +44,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 : QmitkFunctionality()
 , m_Controls(NULL), m_MultiWidget( NULL )
 , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
-, m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_SurfaceNode(NULL)
+, m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
 , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
 , m_SurfaceDisplayCount(0), m_2DDisplayCount(0)
 , m_RealTimeClock(NULL)
@@ -243,6 +243,8 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
     this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+
+    this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
 
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
@@ -500,7 +502,14 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
     this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
   }
-  if (m_AmplitudeImageNode.IsNotNull())
+  if (m_RGBImageNode.IsNotNull())
+  {
+    this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
+    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+  }
+  else if (m_AmplitudeImageNode.IsNotNull())
   {
     this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );

@@ -101,7 +101,7 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-      int requiredImageSequence, int& capturedImageSequence);
+      int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
     //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
     //    /*!
     //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
@@ -140,6 +140,7 @@ namespace mitk
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
     float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
+    unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
 
   private:
 

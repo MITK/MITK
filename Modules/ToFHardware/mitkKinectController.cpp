@@ -138,14 +138,37 @@ namespace mitk
     }
   }
 
-  void KinectController::GetIntensities(float* intensities)
+  void KinectController::GetRgb(unsigned char* rgb)
   {
-
+    xn::ImageMetaData ImageMD;
+    m_ImageGenerator.GetMetaData(ImageMD);
+    const XnRGB24Pixel* rgbPixelArray = ImageMD.RGB24Data();
+    for (int i=0; i<m_CaptureWidth*m_CaptureHeight; i++)
+    {
+      rgb[i*3] = rgbPixelArray[i].nRed;
+      rgb[i*3+1] = rgbPixelArray[i].nGreen;
+      rgb[i*3+2] = rgbPixelArray[i].nBlue;
+    }
   }
 
-  void KinectController::GetAmplitudes(float* amplitudes)
+  void KinectController::GetAllData(float* distances, unsigned char* rgb)
   {
+    // get current distance data
+    xn::DepthMetaData DepthMD;
+    m_DepthGenerator.GetMetaData(DepthMD);
+    const XnDepthPixel* DepthData = DepthMD.Data();
+    // get current rgb data
+    xn::ImageMetaData ImageMD;
+    m_ImageGenerator.GetMetaData(ImageMD);
+    const XnRGB24Pixel* rgbPixelArray = ImageMD.RGB24Data();
 
+    for (unsigned int i=0; i<m_CaptureWidth*m_CaptureHeight; i++)
+    {
+      distances[i] = DepthData[i];
+      rgb[i*3] = rgbPixelArray[i].nRed;
+      rgb[i*3+1] = rgbPixelArray[i].nGreen;
+      rgb[i*3+2] = rgbPixelArray[i].nBlue;
+    }
   }
 
   bool KinectController::ErrorText(unsigned int error)
@@ -156,5 +179,15 @@ namespace mitk
       return false;
     }
     else return true;
+  }
+
+  void KinectController::GetAmplitudes( float* amplitudes )
+  {
+
+  }
+
+  void KinectController::GetIntensities( float* intensities )
+  {
+
   }
 }

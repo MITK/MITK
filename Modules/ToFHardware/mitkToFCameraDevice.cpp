@@ -36,7 +36,6 @@ namespace mitk
 
   ToFCameraDevice::~ToFCameraDevice()
   {
-    CleanupPixelArrays();
   }
 
   void ToFCameraDevice::SetBoolProperty( const char* propertyKey, bool boolValue )

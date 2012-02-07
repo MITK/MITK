@@ -349,7 +349,7 @@ namespace mitk
   }
 
   void ToFCameraMESADevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                                        int requiredImageSequence, int& capturedImageSequence)
+                                        int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
     {

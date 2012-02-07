@@ -27,5 +27,6 @@ SET(MODULE_TESTS
   mitkToFPicImageWriterTest.cpp
   mitkToFOpenCVImageGrabberTest.cpp
   mitkKinectControllerTest.cpp
+  mitkKinectDeviceTest.cpp
 )
 

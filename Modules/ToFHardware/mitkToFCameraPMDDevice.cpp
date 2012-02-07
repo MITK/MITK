@@ -31,6 +31,7 @@ namespace mitk
   ToFCameraPMDDevice::~ToFCameraPMDDevice()
   {
     this->CleanUpSourceData();
+    CleanupPixelArrays();
   }
 
   bool ToFCameraPMDDevice::ConnectCamera()
@@ -291,7 +292,7 @@ namespace mitk
   }
 
   void ToFCameraPMDDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                                        int requiredImageSequence, int& capturedImageSequence)
+                                        int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
     {

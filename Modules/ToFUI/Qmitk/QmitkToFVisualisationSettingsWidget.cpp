@@ -124,11 +124,12 @@ void QmitkToFVisualisationSettingsWidget::UpdateRanges()
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
 } 
 
-void QmitkToFVisualisationSettingsWidget::Initialize(mitk::Image* distanceImage, mitk::Image* amplitudeImage, mitk::Image* intensityImage)
+void QmitkToFVisualisationSettingsWidget::Initialize(mitk::Image* distanceImage, mitk::Image* amplitudeImage, mitk::Image* intensityImage, mitk::Image* rgbImage)
 {
   this->m_MitkDistanceImage = distanceImage;
   this->m_MitkAmplitudeImage = amplitudeImage;
   this->m_MitkIntensityImage = intensityImage;
+  this->m_RGBImage = rgbImage;
 
   if (!m_MitkDistanceImage && !m_MitkAmplitudeImage && !m_MitkIntensityImage)
   {

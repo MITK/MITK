@@ -59,13 +59,22 @@ namespace mitk
     virtual bool UpdateCamera();
     /*!
     \brief acquire new distance data from the Kinect camera
-    \param distances pointer holding the acquired distance array
+    \param distances pointer to memory location where distances should be stored
     */
     void GetDistances(float* distances);
-
-    void GetIntensities(float* intensities);
-
     void GetAmplitudes(float* amplitudes);
+    void GetIntensities(float* intensities);
+    /*!
+    \brief acquire new rgb data from the Kinect camera
+    \parama rgb pointer to memory location where rgb information should be stored
+    */
+    void GetRgb(unsigned char* rgb);
+    /*!
+    \brief convenience method for faster access to distance and rgb data
+    \param distances pointer to memory location where distances should be stored
+    \param rgb pointer to memory location where rgb information should be stored
+    */
+    void GetAllData(float* distances, unsigned char* rgb);
 
   protected:
 

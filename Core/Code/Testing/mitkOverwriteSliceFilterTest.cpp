@@ -31,14 +31,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-int VolumeSize = 5;
+int VolumeSize = 128;
 
 
 
 static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* refImg)
 {
 	/* ============= setup plane ============*/
-	int sliceindex = 3;//rand() % 32;
+	int sliceindex = 55;//rand() % 32;
 	bool isFrontside = true; 
 	bool isRotated = false;
 
@@ -78,7 +78,7 @@ static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* re
 
 	vtkSmartPointer<vtkImageData> map = vtkSmartPointer<vtkImageData>::New();
 	map = slicerMap->GetVtkOutput();
-	
+	MITK_TEST_CONDITION_REQUIRED( map->GetScalarSize() == sizeof(int), "min size of scalar");
 
 	/* ============= overwrite slice ============*/
 	mitk::OverwriteSliceFilter::Pointer overwriter = mitk::OverwriteSliceFilter::New();
@@ -89,6 +89,8 @@ static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* re
 	overwriter->Update();
 
 
+	MITK_INFO<<slice->GetScalarType();
+	MITK_INFO<<map->GetScalarType();
 
 
 	/* ============= check ref == working ============*/
@@ -113,8 +115,8 @@ stop:
 
 
 	/* ============= edit slice ============*/
-	int idX = VolumeSize-3;
-	int idY = VolumeSize-2;
+	int idX = VolumeSize-20;
+	int idY = VolumeSize-66;
 	int idZ = 0;
 	int component = 0;
 	double val = 33.0;
@@ -157,7 +159,7 @@ static void OverwriteByPointerTest(mitk::Image* workingImage, mitk::Image* refIm
 {
 
 	/* ============= setup plane ============*/
-	int sliceindex = 3;//rand() % 32;
+	int sliceindex = 55;//rand() % 32;
 	bool isFrontside = true; 
 	bool isRotated = false;
 
@@ -216,8 +218,8 @@ stop:
 
 
 	/* ============= edit slice ============*/
-	int idX = VolumeSize-1;
-	int idY = VolumeSize-4;
+	int idX = VolumeSize-20;
+	int idY = VolumeSize-66;
 	int idZ = 0;
 	int component = 0;
 	double val = 33.0;

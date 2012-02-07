@@ -99,31 +99,11 @@ mitkVtkImageIdxReslice::mitkVtkImageIdxReslice()
 //----------------------------------------------------------------------------
 mitkVtkImageIdxReslice::~mitkVtkImageIdxReslice()
 {
+	Overwrite_Mode = false;
 }
 
 
 
-
-//----------------------------------------------------------------------------
-//  Interpolation subroutines and associated code 
-//----------------------------------------------------------------------------
-
-// Three interpolation functions are supported: NearestNeighbor, Trilinear,
-// and Tricubic.  These routines have the following signature:
-//
-//int interpolate(T *&outPtr,
-//                const T *inPtr,
-//                const int inExt[6],
-//                const vtkIdType inInc[3],
-//                int numscalars,
-//                const F point[3],
-//                int mode,
-//                const T *background)
-//
-// where 'T' is any arithmetic type and 'F' is a float type
-//
-// The result of the interpolation is put in *outPtr, and outPtr is
-// incremented.
 
 //----------------------------------------------------------------------------
 // constants for different boundary-handling modes
@@ -897,7 +877,7 @@ void mitkVtkImageIdxReslice::ThreadedRequestData(
     {
     return;
     }
-
+	
   // Get the output pointer
   void *outPtr = outData[0]->GetScalarPointerForExtent(outExt);
 

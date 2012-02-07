@@ -35,8 +35,6 @@ public:
    * Creates the global QApplication object
    */
   void Initialize(IWorkbenchConfigurer::Pointer configurer);
-
-  bool PreShutdown();
 };
 
 }

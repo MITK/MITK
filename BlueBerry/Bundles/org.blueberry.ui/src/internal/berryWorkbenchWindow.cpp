@@ -88,7 +88,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
 WorkbenchWindow::~WorkbenchWindow()
 {
-  BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
+  //BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
 Object::Pointer WorkbenchWindow::GetService(const std::string& key)
@@ -372,7 +372,7 @@ Point WorkbenchWindow::GetInitialSize()
 
 bool WorkbenchWindow::Close()
 {
-  BERRY_INFO << "WorkbenchWindow::Close()";
+  //BERRY_INFO << "WorkbenchWindow::Close()";
 
   if (controlResizeListener)
   {

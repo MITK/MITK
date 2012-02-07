@@ -46,6 +46,14 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 {
   QmitkExtWorkbenchWindowAdvisor* advisor = new
     QmitkExtWorkbenchWindowAdvisor(this, configurer);
+
+  // Exclude the help perspective from org.blueberry.ui.qt.help from
+  // the normal perspective list.
+  // The perspective gets a dedicated menu entry in the help menu
+  std::vector<std::string> excludePerspectives;
+  excludePerspectives.push_back("org.blueberry.perspectives.help");
+  advisor->SetPerspectiveExcludeList(excludePerspectives);
+
   advisor->SetWindowIcon(":/QmitkExtApplication/icon_research.xpm");
   return advisor;
   //return new QmitkExtWorkbenchWindowAdvisor(this, configurer);

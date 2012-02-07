@@ -48,9 +48,6 @@ private:
   static QmitkExtApplicationPlugin* inst;
 
   ctkPluginContext* context;
-  berry::QCHPluginListener* pluginListener;
-
-  mutable QString helpCollectionFile;
 };
 
 #endif /* QMITKEXTAPPLICATIONPLUGIN_H_ */

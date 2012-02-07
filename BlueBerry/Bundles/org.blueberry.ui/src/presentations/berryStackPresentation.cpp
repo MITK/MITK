@@ -33,6 +33,15 @@ StackPresentation::StackPresentation(IStackPresentationSite::Pointer stackSite)
   poco_assert(stackSite.IsNotNull());
 }
 
+StackPresentation::~StackPresentation()
+{
+  // Do not remove empty destructor. Otherwise, the WeakPointer member "site"
+  // will be destroyed in a strange way and the destruction of a DefaultStackPresentationSite
+  // instance will notify the WeakPointer "site" (although it was destroyed, the
+  // DefaultStackPresentationSite somehow still has a MessageDelegate for the destroy
+  // event, pointing to the destroyed "site").
+}
+
 IStackPresentationSite::Pointer StackPresentation::GetSite()
 {
   return site.Lock();

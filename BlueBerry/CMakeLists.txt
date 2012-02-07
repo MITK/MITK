@@ -46,6 +46,7 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
     SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
     SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
+    SET(QT_XMLPATTERNS_EXECUTABLE NOTFOUND)
   ENDIF()
 
   FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
@@ -66,12 +67,19 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     NO_DEFAULT_PATH
   )
 
+  FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
+    NAMES xmlpatterns
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
   OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
 
   MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP
                    QT_HELPGENERATOR_EXECUTABLE
                    QT_COLLECTIONGENERATOR_EXECUTABLE
-                   QT_ASSISTANT_EXECUTABLE)
+                   QT_ASSISTANT_EXECUTABLE
+                   QT_XMLPATTERNS_EXECUTABLE)
 
   SET(_doxygen_too_old 1)
   IF(BLUEBERRY_USE_QT_HELP)
@@ -103,6 +111,11 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
 
   IF(BLUEBERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
+    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  ENDIF()
+
+  IF(BLUEBERRY_USE_QT_HELP AND NOT QT_XMLPATTERNS_EXECUTABLE)
+    MESSAGE("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
 
@@ -198,6 +211,7 @@ SET(_ctk_plugins
   Bundles/org.blueberry.core.jobs:OFF
   Bundles/org.blueberry.ui:OFF
   Bundles/org.blueberry.ui.qt:OFF
+  Bundles/org.blueberry.ui.qt.help:OFF
   Bundles/org.blueberry.ui.qt.log:OFF
   Bundles/org.blueberry.ui.qt.objectinspector:OFF
 )

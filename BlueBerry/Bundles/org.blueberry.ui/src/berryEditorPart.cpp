@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryEditorPart.h"
 
 #include "berryImageDescriptor.h"
+#include "berryIWorkbenchPartConstants.h"
 
 #include <cassert>
 
@@ -38,7 +39,7 @@ void EditorPart::SetInputWithNotify(IEditorInput::Pointer input)
   if (input != editorInput)
   {
     editorInput = input;
-    //firePropertyChange(PROP_INPUT);
+    FirePropertyChange(IWorkbenchPartConstants::PROP_INPUT);
   }
 }
 

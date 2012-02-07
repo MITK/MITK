@@ -74,7 +74,7 @@ namespace berry {
  * </ul>
  * </p>
  */
-class BERRY_UI EditorPart : public WorkbenchPart , public IEditorPart {
+class BERRY_UI EditorPart : public WorkbenchPart , public virtual IEditorPart {
 
   Q_OBJECT
   Q_INTERFACES(berry::IEditorPart)

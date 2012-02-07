@@ -309,7 +309,7 @@ void EditorManager::FindEditors(
   // In practice, this case is never used.
   if ((matchFlags & IWorkbenchPage::MATCH_INPUT) == 0)
   {
-    result.assign(editorList.begin(), editorList.end());
+    result.insert(result.end(), editorList.begin(), editorList.end());
     return;
   }
 

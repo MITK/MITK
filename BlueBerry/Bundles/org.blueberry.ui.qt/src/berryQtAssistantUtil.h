@@ -32,6 +32,12 @@
 
 namespace berry {
 
+/**
+ * \deprecated
+ *
+ * This class is deprecated. Please use the org.blueberry.ui.qt.help
+ * plug-in if you want to access help contents in your application.
+ */
 class BERRY_UI_QT QtAssistantUtil
 {
 

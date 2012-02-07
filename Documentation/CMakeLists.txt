@@ -47,7 +47,7 @@ IF(MITK_DOXYGEN_GENERATE_QCH_FILES)
 
   # The name of the generated MITK qch file, relative to the
   # Doxygen HTML output folder
-  SET(MITK_DOXYGEN_QCH_FILE "../MITK-${MITK_REVISION_ID}.qch")
+  SET(MITK_DOXYGEN_QCH_FILE "${MITK_BINARY_DIR}/MITK-${MITK_REVISION_ID}.qch")
 
   # Generating ITK and VTK docs it not done yet
   #OPTION(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE "Use doxygen to generate a Qt compressed help file for VTK docs" OFF)

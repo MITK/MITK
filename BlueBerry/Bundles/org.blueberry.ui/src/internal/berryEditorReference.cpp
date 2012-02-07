@@ -31,6 +31,7 @@
 
 #include "../berryImageDescriptor.h"
 #include "../berryPlatformUI.h"
+#include "../berryIWorkbenchPartConstants.h"
 
 namespace berry
 {
@@ -357,6 +358,19 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
   return result;
 }
 
+void EditorReference::PropertyChanged(Object::Pointer source, int propId)
+{
+  // Detect badly behaved editors that don't fire PROP_INPUT events
+  // when they're supposed to. This branch is only needed to handle
+  // malfunctioning editors.
+  if (propId == IWorkbenchPartConstants::PROP_INPUT)
+  {
+    expectingInputChange = false;
+  }
+
+  WorkbenchPartReference::PropertyChanged(source, propId);
+}
+
 bool EditorReference::SetInput(IEditorInput::Pointer input)
 {
 
@@ -385,7 +399,7 @@ bool EditorReference::SetInput(IEditorInput::Pointer input)
 
         // Fire the property for free (can't be relied on since there are other ways the input
         // can change, but we do it here to be consistent with older versions of the workbench)
-        //firePropertyChange(IWorkbenchPartConstants.PROP_INPUT);
+        FirePropertyChange(IWorkbenchPartConstants::PROP_INPUT);
       }
 
       return editor->GetEditorInput() == input;

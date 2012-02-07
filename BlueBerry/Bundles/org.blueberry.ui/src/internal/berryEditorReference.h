@@ -186,6 +186,8 @@ private:
   //        return new OverlayIcon(descriptor, pinDesc, new Point(16, 16));
   //    }
 
+protected:
+
   /**
    * Wrapper for restoring the editor. First, this delegates to busyRestoreEditorHelper
    * to do the real work of restoring the view. If unable to restore the editor, this
@@ -193,20 +195,9 @@ private:
    *
    * @return the created part
    */
-protected:
   IWorkbenchPart::Pointer CreatePart();
 
-  //protected: void PartPropertyChanged(Object source, int propId) {
-  //
-  //        // Detect badly behaved editors that don't fire PROP_INPUT events
-  //        // when they're supposed to. This branch is only needed to handle
-  //        // malfunctioning editors.
-  //        if (propId == IWorkbenchPartConstants.PROP_INPUT) {
-  //            expectingInputChange = false;
-  //        }
-  //
-  //        super.partPropertyChanged(source, propId);
-  //    }
+  void PropertyChanged(Object::Pointer source, int propId);
 
   /**
    * Attempts to set the input of the editor to the given input. Note that the input

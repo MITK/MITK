@@ -169,7 +169,6 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
 }
 
 // sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-// sets m_AutoTopMost to false
 void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty)
 {
   if (levelWindowProperty.IsNull())
@@ -180,13 +179,13 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;
   }
+
   m_LevelWindowProperty = levelWindowProperty;
 
   itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();  // register listener for new property
   command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
   m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
   m_IsPropertyModifiedTagSet = true;
-  m_AutoTopMost = false;
 
   /* search image than belongs to the property */
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);

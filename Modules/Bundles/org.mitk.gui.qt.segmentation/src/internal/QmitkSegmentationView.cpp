@@ -470,8 +470,31 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   bool isSeg(false);
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
-  if(node->GetBoolProperty("binary", isSeg) && !isHelperObject)
+  node->GetBoolProperty("binary", isSeg);
+  if(isSeg && !isHelperObject)
   {
+    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
+      , mitk::BoolProperty::New(true)));
+
+    // gets the context of the "Mitk" (Core) module (always has id 1)
+    // TODO Workaround until CTL plugincontext is available
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    // Workaround end
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    //mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+
+    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+
+    for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
+    {
+      std::string nodeName = node->GetName();
+      unsigned int t = nodeName.find_last_of(" ");
+      unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
+
+      service->RemovePlanePosition(id);
+
+      this->GetDataStorage()->Remove(it->Value());
+    }
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);

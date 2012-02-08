@@ -26,6 +26,7 @@ IF(MITK_USE_OpenCV)
 
     ExternalProject_Add(${proj}
       URL ${opencv_url}
+      SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

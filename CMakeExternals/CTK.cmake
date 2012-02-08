@@ -35,6 +35,7 @@ IF(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       GIT_REPOSITORY http://github.com/commontk/CTK.git
       GIT_TAG ${revision_tag}
+      SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""

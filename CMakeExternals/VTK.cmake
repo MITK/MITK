@@ -55,6 +55,7 @@ IF(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     URL ${VTK_URL}
+    SOURCE_DIR ${proj}-src
     BINARY_DIR ${proj}-build
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}

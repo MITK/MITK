@@ -40,6 +40,7 @@ IF(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.1.tar.gz
+     SOURCE_DIR ${proj}-src
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}

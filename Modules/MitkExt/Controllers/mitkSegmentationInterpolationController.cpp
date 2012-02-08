@@ -152,7 +152,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
        || m_Segmentation->GetPixelType().GetNumberOfComponents() != 1
      )
   {
-    MITK_ERROR << "original patient image does not match segmentation, ignoring patient image" << std::endl;
+    MITK_WARN << "Segmentation image has different image characteristics than reference image." << std::endl;
     m_ReferenceImage = NULL;
     return;
   }
@@ -160,7 +160,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
   for (unsigned int dim = 0; dim < m_Segmentation->GetDimension(); ++dim)
     if ( m_ReferenceImage->GetDimension(dim) != m_Segmentation->GetDimension(dim) )
     {
-      MITK_ERROR << "original patient image does not match segmentation (different extent in dimension " << dim 
+      MITK_WARN << "original patient image does not match segmentation (different extent in dimension " << dim 
                 << "), ignoring patient image" << std::endl;
       m_ReferenceImage = NULL;
       return;

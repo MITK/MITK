@@ -52,12 +52,12 @@ void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
 
 
 template<class F>
-static void GetOverwritefunc(int dataType, void (**overwritefunc)(F *inPtr, F *outPtr, F *mapPtr, int todo)){
+static void GetOverwritefunc(int dataType, void (**overwritefunc)(F *inPtr, F *outPtr, unsigned int *mapPtr, int todo)){
 
 	switch (dataType)
 	{
 		vtkTemplateAliasMacro(*((void (**)(VTK_TT *outPtr, VTK_TT *inPtr,
-			VTK_TT *mapPtr, int todo))overwritefunc) = \
+			unsigned int *mapPtr, int todo))overwritefunc) = \
 			&Overwrite);
 	default:
 		overwritefunc = 0;
@@ -66,10 +66,10 @@ static void GetOverwritefunc(int dataType, void (**overwritefunc)(F *inPtr, F *o
 
 
 template<class T>
-static void Overwrite(T *inPtr, T *outPtr, T *mapPtr, int todo){
+static void Overwrite(T *inPtr, T *outPtr, unsigned int *mapPtr, int todo){
 	
 	do{
-		unsigned int shift = (unsigned int)*mapPtr;
+		unsigned int shift = *mapPtr;
 		mapPtr++;
 		*(outPtr + shift) = *inPtr++;
 	}while(--todo);
@@ -90,13 +90,13 @@ void mitk::OverwriteSliceFilter::GenerateData()
 
 
 	int* extentMap = m_Map->GetExtent();
-	void* mapPtr = m_Map->GetScalarPointerForExtent(extentMap);
+	unsigned int* mapPtr = (unsigned int*)m_Map->GetScalarPointerForExtent(extentMap);
 
 
 	int* dimensions = m_Slice->GetDimensions();
 	int todo = dimensions[0] * dimensions[1];
 
-  void (*overwritefunc)(void *inPtr, void *outPtr, void *mapPtr, int todo);
+  void (*overwritefunc)(void *inPtr, void *outPtr, unsigned int *mapPtr, int todo);
 	GetOverwritefunc(m_Slice->GetScalarType(),&overwritefunc);
 
 	overwritefunc(inPtr, outPtr, mapPtr, todo);

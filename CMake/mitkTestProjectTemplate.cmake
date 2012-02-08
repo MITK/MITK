@@ -21,18 +21,46 @@ if(BUILD_TESTING)
       -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
       -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
   )
+  
+  add_test(NAME mitkProjectTemplateCleanTest
+           COMMAND ${CMAKE_COMMAND} -E remove_directory "${MITK-ProjectTemplate_BINARY_DIR}"
+          )
+  set_tests_properties(mitkProjectTemplateCleanTest PROPERTIES
+                       LABELS "MITK;BlueBerry")
+
+  add_test(NAME mitkProjectTemplateCleanTest2
+           COMMAND ${CMAKE_COMMAND} -E make_directory "${MITK-ProjectTemplate_BINARY_DIR}"
+          )
+  set_tests_properties(mitkProjectTemplateCleanTest2 PROPERTIES
+                       DEPENDS mitkProjectTemplateCleanTest
+                       LABELS "MITK;BlueBerry")
+                       
                          
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
+      add_test(NAME mitkProjectTemplateConfigureTest-${config} CONFIGURATIONS ${config}
+               COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${config} --target ${proj})
+      set_tests_properties(mitkProjectTemplateConfigureTest-${config} PROPERTIES
+                           DEPENDS mitkProjectTemplateCleanTest2
+                           LABELS "MITK;BlueBerry")
+                           
       add_test(NAME mitkProjectTemplateBuildTest-${config} CONFIGURATIONS ${config}
                COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${config})
       set_tests_properties(mitkProjectTemplateBuildTest-${config} PROPERTIES
+                           DEPENDS mitkProjectTemplateConfigureTest-${config}
                            LABELS "MITK;BlueBerry")
     endforeach()
   else()
+    add_test(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
+             ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${CMAKE_BUILD_TYPE} --target ${proj})
+    set_tests_properties(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
+                         DEPENDS mitkProjectTemplateCleanTest2
+                         LABELS "MITK;BlueBerry")
+                         
     add_test(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
              ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
     set_tests_properties(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
+                         DEPENDS mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
                          LABELS "MITK;BlueBerry")
   endif()
 

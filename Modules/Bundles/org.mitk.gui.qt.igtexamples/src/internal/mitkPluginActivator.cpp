@@ -1,5 +1,5 @@
 #include "mitkPluginActivator.h"
-#include "QmitkImageGuidedTherapyTutorialView.h"
+#include "QmitkIGTTutorialView.h"
 #include "QmitkIGTTrackingLabView.h"
 
 #include <QtPlugin>
@@ -8,7 +8,7 @@ namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkImageGuidedTherapyTutorialView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTutorialView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTrackingLabView, context)
 }
 

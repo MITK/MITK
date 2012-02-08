@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkImageGuidedTherapyTutorialViewControls</class>
- <widget class="QWidget" name="QmitkImageGuidedTherapyTutorialViewControls">
+ <class>QmitkIGTTutorialViewControls</class>
+ <widget class="QWidget" name="QmitkIGTTutorialViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>

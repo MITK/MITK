@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkImageGuidedTherapyTutorialView.h"
+#include "QmitkIGTTutorialView.h"
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
@@ -31,45 +31,45 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 
 
-const std::string QmitkImageGuidedTherapyTutorialView::VIEW_ID = "org.mitk.views.imageguidedtherapytutorial";
+const std::string QmitkIGTTutorialView::VIEW_ID = "org.mitk.views.igttutorial";
 
-QmitkImageGuidedTherapyTutorialView::QmitkImageGuidedTherapyTutorialView()
+QmitkIGTTutorialView::QmitkIGTTutorialView()
 : QmitkFunctionality(), 
   m_Controls(NULL),  m_MultiWidget(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
 {
 }
 
 
-QmitkImageGuidedTherapyTutorialView::~QmitkImageGuidedTherapyTutorialView()
+QmitkIGTTutorialView::~QmitkIGTTutorialView()
 {
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::CreateQtPartControl(QWidget *parent)
+void QmitkIGTTutorialView::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
   {
     // create GUI widget
-    m_Controls = new Ui::QmitkImageGuidedTherapyTutorialViewControls;
+    m_Controls = new Ui::QmitkIGTTutorialViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkIGTTutorialView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::StdMultiWidgetNotAvailable()
+void QmitkIGTTutorialView::StdMultiWidgetNotAvailable()
 {
   m_MultiWidget = NULL;
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::CreateConnections()
+void QmitkIGTTutorialView::CreateConnections()
 {
   if ( m_Controls )
   {
@@ -79,21 +79,21 @@ void QmitkImageGuidedTherapyTutorialView::CreateConnections()
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::Activated()
+void QmitkIGTTutorialView::Activated()
 {
   QmitkFunctionality::Activated();
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::Deactivated()
+void QmitkIGTTutorialView::Deactivated()
 {
   QmitkFunctionality::Deactivated();
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
+void QmitkIGTTutorialView::OnStartIGT()
 {
-  //This method is called when when the Do IGT button is pressed. Any kind of navigation application will 
+  //This method is called when the Do IGT button is pressed. Any kind of navigation application will 
   //start with the connection to a tracking system and as we do image guided procedures we want to show 
   //something on the screen. In this tutorial we connect to the NDI Polaris tracking system and we will 
   //show the movement of a tool as cone in MITK.
@@ -209,7 +209,7 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::OnTimer()
+void QmitkIGTTutorialView::OnTimer()
 {
   //Here we call the Update() method from the Visualization Filter. Internally the filter checks if
   //new NavigationData is available. If we have a new NavigationData the cone position and orientation
@@ -219,7 +219,7 @@ void QmitkImageGuidedTherapyTutorialView::OnTimer()
 }
 
 
-void QmitkImageGuidedTherapyTutorialView::OnStopIGT()
+void QmitkIGTTutorialView::OnStopIGT()
 {
   //This method is called when the Stop button is pressed. Here we disconnect the pipeline.
   if (m_Timer == NULL)

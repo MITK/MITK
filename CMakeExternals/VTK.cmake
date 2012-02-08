@@ -49,12 +49,15 @@ IF(NOT DEFINED VTK_DIR)
   OPTION(MITK_USE_VTK_5_8_IN_SUPERBUILD OFF)
   IF(MITK_USE_VTK_5_8_IN_SUPERBUILD)
     SET(VTK_URL http://mitk.org/download/thirdparty/vtk-5.8.0.tar.gz)
+    SET(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
   ELSE()
     SET(VTK_URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz)
+    SET(VTK_URL_MD5 b80a76435207c5d0f74dfcab15b75181)
   ENDIF()
 
   ExternalProject_Add(${proj}
     URL ${VTK_URL}
+    URL_MD5 ${VTK_URL_MD5}
     BINARY_DIR ${proj}-build
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}

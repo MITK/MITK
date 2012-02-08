@@ -44,6 +44,7 @@ IF(MITK_USE_Boost)
     
     ExternalProject_Add(${proj}
       URL http://mitk.org/download/thirdparty/boost_1_45_0.tar.bz2
+      URL_MD5 d405c606354789d0426bc07bea617e58
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-src
       INSTALL_DIR ${proj}-install

@@ -24,6 +24,7 @@ IF(MITK_USE_DCMTK)
     ENDIF()
     ExternalProject_Add(${proj}
       URL http://mitk.org/download/thirdparty/dcmtk-3.6.0.tar.gz
+      URL_MD5 19409e039e29a330893caea98715390e
       INSTALL_DIR ${proj}-install
       PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-3.6.cmake 
       CMAKE_GENERATOR ${gen}

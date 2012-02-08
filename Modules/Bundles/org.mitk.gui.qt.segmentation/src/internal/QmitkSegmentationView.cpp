@@ -248,7 +248,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
     if (image.IsNotNull())
     {
-      if (image->GetDimension()>2)
+      if (image->GetDimension()>1)
       {
         // ask about the name and organ type of the new segmentation
         QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget

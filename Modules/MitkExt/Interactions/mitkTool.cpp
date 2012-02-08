@@ -122,7 +122,15 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
   Image::Pointer segmentation = Image::New();
  
-  segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );
+  if (original->GetDimension() == 2)
+  {
+    const unsigned int dimensions[] = { original->GetDimension(0), original->GetDimension(1), 1 };
+    segmentation->Initialize(pixelType, 3, dimensions);
+  }
+  else
+  {
+    segmentation->Initialize(pixelType, original->GetDimension(), original->GetDimensions());
+  }
 
   unsigned int byteSize = sizeof(DefaultSegmentationDataType);
   for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 

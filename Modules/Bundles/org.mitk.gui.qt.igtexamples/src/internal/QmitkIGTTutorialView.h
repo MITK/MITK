@@ -15,14 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _QMITKIMAGEGUIDEDTHERAPYTUTORIALVIEW_H_INCLUDED
-#define _QMITKIMAGEGUIDEDTHERAPYTUTORIALVIEW_H_INCLUDED
+#ifndef _QMITKIGTTUTORIALVIEW_H_INCLUDED
+#define _QMITKIGTTUTORIALVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
 
 #include <string>
 
-#include "ui_QmitkImageGuidedTherapyTutorialViewControls.h"
+#include "ui_QmitkIGTTutorialViewControls.h"
 //#include "../IgttutorialDll.h"
 
 #include "mitkTrackingDeviceSource.h"
@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 * \sa QmitkFunctionality
 * \ingroup Functionalities
 */
-class QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
+class QmitkIGTTutorialView : public QmitkFunctionality
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -51,13 +51,13 @@ class QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
-  QmitkImageGuidedTherapyTutorialView();
-  QmitkImageGuidedTherapyTutorialView(const QmitkImageGuidedTherapyTutorialView& other)
+  QmitkIGTTutorialView();
+  QmitkIGTTutorialView(const QmitkIGTTutorialView& other)
   {
     Q_UNUSED(other)
     throw std::runtime_error("Copy constructor not implemented");
   }
-  virtual ~QmitkImageGuidedTherapyTutorialView();
+  virtual ~QmitkIGTTutorialView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -91,7 +91,7 @@ protected slots:
 
 protected:
 
-  Ui::QmitkImageGuidedTherapyTutorialViewControls* m_Controls;
+  Ui::QmitkIGTTutorialViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget; ///< our display widget
 
@@ -103,4 +103,4 @@ protected:
 
 
 
-#endif // _QMITKIMAGEGUIDEDTHERAPYTUTORIALVIEW_H_INCLUDED
+#endif // _QMITKIGTTUTORIALVIEW_H_INCLUDED

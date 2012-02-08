@@ -30,6 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
 
@@ -116,6 +119,8 @@ class MitkExt_EXPORT SegTool2D : public Tool
     unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
+
+		vtkSmartPointer<vtkImageData> m_slice;
 
  
   private:

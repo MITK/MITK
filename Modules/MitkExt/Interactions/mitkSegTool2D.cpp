@@ -38,6 +38,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
 
+#include <mitkExtractSliceFilter.h>
+#include <mitkVtkImageIdxReslice.h>
+
+
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -54,10 +58,13 @@ mitk::SegTool2D::SegTool2D(const char* type)
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
   CONNECT_ACTION( 49014, OnInvertLogic );
+
+	m_slice = vtkSmartPointer<vtkImageData>::New();
 }
 
 mitk::SegTool2D::~SegTool2D()
 {
+	m_slice = NULL;
 }
 
 bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)
@@ -178,67 +185,17 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   if ( !image || !planeGeometry ) return NULL;
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  //DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
-  if ( DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
-  {
-    try
-    {
-      // now we extract the correct slice from the volume, resulting in a 2D image
-      ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
-      extractor->SetInput( image );
-      extractor->SetSliceDimension( affectedDimension );
-      extractor->SetSliceIndex( affectedSlice );
-      extractor->SetTimeStep( timeStep );
-      extractor->Update();
 
-      // here we have a single slice that can be modified
-      Image::Pointer slice = extractor->GetOutput();
-
-      //Workaround because of bug #7079
-      Point3D origin = slice->GetGeometry()->GetOrigin();
-
-      int affectedDimension(-1);
-
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-      {
-          affectedDimension = 2;
-      }
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-      {
-          affectedDimension = 0;
-      }
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-      {
-          affectedDimension = 1;
-      }
-
-      if (affectedDimension != -1)
-      {
-          origin[affectedDimension] = planeGeometry->GetOrigin()[affectedDimension];
-          slice->GetGeometry()->SetOrigin(origin);
-      }
-      //Workaround end
-
-      return slice;
-    }
-    catch(...)
-    {
-      // not working
-      return NULL;
-    }
-  }
-  else
-  {
-    ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
-    newExtractor->SetInput( image );
-    newExtractor->SetActualInputTimestep( timeStep );
-    newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
-    newExtractor->Update();
-    Image::Pointer slice = newExtractor->GetOutput();
-    return slice;
-  }
+	ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
+	extractor->SetInput( image );
+	extractor->SetTimeStep( timeStep );
+	extractor->SetWorldGeometry( planeGeometry );
+	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+	extractor->Update();
+	Image::Pointer slice = extractor->GetOutput();
+	
+	m_slice = extractor->GetVtkOutput();
+	return slice;
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
@@ -270,29 +227,27 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+	
 
-  if (affectedDimension != -1) {
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-  }
-  else {
-    OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( false );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-  }
+	vtkSmartPointer<mitkVtkImageIdxReslice> reslice = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<vtkImageData> sliceInVtk = slice->GetVtkImageData();
+	//sliceInVtk->Sete(m_slice);
+	reslice->SetInputSlice(sliceInVtk);
+	reslice->SetOverwriteMode(true);
+	reslice->Modified();
+
+	mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslice);
+	extractor->SetInput(image);
+	extractor->SetWorldGeometry(planeGeometry);
+	extractor->SetVtkOutputRequest(true);
+	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( positionEvent->GetSender()->GetTimeStep( image ) ) );
+
+	extractor->Modified();
+	
+	extractor->Update();
+
+	image->Modified();
+  
   if ( m_3DInterpolationEnabled )
   {
     slice->DisconnectPipeline();

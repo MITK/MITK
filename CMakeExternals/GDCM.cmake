@@ -24,7 +24,7 @@ SET(GDCM_DEPENDS ${proj})
 IF(NOT DEFINED GDCM_DIR)
 
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/gdcm-2.0.18.tar.gz 
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.0.18.tar.gz 
      URL_MD5 3c431bac0fe4da166f2b71c78f0d37a6
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""

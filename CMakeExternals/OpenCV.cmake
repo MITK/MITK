@@ -22,7 +22,7 @@ IF(MITK_USE_OpenCV)
           )
     ENDIF()
 
-    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.3.0.tar.bz2)
+    SET(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.3.0.tar.bz2)
     SET(opencv_url_md5 4e353dfb04b53bea37407f397aabf069)
 
     ExternalProject_Add(${proj}

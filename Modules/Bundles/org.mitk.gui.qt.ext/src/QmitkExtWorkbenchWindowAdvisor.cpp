@@ -993,13 +993,11 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
  if (showVersionInfo)
  {
   // add version informatioin
-  QString mitkRevision(MITK_REVISION);
-  mitkRevision = mitkRevision.left(6) + " (" MITK_REVISION_NAME ")";
   QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
    .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
    .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
    .arg(QT_VERSION_STR)
-   .arg(mitkRevision);
+   .arg(MITK_VERSION_STRING);
 
   title += versions.toStdString();
  }

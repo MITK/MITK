@@ -295,7 +295,7 @@
   <customwidget>
    <class>ctkDICOMQueryWidget</class>
    <extends>QWidget</extends>
-   <header>ctkdicomquerywidget.h</header>
+   <header>ctkDICOMQueryWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

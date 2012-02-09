@@ -28,6 +28,32 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
+# Warn if source or build path is too long
+#-----------------------------------------------------------------------------
+
+if(WIN32)
+  set(_src_dir_length_max 50)
+  set(_bin_dir_length_max 50)
+  if(MITK_USE_SUPERBUILD)
+    set(_src_dir_length_max 43) # _src_dir_length_max - strlen(ITK-src)
+    set(_bin_dir_length_max 40) # _bin_dir_length_max - strlen(MITK-build)
+  endif()
+  
+  string(LENGTH "${MITK_SOURCE_DIR}" _src_n)
+  string(LENGTH "${MITK_BINARY_DIR}" _bin_n)
+  
+  # The warnings should be converted to errors
+  if(_src_n GREATER _src_dir_length_max)
+    message(WARNING "MITK source code directory path length is too long (${_src_n} > ${_src_dir_length_max})."
+                    "Please move the MITK source code directory to a directory with a shorter path." )
+  endif()
+  if(_bin_n GREATER _bin_dir_length_max)
+    message(WARNING "MITK build directory path length is too long (${_bin_n} > ${_bin_dir_length_max})."
+                    "Please move the MITK build directory to a directory with a shorter path." )
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
 #-----------------------------------------------------------------------------
 

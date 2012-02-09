@@ -38,7 +38,7 @@ foreach(var ${expected_variables})
 endforeach()
 
 # Check if "mbits" is reachable
-file(DOWNLOAD "http://mbits" "${CTEST_BINARY_DIR}/mbits.html" TIMEOUT 2 STATUS _status)
+file(DOWNLOAD "http://mbits" "${CTEST_SCRIPT_DIRECTORY}/mbits.html" TIMEOUT 2 STATUS _status)
 list(GET _status 0 _status_code)
 if (_status_code EQUAL 6) # couldn't resovle host name
   set(MBITS_AVAILABLE 1)

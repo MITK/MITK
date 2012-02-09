@@ -18,6 +18,8 @@ mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderT
 
 mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest ${MITK_DATA_DIR}/PointSetReaderTestData.mps)
 
+mitkAddCustomModuleTest(mitkImageTest_4DImageData mitkImageTest ${MITK_DATA_DIR}/US4DCyl.nrrd)
+
 IF(MITK_ENABLE_GUI_TESTING)
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
@@ -33,8 +35,6 @@ ENDIF()
 
 ADD_TEST(mitkImageTest_brainImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 SET_PROPERTY(TEST mitkImageTest_brainImage PROPERTY LABELS MITK-Core)
-# ADD_TEST(mitkImageTest_4DImageData ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/US4DCyl.pic.gz)
-# SET_PROPERTY(TEST mitkImageTest_4DImageData PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 SET_PROPERTY(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)

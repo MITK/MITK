@@ -7,7 +7,6 @@
 #-----------------------------------------------------------------------------
 # The following variable are expected to be define in the top-level script:
 set(expected_variables
-  CDASH_ADMIN_URL_PREFIX
   CTEST_NOTES_FILES
   CTEST_SITE
   CTEST_DASHBOARD_ROOT
@@ -37,6 +36,27 @@ foreach(var ${expected_variables})
     message(FATAL_ERROR "Variable ${var} should be defined in top-level script !")
   endif()
 endforeach()
+
+# Check if "mbits" is reachable
+file(DOWNLOAD "http://mbits" "${CTEST_BINARY_DIR}/mbits.html" TIMEOUT 2 STATUS _status)
+list(GET _status 0 _status_code)
+if (_status_code EQUAL 6) # couldn't resovle host name
+  set(MBITS_AVAILABLE 1)
+else
+  set(MBITS_AVAILABLE 0)
+endif()
+
+#
+# Site specific options
+#
+if(NOT CDASH_ADMIN_URL_PREFIX AND MBITS_AVAILABLE)
+  set(CDASH_ADMIN_URL_PREFIX "http://mbits")
+endif()
+
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL AND MBITS_AVAILABLE)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL "http://mbits/dl-cache")
+endif()
+
 
 if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(GIT_BRANCH "")
@@ -187,7 +207,7 @@ MACRO(run_ctest)
   
   # Check if a forced run was requested
   set(cdash_remove_rerun_url )
-  if(NOT MITK_NO_CDASH_WEBADMIN)
+  if(CDASH_ADMIN_URL_PREFIX)
     set(cdash_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/${CTEST_BUILD_NAME}")
     set(cdash_remove_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/rerun.php?name=${CTEST_BUILD_NAME}&remove=1")
     file(DOWNLOAD
@@ -225,6 +245,7 @@ MITK_CTEST_SCRIPT_MODE:STRING=${SCRIPT_MODE}
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
 QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 WITH_COVERAGE:BOOL=${WITH_COVERAGE}
+MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}
 ${INITIAL_CMAKECACHE_OPTIONS}
 ")
   endif()
@@ -232,7 +253,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   if(res GREATER 0 OR force_build)
   
     # Clear the forced rerun request
-    if(NOT MITK_NO_CDASH_WEBADMIN AND cdash_remove_rerun_url)
+    if(CDASH_ADMIN_URL_PREFIX AND cdash_remove_rerun_url)
       file(DOWNLOAD "${cdash_remove_rerun_url}" "${CTEST_BINARY_DIRECTORY}/tmp.txt")
       file(REMOVE "${CTEST_BINARY_DIRECTORY}/tmp.txt")
     endif()
@@ -429,7 +450,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     ctest_submit(PARTS Notes)
     
     # Send status to the "CDash Web Admin"
-    if(NOT MITK_NO_CDASH_WEBADMIN)
+    if(CDASH_ADMIN_URL_PREFIX)
       set(cdash_admin_url "${CDASH_ADMIN_URL_PREFIX}/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
       string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
       file(DOWNLOAD

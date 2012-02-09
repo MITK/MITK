@@ -39,7 +39,8 @@ IF(NOT DEFINED ITK_DIR)
   ENDIF()
 
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.1.tar.gz
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-3.20.1.tar.gz
+     URL_MD5 90342ffa78bd88ae48b3f62866fbf050
      SOURCE_DIR ${proj}-src
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""

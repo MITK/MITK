@@ -110,6 +110,10 @@ SET(ep_source_dir ${ep_base}/Source)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
 
+IF(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+  SET(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+ENDIF()
+
 # Compute -G arg for configuring external projects with the same CMake generator:
 IF(CMAKE_EXTRA_GENERATOR)
   SET(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")

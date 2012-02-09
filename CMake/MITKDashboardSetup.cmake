@@ -51,13 +51,6 @@ if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
 endif()
 
 #
-# Site specific options
-#
-if(NOT CDASH_ADMIN_URL_PREFIX)
-  set(CDASH_ADMIN_URL_PREFIX "http://mbits")
-endif()
-
-#
 # Display build info
 #
 message("Site name: ${CTEST_SITE}")
@@ -106,7 +99,7 @@ if(MITK_INITIAL_CACHE)
   set(mitk_cache_file "${CTEST_SCRIPT_DIRECTORY}/mitk_initial_cache.txt")
   file(WRITE "${mitk_cache_file}" "${MITK_INITIAL_CACHE}")
   set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
-MITK_INITIAL_CACHE_FILE::INTERNAL=${mitk_cache_file}
+MITK_INITIAL_CACHE_FILE:INTERNAL=${mitk_cache_file}
 ")
 endif()
 

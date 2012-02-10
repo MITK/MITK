@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkRegionGrowingView.h"
 #include "QmitkStdMultiWidget.h"
+#include "QmitkAdaptiveRegionGrowingView.h"
 
 const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.views.regiongrowing";
 

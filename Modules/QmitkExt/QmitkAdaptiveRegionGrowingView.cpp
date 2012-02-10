@@ -17,36 +17,22 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "QmitkAdaptiveRegionGrowingView.h"
 
-#include <qaction.h>
-#include "QmitkCommonFunctionality.h"
 #include "QmitkStdMultiWidget.h"
 
-#include <qpushbutton.h>
 #include <qmessagebox.h>
-#include <qapplication.h>
-#include <qcursor.h>
-#include <qslider.h>
-#include <qlabel.h>
 
 #include "mitkNodePredicateDataType.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkGlobalInteraction.h"
-#include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
-#include "mitkProgressBar.h"
-#include "mitkStatusBar.h"
 #include "mitkProperties.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkGPUVolumeMapper3D.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkImageTimeSelector.h"
 
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkBinaryThresholdImageFilter.h>
-#include "mitkTool.h"
-#include "mitkPixelType.h"
 
 QmitkAdaptiveRegionGrowingView::QmitkAdaptiveRegionGrowingView(QWidget * parent) :
 QWidget(parent), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0)
@@ -206,7 +192,6 @@ void QmitkAdaptiveRegionGrowingView::OnPointAdded()
       }
 
       m_SeedPointValueMean = 0;
-      //image->GetTimeSteps();
 
       mitk::Index3D currentIndex, runningIndex;
       mitk::ScalarType pixelValues[125];
@@ -279,7 +264,6 @@ void QmitkAdaptiveRegionGrowingView::OnPointAdded()
         m_LOWERTHRESHOLD = m_SeedpointValue - windowSize;
       }
 
-      MITK_INFO<<"Lower/Upper/mean: "<< m_LOWERTHRESHOLD <<"/"<<m_UPPERTHRESHOLD << "/" <<m_SeedPointValueMean;
       this->m_Controls.m_LowerThresholdSpinBox->setValue(m_LOWERTHRESHOLD);
       this->m_Controls.m_UpperThresholdSpinBox->setValue(m_UPPERTHRESHOLD);
   }
@@ -338,7 +322,6 @@ void QmitkAdaptiveRegionGrowingView::RunSegmentation()
           timeSelector->SetInput(orgImage);
           timeSelector->SetTimeNr( timeStep );
           timeSelector->UpdateLargestPossibleRegion();
-          MITK_INFO<<"Time= "<<timeStep;
           mitk::Image* timedImage = timeSelector->GetOutput();
           AccessByItk_2( timedImage , StartRegionGrowing, timedImage->GetGeometry(), seedPoint);
       }
@@ -376,10 +359,7 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
   IndexType seedIndex;
   imageGeometry->WorldToIndex( seedPoint, seedIndex);// convert world coordinates to image indices
 
-  //Determine the direction of the regiongrowing. For dark structures e.g. the lung the regiongrowing
-  //is performed starting at the upper value going to the lower one
 
-  regionGrower->SetGrowingDirectionIsUpwards( m_CurrentRGDirectionIsUpwards );
 
   if (m_SeedpointValue>m_UPPERTHRESHOLD || m_SeedpointValue<m_LOWERTHRESHOLD)
   {
@@ -389,11 +369,15 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
     return;
   }
 
+  //Setting the direction of the regiongrowing. For dark structures e.g. the lung the regiongrowing
+  //is performed starting at the upper value going to the lower one
+  regionGrower->SetGrowingDirectionIsUpwards( m_CurrentRGDirectionIsUpwards );
   regionGrower->SetInput( itkImage );
   regionGrower->AddSeed( seedIndex );
-  MITK_INFO <<setprecision(20)<< "LOWER/UPPER: "<<m_LOWERTHRESHOLD<<"/"<<m_UPPERTHRESHOLD;
-  regionGrower->SetLower( /*m_LOWERTHRESHOLD*/m_Controls.m_LowerThresholdSpinBox->value() );
-  regionGrower->SetUpper( /*m_UPPERTHRESHOLD*/m_Controls.m_UpperThresholdSpinBox->value());
+  //In some cases we have to subtract 1 for the lower threshold and add 1 to the upper.
+  //Otherwise no region growing is done. Maybe a bug in the ConnectiveAdaptiveThresholdFilter
+  regionGrower->SetLower( m_LOWERTHRESHOLD-1 );
+  regionGrower->SetUpper( m_UPPERTHRESHOLD+1);
 
   try
   {
@@ -458,6 +442,8 @@ void QmitkAdaptiveRegionGrowingView::StartRegionGrowing(itk::Image<TPixel, VImag
     this->EnableVolumeRendering(true);
 
   m_UpdateSuggestedThreshold = true;// reset first stored threshold value
+  //Setting progress to finished
+  mitk::ProgressBar::GetInstance()->Progress(357);
 }
 
 void QmitkAdaptiveRegionGrowingView::InitializeLevelWindow()
@@ -495,8 +481,6 @@ void QmitkAdaptiveRegionGrowingView::InitializeLevelWindow()
     this->m_Controls.m_Slider->setValue(this->m_SeedpointValue - this->m_DetectedLeakagePoint +1);
     *level = (this->m_SeedpointValue + this->m_DetectedLeakagePoint +1) - m_LOWERTHRESHOLD + 0.5;
   }
-
-  MITK_INFO<<"InitLW: "<<*level;
 
   tempLevelWindow.SetLevelWindow(*level, *window);
   newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
@@ -549,7 +533,6 @@ void QmitkAdaptiveRegionGrowingView::ChangeLevelWindow(int newValue)
       tempLevelWindow.SetLevelWindow(level, *window);
     }
 
-    MITK_INFO<<"Level/Window: "<<level<<"/"<<*window;
     newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
 
     if (m_UseVolumeRendering)
@@ -635,7 +618,6 @@ void QmitkAdaptiveRegionGrowingView::ITKThresholding(itk::Image<TPixel, VImageDi
     newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); //get the levelWindow associated with the preview
 
     filter->SetUpperThreshold(tempLevelWindow.GetRangeMax());
-//    filter->SetUpperThreshold(tempLevelWindow.GetLevel()+0.5);
     if (m_CurrentRGDirectionIsUpwards)
     {
         filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
@@ -645,7 +627,6 @@ void QmitkAdaptiveRegionGrowingView::ITKThresholding(itk::Image<TPixel, VImageDi
         filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
     }
 
-    MITK_INFO<<"Accept: "<<tempLevelWindow.GetLevel();
     filter->Update();
     mitk::Image::Pointer new_image = mitk::Image::New();
     mitk::CastToMitkImage(filter->GetOutput(), new_image);
@@ -690,7 +671,6 @@ void QmitkAdaptiveRegionGrowingView::EnableVolumeRendering(bool enable)
 
   if (enable)
   {
-    //node->SetMapper(mitk::BaseRenderer::Standard3D, mitk::GPUVolumeMapper3D::New());
     node->SetBoolProperty("volumerendering", enable);
     node->SetBoolProperty("volumerendering.uselod", true);
   }
@@ -778,12 +758,6 @@ void QmitkAdaptiveRegionGrowingView::SetUpperThresholdValue( double upperThresho
 {
   m_UPPERTHRESHOLD = upperThreshold;
 }
-
-//void QmitkAdaptiveRegionGrowingView::SetRegionGrowingDirectionUpwards(bool status)
-//{
-//    this->m_CurrentRGDirectionIsUpwards = status;
-//    //MITK_INFO<<"DirectionUp: "<<status;
-//}
 
 void QmitkAdaptiveRegionGrowingView::Deactivated()
 {

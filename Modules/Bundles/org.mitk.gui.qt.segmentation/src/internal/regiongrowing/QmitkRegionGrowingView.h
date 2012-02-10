@@ -22,16 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkFunctionality.h>
 
-#include "mitkPointSet.h"
-
-#include <itkImage.h>
-
 #include "ui_QmitkRegionGrowingViewControls.h"
-
-#include "mitkPointSetInteractor.h"
-#include "mitkPointSet.h"
-#include "mitkInteractionConst.h"
-
 
 
 /*!
@@ -67,13 +58,6 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     virtual void Deactivated();
 
   protected slots:
-  
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
-
-    void OnSeedPointAdded();
-
-    void ActivatePointSetInteractor(bool);
 
   protected:
 
@@ -88,28 +72,9 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-    void NodeRemoved(const mitk::DataNode *node);
-   // void OnNodeModified();
-
-    void OnPointAdded();
-    void OnPointMoved();
-
-    /// \brief This is the actual seed point data object
-    mitk::PointSet::Pointer m_PointSet;
-
     Ui::QmitkRegionGrowingViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
-
-    mitk::ScalarType m_InitialThreshold;
-
-    mitk::PointSetInteractor::Pointer m_PointSetInteractor;
-    mitk::DataNode::Pointer m_PointSetNode;
-
-    long m_NodeDeleteObserverTag;
-    long m_NodeModifyObserverTag;
-    long m_PointSetAddObserverTag;
-    long m_PointSetMovedObserverTag;
 };
 
 

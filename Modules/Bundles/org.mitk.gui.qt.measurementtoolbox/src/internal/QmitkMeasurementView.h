@@ -156,6 +156,8 @@ class QmitkMeasurementView : public QmitkFunctionality
     void ActionDrawArrowTriggered( bool checked = false );
     void ActionDrawTextTriggered( bool checked = false );
     void CopyToClipboard( bool checked = false );
+
+    void ReproducePotentialBug(bool);
     // fields
   // widgets
 protected:

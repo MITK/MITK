@@ -30,8 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::LevelWindowManager::LevelWindowManager()
-: m_DataStorage(NULL), m_LevelWindowProperty(NULL), m_AutoTopMost(true),
-  m_IsObserverTagSet(false), m_CurrentImage(NULL),m_IsPropertyModifiedTagSet(false)
+: m_DataStorage(NULL)
+, m_LevelWindowProperty(NULL)
+, m_AutoTopMost(true)
+, m_IsObserverTagSet(false)
+, m_CurrentImage(NULL)
+, m_IsPropertyModifiedTagSet(false)
 {
 }
 
@@ -40,19 +44,30 @@ mitk::LevelWindowManager::~LevelWindowManager()
 {
   if (m_DataStorage.IsNotNull())
   {
-    m_DataStorage->AddNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
+    m_DataStorage->AddNodeEvent.RemoveListener(
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
     m_DataStorage = NULL;
   }
+
   if (m_IsPropertyModifiedTagSet && m_LevelWindowProperty.IsNotNull())
   {
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;
   }
-  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); iter++ ) {
+
+  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode.begin(); 
+       iter != m_PropObserverToNode.end(); 
+       ++iter ) 
+  {
     (*iter).second->RemoveObserver((*iter).first);
   }
-  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode2.begin(); iter != m_PropObserverToNode2.end(); iter++ ) {
+
+  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode2.begin(); 
+       iter != m_PropObserverToNode2.end(); 
+       ++iter ) 
+  {
     (*iter).second->RemoveObserver((*iter).first);
   }
 }
@@ -60,19 +75,24 @@ mitk::LevelWindowManager::~LevelWindowManager()
 
 void mitk::LevelWindowManager::SetDataStorage( mitk::DataStorage* ds )
 {
-  if (ds == NULL)
-    return;
+  if (ds == NULL) return;
 
   /* remove listeners of old DataStorage */
   if (m_DataStorage.IsNotNull())
   {
-    m_DataStorage->AddNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
+    m_DataStorage->AddNodeEvent.RemoveListener(
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
   }
+
   /* register listener for new DataStorage */
   m_DataStorage = ds;  // register 
-  m_DataStorage->AddNodeEvent.AddListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
-  m_DataStorage->RemoveNodeEvent.AddListener(MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
+  m_DataStorage->AddNodeEvent.AddListener(
+      MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+  m_DataStorage->RemoveNodeEvent.AddListener(
+      MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
+
   this->DataStorageChanged(); // update us with new DataStorage
 }
 
@@ -94,11 +114,13 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;
   }
+
   /* search topmost image */
   if (m_DataStorage.IsNull())
   {
     itkExceptionMacro("DataStorage not set");
   }
+
   int maxLayer = itk::NumericTraits<int>::min();
   m_LevelWindowProperty = NULL;
 
@@ -120,9 +142,11 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     node->GetIntProperty("layer", layer);
     if ( layer < maxLayer )
       continue;
+
     mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
     if (levelWindowProperty.IsNull())
       continue;
+
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
     topLevelNode = node;
@@ -145,7 +169,6 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
 }
 
 // sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-// sets m_AutoTopMost to false
 void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty)
 {
   if (levelWindowProperty.IsNull())
@@ -156,13 +179,13 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;
   }
+
   m_LevelWindowProperty = levelWindowProperty;
 
   itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();  // register listener for new property
   command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
   m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
   m_IsPropertyModifiedTagSet = true;
-  m_AutoTopMost = false;
 
   /* search image than belongs to the property */
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
@@ -171,6 +194,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   {
     itkExceptionMacro("No Image in DataStorage that belongs to LevelWindow property " << m_LevelWindowProperty);
   }
+
   m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());
   n->SetBoolProperty( "imageForLevelWindow", true );
   this->Modified();
@@ -188,7 +212,9 @@ mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevelWindowPrope
 const mitk::LevelWindow& mitk::LevelWindowManager::GetLevelWindow()
 {
   if (m_LevelWindowProperty.IsNotNull())
+  {
     return m_LevelWindowProperty->GetLevelWindow();
+  }
   else
   {
     itkExceptionMacro("No LevelWindow available!");
@@ -212,12 +238,20 @@ void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataNode* )
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
 {
   /* remove old observers */
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); iter++ ) 
+  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin(); 
+       iter != m_PropObserverToNode.end(); 
+       ++iter) 
+  {
     (*iter).second->RemoveObserver((*iter).first);
+  }
   m_PropObserverToNode.clear();
 
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode2.begin(); iter != m_PropObserverToNode2.end(); iter++ ) 
+  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode2.begin(); 
+       iter != m_PropObserverToNode2.end(); 
+       ++iter) 
+  {
     (*iter).second->RemoveObserver((*iter).first);
+  }
   m_PropObserverToNode2.clear();
 
   if (m_DataStorage.IsNull())
@@ -228,10 +262,13 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
   /* listen to changes  in visible property of all images */
 
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); 
+       it != all->End(); 
+       ++it)
   {
     if (it->Value().IsNull())
       continue;
+
     /* register listener for changes in visible property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::Update);
@@ -240,7 +277,9 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
 
   /* listen to changes  in layer property of all images */
 
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); 
+       it != all->End(); 
+       ++it)
   {
     if (it->Value().IsNull())
       continue;
@@ -252,7 +291,9 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
 
   /* search image than belongs to the property */
   if (m_LevelWindowProperty.IsNull())
+  {
     SetAutoTopMostImage(true, removedNode);
+  }
   else
   {
     mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
@@ -284,7 +325,9 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     return;
   }
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); 
+       it != all->End(); 
+       ++it)
   {
     mitk::DataNode::Pointer node = it->Value();
     if (node.IsNull())
@@ -298,6 +341,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
     if (levelWindowProperty.IsNull())
       continue;
+
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
     node->SetBoolProperty( "imageForLevelWindow", true );

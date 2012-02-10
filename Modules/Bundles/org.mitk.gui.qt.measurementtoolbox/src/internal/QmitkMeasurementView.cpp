@@ -185,6 +185,13 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
 
+  currentAction = m_DrawActionsToolBar->addAction(QIcon(
+    ":/Qmitk/Images_48.png"), "Reproduce potential bug");
+  m_DrawActionsToolBar->addAction(currentAction);
+  QObject::connect( currentAction, SIGNAL( triggered(bool) )
+    , this, SLOT( ReproducePotentialBug(bool) ) );
+
+
   QLabel* selectedImageLabel = new QLabel("Selected Image: ");
   m_SelectedImage = new QLabel;
   m_SelectedImage->setStyleSheet("font-weight: bold;");
@@ -991,3 +998,63 @@ void QmitkMeasurementView::OnRenderWindowDelete(QObject * obj)
   if(obj == m_LastRenderWindow)
     m_LastRenderWindow = 0;
 }
+    
+void QmitkMeasurement::ReproducePotentialBug(bool)
+{
+  std::vector<mitk::DataNode*> nodes = m_SelectedPlanarFigures->GetNodes();
+  QString output;
+
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it
+    != nodes.end(); ++it)
+  {
+    mitk::DataNode* node = *it;
+    if (!node) continue;
+
+    mitk::PlanarFigure* pf = dynamic_cast<mitk::PlanarFigure*>( node->GetData() );
+    if (!pf) continue;
+
+    output.append("huhu");
+    output.append( QString::fromStdString( node->GetName() ) );
+
+    /**
+      Bug reproduction:
+
+      1. get geometry of planar figure from object
+
+      2. use this geometry to initialize rendering manager via InitializeViews
+
+      3. see what is produced. the DisplayGeometry of the render window will NOT contain the planar figure nicely.
+
+    */
+
+    mitk::PlaneGeometry::Pointer planarFigureGeometry = dynamic_cast<mitk::PlaneGeometry*>( pf->GetGeometry() );
+    if (planarFigureGeometry.IsNull()) continue; // not expected
+
+
+    mitk::PlaneGeometry::Pointer geometryForRendering = dynamic_cast<mitk::PlaneGeometry*>( planarFigureGeometry->Clone().GetPointer() );
+
+    bool applyWorkaround(true);
+    geometryForRendering->SetImageGeometry( applyWorkaround );
+
+
+    std::cout << "==== with" << (applyWorkaround?"":"OUT") << " workaround ====================================" << std::endl;
+    std::cout << "--- PlanarFigure geometry --------------" << std::endl;
+    planarFigureGeometry->Print(std::cout);
+    std::cout << "----------------------------------------" << std::endl;
+    
+    mitk::RenderingManager::GetInstance()->InitializeViews( geometryForRendering, mitk::RenderingManager::REQUEST_UPDATE_ALL, false );
+
+    std::cout << "--- Renderer->GetDisplayGeometry() ------------" << std::endl;
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetDisplayGeometry()->Print(std::cout);
+    std::cout << "--- Renderer->GetCurrentWorldGeometry2D() -----" << std::endl;
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D()->Print(std::cout);
+    std::cout << "--- Renderer->GetWorldGeometry() --------------" << std::endl;
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetWorldGeometry()->Print(std::cout);
+  }
+  
+  m_SelectedPlanarFiguresText->setText(output);
+
+
+ 
+}
+

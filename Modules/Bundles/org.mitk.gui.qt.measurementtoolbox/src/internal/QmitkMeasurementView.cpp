@@ -999,7 +999,7 @@ void QmitkMeasurementView::OnRenderWindowDelete(QObject * obj)
     m_LastRenderWindow = 0;
 }
     
-void QmitkMeasurement::ReproducePotentialBug(bool)
+void QmitkMeasurementView::ReproducePotentialBug(bool)
 {
   std::vector<mitk::DataNode*> nodes = m_SelectedPlanarFigures->GetNodes();
   QString output;

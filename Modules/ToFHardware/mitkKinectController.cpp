@@ -38,10 +38,18 @@ namespace mitk
     if (!m_ConnectionCheck)
     {
       // Initialize the OpenNI status
-      m_ConnectionCheck = !ErrorText(m_Context.InitFromXmlFile("C:/Temp/SamplesConfig.xml"));
+      MITK_INFO<<"Before initialization"<<m_ConnectionCheck;
+#ifdef WIN32
+      m_ConnectionCheck = ErrorText(m_Context.InitFromXmlFile("C:/Temp/SamplesConfig.xml"));
+#else
+      m_ConnectionCheck = ErrorText(m_Context.InitFromXmlFile("/usr/local/alex/tmp/SamplesConfig.xml"));
+#endif
+      MITK_INFO<<"After initialization"<<m_ConnectionCheck;
       //m_ConnectionCheck = !ErrorText(m_Context.Init());
       // Create a depth map generator and set its resolution
-      m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_DEPTH, m_DepthGenerator));
+      MITK_INFO<<"Before depth initialization";
+      m_ConnectionCheck = ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_DEPTH, m_DepthGenerator));
+      MITK_INFO<<"After depth initialization"<<m_ConnectionCheck;
       //m_ConnectionCheck = !ErrorText(m_DepthGenerator.Create(m_Context));
       //XnMapOutputMode DepthMode;
       //m_DepthGenerator.GetMapOutputMode(DepthMode);
@@ -63,7 +71,9 @@ namespace mitk
       //}
 
       // Create an image generator and set its resolution
-      m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_IMAGE, m_ImageGenerator));
+      MITK_INFO<<"Before image initialization";
+      m_ConnectionCheck = ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_IMAGE, m_ImageGenerator));
+      MITK_INFO<<"After image initialization"<<m_ConnectionCheck;
       //XnMapOutputMode ImageMode;
       //m_ImageGenerator.GetMapOutputMode(ImageMode);
       //ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
@@ -86,7 +96,7 @@ namespace mitk
       // Camera registration
       if ( m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
       {
-        m_ConnectionCheck = !ErrorText(m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(m_ImageGenerator));
+        m_ConnectionCheck = ErrorText(m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(m_ImageGenerator));
       }
       else
       {
@@ -94,13 +104,13 @@ namespace mitk
       }
 
       // Mirror data
-      m_ConnectionCheck = !ErrorText(m_Context.SetGlobalMirror(!m_Context.GetGlobalMirror()));
+      m_ConnectionCheck = ErrorText(m_Context.SetGlobalMirror(!m_Context.GetGlobalMirror()));
 
       // Start data generation
-      m_ConnectionCheck = !ErrorText(m_Context.StartGeneratingAll());
+      m_ConnectionCheck = ErrorText(m_Context.StartGeneratingAll());
 
-      // Update the connected flag
-      m_ConnectionCheck = true;
+//      // Update the connected flag
+//      m_ConnectionCheck = true;
     }
     MITK_INFO<<"Controller connect?"<<m_ConnectionCheck;
     return m_ConnectionCheck;

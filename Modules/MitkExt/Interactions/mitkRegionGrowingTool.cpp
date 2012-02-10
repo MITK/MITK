@@ -292,18 +292,14 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
       {
         m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 20% of the visible gray values
-        m_InitialUpperThreshold = currentVisibleWindow / 10.0;
-
-        m_VisibleWindow = currentVisibleWindow;
-      }
-      
-      m_LowerThreshold = m_InitialLowerThreshold;
-      m_UpperThreshold = m_InitialUpperThreshold;
-
-      DisplayGeometry* displayGeometry = positionEvent->GetSender()->GetDisplayGeometry();
-      if (displayGeometry)
+      double pixelType = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData())->GetPixelValueByWorldCoordinate(positionEvent->GetWorldPosition());
+      MITK_INFO<<"Pixeltype: "<< pixelType;
+      //if (!initializedAlready)
+      if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
       {
-        m_MouseDistanceScaleFactor = m_VisibleWindow / ( 3.0 * displayGeometry->GetDisplayHeight() );
+          MITK_INFO<<"Setting threshold....";
+        m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 10% of the visible gray values
+
       }
 
       // 3.2.3. Actually perform region growing
@@ -319,6 +315,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
   }
 
   return true;
+}
 }
 
 /**
@@ -343,8 +340,6 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         m_LowerThreshold = m_InitialLowerThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
         
         m_UpperThreshold = m_InitialUpperThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
-
-        //MITK_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << "MouseScaleFactor: "<<m_MouseDistanceScaleFactor << std::endl;
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();

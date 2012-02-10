@@ -22,12 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkFunctionality.h>
 
-#include "mitkPointSet.h"
-
-#include <itkImage.h>
-
 #include "ui_QmitkRegionGrowingViewControls.h"
-
 
 
 /*!
@@ -63,9 +58,6 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     virtual void Deactivated();
 
   protected slots:
-  
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
 
   protected:
 
@@ -79,9 +71,6 @@ class QmitkRegionGrowingView : public QmitkFunctionality
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
-
-    /// \brief This is the actual seed point data object
-    mitk::PointSet::Pointer m_PointSet;
 
     Ui::QmitkRegionGrowingViewControls* m_Controls;
 

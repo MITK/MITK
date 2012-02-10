@@ -8,6 +8,7 @@
 #include "QmitkAutocropAction.h"
 #include "QmitkSegmentationPreferencePage.h"
 #include "QmitkDeformableClippingPlaneView.h"
+#include "src/internal/regiongrowing/QmitkRegionGrowingView.h"
 
 using namespace mitk;
 
@@ -21,6 +22,7 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDeformableClippingPlaneView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkRegionGrowingView, context);
 }
 
 void PluginActivator::stop(ctkPluginContext *)

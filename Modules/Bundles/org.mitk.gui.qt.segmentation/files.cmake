@@ -12,12 +12,14 @@ SET(INTERNAL_CPP_FILES
   QmitkAutocropAction.cpp
   QmitkBooleanOperationsView.cpp
   QmitkDeformableClippingPlaneView.cpp
+  regiongrowing/QmitkRegionGrowingView.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkSegmentationControls.ui
   src/internal/QmitkBooleanOperationsView.ui
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
+  src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
 )
 
 SET(MOC_H_FILES
@@ -31,18 +33,21 @@ SET(MOC_H_FILES
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkBooleanOperationsView.h
   src/internal/QmitkDeformableClippingPlaneView.h
+  src/internal/regiongrowing/QmitkRegionGrowingView.h
 )
 
 SET(CACHED_RESOURCE_FILES
   resources/segmentation.png
   resources/boolean.png
   resources/deformablePlane.png
+  resources/regiongrowing.xpm
   plugin.xml
 )
 
 SET(QRC_FILES
   resources/segmentation.qrc
   resources/boolean.qrc
+  resources/regiongrowing.qrc
 )
 
 

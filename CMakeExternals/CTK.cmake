@@ -15,7 +15,7 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 34a638b)
+    SET(revision_tag 5ce6a4ed)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()
@@ -33,7 +33,7 @@ IF(MITK_USE_CTK)
     ENDFOREACH()
   
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY http://github.com/commontk/CTK.git
+      GIT_REPOSITORY http://github.com/Miluba154/CTK.git
       GIT_TAG ${revision_tag}
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build

@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITK_AdaptiveRegionGrowingView_H
 #define QMITK_AdaptiveRegionGrowingView_H
 
-#include "QmitkExtExports.h"
 
 #include "mitkDataStorage.h"
 #include "itkImage.h"
@@ -27,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "qwidget.h"
 #include "ui_QmitkAdaptiveRegionGrowingViewControls.h"
+
+#include "QmitkExtExports.h"
 
 class QmitkStdMultiWidget;
 class DataNode;
@@ -42,7 +43,7 @@ class QmitkAdaptiveRegionGrowingViewControls;
 *
 */
 
-class QmitkExt_EXPORTS QmitkAdaptiveRegionGrowingView : public QWidget
+class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingView : public QWidget
 {
 
   Q_OBJECT

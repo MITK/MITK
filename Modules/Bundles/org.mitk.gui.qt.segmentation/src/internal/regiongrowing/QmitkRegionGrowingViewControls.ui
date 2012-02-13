@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkAdaptiveRegionGrowingView" name="m_AdaptiveRGWidget" native="true"/>
+    <widget class="QmitkAdaptiveRegionGrowingWidget" name="m_AdaptiveRGWidget" native="true"/>
    </item>
    <item>
     <spacer name="spacer">

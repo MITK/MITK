@@ -25,39 +25,38 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSet.h"
 
 #include "qwidget.h"
-#include "ui_QmitkAdaptiveRegionGrowingViewControls.h"
+#include "ui_QmitkAdaptiveRegionGrowingWidgetControls.h"
 
 #include "QmitkExtExports.h"
 
 class QmitkStdMultiWidget;
 class DataNode;
-class QmitkAdaptiveRegionGrowingViewControls;
+class QmitkAdaptiveRegionGrowingWidgetControls;
 
 
 /*!
 *
-* \brief QmitkAdaptiveRegionGrowingView
+* \brief QmitkAdaptiveRegionGrowingWidget
 *
-* Adaptive Region Growing View class of the segmentation part of the navi-Broncho-Suite.
-* User can choose between automatic or manual tracheobronchial tree and blood vessel segmentation
+* Adaptive Region Growing View class of the segmentation.
 *
 */
 
-class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingView : public QWidget
+class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingWidget : public QWidget
 {
 
   Q_OBJECT
 
 public:
-  typedef QmitkAdaptiveRegionGrowingView   Self;
+  typedef QmitkAdaptiveRegionGrowingWidget   Self;
 
   /**
   * @brief Constructor.
   **/
-  QmitkAdaptiveRegionGrowingView(QWidget *parent=0);
+  QmitkAdaptiveRegionGrowingWidget(QWidget *parent=0);
 
   /** \brief Destructor. */
-  virtual ~QmitkAdaptiveRegionGrowingView();
+  virtual ~QmitkAdaptiveRegionGrowingWidget();
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
@@ -80,7 +79,7 @@ public:
   /**
   * @brief The created GUI from the .ui-File. This Attribute is obligatory
   */
-  Ui::QmitkAdaptiveRegionGrowingViewControls m_Controls;
+  Ui::QmitkAdaptiveRegionGrowingWidgetControls m_Controls;
 
 protected slots:
 

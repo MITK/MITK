@@ -113,7 +113,7 @@ SET(CPP_FILES
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
  
- QmitkAdaptiveRegionGrowingView.cpp
+ QmitkAdaptiveRegionGrowingWidget.cpp
 
  QmitkModuleTableModel.cpp
  QmitkModulesDialog.cpp
@@ -220,7 +220,7 @@ SET(MOC_H_FILES
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
- QmitkAdaptiveRegionGrowingView.h
+ QmitkAdaptiveRegionGrowingWidget.h
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -254,7 +254,7 @@ SET(UI_FILES
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
-  QmitkAdaptiveRegionGrowingViewControls.ui
+  QmitkAdaptiveRegionGrowingWidgetControls.ui
 )
 
 SET(QRC_FILES

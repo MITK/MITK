@@ -34,6 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 		void SetInputSlice(vtkImageData* slice);
 
+		virtual void SetOutputExtent(int ex[]);
+		virtual void SetOutputExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
+
+		virtual void SetOutputOrigin(double or[]);
+		virtual void SetOutputOrigin(double x, double y, double z);
+
 	protected:
 		
 		mitkVtkImageIdxReslice();

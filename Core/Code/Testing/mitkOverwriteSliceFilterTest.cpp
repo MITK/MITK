@@ -22,12 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVtkImageIdxReslice.h>
 #include <mitkImageCast.h>
 #include <mitkGeometry3D.h>
+#include <mitkRotationOperation.h>
+#include <mitkInteractionConst.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
+
 
 
 
@@ -76,9 +79,8 @@ static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* re
 	slicerMap->Modified();
 	slicerMap->Update();
 
-	vtkSmartPointer<vtkImageData> map = vtkSmartPointer<vtkImageData>::New();
-	map = slicerMap->GetVtkOutput();
-	MITK_TEST_CONDITION_REQUIRED( map->GetScalarSize() == sizeof(int), "min size of scalar");
+	unsigned int* map = resliceMap->GetMap();
+
 
 	/* ============= overwrite slice ============*/
 	mitk::OverwriteSliceFilter::Pointer overwriter = mitk::OverwriteSliceFilter::New();
@@ -89,8 +91,6 @@ static void OverwriteByIndexShiftTest(mitk::Image* workingImage, mitk::Image* re
 	overwriter->Update();
 
 
-	MITK_INFO<<slice->GetScalarType();
-	MITK_INFO<<map->GetScalarType();
 
 
 	/* ============= check ref == working ============*/
@@ -115,8 +115,8 @@ stop:
 
 
 	/* ============= edit slice ============*/
-	int idX = VolumeSize-20;
-	int idY = VolumeSize-66;
+  int idX = std::abs(VolumeSize-59);
+	int idY = std::abs(VolumeSize-23);
 	int idZ = 0;
 	int component = 0;
 	double val = 33.0;
@@ -218,8 +218,8 @@ stop:
 
 
 	/* ============= edit slice ============*/
-	int idX = VolumeSize-20;
-	int idY = VolumeSize-66;
+	int idX = std::abs(VolumeSize-59);
+	int idY = std::abs(VolumeSize-23);
 	int idZ = 0;
 	int component = 0;
 	double val = 33.0;
@@ -266,6 +266,183 @@ stop2:
 }
 
 
+
+static void OverwriteByPointerForObliquePlaneTest(mitk::Image* workingImage, mitk::Image* refImg)
+{
+
+/*==============TEST WITHOUT MITK CONVERTION=============================*/
+
+		/* ============= setup plane ============*/
+	int sliceindex = (int)(VolumeSize/2);//rand() % 32;
+	bool isFrontside = true; 
+	bool isRotated = false;
+
+	mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
+	obliquePlane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Transversal, sliceindex, isFrontside, isRotated);
+	mitk::Point3D origin = obliquePlane->GetOrigin();
+	mitk::Vector3D normal;
+	normal = obliquePlane->GetNormal();		
+	normal.Normalize();		
+	origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5		
+	obliquePlane->SetOrigin(origin);
+
+	mitk::Vector3D rotationVector = obliquePlane->GetAxisVector(0);
+	rotationVector.Normalize();
+
+	float degree = 45.0;
+
+	mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, obliquePlane->GetCenter(), rotationVector, degree);
+	obliquePlane->ExecuteOperation(op);
+	delete op;
+
+
+	/* ============= extract slice ============*/
+	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
+	slicer->SetInput(workingImage);
+	slicer->SetWorldGeometry(obliquePlane);
+	slicer->SetVtkOutputRequest(true);
+	slicer->Modified();
+	slicer->Update();
+
+	vtkSmartPointer<vtkImageData> slice = vtkSmartPointer<vtkImageData>::New();
+	slice = slicer->GetVtkOutput();
+
+
+
+	/* ============= overwrite slice ============*/
+	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	mitk::ExtractSliceFilter::Pointer overwriter = mitk::ExtractSliceFilter::New(resliceIdx);
+	resliceIdx->SetOverwriteMode(true);
+	resliceIdx->SetInputSlice(slice);
+	resliceIdx->Modified();
+	overwriter->SetInput(workingImage);
+	overwriter->SetWorldGeometry(obliquePlane);
+	overwriter->SetVtkOutputRequest(true);
+	overwriter->Modified();
+	overwriter->Update();
+
+
+
+	/* ============= check ref == working ============*/
+	bool areSame = true;
+	mitk::Index3D id;
+	id[0] = id[1] = id[2] = 0;
+	for (int x = 0; x < VolumeSize; ++x){
+		id[0]  = x;
+		for (int y = 0; y < VolumeSize; ++y){
+			id[1] = y;
+			for (int z = 0; z < VolumeSize; ++z){
+				id[2] = z;					
+				areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+				if(!areSame)
+					goto stop;
+			}
+		}
+	}
+stop:
+	MITK_TEST_CONDITION(areSame,"comparing images (no mitk convertion)");
+
+
+
+
+
+/*==============TEST WITH MITK CONVERTION=============================*/
+
+		/* ============= extract slice ============*/
+	mitk::ExtractSliceFilter::Pointer slicer2 = mitk::ExtractSliceFilter::New();
+	slicer2->SetInput(workingImage);
+	slicer2->SetWorldGeometry(obliquePlane);
+	slicer2->Modified();
+	slicer2->Update();
+
+
+	mitk::Image::Pointer sliceInMitk = slicer2->GetOutput();
+	vtkSmartPointer<vtkImageData> slice2 = vtkSmartPointer<vtkImageData>::New();
+	slice2 = sliceInMitk->GetVtkImageData();
+
+
+	/* ============= overwrite slice ============*/
+	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx2 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	mitk::ExtractSliceFilter::Pointer overwriter2 = mitk::ExtractSliceFilter::New(resliceIdx2);
+	resliceIdx2->SetOverwriteMode(true);
+	resliceIdx2->SetInputSlice(slice2);
+	resliceIdx2->Modified();
+	overwriter2->SetInput(workingImage);
+	overwriter2->SetWorldGeometry(obliquePlane);
+	overwriter2->SetVtkOutputRequest(true);
+	overwriter2->Modified();
+	overwriter2->Update();
+
+
+
+	/* ============= check ref == working ============*/
+	areSame = true;
+	id[0] = id[1] = id[2] = 0;
+	for (int x = 0; x < VolumeSize; ++x){
+		id[0]  = x;
+		for (int y = 0; y < VolumeSize; ++y){
+			id[1] = y;
+			for (int z = 0; z < VolumeSize; ++z){
+				id[2] = z;					
+				areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+				if(!areSame)
+					goto stop2;
+			}
+		}
+	}
+stop2:
+	MITK_TEST_CONDITION(areSame,"comparing images (with mitk convertion)");
+
+
+/*==============TEST EDIT WITHOUT MITK CONVERTION=============================*/
+
+	/* ============= edit slice ============*/
+	int idX = std::abs(VolumeSize-59);
+	int idY = std::abs(VolumeSize-23);
+	int idZ = 0;
+	int component = 0;
+	double val = 33.0;
+
+	slice->SetScalarComponentFromDouble(idX,idY,idZ,component,val);
+
+
+
+	/* ============= overwrite slice ============*/
+
+	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx3 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	resliceIdx3->SetOverwriteMode(true);
+	resliceIdx3->SetInputSlice(slice);
+	mitk::ExtractSliceFilter::Pointer overwriter3 = mitk::ExtractSliceFilter::New(resliceIdx3);
+	overwriter3->SetInput(workingImage);
+	overwriter3->SetWorldGeometry(obliquePlane);
+	overwriter3->SetVtkOutputRequest(true);
+	overwriter3->Modified();
+	overwriter3->Update();
+	
+
+
+
+	/* ============= check ============*/
+	areSame = true;
+
+	int x,y,z;
+
+	for ( x = 0; x < VolumeSize; ++x){
+		id[0]  = x;
+		for ( y = 0; y < VolumeSize; ++y){
+			id[1] = y;
+			for ( z = 0; z < VolumeSize; ++z){
+				id[2] = z;					
+				areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+				if(!areSame)
+					goto stop3;
+			}
+		}
+	}
+stop3:
+	MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]"; 
+	//MITK_TEST_CONDITION(x==idX && y==idY && z==sliceindex,"overwrited the right index");
+}
 
 
 
@@ -324,13 +501,16 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 		OverwriteByPointerTest(workingImg, refImage);
 
 
-		mitk::Image::Pointer refImage2;
-		CastToMitkImage(image, refImage2);
-		mitk::Image::Pointer workingImg2;
-		CastToMitkImage(image, workingImg2);
-		OverwriteByIndexShiftTest(workingImg2, refImage2);
+		
+		//mitk::Image::Pointer workingImg2;
+		//CastToMitkImage(image, workingImg2);
+		//OverwriteByIndexShiftTest(workingImg2, refImage);
 
 
+		
+		mitk::Image::Pointer workingImg3;
+		CastToMitkImage(image, workingImg3);
+		OverwriteByPointerForObliquePlaneTest(workingImg3, refImage);
 
 	MITK_TEST_END()
 }

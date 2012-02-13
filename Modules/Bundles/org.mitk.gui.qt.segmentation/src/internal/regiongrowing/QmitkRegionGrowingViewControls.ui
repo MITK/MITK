@@ -54,9 +54,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkAdaptiveRegionGrowingView</class>
+   <class>QmitkAdaptiveRegionGrowingWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkAdaptiveRegionGrowingView.h</header>
+   <header location="global">QmitkAdaptiveRegionGrowingWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -43,10 +43,10 @@ IF(MITK_USE_Boost)
     ENDIF()
     
     ExternalProject_Add(${proj}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_45_0.tar.bz2
-      URL_MD5 d405c606354789d0426bc07bea617e58
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-src
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_45_0.tar.bz2
+      URL_MD5 d405c606354789d0426bc07bea617e58
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"

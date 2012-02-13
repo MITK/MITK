@@ -26,10 +26,10 @@ IF(MITK_USE_OpenCV)
     SET(opencv_url_md5 4e353dfb04b53bea37407f397aabf069)
 
     ExternalProject_Add(${proj}
-      URL ${opencv_url}
-      URL_MD5 ${opencv_url_md5}
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build
+      URL ${opencv_url}
+      URL_MD5 ${opencv_url_md5}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

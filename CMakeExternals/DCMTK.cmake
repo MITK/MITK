@@ -23,10 +23,10 @@ IF(MITK_USE_DCMTK)
       SET(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
     ENDIF()
     ExternalProject_Add(${proj}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.0.tar.gz
-      URL_MD5 19409e039e29a330893caea98715390e
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.0.tar.gz
+      URL_MD5 19409e039e29a330893caea98715390e
       INSTALL_DIR ${proj}-install
       PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-3.6.cmake 
       CMAKE_GENERATOR ${gen}

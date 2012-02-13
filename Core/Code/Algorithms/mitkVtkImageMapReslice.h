@@ -30,6 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 		static mitkVtkImageMapReslice *New();
 		vtkTypeMacro(mitkVtkImageMapReslice, vtkImageReslice);
+
+		virtual void SetOutputExtent(int ex[]);
+		virtual void SetOutputExtent(int xmin, int xmax,int ymin,int ymax,int zmin,int zmax);
+
+		virtual unsigned int* GetMap(){ return this->m_Map;}
+
 		
 	protected:
 		
@@ -42,6 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
  																		 vtkImageData ***inData,
  																		 vtkImageData **outData,
  																		 int outExt[6], int id);
+
+		unsigned int* m_Map;
 	};
 
 

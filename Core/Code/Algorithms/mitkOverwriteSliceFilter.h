@@ -44,8 +44,9 @@ namespace mitk
 		void SetInputSlice(vtkImageData* slice){ this->m_Slice = slice; }
 		void SetInputSlice(mitk::Image* slice);
 
-		void SetInputMap(vtkImageData* map){ this->m_Map = map; }
-		void SetInputMap(mitk::Image* map);
+		virtual void SetInputMap(unsigned int* map){ this->m_Map = map;}
+
+		vtkImageData* GetInputSlice(){return this->m_Slice;}
 
 	protected:
 		OverwriteSliceFilter();
@@ -56,11 +57,11 @@ namespace mitk
 		virtual void GenerateInputRequestedRegion();
 
 		vtkSmartPointer<vtkImageData> m_Slice;
-		vtkSmartPointer<vtkImageData> m_Map;
+		unsigned int* m_Map;
 
 		unsigned int m_TimeStep;
 
-			
+		
 		};
 }
 

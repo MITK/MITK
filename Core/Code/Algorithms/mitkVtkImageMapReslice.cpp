@@ -39,7 +39,10 @@
 
 vtkStandardNewMacro(mitkVtkImageMapReslice);
 
-static void* START_INDEX;
+
+static void* START_INDEX_MAP;
+static void* START_INDEX_VOLUME;
+
 
 
 //--------------------------------------------------------------------------
@@ -87,15 +90,23 @@ inline int vtkResliceRound(double x)
 #endif
 }
 
+mitkVtkImageMapReslice* Self;
+
 //----------------------------------------------------------------------------
 mitkVtkImageMapReslice::mitkVtkImageMapReslice()
 {
+	m_Map = NULL;
+	Self = this;
 }
 
 //----------------------------------------------------------------------------
 mitkVtkImageMapReslice::~mitkVtkImageMapReslice()
 {
-	START_INDEX = NULL;
+	Self = NULL;
+	m_Map = NULL;
+	START_INDEX_MAP = NULL;
+	START_INDEX_VOLUME = NULL;
+	
 }
 
 
@@ -393,8 +404,10 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
                                     const int inExt[6],
                                     const vtkIdType inInc[3],
                                     int numscalars, const F point[3],
-                                    int mode, const T *background)
+                                    int mode, const T *background, mitkVtkImageMapReslice* self)
 {
+	unsigned int* map = self->GetMap();
+
   int inIdX0 = vtkResliceRound(point[0]) - inExt[0];
   int inIdY0 = vtkResliceRound(point[1]) - inExt[2];
   int inIdZ0 = vtkResliceRound(point[2]) - inExt[4];
@@ -439,8 +452,13 @@ int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-			*outPtr++ = (int) (inPtr - ((T*)START_INDEX) );
-			inPtr++;
+			/* *outPtr++ = (int) (inPtr - ((T*)START_INDEX) );
+			inPtr++;*/
+
+			unsigned int shiftVolumePtr = (unsigned int)(inPtr - ((T*) START_INDEX_VOLUME));
+			unsigned int shiftMapPtr = (unsigned int)(outPtr - ((T*) START_INDEX_MAP)); //you don't have to care about race conditions 
+			*(map + shiftMapPtr) = shiftVolumePtr;
+			*outPtr++ = *inPtr++;
     }
   while (--numscalars);
 
@@ -460,7 +478,7 @@ void vtkGetResliceInterpFunc(mitkVtkImageMapReslice *self,
                                                  int numscalars,
                                                  const F point[3],
                                                  int mode,
-                                                 const void *background))
+                                                 const void *background, mitkVtkImageMapReslice* self))
 {
 	int dataType = self->GetOutput()->GetScalarType();
 
@@ -471,7 +489,7 @@ void vtkGetResliceInterpFunc(mitkVtkImageMapReslice *self,
 			const vtkIdType inInc[3],
 			int numscalars, const F point[3],
 			int mode,
-			const VTK_TT *background))interpolate) = \
+			const VTK_TT *background, mitkVtkImageMapReslice* self))interpolate) = \
 			&vtkNearestNeighborInterpolation);
 	default:
 		interpolate = 0;
@@ -719,7 +737,7 @@ void vtkImageResliceExecute(mitkVtkImageMapReslice *self,
   int (*interpolate)(void *&outPtr, const void *inPtr,
                      const int inExt[6], const vtkIdType inInc[3],
                      int numscalars, const double point[3],
-                     int mode, const void *background);
+                     int mode, const void *background, mitkVtkImageMapReslice* self);
   void (*setpixels)(void *&out, const void *in, int numscalars, int n);
 
   // the 'mode' species what to do with the 'pad' (out-of-bounds) area
@@ -827,7 +845,7 @@ void vtkImageResliceExecute(mitkVtkImageMapReslice *self,
 
           // interpolate output voxel from input data set
           interpolate(outPtr, inPtr, inExt, inInc, numscalars,
-                      point, mode, background);
+                      point, mode, background, self);
           } 
         }
       outPtr = static_cast<void *>(
@@ -840,6 +858,15 @@ void vtkImageResliceExecute(mitkVtkImageMapReslice *self,
   vtkFreeBackgroundPixel(self, &background);
 }
 
+void mitkVtkImageMapReslice::SetOutputExtent(int ex[]){
+   this->SetOutputExtent(ex[0], ex[1], ex[2], ex[3], ex[4], ex[5]); }
+
+void mitkVtkImageMapReslice::SetOutputExtent(int xmin, int xmax,int ymin,int ymax,int zmin,int zmax){
+   Superclass::SetOutputExtent(xmin, xmax, ymin, ymax, zmin, zmax);
+   //get the size of the map array
+   int numPixels = (xmax-xmin+1) * (ymax-ymin+1);
+   m_Map = new unsigned int[numPixels];
+}
 
 
 //----------------------------------------------------------------------------
@@ -892,7 +919,9 @@ void mitkVtkImageMapReslice::ThreadedRequestData(
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
-	START_INDEX = (static_cast<vtkImageData*>(this->GetInput())->GetScalarPointer());
+	START_INDEX_MAP = outData[0]->GetScalarPointer();
+	START_INDEX_VOLUME = inData[0][0]->GetScalarPointer();
+
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }

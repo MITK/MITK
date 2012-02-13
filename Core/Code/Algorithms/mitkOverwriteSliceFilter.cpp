@@ -19,23 +19,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::OverwriteSliceFilter::OverwriteSliceFilter(){
-
-	m_Map = vtkSmartPointer<vtkImageData>::New();
 	m_TimeStep = 0;
-
 }
 
 mitk::OverwriteSliceFilter::~OverwriteSliceFilter(){
-	m_Map = NULL;
 	m_Slice = NULL;
 }
 
-void mitk::OverwriteSliceFilter::SetInputMap(mitk::Image* map){
-	this->m_Map = map->GetVtkImageData(this->m_TimeStep);
-}
-
-void mitk::OverwriteSliceFilter::SetInputSlice(mitk::Image* slice){
-	this->m_Slice = slice->GetVtkImageData(this->m_TimeStep); 
+void mitk::OverwriteSliceFilter::SetInputSlice(mitk::Image* slice)
+{
+	this->m_Slice = slice->GetVtkImageData();
 }
 
 void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
@@ -47,7 +40,6 @@ void mitk::OverwriteSliceFilter::GenerateInputRequestedRegion(){
 	ImageToImageFilter::InputImagePointer input =  const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
 	input->SetRequestedRegionToLargestPossibleRegion();
 }
-
 
 
 
@@ -67,7 +59,7 @@ static void GetOverwritefunc(int dataType, void (**overwritefunc)(F *inPtr, F *o
 
 template<class T>
 static void Overwrite(T *inPtr, T *outPtr, unsigned int *mapPtr, int todo){
-	
+
 	do{
 		unsigned int shift = *mapPtr;
 		mapPtr++;
@@ -83,30 +75,33 @@ void mitk::OverwriteSliceFilter::GenerateData()
 {
 	vtkSmartPointer<vtkImageData> inputVolume = (const_cast< mitk::Image * >(ImageToImageFilter::GetInput()))->GetVtkImageData(m_TimeStep);
 
-	int* extentSlice = m_Slice->GetExtent();
-	void* inPtr = m_Slice->GetScalarPointerForExtent(extentSlice);
+	void* inPtr = m_Slice->GetScalarPointer();
 
 	void* outPtr = inputVolume->GetScalarPointer();
 
 
-	int* extentMap = m_Map->GetExtent();
-	unsigned int* mapPtr = (unsigned int*)m_Map->GetScalarPointerForExtent(extentMap);
+	unsigned int* mapPtr = m_Map;
 
 
 	int* dimensions = m_Slice->GetDimensions();
 	int todo = dimensions[0] * dimensions[1];
 
-  void (*overwritefunc)(void *inPtr, void *outPtr, unsigned int *mapPtr, int todo);
+
+	void (*overwritefunc)(void *inPtr, void *outPtr, unsigned int *mapPtr, int todo);
 	GetOverwritefunc(m_Slice->GetScalarType(),&overwritefunc);
 
 	overwritefunc(inPtr, outPtr, mapPtr, todo);
 	
-	mitk::Image::Pointer resultImage = this->GetOutput();
+	//mitk::Image::Pointer resultImage = this->GetOutput();
 
-	//initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
-	resultImage->Initialize(inputVolume);
+	////initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
+	//resultImage->Initialize(inputVolume);
 
-	//transfer the voxel data
-	resultImage->SetVolume(inputVolume->GetScalarPointer());	
+	////transfer the voxel data
+	//resultImage->SetVolume(inputVolume->GetScalarPointer());	
 
+	this->GetInput()->Modified();
+
+	delete [] m_Map;
+	m_Map = NULL;
 }

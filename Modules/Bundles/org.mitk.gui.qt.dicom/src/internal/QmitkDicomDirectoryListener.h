@@ -38,6 +38,9 @@ public:
     /// @brief sets listened directory, note that only one directory can be set.
     void SetDicomListenerDirectory(const QString&);
 
+    /// @brief get filepath to the listened directory.
+    const QString& GetDicomListenerDirectory();
+
 signals:
     /// @brief signal starts the dicom import of the given file (the QStringList will only contain one file here).
     void StartImportingFile(QStringList&);
@@ -57,6 +60,7 @@ protected:
     QFileSystemWatcher* m_FileSystemWatcher;
     QStringList* m_CurrentRetrievedFile;
     QStringList* m_LastRetrievedFile;
+    QString m_DicomListenerDirectory;
 };
 
 #endif // QmitkDicomListener_h

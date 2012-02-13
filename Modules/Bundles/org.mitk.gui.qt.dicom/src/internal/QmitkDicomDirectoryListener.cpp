@@ -28,6 +28,7 @@ QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
 , m_CurrentRetrievedFile(new QStringList())
 , m_FileSystemWatcher(new QFileSystemWatcher())
 , m_Timer(new QTimer(this))
+, m_DicomListenerDirectory(QString())
 {
     m_Timer->setSingleShot(true);
     m_Timer->blockSignals(true);
@@ -103,12 +104,18 @@ QStringList* QmitkDicomDirectoryListener::SetRetrievedFile(const QString& filena
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)
 {
-
+    
     if(m_FileSystemWatcher->directories().count()==0||m_FileSystemWatcher->directories().count()==1)
     {
         if(!m_FileSystemWatcher->directories().contains(directory))
         {
+            m_DicomListenerDirectory=QString(directory);
             m_FileSystemWatcher->addPath(directory);
         }
     }
+}
+
+const QString& QmitkDicomDirectoryListener::GetDicomListenerDirectory()
+{
+    return m_DicomListenerDirectory;
 }

@@ -15,8 +15,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef QMITK_AdaptiveRegionGrowingView_H
-#define QMITK_AdaptiveRegionGrowingView_H
+#ifndef QMITK_AdaptiveRegionGrowingWidget_H
+#define QMITK_AdaptiveRegionGrowingWidget_H
 
 
 #include "mitkDataStorage.h"

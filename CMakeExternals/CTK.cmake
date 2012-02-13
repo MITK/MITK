@@ -33,10 +33,10 @@ IF(MITK_USE_CTK)
     ENDFOREACH()
   
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY http://github.com/commontk/CTK.git
-      GIT_TAG ${revision_tag}
       SOURCE_DIR ${proj}-src
       BINARY_DIR ${proj}-build
+      GIT_REPOSITORY http://github.com/commontk/CTK.git
+      GIT_TAG ${revision_tag}
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

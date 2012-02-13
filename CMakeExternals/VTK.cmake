@@ -56,10 +56,10 @@ IF(NOT DEFINED VTK_DIR)
   ENDIF()
 
   ExternalProject_Add(${proj}
-    URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
     SOURCE_DIR ${proj}-src
     BINARY_DIR ${proj}-build
+    URL ${VTK_URL}
+    URL_MD5 ${VTK_URL_MD5}
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS

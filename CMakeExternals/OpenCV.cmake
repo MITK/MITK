@@ -27,7 +27,7 @@ IF(MITK_USE_OpenCV)
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-src
+      BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${opencv_url}
       URL_MD5 ${opencv_url_md5}

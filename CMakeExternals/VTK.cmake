@@ -57,7 +57,7 @@ IF(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-    BINARY_DIR ${proj}-src
+    BINARY_DIR ${proj}-build
     PREFIX ${proj}-cmake
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}

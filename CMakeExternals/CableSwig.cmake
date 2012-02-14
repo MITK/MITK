@@ -19,7 +19,7 @@ IF(NOT DEFINED CableSwig_DIR)
 
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-src
+     BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CableSwig-ITK-3.20.0.tar.gz
      URL_MD5 893882bf8b4fbfbae3fe8c747a75f7a0     

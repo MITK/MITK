@@ -53,11 +53,11 @@ void mitk::FiberBundleXWriter::GenerateData()
     }
     vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
 
-    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleaner->SetInput(input->GetFiberPolyData());
-    cleaner->Update();
+//    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+//    cleaner->SetInput(input->GetFiberPolyData());
+//    cleaner->Update();
 
-    writer->SetInput(cleaner->GetOutput());
+    writer->SetInput(input->GetFiberPolyData());
     writer->SetFileName(m_FileName.c_str());
     writer->SetFileTypeToASCII();
     writer->Write();

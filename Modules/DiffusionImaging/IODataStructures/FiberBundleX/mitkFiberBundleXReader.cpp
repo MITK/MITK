@@ -73,10 +73,10 @@ namespace mitk
         {
           vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
 
-          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-          cleaner->SetInput(fiberPolyData);
-          cleaner->Update();
-          fiberPolyData = cleaner->GetOutput();
+//          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+//          cleaner->SetInput(fiberPolyData);
+//          cleaner->Update();
+//          fiberPolyData = cleaner->GetOutput();
 
           m_OutputCache = OutputType::New(fiberPolyData);
         }

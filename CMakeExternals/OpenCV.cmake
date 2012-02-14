@@ -26,8 +26,9 @@ IF(MITK_USE_OpenCV)
     SET(opencv_url_md5 4e353dfb04b53bea37407f397aabf069)
 
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${proj}-src
-      BINARY_DIR ${proj}-build
+      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+      BINARY_DIR ${proj}-src
+      PREFIX ${proj}-cmake
       URL ${opencv_url}
       URL_MD5 ${opencv_url_md5}
       INSTALL_COMMAND ""

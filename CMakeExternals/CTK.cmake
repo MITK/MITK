@@ -33,8 +33,9 @@ IF(MITK_USE_CTK)
     ENDFOREACH()
   
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${proj}-src
+      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
+      PREFIX ${proj}-cmake
       GIT_REPOSITORY http://github.com/commontk/CTK.git
       GIT_TAG ${revision_tag}
       UPDATE_COMMAND ""

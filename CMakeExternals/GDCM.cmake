@@ -24,8 +24,9 @@ SET(GDCM_DEPENDS ${proj})
 IF(NOT DEFINED GDCM_DIR)
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${proj}-src
-     BINARY_DIR ${proj}-build
+     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+     BINARY_DIR ${proj}-src
+     PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.0.18.tar.gz 
      URL_MD5 3c431bac0fe4da166f2b71c78f0d37a6
      INSTALL_COMMAND ""

@@ -39,8 +39,9 @@ IF(NOT DEFINED ITK_DIR)
   ENDIF()
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${proj}-src
-     BINARY_DIR ${proj}-build
+     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+     BINARY_DIR ${proj}-src
+     PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-3.20.1.tar.gz
      URL_MD5 90342ffa78bd88ae48b3f62866fbf050
      INSTALL_COMMAND ""

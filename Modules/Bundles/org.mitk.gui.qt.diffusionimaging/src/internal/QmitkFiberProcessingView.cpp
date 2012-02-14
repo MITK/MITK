@@ -1042,10 +1042,12 @@ void QmitkFiberProcessingView::DoFiberExtraction()
     mitk::DataNode::Pointer node;
     node = mitk::DataNode::New();
     node->SetData(extFB);
-    QString name(m_SelectedFB.at(0)->GetName().c_str());
-    name += "_extracted";
+    QString name(m_SelectedFB.at(i)->GetName().c_str());
+    name += "_";
+    name += m_SelectedPF.at(0)->GetName().c_str();
     node->SetName(name.toStdString());
     GetDataStorage()->Add(node);
+    m_SelectedFB.at(i)->SetVisibility(false);
   }
 }
 

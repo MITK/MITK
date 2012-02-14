@@ -98,10 +98,10 @@ public:
     vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     fiberPolyData->SetPoints(m_VtkPoints);
     fiberPolyData->SetLines(m_VtkCellArray);
-    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleaner->SetInput(fiberPolyData);
-    cleaner->Update();
-    fiberPolyData = cleaner->GetOutput();
+//    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+//    cleaner->SetInput(fiberPolyData);
+//    cleaner->Update();
+//    fiberPolyData = cleaner->GetOutput();
     return fiberPolyData;
   }
 

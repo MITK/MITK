@@ -24,7 +24,7 @@ IF(MITK_USE_DCMTK)
     ENDIF()
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-src
+      BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.0.tar.gz
       URL_MD5 19409e039e29a330893caea98715390e

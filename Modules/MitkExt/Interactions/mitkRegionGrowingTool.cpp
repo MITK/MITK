@@ -48,7 +48,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_SeedPointMemoryOffset(0),
  m_VisibleWindow(0),
  m_DefaultWindow(0),
- m_MouseDistanceScaleFactor(1.0),
+ m_MouseDistanceScaleFactor(0.5),
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
@@ -291,15 +291,10 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
       if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
       {
-        m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 20% of the visible gray values
-        double pixelType = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData())->GetPixelValueByWorldCoordinate(positionEvent->GetWorldPosition());
-        MITK_DEBUG<<"Pixeltype: "<< pixelType;
-        //if (!initializedAlready)
-        if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
-        {
-          MITK_DEBUG<<"Setting threshold....";
-          m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 10% of the visible gray values
-        }
+        m_InitialLowerThreshold = currentVisibleWindow / 20.0;
+        m_InitialUpperThreshold = currentVisibleWindow / 20.0;
+        m_LowerThreshold = m_InitialLowerThreshold;
+        m_UpperThreshold = m_InitialUpperThreshold;
 
         // 3.2.3. Actually perform region growing
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
@@ -338,9 +333,8 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
         m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
         cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor ;
-        
-        m_UpperThreshold = m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor ;
+        m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
+        m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
@@ -386,7 +380,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
-              //MITK_INFO << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
+              //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
              // 4. write working slice back into image volume
              this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);

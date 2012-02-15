@@ -843,38 +843,6 @@ void mitkVtkImageIdxReslice::SetInputSlice(vtkImageData* slice){
 
 
 
-void mitkVtkImageIdxReslice::SetOutputExtent(int ex[]){SetOutputExtent(ex[0],ex[1],ex[2],ex[3],ex[4],ex[5]);}
-void mitkVtkImageIdxReslice::SetOutputExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax){
-	//if(Overwrite_Mode){
-		/*if(xMin<0)
-		{
-			xMax-=xMin;
-			xMin=0;
-		}
-		if(yMin<0)
-		{
-			yMax-=yMin;
-			yMin=0;
-		}*/
-	//}
-
-	if(Overwrite_Mode){
-		this->OutputOrigin[0] = -xMin;
-		this->OutputOrigin[1] = -yMin;
-		this->OutputOrigin[2] = 0.0;
-	}else{
-		this->OutputOrigin[0] = xMin;
-		this->OutputOrigin[1] = yMin;
-	}
-	Superclass::SetOutputExtent( xMin,  xMax,  yMin,  yMax,  zMin,  zMax);
-}
-
-void mitkVtkImageIdxReslice::SetOutputOrigin(double or[]){this->SetOutputOrigin(or[0],or[1],or[2]);}
-void mitkVtkImageIdxReslice::SetOutputOrigin(double x, double y, double z){
-	//Superclass::SetOutputOrigin( x,y,z );
-	
-}
-
 
 //----------------------------------------------------------------------------
 // This method is passed a input and output region, and executes the filter

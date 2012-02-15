@@ -37,7 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 //Includes for 3DSurfaceInterpolation
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
-
+#include <mitkExtractSliceFilter.h>
+#include <mitkVtkImageIdxReslice.h>
 #include <mitkOverwriteSliceFilter.h>
 #include <mitkVtkImageMapReslice.h>
 
@@ -64,8 +65,6 @@ mitk::SegTool2D::SegTool2D(const char* type)
 
 mitk::SegTool2D::~SegTool2D()
 {
-	m_Map = NULL;
-
 }
 
 bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)
@@ -187,21 +186,22 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   if ( !image || !planeGeometry ) return NULL;
 
 
-	vtkSmartPointer<mitkVtkImageMapReslice> mapReslice = vtkSmartPointer<mitkVtkImageMapReslice>::New();
-	mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(mapReslice);
+	vtkSmartPointer<mitkVtkImageIdxReslice> reslice = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	reslice->SetOverwriteMode(false);
+	reslice->Modified();
 
 
+	mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
 	extractor->SetInput( image );
 	extractor->SetTimeStep( timeStep );
 	extractor->SetWorldGeometry( planeGeometry );
 	extractor->SetVtkOutputRequest(false);
 	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
-	mapReslice->Modified();
+
 	extractor->Modified();
 	extractor->Update();
-	Image::Pointer slice = extractor->GetOutput();
 
-	m_Map = mapReslice->GetMap();
+	Image::Pointer slice = extractor->GetOutput();
 
 	Vector3D axis0 = slice->GetGeometry()->GetAxisVector(0);
 	Vector3D axis1 = slice->GetGeometry()->GetAxisVector(1);
@@ -212,8 +212,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 	
 	int offsetX = extractor->GetVtkOutput()->GetExtent()[0];
 	int offsetY = extractor->GetVtkOutput()->GetExtent()[2];
+
+	Vector3D spacing = slice->GetGeometry()->GetSpacing();
 	
-	origin += (axis0 * offsetX) + (axis1 * offsetY);
+	origin += (axis0 * (offsetX * spacing[0])) + (axis1 * (offsetY * spacing[1]));
 
 	slice->GetGeometry()->SetOrigin(origin);
 
@@ -249,16 +251,23 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-	
 
-	mitk::OverwriteSliceFilter::Pointer overwriter = mitk::OverwriteSliceFilter::New();
-	overwriter->SetInput(image);
-	overwriter->SetInputSlice(slice);
-	overwriter->SetInputMap(m_Map);
-	overwriter->Modified();
-	overwriter->Update();
+	vtkSmartPointer<mitkVtkImageIdxReslice> reslice = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));
+	reslice->SetOverwriteMode(true);
+	reslice->Modified();
 
+	mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
+	extractor->SetInput( image );
+	extractor->SetTimeStep( this->m_TimeStep );
+	extractor->SetWorldGeometry( planeGeometry );
+	extractor->SetVtkOutputRequest(true);
+	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( this->m_TimeStep ) );
 
+	extractor->Modified();
+	extractor->Update();
+
+	image->Modified();
 	
   if ( m_3DInterpolationEnabled )
   {

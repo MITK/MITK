@@ -48,7 +48,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_SeedPointMemoryOffset(0),
  m_VisibleWindow(0),
  m_DefaultWindow(0),
- m_MouseDistanceScaleFactor(3.0),
+ m_MouseDistanceScaleFactor(1.0),
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
@@ -323,7 +323,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
  1. Calculate the new thresholds from mouse position (relative to first position)
  2. Perform a new region growing and update the feedback contour
 */
-bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
 {
   if (FeedbackContourTool::OnMouseMoved( action, stateEvent ))
   {
@@ -337,9 +337,9 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
         cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = m_InitialLowerThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
+        m_LowerThreshold = m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor ;
         
-        m_UpperThreshold = m_InitialUpperThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
+        m_UpperThreshold = m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor ;
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();

@@ -19,14 +19,11 @@
 #ifndef PlanarCircleMapper3D_H_HEADER_INCLUDED
 #define PlanarCircleMapper3D_H_HEADER_INCLUDED
 
-//#include "mitkCommon.h"
-//#include "mitkBaseRenderer.h"
-
+#include <mitkVtkMapper3D.h>
+#include <mitkBaseData.h>
+#include <mitkPlanarCircle.h>
 
 #include <vtkSmartPointer.h>
-#include <mitkVtkMapper3D.h>
-//#include "MitkDiffusionImagingMBIExports.h"
-#include <mitkBaseData.h>
 #include <vtkAppendPolyData.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLActor.h>
@@ -36,22 +33,18 @@
 #include <vtkTubeFilter.h>
 #include <vtkRegularPolygonSource.h>
 
-//class mitkPlanarCircle;
-#include <mitkPlanarCircle.h>
-
 namespace mitk {
 
   //##Documentation
   //## @brief Mapper for FiberBundles
   //## @ingroup Mapper
   //  template<class TPixelType>
-  class /*MitkDiffusionImagingMBI_EXPORT*/ PlanarCircleMapper3D : public VtkMapper3D
+  class PlanarCircleMapper3D : public VtkMapper3D
   {
   public:
 
     mitkClassMacro(PlanarCircleMapper3D, VtkMapper3D);
     itkNewMacro(Self);
-
 
     const mitk::PlanarCircle* GetInput();
 
@@ -64,7 +57,6 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void GenerateData();
 
-
   protected:
 
     PlanarCircleMapper3D();
@@ -72,19 +64,11 @@ namespace mitk {
 
     void UpdateVtkObjects();
 
-
-    vtkAppendPolyData *m_vtkCircleList;
-
-
-    vtkOpenGLPolyDataMapper *m_VtkCircleDataMapperGL;
-
-    vtkOpenGLActor *m_CircleActor;
-
-
-
-    vtkPropAssembly *m_CircleAssembly;
-
-    vtkRegularPolygonSource *m_polygonSource;
+    vtkSmartPointer<vtkAppendPolyData>        m_vtkCircleList;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper>  m_VtkCircleDataMapperGL;
+    vtkSmartPointer<vtkOpenGLActor>           m_CircleActor;
+    vtkSmartPointer<vtkPropAssembly>          m_CircleAssembly;
+    vtkSmartPointer<vtkRegularPolygonSource>  m_polygonSource;
 
   };
 

@@ -21,8 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageReslice.h>
 #include "MitkExports.h"
 
-	/** \brief A Filter based on vtkImageReslice that extracts Coordinates in the 3D volume not pixel values.
-	 * 
+	/** \brief A vtk Filter based on vtkImageReslice with the aditional feature to write a slice into the given input volume.
+	  There are two use cases for the Filter which are specified by the overwritemode property:
+		
+		1)Extract slices from a 3D volume.
+			Overwritemode = false
+
+		2)Overwrite a 3D volume at a given slice.
+			Overwritemode = true
 	 */
 	class MITK_CORE_EXPORT mitkVtkImageIdxReslice : public vtkImageReslice
 	{

@@ -83,8 +83,8 @@ public:
 
   protected slots:
 
-  void ActionDrawEllipseTriggered();
-  void ActionDrawPolygonTriggered();
+  void OnDrawCircle();
+  void OnDrawPolygon();
   void DoFiberExtraction();
   void GenerateAndComposite();
   void GenerateOrComposite();

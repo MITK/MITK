@@ -89,8 +89,8 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_RectangleButton->setVisible(false);
 
     connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
-    connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( ActionDrawEllipseTriggered() ) );
-    connect( m_Controls->m_PolygonButton, SIGNAL( clicked() ), this, SLOT( ActionDrawPolygonTriggered() ) );
+    connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( OnDrawCircle() ) );
+    connect( m_Controls->m_PolygonButton, SIGNAL( clicked() ), this, SLOT( OnDrawPolygon() ) );
     connect(m_Controls->PFCompoANDButton, SIGNAL(clicked()), this, SLOT(GenerateAndComposite()) );
     connect(m_Controls->PFCompoORButton, SIGNAL(clicked()), this, SLOT(GenerateOrComposite()) );
     connect(m_Controls->PFCompoNOTButton, SIGNAL(clicked()), this, SLOT(GenerateNotComposite()) );
@@ -799,7 +799,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
   GenerateStats();
 }
 
-void QmitkFiberProcessingView::ActionDrawPolygonTriggered()
+void QmitkFiberProcessingView::OnDrawPolygon()
 {
   //  bool checked = m_Controls->m_PolygonButton->isChecked();
   //  if(!this->AssertDrawingIsPossible(checked))
@@ -836,7 +836,7 @@ void QmitkFiberProcessingView::ActionDrawPolygonTriggered()
 }
 
 
-void QmitkFiberProcessingView::ActionDrawEllipseTriggered()
+void QmitkFiberProcessingView::OnDrawCircle()
 {
   //bool checked = m_Controls->m_CircleButton->isChecked();
   //if(!this->AssertDrawingIsPossible(checked))
@@ -977,51 +977,18 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
   newNode->AddProperty( "planarfigure.selected.marker.opacity",mitk::FloatProperty::New(2.0));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Add custom property, if available
-  //if ( (propertyKey != NULL) && (property != NULL) )
-  //{
-  //  newNode->AddProperty( propertyKey, property );
-  //}
-
-  //get current selected DataNode -which should be a FiberBundle- and set PlanarFigure as child
-
-  //this->GetDataStorage()->GetNodes()
-
-
-
-  // mitk::FiberBundle::Pointer selectedFBNode = m_SelectedFBNodes.at(0);
-
   // figure drawn on the topmost layer / image
-  this->GetDataStorage()->Add(newNode );
+  newNode->SetColor(1.0,1.0,1.0);
+  newNode->SetOpacity(0.8);
+  GetDataStorage()->Add(newNode );
 
   std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
   for(unsigned int i = 0; i < selectedNodes.size(); i++)
   {
     selectedNodes[i]->SetSelected(false);
   }
-  //selectedNodes = m_SelectedPlanarFigureNodes->GetNodes();
-  /*for(unsigned int i = 0; i < selectedNodes.size(); i++)
-   {
-   selectedNodes[i]->SetSelected(false);
-   }
-   */
-  newNode->SetSelected(true);
 
-  //Select(newNode);
+  newNode->SetSelected(true);
 }
 
 void QmitkFiberProcessingView::DoFiberExtraction()

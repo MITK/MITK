@@ -35,6 +35,7 @@
 #include <vtkKochanekSpline.h>
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricSpline.h>
+#include <vtkPolygon.h>
 
 #include <math.h>
 
@@ -70,7 +71,7 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
 
   this->UpdateFiberGeometry();
   this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-  this->DoGenerateFiberIds();
+  this->GenerateFiberIds();
 }
 
 mitk::FiberBundleX::~FiberBundleX()
@@ -320,7 +321,7 @@ void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, 
   if (updateGeometry)
     UpdateFiberGeometry();
   SetColorCoding(COLORCODING_ORIENTATION_BASED);
-  DoGenerateFiberIds();
+  GenerateFiberIds();
 }
 
 /*
@@ -495,7 +496,7 @@ void mitk::FiberBundleX::DoColorCodingFAbased()
 
   this->SetColorCoding(COLORCODING_FA_BASED);
   MITK_DEBUG << "FBX: done CC FA based";
-  this->DoGenerateFiberIds();
+  this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::DoUseFAasColorOpacity()
@@ -517,7 +518,7 @@ void mitk::FiberBundleX::DoUseFAasColorOpacity()
 
   this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
   MITK_DEBUG << "FBX: done CC OPACITY";
-  this->DoGenerateFiberIds();
+  this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::ResetFiberColorOpacity() {
@@ -556,7 +557,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
   }
 
   m_FiberPolyData->GetPointData()->AddArray(faValues);
-  this->DoGenerateFiberIds();
+  this->GenerateFiberIds();
 
   if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
     MITK_DEBUG << "FA VALUE ARRAY SET";
@@ -568,7 +569,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
   //    }
 }
 
-void mitk::FiberBundleX::DoGenerateFiberIds()
+void mitk::FiberBundleX::GenerateFiberIds()
 {
   if (m_FiberPolyData == NULL)
     return;
@@ -590,6 +591,8 @@ void mitk::FiberBundleX::DoGenerateFiberIds()
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure::Pointer pf)
 {
   std::vector<long> tmp = ExtractFiberIdSubset(pf);
+  if (tmp.size()<=0)
+    return mitk::FiberBundleX::New();
   vtkSmartPointer<vtkPolyData> pTmp = GeneratePolyDataByIds(tmp);
   return mitk::FiberBundleX::New(pTmp);
 }
@@ -830,16 +833,13 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure::P
 
     mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
     mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
-    if (pf->GetNameOfClass() == circleName->GetNameOfClass() )
+    if ( pf->GetNameOfClass() == circleName->GetNameOfClass() )
     {
       //calculate circle radius
       mitk::Point3D V1w = pf->GetWorldControlPoint(0); //centerPoint
       mitk::Point3D V2w  = pf->GetWorldControlPoint(1); //radiusPoint
 
       double distPF = V1w.EuclideanDistanceTo(V2w);
-//      distPF =  sqrt((double)  (V2w[0] - V1w[0]) * (V2w[0] - V1w[0]) +
-//                     (V2w[1] - V1w[1]) * (V2w[1] - V1w[1]) +
-//                     (V2w[2] - V1w[2]) * (V2w[2] - V1w[2]));
 
       for (int i=0; i<PointsOnPlane.size(); i++)
       {
@@ -848,24 +848,50 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure::P
                                 (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) * (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) +
                                 (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2]) * (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2])) ;
 
-        //   MITK_DEBUG << "PntDistance to Radius: " << XdistPnt;
         if( XdistPnt <= distPF)
           PointsInROI.push_back(PointsOnPlane[i]);
       }
-      // MITK_DEBUG << "Points inside circle radius: " << PointsInROI.size();
+    }
+    else if ( pf->GetNameOfClass() == polyName->GetNameOfClass() )
+    {
+      //create vtkPolygon using controlpoints from planarFigure polygon
+      vtkSmartPointer<vtkPolygon> polygonVtk = vtkPolygon::New();
+
+      //get the control points from pf and insert them to vtkPolygon
+      unsigned int nrCtrlPnts = pf->GetNumberOfControlPoints();
+
+      for (int i=0; i<nrCtrlPnts; ++i)
+      {
+        polygonVtk->GetPoints()->InsertNextPoint((double)pf->GetWorldControlPoint(i)[0], (double)pf->GetWorldControlPoint(i)[1], (double)pf->GetWorldControlPoint(i)[2] );
+      }
+
+      //prepare everything for using pointInPolygon function
+      double n[3];
+      polygonVtk->ComputeNormal(polygonVtk->GetPoints()->GetNumberOfPoints(),
+                                static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), n);
+
+      double bounds[6];
+      polygonVtk->GetPoints()->GetBounds(bounds);
+
+      for (int i=0; i<PointsOnPlane.size(); i++)
+      {
+        double checkIn[3] = {clipperout->GetPoint(PointsOnPlane[i])[0], clipperout->GetPoint(PointsOnPlane[i])[1], clipperout->GetPoint(PointsOnPlane[i])[2]};
+        int isInPolygon = polygonVtk->PointInPolygon(checkIn, polygonVtk->GetPoints()->GetNumberOfPoints()
+                                                     , static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n);
+        if( isInPolygon )
+          PointsInROI.push_back(PointsOnPlane[i]);
+      }
     }
 
     MITK_DEBUG << "Step3: Identify fibers";
-
-    /*======STEP 3=======
-     * identify fiberIds for points in ROI */
-
     // we need to access the fiberId Array, so make sure that this array is available
     if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
     {
       MITK_DEBUG << "ERROR: FiberID array does not exist, no correlation between points and fiberIds possible! Make sure calling GenerateFiberIds()";
       return FibersInROI; // FibersInRoi is empty then
     }
+    if (PointsInROI.size()<=0)
+      return FibersInROI;
 
     // prepare a structure where each point id is represented as an indexId.
     // vector looks like: | pntId | fiberIdx |

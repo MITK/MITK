@@ -75,7 +75,7 @@ namespace mitk {
     void DoColorCodingFAbased();
     void DoUseFAasColorOpacity();
     void ResetFiberColorOpacity();
-    void DoGenerateFiberIds();
+    void GenerateFiberIds();
 
     void ResampleFibers(float len);
     void ResampleFibers();

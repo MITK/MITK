@@ -48,7 +48,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_SeedPointMemoryOffset(0),
  m_VisibleWindow(0),
  m_DefaultWindow(0),
- m_MouseDistanceScaleFactor(3.0),
+ m_MouseDistanceScaleFactor(0.5),
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
@@ -94,23 +94,23 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
 {
   //ToolLogger::SetVerboseness(3);
 
-  MITK_INFO << "OnMousePressed" << std::endl;
+  MITK_DEBUG << "OnMousePressed" << std::endl;
   if (FeedbackContourTool::OnMousePressed( action, stateEvent ))
   {
-    MITK_INFO << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
+    MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
 
     // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
     const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (positionEvent)
     {
-      MITK_INFO << "OnMousePressed: got positionEvent" << std::endl;
+      MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
       
       m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
       m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
 
       if ( m_WorkingSlice.IsNotNull() ) // can't do anything without the segmentation
       {
-        MITK_INFO << "OnMousePressed: got working slice" << std::endl;
+        MITK_DEBUG << "OnMousePressed: got working slice" << std::endl;
 
         // 2. Determine if the user clicked inside or outside of the segmentation
           const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
@@ -122,7 +122,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
 
           if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
           {
-            MITK_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
+            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
 
             // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
             itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
@@ -162,7 +162,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
               
             if ( m_ReferenceSlice.IsNotNull() )
             {
-              MITK_INFO << "OnMousePressed: got reference slice" << std::endl;
+              MITK_DEBUG << "OnMousePressed: got reference slice" << std::endl;
 
               m_OriginalPicSlice = mitkIpPicNew();
               CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
@@ -183,7 +183,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
     }
   }
   
-  MITK_INFO << "end OnMousePressed" << std::endl;
+  MITK_DEBUG << "end OnMousePressed" << std::endl;
   return true;
 }
 
@@ -268,7 +268,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
   if ( sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
-    MITK_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
+    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
     //m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
@@ -291,31 +291,27 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
       if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
       {
-        m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 20% of the visible gray values
-      double pixelType = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData())->GetPixelValueByWorldCoordinate(positionEvent->GetWorldPosition());
-      MITK_INFO<<"Pixeltype: "<< pixelType;
-      //if (!initializedAlready)
-      if (!mitk::Equal(currentVisibleWindow, m_VisibleWindow))
-      {
-          MITK_INFO<<"Setting threshold....";
-        m_InitialLowerThreshold = currentVisibleWindow / 10.0; // 10% of the visible gray values
+        m_InitialLowerThreshold = currentVisibleWindow / 20.0;
+        m_InitialUpperThreshold = currentVisibleWindow / 20.0;
+        m_LowerThreshold = m_InitialLowerThreshold;
+        m_UpperThreshold = m_InitialUpperThreshold;
 
-      }
+        // 3.2.3. Actually perform region growing
+        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
+        ipMITKSegmentationFree( result);
 
-      // 3.2.3. Actually perform region growing
-      mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
-      ipMITKSegmentationFree( result);
-
-      // display the contour
-      FeedbackContourTool::SetFeedbackContourVisible(true);
-      mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+        // display the contour
+        FeedbackContourTool::SetFeedbackContourVisible(true);
+        mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
         
         m_FillFeedbackContour = true;
+      }
     }
-  }
 
   return true;
-}
+  }
+
+  return false;
 }
 
 /**
@@ -323,7 +319,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
  1. Calculate the new thresholds from mouse position (relative to first position)
  2. Perform a new region growing and update the feedback contour
 */
-bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
 {
   if (FeedbackContourTool::OnMouseMoved( action, stateEvent ))
   {
@@ -337,9 +333,8 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
         cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = m_InitialLowerThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
-        
-        m_UpperThreshold = m_InitialUpperThreshold + m_ScreenYDifference * m_MouseDistanceScaleFactor ;
+        m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
+        m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
@@ -385,7 +380,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
-              //MITK_INFO << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
+              //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
              // 4. write working slice back into image volume
              this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);

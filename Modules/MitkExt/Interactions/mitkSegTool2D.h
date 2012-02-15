@@ -32,8 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
-#include <mitkExtractSliceFilter.h>
-#include <mitkVtkImageIdxReslice.h>
+
 
 namespace mitk
 {

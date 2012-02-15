@@ -1006,6 +1006,9 @@ void QmitkFiberProcessingView::DoFiberExtraction()
 
     mitk::FiberBundleX::Pointer extFB = fib->ExtractFiberSubset(roi);
 
+    if (extFB->GetNumFibers()<=0)
+      continue;
+
     mitk::DataNode::Pointer node;
     node = mitk::DataNode::New();
     node->SetData(extFB);

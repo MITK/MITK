@@ -76,7 +76,7 @@ void QmitkFiberIDWorker::run()
     m_itemPackage.st_FancyGUITimer1->start();
 
     //do processing
-    m_itemPackage.st_FBX->DoGenerateFiberIds();
+    m_itemPackage.st_FBX->GenerateFiberIds();
 
     /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
     clock.Stop();

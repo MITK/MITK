@@ -70,7 +70,8 @@ public:
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 signals:
-
+    void FinishedImport(QString);
+    
     public slots:
 
         /// @brief Called when cancel button was clicked.
@@ -97,6 +98,8 @@ protected:
     // adds dicom files from a string list containing the filepath to the local storage.
     void OnAddDICOMData(QStringList& dicomFiles);
 
+    void SetDatabase(QString databaseFile);
+
     ctkDICOMDatabase* m_LocalDatabase;
     ctkDICOMModel* m_LocalModel;
     ctkDICOMIndexer* m_LocalIndexer;
@@ -105,8 +108,6 @@ protected:
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
     QTimer* m_Timer;
-
-    QString m_LocalDatabaseDirectory;
 
     // Performs a starbust on inputimage, which results in outputimage. Only workds with 3D and 4D Ultrasound images (char Pixeltype)
     //void PerformStarburst(mitk::Image::Pointer inputImage, mitk::Image::Pointer &outputImage, mitk::Point3D startPoint, bool doubleStarburst, bool thinStarburst);

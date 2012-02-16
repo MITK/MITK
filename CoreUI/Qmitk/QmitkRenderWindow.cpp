@@ -185,7 +185,7 @@ void QmitkRenderWindow::leaveEvent( QEvent *e )
 void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
 {
   //We are using our own interaction and thus have to call the rendering manually.
-  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderWindow());
+  this->GetRenderer()->GetRenderingManager()->RequestUpdate(GetRenderWindow());
 }
 
 void QmitkRenderWindow::resizeEvent(QResizeEvent* event)

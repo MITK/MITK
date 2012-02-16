@@ -67,8 +67,6 @@ mitk::SegTool2D::SegTool2D(const char* type)
 
 mitk::SegTool2D::~SegTool2D()
 {
-	m_Map = NULL;
-
 }
 
 bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)

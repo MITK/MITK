@@ -343,7 +343,13 @@ int main(int argc, char* argv[])
   mitkWidget3->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget4->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
+  mitkWidget1->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
+  mitkWidget2->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
+  mitkWidget3->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
   
+  mitkWidget1->ReinitEventProvider();
+  mitkWidget2->ReinitEventProvider();
+  mitkWidget3->ReinitEventProvider();
 
   mitkWidget1->GetVtkRenderWindow()->SetSize(400, 400);
   

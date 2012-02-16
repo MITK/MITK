@@ -16,12 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVtkEventProvider.h"
-#include "vtkCallbackCommand.h"
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindowInteractor.h"
 #include "mitkVtkEventAdapter.h"
-
 #include <mbilog.h>
+
+#include <vtkCallbackCommand.h>
+#include <vtkObjectFactory.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyle.h>
 
 #define VTKEVENTPROVIDER_INFO  MBI_INFO("mitk.core.vtkeventprovider")
 #define VTKEVENTPROVIDER_WARN  MBI_WARN("mitk.core.vtkeventprovider")
@@ -109,8 +110,9 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
     InteractionEventsVectorType::iterator it;
     for(it = m_InteractionEventsVector.begin(); it != m_InteractionEventsVector.end(); it++)
     {
-      i->AddObserver((vtkCommand::EventIds) (*it), this->EventCallbackCommand, 
-                   this->Priority);
+      // add observer to interactorStyle
+      i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds) (*it), this->EventCallbackCommand, 
+        this->Priority);
     }
 
     this->InvokeEvent(vtkCommand::EnableEvent,NULL);
@@ -162,7 +164,7 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject* object,
   vtkEventProvider* self = 
     reinterpret_cast<vtkEventProvider *>( clientData );
   vtkRenderWindowInteractor* rwi = 
-    static_cast<vtkRenderWindowInteractor *>( object );
+    static_cast<vtkInteractorStyle *>( object )->GetInteractor();
 
   // base renderer
   mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(self->GetRenderWindow()->GetVtkRenderWindow());

@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include<QString>
 #include <QStringList>
 #include <QFileSystemWatcher>
+#include <QDir>
 
 
 #include<QTimer>
@@ -52,6 +53,12 @@ public slots:
 
 
 protected:
+
+    /// \brief creates directory if it's not already existing.  
+    void CreateListenerDirectory(const QDir& directory);
+
+    /// \brief checks wheter the given directory is the only directory that is listened.
+    bool isOnlyListenedDirectory(const QString& directory);
 
     /// \brief Composes the filename and initializes m_LastRetrievedFile with it
     QStringList* SetRetrievedFile(const QString& filename);

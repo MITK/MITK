@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDicomDirectoryListener.h"
 
 #include <QString>
-#include <QDir>
 #include <QFile>
 
 #include <QFileInfoList>
@@ -78,19 +77,19 @@ QStringList* QmitkDicomDirectoryListener::SetRetrievedFile(const QString& filena
     //if the listenordirectory is empty you have deleted the last file
     if(!listenerDirectory.entryList().isEmpty())
     {
-        QFileInfoList fileInfoList;
-        fileInfoList = listenerDirectory.entryInfoList();
-        QFileInfoList::iterator it;
-        it=fileInfoList.begin();
+        QFileInfoList directoryMembers;
+        directoryMembers = listenerDirectory.entryInfoList();
+        QFileInfoList::iterator member;
+        member=directoryMembers.begin();
         QStringList temp;
 
         //filter files, no directories wanted
-        while(it!=fileInfoList.end())
+        while(member!=directoryMembers.end())
         {
-            if((*it).isFile()){
-                temp.append((*it).absoluteFilePath());
+            if((*member).isFile()){
+                temp.append((*member).absoluteFilePath());
             }
-            ++it;
+            ++member;
         }
 
         //check if there is an existing new file
@@ -104,18 +103,39 @@ QStringList* QmitkDicomDirectoryListener::SetRetrievedFile(const QString& filena
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)
 {
-    
-    if(m_FileSystemWatcher->directories().count()==0||m_FileSystemWatcher->directories().count()==1)
+    if(isOnlyListenedDirectory(directory))
     {
-        if(!m_FileSystemWatcher->directories().contains(directory))
-        {
-            m_DicomListenerDirectory=QString(directory);
-            m_FileSystemWatcher->addPath(directory);
-        }
+        QDir listenerDirectory = QDir(directory);
+        CreateListenerDirectory(listenerDirectory);
+        
+        m_DicomListenerDirectory=listenerDirectory.absolutePath();
+        m_FileSystemWatcher->addPath(m_DicomListenerDirectory);
     }
+
 }
 
 const QString& QmitkDicomDirectoryListener::GetDicomListenerDirectory()
 {
     return m_DicomListenerDirectory;
+}
+
+void QmitkDicomDirectoryListener::CreateListenerDirectory(const QDir& directory)
+{   
+    if(!directory.exists())
+    {
+        directory.mkpath(directory.absolutePath());
+    }
+}
+
+bool QmitkDicomDirectoryListener::isOnlyListenedDirectory(const QString& directory)
+{
+    bool isOnlyListenedDirectory = false;
+    if(m_FileSystemWatcher->directories().count()==0||m_FileSystemWatcher->directories().count()==1)
+    {
+        if(!m_FileSystemWatcher->directories().contains(directory))
+        {
+            isOnlyListenedDirectory = true;
+        }
+    }
+    return isOnlyListenedDirectory;
 }

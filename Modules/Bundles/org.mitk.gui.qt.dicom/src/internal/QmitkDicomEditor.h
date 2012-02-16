@@ -104,6 +104,8 @@ protected:
 
     void CreateQtPartControl(QWidget *parent);
 
+    void SetupDefaults();
+
     Events::Types GetPartEventTypes() const;
 
     Ui::QmitkDicomEditorControls m_Controls;
@@ -112,6 +114,8 @@ protected:
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
 
 private:
+
+
  
 };
 

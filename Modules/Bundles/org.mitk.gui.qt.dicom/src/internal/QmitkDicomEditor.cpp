@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk
 #include "QmitkDicomEditor.h"
+#include "mitkPluginActivator.h"
 #include <mitkDicomSeriesReader.h>
 //#include "mitkProgressBar.h"
 
@@ -81,11 +82,9 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-
-    QString directory("C:/DICOMListenerDirectory");
-    StartDicomDirectoryListener(directory);
+    SetupDefaults();
+    
     connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
-
 
     //connections for base controls
     connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
@@ -215,7 +214,10 @@ void QmitkDicomEditor::OnChangePage(int page)
 void QmitkDicomEditor::OnDicomImportFinished(QString path)
 {
     QFile file(path);
-    if(file.remove());
+    if(file.fileName().contains(m_DicomDirectoryListener->GetDicomListenerDirectory()))
+    {
+        file.remove();
+    }
 }
 
 void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
@@ -230,4 +232,26 @@ void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
     //QThread* thread = new QThread();
     //listener->moveToThread(thread);
     //thread->start();
+}
+
+void QmitkDicomEditor::SetupDefaults()
+{
+    QString pluginDirectory;
+    mitk::PluginActivator::getContext()->getDataFile(pluginDirectory);
+    pluginDirectory.append("/");
+    
+    QString databaseDirectory;
+    databaseDirectory.append(pluginDirectory);
+    databaseDirectory.append(QString("DicomDatabase"));
+    
+    QDir tmp(databaseDirectory);
+    tmp.mkpath(databaseDirectory);
+   
+    m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);
+    
+    QString listenerDirectory;
+    listenerDirectory.append(pluginDirectory);
+    listenerDirectory.append(QString("DicomListener"));
+    StartDicomDirectoryListener(QString("C:/DICOMListenerDirectory"));
+
 }

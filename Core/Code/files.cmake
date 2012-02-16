@@ -237,6 +237,7 @@ SET(CPP_FILES
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkKeyEvent.cpp
   Interactions/mitkVtkEventAdapter.cpp
+  Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkDicomSeriesReader.cpp

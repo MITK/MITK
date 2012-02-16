@@ -65,12 +65,14 @@ public:
 
   void SetSize( int width, int height );
 
+  void ReinitEventProvider();
+
+
 protected:
     RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL );
 
 
     void ResetView();
-  
     vtkRenderWindow *               m_vtkRenderWindow;
     vtkRenderWindowInteractor *     m_vtkRenderWindowInteractor;
 

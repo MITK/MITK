@@ -63,6 +63,8 @@ public:
   
   void FullScreenMode( bool state );
 
+  void SetSize( int width, int height );
+
 protected:
     RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL );
 

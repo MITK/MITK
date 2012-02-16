@@ -375,14 +375,14 @@ int main(int argc, char* argv[])
 
 
   m_DataStorage->Print( std::cout );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
 
   mitkWidget1->GetVtkRenderWindow()->Render();
   mitkWidget2->GetVtkRenderWindow()->Render();
   mitkWidget3->GetVtkRenderWindow()->Render();
   mitkWidget4->GetVtkRenderWindow()->Render();
-  mitkWidget1->GetVtkRenderWindowInteractor()->Start();
+  mitkWidget4->GetVtkRenderWindowInteractor()->Start();
 
  
   return 0;

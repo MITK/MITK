@@ -33,7 +33,9 @@ public:
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
-
+  static ctkPluginContext* getContext();
+private:
+    static ctkPluginContext* pluginContext;
 }; // PluginActivator
 
 }

@@ -59,6 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 		    Default: false
 		 */
 		void SetOverwriteMode(bool b);
+		bool IsOverwriteMode(){return m_Overwrite_Mode;}
 
 		/** \brief Set the slice for overwrite mode.
 		  Note:

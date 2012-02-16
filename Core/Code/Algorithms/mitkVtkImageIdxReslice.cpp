@@ -41,9 +41,6 @@ vtkStandardNewMacro(mitkVtkImageIdxReslice);
 
 
 
-bool Overwrite_Mode = false;
-//mitkVtkImageIdxReslice* self_obj;
-
 
 //--------------------------------------------------------------------------
 // The 'floor' function on x86 and mips is many times slower than these
@@ -93,13 +90,13 @@ inline int vtkResliceRound(double x)
 //----------------------------------------------------------------------------
 mitkVtkImageIdxReslice::mitkVtkImageIdxReslice()
 {
+	m_Overwrite_Mode = false;
 	this->GetOutput()->SetScalarTypeToUnsignedInt();
 }
 
 //----------------------------------------------------------------------------
 mitkVtkImageIdxReslice::~mitkVtkImageIdxReslice()
 {
-	Overwrite_Mode = false;
 }
 
 
@@ -376,7 +373,8 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
                                     const int inExt[6],
                                     const vtkIdType inInc[3],
                                     int numscalars, const F point[3],
-                                    int mode, const T *background)
+                                    int mode, const T *background,
+																		mitkVtkImageIdxReslice *self)
 {
   int inIdX0 = vtkResliceRound(point[0]) - inExt[0];
   int inIdY0 = vtkResliceRound(point[1]) - inExt[2];
@@ -423,12 +421,14 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
   do
     {
 			
-			if(!Overwrite_Mode)
+			if(!self->IsOverwriteMode())
 			{
+				//just copy from input to output
 				*outPtr++ = *inPtr++;				
 			}
 			else
 			{
+				//copy from output to input in overwrite mode
 				*(const_cast<T*>(inPtr)) = *outPtr++;
 				inPtr++;
 			}
@@ -440,8 +440,7 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
 
 //--------------------------------------------------------------------------
-// get appropriate interpolation function according to interpolation mode
-// and scalar type
+// get appropriate interpolation function according to scalar type
 template<class F>
 static void vtkGetResliceInterpFunc(mitkVtkImageIdxReslice *self,
                              int (**interpolate)(void *&outPtr,
@@ -451,7 +450,8 @@ static void vtkGetResliceInterpFunc(mitkVtkImageIdxReslice *self,
                                                  int numscalars,
                                                  const F point[3],
                                                  int mode,
-                                                 const void *background))
+                                                 const void *background,
+																								 mitkVtkImageIdxReslice *self))
 {
 	int dataType = self->GetOutput()->GetScalarType();
 
@@ -462,7 +462,8 @@ static void vtkGetResliceInterpFunc(mitkVtkImageIdxReslice *self,
 			const vtkIdType inInc[3],
 			int numscalars, const F point[3],
 			int mode,
-			const VTK_TT *background))interpolate) = \
+			const VTK_TT *background,
+			mitkVtkImageIdxReslice *self))interpolate) = \
 			&vtkNearestNeighborInterpolation);
 	default:
 		interpolate = 0;
@@ -710,7 +711,7 @@ static void vtkImageResliceExecute(mitkVtkImageIdxReslice *self,
   int (*interpolate)(void *&outPtr, const void *inPtr,
                      const int inExt[6], const vtkIdType inInc[3],
                      int numscalars, const double point[3],
-                     int mode, const void *background);
+                     int mode, const void *background, mitkVtkImageIdxReslice *self);
   void (*setpixels)(void *&out, const void *in, int numscalars, int n);
 
   // the 'mode' species what to do with the 'pad' (out-of-bounds) area
@@ -818,7 +819,7 @@ static void vtkImageResliceExecute(mitkVtkImageIdxReslice *self,
 
           // interpolate output voxel from input data set
           interpolate(outPtr, inPtr, inExt, inInc, numscalars,
-                      point, mode, background);
+                      point, mode, background, self);
           } 
         }
       outPtr = static_cast<void *>(
@@ -833,11 +834,12 @@ static void vtkImageResliceExecute(mitkVtkImageIdxReslice *self,
 
 
 void mitkVtkImageIdxReslice::SetOverwriteMode(bool b){
-	Overwrite_Mode = b;
+	m_Overwrite_Mode = b;
 }
 
 
 void mitkVtkImageIdxReslice::SetInputSlice(vtkImageData* slice){
+	//set the output as input
 	this->SetOutput(slice);
 }
 
@@ -846,9 +848,7 @@ void mitkVtkImageIdxReslice::SetInputSlice(vtkImageData* slice){
 
 //----------------------------------------------------------------------------
 // This method is passed a input and output region, and executes the filter
-// algorithm to fill the output from the input.
-// It just executes a switch statement to call the correct function for
-// the regions data types.
+// algorithm to fill the output from the input or vice versa.
 void mitkVtkImageIdxReslice::ThreadedRequestData(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),

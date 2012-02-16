@@ -64,7 +64,7 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkTbssRoiImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
-  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp 
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
@@ -80,7 +80,7 @@ SET(CPP_FILES
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  Rendering/mitkTbssImageMapper.cpp  
+  Rendering/mitkTbssImageMapper.cpp
   Rendering/mitkPlanarCircleMapper3D.cpp
   Rendering/mitkPlanarPolygonMapper3D.cpp
 
@@ -119,7 +119,7 @@ SET(H_FILES
   Reconstruction/itkRegularizedIVIMReconstructionSingleIteration.h
 
   # IO Datastructures
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h 
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
   IODataStructures/TbssImages/mitkTbssImporter.h
 
   # DataStructures -> FiberBundleX
@@ -155,6 +155,7 @@ SET(H_FILES
   Algorithms/itkDistanceMapFilter.h
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
+  Algorithms/itkReduceDirectionGradientsFilter.h
 )
 
 SET( TOOL_FILES

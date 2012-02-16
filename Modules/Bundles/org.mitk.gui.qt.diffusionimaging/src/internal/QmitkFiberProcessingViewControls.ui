@@ -578,10 +578,10 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Resample fibers using b-spline interpolation</string>
+         <string>Resample fibers using a Kochanek spline interpolation</string>
         </property>
         <property name="text">
-         <string>Resample Fibers</string>
+         <string>Smooth Fibers</string>
         </property>
        </widget>
       </item>

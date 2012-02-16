@@ -814,8 +814,6 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
     //turn the light out in the scene in order to render correct grey values.
     //TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
-    //remove the VTK interaction
-    this->GetVtkRenderer()->GetRenderWindow()->GetInteractor()->Disable();
   }
   return true;
 }

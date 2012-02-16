@@ -288,7 +288,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   image->InitializeFromVectorImage();
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( image );
-  imageNode->SetName("reduced gradients image");
+  imageNode->SetName("reduced_image");
   this->GetDefaultDataStorage()->Add(imageNode);
 
   std::vector< int > gradients = filter->GetUsedGradientIndices();
@@ -326,29 +326,8 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   originalN->SetProperty("pointsize", mitk::FloatProperty::New(0.04));
   originalN->SetProperty("color", mitk::ColorProperty::New(1,0,0));
 
-//  GradientDirectionContainerType::Pointer shellContainer = filter->GetPointShell();
-//  mitk::PointSet::Pointer newShell = mitk::PointSet::New();
-//  for (int j=0; j<shellContainer->Size(); j++)
-//  {
-//    mitk::Point3D p;
-//    vnl_vector_fixed< double, 3 > v = shellContainer->at(j);
-//    p[0] = v[0];
-//    p[1] = v[1];
-//    p[2] = v[2];
-//    newShell->InsertPoint(j, p);
-//  }
-//  mitk::DataNode::Pointer shellNode = mitk::DataNode::New();
-//  shellNode->SetData(newShell);
-//  shellNode->SetName("new_shell");
-//  shellNode->SetProperty("pointsize", mitk::FloatProperty::New(0.04));
-//  shellNode->SetProperty("color", mitk::ColorProperty::New(0,0,1));
-
   this->GetDefaultDataStorage()->Add(originalN);
-//  this->GetDefaultDataStorage()->Add(shellNode);
   this->GetDefaultDataStorage()->Add(node);
-
-//  DiffusionImageType* bla;
-
 }
 
 void QmitkPreprocessingView::ExtractB0()

@@ -153,15 +153,15 @@ void QmitkFiberColoringWorker::run()
 
     //do processing
     if(m_itemPackage.st_Controls->radioButton_ColorOrient->isChecked()) {
-        m_itemPackage.st_FBX->DoColorCodingOrientationbased();
+        m_itemPackage.st_FBX->DoColorCodingOrientationBased();
 
     } else if(m_itemPackage.st_Controls->radioButton_ColorFA->isChecked()) {
-        m_itemPackage.st_FBX->DoColorCodingFAbased();
+        m_itemPackage.st_FBX->DoColorCodingFaBased();
 
     } else if(m_itemPackage.st_Controls->radioButton_OpacityFA->isChecked()) {
         //        m_itemPackage.st_FBX->SetColorCoding("");
         m_itemPackage.st_PassedDataNode->SetOpacity(0.999);
-        m_itemPackage.st_FBX->DoUseFAasColorOpacity();
+        m_itemPackage.st_FBX->DoUseFaFiberOpacity();
     } else if(m_itemPackage.st_Controls->radioButton_ColorCustom->isChecked()){
         m_itemPackage.st_FBX->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
     }

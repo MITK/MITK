@@ -46,17 +46,12 @@ void mitk::FiberBundleXWriter::GenerateData()
         itkWarningMacro(<<"Sorry, input to FiberBundleXWriter is NULL!");
         return;
     }
-    if ( m_FileName == "" )
+    else if ( m_FileName == "" )
     {
         itkWarningMacro( << "Sorry, filename has not been set!" );
         return ;
     }
     vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-
-//    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-//    cleaner->SetInput(input->GetFiberPolyData());
-//    cleaner->Update();
-
     writer->SetInput(input->GetFiberPolyData());
     writer->SetFileName(m_FileName.c_str());
     writer->SetFileTypeToASCII();

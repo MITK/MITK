@@ -86,7 +86,8 @@ protected slots:
   void BrainMask();
   void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
-  void ApplyMesurementFrame();
+  void DoApplyMesurementFrame();
+  void DoReduceGradientDirections();
 
 protected:
 

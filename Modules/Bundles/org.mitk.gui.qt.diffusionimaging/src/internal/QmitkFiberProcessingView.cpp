@@ -1381,7 +1381,7 @@ void QmitkFiberProcessingView::JoinBundles()
   ++it;
   for (it; it!=m_SelectedFB.end(); ++it)
   {
-    newBundle = *newBundle+dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
     name += "+"+QString((*it)->GetName().c_str());
   }
 
@@ -1407,7 +1407,7 @@ void QmitkFiberProcessingView::SubstractBundles()
   ++it;
   for (it; it!=m_SelectedFB.end(); ++it)
   {
-    newBundle = *newBundle-dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
     name += "-"+QString((*it)->GetName().c_str());
   }
 

@@ -26,17 +26,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 // itk includes
 #include "itkTimeProbe.h"
+#include "itkB0ImageExtractionImageFilter.h"
+#include "itkBrainMaskExtractionImageFilter.h"
+#include "itkCastImageFilter.h"
+#include "itkVectorContainer.h"
+#include <itkReduceDirectionGradientsFilter.h>
 
 // mitk includes
-#include "mitkProgressBar.h"
-#include "mitkStatusBar.h"
-
-#include "mitkNodePredicateDataType.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
-
-#include "itkVectorContainer.h"
-
+#include "mitkProgressBar.h"
+#include "mitkStatusBar.h"
+#include "mitkNodePredicateDataType.h"
 #include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkLookupTable.h"
@@ -46,10 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNodeObject.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
-
-#include "itkB0ImageExtractionImageFilter.h"
-#include "itkBrainMaskExtractionImageFilter.h"
-#include "itkCastImageFilter.h"
+#include <mitkPointSet.h>
 
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
@@ -113,6 +111,7 @@ struct PrpSelListener : ISelectionListener
       m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
+      m_View->m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);
 
       if (foundDwiVolume)
       {
@@ -226,7 +225,8 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
     connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
     connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );
-    connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(ApplyMesurementFrame()) );
+    connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(DoApplyMesurementFrame()) );
+    connect( (QObject*)(m_Controls->m_ReduceGradientsButton), SIGNAL(clicked()), this, SLOT(DoReduceGradientDirections()) );
   }
 }
 
@@ -245,7 +245,7 @@ void QmitkPreprocessingView::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
-void QmitkPreprocessingView::ApplyMesurementFrame()
+void QmitkPreprocessingView::DoApplyMesurementFrame()
 {
   if (m_DiffusionImage.IsNull())
     return;
@@ -259,6 +259,75 @@ void QmitkPreprocessingView::ApplyMesurementFrame()
       mf[r][c] = item->text().toDouble();
     }
   m_DiffusionImage->SetMeasurementFrame(mf);
+}
+
+void QmitkPreprocessingView::DoReduceGradientDirections()
+{
+  if (m_DiffusionImage.IsNull())
+    return;
+
+  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef itk::ReduceDirectionGradientsFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+
+  GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetOriginalDirections();
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(m_DiffusionImage->GetVectorImage());
+  filter->SetOriginalGradientDirections(gradientContainer);
+  filter->SetNumGradientDirections(m_Controls->m_ReduceGradientsBox->value());
+  filter->Update();
+
+  DiffusionImageType::Pointer image = DiffusionImageType::New();
+  image->SetVectorImage( filter->GetOutput() );
+  image->SetB_Value(m_DiffusionImage->GetB_Value());
+  image->SetDirections(filter->GetGradientDirections());
+  image->SetOriginalDirections(filter->GetGradientDirections());
+  image->SetMeasurementFrame(m_DiffusionImage->GetMeasurementFrame());
+  image->InitializeFromVectorImage();
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData( image );
+  imageNode->SetName("reduced_image");
+  this->GetDefaultDataStorage()->Add(imageNode);
+
+  std::vector< int > gradients = filter->GetUsedGradientIndices();
+  mitk::PointSet::Pointer points = mitk::PointSet::New();
+  int ind = 0;
+  for (std::vector<int>::iterator it = gradients.begin(); it!=gradients.end(); ++it)
+  {
+    mitk::Point3D p;
+    vnl_vector_fixed< double, 3 > v = gradientContainer->at(*it);
+    p[0] = v[0];
+    p[1] = v[1];
+    p[2] = v[2];
+    points->InsertPoint(ind, p);
+    ind++;
+  }
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(points);
+  node->SetName("reduced_shell");
+  node->SetProperty("pointsize", mitk::FloatProperty::New(0.05));
+  node->SetProperty("color", mitk::ColorProperty::New(0,1,0));
+
+  mitk::PointSet::Pointer originalP = mitk::PointSet::New();
+  for (int j=0; j<gradientContainer->Size(); j++)
+  {
+    mitk::Point3D p;
+    vnl_vector_fixed< double, 3 > v = gradientContainer->at(j);
+    p[0] = v[0];
+    p[1] = v[1];
+    p[2] = v[2];
+    originalP->InsertPoint(j, p);
+  }
+  mitk::DataNode::Pointer originalN = mitk::DataNode::New();
+  originalN->SetData(originalP);
+  originalN->SetName("original_shell");
+  originalN->SetProperty("pointsize", mitk::FloatProperty::New(0.04));
+  originalN->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+
+  this->GetDefaultDataStorage()->Add(originalN);
+  this->GetDefaultDataStorage()->Add(node);
 }
 
 void QmitkPreprocessingView::ExtractB0()

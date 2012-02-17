@@ -230,7 +230,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
     intersectionWorldPoint.Fill(std::numeric_limits<int>::min());
 
     // Get intersection point of line and plane geometry
-    m_PlaneGeometry->IntersectionPoint(line, intersectionWorldPoint);  
+    geometry->IntersectionPoint(line, intersectionWorldPoint);  
 
     double t = -1.0;
 

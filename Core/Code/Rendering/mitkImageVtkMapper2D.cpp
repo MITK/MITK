@@ -51,8 +51,6 @@ PURPOSE.  See the above copyright notices for more information.
 //ITK
 #include <itkRGBAPixel.h>
 
-#include <mitkVtkImageMapReslice.h>
-
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }

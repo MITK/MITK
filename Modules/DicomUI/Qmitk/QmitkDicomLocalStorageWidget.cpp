@@ -66,6 +66,8 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
         connect(m_Controls->CancelButton, SIGNAL(clicked()), this , SLOT(OnCancelButtonClicked()));
         connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
+
+        connect(m_Controls->SearchOption, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
     }
 }
 
@@ -165,4 +167,9 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
 //TODO
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
+}
+
+void QmitkDicomLocalStorageWidget::OnSearchParameterChanged(){
+ 
+    m_LocalModel->setDatabase(m_LocalDatabase->database(),m_Controls->SearchOption->parameters());
 }

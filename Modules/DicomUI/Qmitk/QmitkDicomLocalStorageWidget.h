@@ -89,6 +89,9 @@ signals:
         /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
         void StartDicomImport(QStringList& dicomData);
 
+        /// @brief   Called when search parameters change.
+        void OnSearchParameterChanged();
+
 
 protected:
 

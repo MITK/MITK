@@ -91,6 +91,9 @@ signals:
        /// @brief Called when cancel button was clicked.
        void OnCancelButtonClicked();
 
+       /// @brief   Called when search parameters change.
+        void OnSearchParameterChanged();
+
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.

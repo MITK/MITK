@@ -156,6 +156,7 @@ SET(H_FILES
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
   Algorithms/itkReduceDirectionGradientsFilter.h
+  Algorithms/itkResidualImageFilter.h
 )
 
 SET( TOOL_FILES

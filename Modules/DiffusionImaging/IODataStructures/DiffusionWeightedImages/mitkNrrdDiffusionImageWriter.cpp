@@ -72,10 +72,6 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 
   char keybuffer[512];
   char valbuffer[512];
-  std::string tmp;
-
-  itk::VectorImage<short,3>::Pointer img = input->GetVectorImage();
-  img->GetMetaDataDictionary();
 
   //itk::MetaDataDictionary dic = input->GetImage()->GetMetaDataDictionary();
 
@@ -84,7 +80,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       measurementFrame(1,0) || measurementFrame(1,1) || measurementFrame(1,2) ||
       measurementFrame(2,0) || measurementFrame(2,1) || measurementFrame(2,2))
   {
-    sprintf( valbuffer, " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", measurementFrame(0,0), measurementFrame(0,1), measurementFrame(0,2), measurementFrame(1,0), measurementFrame(1,1), measurementFrame(1,2), measurementFrame(2,0), measurementFrame(2,1), measurementFrame(2,2));
+    sprintf( valbuffer, " (%lf,%lf,%lf) (%lf,%lf,%lf) (%lf,%lf,%lf)", measurementFrame(0,0), measurementFrame(0,1), measurementFrame(0,2), measurementFrame(1,0), measurementFrame(1,1), measurementFrame(1,2), measurementFrame(2,0), measurementFrame(2,1), measurementFrame(2,2));
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
   }
 

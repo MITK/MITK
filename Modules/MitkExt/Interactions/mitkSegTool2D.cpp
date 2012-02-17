@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //includes for resling and overwriting
 #include <mitkExtractSliceFilter.h>
-#include <mitkVtkImageIdxReslice.h>
+#include <mitkVtkImageOverwrite.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 
@@ -188,7 +188,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   if ( !image || !planeGeometry ) return NULL;
 
 	//Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
-	vtkSmartPointer<mitkVtkImageIdxReslice> reslice = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	//set to false to extract a slice
 	reslice->SetOverwriteMode(false);
 	reslice->Modified();
@@ -266,7 +266,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
 	//Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
-	vtkSmartPointer<mitkVtkImageIdxReslice> reslice = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
 	//Set the slice as 'input'
 	reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));

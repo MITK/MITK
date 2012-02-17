@@ -54,7 +54,7 @@ SET(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
-  Algorithms/mitkVtkImageIdxReslice.h
+  Algorithms/mitkVtkImageOverwrite.h
   
   IO/mitkPixelTypeTraits.h
 
@@ -112,7 +112,7 @@ SET(CPP_FILES
   Algorithms/mitkVolumeCalculator.cpp
   Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Algorithms/mitkExtractSliceFilter.cpp
-  Algorithms/mitkVtkImageIdxReslice.cpp
+  Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

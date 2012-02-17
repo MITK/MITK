@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTestingMacros.h>
 
 #include <mitkExtractSliceFilter.h>
-#include <mitkVtkImageIdxReslice.h>
+#include <mitkVtkImageOverwrite.h>
 #include <mitkImageCast.h>
 #include <mitkGeometry3D.h>
 #include <mitkRotationOperation.h>
@@ -55,7 +55,7 @@ static void OverwriteByPointerTest(mitk::Image* workingImage, mitk::Image* refIm
 
 
 	/* ============= extract slice ============*/
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> resliceIdx = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New(resliceIdx);
 	slicer->SetInput(workingImage);
 	slicer->SetWorldGeometry(plane);
@@ -110,7 +110,7 @@ stop:
 
 	/* ============= overwrite slice ============*/
 
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx2 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> resliceIdx2 = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	resliceIdx2->SetOverwriteMode(true);
 	resliceIdx2->SetInputSlice(slice);
 	mitk::ExtractSliceFilter::Pointer slicer2 = mitk::ExtractSliceFilter::New(resliceIdx2);
@@ -190,7 +190,7 @@ static void OverwriteByPointerForObliquePlaneTest(mitk::Image* workingImage, mit
 
 
 	/* ============= overwrite slice ============*/
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> resliceIdx = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	mitk::ExtractSliceFilter::Pointer overwriter = mitk::ExtractSliceFilter::New(resliceIdx);
 	resliceIdx->SetOverwriteMode(true);
 	resliceIdx->SetInputSlice(slice);
@@ -242,7 +242,7 @@ stop:
 
 
 	/* ============= overwrite slice ============*/
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx2 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> resliceIdx2 = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	mitk::ExtractSliceFilter::Pointer overwriter2 = mitk::ExtractSliceFilter::New(resliceIdx2);
 	resliceIdx2->SetOverwriteMode(true);
 	resliceIdx2->SetInputSlice(slice2);
@@ -291,7 +291,7 @@ stop2:
 
 	/* ============= overwrite slice ============*/
 
-	vtkSmartPointer<mitkVtkImageIdxReslice> resliceIdx3 = vtkSmartPointer<mitkVtkImageIdxReslice>::New();
+	vtkSmartPointer<mitkVtkImageOverwrite> resliceIdx3 = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 	resliceIdx3->SetOverwriteMode(true);
 	resliceIdx3->SetInputSlice(slice);
 	mitk::ExtractSliceFilter::Pointer overwriter3 = mitk::ExtractSliceFilter::New(resliceIdx3);

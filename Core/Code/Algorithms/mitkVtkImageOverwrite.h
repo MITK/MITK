@@ -15,15 +15,15 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkVtkImageIdxReslice_h_Included
-#define mitkVtkImageIdxReslice_h_Included
+#ifndef mitkVtkImageOverwrite_h_Included
+#define mitkVtkImageOverwrite_h_Included
 
 #include <vtkImageReslice.h>
 #include "MitkExports.h"
 
 	/** \brief A vtk Filter based on vtkImageReslice with the aditional feature to write a slice into the given input volume.
 		All optimizations for e.g. the plane directions or interpolation are stripped away, the algorithm only interpolates nearest
-		neighbour and uses the non optimized execute function of vtkImageReslice.
+		neighbor and uses the non optimized execute function of vtkImageReslice.
 	  There are two use cases for the Filter which are specified by the overwritemode property:
 		
 		1)Extract slices from a 3D volume.
@@ -49,11 +49,11 @@ PURPOSE.  See the above copyright notices for more information.
 			\sa vtkImageReslice
 			(Note that the execute and interpolation function are no members and thus can not be overriden)
 	 */
-	class MITK_CORE_EXPORT mitkVtkImageIdxReslice : public vtkImageReslice
+	class MITK_CORE_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
 	{
 	public:
-		static mitkVtkImageIdxReslice *New();
-		vtkTypeMacro(mitkVtkImageIdxReslice, vtkImageReslice);
+		static mitkVtkImageOverwrite *New();
+		vtkTypeMacro(mitkVtkImageOverwrite, vtkImageReslice);
 
 		/** \brief Set the mode either to reslice (false) or to overwrite (true).
 		    Default: false
@@ -70,8 +70,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 	protected:
 		
-		mitkVtkImageIdxReslice();
-		virtual ~mitkVtkImageIdxReslice();
+		mitkVtkImageOverwrite();
+		virtual ~mitkVtkImageOverwrite();
 
 		bool m_Overwrite_Mode;
 
@@ -85,4 +85,4 @@ PURPOSE.  See the above copyright notices for more information.
 	};
 
 
-#endif //mitkVtkImageIdxReslice_h_Included
+#endif //mitkVtkImageOverwrite_h_Included

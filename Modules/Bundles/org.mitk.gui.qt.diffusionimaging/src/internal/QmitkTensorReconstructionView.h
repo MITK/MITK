@@ -89,13 +89,13 @@ protected slots:
   void Reconstruct(int method);
   void TeemReconstruction();
   void ItkReconstruction();
+
+protected:
+
   void ItkTensorReconstruction
     (mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TeemTensorReconstruction
     (mitk::DataStorage::SetOfObjects::Pointer inImages);
-
-
-protected:
 
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 

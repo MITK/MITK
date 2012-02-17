@@ -56,6 +56,9 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
+  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+
   QmitkPreprocessingView();
   QmitkPreprocessingView(const QmitkPreprocessingView& other);
   virtual ~QmitkPreprocessingView();
@@ -88,6 +91,8 @@ protected slots:
 
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();
+  void DoShowGradientDirections();
+  void DoHalfSphereGradientDirections();
 
 protected:
 

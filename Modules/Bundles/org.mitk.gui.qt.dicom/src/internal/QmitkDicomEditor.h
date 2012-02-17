@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QString>
 #include <QStringList>
 #include <QThread.h>
+#include <QProcess>
 
 /*!
 \brief QmitkDicomEditor
@@ -99,9 +100,6 @@ signals:
 
 protected:
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
-
     void CreateQtPartControl(QWidget *parent);
 
     void SetupDefaults();
@@ -112,10 +110,6 @@ protected:
 
     QThread* m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
-
-private:
-
-
  
 };
 

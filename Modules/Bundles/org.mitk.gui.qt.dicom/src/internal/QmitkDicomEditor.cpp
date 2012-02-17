@@ -73,6 +73,7 @@ QmitkDicomEditor::QmitkDicomEditor()
 QmitkDicomEditor::~QmitkDicomEditor()
 {
     m_Thread->terminate();
+    delete m_StoreSCP;
     delete m_Thread;
     delete m_DicomDirectoryListener;
 }
@@ -96,26 +97,6 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));   
 
-}
-
-void QmitkDicomEditor::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{
-    // iterate all selected objects, adjust warning visibility
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-        it != nodes.end();
-        ++it )
-    {
-        mitk::DataNode::Pointer node = *it;
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-        {
-            //m_Controls.labelWarning->setVisible( false );
-            //m_Controls.buttonPerformImageProcessing->setEnabled( true );
-            return;
-        }
-    }
-
-    //m_Controls.labelWarning->setVisible( true );
-    //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
 void QmitkDicomEditor::OnSeriesModelDoubleClicked(QModelIndex index){
@@ -172,9 +153,6 @@ void QmitkDicomEditor::OnSeriesModelDoubleClicked(QModelIndex index){
 
 void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
-    //if (input.Cast<berry::FileEditorInput>().IsNull())
-    //   throw berry::PartInitException("Invalid Input: Must be FileEditorInput");
-
     this->SetSite(site);
     this->SetInput(input);
 }
@@ -224,14 +202,8 @@ void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
 {   
     m_DicomDirectoryListener->SetDicomListenerDirectory(directory);
     connect(m_DicomDirectoryListener,SIGNAL(StartImportingFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)),Qt::DirectConnection);
-    //m_FileSystemWatcher->addPath(directory);
     m_DicomDirectoryListener->moveToThread(m_Thread);
-    m_Thread->start();
-    
-    //QmitkDicomDirectoryListener* listener = new QmitkDicomDirectoryListener();
-    //QThread* thread = new QThread();
-    //listener->moveToThread(thread);
-    //thread->start();
+    m_Thread->start();   
 }
 
 void QmitkDicomEditor::SetupDefaults()

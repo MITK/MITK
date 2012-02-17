@@ -504,6 +504,34 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Residuals</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QCommandLinkButton" name="m_ResidualButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string comment="Calculate ODF value as tensor value in the according direction" extracomment="Calculate ODF value as tensor value in the according direction">Calculate the residual from a dti and a dwi iimage</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Residual Image Calculation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

@@ -230,6 +230,15 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
+  
+  // do nothing if the renderWindow is not managed by this instance
+  RenderWindowVector::iterator iter = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
+  if ( iter == m_AllRenderWindows.end() )
+  {
+    MITK_ERROR << "Update requested for vtkRenderWindow that has not been registered in this instance of mitkRenderingManager";
+    return;
+  }
+
   m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
   if ( !m_UpdatePending )

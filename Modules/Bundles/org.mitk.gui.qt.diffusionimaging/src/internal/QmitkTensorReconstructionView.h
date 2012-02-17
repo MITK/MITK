@@ -89,6 +89,7 @@ protected slots:
   void Reconstruct(int method);
   void TeemReconstruction();
   void ItkReconstruction();
+  void ResidualCalculation();
 
 protected:
 

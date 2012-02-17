@@ -114,6 +114,8 @@ struct TrSelListener : ISelectionListener
       m_View->m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);
 
+      m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
+
 
     }
   }
@@ -231,6 +233,7 @@ void QmitkTensorReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_TensorEstimationManualThreashold), SIGNAL(clicked()), this, SLOT(ManualThresholdClicked()) );
     connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
     connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
+    connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
   }
 }
 
@@ -276,6 +279,112 @@ void QmitkTensorReconstructionView::MethodChoosen(int method)
 {
   m_Controls->m_TensorEstimationTeemNumItsLabel_2->setEnabled(method==3);
   m_Controls->m_TensorEstimationTeemNumItsSpin->setEnabled(method==3);
+}
+
+void QmitkTensorReconstructionView::ResidualCalculation()
+{
+  // Extract dwi and dti from current selection
+  // In case of multiple selections, take the first one, since taking all combinations is not meaningful
+  if(m_CurrentSelection)
+  {
+    mitk::DataStorage::SetOfObjects::Pointer set =
+      mitk::DataStorage::SetOfObjects::New();
+
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer diffImage
+        = mitk::DiffusionImage<DiffusionPixelType>::New();
+
+    typedef float                                       TTensorPixelType;
+    typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
+    typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+
+    TensorImageType::Pointer tensorImage;
+
+    std::string nodename;
+
+
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
+      ++i)
+    {
+
+      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      {
+        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+        {
+          diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+        }
+        else if((QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0))
+        {
+          mitk::TensorImage* mitkVol;
+          mitkVol = static_cast<mitk::TensorImage*>((node)->GetData());
+          mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
+          node->GetStringProperty("name", nodename);
+        }
+      }
+    }
+
+
+
+    typedef itk::TensorImageToDiffusionImageFilter<
+      TTensorPixelType, DiffusionPixelType > FilterType;
+
+    FilterType::GradientListType gradientList;
+    mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionContainerType* gradients
+        = diffImage->GetDirections();
+
+    // Copy gradients vectors from gradients to gradientList
+
+
+
+    for(int i=0; i<gradients->Size(); i++)
+    {
+      mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionType vec = gradients->at(i);
+      itk::Vector<double,3> grad;
+
+      grad[0] = vec[0];
+      grad[1] = vec[1];
+      grad[2] = vec[2];
+
+      gradientList.push_back(grad);
+
+
+    }
+
+
+
+    //Initialize filter that calculates the modeled diffusion weighted signals
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( tensorImage );
+    filter->SetBValue(diffImage->GetB_Value());
+    filter->SetGradientList(gradientList);
+    filter->Update();
+
+
+    // TENSORS TO DATATREE
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
+    image->SetVectorImage( filter->GetOutput() );
+    image->SetB_Value(diffImage->GetB_Value());
+    image->SetDirections(gradientList);
+    image->SetOriginalDirections(gradientList);
+    image->InitializeFromVectorImage();
+    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    node->SetData( image );
+
+
+    QString newname;
+    newname = newname.append(nodename.c_str());
+    newname = newname.append("_dwi");
+    node->SetName(newname.toAscii());
+
+
+    GetDefaultDataStorage()->Add(node);
+
+
+    m_MultiWidget->RequestUpdate();
+
+
+  }
 }
 
 void QmitkTensorReconstructionView::ItkReconstruction()

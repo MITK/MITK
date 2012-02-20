@@ -61,16 +61,11 @@ public:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    /* @brief   Initializes the widget. This method has to be called before widget can start. 
-    * @param dataStorage The data storage the widget should work with.
-    * @param multiWidget The corresponding multiwidget were the ct Image is displayed and the user should define his path.
-    * @param imageNode  The image node which will be the base of mitral processing
-    */
-
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 signals:
     void FinishedImport(QString);
+    void FinishedImport(QStringList);
     
     public slots:
 
@@ -110,13 +105,6 @@ protected:
 
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
-    QTimer* m_Timer;
-
-    // Performs a starbust on inputimage, which results in outputimage. Only workds with 3D and 4D Ultrasound images (char Pixeltype)
-    //void PerformStarburst(mitk::Image::Pointer inputImage, mitk::Image::Pointer &outputImage, mitk::Point3D startPoint, bool doubleStarburst, bool thinStarburst);
-
-
-
 };
 
 

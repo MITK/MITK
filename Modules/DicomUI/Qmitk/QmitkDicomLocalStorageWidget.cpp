@@ -41,7 +41,6 @@ QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
     delete m_LocalIndexer;
     delete m_LocalModel;
     delete m_Controls;
-    delete m_Timer;
 }
 
 
@@ -98,24 +97,21 @@ void QmitkDicomLocalStorageWidget::OnAddDICOMData(QString& directory)
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
     emit FinishedImport(directory);
-    //m_LocalDatabase->closeDatabase();
 }
 
 void QmitkDicomLocalStorageWidget::OnAddDICOMData(QStringList& patientFiles)
 {
     if(m_LocalDatabase->isOpen())
     {
-        float length=static_cast<float>(patientFiles.length());
-        float i(0);
-        for (QStringList::iterator currentPatientFilePath = patientFiles.begin();
-            currentPatientFilePath != patientFiles.end(); ++currentPatientFilePath) 
-        {   ++i;
-        m_LocalIndexer->addFile(*m_LocalDatabase,*currentPatientFilePath,m_LocalDatabase->databaseDirectory());
-        emit FinishedImport(*currentPatientFilePath);
+        QStringListIterator fileIterator(patientFiles);
+
+        while(fileIterator.hasNext())
+        {
+            m_LocalIndexer->addFile(*m_LocalDatabase,fileIterator.next(),m_LocalDatabase->databaseDirectory());
         }
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
-    //m_LocalDatabase->closeDatabase();
+    emit FinishedImport(patientFiles);
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()

@@ -51,6 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryISelectionService.h"
 
 #include <itkTensorImageToQBallImageFilter.h>
+#include <itkResidualImageFilter.h>
 
 const std::string QmitkTensorReconstructionView::VIEW_ID =
 "org.mitk.views.tensorreconstruction";
@@ -334,9 +335,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
         = diffImage->GetDirections();
 
     // Copy gradients vectors from gradients to gradientList
-
-
-
     for(int i=0; i<gradients->Size(); i++)
     {
       mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionType vec = gradients->at(i);
@@ -347,8 +345,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
       grad[2] = vec[2];
 
       gradientList.push_back(grad);
-
-
     }
 
 
@@ -378,8 +374,22 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     node->SetName(newname.toAscii());
 
 
-    GetDefaultDataStorage()->Add(node);
+    GetDefaultDataStorage()->Add(node);    
 
+    typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
+
+    ResidualImageFilterType::Pointer residualFilter = ResidualImageFilterType::New();
+    residualFilter->SetInput(diffImage->GetVectorImage());
+    residualFilter->SetSecondDiffusionImage(image->GetVectorImage());
+    residualFilter->Update();
+
+    itk::Image<float, 3>::Pointer residualImage = residualFilter->GetOutput();
+    mitk::Image::Pointer mitkResImg = mitk::Image::New();
+    mitk::CastToMitkImage(residualImage, mitkResImg);
+    mitk::DataNode::Pointer resNode=mitk::DataNode::New();
+    resNode->SetData( image );
+    resNode->SetName("Residual Image");
+    GetDefaultDataStorage()->Add(resNode);
 
     m_MultiWidget->RequestUpdate();
 

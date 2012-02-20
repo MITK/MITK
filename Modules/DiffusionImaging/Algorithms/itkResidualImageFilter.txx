@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkResidualImageFilter.h"
-
+#include <mitkCommon.h>
 
 namespace itk
 {
@@ -29,34 +29,13 @@ namespace itk
   //  TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   //  ::GenerateData()
   //{
-  //  // Call a method that can be overriden by a subclass to allocate
-  //  // memory for the filter's outputs
-  //  this->AllocateOutputs();
 
-  //  // Call a method that can be overridden by a subclass to perform
-  //  // some calculations prior to splitting the main computations into
-  //  // separate threads
-  //  this->BeforeThreadedGenerateData();
-
-  //  // Set up the multithreaded processing
-  //  ThreadStruct str;
-  //  str.Filter = this;
-
-  //  this->GetMultiThreader()->SetNumberOfThreads(this->GetNumberOfThreads());
-  //  this->GetMultiThreader()->SetSingleMethod(this->ThreaderCallback, &str);
-
-  //  // multithread the execution
-  //  this->GetMultiThreader()->SingleMethodExecute();
-
-  //  // Call a method that can be overridden by a subclass to perform
-  //  // some calculations after all the threads have completed
-  //  this->AfterThreadedGenerateData();
 
   //}
 
   template <class TInputScalarType, class TOutputScalarType>
   void
-    TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+    ResidualImageFilter<TInputScalarType, TOutputScalarType>
     ::BeforeThreadedGenerateData()
   {
 
@@ -66,10 +45,68 @@ namespace itk
 
   template <class TInputScalarType, class TOutputScalarType>
   void
-    TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+    ResidualImageFilter<TInputScalarType, TOutputScalarType>
     ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
   {
+    typename InputImageType::Pointer inputImage = this->GetInput();
+    typename InputImageType::SizeType size = inputImage->GetLargestPossibleRegion().GetSize();
+    typename InputImageType::SizeType size2 = m_SecondDiffusionImage->GetLargestPossibleRegion().GetSize();
 
+    if(size != size2)
+    {
+      MITK_ERROR << "Sizes do not match";
+      return;
+    }
+
+    // Initialize output image
+    typename OutputImageType::Pointer outputImage = OutputImageType::New();
+    outputImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
+    outputImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
+    outputImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
+    outputImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+    outputImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+    outputImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+    outputImage->Allocate();
+
+    for(int x=0; x<size[0]; x++)
+    {
+      for(int y=0; y<size[1]; y++)
+      {
+        for(int z=0; z<size[2]; z++)
+        {
+          itk::Index<3> ix;
+          ix[0] = x;
+          ix[1] = y;
+          ix[2] = z;
+
+          typename InputImageType::PixelType p1 = inputImage->GetPixel(x);
+          typename InputImageType::PixelType p2 = inputImage->GetPixel(x);
+
+          if(p1.GetSize() != p2.GetSize())
+          {
+            MITK_ERROR << "Vector sizes do not match";
+            return;
+          }
+
+          float res = 0;
+
+          for(int i = 0; i<p1.GetSize(); i++)
+          {
+            typename InputScalarType val1 = p1.GetElement(i);
+            typename InputScalarType val2 = p2.GetElement(i);
+
+            res += abs(val1-val2);
+          }
+
+          res /= p1.GetSize();
+
+          outputImage->SetPixel(ix, res);
+
+        }
+      }
+    }
+
+    this->SetNthInput(0, outputImage);
 
   }
 

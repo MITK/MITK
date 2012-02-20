@@ -25,7 +25,7 @@ namespace itk
 
   template <class TInputScalarType, class TOutputScalarType>
   class ResidualImageFilter
-    : public ImageToImageFilter<itk::VectorImage<TOutputScalarType,3>, itk::Image<TOutputScalarType,3> >
+    : public ImageToImageFilter<itk::VectorImage<TInputScalarType,3>, itk::Image<TOutputScalarType,3> >
   {
 
   public:
@@ -53,13 +53,19 @@ namespace itk
 
     itkNewMacro (Self);
 
+    void SetSecondDiffusionImage(typename InputImageType::Pointer diffImage)
+    {
+      m_SecondDiffusionImage = diffImage;
+    }
+
+
 
   protected:
     ResidualImageFilter()
     {
 
     };
-    ~TensorImageToDiffusionImageFilter(){};
+    ~ResidualImageFilter(){};
 
     void PrintSelf (std::ostream& os, Indent indent) const
     {
@@ -78,6 +84,7 @@ namespace itk
     ResidualImageFilter (const Self&);
     void operator=(const Self&);
 
+    typename InputImageType::Pointer m_SecondDiffusionImage;
 
 
   };    

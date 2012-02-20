@@ -158,7 +158,13 @@ namespace itk
     unsigned int                                      m_NumberOfBaselineImages;
 
 
-  };    
+  };
+
+
+
+  void remove_negative_eigs(int x, int y, int z, int &table, int nof, int size, int H, int &D, int &atten, float higher_thresh, float lower_thresh, int wasdetected bad, int b0_mean_image, int sorted_eigs, int numberb0){};
+
+  void check_the_neighbors(int x, int y, int z, int &table, int g, int size){};
 
 
 } // end of namespace

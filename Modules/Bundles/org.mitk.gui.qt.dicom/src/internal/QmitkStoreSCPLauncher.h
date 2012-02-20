@@ -15,21 +15,33 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <QProcess>
+#ifndef QmitkStoreSCPLauncher_h
+#define QmitkStoreSCPLauncher_h
 
-class QmitkStoreSCPLauncher
+#include <QProcess>
+#include <QString>
+#include "QmitkStoreSCPLauncherBuilder.h"
+
+class QmitkStoreSCPLauncher : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-QmitkStoreSCPLauncher();
-virtual ~QmitkStoreSCPLauncher();
+    QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder);
+    virtual ~QmitkStoreSCPLauncher();
 
-protected slots:
-StartStoreSCP();
+    public slots:
+        void StartStoreSCP();
+        void OnProcessError(QProcess::ProcessError error);
+        void OnStateChanged(QProcess::ProcessState status);
+
 
 private:
-QString GetWorkingDirectory();
-QProcess* m_StoreSCP;
+    QString GetPathToExecutable();
+    void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
+    QString ArgumentListToQString();
 
+    QProcess* m_StoreSCP;
+    QStringList m_ArgumentList;
 };
+#endif //QmitkStoreSCPLauncher_h

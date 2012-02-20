@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkDicomEditorControls.h"
 #include "QmitkDicomDirectoryListener.h"
+#include "QmitkStoreSCPLauncher.h"
+#include "QmitkStoreSCPLauncherBuilder.h"
 
 #include <QTextEdit>
 #include <QModelIndex>
@@ -80,6 +82,9 @@ signals:
         /// \brief Called when import is finished
         void OnDicomImportFinished(QString path);
 
+                /// \brief Called when import is finished
+        void OnDicomImportFinished(QStringList path);
+
         /// \brief Called when series in TreeView is double clicked.
         void OnSeriesModelDoubleClicked(QModelIndex index);
 
@@ -110,6 +115,7 @@ protected:
 
     QThread* m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
+    QmitkStoreSCPLauncher* m_StoreSCPLauncher;
  
 };
 

@@ -58,9 +58,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkDICOMQueryRetrieveWidget.h>
 
 
-
-
-
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 
 
@@ -73,19 +70,19 @@ QmitkDicomEditor::QmitkDicomEditor()
 QmitkDicomEditor::~QmitkDicomEditor()
 {
     m_Thread->terminate();
-    delete m_StoreSCP;
+    delete m_StoreSCPLauncher;
     delete m_Thread;
     delete m_DicomDirectoryListener;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {   
-
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     SetupDefaults();
     
-    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
+    //connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
+    //connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QStringList)),this,SLOT(OnDicomImportFinished(QStringList)));
 
     //connections for base controls
     connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
@@ -198,6 +195,16 @@ void QmitkDicomEditor::OnDicomImportFinished(QString path)
     }
 }
 
+void QmitkDicomEditor::OnDicomImportFinished(QStringList path)
+{
+    QStringListIterator filePath(path);
+
+    while(filePath.hasNext())
+    {
+        OnDicomImportFinished(filePath.next());
+    }
+}
+
 void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
 {   
     m_DicomDirectoryListener->SetDicomListenerDirectory(directory);
@@ -221,9 +228,13 @@ void QmitkDicomEditor::SetupDefaults()
    
     m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);
     
-    QString listenerDirectory;
-    listenerDirectory.append(pluginDirectory);
-    listenerDirectory.append(QString("DicomListener"));
-    StartDicomDirectoryListener(QString("C:/DICOMListenerDirectory"));
+    QString listenerDirectory("C:/DICOMListenerDirectory");
+
+    StartDicomDirectoryListener(listenerDirectory);
+
+    QmitkStoreSCPLauncherBuilder builder;
+    builder.AddPort()->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(listenerDirectory);
+    m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
+    m_StoreSCPLauncher->StartStoreSCP();
 
 }

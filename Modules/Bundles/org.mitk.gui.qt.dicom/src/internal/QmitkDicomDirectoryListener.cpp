@@ -23,82 +23,68 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFileInfoList>
 
 QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
-: m_LastRetrievedFile(new QStringList())
-, m_CurrentRetrievedFile(new QStringList())
-, m_FileSystemWatcher(new QFileSystemWatcher())
-, m_Timer(new QTimer(this))
+: m_FileSystemWatcher(new QFileSystemWatcher())
+, m_FilesToImport(new QStringList())
+, m_ImportingFiles(new QStringList())
 , m_DicomListenerDirectory(QString())
 {
-    m_Timer->setSingleShot(true);
-    m_Timer->blockSignals(true);
     connect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&))); 
-
 }
 
 QmitkDicomDirectoryListener::~QmitkDicomDirectoryListener()
 {
+    delete m_FilesToImport;
+    delete m_ImportingFiles;
     delete m_FileSystemWatcher;
-    delete m_CurrentRetrievedFile;
-    delete m_LastRetrievedFile;
-    delete m_Timer;
 }
 
 
-void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString& changedFile)
+void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
 {   
-
-    // set m_CurrentRetrievedFile stays empty if the folder doesn't contain any new files e.g. if a file was deleted  
-    m_CurrentRetrievedFile = SetRetrievedFile(changedFile);
-
-    //Situation: directory is empty and there is a new incoming file
-    if(!m_Timer->isActive() && !m_CurrentRetrievedFile->isEmpty())
-    {
-        m_Timer->start(30000);      
-        emit StartImportingFile(*m_CurrentRetrievedFile);        
-        m_LastRetrievedFile = m_CurrentRetrievedFile;
-        m_CurrentRetrievedFile->clear();
-    }
-    //Situation: A new file comes in and the timer is still running -> indicates the last download is finished
-    if(m_Timer->isActive()&& !m_CurrentRetrievedFile->isEmpty())
-    {     
-        m_Timer->stop(); 
-        emit StartImportingFile(*m_LastRetrievedFile);        
-        m_Timer->start(30000);      
-        emit StartImportingFile(*m_CurrentRetrievedFile);        
-        m_LastRetrievedFile = m_CurrentRetrievedFile;
-        m_CurrentRetrievedFile->clear();
-    }
-
+    m_Mutex.lock();
+    SetFilesToImport();
+    m_ImportingFiles->append(*m_FilesToImport);
+    emit SignalAddDicomData(*m_FilesToImport);
+    m_Mutex.unlock();
 }
 
-QStringList* QmitkDicomDirectoryListener::SetRetrievedFile(const QString& filename)
+void QmitkDicomDirectoryListener::OnDicomImportFinished(const QStringList& finishedFiles)
 {
-    QDir listenerDirectory(filename);
-    //if the listenordirectory is empty you have deleted the last file
-    if(!listenerDirectory.entryList().isEmpty())
+    m_Mutex.lock();
+    RemoveFilesFromDirectoryAndImportingFilesList(finishedFiles);
+    m_Mutex.unlock();
+}
+
+void QmitkDicomDirectoryListener::SetFilesToImport()
+{   
+    m_FilesToImport->clear();
+    QDir listenerDirectory(m_DicomListenerDirectory);
+    QFileInfoList entries = listenerDirectory.entryInfoList(QDir::Files);
+    if(!entries.isEmpty())
     {
-        QFileInfoList directoryMembers;
-        directoryMembers = listenerDirectory.entryInfoList();
-        QFileInfoList::iterator member;
-        member=directoryMembers.begin();
-        QStringList temp;
-
-        //filter files, no directories wanted
-        while(member!=directoryMembers.end())
+        QFileInfoList::const_iterator file;
+        for(file = entries.constBegin(); file != entries.constEnd(); ++file )
         {
-            if((*member).isFile()){
-                temp.append((*member).absoluteFilePath());
+            if(!m_ImportingFiles->contains((*file).absoluteFilePath()))
+            {
+                m_FilesToImport->append((*file).absoluteFilePath());
             }
-            ++member;
         }
+    } 
+}
 
-        //check if there is an existing new file
-        if(!temp.isEmpty())
+void QmitkDicomDirectoryListener::RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files)
+{
+    QStringListIterator fileToDeleteIterator(files);
+    while(fileToDeleteIterator.hasNext())
+    {
+        QFile file(fileToDeleteIterator.next());
+        if(m_ImportingFiles->contains(file.fileName()))
         {
-            return new QStringList(temp);
+            m_ImportingFiles->removeOne(file.fileName());
+            file.remove();
         }
     }
-    return new QStringList();
 }
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)
@@ -111,7 +97,6 @@ void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& direc
         m_DicomListenerDirectory=listenerDirectory.absolutePath();
         m_FileSystemWatcher->addPath(m_DicomListenerDirectory);
     }
-
 }
 
 const QString& QmitkDicomDirectoryListener::GetDicomListenerDirectory()

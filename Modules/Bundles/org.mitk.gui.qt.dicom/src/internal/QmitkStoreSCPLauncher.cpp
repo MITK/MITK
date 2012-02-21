@@ -41,8 +41,6 @@ void QmitkStoreSCPLauncher::StartStoreSCP()
     QString storeSCP;
     storeSCP.append(GetPathToExecutable());
     storeSCP.append(QString("/storescp.exe"));
-
-    MITK_INFO << ArgumentListToQString().toStdString();
     //m_StoreSCP->start(storeSCP,m_ArgumentList);
     QProcess::startDetached(storeSCP,m_ArgumentList);
 }
@@ -113,12 +111,10 @@ QString QmitkStoreSCPLauncher::ArgumentListToQString()
 {
     QString argumentString;
     QStringListIterator argumentIterator(m_ArgumentList);
-    
     while(argumentIterator.hasNext())
     {
         argumentString.append(" ");
         argumentString.append(argumentIterator.next());
     }
-
     return argumentString;
 }

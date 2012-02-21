@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStringList>
 #include <QFileSystemWatcher>
 #include <QDir>
+#include <QMutex>
 
 
 #include<QTimer>
@@ -44,11 +45,14 @@ public:
 
 signals:
     /// @brief signal starts the dicom import of the given file (the QStringList will only contain one file here).
-    void StartImportingFile(QStringList&);
+    void SignalAddDicomData(const QStringList&);
 
 public slots:
     /// \brief called when listener directory changes
-    void OnDirectoryChanged(const QString& changedFile);
+    void OnDirectoryChanged(const QString&);
+
+    /// \brief called when import is finished
+    void OnDicomImportFinished(const QStringList&);
 
 
 
@@ -61,13 +65,16 @@ protected:
     bool isOnlyListenedDirectory(const QString& directory);
 
     /// \brief Composes the filename and initializes m_LastRetrievedFile with it
-    QStringList* SetRetrievedFile(const QString& filename);
+    void SetFilesToImport();
 
-    QTimer* m_Timer;
+    /// \brief removes files from 
+    void RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files);
+
     QFileSystemWatcher* m_FileSystemWatcher;
-    QStringList* m_CurrentRetrievedFile;
-    QStringList* m_LastRetrievedFile;
+    QStringList* m_FilesToImport;
+    QStringList* m_ImportingFiles;
     QString m_DicomListenerDirectory;
+    QMutex m_Mutex;
 };
 
 #endif // QmitkDicomListener_h

@@ -376,6 +376,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     GetDefaultDataStorage()->Add(node);    
 
+    /*
     typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
 
     ResidualImageFilterType::Pointer residualFilter = ResidualImageFilterType::New();
@@ -390,7 +391,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     resNode->SetData( image );
     resNode->SetName("Residual Image");
     GetDefaultDataStorage()->Add(resNode);
-
+*/
     m_MultiWidget->RequestUpdate();
 
 
@@ -826,6 +827,11 @@ std::vector<itk::Vector<double,3> > QmitkTensorReconstructionView::MakeGradientL
     v[0] = U->get(0,i); v[1] = U->get(1,i); v[2] = U->get(2,i);
     retval.push_back(v);
   }
+  // Add 0 vector for B0
+  itk::Vector<double,3> v;
+  v.Fill(0.0);
+  retval.push_back(v);
+
   return retval;
 }
 

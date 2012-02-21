@@ -110,7 +110,7 @@ namespace itk
     outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
     outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
     outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetVectorLength(m_GradientList.size()+1);
+    outImage->SetVectorLength(m_GradientList.size());
     outImage->Allocate();
 
     this->SetNumberOfRequiredOutputs (1);
@@ -155,12 +155,12 @@ namespace itk
       BaselinePixelType b0 = itB0.Get();
 
       OutputPixelType out;
-      out.SetSize(m_GradientList.size()+1);
+      out.SetSize(m_GradientList.size());
       out.Fill(0);
 
       if( b0 > 0)
       {
-        for( unsigned int i=0; i<m_GradientList.size(); i++)
+        for( unsigned int i=0; i<m_GradientList.size()-1; i++)
         {
 
           GradientType g = m_GradientList[i];
@@ -184,7 +184,7 @@ namespace itk
         }
       }
 
-      out[m_GradientList.size()] = b0;
+      out[m_GradientList.size()-1] = b0;
 
       itOut.Set(out);
 

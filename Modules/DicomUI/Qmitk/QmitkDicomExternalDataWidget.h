@@ -71,8 +71,8 @@ public:
 
 signals:
     void SignalChangePage(int);
-    void SignalAddDicomData(QString&);
-    void SignalAddDicomData(QStringList&);
+    void SignalAddDicomData(const QString&);
+    void SignalAddDicomData(const QStringList&);
 
    public slots:
 

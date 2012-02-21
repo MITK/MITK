@@ -64,8 +64,8 @@ public:
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 signals:
-    void FinishedImport(QString);
-    void FinishedImport(QStringList);
+    void FinishedImport(const QString&);
+    void FinishedImport(const QStringList&);
     
     public slots:
 
@@ -79,10 +79,10 @@ signals:
         void OnDeleteButtonClicked();
 
         /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
-        void StartDicomImport(QString& dicomData);
+        void StartDicomImport(const QString& dicomData);
 
         /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
-        void StartDicomImport(QStringList& dicomData);
+        void StartDicomImport(const QStringList& dicomData);
 
         /// @brief   Called when search parameters change.
         void OnSearchParameterChanged();
@@ -91,10 +91,10 @@ signals:
 protected:
 
     // adds dicom files from a directory containing dicom files to the local storage. 
-    void OnAddDICOMData(QString& dicomDirectory);
+    void AddDICOMData(const QString& dicomDirectory);
 
     // adds dicom files from a string list containing the filepath to the local storage.
-    void OnAddDICOMData(QStringList& dicomFiles);
+    void AddDICOMData(const QStringList& dicomFiles);
 
     void SetDatabase(QString databaseFile);
 

@@ -72,12 +72,8 @@ namespace itk
       Superclass::PrintSelf (os, indent);      
     }
 
-    void BeforeThreadedGenerateData( void );
-
-    void ThreadedGenerateData( const 
-      OutputImageRegionType &outputRegionForThread, int);
   
-    //void GenerateData();
+    void GenerateData();
 
   private:
 

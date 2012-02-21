@@ -24,32 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
-  //template <class TInputScalarType, class TOutputScalarType>
-  //void
-  //  TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-  //  ::GenerateData()
-  //{
-
-
-  //}
-
   template <class TInputScalarType, class TOutputScalarType>
   void
-    ResidualImageFilter<TInputScalarType, TOutputScalarType>
-    ::BeforeThreadedGenerateData()
+  ResidualImageFilter<TInputScalarType, TOutputScalarType>
+  ::GenerateData()
   {
-
-
-
-  }
-
-  template <class TInputScalarType, class TOutputScalarType>
-  void
-    ResidualImageFilter<TInputScalarType, TOutputScalarType>
-    ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
-  {
-    typename InputImageType::Pointer inputImage = this->GetInput();
-    typename InputImageType::SizeType size = inputImage->GetLargestPossibleRegion().GetSize();
+    typename InputImageType::SizeType size = this->GetInput()->GetLargestPossibleRegion().GetSize();
     typename InputImageType::SizeType size2 = m_SecondDiffusionImage->GetLargestPossibleRegion().GetSize();
 
     if(size != size2)
@@ -79,8 +59,11 @@ namespace itk
           ix[1] = y;
           ix[2] = z;
 
-          typename InputImageType::PixelType p1 = inputImage->GetPixel(x);
-          typename InputImageType::PixelType p2 = inputImage->GetPixel(x);
+          typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
+          typename InputImageType::PixelType p2 = m_SecondDiffusionImage->GetPixel(ix);
+
+          int s1 = p1.GetSize();
+          int s2 = p2.GetSize();
 
           if(p1.GetSize() != p2.GetSize())
           {
@@ -92,8 +75,8 @@ namespace itk
 
           for(int i = 0; i<p1.GetSize(); i++)
           {
-            typename InputScalarType val1 = p1.GetElement(i);
-            typename InputScalarType val2 = p2.GetElement(i);
+            short val1 = p1.GetElement(i);
+            short val2 = p2.GetElement(i);
 
             res += abs(val1-val2);
           }
@@ -108,7 +91,12 @@ namespace itk
 
     this->SetNthInput(0, outputImage);
 
+
+
   }
+
+
+
 
 
 

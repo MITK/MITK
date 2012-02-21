@@ -376,7 +376,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     GetDefaultDataStorage()->Add(node);    
 
-    /*
+
     typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
 
     ResidualImageFilterType::Pointer residualFilter = ResidualImageFilterType::New();
@@ -391,7 +391,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     resNode->SetData( image );
     resNode->SetName("Residual Image");
     GetDefaultDataStorage()->Add(resNode);
-*/
+
     m_MultiWidget->RequestUpdate();
 
 

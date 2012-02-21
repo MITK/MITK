@@ -80,10 +80,10 @@ signals:
     protected slots:
 
         /// \brief Called when import is finished
-        void OnDicomImportFinished(QString path);
+        void OnDicomImportFinished(const QString& path);
 
-                /// \brief Called when import is finished
-        void OnDicomImportFinished(QStringList path);
+        /// \brief Called when import is finished
+        void OnDicomImportFinished(const QStringList& path);
 
         /// \brief Called when series in TreeView is double clicked.
         void OnSeriesModelDoubleClicked(QModelIndex index);

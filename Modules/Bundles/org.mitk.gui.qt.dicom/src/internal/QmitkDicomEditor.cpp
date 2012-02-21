@@ -77,23 +77,17 @@ QmitkDicomEditor::~QmitkDicomEditor()
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {   
-    // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     SetupDefaults();
-    
-    //connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QString)),this,SLOT(OnDicomImportFinished(QString)));
-    //connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(QStringList)),this,SLOT(OnDicomImportFinished(QStringList)));
-
-    //connections for base controls
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&))); 
+    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QString&)),this,SLOT(OnDicomImportFinished(const QString&)));
+    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QStringList&)),this,SLOT(OnDicomImportFinished(const QStringList&)));
     connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.FolderButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
-
     connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QString&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)));   
-
 }
 
 void QmitkDicomEditor::OnSeriesModelDoubleClicked(QModelIndex index){
@@ -163,8 +157,6 @@ berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-
-
 void QmitkDicomEditor::OnQueryRetrieve()
 {
     OnChangePage(2);
@@ -185,30 +177,19 @@ void QmitkDicomEditor::OnChangePage(int page)
     }
 }
 
-
-void QmitkDicomEditor::OnDicomImportFinished(QString path)
+void QmitkDicomEditor::OnDicomImportFinished(const QString& path)
 {
-    QFile file(path);
-    if(file.fileName().contains(m_DicomDirectoryListener->GetDicomListenerDirectory()))
-    {
-        file.remove();
-    }
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(QStringList path)
+void QmitkDicomEditor::OnDicomImportFinished(const QStringList& path)
 {
-    QStringListIterator filePath(path);
-
-    while(filePath.hasNext())
-    {
-        OnDicomImportFinished(filePath.next());
-    }
 }
 
 void QmitkDicomEditor::StartDicomDirectoryListener(QString& directory)
 {   
     m_DicomDirectoryListener->SetDicomListenerDirectory(directory);
-    connect(m_DicomDirectoryListener,SIGNAL(StartImportingFile(QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(QStringList&)),Qt::DirectConnection);
+    connect(m_DicomDirectoryListener,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)),Qt::DirectConnection);
+    connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QStringList&)),m_DicomDirectoryListener,SLOT(OnDicomImportFinished(const QStringList&)),Qt::DirectConnection);
     m_DicomDirectoryListener->moveToThread(m_Thread);
     m_Thread->start();   
 }
@@ -218,23 +199,16 @@ void QmitkDicomEditor::SetupDefaults()
     QString pluginDirectory;
     mitk::PluginActivator::getContext()->getDataFile(pluginDirectory);
     pluginDirectory.append("/");
-    
     QString databaseDirectory;
     databaseDirectory.append(pluginDirectory);
     databaseDirectory.append(QString("DicomDatabase"));
-    
     QDir tmp(databaseDirectory);
     tmp.mkpath(databaseDirectory);
-   
     m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);
-    
     QString listenerDirectory("C:/DICOMListenerDirectory");
-
     StartDicomDirectoryListener(listenerDirectory);
-
     QmitkStoreSCPLauncherBuilder builder;
     builder.AddPort()->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(listenerDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
     m_StoreSCPLauncher->StartStoreSCP();
-
 }

@@ -32,9 +32,17 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   
   if(m_vtkRenderWindow == NULL)
     m_vtkRenderWindow = vtkRenderWindow::New();
+
+  if ( m_vtkRenderWindow->GetSize()[0] > 10 
+    || m_vtkRenderWindow->GetSize()[0] > 10 )
+  {
+    m_vtkRenderWindow->SetSize( 100, 100 );
+  }
  
   m_vtkRenderWindowInteractor = vtkRenderWindowInteractor::New();
-  
+  m_vtkRenderWindowInteractor->SetRenderWindow(m_vtkRenderWindow);
+  m_vtkRenderWindowInteractor->Initialize();
+
   // initialize from RenderWindowBase
   Initialize(rm,name);
 
@@ -43,8 +51,6 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   m_vtkMitkEventProvider->SetMitkRenderWindow(this);
   m_vtkMitkEventProvider->SetEnabled(1);
 
-  m_vtkRenderWindowInteractor->SetRenderWindow(m_vtkRenderWindow);
-  m_vtkRenderWindowInteractor->Initialize();
 }
 
 mitk::RenderWindow::~RenderWindow()
@@ -63,5 +69,21 @@ vtkRenderWindow* mitk::RenderWindow::GetVtkRenderWindow()
 vtkRenderWindowInteractor* mitk::RenderWindow::GetVtkRenderWindowInteractor()
 {
   return m_vtkRenderWindowInteractor;   
+}
+
+
+void mitk::RenderWindow::SetSize( int width, int height )
+{
+  this->GetVtkRenderWindow()->SetSize( width, height );
+
+  this->resizeMitkEvent( width, height );
+}
+
+void mitk::RenderWindow::ReinitEventProvider()
+{
+  m_vtkMitkEventProvider->SetEnabled(0);
+  m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());
+  m_vtkMitkEventProvider->SetMitkRenderWindow(this);
+  m_vtkMitkEventProvider->SetEnabled(1);
 }
 

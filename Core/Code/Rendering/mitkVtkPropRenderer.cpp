@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkSurface.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkVtkInteractorStyle.h"
 
 // VTK
 #include <vtkRenderer.h>
@@ -52,13 +53,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
+#include <vtkInteractorStyleJoystickCamera.h>
+
 
 
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm), 
   m_VtkMapperPresent(false), 
   m_NewRenderer(true),
-  m_2DCameraInitialized(false)
+  m_CameraInitializedForMapperID(0)
 {
   didCount=false;
 
@@ -799,23 +802,34 @@ void mitk::VtkPropRenderer::checkState()
 //### Contains all methods which are neceassry before each VTK Render() call
 void mitk::VtkPropRenderer::PrepareRender()
 {
-  //  if(!m_2DCameraInitialized)
-  //  {
-  m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
-  //  }
+  if ( this->GetMapperID() != m_CameraInitializedForMapperID )
+  {
+    Initialize2DvtkCamera(); //Set parallel projection etc.
+  }
+
   AdjustCameraToScene(); //Prepare camera for 2D render windows
 }
 
-bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
-  if(this->GetMapperID() == Standard2D)
+bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
+{
+  if ( this->GetMapperID() == Standard3D )
+  {
+    //activate parallel projection for 2D
+    this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( vtkInteractorStyleJoystickCamera::New() );
+    m_CameraInitializedForMapperID = Standard3D;
+  }
+  else if( this->GetMapperID() == Standard2D)
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
     //turn the light out in the scene in order to render correct grey values.
     //TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
-    //remove the VTK interaction
-    this->GetVtkRenderer()->GetRenderWindow()->GetInteractor()->Disable();
+
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
+
+    m_CameraInitializedForMapperID = Standard2D;
   }
   return true;
 }

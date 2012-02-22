@@ -429,7 +429,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       }
       else
       {
-        nSeries = values1.size();
+        nSeries = values2.size();
       }
 
       gdcm::Directory::FilenamesType files;
@@ -454,7 +454,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         continue;
       }
 
+
+
       int filesPerSeries = nfiles / nSeries;
+
 
 
       gdcm::Scanner::ValuesType::const_iterator it2 = values2.begin();
@@ -508,6 +511,8 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         }
 
         int filesPerAcqu = filesPerSeries / nAcquis;
+
+
 
         gdcm::Directory::FilenamesType subfiles = subsorter.GetFilenames();
         for ( unsigned int j = 0 ; j < nAcquis ; ++j )

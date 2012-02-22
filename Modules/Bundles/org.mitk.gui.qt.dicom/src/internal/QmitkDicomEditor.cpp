@@ -200,8 +200,8 @@ void QmitkDicomEditor::SetupDefaults()
     mitk::PluginActivator::getContext()->getDataFile(pluginDirectory);
     pluginDirectory.append("/");
     QString databaseDirectory;
-    databaseDirectory.append(pluginDirectory);
-    databaseDirectory.append(QString("DicomDatabase"));
+    //databaseDirectory.append(pluginDirectory);
+    databaseDirectory.append(QString("C:/DicomDatabase"));
     QDir tmp(databaseDirectory);
     tmp.mkpath(databaseDirectory);
     m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);

@@ -83,7 +83,7 @@ struct BERRY_UI IEditorRegistry {
      */
     static const std::string SYSTEM_INPLACE_EDITOR_ID; // = "org.blueberry.ui.systemInPlaceEditor"; //$NON-NLS-1$
 
-    /**
+    /*
      * Adds a listener for changes to properties of this registry.
      * Has no effect if an identical listener is already registered.
      * <p>
@@ -134,7 +134,7 @@ struct BERRY_UI IEditorRegistry {
    */
     virtual IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName) = 0;
     
-    /**
+    /*
      * Returns the default editor for a given file name and with the given content type.  
      * <p>
      * The default editor is determined by taking the file extension for the
@@ -149,7 +149,7 @@ struct BERRY_UI IEditorRegistry {
      */
     //virtual IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName, IContentType contentType) = 0;
 
-    /**
+  /**
    * Returns the list of file editors registered to work against the file with
    * the given file name. This method assumes an unknown content type for the
    * given file.
@@ -162,9 +162,9 @@ struct BERRY_UI IEditorRegistry {
    *            the file name in the system
    * @return a list of editor descriptors
    */
-    virtual std::list<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName) = 0;
+  virtual std::list<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName) = 0;
  
-    /**
+  /*
    * Returns the list of file editors registered to work against the file with
    * the given file name and with the given content type.
    * <p>
@@ -196,7 +196,7 @@ struct BERRY_UI IEditorRegistry {
      */
     virtual std::vector<IFileEditorMapping::Pointer> GetFileEditorMappings() = 0;
 
-    /**
+  /*
    * Returns the image descriptor associated with a given file. This image is
    * usually displayed next to the given file. This method assumes an unknown
    * content type for the given file.
@@ -212,7 +212,7 @@ struct BERRY_UI IEditorRegistry {
    */
    // virtual ImageDescriptor* GetImageDescriptor(const std::string& filename) = 0;
   
-    /**
+  /*
    * Returns the image descriptor associated with a given file. This image is
    * usually displayed next to the given file.
    * <p>
@@ -231,7 +231,7 @@ struct BERRY_UI IEditorRegistry {
    */
    // virtual ImageDescriptor* GetImageDescriptor(const std::tring& filename, IContentType contentType) = 0;
 
-    /**
+    /*
      * Removes the given property listener from this registry.
      * Has no affect if an identical listener is not registered.
      *
@@ -271,7 +271,7 @@ struct BERRY_UI IEditorRegistry {
      */
     virtual bool IsSystemExternalEditorAvailable(const std::string& filename) = 0;
 
-    /**
+    /*
      * Returns the image descriptor associated with the system editor that
      * would be used to edit this file externally.
      *

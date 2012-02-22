@@ -1,5 +1,7 @@
 SET(CPP_FILES
 QmitkApplicationCursor.cpp
+QmitkEnums.h
+QmitkCustomVariants.h
 QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp

@@ -342,31 +342,24 @@ int main(int argc, char* argv[])
   mitkWidget2->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget3->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget4->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
+ 
 
-  mitkWidget1->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
-  mitkWidget2->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
-  mitkWidget3->GetVtkRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
-  
-  mitkWidget1->ReinitEventProvider();
-  mitkWidget2->ReinitEventProvider();
-  mitkWidget3->ReinitEventProvider();
-
-  mitkWidget1->GetVtkRenderWindow()->SetSize(400, 400);
+  mitkWidget1->SetSize(400, 400);
   
   
   mitkWidget2->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0]+420,
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]);
-  mitkWidget2->GetVtkRenderWindow()->SetSize(400, 400);
+  mitkWidget2->SetSize(400, 400);
   
   
   mitkWidget3->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0],
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]+450);
-  mitkWidget3->GetVtkRenderWindow()->SetSize(400, 400);
+  mitkWidget3->SetSize(400, 400);
   
   
   mitkWidget4->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0]+420,
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]+450);
-  mitkWidget4->GetVtkRenderWindow()->SetSize(400, 400);
+  mitkWidget4->SetSize(400, 400);
 
 
   InitializeWindows();
@@ -382,6 +375,13 @@ int main(int argc, char* argv[])
 
   m_DataStorage->Print( std::cout );
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+  // reinit the mitkVTKEventProvider;
+  // this is only necessary once after calling 
+  // ForceImmediateUpdateAll() for the first time
+  mitkWidget1->ReinitEventProvider();
+  mitkWidget2->ReinitEventProvider();
+  mitkWidget3->ReinitEventProvider();
 
 
   mitkWidget1->GetVtkRenderWindow()->Render();

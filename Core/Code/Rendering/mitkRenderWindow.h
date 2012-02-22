@@ -63,8 +63,27 @@ public:
   
   void FullScreenMode( bool state );
 
+  /**
+  * \brief Convenience method to set the size of an mitkRenderWindow.
+  * 
+  * This method sets the size of the vtkRenderWindow and tells the 
+  * rendering that the size has changed -> adapts displayGeometry, etc.
+  */
   void SetSize( int width, int height );
 
+  /**
+  * \brief Initializes the mitkVtkEventProvider to listen to the 
+  * currently used vtkInteractorStyle.
+  * 
+  * This method makes sure that the internal mitkVtkEventProvider
+  * listens to the correct vtkInteractorStyle.
+  * This makes sure that VTK-Events are correctly translated into 
+  * MITK-Events.
+  * 
+  * \warn This method needs to be called MANUALLY as soon as the MapperID
+  * for this RenderWindow is changed or the vtkInteractorStyle is modified 
+  * somehow else!
+  */
   void ReinitEventProvider();
 
 

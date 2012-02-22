@@ -18,11 +18,6 @@ class MITK_QT_SEGMENTATION QmitkStatisticsAction: public QObject, public mitk::I
 public:
 
   QmitkStatisticsAction();
-  QmitkStatisticsAction(const QmitkStatisticsAction& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   virtual ~QmitkStatisticsAction();
 
   //interface methods

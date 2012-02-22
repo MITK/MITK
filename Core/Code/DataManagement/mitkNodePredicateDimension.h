@@ -57,7 +57,7 @@ namespace mitk {
     NodePredicateDimension(unsigned int dimension, int pixelComponents);
 
     unsigned int m_Dimension;
-    int m_PixelComponents;
+    std::size_t m_PixelComponents;
   };
 } // namespace mitk
 

@@ -224,7 +224,7 @@ In consequence the level window maximizes contrast with minimal amount of
 computation and does do useful things if the data contains std::min or
 std:max values or has only 1 or 2 or 3 data values.
 */
-void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
+void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice)
 {
   if ( IsFixed() )
     return;

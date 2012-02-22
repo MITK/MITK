@@ -336,7 +336,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
 void mitk::StateMachineFactory::EndElement (const char* elementName) 
 {
-  bool ok = true;
+  //bool ok = true;
   std::string name(elementName);
 
   //skip the state machine pattern because the name was not unique!
@@ -352,7 +352,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
       return;
     }
 
-    ok = ConnectStates(&m_AllStatesOfOneStateMachine);
+    /*ok =*/ ConnectStates(&m_AllStatesOfOneStateMachine);
     m_AllStatesOfOneStateMachine.clear();
   } 
   else if ( name == STATE_MACHINE ) 

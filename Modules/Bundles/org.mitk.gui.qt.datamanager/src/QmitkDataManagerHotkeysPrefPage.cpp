@@ -38,12 +38,6 @@ QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
 
 }
 
-QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage(const QmitkDataManagerHotkeysPrefPage& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemelnted");
-}
-
 void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer )
 {
 

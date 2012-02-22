@@ -33,7 +33,6 @@ struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public QObject, publ
 
 public:
   QmitkDataManagerPreferencePage();
-  QmitkDataManagerPreferencePage(const QmitkDataManagerPreferencePage& other);
 
   void Init(berry::IWorkbench::Pointer workbench);
 

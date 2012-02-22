@@ -37,7 +37,7 @@ mitk::DisplayInteractor::DisplayInteractor(mitk::BaseRenderer * ren)
 void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
 {
 
-  bool ok;//as return type
+  //bool ok;//as return type
 
   mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
   if ( dcOperation != NULL )
@@ -52,7 +52,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
       {
         renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
         renderer->GetRenderingManager()->RequestUpdate(renderer->GetRenderWindow());
-        ok = true;
+        //ok = true;
       }
       break;
     case OpZOOM :
@@ -79,7 +79,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
         renderer->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, dcOperation->GetStartDisplayCoordinate(), dcOperation->GetStartCoordinateInMM());
         
         renderer->GetRenderingManager()->RequestUpdate(renderer->GetRenderWindow());
-        ok = true;
+        //ok = true;
       }
       break;
     default:

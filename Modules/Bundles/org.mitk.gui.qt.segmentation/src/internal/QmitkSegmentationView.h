@@ -39,11 +39,7 @@ class QmitkSegmentationView : public QmitkFunctionality
 public:
   
   QmitkSegmentationView();
-  QmitkSegmentationView(const QmitkSegmentationView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
+
   virtual ~QmitkSegmentationView();
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;

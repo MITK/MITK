@@ -41,13 +41,10 @@ public:
   */
   QmitkInputDevicesPrefPage();
 
-  QmitkInputDevicesPrefPage(const QmitkInputDevicesPrefPage& other);
-
   /**
   * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)
   */
   void Init(berry::IWorkbench::Pointer workbench);
-
 
   /**
   * @see berry::IPreferencePage::CreateQtControl(void* parent)

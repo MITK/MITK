@@ -42,7 +42,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   m_Data = static_cast<unsigned char*>(aParent.GetData())+offset;
 
   // compute size
-  const unsigned int *dims = desc->GetDimensions();
+  //const unsigned int *dims = desc->GetDimensions();
   m_Dimension = dimension;
   for( unsigned int i=0; i<dimension; i++)
     m_Dimensions[i] = desc->GetDimensions()[i];
@@ -123,7 +123,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
 }
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
-  : m_PixelType(other.m_PixelType), m_ManageMemory(other.m_ManageMemory), m_Offset(other.m_Offset),
+  : itk::LightObject(), m_PixelType(other.m_PixelType), m_ManageMemory(other.m_ManageMemory), m_Offset(other.m_Offset),
     m_IsComplete(other.m_IsComplete), m_Size(other.m_Size)
 {
 

@@ -158,7 +158,7 @@ void QmitkDeformableClippingPlaneView::OnSelectionChanged(std::vector<mitk::Data
   this->UpdateView();
 }
 
-void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode* node)
+void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode* /*node*/)
 {
   this->UpdateView();
 }

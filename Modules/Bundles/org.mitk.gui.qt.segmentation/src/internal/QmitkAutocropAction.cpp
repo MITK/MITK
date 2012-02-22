@@ -120,7 +120,7 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
   return paddedImage;
 }
 
-void QmitkAutocropAction::SetSmoothed(bool smoothed)
+void QmitkAutocropAction::SetSmoothed(bool /*smoothed*/)
 {
  //not needed
 }
@@ -140,7 +140,7 @@ void QmitkAutocropAction::SetStdMultiWidget(QmitkStdMultiWidget *)
   //not needed
 }
 
-void QmitkAutocropAction::SetFunctionality(berry::QtViewPart *functionality)
+void QmitkAutocropAction::SetFunctionality(berry::QtViewPart */*functionality*/)
 {
   //not needed
 }

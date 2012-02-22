@@ -46,9 +46,7 @@ public:
   ///
   QmitkPropertyListView();
 
-  QmitkPropertyListView(const QmitkPropertyListView& other);
-
-  ///
+    ///
   /// \brief Standard dtor.
   ///
   virtual ~QmitkPropertyListView();

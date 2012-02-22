@@ -29,8 +29,7 @@ class QmitkExtDefaultPerspective : public QObject, public berry::IPerspectiveFac
 public:
 
   QmitkExtDefaultPerspective();
-  QmitkExtDefaultPerspective(const QmitkExtDefaultPerspective& other);
-  
+
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };

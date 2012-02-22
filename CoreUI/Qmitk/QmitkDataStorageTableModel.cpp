@@ -206,7 +206,7 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
   if(m_DataStorage.GetPointer() != _DataStorage.GetPointer())
   {
     // if a data storage was set before remove old event listeners
-    if(m_DataStorage != 0)
+    if(m_DataStorage.IsNotNull())
     {
       this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
         , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
@@ -219,7 +219,7 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     m_DataStorage = _DataStorage.GetPointer();
 
     // if new storage is not 0 subscribe for events
-    if(m_DataStorage != 0)
+    if(m_DataStorage.IsNotNull())
     {
       // subscribe for node added/removed events
       this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel

@@ -34,7 +34,6 @@ struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public QObject, pub
 
 public:
   QmitkDataManagerHotkeysPrefPage();
-  QmitkDataManagerHotkeysPrefPage(const QmitkDataManagerHotkeysPrefPage& other);
 
   void Init(berry::IWorkbench::Pointer workbench);
 

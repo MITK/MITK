@@ -66,7 +66,7 @@ unsigned int QmitkRenderWindow::GetLayoutIndex()
   if( m_MenuWidget )
     return m_MenuWidget->GetLayoutIndex();
   else
-    return NULL;
+    return 0;
 }
 
 void QmitkRenderWindow::LayoutDesignListChanged( int layoutDesignIndex )

@@ -36,11 +36,6 @@ class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, pub
 public:
 
   QmitkSegmentationPreferencePage();
-  QmitkSegmentationPreferencePage(const QmitkSegmentationPreferencePage& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkSegmentationPreferencePage();
 
   void Init(berry::IWorkbench::Pointer workbench);

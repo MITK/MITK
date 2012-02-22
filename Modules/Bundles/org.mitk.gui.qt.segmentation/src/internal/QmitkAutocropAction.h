@@ -19,11 +19,6 @@ class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IC
 public:
 
   QmitkAutocropAction();
-  QmitkAutocropAction(const QmitkAutocropAction& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   virtual ~QmitkAutocropAction();
 
   //interface methods

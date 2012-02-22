@@ -48,7 +48,6 @@ class QmitkRegionGrowingView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkRegionGrowingView();
-    QmitkRegionGrowingView(const QmitkRegionGrowingView& other);
     virtual ~QmitkRegionGrowingView();
 
     virtual void CreateQtPartControl(QWidget *parent);

@@ -23,7 +23,7 @@ void QmitkStatisticsAction::SetFunctionality(berry::QtViewPart* functionality)
   this->m_BlueBerryView = functionality;
 }
 
-void QmitkStatisticsAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkStatisticsAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
 {
   //not needed
 }
@@ -33,12 +33,12 @@ void QmitkStatisticsAction::SetStdMultiWidget(QmitkStdMultiWidget *)
   // not needed
 }
 
-void QmitkStatisticsAction::SetSmoothed(bool smoothed)
+void QmitkStatisticsAction::SetSmoothed(bool /*smoothed*/)
 {
   //not needed
 }
 
-void QmitkStatisticsAction::SetDecimated(bool decimated)
+void QmitkStatisticsAction::SetDecimated(bool /*decimated*/)
 {
   //not needed
 }

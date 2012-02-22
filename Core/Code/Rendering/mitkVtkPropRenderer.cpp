@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkSurface.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkVtkInteractorStyle.h"
 
 // VTK
 #include <vtkRenderer.h>
@@ -799,21 +800,27 @@ void mitk::VtkPropRenderer::checkState()
 //### Contains all methods which are neceassry before each VTK Render() call
 void mitk::VtkPropRenderer::PrepareRender()
 {
-  //  if(!m_2DCameraInitialized)
-  //  {
-  m_2DCameraInitialized = Initialize2DvtkCamera(); //Set parallel projection etc. TODO: call only once per RW
-  //  }
+  Initialize2DvtkCamera(); //Set parallel projection etc.
   AdjustCameraToScene(); //Prepare camera for 2D render windows
 }
 
-bool mitk::VtkPropRenderer::Initialize2DvtkCamera(){
-  if(this->GetMapperID() == Standard2D)
+bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
+{
+  if ( this->GetMapperID() == Standard3D )
+  {
+    m_2DCameraInitialized = false;
+  }
+  else if( !m_2DCameraInitialized && this->GetMapperID() == Standard2D)
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
     //turn the light out in the scene in order to render correct grey values.
     //TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
+
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
+
+    m_2DCameraInitialized = true;
   }
   return true;
 }

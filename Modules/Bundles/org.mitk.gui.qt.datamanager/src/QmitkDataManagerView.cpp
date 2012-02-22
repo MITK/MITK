@@ -777,7 +777,7 @@ void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )
     node->GetBoolProperty("visible", isVisible);
     node->SetVisibility(!isVisible);
   }
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )

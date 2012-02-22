@@ -41,8 +41,7 @@ void QmitkStoreSCPLauncher::StartStoreSCP()
     QString storeSCP;
     storeSCP.append(GetPathToExecutable());
     storeSCP.append(QString("/storescp.exe"));
-    //m_StoreSCP->start(storeSCP,m_ArgumentList);
-    QProcess::startDetached(storeSCP,m_ArgumentList);
+    m_StoreSCP->start(storeSCP,m_ArgumentList);
 }
 
 QString QmitkStoreSCPLauncher::GetPathToExecutable()

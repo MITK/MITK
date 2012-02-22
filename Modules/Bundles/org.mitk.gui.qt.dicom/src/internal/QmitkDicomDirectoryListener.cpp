@@ -41,18 +41,18 @@ QmitkDicomDirectoryListener::~QmitkDicomDirectoryListener()
 
 void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
 {   
-    m_Mutex.lock();
+    //m_Mutex.lock();
     SetFilesToImport();
     m_ImportingFiles->append(*m_FilesToImport);
     emit SignalAddDicomData(*m_FilesToImport);
-    m_Mutex.unlock();
+    //m_Mutex.unlock();
 }
 
 void QmitkDicomDirectoryListener::OnDicomImportFinished(const QStringList& finishedFiles)
 {
-    m_Mutex.lock();
+    //m_Mutex.lock();
     RemoveFilesFromDirectoryAndImportingFilesList(finishedFiles);
-    m_Mutex.unlock();
+    //m_Mutex.unlock();
 }
 
 void QmitkDicomDirectoryListener::SetFilesToImport()

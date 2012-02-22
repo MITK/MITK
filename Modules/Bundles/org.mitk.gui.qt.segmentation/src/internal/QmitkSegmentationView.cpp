@@ -461,8 +461,8 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(temp);
 
   // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  /*mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
 }
 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)

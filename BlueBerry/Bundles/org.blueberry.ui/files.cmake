@@ -20,6 +20,7 @@ SET(SRC_CPP_FILES
   berryEditorPart.cpp
   berryFileEditorInput.cpp
   berryGeometry.cpp
+  berryIDropTargetListener.cpp
   berryIEditorRegistry.cpp
   berryImageDescriptor.cpp
   berryIMemento.cpp
@@ -184,6 +185,9 @@ SET(INTERNAL_CPP_FILES
   berryPresentablePart.cpp
   berryPresentationFactoryUtil.cpp
   berryPresentationSerializer.cpp
+  berryQtControlWidget.cpp
+  berryQtDnDControlWidget.cpp
+  berryQtWidgetController.cpp
   berryRegistryReader.cpp
   berrySaveablesList.cpp
   berryServiceLocator.cpp

@@ -24,11 +24,13 @@
 
 #include <QMetaType>
 
+#include <org_blueberry_ui_Export.h>
+
 namespace berry {
 
 class Shell;
 
-class QtWidgetController : public Object
+class BERRY_UI QtWidgetController : public Object
 {
 
 public:

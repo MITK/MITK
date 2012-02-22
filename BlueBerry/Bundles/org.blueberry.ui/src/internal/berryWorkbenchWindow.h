@@ -169,6 +169,7 @@ protected:
   friend class WorkbenchWindowConfigurer::WindowActionBarConfigurer;
   friend class Workbench;
   friend class LayoutPartSash;
+  friend class EditorSashContainer;
   friend class WorkbenchPage;
   friend class DetachedWindow;
 

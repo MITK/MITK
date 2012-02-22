@@ -23,9 +23,11 @@
 
 #include "berryQtWidgetController.h"
 
+#include <org_blueberry_ui_Export.h>
+
 namespace berry {
 
-class QtControlWidget : public QFrame
+class BERRY_UI QtControlWidget : public QFrame
 {
 
 public:

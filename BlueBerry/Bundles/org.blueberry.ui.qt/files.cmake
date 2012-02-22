@@ -32,7 +32,6 @@ SET(INTERNAL_CPP_FILES
   util/berryTabbedStackPresentation.cpp
   util/berryTabFolderEvent.cpp
   
-  berryQtControlWidget.cpp
   berryQtDisplay.cpp
   berryQtDnDTweaklet.cpp
   berryQtFileImageDescriptor.cpp
@@ -53,7 +52,6 @@ SET(INTERNAL_CPP_FILES
   berryQtStyleManager.cpp
   berryQtStylePreferencePage.cpp
   berryQtTracker.cpp
-  berryQtWidgetController.cpp
   berryQtWidgetsTweaklet.cpp
   berryQtWidgetsTweakletImpl.cpp
   berryQtWorkbenchPageTweaklet.cpp

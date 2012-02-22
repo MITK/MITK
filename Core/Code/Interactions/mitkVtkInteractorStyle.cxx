@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkInteractorStyle.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkCommand.h"
+#include <vtkObjectFactory.h>
+#include <vtkCommand.h>
 
 
 vtkCxxRevisionMacro(mitkVtkInteractorStyle, "$Revision: 1.35 $");
@@ -46,14 +46,6 @@ void mitkVtkInteractorStyle::OnMouseWheelBackward()
   if (this->HasObserver(vtkCommand::MouseWheelBackwardEvent)) 
   {
     this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, NULL);
-  }
-}
-
-void mitkVtkInteractorStyle::OnWidgetModified()
-{
-  if (this->HasObserver(vtkCommand::WidgetModifiedEvent)) 
-  {
-    this->InvokeEvent(vtkCommand::WidgetModifiedEvent, NULL);
   }
 }
 

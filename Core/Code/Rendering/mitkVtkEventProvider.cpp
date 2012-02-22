@@ -66,8 +66,6 @@ mitk::vtkEventProvider::vtkEventProvider()
   AddInteractionEvent(vtkCommand::MouseWheelForwardEvent);
   // key press event
   AddInteractionEvent(vtkCommand::KeyPressEvent);
-  // window resize event
-  AddInteractionEvent(vtkCommand::WidgetModifiedEvent);
 }
 
 mitk::vtkEventProvider::~vtkEventProvider()
@@ -219,14 +217,6 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject* object,
       self->GetRenderWindow()->wheelMitkEvent(&we);
       break;
     }
-
-  // widget resize
-    case vtkCommand::WidgetModifiedEvent:
-    {
-      VTKEVENTPROVIDER_DEBUG << "widget resize event";
-      self->GetRenderWindow()->resizeMitkEvent(rwi->GetRenderWindow()->GetSize()[0],rwi->GetRenderWindow()->GetSize()[1]);
-      break;
-    }  
 
   default:
       VTKEVENTPROVIDER_INFO << "VTK event not mapped properly.";

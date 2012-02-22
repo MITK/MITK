@@ -30,12 +30,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __mitkVtkInteractorStyle_h
 #define __mitkVtkInteractorStyle_h
 
-#include <MitkExports.h>
-#include "vtkInteractorStyleUser.h"
+#include "MitkExports.h"
+#include <vtkInteractorStyleUser.h>
 
 class MITK_CORE_EXPORT mitkVtkInteractorStyle : public vtkInteractorStyleUser 
 {
 public:
+
+  // default VTK c'tor
   static mitkVtkInteractorStyle *New();
   vtkTypeRevisionMacro(mitkVtkInteractorStyle,vtkInteractorStyleUser);
   
@@ -48,12 +50,6 @@ public:
   * \brief Called when scrolling backwards with the mouse-wheel.
   */ 
   virtual void OnMouseWheelBackward();
-
-  /**
-  * \brief No idea when this is called, but mitkVtkEventProvider listens to it.
-  */ 
-  virtual void OnWidgetModified();
-
 
 protected:
 

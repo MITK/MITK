@@ -72,11 +72,11 @@ namespace mitk {
 #define CONNECT_ACTION(a, f) \
   StateMachine::AddActionFunction(a, new TSpecificStateMachineFunctor<Self>(this, &Self::f));
 
-#define STATEMACHINE_INFO MITK_INFO("StateMachine")
-#define STATEMACHINE_WARN MITK_WARN("StateMachine")
-#define STATEMACHINE_FATAL MITK_FATAL("StateMachine")
-#define STATEMACHINE_ERROR MITK_ERROR("StateMachine")
-#define STATEMACHINE_DEBUG MITK_DEBUG("StateMachine")
+#define STATEMACHINE_INFO MITK_INFO("StateMachine") << "[type: " << GetType() << "] "
+#define STATEMACHINE_WARN MITK_WARN("StateMachine") << "[type: " << GetType() << "] "
+#define STATEMACHINE_FATAL MITK_FATAL("StateMachine") << "[type: " << GetType() << "] "
+#define STATEMACHINE_ERROR MITK_ERROR("StateMachine") << "[type: " << GetType() << "] "
+#define STATEMACHINE_DEBUG MITK_DEBUG("StateMachine") << "[type: " << GetType() << "] "
 
 /**
 @brief Superior statemachine

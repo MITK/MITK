@@ -151,9 +151,9 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
       m_UndoController->SetOperationEvent(operationEvent);
     }
 
-    STATEMACHINE_DEBUG("StateChange")<<this->GetType()<<" from " << m_CurrentStateVector[m_TimeStep]->GetId() 
-      << " " << m_CurrentStateVector[m_TimeStep]->GetName()
-      <<" to " << tempNextState->GetId() <<" "<<tempNextState->GetName();
+    STATEMACHINE_DEBUG << "from " << m_CurrentStateVector[m_TimeStep]->GetId()
+                       << " " << m_CurrentStateVector[m_TimeStep]->GetName()
+                       << " to " << tempNextState->GetId() <<" "<<tempNextState->GetName();
 
     //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentStateVector[m_TimeStep] = tempNextState;

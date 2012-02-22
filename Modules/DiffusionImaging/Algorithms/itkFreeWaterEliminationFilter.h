@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkImageToImageFilter.h"
 #include <itkDiffusionTensor3D.h>
+#include <itkVectorImage.h>
 
 namespace itk
 {
@@ -34,10 +35,10 @@ namespace itk
     typedef SmartPointer<Self>                          Pointer;
     typedef SmartPointer<const Self>                    ConstPointer;
     typedef ImageToImageFilter< Image< TDiffusionPixelType, 3>,
-            Image< DiffusionTensor3D< TTensorPixelType >, 3 > >
-                                                        Superclass;
+      Image< DiffusionTensor3D< TTensorPixelType >, 3 > >
+      Superclass;
 
-     /** Method for creation through the object factory. */
+    /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
     /** Runtime information support. */
@@ -49,21 +50,22 @@ namespace itk
 
 
     /** Reference image data,  This image is aquired in the absence
-       * of a diffusion sensitizing field gradient */
+    * of a diffusion sensitizing field gradient */
     typedef typename Superclass::InputImageType      ReferenceImageType;
     typedef Image< TensorPixelType, 3 >              TensorImageType;
     typedef TensorImageType                          OutputImageType;
     typedef typename Superclass::OutputImageRegionType
-                                                     OutputImageRegionType;
+      OutputImageRegionType;
 
     /** Typedef defining one (of the many) gradient images.  */
     typedef Image< GradientPixelType, 3 >            GradientImageType;
 
     /** An alternative typedef defining one (of the many) gradient images.
-     * It will be assumed that the vectorImage has the same dimension as the
-     * Reference image and a vector length parameter of \c n (number of
-     * gradient directions) */
+    * It will be assumed that the vectorImage has the same dimension as the
+    * Reference image and a vector length parameter of \c n (number of
+    * gradient directions) */
     typedef VectorImage< GradientPixelType, 3 >      GradientImagesType;
+
 
 
     /*
@@ -78,32 +80,32 @@ namespace itk
 
     /** Container to hold gradient directions of the 'n' DW measurements */
     typedef VectorContainer< unsigned int,
-            GradientDirectionType >                  GradientDirectionContainerType;
+      GradientDirectionType >                  GradientDirectionContainerType;
 
 
 
     /** Another set method to add a gradient directions and its corresponding
-     * image. The image here is a VectorImage. The user is expected to pass the
-     * gradient directions in a container. The ith element of the container
-     * corresponds to the gradient direction of the ith component image the
-     * VectorImage.  For the baseline image, a vector of all zeros
-     * should be set. */
+    * image. The image here is a VectorImage. The user is expected to pass the
+    * gradient directions in a container. The ith element of the container
+    * corresponds to the gradient direction of the ith component image the
+    * VectorImage.  For the baseline image, a vector of all zeros
+    * should be set. */
     void SetGradientImage( GradientDirectionContainerType *,
-                                               const GradientImagesType *image);
+      const GradientImagesType *image);
 
     /** Set method to set the reference image. */
     void SetReferenceImage( ReferenceImageType *referenceImage )
-      {
+    {
       if( m_GradientImageTypeEnumeration == GradientIsInASingleImage)
-        {
+      {
         itkExceptionMacro( << "Cannot call both methods:"
-        << "AddGradientImage and SetGradientImage. Please call only one of them.");
-        }
+          << "AddGradientImage and SetGradientImage. Please call only one of them.");
+      }
 
       this->ProcessObject::SetNthInput( 0, referenceImage );
 
       m_GradientImageTypeEnumeration = GradientIsInManyImages;
-      }
+    }
 
     /** Get reference image */
     virtual ReferenceImageType * GetReferenceImage()
@@ -111,15 +113,15 @@ namespace itk
 
     /** Return the gradient direction. idx is 0 based */
     virtual GradientDirectionType GetGradientDirection( unsigned int idx) const
-      {
+    {
       if( idx >= m_NumberOfGradientDirections )
-        {
+      {
         itkExceptionMacro( << "Gradient direction " << idx << "does not exist" );
-        }
-      return m_GradientDirectionContainer->ElementAt( idx+1 );
       }
+      return m_GradientDirectionContainer->ElementAt( idx+1 );
+    }
 
-  itkSetMacro( BValue, TTensorPixelType);
+    itkSetMacro( BValue, TTensorPixelType);
 
   protected:
 
@@ -128,18 +130,27 @@ namespace itk
 
 
     void GenerateData();
-  
+
 
     typedef enum
-      {
+    {
       GradientIsInASingleImage = 1,
       GradientIsInManyImages,
       Else
-      } GradientImageTypeEnumeration;
+    } GradientImageTypeEnumeration;
 
 
 
   private:
+
+    void remove_negative_eigs(int x, int y, int z, int ****table, 
+      int nof, itk::Size<3> size, 
+      vnl_matrix<float> H, int ****D, int ****atten, 
+      vnl_vector<float> higher_thresh, 
+      vnl_vector<float> lower_thresh, int wasdetectedbad, 
+      int ***b0_mean_image, int ****sorted_eigs, int numberb0);
+
+    void check_the_neighbors(int g, int x, int y, int z, int ****table, itk::Size<3>);
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;
@@ -162,9 +173,7 @@ namespace itk
 
 
 
-  void remove_negative_eigs(int x, int y, int z, int &table, int nof, int size, int H, int &D, int &atten, float higher_thresh, float lower_thresh, int wasdetected bad, int b0_mean_image, int sorted_eigs, int numberb0){};
 
-  void check_the_neighbors(int x, int y, int z, int &table, int g, int size){};
 
 
 } // end of namespace

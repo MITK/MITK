@@ -53,13 +53,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
+#include <vtkInteractorStyleJoystickCamera.h>
+
 
 
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm), 
   m_VtkMapperPresent(false), 
   m_NewRenderer(true),
-  m_2DCameraInitialized(false)
+  m_CameraInitializedForMapperID(0)
 {
   didCount=false;
 
@@ -800,7 +802,11 @@ void mitk::VtkPropRenderer::checkState()
 //### Contains all methods which are neceassry before each VTK Render() call
 void mitk::VtkPropRenderer::PrepareRender()
 {
-  Initialize2DvtkCamera(); //Set parallel projection etc.
+  if ( this->GetMapperID() != m_CameraInitializedForMapperID )
+  {
+    Initialize2DvtkCamera(); //Set parallel projection etc.
+  }
+
   AdjustCameraToScene(); //Prepare camera for 2D render windows
 }
 
@@ -808,9 +814,12 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
 {
   if ( this->GetMapperID() == Standard3D )
   {
-    m_2DCameraInitialized = false;
+    //activate parallel projection for 2D
+    this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( vtkInteractorStyleJoystickCamera::New() );
+    m_CameraInitializedForMapperID = Standard3D;
   }
-  else if( !m_2DCameraInitialized && this->GetMapperID() == Standard2D)
+  else if( this->GetMapperID() == Standard2D)
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
@@ -820,7 +829,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
 
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
 
-    m_2DCameraInitialized = true;
+    m_CameraInitializedForMapperID = Standard2D;
   }
   return true;
 }

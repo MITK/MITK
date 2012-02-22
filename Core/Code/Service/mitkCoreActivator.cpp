@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
+#include "mitkCoreDataNodeReader.h"
 
 #include <mitkModuleActivator.h>
 
@@ -32,8 +33,11 @@ public:
   {
     //m_RenderingManager = mitk::RenderingManager::New();
     //context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
-      m_PlanePositionManager = mitk::PlanePositionManagerService::New();
-      m_PlanePositionManagerReg = context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager);
+    m_PlanePositionManager = mitk::PlanePositionManagerService::New();
+    context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager);
+
+    m_CoreDataNodeReader = mitk::CoreDataNodeReader::New();
+    context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader);
   }
 
   void Unload(mitk::ModuleContext* )
@@ -42,17 +46,13 @@ public:
     // will always be 0 for the Mitk library. It makes no sense
     // to use it at this stage anyway, since all libraries which
     // know about the module system have already been unloaded.
-
-      m_PlanePositionManagerReg.Unregister();
-      m_PlanePositionManager = 0;
-
   }
 
 private:
 
-  mitk::RenderingManager::Pointer m_RenderingManager;
+  //mitk::RenderingManager::Pointer m_RenderingManager;
   mitk::PlanePositionManagerService::Pointer m_PlanePositionManager;
-  mitk::ServiceRegistration m_PlanePositionManagerReg;
+  mitk::CoreDataNodeReader::Pointer m_CoreDataNodeReader;
 };
 
 MITK_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)

@@ -54,6 +54,8 @@ SET(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
 
+  Interfaces/mitkIDataNodeReader.h
+
   IO/mitkPixelTypeTraits.h
 
   DataManagement/mitkCommon.h
@@ -68,6 +70,7 @@ SET(H_FILES
   Service/mitkModuleAbstractTracked.tpp
   Service/mitkModuleActivator.h
   Service/mitkServiceFactory.h
+  Service/mitkServiceInterface.h
   Service/mitkServiceTracker.h
   Service/mitkServiceTracker.tpp
   Service/mitkServiceTrackerCustomizer.h
@@ -239,6 +242,7 @@ SET(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkCrosshairPositionEvent.cpp
   IO/mitkBaseDataIOFactory.cpp
+  IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
   IO/mitkFileSeriesReader.cpp
@@ -250,6 +254,7 @@ SET(CPP_FILES
   IO/mitkItkImageFileIOFactory.cpp
   IO/mitkItkImageFileReader.cpp
   IO/mitkItkPictureWrite.cpp
+  IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
   #IO/mitkPicFileIOFactory.cpp

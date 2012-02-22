@@ -334,9 +334,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
 
-
-
-
       if(m_OutputFolderNameSet) logfile << "Reading " << folderName.toStdString() << '\n';
 
       // PARSING DIRECTORY
@@ -429,7 +426,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       }
       else
       {
-        nSeries = values1.size();
+        nSeries = values2.size();
       }
 
       gdcm::Directory::FilenamesType files;
@@ -455,7 +452,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       }
 
       int filesPerSeries = nfiles / nSeries;
-
 
       gdcm::Scanner::ValuesType::const_iterator it2 = values2.begin();
       for(int i=0; i<nSeries; i++)

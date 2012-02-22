@@ -34,7 +34,7 @@ if(UNIX AND NOT APPLE)
 
   CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
   if(NOT LIB_WRAP)
-    message(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+    message(STATUS "Could not find tcpd.h - if this is missing in the build libwrap0-dev needs to be installed")
   endif()
 
 endif()

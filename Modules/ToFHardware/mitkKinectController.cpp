@@ -39,11 +39,7 @@ namespace mitk
   {
     if (!m_ConnectionCheck)
     {
-      //// Initialize the OpenNI status
-      //m_ConnectionCheck = !ErrorText(m_Context.InitFromXmlFile("C:/Temp/SamplesConfig.xml"));
-      //// Create a depth map generator and set its resolution
-      //m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_DEPTH, m_DepthGenerator));
-      //m_ConnectionCheck = !ErrorText(m_Context.FindExistingNode(XN_NODE_TYPE_IMAGE, m_ImageGenerator));
+      // Initialize the OpenNI status
       m_ConnectionCheck = !ErrorText(m_Context.Init());
       // Create a depth generator and set its resolution
       XnMapOutputMode DepthMode;
@@ -142,13 +138,13 @@ namespace mitk
       }
 
       // Mirror data
-      m_ConnectionCheck = !ErrorText(m_Context.SetGlobalMirror(!m_Context.GetGlobalMirror()));
+      m_ConnectionCheck = ErrorText(m_Context.SetGlobalMirror(!m_Context.GetGlobalMirror()));
 
       // Start data generation
-      m_ConnectionCheck = !ErrorText(m_Context.StartGeneratingAll());
+      m_ConnectionCheck = ErrorText(m_Context.StartGeneratingAll());
 
-      // Update the connected flag
-      m_ConnectionCheck = true;
+//      // Update the connected flag
+//      m_ConnectionCheck = true;
     }
     MITK_INFO<<"Controller connect?"<<m_ConnectionCheck;
     return m_ConnectionCheck;

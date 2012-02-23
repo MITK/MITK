@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_diffusionimaging org.mitk.diffusionimaging Plugin
+  \defgroup org_mitk_diffusionimaging org.mitk.diffusionimaging
   \ingroup MITKPlugins
 
   \brief This small plug-in is responsible for initializing the mitkDiffusionImaging module.

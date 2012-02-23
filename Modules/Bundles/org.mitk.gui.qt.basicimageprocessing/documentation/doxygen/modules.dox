@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_basicimageprocessing org.mitk.gui.qt.basicimageprocessing Plugin
+  \defgroup org_mitk_gui_qt_basicimageprocessing org.mitk.gui.qt.basicimageprocessing
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

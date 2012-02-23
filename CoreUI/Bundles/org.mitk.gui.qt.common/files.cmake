@@ -1,51 +1,28 @@
 SET(SRC_CPP_FILES
-  QmitkCloseProjectAction.cpp
-  QmitkDnDFrameWidget.cpp
+  QmitkAbstractRenderEditor.cpp
+  QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
-  QmitkFileOpenAction.cpp
-  QmitkFileExitAction.cpp
-  QmitkFunctionality.cpp
-  QmitkFunctionality2.cpp
-  QmitkStatusBar.cpp
-  QmitkStdMultiWidgetEditor.cpp
-  QmitkPreferencesDialog.cpp
-  QmitkFunctionalityCoordinator.cpp
+  QmitkDnDFrameWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkDataNodeSelection.cpp
   QmitkCommonActivator.cpp
-  QmitkEditorsPreferencePage.cpp
-  QmitkFunctionalityUtil.cpp
-  QmitkGeneralPreferencePage.cpp
-  QmitkStdMultiWidgetEditorPreferencePage.cpp
+  QmitkDataNodeItemModel.cpp
+  QmitkDataNodeSelection.cpp
+  QmitkViewCoordinator.cpp
 )
 
 SET(MOC_H_FILES
-  src/QmitkCloseProjectAction.h
-  src/QmitkFileOpenAction.h
-  src/QmitkFileExitAction.h
-  src/QmitkPreferencesDialog.h
-  src/QmitkStdMultiWidgetEditor.h
+  src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
-  
-  src/internal/QmitkCommonActivator.h
-  src/internal/QmitkEditorsPreferencePage.h
-  src/internal/QmitkGeneralPreferencePage.h
-  src/internal/QmitkStdMultiWidgetEditorPreferencePage.h
-)
 
-SET(UI_FILES
-  src/QmitkPreferencesDialog.ui
+  src/internal/QmitkCommonActivator.h
 )
 
 SET(CACHED_RESOURCE_FILES
-  plugin.xml
 )
 
-# todo: add some qt style sheet resources
 SET(QRC_FILES
-  resources/resources.qrc
 )
 
 SET(CPP_FILES )

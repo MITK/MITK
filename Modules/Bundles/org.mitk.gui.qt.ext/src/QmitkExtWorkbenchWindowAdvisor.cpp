@@ -43,10 +43,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
 
-#include <QmitkExtFileOpenAction.h>
+#include <QmitkFileOpenAction.h>
 #include <QmitkExtFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
+#include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
@@ -325,7 +326,7 @@ private:
 
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
                   berry::IWorkbenchWindowConfigurer::Pointer configurer) :
-QmitkCommonWorkbenchWindowAdvisor(configurer),
+berry::WorkbenchWindowAdvisor(configurer),
 lastInput(0),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
@@ -334,7 +335,8 @@ showVersionInfo(true),
 showMitkVersionInfo(true),
 showViewMenuItem(true),
 showNewWindowMenuItem(true),
-showClosePerspectiveMenuItem(true)
+showClosePerspectiveMenuItem(true),
+dropTargetListener(new QmitkDefaultDropTargetListener)
 {
  productName = berry::Platform::GetConfiguration().getString("application.baseName");
 }
@@ -411,7 +413,6 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
- QmitkCommonWorkbenchWindowAdvisor::PostWindowCreate();
  // very bad hack...
  berry::IWorkbenchWindow::Pointer window =
   this->GetWindowConfigurer()->GetWindow();
@@ -438,7 +439,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QMenu* fileMenu = menuBar->addMenu("&File");
  fileMenu->setObjectName("FileMenu");
 
- QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
+ QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
  fileMenu->addAction(fileOpenAction);
  fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
  fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
@@ -715,6 +716,9 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  menuPerspectiveListener = new PerspectiveListenerForMenu(this);
  configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
+
+ configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
+ configurer->ConfigureEditorAreaDropListener(dropTargetListener);
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

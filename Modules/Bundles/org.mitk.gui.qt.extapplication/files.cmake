@@ -1,15 +1,15 @@
 SET(SRC_CPP_FILES
-  QmitkExtApplication.cpp
-  QmitkExtAppWorkbenchAdvisor.cpp
 )
 
 SET(INTERNAL_CPP_FILES
+  QmitkExtApplication.cpp
   QmitkExtApplicationPlugin.cpp
+  QmitkExtAppWorkbenchAdvisor.cpp
   QmitkExtDefaultPerspective.cpp
 )
 
 SET(MOC_H_FILES
-  src/QmitkExtApplication.h
+  src/internal/QmitkExtApplication.h
   src/internal/QmitkExtApplicationPlugin.h
   src/internal/QmitkExtDefaultPerspective.h
 )

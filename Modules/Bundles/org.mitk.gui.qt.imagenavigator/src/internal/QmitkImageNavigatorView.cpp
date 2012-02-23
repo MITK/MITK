@@ -11,151 +11,137 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkImageNavigatorView.h"
 
-#include "mitkNodePredicateDataType.h"
+#include <QmitkStepperAdapter.h>
+#include <QmitkRenderWindow.h>
 
-#include "QmitkDataStorageComboBox.h"
-#include "QmitkStdMultiWidget.h"
-
-#include "mitkDataStorageEditorInput.h"
-
-// berry Includes
-#include <berryPlatform.h>
-#include <berryIWorkbenchPage.h>
 #include <berryConstants.h>
-
-#include <QMessageBox>
-
 
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 
-class ImageNavigatorPartListener : public berry::IPartListener
-{
-public:
-
-  ImageNavigatorPartListener(QmitkImageNavigatorView* view)
-    : m_View(view)
-  {}
-
-  berry::IPartListener::Events::Types GetPartEventTypes() const
-  {
-    return berry::IPartListener::Events::OPENED |
-        berry::IPartListener::Events::CLOSED;
-  }
-
-  void PartClosed(berry::IWorkbenchPartReference::Pointer partRef)
-  {
-    if((partRef->GetId() == QmitkImageNavigatorView::VIEW_ID) || (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID))
-    {
-      m_View->SetMultiWidget(0);
-    }
-  }
-
-  void PartOpened(berry::IWorkbenchPartReference::Pointer partRef)
-  {
-    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
-    {
-      if (QmitkStdMultiWidgetEditor::Pointer multiWidgetPart =
-          partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>())
-      {
-        m_View->SetMultiWidget(multiWidgetPart->GetStdMultiWidget());
-      }
-      else
-      {
-        m_View->SetMultiWidget(0);
-      }
-    }
-  }
-
-private:
-
-  QmitkImageNavigatorView* m_View;
-};
-
-
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_MultiWidget(NULL)
+  : m_TransversalStepper(0)
+  , m_SagittalStepper(0)
+  , m_FrontalStepper(0)
+  , m_TimeStepper(0)
+  , m_Parent(0)
+  , m_IRenderWindowPart(0)
 {
-  multiWidgetListener = new ImageNavigatorPartListener(this);
 }
 
 QmitkImageNavigatorView::~QmitkImageNavigatorView()
 {
-  this->GetSite()->GetPage()->RemovePartListener(multiWidgetListener);
 }
 
 void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
 {
-
   // create GUI widgets
+  m_Parent = parent;
   m_Controls.setupUi(parent);
-  m_MultiWidget = this->GetActiveStdMultiWidget();
   m_Controls.m_SliceNavigatorTransversal->SetInverseDirection(true);
-  m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice() , "sliceNavigatorTransversalFromSimpleExample");
-  m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
-  m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
-  m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
-
-  this->GetSite()->GetPage()->AddPartListener(multiWidgetListener);
 
   connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_ZWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
 
-  connect(m_TransversalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-  connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-  connect(m_FrontalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+  m_Parent->setEnabled(false);
+
+  mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
+  this->RenderWindowPartActivated(renderPart);
 }
 
 void QmitkImageNavigatorView::SetFocus ()
 {
-
+  m_Controls.m_XWorldCoordinateSpinBox->setFocus();
 }
 
-void QmitkImageNavigatorView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
+void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  m_MultiWidget = multiWidget;
-  if (m_MultiWidget)
+  if (this->m_IRenderWindowPart != renderWindowPart)
   {
-    m_TransversalStepper->deleteLater();
-    m_SagittalStepper->deleteLater();
-    m_FrontalStepper->deleteLater();
-    m_TimeStepper->deleteLater();
+    this->m_IRenderWindowPart = renderWindowPart;
+    this->m_Parent->setEnabled(true);
 
-    m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice() , "sliceNavigatorTransversalFromSimpleExample");
-    m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
-    m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
-    m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
-  }
-  else
-  {
-    m_TransversalStepper->SetStepper(0);
-    m_SagittalStepper->SetStepper(0);
-    m_FrontalStepper->SetStepper(0);
-    m_TimeStepper->SetStepper(0);
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetRenderWindow("transversal");
+    if (renderWindow)
+    {
+      if (m_TransversalStepper) m_TransversalStepper->deleteLater();
+      m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal,
+                                                     renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                     "sliceNavigatorTransversalFromSimpleExample");
+      m_Controls.m_SliceNavigatorTransversal->setEnabled(true);
+      m_Controls.m_TransversalLabel->setEnabled(true);
+      m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(true);
+      connect(m_TransversalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+    }
+    else
+    {
+      m_Controls.m_SliceNavigatorTransversal->setEnabled(false);
+      m_Controls.m_TransversalLabel->setEnabled(false);
+      m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(false);
+    }
+
+    renderWindow = renderWindowPart->GetRenderWindow("sagittal");
+    if (renderWindow)
+    {
+      if (m_SagittalStepper) m_SagittalStepper->deleteLater();
+      m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal,
+                                                  renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                  "sliceNavigatorSagittalFromSimpleExample");
+      m_Controls.m_SliceNavigatorSagittal->setEnabled(true);
+      m_Controls.m_SagittalLabel->setEnabled(true);
+      m_Controls.m_YWorldCoordinateSpinBox->setEnabled(true);
+      connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+    }
+    else
+    {
+      m_Controls.m_SliceNavigatorSagittal->setEnabled(false);
+      m_Controls.m_SagittalLabel->setEnabled(false);
+      m_Controls.m_YWorldCoordinateSpinBox->setEnabled(false);
+    }
+
+    renderWindow = renderWindowPart->GetRenderWindow("coronal");
+    if (renderWindow)
+    {
+      if (m_FrontalStepper) m_FrontalStepper->deleteLater();
+      m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal,
+                                                 renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                 "sliceNavigatorFrontalFromSimpleExample");
+      m_Controls.m_SliceNavigatorFrontal->setEnabled(true);
+      m_Controls.m_CoronalLabel->setEnabled(true);
+      m_Controls.m_XWorldCoordinateSpinBox->setEnabled(true);
+      connect(m_FrontalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+    }
+    else
+    {
+      m_Controls.m_SliceNavigatorFrontal->setEnabled(false);
+      m_Controls.m_CoronalLabel->setEnabled(false);
+      m_Controls.m_XWorldCoordinateSpinBox->setEnabled(false);
+    }
+
+    mitk::SliceNavigationController* timeController = renderWindowPart->GetTimeNavigationController();
+    if (timeController)
+    {
+      if (m_TimeStepper) m_TimeStepper->deleteLater();
+      m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime,
+                                              timeController->GetSlice(),
+                                              "sliceNavigatorTimeFromSimpleExample");
+      m_Controls.m_SliceNavigatorTime->setEnabled(true);
+      m_Controls.m_TimeLabel->setEnabled(true);
+    }
+    else
+    {
+      m_Controls.m_SliceNavigatorTime->setEnabled(false);
+      m_Controls.m_TimeLabel->setEnabled(false);
+    }
   }
 }
 
-QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
+void QmitkImageNavigatorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  QmitkStdMultiWidget* activeStdMultiWidget = 0;
-  berry::IEditorPart::Pointer editor =
-      this->GetSite()->GetPage()->GetActiveEditor();
-
-  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-  {
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-  }
-  else
-  {
-    mitk::DataStorageEditorInput::Pointer editorInput;
-    editorInput = new mitk::DataStorageEditorInput();
-    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-  }
-
-  return activeStdMultiWidget;
+  m_IRenderWindowPart = 0;
+  m_Parent->setEnabled(false);
 }
 
 int QmitkImageNavigatorView::GetSizeFlags(bool width)
@@ -174,7 +160,7 @@ int QmitkImageNavigatorView::ComputePreferredSize(bool width, int /*availablePar
 {
   if(width==false)
   {
-    return 160;
+    return 200;
   }
   else
   {
@@ -210,35 +196,43 @@ int QmitkImageNavigatorView::GetClosestAxisIndex(mitk::Vector3D normal)
 
 void QmitkImageNavigatorView::SetBorderColors()
 {
-  if (m_MultiWidget)
+  if (m_IRenderWindowPart)
   {
-    mitk::PlaneGeometry::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-    if (geometry.IsNotNull())
+    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetRenderWindow("transversal");
+    if (renderWindow)
     {
-      mitk::Vector3D normal = geometry->GetNormal();
-      int axis = this->GetClosestAxisIndex(normal);
-      this->SetBorderColor(axis, QString("red"));
+      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+      if (geometry.IsNotNull())
+      {
+        mitk::Vector3D normal = geometry->GetNormal();
+        int axis = this->GetClosestAxisIndex(normal);
+        this->SetBorderColor(axis, QString("red"));
+      }
     }
 
-    geometry = m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-    if (geometry.IsNotNull())
+    renderWindow = m_IRenderWindowPart->GetRenderWindow("sagittal");
+    if (renderWindow)
     {
-      mitk::Vector3D normal = geometry->GetNormal();
-      int axis = this->GetClosestAxisIndex(normal);
-      this->SetBorderColor(axis, QString("green"));
+      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+      if (geometry.IsNotNull())
+      {
+        mitk::Vector3D normal = geometry->GetNormal();
+        int axis = this->GetClosestAxisIndex(normal);
+        this->SetBorderColor(axis, QString("green"));
+      }
     }
 
-    geometry = m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-    if (geometry.IsNotNull())
+    renderWindow = m_IRenderWindowPart->GetRenderWindow("coronal");
+    if (renderWindow)
     {
-      mitk::Vector3D normal = geometry->GetNormal();
-      int axis = this->GetClosestAxisIndex(normal);
-      this->SetBorderColor(axis, QString("blue"));
+      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+      if (geometry.IsNotNull())
+      {
+        mitk::Vector3D normal = geometry->GetNormal();
+        int axis = this->GetClosestAxisIndex(normal);
+        this->SetBorderColor(axis, QString("blue"));
+      }
     }
-
   }
 }
 
@@ -273,9 +267,9 @@ void QmitkImageNavigatorView::SetStepSizes()
 
 void QmitkImageNavigatorView::SetStepSize(int axis)
 {
-  if (m_MultiWidget)
+  if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -284,7 +278,7 @@ void QmitkImageNavigatorView::SetStepSize(int axis)
       mitk::Point3D crossPositionInMillimetresPlus1;
       mitk::Vector3D transformedAxisDirection;
 
-      mitk::Point3D crossPositionInMillimetres = m_MultiWidget->GetCrossPosition();
+      mitk::Point3D crossPositionInMillimetres = m_IRenderWindowPart->GetSelectedPosition();
       geometry->WorldToIndex(crossPositionInMillimetres, crossPositionInIndexCoordinates);
 
       crossPositionInIndexCoordinatesPlus1 = crossPositionInIndexCoordinates;
@@ -319,9 +313,9 @@ void QmitkImageNavigatorView::SetStepSize(int axis, double stepSize)
 
 void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 {
-  if (m_MultiWidget)
+  if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -330,16 +324,16 @@ void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
       positionInWorldCoordinates[1] = m_Controls.m_YWorldCoordinateSpinBox->value();
       positionInWorldCoordinates[2] = m_Controls.m_ZWorldCoordinateSpinBox->value();
 
-      m_MultiWidget->MoveCrossToPosition(positionInWorldCoordinates);
+      m_IRenderWindowPart->SetSelectedPosition(positionInWorldCoordinates);
     }
   }
 }
 
 void QmitkImageNavigatorView::OnRefetch()
 {
-  if (m_MultiWidget)
+  if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -365,7 +359,7 @@ void QmitkImageNavigatorView::OnRefetch()
         cornerPoint2InIndexCoordinates[2] -= 0.5;
       }
 
-      mitk::Point3D crossPositionInWorldCoordinates = m_MultiWidget->GetCrossPosition();
+      mitk::Point3D crossPositionInWorldCoordinates = m_IRenderWindowPart->GetSelectedPosition();
 
       mitk::Point3D cornerPoint1InWorldCoordinates;
       mitk::Point3D cornerPoint2InWorldCoordinates;

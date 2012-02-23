@@ -19,7 +19,7 @@
 #ifndef BERRYQTWIDGETSTWEAKLETIMPL_H_
 #define BERRYQTWIDGETSTWEAKLETIMPL_H_
 
-#include "berryQtWidgetController.h"
+#include <internal/berryQtWidgetController.h>
 
 #include <berryRectangle.h>
 #include <berryShell.h>

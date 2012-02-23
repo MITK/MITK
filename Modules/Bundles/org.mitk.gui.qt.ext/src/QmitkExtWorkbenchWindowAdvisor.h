@@ -24,14 +24,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryWorkbenchAdvisor.h>
+#include <berryWorkbenchWindowAdvisor.h>
+
 #include <org_mitk_gui_qt_ext_Export.h>
-#include "QmitkCommonWorkbenchWindowAdvisor.h"
 
 #include <QList>
+
 class QAction;
 class QMenu;
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QObject, public QmitkCommonWorkbenchWindowAdvisor
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 {
   Q_OBJECT
 
@@ -137,6 +139,9 @@ private:
   bool showClosePerspectiveMenuItem;
   std::string productName;
   std::string windowIcon;
+
+  // enables DnD on the editor area
+  berry::IDropTargetListener::Pointer dropTargetListener;
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
   std::vector<std::string> perspectiveExcludeList;

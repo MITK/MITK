@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_diffusionimaging org.mitk.gui.qt.diffusionimaging Plugin
+  \defgroup org_mitk_gui_qt_diffusionimaging org.mitk.gui.qt.diffusionimaging
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

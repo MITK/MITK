@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+/**
+ * \ingroup org_mitk_core_services
+ */
 struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 {
   berryInterfaceMacro(IDataStorageReference, mitk);
@@ -37,10 +40,10 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 
   virtual bool IsDefault() const = 0;
 
-  virtual std::string GetLabel() const = 0;
-  virtual void SetLabel(const std::string& label) = 0;
+  virtual QString GetLabel() const = 0;
+  virtual void SetLabel(const QString& label) = 0;
 
-  virtual bool operator==(const IDataStorageReference* o) const = 0;
+  virtual bool operator==(const berry::Object* o) const = 0;
 };
 
 }

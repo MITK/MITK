@@ -18,17 +18,11 @@ class MITK_QT_SEGMENTATION QmitkStatisticsAction: public QObject, public mitk::I
 public:
 
   QmitkStatisticsAction();
-  QmitkStatisticsAction(const QmitkStatisticsAction& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   virtual ~QmitkStatisticsAction();
 
   //interface methods
-  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);

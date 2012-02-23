@@ -18,15 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKINFODIALOG_H_
 #define QMITKINFODIALOG_H_
 
-#include <vector>
+#include <mitkDataNode.h>
 
 #include <QDialog>
 
-//class QmitkDataStorageComboBox;
-namespace mitk
-{
-  class DataNode;
-}
 class QTextBrowser;
 class QLineEdit;
 
@@ -39,7 +34,7 @@ class QmitkInfoDialog : public QDialog
   Q_OBJECT
 
   public:
-    QmitkInfoDialog( std::vector<mitk::DataNode*> _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
+    QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
   public slots:
     void OnSelectionChanged(const mitk::DataNode*);
     void OnSearchButtonClicked ( bool checked = false );

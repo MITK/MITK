@@ -63,7 +63,7 @@ public:
   ///
   /// Returns a copy of the node-vector that is shown by this model
   ///
-  virtual std::vector<mitk::DataNode*> GetNodeSet() const;
+  virtual QList<mitk::DataNode::Pointer> GetNodeSet() const;
   ///
   /// Get the DataStorage.
   ///
@@ -264,7 +264,7 @@ protected:
   ///
   /// Adds all Childs in parent to vec. Before a child is added the function is called recursively
   ///
-  void TreeToNodeSet(TreeItem* parent, std::vector<mitk::DataNode*>& vec) const;
+  void TreeToNodeSet(TreeItem* parent, QList<mitk::DataNode::Pointer> &vec) const;
   ///
   /// Update Tree Model according to predicates
   ///

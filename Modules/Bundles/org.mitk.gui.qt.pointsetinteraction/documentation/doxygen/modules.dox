@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_pointsetinteraction org.mitk.gui.qt.pointsetinteraction Plugin
+  \defgroup org_mitk_gui_qt_pointsetinteraction org.mitk.gui.qt.pointsetinteraction
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

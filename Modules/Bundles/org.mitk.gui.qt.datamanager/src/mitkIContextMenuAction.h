@@ -26,11 +26,10 @@ namespace mitk
       /**
       * @brief Executes the action, that linked to the context menu entry.
       */
-      virtual void Run( const std::vector<mitk::DataNode*>& selectedNodes ) = 0;
+      virtual void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) = 0;
 
     // Setters
     virtual void SetDataStorage(mitk::DataStorage* dataStorage) = 0;
-    virtual void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget) = 0;
     virtual void SetSmoothed(bool smoothed) = 0;
     virtual void SetDecimated(bool decimated) = 0;
     virtual void SetFunctionality(berry::QtViewPart* functionality) = 0;

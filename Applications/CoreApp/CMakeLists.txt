@@ -12,7 +12,8 @@ set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.pr
 
 set(_plugins
   org.blueberry.compat
-  org.mitk.gui.qt.application
+  org.mitk.gui.qt.coreapplication
+  org.mitk.gui.qt.stdmultiwidgeteditor
 )
 
 # Plug-ins listed below will not be

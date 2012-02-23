@@ -178,14 +178,14 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   
   //go through the generated list and let the sorted mappers paint
   bool lastVtkBased = true;
-  bool sthVtkBased = false;
+  //bool sthVtkBased = false;
   
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
     if((mapper->IsVtkBased() == true) )
     {
-      sthVtkBased = true;
+      //sthVtkBased = true;
       mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
       if(vtkMapper)
       {

@@ -5,7 +5,7 @@ $(license)
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_$(view-file-name)Controls.h"
 
@@ -18,7 +18,7 @@ $(license)
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
 */
-class $(view-class-name) : public QmitkFunctionality
+class $(view-class-name) : public QmitkAbstractView
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -28,9 +28,6 @@ class $(view-class-name) : public QmitkFunctionality
 
     static const std::string VIEW_ID;
 
-    $(view-class-name)();
-    virtual ~$(view-class-name)();
-
     virtual void CreateQtPartControl(QWidget *parent);
 
   protected slots:
@@ -39,9 +36,12 @@ class $(view-class-name) : public QmitkFunctionality
     void DoImageProcessing();
 
   protected:
+  
+    virtual void SetFocus();
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+                                     const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::$(view-file-name)Controls m_Controls;
 

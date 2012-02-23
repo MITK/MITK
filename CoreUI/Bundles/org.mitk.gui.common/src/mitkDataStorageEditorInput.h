@@ -26,6 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+/**
+ * \ingroup org_mitk_gui_common
+ *
+ * \brief An editor input based on a mitk::DataStorage.
+ *
+ * This editor input is usually used in render window editors inheriting from
+ * QmitkAbstractRenderEditor.
+ */
 class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput
 {
 public:

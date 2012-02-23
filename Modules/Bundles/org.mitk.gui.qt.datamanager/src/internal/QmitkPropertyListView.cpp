@@ -31,12 +31,6 @@ QmitkPropertyListView::QmitkPropertyListView()
 {
 }
 
-QmitkPropertyListView::QmitkPropertyListView(const QmitkPropertyListView& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkPropertyListView::~QmitkPropertyListView()
 {
 }
@@ -51,14 +45,15 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
   parent->setLayout(layout);
 }
 
-void QmitkPropertyListView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkPropertyListView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
+                                               const QList<mitk::DataNode::Pointer> &nodes)
 {
-  if (nodes.empty() || (nodes.front() == NULL)) return;
+  if (nodes.empty() || (nodes.front().IsNull())) return;
       
   m_NodePropertiesTableEditor->SetPropertyList(nodes.front()->GetPropertyList());
 }
 
-bool QmitkPropertyListView::IsExclusiveFunctionality() const
+void QmitkPropertyListView::SetFocus()
 {
-  return false;
+  m_NodePropertiesTableEditor->setFocus();
 }

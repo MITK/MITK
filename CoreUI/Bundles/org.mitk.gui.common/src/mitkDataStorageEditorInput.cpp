@@ -50,7 +50,7 @@ std::string DataStorageEditorInput::GetToolTipText() const
 bool DataStorageEditorInput::operator==(const berry::Object* o) const
 {
   if (const DataStorageEditorInput* input = dynamic_cast<const DataStorageEditorInput*>(o))
-    return this->GetName() == input->GetName();
+    return this->m_DataStorageRef == input->m_DataStorageRef;
 
   return false;
 }

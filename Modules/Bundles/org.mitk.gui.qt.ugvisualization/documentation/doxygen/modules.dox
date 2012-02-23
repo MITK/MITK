@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_ugvisualization org.mitk.gui.qt.ugvisualization Plugin
+  \defgroup org_mitk_gui_qt_ugvisualization org.mitk.gui.qt.ugvisualization
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

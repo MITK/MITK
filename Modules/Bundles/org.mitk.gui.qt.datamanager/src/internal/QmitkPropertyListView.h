@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Own includes
 
-#include <org_mitk_gui_qt_datamanager_Export.h>
+#include <QmitkAbstractView.h>
+
 #include <mitkDataNodeSelection.h>
-#include <QmitkFunctionality.h>
 #include <QmitkDataNodeSelectionProvider.h>
 
 class QmitkPropertiesTableEditor;
@@ -30,7 +30,7 @@ class QmitkPropertiesTableEditor;
 ///
 /// A view to show 
 ///
-class MITK_QT_DATAMANAGER QmitkPropertyListView : public QmitkFunctionality
+class QmitkPropertyListView : public QmitkAbstractView
 {  
   Q_OBJECT
 
@@ -41,14 +41,13 @@ public:
   /// The unique ID of this view
   ///
   static const std::string VIEW_ID;
+
   ///
   /// \brief Standard ctor.
   ///
   QmitkPropertyListView();
 
-  QmitkPropertyListView(const QmitkPropertyListView& other);
-
-  ///
+    ///
   /// \brief Standard dtor.
   ///
   virtual ~QmitkPropertyListView();
@@ -58,14 +57,13 @@ public:
   void CreateQtPartControl(QWidget* parent);
 
   ///
-  /// This is not a standalone functionality (can be easily used with other functionalities open) -> return false
-  ///
-  virtual bool IsExclusiveFunctionality() const;
-
-  ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes);
+
+protected:
+
+  void SetFocus();
 
 private:
   ///

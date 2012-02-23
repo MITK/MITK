@@ -60,7 +60,8 @@ m_PlaneNode1(NULL),
 m_PlaneNode2(NULL), 
 m_PlaneNode3(NULL), 
 m_Node(NULL),
-m_PendingCrosshairPositionEvent(false)
+m_PendingCrosshairPositionEvent(false),
+m_CrosshairNavigationEnabled(false)
 {
   /*******************************/
   //Create Widget manually
@@ -1680,6 +1681,7 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
   }
 
   gi->AddListener( m_TimeNavigationController );
+  m_CrosshairNavigationEnabled = true;
 }
 
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
@@ -1709,6 +1711,7 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
   }
 
   gi->RemoveListener( m_TimeNavigationController );
+  m_CrosshairNavigationEnabled = false;
 }
 
 
@@ -1753,6 +1756,16 @@ void QmitkStdMultiWidget::EnableDepartmentLogo()
 void QmitkStdMultiWidget::DisableDepartmentLogo()
 {
   m_LogoRendering4->Disable();
+}
+
+bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
+{
+  return m_LogoRendering4->IsEnabled();
+}
+
+bool QmitkStdMultiWidget::IsCrosshairNavigationEnabled() const
+{
+  return m_CrosshairNavigationEnabled;
 }
 
 
@@ -2086,6 +2099,11 @@ void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
   mitkWidget3->ActivateMenuWidget( state );
   mitkWidget4->ActivateMenuWidget( state );
 }
+
+bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const
+{
+  return mitkWidget1->GetActivateMenuWidgetFlag();
+}
  
 void QmitkStdMultiWidget::ResetCrosshair()
 {
@@ -2127,6 +2145,10 @@ void QmitkStdMultiWidget::DisableColoredRectangles()
   m_RectangleRendering4->Disable();
 }
 
+bool QmitkStdMultiWidget::IsColoredRectanglesEnabled() const
+{
+  return m_RectangleRendering1->IsEnabled();
+}
 
 mitk::MouseModeSwitcher* QmitkStdMultiWidget::GetMouseModeSwitcher()
 {

@@ -19,17 +19,11 @@ class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IC
 public:
 
   QmitkAutocropAction();
-  QmitkAutocropAction(const QmitkAutocropAction& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   virtual ~QmitkAutocropAction();
 
   //interface methods
-  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);
@@ -40,7 +34,7 @@ protected:
 
 private:
 
-  typedef std::vector<mitk::DataNode*> NodeList;
+  typedef QList<mitk::DataNode::Pointer> NodeList;
 
 };
 

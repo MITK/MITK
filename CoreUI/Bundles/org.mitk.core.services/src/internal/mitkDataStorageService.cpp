@@ -29,7 +29,7 @@ DataStorageService::DataStorageService()
 }
 
 bool
-DataStorageService::IsA(const std::type_info& type)
+DataStorageService::IsA(const std::type_info& type) const
 {
   std::string name(GetType().name());
   return name == type.name() || Service::IsA(type);
@@ -41,13 +41,13 @@ DataStorageService::GetType() const
   return typeid(IDataStorageService);
 }
 
-IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const std::string& label)
+IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const QString& label)
 {
 
   StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
   DataStorageReference::Pointer ref(new DataStorageReference(dataStorage.GetPointer()));
   ref->SetLabel(label);
-  m_DataStorageReferences.push_back(ref);
+  m_DataStorageReferences.insert(ref);
 
   return ref;
 }
@@ -55,11 +55,21 @@ IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const std::
 
 std::vector<IDataStorageReference::Pointer> DataStorageService::GetDataStorageReferences() const
 {
-  return m_DataStorageReferences;
+  std::vector<IDataStorageReference::Pointer> res;
+  res.reserve(m_DataStorageReferences.size()+1);
+  res.push_back(m_DefaultDataStorageRef);
+  res.insert(res.end(), m_DataStorageReferences.begin(), m_DataStorageReferences.end());
+  return res;
 }
 
 IDataStorageReference::Pointer DataStorageService::GetDefaultDataStorage() const
 {
+  return m_DefaultDataStorageRef;
+}
+
+IDataStorageReference::Pointer DataStorageService::GetDataStorage() const
+{
+  if (m_ActiveDataStorageRef.IsNotNull()) return m_ActiveDataStorageRef;
   return m_DefaultDataStorageRef;
 }
 
@@ -72,6 +82,23 @@ void DataStorageService::SetActiveDataStorage(IDataStorageReference::Pointer dat
 {
   if (dataStorageRef.IsNull()) m_ActiveDataStorageRef = m_DefaultDataStorageRef;
   else m_ActiveDataStorageRef = dataStorageRef;
+}
+
+void DataStorageService::AddDataStorageReference(IDataStorageReference::Pointer dataStorageRef)
+{
+  if (dataStorageRef.IsNull() || dataStorageRef->IsDefault()) return;
+
+  m_DataStorageReferences.insert(dataStorageRef);
+}
+
+bool DataStorageService::RemoveDataStorageReference(IDataStorageReference::Pointer dataStorageRef)
+{
+  if (m_ActiveDataStorageRef == dataStorageRef)
+  {
+    m_ActiveDataStorageRef = 0;
+  }
+
+  return m_DataStorageReferences.erase(dataStorageRef);
 }
 
 }

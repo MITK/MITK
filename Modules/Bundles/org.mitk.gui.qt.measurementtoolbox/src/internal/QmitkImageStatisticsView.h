@@ -18,19 +18,17 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkImageStatisticsView_H__INCLUDED
 #define QmitkImageStatisticsView_H__INCLUDED
 
-#include "QmitkFunctionality.h"
 #include "ui_QmitkImageStatisticsViewControls.h"
+
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 
 #include "QmitkStepperAdapter.h"
 
 #include "mitkImageStatisticsCalculator.h"
 
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 #include <itkTimeStamp.h>
 #include "mitkPlanarLine.h"
-
 
 
 /*!
@@ -39,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkImageStatisticsView : public QmitkFunctionality
+class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   Q_OBJECT
 
@@ -56,11 +54,6 @@ public:
   \brief default constructor
   */
   QmitkImageStatisticsView(QObject *parent=0, const char *name=0);
-  QmitkImageStatisticsView(const QmitkImageStatisticsView& other)
-  {
-     Q_UNUSED(other)
-     throw std::runtime_error("Copy constructor not implemented");
-  }
 
   /*!
   \brief default destructor
@@ -81,7 +74,7 @@ public:
 
   virtual bool event( QEvent *event );
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
 
   static const std::string VIEW_ID;
 
@@ -94,8 +87,6 @@ protected slots:
 
 
 protected:
-
-  void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
 
   void FillStatisticsTableView( const mitk::ImageStatisticsCalculator::Statistics &s,
     const mitk::Image *image );
@@ -124,8 +115,13 @@ protected:
   /** \brief Computes an Intensity Profile along line and updates the histogram widget with it. */
   void ComputeIntensityProfile( mitk::PlanarLine* line );
 
-  void Visible( );
+  void Activated();
+  void Deactivated();
 
+  void Visible();
+  void Hidden();
+
+  void SetFocus();
 
 
   typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer >
@@ -163,6 +159,8 @@ protected:
   bool m_CurrentStatisticsValid;
 
   bool m_StatisticsUpdatePending;
+
+  bool m_Visible;
 };
 
 

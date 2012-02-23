@@ -17,7 +17,7 @@
 
 #include "berryQtWorkbenchPageTweaklet.h"
 
-#include "berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <ui_berryQtStatusPart.h>
 

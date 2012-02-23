@@ -17,43 +17,41 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCommonActivator.h"
 
-#include "../QmitkStdMultiWidgetEditor.h"
-#include "QmitkStdMultiWidgetEditorPreferencePage.h"
-#include "QmitkGeneralPreferencePage.h"
-#include "QmitkEditorsPreferencePage.h"
+#include <berryPlatformUI.h>
+#include <mitkLogMacros.h>
 
-#include <mitkGlobalInteraction.h>
-#include <QmitkRegisterClasses.h>
+ctkPluginContext* QmitkCommonActivator::m_Context = 0;
 
+ctkPluginContext* QmitkCommonActivator::GetContext()
+{
+  return m_Context;
+}
 
 void
 QmitkCommonActivator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  this->m_Context = context;
 
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStdMultiWidgetEditor, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStdMultiWidgetEditorPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
-  
-  QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
-  if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )
+  if(berry::PlatformUI::IsWorkbenchRunning())
   {
-    QByteArray contents = file.readAll();
-    QString string(contents);
-    file.close();
-    mitk::GlobalInteraction::GetInstance()->Initialize("global", string.toStdString());
+    m_ViewCoordinator = QmitkViewCoordinator::Pointer(new QmitkViewCoordinator);
+    m_ViewCoordinator->Start();
   }
-  else throw std::exception();
-
-  QmitkRegisterClasses();
-
+  else
+  {
+    MITK_ERROR << "BlueBerry Workbench not running!";
+  }
 }
 
 void
 QmitkCommonActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+  m_ViewCoordinator->Stop();
+  m_ViewCoordinator = 0;
+
+  this->m_Context = 0;
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_common, QmitkCommonActivator)

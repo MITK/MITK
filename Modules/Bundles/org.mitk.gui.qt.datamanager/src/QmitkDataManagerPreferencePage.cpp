@@ -32,12 +32,6 @@ QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
 
 }
 
-QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage(const QmitkDataManagerPreferencePage& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
-}
-
 void QmitkDataManagerPreferencePage::Init(berry::IWorkbench::Pointer )
 {
 

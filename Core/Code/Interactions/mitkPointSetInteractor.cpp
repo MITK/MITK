@@ -674,7 +674,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       }
       else
       {
-        STATEMACHINE_DEBUG("OperationError")<<this->GetType()<<" AcCHECKELEMENT expected PointOperation.";
+        MITK_DEBUG("OperationError")<<this->GetType()<<" AcCHECKELEMENT expected PointOperation.";
 
         mitk::DisplayPositionEvent const  *disPosEvent = 
           dynamic_cast <const mitk::DisplayPositionEvent *> (

@@ -23,6 +23,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.core.ext
     org.mitk.core.jobs
     org.mitk.diffusionimaging
+    org.mitk.gui.qt.common.legacy
     org.mitk.gui.qt.diffusionimaging
     org.mitk.gui.qt.dtiatlasapp
     org.mitk.gui.qt.diffusionimagingapp

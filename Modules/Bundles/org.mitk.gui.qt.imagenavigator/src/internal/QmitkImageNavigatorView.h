@@ -18,19 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 
-#include <berryQtViewPart.h>
-#include "berryISizeProvider.h"
+#include <berryISizeProvider.h>
 
-#include <QmitkDataNodeSelectionProvider.h>
-#include <QmitkDnDFrameWidget.h>
-#include <QmitkStdMultiWidgetEditor.h>
-#include "QmitkStepperAdapter.h"
-
-#include <string>
+#include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
 
 #include "ui_QmitkImageNavigatorViewControls.h"
-#include "berryISizeProvider.h"
 
+
+class QmitkStepperAdapter;
 
 /*!
  * \ingroup org_mitk_gui_qt_imagenavigator_internal
@@ -43,32 +39,25 @@ PURPOSE.  See the above copyright notices for more information.
  * For images, the stepper position corresponds to a voxel index. For other datasets
  * such as a surface, it corresponds to a sub-division of the bounding box.
  *
- * \sa QmitkFunctionality
+ * \sa QmitkAbstractView
  */
-class QmitkImageNavigatorView : public berry::QtViewPart, public berry::ISizeProvider
+class QmitkImageNavigatorView :
+    public QmitkAbstractView, public mitk::IRenderWindowPartListener,
+    public berry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
-  public:
+public:
 
   static const std::string VIEW_ID;
 
   QmitkImageNavigatorView();
-  QmitkImageNavigatorView(const QmitkImageNavigatorView& other)
-  {
-     Q_UNUSED(other)
-     throw std::runtime_error("Copy constructor not implemented");
-  }
 
   virtual ~QmitkImageNavigatorView();
 
   virtual void CreateQtPartControl(QWidget *parent);
-
-  QmitkStdMultiWidget* GetActiveStdMultiWidget();
-
-  void SetFocus();
 
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
@@ -80,9 +69,11 @@ protected slots:
 
 protected:
 
-  friend class ImageNavigatorPartListener;
+  void SetFocus();
 
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
+
   void SetBorderColors();
   void SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString);
   void SetBorderColor(int axis, QString colorAsStyleSheetString);
@@ -93,17 +84,14 @@ protected:
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
-  QmitkStdMultiWidget* m_MultiWidget;
   QmitkStepperAdapter* m_TransversalStepper;
   QmitkStepperAdapter* m_SagittalStepper;
   QmitkStepperAdapter* m_FrontalStepper;
   QmitkStepperAdapter* m_TimeStepper;
 
-  berry::IPartListener::Pointer multiWidgetListener;
+  QWidget* m_Parent;
+
+  mitk::IRenderWindowPart* m_IRenderWindowPart;
 };
 
-
-
-
 #endif // _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
-

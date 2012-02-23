@@ -1,9 +1,9 @@
 /*=========================================================================
 
-Program:   BlueBerry Platform
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-01-16 19:57:43 +0100 (Sat, 16 Jan 2010) $
-Version:   $Revision: 21070 $
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

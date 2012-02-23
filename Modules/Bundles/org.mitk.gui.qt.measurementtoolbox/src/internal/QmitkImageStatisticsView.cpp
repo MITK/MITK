@@ -88,8 +88,7 @@ inline bool my_isnan(float x)
  }
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
-: QmitkFunctionality(),
-  m_Controls( NULL ),
+: m_Controls( NULL ),
   m_TimeStepperAdapter( NULL ),
   m_SelectedImageNode( NULL ),
   m_SelectedImage( NULL ),
@@ -100,7 +99,8 @@ QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const ch
   m_ImageMaskObserverTag( -1 ),
   m_PlanarFigureObserverTag( -1 ),
   m_CurrentStatisticsValid( false ),
-  m_StatisticsUpdatePending( false )
+  m_StatisticsUpdatePending( false ),
+  m_Visible(false)
 {
 }
 
@@ -147,12 +147,6 @@ void QmitkImageStatisticsView::IgnoreZerosCheckboxClicked(  )
 {
   UpdateStatistics();
 }
-
-void QmitkImageStatisticsView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
-{
-  QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
-}
-
 
 void QmitkImageStatisticsView::ClipboardHistogramButtonClicked()
 {
@@ -257,12 +251,13 @@ void QmitkImageStatisticsView::InvalidateStatisticsTableView()
 }
 
 
-void QmitkImageStatisticsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*part*/,
+                                                   const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
   // Clear any unreferenced images
   this->RemoveOrphanImages();
 
-  if ( !this->IsVisible() )
+  if ( !m_Visible )
   {
     return;
   }
@@ -273,18 +268,19 @@ void QmitkImageStatisticsView::OnSelectionChanged( std::vector<mitk::DataNode*> 
   bool tooManyNodes( true );
   bool invalidNodes( true );
 
-  if ( nodes.size() < 3 )
+  if ( selectedNodes.size() < 3 )
   {
     tooManyNodes = false;
   }
 
+  QList<mitk::DataNode::Pointer> nodes(selectedNodes);
   if( !tooManyNodes )
   {
     unsigned int numberImages = 0;
     unsigned int numberSegmentations = 0;
     unsigned int numberPlanarFigures = 0;
 
-    for ( unsigned int index = 0; index < nodes.size(); index++ )
+    for ( int index = 0; index < nodes.size(); index++ )
     {
       m_SelectedImageMask = dynamic_cast< mitk::Image * >( nodes[ index ]->GetData() );
       m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( nodes[ index ]->GetData() );
@@ -375,7 +371,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( std::vector<mitk::DataNode*> 
 
   {
     unsigned int parentObjectIndex = 0;
-    parentObjects = this->GetDefaultDataStorage()->GetSources( selectedNode );
+    parentObjects = this->GetDataStorage()->GetSources( selectedNode );
     while( parentObjectIndex < parentObjects->Size() )
     {
       // Use first parent object (if multiple parents are present)
@@ -483,13 +479,13 @@ void QmitkImageStatisticsView::UpdateStatistics()
   // Remove any cached images that are no longer referenced elsewhere
   this->RemoveOrphanImages();
 
-  QmitkStdMultiWidget *multiWidget = this->GetActiveStdMultiWidget();
-  if ( multiWidget == NULL )
+  mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
+  if ( renderPart == NULL )
   {
     return;
   }
 
-  unsigned int timeStep = multiWidget->GetTimeNavigationController()->GetTime()->GetPos();
+  unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
 
   if ( m_SelectedImage != NULL )
   {
@@ -714,7 +710,7 @@ void QmitkImageStatisticsView::RemoveOrphanImages()
     ++it;
 
     mitk::NodePredicateData::Pointer hasImage = mitk::NodePredicateData::New( image );
-    if ( this->GetDefaultDataStorage()->GetNode( hasImage ) == NULL )
+    if ( this->GetDataStorage()->GetNode( hasImage ) == NULL )
     {
       if ( m_SelectedImage == image )
       {
@@ -762,7 +758,7 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
   histogram->Initialize(siz, lower, higher);
   for(int i = 0; i < sampling; i++)
   {
-    mitk::Point3D location = begin + double(i)/sampling * direction;
+    //mitk::Point3D location = begin + double(i)/sampling * direction;
     double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + double(i)/sampling * direction);
     histogram->SetFrequency(i,d);
   }
@@ -772,12 +768,28 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
 
 }
 
-bool QmitkImageStatisticsView::IsExclusiveFunctionality() const
+
+void QmitkImageStatisticsView::Activated()
 {
-  return false;
+}
+
+void QmitkImageStatisticsView::Deactivated()
+{
 }
 
 void QmitkImageStatisticsView::Visible()
 {
-  this->OnSelectionChanged( this->GetDataManagerSelection() );
+  m_Visible = true;
+  this->OnSelectionChanged(this->GetSite()->GetPage()->FindView("org.mitk.views.datamanager"),
+                           this->GetDataManagerSelection());
+}
+
+void QmitkImageStatisticsView::Hidden()
+{
+  m_Visible = false;
+}
+
+void QmitkImageStatisticsView::SetFocus()
+{
+
 }

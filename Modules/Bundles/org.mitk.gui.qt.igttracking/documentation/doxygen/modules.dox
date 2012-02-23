@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_igttracking org.mitk.gui.qt.igttracking Plugin
+  \defgroup org_mitk_gui_qt_igttracking org.mitk.gui.qt.igttracking
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

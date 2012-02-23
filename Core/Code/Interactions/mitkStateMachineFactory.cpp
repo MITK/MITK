@@ -232,7 +232,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     if (m_AllStateMachineMap.find(tempStateMachineName) != m_AllStateMachineMap.end())
     {
       //warning: Statemachine tempStateMachineName already exists!
-      STATEMACHINE_FATAL<<"State machine pattern " << tempStateMachineName << " already exists! Skipping state machine pattern";
+      MITK_FATAL << "State machine pattern " << tempStateMachineName << " already exists! Skipping state machine pattern";
       m_SkipStateMachine = true;
     }
     else //tempStateMachineName is unique, so add it
@@ -336,7 +336,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
 void mitk::StateMachineFactory::EndElement (const char* elementName) 
 {
-  bool ok = true;
+  //bool ok = true;
   std::string name(elementName);
 
   //skip the state machine pattern because the name was not unique!
@@ -352,7 +352,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
       return;
     }
 
-    ok = ConnectStates(&m_AllStatesOfOneStateMachine);
+    /*ok =*/ ConnectStates(&m_AllStatesOfOneStateMachine);
     m_AllStatesOfOneStateMachine.clear();
   } 
   else if ( name == STATE_MACHINE ) 
@@ -448,7 +448,7 @@ bool mitk::StateMachineFactory::AddStateMachinePattern(const char * type, mitk::
   StartStateMapIter tempState = m_StartStates.find(type);
   if( tempState != m_StartStates.end() )
   {
-    STATEMACHINE_WARN << "Pattern " << type << " has already been added!\n";
+    MITK_WARN << "Pattern " << type << " has already been added!\n";
     return false;
   }
 

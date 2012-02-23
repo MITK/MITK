@@ -36,20 +36,21 @@ bool DataStorageReference::IsDefault() const
   return m_Default;
 }
   
-std::string DataStorageReference::GetLabel() const
+QString DataStorageReference::GetLabel() const
 {
   return m_Label;
 }
 
-void DataStorageReference::SetLabel(const std::string& label)
+void DataStorageReference::SetLabel(const QString& label)
 {
   m_Label = label;
 }
   
-bool DataStorageReference::operator==(const IDataStorageReference* o) const
+bool DataStorageReference::operator==(const berry::Object* o) const
 {
-  if (dynamic_cast<const DataStorageReference*>(o) == 0) return false;
-  return (m_DataStorage == dynamic_cast<const DataStorageReference*>(o)->m_DataStorage);
+  const DataStorageReference* other = dynamic_cast<const DataStorageReference*>(o);
+  if (other == 0) return false;
+  return (m_DataStorage == other->m_DataStorage);
 }
 
 }

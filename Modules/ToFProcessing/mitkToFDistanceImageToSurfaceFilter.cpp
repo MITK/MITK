@@ -98,7 +98,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     int yDimension = input->GetDimension(1);
     unsigned int size = xDimension*yDimension; //size of the image-array
     std::vector<bool> isPointValid;
-    isPointValid.reserve(size);
+    isPointValid.resize(size);
     vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
     vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
     textureCoords->SetNumberOfComponents(2);
@@ -130,7 +130,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
     //array to save the distance values corresponding to 1 quad
-    mitk::ToFProcessingCommon::ToFScalarType lastDistances[4];
+    mitk::ToFProcessingCommon::ToFScalarType lastDistances[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
 
     for (int j=0; j<yDimension; j++)
     {
@@ -155,6 +156,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
                 //expensive call, because of memory allocation of VTK
                 m_Points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
+
+
 
                 if((i >= 1) && (j >= 1))
                 {
@@ -200,6 +203,10 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
                             m_Polys->InsertCellPoint(x_1y);
                         }
                     }
+                }
+                else if(i == 0)
+                {
+                    lastDistances[3] = cartesianCoordinates[2]; // = (i,j)
                 }
 
                 if (scalarFloatData)

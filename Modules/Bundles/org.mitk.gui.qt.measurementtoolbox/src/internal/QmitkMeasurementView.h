@@ -29,10 +29,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkWeakPointer.h>
 #include <mitkPlanarFigure.h>
 #include <mitkDataStorageSelection.h>
+#include <mitkIZombieViewPart.h>
 
-#include <QmitkFunctionality.h>
-#include <QmitkStandardViews.h>
-#include <QmitkStdMultiWidgetEditor.h>
+#include <QmitkAbstractView.h>
 
 class QmitkPlanarFiguresTableModel;
 class QGridLayout;
@@ -41,6 +40,8 @@ class QToolBar;
 class QLabel;
 class QTableView;
 class QTextBrowser;
+class QActionGroup;
+class QPushButton;
 
 class vtkRenderer;
 class vtkCornerAnnotation;
@@ -54,7 +55,7 @@ class vtkCornerAnnotation;
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurementView : public QmitkFunctionality
+class QmitkMeasurementView : public QmitkAbstractView, public mitk::IZombieViewPart
 {
   Q_OBJECT
 
@@ -68,12 +69,6 @@ class QmitkMeasurementView : public QmitkFunctionality
     /// Initialize pointers to 0. The rest is done in CreateQtPartControl()
     ///
     QmitkMeasurementView();
-
-  QmitkMeasurementView(const QmitkMeasurementView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
 
     ///
     /// Remove all event listener from DataStorage, DataStorageSelection, Selection Service
@@ -95,11 +90,17 @@ class QmitkMeasurementView : public QmitkFunctionality
     /// Add their interactor to the global interaction.
     ///
     virtual void Activated();
+
+    virtual void Deactivated();
+
+    virtual void Visible();
+    virtual void Hidden();
+
     ///
     /// Show widget planes and all renderwindows again.
     /// Remove all planar figure interactors from the global interaction.
     ///
-    virtual void Deactivated();
+    virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView);
     ///
     /// Invoked from a DataStorage selection
     ///
@@ -119,7 +120,7 @@ class QmitkMeasurementView : public QmitkFunctionality
     /// All selected planarfigures will be added to m_SelectedPlanarFigures.
     /// Then PlanarFigureSelectionChanged is called
     ///
-    virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
 
   public slots:
     ///
@@ -144,6 +145,8 @@ class QmitkMeasurementView : public QmitkFunctionality
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
 
+    void SetFocus();
+
   protected slots:
     ///# draw actions
     void ActionDrawLineTriggered( bool checked = false );
@@ -161,6 +164,7 @@ class QmitkMeasurementView : public QmitkFunctionality
     // fields
   // widgets
 protected:
+  QWidget* m_Parent;
   QGridLayout* m_Layout;
   QLabel* m_SelectedImage;
   QAction* m_DrawLine;
@@ -203,6 +207,7 @@ protected:
   unsigned int m_EndInteractionObserverTag;
   bool m_Visible;
   bool m_CurrentFigureNodeInitialized;
+  bool m_Activated;
 
   ///
   /// Saves the last renderwindow any info data was inserted

@@ -1,0 +1,19 @@
+/**
+  \defgroup org_mitk_gui_qt_common_legacy org.mitk.gui.qt.common.legacy
+  \ingroup MITKPlugins
+
+  \brief Provides legacy classes and functionality common for MITK plug-ins.
+  
+  \deprecated This plug-in is deprecated. Old plug-ins having a dependency on it should
+              migrate to the org_mitk_gui_qt_common Plug-in using http://www.mitk.org/wiki/ViewsWithoutMultiWidget
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_common_legacy_internal Internal
+  \ingroup org_mitk_gui_qt_common_legacy
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.common.legacy plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

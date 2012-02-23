@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 
 #include <berryQtViewPart.h>
-#include "berryISizeProvider.h"
+#include <berryISizeProvider.h>
+#include <berryIPartListener.h>
 
 #include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkExtApplicationPlugin.h"
 #include "QmitkExtDefaultPerspective.h"
-#include "../QmitkExtApplication.h"
+#include "QmitkExtApplication.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>

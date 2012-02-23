@@ -42,7 +42,7 @@
 #include <QByteArray>
 #include <QDesktopServices>
 
-
+#include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
 #include "mitkPluginActivator.h"
 #include "mitkDataStorageEditorInput.h"

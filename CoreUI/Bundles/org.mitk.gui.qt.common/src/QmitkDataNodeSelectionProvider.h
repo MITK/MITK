@@ -24,6 +24,17 @@
 #include <berryQtSelectionProvider.h>
 #include <mitkDataNodeSelection.h>
 
+/**
+ * \ingroup org_mitk_gui_qt_common
+ *
+ * \brief A BlueBerry selection provider for mitk::DataNode selections.
+ *
+ * This class works together with a Qt item selection model which holds the actual
+ * selection. The underlying Qt model must support the data role \e QmitkDataNodeRole
+ * and return a mitk::DataNode::Pointer object for each QModelIndex in the selection.
+ *
+ * You can set a Qt item selection model using QtSelectionProvider::SetItemSelectionModel().
+ */
 class MITK_QT_COMMON QmitkDataNodeSelectionProvider : public berry::QtSelectionProvider
 {
 public:
@@ -32,6 +43,9 @@ public:
 
   QmitkDataNodeSelectionProvider();
 
+  /**
+   * This method will always return a mitk::DataNodeSelection object.
+   */
   berry::ISelection::ConstPointer GetSelection() const;
 
 protected:

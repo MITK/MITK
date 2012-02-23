@@ -1,24 +1,39 @@
 SET(SRC_CPP_FILES
-  QmitkApplication.cpp
-  QmitkActionBarAdvisor.cpp
-  QmitkDefaultPerspective.cpp
-  QmitkWorkbenchAdvisor.cpp
-  QmitkWorkbenchWindowAdvisor.cpp
+  QmitkCloseProjectAction.cpp
+  QmitkDefaultDropTargetListener.cpp
+  QmitkFileExitAction.cpp
+  QmitkFileOpenAction.cpp
+  QmitkPreferencesDialog.cpp
+  QmitkStatusBar.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  mitkPluginActivator.cpp
+  org_mitk_gui_qt_application_Activator.cpp
+  QmitkEditorsPreferencePage.cpp
+  QmitkGeneralPreferencePage.cpp
 )
 
 SET(MOC_H_FILES
-  src/QmitkApplication.h
-  src/QmitkDefaultPerspective.h
+  src/QmitkCloseProjectAction.h
+  src/QmitkFileExitAction.h
+  src/QmitkFileOpenAction.h
+  src/QmitkPreferencesDialog.h
 
-  src/internal/mitkPluginActivator.h
+  src/internal/org_mitk_gui_qt_application_Activator.h
+  src/internal/QmitkEditorsPreferencePage.h
+  src/internal/QmitkGeneralPreferencePage.h
+)
+
+SET(UI_FILES
+  src/QmitkPreferencesDialog.ui
 )
 
 SET(CACHED_RESOURCE_FILES
   plugin.xml
+)
+
+SET(QRC_FILES
+  resources/resources.qrc
 )
 
 SET(CPP_FILES )

@@ -26,6 +26,9 @@
 
 namespace mitk {
 
+/**
+ * \ingroup org_mitk_gui_common
+ */
 class MITK_GUI_COMMON_PLUGIN DataNodeSelection : public virtual berry::IStructuredSelection
 {
 

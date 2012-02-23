@@ -32,6 +32,14 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMouseEvent;
 
+/**
+ * \ingroup org_mitk_gui_qt_common
+ *
+ * \brief Enables loading data into a MITK application via Drag'n Drop.
+ *
+ * You can use this class inside your MITK View as a container for your widgets
+ * if you want the user to be able to load data by dropping files onto your view.
+ */
 class MITK_QT_COMMON QmitkDnDFrameWidget : public QWidget
 {
   Q_OBJECT

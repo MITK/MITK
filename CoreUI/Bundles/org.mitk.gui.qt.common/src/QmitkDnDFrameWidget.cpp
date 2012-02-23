@@ -16,23 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <QmitkDnDFrameWidget.h>
-#include <QtGui>
 
+#include <berryPlatformUI.h>
 
-// berry Includes
-#include <berryPlatform.h>
+#include "mitkWorkbenchUtil.h"
 
-#include <mitkDataNodeFactory.h>
-#include "mitkIDataStorageService.h"
-#include "mitkDataStorageEditorInput.h"
-#include "mitkRenderingManager.h"
+#include <QDragEnterEvent>
 
-#include "mitkProperties.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-
-#include "mitkProgressBar.h"
 
 QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)
 : QWidget(parent)
@@ -42,63 +32,25 @@ QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)
 
 void QmitkDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
 {   // accept drags
-  event->accept();
+  event->acceptProposedAction();
 }
+
 void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
 { //open dragged files
 
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-  mitk::DataStorage::Pointer ds;
-  if (service.IsNotNull())
-    ds = service->GetActiveDataStorage()->GetDataStorage();
-  else
+  QList<QUrl> fileNames = event->mimeData()->urls();
+  if (fileNames.empty())
     return;
 
-  QList<QUrl> fileNames = event->mimeData()->urls();
-
-  bool dsmodified = false;
-  for (QList<QUrl>::Iterator fileName = fileNames.begin();
-    fileName != fileNames.end(); ++fileName)
+  QStringList fileNames2;
+  fileNames2.reserve(fileNames.size());
+  foreach(QUrl url, fileNames)
   {
-
-    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-    try
-    {
-      nodeReader->SetFileName(fileName->toLocalFile().toStdString());
-      if(event->dropAction()==Qt::LinkAction)
-        nodeReader->SetImageSerie(true);
-      nodeReader->Update();
-      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
-      {
-        mitk::DataNode::Pointer node;
-        node = nodeReader->GetOutput(i);
-        if ( node->GetData() != NULL )
-        {
-          ds->Add(node);
-          dsmodified = true;
-        }
-      }
-    }
-    catch(...)
-    {
-
-    }
-
+    fileNames2.push_back(url.toLocalFile());
   }
 
-  if(dsmodified)
-  {
-    // get all nodes that have not set "includeInBoundingBox" to false
-    mitk::NodePredicateNot::Pointer pred
-      = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-      , mitk::BoolProperty::New(false)));
+  mitk::WorkbenchUtil::LoadFiles(fileNames2,
+                                 berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
 
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);
-    // calculate bounding geometry of these nodes
-    mitk::TimeSlicedGeometry::Pointer bounds = ds->ComputeBoundingGeometry3D(rs);
-    // initialize the views to the bounding geometry
-    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  }
+  event->accept();
 }

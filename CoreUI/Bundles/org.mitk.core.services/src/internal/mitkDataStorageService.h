@@ -31,24 +31,28 @@ public:
   
   DataStorageService();
   
-  bool IsA(const std::type_info& type);
+  bool IsA(const std::type_info& type) const;
 
   const std::type_info& GetType() const;
 
-  IDataStorageReference::Pointer CreateDataStorage(const std::string& label);
+  IDataStorageReference::Pointer CreateDataStorage(const QString& label);
     
   std::vector<IDataStorageReference::Pointer> GetDataStorageReferences() const;
   
   IDataStorageReference::Pointer GetDefaultDataStorage() const;
+  IDataStorageReference::Pointer GetDataStorage() const;
     
   IDataStorageReference::Pointer GetActiveDataStorage() const;
   void SetActiveDataStorage(IDataStorageReference::Pointer dataStorageRef);
+
+  void AddDataStorageReference(IDataStorageReference::Pointer dataStorageRef);
+  bool RemoveDataStorageReference(IDataStorageReference::Pointer dataStorageRef);
   
 private:
 
   IDataStorageReference::Pointer m_ActiveDataStorageRef;
   IDataStorageReference::Pointer m_DefaultDataStorageRef;
-  std::vector<IDataStorageReference::Pointer> m_DataStorageReferences;
+  std::set<IDataStorageReference::Pointer> m_DataStorageReferences;
 };
 
 }

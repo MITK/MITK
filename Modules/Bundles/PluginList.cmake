@@ -3,6 +3,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.core.jobs:OFF
   org.mitk.planarfigure:ON
   org.mitk.diffusionimaging:OFF
+  org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.examples:OFF
   org.mitk.gui.qt.examplesopencv:OFF
   org.mitk.gui.qt.ext:OFF

@@ -21,8 +21,10 @@
 
 #include <ctkPluginActivator.h>
 
+#include "QmitkViewCoordinator.h"
+
 /**
- * \ingroup org_mitk_core_ext_internal
+ * \ingroup org_mitk_gui_qt_common_internal
  *
  * \brief The plug-in activator for the StateMachine
  *
@@ -36,11 +38,19 @@ class QmitkCommonActivator : public QObject, public ctkPluginActivator
 
 public:
 
+  static ctkPluginContext* GetContext();
+
   /**
    * Sets default StateMachine to EventMapper.
    */
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
+
+private:
+
+  static ctkPluginContext* m_Context;
+
+  QmitkViewCoordinator::Pointer m_ViewCoordinator;
 
 };
 

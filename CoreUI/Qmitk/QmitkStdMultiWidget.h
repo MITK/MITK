@@ -93,6 +93,12 @@ public:
 
   bool GetGradientBackgroundFlag() const;
 
+  bool IsColoredRectanglesEnabled() const;
+
+  bool IsDepartmentLogoEnabled() const;
+
+  bool IsCrosshairNavigationEnabled() const;
+
   void InitializeWidget();
 
   /// called when the StdMultiWidget is closed to remove the 3 widget planes and the helper node from the DataStorage
@@ -110,6 +116,8 @@ public:
 
   /// activate Menu Widget. true: activated, false: deactivated
   void ActivateMenuWidget( bool state );
+
+  bool IsMenuWidgetEnabled() const;
   
 protected:
 
@@ -317,6 +325,7 @@ protected:
   } m_CornerAnnotaions[3];
 
   bool m_PendingCrosshairPositionEvent;
+  bool m_CrosshairNavigationEnabled;
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

@@ -33,15 +33,15 @@ public:
   
   bool IsDefault() const;
   
-  std::string GetLabel() const;
-  void SetLabel(const std::string& label);
+  QString GetLabel() const;
+  void SetLabel(const QString& label);
     
-  bool operator==(const IDataStorageReference* o) const;
+  bool operator==(const berry::Object* o) const;
   
 private:
   
   bool m_Default;
-  std::string m_Label;
+  QString m_Label;
   DataStorage::Pointer m_DataStorage;
 };
 

@@ -1,15 +1,22 @@
 SET(MOC_H_FILES
-  src/internal/mitkPluginActivator.h
+  src/internal/org_mitk_gui_common_Activator.h
 )
 
 SET(SRC_CPP_FILES
-  mitkDataStorageEditorInput.cpp
   mitkDataNodeObject.cpp
   mitkDataNodeSelection.cpp
+  mitkDataStorageEditorInput.cpp
+  mitkILifecycleAwarePart.h
+  mitkILinkedRenderWindowPart.h
+  mitkIRenderingManager.cpp
+  mitkIRenderWindowPart.cpp
+  mitkIRenderWindowPartListener.h
+  mitkIZombieViewPart.h
+  mitkWorkbenchUtil.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  mitkPluginActivator.cpp
+  org_mitk_gui_common_Activator.cpp
 )
 
 

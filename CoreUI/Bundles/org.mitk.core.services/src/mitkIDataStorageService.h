@@ -30,6 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+/**
+ * \ingroup org_mitk_core_services
+ */
 struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public berry::Service
 {
   berryInterfaceMacro(IDataStorageService, berry);

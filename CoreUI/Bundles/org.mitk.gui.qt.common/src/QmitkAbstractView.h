@@ -180,6 +180,12 @@ protected:
    */
   mitk::IRenderWindowPart* GetRenderWindowPart(IRenderWindowPartStrategies strategies = NONE) const;
 
+  /**
+   * Request an update of all render windows of the currently active IRenderWindowPart.
+   *
+   * \param requestType Specifies the type of render windows for which an update
+   *        will be requested.
+   */
   void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
 
   /**

@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_materialeditor org.mitk.gui.qt.materialeditor Plugin
+  \defgroup org_mitk_gui_qt_materialeditor org.mitk.gui.qt.materialeditor
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

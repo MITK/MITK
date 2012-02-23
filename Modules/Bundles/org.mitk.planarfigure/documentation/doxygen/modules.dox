@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_planarfigure org.mitk.planarfigure Plugin
+  \defgroup org_mitk_planarfigure org.mitk.planarfigure
   \ingroup MITKPlugins
 
   \brief This small plug-in is responsible for initializing the PlanarFigure module.

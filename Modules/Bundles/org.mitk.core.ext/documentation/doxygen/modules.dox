@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_core_ext org.mitk.core.ext Plugin
+  \defgroup org_mitk_core_ext org.mitk.core.ext
   \ingroup MITKPlugins
 
   \brief This small plug-in is responsible for initializing the MBI CoreExt module.

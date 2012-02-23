@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_igtexamples org.mitk.gui.qt.igtexamples Plugin
+  \defgroup org_mitk_gui_qt_igtexamples org.mitk.gui.qt.igtexamples
   \ingroup MITKPlugins
 
    \brief QmitkIGTExamples shows a small typically navigation MITK functionality.

@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_igtnavigation org.mitk.gui.qt.igtnavigation Plugin
+  \defgroup org_mitk_gui_qt_igtnavigation org.mitk.gui.qt.igtnavigation
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

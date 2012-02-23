@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_examplesopencv org.mitk.gui.qt.examplesopencv Plugin
+  \defgroup org_mitk_gui_qt_examplesopencv org.mitk.gui.qt.examplesopencv
   \ingroup MITKPlugins
 
   \brief This is the examplesopencv plugin. 

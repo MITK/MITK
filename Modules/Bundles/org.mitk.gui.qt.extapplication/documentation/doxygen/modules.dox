@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_extapplication org.mitk.gui.qt.extapplication Plugin
+  \defgroup org_mitk_gui_qt_extapplication org.mitk.gui.qt.extapplication
   \ingroup MITKPlugins
 
   \brief This plug-in is responsible for initializing the "ExtApp".

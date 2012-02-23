@@ -1,5 +1,6 @@
 SET(LIBPOSTFIX "Ext")
 
+# Modules must be listed according to their dependencies
 SET(module_dirs
     SceneSerializationBase
     PlanarFigure
@@ -9,6 +10,7 @@ SET(module_dirs
     IpPicSupport
     MitkExt
     SceneSerialization
+    Qmitk
     QmitkExt
     GraphAlgorithms
     DiffusionImaging
@@ -26,7 +28,7 @@ SET(module_dirs
     ToFHardware
     ToFProcessing
     ToFUI
-	ClippingTools
+    ClippingTools
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

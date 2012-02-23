@@ -54,6 +54,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIEditorRegistry.h>
 
 //# Toolkit Includes
 #include <QTableView>
@@ -81,6 +83,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
+#include <QSignalMapper>
 
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
@@ -150,6 +153,21 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeMenu = new QMenu(m_NodeTreeView);
 
   // # Actions
+  berry::IEditorRegistry* editorRegistry = berry::PlatformUI::GetWorkbench()->GetEditorRegistry();
+  std::list<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.mitk");
+  if (editors.size() > 1)
+  {
+    m_ShowInMapper = new QSignalMapper(this);
+    foreach(berry::IEditorDescriptor::Pointer descriptor, editors)
+    {
+      QAction* action = new QAction(QString::fromStdString(descriptor->GetLabel()), this);
+      m_ShowInActions << action;
+      m_ShowInMapper->connect(action, SIGNAL(triggered()), m_ShowInMapper, SLOT(map()));
+      m_ShowInMapper->setMapping(action, QString::fromStdString(descriptor->GetId()));
+    }
+    connect(m_ShowInMapper, SIGNAL(mapped(QString)), this, SLOT(ShowIn(QString)));
+  }
+
   QmitkNodeDescriptor* unknownDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataNodeDescriptor();
 
@@ -410,6 +428,11 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
     else
       actions = QmitkNodeDescriptorManager::GetInstance()->GetActions(selectedNodes);
 
+    if (!m_ShowInActions.isEmpty())
+    {
+      QMenu* showInMenu = m_NodeMenu->addMenu("Show In");
+      showInMenu->addActions(m_ShowInActions);
+    }
     m_NodeMenu->addActions(actions);
     m_NodeMenu->popup(QCursor::pos());
   }
@@ -887,6 +910,13 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
   }
   //changing the selection does NOT require any rendering processes!
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkDataManagerView::ShowIn(const QString &editorId)
+{
+  berry::IWorkbenchPage::Pointer page = this->GetSite()->GetPage();
+  berry::IEditorInput::Pointer input(new mitk::DataStorageEditorInput(this->GetDataStorageReference()));
+  page->OpenEditor(input, editorId.toStdString(), false, berry::IWorkbenchPage::MATCH_ID);
 }
 
 mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart()

@@ -21,9 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImage.h>
 
-//#include <vtkCellArray.h>
-//#include <vtkPoints.h>
-//#include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyDataNormals.h>

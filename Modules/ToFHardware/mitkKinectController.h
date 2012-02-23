@@ -74,7 +74,7 @@ namespace mitk
     \param distances pointer to memory location where distances should be stored
     \param rgb pointer to memory location where rgb information should be stored
     */
-    void GetAllData(float* distances, unsigned char* rgb);
+    void GetAllData(float* distances, float* amplitudes, unsigned char* rgb);
 
   protected:
 
@@ -87,9 +87,12 @@ namespace mitk
     xn::Context m_Context; ///< OpenNI context
     xn::DepthGenerator m_DepthGenerator; ///< Depth generator to access depth image of kinect
     xn::ImageGenerator m_ImageGenerator; ///< Image generator to access RGB image of kinect
+    xn::IRGenerator m_IRGenerator; ///< IR generator to access IR image of kinect
     //xn::IRGenerator m_IRGenerator;
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
+
+    bool m_UseIR; ///< flag indicating whether IR image is used or not
 
     unsigned int m_CaptureWidth; ///< image width
     unsigned int m_CaptureHeight; ///< image height

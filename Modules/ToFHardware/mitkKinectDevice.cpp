@@ -120,7 +120,7 @@ namespace mitk
       // get the first image
       this->m_Controller->UpdateCamera();
       this->m_ImageMutex->Lock();
-      this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
+      this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_AmplitudeDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
       this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
       this->m_ImageSequence++;
@@ -197,7 +197,7 @@ namespace mitk
         toFCameraDevice->UpdateCamera();
         // get the image data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
-        toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified

@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
+
+
+
   template <class TInputScalarType, class TOutputScalarType>
   void
   ResidualImageFilter<TInputScalarType, TOutputScalarType>
@@ -39,14 +42,15 @@ namespace itk
     }
 
     // Initialize output image
-    typename OutputImageType::Pointer outputImage = OutputImageType::New();
+    typename OutputImageType::Pointer outputImage =
+        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+
     outputImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
     outputImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
     outputImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
-    outputImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-    outputImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outputImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+    outputImage->SetRegions( this->GetInput()->GetLargestPossibleRegion() );
     outputImage->Allocate();
+    outputImage->FillBuffer(0.0);
 
     for(int x=0; x<size[0]; x++)
     {
@@ -62,8 +66,7 @@ namespace itk
           typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
           typename InputImageType::PixelType p2 = m_SecondDiffusionImage->GetPixel(ix);
 
-          int s1 = p1.GetSize();
-          int s2 = p2.GetSize();
+
 
           if(p1.GetSize() != p2.GetSize())
           {
@@ -75,13 +78,19 @@ namespace itk
 
           for(int i = 0; i<p1.GetSize(); i++)
           {
-            short val1 = p1.GetElement(i);
-            short val2 = p2.GetElement(i);
+            float val1 = (float)p1.GetElement(i);
+            float val2 = (float)p2.GetElement(i);
 
             res += abs(val1-val2);
           }
 
-          res /= p1.GetSize();
+
+          res = res/p1.GetSize();
+          if(res!=0.0)
+          {
+            std::cout << "not 0";
+          }
+
 
           outputImage->SetPixel(ix, res);
 
@@ -89,7 +98,7 @@ namespace itk
       }
     }
 
-    this->SetNthInput(0, outputImage);
+   // Superclass::SetNthInput(0, outputImage);
 
 
 

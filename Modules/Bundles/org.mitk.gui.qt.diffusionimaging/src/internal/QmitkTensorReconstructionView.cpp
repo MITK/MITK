@@ -384,11 +384,18 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     residualFilter->SetSecondDiffusionImage(image->GetVectorImage());
     residualFilter->Update();
 
-    itk::Image<float, 3>::Pointer residualImage = residualFilter->GetOutput();
+    itk::Image<float, 3>::Pointer residualImage = itk::Image<float, 3>::New();
+    residualImage = residualFilter->GetOutput();
+
     mitk::Image::Pointer mitkResImg = mitk::Image::New();
+
     mitk::CastToMitkImage(residualImage, mitkResImg);
+   // mitkResImg->InitializeByItk(residualImage.GetPointer());
+  //  image->SetVolume( residualImage->GetBufferPointer() );
+
+   // mitk::CastToMitkImage(residualImage, mitkResImg);
     mitk::DataNode::Pointer resNode=mitk::DataNode::New();
-    resNode->SetData( image );
+    resNode->SetData( mitkResImg );
     resNode->SetName("Residual Image");
     GetDefaultDataStorage()->Add(resNode);
 

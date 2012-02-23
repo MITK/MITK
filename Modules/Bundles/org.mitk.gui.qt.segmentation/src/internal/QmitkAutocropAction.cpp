@@ -18,14 +18,10 @@ QmitkAutocropAction::~QmitkAutocropAction()
 {
 }
 
-void QmitkAutocropAction::Run( const std::vector<mitk::DataNode*>& selectedNodes )
+void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-   NodeList selection = selectedNodes;
-
-  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
+  foreach ( mitk::DataNode::Pointer node, selectedNodes )
   {
-    mitk::DataNode* node = *iter;
-
     if (node)
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
@@ -125,17 +121,12 @@ void QmitkAutocropAction::SetSmoothed(bool /*smoothed*/)
  //not needed
 }
 
-void QmitkAutocropAction::SetDecimated(bool decimated)
+void QmitkAutocropAction::SetDecimated(bool /*decimated*/)
 {
   //not needed
 }
 
-void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  //not needed
-}
-
-void QmitkAutocropAction::SetStdMultiWidget(QmitkStdMultiWidget *)
+void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
 {
   //not needed
 }

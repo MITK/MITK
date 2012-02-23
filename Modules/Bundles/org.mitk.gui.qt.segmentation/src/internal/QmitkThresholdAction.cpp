@@ -22,7 +22,7 @@ QmitkThresholdAction::~QmitkThresholdAction()
 {
 }
 
-void QmitkThresholdAction::Run(const vector<DataNode *> &selectedNodes)
+void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 {
   m_ThresholdingToolManager = ToolManager::New(m_DataStorage);
 
@@ -84,10 +84,6 @@ void QmitkThresholdAction::OnThresholdingToolManagerToolModified()
 void QmitkThresholdAction::SetDataStorage(DataStorage *dataStorage)
 {
   m_DataStorage = dataStorage;
-}
-
-void QmitkThresholdAction::SetStdMultiWidget(QmitkStdMultiWidget *)
-{
 }
 
 void QmitkThresholdAction::SetSmoothed(bool)

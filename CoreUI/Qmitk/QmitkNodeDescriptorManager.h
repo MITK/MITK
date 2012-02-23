@@ -91,7 +91,7 @@ public:
   ///
   /// \return a list of actions associated with the given nodes
   ///
-  QList<QAction*> GetActions( const std::vector<mitk::DataNode*>& _Nodes ) const;
+  QList<QAction*> GetActions( const QList<mitk::DataNode::Pointer>& _Nodes ) const;
   ///
   /// Deletes all Descriptors in the list
   ///

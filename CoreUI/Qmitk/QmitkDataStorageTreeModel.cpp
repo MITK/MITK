@@ -633,16 +633,16 @@ QModelIndex QmitkDataStorageTreeModel::IndexFromTreeItem( TreeItem* item ) const
     return this->createIndex(item->GetIndex(), 0, item);
 }
 
-std::vector<mitk::DataNode*> QmitkDataStorageTreeModel::GetNodeSet() const
+QList<mitk::DataNode::Pointer> QmitkDataStorageTreeModel::GetNodeSet() const
 {
-  std::vector<mitk::DataNode*> vec;
+  QList<mitk::DataNode::Pointer> res;
   if(m_Root)
-    this->TreeToNodeSet(m_Root, vec);
+    this->TreeToNodeSet(m_Root, res);
 
-  return vec;
+  return res;
 }
 
-void QmitkDataStorageTreeModel::TreeToNodeSet( TreeItem* parent, std::vector<mitk::DataNode*>& vec ) const
+void QmitkDataStorageTreeModel::TreeToNodeSet( TreeItem* parent, QList<mitk::DataNode::Pointer>& vec ) const
 {
   TreeItem* current;
   for(int i = 0; i<parent->GetChildCount(); ++i)

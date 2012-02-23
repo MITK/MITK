@@ -22,9 +22,8 @@ public:
   virtual ~QmitkAutocropAction();
 
   //interface methods
-  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);
@@ -35,7 +34,7 @@ protected:
 
 private:
 
-  typedef std::vector<mitk::DataNode*> NodeList;
+  typedef QList<mitk::DataNode::Pointer> NodeList;
 
 };
 

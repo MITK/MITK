@@ -7,16 +7,19 @@
 #include <mitkStatusBar.h>
 #include <QmitkStdMultiWidget.h>
 
+#include <mitkIRenderWindowPart.h>
+#include <mitkIRenderingManager.h>
+
 // Blueberry
 #include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIWorkbenchPage.h>
 
 using namespace berry;
 using namespace mitk;
 using namespace std;
 
 QmitkCreatePolygonModelAction::QmitkCreatePolygonModelAction()
-  : m_StdMultiWidget(0)
 {
 }
 
@@ -24,7 +27,7 @@ QmitkCreatePolygonModelAction::~QmitkCreatePolygonModelAction()
 {
 }
 
-void QmitkCreatePolygonModelAction::Run(const vector<DataNode *> &selectedNodes)
+void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 {
   DataNode::Pointer selectedNode = selectedNodes[0];
   Image::Pointer image = dynamic_cast<mitk::Image *>(selectedNode->GetData());
@@ -78,7 +81,16 @@ void QmitkCreatePolygonModelAction::Run(const vector<DataNode *> &selectedNodes)
       surfaceFilter->SetPointerParameter("Input", image);
       surfaceFilter->SetPointerParameter("Group node", selectedNode);
 
-      int timeNr = m_StdMultiWidget != 0 ? m_StdMultiWidget->GetTimeNavigationController()->GetTime()->GetPos() : 0;
+      berry::IWorkbenchPart::Pointer activePart =
+          berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetActivePart();
+      mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(activePart.GetPointer());
+      mitk::SliceNavigationController* timeNavController = 0;
+      if (renderPart != 0)
+      {
+        timeNavController = renderPart->GetRenderingManager()->GetTimeNavigationController();
+      }
+
+      int timeNr = timeNavController != 0 ? timeNavController->GetTime()->GetPos() : 0;
       surfaceFilter->SetParameter("TimeNr", timeNr);
 
       IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
@@ -122,11 +134,6 @@ void QmitkCreatePolygonModelAction::OnSurfaceCalculationDone()
 void QmitkCreatePolygonModelAction::SetDataStorage(DataStorage *dataStorage)
 {
   m_DataStorage = dataStorage;
-}
-
-void QmitkCreatePolygonModelAction::SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget)
-{
-  m_StdMultiWidget = stdMultiWidget;
 }
 
 void QmitkCreatePolygonModelAction::SetSmoothed(bool smoothed)

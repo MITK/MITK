@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
+
 #include <QList>
+#include <QSet>
 
 
 QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
@@ -130,27 +132,24 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _N
   return actions;
 }
 
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const std::vector<mitk::DataNode*>& _Nodes ) const
+QList<QAction*> QmitkNodeDescriptorManager::GetActions( const QList<mitk::DataNode::Pointer> &_Nodes ) const
 {
   QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
-  std::vector<QmitkNodeDescriptor*> nodeDescriptors;
+  QSet<QmitkNodeDescriptor*> nodeDescriptors;
   QmitkNodeDescriptor* lastDescriptor;
 
   // find all descriptors for the nodes (unique)
-  for( std::vector<mitk::DataNode*>::const_iterator it = _Nodes.begin()
-    ; it != _Nodes.end(); ++it)
+  foreach (mitk::DataNode::Pointer node, _Nodes)
   {
-    lastDescriptor = this->GetDescriptor(*it);
-    if(std::find(nodeDescriptors.begin(), nodeDescriptors.end(), lastDescriptor) == nodeDescriptors.end())
-      nodeDescriptors.push_back(lastDescriptor);
+    lastDescriptor = this->GetDescriptor(node);
+    nodeDescriptors.insert(lastDescriptor);
   }
   // add all actions for the found descriptors
   lastDescriptor = m_UnknownDataNodeDescriptor;
-  for( std::vector<QmitkNodeDescriptor*>::const_iterator it = nodeDescriptors.begin()
-    ; it != nodeDescriptors.end(); ++it)
+  foreach (QmitkNodeDescriptor* descr, nodeDescriptors)
   {
     actions.append(lastDescriptor->GetSeparator());
-    lastDescriptor = *it;
+    lastDescriptor = descr;
     actions.append(lastDescriptor->GetBatchActions());
   }
 

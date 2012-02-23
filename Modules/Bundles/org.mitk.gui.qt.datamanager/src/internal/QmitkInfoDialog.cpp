@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QEvent>
 #include <QKeyEvent>
 
-QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataNode*> _Nodes, QWidget * parent /*= 0*/, Qt::WindowFlags f /*= 0 */ )
+QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, QWidget * parent /*= 0*/, Qt::WindowFlags f /*= 0 */ )
 : QDialog(parent, f)
 {
   // DIM
@@ -56,10 +56,9 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataNode*> _Nodes, QWidget *
   QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) )
     , this, SLOT( OnSelectionChanged( const mitk::DataNode* ) ) );
 
-  for (std::vector<mitk::DataNode*>::iterator it = _Nodes.begin()
-    ; it != _Nodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, _Nodes)
   {
-    _QmitkDataStorageComboBox->AddNode(*it);
+    _QmitkDataStorageComboBox->AddNode(node);
   }
 
   QObject::connect( m_KeyWord, SIGNAL( textChanged ( const QString & )  )

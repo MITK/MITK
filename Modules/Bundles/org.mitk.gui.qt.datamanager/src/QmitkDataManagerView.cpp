@@ -38,11 +38,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>
+#include <mitkIRenderingManager.h>
 //## Qmitk
-#include <QmitkStdMultiWidget.h>
+#include <QmitkDnDFrameWidget.h>
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
-#include <QmitkStdMultiWidgetEditor.h>
 #include <QmitkCommonFunctionality.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkNodeDescriptorManager.h>
@@ -92,28 +92,8 @@ QmitkDataManagerView::QmitkDataManagerView()
 {
 }
 
-QmitkDataManagerView::QmitkDataManagerView(const QmitkDataManagerView& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
-}
-
-
 QmitkDataManagerView::~QmitkDataManagerView()
 {
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemoveSelectionListener(m_SelectionListener);
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
-  berry::IBerryPreferences::Pointer prefs
-      = (prefService->GetSystemPreferences()->Node(VIEW_ID))
-        .Cast<berry::IBerryPreferences>();
-  prefs->OnChanged.RemoveListener( berry::MessageDelegate1<QmitkDataManagerView
-    , const berry::IBerryPreferences*>( this
-      , &QmitkDataManagerView::OnPreferencesChanged ) );
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -168,11 +148,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   //# m_NodeMenu
   m_NodeMenu = new QMenu(m_NodeTreeView);
-
-  //# m_SelectionProvider
-  m_SelectionProvider = new QmitkDataNodeSelectionProvider();
-  m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
-  this->GetSite()->SetSelectionProvider(m_SelectionProvider);
 
   // # Actions
   QmitkNodeDescriptor* unknownDataNodeDescriptor =
@@ -345,13 +320,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
 
   m_Parent->setLayout(layout);
-
-  m_SelectionListener = new berry::SelectionChangedAdapter<QmitkDataManagerView>
-    (this, &QmitkDataManagerView::SelectionChanged);
-
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  s->AddSelectionListener(m_SelectionListener);
-
 }
 
 void QmitkDataManagerView::SetFocus()
@@ -371,11 +339,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   }
   berry::IConfigurationElement::Pointer confElem = it->second;
   mitk::IContextMenuAction* contextMenuAction = confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class");
-  if (contextMenuAction == 0)
-  {
-    // support legacy BlueBerry extensions
-    contextMenuAction = confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class", mitk::IContextMenuAction::GetManifestName());
-  }
+
   std::string className;
   std::string smoothed;
   confElem->GetAttribute("class", className);
@@ -384,27 +348,9 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
   }
-  if(className == "QmitkCreatePolygonModelAction")
+  else if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
-    QmitkStdMultiWidget* activeStdMultiWidget = 0;
-    berry::IEditorPart::Pointer editor =
-      this->GetSite()->GetPage()->GetActiveEditor();
-
-    if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-    {
-      activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-    }
-    else
-    {
-      mitk::DataStorageEditorInput::Pointer editorInput;
-      editorInput = new mitk::DataStorageEditorInput();
-      // open a new multi-widget editor, but do not give it the focus
-      berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
-      activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-    }
-
-    contextMenuAction->SetStdMultiWidget(activeStdMultiWidget);
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);
@@ -415,24 +361,11 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
     }
     contextMenuAction->SetDecimated(m_SurfaceDecimation);
   }
-  if(className == "QmitkStatisticsAction")
+  else if(className == "QmitkStatisticsAction")
   {
     contextMenuAction->SetFunctionality(this);
   }
-  contextMenuAction->Run( this->GetSelectedNodes() ); // run the action
-}
-
-mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
-{
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-  if (service.IsNotNull())
-  {
-    return service->GetDefaultDataStorage()->GetDataStorage();
-  }
-
-  return 0;
+  contextMenuAction->Run( this->GetCurrentSelection() ); // run the action
 }
 
 void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
@@ -459,9 +392,9 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 {
   QModelIndex selected = m_NodeTreeView->indexAt ( pos );
   mitk::DataNode::Pointer node = m_NodeTreeModel->GetNode(selected);
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
-  if(!selectedNodes.empty())
+  if(!selectedNodes.isEmpty())
   {
     m_NodeMenu->clear();
     QList<QAction*> actions;
@@ -670,20 +603,18 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  this->ReinitMultiWidgetEditor();
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart();
 
-  mitk::DataNode* node = 0;
-  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
-    ; it != selectedNodes.end(); it++)
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
+
+  foreach(mitk::DataNode::Pointer node, selectedNodes)
   {
-    node = *it;
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())
     {
-      mitk::RenderingManager::GetInstance()->InitializeViews(
-        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderWindow->GetRenderingManager()->InitializeViews(
+            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      renderWindow->GetRenderingManager()->RequestUpdateAll();
     }
   }
 }
@@ -735,45 +666,35 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
 
 void QmitkDataManagerView::MakeAllNodesInvisible( bool )
 {
-  std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  QList<mitk::DataNode::Pointer> nodes = m_NodeTreeModel->GetNodeSet();
 
-  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
-    ; it != nodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, nodes)
   {
-    (*it)->SetVisibility(false);
+    node->SetVisibility(false);
   }
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
 {
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
-  std::vector<mitk::DataNode*> allNodes = m_NodeTreeModel->GetNodeSet();
-  mitk::DataNode* node = 0;
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
+  QList<mitk::DataNode::Pointer> allNodes = m_NodeTreeModel->GetNodeSet();
 
-  for (std::vector<mitk::DataNode*>::iterator it = allNodes.begin()
-    ; it != allNodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, allNodes)
   {
-    node = *it;
-    if(std::find(selectedNodes.begin(), selectedNodes.end(), node) == selectedNodes.end())
-      node->SetVisibility(false);
-    else
-      node->SetVisibility(true);
+    node->SetVisibility(selectedNodes.contains(node));
   }
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )
 {
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
   bool isVisible = false;
-  mitk::DataNode* node = 0;
-  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
-    ; it != selectedNodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, selectedNodes)
   {
     isVisible = false;
-    node = *it;
     node->GetBoolProperty("visible", isVisible);
     node->SetVisibility(!isVisible);
   }
@@ -782,7 +703,7 @@ void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )
 
 void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
 {
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
   QmitkInfoDialog _QmitkInfoDialog(selectedNodes, this->m_Parent);
   _QmitkInfoDialog.exec();
@@ -830,9 +751,14 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
   QApplication::restoreOverrideCursor();
 }
 
+QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const
+{
+  return m_NodeTreeView->selectionModel();
+}
+
 void QmitkDataManagerView::GlobalReinit( bool )
 {
-  this->ReinitMultiWidgetEditor();
+  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart();
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred
     = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
@@ -843,52 +769,21 @@ void QmitkDataManagerView::GlobalReinit( bool )
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
 
   // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  renderWindow->GetRenderingManager()->InitializeViews(bounds);
 }
 
-std::vector<mitk::DataNode*> QmitkDataManagerView::GetSelectedNodes() const
-{
-  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
-  std::vector<mitk::DataNode*> selectedNodes;
-
-  mitk::DataNode* node = 0;
-  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
-    ; it != indexesOfSelectedRows.end(); it++)
-  {
-    node = 0;
-    node = m_NodeTreeModel->GetNode(*it);
-    // if node is not defined or if the node contains geometry data do not remove it
-    if ( node != 0 )
-      selectedNodes.push_back(node);
-  }
-
-  return selectedNodes;
-}
-
-void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part , berry::ISelection::ConstPointer selection )
+void QmitkDataManagerView::OnSelectionChanged( berry::IWorkbenchPart::Pointer part , const QList<mitk::DataNode::Pointer>& selection )
 {
   if(part.GetPointer() == this)
     return;
-  mitk::DataNodeSelection::ConstPointer _DataNodeSelection
-    = selection.Cast<const mitk::DataNodeSelection>();
 
-  if(_DataNodeSelection.IsNull())
-    return;
-
-  std::vector<mitk::DataNode*> selectedNodes;
-  mitk::DataNodeObject* _DataNodeObject = 0;
-  mitk::DataNode* _DataNode = 0;
   QItemSelection newSelection;
 
   m_NodeTreeView->selectionModel()->reset();
 
-  for(mitk::DataNodeSelection::iterator it = _DataNodeSelection->Begin();
-    it != _DataNodeSelection->End(); ++it)
+  foreach(mitk::DataNode::Pointer node, selection)
   {
-    _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
-    if(_DataNodeObject)
-      _DataNode = _DataNodeObject->GetDataNode();
-    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataNode);
+    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(node);
     if(treeIndex.isValid())
       newSelection.select(treeIndex, treeIndex);
   }
@@ -897,15 +792,12 @@ void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part
 
 void QmitkDataManagerView::OtsuFilter( bool )
 {
-  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
-  mitk::DataNode* _DataNode = 0;
   mitk::Image::Pointer mitkImage = 0;
-  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
-    ; it != selectedNodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, selectedNodes)
   {
-    _DataNode = *it;
-    mitkImage = dynamic_cast<mitk::Image*>( _DataNode->GetData() );
+    mitkImage = dynamic_cast<mitk::Image*>( node->GetData() );
 
     if(mitkImage.IsNull())
       continue;
@@ -934,13 +826,13 @@ void QmitkDataManagerView::OtsuFilter( bool )
       filter->Update();
 
       mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-      std::string nameOfResultImage = _DataNode->GetName();
+      std::string nameOfResultImage = node->GetName();
       nameOfResultImage.append("Otsu");
       resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
       resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
       resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
 
-      this->GetDataStorage()->Add(resultNode, _DataNode);
+      this->GetDataStorage()->Add(resultNode, node);
 
     }
     catch( std::exception& err )
@@ -951,7 +843,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
   }
 }
 void QmitkDataManagerView::NodeTreeViewRowsRemoved ( 
-  const QModelIndex & parent, int start, int end )
+  const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {
   m_CurrentRowCount = m_NodeTreeModel->rowCount();
 }
@@ -962,7 +854,7 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
   // a new row was inserted
   if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )
   {
-    this->ReinitMultiWidgetEditor();
+    this->OpenRenderWindowPart();
     m_CurrentRowCount = m_NodeTreeModel->rowCount();
     /*
     std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
@@ -977,61 +869,27 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
 {
-  std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
-  mitk::DataNode* node = 0;
+  QList<mitk::DataNode::Pointer> nodes = m_NodeTreeModel->GetNodeSet();
 
-  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
-    ; it != nodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, nodes)
   {
-    node = *it;
-    if ( node )
+    if ( node.IsNotNull() )
       node->SetBoolProperty("selected", false);
   }
 
   nodes.clear();
-  nodes = this->GetSelectedNodes();
+  nodes = this->GetCurrentSelection();
 
-  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
-    ; it != nodes.end(); it++)
+  foreach(mitk::DataNode::Pointer node, nodes)
   {
-    node = *it;
-    if ( node )
+    if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
   }
   //changing the selection does NOT require any rendering processes!
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkDataManagerView::ReinitMultiWidgetEditor()
+mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart()
 {
-  berry::IEditorPart::Pointer editor;
-  std::vector<berry::IEditorPart::Pointer> editors =
-    this->GetSite()->GetPage()->GetEditors();
-  for (size_t i=0; i<editors.size(); ++i)
-  {
-    if( editors.at(i).Cast<QmitkStdMultiWidgetEditor>().IsNotNull() )
-    {
-      editor = editors.at(i);
-      break;
-    }
-  }
-
-  if ( editor.IsNull() )
-  {
-    mitk::IDataStorageService::Pointer service =
-      berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-    mitk::IDataStorageReference::Pointer DataStorageReference;
-    if (service.IsNotNull())
-    {
-      DataStorageReference = service->GetDefaultDataStorage();
-    }
-    mitk::DataStorageEditorInput::Pointer editorInput;
-    editorInput = new mitk::DataStorageEditorInput(DataStorageReference);
-    // open a new multi-widget editor, but do not give it the focus
-    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
-  }
-  else
-    this->GetSite()->GetPage()->OpenEditor(editor->GetEditorInput()
-      , QmitkStdMultiWidgetEditor::EDITOR_ID, true);
+  return this->GetRenderWindowPart(QmitkAbstractView::ACTIVATE | QmitkAbstractView::OPEN);
 }

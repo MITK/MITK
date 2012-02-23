@@ -21,9 +21,8 @@ public:
   virtual ~QmitkStatisticsAction();
 
   //interface methods
-  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetStdMultiWidget(QmitkStdMultiWidget *stdMultiWidget);
   void SetSmoothed(bool smoothed);
   void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);

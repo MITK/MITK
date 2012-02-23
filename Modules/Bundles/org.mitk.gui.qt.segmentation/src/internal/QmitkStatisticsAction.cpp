@@ -8,7 +8,7 @@ QmitkStatisticsAction::~QmitkStatisticsAction()
 {
 }
 
-void QmitkStatisticsAction::Run(const std::vector<mitk::DataNode*>& selectedNodes)
+void QmitkStatisticsAction::Run(const QList<mitk::DataNode::Pointer>& /*selectedNodes*/)
 {
   berry::IBundle::Pointer imageStatisticsBundle = berry::Platform::GetBundle("org.mitk.gui.qt.imagestatistics");
 
@@ -26,11 +26,6 @@ void QmitkStatisticsAction::SetFunctionality(berry::QtViewPart* functionality)
 void QmitkStatisticsAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
 {
   //not needed
-}
-
-void QmitkStatisticsAction::SetStdMultiWidget(QmitkStdMultiWidget *)
-{
-  // not needed
 }
 
 void QmitkStatisticsAction::SetSmoothed(bool /*smoothed*/)

@@ -18,24 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKDATAMANAGERVIEW_H_
 #define QMITKDATAMANAGERVIEW_H_
 
-// Own includes
-#include <berryIPartListener.h>
-#include <berryISelection.h>
-#include <berryISelectionProvider.h>
-#include <berryIPreferencesService.h>
+// BlueBerry includes
 #include <berryIBerryPreferences.h>
-#include <berryISelectionListener.h>
 
 /// Qmitk
-#include <berryQtViewPart.h>
-#include <QmitkDataNodeSelectionProvider.h>
-#include <QmitkDnDFrameWidget.h>
+#include <QmitkAbstractView.h>
 
-#include <berryIWorkbenchPartReference.h>
-#include <berryIPartListener.h>
-#include <berryIPreferencesService.h>
+/// Qt
+#include <QItemSelection>
 
-#include <mitkDataStorage.h>
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
 // Forward declarations
@@ -50,7 +41,9 @@ class QPushButton;
 class QToolBar;
 class QMenu;
 
+class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
+
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
 ///
@@ -58,7 +51,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public berry::QtViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -70,16 +63,10 @@ public:
   ///
   QmitkDataManagerView();
 
-  QmitkDataManagerView(const QmitkDataManagerView& other);
-
   ///
   /// \brief Standard dtor.
   ///
   virtual ~QmitkDataManagerView();
-  ///
-  /// \brief Returns all selected nodes in a vector
-  ///
-  std::vector<mitk::DataNode*> GetSelectedNodes() const;
 
 public slots:
   ///
@@ -167,10 +154,10 @@ public slots:
   void ContextMenuActionTriggered( bool );
 
   ///
-  /// Invoked when the DataManager selection changed
+  /// Invoked when the MITK workbench selection changed
   ///
-  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
-    , berry::ISelection::ConstPointer selection);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+                          const QList<mitk::DataNode::Pointer>& selection);
 
   /// Invoked when the median action is invoked
   void OtsuFilter( bool checked = false );
@@ -185,17 +172,21 @@ public slots:
   void NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
 protected:
+
   ///
   /// \brief Create the view here.
   ///
   virtual void CreateQtPartControl(QWidget* parent);
+
   void SetFocus();
-  mitk::DataStorage::Pointer GetDataStorage() const;
+
   ///
   /// \brief Shows a file open dialog.
   ///
   void FileOpen( const char * fileName, mitk::DataNode* parentNode );
+
 protected:
+
   QWidget* m_Parent;
   QmitkDnDFrameWidget* m_DndFrameWidget;
 
@@ -203,10 +194,6 @@ protected:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
-  ///
-  /// \brief The BlueBerry selection provider
-  ///
-  QmitkDataNodeSelectionProvider::Pointer m_SelectionProvider;
   ///
   /// Holds the preferences for the datamanager. 
   ///
@@ -258,15 +245,16 @@ protected:
   
   /// Special filter action for images
   QAction* m_OtsuFilterAction;
-  /// A selection listener for datatreenode events
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
-  friend struct berry::SelectionChangedAdapter<QmitkDataManagerView>;
+
   /// saves the current amount of rows shown in the datamanager
   size_t m_CurrentRowCount;
+
 private:
+
+  QItemSelectionModel* GetDataNodeSelectionModel() const;
+
   /// Reopen multi widget editor if it has been closed
-  void ReinitMultiWidgetEditor();
+  mitk::IRenderWindowPart *OpenRenderWindowPart();
 };
 
 #endif /*QMITKDATAMANAGERVIEW_H_*/

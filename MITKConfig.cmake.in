@@ -29,8 +29,7 @@ SET(MITK_VERSION_STRING "@MITK_VERSION_STRING@")
 
 # Internal version numbers, used for approximate compatibility checks
 # of a MITK development version (non-release).
-SET(MITK_VERSION_PLUGIN_SYSTEM 1)
-SET(MITK_VERSION_PLUGIN_SYSTEM_HASH b86bf28) # minimum required hash for version 1
+SET(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake support
 
 # MITK specific variables
 SET(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")

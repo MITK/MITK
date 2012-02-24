@@ -110,14 +110,6 @@ ENDIF()
 IF(MITK_USE_BLUEBERRY)
 
   SET(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-
-  INCLUDE(mitkMacroCreatePlugin)
-
-  IF(NOT MITK_SKIP_BUNDLELIST)
-    IF(MITK_USE_EXT)
-      INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKModulesBundleList.cmake")
-    ENDIF()
-  ENDIF(NOT MITK_SKIP_BUNDLELIST)
   
   # Don't include the BlueBerry exports file, since the targets are
   # also exported in the MITK exports file
@@ -127,13 +119,6 @@ IF(MITK_USE_BLUEBERRY)
   IF(NOT BlueBerry_FOUND)
     MESSAGE(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
   ENDIF(NOT BlueBerry_FOUND)
-
-  SET(MITK_PLUGIN_SOURCE_DIRS "@MITK_SOURCE_DIR@/Bundles")
-  
-  SET(MITK_PLUGIN_OUTPUT_DIRS )
-  IF(MITK_USE_EXT)
-    LIST(APPEND MITK_PLUGIN_OUTPUT_DIRS @MITK_MODULES_PLUGIN_OUTPUT_DIRS@)
-  ENDIF()
 
   SET(MITK_PLUGIN_USE_FILE @MITK_PLUGIN_USE_FILE@)
   IF(MITK_PLUGIN_USE_FILE)

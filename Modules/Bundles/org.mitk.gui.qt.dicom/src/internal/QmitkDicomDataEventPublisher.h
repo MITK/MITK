@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <ctkServiceReference.h>
 #include <ctkPluginContext.h>
-#include <Libs/PluginFramework/service/event/ctkEventAdmin.h>
-#include <Libs/PluginFramework/service/event/ctkEvent.h>
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEvent.h>
 
 class QmitkDicomDataEventPublisher
 {

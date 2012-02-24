@@ -123,6 +123,9 @@ endif()
 #-----------------------------------------------------------------------------
 
 find_package(MITK REQUIRED)
+
+mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
+
 link_directories(${MITK_LINK_DIRECTORIES})
 
 #-----------------------------------------------------------------------------

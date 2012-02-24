@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageToImageFilter.h"
 #include <itkDiffusionTensor3D.h>
 #include <itkVectorImage.h>
+#include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 namespace itk
 {
@@ -145,7 +146,7 @@ namespace itk
 
     void remove_negative_eigs(int x, int y, int z, int ****table, 
       int nof, itk::Size<3> size, 
-      vnl_matrix<float> H, int ****D, int ****atten, 
+      vnl_matrix<float> pseudoInverse, int ****D, int ****atten, 
       vnl_vector<float> higher_thresh, 
       vnl_vector<float> lower_thresh, int wasdetectedbad, 
       int ***b0_mean_image, int ****sorted_eigs, int numberb0);

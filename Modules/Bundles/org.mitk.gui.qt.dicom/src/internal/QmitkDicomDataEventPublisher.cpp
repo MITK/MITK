@@ -24,3 +24,27 @@ QmitkDicomDataEventPublisher::QmitkDicomDataEventPublisher()
 QmitkDicomDataEventPublisher::~QmitkDicomDataEventPublisher()
 {
 }
+
+void QmitkDicomDataEventPublisher::SendEvent(const ctkEvent& ctkEvent,bool synchronously)
+{
+    if(synchronously)
+    {
+        m_EventAdmin->sendEvent(ctkEvent);
+    }else{
+        m_EventAdmin->postEvent(ctkEvent);
+    }
+}
+
+void QmitkDicomDataEventPublisher::SetEventAdmin(ctkPluginContext* context)
+{
+    SetServiceReference(context);
+    if(*m_ServiceReference)
+    {
+        m_EventAdmin = context->getServiceReference<ctkEventAdmin>(*m_ServiceReference);
+    }
+}
+
+void QmitkDicomDataEventPublisher::SetServiceReference(ctkPluginContext* context)
+{
+    m_ServiceReference = context->getServiceReference<ctkEventAdmin>();
+}

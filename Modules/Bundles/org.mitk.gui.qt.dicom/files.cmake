@@ -9,6 +9,7 @@ set(INTERNAL_CPP_FILES
   QmitkStoreSCPLauncher.cpp
   QmitkStoreSCPLauncherBuilder.cpp
   QmitkDicomDataEventPublisher.cpp
+  DicomEventHandler.cpp
 )
 
 set(UI_FILES
@@ -22,6 +23,7 @@ set(MOC_H_FILES
   src/internal/QmitkStoreSCPLauncher.h
   src/internal/QmitkStoreSCPLauncherBuilder.h
   src/internal/QmitkDicomDataEventPublisher.h
+  src/internal/DicomEventHandler.h
 )
 
 # list of resource files which can be used by the plug-in

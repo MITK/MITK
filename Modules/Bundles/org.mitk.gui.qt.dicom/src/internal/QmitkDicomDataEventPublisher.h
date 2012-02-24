@@ -43,7 +43,7 @@ class QmitkDicomDataEventPublisher
         /// @brief sets the service reference from given plugin context
         void SetServiceReference(ctkPluginContext* context);
 
-        ctkServiceReference* m_ServiceReference;
+        ctkServiceReference m_ServiceReference;
         ctkEventAdmin* m_EventAdmin;
 
 };

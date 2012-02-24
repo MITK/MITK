@@ -23,6 +23,7 @@ QmitkDicomDataEventPublisher::QmitkDicomDataEventPublisher()
 
 QmitkDicomDataEventPublisher::~QmitkDicomDataEventPublisher()
 {
+    delete m_EventAdmin;
 }
 
 void QmitkDicomDataEventPublisher::SendEvent(const ctkEvent& ctkEvent,bool synchronously)
@@ -38,9 +39,9 @@ void QmitkDicomDataEventPublisher::SendEvent(const ctkEvent& ctkEvent,bool synch
 void QmitkDicomDataEventPublisher::SetEventAdmin(ctkPluginContext* context)
 {
     SetServiceReference(context);
-    if(*m_ServiceReference)
+    if(m_ServiceReference)
     {
-        m_EventAdmin = context->getServiceReference<ctkEventAdmin>(*m_ServiceReference);
+        m_EventAdmin = context->getService<ctkEventAdmin>(m_ServiceReference);
     }
 }
 

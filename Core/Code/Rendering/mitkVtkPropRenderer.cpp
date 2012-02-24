@@ -53,8 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
-#include <vtkInteractorStyleJoystickCamera.h>
-
+#include <vtkInteractorStyleTrackballCamera.h>
 
 
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
@@ -816,7 +815,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
-    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( vtkInteractorStyleJoystickCamera::New() );
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( vtkInteractorStyleTrackballCamera::New() );
     m_CameraInitializedForMapperID = Standard3D;
   }
   else if( this->GetMapperID() == Standard2D)

@@ -165,6 +165,22 @@ namespace itk
       }
     }
 
+
+    int ****table1;// table in which all images except b0 are store
+    table1 = new int***[nof-numberb0];
+    for (int g=0; g<nof-numberb0; g++)
+    {
+      table1[g] = new int**[size[0]];
+      for ( int i = 0 ; i < size[0] ; i++ ) 
+      {
+        table1[g][i] = new int*[size[1]] ;
+        for ( int j = 0 ; j < size[1] ; j++ )
+        {
+          table1[g][i][j] = new int[size[2]] ;
+        }
+      }
+    }
+
       int ****b0image;// table with all b0images
     b0image = new int***[numberb0];
     for (int g=0; g<numberb0; g++)
@@ -234,7 +250,7 @@ namespace itk
        
       }
     }
-
+    
     for(int x =0;x<size[0];x++)
     {
         for(int y=0;y<size[1];y++)
@@ -385,28 +401,73 @@ namespace itk
     std::cout << std::endl;
   }
 
+  int negativitycheck=0;
+   for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(b0_mean_image[x][y][z]<0)
+          {
+            negativitycheck++;
+          }
+        }
+      }
+    }
+
+   for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(b0_mean_image[x][y][z]<0)
+          {
+          check_the_neighbors(x,y,z,b0_mean_image,size);
+          }
+        }
+      }
+    }
+    int negativitycheckafter=0;
+
+    for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(b0_mean_image[x][y][z]<0)
+          {
+            negativitycheckafter++;
+          }
+        }
+      }
+    }
+    std::cout << "before: " << negativitycheck << "\nafter: " << negativitycheckafter << std::endl;
   
+   /*for ( int g=0;g<nof-numberb0;g++)
+  {
+    for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(table[g][x][y][z]<=0)
+          {
+          check_the_neighbors(x,y,z,table[g],size);
+          }
+        }
+      }
+    }
+  }// removing voxels smaller than 0 from the data / i am not using this threshold for this step cause in my opinion its sensles - if data are below zero it would be below threshold for sure.
 
 
-    //H = pinverse((H.transpose()*H *H.transpose()));  
 
-  // Create Design Matrix end
-/*
-   for ( int g=0;g<nof-numberb0;g++)
-   {
-       for ( int x=0;x<size[0];x++)
-       {
-           for ( int y=0;y<size[1];y++)
-           {
-               for ( int z=0;z<size[2];z++)
+ 
 
-               { // if condition
-                   check_the_neighbors(g,x,y,z,table,size);
-               }
-           }
-       }
-   }// removing voxels smaller than 0 from the data / i am not using this threshold for this step cause in my opinion its sensles - if data are below zero it would be below threshold for sure.
-  
+
   for (int i=1;i<nof-numberb0;i++)
    {
       higher_thresh[i]=exp(-b_vec[i]*LOW_D);
@@ -489,7 +550,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::check_the_neighbors(int g, int x, int y, int z, int ****table, itk::Size<3> size)   
+  ::check_the_neighbors(int x, int y, int z, int ***table, itk::Size<3> size)   
   {
    
      int temp_sum=0;
@@ -517,7 +578,7 @@ namespace itk
        limit_i=x+2;
      }
      
-     for (int i=init_i;i<limit_i;i+2)
+     for (int i=init_i;i<limit_i;i+=2)
          
      {// 1
        if(y==0)
@@ -536,7 +597,7 @@ namespace itk
               limit_j=y+2;
             }
 
-        for (int j=init_j;j<limit_j;j+2)
+        for (int j=init_j;j<limit_j;j+=2)
         {//2
 
            if(z==0)
@@ -554,17 +615,17 @@ namespace itk
                 init_c=z-1;
                 limit_c=z+2;
                 }
-           for (int c=init_c;c<limit_c;c+2)
+           for (int c=init_c;c<limit_c;c+=2)
            {//3
                
                
-               if(table[g][i][j][c]<=0)
+               if(table[i][j][c]<=0)
                {
                 temp_sum=temp_sum+ 0;
                }
                else
                {
-                 temp_sum=temp_sum+table[g][i][j][c];
+                 temp_sum=temp_sum+table[i][j][c];
                  temp_number++;
                }
             }//3
@@ -573,11 +634,11 @@ namespace itk
 
    if (temp_number==0)
     {
-    table[g][x][y][z]=0;
+    table[x][y][z]=0;
     }
      else
     {
-      table[g][x][y][z]=temp_sum/temp_number;
+      table[x][y][z]=temp_sum/temp_number;
      }
    
 

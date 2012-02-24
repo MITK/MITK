@@ -151,7 +151,7 @@ namespace itk
       vnl_vector<float> lower_thresh, int wasdetectedbad, 
       int ***b0_mean_image, int ****sorted_eigs, int numberb0);
 
-    void check_the_neighbors(int g, int x, int y, int z, int ****table, itk::Size<3>);
+    void check_the_neighbors(int x, int y, int z, int ***table, itk::Size<3>);
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;

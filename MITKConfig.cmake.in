@@ -4,6 +4,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 
 # Include MITK macros
 include(MacroParseArguments)
+include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
@@ -25,6 +26,11 @@ SET(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
 SET(MITK_VERSION_MINOR "@MITK_VERSION_MINOR@")
 SET(MITK_VERSION_PATCH "@MITK_VERSION_PATCH@")
 SET(MITK_VERSION_STRING "@MITK_VERSION_STRING@")
+
+# Internal version numbers, used for approximate compatibility checks
+# of a MITK development version (non-release).
+SET(MITK_VERSION_PLUGIN_SYSTEM 1)
+#SET(MITK_VERSION_PLUGIN_SYSTEM_HASH )
 
 # MITK specific variables
 SET(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")

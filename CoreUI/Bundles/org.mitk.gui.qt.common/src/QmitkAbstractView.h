@@ -97,19 +97,28 @@ class QmitkAbstractViewSelectionProvider;
  * <li>void DataStorageChanged(mitk::IDataStorageReference::Pointer dsRef)
  * </ul>
  *
- * \see ILifecycleAwarePart
- * \see IZombieViewPart
- * \see IRenderWindowPartListener
+ * \see mitk::ILifecycleAwarePart
+ * \see mitk::IZombieViewPart
+ * \see mitk::IRenderWindowPartListener
  */
 class MITK_QT_COMMON QmitkAbstractView : public berry::QtViewPart
 {
 
 public:
 
+  /**
+   * Describes the strategies to be used for getting a mitk::IRenderWindowPart
+   * instance.
+   */
   enum IRenderWindowPartStrategy {
+
+    /** Do nothing. */
     NONE           = 0x00000000,
+    /** Bring the most recently activated mitk::IRenderWindowPart instance to the front. */
     BRING_TO_FRONT = 0x00000001,
+    /** Activate a mitk::IRenderWindowPart part (implies bringing it to the front). */
     ACTIVATE       = 0x00000002,
+    /** Create a mitk::IRenderWindowPart if none is alredy opened. */
     OPEN           = 0x00000004
   };
 
@@ -173,10 +182,11 @@ protected:
   mitk::DataStorage::Pointer GetDataStorage() const;
 
   /**
-   * Returns the default and active StdMultiWidget.
-   * \param reCreateWidget a boolean flag to en-/disable the attept to re-create the StdWidget
-   * <b>If there is not StdMultiWidget yet a new one is
-   * created in this method when called with default parameter!</b>
+   * Returns the currently active mitk::IRenderWindowPart.
+   *
+   * \param strategies Strategies for returning a mitk::IRenderWindowPart instance if there
+   *        is currently no active one.
+   * \return The active mitk::IRenderWindowPart.
    */
   mitk::IRenderWindowPart* GetRenderWindowPart(IRenderWindowPartStrategies strategies = NONE) const;
 

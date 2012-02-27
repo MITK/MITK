@@ -6,7 +6,7 @@ ENDIF(NOT OPENGL_FOUND )
 SET(TOOL_CPPS "")
 
 MITK_CREATE_MODULE( Mitk
-  INCLUDE_DIRS Algorithms DataManagement Controllers Interactions IO Rendering Service ${MITK_BINARY_DIR}
+  INCLUDE_DIRS Algorithms DataManagement Controllers Interactions Interfaces IO Rendering Service ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
   DEPENDS mbilog tinyxml
   DEPENDS_INTERNAL IIL4MITK pic2vtk

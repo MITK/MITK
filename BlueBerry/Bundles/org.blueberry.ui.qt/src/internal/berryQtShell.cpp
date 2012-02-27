@@ -19,7 +19,7 @@
 
 #include "berryQtWidgetsTweakletImpl.h"
 #include "berryQtMainWindowControl.h"
-#include "berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>
 #include <internal/berryTweaklets.h>

@@ -4,6 +4,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 
 # Include MITK macros
 include(MacroParseArguments)
+include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
@@ -25,6 +26,10 @@ SET(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
 SET(MITK_VERSION_MINOR "@MITK_VERSION_MINOR@")
 SET(MITK_VERSION_PATCH "@MITK_VERSION_PATCH@")
 SET(MITK_VERSION_STRING "@MITK_VERSION_STRING@")
+
+# Internal version numbers, used for approximate compatibility checks
+# of a MITK development version (non-release).
+SET(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake support
 
 # MITK specific variables
 SET(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
@@ -110,14 +115,6 @@ ENDIF()
 IF(MITK_USE_BLUEBERRY)
 
   SET(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-
-  INCLUDE(mitkMacroCreatePlugin)
-
-  IF(NOT MITK_SKIP_BUNDLELIST)
-    IF(MITK_USE_EXT)
-      INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKModulesBundleList.cmake")
-    ENDIF()
-  ENDIF(NOT MITK_SKIP_BUNDLELIST)
   
   # Don't include the BlueBerry exports file, since the targets are
   # also exported in the MITK exports file
@@ -127,13 +124,6 @@ IF(MITK_USE_BLUEBERRY)
   IF(NOT BlueBerry_FOUND)
     MESSAGE(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
   ENDIF(NOT BlueBerry_FOUND)
-
-  SET(MITK_PLUGIN_SOURCE_DIRS "@MITK_SOURCE_DIR@/Bundles")
-  
-  SET(MITK_PLUGIN_OUTPUT_DIRS )
-  IF(MITK_USE_EXT)
-    LIST(APPEND MITK_PLUGIN_OUTPUT_DIRS @MITK_MODULES_PLUGIN_OUTPUT_DIRS@)
-  ENDIF()
 
   SET(MITK_PLUGIN_USE_FILE @MITK_PLUGIN_USE_FILE@)
   IF(MITK_PLUGIN_USE_FILE)

@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: MITK Input Device Space Navigator 
-Bundle-SymbolicName: org.mitk.inputdevices.spacenavigator 
-Bundle-Version: 0.1
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.mitk.core.ext, org.mitk.gui.qt.common
-Bundle-Activator: 

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_application org.mitk.gui.qt.application
+  \ingroup MITKPlugins
+
+  \brief Provides utility classes for MITK application developers.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_application_internal Internal
+  \ingroup org_mitk_gui_qt_application
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.application plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

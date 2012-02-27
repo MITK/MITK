@@ -60,7 +60,7 @@ protected:
 
 protected slots:
 
-virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 };
 

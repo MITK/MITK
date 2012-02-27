@@ -21,12 +21,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImage.h>
 #include <mitkSurfaceSource.h>
-#include <mitkToFProcessingExports.h>
-#include <mitkToFProcessingCommon.h>
+#include "mitkToFProcessingExports.h"
+#include "mitkToFProcessingCommon.h"
 #include <mitkCameraIntrinsics.h>
-#include "mitkCameraIntrinsics.h"
 #include <mitkPointSet.h>
+
+
+#include <vtkSmartPointer.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+
 #include <cv.h>
+
 
 namespace mitk
 {
@@ -142,13 +149,16 @@ namespace mitk
     IplImage* m_IplScalarImage; ///< Scalar image used for surface texturing
 
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< Specifies the intrinsic parameters
-    //mitk::CameraIntrinsics::Pointer m_CameraModel; ///< Specifies the intrinsic parameters
 
     int m_TextureImageWidth; ///< Width (x-dimension) of the texture image
     int m_TextureImageHeight; ///< Height (y-dimension) of the texture image
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
 
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
+
+    vtkSmartPointer<vtkPoints> m_Points; ///< VTK representation of all points in worldcoordinates
+    vtkSmartPointer<vtkCellArray> m_Polys; ///< VTK representation of the faces/edges connecting the points
+    vtkSmartPointer<vtkPolyData> m_Mesh; ///< Faces and points together form the mesh in VTK
 
   };
 } //END mitk namespace

@@ -236,7 +236,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
         sphere->SetRadius(m_PointSize);
-        itk::Point<float> point1 = pointsIter->Value(); 
+        //itk::Point<float> point1 = pointsIter->Value();
         sphere->SetThetaResolution(20);
         sphere->SetPhiResolution(20);
         source = sphere;

@@ -33,7 +33,8 @@ mitk::BaseData::BaseData() :
 }
 
 mitk::BaseData::BaseData( const BaseData &other ): 
-m_RequestedRegionInitialized(other.m_RequestedRegionInitialized), 
+itk::DataObject(),
+m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
 m_SmartSourcePointer(other.m_SmartSourcePointer), 
 m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
 m_Initialized(other.m_Initialized), m_Unregistering(other.m_Unregistering),

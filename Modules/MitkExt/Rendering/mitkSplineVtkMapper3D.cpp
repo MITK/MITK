@@ -71,7 +71,7 @@ mitk::SplineVtkMapper3D::GenerateData()
   if ( m_SplineUpdateTime < m_LastUpdateTime || m_SplineUpdateTime == 0) 
   {
     this->UpdateSpline();
-    this->ApplyProperties();
+    this->ApplyProperties(m_SplinesActor, NULL);
   }
 
   if ( m_SplinesAvailable )
@@ -112,12 +112,14 @@ void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rende
   //if the properties have been changed, then refresh the properties
   if ( (m_SplineUpdateTime < this->m_DataNode->GetPropertyList()->GetMTime() ) || 
        (m_SplineUpdateTime < this->m_DataNode->GetPropertyList(renderer)->GetMTime() ) )
-    this->ApplyProperties();
+    this->ApplyProperties(m_SplinesActor, NULL);
 }
 
 
-void mitk::SplineVtkMapper3D::ApplyProperties()
+void mitk::SplineVtkMapper3D::ApplyProperties(vtkActor *actor, BaseRenderer *renderer)
 {
+  Superclass::ApplyProperties(actor, renderer);
+
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
   vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 

@@ -338,7 +338,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     {
       mitk::BoundingBox::PointType boundingBoxMin = m_BoundingBox->GetMinimum();
       mitk::BoundingBox::PointType boundingBoxMax = m_BoundingBox->GetMaximum();
-      mitk::BoundingBox::PointType boundingBoxCenter = m_BoundingBox->GetCenter();
+      //mitk::BoundingBox::PointType boundingBoxCenter = m_BoundingBox->GetCenter();
 
       m_Box->SetXMin( boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2] );
       m_Box->SetXMax( boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2] );

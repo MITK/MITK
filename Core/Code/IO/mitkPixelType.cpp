@@ -71,8 +71,8 @@ mitk::PixelType::PixelType( const mitk::PixelType& other )
     m_PixelType( other.m_PixelType),
     m_ComponentTypeName( other.m_ComponentTypeName ),
     m_PixelTypeName( other.m_PixelTypeName ),
-    m_BytesPerComponent( other.m_BytesPerComponent ),
-    m_NumberOfComponents( other.m_NumberOfComponents )
+    m_NumberOfComponents( other.m_NumberOfComponents ),
+    m_BytesPerComponent( other.m_BytesPerComponent )
 {
 
 }

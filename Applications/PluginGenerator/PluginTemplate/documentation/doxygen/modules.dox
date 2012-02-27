@@ -1,5 +1,5 @@
 /**
-  \defgroup $(plugin-target) $(plugin-symbolic-name) Plugin
+  \defgroup $(plugin-target) $(plugin-symbolic-name)
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

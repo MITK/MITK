@@ -50,10 +50,13 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
     ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL, 
                                    mitk::Image::Pointer image = NULL);
+    ClippedSurfaceBoundsCalculator(const mitk::Geometry3D* geometry,
+                                   mitk::Image::Pointer image);
     virtual ~ClippedSurfaceBoundsCalculator();
 
 
     void SetInput(const mitk::PlaneGeometry* geometry, mitk::Image* image);
+    void SetInput(const mitk::Geometry3D *geometry, mitk::Image *image);
 
     /**
       \brief Request calculation.
@@ -89,8 +92,10 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
     OutputType GetMinMaxSpatialDirectionZ();
 
   protected:
+    void CalculateIntersectionPoints(const mitk::PlaneGeometry* geometry);
 
     mitk::PlaneGeometry::ConstPointer m_PlaneGeometry;
+    mitk::Geometry3D::ConstPointer m_Geometry3D;
     mitk::Image::Pointer m_Image;
     std::vector< OutputType > m_MinMaxOutput;
 

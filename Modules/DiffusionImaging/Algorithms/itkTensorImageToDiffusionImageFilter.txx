@@ -69,7 +69,7 @@ namespace itk
     }
 
     // create a B0 image by taking the norm of the tensor field * scale:
-    typedef itk::TensorToL2NormImageFilter<InputImageType, itk::Image<InputScalarType,3> >
+    typedef itk::TensorToL2NormImageFilter<InputImageType, itk::Image<OutputScalarType,3> >
       TensorToL2NormFilterType;
 
     typename TensorToL2NormFilterType::Pointer myFilter1 = TensorToL2NormFilterType::New();
@@ -85,11 +85,11 @@ namespace itk
       return;
     }
 
-    typename itk::RescaleIntensityImageFilter< itk::Image<InputScalarType,3>, BaselineImageType>::Pointer rescaler=
-      itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
+    typename itk::RescaleIntensityImageFilter< itk::Image<OutputScalarType,3>, BaselineImageType>::Pointer rescaler=
+      itk::RescaleIntensityImageFilter<itk::Image<OutputScalarType,3>, BaselineImageType>::New();
 
-    rescaler->SetOutputMinimum ( 0 );
-    rescaler->SetOutputMaximum ( 10000 );
+    rescaler->SetOutputMinimum ( m_Min );
+    rescaler->SetOutputMaximum ( m_Max );
     rescaler->SetInput ( myFilter1->GetOutput() );
     try
     {

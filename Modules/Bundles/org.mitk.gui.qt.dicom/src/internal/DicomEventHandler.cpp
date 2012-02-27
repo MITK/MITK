@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "DicomEventHandler.h"
 #include <service/event/ctkEventConstants.h>
 #include <ctkDictionary.h>
+#include <mitklogmacros.h>
 
 DicomEventHandler::DicomEventHandler() 
 {    
@@ -29,7 +30,7 @@ DicomEventHandler::~DicomEventHandler()
 
 void DicomEventHandler::handleEvent(const ctkEvent& ctkEvent)
 {
-    std::cout << "I'll handle your event:" ctkEvent.getProperty("SeriesName").toString();
+    MITK_INFO << "I'll handle your event:" << ctkEvent.getProperty("title").toString().toStdString();
 }
 
 void DicomEventHandler::Register(QString eventTopic, QString filter)

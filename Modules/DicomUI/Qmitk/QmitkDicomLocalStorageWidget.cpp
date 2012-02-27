@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 //#include <mitkProgressBar.h>
 // Qt
 #include <QMessageBox>
+#include <QModelIndex>
+//#include "QmitkDicomDataEventPublisher.h"
 
 
 
@@ -131,6 +133,7 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
 //TODO
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
+    //QModelIndex index = m_Controls->InternalDataTreeView->currentIndex();
 }
 
 void QmitkDicomLocalStorageWidget::OnSearchParameterChanged()

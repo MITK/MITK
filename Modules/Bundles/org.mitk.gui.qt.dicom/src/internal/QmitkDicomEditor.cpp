@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDicomEditor.h"
 #include "mitkPluginActivator.h"
 #include <mitkDicomSeriesReader.h>
+
 //#include "mitkProgressBar.h"
 
 // Qt
@@ -70,6 +71,8 @@ QmitkDicomEditor::QmitkDicomEditor()
 QmitkDicomEditor::~QmitkDicomEditor()
 {
     m_Thread->terminate();
+    delete m_Handler;
+    delete m_Publisher;
     delete m_StoreSCPLauncher;
     delete m_Thread;
     delete m_DicomDirectoryListener;
@@ -78,6 +81,7 @@ QmitkDicomEditor::~QmitkDicomEditor()
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {   
     m_Controls.setupUi( parent );
+    TestHandler();
     SetupDefaults();
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&))); 
@@ -211,4 +215,21 @@ void QmitkDicomEditor::SetupDefaults()
     builder.AddPort()->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(listenerDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
     m_StoreSCPLauncher->StartStoreSCP();
+}
+
+//TODO Remove
+void QmitkDicomEditor::TestHandler()
+{
+      ctkDictionary properties;
+      properties["title"] = "bla";
+
+      m_Handler = new DicomEventHandler();
+      m_Handler->SetPluginContext(mitk::PluginActivator::getContext());
+      m_Handler->Register(QString("com/acme/reportgenerator/GENERATED"));
+
+      ctkEvent reportGeneratedEvent("com/acme/reportgenerator/GENERATED", properties);
+
+      m_Publisher = new QmitkDicomDataEventPublisher();
+      m_Publisher->SetEventAdmin(mitk::PluginActivator::getContext());
+      m_Publisher->SendEvent(reportGeneratedEvent);   
 }

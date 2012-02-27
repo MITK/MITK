@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDicomDirectoryListener.h"
 #include "QmitkStoreSCPLauncher.h"
 #include "QmitkStoreSCPLauncherBuilder.h"
+#include "DicomEventHandler.h"
+#include "QmitkDicomDataEventPublisher.h"
 
 #include <QTextEdit>
 #include <QModelIndex>
@@ -103,6 +105,8 @@ signals:
         /// To be called when an entry of the tree list is expanded
         //void OnTreeExpanded(const QModelIndex& index);
 
+        void TestHandler();
+
 protected:
 
     void CreateQtPartControl(QWidget *parent);
@@ -116,6 +120,8 @@ protected:
     QThread* m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
+    DicomEventHandler* m_Handler;
+    QmitkDicomDataEventPublisher* m_Publisher;
  
 };
 

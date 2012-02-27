@@ -86,11 +86,6 @@ namespace itk
 
 
           res = res/p1.GetSize();
-          if(res!=0.0)
-          {
-            std::cout << "not 0";
-          }
-
 
           outputImage->SetPixel(ix, res);
 

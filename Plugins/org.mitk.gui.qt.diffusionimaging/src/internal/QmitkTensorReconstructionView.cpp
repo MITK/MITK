@@ -45,6 +45,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 #include "mitkDiffusionImageMapper.h"
+#include "mitkLookupTableProperty.h"
+#include "mitkLookupTable.h"
+#include "mitkImageStatisticsHolder.h"
 
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
@@ -347,13 +350,16 @@ void QmitkTensorReconstructionView::ResidualCalculation()
       gradientList.push_back(grad);
     }
 
-
+    // Find the min and the max values from a baseline image
+    mitk::ImageStatisticsHolder *stats = diffImage->GetStatistics();
 
     //Initialize filter that calculates the modeled diffusion weighted signals
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( tensorImage );
     filter->SetBValue(diffImage->GetB_Value());
     filter->SetGradientList(gradientList);
+    filter->SetMin(stats->GetScalarValueMin());
+    filter->SetMax(stats->GetScalarValueMax());
     filter->Update();
 
 
@@ -390,13 +396,59 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     mitk::Image::Pointer mitkResImg = mitk::Image::New();
 
     mitk::CastToMitkImage(residualImage, mitkResImg);
-   // mitkResImg->InitializeByItk(residualImage.GetPointer());
-  //  image->SetVolume( residualImage->GetBufferPointer() );
 
-   // mitk::CastToMitkImage(residualImage, mitkResImg);
+    stats = mitkResImg->GetStatistics();
+    float min = stats->GetScalarValueMin();
+    float max = stats->GetScalarValueMax();
+
+    mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+
+
+    vtkSmartPointer<vtkLookupTable> lookupTable =
+        vtkSmartPointer<vtkLookupTable>::New();
+
+    lookupTable->SetTableRange(min, max);
+
+
+
+
+    // If you don't want to use the whole color range, you can use
+    // SetValueRange, SetHueRange, and SetSaturationRange
+    lookupTable->Build();
+
+    int size =lookupTable->GetTable()->GetSize();
+
+    vtkSmartPointer<vtkLookupTable> reversedlookupTable =
+        vtkSmartPointer<vtkLookupTable>::New();
+    reversedlookupTable->SetTableRange(min+1, max);
+    reversedlookupTable->Build();
+
+    for(int i=0; i<=256; i++)
+    {
+      double* rgba = reversedlookupTable->GetTableValue(255-i);
+
+      std::cout << rgba[0] << ' ' << rgba[1] << ' ' << rgba[2] << ' ' << rgba[3] << '\n';
+      lookupTable->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
+    std::cout << std::endl;
+
+
+    lut->SetVtkLookupTable(lookupTable);
+    lutProp->SetLookupTable(lut);
+
+    // Create lookuptable
+
     mitk::DataNode::Pointer resNode=mitk::DataNode::New();
     resNode->SetData( mitkResImg );
     resNode->SetName("Residual Image");
+
+    resNode->SetProperty("LookupTable", lutProp);
+
+    bool b;
+    resNode->GetBoolProperty("use color", b);
+    resNode->SetBoolProperty("use color", false);
+
     GetDefaultDataStorage()->Add(resNode);
 
     m_MultiWidget->RequestUpdate();

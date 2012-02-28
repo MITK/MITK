@@ -594,7 +594,7 @@ protected:
   Geometry3D();
   Geometry3D(const Geometry3D& other);
 
-  static const char* GetTransformAsString( TransformType* transformType );
+  static const std::string GetTransformAsString( TransformType* transformType );
 
   virtual ~Geometry3D();
 

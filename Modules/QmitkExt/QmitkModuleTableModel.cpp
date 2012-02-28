@@ -49,7 +49,7 @@ public:
     context->RemoveModuleListener(this, &QmitkModuleTableModelPrivate::ModuleChanged);
   }
 
-  void ModuleChanged(const mitk::ModuleEvent& event)
+  void ModuleChanged(mitk::ModuleEvent event)
   {
     q->insertModule(event.GetModule());
   }
@@ -79,7 +79,7 @@ int QmitkModuleTableModel::rowCount(const QModelIndex& parent) const
 int QmitkModuleTableModel::columnCount(const QModelIndex& parent) const
 {
   if (parent.isValid()) return 0;
-  return 7;
+  return 5;
 }
 
 QVariant QmitkModuleTableModel::data(const QModelIndex& index, int role) const
@@ -105,16 +105,7 @@ QVariant QmitkModuleTableModel::data(const QModelIndex& index, int role) const
       }
       return deps;
     }
-    case 4: return QString::fromStdString(module->GetProperty(mitk::Module::PROP_PACKAGE_DEPENDS()));
-    case 6: return QString::fromStdString(module->GetLocation());
-    }
-  }
-  else if (role == Qt::CheckStateRole)
-  {
-    if (index.column() == 5)
-    {
-      mitk::Module* module = d->modules[index.row()+1];
-      return module->GetProperty(mitk::Module::PROP_QT()) == "true" ? Qt::Checked : Qt::Unchecked;
+    case 4: return QString::fromStdString(module->GetLocation());
     }
   }
   else if (role == Qt::ForegroundRole)
@@ -132,15 +123,13 @@ QVariant QmitkModuleTableModel::data(const QModelIndex& index, int role) const
     QString name = QString::fromStdString(module->GetName());
     QString version = QString::fromStdString(module->GetVersion().ToString());
     QString moduleDepends = QString::fromStdString(module->GetProperty(mitk::Module::PROP_MODULE_DEPENDS()));
-    QString packageDepends = QString::fromStdString(module->GetProperty(mitk::Module::PROP_PACKAGE_DEPENDS()));
     QString libDepends = QString::fromStdString(module->GetProperty(mitk::Module::PROP_LIB_DEPENDS()));
     QString location = QString::fromStdString(module->GetLocation());
-    QString isQt =  module->GetProperty(mitk::Module::PROP_QT()) == "true" ? "Yes" : "No";
     QString state = module->IsLoaded() ? "Loaded" : "Unloaded";
 
-    QString tooltip = "Id: %1\nName: %2\nVersion: %3\nModule Dependencies: %4\nPackage Dependencies: %5\nLibrary Dependencies: %6\nLocation: %7\nQt Module: %8\nState: %9";
+    QString tooltip = "Id: %1\nName: %2\nVersion: %3\nModule Dependencies: %4\nLibrary Dependencies: %6\nLocation: %7\nState: %9";
 
-    return tooltip.arg(id, name, version, moduleDepends, packageDepends, libDepends, location, isQt, state);
+    return tooltip.arg(id, name, version, moduleDepends, libDepends, location, state);
   }
   return QVariant();
 }
@@ -156,9 +145,7 @@ QVariant QmitkModuleTableModel::headerData(int section, Qt::Orientation orientat
   case 1: return "Name";
   case 2: return "Version";
   case 3: return "Depends";
-  case 4: return "Packages";
-  case 5: return "Qt";
-  case 6: return "Location";
+  case 4: return "Location";
   }
   return QVariant();
 }

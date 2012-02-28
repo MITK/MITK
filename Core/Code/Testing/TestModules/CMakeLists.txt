@@ -1,5 +1,0 @@
-add_subdirectory(libA)
-add_subdirectory(libA2)
-add_subdirectory(libSL1)
-add_subdirectory(libSL3)
-add_subdirectory(libSL4)

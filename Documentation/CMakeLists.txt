@@ -3,7 +3,7 @@
 #  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
 
 # Compile source code snippets
-add_subdirectory(Snippets)
+#add_subdirectory(Snippets)
 
 FIND_PACKAGE(Doxygen)
 

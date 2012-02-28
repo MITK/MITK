@@ -99,6 +99,6 @@ namespace mitk
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
  };
 }
-MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
+US_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 
 #endif

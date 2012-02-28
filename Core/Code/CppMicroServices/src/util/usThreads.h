@@ -32,6 +32,7 @@
 
   #if defined(US_PLATFORM_APPLE)
     // OSAtomic.h optimizations only used in 10.5 and later
+    #include <AvailabilityMacros.h>
     #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
       #include <libkern/OSAtomic.h>
       #define US_ATOMIC_OPTIMIZATION_APPLE
@@ -106,7 +107,7 @@
       #define US_ATOMIC_INCREMENT(x)      m_AtomicMtx.Lock();  \
                                           IntType n = ++x;     \
                                           m_AtomicMtx.Unlock()
-      #define US_ATOMIC_INCREMENT(x)      m_AtomicMtx.Lock();  \
+      #define US_ATOMIC_DECREMENT(x)      m_AtomicMtx.Lock();  \
                                           IntType n = --x;     \
                                           m_AtomicMtx.Unlock()
       #define US_ATOMIC_ASSIGN(l, v)      m_AtomicMtx.Lock();  \

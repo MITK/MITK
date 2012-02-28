@@ -59,6 +59,22 @@ namespace itk
     }
 
 
+    std::vector<double> GetQ1()
+    {
+      return m_Q1;
+    }
+
+    std::vector<double> GetQ3()
+    {
+      return m_Q3;
+    }
+
+    std::vector<double> GetMeans()
+    {
+      return m_Means;
+    }
+
+
 
   protected:
     ResidualImageFilter()
@@ -81,6 +97,8 @@ namespace itk
     void operator=(const Self&);
 
     typename InputImageType::Pointer m_SecondDiffusionImage;
+
+    std::vector<double> m_Means, m_Q1, m_Q3;
 
 
   };    

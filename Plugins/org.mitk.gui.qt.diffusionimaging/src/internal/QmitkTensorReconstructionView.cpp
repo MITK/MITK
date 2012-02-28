@@ -118,7 +118,9 @@ struct TrSelListener : ISelectionListener
       m_View->m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);
 
-      m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
+
+      //m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
+      m_View->m_Controls->m_ResidualButton->setEnabled(true);
 
 
     }
@@ -289,6 +291,9 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 {
   // Extract dwi and dti from current selection
   // In case of multiple selections, take the first one, since taking all combinations is not meaningful
+
+
+
   if(m_CurrentSelection)
   {
     mitk::DataStorage::SetOfObjects::Pointer set =
@@ -424,7 +429,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     reversedlookupTable->SetTableRange(min+1, max);
     reversedlookupTable->Build();
 
-    for(int i=0; i<=256; i++)
+    for(int i=0; i<256; i++)
     {
       double* rgba = reversedlookupTable->GetTableValue(255-i);
 
@@ -454,7 +459,52 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     m_MultiWidget->RequestUpdate();
 
 
+
+    // Draw Graph
+    std::vector<double> means = residualFilter->GetMeans();
+    std::vector<double> q1s = residualFilter->GetQ1();
+    std::vector<double> q3s = residualFilter->GetQ3();
+
+    m_Controls->m_ResidualAnalysis->SetMeans(means);
+    m_Controls->m_ResidualAnalysis->SetQ1(q1s);
+    m_Controls->m_ResidualAnalysis->SetQ3(q3s);
+
+    m_Controls->m_ResidualAnalysis->DrawMeans();
+
   }
+
+  /*
+  std::vector<double> means;
+  means.push_back(4.0);
+  means.push_back(5.0);
+  means.push_back(3.0);
+  means.push_back(5.0);
+  means.push_back(4.5);
+  means.push_back(3.4);
+  means.push_back(4.0);
+  means.push_back(8.7);
+  std::vector<double> q1s;
+  q1s.push_back(2.0);
+  q1s.push_back(1.0);
+  q1s.push_back(2.0);
+  q1s.push_back(1.0);
+  q1s.push_back(2.0);
+  q1s.push_back(4.0);
+  q1s.push_back(2.0);
+  q1s.push_back(1.0);
+  std::vector<double> q3s;
+  q3s.push_back(7.0);
+  q3s.push_back(6.0);
+  q3s.push_back(7.0);
+  q3s.push_back(6.0);
+  q3s.push_back(7.0);
+  q3s.push_back(6.0);
+  q3s.push_back(7.0);
+  q3s.push_back(6.0);
+  q3s.push_back(7.0);
+  q3s.push_back(11.0);
+
+*/
 }
 
 void QmitkTensorReconstructionView::ItkReconstruction()

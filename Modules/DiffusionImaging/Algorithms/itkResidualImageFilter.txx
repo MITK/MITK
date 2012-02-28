@@ -52,6 +52,16 @@ namespace itk
     outputImage->Allocate();
     outputImage->FillBuffer(0.0);
 
+
+
+
+
+    std::vector< std::vector<double> > residuals;
+    residuals.resize(this->GetInput()->GetVectorLength());
+
+
+
+    // Calculate the standard residual image and for each volume put all residuals in a vector
     for(int x=0; x<size[0]; x++)
     {
       for(int y=0; y<size[1]; y++)
@@ -74,14 +84,17 @@ namespace itk
             return;
           }
 
-          float res = 0;
+          double res = 0;
 
           for(int i = 0; i<p1.GetSize(); i++)
           {
-            float val1 = (float)p1.GetElement(i);
-            float val2 = (float)p2.GetElement(i);
+            double val1 = (double)p1.GetElement(i);
+            double val2 = (double)p2.GetElement(i);
 
             res += abs(val1-val2);
+
+            residuals[i].push_back(val1-val2);
+
           }
 
 
@@ -93,7 +106,41 @@ namespace itk
       }
     }
 
-   // Superclass::SetNthInput(0, outputImage);
+
+    // for each dw volume: sort the the measured residuals (for each voxel) to enable determining Q1 and Q3; calculate means
+
+
+    double q1,q3;
+    std::vector< std::vector<double> >::iterator it = residuals.begin();
+    while(it != residuals.end())
+    {
+      std::vector<double> res = *it;
+
+      // sort
+      std::sort(res.begin(), res.end());
+
+      q1 = res[0.25*res.size()];
+      m_Q1.push_back(q1);
+      q3 = res[0.75*res.size()];
+      m_Q3.push_back(q3);
+
+      std::vector<double>::iterator resIt = res.begin();
+      double mean;
+      while(resIt != res.end())
+      {
+        double f = *resIt;
+        mean += f;
+        ++resIt;
+      }
+
+      mean /= res.size();
+      m_Means.push_back(mean);
+
+      std::cout << "mean: " << mean << '\n'<< "\nq1: " << q1 << "\nq3: " << q3 << '\n';
+
+      ++it;
+    }
+    std::cout << std::endl;
 
 
 

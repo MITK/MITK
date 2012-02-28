@@ -4,6 +4,7 @@ SET(SRC_CPP_FILES
   QmitkPartialVolumeAnalysisWidget.cpp
   QmitkIVIMWidget.cpp
   QmitkTbssRoiAnalysisWidget.cpp
+  QmitkResidualAnalysisWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -68,6 +69,7 @@ SET(MOC_H_FILES
   src/internal/QmitkTractbasedSpatialStatisticsView.h
   src/internal/QmitkTbssSkeletonizationView.h
   src/QmitkTbssRoiAnalysisWidget.h
+  src/QmitkResidualAnalysisWidget.h
 )
 
 SET(CACHED_RESOURCE_FILES

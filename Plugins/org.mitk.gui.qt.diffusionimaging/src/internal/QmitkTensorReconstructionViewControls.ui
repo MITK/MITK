@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>836</height>
+    <height>1303</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -508,24 +508,52 @@
      <property name="title">
       <string>Residuals</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
-       <widget class="QCommandLinkButton" name="m_ResidualButton">
-        <property name="enabled">
-         <bool>false</bool>
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="toolTip">
-         <string comment="Calculate ODF value as tensor value in the according direction" extracomment="Calculate ODF value as tensor value in the according direction">Calculate the residual from a dti and a dwi iimage</string>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Residual Image Calculation</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QCommandLinkButton" name="m_ResidualButton">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string comment="Calculate ODF value as tensor value in the according direction" extracomment="Calculate ODF value as tensor value in the according direction">Calculate the residual from a dti and a dwi iimage</string>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>Residual Image Calculation</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QmitkResidualAnalysisWidget" name="m_ResidualAnalysis" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>300</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -547,6 +575,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkResidualAnalysisWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkResidualAnalysisWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

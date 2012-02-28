@@ -100,23 +100,15 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
           ENDIF(MITK_GENERATE_MODULE_DOT)
 
           IF(NOT MODULE_NO_INIT)
-            # Create variables of the ModuleInfo object, created in CMake/mitkModuleInit.cpp
             SET(MODULE_LIBNAME ${MODULE_PROVIDES})
-            SET(MODULE_DEPENDS_STR "")
-            FOREACH(_dep ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL})
-              SET(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
-            ENDFOREACH()
-            SET(MODULE_PACKAGE_DEPENDS_STR "")
-            FOREACH(_dep ${MODULE_PACKAGE_DEPENDS})
-              SET(MODULE_PACKAGE_DEPENDS_STR "${MODULE_PACKAGE_DEPENDS_STR} ${_dep}")
-            ENDFOREACH()
-            IF(MODULE_QT_MODULE)
-              SET(MODULE_QT_BOOL "true")
-            ELSE()
-              SET(MODULE_QT_BOOL "false")
-            ENDIF()
-            SET(module_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}_init.cpp")
-            CONFIGURE_FILE(${MITK_SOURCE_DIR}/CMake/mitkModuleInit.cpp ${module_init_src_file} @ONLY)
+                        
+            SET(module_init_src_file)
+            usFunctionGenerateModuleInit(module_init_src_file
+                                         NAME ${MODULE_NAME}
+                                         LIBRARY_NAME ${MODULE_LIBNAME}
+                                         DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
+                                         #VERSION ${MODULE_VERSION}
+                                        )
           ENDIF()
 
           SET(DEPENDS "${MODULE_DEPENDS}") 

@@ -46,5 +46,5 @@ private:
 
 }
 
-MITK_EXPORT_MODULE_ACTIVATOR(SceneSerialization, mitk::SceneSerializationActivator)
+US_EXPORT_MODULE_ACTIVATOR(SceneSerialization, mitk::SceneSerializationActivator)
 

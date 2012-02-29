@@ -46,7 +46,7 @@ namespace mitk {
 mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
-m_CurrentThresholdValue(1),
+m_CurrentThresholdValue(0.0),
 m_IsFloatImage(false)
 {
   this->SupportRoiOn();
@@ -265,8 +265,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
 
   while (!outputIterator.IsAtEnd())
   {
-     // WHY SIGNED CASTNG??? pixeltype could be negatvie as well ..
-      if ( (signed)inputIterator.Get() >= m_CurrentThresholdValue )
+      if ( inputIterator.Get() >= m_CurrentThresholdValue )
         outputIterator.Set( 1 );
       else
         outputIterator.Set( 0 );

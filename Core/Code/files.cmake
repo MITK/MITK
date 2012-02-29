@@ -307,6 +307,7 @@ SET(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
   
   Service/mitkAny.cpp
   Service/mitkAtomicInt.cpp

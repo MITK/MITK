@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
 #include "vtkMitkApplyLevelWindowToRGBFilter.h"
+#include "vtkMitkLevelWindowFilter.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -522,12 +523,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
     this->ApplyLookuptable(renderer);
     //Interpret the values as binary values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
   }
   else if( numberOfComponents == 1 ) //gray images
   {
     //Interpret the values as gray values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
     this->ApplyLookuptable(renderer);
   }
@@ -650,7 +651,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   //default lookuptable
-  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+  //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 
   if(binary)
   {
@@ -681,7 +682,8 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
           LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
         }
         //we use the user-defined lookuptable
-        localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
+        //localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
+        localStorage->m_LookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
       }
       else
       {
@@ -691,15 +693,31 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
     //set up the lookuptable with the level window range
-    localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+    localStorage->m_LookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
   //the color function can be applied if the user does not want to use color
   //and does not provide a lookuptable
   if(CTFcanBeApplied)
   {
-    ApplyColorTransferFunction(renderer);
+    //ApplyColorTransferFunction(renderer);
   }
-  localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
+
+  // TODO use filter thing to create RGBA texture
+  // ... set outside pixels to alpha=0
+  //pass the LuT to the RBG filter
+  // TODO check whether setting LUT on BOTH texture and our filter is useful
+  
+  //localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_Texture->GetLookupTable());
+  
+  localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_LookupTable);
+  //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+  // TODO check opacity handling
+  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  //connect the texture with the output of the RGB filter
+  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+  // TODO use filter thing to create RGBA texture
+  
+ // localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
 }
 
 void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* renderer)
@@ -1227,4 +1245,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //filter for RGB(A) images
   m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
+  
+  m_LevelWindowFilter = new vtkMitkLevelWindowFilter();
 }

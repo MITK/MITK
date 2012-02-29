@@ -33,6 +33,7 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkApplyLevelWindowToRGBFilter;
+class vtkMitkLevelWindowFilter;
 
 namespace mitk {
 
@@ -171,6 +172,8 @@ namespace mitk {
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+      
+      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

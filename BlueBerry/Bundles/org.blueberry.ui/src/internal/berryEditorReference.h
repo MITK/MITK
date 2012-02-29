@@ -19,11 +19,11 @@
 #define BERRYEDITORREFERENCE_H_
 
 #include "berryWorkbenchPartReference.h"
-#include "../berryIEditorReference.h"
-#include "../berryIEditorInput.h"
-#include "../berryIMemento.h"
-#include "../berryIWorkbenchPart.h"
-#include "../berryIEditorPart.h"
+#include "berryIEditorReference.h"
+#include "berryIEditorInput.h"
+#include "berryIMemento.h"
+#include "berryIWorkbenchPart.h"
+#include "berryIEditorPart.h"
 
 namespace berry
 {

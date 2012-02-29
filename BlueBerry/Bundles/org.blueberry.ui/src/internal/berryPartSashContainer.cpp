@@ -26,12 +26,12 @@
 #include "berryDragUtil.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryWorkbenchPreferenceConstants.h"
-#include "../berryGeometry.h"
+#include "berryWorkbenchPreferenceConstants.h"
+#include "berryGeometry.h"
 #include "berryPartPane.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../berryConstants.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "berryConstants.h"
 
 
 namespace berry

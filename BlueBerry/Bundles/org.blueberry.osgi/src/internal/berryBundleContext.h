@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYBUNDLECONTEXT_H_
 #define BERRYBUNDLECONTEXT_H_
 
-#include "../berryIBundleContext.h"
-#include "../berryBundleLoader.h"
+#include "berryIBundleContext.h"
+#include "berryBundleLoader.h"
 
 namespace berry {
 

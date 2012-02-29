@@ -21,14 +21,14 @@
 
 #include <berryMacros.h>
 
-#include "../internal/berryTweaklets.h"
-#include "../guitk/berryGuiTkISelectionListener.h"
-#include "../guitk/berryGuiTkIControlListener.h"
-#include "../berryRectangle.h"
-#include "../berryShell.h"
+#include "internal/berryTweaklets.h"
+#include "guitk/berryGuiTkISelectionListener.h"
+#include "guitk/berryGuiTkIControlListener.h"
+#include "berryRectangle.h"
+#include "berryShell.h"
 
-//#include "../commands/berryIMenu.h"
-//#include "../commands/berryIMenuItem.h"
+//#include "commands/berryIMenu.h"
+//#include "commands/berryIMenuItem.h"
 
 
 namespace berry {

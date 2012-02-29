@@ -21,8 +21,8 @@
 #include "berryLayoutTreeNode.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryConstants.h"
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "berryConstants.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 namespace berry
 {

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYTYPEEXTENSIONMANAGER_H_
 #define BERRYTYPEEXTENSIONMANAGER_H_
 
-#include "../berryIPropertyTester.h"
+#include "berryIPropertyTester.h"
 
 #include "berryTypeExtension.h"
 #include "berryPropertyCache.h"

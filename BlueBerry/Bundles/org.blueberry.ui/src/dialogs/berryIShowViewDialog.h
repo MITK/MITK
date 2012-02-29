@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIDialog.h"
 
 #include <vector>
-#include "../berryIViewDescriptor.h"
+#include "berryIViewDescriptor.h"
 
 namespace berry {
 

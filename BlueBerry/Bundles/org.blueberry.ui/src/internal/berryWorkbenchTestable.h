@@ -18,7 +18,7 @@
 #ifndef BERRYWORKBENCHTESTABLE_H_
 #define BERRYWORKBENCHTESTABLE_H_
 
-#include "../testing/berryTestableObject.h"
+#include "testing/berryTestableObject.h"
 
 #include <Poco/Thread.h>
 

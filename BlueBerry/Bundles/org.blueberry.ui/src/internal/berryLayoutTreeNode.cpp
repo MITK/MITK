@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryLayoutTreeNode.h"
 
-#include "../berryConstants.h"
-#include "../berryIPageLayout.h"
+#include "berryConstants.h"
+#include "berryIPageLayout.h"
 
 #include <sstream>
 

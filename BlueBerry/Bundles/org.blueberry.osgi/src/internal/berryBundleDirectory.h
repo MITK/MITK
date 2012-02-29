@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Path.h>
 
-#include "../berryIBundleStorage.h"
+#include "berryIBundleStorage.h"
 
 
 namespace berry {

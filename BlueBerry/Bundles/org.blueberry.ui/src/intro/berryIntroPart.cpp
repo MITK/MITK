@@ -22,8 +22,8 @@
 #include <berryIWorkbenchPartConstants.h>
 #include <berryAbstractUIPlugin.h>
 
-#include "../util/berrySafeRunnable.h"
-#include "../internal/berryWorkbenchRegistryConstants.h"
+#include "util/berrySafeRunnable.h"
+#include "internal/berryWorkbenchRegistryConstants.h"
 
 namespace berry
 {

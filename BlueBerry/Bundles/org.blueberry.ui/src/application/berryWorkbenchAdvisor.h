@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org_blueberry_ui_Export.h>
 
-#include "../berryIMemento.h"
+#include "berryIMemento.h"
 #include <berryIAdaptable.h>
 
 #include "berryWorkbenchWindowAdvisor.h"

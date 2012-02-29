@@ -18,7 +18,7 @@
 #ifndef BERRYPAGELAYOUT_H_
 #define BERRYPAGELAYOUT_H_
 
-#include "../berryIPageLayout.h"
+#include "berryIPageLayout.h"
 
 #include "berryViewLayoutRec.h"
 #include "berryContainerPlaceholder.h"

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryDefinitionRegistry.h"
 
-#include "../berryExpressionConverter.h"
+#include "berryExpressionConverter.h"
 
 #include "berryPlatform.h"
 #include "berryPlatformException.h"

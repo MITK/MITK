@@ -18,7 +18,7 @@
 #ifndef BERRYNATIVETABITEM_H_
 #define BERRYNATIVETABITEM_H_
 
-#include "../util/berryAbstractTabItem.h"
+#include "internal/util/berryAbstractTabItem.h"
 
 #include <QObject>
 

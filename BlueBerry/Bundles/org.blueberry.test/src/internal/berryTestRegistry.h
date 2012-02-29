@@ -21,7 +21,7 @@
 
 #include <service/berryIConfigurationElement.h>
 
-#include "../berryITestDescriptor.h"
+#include "berryITestDescriptor.h"
 
 #include <Poco/HashMap.h>
 #include <vector>

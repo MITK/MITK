@@ -23,11 +23,11 @@
 #include "berryRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include "../berryImageDescriptor.h"
-#include "../berryAbstractUIPlugin.h"
-#include "../berryAbstractUICTKPlugin.h"
-#include "../berryImageDescriptor.h"
-#include "../handlers/berryIHandlerActivation.h"
+#include "berryImageDescriptor.h"
+#include "berryAbstractUIPlugin.h"
+#include "berryAbstractUICTKPlugin.h"
+#include "berryImageDescriptor.h"
+#include "handlers/berryIHandlerActivation.h"
 
 #include <Poco/String.h>
 #include <Poco/StringTokenizer.h>

@@ -19,7 +19,7 @@
 #ifndef BERRYSOURCEPRIORITYNAMEMAPPING_H_
 #define BERRYSOURCEPRIORITYNAMEMAPPING_H_
 
-#include "../berryISources.h"
+#include "berryISources.h"
 
 #include <berryExpression.h>
 

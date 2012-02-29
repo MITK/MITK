@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "berryJobChangeEvent.h"
-#include "../berryJob.h"
+#include "berryJob.h"
 
 namespace berry
 {

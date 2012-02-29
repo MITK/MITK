@@ -19,8 +19,8 @@
 
 #include "berryIntroPartAdapterSite.h"
 
-#include "../berryWorkbench.h"
-#include "../berryWorkbenchPlugin.h"
+#include "internal/berryWorkbench.h"
+#include "internal/berryWorkbenchPlugin.h"
 
 namespace berry
 {

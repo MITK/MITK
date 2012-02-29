@@ -26,7 +26,7 @@
 #include "berryWorkbenchWindow.h"
 #include "berryQtDnDControlWidget.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include <Poco/HashMap.h>
 #include <sstream>

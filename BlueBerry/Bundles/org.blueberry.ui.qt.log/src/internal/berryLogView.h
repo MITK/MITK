@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtGui/QWidget>
 
-#include "../berryQtViewPart.h"
+#include "berryQtViewPart.h"
 
 namespace berry {
 

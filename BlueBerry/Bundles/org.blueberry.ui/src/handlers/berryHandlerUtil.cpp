@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEvaluationContext.h>
 #include <berryCommandExceptions.h>
 
-#include "../berryISources.h"
+#include "berryISources.h"
 
 namespace berry
 {

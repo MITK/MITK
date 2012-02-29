@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPARTTESTER_H_
 #define BERRYPARTTESTER_H_
 
-#include "../berryIEditorPart.h"
-#include "../berryIEditorInput.h"
-#include "../berryIViewPart.h"
+#include "berryIEditorPart.h"
+#include "berryIEditorInput.h"
+#include "berryIViewPart.h"
 
 namespace berry {
 

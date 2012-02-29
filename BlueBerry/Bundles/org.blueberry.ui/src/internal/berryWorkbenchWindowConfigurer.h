@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYWORKBENCHWINDOWCONFIGURER_H_
 #define BERRYWORKBENCHWINDOWCONFIGURER_H_
 
-#include "../application/berryIActionBarConfigurer.h"
-#include "../application/berryIWorkbenchConfigurer.h"
-#include "../application/berryIWorkbenchWindowConfigurer.h"
+#include "application/berryIActionBarConfigurer.h"
+#include "application/berryIWorkbenchConfigurer.h"
+#include "application/berryIWorkbenchWindowConfigurer.h"
 
 #include <berryWeakPointer.h>
 

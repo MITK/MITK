@@ -17,7 +17,7 @@
 
 #include "berryPagePartSelectionTracker.h"
 
-#include "../berryIPostSelectionProvider.h"
+#include "berryIPostSelectionProvider.h"
 
 namespace berry
 {

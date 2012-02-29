@@ -18,7 +18,7 @@
 #include "berryJobListeners.h"
 #include "berryJobManager.h"
 
-#include "../berryJob.h"
+#include "berryJob.h"
 
 #include <berrySolsticeExceptions.h>
 #include <typeinfo>

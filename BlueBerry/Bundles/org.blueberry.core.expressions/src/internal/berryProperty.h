@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPROPERTY_H_
 #define BERRYPROPERTY_H_
 
-#include "../berryIPropertyTester.h"
+#include "berryIPropertyTester.h"
 
 #include "berryObject.h"
 

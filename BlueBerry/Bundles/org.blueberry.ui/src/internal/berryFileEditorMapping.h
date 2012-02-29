@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYFILEEDITORMAPPING_H_
 #define BERRYFILEEDITORMAPPING_H_
 
-#include "../berryIFileEditorMapping.h"
+#include "berryIFileEditorMapping.h"
 
 #include "berryEditorDescriptor.h"
 

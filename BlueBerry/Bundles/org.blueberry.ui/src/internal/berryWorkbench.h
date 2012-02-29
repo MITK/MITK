@@ -18,18 +18,18 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYWORKBENCH_H_
 #define BERRYWORKBENCH_H_
 
-#include "../berryIViewPart.h"
-#include "../berryIWorkbench.h"
+#include "berryIViewPart.h"
+#include "berryIWorkbench.h"
 #include "berryWorkbenchWindow.h"
-#include "../berryIWorkbenchPage.h"
-#include "../berryIWorkbenchPartReference.h"
-#include "../berryXMLMemento.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIWorkbenchPartReference.h"
+#include "berryXMLMemento.h"
 
 #include "berryPartPane.h"
 #include "berryEditorAreaHelper.h"
 #include "berryWindowManager.h"
 #include "berryWorkbenchConfigurer.h"
-#include "../application/berryWorkbenchAdvisor.h"
+#include "application/berryWorkbenchAdvisor.h"
 #include "berryWorkbenchTestable.h"
 #include "intro/berryIntroDescriptor.h"
 #include "intro/berryWorkbenchIntroManager.h"

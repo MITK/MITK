@@ -18,8 +18,8 @@
 #ifndef BERRYPRESENTATIONSERIALIZER_H_
 #define BERRYPRESENTATIONSERIALIZER_H_
 
-#include "../presentations/berryIPresentationSerializer.h"
-#include "../presentations/berryIPresentablePart.h"
+#include "presentations/berryIPresentationSerializer.h"
+#include "presentations/berryIPresentablePart.h"
 
 #include <vector>
 

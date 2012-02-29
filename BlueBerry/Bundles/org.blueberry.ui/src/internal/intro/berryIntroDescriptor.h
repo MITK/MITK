@@ -19,8 +19,8 @@
 #define BERRYINTRODESCRIPTOR_H_
 
 #include "berryIIntroDescriptor.h"
-#include "../../intro/berryIntroContentDetector.h"
-#include "../../intro/berryIIntroPart.h"
+#include "intro/berryIntroContentDetector.h"
+#include "intro/berryIIntroPart.h"
 
 #include <berryIConfigurationElement.h>
 #include <berryImageDescriptor.h>

@@ -21,8 +21,8 @@
 
 #include "berryDnDTweaklet.h"
 
-#include "../berryRectangle.h"
-#include "../guitk/berryGuiTkIControlListener.h"
+#include "berryRectangle.h"
+#include "guitk/berryGuiTkIControlListener.h"
 
 namespace berry {
 

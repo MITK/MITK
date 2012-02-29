@@ -20,7 +20,7 @@
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryEditorPart.h"
+#include "berryEditorPart.h"
 #include "berryImageDescriptor.h"
 
 namespace berry

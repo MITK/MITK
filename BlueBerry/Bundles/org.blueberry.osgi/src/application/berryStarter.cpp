@@ -19,11 +19,11 @@
 
 #include "berryStarter.h"
 
-#include "../berryPlatform.h"
+#include "berryPlatform.h"
 
-#include "../internal/berryInternalPlatform.h"
-#include "../service/berryIExtensionPointService.h"
-#include "../service/berryIConfigurationElement.h"
+#include "internal/berryInternalPlatform.h"
+#include "service/berryIExtensionPointService.h"
+#include "service/berryIConfigurationElement.h"
 
 #include "berryIApplication.h"
 

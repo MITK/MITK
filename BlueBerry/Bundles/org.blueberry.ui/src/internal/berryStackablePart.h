@@ -21,10 +21,10 @@
 
 #include <berryMacros.h>
 
-#include "../berryShell.h"
+#include "berryShell.h"
 
-#include "../berryPoint.h"
-#include "../berryRectangle.h"
+#include "berryPoint.h"
+#include "berryRectangle.h"
 
 #include <string>
 

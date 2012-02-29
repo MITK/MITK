@@ -21,11 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryBundle.h"
 #include "berryInternalPlatform.h"
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 #include "berryBundleManifest.h"
-#include "../berryIBundleActivator.h"
-#include "../berryIBundleContext.h"
-#include "../berryPlatformException.h"
+#include "berryIBundleActivator.h"
+#include "berryIBundleContext.h"
+#include "berryPlatformException.h"
 
 #include <ctkPluginContext.h>
 

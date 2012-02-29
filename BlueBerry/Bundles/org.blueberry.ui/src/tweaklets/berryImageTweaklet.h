@@ -20,8 +20,8 @@
 #define BERRYIMAGETWEAKLET_H_
 
 #include <org_blueberry_ui_Export.h>
-#include "../internal/berryTweaklets.h"
-#include "../berryImageDescriptor.h"
+#include "internal/berryTweaklets.h"
+#include "berryImageDescriptor.h"
 
 #include <iostream>
 

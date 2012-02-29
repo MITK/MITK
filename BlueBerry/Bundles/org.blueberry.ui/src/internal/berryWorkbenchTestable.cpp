@@ -17,8 +17,8 @@
 
 #include "berryWorkbenchTestable.h"
 
-#include "../berryDisplay.h"
-#include "../berryIWorkbench.h"
+#include "berryDisplay.h"
+#include "berryIWorkbench.h"
 
 #include <Poco/Thread.h>
 

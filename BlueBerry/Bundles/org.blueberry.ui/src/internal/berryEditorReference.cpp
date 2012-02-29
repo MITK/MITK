@@ -17,7 +17,7 @@
 
 #include "berryEditorReference.h"
 
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
+#include "tweaklets/berryWorkbenchPageTweaklet.h"
 
 #include "berryEditorManager.h"
 #include "berryEditorDescriptor.h"
@@ -29,9 +29,9 @@
 #include "berryNullEditorInput.h"
 #include "berryPartTester.h"
 
-#include "../berryImageDescriptor.h"
-#include "../berryPlatformUI.h"
-#include "../berryIWorkbenchPartConstants.h"
+#include "berryImageDescriptor.h"
+#include "berryPlatformUI.h"
+#include "berryIWorkbenchPartConstants.h"
 
 namespace berry
 {

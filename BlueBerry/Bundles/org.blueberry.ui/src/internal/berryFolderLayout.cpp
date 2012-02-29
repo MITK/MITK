@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryPageLayout.h"
 #include "berryLayoutHelper.h"
 
-#include "../berryUIException.h"
+#include "berryUIException.h"
 
 namespace berry
 {

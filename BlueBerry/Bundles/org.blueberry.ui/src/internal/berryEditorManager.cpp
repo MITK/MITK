@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryEditorManager.h"
 
-#include "../berryIWorkbenchPart.h"
-#include "../berryIWorkbenchWindow.h"
-#include "../berryIEditorRegistry.h"
-#include "../berryUIException.h"
+#include "berryIWorkbenchPart.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIEditorRegistry.h"
+#include "berryUIException.h"
 
 #include "berryWorkbenchWindow.h"
 #include "berryWorkbenchPage.h"

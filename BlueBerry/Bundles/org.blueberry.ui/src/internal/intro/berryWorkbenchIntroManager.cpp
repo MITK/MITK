@@ -19,11 +19,11 @@
 
 #include "berryIntroConstants.h"
 
-#include "../berryWorkbench.h"
-#include "../berryWorkbenchPage.h"
-#include "../berryWorkbenchPlugin.h"
-#include "../berryPerspective.h"
-#include "../berryNullEditorInput.h"
+#include "internal/berryWorkbench.h"
+#include "internal/berryWorkbenchPage.h"
+#include "internal/berryWorkbenchPlugin.h"
+#include "internal/berryPerspective.h"
+#include "internal/berryNullEditorInput.h"
 
 namespace berry
 {

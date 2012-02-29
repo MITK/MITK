@@ -25,7 +25,7 @@
 #include "berryIPresentablePart.h"
 
 #include <org_blueberry_ui_Export.h>
-#include "../berryPoint.h"
+#include "berryPoint.h"
 
 namespace berry
 {

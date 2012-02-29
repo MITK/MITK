@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryBundleContext.h"
 
 #include "berryBundle.h"
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 
 namespace berry {
 

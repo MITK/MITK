@@ -18,7 +18,7 @@
 
 #include "berryPluginActivator.h"
 
-#include "../berryCoreTestApplication.h"
+#include "berryCoreTestApplication.h"
 
 #include <QtPlugin>
 

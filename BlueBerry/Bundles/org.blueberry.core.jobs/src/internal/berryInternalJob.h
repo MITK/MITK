@@ -24,10 +24,10 @@
 
 #include <org_blueberry_core_jobs_Export.h>
 
-#include "../berryJobExceptions.h"
-#include "../berryISchedulingRule.h"
-#include "../berryIProgressMonitor.h"
-#include "../berryIJobChangeListener.h"
+#include "berryJobExceptions.h"
+#include "berryISchedulingRule.h"
+#include "berryIProgressMonitor.h"
+#include "berryIJobChangeListener.h"
 
 #include <berryIStatus.h>
 #include <berryStatus.h>

@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryObjectString.h>
 
-#include "../berryIEditorSite.h"
-#include "../berryIViewSite.h"
+#include "berryIEditorSite.h"
+#include "berryIViewSite.h"
 
 namespace berry
 {

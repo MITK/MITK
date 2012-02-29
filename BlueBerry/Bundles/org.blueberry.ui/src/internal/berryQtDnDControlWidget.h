@@ -21,7 +21,7 @@
 
 #include "berryQtControlWidget.h"
 
-#include "../berryIDropTargetListener.h"
+#include "berryIDropTargetListener.h"
 
 #include <QMimeData>
 

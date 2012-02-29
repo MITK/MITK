@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYSYSTEMBUNDLEMANIFEST_H
 #define BERRYSYSTEMBUNDLEMANIFEST_H
 
-#include "../berryIBundleManifest.h"
+#include "berryIBundleManifest.h"
 
 #include <QHash>
 

@@ -22,10 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org_blueberry_ui_Export.h>
 
-#include "../berryShell.h"
-#include "../berryIMemento.h"
-#include "../berryPoint.h"
-#include "../berryIDropTargetListener.h"
+#include "berryShell.h"
+#include "berryIMemento.h"
+#include "berryPoint.h"
+#include "berryIDropTargetListener.h"
 
 namespace berry
 {

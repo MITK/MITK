@@ -19,7 +19,7 @@
 #ifndef BERRYJOBCHANGEEVENT_H_
 #define BERRYJOBCHANGEEVENT_H_
 
-#include "../berryIJobChangeEvent.h"
+#include "berryIJobChangeEvent.h"
 
 namespace berry {
 

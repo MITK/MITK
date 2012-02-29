@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryExtensionPoint.h"
 
-#include "../service/berryIConfigurationElement.h"
+#include "service/berryIConfigurationElement.h"
 
-#include "../berryPlatformException.h"
+#include "berryPlatformException.h"
 
 namespace berry {
 

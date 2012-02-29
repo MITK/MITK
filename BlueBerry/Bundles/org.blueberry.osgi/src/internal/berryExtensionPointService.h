@@ -18,14 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEXTENSIONPOINTSERVICE_H_
 #define BERRYEXTENSIONPOINTSERVICE_H_
 
-#include "../berryMacros.h"
+#include "berryMacros.h"
 
 #include "Poco/SAX/InputSource.h"
 #include "Poco/DOM/DOMParser.h"
 
-#include "../service/berryIConfigurationElement.h"
+#include "service/berryIConfigurationElement.h"
 #include "berryExtensionPoint.h"
-#include "../service/berryIExtensionPointService.h"
+#include "service/berryIExtensionPointService.h"
 
 #include <set>
 

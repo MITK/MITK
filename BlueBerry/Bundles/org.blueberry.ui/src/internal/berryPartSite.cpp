@@ -17,12 +17,12 @@
 
 #include "berryPartSite.h"
 
-#include "../berryIWorkbenchPart.h"
-#include "../berryIWorkbenchPage.h"
-#include "../berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPart.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIWorkbenchWindow.h"
 #include "berryPartPane.h"
 
-#include "../services/berryIServiceFactory.h"
+#include "services/berryIServiceFactory.h"
 
 #include "berryIServiceLocatorCreator.h"
 #include "berryWorkbenchPartReference.h"

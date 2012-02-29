@@ -28,9 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryAbstractDropTarget.h"
 
 #include "berryPartPane.h"
-#include "../berryIMemento.h"
+#include "berryIMemento.h"
 
-#include "../presentations/berryIPresentationFactory.h"
+#include "presentations/berryIPresentationFactory.h"
 
 #include <vector>
 #include <list>

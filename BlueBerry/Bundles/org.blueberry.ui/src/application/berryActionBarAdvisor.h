@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYACTIONBARADVISOR_H_
 #define BERRYACTIONBARADVISOR_H_
 
-#include "../berryIMemento.h"
-#include "../berryIWorkbenchWindow.h"
+#include "berryIMemento.h"
+#include "berryIWorkbenchWindow.h"
 
 #include "berryIActionBarConfigurer.h"
 

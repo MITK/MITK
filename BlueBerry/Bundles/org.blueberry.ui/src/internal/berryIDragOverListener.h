@@ -22,8 +22,8 @@
 #include <berryMacros.h>
 #include <berryMessage.h>
 
-#include "../berryPoint.h"
-#include "../berryRectangle.h"
+#include "berryPoint.h"
+#include "berryRectangle.h"
 
 #include "berryIDropTarget.h"
 

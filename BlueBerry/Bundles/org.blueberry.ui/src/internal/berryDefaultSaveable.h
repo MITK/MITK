@@ -19,7 +19,7 @@
 #ifndef BERRYDEFAULTSAVEABLE_H_
 #define BERRYDEFAULTSAVEABLE_H_
 
-#include "../berrySaveable.h"
+#include "berrySaveable.h"
 
 namespace berry {
 

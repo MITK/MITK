@@ -18,7 +18,7 @@
 #ifndef BERRYPRESENTABLEPART_H_
 #define BERRYPRESENTABLEPART_H_
 
-#include "../presentations/berryIPresentablePart.h"
+#include "presentations/berryIPresentablePart.h"
 
 #include "berryWorkbenchPartReference.h"
 

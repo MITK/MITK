@@ -22,7 +22,7 @@
 #include <QTabBar>
 #include <deque>
 
-#include "../util/berryAbstractTabItem.h"
+#include "internal/util/berryAbstractTabItem.h"
 
 namespace berry {
 

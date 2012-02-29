@@ -23,9 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "service/berryIConfigurationElement.h"
 
-#include "../berryExpression.h"
-#include "../berryIIterable.h"
-#include "../berryICountable.h"
+#include "berryExpression.h"
+#include "berryIIterable.h"
+#include "berryICountable.h"
 
 #include <string>
 #include <vector>

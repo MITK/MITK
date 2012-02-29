@@ -19,7 +19,7 @@
 #ifndef BERRYEMPTYTABITEM_H_
 #define BERRYEMPTYTABITEM_H_
 
-#include "../util/berryAbstractTabItem.h"
+#include "internal/util/berryAbstractTabItem.h"
 
 namespace berry {
 

@@ -21,7 +21,7 @@
 #include "berryLayoutPartSash.h"
 #include "berryContainerPlaceholder.h"
 
-#include "../berryConstants.h"
+#include "berryConstants.h"
 
 namespace berry
 {

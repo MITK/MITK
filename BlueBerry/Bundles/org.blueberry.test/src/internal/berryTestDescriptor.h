@@ -19,7 +19,7 @@
 #ifndef BERRYTESTDESCRIPTOR_H_
 #define BERRYTESTDESCRIPTOR_H_
 
-#include "../berryITestDescriptor.h"
+#include "berryITestDescriptor.h"
 
 #include <service/berryIConfigurationElement.h>
 

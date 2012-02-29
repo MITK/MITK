@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berrySystemBundleActivator.h"
 
-#include "../berryIBundleContext.h"
-#include "../berryPlatform.h"
-#include "../service/berryServiceRegistry.h"
+#include "berryIBundleContext.h"
+#include "berryPlatform.h"
+#include "service/berryServiceRegistry.h"
 
 #include "berrySystemBundle.h"
 #include "berryExtensionPointService.h"

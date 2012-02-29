@@ -19,10 +19,10 @@
 
 #include <berryIConfigurationElement.h>
 
-#include "../berryUIException.h"
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
-#include "../berryPlatformUI.h"
-#include "../berryImageDescriptor.h"
+#include "berryUIException.h"
+#include "tweaklets/berryWorkbenchPageTweaklet.h"
+#include "berryPlatformUI.h"
+#include "berryImageDescriptor.h"
 
 #include "berryWorkbenchPage.h"
 #include "berryWorkbenchConstants.h"

@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYVIEWDESCRIPTOR_H_
 #define BERRYVIEWDESCRIPTOR_H_
 
-#include "../berryIViewPart.h"
-#include "../berryIViewDescriptor.h"
+#include "berryIViewPart.h"
+#include "berryIViewDescriptor.h"
 
 #include "service/berryIConfigurationElement.h"
 

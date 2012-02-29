@@ -24,10 +24,10 @@
 #include "berryIDragOverListener.h"
 #include "berryAbstractDropTarget.h"
 
-#include "../tweaklets/berryDnDTweaklet.h"
-#include "../berryRectangle.h"
+#include "tweaklets/berryDnDTweaklet.h"
+#include "berryRectangle.h"
 
-#include "../guitk/berryGuiTkIControlListener.h"
+#include "guitk/berryGuiTkIControlListener.h"
 
 namespace berry
 {

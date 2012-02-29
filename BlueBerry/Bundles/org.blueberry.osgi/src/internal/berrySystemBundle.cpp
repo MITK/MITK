@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/Exception.h"
 
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 
 namespace berry {
 

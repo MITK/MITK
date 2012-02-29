@@ -21,7 +21,7 @@
 #include <berryMacros.h>
 
 #include <org_blueberry_ui_Export.h>
-#include "../internal/berryTweaklets.h"
+#include "internal/berryTweaklets.h"
 
 namespace berry
 {

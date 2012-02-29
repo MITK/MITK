@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEDITORDESCRIPTOR_H_
 #define BERRYEDITORDESCRIPTOR_H_
 
-#include "../berryIEditorDescriptor.h"
-#include "../berryIMemento.h"
+#include "berryIEditorDescriptor.h"
+#include "berryIMemento.h"
 
 #include <berryIConfigurationElement.h>
 

@@ -17,15 +17,15 @@
 
 #include "berryViewFactory.h"
 
-#include "../berryUIException.h"
-#include "../berryIViewRegistry.h"
-#include "../berryImageDescriptor.h"
+#include "berryUIException.h"
+#include "berryIViewRegistry.h"
+#include "berryImageDescriptor.h"
 
 #include "berryViewReference.h"
 #include "berryViewDescriptor.h"
 #include "berryWorkbenchPage.h"
 #include "berryWorkbenchConstants.h"
-#include "../util/berrySafeRunnable.h"
+#include "util/berrySafeRunnable.h"
 
 #include <berrySafeRunner.h>
 

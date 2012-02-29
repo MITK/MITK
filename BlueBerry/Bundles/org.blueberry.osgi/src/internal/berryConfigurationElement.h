@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEXTENSIONELEMENT_H_
 #define BERRYEXTENSIONELEMENT_H_
 
-#include "../berryMacros.h"
+#include "berryMacros.h"
 
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 
 #include "Poco/DOM/Node.h"
 
-#include "../service/berryIConfigurationElement.h"
+#include "service/berryIConfigurationElement.h"
 
 namespace berry {
 

@@ -18,9 +18,9 @@
 #ifndef BERRYLAYOUTTREE_H_
 #define BERRYLAYOUTTREE_H_
 
-#include "../berryISizeProvider.h"
-#include "../berryRectangle.h"
-#include "../berryPoint.h"
+#include "berryISizeProvider.h"
+#include "berryRectangle.h"
+#include "berryPoint.h"
 
 #include "berryPartSashContainer.h"
 

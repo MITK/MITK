@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEXTENSION_H_
 #define BERRYEXTENSION_H_
 
-#include "../service/berryIExtension.h"
+#include "service/berryIExtension.h"
 #include "berryConfigurationElement.h"
 
 namespace berry {

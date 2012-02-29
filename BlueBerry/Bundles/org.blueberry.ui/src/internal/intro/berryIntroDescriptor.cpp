@@ -18,7 +18,7 @@
 #include "berryIntroDescriptor.h"
 
 #include "berryIntroConstants.h"
-#include "../berryWorkbenchRegistryConstants.h"
+#include "internal/berryWorkbenchRegistryConstants.h"
 
 #include <berryAbstractUIPlugin.h>
 

@@ -17,10 +17,10 @@
 
 #include "berryDragUtil.h"
 
-#include "../berryGeometry.h"
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../tweaklets/berryDnDTweaklet.h"
-#include "../tweaklets/berryITracker.h"
+#include "berryGeometry.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryDnDTweaklet.h"
+#include "tweaklets/berryITracker.h"
 
 namespace berry
 {

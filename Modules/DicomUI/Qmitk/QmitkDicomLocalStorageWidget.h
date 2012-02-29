@@ -66,6 +66,7 @@ public:
 signals:
     void FinishedImport(const QString&);
     void FinishedImport(const QStringList&);
+    void SignalDicomToDataManager(const QStringList&);
     
     public slots:
 

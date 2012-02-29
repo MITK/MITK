@@ -20,34 +20,23 @@ PURPOSE.  See the above copyright notices for more information.
 #define DicomEventHandler_h
 
 #include <QObject>
-#include <QString>
-#include <service/event/ctkEventHandler.h>
 #include <service/event/ctkEvent.h>
-#include <ctkPluginContext.h>
 
-class DicomEventHandler : public QObject, public ctkEventHandler
+class DicomEventHandler : public QObject
 {
     Q_OBJECT
-    Q_INTERFACES(ctkEventHandler)
     public:
 
 		DicomEventHandler();
 
 		virtual ~DicomEventHandler();
 
-        void handleEvent(const ctkEvent& ctkEvent);
+        void SubscribeSlots();
 
-        /*!
-        \brief Registers the dicom event handler with its topic as a service
-        \param eventTopic the specific topic which will be handeled
-        \param filter you can filter events e.g. if you pass "(title=samplereport)" only events with a title samplereport will be processed. 
-        */
-        void Register(QString eventTopic, QString filter  = QString());
+    public slots:
 
-        void SetPluginContext(ctkPluginContext* context);
+        void OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent);
 
-    private:
-
-        ctkPluginContext* m_PluginContext;
+        void OnSignalRemoveSeriesFromStorage(const ctkEvent& ctkEvent);
 };
 #endif // QmitkDicomEventHandlerBuilder_h

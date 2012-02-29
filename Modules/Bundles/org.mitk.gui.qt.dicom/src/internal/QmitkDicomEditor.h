@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStringList>
 #include <QThread.h>
 #include <QProcess>
+#include <QstringList>
 
 /*!
 \brief QmitkDicomEditor
@@ -87,14 +88,14 @@ signals:
         /// \brief Called when import is finished
         void OnDicomImportFinished(const QStringList& path);
 
-        /// \brief Called when series in TreeView is double clicked.
-        void OnSeriesModelDoubleClicked(QModelIndex index);
-
         /// \brief Called when Query Retrieve or Import Folder was clicked.
         void OnQueryRetrieve();
 
         /// \brief Called when LocalStorageButton was clicked.
         void OnLocalStorage();
+
+        /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
+        void OnViewButtonAddToDataManager(const QStringList& eventProperties);
 
         void StartDicomDirectoryListener(QString& directory);
 

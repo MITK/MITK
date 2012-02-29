@@ -73,6 +73,7 @@ signals:
     void SignalChangePage(int);
     void SignalAddDicomData(const QString&);
     void SignalAddDicomData(const QStringList&);
+    void SignalDicomToDataManager(const QStringList&);
 
    public slots:
 
@@ -112,6 +113,7 @@ protected:
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
     QTimer* m_Timer;
+    QString* m_DirectoryName;
 
 };
 

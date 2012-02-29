@@ -19,32 +19,28 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkDicomDataEventPublisher_H
 #define QmitkDicomDataEventPublisher_H
 
-#include <ctkServiceReference.h>
 #include <ctkPluginContext.h>
-#include <service/event/ctkEventAdmin.h>
-#include <service/event/ctkEvent.h>
+#include <QObject>
 
-class QmitkDicomDataEventPublisher
+class QmitkDicomDataEventPublisher : public QObject
 {
+    Q_OBJECT
     public:
 
         QmitkDicomDataEventPublisher();
 
         virtual ~QmitkDicomDataEventPublisher();
 
-        /// @brief sends an ctkEvent default asynchronously
-        void SendEvent(const ctkEvent& ctkEvent, bool synchronously = false );
-
         /// @brief sets the event admin from given plugin context
-        void SetEventAdmin(ctkPluginContext* context);
-		
-	private:
+        void PublishSignals(ctkPluginContext* context);
 
-        /// @brief sets the service reference from given plugin context
-        void SetServiceReference(ctkPluginContext* context);
+        void AddSeriesToDataManagerEvent(const ctkDictionary& properties);
 
-        ctkServiceReference m_ServiceReference;
-        ctkEventAdmin* m_EventAdmin;
+        void RemoveSeriesFromStorageEvent(const ctkDictionary& properties);
 
+    signals:
+        void SignalAddSeriesToDataManager(const ctkDictionary&);
+
+        void SignalRemoveSeriesFromStorage(const ctkDictionary&);
 };
 #endif // QmitkDicomDataEventPublisher_H

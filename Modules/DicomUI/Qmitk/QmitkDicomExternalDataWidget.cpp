@@ -34,6 +34,7 @@ const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.Qm
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
 :  m_Controls( 0 )
+, m_DirectoryName(new QString())
 {
     Initialize();
     CreateQtPartControl(this);
@@ -46,7 +47,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
     delete m_ExternalModel;
     delete m_ExternalIndexer;
     delete m_Controls;
-    //delete m_Timer;
+    delete m_DirectoryName;
 }
 
 
@@ -77,7 +78,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
 
         //connect Buttons
         connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
-        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
         connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
 
         connect(m_Controls->SearchOption_2, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
@@ -107,26 +108,23 @@ void QmitkDicomExternalDataWidget::OnFolderCDImport()
 {
     m_ImportDialog->show();
     m_ImportDialog->raise();  
-
 }
 
 void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directory)
 {
-
     if (QDir(directory).exists())
     {
+        m_DirectoryName = new QString(directory);
         QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(m_ImportDialog->bottomWidget());
-
 
         if (copyOnImport->isChecked())
         {
             //targetDirectory = d->DICOMDatabase->databaseDirectory();
             MBI_DEBUG<<directory.toStdString();
             emit SignalAddDicomData(directory);
-
         }else{
-
-            if (m_Watcher.isRunning()){
+            if (m_Watcher.isRunning())
+            {
                 m_Watcher.waitForFinished();
             }
             m_Future = QtConcurrent::run(this,(void (QmitkDicomExternalDataWidget::*)(QString)) &QmitkDicomExternalDataWidget::AddDicomTemporary,directory);
@@ -135,7 +133,6 @@ void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directo
             emit SignalChangePage(1);
         }
     }
-
 }
 
 void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
@@ -145,9 +142,18 @@ void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
     emit SignalAddDicomData(*filePaths);
 }
 
-//TODO
 void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 {
+    QModelIndex currentIndex = m_Controls->ExternalDataTreeView->currentIndex();
+    if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
+    {
+        QString seriesUID = m_ExternalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
+        QStringList eventProperties;
+        eventProperties << seriesUID << *m_DirectoryName;
+        MITK_INFO << m_DirectoryName->toStdString();
+
+        emit SignalDicomToDataManager(eventProperties);
+    }
 }
 
 void QmitkDicomExternalDataWidget::OnCancelButtonClicked()
@@ -159,10 +165,7 @@ void QmitkDicomExternalDataWidget::OnCancelButtonClicked()
 void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
 {
     QModelIndex currentIndex = m_Controls->ExternalDataTreeView->currentIndex();
-
     QString currentUID = m_ExternalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
-
-
 
     if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
     {
@@ -195,7 +198,6 @@ void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
             }
         }
     }
-
 }
 
 void QmitkDicomExternalDataWidget::AddDicomTemporary(QString directory)
@@ -204,7 +206,7 @@ void QmitkDicomExternalDataWidget::AddDicomTemporary(QString directory)
     m_ExternalModel->reset();
 }
 
-void QmitkDicomExternalDataWidget::OnSearchParameterChanged(){
- 
+void QmitkDicomExternalDataWidget::OnSearchParameterChanged()
+{
     m_ExternalModel->setDatabase(m_ExternalDatabase->database(),m_Controls->SearchOption_2->parameters());
 }

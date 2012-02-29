@@ -83,67 +83,20 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     m_Controls.setupUi( parent );
     TestHandler();
     SetupDefaults();
+
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&))); 
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
+
     connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QString&)),this,SLOT(OnDicomImportFinished(const QString&)));
     connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QStringList&)),this,SLOT(OnDicomImportFinished(const QStringList&)));
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    
     connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.FolderButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
-    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
-}
-
-void QmitkDicomEditor::OnSeriesModelDoubleClicked(QModelIndex index){
-    QModelIndex studyIndex = index.parent();
-    QModelIndex seriesIndex = index;
-
-    //ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
-
-    //if(model)
-    //{
-    //    model->fetchMore(seriesIndex);
-
-    //    int imageCount = model->rowCount(seriesIndex);
-
-    //    MITK_INFO<< "Series Index:"<< imageCount << "\n";
-
-    //    QString filePath = m_Controls.m_ctkDICOMAppWidget->databaseDirectory() +
-    //        "/dicom/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString() + "/";
-
-    //    MITK_INFO << "filepath: "<< filePath.toStdString() << "\n";
-
-    //    QString series_uid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
-
-    //    MITK_INFO << "series_uid: " << series_uid.toStdString() << "\n";
-
-    //    if(QFile(filePath).exists())
-    //    {
-    //        filePath.replace(0,1,"");
-    //        QString absolutFilePath("C:/home/bauerm/bin/MITK/MITK-build/Applications/ExtApp/ctkDICOM-Database/dicom/");
-    //        absolutFilePath.append(model->data(studyIndex ,ctkDICOMModel::UIDRole).toString());
-    //        absolutFilePath.append("/");
-    //        //add all fienames from series to strin container
-    //        mitk::DicomSeriesReader::StringContainer names = mitk::DicomSeriesReader::GetSeries(absolutFilePath.toStdString(),series_uid.toStdString());
-    //        mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(names, true, true);
-
-    //        if (node.IsNull())
-    //        {
-    //            MITK_ERROR << "Could not load series: " << series_uid.toStdString();
-    //        }
-    //        else
-    //        {
-    //            node->SetName(series_uid.toStdString());
-    //            this->GetDefaultDataStorage()->Add(node);
-
-    //            this->GetActiveStdMultiWidget();
-
-    //            mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-    //            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    //        }
-
-    //    }
-    //}
+    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));    
 }
 
 void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
@@ -220,16 +173,19 @@ void QmitkDicomEditor::SetupDefaults()
 //TODO Remove
 void QmitkDicomEditor::TestHandler()
 {
-      ctkDictionary properties;
-      properties["title"] = "bla";
-
       m_Handler = new DicomEventHandler();
-      m_Handler->SetPluginContext(mitk::PluginActivator::getContext());
-      m_Handler->Register(QString("com/acme/reportgenerator/GENERATED"));
+      m_Handler->SubscribeSlots();
+}
 
-      ctkEvent reportGeneratedEvent("com/acme/reportgenerator/GENERATED", properties);
+void QmitkDicomEditor::OnViewButtonAddToDataManager(const QStringList& eventProperties)
+{
+    ctkDictionary properties;
+    properties["Action"] = "ADD";
+    properties["SeriesUID"] = eventProperties.at(0);
+    properties["Path"] = eventProperties.at(1);
 
-      m_Publisher = new QmitkDicomDataEventPublisher();
-      m_Publisher->SetEventAdmin(mitk::PluginActivator::getContext());
-      m_Publisher->SendEvent(reportGeneratedEvent);   
+    m_Publisher = new QmitkDicomDataEventPublisher();
+    m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
+
+    m_Publisher->AddSeriesToDataManagerEvent(properties);
 }

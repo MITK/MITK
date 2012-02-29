@@ -17,35 +17,39 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkDicomDataEventPublisher.h"
 
+#include <ctkServiceReference.h>
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEvent.h>
+
 QmitkDicomDataEventPublisher::QmitkDicomDataEventPublisher()
 {
 }
 
 QmitkDicomDataEventPublisher::~QmitkDicomDataEventPublisher()
 {
-    delete m_EventAdmin;
 }
 
-void QmitkDicomDataEventPublisher::SendEvent(const ctkEvent& ctkEvent,bool synchronously)
+void QmitkDicomDataEventPublisher::AddSeriesToDataManagerEvent(const ctkDictionary& properties)
 {
-    if(synchronously)
+    emit SignalAddSeriesToDataManager(properties);
+}
+
+void QmitkDicomDataEventPublisher::RemoveSeriesFromStorageEvent(const ctkDictionary& properties)
+{
+    emit SignalRemoveSeriesFromStorage(properties);
+}
+
+void QmitkDicomDataEventPublisher::PublishSignals(ctkPluginContext* context)
+{
+    ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
+    if (ref)
     {
-        m_EventAdmin->sendEvent(ctkEvent);
-    }else{
-        m_EventAdmin->postEvent(ctkEvent);
-    }
-}
+      ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
+      // Using Qt::DirectConnection is equivalent to ctkEventAdmin::sendEvent()
+      eventAdmin->publishSignal(this, SIGNAL(SignalAddSeriesToDataManager(ctkDictionary)),
+                                "org/mitk/gui/qt/dicom/ADD");
 
-void QmitkDicomDataEventPublisher::SetEventAdmin(ctkPluginContext* context)
-{
-    SetServiceReference(context);
-    if(m_ServiceReference)
-    {
-        m_EventAdmin = context->getService<ctkEventAdmin>(m_ServiceReference);
+      eventAdmin->publishSignal(this, SIGNAL(SignalAddSeriesToDataManager(ctkDictionary)),
+                                "org/mitk/gui/qt/dicom/DELETED");
     }
-}
-
-void QmitkDicomDataEventPublisher::SetServiceReference(ctkPluginContext* context)
-{
-    m_ServiceReference = context->getServiceReference<ctkEventAdmin>();
 }

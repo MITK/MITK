@@ -133,7 +133,27 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
 //TODO
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
-    //QModelIndex index = m_Controls->InternalDataTreeView->currentIndex();
+    QModelIndex currentIndex = m_Controls->InternalDataTreeView->currentIndex();
+    if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
+    {
+        QString seriesUID = m_LocalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
+        
+        QModelIndex studyIndex = m_LocalModel->parent(currentIndex);
+        QString studyUID = m_LocalModel->data(studyIndex,ctkDICOMModel::UIDRole).toString();
+
+        QString filePath;
+        filePath.append(m_LocalDatabase->databaseDirectory());
+        filePath.append("/dicom/");
+        filePath.append(studyUID);
+        filePath.append("/");
+        filePath.append(seriesUID);
+        filePath.append("/");
+
+        QStringList eventProperties;
+        eventProperties << seriesUID << filePath;
+        MITK_INFO << filePath.toStdString();
+        emit SignalDicomToDataManager(eventProperties);
+    }
 }
 
 void QmitkDicomLocalStorageWidget::OnSearchParameterChanged()

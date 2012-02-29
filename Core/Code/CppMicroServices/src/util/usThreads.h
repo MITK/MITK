@@ -105,13 +105,13 @@
       #define US_THREADS_LONG             long
       #undef US_ATOMIC_OPTIMIZATION
       #define US_ATOMIC_INCREMENT(x)      m_AtomicMtx.Lock();  \
-                                          IntType n = ++x;     \
+                                          IntType n = ++(*x);  \
                                           m_AtomicMtx.Unlock()
       #define US_ATOMIC_DECREMENT(x)      m_AtomicMtx.Lock();  \
-                                          IntType n = --x;     \
+                                          IntType n = --(*x);  \
                                           m_AtomicMtx.Unlock()
       #define US_ATOMIC_ASSIGN(l, v)      m_AtomicMtx.Lock();  \
-                                          l = v;               \
+                                          *l = v;              \
                                           m_AtomicMtx.Unlock()
     #endif
 

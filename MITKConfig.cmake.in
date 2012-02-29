@@ -2,8 +2,11 @@
 # Update the CMake module path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 
+SET(CppMicroServices_SOURCE_DIR @MITK_SOURCE_DIR@/Core/Code/CppMicroServices)
+
 # Include MITK macros
 include(MacroParseArguments)
+include(@CppMicroServices_SOURCE_DIR@/CMake/usFunctionGenerateModuleInit.cmake)
 include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)

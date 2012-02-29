@@ -81,9 +81,43 @@ void QmitkResidualAnalysisWidget::DrawMeans()
   this->m_Plot->setAxisTitle(3, "DWI Volume");
 
 
+  QwtLegend *legend = new QwtLegend;
+  this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
+
   this->Replot();
 
+}
 
+void QmitkResidualAnalysisWidget::DrawPercentagesOfOutliers()
+{
+  this->Clear();
+
+
+  this->SetPlotTitle("Percentage of outliers");
+  QPen pen( Qt::SolidLine );
+  pen.setWidth(1);
+
+
+  // Create values for x-axis
+  std::vector<double> xAxis;
+  for(int i=0; i<m_PercentagesOfOutliers.size(); ++i)
+  {
+    xAxis.push_back((double)i);
+  }
+
+  pen.setColor(Qt::black);
+  int curveId = this->InsertCurve( "Outliers" );
+  this->SetCurveData( curveId, xAxis, m_PercentagesOfOutliers );
+  this->SetCurvePen( curveId, pen );
+  //this->SetCurveStyle( curveId, QwtPlotCurve::Fitted);
+
+  this->m_Plot->setAxisTitle(0, "Percentage of outliers");
+  this->m_Plot->setAxisTitle(3, "DWI Volume");
+
+  QwtLegend *legend = new QwtLegend;
+  this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
+
+  this->Replot();
 }
 
 

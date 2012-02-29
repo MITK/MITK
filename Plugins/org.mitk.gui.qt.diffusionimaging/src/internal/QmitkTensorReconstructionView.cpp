@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkTensorImageToDiffusionImageFilter.h"
 #include "itkPointShell.h"
 #include "itkVector.h"
+#include "itkB0ImageExtractionImageFilter.h"
 
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
@@ -119,9 +120,8 @@ struct TrSelListener : ISelectionListener
       m_View->m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);
 
 
-      //m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
-      m_View->m_Controls->m_ResidualButton->setEnabled(true);
-
+      m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
+      m_View->m_Controls->m_PercentagesOfOutliers->setEnabled(foundDwiVolume && foundTensorVolume);
 
     }
   }
@@ -374,7 +374,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     image->SetB_Value(diffImage->GetB_Value());
     image->SetDirections(gradientList);
     image->SetOriginalDirections(gradientList);
-    image->InitializeFromVectorImage();
+    image->InitializeFromVectorImage();    
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
 
@@ -386,13 +386,33 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
 
     GetDefaultDataStorage()->Add(node);    
+    m_MultiWidget->RequestUpdate();
 
+
+    // Extract B0
+    typedef itk::B0ImageExtractionImageFilter<DiffusionPixelType, DiffusionPixelType> BaslineFilterType;
+    BaslineFilterType::Pointer baseFilter = BaslineFilterType::New();
+    baseFilter->SetInput(image->GetVectorImage());
+    baseFilter->SetDirections(image->GetDirections());
+    baseFilter->Update();
+
+    mitk::Image::Pointer boImage = mitk::Image::New();
+    boImage->InitializeByItk( baseFilter->GetOutput() );
+    boImage->SetVolume( baseFilter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer b0Node=mitk::DataNode::New();
+    b0Node->SetData( boImage );
+    b0Node->SetProperty( "name", mitk::StringProperty::New("baseline"));
+
+    GetDefaultDataStorage()->Add(b0Node);
+/*
 
     typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
 
     ResidualImageFilterType::Pointer residualFilter = ResidualImageFilterType::New();
     residualFilter->SetInput(diffImage->GetVectorImage());
     residualFilter->SetSecondDiffusionImage(image->GetVectorImage());
+    residualFilter->SetGradients(gradients);
+    residualFilter->SetBaseLineImage(baseFilter->GetOutput());
     residualFilter->Update();
 
     itk::Image<float, 3>::Pointer residualImage = itk::Image<float, 3>::New();
@@ -416,8 +436,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     lookupTable->SetTableRange(min, max);
 
 
-
-
     // If you don't want to use the whole color range, you can use
     // SetValueRange, SetHueRange, and SetSaturationRange
     lookupTable->Build();
@@ -433,11 +451,8 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     {
       double* rgba = reversedlookupTable->GetTableValue(255-i);
 
-      std::cout << rgba[0] << ' ' << rgba[1] << ' ' << rgba[2] << ' ' << rgba[3] << '\n';
       lookupTable->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
-    std::cout << std::endl;
-
 
     lut->SetVtkLookupTable(lookupTable);
     lutProp->SetLookupTable(lut);
@@ -464,47 +479,26 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     std::vector<double> means = residualFilter->GetMeans();
     std::vector<double> q1s = residualFilter->GetQ1();
     std::vector<double> q3s = residualFilter->GetQ3();
+    std::vector<double> percentagesOfOUtliers = residualFilter->GetPercentagesOfOutliers();
 
     m_Controls->m_ResidualAnalysis->SetMeans(means);
     m_Controls->m_ResidualAnalysis->SetQ1(q1s);
     m_Controls->m_ResidualAnalysis->SetQ3(q3s);
+    m_Controls->m_ResidualAnalysis->SetPercentagesOfOutliers(percentagesOfOUtliers);
 
-    m_Controls->m_ResidualAnalysis->DrawMeans();
-
-  }
-
-  /*
-  std::vector<double> means;
-  means.push_back(4.0);
-  means.push_back(5.0);
-  means.push_back(3.0);
-  means.push_back(5.0);
-  means.push_back(4.5);
-  means.push_back(3.4);
-  means.push_back(4.0);
-  means.push_back(8.7);
-  std::vector<double> q1s;
-  q1s.push_back(2.0);
-  q1s.push_back(1.0);
-  q1s.push_back(2.0);
-  q1s.push_back(1.0);
-  q1s.push_back(2.0);
-  q1s.push_back(4.0);
-  q1s.push_back(2.0);
-  q1s.push_back(1.0);
-  std::vector<double> q3s;
-  q3s.push_back(7.0);
-  q3s.push_back(6.0);
-  q3s.push_back(7.0);
-  q3s.push_back(6.0);
-  q3s.push_back(7.0);
-  q3s.push_back(6.0);
-  q3s.push_back(7.0);
-  q3s.push_back(6.0);
-  q3s.push_back(7.0);
-  q3s.push_back(11.0);
+    if(m_Controls->m_PercentagesOfOutliers->isChecked())
+    {
+      m_Controls->m_ResidualAnalysis->DrawPercentagesOfOutliers();
+    }
+    else
+    {
+      m_Controls->m_ResidualAnalysis->DrawMeans();
+    }
 
 */
+  }
+
+
 }
 
 void QmitkTensorReconstructionView::ItkReconstruction()
@@ -605,8 +599,6 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
 
       TensorImageType::Pointer tensorImage;
       tensorImage = tensorReconstructionFilter->GetOutput();
-
-
 
 
       // Check the tensor for negative eigenvalues

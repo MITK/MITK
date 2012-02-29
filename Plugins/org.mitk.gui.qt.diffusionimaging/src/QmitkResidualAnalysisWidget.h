@@ -78,15 +78,21 @@ public:
     m_Q3 = q3;
   }
 
+  void SetPercentagesOfOutliers(std::vector< double > perc)
+  {
+    m_PercentagesOfOutliers = perc;
+  }
+
 
   void DrawMeans();
+  void DrawPercentagesOfOutliers();
 
 
 protected:
   std::vector< double > m_Means;
   std::vector< double > m_Q1;
   std::vector< double > m_Q3;
-
+  std::vector< double > m_PercentagesOfOutliers;
 };
 
 #endif

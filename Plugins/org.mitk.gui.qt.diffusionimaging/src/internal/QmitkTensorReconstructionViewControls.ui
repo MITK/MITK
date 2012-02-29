@@ -527,7 +527,7 @@
          <item>
           <widget class="QCommandLinkButton" name="m_ResidualButton">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="toolTip">
             <string comment="Calculate ODF value as tensor value in the according direction" extracomment="Calculate ODF value as tensor value in the according direction">Calculate the residual from a dti and a dwi iimage</string>
@@ -550,6 +550,16 @@
              <width>200</width>
              <height>300</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="m_PercentagesOfOutliers">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>percentages of error</string>
            </property>
           </widget>
          </item>

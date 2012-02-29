@@ -57,7 +57,20 @@ namespace itk
 
 
     std::vector< std::vector<double> > residuals;
-    residuals.resize(this->GetInput()->GetVectorLength());
+
+
+    // Detrmine number of B0 images
+    int numberB0=0;
+    for(int i=0; i<m_Gradients->Size(); i++)
+    {
+      GradientDirectionType grad = m_Gradients->ElementAt(i);
+      if(grad[0] < 0.001 && grad[1] < 0.001 && grad[2] < 0.001)
+      {
+        numberB0++;
+      }
+    }
+
+    residuals.resize(this->GetInput()->GetVectorLength()-numberB0);
 
 
 
@@ -68,10 +81,17 @@ namespace itk
       {
         for(int z=0; z<size[2]; z++)
         {
+
+
+          // Check if b0 exceeds threshold
           itk::Index<3> ix;
           ix[0] = x;
           ix[1] = y;
           ix[2] = z;
+          if(m_BaseLineImage->GetPixel(ix) <= m_B0Threshold)
+          {
+            continue;
+          }
 
           typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
           typename InputImageType::PixelType p2 = m_SecondDiffusionImage->GetPixel(ix);
@@ -85,15 +105,28 @@ namespace itk
           }
 
           double res = 0;
+          int shift = 0; // correction for the skipped B0 images
 
           for(int i = 0; i<p1.GetSize(); i++)
           {
-            double val1 = (double)p1.GetElement(i);
-            double val2 = (double)p2.GetElement(i);
 
-            res += abs(val1-val2);
 
-            residuals[i].push_back(val1-val2);
+            GradientDirectionType grad = m_Gradients->ElementAt(i);
+            if(!(grad[0] < 0.001 && grad[1] < 0.001 && grad[2] < 0.001))
+            {
+              double val1 = (double)p1.GetElement(i);
+              double val2 = (double)p2.GetElement(i);
+
+
+              res += abs(val1-val2);
+
+              residuals[i-shift].push_back(val1-val2);
+            }
+            else
+            {
+              shift++;
+            }
+
 
           }
 
@@ -107,10 +140,14 @@ namespace itk
     }
 
 
+
+
+
     // for each dw volume: sort the the measured residuals (for each voxel) to enable determining Q1 and Q3; calculate means
+    // determine percentage of errors as described in QUALITY ASSESSMENT THROUGH ANALYSIS OF RESIDUALS OF DIFFUSION IMAGE FITTING
+    // Leemans et al 2008
 
-
-    double q1,q3;
+    double q1,q3, median;
     std::vector< std::vector<double> >::iterator it = residuals.begin();
     while(it != residuals.end())
     {
@@ -124,23 +161,35 @@ namespace itk
       q3 = res[0.75*res.size()];
       m_Q3.push_back(q3);
 
+
+
+      median = res[0.5*res.size()];
+      double iqr = q3-q1;
+      double outlierThreshold = median + 1.5*iqr;
+      double numberOfOutliers = 0.0;
+
       std::vector<double>::iterator resIt = res.begin();
       double mean;
       while(resIt != res.end())
       {
         double f = *resIt;
+        if(f>outlierThreshold)
+        {
+          numberOfOutliers++;
+        }
         mean += f;
         ++resIt;
       }
 
+      double percOfOutliers = 100 * numberOfOutliers / res.size();
+      m_PercentagesOfOutliers.push_back(percOfOutliers);
+
       mean /= res.size();
       m_Means.push_back(mean);
 
-      std::cout << "mean: " << mean << '\n'<< "\nq1: " << q1 << "\nq3: " << q3 << '\n';
-
       ++it;
     }
-    std::cout << std::endl;
+
 
 
 

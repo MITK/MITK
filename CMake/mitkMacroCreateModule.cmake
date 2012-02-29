@@ -121,6 +121,9 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
           INCLUDE(files.cmake)
 
           SET(module_compile_flags )
+          IF(WIN32)
+            SET(module_compile_flags "${module_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+          ENDIF()
           # MinGW does not export all symbols automatically, so no need to set flags
           IF(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW AND NOT MODULE_GCC_DEFAULT_VISIBILITY)
             IF(${GCC_VERSION} VERSION_GREATER "4.5.0")

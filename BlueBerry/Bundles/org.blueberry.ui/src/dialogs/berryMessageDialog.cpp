@@ -15,7 +15,7 @@
 
  =========================================================================*/
 
-#include "../tweaklets/berryMessageDialogTweaklet.h"
+#include "tweaklets/berryMessageDialogTweaklet.h"
 
 #include "berryMessageDialog.h"
 

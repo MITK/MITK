@@ -22,10 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryIDropTarget.h"
 
-#include "../berryISizeProvider.h"
-#include "../berryRectangle.h"
-#include "../berryPoint.h"
-#include "../berryShell.h"
+#include "berryISizeProvider.h"
+#include "berryRectangle.h"
+#include "berryPoint.h"
+#include "berryShell.h"
 
 namespace berry {
 

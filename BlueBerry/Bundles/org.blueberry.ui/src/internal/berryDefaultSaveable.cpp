@@ -17,10 +17,10 @@
 
 #include "berryDefaultSaveable.h"
 
-#include "../berryIWorkbenchPart.h"
-#include "../berryIWorkbenchPage.h"
-#include "../berryUIException.h"
-#include "../berryImageDescriptor.h"
+#include "berryIWorkbenchPart.h"
+#include "berryIWorkbenchPage.h"
+#include "berryUIException.h"
+#include "berryImageDescriptor.h"
 
 namespace berry
 {

@@ -19,7 +19,7 @@
 #define BERRYJOBLISTENERS_H_
 
 #include "berryJobChangeEvent.h"
-#include "../berryIJobChangeListener.h"
+#include "berryIJobChangeListener.h"
 
 namespace berry
 {

@@ -26,12 +26,12 @@
 #include "berryPerspectiveHelper.h"
 #include "berryWorkbenchConstants.h"
 
-#include "../berryXMLMemento.h"
+#include "berryXMLMemento.h"
 
-#include "../berryIWorkbenchPartConstants.h"
-#include "../berryGeometry.h"
+#include "berryIWorkbenchPartConstants.h"
+#include "berryGeometry.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include <berryObjects.h>
 

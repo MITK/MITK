@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "intro/berryEditorIntroAdapterPart.h"
 
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 
 #include <Poco/String.h>
 #include <QDebug>

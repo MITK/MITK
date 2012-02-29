@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYNULLEDITORINPUT_H_
 #define BERRYNULLEDITORINPUT_H_
 
-#include "../berryIEditorInput.h"
+#include "berryIEditorInput.h"
 #include "berryEditorReference.h"
 
 namespace berry {

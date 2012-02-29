@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYBUNDLEMANIFEST_H_
 #define BERRYBUNDLEMANIFEST_H_
 
-#include "../berryIBundleManifest.h"
+#include "berryIBundleManifest.h"
 
 
 namespace berry {

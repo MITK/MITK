@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryCompositeExpression.h"
 
-#include "../berryEvaluationContext.h"
-#include "../berryEvaluationResult.h"
-#include "../berryExpressionInfo.h"
+#include "berryEvaluationContext.h"
+#include "berryEvaluationResult.h"
+#include "berryExpressionInfo.h"
 
 #include "service/berryIConfigurationElement.h"
 

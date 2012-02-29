@@ -21,7 +21,7 @@
 
 #include "berryIDialog.h"
 
-#include "../berryShell.h"
+#include "berryShell.h"
 
 #include <string>
 #include <vector>

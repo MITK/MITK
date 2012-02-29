@@ -30,7 +30,7 @@
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
 
-#include "../berryQtPreferences.h"
+#include "berryQtPreferences.h"
 
 namespace berry
 {

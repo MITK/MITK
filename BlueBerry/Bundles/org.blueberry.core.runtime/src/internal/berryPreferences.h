@@ -2,7 +2,7 @@
 #define BERRYPREFERENCES_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "../berryIBerryPreferences.h"
+#include "berryIBerryPreferences.h"
 
 #include <map>
 #include <vector>

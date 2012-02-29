@@ -23,7 +23,7 @@
 #include "berryWorker.h"
 #include "berryInternalJob.h"
 
-#include "../berryJobExceptions.h"
+#include "berryJobExceptions.h"
 
 #include <Poco/ScopedLock.h>
 #include <Poco/Exception.h>

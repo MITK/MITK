@@ -24,7 +24,7 @@
 #include "berryWorkbenchConstants.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 
 #include <Poco/HashMap.h>
 

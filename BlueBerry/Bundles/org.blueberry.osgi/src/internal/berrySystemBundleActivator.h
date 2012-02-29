@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYSYSTEMBUNDLEACTIVATOR_H_
 #define BERRYSYSTEMBUNDLEACTIVATOR_H_
 
-#include "../berryIBundleActivator.h"
+#include "berryIBundleActivator.h"
 
 namespace berry {
 

@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "berryQtGlobalEventFilter.h"
-#include "../internal/berryQtControlWidget.h"
+#include "internal/berryQtControlWidget.h"
 
 #include <QEvent>
 #include <QMouseEvent>

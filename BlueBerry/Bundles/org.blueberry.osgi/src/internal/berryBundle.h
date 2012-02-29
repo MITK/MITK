@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Path.h"
 #include "Poco/Mutex.h"
 
-#include "../berryIBundle.h"
-#include "../berryIBundleStorage.h"
+#include "berryIBundle.h"
+#include "berryIBundleStorage.h"
 
 namespace berry {
 

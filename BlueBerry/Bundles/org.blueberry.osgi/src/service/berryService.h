@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define BERRYSERVICE_H_
 
 #include <org_blueberry_osgi_Export.h>
-#include "../berryMacros.h"
-#include "../berryObject.h"
+#include "berryMacros.h"
+#include "berryObject.h"
 
 #include <typeinfo>
 

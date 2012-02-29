@@ -18,7 +18,7 @@
 #include "berryPresentablePartFolder.h"
 #include "berryAbstractTabItem.h"
 
-#include "../berryQtWidgetsTweaklet.h"
+#include "internal/berryQtWidgetsTweaklet.h"
 #include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>

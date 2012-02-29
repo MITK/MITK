@@ -22,9 +22,9 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "../berryISelectionService.h"
-#include "../berryISelectionListener.h"
-#include "../berryIWorkbenchPart.h"
+#include "berryISelectionService.h"
+#include "berryISelectionListener.h"
+#include "berryIWorkbenchPart.h"
 
 #include <list>
 

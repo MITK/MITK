@@ -20,8 +20,8 @@
 #define BERRYDRAGUTIL_H_
 
 #include <org_blueberry_ui_Export.h>
-#include "../berryRectangle.h"
-#include "../guitk/berryGuiTkIControlListener.h"
+#include "berryRectangle.h"
+#include "guitk/berryGuiTkIControlListener.h"
 
 #include "berryTestDropLocation.h"
 #include "berryIDragOverListener.h"

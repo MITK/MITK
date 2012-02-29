@@ -17,7 +17,7 @@
 
 #include "berryIPresentationFactory.h"
 
-#include "../berryConstants.h"
+#include "berryConstants.h"
 
 namespace berry
 {

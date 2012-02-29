@@ -18,13 +18,13 @@
 #ifndef BERRYSAVEABLESLIST_H_
 #define BERRYSAVEABLESLIST_H_
 
-#include "../berryISaveablesLifecycleListener.h"
+#include "berryISaveablesLifecycleListener.h"
 
-#include "../berryISaveablesSource.h"
-#include "../berryIWorkbenchWindow.h"
-#include "../berryIWorkbenchPart.h"
+#include "berryISaveablesSource.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPart.h"
 
-#include "../berryWorkbenchPart.h"
+#include "berryWorkbenchPart.h"
 
 #include <map>
 #include <set>

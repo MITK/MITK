@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEXTENSIONPOINT_H_
 #define BERRYEXTENSIONPOINT_H_
 
-#include "../berryMacros.h"
+#include "berryMacros.h"
 
-#include "../service/berryIExtensionPoint.h"
-#include "../service/berryIExtension.h"
+#include "service/berryIExtensionPoint.h"
+#include "service/berryIExtension.h"
 
 #include "berryExtension.h"
 

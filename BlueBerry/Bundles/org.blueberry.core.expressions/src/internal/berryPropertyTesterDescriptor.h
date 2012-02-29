@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BERRYPROPERTYTESTERDESCRIPTOR_H_
 
 #include "service/berryIConfigurationElement.h"
-#include "../berryIPropertyTester.h"
+#include "berryIPropertyTester.h"
 
 #include "Poco/Any.h"
 

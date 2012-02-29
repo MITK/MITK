@@ -25,10 +25,10 @@
 #include "berryWorkerPool.h"
 #include "berryJobListeners.h"
 
-#include "../berryJob.h"
-#include "../berryIProgressMonitorWithBlocking.h"
-#include "../berryIJobManager.h"
-#include "../berryISchedulingRule.h"
+#include "berryJob.h"
+#include "berryIProgressMonitorWithBlocking.h"
+#include "berryIJobManager.h"
+#include "berryISchedulingRule.h"
 
 #include <org_blueberry_core_jobs_Export.h>
 

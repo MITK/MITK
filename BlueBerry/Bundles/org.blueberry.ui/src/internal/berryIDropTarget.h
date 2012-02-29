@@ -21,8 +21,8 @@
 
 #include <berryMacros.h>
 
-#include "../berryRectangle.h"
-#include "../tweaklets/berryDnDTweaklet.h"
+#include "berryRectangle.h"
+#include "tweaklets/berryDnDTweaklet.h"
 
 namespace berry {
 

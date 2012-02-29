@@ -15,7 +15,7 @@
 
  =========================================================================*/
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "berryPerspectiveHelper.h"
 

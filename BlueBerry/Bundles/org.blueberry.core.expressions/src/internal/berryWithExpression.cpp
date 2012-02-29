@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryWithExpression.h"
 
 #include "berryExpressions.h"
-#include "../berryEvaluationContext.h"
+#include "berryEvaluationContext.h"
 
 #include <Poco/Hash.h>
 

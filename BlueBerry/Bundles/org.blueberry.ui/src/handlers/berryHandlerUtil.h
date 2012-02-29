@@ -23,12 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryObjectString.h>
 
 #include <org_blueberry_ui_Export.h>
-#include "../berryIWorkbenchPart.h"
-#include "../berryIWorkbenchPartSite.h"
-#include "../berryISelection.h"
-#include "../berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPart.h"
+#include "berryIWorkbenchPartSite.h"
+#include "berryISelection.h"
+#include "berryIWorkbenchWindow.h"
 
-#include "../berryISources.h"
+#include "berryISources.h"
 
 namespace berry {
 

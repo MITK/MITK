@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYCOMPOSITEEXPRESSION_H_
 #define BERRYCOMPOSITEEXPRESSION_H_
 
-#include "../berryExpression.h"
-#include "../berryExpressionInfo.h"
-#include "../berryEvaluationResult.h"
-#include "../berryIEvaluationContext.h"
+#include "berryExpression.h"
+#include "berryExpressionInfo.h"
+#include "berryEvaluationResult.h"
+#include "berryIEvaluationContext.h"
 
 #include <vector>
 

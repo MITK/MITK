@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryViewSite.h"
 
-#include "../berryIViewReference.h"
-#include "../berryIViewPart.h"
+#include "berryIViewReference.h"
+#include "berryIViewPart.h"
 #include "berryPartPane.h"
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 #include "berryViewDescriptor.h"
 #include "berryWorkbenchPage.h"
 

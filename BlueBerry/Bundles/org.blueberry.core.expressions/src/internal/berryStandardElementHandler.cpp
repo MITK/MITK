@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryStandardElementHandler.h"
 
-#include "../berryExpressionTagNames.h"
+#include "berryExpressionTagNames.h"
 
 #include "berryInstanceofExpression.h"
 #include "berryTestExpression.h"

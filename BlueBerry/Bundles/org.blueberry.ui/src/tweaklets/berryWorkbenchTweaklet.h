@@ -19,11 +19,11 @@
 #ifndef BERRYWORKBENCHTWEAKLET_H_
 #define BERRYWORKBENCHTWEAKLET_H_
 
-#include "../internal/berryTweaklets.h"
+#include "internal/berryTweaklets.h"
 
-#include "../berryShell.h"
-#include "../berryDisplay.h"
-#include "../dialogs/berryIDialog.h"
+#include "berryShell.h"
+#include "berryDisplay.h"
+#include "dialogs/berryIDialog.h"
 
 namespace berry
 {

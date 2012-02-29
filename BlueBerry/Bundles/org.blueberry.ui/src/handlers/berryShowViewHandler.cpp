@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryShowViewHandler.h"
 #include "berryHandlerUtil.h"
 
-#include "../tweaklets/berryWorkbenchTweaklet.h"
-#include "../dialogs/berryIShowViewDialog.h"
+#include "tweaklets/berryWorkbenchTweaklet.h"
+#include "dialogs/berryIShowViewDialog.h"
 
-#include "../berryUIException.h"
-#include "../berryIWorkbenchPage.h"
-#include "../berryIViewDescriptor.h"
-#include "../berryPlatformUI.h"
+#include "berryUIException.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIViewDescriptor.h"
+#include "berryPlatformUI.h"
 
 #include <berryCommandExceptions.h>
 

@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryViewRegistry.h"
 
-#include "../berryPlatformUI.h"
-#include "../berryImageDescriptor.h"
+#include "berryPlatformUI.h"
+#include "berryImageDescriptor.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 

@@ -20,15 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryMessage.h>
 
-#include "../berryISizeProvider.h"
-#include "../berryIWorkbenchPartReference.h"
-#include "../berryIWorkbenchPart.h"
+#include "berryISizeProvider.h"
+#include "berryIWorkbenchPartReference.h"
+#include "berryIWorkbenchPart.h"
 
 #include <set>
 
 //TODO should be removed
 #include <org_blueberry_ui_Export.h>
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 
 namespace berry {
 

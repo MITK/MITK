@@ -18,8 +18,8 @@
 #ifndef BERRYWORKBENCHWINDOWADVISOR_H_
 #define BERRYWORKBENCHWINDOWADVISOR_H_
 
-#include "../berryIMemento.h"
-#include "../berryShell.h"
+#include "berryIMemento.h"
+#include "berryShell.h"
 
 #include "berryActionBarAdvisor.h"
 #include "berryIActionBarConfigurer.h"

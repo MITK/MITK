@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __BERRY_INSTANCEOF_EXPRESSION_H__
 #define __BERRY_INSTANCEOF_EXPRESSION_H__
 
-#include "../berryExpression.h"
+#include "berryExpression.h"
 
 #include "service/berryIConfigurationElement.h"
 

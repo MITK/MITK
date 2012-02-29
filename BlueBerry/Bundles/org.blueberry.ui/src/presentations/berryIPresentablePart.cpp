@@ -17,7 +17,7 @@
 
 #include "berryIPresentablePart.h"
 
-#include "../berryIWorkbenchPartConstants.h"
+#include "berryIWorkbenchPartConstants.h"
 
 namespace berry
 {

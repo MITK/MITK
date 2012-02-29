@@ -22,7 +22,7 @@
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "../berryRectangle.h"
+#include "berryRectangle.h"
 
 namespace berry {
 

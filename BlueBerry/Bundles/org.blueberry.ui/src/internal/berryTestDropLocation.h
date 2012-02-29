@@ -20,8 +20,8 @@
 #define BERRYTESTDROPLOCATION_H_
 
 #include <berryObject.h>
-#include "../berryPoint.h"
-#include "../berryShell.h"
+#include "berryPoint.h"
+#include "berryShell.h"
 
 #include <vector>
 

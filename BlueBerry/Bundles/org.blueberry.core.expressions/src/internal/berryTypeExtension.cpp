@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryTypeExtensionManager.h"
 #include "berryPropertyTesterDescriptor.h"
-#include "../berryPropertyTester.h"
+#include "berryPropertyTester.h"
 
 namespace berry {
 

@@ -18,7 +18,7 @@
 #ifndef BERRYPLACEHOLDERFOLDERLAYOUT_H_
 #define BERRYPLACEHOLDERFOLDERLAYOUT_H_
 
-#include "../berryIPlaceholderFolderLayout.h"
+#include "berryIPlaceholderFolderLayout.h"
 
 #include "berryStackablePart.h"
 #include "berryPageLayout.h"

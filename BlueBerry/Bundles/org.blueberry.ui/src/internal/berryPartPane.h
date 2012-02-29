@@ -21,10 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryWorkbenchPartReference.h"
 #include "berryStackablePart.h"
 
-#include "../berryRectangle.h"
-#include "../berryIPropertyChangeListener.h"
+#include "berryRectangle.h"
+#include "berryIPropertyChangeListener.h"
 
-#include "../guitk/berryGuiTkIControlListener.h"
+#include "guitk/berryGuiTkIControlListener.h"
 
 namespace berry {
 

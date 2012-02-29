@@ -18,7 +18,7 @@
 #ifndef BERRYSHELLPOOL_H_
 #define BERRYSHELLPOOL_H_
 
-#include "../berryShell.h"
+#include "berryShell.h"
 
 #include <list>
 

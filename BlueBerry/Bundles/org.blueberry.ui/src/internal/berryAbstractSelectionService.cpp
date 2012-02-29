@@ -18,8 +18,8 @@
 #include "berryAbstractSelectionService.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryIPostSelectionProvider.h"
-#include "../berryINullSelectionListener.h"
+#include "berryIPostSelectionProvider.h"
+#include "berryINullSelectionListener.h"
 
 namespace berry
 {

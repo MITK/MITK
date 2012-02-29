@@ -27,8 +27,8 @@
 #include "berryIPresentationSerializer.h"
 #include "berryStackDropResult.h"
 
-#include "../berryISizeProvider.h"
-#include "../berryIMemento.h"
+#include "berryISizeProvider.h"
+#include "berryIMemento.h"
 
 namespace berry
 {

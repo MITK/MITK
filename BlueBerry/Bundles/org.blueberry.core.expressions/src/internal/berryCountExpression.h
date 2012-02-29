@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __BERRY_COUNT_EXPRESSION_H__
 #define __BERRY_COUNT_EXPRESSION_H__
 
-#include "../berryExpression.h"
-#include "../berryIEvaluationContext.h"
-#include "../berryExpressionInfo.h"
+#include "berryExpression.h"
+#include "berryIEvaluationContext.h"
+#include "berryExpressionInfo.h"
 
 #include "service/berryIConfigurationElement.h"
 

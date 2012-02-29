@@ -24,9 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIExtensionPointService.h>
 #include <berryPlatform.h>
 
-#include "../berryAbstractUICTKPlugin.h"
-#include "../berryPlatformUI.h"
-#include "../presentations/berryIPresentationFactory.h"
+#include "berryAbstractUICTKPlugin.h"
+#include "berryPlatformUI.h"
+#include "presentations/berryIPresentationFactory.h"
 
 
 #include "berryViewRegistry.h"

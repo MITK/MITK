@@ -1,7 +1,7 @@
 #ifndef BERRYPARTSERVICE_H_
 #define BERRYPARTSERVICE_H_
 
-#include "../berryIPartService.h"
+#include "berryIPartService.h"
 
 #include <string>
 

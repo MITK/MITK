@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "berryBundleEvent.h"
-#include "../berryIBundle.h"
+#include "berryIBundle.h"
 
 namespace berry {
 

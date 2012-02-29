@@ -18,10 +18,10 @@
 #ifndef BERRYABSTRACTSELECTIONSERVICE_H_
 #define BERRYABSTRACTSELECTIONSERVICE_H_
 
-#include "../berryISelectionService.h"
-#include "../berryIWorkbenchPage.h"
-#include "../berryISelectionChangedListener.h"
-#include "../berryISelectionProvider.h"
+#include "berryISelectionService.h"
+#include "berryIWorkbenchPage.h"
+#include "berryISelectionChangedListener.h"
+#include "berryISelectionProvider.h"
 
 #include "berryAbstractPartSelectionTracker.h"
 

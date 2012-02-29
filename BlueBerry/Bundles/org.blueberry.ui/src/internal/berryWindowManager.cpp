@@ -17,7 +17,7 @@
 
 #include "berryWindowManager.h"
 
-#include "../berryWindow.h"
+#include "berryWindow.h"
 
 #include <algorithm>
 

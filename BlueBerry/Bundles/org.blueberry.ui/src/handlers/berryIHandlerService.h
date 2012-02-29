@@ -19,9 +19,9 @@
 #ifndef BERRYIHANDLERSERVICE_H_
 #define BERRYIHANDLERSERVICE_H_
 
-#include "../services/berryIServiceWithSources.h"
+#include "services/berryIServiceWithSources.h"
 
-#include "../common/berryCommandExceptions.h"
+#include "common/berryCommandExceptions.h"
 
 namespace berry {
 

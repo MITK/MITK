@@ -22,8 +22,8 @@
 
 #include "berryPartSashContainer.h"
 
-#include "../guitk/berryGuiTkISelectionListener.h"
-#include "../presentations/berryIPresentationFactory.h"
+#include "guitk/berryGuiTkISelectionListener.h"
+#include "presentations/berryIPresentationFactory.h"
 
 namespace berry
 {

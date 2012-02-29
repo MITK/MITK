@@ -18,9 +18,9 @@
 #include "berrySaveablesList.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryDefaultSaveable.h"
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 
-#include "../berryWorkbenchPart.h"
+#include "berryWorkbenchPart.h"
 
 namespace berry
 {

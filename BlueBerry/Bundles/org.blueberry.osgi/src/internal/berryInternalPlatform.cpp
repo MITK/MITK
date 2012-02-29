@@ -36,14 +36,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-#include "../berryPlatform.h"
-#include "../berryPlatformException.h"
-#include "../berryDebugUtil.h"
-#include "../event/berryPlatformEvents.h"
+#include "berryPlatform.h"
+#include "berryPlatformException.h"
+#include "berryDebugUtil.h"
+#include "event/berryPlatformEvents.h"
 #include "berryPlatformLogChannel.h"
-#include "../berryIBundle.h"
+#include "berryIBundle.h"
 #include "berryCodeCache.h"
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 #include "berrySystemBundle.h"
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"

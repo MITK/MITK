@@ -17,7 +17,7 @@
 
 #include "berryShellPool.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 namespace berry
 {

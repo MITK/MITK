@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYWORKBENCHCONFIGURER_H_
 #define BERRYWORKBENCHCONFIGURER_H_
 
-#include "../application/berryIWorkbenchConfigurer.h"
+#include "application/berryIWorkbenchConfigurer.h"
 
 #include <Poco/HashMap.h>
 

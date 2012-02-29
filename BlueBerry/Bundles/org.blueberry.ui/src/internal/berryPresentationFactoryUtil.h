@@ -18,9 +18,9 @@
 #ifndef BERRYPRESENTATIONFACTORYUTIL_H_
 #define BERRYPRESENTATIONFACTORYUTIL_H_
 
-#include "../presentations/berryIPresentationFactory.h"
-#include "../presentations/berryIStackPresentationSite.h"
-#include "../presentations/berryIPresentationSerializer.h"
+#include "presentations/berryIPresentationFactory.h"
+#include "presentations/berryIStackPresentationSite.h"
+#include "presentations/berryIPresentationSerializer.h"
 
 namespace berry
 {

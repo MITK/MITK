@@ -23,7 +23,7 @@
 #include <QDir>
 #include <QDateTime>
 
-#include "../berryQtAssistantUtil.h"
+#include "berryQtAssistantUtil.h"
 
 namespace berry {
 

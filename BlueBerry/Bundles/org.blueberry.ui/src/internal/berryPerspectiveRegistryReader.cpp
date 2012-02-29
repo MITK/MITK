@@ -19,7 +19,7 @@
 
 #include "berryPerspectiveRegistry.h"
 #include "berryWorkbenchPlugin.h"
-#include "../berryPlatformUI.h"
+#include "berryPlatformUI.h"
 #include "berryWorkbenchRegistryConstants.h"
 
 namespace berry

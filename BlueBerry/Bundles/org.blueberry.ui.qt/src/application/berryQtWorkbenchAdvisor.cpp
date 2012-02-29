@@ -16,8 +16,8 @@
  =========================================================================*/
 
 #include "berryQtWorkbenchAdvisor.h"
-#include "../internal/berryQtGlobalEventFilter.h"
-#include "../berryQtPreferences.h"
+#include "internal/berryQtGlobalEventFilter.h"
+#include "berryQtPreferences.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>

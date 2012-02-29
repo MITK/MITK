@@ -18,8 +18,8 @@
 
 #include "berryPluginActivator.h"
 
-#include "../berryUITestApplication.h"
-#include "../util/berryEmptyPerspective.h"
+#include "berryUITestApplication.h"
+#include "util/berryEmptyPerspective.h"
 
 #include <QtPlugin>
 

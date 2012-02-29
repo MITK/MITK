@@ -2,7 +2,7 @@
 #define BERRYPREFERENCESSERVICE_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "../berryIBerryPreferencesService.h"
+#include "berryIBerryPreferencesService.h"
 #include "berryAbstractPreferencesStorage.h"
 
 #include <vector>

@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYVIEWREFERENCE_H_
 #define BERRYVIEWREFERENCE_H_
 
-#include "../berryIMemento.h"
+#include "berryIMemento.h"
 
 #include "berryWorkbenchPartReference.h"
-#include "../berryIViewReference.h"
+#include "berryIViewReference.h"
 #include "berryPartPane.h"
 
 namespace berry {

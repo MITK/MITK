@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYDEFAULTACTIVATOR_H_
 #define BERRYDEFAULTACTIVATOR_H_
 
-#include "../berryIBundleActivator.h"
-#include "../berryIBundleContext.h"
+#include "berryIBundleActivator.h"
+#include "berryIBundleContext.h"
 
 namespace berry {
 

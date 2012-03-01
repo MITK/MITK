@@ -76,7 +76,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing");
-    return NULL;
+    return EXIT_FAILURE;
   }
 
   //check for the two images

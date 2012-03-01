@@ -127,7 +127,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
 
         // \todo use memory of Image as in PicFileReader (or integrate everything into the PicFileReader!)
         PicFileReader::ConvertHandedness(volume3d);
-        bool result;
+        bool result = false;
         // FIXME
         //result = output->SetPicVolume( volume3d, t );
         if(result==false)

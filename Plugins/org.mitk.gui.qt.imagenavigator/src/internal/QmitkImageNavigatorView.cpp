@@ -125,7 +125,7 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     {
       if (m_TimeStepper) m_TimeStepper->deleteLater();
       m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime,
-                                              timeController->GetSlice(),
+                                              timeController->GetTime(),
                                               "sliceNavigatorTimeFromSimpleExample");
       m_Controls.m_SliceNavigatorTime->setEnabled(true);
       m_Controls.m_TimeLabel->setEnabled(true);

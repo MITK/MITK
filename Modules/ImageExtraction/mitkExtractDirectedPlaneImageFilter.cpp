@@ -306,11 +306,6 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
-  // Determine output extent for reslicing
-  ScalarType size[2];
-  size[0] = (bounds[1] - bounds[0]) / mmPerPixel[0];
-  size[1] = (bounds[3] - bounds[2]) / mmPerPixel[1];
-
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
@@ -399,7 +394,6 @@ bool mitk::ExtractDirectedPlaneImageFilter
 
   BoundingBox::PointType bbMin = boundingBox->GetMinimum();
   BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-  BoundingBox::PointType bbCenter = boundingBox->GetCenter();
 
   vtkPoints *points = vtkPoints::New();
   if(boundingGeometry->GetImageGeometry())

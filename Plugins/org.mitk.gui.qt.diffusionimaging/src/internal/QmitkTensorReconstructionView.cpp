@@ -364,7 +364,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     filter->SetBValue(diffImage->GetB_Value());
     filter->SetGradientList(gradientList);
     filter->SetMin(stats->GetScalarValueMin());
-    filter->SetMax(stats->GetScalarValueMax());
+    filter->SetMax(500);
     filter->Update();
 
 
@@ -375,9 +375,9 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     image->SetDirections(gradientList);
     image->SetOriginalDirections(gradientList);
     image->InitializeFromVectorImage();    
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
-
+    mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
 
     QString newname;
     newname = newname.append(nodename.c_str());
@@ -386,9 +386,11 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
 
     GetDefaultDataStorage()->Add(node);    
-    m_MultiWidget->RequestUpdate();
 
 
+    std::vector<int> b0Indices = image->GetB0Indices();
+
+/*
     // Extract B0
     typedef itk::B0ImageExtractionImageFilter<DiffusionPixelType, DiffusionPixelType> BaslineFilterType;
     BaslineFilterType::Pointer baseFilter = BaslineFilterType::New();
@@ -404,7 +406,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     b0Node->SetProperty( "name", mitk::StringProperty::New("baseline"));
 
     GetDefaultDataStorage()->Add(b0Node);
-/*
+*/
 
     typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
 
@@ -412,7 +414,8 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     residualFilter->SetInput(diffImage->GetVectorImage());
     residualFilter->SetSecondDiffusionImage(image->GetVectorImage());
     residualFilter->SetGradients(gradients);
-    residualFilter->SetBaseLineImage(baseFilter->GetOutput());
+    residualFilter->SetB0Index(b0Indices[0]);
+    residualFilter->SetB0Threshold(30);
     residualFilter->Update();
 
     itk::Image<float, 3>::Pointer residualImage = itk::Image<float, 3>::New();
@@ -440,7 +443,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     // SetValueRange, SetHueRange, and SetSaturationRange
     lookupTable->Build();
 
-    int size =lookupTable->GetTable()->GetSize();
+    int size = lookupTable->GetTable()->GetSize();
 
     vtkSmartPointer<vtkLookupTable> reversedlookupTable =
         vtkSmartPointer<vtkLookupTable>::New();
@@ -495,7 +498,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
       m_Controls->m_ResidualAnalysis->DrawMeans();
     }
 
-*/
+
   }
 
 

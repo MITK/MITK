@@ -88,21 +88,29 @@ namespace itk
           ix[0] = x;
           ix[1] = y;
           ix[2] = z;
-          if(m_BaseLineImage->GetPixel(ix) <= m_B0Threshold)
-          {
-            continue;
-          }
+
+
 
           typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
           typename InputImageType::PixelType p2 = m_SecondDiffusionImage->GetPixel(ix);
 
 
+          int s1 = p1.GetSize();
+          int s2 = p2.GetSize();
 
           if(p1.GetSize() != p2.GetSize())
           {
             MITK_ERROR << "Vector sizes do not match";
             return;
           }
+
+
+          if(p1.GetElement(m_B0Index) <= m_B0Threshold)
+          {
+            continue;
+          }
+
+
 
           double res = 0;
           int shift = 0; // correction for the skipped B0 images

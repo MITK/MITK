@@ -102,6 +102,8 @@ namespace itk
       m_B0Threshold = threshold;
     }
 
+    itkSetMacro(B0Index, int)
+
 
   protected:
     ResidualImageFilter()
@@ -132,6 +134,8 @@ namespace itk
     typename BaselineImageType::Pointer m_BaseLineImage;
 
     InputScalarType m_B0Threshold;
+
+    int m_B0Index;
 
   };    
 

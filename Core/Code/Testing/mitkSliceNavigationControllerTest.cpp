@@ -370,9 +370,6 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   if(result!=EXIT_SUCCESS)
     return result;
 
-
-
-  mitk::BoundingBox::BoundsArrayType bounds =  geometry->GetBounds();
   mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
   transform->SetMatrix(geometry->GetIndexToWorldTransform()->GetMatrix());
   mitk::BoundingBox::Pointer boundingbox = geometry->CalculateBoundingBoxRelativeToTransform(transform);

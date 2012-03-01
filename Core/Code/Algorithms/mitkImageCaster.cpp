@@ -32,6 +32,10 @@ vtkRenderer* mitk::RendererAccess::Get3DRenderer()
   return m_3DRenderer;
 }
 
+void mitk::Caster::Cast(mitk::BaseData*, mitk::Surface*)
+{
+}
+
 void mitk::ImageCaster::CastBaseData(mitk::BaseData* const mitkBaseData, itk::SmartPointer<mitk::Image>& mitkoutputimage){
     try
     {
@@ -41,10 +45,6 @@ void mitk::ImageCaster::CastBaseData(mitk::BaseData* const mitkBaseData, itk::Sm
     {
         return;
     }
-}
-
-void mitk::Caster::Cast(mitk::BaseData* mitkBaseData, mitk::Surface* surface){
-        surface = dynamic_cast<mitk::Surface*>(mitkBaseData);
 }
 
 #define DefineMitkImageCasterMethods(r, data, type) \

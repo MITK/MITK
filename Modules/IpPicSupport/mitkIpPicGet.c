@@ -569,6 +569,7 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
 
   ignored = mitkIpPicFReadLE( &(pic->n), sizeof(mitkIpUInt4_t), pic->dim, infile );
 
+  (void *)ignored;
 
   to_read = len -        3 * sizeof(mitkIpUInt4_t)
                 - pic->dim * sizeof(mitkIpUInt4_t);

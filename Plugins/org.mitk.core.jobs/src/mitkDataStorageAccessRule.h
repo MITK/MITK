@@ -97,8 +97,8 @@ namespace mitk {
   DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataNode::Pointer myDataNode,    
                          DataStorageAccessRule::RuleType myRule) ;  
 
-  bool Contains (berry::ISchedulingRule::Pointer otherISchedulingRule) ;
-  bool IsConflicting (berry::ISchedulingRule::Pointer otherISchedulingRule) ;
+  bool Contains (berry::ISchedulingRule::Pointer otherISchedulingRule) const;
+  bool IsConflicting (berry::ISchedulingRule::Pointer otherISchedulingRule) const;
 
     
 

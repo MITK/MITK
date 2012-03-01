@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test data set for the tests (see CMakeLists.txt).
  */
-int mitkPointSetReaderTest(int argc , char** argv)
+int mitkPointSetReaderTest(int argc , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("PointSetReader")

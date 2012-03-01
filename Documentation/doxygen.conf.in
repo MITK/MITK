@@ -633,9 +633,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @MITK_SOURCE_DIR@/Core \
-                         /home/sascha/git/uServices \
-                         @MITK_SOURCE_DIR@/Documentation \
+INPUT                  = @MITK_SOURCE_DIR@ \
+                         @MITK_BINARY_DIR@ \
                          @MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@
 
 # This tag can be used to specify the character encoding of the source files
@@ -673,21 +672,22 @@ RECURSIVE              = YES
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 # Note that relative paths are relative to directory from which doxygen is run.
 
-EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
-                         @MITK_SOURCE_DIR@/Utilities/ann/ \
+EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ann/ \
                          @MITK_SOURCE_DIR@/Utilities/glew/ \
+                         @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
+                         @MITK_SOURCE_DIR@/Utilities/ipSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
+                         @MITK_SOURCE_DIR@/Utilities/pic2vtk/ \
+                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
+                         @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
                          @MITK_SOURCE_DIR@/Utilities/qwt/ \
                          @MITK_SOURCE_DIR@/Utilities/qxt/ \
                          @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
-                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
+                         @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
                          @MITK_SOURCE_DIR@/BlueBerry/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
-                         @MITK_SOURCE_DIR@/Documentation/Snippets/ \
-                         @MITK_SOURCE_DIR@/Core/Testing/ \
-                         @MITK_SOURCE_DIR@/Core/Code/Service/ \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
                          @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \
@@ -712,6 +712,10 @@ EXCLUDE_PATTERNS       = moc_* \
                          Register* \
                          */files.cmake \
                          */.git/* \
+                         */Snippets/* \
+                         */snippets/* \
+                         */testing/* \
+                         */Testing/* \
                          @MITK_BINARY_DIR@/*.cmake \
                          @MITK_DOXYGEN_EXCLUDE_PATTERNS@
 
@@ -754,7 +758,6 @@ EXAMPLE_RECURSIVE      = YES
 IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Modules/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \
-                         @MITK_SOURCE_DIR@/Core/DataStructures/ \
                          @MITK_SOURCE_DIR@
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should

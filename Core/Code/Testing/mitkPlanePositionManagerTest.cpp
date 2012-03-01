@@ -150,7 +150,6 @@ int testGetPlanePosition()
     for (unsigned int i = 0; i < m_Geometries.size(); ++i)
     {
         plane = m_Geometries.at(i);
-        mitk::PlaneGeometry* test = m_Geometries.at(i); test;
         op = m_Service->GetPlanePosition(i);
         error = ( !mitk::Equal(op->GetHeight(),plane->GetExtent(1)) ||
                   !mitk::Equal(op->GetWidth(),plane->GetExtent(0)) ||

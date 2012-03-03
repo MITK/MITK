@@ -544,13 +544,37 @@
           </widget>
          </item>
          <item>
-          <widget class="QmitkResidualAnalysisWidget" name="m_ResidualAnalysis" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>300</height>
-            </size>
+          <widget class="QTabWidget" name="m_ResidualTab">
+           <property name="currentIndex">
+            <number>1</number>
            </property>
+           <widget class="QWidget" name="tab">
+            <attribute name="title">
+             <string>Per volume</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="QmitkResidualAnalysisWidget" name="m_ResidualAnalysis" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>300</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_2">
+            <attribute name="title">
+             <string>Per slice</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item>
+              <widget class="QGraphicsView" name="m_PerSliceView"/>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
          <item>

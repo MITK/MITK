@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 // qt includes
 #include <QMessageBox>
+#include <QImage>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsEllipseItem>
 
 // itk includes
 #include "itkTimeProbe.h"
@@ -56,6 +60,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkTensorImageToQBallImageFilter.h>
 #include <itkResidualImageFilter.h>
+
 
 const std::string QmitkTensorReconstructionView::VIEW_ID =
 "org.mitk.views.tensorreconstruction";
@@ -150,6 +155,10 @@ QmitkTensorReconstructionView::QmitkTensorReconstructionView()
 m_Controls(NULL),
 m_MultiWidget(NULL)
 {
+
+
+
+
 }
 
 QmitkTensorReconstructionView::QmitkTensorReconstructionView(const QmitkTensorReconstructionView& other)
@@ -210,6 +219,49 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<TrSelListener>()->DoSelectionChanged(sel);
+
+
+
+
+
+  // Create some QImage
+  QImage image(3, 3, QImage::Format_Indexed8);
+  QRgb value;
+
+  value = qRgb(122, 163, 39); // 0xff7aa327
+  image.setColor(0, value);
+
+  value = qRgb(237, 187, 51); // 0xffedba31
+  image.setColor(1, value);
+  value = qRgb(189, 149, 39); // 0xffbd9527
+
+  image.setColor(2, value);
+
+  image.setPixel(0, 1, 0);
+  image.setPixel(1, 0, 0);
+  image.setPixel(1, 1, 2);
+  image.setPixel(2, 1, 1);
+
+  int dotX = image.dotsPerMeterX();
+  int dotY= image.dotsPerMeterY();
+
+  image.setDotsPerMeterX(10*dotX);
+  image.setDotsPerMeterY(10*dotY);
+
+  QGraphicsScene* scene = new QGraphicsScene;
+
+  QGraphicsPixmapItem *item = new QGraphicsPixmapItem( QPixmap::fromImage(image), 0, scene);
+
+  item->setScale(25);
+
+
+  //QGraphicsView view( &scene );
+  m_Controls->m_PerSliceView->setRenderHints( QPainter::Antialiasing );
+
+  m_Controls->m_PerSliceView->setScene(scene);
+  m_Controls->m_PerSliceView->show();
+
+  m_Controls->m_PerSliceView->repaint();
 }
 
 void QmitkTensorReconstructionView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

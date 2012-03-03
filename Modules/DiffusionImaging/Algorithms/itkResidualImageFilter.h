@@ -129,6 +129,9 @@ namespace itk
 
     std::vector<double> m_Means, m_Q1, m_Q3, m_PercentagesOfOutliers;
 
+    // 'Outer' vector: volumes, 'Inner' vector slices
+    std::vector< std::vector<double> > m_OutliersPerSlice;
+
     GradientDirectionContainerType* m_Gradients;
 
     typename BaselineImageType::Pointer m_BaseLineImage;

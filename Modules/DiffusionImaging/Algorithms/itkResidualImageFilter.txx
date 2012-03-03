@@ -58,6 +58,8 @@ namespace itk
 
     std::vector< std::vector<double> > residuals;
 
+    // per slice, per volume
+    std::vector< std::vector <std::vector<double> > > residualsPerSlice;
 
     // Detrmine number of B0 images
     int numberB0=0;
@@ -72,23 +74,22 @@ namespace itk
 
     residuals.resize(this->GetInput()->GetVectorLength()-numberB0);
 
-
-
     // Calculate the standard residual image and for each volume put all residuals in a vector
-    for(int x=0; x<size[0]; x++)
+    for(int z=0; z<size[2]; z++)
     {
+      std::vector< std::vector<double> > sliceResiduals; // residuals per volume for this slice
+      sliceResiduals.resize(this->GetInput()->GetVectorLength()-numberB0);
+
       for(int y=0; y<size[1]; y++)
       {
-        for(int z=0; z<size[2]; z++)
+        for(int x=0; x<size[0]; x++)
         {
-
 
           // Check if b0 exceeds threshold
           itk::Index<3> ix;
           ix[0] = x;
           ix[1] = y;
           ix[2] = z;
-
 
 
           typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
@@ -119,21 +120,24 @@ namespace itk
           {
 
 
+
             GradientDirectionType grad = m_Gradients->ElementAt(i);
             if(!(grad[0] < 0.001 && grad[1] < 0.001 && grad[2] < 0.001))
             {
               double val1 = (double)p1.GetElement(i);
               double val2 = (double)p2.GetElement(i);
 
-
               res += abs(val1-val2);
 
               residuals[i-shift].push_back(val1-val2);
+              sliceResiduals[i-shift].push_back(val1-val2);
+
             }
             else
             {
               shift++;
             }
+
 
 
           }
@@ -145,6 +149,8 @@ namespace itk
 
         }
       }
+
+      residualsPerSlice.push_back(sliceResiduals);
     }
 
 

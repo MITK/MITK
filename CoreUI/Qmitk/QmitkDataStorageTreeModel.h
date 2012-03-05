@@ -284,6 +284,10 @@ protected:
 private:
   void AddNodeInternal(const mitk::DataNode*);
   void RemoveNodeInternal(const mitk::DataNode*);
+  ///
+  /// Checks if dicom properties patient name, study names and series name exists
+  ///
+  bool DicomPropertiesExists(const mitk::DataNode&) const;
 };
 
 #endif /* QMITKDATASTORAGETREEMODEL_H_ */

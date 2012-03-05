@@ -26,6 +26,8 @@ PURPOSE. See the above copyright notices for more information.
 #include "vtkPolygon.h"
 #include "vtkCellArray.h"
 
+#include "mitkProgressBar.h"
+
 namespace mitk {
 
 /**
@@ -55,6 +57,20 @@ class MitkExt_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
    //typedef unsigned int VDimension;
    typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
    typedef PolyLineParametricPath2D::VertexListType ContourPath;
+
+   /**
+     \brief Set whether the mitkProgressBar should be used
+
+     \a Parameter true for using the progress bar, false otherwise
+   */
+   void SetUseProgressBar(bool);
+
+   /**
+     \brief Set the stepsize which the progress bar should proceed
+
+     \a Parameter The stepsize for progressing
+   */
+   void SetProgressStepSize(unsigned int stepSize);
    
  protected:
    ImageToContourFilter();
@@ -64,6 +80,8 @@ class MitkExt_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
    
  private:
    const Geometry3D* m_SliceGeometry;
+   bool m_UseProgressBar;
+   unsigned int m_ProgressStepSize;
 
    template<typename TPixel, unsigned int VImageDimension>
    void Itk2DContourExtraction (itk::Image<TPixel, VImageDimension>* sliceImage);

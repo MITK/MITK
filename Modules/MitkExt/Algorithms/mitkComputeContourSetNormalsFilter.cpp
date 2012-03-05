@@ -18,6 +18,8 @@ PURPOSE. See the above copyright notices for more information.
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
 {
     m_MaxSpacing = 5;
+    this->m_UseProgressBar = false;
+    this->m_ProgressStepSize = 1;
 }
 
 mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
@@ -198,6 +200,10 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     Surface::Pointer surface = this->GetOutput(i);
     surface->GetVtkPolyData()->GetCellData()->SetNormals(normals);
   }//end for all inputs
+
+  //Setting progressbar
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
 
@@ -284,4 +290,14 @@ void mitk::ComputeContourSetNormalsFilter::Reset()
   }
   this->SetNumberOfInputs(0);
   this->SetNumberOfOutputs(0);
+}
+
+void mitk::ComputeContourSetNormalsFilter::SetUseProgressBar(bool status)
+{
+  this->m_UseProgressBar = status;
+}
+
+void mitk::ComputeContourSetNormalsFilter::SetProgressStepSize(unsigned int stepSize)
+{
+  this->m_ProgressStepSize = stepSize;
 }

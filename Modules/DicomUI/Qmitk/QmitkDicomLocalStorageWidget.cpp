@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 // Qt
 #include <QMessageBox>
 #include <QModelIndex>
+#include <QMap>
+#include <QVariant>
 //#include "QmitkDicomDataEventPublisher.h"
 
 
@@ -137,9 +139,14 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
     if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
     {
         QString seriesUID = m_LocalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
+        QString seriesName = m_LocalModel->data(currentIndex).toString();
         
         QModelIndex studyIndex = m_LocalModel->parent(currentIndex);
         QString studyUID = m_LocalModel->data(studyIndex,ctkDICOMModel::UIDRole).toString();
+        QString studyName = m_LocalModel->data(studyIndex).toString();
+
+        QModelIndex patientIndex = m_LocalModel->parent(studyIndex);
+        QString patientName = m_LocalModel->data(patientIndex).toString();        
 
         QString filePath;
         filePath.append(m_LocalDatabase->databaseDirectory());
@@ -150,7 +157,7 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
         filePath.append("/");
 
         QStringList eventProperties;
-        eventProperties << seriesUID << filePath;
+        eventProperties << patientName << studyUID <<studyName << seriesUID << seriesName << filePath;
         MITK_INFO << filePath.toStdString();
         emit SignalDicomToDataManager(eventProperties);
     }

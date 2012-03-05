@@ -39,21 +39,45 @@ DicomEventHandler::~DicomEventHandler()
 
 void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 {
-    mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(ctkEvent.getProperty("Path").toString().toStdString());
-    mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(dicomSeriesMap[ctkEvent.getProperty("SeriesUID").toString().toStdString()]);
+    QString patientName = ctkEvent.getProperty("PatientName").toString();
+    QString studyUID = ctkEvent.getProperty("StudyUID").toString();
+    QString studyName = ctkEvent.getProperty("StudyName").toString();
+    QString seriesUID = ctkEvent.getProperty("SeriesUID").toString();
+    QString seriesName = ctkEvent.getProperty("SeriesName").toString();
+    QString path = ctkEvent.getProperty("Path").toString(); 
+
+    std::list<std::string> qualifiedUIDs;
+    mitk::DicomSeriesReader::StringContainer seriesToLoad;
+    std::size_t found;
+
+    mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString());
+    mitk::DicomSeriesReader::UidFileNamesMap::const_iterator qualifiedSeriesInstanceUIDIterator;
+        
+    for(qualifiedSeriesInstanceUIDIterator = dicomSeriesMap.begin();
+        qualifiedSeriesInstanceUIDIterator != dicomSeriesMap.end();
+        ++qualifiedSeriesInstanceUIDIterator)
+    {
+        found = qualifiedSeriesInstanceUIDIterator->first.find(seriesUID.toStdString());
+        if(found!= qualifiedSeriesInstanceUIDIterator->first.npos)
+        {
+            qualifiedUIDs.push_back(qualifiedSeriesInstanceUIDIterator->first); 
+            seriesToLoad = qualifiedSeriesInstanceUIDIterator->second;
+        }
+    }
+
+    mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(seriesToLoad);
     if (node.IsNull())
     {
-        MITK_ERROR << "Could not load series: " << ctkEvent.getProperty("SeriesUID").toString().toStdString();
+        MITK_ERROR << "Could not load series: " << seriesUID.toStdString();
     }
     else
-    {
-        node->SetName(ctkEvent.getProperty("SeriesUID").toString().toStdString());
+    {        
         ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
         mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+        
         storageService->GetActiveDataStorage().GetPointer()->GetDataStorage()->Add(node);
         mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
     }
 }
 

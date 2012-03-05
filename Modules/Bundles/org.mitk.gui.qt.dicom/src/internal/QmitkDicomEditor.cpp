@@ -180,9 +180,12 @@ void QmitkDicomEditor::TestHandler()
 void QmitkDicomEditor::OnViewButtonAddToDataManager(const QStringList& eventProperties)
 {
     ctkDictionary properties;
-    properties["Action"] = "ADD";
-    properties["SeriesUID"] = eventProperties.at(0);
-    properties["Path"] = eventProperties.at(1);
+    properties["PatientName"] = eventProperties.at(0);
+    properties["StudyUID"] = eventProperties.at(1);
+    properties["StudyName"] = eventProperties.at(2);
+    properties["SeriesUID"] = eventProperties.at(3);
+    properties["SeriesName"] = eventProperties.at(4);
+    properties["Path"] = eventProperties.at(5);
 
     m_Publisher = new QmitkDicomDataEventPublisher();
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());

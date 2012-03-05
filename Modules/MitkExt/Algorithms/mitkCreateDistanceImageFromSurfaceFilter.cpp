@@ -18,6 +18,8 @@ PURPOSE. See the above copyright notices for more information.
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
   m_DistanceImageVolume = 50000;
+  this->m_UseProgressBar = false;
+  this->m_ProgressStepSize = 5;
 }
 
 
@@ -34,6 +36,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   vnl_qr<double> solver (m_SolutionMatrix);
   m_Weights = solver.solve(m_FunctionValues);
 
+  //Setting progressbar
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(2);
+
   //The last step is to create the distance map with the interpolated distance function
   this->CreateDistanceImage();
   m_Centers.clear();
@@ -41,6 +47,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   m_Normals.clear();
   m_Weights.clear();
   m_SolutionMatrix.clear();
+
+  //Setting progressbar
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(3);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()
@@ -485,4 +495,14 @@ void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
   }
   this->SetNumberOfInputs(0);
   this->SetNumberOfOutputs(1);
+}
+
+void mitk::CreateDistanceImageFromSurfaceFilter::SetUseProgressBar(bool status)
+{
+  this->m_UseProgressBar = status;
+}
+
+void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned int stepSize)
+{
+  this->m_ProgressStepSize = stepSize;
 }

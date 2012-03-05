@@ -11,6 +11,7 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoFiles mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_CTImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-ct.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-mr.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
+mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_DefectImage mitkDICOMTestingSanityTest 0 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
 #see bug 8108
 IF(NOT APPLE)

@@ -159,6 +159,8 @@ m_MultiWidget(NULL)
 
 
 
+
+
 }
 
 QmitkTensorReconstructionView::QmitkTensorReconstructionView(const QmitkTensorReconstructionView& other)
@@ -224,44 +226,7 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
 
 
 
-  // Create some QImage
-  QImage image(3, 3, QImage::Format_Indexed8);
-  QRgb value;
 
-  value = qRgb(122, 163, 39); // 0xff7aa327
-  image.setColor(0, value);
-
-  value = qRgb(237, 187, 51); // 0xffedba31
-  image.setColor(1, value);
-  value = qRgb(189, 149, 39); // 0xffbd9527
-
-  image.setColor(2, value);
-
-  image.setPixel(0, 1, 0);
-  image.setPixel(1, 0, 0);
-  image.setPixel(1, 1, 2);
-  image.setPixel(2, 1, 1);
-
-  int dotX = image.dotsPerMeterX();
-  int dotY= image.dotsPerMeterY();
-
-  image.setDotsPerMeterX(10*dotX);
-  image.setDotsPerMeterY(10*dotY);
-
-  QGraphicsScene* scene = new QGraphicsScene;
-
-  QGraphicsPixmapItem *item = new QGraphicsPixmapItem( QPixmap::fromImage(image), 0, scene);
-
-  item->setScale(25);
-
-
-  //QGraphicsView view( &scene );
-  m_Controls->m_PerSliceView->setRenderHints( QPainter::Antialiasing );
-
-  m_Controls->m_PerSliceView->setScene(scene);
-  m_Controls->m_PerSliceView->show();
-
-  m_Controls->m_PerSliceView->repaint();
 }
 
 void QmitkTensorReconstructionView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -550,6 +515,101 @@ void QmitkTensorReconstructionView::ResidualCalculation()
       m_Controls->m_ResidualAnalysis->DrawMeans();
     }
 
+
+
+    // Draw Graph for volumes per slice in the QGraphicsView
+    std::vector< std::vector<double> > outliersPerSlice = residualFilter->GetOutliersPerSlice();
+    int xSize = outliersPerSlice.size();
+    if(xSize == 0)
+    {
+      return;
+    }
+    int ySize = outliersPerSlice[0].size();
+
+
+    // Find maximum in outliersPerSlice
+    double maxOutlier= 0.0;
+    for(int i=0; i<xSize; i++)
+    {
+      for(int j=0; j<ySize; j++)
+      {
+        if(outliersPerSlice[i][j]>maxOutlier)
+        {
+          maxOutlier = outliersPerSlice[i][j];
+        }
+      }
+    }
+
+
+    // Create some QImage
+    QImage qImage(xSize, ySize, QImage::Format_RGB32);
+    QRgb value;
+
+    vtkSmartPointer<vtkLookupTable> lookup =
+        vtkSmartPointer<vtkLookupTable>::New();
+
+    lookup->SetTableRange(0.0, maxOutlier);
+    lookup->Build();
+
+    vtkIndent ind;
+    lookup->GetTable()->PrintSelf(std::cout, ind);
+
+
+
+    // Fill qImage
+    for(int i=0; i<xSize; i++)
+    {
+      for(int j=0; j<ySize; j++)
+      {
+
+        double out = outliersPerSlice[i][j];
+        double* c = lookup->GetTableValue(out);
+        double r = c[0] * 255;
+        double g = c[1] * 255;
+        double b = c[2] * 255;
+
+        value = qRgb((int)r, (int)g, (int)b);
+
+        std::cout << out << ": " << r << ' ' << g << ' ' << b << '\n';
+
+        qImage.setPixel(i,j,value);
+      }
+    }
+  std::cout << std::endl;
+
+/*
+    value = qRgb(122, 163, 39); // 0xff7aa327
+    qImage.setColor(0, value);
+
+    value = qRgb(237, 187, 51); // 0xffedba31
+    qImage.setColor(1, value);
+    value = qRgb(189, 149, 39); // 0xffbd9527
+
+    qImage.setColor(2, value);
+
+
+
+    int dotX = qImage.dotsPerMeterX();
+    int dotY= qImage.dotsPerMeterY();
+
+    qImage.setDotsPerMeterX(10*dotX);
+    qImage.setDotsPerMeterY(10*dotY);
+ */
+
+    QGraphicsScene* scene = new QGraphicsScene;
+
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem( QPixmap::fromImage(qImage), 0, scene);
+
+    item->setScale(25);
+
+
+    //QGraphicsView view( &scene );
+    m_Controls->m_PerSliceView->setRenderHints( QPainter::Antialiasing );
+
+    m_Controls->m_PerSliceView->setScene(scene);
+    m_Controls->m_PerSliceView->show();
+
+    m_Controls->m_PerSliceView->repaint();
 
   }
 

@@ -206,6 +206,61 @@ namespace itk
 
 
 
+    // Calculate for each slice the number of outliers per volume(dw volume)
+    std::vector< std::vector <std::vector<double> > >::iterator sliceIt = residualsPerSlice.begin();
+
+    while(sliceIt != residualsPerSlice.end())
+    {
+      std::vector< std::vector<double> > currentSlice = *sliceIt;
+      std::vector<double> percentages;
+
+      std::vector< std::vector<double> >::iterator volIt = currentSlice.begin();
+      while(volIt != currentSlice.end())
+      {
+
+
+        std::vector<double> currentVolume = *volIt;
+
+        //sort
+        std::sort(currentVolume.begin(), currentVolume.end());
+
+
+
+        q1 = currentVolume[0.25*currentVolume.size()];
+        q3 = currentVolume[0.75*currentVolume.size()];
+        median = currentVolume[0.5*currentVolume.size()];
+        double iqr = q3-q1;
+        double outlierThreshold = median + 1.5*iqr;
+        double numberOfOutliers = 0.0;
+
+        std::vector<double>::iterator resIt = currentVolume.begin();
+        double mean;
+        while(resIt != currentVolume.end())
+        {
+          double f = *resIt;
+          if(f>outlierThreshold)
+          {
+            numberOfOutliers++;
+          }
+          mean += f;
+          ++resIt;
+       }
+
+       double percOfOutliers = 100 * numberOfOutliers / currentVolume.size();
+       percentages.push_back(percOfOutliers);
+
+       ++volIt;
+     }
+
+     m_OutliersPerSlice.push_back(percentages);
+
+
+
+      ++sliceIt;
+    }
+
+
+
 
   }
 

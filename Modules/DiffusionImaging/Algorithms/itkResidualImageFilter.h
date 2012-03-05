@@ -87,6 +87,11 @@ namespace itk
       return m_PercentagesOfOutliers;
     }
 
+    std::vector< std::vector<double> > GetOutliersPerSlice()
+    {
+      return m_OutliersPerSlice;
+    }
+
     void SetGradients(GradientDirectionContainerType* grads)
     {
       m_Gradients = grads;
@@ -129,7 +134,9 @@ namespace itk
 
     std::vector<double> m_Means, m_Q1, m_Q3, m_PercentagesOfOutliers;
 
-    // 'Outer' vector: volumes, 'Inner' vector slices
+
+
+    // 'Outer' vector: slices, 'Inner' volumes
     std::vector< std::vector<double> > m_OutliersPerSlice;
 
     GradientDirectionContainerType* m_Gradients;

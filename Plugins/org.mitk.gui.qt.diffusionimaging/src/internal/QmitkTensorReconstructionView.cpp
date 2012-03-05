@@ -543,7 +543,15 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     // Create some QImage
     QImage qImage(xSize, ySize, QImage::Format_RGB32);
+
+
+
+
     QRgb value;
+
+
+
+
 
     vtkSmartPointer<vtkLookupTable> lookup =
         vtkSmartPointer<vtkLookupTable>::New();
@@ -551,9 +559,14 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     lookup->SetTableRange(0.0, maxOutlier);
     lookup->Build();
 
-    vtkIndent ind;
-    lookup->GetTable()->PrintSelf(std::cout, ind);
+    reversedlookupTable->SetTableRange(0, maxOutlier);
+    reversedlookupTable->Build();
 
+    for(int i=0; i<256; i++)
+    {
+      double* rgba = reversedlookupTable->GetTableValue(255-i);
+      lookup->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
 
 
     // Fill qImage
@@ -561,52 +574,38 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     {
       for(int j=0; j<ySize; j++)
       {
-
         double out = outliersPerSlice[i][j];
-        double* c = lookup->GetTableValue(out);
-        double r = c[0] * 255;
-        double g = c[1] * 255;
-        double b = c[2] * 255;
 
-        value = qRgb((int)r, (int)g, (int)b);
+        unsigned char *_rgba = lookup->MapValue(out);
+        int r, g, b;
+        r = _rgba[0];
+        g = _rgba[1];
+        b = _rgba[2];
 
-        std::cout << out << ": " << r << ' ' << g << ' ' << b << '\n';
+        value = qRgb(r, g, b);
 
         qImage.setPixel(i,j,value);
       }
     }
-  std::cout << std::endl;
-
-/*
-    value = qRgb(122, 163, 39); // 0xff7aa327
-    qImage.setColor(0, value);
-
-    value = qRgb(237, 187, 51); // 0xffedba31
-    qImage.setColor(1, value);
-    value = qRgb(189, 149, 39); // 0xffbd9527
-
-    qImage.setColor(2, value);
 
 
-
-    int dotX = qImage.dotsPerMeterX();
-    int dotY= qImage.dotsPerMeterY();
-
-    qImage.setDotsPerMeterX(10*dotX);
-    qImage.setDotsPerMeterY(10*dotY);
- */
 
     QGraphicsScene* scene = new QGraphicsScene;
 
-    QGraphicsPixmapItem *item = new QGraphicsPixmapItem( QPixmap::fromImage(qImage), 0, scene);
 
-    item->setScale(25);
 
+
+
+    QPixmap pixmap(QPixmap::fromImage(qImage));
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem( pixmap, 0, scene);
+    item->scale(10.0, 3.0);
 
     //QGraphicsView view( &scene );
     m_Controls->m_PerSliceView->setRenderHints( QPainter::Antialiasing );
 
     m_Controls->m_PerSliceView->setScene(scene);
+
+
     m_Controls->m_PerSliceView->show();
 
     m_Controls->m_PerSliceView->repaint();

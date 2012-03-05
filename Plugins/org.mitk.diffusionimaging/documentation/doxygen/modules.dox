@@ -1,0 +1,19 @@
+/**
+  \defgroup org_mitk_diffusionimaging org.mitk.diffusionimaging
+  \ingroup MITKPlugins
+
+  \brief This small plug-in is responsible for initializing the mitkDiffusionImaging module.
+  
+  It is started with an "eager" Bundle-ActivationPolicy, sucht that the plug-ins
+  activator is executed before any other (non-eager) plug-ins.
+  
+*/
+
+/**
+  \defgroup org_mitk_diffusionimaging_internal Internal
+  \ingroup org_mitk_diffusionimaging
+
+  \brief This subcategory includes the internal classes of the org.mitk.diffusionimaging plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

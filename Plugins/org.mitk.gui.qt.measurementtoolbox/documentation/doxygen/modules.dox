@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_measurementtoolbox org.mitk.gui.qt.measurementtoolbox
+  \ingroup MITKPlugins
+
+  \brief This is the measurementtoolbox plugin. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_measurementtoolbox_internal Internal
+  \ingroup org_mitk_gui_qt_measurementtoolbox
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.measurementtoolbox plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

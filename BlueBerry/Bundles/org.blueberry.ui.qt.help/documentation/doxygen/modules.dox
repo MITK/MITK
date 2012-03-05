@@ -1,5 +1,5 @@
 /**
-  \defgroup org_blueberry_ui_qt_help org.blueberry.ui.qt.help Plugin
+  \defgroup org_blueberry_ui_qt_help org.blueberry.ui.qt.help
   \ingroup BlueBerryPlugins
 
   \brief Provides access to Qt Help information from inside the Workbench.

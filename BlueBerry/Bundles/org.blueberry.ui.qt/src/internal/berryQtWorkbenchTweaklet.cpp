@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "berryQtWorkbenchTweaklet.h"
-#include "berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <QApplication>
 #include <QMainWindow>

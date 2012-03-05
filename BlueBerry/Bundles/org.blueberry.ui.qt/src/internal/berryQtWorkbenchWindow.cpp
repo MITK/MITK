@@ -17,7 +17,7 @@
 
 #include "berryQtWorkbenchWindow.h"
 
-#include "berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 #include "berryQtPerspectiveSwitcher.h"
 
 #include <QWidget>

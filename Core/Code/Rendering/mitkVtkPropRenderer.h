@@ -210,7 +210,7 @@ private:
   bool m_ResizeNeeded;
   bool m_VtkMapperPresent;
   bool m_NewRenderer;
-  bool m_2DCameraInitialized;
+  MapperSlotId m_CameraInitializedForMapperID;
 
   // Picking
   vtkWorldPointPicker     * m_WorldPointPicker;

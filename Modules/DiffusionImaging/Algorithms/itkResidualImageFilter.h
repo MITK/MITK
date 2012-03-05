@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageToImageFilter.h"
 #include <itkDiffusionTensor3D.h>
 
+
 namespace itk
 {
 
@@ -46,6 +47,13 @@ namespace itk
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
+    typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
+    typedef itk::VectorContainer< unsigned int,
+      GradientDirectionType >                   GradientDirectionContainerType;
+
+
+    typedef itk::Image<InputScalarType,3>  BaselineImageType;
+
     itkTypeMacro (ResidualImageFilter, ImageToImageFilter);
 
     itkStaticConstMacro (ImageDimension, unsigned int,
@@ -59,11 +67,53 @@ namespace itk
     }
 
 
+    std::vector<double> GetQ1()
+    {
+      return m_Q1;
+    }
+
+    std::vector<double> GetQ3()
+    {
+      return m_Q3;
+    }
+
+    std::vector<double> GetMeans()
+    {
+      return m_Means;
+    }
+
+    std::vector<double> GetPercentagesOfOutliers()
+    {
+      return m_PercentagesOfOutliers;
+    }
+
+    std::vector< std::vector<double> > GetOutliersPerSlice()
+    {
+      return m_OutliersPerSlice;
+    }
+
+    void SetGradients(GradientDirectionContainerType* grads)
+    {
+      m_Gradients = grads;
+    }
+
+    void SetBaseLineImage(BaselineImageType* baseline)
+    {
+      m_BaseLineImage = baseline;
+    }
+
+    void SetB0Threshold(InputScalarType threshold)
+    {
+      m_B0Threshold = threshold;
+    }
+
+    itkSetMacro(B0Index, int)
+
 
   protected:
     ResidualImageFilter()
     {
-
+      m_B0Threshold = 30.0; // default value. allow user to redefine
     };
     ~ResidualImageFilter(){};
 
@@ -82,6 +132,20 @@ namespace itk
 
     typename InputImageType::Pointer m_SecondDiffusionImage;
 
+    std::vector<double> m_Means, m_Q1, m_Q3, m_PercentagesOfOutliers;
+
+
+
+    // 'Outer' vector: slices, 'Inner' volumes
+    std::vector< std::vector<double> > m_OutliersPerSlice;
+
+    GradientDirectionContainerType* m_Gradients;
+
+    typename BaselineImageType::Pointer m_BaseLineImage;
+
+    InputScalarType m_B0Threshold;
+
+    int m_B0Index;
 
   };    
 

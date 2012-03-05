@@ -36,6 +36,7 @@
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricSpline.h>
 #include <vtkPolygon.h>
+#include <vtkCleanPolyData.h>
 
 #include <math.h>
 
@@ -53,6 +54,11 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
   m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
   if (fiberPolyData != NULL)
   {
+    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleaner->SetInput(fiberPolyData);
+    cleaner->Update();
+    fiberPolyData = cleaner->GetOutput();
+
     m_FiberPolyData->DeepCopy(fiberPolyData);
     this->DoColorCodingOrientationBased();
   }

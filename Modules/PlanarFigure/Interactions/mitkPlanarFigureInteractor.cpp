@@ -122,14 +122,14 @@ bool mitk::PlanarFigureInteractor
   // Get the timestep to also support 3D+t
   const mitk::Event *theEvent = stateEvent->GetEvent();
   int timeStep = 0;
-  mitk::ScalarType timeInMS = 0.0;
+  //mitk::ScalarType timeInMS = 0.0;
 
   if ( theEvent )
   {
     if (theEvent->GetSender() != NULL)
     {
       timeStep = theEvent->GetSender()->GetTimeStep( planarFigure );
-      timeInMS = theEvent->GetSender()->GetTime();
+      //timeInMS = theEvent->GetSender()->GetTime();
     }
   }
 
@@ -301,7 +301,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      if ( m_LastPointWasValid && planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  )
+      if ( planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  )
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners

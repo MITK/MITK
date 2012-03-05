@@ -1,19 +1,19 @@
 /*=========================================================================
-
-Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToDiffusionImageFilter.txx $
-Language:  C++
-Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
-Version:   $Revision: 68 $
-
-Copyright (c) INRIA 2010. All rights reserved.
-See LICENSE.txt for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
+   2
+   3 Program:   Tensor ToolKit - TTK
+   4 Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToDiffusionImageFilter.txx $
+   5 Language:  C++
+   6 Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
+   7 Version:   $Revision: 68 $
+   8
+   9 Copyright (c) INRIA 2010. All rights reserved.
+  10 See LICENSE.txt for details.
+  11
+  12 This software is distributed WITHOUT ANY WARRANTY; without even
+  13 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  14 PURPOSE.  See the above copyright notices for more information.
+  15
+  16 =========================================================================*/
 #ifndef _itk_TensorImageToDiffusionImageFilter_txx_
 #define _itk_TensorImageToDiffusionImageFilter_txx_
 #endif
@@ -88,8 +88,8 @@ namespace itk
     typename itk::RescaleIntensityImageFilter< itk::Image<InputScalarType,3>, BaselineImageType>::Pointer rescaler=
       itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
 
-    rescaler->SetOutputMinimum ( 0 );
-    rescaler->SetOutputMaximum ( 10000 );
+    rescaler->SetOutputMinimum ( m_Min );
+    rescaler->SetOutputMaximum ( m_Max );
     rescaler->SetInput ( myFilter1->GetOutput() );
     try
     {

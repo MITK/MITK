@@ -58,6 +58,7 @@ namespace itk
         }
       c++;
     }
+
     return costs;
   }
 
@@ -71,6 +72,10 @@ namespace itk
     // initialize index vectors
     m_UsedGradientIndices.clear();
     m_UnUsedGradientIndices.clear();
+
+    if ( m_OriginalGradientDirections->Size()<= m_NumGradientDirections )
+      m_NumGradientDirections = m_OriginalGradientDirections->Size();
+
     int c=0;
     int numB0 = 0;
     for (int i=0; i<m_OriginalGradientDirections->Size(); i++)

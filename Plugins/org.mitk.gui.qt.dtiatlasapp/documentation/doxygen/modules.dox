@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_dtiatlasapp org.mitk.dtiatlasapp
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup org_mitk_dtiatlasapp_internal Internal
+  \ingroup org_mitk_dtiatlasapp
+
+  \brief This subcategory includes the internal classes of the org.mitk.dtiatlasapp plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

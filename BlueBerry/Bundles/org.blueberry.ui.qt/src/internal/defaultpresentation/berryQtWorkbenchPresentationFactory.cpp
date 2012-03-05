@@ -24,7 +24,7 @@
 #include "../util/berryTabbedStackPresentation.h"
 
 #include "../berryQtSash.h"
-#include "../berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <QApplication>
 

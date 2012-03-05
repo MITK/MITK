@@ -21,7 +21,7 @@
 
 #include <QMainWindow>
 
-#include "berryQtWidgetController.h"
+#include <internal/berryQtWidgetController.h>
 
 namespace berry {
 

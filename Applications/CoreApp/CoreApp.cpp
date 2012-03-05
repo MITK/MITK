@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
   coreConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
-  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.application");
+  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.coreapplication");
 
   // Preload the org.mitk.gui.qt.common plug-in (and hence also Qmitk) to speed
   // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,

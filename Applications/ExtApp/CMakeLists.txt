@@ -21,7 +21,7 @@ set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.prov
 set(_exclude_plugins
   org.blueberry.test
   org.blueberry.uitest
-  org.mitk.gui.qt.application
+  org.mitk.gui.qt.coreapplication
   org.mitk.gui.qt.diffusionimagingapp
 )
 

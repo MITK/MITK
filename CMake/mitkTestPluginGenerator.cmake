@@ -9,20 +9,20 @@ if(BUILD_TESTING)
            COMMAND ${CMAKE_COMMAND} -E remove_directory "${test_project_source_dir}"
           )
   set_tests_properties(mitkPluginGeneratorCleanTest PROPERTIES
-                       LABLES "MITK;BlueBerry")
+                       LABELS "MITK;BlueBerry")
   
   add_test(NAME mitkPluginGeneratorCleanTest2
            COMMAND ${CMAKE_COMMAND} -E remove_directory "${test_project_binary_dir}"
           )
   set_tests_properties(mitkPluginGeneratorCleanTest2 PROPERTIES
-                       LABLES "MITK;BlueBerry")
+                       LABELS "MITK;BlueBerry")
 
   add_test(NAME mitkPluginGeneratorCleanTest3
            COMMAND ${CMAKE_COMMAND} -E make_directory "${test_project_binary_dir}"
           )
   set_tests_properties(mitkPluginGeneratorCleanTest3 PROPERTIES
                        DEPENDS mitkPluginGeneratorCleanTest2
-                       LABLES "MITK;BlueBerry")
+                       LABELS "MITK;BlueBerry")
   
   add_test(NAME mitkPluginGeneratorCreateTest
            COMMAND ${exec_target} --project-name "${proj}" --project-app-name "TestApp"
@@ -61,8 +61,8 @@ if(BUILD_TESTING)
                          DEPENDS mitkPluginGeneratorCreateTest
                          LABELS "MITK;BlueBerry")
   
-    add_test(mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE}
-             ${CMAKE_COMMAND} --build ${test_project_binary_dir} --config ${CMAKE_BUILD_TYPE})
+    add_test(NAME mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE}
+             COMMAND ${CMAKE_COMMAND} --build ${test_project_binary_dir} --config ${CMAKE_BUILD_TYPE})
     set_tests_properties(mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS mitkPluginGeneratorConfigureTest-${CMAKE_BUILD_TYPE}
                          LABELS "MITK;BlueBerry")

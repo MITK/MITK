@@ -585,7 +585,7 @@ void  mitk::EventMapper::StartElement (const char *elementName, const char **att
       {
         if (*iter == eventDescr)
         {
-          STATEMACHINE_WARN<<"Event description " << eventDescr.GetName() << " already present! Skipping event description";
+          MITK_WARN << "Event description " << eventDescr.GetName() << " already present! Skipping event description";
           return;
         }
       }

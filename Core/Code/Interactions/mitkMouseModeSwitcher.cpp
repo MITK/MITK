@@ -119,7 +119,8 @@ void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
       {
         m_GlobalInteraction->RemoveListener( (*iter) );
       }
-    }
+      break;
+    } // case OFF
   } // switch
 
 

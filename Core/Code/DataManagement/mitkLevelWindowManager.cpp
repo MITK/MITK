@@ -162,7 +162,6 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
   m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
   m_IsPropertyModifiedTagSet = true;
-  m_AutoTopMost = false;
 
   /* search image than belongs to the property */
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);

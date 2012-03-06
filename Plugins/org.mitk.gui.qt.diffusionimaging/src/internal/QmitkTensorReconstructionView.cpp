@@ -529,14 +529,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     // Create some QImage
     QImage qImage(xSize, ySize, QImage::Format_RGB32);
     QImage legend(1, 256, QImage::Format_RGB32);
-
-
-
     QRgb value;
-
-
-
-
 
     vtkSmartPointer<vtkLookupTable> lookup =
         vtkSmartPointer<vtkLookupTable>::New();
@@ -603,6 +596,8 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     QPixmap pixmap2(QPixmap::fromImage(legend));
     QGraphicsPixmapItem *item2 = new QGraphicsPixmapItem( pixmap2, 0, scene2);
     item2->scale(20.0, 1.0);
+
+    m_Controls->m_PerSliceView->SetResidualPixmapItem(item);
 
 
 

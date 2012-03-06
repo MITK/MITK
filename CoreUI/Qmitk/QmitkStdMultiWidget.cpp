@@ -62,6 +62,10 @@ m_Node(NULL),
 m_GradientBackgroundFlag(true),
 m_PendingCrosshairPositionEvent(false)
 {
+
+  /** Generate a Unique Name for the widgets we add to DataStorage */
+  m_NodeBaseName = QString(tr("widget%1.").arg((unsigned long)this));
+
   /*******************************/
   //Create Widget manually
   /*******************************/
@@ -1297,6 +1301,8 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // add the displayed planes of the multiwidget to a node to which the subtree 
   // @a planesSubTree points ...
 
+  std::string baseName = m_NodeBaseName.toLocal8Bit().constData();
+
   float white[3] = {1.0f,1.0f,1.0f};
   mitk::Geometry2DDataMapper2D::Pointer mapper;
 
@@ -1304,7 +1310,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
   m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
+  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(baseName + "widget1Plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
@@ -1314,7 +1320,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_PlaneNode2 =( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
   m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
+  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(baseName + "widget2Plane"));
   m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
@@ -1324,7 +1330,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
   m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
+  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(baseName + "widget3Plane"));
   m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();

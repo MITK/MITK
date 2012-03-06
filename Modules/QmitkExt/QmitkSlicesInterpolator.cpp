@@ -328,14 +328,12 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
 void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 {
-    OnInterpolationActivated(status);
-    //On3DInterpolationActivated(!status);
+  OnInterpolationActivated(status);
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
 {
   On3DInterpolationActivated(status);
-  //OnInterpolationActivated(!status);
 }
 
 void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)

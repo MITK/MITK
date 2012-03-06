@@ -301,6 +301,7 @@ protected:
   mitk::DataNode::Pointer m_PlaneNode2;
   mitk::DataNode::Pointer m_PlaneNode3;
   mitk::DataNode::Pointer m_Node;
+  QString m_NodeBaseName;
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;

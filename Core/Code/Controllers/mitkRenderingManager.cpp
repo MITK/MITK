@@ -230,6 +230,12 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
+  // If the renderWindow is not valid, we do not want to inadvertantly create an entry.
+  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
+  {
+    return;
+  }
+
   m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
   if ( !m_UpdatePending )
@@ -244,6 +250,12 @@ void
 RenderingManager
 ::ForceImmediateUpdate( vtkRenderWindow *renderWindow )
 {
+  // If the renderWindow is not valid, we do not want to inadvertantly create an entry.
+  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
+  {
+    return;
+  }
+
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
 

@@ -90,6 +90,7 @@ protected slots:
   void TeemReconstruction();
   void ItkReconstruction();
   void ResidualCalculation();
+  void ResidualClicked();
 
 protected:
 

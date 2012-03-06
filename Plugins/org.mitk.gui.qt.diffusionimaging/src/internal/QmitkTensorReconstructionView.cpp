@@ -258,7 +258,13 @@ void QmitkTensorReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
     connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
     connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
+    connect( (QObject*)(m_Controls->m_ResidualAnalysis), SIGNAL(clicked()), this, SLOT(ResidualClicked()) );
   }
+}
+
+void QmitkTensorReconstructionView::ResidualClicked()
+{
+  std::cout << "clicked in the residual widget" << std::endl;
 }
 
 void QmitkTensorReconstructionView::TeemCheckboxClicked()

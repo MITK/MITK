@@ -509,10 +509,10 @@
       <string>Residuals</string>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
@@ -569,51 +569,77 @@
             <attribute name="title">
              <string>Per slice</string>
             </attribute>
-            <layout class="QHBoxLayout" name="horizontalLayout">
+            <layout class="QVBoxLayout" name="verticalLayout_10">
              <item>
-              <widget class="QmitkResidualViewWidget" name="m_PerSliceView">
-               <property name="maximumSize">
-                <size>
-                 <width>300</width>
-                 <height>400</height>
-                </size>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Percentage of outliers per slice</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QFrame" name="frame_4">
+              <widget class="QFrame" name="frame_5">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_9">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
-                 <widget class="QLabel" name="m_UpperLabel">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGraphicsView" name="m_LegendView">
+                 <widget class="QmitkResidualViewWidget" name="m_PerSliceView">
                   <property name="maximumSize">
                    <size>
-                    <width>20</width>
-                    <height>255</height>
+                    <width>300</width>
+                    <height>400</height>
                    </size>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="m_LowerLabel">
-                  <property name="text">
-                   <string/>
+                 <widget class="QFrame" name="frame_4">
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_9">
+                   <item>
+                    <widget class="QLabel" name="m_UpperLabel">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QGraphicsView" name="m_LegendView">
+                     <property name="maximumSize">
+                      <size>
+                       <width>20</width>
+                       <height>255</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="m_LowerLabel">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Volume: .., Slice:..</string>
+               </property>
               </widget>
              </item>
             </layout>

@@ -61,25 +61,17 @@ protected:
 
   void mouseMoveEvent(QMouseEvent* event);
 
+  void mousePressEvent(QMouseEvent* event);
 
+  void mouseReleaseEvent(QMouseEvent* event);
 
-  QPointF m_CurrentCenterPoint, m_LastPanPoint;
-
+  QPointF m_CurrentCenterPoint;
 
   QGraphicsPixmapItem* m_ResidualPixmapItem;
 
-  //From panning the view
-  //QPoint LastPanPoint;
+  QPoint m_LastPanPoint;
 
-  //Set the current centerpoint in the
   void SetCenter(const QPointF& centerPoint);
-
-  /*
-  QPointF GetCenter()
-  {
-    return m_CurrentCenterPoint;
-  }
-*/
 
 };
 

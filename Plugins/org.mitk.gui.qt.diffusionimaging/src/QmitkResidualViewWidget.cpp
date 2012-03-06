@@ -28,26 +28,38 @@ QmitkResidualViewWidget::QmitkResidualViewWidget(QGraphicsScene *scene, QWidget 
 
 }
 
-void QmitkResidualViewWidget::mouseMoveEvent(QMouseEvent *event)
-{
+
+void QmitkResidualViewWidget::mousePressEvent(QMouseEvent* event) {
+  // Panning
+  m_LastPanPoint = event->pos();
+  setCursor(Qt::ClosedHandCursor);
+
+
   QGraphicsItem *item = this->itemAt(event->pos());
   if(item == m_ResidualPixmapItem)
   {
     QPointF sceneCoord(mapToScene(event->pos()));
     QPointF imageCoord(item->mapFromParent(sceneCoord));
-    std::cout << "Image coord: " << imageCoord.x() << ' ' << imageCoord.y() << std::endl;
 
-
-
-
-    QPoint p;
-    p.setX(QCursor::pos().x()+25);
-    p.setY(QCursor::pos().y()+25);
-    QToolTip::showText(p, "Text", this, this->rect());
+    emit clicked();
+    // Use image coord to reset crosshair
   }
-
 }
 
+
+void QmitkResidualViewWidget::mouseReleaseEvent(QMouseEvent* event) {
+  setCursor(Qt::OpenHandCursor);
+  m_LastPanPoint = QPoint();
+}
+
+void QmitkResidualViewWidget::mouseMoveEvent(QMouseEvent *event)
+{
+  if(!m_LastPanPoint.isNull()) {
+    QPointF delta = mapToScene(m_LastPanPoint) - mapToScene(event->pos());
+    m_LastPanPoint = event->pos();
+    SetCenter(m_CurrentCenterPoint + delta);
+  }
+}
 
 void QmitkResidualViewWidget::wheelEvent(QWheelEvent *event)
 {  
@@ -93,9 +105,9 @@ void QmitkResidualViewWidget::SetCenter(const QPointF& center) {
   QRectF visibleArea = mapToScene(rect()).boundingRect();
   QRectF sceneBounds = sceneRect();
 
-  double boundX = visibleArea.width() ;
+  double boundX = visibleArea.width() / 2.0 ;
   double boundY = visibleArea.height() / 2.0;
-  double boundWidth = sceneBounds.width() * boundX;
+  double boundWidth = sceneBounds.width() -2.0 * boundX;
   double boundHeight = sceneBounds.height() - 2.0 * boundY;
 
   //The max boundary that the centerPoint can be to

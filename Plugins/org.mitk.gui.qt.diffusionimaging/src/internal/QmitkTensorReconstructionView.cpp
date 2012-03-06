@@ -24,7 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QImage>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsEllipseItem>
+#include <QGraphicsLinearLayout>
+
 
 // itk includes
 #include "itkTimeProbe.h"
@@ -407,23 +408,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     std::vector<int> b0Indices = image->GetB0Indices();
 
-/*
-    // Extract B0
-    typedef itk::B0ImageExtractionImageFilter<DiffusionPixelType, DiffusionPixelType> BaslineFilterType;
-    BaslineFilterType::Pointer baseFilter = BaslineFilterType::New();
-    baseFilter->SetInput(image->GetVectorImage());
-    baseFilter->SetDirections(image->GetDirections());
-    baseFilter->Update();
 
-    mitk::Image::Pointer boImage = mitk::Image::New();
-    boImage->InitializeByItk( baseFilter->GetOutput() );
-    boImage->SetVolume( baseFilter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer b0Node=mitk::DataNode::New();
-    b0Node->SetData( boImage );
-    b0Node->SetProperty( "name", mitk::StringProperty::New("baseline"));
-
-    GetDefaultDataStorage()->Add(b0Node);
-*/
 
     typedef itk::ResidualImageFilter<DiffusionPixelType, float> ResidualImageFilterType;
 
@@ -543,7 +528,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     // Create some QImage
     QImage qImage(xSize, ySize, QImage::Format_RGB32);
-
+    QImage legend(1, 256, QImage::Format_RGB32);
 
 
 
@@ -585,30 +570,51 @@ void QmitkTensorReconstructionView::ResidualCalculation()
         value = qRgb(r, g, b);
 
         qImage.setPixel(i,j,value);
+
       }
     }
 
+    for(int i=0; i<256; i++)
+    {
+      double* rgba = lookup->GetTableValue(i);
+      int r, g, b;
+      r = rgba[0]*255;
+      g = rgba[1]*255;
+      b = rgba[2]*255;
+      value = qRgb(r, g, b);
+      legend.setPixel(0,255-i,value);
+    }
 
+    QString upper = QString::number(maxOutlier, 'g', 3);
+    upper.append(" %");
+    QString lower = QString::number(0.0);
+    lower.append(" %");
+    m_Controls->m_UpperLabel->setText(upper);
+    m_Controls->m_LowerLabel->setText(lower);
 
     QGraphicsScene* scene = new QGraphicsScene;
-
-
-
+    QGraphicsScene* scene2 = new QGraphicsScene;
 
 
     QPixmap pixmap(QPixmap::fromImage(qImage));
     QGraphicsPixmapItem *item = new QGraphicsPixmapItem( pixmap, 0, scene);
     item->scale(10.0, 3.0);
 
-    //QGraphicsView view( &scene );
-    m_Controls->m_PerSliceView->setRenderHints( QPainter::Antialiasing );
+    QPixmap pixmap2(QPixmap::fromImage(legend));
+    QGraphicsPixmapItem *item2 = new QGraphicsPixmapItem( pixmap2, 0, scene2);
+    item2->scale(20.0, 1.0);
+
+
 
     m_Controls->m_PerSliceView->setScene(scene);
-
-
+    m_Controls->m_LegendView->setScene(scene2);
     m_Controls->m_PerSliceView->show();
-
     m_Controls->m_PerSliceView->repaint();
+
+    m_Controls->m_LegendView->setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+    m_Controls->m_LegendView->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+    m_Controls->m_LegendView->show();
+    m_Controls->m_LegendView->repaint();
 
   }
 

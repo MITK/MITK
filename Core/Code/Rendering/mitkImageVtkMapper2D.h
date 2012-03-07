@@ -261,7 +261,7 @@ namespace mitk {
     void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
 
     /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+    void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );
 
     /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
     Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous

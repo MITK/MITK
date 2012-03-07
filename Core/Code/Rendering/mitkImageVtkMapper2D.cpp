@@ -431,6 +431,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     return;
   }
 
+
+  MITK_INFO << "-------------------------\nboundInitialized = " << boundsInitialized;
+  MITK_INFO << "xMin " << xMin;
+  MITK_INFO << "xMax " << xMax;
+  MITK_INFO << "yMin " << yMin;
+  MITK_INFO << "yMax " << yMax;
+  for (int i = 0; i < 4 ; ++i)
+    MITK_INFO << "sliceBounds[" << i<< "] " <<sliceBounds[i] ;
+  // TODO "clip" by setting background to alpha=0
+
+
+
   // Calculate dataset spacing in plane z direction (NOT spacing of current
   // world geometry)
   double dataZSpacing = 1.0;
@@ -485,6 +497,30 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     return;
   }
 
+  // TODO calculate minimum bounding rect of IMAGE in texture
+  vtkFloatingPointType textureClippingBounds[6];
+  for ( int i = 0; i < 6; ++i )
+  {
+    textureClippingBounds[i] = 0.0;
+  }
+  // Calculate the actual bounds of the transformed plane clipped by the
+  // dataset bounding box; this is required for drawing the texture at the
+  // correct position during 3D mapping.
+  bool anyPartVisible = this->CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
+
+  textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[2] = static_cast< int >( textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5 );
+  textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
+
+
+  MITK_INFO << "-------------------------anyPartVisible = " << anyPartVisible;
+  for (int i = 0; i < 4 ; ++i)
+    MITK_INFO << "textureClippingBounds[" << i<< "] " <<textureClippingBounds[i] ;
+  // TODO "clip" by setting background to alpha=0
+
+
+
   //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
@@ -510,7 +546,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       else
       {
         binaryOutline = false;
-        this->ApplyLookuptable(renderer);
+        this->ApplyLookuptable(renderer, textureClippingBounds);
         MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
       }
     }
@@ -521,29 +557,25 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
         MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
       }
     }
-    this->ApplyLookuptable(renderer);
-    //Interpret the values as binary values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+    this->ApplyLookuptable(renderer, textureClippingBounds);
   }
   else if( numberOfComponents == 1 ) //gray images
   {
-    //Interpret the values as gray values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
-
-    this->ApplyLookuptable(renderer);
+    this->ApplyLookuptable(renderer, textureClippingBounds);
   }
   else if ( (numberOfComponents == 3) || (numberOfComponents == 4) ) //RBG(A) images
   {
-    //Interpret the RGB(A) images values correctly
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-    this->ApplyLookuptable(renderer);
+    this->ApplyLookuptable(renderer, textureClippingBounds);
     this->ApplyRBGALevelWindow(renderer);
   }
   else
   {
     MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
   }
+    
+  // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
+  localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
   this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );
@@ -643,7 +675,7 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
 }
 
-void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
+void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds )
 {
   bool binary = false;
   bool CTFcanBeApplied = false;
@@ -679,7 +711,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
           <= this->GetDataNode()->GetPropertyList()->GetMTime() )
           {
           LookupTableProp->GetLookupTable()->ChangeOpacityForAll( LookupTableProp->GetLookupTable()->GetVtkLookupTable()->GetAlpha()*localStorage->m_Actor->GetProperty()->GetOpacity() );
-          LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+          //LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
         }
         //we use the user-defined lookuptable
         //localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
@@ -713,6 +745,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
   // TODO check opacity handling
   localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+
+  localStorage->m_LevelWindowFilter->SetClippingBounds(bounds);
+
+
   //connect the texture with the output of the RGB filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
   // TODO use filter thing to create RGBA texture
@@ -1234,8 +1270,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_LookupTable->SetHueRange( 0.0, 0.0 );
   m_LookupTable->SetValueRange( 0.0, 1.0 );
   m_LookupTable->Build();
-  //map all black values to transparent
-  m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+  //map all black values to transparent !STUPID
+  //m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

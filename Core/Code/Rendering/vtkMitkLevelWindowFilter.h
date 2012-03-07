@@ -51,6 +51,8 @@ public:
   void SetMaxOpacity(double maxOpacity);
   inline double GetMaxOpacity() const;
 
+  void SetClippingBounds(vtkFloatingPointType*);
+
   /** Default constructor. */
   vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
@@ -77,5 +79,7 @@ private:
   double m_MinOqacity;
   /** m_MinOqacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
+
+  vtkFloatingPointType m_ClippingBounds[4];
 };
 #endif

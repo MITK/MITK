@@ -22,6 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkVectorImage.h>
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 
+#include <math.h>
+
+
+
+
+
+
 namespace itk
 {
 
@@ -124,6 +131,8 @@ namespace itk
 
     itkSetMacro( BValue, TTensorPixelType);
 
+    //itkGetMacro( GradientDirectionContainer, GradientDirectionContainerType::Pointer);
+
   protected:
 
     FreeWaterEliminationFilter();
@@ -144,14 +153,23 @@ namespace itk
 
   private:
 
-    void remove_negative_eigs(int x, int y, int z, int ****table, 
+    void remove_negative_eigs(int x, int y, int z, float ****table, 
       int nof, itk::Size<3> size, 
-      vnl_matrix<float> pseudoInverse, int ****D, int ****atten, 
+      vnl_matrix<float> pseudoInverse, float ****D, float ****atten, 
       vnl_vector<float> higher_thresh, 
-      vnl_vector<float> lower_thresh, int wasdetectedbad, 
-      int ***b0_mean_image, int ****sorted_eigs, int numberb0);
+      vnl_vector<float> lower_thresh, int& wasdetectedbad, 
+      float ***b0_mean_image, float ****sorted_eigs, int numberb0, int break_flag);
 
-    void check_the_neighbors(int x, int y, int z, int ***table, itk::Size<3>);
+   void check_the_neighbors(int x, int y, int z, float ***table, itk::Size<3>);
+
+  
+   void check_the_neighbors4D(int g,int x, int y, int z, float ****table, itk::Size<3> size); 
+
+
+
+
+
+
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;

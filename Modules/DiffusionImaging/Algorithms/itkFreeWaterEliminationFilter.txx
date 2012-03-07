@@ -29,6 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 #include <C:\toolkits\mitk\bin2\MITK-superbuild\ITK-src\Utilities\vxl\core\vnl\algo\vnl_symmetric_eigensystem.h>
 
+#include <math.h>
+
+
+
+
 
 namespace itk
 {
@@ -89,7 +94,7 @@ namespace itk
     int b= 1000;
     int in_g=0;
     int in_b=0;
-    int temporaryb0sum=0;
+    float temporaryb0sum=0.0;
     int cnt_dir=0;
             
     int etbt[6] = { 0, 4, 8, 1, 5, 2 };
@@ -100,7 +105,7 @@ namespace itk
     int wasdetectedbad=0;
     int LOW_D=0.01;
     int HIGH_D = 5;
-    int oldnumberofbads=1000000000000;
+    int oldnumberofbads=100000000000;
     int newnumberofbads;
     int diff=1;
     
@@ -150,48 +155,35 @@ namespace itk
      
    
 
-   int ****table;// table in which all images except b0 are store
-    table = new int***[nof-numberb0];
+   float ****table;// table in which all images except b0 are store
+    table = new float***[nof-numberb0];
     for (int g=0; g<nof-numberb0; g++)
     {
-      table[g] = new int**[size[0]];
+      table[g] = new float**[size[0]];
       for ( int i = 0 ; i < size[0] ; i++ ) 
       {
-        table[g][i] = new int*[size[1]] ;
+        table[g][i] = new float*[size[1]] ;
         for ( int j = 0 ; j < size[1] ; j++ )
         {
-          table[g][i][j] = new int[size[2]] ;
+          table[g][i][j] = new float[size[2]] ;
         }
       }
     }
 
 
-    int ****table1;// table in which all images except b0 are store
-    table1 = new int***[nof-numberb0];
-    for (int g=0; g<nof-numberb0; g++)
-    {
-      table1[g] = new int**[size[0]];
-      for ( int i = 0 ; i < size[0] ; i++ ) 
-      {
-        table1[g][i] = new int*[size[1]] ;
-        for ( int j = 0 ; j < size[1] ; j++ )
-        {
-          table1[g][i][j] = new int[size[2]] ;
-        }
-      }
-    }
+  
 
-      int ****b0image;// table with all b0images
-    b0image = new int***[numberb0];
+      float ****b0image;// table with all b0images
+    b0image = new float***[numberb0];
     for (int g=0; g<numberb0; g++)
     {
-      b0image[g] = new int**[size[0]];
+      b0image[g] = new float**[size[0]];
       for ( int i = 0 ; i < size[0] ; i++ ) 
       {
-        b0image[g][i] = new int*[size[1]] ;
+        b0image[g][i] = new float*[size[1]] ;
         for ( int j = 0 ; j < size[1] ; j++ )
         {
-          b0image[g][i][j] = new int[size[2]] ;
+          b0image[g][i][j] = new float[size[2]] ;
         }
       }
     }
@@ -239,14 +231,14 @@ namespace itk
   }
 
 
-    int ***b0_mean_image;// table with mean b0 image
-    b0_mean_image = new int**[size[0]];
+    float ***b0_mean_image;// table with mean b0 image
+    b0_mean_image = new float**[size[0]];
     for (int g=0; g<size[0]; g++)
     {
-      b0_mean_image[g] = new int*[size[1]];
+      b0_mean_image[g] = new float*[size[1]];
       for ( int i = 0 ; i < size[1] ; i++ ) 
       {
-        b0_mean_image[g][i] = new int[size[2]] ;
+        b0_mean_image[g][i] = new float[size[2]] ;
        
       }
     }
@@ -267,47 +259,47 @@ namespace itk
         }
     }
 
-    int ****sorted_eigs;// table in which all images except b0 are stored
-    sorted_eigs = new int***[3];
+    float ****sorted_eigs;// table in which all images except b0 are stored
+    sorted_eigs = new float***[3];
     for (int g=0; g<3; g++)
     {
-      sorted_eigs[g] = new int**[size[0]];
+      sorted_eigs[g] = new float**[size[0]];
       for ( int i = 0 ; i < size[0] ; i++ ) 
       {
-        sorted_eigs[g][i] = new int*[size[1]] ;
+        sorted_eigs[g][i] = new float*[size[1]] ;
         for ( int j = 0 ; j < size[1] ; j++ )
         {
-          sorted_eigs[g][i][j] = new int[size[2]] ;
+          sorted_eigs[g][i][j] = new float[size[2]] ;
         }
       }
     }
     
-    int ****atten;// table in which all images except b0 are stored
-    atten = new int***[nof-numberb0];
+    float ****atten;// table in which all images except b0 are stored
+    atten = new float***[nof-numberb0];
     for (int g=0; g<nof-numberb0; g++)
     {
-      atten[g] = new int**[size[0]];
+      atten[g] = new float**[size[0]];
       for ( int i = 0 ; i < size[0] ; i++ ) 
       {
-        atten[g][i] = new int*[size[1]] ;
+        atten[g][i] = new float*[size[1]] ;
         for ( int j = 0 ; j < size[1] ; j++ )
         {
-          atten[g][i][j] = new int[size[2]] ;
+          atten[g][i][j] = new float[size[2]] ;
         }
       }
     }
     
-    int ****D;
-    D = new int***[6];
+    float ****D;
+    D = new float***[6];
     for (int g=0; g<6; g++)
     {
-      D[g] = new int**[size[0]];
+      D[g] = new float**[size[0]];
       for ( int i = 0 ; i < size[0] ; i++ ) 
       {
-        D[g][i] = new int*[size[1]] ;
+        D[g][i] = new float*[size[1]] ;
         for ( int j = 0 ; j < size[1] ; j++ )
         {
-          D[g][i][j] = new int[size[2]] ;
+          D[g][i][j] = new float[size[2]] ;
         }
       }
     }
@@ -401,6 +393,8 @@ namespace itk
     std::cout << std::endl;
   }
 
+
+
   int negativitycheck=0;
    for ( int x=0;x<size[0];x++)
     {
@@ -422,7 +416,7 @@ namespace itk
       {
         for ( int z=0;z<size[2];z++)
         { 
-          if(b0_mean_image[x][y][z]<0)
+          if(b0_mean_image[x][y][z]<=0)
           {
           check_the_neighbors(x,y,z,b0_mean_image,size);
           }
@@ -445,6 +439,63 @@ namespace itk
       }
     }
     std::cout << "before: " << negativitycheck << "\nafter: " << negativitycheckafter << std::endl;
+
+    table[2][3][4][8]=-10;
+    table[4][45][56][38]=-10;
+
+    int negativitycheck1=0;
+
+  for (int g=0;g<nof-numberb0;g++)
+  {
+   for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(table[g][x][y][z]<0)
+          {
+            negativitycheck1++;
+          }
+        }
+      }
+    }
+  }
+   for (int g=0;g<nof-numberb0;g++)
+  {
+   for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(table[g][x][y][z]<=0)
+          {
+          
+          check_the_neighbors4D(g,x,y,z,table,size);
+          }
+        }
+      }
+    }
+   }
+    int negativitycheckafter1=0;
+    for (int g=0;g<nof-numberb0;g++)
+  {
+    for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          if(table[g][x][y][z]<0)
+          {
+            negativitycheckafter1++;
+          }
+        }
+      }
+    }
+    }
+    std::cout << "before: " << negativitycheck1 << "\nafter: " << negativitycheckafter1 << std::endl;
   
    /*for ( int g=0;g<nof-numberb0;g++)
   {
@@ -462,7 +513,8 @@ namespace itk
       }
     }
   }// removing voxels smaller than 0 from the data / i am not using this threshold for this step cause in my opinion its sensles - if data are below zero it would be below threshold for sure.
-
+ 
+ */
 
 
  
@@ -473,9 +525,13 @@ namespace itk
       higher_thresh[i]=exp(-b_vec[i]*LOW_D);
       lower_thresh[i]= exp(-b_vec[i]*HIGH_D);
    }
+   
+  int break_flag=0;
 
+  
    while(diff>0)
    {
+     wasdetectedbad=0;
 
      for ( int x=0;x<size[0];x++)
      {
@@ -483,16 +539,73 @@ namespace itk
          {
              for ( int z=0;z<size[2];z++)
              {
-                 remove_negative_eigs(x,y,z,table,nof,size,H,D,atten,higher_thresh,lower_thresh, wasdetectedbad,b0_mean_image,sorted_eigs,numberb0);
+
+               //if(b0_mean_image[x][y][z]>=0)
+
+               //{
+
+            
+               remove_negative_eigs(x,y,z,table,nof,size,pseudoInverse, D, atten, higher_thresh, lower_thresh,wasdetectedbad, b0_mean_image,sorted_eigs,numberb0,break_flag);
+             
+               //}
+                 
              }
          }
      }
+     std::cout << "current: " << wasdetectedbad << std::endl;
      newnumberofbads=wasdetectedbad;
      diff=oldnumberofbads-newnumberofbads;
+     //std::cout << "current: " << newnumberofbads << "\npast: " << oldnumberofbads << std::endl;
      oldnumberofbads=wasdetectedbad;
    }
+/// I will try to change it as well   std::cout << "current: " << newnumberofbads << "\npast: " << oldnumberofbads << std::endl;`
 
-*/
+typedef itk::VectorImage<float, 3>  ImageType;
+ 
+  ImageType::IndexType start;
+  start.Fill(0);
+ 
+  ImageType::RegionType region(start,size);
+ 
+  ImageType::Pointer image = ImageType::New();
+  image->SetRegions(region);
+  image->SetVectorLength(nof-numberb0);
+  image->Allocate();
+ 
+  ImageType::IndexType pixelIndex;
+ 
+ 
+  typedef itk::VariableLengthVector<float> VariableVectorType;
+  VariableVectorType variableLengthVector;
+  variableLengthVector.SetSize(nof-numberb0);
+  
+  
+	for(int x=0;x<size[0];x++)
+	  {
+	  for(int y=0;y<size[1];y++)
+	    {
+		for(int z=0;z<size[2];z++)
+		  {
+      pixelIndex[0] = x;
+      pixelIndex[1] = y;
+      pixelIndex[2] = z;
+
+		  for(int i=0;i<nof-numberb0;i++)
+		    {
+		     variableLengthVector[i] = table[i][x][y][z];
+			 }
+        image->SetPixel(pixelIndex, variableLengthVector);
+
+		   }
+		 }
+	}
+           
+  
+
+
+
+   
+
   }// end of class
 
  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -546,15 +659,17 @@ namespace itk
         const_cast< GradientImagesType* >(gradientImage) );
     m_GradientImageTypeEnumeration = GradientIsInASingleImage;
   }
+ 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::check_the_neighbors(int x, int y, int z, int ***table, itk::Size<3> size)   
+  ::check_the_neighbors4D(int g,int x, int y, int z, float ****table, itk::Size<3> size)   
   {
+
    
-     int temp_sum=0;
-     int temp_number=0;
+     float temp_sum=0;
+     float temp_number=0;
      int init_i;
      int init_j;
      int init_c;
@@ -567,7 +682,7 @@ namespace itk
        init_i=x;
        limit_i=x+2;
      }
-     else if(x==size[0])
+     else if(x==size[0]-1)
      {
        init_i=x-1;
        limit_i=x+1;
@@ -586,7 +701,7 @@ namespace itk
              init_j=y;
              limit_j=y+2;
            }
-       else if(y==size[1])
+       else if(y==size[1]-1)
            {
               init_j=y-1;
               limit_j=y+1;
@@ -605,7 +720,105 @@ namespace itk
                init_c=z;
                limit_c=z+2;
                }
-           else if(z==size[2])
+           else if(z==size[2]-1)
+              {
+                init_c=z-1;
+                limit_c=z+1;
+              }
+           else
+               {
+                init_c=z-1;
+                limit_c=z+2;
+                }
+           for (int c=init_c;c<limit_c;c+=2)
+           {//3
+               
+               
+               if(table[g][i][j][c]<= 0)
+               {
+                temp_sum=temp_sum + 0;
+               }
+               else
+               {
+                 temp_sum=temp_sum+table[g][i][j][c];
+                 temp_number++;
+               }
+            }//3
+         }//2
+    }//1
+
+   if (temp_number==0)
+    {
+    table[g][x][y][z]=0.01;
+    }
+     else
+    {
+      table[g][x][y][z]=temp_sum/temp_number;
+     }
+   
+
+   }// end of void
+
+
+  template <class TDiffusionPixelType, class TTensorPixelType>
+  void
+  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  ::check_the_neighbors(int x, int y, int z, float ***table, itk::Size<3> size)   
+  {
+   
+     float temp_sum=0;
+     float temp_number=0;
+     int init_i;
+     int init_j;
+     int init_c;
+     int limit_i;
+     int limit_j;
+     int limit_c;
+    
+     if(x==0)
+     {
+       init_i=x;
+       limit_i=x+2;
+     }
+     else if(x==size[0]-1)
+     {
+       init_i=x-1;
+       limit_i=x+1;
+     }
+     else
+     {
+       init_i=x-1;
+       limit_i=x+2;
+     }
+     
+     for (int i=init_i;i<limit_i;i+=2)
+         
+     {// 1
+       if(y==0)
+          {
+             init_j=y;
+             limit_j=y+2;
+           }
+       else if(y==size[1]-1)
+           {
+              init_j=y-1;
+              limit_j=y+1;
+            }
+       else
+           {
+              init_j=y-1;
+              limit_j=y+2;
+            }
+
+        for (int j=init_j;j<limit_j;j+=2)
+        {//2
+
+           if(z==0)
+              {
+               init_c=z;
+               limit_c=z+2;
+               }
+           else if(z==size[2]-1)
               {
                 init_c=z-1;
                 limit_c=z+1;
@@ -621,7 +834,7 @@ namespace itk
                
                if(table[i][j][c]<=0)
                {
-                temp_sum=temp_sum+ 0;
+                temp_sum=temp_sum + 0;
                }
                else
                {
@@ -634,7 +847,7 @@ namespace itk
 
    if (temp_number==0)
     {
-    table[x][y][z]=0;
+    table[x][y][z]=0.01;
     }
      else
     {
@@ -647,13 +860,34 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   void 
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::remove_negative_eigs(int x, int y, int z, int ****table, 
+  ::remove_negative_eigs(int x, int y, int z, float ****table, 
                             int nof, itk::Size<3> size, 
-                            vnl_matrix<float> pseudoInverse, int ****D, int ****atten, 
+                            vnl_matrix<float> pseudoInverse, float ****D, float ****atten, 
                             vnl_vector<float> higher_thresh, 
-                            vnl_vector<float> lower_thresh, int wasdetectedbad, 
-                            int ***b0_mean_image, int ****sorted_eigs, int numberb0)
+                            vnl_vector<float> lower_thresh, int& wasdetectedbad, 
+                            float ***b0_mean_image, float ****sorted_eigs, int numberb0, int break_flag)
   {//0
+
+ 
+ /* for (int g=0;g<6;g++)
+  {
+    for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
+        { 
+          std::cout <<  table [g][x][y][z] << std::endl;
+          std::cin.get();
+
+        }
+      }
+    }
+  }*/
+  
+   
+
+   
    int temp_sum=0;
    int temp_number=0;
    int init_i;
@@ -664,39 +898,53 @@ namespace itk
    int limit_c;
    int temp_product;
    int flag;
+
    vnl_matrix<float> temporary(nof-1,3);
 
-   vnl_matrix<int> temp_tensor(3,3);
+   vnl_matrix<float> temp_tensor(3,3);
 
    vnl_vector<float> atten_log(nof-numberb0);
    vnl_vector<float> temp_atten(nof-numberb0);
    vnl_vector<float> temp_D(6);
-   vnl_vector<int> eigen_vals(3);
+   vnl_vector<float> eigen_vals(3);
+
+
    
    for (int u=0;u<nof-numberb0;u++)
    {
-     atten[u][x][y][z]=table[u][x][y][z]/b0_mean_image[x][y][z];
-     atten_log[u]=log((float)atten[u][x][y][z]);
-     temp_atten[u]=atten[u][x][y][z];
+     if(table[u][x][y][z]<50.0 || b0_mean_image[x][y][z]<0.01){break_flag=1;}else{break_flag=0;}
+     float temp_table = table[u][x][y][z];
+     float temp_b0 = b0_mean_image[x][y][z];
+     
+     
+     atten[u][x][y][z]=temp_table/temp_b0;
+     if(atten[u][x][y][z]==1.0){atten[u][x][y][z]=1.1;}
+     float temp_f =atten[u][x][y][z];
+     atten_log[u]=log(temp_f);
+     temp_atten[u]=atten_log[u];
    }
+  
+   if(break_flag==0)
+   {
+  
    temp_D = pseudoInverse*temp_atten;
+
+
+
    
    for (int u=0;u<6;u++){D[u][x][y][z]=temp_D[u];}
    
-   /*int a= temp_D[0];
-   int aa= temp_D[3];
-   int aaa= temp_D[5];
-   int b= temp_D[3];
-   int bb= temp_D[1];
-   int bbb= temp_D[4];
-   int d= temp_D[5];
-   int dd= temp_D[4];
-   int ddd= temp_D[2];/// check it- 16.02 its ok.
+   /*double M11= temp_D[0];
+   double M12= temp_D[3];
+   double M13= temp_D[5];
+   double M22= temp_D[1];
+   double M23= temp_D[4];
+   double M33= temp_D[2];*/
    
    
-   int l1;
-   int l2;
-   int l3;*/
+   float l1;
+   float l2;
+   float l3;
 
    temp_tensor[0][0]= temp_D[0];
    temp_tensor[1][0]= temp_D[3];
@@ -706,18 +954,25 @@ namespace itk
    temp_tensor[2][1]= temp_D[4];
    temp_tensor[0][2]= temp_D[5];
    temp_tensor[1][2]= temp_D[4];
-   temp_tensor[2][2]= temp_D[2];/// check it- 16.02 its ok.
+   temp_tensor[2][2]= temp_D[2];
 
 
- 
+     /*for (int i=0; i<3;i++)
 
+     {
+       for(int j=0;j<3;j++)
+       {
+         std::cout<<temp_tensor[i][j]<<std::endl;
+       }
+     }*/
+
+
+   vnl_symmetric_eigensystem <float> eigen_tensor(temp_tensor);
    
-   //vnl_symmetric_eigensystem <int> eigen_tensor(temp_tensor);
    
-   /*
-   eigen_vals[0]=eigen_tensor.get_eigenvalue(1);
-   eigen_vals[1]=eigen_tensor.get_eigenvalue(2);
-   eigen_vals[2]=eigen_tensor.get_eigenvalue(3);
+   eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
+   eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
+   eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
 
    /*for (int i=0;i<3;i++)
    {
@@ -727,13 +982,16 @@ namespace itk
       
    }*/
 
-   //vnl_symetric_eigensystem_compute_eigenvals <int> (a,aa,aaa,b,bb,bbb,d,dd,ddd,&l1,&l2,&l3);
+   
 
-   int l1=eigen_vals[0];
-   int l2=eigen_vals[1];
-   int l3=eigen_vals[2];
+   l1=eigen_vals[0];
+   l2=eigen_vals[1];
+   l3=eigen_vals[2];
 
-   if( l1>0.01 && l2>0.01 &&l3>0.01){flag=0;}
+   //std::cout <<l1<<l2<<l3 << std::endl;
+   //std::cin.get();
+
+   if( l1>0.01 && l2>0.01 && l3>0.01){flag=0;}
    else{flag=1;}
    
    sorted_eigs[0][x][y][z]=l1;
@@ -753,7 +1011,7 @@ namespace itk
           init_i=x;
           limit_i=x+2;
         }
-        else if(x==size[0])
+        else if(x==size[0]-1)
         {
           init_i=x-1;
           limit_i=x+1;
@@ -764,14 +1022,14 @@ namespace itk
           limit_i=x+2;
         }
 
-        for (int i=init_i;i<limit_i;i+2)//4
+        for (int i=init_i;i<limit_i;i+=2)//4
         {
         if(y==0)
         {
           init_j=y;
           limit_j=y+2;
         }
-        else if(y==size[1])
+        else if(y==size[1]-1)
         {
           init_j=y-1;
           limit_j=y+1;
@@ -781,14 +1039,14 @@ namespace itk
           init_j=y-1;
           limit_j=y+2;
         }
-        for (int j=init_j;j<limit_j;j+2)//5
+        for (int j=init_j;j<limit_j;j+=2)//5
         {
         if(z==0)
         {
           init_c=z;
           limit_c=z+2;
         }
-        else if(z==size[2])
+        else if(z==size[2]-1)
         {
           init_c=z-1;
           limit_c=z+1;
@@ -798,7 +1056,7 @@ namespace itk
           init_c=z-1;
           limit_c=z+2;
         }
-        for (int c=init_c;c<limit_c;c+2)
+        for (int c=init_c;c<limit_c;c+=2)
         {// 6
           if(table[u][i][j][c]<=0)
           {
@@ -811,7 +1069,7 @@ namespace itk
           }
         }//5
 
-        if (temp_number==0){table[u][x][y][z]=0;}
+        if (temp_number==0){table[u][x][y][z]=0.01;}
         else{ table[u][x][y][z]=temp_sum/temp_number;}     
 
       } //end if//4
@@ -820,12 +1078,28 @@ namespace itk
    
   } // end of if//2
  }//1
+
+   }else 
+   {
+     for (int u=0;u<6;u++){D[u][x][y][z]=0.0;}
+     sorted_eigs[0][x][y][z]=0.0;
+     sorted_eigs[1][x][y][z]=0.0;
+     sorted_eigs[2][x][y][z]=0.0;
+     for (int u=0;u<nof-numberb0;u++){atten[u][x][y][z]=0.0;}
+
+   }
+
 }// end of void//0
+
+
+  
 
 } // end of namespace
 
-
 }
+//}
+
+
 
 
 

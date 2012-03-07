@@ -1,0 +1,61 @@
+/**
+\bundlemainpage{org.mitk.views.tractbasedspatialstatistics} The TBSS Module
+
+\image html tbss.png "Icon of the Module"
+
+\section QmitkTractbasedSpatialStatistics Summary
+
+This module can be used to locally explore data resulting from preprocessing with the TBSS module of FSL
+
+This document will tell you how to use this module, but it is assumed that you already know how to use MITK in general and how to work with the TBSS module of FSL.
+
+If you encounter problems using the module, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTrouble page.
+
+Sections:
+
+- \ref QmitkTractbasedSpatialStatisticsUserManualOverview 
+- \ref QmitkTractbasedSpatialStatisticsUserManualFSLImport
+- \ref QmitkTractbasedSpatialStatisticsUserManualRois
+- \ref QmitkTractbasedSpatialStatisticsUserManualProfiles
+- \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting
+- \ref QmitkTractbasedSpatialStatisticsUserManualReferences
+
+\section QmitkTractbasedSpatialStatisticsUserManualOverview Overview
+
+This module is currently under development and as such the interface as well as the capabilities are likely to change significantly between different versions. 
+
+This documentation describes the features of this current version.
+
+
+
+\section QmitkTractbasedSpatialStatisticsUserManualFSLImport FSL Import
+The FSL import allows to import data that has been preprocessed by FSL. FSL creates output images that typically have names like all_FA_skeletonized.nii.gz that are 4-dimensional images that contain registered images of all subjects. By loading this 4D image into the datamanager and listing the groups with the correct number of subjects, in the order of occurrence in the 4D image, in the TBSS-View using the Add button and clicking the import subject data a TBSS file is created that contains all the information needed for tract analysis. The diffusion measure of the image can be set as well.
+
+\image html fslimport.png "FSL Import"
+
+\section QmitkTractbasedSpatialStatisticsUserManualRois Regions of Interest (ROIs)
+To create a ROI the mean FA skeleton (typically called mean_FA_skeleton.nii.gz) that is created by FSL should be loaded in to the datamanager and selected. By using the Pointlistwidget points should be set on the skeleton (make sure to select points with relatively high FA values). Points are set by first selecting the button with the '+' and than shift-leftclick in the image. When the correct image is selected in the datamanager the Create ROI button is enabled. Clicking this will create a region of interest that passes through the previously selected points. The roi appears in the datamanager. Before doing so, the name of the roi and the information on the structure on which the ROI lies can be set. This will be saved as extra information in the roi-image. Before the ROI is calculated, a pop-up window will ask the user to provide a threshold value. This should be the same threshold that was previously used in FSL to create a binary mask of the FA skeleton. When this is not done correctly, the region of interest will possible contain zero-valued voxels.
+
+\image html tbssRoi.png "Regions of Interest (ROIs)"
+
+
+\section QmitkTractbasedSpatialStatisticsUserManualProfiles
+
+y selecting a tbss image with group information and a region of interest image (as was created in a previous stap). A profile plot is drawn in the plot canvas. By clicking in the graph the crosshairs jump to the corresponding location in the image.
+
+\image html profiles.png "Profile plots"
+
+\section QmitkTractbasedSpatialStatisticsUserManualTroubleshooting Troubleshooting
+
+No known problems.
+
+<B>All other problems.</B><BR>
+Please report to the MITK mailing list.
+See http://www.mitk.org/wiki/Mailinglist on how to do this.
+
+
+
+\section QmitkTractbasedSpatialStatisticsUserManualReferences References
+1. S.M. Smith, M. Jenkinson, H. Johansen-Berg, D. Rueckert, T.E. Nichols, C.E. Mackay, K.E. Watkins, O. Ciccarelli, M.Z. Cader, P.M. Matthews, and T.E.J. Behrens. Tract-based spatial statistics: Voxelwise analysis of multi-subject diffusion data. NeuroImage, 31:1487-1505, 2006.
+
+2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-219, 2004.

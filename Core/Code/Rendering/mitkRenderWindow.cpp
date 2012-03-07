@@ -33,8 +33,8 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   if(m_vtkRenderWindow == NULL)
     m_vtkRenderWindow = vtkRenderWindow::New();
 
-  if ( m_vtkRenderWindow->GetSize()[0] > 10 
-    || m_vtkRenderWindow->GetSize()[0] > 10 )
+  if ( m_vtkRenderWindow->GetSize()[0] <= 10 
+    || m_vtkRenderWindow->GetSize()[0] <= 10 )
   {
     m_vtkRenderWindow->SetSize( 100, 100 );
   }

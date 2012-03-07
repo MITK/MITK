@@ -57,7 +57,6 @@ QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
 //remove the tracking volume
 this->GetDataStorage()->Remove(m_TrackingVolumeNode);
-this->GlobalReinit();
 }
 
 

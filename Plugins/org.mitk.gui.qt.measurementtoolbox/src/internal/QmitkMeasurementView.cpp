@@ -109,8 +109,6 @@ QmitkMeasurementView::~QmitkMeasurementView()
   mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
     m_MeasurementInfoRenderer);
   this->m_MeasurementInfoRenderer->Delete();
-
-  m_SelectedPlanarFigures
 }
 
 void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)

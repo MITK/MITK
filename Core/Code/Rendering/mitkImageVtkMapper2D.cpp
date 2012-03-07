@@ -567,7 +567,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
 
     this->ApplyLookuptable(renderer, textureClippingBounds);
-    this->ApplyRBGALevelWindow(renderer);
+    //this->ApplyRBGALevelWindow(renderer);
   }
   else
   {
@@ -688,7 +688,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   if(binary)
   {
     //default lookuptable for binary images
-    localStorage->m_Texture->GetLookupTable()->SetRange(0.0, 1.0);
+    localStorage->m_LookupTable->SetRange(0.0, 1.0);
+    double rgba[4];
+    localStorage->m_LookupTable->GetTableValue(0, rgba);
+    localStorage->m_LookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0); // background to 0
   }
   else
   {
@@ -734,6 +737,18 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     //ApplyColorTransferFunction(renderer);
   }
 
+  mitk::LevelWindow opacLevelWindow;
+  if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+  {//pass the opaque level window to the filter
+    localStorage->m_LevelWindowFilter->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+    localStorage->m_LevelWindowFilter->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+  }
+  else
+  {//no opaque level window
+    localStorage->m_LevelWindowFilter->SetMinOpacity(0.0);
+    localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
+  }
+
   // TODO use filter thing to create RGBA texture
   // ... set outside pixels to alpha=0
   //pass the LuT to the RBG filter
@@ -758,6 +773,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
 
 void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* renderer)
 {
+  // TODO use m_LevelWindowFilter
   mitk::TransferFunctionProperty::Pointer transferFunctionProperty =
       dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);

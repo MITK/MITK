@@ -353,7 +353,7 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   QString status = "Scanning ";
 #ifdef WIN32
   QString devName;
-  for (unsigned int i = 1; i < 20; ++i)
+  for (unsigned int i = 1; i < 40; ++i)
   {
     if (i<10)
     devName = QString("COM%1").arg(i);

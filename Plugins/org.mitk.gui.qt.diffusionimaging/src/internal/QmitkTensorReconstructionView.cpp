@@ -68,7 +68,10 @@ const std::string QmitkTensorReconstructionView::VIEW_ID =
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
 
-typedef float TTensorPixelType;
+typedef float                                       TTensorPixelType;
+typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
+typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+
 
 using namespace berry;
 
@@ -128,6 +131,9 @@ struct TrSelListener : ISelectionListener
 
       m_View->m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
       m_View->m_Controls->m_PercentagesOfOutliers->setEnabled(foundDwiVolume && foundTensorVolume);
+      m_View->m_Controls->m_PerSliceView->setEnabled(foundDwiVolume && foundTensorVolume);
+
+
 
     }
   }
@@ -157,9 +163,43 @@ m_Controls(NULL),
 m_MultiWidget(NULL)
 {
 
+  if(m_CurrentSelection)
+  {
+    mitk::DataStorage::SetOfObjects::Pointer set =
+      mitk::DataStorage::SetOfObjects::New();
+
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer diffImage
+        = mitk::DiffusionImage<DiffusionPixelType>::New();
 
 
+    TensorImageType::Pointer tensorImage;
 
+    std::string nodename;
+
+
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+      i != m_CurrentSelection->End();
+      ++i)
+    {
+
+      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      {
+        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+        {
+          diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+        }
+        else if((QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0))
+        {
+          mitk::TensorImage* mitkVol;
+          mitkVol = static_cast<mitk::TensorImage*>((node)->GetData());
+          mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
+          node->GetStringProperty("name", nodename);
+        }
+      }
+    }
+
+  }
 
 
 }
@@ -270,15 +310,59 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
 
   // Update Label
 
+
   // to do: This position should be modified in order to skip B0 volumes that are not taken into account
   // when calculating residuals
 
-  QString pos = "Volume: ";
-  pos.append(QString::number(volume));
-  pos.append(", Slice: ");
-  pos.append(QString::number(slice));
-  m_Controls->m_PositionLabel->setText(pos);
+  // Find the diffusion image
+  mitk::DiffusionImage<DiffusionPixelType>* diffImage;
 
+
+  for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+    i != m_CurrentSelection->End();
+    ++i)
+  {
+    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+    {
+      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+      {
+        diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+      }
+    }
+  }
+
+  if(diffImage != NULL)
+  {
+    typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
+    typedef itk::VectorContainer< unsigned int,
+      GradientDirectionType >                   GradientDirectionContainerType;
+
+    GradientDirectionContainerType::Pointer dirs = diffImage->GetDirections();
+
+
+
+    for(int i=0; i<dirs->Size() && i<=volume; i++)
+    {
+      GradientDirectionType grad = dirs->ElementAt(i);
+
+      // check if image is b0 weighted
+      if(abs(grad[0]) < 0.001 && abs(grad[1]) < 0.001 && abs(grad[2]) < 0.001)
+      {
+        volume++;
+      }
+    }
+
+
+    QString pos = "Volume: ";
+    pos.append(QString::number(volume));
+    pos.append(", Slice: ");
+    pos.append(QString::number(slice));
+    m_Controls->m_PositionLabel->setText(pos);
+
+
+
+  }
 
 }
 
@@ -340,10 +424,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     mitk::DiffusionImage<DiffusionPixelType>::Pointer diffImage
         = mitk::DiffusionImage<DiffusionPixelType>::New();
-
-    typedef float                                       TTensorPixelType;
-    typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-    typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
 
     TensorImageType::Pointer tensorImage;
 

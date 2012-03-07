@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
   QmitkIVIMWidget.cpp
   QmitkTbssRoiAnalysisWidget.cpp
   QmitkResidualAnalysisWidget.cpp
+  QmitkResidualViewWidget.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -70,6 +71,7 @@ SET(MOC_H_FILES
   src/internal/QmitkTbssSkeletonizationView.h
   src/QmitkTbssRoiAnalysisWidget.h
   src/QmitkResidualAnalysisWidget.h
+  src/QmitkResidualViewWidget.h
 )
 
 SET(CACHED_RESOURCE_FILES

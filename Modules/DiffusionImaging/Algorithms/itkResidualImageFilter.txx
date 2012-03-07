@@ -66,7 +66,7 @@ namespace itk
     for(int i=0; i<m_Gradients->Size(); i++)
     {
       GradientDirectionType grad = m_Gradients->ElementAt(i);
-      if(grad[0] < 0.001 && grad[1] < 0.001 && grad[2] < 0.001)
+      if(abs(grad[0]) < 0.001 && abs(grad[1]) < 0.001 && abs(grad[2]) < 0.001)
       {
         numberB0++;
       }

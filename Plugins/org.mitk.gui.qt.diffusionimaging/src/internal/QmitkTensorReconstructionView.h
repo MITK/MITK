@@ -90,7 +90,7 @@ protected slots:
   void TeemReconstruction();
   void ItkReconstruction();
   void ResidualCalculation();
-  void ResidualClicked();
+  void ResidualClicked(int slice, int volume);
 
 protected:
 

@@ -573,7 +573,7 @@
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>Percentage of outliers per slice</string>
+                <string>outliers per slice</string>
                </property>
               </widget>
              </item>
@@ -636,7 +636,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="m_PositionLabel">
                <property name="text">
                 <string>Volume: .., Slice:..</string>
                </property>

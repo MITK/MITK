@@ -258,13 +258,28 @@ void QmitkTensorReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
     connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
     connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
-    connect( (QObject*)(m_Controls->m_ResidualAnalysis), SIGNAL(clicked()), this, SLOT(ResidualClicked()) );
+    connect( (QObject*)(m_Controls->m_PerSliceView), SIGNAL(pointSelected(int, int)), this, SLOT(ResidualClicked(int, int)) );
   }
 }
 
-void QmitkTensorReconstructionView::ResidualClicked()
+void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
 {
-  std::cout << "clicked in the residual widget" << std::endl;
+  // Use image coord to reset crosshair
+
+  // Find currently selected diffusion image
+
+  // Update Label
+
+  // to do: This position should be modified in order to skip B0 volumes that are not taken into account
+  // when calculating residuals
+
+  QString pos = "Volume: ";
+  pos.append(QString::number(volume));
+  pos.append(", Slice: ");
+  pos.append(QString::number(slice));
+  m_Controls->m_PositionLabel->setText(pos);
+
+
 }
 
 void QmitkTensorReconstructionView::TeemCheckboxClicked()

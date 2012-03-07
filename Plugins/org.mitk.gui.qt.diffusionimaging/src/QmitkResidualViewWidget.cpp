@@ -35,14 +35,18 @@ void QmitkResidualViewWidget::mousePressEvent(QMouseEvent* event) {
   setCursor(Qt::ClosedHandCursor);
 
 
+
   QGraphicsItem *item = this->itemAt(event->pos());
   if(item == m_ResidualPixmapItem)
   {
     QPointF sceneCoord(mapToScene(event->pos()));
     QPointF imageCoord(item->mapFromParent(sceneCoord));
 
-    emit clicked();
-    // Use image coord to reset crosshair
+    int volume = (int)imageCoord.x();
+    int slice = (int)imageCoord.y();
+
+    emit pointSelected(slice, volume);
+
   }
 }
 

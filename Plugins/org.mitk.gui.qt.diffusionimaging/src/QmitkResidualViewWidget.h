@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkResidualViewWidget_H_
 #define QmitkResidualViewWidget_H_
 
-#include <QObject>
+//#include <QObject>
 #include <QGraphicsView>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -55,6 +55,10 @@ public:
     m_ResidualPixmapItem = item;
   }
 
+signals:
+
+  void pointSelected(int slice, int volume);
+
 protected:
 
   void wheelEvent(QWheelEvent *event);
@@ -72,6 +76,8 @@ protected:
   QPoint m_LastPanPoint;
 
   void SetCenter(const QPointF& centerPoint);
+
+
 
 };
 

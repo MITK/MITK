@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileReader.h>
 #include <mitkFiberBundleX.h>
 #include <vtkSmartPointer.h>
+#include <MitkDiffusionImagingExports.h>
 
 namespace mitk
 {
@@ -29,7 +30,7 @@ namespace mitk
   /** \brief
   */
 
-  class FiberBundleXReader : public FileReader, public BaseProcess
+  class MitkDiffusionImaging_EXPORT FiberBundleXReader : public FileReader, public BaseProcess
   {
   public:
 

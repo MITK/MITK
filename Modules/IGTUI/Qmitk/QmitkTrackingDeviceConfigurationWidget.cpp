@@ -180,10 +180,30 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   //reset output
   ResetOutput();
 
-  //print output
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) AddOutput("<br>NDI Polaris selected");        //NDI Polaris
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) AddOutput("<br>NDI Aurora selected");    //NDI Aurora
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) AddOutput("<br>Microntracker selected"); //ClaronTechnology MicronTracker 2
+  //print output and do further initializations
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
+    {
+    AddOutput("<br>NDI Polaris selected");
+    }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)  //NDI Aurora
+    {
+    AddOutput("<br>NDI Aurora selected");   
+    }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) //ClaronTechnology MicronTracker 2
+    {
+    AddOutput("<br>Microntracker selected");
+    if (!mitk::ClaronTrackingDevice::New()->IsMicronTrackerInstalled())
+      {
+      AddOutput("<br>ERROR: not installed!");
+      }
+    else if (this->m_MTCalibrationFile == "") //if configuration file for MicronTracker is empty: load default 
+      {
+      mitk::ClaronTrackingDevice::Pointer tempDevice = mitk::ClaronTrackingDevice::New();
+      m_MTCalibrationFile = tempDevice->GetCalibrationDir();
+      Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
+      m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+      }
+    }
 
   emit TrackingDeviceSelectionChanged();
 }

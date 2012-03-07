@@ -104,6 +104,9 @@ namespace mitk
 
     /** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
     itkSetMacro(CalibrationDir,std::string);
+	
+	/** @brief Gets the current calibration directory. */
+    itkGetMacro(CalibrationDir,std::string);
 
   protected:
     ClaronTrackingDevice();

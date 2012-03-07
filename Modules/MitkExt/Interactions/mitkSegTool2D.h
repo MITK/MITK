@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <DiffSliceOperation.h>
+
 
 namespace mitk
 {
@@ -127,6 +129,9 @@ class MitkExt_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
+
+		DiffSliceOperation* m_doOperation;
+		DiffSliceOperation* m_undoOperation;
 };
 
 } // namespace

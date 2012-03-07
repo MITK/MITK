@@ -44,7 +44,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 
-
+#include <DiffSliceOperationApplier.h>
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -206,6 +208,9 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 	Image::Pointer slice = extractor->GetOutput();
 
+
+	m_doOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), slice, timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+
 	/*At this point we have to adjust the geometry because reslicing is based on vtk.
 		For oblique planes the calculation of the extent has negative minimum values.
 		As these values are used as some kind of geometry information by the rendering,
@@ -287,6 +292,14 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
 	//the image was modified within the pipeline, but not marked so
 	image->Modified();
+
+
+	m_undoOperation = new DiffSliceOperation(image, slice, this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+	OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+	UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+
+	m_undoOperation = NULL;
+	m_doOperation = NULL;
 	
   if ( m_3DInterpolationEnabled )
   {

@@ -42,8 +42,8 @@ void QmitkResidualViewWidget::mousePressEvent(QMouseEvent* event) {
     QPointF sceneCoord(mapToScene(event->pos()));
     QPointF imageCoord(item->mapFromParent(sceneCoord));
 
-    int volume = (int)imageCoord.x();
-    int slice = (int)imageCoord.y();
+    int volume = (int)imageCoord.y();
+    int slice = (int)imageCoord.x();
 
     emit pointSelected(slice, volume);
 

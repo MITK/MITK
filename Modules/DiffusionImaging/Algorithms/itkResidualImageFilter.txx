@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkResidualImageFilter.h"
 #include <mitkCommon.h>
+#include <cmath>
 
 namespace itk
 {
@@ -66,7 +67,8 @@ namespace itk
     for(int i=0; i<m_Gradients->Size(); i++)
     {
       GradientDirectionType grad = m_Gradients->ElementAt(i);
-      if(abs(grad[0]) < 0.001 && abs(grad[1]) < 0.001 && abs(grad[2]) < 0.001)
+
+      if(fabs(grad[0]) < 0.001 && fabs(grad[1]) < 0.001 && fabs(grad[2]) < 0.001)
       {
         numberB0++;
       }
@@ -122,7 +124,7 @@ namespace itk
 
 
             GradientDirectionType grad = m_Gradients->ElementAt(i);
-            if(!(grad[0] < 0.001 && grad[1] < 0.001 && grad[2] < 0.001))
+            if(!(fabs(grad[0]) < 0.001 && fabs(grad[1]) < 0.001 && fabs(grad[2]) < 0.001))
             {
               double val1 = (double)p1.GetElement(i);
               double val2 = (double)p2.GetElement(i);

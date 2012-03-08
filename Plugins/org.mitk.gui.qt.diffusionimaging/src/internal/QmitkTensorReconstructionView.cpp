@@ -317,17 +317,26 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
   // Find the diffusion image
   mitk::DiffusionImage<DiffusionPixelType>* diffImage;
 
+  mitk::DataNodeObject::Pointer nodeObj;
+  mitk::DataNode::Pointer correctNode;
+  mitk::Geometry3D* geometry;
 
   for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
     i != m_CurrentSelection->End();
     ++i)
   {
-    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+    if (nodeObj = i->Cast<mitk::DataNodeObject>())
     {
       mitk::DataNode::Pointer node = nodeObj->GetDataNode();
       if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
       {
         diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+
+        geometry = diffImage->GetGeometry();
+
+        // Remember the node whose display index must be updated
+        correctNode = mitk::DataNode::New();
+        correctNode = node;
       }
     }
   }
@@ -347,7 +356,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
       GradientDirectionType grad = dirs->ElementAt(i);
 
       // check if image is b0 weighted
-      if(abs(grad[0]) < 0.001 && abs(grad[1]) < 0.001 && abs(grad[2]) < 0.001)
+      if(fabs(grad[0]) < 0.001 && fabs(grad[1]) < 0.001 && fabs(grad[2]) < 0.001)
       {
         volume++;
       }
@@ -359,6 +368,54 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
     pos.append(", Slice: ");
     pos.append(QString::number(slice));
     m_Controls->m_PositionLabel->setText(pos);
+
+
+
+
+    if(correctNode)
+    {
+
+      int oldDisplayVal;
+      correctNode->GetIntProperty("DisplayChannel", oldDisplayVal);
+      std::string oldVal = QString::number(oldDisplayVal).toStdString();
+      std::string newVal = QString::number(volume).toStdString();
+
+      correctNode->SetIntProperty("DisplayChannel",volume);
+
+      correctNode->SetSelected(true);
+
+      this->FirePropertyChanged("DisplayChannel", oldVal, newVal);
+
+
+      correctNode->UpdateOutputInformation();
+
+
+      mitk::Point3D p3 = m_MultiWidget->GetCrossPosition();
+      itk::Index<3> ix;
+      geometry->WorldToIndex(p3, ix);
+      ix[2] = slice;
+
+      mitk::Vector3D vec;
+      vec[0] = ix[0];
+      vec[1] = ix[1];
+      vec[2] = ix[2];
+
+
+      mitk::Vector3D v3New;
+      geometry->IndexToWorld(vec, v3New);
+
+      mitk::Point3D p3New;
+      p3New[0] = v3New[0];
+      p3New[1] = v3New[1];
+      p3New[2] = v3New[2];
+
+      m_MultiWidget->MoveCrossToPosition(p3New);
+
+
+      m_MultiWidget->RequestUpdate();
+
+
+    }
 
 
 

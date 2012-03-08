@@ -84,7 +84,6 @@ m_AngleCounter(0), m_FourPointAngleCounter(0), m_EllipseCounter(0),
 
 QmitkMeasurementView::~QmitkMeasurementView()
 {
-  this->SetMeasurementInfoToRenderWindow("",m_LastRenderWindow);
   this->GetDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurementView
     , const mitk::DataNode*>( this, &QmitkMeasurementView::NodeAddedInDataStorage );
 
@@ -106,8 +105,12 @@ QmitkMeasurementView::~QmitkMeasurementView()
   m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurementView
     , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
 
-  mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
-    m_MeasurementInfoRenderer);
+  if(this->m_LastRenderWindow != NULL)
+  {
+    this->SetMeasurementInfoToRenderWindow("",m_LastRenderWindow);
+    mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
+      m_MeasurementInfoRenderer);
+  }
   this->m_MeasurementInfoRenderer->Delete();
 }
 

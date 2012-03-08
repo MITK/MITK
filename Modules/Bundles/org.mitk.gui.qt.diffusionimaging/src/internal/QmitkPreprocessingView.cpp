@@ -331,6 +331,13 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
       fweFilter->Update();
 
 
+      mitk::DiffusionImage<float>::Pointer diffImg = fweFilter->GetOutputDiffusionImage();
+
+      DataNode::Pointer dn = DataNode::New();
+      dn->SetData(diffImg);
+      dn->SetProperty("name", StringProperty::New("Preprocessed dwi"));
+      this->GetDefaultDataStorage()->Add(dn);
+
     }
 
     std::vector<mitk::DataNode::Pointer>::iterator nodeIt;

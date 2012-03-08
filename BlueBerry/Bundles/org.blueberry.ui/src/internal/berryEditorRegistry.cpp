@@ -252,7 +252,7 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
       // we'll later try to add them all after content types are resolved
       // duplicates (ie: default editors) will be ignored
       std::list<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
-      nonDefaultFileEditors.merge(tmpList);
+      nonDefaultFileEditors.splice(nonDefaultFileEditors.end(), tmpList);
     }
 
     std::string::size_type index = fileName.find_last_of('.');
@@ -274,7 +274,7 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
           }
         }
         std::list<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
-        nonDefaultFileEditors.merge(tmpList);
+        nonDefaultFileEditors.splice(nonDefaultFileEditors.end(), tmpList);
       }
     }
   }

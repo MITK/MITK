@@ -393,21 +393,26 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
       mitk::Point3D p3 = m_MultiWidget->GetCrossPosition();
       itk::Index<3> ix;
       geometry->WorldToIndex(p3, ix);
-      ix[2] = slice;
+     // ix[2] = slice;
 
       mitk::Vector3D vec;
       vec[0] = ix[0];
       vec[1] = ix[1];
-      vec[2] = ix[2];
+      vec[2] = slice;
 
 
       mitk::Vector3D v3New;
       geometry->IndexToWorld(vec, v3New);
 
+
+      mitk::Point3D origin = geometry->GetOrigin();
+
       mitk::Point3D p3New;
-      p3New[0] = v3New[0];
-      p3New[1] = v3New[1];
-      p3New[2] = v3New[2];
+      p3New[0] = v3New[0] + origin[0];
+      p3New[1] = v3New[1] + origin[1];
+      p3New[2] = v3New[2] + origin[2];
+
+
 
       m_MultiWidget->MoveCrossToPosition(p3New);
 

@@ -54,6 +54,6 @@ struct IDataNodeReader
 
 }
 
-MITK_DECLARE_SERVICE_INTERFACE(mitk::IDataNodeReader, "org.mitk.IDataNodeReader")
+US_DECLARE_SERVICE_INTERFACE(mitk::IDataNodeReader, "org.mitk.IDataNodeReader")
 
 #endif // MITKIDATANODEREADER_H

@@ -96,6 +96,16 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
     optimized PocoUtil debug PocoUtild
     optimized PocoXML debug PocoXMLd
   )
+  
+  # Set compiler flags
+  GET_TARGET_PROPERTY(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)
+  IF(NOT _plugin_compile_flags)
+    SET(_plugin_compile_flags "")
+  ENDIF()
+  IF(WIN32)
+    SET(_plugin_compile_flags "${_plugin_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  ENDIF()
+  SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES COMPILE_FLAGS "${_plugin_compile_flags}")
 
   SET(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")

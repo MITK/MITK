@@ -390,8 +390,13 @@ set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_C
 
 include(mitkSetupC++0xVariables)
 
+set(cflags )
+if(WIN32)
+  set(cflags "${cflags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
+  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
 
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
@@ -415,10 +420,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(MITK_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${MITK_CXX_FLAGS}")
   endif()
 
-  set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
-  #set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
-  set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
+  #set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
+  set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
 endif()
+
+set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
+set(MITK_CXX_FLAGS "${cflags} ${MITK_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # MITK Packages

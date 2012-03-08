@@ -321,9 +321,9 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
 
 
       typedef itk::FreeWaterEliminationFilter<
-        DiffusionPixelType, TTensorPixelType > FreeWaterEliminationFilterType;
+      DiffusionPixelType, TTensorPixelType > FreeWaterEliminationFilterType;
       FreeWaterEliminationFilterType::Pointer fweFilter =
-        FreeWaterEliminationFilterType::New();
+      FreeWaterEliminationFilterType::New();
 
       fweFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       fweFilter->SetBValue(vols->GetB_Value());
@@ -331,11 +331,11 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
       fweFilter->Update();
 
 
-      mitk::DiffusionImage<float>::Pointer diffImg = fweFilter->GetOutputDiffusionImage();
-
-      DataNode::Pointer dn = DataNode::New();
+      mitk::DiffusionImage<short>::Pointer diffImg = fweFilter->GetOutputDiffusionImage();
+      
+      mitk::DataNode::Pointer dn = mitk::DataNode::New();
       dn->SetData(diffImg);
-      dn->SetProperty("name", StringProperty::New("Preprocessed dwi"));
+      dn->SetProperty("name", mitk::StringProperty::New("Preprocessed dwi"));
       this->GetDefaultDataStorage()->Add(dn);
 
     }

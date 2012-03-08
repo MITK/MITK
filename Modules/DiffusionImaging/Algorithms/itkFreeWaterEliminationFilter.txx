@@ -569,15 +569,15 @@ namespace itk
 
     ImageType::Pointer image = ImageType::New();
     image->SetRegions(region);
-    image->SetVectorLength(nof-numberb0);
+    image->SetVectorLength(nof);
     image->Allocate();
 
     ImageType::IndexType pixelIndex;
 
 
-    typedef itk::VariableLengthVector<float> VariableVectorType;
+    typedef itk::VariableLengthVector<short> VariableVectorType;
     VariableVectorType variableLengthVector;
-    variableLengthVector.SetSize(nof-numberb0);
+    variableLengthVector.SetSize(nof);
 
 
     for(int x=0;x<size[0];x++)
@@ -592,8 +592,9 @@ namespace itk
 
           for(int i=0;i<nof-numberb0;i++)
           {
-            variableLengthVector[i] = table[i][x][y][z];
+            variableLengthVector[i] = (short)table[i][x][y][z];
           }
+          variableLengthVector[nof-1]= (short)b0_mean_image[x][y][z];
           image->SetPixel(pixelIndex, variableLengthVector);
 
         }
@@ -602,7 +603,7 @@ namespace itk
 
  
   
-    m_OutputDiffusionImage = mitk::DiffusionImage<float>::New();
+    m_OutputDiffusionImage = mitk::DiffusionImage<short>::New();
    
     m_OutputDiffusionImage->SetVectorImage( image );
     m_OutputDiffusionImage->SetB_Value(m_BValue);

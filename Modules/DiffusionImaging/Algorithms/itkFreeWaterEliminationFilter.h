@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-typedef itk::VectorImage<float, 3>  ImageType;
+typedef itk::VectorImage<short, 3>  ImageType;
 
 
 
@@ -133,7 +133,11 @@ namespace itk
 
     itkSetMacro( BValue, TTensorPixelType);
 
-    itkGetMacro(OutputDiffusionImage, mitk::DiffusionImage<float>)
+    mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
+    {
+      return m_OutputDiffusionImage;
+    }
+    //itkGetMacro(OutputDiffusionImage, mitk::DiffusionImage<float>)
 
     //itkGetMacro( GradientDirectionContainer, GradientDirectionContainerType::Pointer);
 
@@ -191,7 +195,7 @@ namespace itk
     /** Number of baseline images */
     unsigned int                                      m_NumberOfBaselineImages;
 
-    mitk::DiffusionImage<float>::Pointer                     m_OutputDiffusionImage;
+    mitk::DiffusionImage<short>::Pointer                     m_OutputDiffusionImage;
 
 
   };

@@ -208,8 +208,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 	Image::Pointer slice = extractor->GetOutput();
 
-
+	/*============= BEGIN undo feature block ========================*/
+	//specify the undo operation with the non edited slice
 	m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  /*============= END undo feature block ========================*/
 
 	/*At this point we have to adjust the geometry because reslicing is based on vtk.
 		For oblique planes the calculation of the extent has negative minimum values.
@@ -293,13 +295,20 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 	//the image was modified within the pipeline, but not marked so
 	image->Modified();
 
-
+	/*============= BEGIN undo feature block ========================*/
+	//specify the undo operation with the edited slice
 	m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(), this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+	
+	//create an operation event for the undo stack
 	OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+	
+	//add it to the undo controller
 	UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
+	//clear the pointers as the operation are stored in the undocontroller and also deleted from there
 	m_undoOperation = NULL;
 	m_doOperation = NULL;
+  /*============= END undo feature block ========================*/
 	
   if ( m_3DInterpolationEnabled )
   {

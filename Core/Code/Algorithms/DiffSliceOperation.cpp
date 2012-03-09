@@ -46,13 +46,16 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 
 	m_Image = imageVolume;
 
+	if ( m_Image) {
+		/*add an observer to listen to the delete event of the image, this is necessary because the operation is then invalid*/
+		itk::SimpleMemberCommand< DiffSliceOperation >::Pointer command = itk::SimpleMemberCommand< DiffSliceOperation >::New();
+		command->SetCallbackFunction( this, &DiffSliceOperation::OnImageDeleted );
+		//get the id of the observer, used to remove it later on
+		m_DeleteObserverTag = imageVolume->AddObserver( itk::DeleteEvent(), command );
 
-	itk::SimpleMemberCommand< DiffSliceOperation >::Pointer command = itk::SimpleMemberCommand< DiffSliceOperation >::New();
-	command->SetCallbackFunction( this, &DiffSliceOperation::OnImageDeleted );
-	m_DeleteTag = imageVolume->AddObserver( itk::DeleteEvent(), command );
 
-	if ( m_Image) 
 		m_ImageIsValid = true;
+	}
 	else
 		m_ImageIsValid = false;
 
@@ -67,7 +70,8 @@ mitk::DiffSliceOperation::~DiffSliceOperation()
 
 	if (m_ImageIsValid)
   {
-    m_Image->RemoveObserver( m_DeleteTag );
+		//if the image is still there, we have to remove the observer from it
+    m_Image->RemoveObserver( m_DeleteObserverTag );
   }
 	m_Image = NULL;
 }
@@ -80,10 +84,11 @@ vtkImageData* mitk::DiffSliceOperation::GetSlice()
 
 bool mitk::DiffSliceOperation::IsValid()
 {
-  return m_ImageIsValid;//TODO improve
+	return m_ImageIsValid && (m_Slice.GetPointer() != NULL) && (m_WorldGeometry.IsNotNull());//TODO improve
 }
 
 void mitk::DiffSliceOperation::OnImageDeleted()
 {
+	//if our imageVolume is removed e.g. from the datastorage the operation is no lnger valid
   m_ImageIsValid = false;
 }

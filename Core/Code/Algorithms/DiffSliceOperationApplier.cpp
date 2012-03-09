@@ -31,11 +31,15 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 {
 	DiffSliceOperation* imageOperation = dynamic_cast<DiffSliceOperation*>( operation );
 
+	//as we only support DiffSliceOperation return if operation is not type of DiffSliceOperation
 	if(!imageOperation)
 		return;
 
+
+	//chak if the operation is valid
 	if(imageOperation->IsValid())
 	{
+		//the actual overwrite filter (vtk)
 		vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
 		//Set the slice as 'input'
@@ -45,6 +49,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 		reslice->SetOverwriteMode(true);
 		reslice->Modified();
 
+		//a wrapper for vtkImageOverwrite
 		mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
 		extractor->SetInput( imageOperation->GetImage() );
 		extractor->SetTimeStep( imageOperation->GetTimeStep() );
@@ -55,14 +60,18 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 		extractor->Modified();
 		extractor->Update();
 
+		//make sure the modification is rendered
 		RenderingManager::GetInstance()->RequestUpdateAll();
 		imageOperation->GetImage()->Modified();
 	}
 }
 
+//mitk::DiffSliceOperationApplier* mitk::DiffSliceOperationApplier::s_Instance = NULL;
+
 mitk::DiffSliceOperationApplier* mitk::DiffSliceOperationApplier::GetInstance()
 {
-  static DiffSliceOperationApplier* s_Instance = new DiffSliceOperationApplier();
+	//if(!s_Instance)
+	static DiffSliceOperationApplier*	s_Instance = new DiffSliceOperationApplier();
 
   return s_Instance;
 }

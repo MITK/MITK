@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTbssTableModel.h"
 #include "QmitkTbssMetaTableModel.h"
 
-
+#include <mitkFiberBundleX.h>
 
 
 typedef short DiffusionPixelType;
@@ -149,6 +149,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
+
+    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img);
 
     void InitPointsets();
 

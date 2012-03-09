@@ -53,6 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTbssImporter.h>
 
 
+
 #include <mitkVectorImageMapper2D.h>
 #include "vtkFloatArray.h"
 #include "vtkLinearTransform.h"
@@ -62,6 +63,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkArrowSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
+#include <vtkCellArray.h>
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -109,9 +111,12 @@ struct TbssSelListener : ISelectionListener
       bool foundTbss = false;
       bool found3dImage = false;
       bool found4dImage = false;
+      bool foundFiberBundle = false;
 
       mitk::TbssRoiImage* roiImage;
       mitk::TbssImage* image;
+      mitk::Image* img;
+      mitk::FiberBundleX* fib;
 
 
       // iterate selection
@@ -138,7 +143,7 @@ struct TbssSelListener : ISelectionListener
           }
           else if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
           {
-            mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
+            img = static_cast<mitk::Image*>(node->GetData());
             if(img->GetDimension() == 3)
             {
               found3dImage = true;
@@ -149,6 +154,11 @@ struct TbssSelListener : ISelectionListener
             }
           }
 
+          else if (QString("FiberBundleX").compare(node->GetData()->GetNameOfClass())==0)
+          {
+            foundFiberBundle = true;
+            fib = static_cast<mitk::FiberBundleX*>(node->GetData());
+          }
 
         }
 
@@ -165,6 +175,11 @@ struct TbssSelListener : ISelectionListener
       if(foundTbss && foundTbssRoi)
       {
         m_View->Plot(image, roiImage);
+      }
+
+      if(found3dImage == true && foundFiberBundle)
+      {
+        m_View->PlotFiberBundle(fib, img);
       }
 
     }
@@ -1087,7 +1102,88 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 }
 
 
+void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img)
+{
+  int num = fib->GetNumFibers();
+  std::cout << "number of fibers: " << num << std::endl;
 
+  vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
+
+  vtkCellArray* lines = fiberPolyData->GetLines();
+  lines->InitTraversal();
+
+  int lineSize = lines->GetSize();
+  std::cout << "line size: " << lineSize << std::cout;
+
+  typedef itk::Point<float,3>               PointType;
+  typedef std::vector< PointType>           TractType;
+  typedef std::vector< TractType > TractContainerType;
+
+
+  TractContainerType tracts;
+
+  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+  {
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+    TractType singleTract;
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    {
+      // push back point
+      double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+      PointType point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+
+      singleTract.push_back( point );
+
+    }
+
+    tracts.push_back(singleTract);
+  }
+
+
+  std::vector<TractType>::iterator it = tracts.begin();
+
+
+  // Get the values along the curves from a 3D images. should also contain info about the position on screen.
+  std::vector< std::vector <double > > profiles;
+
+  while(it != tracts.end())
+  {
+    std::cout << "Tract\n";
+    TractType tract = *it;
+    TractType::iterator tractIt = tract.begin();
+
+    std::vector<double> profile;
+
+    while(tractIt != tract.end())
+    {
+      PointType p = *tractIt;
+      std::cout << p[0] << ' ' << p[1] << ' ' << p[2] << '\n';
+
+
+      // Get value from image
+      profile.push_back( (double)img->GetPixelValueByWorldCoordinate(p) );
+
+      ++tractIt;
+    }
+
+    profiles.push_back(profile);
+    std::cout << std::endl;
+
+    ++it;
+  }
+
+  m_Controls->m_RoiPlotWidget->PlotFiberBundles(profiles);
+
+
+
+
+}
 
 
 void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::TbssRoiImage* roiImage)

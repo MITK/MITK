@@ -220,6 +220,44 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 
 }
 
+
+
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(std::vector<std::vector<double> > profiles)
+{
+  this->Clear();
+
+  std::string title = "Fiber bundle plot";
+  this->SetPlotTitle( title.c_str() );
+  QPen pen( Qt::SolidLine );
+  pen.setWidth(2);
+
+
+  std::vector< std::vector<double> >::iterator it = profiles.begin();
+
+  int id=0;
+
+  while(it != profiles.end())
+  {
+    std::vector<double> profile = *it;
+
+    std::vector<double> xAxis;
+    for(int i=0; i<profile.size(); ++i)
+    {
+      xAxis.push_back((double)i);
+    }
+
+    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    this->SetCurveData( curveId, xAxis, profile );
+
+    ++it;
+    id++;
+
+  }
+
+  this->Replot();
+}
+
+
 void QmitkTbssRoiAnalysisWidget::Boxplots()
 {
   this->Clear();

@@ -64,6 +64,10 @@ public:
 
   void DrawProfiles(std::string preprocessed);
 
+
+  void PlotFiberBundles(std::vector< std::vector<double> > profiles);
+
+
   void Boxplots();
 
   void SetProjections(VectorImageType::Pointer projections)

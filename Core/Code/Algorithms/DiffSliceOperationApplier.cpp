@@ -39,7 +39,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 		vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
 		//Set the slice as 'input'
-		reslice->SetInputSlice(imageOperation->GetSlice()->GetVtkImageData(imageOperation->GetTimeStep()));
+		reslice->SetInputSlice(imageOperation->GetSlice());
 
 		//set overwrite mode to true to write back to the image volume
 		reslice->SetOverwriteMode(true);
@@ -48,7 +48,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 		mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
 		extractor->SetInput( imageOperation->GetImage() );
 		extractor->SetTimeStep( imageOperation->GetTimeStep() );
-		extractor->SetWorldGeometry( imageOperation->GetWorldGeometry() );
+		extractor->SetWorldGeometry( dynamic_cast<Geometry2D*>(imageOperation->GetWorldGeometry()) );
 		extractor->SetVtkOutputRequest(true);
 		extractor->SetResliceTransformByGeometry( imageOperation->GetImage()->GetTimeSlicedGeometry()->GetGeometry3D( imageOperation->GetTimeStep() ) );
 
@@ -56,6 +56,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 		extractor->Update();
 
 		RenderingManager::GetInstance()->RequestUpdateAll();
+		imageOperation->GetImage()->Modified();
 	}
 }
 

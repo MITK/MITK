@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "mitkCompressedImageContainer.h"
 
 #include <mitkImage.h>
+#include <vtkSmartPointer.h>
+#include <vtkImageData.h>
+
 
 namespace mitk
 {
@@ -36,17 +39,17 @@ namespace mitk
 		//mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::Geometry2D);
 
 		DiffSliceOperation();
-		DiffSliceOperation( mitk::Image* imageVolume, mitk::Image* slice, unsigned int timestep, mitk::Geometry2D* currentWorldGeometry);
+		DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, unsigned int timestep, AffineGeometryFrame3D* currentWorldGeometry);
 
 		bool IsValid();
 
 		mitk::Image* GetImage(){return this->m_Image;}
 
-		mitk::Image* GetSlice();
+		vtkImageData* GetSlice();
 
 		unsigned int GetTimeStep(){return this->m_TimeStep;}
 
-		mitk::Geometry2D* GetWorldGeometry(){return this->m_WorldGeometry;}
+		AffineGeometryFrame3D* GetWorldGeometry(){return this->m_WorldGeometry;}
 
 
 	protected:
@@ -58,9 +61,9 @@ namespace mitk
 
 		//CompressedImageContainer::Pointer m_zlibSliceContainer;
 		mitk::Image* m_Image;
-		mitk::Image* m_Slice;
+		vtkSmartPointer<vtkImageData> m_Slice;
 		unsigned int m_TimeStep;
-		mitk::Geometry2D* m_WorldGeometry;
+		AffineGeometryFrame3D::Pointer m_WorldGeometry;
 		bool m_ImageIsValid;
 
 		unsigned long m_DeleteTag;

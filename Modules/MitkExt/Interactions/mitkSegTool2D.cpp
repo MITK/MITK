@@ -209,7 +209,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 	Image::Pointer slice = extractor->GetOutput();
 
 
-	m_doOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), slice, timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+	m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
 	/*At this point we have to adjust the geometry because reslicing is based on vtk.
 		For oblique planes the calculation of the extent has negative minimum values.
@@ -294,7 +294,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 	image->Modified();
 
 
-	m_undoOperation = new DiffSliceOperation(image, slice, this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+	m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(), this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 	OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
 	UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 

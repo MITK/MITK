@@ -30,47 +30,49 @@ mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
-																						 mitk::Image* slice,
+																						 vtkImageData* slice,
 																						 unsigned int timestep,
-																						 mitk::Geometry2D* currentWorldGeometry):Operation(1)
-																						 
+																						 AffineGeometryFrame3D* currentWorldGeometry):Operation(1)
+
 {
-	m_WorldGeometry = dynamic_cast<mitk::Geometry2D*> (currentWorldGeometry->Clone().GetPointer());
+	m_WorldGeometry = currentWorldGeometry->Clone();
 
 	m_TimeStep = timestep;
 
 	/*m_zlibSliceContainer = CompressedImageContainer::New();
-  m_zlibSliceContainer->SetImage( slice );*/
-	m_Slice = slice;
+	m_zlibSliceContainer->SetImage( slice );*/
+	m_Slice = vtkSmartPointer<vtkImageData>::New();
+	m_Slice->DeepCopy(slice);
 
 	m_Image = imageVolume;
 
 
 	itk::SimpleMemberCommand< DiffSliceOperation >::Pointer command = itk::SimpleMemberCommand< DiffSliceOperation >::New();
-    command->SetCallbackFunction( this, &DiffSliceOperation::OnImageDeleted );
-    m_DeleteTag = imageVolume->AddObserver( itk::DeleteEvent(), command );
+	command->SetCallbackFunction( this, &DiffSliceOperation::OnImageDeleted );
+	m_DeleteTag = imageVolume->AddObserver( itk::DeleteEvent(), command );
 
-		if ( m_Image) 
-			m_ImageIsValid = true;
-		else
-			m_ImageIsValid = false;
+	if ( m_Image) 
+		m_ImageIsValid = true;
+	else
+		m_ImageIsValid = false;
 
 }
 
 mitk::DiffSliceOperation::~DiffSliceOperation()
 {
-	m_Image = NULL;
+	
 	m_Slice = NULL;
-	m_WorldGeometry->Delete();
 	m_WorldGeometry = NULL;
 	//m_zlibSliceContainer = NULL;
+
 	if (m_ImageIsValid)
   {
     m_Image->RemoveObserver( m_DeleteTag );
   }
+	m_Image = NULL;
 }
 
-mitk::Image* mitk::DiffSliceOperation::GetSlice()
+vtkImageData* mitk::DiffSliceOperation::GetSlice()
 {
 	//Image::ConstPointer image = m_zlibSliceContainer->GetImage().GetPointer();
 	return m_Slice;

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
+    <width>415</width>
     <height>496</height>
    </rect>
   </property>
@@ -42,6 +42,16 @@
        </item>
        <item>
         <widget class="QLineEdit" name="filterContent"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="ShowAdvancedFields">
+         <property name="text">
+          <string>Show advanced fields</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

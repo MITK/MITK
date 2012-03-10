@@ -44,6 +44,7 @@ protected slots:
     void slotFilterChange( const QString& );
     void slotRowAdded( const QModelIndex & , int , int  );
     void slotScrollDown( );
+    void on_ShowAdvancedFields_clicked( bool checked = false );
     
 };
 

@@ -24,6 +24,10 @@ SET(CACHED_RESOURCE_FILES
   resources/Logging.png
 )
 
+SET(QRC_FILES
+  resources/org_blueberry_ui_qt_log.qrc
+)
+
 SET(UI_FILES
   src/internal/berryQtLogView.ui
 )

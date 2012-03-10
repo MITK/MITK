@@ -222,6 +222,17 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
       }
     }
   }
+  else if(  role == Qt::DecorationRole )
+  {
+    if (index.column()==3)
+    {
+      QString file;
+      QIcon icon(file);
+      retr
+
+    }
+  }
+
 
   return QVariant();
 }

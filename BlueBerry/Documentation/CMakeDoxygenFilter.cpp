@@ -77,13 +77,15 @@ public:
 
   enum Token {
     TOK_EOF = -1,
+    TOK_EOL = -2,
 
     // commands
-    TOK_MACRO = -2, TOK_ENDMACRO = -3,
-    TOK_FUNCTION = -4, TOK_ENDFUNCTION = -5,
-    TOK_DOXYGEN_COMMENT = -6,
-
+    TOK_MACRO = -3, TOK_ENDMACRO = -4,
+    TOK_FUNCTION = -5, TOK_ENDFUNCTION = -6,
+    TOK_DOXYGEN_COMMENT = -7,
+    TOK_SET = -8,
     TOK_STRING_LITERAL = -100,
+    TOK_NUMBER_LITERAL = -102,
 
     // primary
     TOK_IDENTIFIER = -200
@@ -96,7 +98,7 @@ public:
   int getToken()
   {
     // skip whitespace
-    while (isspace(_lastChar))
+    while (isspace(_lastChar) && _lastChar != '\r' && _lastChar != '\n')
     {
       _lastChar = getChar();
     }
@@ -109,6 +111,8 @@ public:
         _identifier += _lastChar;
       }
 
+      if (_identifier == "set")
+        return TOK_SET;
       if (_identifier == "function")
         return TOK_FUNCTION;
       if (_identifier == "macro")
@@ -118,6 +122,17 @@ public:
       if (_identifier == "endmacro")
         return TOK_ENDMACRO;
       return TOK_IDENTIFIER;
+    }
+
+    if (isdigit(_lastChar))
+    {
+      // very lax!! number detection
+      _identifier = _lastChar;
+      while (isalnum(_lastChar = getChar()) || _lastChar == '.' || _lastChar == ',')
+      {
+        _identifier += _lastChar;
+      }
+      return TOK_NUMBER_LITERAL;
     }
 
     if (_lastChar == '#')
@@ -161,6 +176,14 @@ public:
 
     // don't eat the EOF
     if (_lastChar == EOF) return TOK_EOF;
+
+    // don't eat the EOL
+    if (_lastChar == '\r' || _lastChar == '\n')
+    {
+       if (_lastChar == '\r') _lastChar = getChar();
+       if (_lastChar == '\n') _lastChar = getChar();
+       return TOK_EOL;
+    }
 
     // return the character as its ascii value
     int thisChar = _lastChar;
@@ -219,7 +242,7 @@ class CMakeParser
 public:
 
   CMakeParser(std::istream& is, std::ostream& os)
-    : _is(is), _os(os), _lexer(is), _curToken(CMakeLexer::TOK_EOF)
+    : _is(is), _os(os), _lexer(is), _curToken(CMakeLexer::TOK_EOF), _lastToken(CMakeLexer::TOK_EOF)
   { }
 
   int curToken()
@@ -229,7 +252,15 @@ public:
 
   int nextToken()
   {
-    return _curToken = _lexer.getToken();
+    _lastToken = _curToken;
+    _curToken = _lexer.getToken();
+    while (_curToken == CMakeLexer::TOK_EOL)
+    {
+      // Try to preserve lines in output to allow correct line number referencing by doxygen.
+      _os << std::endl;
+      _curToken = _lexer.getToken();
+    }
+    return _curToken;
   }
 
   void handleMacro()
@@ -250,9 +281,23 @@ public:
     }
   }
 
+  void handleSet()
+  {
+    // SET(var ...) following a documentation block is assumed to be a variable declaration.
+    if (_lastToken != CMakeLexer::TOK_DOXYGEN_COMMENT)
+    {
+      // No comment block before
+      nextToken();
+    } else if(!parseSet())
+    {
+      // skip token for error recovery
+      nextToken();
+    }
+  }
+
   void handleDoxygenComment()
   {
-    _os << "///" << _lexer.getIdentifier() << std::endl;
+    _os << "///" << _lexer.getIdentifier();
     nextToken();
   }
 
@@ -266,7 +311,7 @@ private:
 
   void printError(const char* str)
   {
-    std::cerr << "Error: " << str << " (at line " << _lexer.curLine() << ", col " << _lexer.curCol() << ")\n";
+    std::cerr << "Error: " << str << " (at line " << _lexer.curLine() << ", col " << _lexer.curCol() << ")";
   }
 
   bool parseMacro()
@@ -301,7 +346,47 @@ private:
     }
     else
     {
-      _os << ");" << std::endl;
+      _os << ");";
+    }
+
+    // eat the ')'
+    nextToken();
+    return true;
+  }
+
+  bool parseSet()
+  {
+    if (nextToken() != '(')
+    {
+      printError("Expected '(' after SET");
+      return false;
+    }
+
+    nextToken();
+    std::string variableName = _lexer.getIdentifier();
+    if (curToken() != CMakeLexer::TOK_IDENTIFIER || variableName.empty())
+    {
+      printError("Expected variable name");
+      return false;
+    }
+
+    _os << "CMAKE_VARIABLE " << variableName;
+
+    nextToken();
+    while ((curToken() == CMakeLexer::TOK_IDENTIFIER)
+           || (curToken() == CMakeLexer::TOK_STRING_LITERAL)
+           || (curToken() == CMakeLexer::TOK_NUMBER_LITERAL))
+    {
+      nextToken();
+    }
+
+    if (curToken() != ')')
+    {
+      printError("Missing expected ')'");
+    }
+    else
+    {
+      _os << ";";
     }
 
     // eat the ')'
@@ -341,7 +426,7 @@ private:
     }
     else
     {
-      _os << ");" << std::endl;
+      _os << ");";
     }
 
     // eat the ')'
@@ -354,6 +439,7 @@ private:
   std::ostream& _os;
   CMakeLexer _lexer;
   int _curToken;
+  int _lastToken;
 };
 
 
@@ -386,6 +472,9 @@ int main(int argc, char** argv)
         break;
       case CMakeLexer::TOK_FUNCTION:
         parser.handleFunction();
+        break;
+      case CMakeLexer::TOK_SET:
+        parser.handleSet();
         break;
       case CMakeLexer::TOK_DOXYGEN_COMMENT:
         parser.handleDoxygenComment();

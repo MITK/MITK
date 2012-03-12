@@ -1146,39 +1146,8 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
   }
 
 
-  std::vector<TractType>::iterator it = tracts.begin();
 
-
-  // Get the values along the curves from a 3D images. should also contain info about the position on screen.
-  std::vector< std::vector <double > > profiles;
-
-  while(it != tracts.end())
-  {
-    std::cout << "Tract\n";
-    TractType tract = *it;
-    TractType::iterator tractIt = tract.begin();
-
-    std::vector<double> profile;
-
-    while(tractIt != tract.end())
-    {
-      PointType p = *tractIt;
-      std::cout << p[0] << ' ' << p[1] << ' ' << p[2] << '\n';
-
-
-      // Get value from image
-      profile.push_back( (double)img->GetPixelValueByWorldCoordinate(p) );
-
-      ++tractIt;
-    }
-
-    profiles.push_back(profile);
-    std::cout << std::endl;
-
-    ++it;
-  }
-
-  m_Controls->m_RoiPlotWidget->PlotFiberBundles(profiles);
+  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img);
 
 
 

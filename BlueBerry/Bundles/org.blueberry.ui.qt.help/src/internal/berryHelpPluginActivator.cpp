@@ -427,7 +427,7 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
             {
               QString pluginID = QString::fromStdString(currentPart->GetSite()->GetPluginId());
               QString viewID = QString::fromStdString(currentPart->GetSite()->GetId());
-              QString loc = "qthelp://" + pluginID + "/bundle/%1";
+              QString loc = "qthelp://" + pluginID + "/bundle/%1.html";
 
               QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
               QUrl contextUrl(loc.arg(viewID.replace(".", "_")));
@@ -437,7 +437,16 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
               {
                 BERRY_INFO << "Context help url invalid: " << contextUrl.toString().toStdString();
               }
-              url = helpEngine.findFile(QUrl(loc.arg("index.html")));
+              // Try to get the index.html file of the plug-in contributing the
+              // currently active part.
+              QUrl pluginIndexUrl(loc.arg("index"));
+              url = helpEngine.findFile(pluginIndexUrl);
+              if (url != pluginIndexUrl)
+              {
+                // Use the default page instead of another index.html
+                // (merged via the virtual folder property).
+                url = QUrl();
+              }
               return url;
             }
           }

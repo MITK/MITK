@@ -606,6 +606,34 @@ bool mitk::PlanarFigureInteractor
       break;
     }
 
+  case AcENTEROBJECT:
+    {
+      bool selected = false;
+      m_DataNode->GetBoolProperty("selected", selected);
+
+      // no need to invoke this if the figure is already selected
+      if ( !selected )
+      {
+        planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+      }
+  
+      // if this was a right mouse button click, invoke the event
+      if ( theEvent->GetButton() == 2 )
+      {
+        planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
+        ok = true;
+      }
+      else
+      {
+        ok = false;  
+      }
+
+      // we HAVE TO proceed with 'EIDNO' here to ensure correct states
+      // and convenient application behaviour
+      this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+      break;
+    }
+
 
   case AcSELECTPOINT:
     {

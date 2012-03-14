@@ -3618,7 +3618,9 @@
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="52">
         <action ID="100" />
       </transition>
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="53" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="52" >
+        <action ID="48000" />
+      </transition>
     </state>
     <state NAME="IsOverControlPoint" ID="59" X_POS="586" Y_POS="636" WIDTH="120" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="55">

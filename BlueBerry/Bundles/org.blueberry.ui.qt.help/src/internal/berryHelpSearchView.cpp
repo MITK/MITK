@@ -136,7 +136,7 @@ void HelpSearchView::resetZoom()
 
 void HelpSearchView::search() const
 {
-  QList<QHelpSearchQuery> query = m_SearchEngine->queryWidget()->query();
+  QList<QHelpSearchQuery> query = m_QueryWidget->query();
   m_SearchEngine->search(query);
 }
 

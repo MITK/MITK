@@ -327,6 +327,7 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
 
       fweFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       fweFilter->SetBValue(vols->GetB_Value());
+      
 
       fweFilter->Update();
 

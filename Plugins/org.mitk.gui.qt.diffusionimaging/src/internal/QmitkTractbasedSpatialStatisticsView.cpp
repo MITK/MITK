@@ -165,6 +165,7 @@ struct TbssSelListener : ISelectionListener
       }
 
 
+      m_View->m_Controls->m_Transform->setEnabled(found3dImage);
       m_View->m_Controls->m_CreateRoi->setEnabled(found3dImage);
       m_View->m_Controls->m_ImportFsl->setEnabled(found4dImage);
       if(found3dImage)
@@ -336,7 +337,125 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
+    connect( (QObject*)(m_Controls->m_Transform), SIGNAL(clicked()), this, SLOT(Transform()) );
   }
+}
+
+
+void QmitkTractbasedSpatialStatisticsView::Transform()
+{
+
+  mitk::Image::Pointer image;
+
+  for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
+    i != m_CurrentSelection->End(); ++i)
+  {
+    // extract datatree node
+    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+    {
+      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+
+      if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+      {
+        mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
+        if(img->GetDimension() == 3)
+        {
+          image = img;
+        }
+      }
+    }
+  }
+
+
+
+  // Get transformation from gui
+  std::string str = m_Controls->m_TransformText->toPlainText().toStdString();
+
+  std::cout << "str " << str <<std::endl;
+
+  // Get matrix of mask
+  mitk::Geometry3D* geo = image->GetGeometry();
+  std::vector<std::string> lines;
+  Tokenize(str, lines, "\n");
+
+  //itk::Matrix<float,3,3>
+
+  std::vector< std::string >::iterator it = lines.begin();
+  itk::Matrix<float,3,3> m;
+  itk::FixedArray<float,3> off;
+
+  std::vector< std::vector<std::string> > rows;
+
+  while(it != lines.end())
+  {
+    std::string line = *it;
+    std::cout << "line " << line << std::endl;
+    std::vector<std::string> row;
+    Tokenize(line, row, " ");
+    ++it;
+    rows.push_back(row);
+  }
+
+  if(rows.size() != 4)
+  {
+    return;
+  }
+
+  for(int i=0; i<3; i++)
+  {
+    if(rows[i].size() != 4)
+    {
+      return;
+    }
+    for(int j=0; j<3; j++)
+    {
+      std::string s = std::string(rows[i][j]);
+      m[j][i] = QString(s.c_str()).toFloat();
+    }
+    std::string s = std::string(rows[i][3]);
+    off[i] = QString(s.c_str()).toFloat();
+  }
+
+  itk::ScalableAffineTransform<float, 3>* trans = geo->GetIndexToWorldTransform();
+  itk::Matrix<float,3,3> mat = trans->GetMatrix();
+  itk::FixedArray<float,3> offset = trans->GetOffset();
+
+  mat = mat * m.GetInverse();
+
+  itk::Vector<float,3> newOffset;
+
+  for(int i=0; i<3; i++)
+  {
+    newOffset[i] = offset[i] + off[i];
+  }
+
+  itk::ScalableAffineTransform<float,3>::Pointer newTrans = itk::ScalableAffineTransform<float,3>::New();
+
+  newTrans->SetMatrix(mat);
+  newTrans->SetTranslation(newOffset);
+
+  mitk::Image::Pointer transposed = mitk::Image::New();
+  transposed = image;
+  transposed->GetGeometry()->SetIndexToWorldTransform(newTrans);
+
+
+
+  mitk::DataNode::Pointer result = mitk::DataNode::New();
+  result->SetProperty( "name", mitk::StringProperty::New("transformed") );
+  result->SetData( transposed );
+  //result->SetProperty( "levelwindow", levWinProp );
+
+
+  // add new image to data storage and set as active to ease further processing
+  GetDefaultDataStorage()->Add( result );
+
+  // show the results
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+
+
+  std::cout << "pause";
+
 }
 
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()

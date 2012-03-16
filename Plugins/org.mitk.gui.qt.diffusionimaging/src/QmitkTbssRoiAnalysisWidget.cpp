@@ -259,6 +259,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     TractType tract = *it;
     if(tract == smallestTract)
     {
+      ++it;
       continue;
     }
 
@@ -284,6 +285,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
         {
           correspondingIndex = j;
           correspondingPoint = p2;
+          minDist = dist;
         }
       }
 
@@ -310,7 +312,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
       PointType p2 = correspondingPoints[i];
 
       std::cout << "[" << p[0] << ", " << p[1] << ", " << p[2] << ", ["
-                   << p2[0] << ", " << p[1] << ", " << p[2] << "]\n";
+                   << p2[0] << ", " << p2[1] << ", " << p2[2] << "]\n";
     }
 
 

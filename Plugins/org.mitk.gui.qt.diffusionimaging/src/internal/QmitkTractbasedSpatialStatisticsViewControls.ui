@@ -163,7 +163,7 @@
          <string>To create a roi first load a tbss meta image into the datamanager</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="m_RoiTab">
          <attribute name="title">
@@ -287,6 +287,26 @@
            <widget class="QPushButton" name="m_Clipboard">
             <property name="text">
              <string>Copy to clipboard</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Transform</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QTextEdit" name="m_TransformText"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="m_Transform">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Transform</string>
             </property>
            </widget>
           </item>

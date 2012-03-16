@@ -189,11 +189,6 @@ public:
     }
 
   static void tofile2(vnl_matrix<double> *A, std::string fname);
-  static double factorial(int number);
-  static void Cart2Sph(double x, double y, double z, double* cart);
-  static double legendre0(int l);
-  static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
-  static double Yj(int m, int k, double theta, double phi);
 
   OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
 

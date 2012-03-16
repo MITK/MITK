@@ -24,20 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkArray.h>
 #include <vnl/vnl_vector.h>
 
-#include <boost/version.hpp>
 #include <stdio.h>
-#include <locale>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-#include <boost/math/special_functions/legendre.hpp>
-#endif
-#endif
 
 #include "itkPointShell.h"
+
+#include "mitkSphericalHarmonicsFunctions.h"
 
 namespace itk {
 
@@ -448,130 +439,6 @@ namespace itk {
       }
 
       template< class T, class TG, class TO, int L, int NODF>
-      double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::factorial(int number) {
-          if(number <= 1) return 1;
-          double result = 1.0;
-          for(int i=1; i<=number; i++)
-            result *= i;
-          return result;
-      }
-
-      template< class T, class TG, class TO, int L, int NODF>
-      void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::Cart2Sph(double x, double y, double z, double *cart)
-      {
-        double phi, th, rad;
-        rad = sqrt(x*x+y*y+z*z);
-        th = atan2(z,sqrt(x*x+y*y));
-        phi = atan2(y,x);
-        th = -th+QBALL_ANAL_RECON_PI/2;
-        phi = -phi+QBALL_ANAL_RECON_PI;
-        cart[0] = phi;
-        cart[1] = th;
-        cart[2] = rad;
-      }
-
-      template< class T, class TG, class TO, int L, int NODF>
-      double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::legendre0(int l)
-      {
-        if( l%2 != 0 )
-        {
-          return 0;
-        }
-        else
-        {
-          double prod1 = 1.0;
-          for(int i=1;i<l;i+=2) prod1 *= i;
-          double prod2 = 1.0;
-          for(int i=2;i<=l;i+=2) prod2 *= i;
-          return pow(-1.0,l/2.0)*(prod1/prod2);
-        }
-      }
-
-      template< class T, class TG, class TO, int L, int NODF>
-      double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::spherical_harmonic(int m,int l,double theta,double phi, bool complexPart)
-      {
-        if( theta < 0 || theta > QBALL_ANAL_RECON_PI )
-        {
-          std::cout << "bad range" << std::endl;
-          return 0;
-        }
-
-        if( phi < 0 || phi > 2*QBALL_ANAL_RECON_PI )
-        {
-          std::cout << "bad range" << std::endl;
-          return 0;
-        }
-
-        double pml = 0;
-        double fac1 = factorial(l+m);
-        double fac2 = factorial(l-m);
-
-        if( m<0 )
-        {
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-          pml = ::boost::math::legendre_p<double>(l, -m, cos(theta));
-#else
-          std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-#endif
-#else
-          std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-#endif
-          double mypow = pow(-1.0,-m);
-          double myfac = (fac1/fac2);
-          pml *= mypow*myfac;
-        }
-        else
-        {
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-          pml = ::boost::math::legendre_p<double>(l, m, cos(theta));
-#endif
-#endif
-        }
-
-        //std::cout << "legendre(" << l << "," << m << "," << cos(theta) << ") = " << pml << std::endl;
-
-        double retval = sqrt(((2.0*(double)l+1.0)/(4.0*QBALL_ANAL_RECON_PI))*(fac2/fac1)) * pml;
-        if( !complexPart )
-        {
-          retval *= cos(m*phi);
-        }
-        else
-        {
-          retval *= sin(m*phi);
-        }
-        //std::cout << retval << std::endl;
-        return retval;
-      }
-
-      template< class T, class TG, class TO, int L, int NODF>
-      double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-        ::Yj(int m, int k, double theta, double phi)
-      {
-        if( -k <= m && m < 0 )
-        {
-          return sqrt(2.0) * spherical_harmonic(m,k,theta,phi,false);
-        }
-
-        if( m == 0 )
-          return spherical_harmonic(0,k,theta,phi,false);
-
-        if( 0 < m && m <= k )
-        {
-          return sqrt(2.0) * spherical_harmonic(m,k,theta,phi,true);
-        }
-
-        return 0;
-      }
-
-
-
-      template< class T, class TG, class TO, int L, int NODF>
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ::ComputeReconstructionMatrix()
       {
@@ -640,7 +507,7 @@ namespace itk {
               double y = gdcit.Value().get(1);
               double z = gdcit.Value().get(2);
               double cart[3];
-              Cart2Sph(x,y,z,cart);
+              mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
               (*Q)(0,i) = cart[0];
               (*Q)(1,i) = cart[1];
               (*Q)(2,i++) = cart[2];
@@ -657,7 +524,7 @@ namespace itk {
                 double y = gdcit.Value().get(1);
                 double z = gdcit.Value().get(2);
                 double cart[3];
-                Cart2Sph(x,y,z,cart);
+                mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
                 (*Q)(0,i) = cart[0];
                 (*Q)(1,i) = cart[1];
                 (*Q)(2,i++) = cart[2];
@@ -692,7 +559,7 @@ namespace itk {
               (*lj)[j] = k;
               double phi = (*Q)(0,i);
               double th = (*Q)(1,i);
-              (*B)(i,j) = Yj(m,k,th,phi);
+              (*B)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
               //std::cout << "B(" << i << "," << j << ") = Yj(" << m << "," << k << "," << th << "," << phi << ") = " << (*B)(i,j) << std::endl;
             }
           }
@@ -712,12 +579,12 @@ namespace itk {
           if(m_NormalizationMethod == QBAR_SOLID_ANGLE ||
             m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
           {
-            (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*legendre0((*lj)[i]);
+            (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*mitk::ShericalHarmonicsFunctions::legendre0((*lj)[i]);
             (*m_LP)(i) *= (*P)(i,i);
           }
           else
           {
-            (*P)(i,i) = legendre0((*lj)[i]);
+            (*P)(i,i) = mitk::ShericalHarmonicsFunctions::legendre0((*lj)[i]);
           }
         }
         m_B_t = new vnl_matrix<double>(B->transpose());
@@ -781,7 +648,7 @@ namespace itk {
           double y = (*U)(1,i);
           double z = (*U)(2,i);
           double cart[3];
-          Cart2Sph(x,y,z,cart);
+          mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
           (*U)(0,i) = cart[0];
           (*U)(1,i) = cart[1];
           (*U)(2,i) = cart[2];
@@ -796,7 +663,7 @@ namespace itk {
               int j = (k*k + k + 2)/2 + m - 1;
               double phi = (*U)(0,i);
               double th = (*U)(1,i);
-              (*m_SphericalHarmonicBasisMatrix)(i,j) = Yj(m,k,th,phi);
+              (*m_SphericalHarmonicBasisMatrix)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
               (*sphericalHarmonicBasisMatrix2)(i,j) = (*m_SphericalHarmonicBasisMatrix)(i,j);
             }
           }

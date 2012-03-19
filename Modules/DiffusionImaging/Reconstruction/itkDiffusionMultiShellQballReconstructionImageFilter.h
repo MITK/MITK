@@ -126,7 +126,7 @@ protected:
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void ComputeReconstructionMatrix();
-
+    bool CheckDuplicateDiffusionGradients();
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );

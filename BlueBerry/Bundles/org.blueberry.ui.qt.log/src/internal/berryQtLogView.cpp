@@ -62,6 +62,7 @@ QtLogView::QtLogView(QWidget *parent)
   ui.tableView->setModel(filterModel);
 
   ui.tableView->verticalHeader()->setVisible(false);
+  ui.tableView->horizontalHeader()->setStretchLastSection(true);
              
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
@@ -104,9 +105,9 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
 
 void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
 {
-  QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );
+  QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );  
   ui.tableView->resizeColumnsToContents();
-  
+
   berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);

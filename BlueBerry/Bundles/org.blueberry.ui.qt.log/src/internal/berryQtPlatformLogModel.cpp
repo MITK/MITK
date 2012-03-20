@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace berry {
 
 const QString QtPlatformLogModel::Error = QString("Error");
-const QString QtPlatformLogModel::Warn = QString("Warn");
+const QString QtPlatformLogModel::Warn = QString("Warning");
 const QString QtPlatformLogModel::Fatal = QString("Fatal");
 const QString QtPlatformLogModel::Info = QString("Info");
 const QString QtPlatformLogModel::Debug = QString("Debug");
@@ -194,8 +194,6 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
         case 1: 
           {
             // change muellerm, an icon is returned do not return text
-            return QVariant(QString(""));
-            /*
             switch(msg->message.level)
             {
               default:
@@ -214,7 +212,6 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
               case mbilog::Debug:
                 return QVariant(Debug);
             }
-            */
           }
           
         case 2: 
@@ -245,6 +242,27 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
     else // m_ShowAdvancedFields
     {
       // only return text
+      if( index.column() == 0 )
+      {
+        switch(msg->message.level)
+        {
+          default:
+          case mbilog::Info:
+            return QVariant(Info);
+
+          case mbilog::Warn:
+            return QVariant(Warn);
+
+          case mbilog::Error:
+            return QVariant(Error);
+
+          case mbilog::Fatal:
+            return QVariant(Fatal);
+
+          case mbilog::Debug:
+            return QVariant(Debug);
+        }
+      }
       if( index.column()==1 )
       {
         return QVariant(QString(msg->message.message.c_str()));

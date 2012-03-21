@@ -263,8 +263,8 @@ int mitkImageTest(int argc, char* argv[])
   mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
   mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
   mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
-  MITK_TEST_CONDITION( (value>=imageMin && value <=imageMax), "Value returned is between max/min");
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
+  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
 
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
@@ -320,5 +320,7 @@ int mitkImageTest(int argc, char* argv[])
   {
     MITK_INFO << "Image does not contain three dimensions, some test cases are skipped!";
   } 
+
+
   MITK_TEST_END();
 }

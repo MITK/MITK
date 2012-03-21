@@ -85,7 +85,7 @@ m_3DInterpolationEnabled(false)
   m_RBtnEnable3DInterpolation->setChecked(true);
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
 
-  m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
+  m_BtnAccept3DInterpolation = new QPushButton("Accept", this);
   m_BtnAccept3DInterpolation->setEnabled(false);
   connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
   grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
@@ -100,7 +100,7 @@ m_3DInterpolationEnabled(false)
   connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
   grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
 
-  m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
+  m_BtnAcceptInterpolation = new QPushButton("Accept", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
   grid->addWidget(m_BtnAcceptInterpolation,1,1);
@@ -110,7 +110,7 @@ m_3DInterpolationEnabled(false)
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
   grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
 
-  m_RBtnDisableInterpolation = new QRadioButton("Disable Interpolation", this);
+  m_RBtnDisableInterpolation = new QRadioButton("Disable", this);
   connect(m_RBtnDisableInterpolation, SIGNAL(toggled(bool)), this, SLOT(OnInterpolationDisabled(bool)));
   grid->addWidget(m_RBtnDisableInterpolation, 2,0);
 

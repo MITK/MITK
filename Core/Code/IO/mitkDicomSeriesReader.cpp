@@ -145,36 +145,41 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
       {
       case DcmIoType::UCHAR:
         DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::CHAR:
         DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::USHORT:
         DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::SHORT:
         DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::UINT:
         DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::INT:
         DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::ULONG:
         DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::LONG:
         DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::FLOAT:
         DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::DOUBLE:
         DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       default:
         MITK_ERROR << "Found unsupported DICOM pixel type: (enum value) " << io->GetComponentType();
+      }
+      
+      if (node.GetData())
+      {
+        return true;
       }
     }
   }

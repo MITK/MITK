@@ -672,19 +672,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 
-    mitk::DataNode* refImageNode = m_ToolManager->GetReferenceData(0);
-
-    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    std::string nameOfResultImage = refImageNode->GetName();
-    nameOfResultImage.append(m_InterpolatedSurfaceNode->GetName());
-    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-    resultNode->SetProperty("3DInterpolationResult", mitk::BoolProperty::New(true));
-    resultNode->SetData( s2iFilter->GetOutput() );
-
-    this->GetDataStorage()->Add(resultNode, refImageNode);
-
-    m_RBtnDisableInterpolation->toggle();
+    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
+    segmentationNode->SetData(s2iFilter->GetOutput());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

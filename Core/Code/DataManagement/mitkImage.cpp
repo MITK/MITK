@@ -42,7 +42,7 @@ m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStati
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
-  this->Initialize(&other);
+  this->Initialize( other.GetPixelType(), other.GetDimension(), other.GetDimensions());
 
   if (this->GetDimension() > 3)
   {

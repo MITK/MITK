@@ -39,6 +39,9 @@ PURPOSE.  See the above copyright notices for more information.
 // vtk
 #include <vtkSphereSource.h>
 
+//POCO
+#include <Poco/Zip/ZipException.h>
+
 
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
@@ -142,7 +145,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
     m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
     errorMessage = myDeserializer->GetErrorMessage();
     }
-  catch(...) //temporary solution: replace this by defined exception handling later!
+  catch(std::exception e) //temporary solution: replace this by defined exception handling later!
     {
     errorMessage = "Error: wrong file format! \n (please only load tool storage files)";
     m_toolStorage = NULL;

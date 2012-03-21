@@ -17,7 +17,8 @@ if(BUILD_TESTING)
 
       set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 3600
-                          LABELS "MITK;MITK-Plugins")
+                          LABELS "MITK;MITK-Plugins"
+                          RUN_SERIAL TRUE)
     endif()
 
   endif() # NOT MITK_FAST_TESTING

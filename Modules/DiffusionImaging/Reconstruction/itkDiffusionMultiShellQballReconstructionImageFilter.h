@@ -106,9 +106,6 @@ public:
     itkSetMacro( Threshold, ReferencePixelType );
     itkGetMacro( Threshold, ReferencePixelType );
 
-    itkSetMacro( NormalizationMethod, Normalization);
-    itkGetMacro( NormalizationMethod, Normalization );
-
     itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
     itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
 
@@ -127,6 +124,8 @@ protected:
 
     void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation );
+    void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );

@@ -11,8 +11,8 @@ of the interaction is stored in an XML-file that is loaded by the application du
 That even allows the storage of different interaction patterns, e.g. an interaction behaviour like in MS PowerPoint, 
 in Adobe Photoshop or like the interaction behaviour on a medical image retrieval system.
 
-\section Statemachines Statemachines to realize Interaction
-The interaction in MITK is realized with the concept of state machines (by Mealy).
+\section Statemachines Statemachines to implement Interaction
+The interaction in MITK is implemented with the concept of state machines (by Mealy).
 This concept allows to build the steps of interaction with different states, which each have different conditions, very alike the different interactions that may have to be build to develop medical imaging applications.
 Furthermore state machines can be implemented using object oriented programming (OOP). Due to that we can abstract from the section of code, that implements the interaction and focus on the sequence of interaction. What steps must the user do first before the program can compute a result? For example he has to declare three points in space first and these points are the input of a filter so only after the definition of the points, the filter can produce a result. The according interaction sequence will inform the filter after the third point is set and not before that. Now the filter after an adaption only needs two points as an input. The sequence of the interaction can be easily changed if it is build up as a sequence of objects and not hard implemented in a e.g. switch/case block. Or the user wants to add a point in the scene with the right mouse button instead of the left. Wouldn't it be nice to only change the definition of an interaction sequence rather than having to search through the code and changing every single if/else condition?
 

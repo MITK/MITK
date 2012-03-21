@@ -14,16 +14,15 @@ Available sections:
 Geometries are used to describe the geometrical properties of data objects in space and time.\n
 To use the geometry classes in the right way you have to understand the three different coordinate types present in MITK:\n\n
 \image html CoordinateTypes.png
-<center><b>The different coordinate types\n\n</b></center>
-
-
+<center><b>The different coordinate types\n\n</b></center>\n
 	-# World coordinates:
-	    - World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality
+	    	- World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality 
 		- The geometry defines the offset, orientation, and scale of the considered data objects in reference to the world coordinate systems.
 		- World coordinates are always measured in mm
-		- <b> If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n 
-		  If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER</b>
+		- If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n 
+		- If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER
 		- Index coordinates can be converted to world coordinates by calling Geometry3D::IndexToWorld()\n\n
+
 \image html worldcoordinateSystem.png
 <center><b>Corner-based coordinates\n\n</b></center>
 \image html WorldcoordinateSystemCenterBased.png
@@ -45,7 +44,7 @@ As the superclass of all MITK geometries Geometry3D holds:
 	- a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by Geometry3D::GetBoundingBox()
 	- a time related bounding box which holds the temporal validity of the considered data object in milliseconds (start and end time), to be accessed by Geometry3D::GetTimeBounds().\n 
 	  The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
-	- position information in form of a Euclidian transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa,\n
+	- position information in form of a Euclidean transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa,\n
        to be accessed by Geometry3D::GetIndexToWorldTransform()\n
 	   See also: \ref Section_1 "Introduction to Geometries"
 	- Many other properties (e.g. origin, extent, ...) which can be found in the \ref Geometry3D "class documentation"
@@ -57,7 +56,7 @@ This is because all data objects are objects in space and time. The data values 
 The information required to convert these index coordinates into a world coordinate system, with spatiotemporal coordinates in millimeters and milliseconds, is stored in Geometry3D\n
 class and its sub-classes.
 
-TimeSlicedGeometry describes a spatiotemporal geometry consisting of spatial geometries exising at different times, and allocates each geometry at a valid time step a discrete number. It contains a list of Geometry3D instances to be accessed by\n
+TimeSlicedGeometry describes a spatiotemporal geometry consisting of spatial geometries existing at different times, and allocates each geometry at a valid time step a discrete number. It contains a list of Geometry3D instances to be accessed by\n
 TimeSlicedGeometry::GetGeometry3D(t), with t between 0 and TimeSlicedGeometry::GetTimeSteps().\n
 To convert between world time in milliseconds and the integer timestep number use TimeSlicedGeometry::MSToTimeStep(), for conversion in the opposite direction\n
 TimeSlicedGeometry::TimeStepToMS().
@@ -71,7 +70,7 @@ The instance of Geometry3D provided to TimeSlicedGeometry::InitializeEvenlyTimed
 TimeSlicedGeometry is a Geometry3D itself. Its bounding box and transformation is usually the same as the bounding box and transformations of the contained Geometry3D instances.\n 
 Its life span (to be accessed by TimeSlicedGeometry::GetTimeBounds()) is the span from the initial valid time of the first contained Geometry3D to the termination of the last valid time of contained Geometry3Ds.
 
-TimeSlicedGeometry can also contain Geometry3D instances that do not have the same Euclidian geometry. In that case, TimeSlicedGeometry::GetEvenlyTimed() has to be false.
+TimeSlicedGeometry can also contain Geometry3D instances that do not have the same Euclidean geometry. In that case, TimeSlicedGeometry::GetEvenlyTimed() has to be false.
 
 SlicedGeometry3D is a sub-class of Geometry3D, which describes data objects consisting of slices, e.g., objects of type Image (or SlicedData, which is the super-class of Image). 
 Therefore, Image::GetTimeSlicedGeometry() will contain a list of SlicedGeometry3D instances. There is a special method SlicedData::GetSlicedGeometry(t) which directly returns\n

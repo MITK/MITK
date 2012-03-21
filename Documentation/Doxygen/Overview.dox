@@ -19,7 +19,7 @@ of visualization algorithms including scalar, vector, tensor, texture, and volum
 and advanced modeling techniques such as implicit modelling, polygon reduction, mesh smoothing, 
 cutting, contouring, and Delaunay triangulation. In addition, dozens of imaging algorithms have 
 been directly integrated to allow the user to mix 2D imaging / 3D graphics algorithms and data."
-(from the <a href="http://www.vtk.org">vtk homepage</a>).
+(from the <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a> ).
  <li> the <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and 
 segmentation algorithms.
 </ul>

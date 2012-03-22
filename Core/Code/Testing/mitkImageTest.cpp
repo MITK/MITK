@@ -263,8 +263,8 @@ int mitkImageTest(int argc, char* argv[])
   mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
   mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
   mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
-  MITK_TEST_CONDITION( (value>=imageMin && value <=imageMax), "Value returned is between max/min");
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
+  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
 
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
@@ -320,5 +320,17 @@ int mitkImageTest(int argc, char* argv[])
   {
     MITK_INFO << "Image does not contain three dimensions, some test cases are skipped!";
   } 
+  
+  // clone generated 3D image with one slice in z direction (cf. bug 11058)
+  unsigned int* threeDdim = new unsigned int[3];
+  threeDdim[0] = 100;
+  threeDdim[1] = 200;
+  threeDdim[2] = 1;
+  mitk::Image::Pointer threeDImage = mitk::Image::New();
+  threeDImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, threeDdim);
+  mitk::Image::Pointer cloneThreeDImage = threeDImage->Clone();
+  // check that the clone image has the same dimensionality as the source image
+  MITK_TEST_CONDITION_REQUIRED( cloneThreeDImage->GetDimension() == 3, "Testing if the clone image initializes with 3D!");
+
   MITK_TEST_END();
 }

@@ -9,7 +9,7 @@ all required third-party libraries (except Qt) automatically. These instructions
 \note This page explains explicitly how to build MITK itself. If you want to create your own project based on MITK, the process
 described below is completely automated. Please see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">Setup a MITK-based project</a>
 
-For more advanced users, the last sections explain how to inject custom build libraries into the supebuild process.
+For more advanced users, the last sections explain how to inject custom build libraries into the superbuild process.
 
 \section BIOne Prerequisites
 

@@ -13,8 +13,6 @@ There are eight directories on the top level, each containing several sub-direct
 
 \section Directory Naming Conventions
 If the classes within a sub-directory are implemented according to the mechanisms or on basis of a toolkit, the name of the sub-directory should start with the acronym of the toolkit. For example, if a registration algorithm uses itk, a reasonable directory name is \a itkRegistration. The classes within the directory need not be in the namespace of the toolkit (as in the case of itk-using classes), but they may, as in the case of directories containing mitk-core-classes. Typical acronyms are \a mitk, \a itk, \a vtk, \a ip and \a Qmitk (following the <a href="http://www.trolltech.com/documentation/naming.html">Qt-Naming Guidelines</a>).
-
-\section File Naming Conventions
 If a file contains a class that is within a namespace, the file name \em must begin with the namespace name, e.g.  mitkImage.h and mitkImage.cpp contain the class mitk::Image. Namespace names are normally identical to toolkit acronyms. Consequently, name of the directory will begin with the acronym according to the previous section.
 
 \section Compilation Conventions

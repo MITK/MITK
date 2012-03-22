@@ -153,20 +153,20 @@ m_CrosshairNavigationEnabled(false)
   mitkWidgetLayout1->addWidget(mitkWidget1); 
 
   //Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2", m_RenderingManager);
+  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2", NULL, m_RenderingManager);
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3", m_RenderingManager);
+  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3", NULL, m_RenderingManager);
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3); 
 
   //Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4", m_RenderingManager);
+  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4", NULL, m_RenderingManager);
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4); 

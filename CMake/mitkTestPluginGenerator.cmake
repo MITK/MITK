@@ -1,6 +1,6 @@
 if(BUILD_TESTING)
  
-  set(proj GeneratedTestProject)
+  set(proj GP) # Means GenerateProject (use a short name due to Windows limitations)
   set(test_project_out_dir "${MITK_BINARY_DIR}")
   set(test_project_source_dir "${MITK_BINARY_DIR}/${proj}")
   set(test_project_binary_dir "${MITK_BINARY_DIR}/${proj}-bin")

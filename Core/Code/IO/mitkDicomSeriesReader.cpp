@@ -741,14 +741,28 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
           try {
             // check whether this and the previous block share a comon origin
             // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
-            std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
-            std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+            
+            const char 
+                *origin_value = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient ),
+                *previous_origin_value = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient ),
+                *destination_value = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient ),
+                *previous_destination_value = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+         
+            if (!origin_value || !previous_origin_value || !destination_value || !previous_destination_value)
+            {
+              identicalOrigins = false;
+            } 
+            else
+            { 
+              std::string thisOriginString = origin_value;
+              std::string previousOriginString = previous_origin_value;
 
-            // also compare last origin, because this might differ if z-spacing is different
-            std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
-            std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+              // also compare last origin, because this might differ if z-spacing is different
+              std::string thisDestinationString = destination_value;
+              std::string previousDestinationString = previous_destination_value;
 
-            identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+              identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+            }
 
           } catch(...)
           {

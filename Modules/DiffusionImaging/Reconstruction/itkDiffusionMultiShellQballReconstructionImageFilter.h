@@ -160,6 +160,9 @@ private:
     int m_NumberCoefficients;
 
     BlaImage::Pointer m_ODFSumImage;
+
+    void printMatrix( vnl_matrix< double > * mat );
+
 };
 
 }

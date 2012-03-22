@@ -27,18 +27,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <boost/version.hpp>
 #include <stdio.h>
 #include <locale>
+#include <strstream>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-#include <boost/math/special_functions/legendre.hpp>
-#endif
-#endif
-
 #include "mitkSphericalHarmonicsFunctions.h"
 #include "itkPointShell.h"
+#include <memory>
 
 namespace itk {
 
@@ -65,7 +61,20 @@ template< class TReferenceImagePixelType, class TGradientImagePixelType, class T
 typename itk::DiffusionMultiShellQballReconstructionImageFilter< TReferenceImagePixelType,TGradientImagePixelType,TOdfPixelType, NOrderL,NrOdfDirections>::OdfPixelType itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, NOrderL, NrOdfDirections>
 ::Normalize( OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
 {
+  for(int i=0; i<NrOdfDirections; i++)
+  {
+    odf[i] = odf[i] < 0 ? 0 : odf[i];
+    odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
+  }
+  TOdfPixelType sum = 0;
+  for(int i=0; i<NrOdfDirections; i++)
+  {
+    sum += odf[i];
+  }
+  if(sum>0)
+    odf /= sum;
 
+  return odf;
 }
 
 
@@ -97,6 +106,7 @@ vnl_vector<TOdfPixelType>itk::DiffusionMultiShellQballReconstructionImageFilter<
       vec[i] = 1 - (sigma / 2);
     }
 
+    //TO DO
     if (b0f==0)
       b0f = 0.01;
     if(vec[i] >= b0f)
@@ -242,7 +252,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs = ( (*m_CoeffReconstructionMatrix) * B );
       coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
       odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
+      //odf = Normalize(odf, b0);
 
+      MITK_INFO << odf;
+      return;
     }
     float sum = 0.0;
     oit.Set( odf );
@@ -263,7 +276,7 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T, TG, TO, L, NODF>::
 ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<double> *SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation )
 {
-  for(unsigned int i=0; i<m_NumberOfGradientDirections; i++)
+  for(unsigned int i=0; i< (*SHBasisOutput).rows(); i++)
   {
     for(int k = 0; k <= L; k += 2)
     {
@@ -277,10 +290,12 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
         (*SHBasisOutput)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
 
         // Laplacian Baltrami Order Association
-        (*LaplaciaBaltramiOutput)(j,j) = k*k*(k + 1)*(k+1);
+        if(LaplaciaBaltramiOutput)
+          (*LaplaciaBaltramiOutput)(j,j) = k*k*(k + 1)*(k+1);
 
         // Order Association
-        (*SHOrderAssociation)[j] = k;
+        if(SHOrderAssociation)
+          (*SHOrderAssociation)[j] = k;
 
       }
     }
@@ -298,10 +313,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 }
 
 
-template< class T, class TG, class TO, int L, int NODF>
-void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+template< class T, class TG, class TO, int L, int NOdfDirections>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 ::ComputeReconstructionMatrix()
 {
+
+  typedef std::auto_ptr< vnl_matrix< double> >  MatrixDoublePtr;
+  typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
+  typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
+
   if( m_NumberOfGradientDirections < (((L+1)*(L+2))/2) /* && m_NumberOfGradientDirections < 6 */ )
   {
     itkExceptionMacro( << "At least (L+1)(L+2)/2 gradient directions are required" );
@@ -334,8 +354,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
   }
 
-  vnl_matrix<double> *Q = new vnl_matrix<double>(3, m_NumberOfGradientDirections);
-
+  MatrixDoublePtr Q(new vnl_matrix<double>(3, m_NumberOfGradientDirections));
   // Cartesian to spherical coordinates
   {
     int i = 0;
@@ -372,73 +391,68 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       }
     }
   }
+  MITK_INFO << "QBALL IMAGE";
+  //printMatrix(Q.get());
 
   int LOrder = L;
   m_NumberCoefficients = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
 
-  vnl_matrix<double>* SHBasis = new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients);
-  vnl_vector<int>* SHOrderAssociation = new vnl_vector<int>(m_NumberCoefficients);
-  vnl_matrix<double>* LaplacianBaltrami = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  vnl_matrix<double>* FRTMatrix = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
+  MatrixDoublePtr SHBasis(new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients));
+  VectorIntPtr SHOrderAssociation(new vnl_vector<int>(m_NumberCoefficients));
+  MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
 
   LaplacianBaltrami->fill(0.0);
   FRTMatrix->fill(0.0);
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
-  ComputeSphericalHarmonicsBasis(Q ,SHBasis, LaplacianBaltrami, SHOrderAssociation);
+  ComputeSphericalHarmonicsBasis(Q.get() ,SHBasis.get(), LaplacianBaltrami.get(), SHOrderAssociation.get());
+
+  MITK_INFO << "SH BASIS";
+  //printMatrix(SHBasis.get());
+
+  MITK_INFO << "Laplacian Baltrami";
+  printMatrix(LaplacianBaltrami.get());
 
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
-  ComputeFunkRadonTransformationMatrix(SHOrderAssociation ,FRTMatrix);
+  ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
+
+  MITK_INFO << "FRTMatrix";
+  printMatrix(FRTMatrix.get());
 
 
+  MatrixDoublePtr temp(new vnl_matrix<double>(((SHBasis->transpose()) * (*SHBasis)) + (m_Lambda  * (*LaplacianBaltrami))));
 
- // vnl_matrix<double> * temp = new vnl_matrix<double>(((SHBasis->transpose() * (*SHBasis)) + (m_Lamda * LaplacianBaltrami) );
- // vnl_matrix_inverse<double> *inv =
+  MITK_INFO << "Inner Product";
+  printMatrix(temp.get());
 
-  /// OLD SHIT
-  vnl_matrix<double> * SHBasisTranspose = new vnl_matrix<double>(SHBasis->transpose());
-  vnl_matrix<double> SHBasisTransposeMultipliedWithSHBasis = (*SHBasisTranspose) * (*SHBasis);
-  vnl_matrix<double>* SquaredLaplacianBaltrami = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  SquaredLaplacianBaltrami->fill(0.0);
+  InverseMatrixDoublePtr pseudo_inv(new vnl_matrix_inverse<double>((*temp)));
+  MatrixDoublePtr inverse(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  inverse->fill(0.0);
+  (*inverse) = pseudo_inv->inverse();
 
-  SquaredLaplacianBaltrami->update(*LaplacianBaltrami);
-  *SquaredLaplacianBaltrami *= *LaplacianBaltrami;
+  MITK_INFO << "Inverse Inner Product";
+  printMatrix(inverse.get());
 
-  vnl_matrix<double> lambdaLMultipliedWithSquaredLaplacianBaltrami(m_NumberCoefficients,m_NumberCoefficients);
-  lambdaLMultipliedWithSquaredLaplacianBaltrami.update((*SquaredLaplacianBaltrami));
-  lambdaLMultipliedWithSquaredLaplacianBaltrami *= m_Lambda;
+  double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  MatrixDoublePtr TransformationMatrix(new vnl_matrix<double>( factor * ((*FRTMatrix) * (*inverse) * (SHBasis->transpose()))));
 
-  vnl_matrix<double> tmp( SHBasisTransposeMultipliedWithSHBasis + lambdaLMultipliedWithSquaredLaplacianBaltrami );
-  vnl_matrix_inverse<double> *pseudoInverse = new vnl_matrix_inverse<double>( tmp );
-  vnl_matrix<double>* Inv = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  Inv->fill(0.0);
-
-  (*Inv) = pseudoInverse->pinverse();
-
-  vnl_matrix<double> temp( (*Inv) *  (*SHBasisTranspose));
-
-  double fac1 = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
-
-  temp = fac1 * (*FRTMatrix) * (*LaplacianBaltrami) * temp;
+  MITK_INFO << "Transformation Matrix";
+  printMatrix(TransformationMatrix.get());
 
   m_CoeffReconstructionMatrix = new vnl_matrix<TO>(m_NumberCoefficients,m_NumberOfGradientDirections);
 
-  MITK_INFO << m_NumberCoefficients <<  " " << m_NumberOfGradientDirections;
+  // Cast double to float
   for(int i=0; i<m_NumberCoefficients; i++)
-  {
     for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
-    {
-      (*m_CoeffReconstructionMatrix)(i,j) = (float) temp(i,j);
-    }
-  }
+      (*m_CoeffReconstructionMatrix)(i,j) = (TO)(*TransformationMatrix)(i,j);
 
   // this code goes to the image adapter coeffs->odfs later
 
-  int NOdfDirections = NODF;
-  vnl_matrix_fixed<double, 3, NODF>* U = itk::PointShell<NODF, vnl_matrix_fixed<double, 3, NODF> >::DistributePointShell();
+  vnl_matrix_fixed<double, 3, NOdfDirections>* U = itk::PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
 
   m_SphericalHarmonicBasisMatrix  = new vnl_matrix<TO>(NOdfDirections,m_NumberCoefficients);
-  vnl_matrix<double>* sphericalHarmonicBasisMatrix2 = new vnl_matrix<double>(NOdfDirections,m_NumberCoefficients);
+
 
   for(int i=0; i<NOdfDirections; i++)
   {
@@ -462,7 +476,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         double phi = (*U)(0,i);
         double th = (*U)(1,i);
         (*m_SphericalHarmonicBasisMatrix)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
-        (*sphericalHarmonicBasisMatrix2)(i,j) = (*m_SphericalHarmonicBasisMatrix)(i,j);
       }
     }
   }
@@ -470,6 +483,24 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_ReconstructionMatrix = new vnl_matrix<TO>(NOdfDirections,m_NumberOfGradientDirections);
   *m_ReconstructionMatrix = (*m_SphericalHarmonicBasisMatrix) * (*m_CoeffReconstructionMatrix);
 
+}
+
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::printMatrix( vnl_matrix< double > * mat  )
+{
+
+ std::stringstream stream;
+
+  for(int i = 0 ; i < mat->rows(); i++)
+  {
+    stream.str("");
+    for(int j = 0; j < mat->cols(); j++)
+    {
+      stream << (*mat)(i,j) << "  ";
+    }
+    MITK_INFO << stream.str();
+   }
 }
 
 template< class T, class TG, class TO, int L, int NODF>

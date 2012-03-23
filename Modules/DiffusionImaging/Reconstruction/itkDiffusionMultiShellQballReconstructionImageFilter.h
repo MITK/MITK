@@ -124,7 +124,7 @@ protected:
 
     void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
-    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation );
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
     void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
 
     void BeforeThreadedGenerateData();
@@ -161,7 +161,8 @@ private:
 
     BlaImage::Pointer m_ODFSumImage;
 
-    void printMatrix( vnl_matrix< double > * mat );
+    template< class VNLType >
+    void printMatrix( VNLType * mat );
 
 };
 

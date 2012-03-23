@@ -84,11 +84,19 @@ vnl_vector<TOdfPixelType>itk::DiffusionMultiShellQballReconstructionImageFilter<
 {
   // Threshold
   double sigma = 0.001;
-
+  double temp;
   int n = vec.size();
   double b0f = (double)b0;
   for(int i=0; i<n; i++)
   {
+
+    if (b0f==0)
+          b0f = 0.01;
+
+    vec[i] /= b0f;
+
+    //temp = vec[i];
+
     if(vec[i] < 0)
     {
       vec[i] = sigma / 2 ;
@@ -105,14 +113,10 @@ vnl_vector<TOdfPixelType>itk::DiffusionMultiShellQballReconstructionImageFilter<
     {
       vec[i] = 1 - (sigma / 2);
     }
+   // MITK_INFO <<  temp  << "  <->  " << vec[i];
 
-    //TO DO
-    if (b0f==0)
-      b0f = 0.01;
-    if(vec[i] >= b0f)
-      vec[i] = b0f - 0.001;
 
-    vec[i] = log(-log(vec[i]/b0f));
+    vec[i] = log(-log(vec[i]));
   }
   return vec;
 }
@@ -248,14 +252,22 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       }
 
       B = PreNormalize(B, b0);
+
       vnl_vector<TO> coeffs(m_NumberCoefficients);
       coeffs = ( (*m_CoeffReconstructionMatrix) * B );
       coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
       odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
       //odf = Normalize(odf, b0);
 
-      MITK_INFO << odf;
-      return;
+
+      //MITK_INFO << "MEMBER CoeffReconstructionMatrix";
+      //printMatrix(m_CoeffReconstructionMatrix);
+
+     //MITK_INFO << "MEMBER SH BASIS";
+     //printMatrix(m_SphericalHarmonicBasisMatrix);
+
+      //MITK_INFO << "Print ODF";
+      //MITK_INFO << odf;
     }
     float sum = 0.0;
     oit.Set( odf );
@@ -274,7 +286,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T, TG, TO, L, NODF>::
-ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<double> *SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation )
+ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<double> *SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation, vnl_matrix<double>* SHEigenvalues )
 {
   for(unsigned int i=0; i< (*SHBasisOutput).rows(); i++)
   {
@@ -292,6 +304,10 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
         // Laplacian Baltrami Order Association
         if(LaplaciaBaltramiOutput)
           (*LaplaciaBaltramiOutput)(j,j) = k*k*(k + 1)*(k+1);
+
+        // SHEigenvalues with order Accosiation kj
+        if(SHEigenvalues)
+          (*SHEigenvalues)(j,j) = -k* (k+1);
 
         // Order Association
         if(SHOrderAssociation)
@@ -391,7 +407,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
       }
     }
   }
-  MITK_INFO << "QBALL IMAGE";
+  //MITK_INFO << "QBALL IMAGE";
   //printMatrix(Q.get());
 
   int LOrder = L;
@@ -401,44 +417,45 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   VectorIntPtr SHOrderAssociation(new vnl_vector<int>(m_NumberCoefficients));
   MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
   MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
 
   LaplacianBaltrami->fill(0.0);
   FRTMatrix->fill(0.0);
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
-  ComputeSphericalHarmonicsBasis(Q.get() ,SHBasis.get(), LaplacianBaltrami.get(), SHOrderAssociation.get());
+  ComputeSphericalHarmonicsBasis(Q.get() ,SHBasis.get(), LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
 
-  MITK_INFO << "SH BASIS";
+  //MITK_INFO << "SH BASIS";
   //printMatrix(SHBasis.get());
 
-  MITK_INFO << "Laplacian Baltrami";
-  printMatrix(LaplacianBaltrami.get());
+  //MITK_INFO << "Laplacian Baltrami";
+  //printMatrix(LaplacianBaltrami.get());
 
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
   ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
 
-  MITK_INFO << "FRTMatrix";
-  printMatrix(FRTMatrix.get());
+  //MITK_INFO << "FRTMatrix";
+  //printMatrix(FRTMatrix.get());
 
 
   MatrixDoublePtr temp(new vnl_matrix<double>(((SHBasis->transpose()) * (*SHBasis)) + (m_Lambda  * (*LaplacianBaltrami))));
 
-  MITK_INFO << "Inner Product";
-  printMatrix(temp.get());
+  //MITK_INFO << "Inner Product";
+  //printMatrix(temp.get());
 
   InverseMatrixDoublePtr pseudo_inv(new vnl_matrix_inverse<double>((*temp)));
   MatrixDoublePtr inverse(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
   inverse->fill(0.0);
   (*inverse) = pseudo_inv->inverse();
 
-  MITK_INFO << "Inverse Inner Product";
-  printMatrix(inverse.get());
+  //MITK_INFO << "Inverse Inner Product";
+  //printMatrix(inverse.get());
 
   double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
-  MatrixDoublePtr TransformationMatrix(new vnl_matrix<double>( factor * ((*FRTMatrix) * (*inverse) * (SHBasis->transpose()))));
+  MatrixDoublePtr TransformationMatrix(new vnl_matrix<double>( factor * ((*FRTMatrix) * ((*SHEigenvalues) * ((*inverse) * (SHBasis->transpose()) ) ) )));
 
-  MITK_INFO << "Transformation Matrix";
-  printMatrix(TransformationMatrix.get());
+  //MITK_INFO << "Transformation Matrix";
+  //printMatrix(TransformationMatrix.get());
 
   m_CoeffReconstructionMatrix = new vnl_matrix<TO>(m_NumberCoefficients,m_NumberOfGradientDirections);
 
@@ -446,6 +463,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   for(int i=0; i<m_NumberCoefficients; i++)
     for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
       (*m_CoeffReconstructionMatrix)(i,j) = (TO)(*TransformationMatrix)(i,j);
+
+  //MITK_INFO << "CoeffReconstructionMatrix";
+  //printMatrix(m_CoeffReconstructionMatrix);
+
 
   // this code goes to the image adapter coeffs->odfs later
 
@@ -483,11 +504,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   m_ReconstructionMatrix = new vnl_matrix<TO>(NOdfDirections,m_NumberOfGradientDirections);
   *m_ReconstructionMatrix = (*m_SphericalHarmonicBasisMatrix) * (*m_CoeffReconstructionMatrix);
 
+  //MITK_INFO << "NODF Reconstruction Matrix ";
+  //printMatrix(m_ReconstructionMatrix);
+
 }
 
 template< class T, class TG, class TO, int L, int NODF>
+template< class VNLType >
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::printMatrix( vnl_matrix< double > * mat  )
+::printMatrix( VNLType * mat  )
 {
 
  std::stringstream stream;

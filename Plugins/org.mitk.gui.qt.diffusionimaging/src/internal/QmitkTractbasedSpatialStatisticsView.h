@@ -143,6 +143,13 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Transform();
 
+    void SetDxx();
+    void SetDyy();
+    void SetDzz();
+    void SetDxy();
+    void SetDxz();
+    void SetDyz();
+
 
 
   protected:

@@ -1,9 +1,9 @@
-FIND_PACKAGE(VTK)
-INCLUDE(${VTK_USE_FILE})
+find_package(VTK)
+include(${VTK_USE_FILE})
 
-INCLUDE_DIRECTORIES(.. ../ipPic)
-ADD_LIBRARY(pic2vtk ${MITK_WIN32_FORCE_STATIC} pic2vtk.cpp)
-TARGET_LINK_LIBRARIES(pic2vtk mitkIpPic vtkIO)
+include_directories(.. ../ipPic)
+add_library(pic2vtk ${MITK_WIN32_FORCE_STATIC} pic2vtk.cpp)
+target_link_libraries(pic2vtk mitkIpPic vtkIO)
 
 MITK_CREATE_MODULE_CONF(pic2vtk
   DEPENDS mitkIpPic

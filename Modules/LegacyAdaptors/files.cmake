@@ -1,3 +1,3 @@
-SET(CPP_FILES
+set(CPP_FILES
   mitkLegacyAdaptors.cpp
 )

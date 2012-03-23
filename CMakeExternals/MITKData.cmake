@@ -3,20 +3,20 @@
 #-----------------------------------------------------------------------------
 
 # Sanity checks
-IF(DEFINED MITK_DATA_DIR AND NOT EXISTS ${MITK_DATA_DIR})
-  MESSAGE(FATAL_ERROR "MITK_DATA_DIR variable is defined but corresponds to non-existing directory")
-ENDIF()
+if(DEFINED MITK_DATA_DIR AND NOT EXISTS ${MITK_DATA_DIR})
+  message(FATAL_ERROR "MITK_DATA_DIR variable is defined but corresponds to non-existing directory")
+endif()
 
-SET(proj MITK-Data)
-SET(proj_DEPENDENCIES)
-SET(MITK-Data_DEPENDS ${proj})
+set(proj MITK-Data)
+set(proj_DEPENDENCIES)
+set(MITK-Data_DEPENDS ${proj})
 
-IF(BUILD_TESTING)
+if(BUILD_TESTING)
 
-  SET(revision_tag 9cb5f967fde0dece1835e51bf173510bea58da18)
-  IF(${proj}_REVISION_TAG)
-    SET(revision_tag ${${proj}_REVISION_TAG})
-  ENDIF()
+  set(revision_tag 9cb5f967fde0dece1835e51bf173510bea58da18)
+  if(${proj}_REVISION_TAG)
+    set(revision_tag ${${proj}_REVISION_TAG})
+  endif()
 
   ExternalProject_Add(${proj}
     GIT_REPOSITORY http://git.mitk.org/MITK-Data.git
@@ -28,12 +28,12 @@ IF(BUILD_TESTING)
     DEPENDS ${proj_DEPENDENCIES}
   )
   
-  SET(MITK_DATA_DIR ${ep_source_dir}/${proj})
+  set(MITK_DATA_DIR ${ep_source_dir}/${proj})
   
-ELSE()
+else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   
-ENDIF(BUILD_TESTING)
+endif(BUILD_TESTING)
 
  

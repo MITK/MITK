@@ -1,4 +1,4 @@
-SET(MODULE_TESTS
+set(MODULE_TESTS
   mitkThreadedToFRawDataReconstructionTest.cpp
   mitkToFCameraMITKPlayerControllerTest.cpp
   mitkToFCameraMITKPlayerDeviceTest.cpp

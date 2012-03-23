@@ -2,35 +2,35 @@
 # CTK
 #-----------------------------------------------------------------------------
 
-IF(MITK_USE_CTK)
+if(MITK_USE_CTK)
 
   # Sanity checks
-  IF(DEFINED CTK_DIR AND NOT EXISTS ${CTK_DIR})
-    MESSAGE(FATAL_ERROR "CTK_DIR variable is defined but corresponds to non-existing directory")
-  ENDIF()
+  if(DEFINED CTK_DIR AND NOT EXISTS ${CTK_DIR})
+    message(FATAL_ERROR "CTK_DIR variable is defined but corresponds to non-existing directory")
+  endif()
 
-  SET(proj CTK)
-  SET(proj_DEPENDENCIES )
-  SET(CTK_DEPENDS ${proj})
+  set(proj CTK)
+  set(proj_DEPENDENCIES )
+  set(CTK_DEPENDS ${proj})
 
-  IF(NOT DEFINED CTK_DIR)
+  if(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag de466419)
-    #IF(${proj}_REVISION_TAG)
-    #  SET(revision_tag ${${proj}_REVISION_TAG})
-    #ENDIF()
+    set(revision_tag de466419)
+    #if(${proj}_REVISION_TAG)
+    #  set(revision_tag ${${proj}_REVISION_TAG})
+    #endif()
     
-    SET(ctk_optional_cache_args )
-    IF(MITK_USE_Python)
-      LIST(APPEND ctk_optional_cache_args
+    set(ctk_optional_cache_args )
+    if(MITK_USE_Python)
+      list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
       )
-    ENDIF()
-    FOREACH(type RUNTIME ARCHIVE LIBRARY)
-      IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
-        LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
-      ENDIF()
-    ENDFOREACH()
+    endif()
+    foreach(type RUNTIME ARCHIVE LIBRARY)
+      if(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
+        list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
+      endif()
+    endforeach()
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -56,12 +56,12 @@ IF(MITK_USE_CTK)
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
       DEPENDS ${proj_DEPENDENCIES}
      )
-  SET(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
   
-  ELSE()
+  else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     
-  ENDIF()
+  endif()
   
-ENDIF()
+endif()

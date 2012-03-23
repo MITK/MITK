@@ -17,6 +17,6 @@ set_target_properties( ${LIBNAME} PROPERTIES
 #target_link_libraries( ${LIBNAMED} )
 
 # Needs MFC headers, so exclude it to be able to compile on VS Express Edition
-#IF (WIN32 AND NOT MINGW)
+#if(WIN32 AND NOT MINGW)
 #  add_subdirectory(WinTestRunner)
-#ENDIF()
+#endif()

@@ -1,8 +1,8 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkSegmentationView.cpp
   QmitkSegmentationPostProcessing.cpp
@@ -15,14 +15,14 @@ SET(INTERNAL_CPP_FILES
   regiongrowing/QmitkRegionGrowingView.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/QmitkSegmentationControls.ui
   src/internal/QmitkBooleanOperationsView.ui
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
   src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
@@ -36,7 +36,7 @@ SET(MOC_H_FILES
   src/internal/regiongrowing/QmitkRegionGrowingView.h
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   resources/segmentation.png
   resources/boolean.png
   resources/deformablePlane.png
@@ -44,19 +44,19 @@ SET(CACHED_RESOURCE_FILES
   plugin.xml
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/segmentation.qrc
   resources/boolean.qrc
   resources/regiongrowing.qrc
 )
 
 
-SET(CPP_FILES)
+set(CPP_FILES)
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

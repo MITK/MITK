@@ -1,3 +1,3 @@
-IF(WIN32)
+if(WIN32)
 MACRO_CREATE_MITK_PLUGIN(mitkSpaceNavigator)
-ENDIF(WIN32)
+endif(WIN32)

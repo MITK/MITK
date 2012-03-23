@@ -1,13 +1,13 @@
-SET (QT_USE_QTWEBKIT TRUE)
-INCLUDE(${QT_USE_FILE})
+set(QT_USE_QTWEBKIT TRUE)
+include(${QT_USE_FILE})
 
-IF(QT_QTWEBKIT_FOUND)
-  ADD_DEFINITIONS(-DQT_WEBKIT)
-ENDIF(QT_QTWEBKIT_FOUND)
+if(QT_QTWEBKIT_FOUND)
+  add_definitions(-DQT_WEBKIT)
+endif(QT_QTWEBKIT_FOUND)
 
 # The project name must correspond to the directory name of your plug-in
 # and must not contain periods.
-PROJECT(org_mitk_gui_qt_diffusionimagingapp)
+project(org_mitk_gui_qt_diffusionimagingapp)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_APP_EXPORT
@@ -15,4 +15,4 @@ MACRO_CREATE_MITK_CTK_PLUGIN(
   MODULE_DEPENDENCIES Qmitk SceneSerialization
 )
 
-TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${QT_LIBRARIES})
+target_link_libraries(${PLUGIN_TARGET} ${QT_LIBRARIES})

@@ -1,6 +1,6 @@
-PROJECT(org_blueberry_ui)
+project(org_blueberry_ui)
 
-SET(PLUGIN_exported_include_suffixes
+set(PLUGIN_exported_include_suffixes
   src
   src/application
   src/commands

@@ -1,30 +1,30 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
 
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   QmitkIGTTrackingLabView.cpp
   QmitkIGTTutorialView.cpp
   mitkPluginActivator.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/QmitkIGTTrackingLabViewControls.ui
   src/internal/QmitkIGTTutorialViewControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/QmitkIGTTrackingLabView.h
   src/internal/QmitkIGTTutorialView.h
   src/internal/mitkPluginActivator.h
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/QmitkIGTTrackingLabView.qrc
   #resources/QmitkIGTTutorialView.qrc
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   resources/IgtTrackingLab.png
   resources/start_rec.png
   resources/stop_rec.png
@@ -32,14 +32,14 @@ SET(CACHED_RESOURCE_FILES
   plugin.xml
 )
 
-SET(CPP_FILES
+set(CPP_FILES
 
 )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

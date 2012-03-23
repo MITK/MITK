@@ -1,5 +1,5 @@
-if (BUILD_TESTING)
-if (GDCM_DIR)
+if(BUILD_TESTING)
+if(GDCM_DIR)
 
 # clear variables from prior files.cmake
 set(MODULE_TESTS)
@@ -15,9 +15,9 @@ MITK_CREATE_MODULE( mitkDICOMTesting
 )
 
 MITK_CHECK_MODULE(_RESULT mitkDICOMTesting)
-IF(_RESULT)
-  MESSAGE(STATUS "mitkDICOMTesting application won't be built. Missing: ${_RESULT}")
-ELSE(_RESULT)
+if(_RESULT)
+  message(STATUS "mitkDICOMTesting application won't be built. Missing: ${_RESULT}")
+else(_RESULT)
 
 # add helpful applications
 MITK_USE_MODULE( mitkDICOMTesting )
@@ -32,7 +32,7 @@ add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
 target_link_libraries(VerifyDICOMMitkImageDump ${ALL_LIBRARIES})
 
 add_subdirectory(Testing)
-ENDIF()
+endif()
 
 endif()
 endif()

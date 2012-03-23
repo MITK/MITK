@@ -1,7 +1,7 @@
 
 # Plug-ins must be ordered according to their dependencies
 
-SET(MITK_EXT_PLUGINS
+set(MITK_EXT_PLUGINS
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON

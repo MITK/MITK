@@ -1,7 +1,7 @@
-PROJECT(QtFreeRender)
-FIND_PACKAGE(MITK)
-INCLUDE_DIRECTORIES(${MITK_INCLUDE_DIRS})
-LINK_DIRECTORIES(${MITK_LINK_DIRECTORIES})
-ADD_EXECUTABLE(QtFreeRender QtFreeRender.cpp)
-TARGET_LINK_LIBRARIES(QtFreeRender ${MITK_LIBRARIES} ITKCommon.lib)
+project(QtFreeRender)
+find_package(MITK)
+include_directories(${MITK_INCLUDE_DIRS})
+link_directories(${MITK_LINK_DIRECTORIES})
+add_executable(QtFreeRender QtFreeRender.cpp)
+target_link_libraries(QtFreeRender ${MITK_LIBRARIES} ITKCommon.lib)
 

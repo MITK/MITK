@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   Qmitk/QmitkTrackingDeviceWidget.cpp
   Qmitk/QmitkTrackingDeviceConfigurationWidget.cpp
   Qmitk/QmitkNDIConfigurationWidget.cpp
@@ -16,7 +16,7 @@ SET(CPP_FILES
   Qmitk/QmitkNavigationToolCreationWidget.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   Qmitk/QmitkNavigationToolManagementWidgetControls.ui
   Qmitk/QmitkTrackingDeviceConfigurationWidgetControls.ui
   Qmitk/QmitkNDIConfigurationWidget.ui
@@ -32,7 +32,7 @@ SET(UI_FILES
   Qmitk/QmitkNavigationToolCreationWidget.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   Qmitk/QmitkNavigationToolManagementWidget.h
   Qmitk/QmitkTrackingDeviceWidget.h
   Qmitk/QmitkTrackingDeviceConfigurationWidget.h
@@ -50,7 +50,7 @@ SET(MOC_H_FILES
   Qmitk/QmitkNavigationToolCreationWidget.h
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/IGTUI.qrc
 )
 

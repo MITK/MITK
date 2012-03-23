@@ -24,21 +24,21 @@ mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest ${MITK_DATA_DIR}
 mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 #mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 
-IF(MITK_ENABLE_GUI_TESTING)
+if(MITK_ENABLE_GUI_TESTING)
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
 )
-ENDIF()
+endif()
 
 # see bug 9882
-IF(NOT APPLE)
-ADD_TEST(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
-SET_PROPERTY(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
-ENDIF()
+if(NOT APPLE)
+add_test(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
+set_property(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
+endif()
 
-ADD_TEST(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
-SET_PROPERTY(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
+add_test(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
+set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 
 add_subdirectory(DICOMTesting)
 

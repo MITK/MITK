@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   mitkToFCompositeFilter.cpp
   mitkToFDistanceImageToPointSetFilter.cpp
   mitkToFDistanceImageToSurfaceFilter.cpp

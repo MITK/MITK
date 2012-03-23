@@ -1,5 +1,5 @@
 
-SET(CPP_FILES
+set(CPP_FILES
   Qmitk/QmitkToFConnectionWidget.cpp
   Qmitk/QmitkToFPointSetWidget.cpp
   Qmitk/QmitkToFRecorderWidget.cpp
@@ -8,7 +8,7 @@ SET(CPP_FILES
   Qmitk/QmitkToFPMDParameterWidget.cpp
   Qmitk/QmitkToFMESAParameterWidget.cpp
 )
-SET(UI_FILES
+set(UI_FILES
   Qmitk/QmitkToFConnectionWidgetControls.ui
   Qmitk/QmitkToFPointSetWidgetControls.ui
   Qmitk/QmitkToFRecorderWidgetControls.ui
@@ -18,7 +18,7 @@ SET(UI_FILES
   Qmitk/QmitkToFMESAParameterWidgetControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   Qmitk/QmitkToFConnectionWidget.h
   Qmitk/QmitkToFPointSetWidget.h
   Qmitk/QmitkToFRecorderWidget.h
@@ -29,6 +29,6 @@ SET(MOC_H_FILES
 )
 
 # uncomment the following line if you want to use Qt resources
-SET(QRC_FILES
+set(QRC_FILES
   resources/QmitkToFUtilWidget.qrc
 )

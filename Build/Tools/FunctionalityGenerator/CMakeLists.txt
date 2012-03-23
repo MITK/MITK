@@ -1,30 +1,30 @@
-PROJECT(FunctionalityGenerator)
+project(FunctionalityGenerator)
 
-SET(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality")
-SET(FUNCTIONALITY_NAME "" CACHE STRING "Name of the new functionality")
-FIND_FILE(FUNCTIONALITY_TEMPLATE QmitkFunctionalityTemplate 
+set(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality")
+set(FUNCTIONALITY_NAME "" CACHE STRING "Name of the new functionality")
+find_file(FUNCTIONALITY_TEMPLATE QmitkFunctionalityTemplate 
   ${PROJECT_SOURCE_DIR}/../../../CMake
   DOC "Path to the functionality template") 
 
-SET(FUNCTIONALITY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FUNCTIONALITY_NAME})
+set(FUNCTIONALITY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FUNCTIONALITY_NAME})
 
-IF(GENERATE_FUNCTIONALITY)
-  IF(FUNCTIONALITY_TEMPLATE)
-    MESSAGE("Generating ${FUNCTIONALITY_NAME} from template ${FUNCTIONALITY_TEMPLATE} in directory ${FUNCTIONALITY_DIR} ...")
-    FILE(GLOB_RECURSE TEMPLATE_FILES RELATIVE ${FUNCTIONALITY_TEMPLATE} ${FUNCTIONALITY_TEMPLATE}/*)
-    FOREACH(F ${TEMPLATE_FILES})
-      IF(NOT F MATCHES ".svn/")
-      STRING(REPLACE QmitkFunctionalityTemplate ${FUNCTIONALITY_NAME} NEW_RELPATH ${F})
-      MESSAGE(STATUS "Generating ${FUNCTIONALITY_DIR}/${NEW_RELPATH}")
-      IF(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
-        MESSAGE(FATAL_ERROR "Won't overwrite existing functionality. Please remove all files from ${FUNCTIONALITY_DIR}!") 
-      ENDIF(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
-      CONFIGURE_FILE(${FUNCTIONALITY_TEMPLATE}/${F} ${FUNCTIONALITY_DIR}/${NEW_RELPATH} @ONLY)
-      ENDIF(NOT F MATCHES ".svn/")
-    ENDFOREACH(F)
-    SET(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality" FORCE)
-    MESSAGE("New Functionality \"${FUNCTIONALITY_NAME}\" has been generated in \"${FUNCTIONALITY_DIR}\"."
+if(GENERATE_FUNCTIONALITY)
+  if(FUNCTIONALITY_TEMPLATE)
+    message("Generating ${FUNCTIONALITY_NAME} from template ${FUNCTIONALITY_TEMPLATE} in directory ${FUNCTIONALITY_DIR} ...")
+    file(GLOB_RECURSE TEMPLATE_FILES RELATIVE ${FUNCTIONALITY_TEMPLATE} ${FUNCTIONALITY_TEMPLATE}/*)
+    foreach(F ${TEMPLATE_FILES})
+      if(NOT F MATCHES ".svn/")
+      string(REPLACE QmitkFunctionalityTemplate ${FUNCTIONALITY_NAME} NEW_RELPATH ${F})
+      message(STATUS "Generating ${FUNCTIONALITY_DIR}/${NEW_RELPATH}")
+      if(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
+        message(FATAL_ERROR "Won't overwrite existing functionality. Please remove all files from ${FUNCTIONALITY_DIR}!") 
+      endif(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
+      configure_file(${FUNCTIONALITY_TEMPLATE}/${F} ${FUNCTIONALITY_DIR}/${NEW_RELPATH} @ONLY)
+      endif(NOT F MATCHES ".svn/")
+    endforeach(F)
+    set(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality" FORCE)
+    message("New Functionality \"${FUNCTIONALITY_NAME}\" has been generated in \"${FUNCTIONALITY_DIR}\"."
             "Add this directory to QFunctionalities to add it to the MainApp!")
-  ENDIF(FUNCTIONALITY_TEMPLATE)
-ENDIF(GENERATE_FUNCTIONALITY)
+  endif(FUNCTIONALITY_TEMPLATE)
+endif(GENERATE_FUNCTIONALITY)
 

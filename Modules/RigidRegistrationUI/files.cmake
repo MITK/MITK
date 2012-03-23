@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   RigidRegistrationMetrics/QmitkRigidRegistrationMetricsGUIBase.cpp
   RigidRegistrationMetrics/QmitkMeanSquaresMetricView.cpp
   RigidRegistrationMetrics/QmitkNormalizedCorrelationMetricView.cpp
@@ -49,7 +49,7 @@ SET(CPP_FILES
   RigidRegistrationTransforms/QmitkCenteredSimilarity2DTransformView.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   RigidRegistrationMetrics/QmitkMeanSquaresMetricControls.ui
   RigidRegistrationMetrics/QmitkNormalizedCorrelationMetricControls.ui
   RigidRegistrationMetrics/QmitkGradientDifferenceMetricControls.ui

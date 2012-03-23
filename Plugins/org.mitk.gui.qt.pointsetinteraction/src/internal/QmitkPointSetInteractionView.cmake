@@ -1,11 +1,11 @@
 # QmitkPointSetInteractionView
 
-MESSAGE(STATUS "processing QmitkPointSetInteractionView.cmake")
-MESSAGE(STATUS "APPMOD_CPP before: ${APPMOD_CPP}")
+message(STATUS "processing QmitkPointSetInteractionView.cmake")
+message(STATUS "APPMOD_CPP before: ${APPMOD_CPP}")
 
-SET( APPMOD_H ${APPMOD_H} QmitkPointSetInteractionView.h )
-SET( APPMOD_MOC_H ${APPMOD_MOC_H} QmitkPointSetInteractionView.h )
-SET( APPMOD_CPP ${APPMOD_CPP} QmitkPointSetInteractionView.cpp )
-SET (APPMOD_FORMS ${APPMOD_FORMS} QmitkPointSetInteractionControls.ui)
-MESSAGE(STATUS "APPMOD_CPP after: ${APPMOD_CPP}")
+set( APPMOD_H ${APPMOD_H} QmitkPointSetInteractionView.h )
+set( APPMOD_MOC_H ${APPMOD_MOC_H} QmitkPointSetInteractionView.h )
+set( APPMOD_CPP ${APPMOD_CPP} QmitkPointSetInteractionView.cpp )
+set(APPMOD_FORMS ${APPMOD_FORMS} QmitkPointSetInteractionControls.ui)
+message(STATUS "APPMOD_CPP after: ${APPMOD_CPP}")
 

@@ -1,8 +1,8 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   colourimageprocessing/QmitkColourImageProcessingView.cpp
   colourimageprocessing/mitkColourImageProcessor.cpp
@@ -13,7 +13,7 @@ SET(INTERNAL_CPP_FILES
   volumetry/QmitkVolumetryView.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/colourimageprocessing/QmitkColourImageProcessingViewControls.ui
   src/internal/isosurface/QmitkIsoSurfaceControls.ui
   src/internal/simpleexample/QmitkSimpleExampleViewControls.ui
@@ -22,7 +22,7 @@ SET(UI_FILES
   src/internal/volumetry/QmitkVolumetryViewControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/colourimageprocessing/QmitkColourImageProcessingView.h
   src/internal/isosurface/QmitkIsoSurface.h
@@ -32,7 +32,7 @@ SET(MOC_H_FILES
   src/internal/volumetry/QmitkVolumetryView.h
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/ColorImageProcessing.png
   resources/isoSurface.xpm
@@ -42,19 +42,19 @@ SET(CACHED_RESOURCE_FILES
   resources/volumetryIcon.xpm
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/QmitkColourImageProcessingView.qrc
   resources/isosurface.qrc
   resources/QmitkVolumetryView.qrc
 )
 
-SET(CPP_FILES )
+set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 

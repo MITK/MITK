@@ -2,45 +2,45 @@
 # Boost
 #-----------------------------------------------------------------------------
 
-IF(MITK_USE_Boost)
+if(MITK_USE_Boost)
 
   # Sanity checks
-  IF(DEFINED BOOST_ROOT AND NOT EXISTS ${BOOST_ROOT})
-    MESSAGE(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
-  ENDIF()
+  if(DEFINED BOOST_ROOT AND NOT EXISTS ${BOOST_ROOT})
+    message(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
+  endif()
 
-  SET(proj Boost)
-  SET(proj_DEPENDENCIES )
-  SET(Boost_DEPENDS ${proj})
+  set(proj Boost)
+  set(proj_DEPENDENCIES )
+  set(Boost_DEPENDS ${proj})
 
-  IF(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
+  if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   
-    SET(_boost_libs )
+    set(_boost_libs )
     
-    IF(MITK_USE_Boost_LIBRARIES)
+    if(MITK_USE_Boost_LIBRARIES)
       # We need binary boost libraries
-      FOREACH(_boost_lib ${MITK_USE_Boost_LIBRARIES})
-        SET(_boost_libs ${_boost_libs} --with-${_boost_lib})
-      ENDFOREACH()
+      foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
+        set(_boost_libs ${_boost_libs} --with-${_boost_lib})
+      endforeach()
 
-      IF(WIN32)
-        SET(_boost_variant "")
-        SET(_shell_extension .bat)
-      ELSE()
-        IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-          SET(_boost_variant "variant=debug")
-        ELSE()
-          SET(_boost_variant "variant=release")
-        ENDIF()
-        SET(_shell_extension .sh)
-      ENDIF()  
+      if(WIN32)
+        set(_boost_variant "")
+        set(_shell_extension .bat)
+      else()
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+          set(_boost_variant "variant=debug")
+        else()
+          set(_boost_variant "variant=release")
+        endif()
+        set(_shell_extension .sh)
+      endif()  
       
-      SET(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
-      SET(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
-    ELSE()
-      SET(_boost_cfg_cmd )
-      SET(_boost_build_cmd )
-    ENDIF()
+      set(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
+      set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
+    else()
+      set(_boost_cfg_cmd )
+      set(_boost_build_cmd )
+    endif()
     
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -56,16 +56,16 @@ IF(MITK_USE_Boost)
       DEPENDS ${proj_DEPENDENCIES}
       )
     
-    IF(MITK_USE_Boost_LIBRARIES)
-      SET(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
-    ELSE()
-      SET(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
-    ENDIF()
+    if(MITK_USE_Boost_LIBRARIES)
+      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
+    else()
+      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
+    endif()
 
-  ELSE()
+  else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     
-  ENDIF()
+  endif()
   
-ENDIF()
+endif()

@@ -6,7 +6,7 @@
 #
 function(mitkFunctionAddTestLabel test_name)
   set(label ${MITK_DEFAULT_SUBPROJECTS})
-  if (ARGN)
+  if(ARGN)
     set(label ${ARGN})
   endif()
   set_property(TEST ${test_name} APPEND PROPERTY LABELS ${label})

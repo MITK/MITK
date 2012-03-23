@@ -1,5 +1,5 @@
 
-SET(MODULE_TESTS 
+set(MODULE_TESTS 
   mitkPropertySerializationTest.cpp
 )
 

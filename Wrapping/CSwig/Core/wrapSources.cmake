@@ -1,5 +1,5 @@
 # create the mitkControllers libraries
-SET(WRAP_SOURCES_TEST
+set(WRAP_SOURCES_TEST
 	#Algorithms:
 	#wrap_itkImportMitkImageContainer //Template: can be wrapped; TODO: instantiate the needed templates
 	#wrap_itkLocalVariationImageFilter //Template: can be wrapped; TODO: instantiate the needed templates

@@ -2,85 +2,85 @@
 # Variables:
 #  BLUEBERRY_DOCS_OUTPUT_DIR: documentation output directory (optional)
 
-ADD_SUBDIRECTORY(snippets)
+add_subdirectory(snippets)
 
-FIND_PACKAGE(Doxygen)
+find_package(Doxygen)
 
-IF(DOXYGEN_FOUND)
+if(DOXYGEN_FOUND)
 
-OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
-MARK_AS_ADVANCED(USE_DOT)
+option(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
+mark_as_advanced(USE_DOT)
 
-SET(HAVE_DOT "NO")
-IF(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
-  SET(HAVE_DOT "YES")
-ENDIF()
+set(HAVE_DOT "NO")
+if(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
+  set(HAVE_DOT "YES")
+endif()
 
-SET(BLUEBERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "BlueBerry output directory for all generated documentation.")
-SET(BLUEBERRY_DOXYGEN_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL "BlueBerry doxygen output directory")
-SET(BLUEBERRY_XPDOC_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/extension-points)
+set(BLUEBERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "BlueBerry output directory for all generated documentation.")
+set(BLUEBERRY_DOXYGEN_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL "BlueBerry doxygen output directory")
+set(BLUEBERRY_XPDOC_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/extension-points)
 
-SET(BLUEBERRY_DOXYGEN_TAGFILE_NAME ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/BlueBerry.tag CACHE INTERNAL "BlueBerry Doxygen tag file")
+set(BLUEBERRY_DOXYGEN_TAGFILE_NAME ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/BlueBerry.tag CACHE INTERNAL "BlueBerry Doxygen tag file")
 
 # This is relative to the working directory of the doxygen command
-SET(BLUEBERRY_DOXYGEN_STYLESHEET bb_doxygen.css)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET}
+set(BLUEBERRY_DOXYGEN_STYLESHEET bb_doxygen.css)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET}
                ${CMAKE_CURRENT_BINARY_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET} @COPYONLY)
 
-FILE(RELATIVE_PATH BLUEBERRY_DOXYGEN_XP_RELATIVEDIR ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_XPDOC_OUTPUT_DIR}/)
+file(RELATIVE_PATH BLUEBERRY_DOXYGEN_XP_RELATIVEDIR ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_XPDOC_OUTPUT_DIR}/)
 
-SET(_doxygen_qt4bundles )
-SET(_doxygen_bundles )
-SET(_doxygen_binary_qt4bundles )
-SET(_doxygen_binary_bundles )
-FILE(GLOB _bundle_dirs RELATIVE "${BLUEBERRY_PLUGINS_SOURCE_DIR}" "${BLUEBERRY_PLUGINS_SOURCE_DIR}/*")
-FOREACH(_bundle_dir ${_bundle_dirs})
-  STRING(REGEX MATCH "^\\..*" _matched_hidden "${_bundle_dir}")
-  IF(NOT _matched_hidden)
-    IF(IS_DIRECTORY "${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}")
-      STRING(REGEX MATCH ".*\\.qt.*" _matched "${_bundle_dir}")
-      IF(_matched)
-        IF(QT4_FOUND)
-          SET(_doxygen_qt4bundles "${_doxygen_qt4bundles} \"${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}\"")
-          SET(_doxygen_binary_qt4bundles  "${_doxygen_binary_qt4bundles} \"${BLUEBERRY_PLUGINS_BINARY_DIR}/${_bundle_dir}\"")
-        ENDIF()
-      ELSE()
-        SET(_doxygen_bundles "${_doxygen_bundles} \"${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}\"")
-        SET(_doxygen_binary_bundles  "${_doxygen_binary_bundles} \"${BLUEBERRY_PLUGINS_BINARY_DIR}/${_bundle_dir}\"")
-      ENDIF()
-    ENDIF()
-  ENDIF()
-ENDFOREACH()
+set(_doxygen_qt4bundles )
+set(_doxygen_bundles )
+set(_doxygen_binary_qt4bundles )
+set(_doxygen_binary_bundles )
+file(GLOB _bundle_dirs RELATIVE "${BLUEBERRY_PLUGINS_SOURCE_DIR}" "${BLUEBERRY_PLUGINS_SOURCE_DIR}/*")
+foreach(_bundle_dir ${_bundle_dirs})
+  string(REGEX MATCH "^\\..*" _matched_hidden "${_bundle_dir}")
+  if(NOT _matched_hidden)
+    if(IS_DIRECTORY "${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}")
+      string(REGEX MATCH ".*\\.qt.*" _matched "${_bundle_dir}")
+      if(_matched)
+        if(QT4_FOUND)
+          set(_doxygen_qt4bundles "${_doxygen_qt4bundles} \"${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}\"")
+          set(_doxygen_binary_qt4bundles  "${_doxygen_binary_qt4bundles} \"${BLUEBERRY_PLUGINS_BINARY_DIR}/${_bundle_dir}\"")
+        endif()
+      else()
+        set(_doxygen_bundles "${_doxygen_bundles} \"${BLUEBERRY_PLUGINS_SOURCE_DIR}/${_bundle_dir}\"")
+        set(_doxygen_binary_bundles  "${_doxygen_binary_bundles} \"${BLUEBERRY_PLUGINS_BINARY_DIR}/${_bundle_dir}\"")
+      endif()
+    endif()
+  endif()
+endforeach()
 
 # Compile a doxygen input filter for processing CMake scripts
-INCLUDE(FunctionCMakeDoxygenFilterCompile)
+include(FunctionCMakeDoxygenFilterCompile)
 FunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
 
-CONFIGURE_FILE(doxygen.conf.in
+configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
                
-CONFIGURE_FILE(reference/extension-points/index.dox.in
+configure_file(reference/extension-points/index.dox.in
                ${CMAKE_CURRENT_BINARY_DIR}/reference/extension-points/index.dox)
 
-FIND_PACKAGE(Doxygen)
+find_package(Doxygen)
 
-ADD_CUSTOM_TARGET(BlueBerryDoc 
+add_custom_target(BlueBerryDoc 
                   ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   DEPENDS ${_BlueBerryDoc_depends}
                   )
                   
 # convert the extension points schema files into html
-IF(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-  FILE(GLOB_RECURSE _plugin_xmls  ${BLUEBERRY_PLUGINS_SOURCE_DIR}/plugin.xml)
+if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
+  file(GLOB_RECURSE _plugin_xmls  ${BLUEBERRY_PLUGINS_SOURCE_DIR}/plugin.xml)
   MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
                        OUTPUT_DIR "${BLUEBERRY_XPDOC_OUTPUT_DIR}"
                        TARGET_NAME BlueBerryXPDoc
                        )
 
-  ADD_DEPENDENCIES(BlueBerryDoc BlueBerryXPDoc)
-ENDIF(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
+  add_dependencies(BlueBerryDoc BlueBerryXPDoc)
+endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 
-CONFIGURE_FILE(schema.css ${BLUEBERRY_DOCS_OUTPUT_DIR}/schema.css)
+configure_file(schema.css ${BLUEBERRY_DOCS_OUTPUT_DIR}/schema.css)
 
-ENDIF(DOXYGEN_FOUND)
+endif(DOXYGEN_FOUND)

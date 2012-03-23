@@ -89,7 +89,7 @@ set(CMAKE_MODULE_PATH
   )
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
+# CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
 include(mitkMacroEmptyExternalProject)
@@ -117,9 +117,9 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
     endif()
   else()
     if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
-      SET(output_dir ${MITK_BINARY_DIR}/bin)
+      set(output_dir ${MITK_BINARY_DIR}/bin)
     else()
-      SET(output_dir ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
+      set(output_dir ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
     endif()
   endif()
   set(CMAKE_${type}_OUTPUT_DIRECTORY ${output_dir} CACHE INTERNAL "Single output directory for building all libraries.")
@@ -281,7 +281,7 @@ endif()
 #*****************************************************************************
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
+# CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
 include(CheckCXXSourceCompiles)
@@ -532,7 +532,7 @@ if(MITK_USE_BLUEBERRY)
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
     # check if the application is enabled and if target_libraries.cmake exists
-    if (${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+    if(${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       foreach(_target_dep ${target_libraries})
         if(_target_dep MATCHES org_blueberry_)
@@ -623,13 +623,13 @@ if(MITK_USE_BLUEBERRY)
   endif() 
 
   # Specify which plug-ins belong to this project
-  MACRO(GetMyTargetLibraries all_target_libraries varname)
-    SET(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
-    SET(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
-    SET(_tmp_list)
-    LIST(APPEND _tmp_list ${all_target_libraries})
+  macro(GetMyTargetLibraries all_target_libraries varname)
+    set(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
+    set(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
+    set(_tmp_list)
+    list(APPEND _tmp_list ${all_target_libraries})
     ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
-  ENDMACRO()
+  endmacro()
 
   # Get infos about application directories and build options
   include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
@@ -771,7 +771,7 @@ set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 file(GLOB _MODULES_CONF_FILES RELATIVE ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME} ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
-SET(MITK_MODULE_NAMES)
+set(MITK_MODULE_NAMES)
 foreach(_module ${_MODULES_CONF_FILES})
   string(REPLACE Config.cmake "" _module_name ${_module})
   list(APPEND MITK_MODULE_NAMES ${_module_name})

@@ -1,6 +1,6 @@
 # The project name must correspond to the directory name of your plug-in
 # and must not contain periods.
-PROJECT(org_mitk_gui_qt_moviemaker)
+project(org_mitk_gui_qt_moviemaker)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE MOVIEMAKER_EXPORT

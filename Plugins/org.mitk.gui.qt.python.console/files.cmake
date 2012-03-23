@@ -1,8 +1,8 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkPythonConsoleView.cpp
   QmitkPythonEditor.cpp
@@ -19,14 +19,14 @@ SET(INTERNAL_CPP_FILES
   QmitkPythonSnippets.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/QmitkPythonConsoleViewControls.ui
   src/internal/QmitkPythonEditor.ui
   src/internal/QmitkPythonVariableStack.ui
   src/internal/QmitkPythonSnippets.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkPythonCommandHistory.h
   src/internal/QmitkPythonCommandHistoryTreeWidget.h
@@ -42,20 +42,20 @@ SET(MOC_H_FILES
   src/internal/QmitkCTKPythonShell.h
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   resources/py.png
   plugin.xml
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/QmitkPythonConsoleView.qrc
 )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 

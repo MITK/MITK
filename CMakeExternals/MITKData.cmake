@@ -13,14 +13,14 @@ SET(MITK-Data_DEPENDS ${proj})
 
 IF(BUILD_TESTING)
 
-  SET(revision_tag 9cb5f967fde0dece1835e51bf173510bea58da18)
-  IF(${proj}_REVISION_TAG)
-    SET(revision_tag ${${proj}_REVISION_TAG})
-  ENDIF()
-
+  SET(revision_tag 9cb5f967)
+  #IF(${proj}_REVISION_TAG)
+  #  SET(revision_tag ${${proj}_REVISION_TAG})
+  #ENDIF()
+  
   ExternalProject_Add(${proj}
-    GIT_REPOSITORY http://git.mitk.org/MITK-Data.git
-    GIT_TAG ${revision_tag}
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz
+    URL_MD5 f0e1128618c59f7f69f9c79c9673b51b 
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

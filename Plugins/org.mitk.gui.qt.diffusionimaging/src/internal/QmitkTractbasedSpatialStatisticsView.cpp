@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMultiplyImageFilter.h>
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
-
+#include <mitkProgressBar.h>
 
 
 #include <mitkVectorImageMapper2D.h>
@@ -75,6 +75,9 @@ PURPOSE.  See the above copyright notices for more information.
 // #include "mitkImageMapperGL2D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkTensorImage.h"
+
+#include "itkDiffusionTensor3D.h"
 
 
 #define SEARCHSIGMA 10 /* length in linear voxel dimens
@@ -336,151 +339,282 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( (QObject*)(m_Controls->m_Transform), SIGNAL(clicked()), this, SLOT(Transform()) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );   
     connect( (QObject*)(m_Controls->m_SetDxx), SIGNAL(clicked()), this, SLOT(SetDxx()) );
     connect( (QObject*)(m_Controls->m_SetDxy), SIGNAL(clicked()), this, SLOT(SetDxy()) );
     connect( (QObject*)(m_Controls->m_SetDxz), SIGNAL(clicked()), this, SLOT(SetDxz()) );
     connect( (QObject*)(m_Controls->m_SetDyy), SIGNAL(clicked()), this, SLOT(SetDyy()) );
     connect( (QObject*)(m_Controls->m_SetDyz), SIGNAL(clicked()), this, SLOT(SetDyz()) );
     connect( (QObject*)(m_Controls->m_SetDzz), SIGNAL(clicked()), this, SLOT(SetDzz()) );
+    connect( (QObject*)(m_Controls->m_TensorByComps), SIGNAL(clicked()), this, SLOT(ImportTensorByComps()) );
+  }
+}
+
+void QmitkTractbasedSpatialStatisticsView::ImportTensorByComps()
+{
+  if(m_DxxNode.IsNull() || m_DxyNode.IsNull() || m_DxzNode.IsNull()
+      || m_DyzNode.IsNull() || m_DyyNode.IsNull() || m_DzzNode.IsNull() )
+  {
+    return;
+  }
+
+  mitk::Image* img = static_cast<mitk::Image*>(m_DxxNode->GetData());
+  FloatImageType::Pointer Dxx = FloatImageType::New();
+  mitk::CastToItkImage(img, Dxx);
+
+  img = static_cast<mitk::Image*>(m_DxyNode->GetData());
+  FloatImageType::Pointer Dxy = FloatImageType::New();
+  mitk::CastToItkImage(img, Dxy);
+
+  img = static_cast<mitk::Image*>(m_DxzNode->GetData());
+  FloatImageType::Pointer Dxz = FloatImageType::New();
+  mitk::CastToItkImage(img, Dxz);
+
+  img = static_cast<mitk::Image*>(m_DyzNode->GetData());
+  FloatImageType::Pointer Dyz = FloatImageType::New();
+  mitk::CastToItkImage(img, Dyz);
+
+  img = static_cast<mitk::Image*>(m_DyyNode->GetData());
+  FloatImageType::Pointer Dyy = FloatImageType::New();
+  mitk::CastToItkImage(img, Dyy);
+
+  img = static_cast<mitk::Image*>(m_DzzNode->GetData());
+  FloatImageType::Pointer Dzz = FloatImageType::New();
+  mitk::CastToItkImage(img, Dzz);
+
+
+
+  itk::Image<itk::DiffusionTensor3D<float>, 3>::Pointer tensorImg = itk::Image<itk::DiffusionTensor3D<float>, 3>::New();
+  tensorImg->SetSpacing(Dzz->GetSpacing());
+  tensorImg->SetOrigin(Dzz->GetOrigin());
+  tensorImg->SetRegions(Dzz->GetLargestPossibleRegion().GetSize());
+  tensorImg->Allocate();
+
+
+  mitk::TensorImage::Pointer image = mitk::TensorImage::New();
+
+  FloatImageType::SizeType size = Dxx->GetLargestPossibleRegion().GetSize();
+
+  for(int x=0; x<size[0]; x++)
+  {
+    for(int y=0; y<size[1]; y++)
+    {
+      for(int z=0; z<size[2]; z++)
+      {
+        itk::Index<3> ix;
+        ix[0]=x;
+        ix[1]=y;
+        ix[2]=z;
+
+        float dxx = Dxx->GetPixel(ix);
+        float dxy = Dxy->GetPixel(ix);
+        float dxz = Dxz->GetPixel(ix);
+        float dyz = Dyz->GetPixel(ix);
+        float dyy = Dyy->GetPixel(ix);
+        float dzz = Dzz->GetPixel(ix);
+
+
+        itk::DiffusionTensor3D<float> tensor;
+        tensor[0] = dxx*1000;
+        tensor[1] = dxy*1000;
+        tensor[2] = dxz*1000;
+        tensor[3] = dyy*1000;
+        tensor[4] = dyz*1000;
+        tensor[5] = dzz*1000;
+
+        tensorImg->SetPixel(ix, tensor);
+      }
+    }
+  }
+
+  image->InitializeByItk( tensorImg.GetPointer() );
+  image->SetVolume( tensorImg->GetBufferPointer() );
+  mitk::DataNode::Pointer node=mitk::DataNode::New();
+  node->SetData( image );
+  GetDefaultDataStorage()->Add( node );
+
+
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetTensorComponent(QLineEdit* edit, mitk::DataNode::Pointer node)
+{
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    node = NULL;
+    edit->setText("N/A");
+    return;
+  }
+
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      node = mitk::DataNode::New();
+      node = n;
+      edit->setText(node->GetName().c_str());
+      return;
+    }
   }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDxx()
 {
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_DxxNode = NULL;
+    m_Controls->m_DxxImageEdit->setText("N/A");
+    return;
+  }
 
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      m_DxxNode = n;
+      m_Controls->m_DxxImageEdit->setText(n->GetName().c_str());
+      return;
+    }
+  }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDxy()
 {
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_DxyNode = NULL;
+    m_Controls->m_DxyImageEdit->setText("N/A");
+    return;
+  }
 
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      m_DxyNode = n;
+      m_Controls->m_DxyImageEdit->setText(n->GetName().c_str());
+      return;
+    }
+  }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDxz()
 {
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_DxzNode = NULL;
+    m_Controls->m_DxzImageEdit->setText("N/A");
+    return;
+  }
 
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      m_DxzNode = n;
+      m_Controls->m_DxzImageEdit->setText(n->GetName().c_str());
+      return;
+    }
+  }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDyy()
 {
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_DyyNode = NULL;
+    m_Controls->m_DyyImageEdit->setText("N/A");
+    return;
+  }
 
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      m_DyyNode = n;
+      m_Controls->m_DyyImageEdit->setText(n->GetName().c_str());
+      return;
+    }
+  }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDyz()
 {
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
+  {
+    m_DyzNode = NULL;
+    m_Controls->m_DyzImageEdit->setText("N/A");
+    return;
+  }
 
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
+  {
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
+    {
+      m_DyzNode = n;
+      m_Controls->m_DyzImageEdit->setText(n->GetName().c_str());
+      return;
+    }
+  }
 }
 
 void QmitkTractbasedSpatialStatisticsView::SetDzz()
 {
-
-}
-
-
-void QmitkTractbasedSpatialStatisticsView::Transform()
-{
-
-  mitk::Image::Pointer image;
-
-  for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-    i != m_CurrentSelection->End(); ++i)
+  std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+  if (nodes.empty())
   {
-    // extract datatree node
-    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-    {
-      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-      if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-      {
-        mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-        if(img->GetDimension() == 3)
-        {
-          image = img;
-        }
-      }
-    }
-  }
-
-
-
-  // Get transformation from gui
-  std::string str = m_Controls->m_TransformText->toPlainText().toStdString();
-
-
-  // Get matrix of mask
-  mitk::Geometry3D* geo = image->GetGeometry();
-  std::vector<std::string> lines;
-  Tokenize(str, lines, "\n");
-
-  //itk::Matrix<float,3,3>
-
-  std::vector< std::string >::iterator it = lines.begin();
-  itk::Matrix<float,3,3> m;
-  itk::Vector<float,3> off;
-
-  std::vector< std::vector<std::string> > rows;
-
-  while(it != lines.end())
-  {
-    std::string line = *it;
-    std::cout << "line " << line << std::endl;
-    std::vector<std::string> row;
-    Tokenize(line, row, " ");
-    ++it;
-    rows.push_back(row);
-  }
-
-  if(rows.size() != 4)
-  {
+    m_DzzNode = NULL;
+    m_Controls->m_DzzImageEdit->setText("N/A");
     return;
   }
 
-  for(int i=0; i<3; i++)
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+      it != nodes.end();
+      ++it )
   {
-    if(rows[i].size() != 4)
+    mitk::DataNode::Pointer n = *it;
+
+    if (n.IsNotNull() && dynamic_cast<mitk::Image*>(n->GetData()))
     {
+      m_DzzNode = n;
+      m_Controls->m_DzzImageEdit->setText(n->GetName().c_str());
       return;
     }
-    for(int j=0; j<3; j++)
-    {
-      std::string s = std::string(rows[i][j]);
-      m[j][i] = QString(s.c_str()).toFloat();
-    }
-    std::string s = std::string(rows[i][3]);
-    off[i] = QString(s.c_str()).toFloat();
   }
-
-
-  itk::ScalableAffineTransform<float, 3>* trans = geo->GetIndexToWorldTransform();
-  itk::ScalableAffineTransform<float,3>::Pointer newTrans = itk::ScalableAffineTransform<float,3>::New();
-
-  newTrans->SetMatrix(m);
-  newTrans->SetTranslation(off);
-  newTrans->GetInverse(newTrans);
-  trans->Compose(newTrans, true);
-
-
-  mitk::Image::Pointer transposed = mitk::Image::New();
-  transposed = image;
-  transposed->GetGeometry()->SetIndexToWorldTransform(trans);
-
-
-
-  mitk::DataNode::Pointer result = mitk::DataNode::New();
-  result->SetProperty( "name", mitk::StringProperty::New("transformed") );
-  result->SetData( transposed );
-
-  GetDefaultDataStorage()->Add( result );
-
-  // show the results
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-
-
-  std::cout << "pause";
-
 }
+
+
+
 
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
 {
@@ -1156,7 +1290,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
       mitk::Point3D p2 = m_PointSetNode->GetPoint(i+1);
 
 
-      itk::Index<3> StartPoint;
+      itk::Index<3> StartPoint; mitk::ProgressBar::GetInstance()->Progress();
+
       itk::Index<3> EndPoint;
       image->GetGeometry()->WorldToIndex(p,StartPoint);
       image->GetGeometry()->WorldToIndex(p2,EndPoint);
@@ -1173,7 +1308,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
         itk::Index<3> ix = *it;
 
         if (!(ix==EndPoint))
-        {
+        { mitk::ProgressBar::GetInstance()->Progress();
+
           totalPath.push_back(ix);
           std::stringstream ss;
           ss << ix[0] << " " << ix[1] << " " << ix[2] << "\n";

@@ -155,7 +155,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTabWidget" name="m_ImportTensor">
+       <widget class="QTabWidget" name="m_TabWidget">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -398,7 +398,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="m_DyxImageEdit">
+              <widget class="QLineEdit" name="m_DxyImageEdit">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -603,6 +603,13 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QPushButton" name="m_TensorByComps">
+            <property name="text">
+             <string>Import</string>
+            </property>
            </widget>
           </item>
          </layout>

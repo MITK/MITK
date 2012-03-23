@@ -338,7 +338,43 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( (QObject*)(m_Controls->m_Transform), SIGNAL(clicked()), this, SLOT(Transform()) );
+    connect( (QObject*)(m_Controls->m_SetDxx), SIGNAL(clicked()), this, SLOT(SetDxx()) );
+    connect( (QObject*)(m_Controls->m_SetDxy), SIGNAL(clicked()), this, SLOT(SetDxy()) );
+    connect( (QObject*)(m_Controls->m_SetDxz), SIGNAL(clicked()), this, SLOT(SetDxz()) );
+    connect( (QObject*)(m_Controls->m_SetDyy), SIGNAL(clicked()), this, SLOT(SetDyy()) );
+    connect( (QObject*)(m_Controls->m_SetDyz), SIGNAL(clicked()), this, SLOT(SetDyz()) );
+    connect( (QObject*)(m_Controls->m_SetDzz), SIGNAL(clicked()), this, SLOT(SetDzz()) );
   }
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDxx()
+{
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDxy()
+{
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDxz()
+{
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDyy()
+{
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDyz()
+{
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::SetDzz()
+{
+
 }
 
 
@@ -371,7 +407,6 @@ void QmitkTractbasedSpatialStatisticsView::Transform()
   // Get transformation from gui
   std::string str = m_Controls->m_TransformText->toPlainText().toStdString();
 
-  std::cout << "str " << str <<std::endl;
 
   // Get matrix of mask
   mitk::Geometry3D* geo = image->GetGeometry();
@@ -382,7 +417,7 @@ void QmitkTractbasedSpatialStatisticsView::Transform()
 
   std::vector< std::string >::iterator it = lines.begin();
   itk::Matrix<float,3,3> m;
-  itk::FixedArray<float,3> off;
+  itk::Vector<float,3> off;
 
   std::vector< std::vector<std::string> > rows;
 
@@ -416,37 +451,26 @@ void QmitkTractbasedSpatialStatisticsView::Transform()
     off[i] = QString(s.c_str()).toFloat();
   }
 
+
   itk::ScalableAffineTransform<float, 3>* trans = geo->GetIndexToWorldTransform();
-  itk::Matrix<float,3,3> mat = trans->GetMatrix();
-  itk::FixedArray<float,3> offset = trans->GetOffset();
-
-  mat = mat * m.GetInverse();
-
-  itk::Vector<float,3> newOffset;
-
-  for(int i=0; i<3; i++)
-  {
-    newOffset[i] = offset[i] + off[i];
-  }
-
   itk::ScalableAffineTransform<float,3>::Pointer newTrans = itk::ScalableAffineTransform<float,3>::New();
 
-  newTrans->SetMatrix(mat);
-  newTrans->SetTranslation(newOffset);
+  newTrans->SetMatrix(m);
+  newTrans->SetTranslation(off);
+  newTrans->GetInverse(newTrans);
+  trans->Compose(newTrans, true);
+
 
   mitk::Image::Pointer transposed = mitk::Image::New();
   transposed = image;
-  transposed->GetGeometry()->SetIndexToWorldTransform(newTrans);
+  transposed->GetGeometry()->SetIndexToWorldTransform(trans);
 
 
 
   mitk::DataNode::Pointer result = mitk::DataNode::New();
   result->SetProperty( "name", mitk::StringProperty::New("transformed") );
   result->SetData( transposed );
-  //result->SetProperty( "levelwindow", levWinProp );
 
-
-  // add new image to data storage and set as active to ease further processing
   GetDefaultDataStorage()->Add( result );
 
   // show the results

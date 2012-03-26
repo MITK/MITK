@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QModelIndex>
 #include <QMap>
 #include <QVariant>
+#include <mitkStatusBar.h>
+#include <mitkProgressBar.h>
 //#include "QmitkDicomDataEventPublisher.h"
 
 
@@ -132,7 +134,7 @@ void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
     m_Watcher.waitForFinished();
     m_LocalDatabase->closeDatabase();
 }
-//TODO
+
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
     QModelIndex currentIndex = m_Controls->InternalDataTreeView->currentIndex();

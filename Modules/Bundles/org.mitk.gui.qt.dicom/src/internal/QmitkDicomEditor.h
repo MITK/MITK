@@ -23,9 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryQtEditorPart.h>
 #include <berryIPartListener.h>
 
-#include <mitkIDataStorageReference.h>
-#include <mitkIDataStorageService.h>
-#include <mitkDataStorageEditorInput.h>
+//#include <mitkIDataStorageReference.h>
+//#include <mitkIDataStorageService.h>
+//#include <mitkDataStorageEditorInput.h>
 
 #include "ui_QmitkDicomEditorControls.h"
 #include "QmitkDicomDirectoryListener.h"

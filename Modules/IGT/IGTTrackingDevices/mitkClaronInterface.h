@@ -28,7 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
-typedef int mtHandle;
+#ifdef _WIN64  //Defined for applications for Win64.
+typedef long mtHandle; 
+#else 
+typedef int mtHandle; 
+#endif
 
 namespace mitk
 {

@@ -8,13 +8,16 @@ IF(MITK_USE_MICRON_TRACKER)
   FIND_PATH(MITK_MICRON_TRACKER_INCLUDE_DIR MTC.h ${MICRON_TRACKER_SDK_DIR} DOC  "Include directory of the MT2.")
   FIND_PATH(MITK_MICRON_TRACKER_TEMP_DIR . DOC "Any temporary directory which can be used by the MicronTracker2.")
   FIND_PATH(MITK_MICRON_TRACKER_CALIBRATION_DIR BumbleBee_6400420.calib DOC "Path which contains the MT2 calibration file.")
+  MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/MTC.dll  CONFIGURATIONS Release)
+  MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/MTInterfaceDotNet.dll  CONFIGURATIONS Release)
+  MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/PGRFlyCapture.dll  CONFIGURATIONS Release)
 ENDIF(MITK_USE_MICRON_TRACKER)
 #End MicronTracker Hardware
 
 
 # only on Win32
 IF(WIN32)
-  
+
   #Begin Ascension MicroBird Hardware
   OPTION(MITK_USE_MICROBIRD_TRACKER "Enable support for Ascension MicroBird tracker hardware" OFF)
   IF(MITK_USE_MICROBIRD_TRACKER)

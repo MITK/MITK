@@ -7,6 +7,7 @@ Some abstract concepts of MITK are described in \ref Concepts
 
 \section DevelopmentSetup Setting Up MITK
 
+\li \subpage SupportedPlatformsPage
 \li \subpage BuildInstructionsPage
 \li \subpage thirdpartylibs
 

@@ -382,6 +382,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   }
 
   MatrixDoublePtr Q(new vnl_matrix<double>(3, m_NumberOfGradientDirections));
+  Q->fill(0.0);
   // Cartesian to spherical coordinates
   {
     int i = 0;
@@ -423,13 +424,17 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   m_NumberCoefficients = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
 
   MatrixDoublePtr SHBasis(new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients));
+  SHBasis->fill(0.0);
   VectorIntPtr SHOrderAssociation(new vnl_vector<int>(m_NumberCoefficients));
+  SHOrderAssociation->fill(0.0);
   MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
-  MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
-  MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
-
   LaplacianBaltrami->fill(0.0);
+  MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
   FRTMatrix->fill(0.0);
+  MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  SHEigenvalues->fill(0.0);
+
+
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
   ComputeSphericalHarmonicsBasis(Q.get() ,SHBasis.get(), LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());

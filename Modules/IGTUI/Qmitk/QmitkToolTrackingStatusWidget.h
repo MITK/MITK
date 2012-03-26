@@ -77,8 +77,10 @@ public:
 
   /*!  
   \brief Changes background color of status labels (green or red) to show if actual navigation data of each tool is valid.
+  * Depending on usage of SetShowPosition(bool) or SetShowQuaternions(bool) the position coordinates and quaternion values of each tool are shown. 
+  * The number of decimal places is set with the parameters posPrecision and quatPrecision. 
   */ 
-  void Refresh();
+  void Refresh(int posPrecision = 2, int quatPrecision = 2);
   
   /*!  
   \brief Removes all status labels.

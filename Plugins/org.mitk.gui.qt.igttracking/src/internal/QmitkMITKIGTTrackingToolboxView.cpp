@@ -78,7 +78,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-	  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+	connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
@@ -96,6 +96,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_TrackingVolumeNode = mitk::DataNode::New();
     m_TrackingVolumeNode->SetName("TrackingVolume");
     m_TrackingVolumeNode->SetOpacity(0.25);
+    m_TrackingVolumeNode->SetBoolProperty("Backface Culling",true);
     mitk::Color red;
     red.SetRed(1);
     m_TrackingVolumeNode->SetColor(red);
@@ -267,7 +268,7 @@ this->GlobalReinit();
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
   mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
-	
+
   // Code to enable/disable device specific buttons
   if (Type == mitk::NDIAurora) //Aurora
   {
@@ -296,7 +297,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
   if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
-	
+
 	  std::string str = qstr.toStdString();
 
 	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
@@ -307,7 +308,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 
     m_TrackingVolumeNode->SetData(volumeSurface);
-    
+
     GlobalReinit();
   }
 }
@@ -473,9 +474,9 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
   m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(),Identifier.toStdString());
   m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(),false);
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
-  
+
   }
- 
+
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
   {
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
@@ -484,7 +485,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   QString toolLabel = QString("Loaded Tools: <manually added>");
   }
-  
+
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolCanceled()
   {
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
@@ -559,5 +560,4 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
     m_Controls->m_LoadTools->setEnabled(false);
     m_Controls->m_ResetTools->setEnabled(false);
 }
-
 

@@ -185,7 +185,7 @@ namespace itk
       double numberOfOutliers = 0.0;
 
       std::vector<double>::iterator resIt = res.begin();
-      double mean;
+      double mean = 0;
       while(resIt != res.end())
       {
         double f = *resIt;

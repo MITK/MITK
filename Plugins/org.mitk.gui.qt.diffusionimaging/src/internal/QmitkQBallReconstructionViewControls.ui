@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>385</height>
+    <height>507</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -146,7 +146,7 @@
       <item>
        <widget class="QComboBox" name="m_QBallReconstructionMethodComboBox">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <item>
          <property name="text">
@@ -178,6 +178,11 @@
           <string>Raw Signal only (SH)</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Multiple Q-Shell (SH)</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -204,6 +209,25 @@
         <property name="text">
          <string>Start Reconstruction</string>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="m_groupQShellSelecton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>Q-Shell selection</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="text">
+            <string>CheckBox</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

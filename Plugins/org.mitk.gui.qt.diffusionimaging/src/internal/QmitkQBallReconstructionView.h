@@ -94,6 +94,7 @@ protected slots:
   
   void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
   void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
+  void MultiShellQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
 
 protected:
 
@@ -103,6 +104,10 @@ protected:
 
   template<int L>
   void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols, 
+    float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
+
+  template<int L>
+  void TemplatedMultiShellQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);

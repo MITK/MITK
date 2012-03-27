@@ -64,7 +64,6 @@ public:
     typedef vnl_vector_fixed< double, 3 >             GradientDirectionType;
     /** Container to hold gradient directions of the 'n' DW measurements */
     typedef VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
-    typedef Image<float, 3> BlaImage;
 
     // --------------------------------------------------------------------------------------------//
 
@@ -107,7 +106,7 @@ public:
     itkGetMacro( Threshold, ReferencePixelType );
 
     itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
-    itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
+    //itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
 
     itkSetMacro( BValue, TOdfPixelType);
 
@@ -126,6 +125,7 @@ protected:
     bool CheckDuplicateDiffusionGradients();
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
     void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
+    bool CheckHemisphericalArrangementOfGradientDirections();
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
@@ -155,11 +155,9 @@ private:
 
     double m_Lambda;
 
-    bool m_DirectionsDuplicated;
+    bool m_IsHemisphericalArrangementOfGradientDirections;
 
     int m_NumberCoefficients;
-
-    BlaImage::Pointer m_ODFSumImage;
 
     template< class VNLType >
     void printMatrix( VNLType * mat );

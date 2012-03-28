@@ -341,7 +341,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             {
               m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0)->SetSelected(false);
             }
-            //emptySegmentation->SetSelected(true);
+            emptySegmentation->SetSelected(true);
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
             this->FireNodeSelected( emptySegmentation );

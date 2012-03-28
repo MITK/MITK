@@ -103,6 +103,28 @@ public:
     
     }
 
+    static void TestSetTrackingDeviceData()
+    {
+      MITK_TEST_OUTPUT(<< "---- Testing method SetTrackingDeviceData() ----");
+      mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+      myTVGenerator->SetTrackingDeviceData(mitk::DeviceDataAuroraPlanarCube);
+      MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIAurora),"testing if data was set correctly");    
+    }
+
+    static void TestGetTrackingDeviceData()
+    {
+      MITK_TEST_OUTPUT(<< "---- Testing method GetTrackingDeviceData() ----");
+      mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+      myTVGenerator->SetTrackingDeviceData(mitk::DeviceDataInvalid);
+      MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemInvalid),"setting device to invalid");
+      myTVGenerator->SetTrackingDeviceData(mitk::DeviceDataMicronTrackerH40);
+      mitk::TrackingDeviceData testData = myTVGenerator->GetTrackingDeviceData(); 
+      MITK_TEST_CONDITION(( (testData.Line == mitk::DeviceDataMicronTrackerH40.Line) &&
+                            (testData.Model == mitk::DeviceDataMicronTrackerH40.Model) &&
+                            (testData.VolumeModelLocation == mitk::DeviceDataMicronTrackerH40.VolumeModelLocation)    
+                          ),"changing device and testing getter");
+    }
+
 
     /* The isInside() method is not implemented so far. So please activate is as soon as this is done. Then we could load
      * the different Trackingvolumens (Polaris, MicronTracker, etc) and test different points inside and outside in this method.
@@ -133,6 +155,8 @@ int mitkTrackingVolumeGeneratorTest(int /* argc */, char* /*argv*/[])
     mitkTrackingVolumeGeneratorTestClass::TestIntuitiveDaVinciTrackingVolume();
     mitkTrackingVolumeGeneratorTestClass::TestInvalidInputBehaviour();
     mitkTrackingVolumeGeneratorTestClass::TestSetTrackingDevice();
+    mitkTrackingVolumeGeneratorTestClass::TestSetTrackingDeviceData();
+    mitkTrackingVolumeGeneratorTestClass::TestGetTrackingDeviceData();
     //mitkTrackingVolumeTestClass::TestIsInside(); Activate this code when method isInside() is implemented!
 
     MITK_TEST_END() ;

@@ -40,6 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSphereSource.h>
 
 
+
+
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
 QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
@@ -136,14 +138,16 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   if (filename.isNull()) return;
 
   //read tool storage from disk
+  std::string errorMessage = "";
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
   m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
-  if (m_toolStorage.IsNull())
+  
+  if(m_toolStorage->isEmpty())
     {
-    MessageBox(myDeserializer->GetErrorMessage());
-    m_toolStorage = NULL;
+    errorMessage = myDeserializer->GetErrorMessage();
+    MessageBox(errorMessage);
     return;
-  }
+    }
 
   //update label
   Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path

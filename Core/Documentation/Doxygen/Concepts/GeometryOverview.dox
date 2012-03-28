@@ -4,12 +4,12 @@ namespace mitk{
 
 Available sections:
 
--# \ref Section_1 "Introduction to Geometries"
--# \ref Section_2 "The Geometry Concept"
-	-# \ref Subsection_21 "IMPORTANT: Putting it together for an Image"
--# \ref Section_3 "Connection between MITK, ITK and VTK Geometries"\n\n
+-# \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
+-# \ref GeometryOverviewPage_Concept "The Geometry Concept"
+	-# \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"
+-# \ref GeometryOverviewPage_Connection "Connection between MITK, ITK and VTK Geometries"\n\n
 
-\section Section_1 Introduction to Geometries
+\section GeometryOverviewPage_Introduction Introduction to Geometries
 
 Geometries are used to describe the geometrical properties of data objects in space and time.\n
 To use the geometry classes in the right way you have to understand the three different coordinate types present in MITK:\n\n
@@ -38,7 +38,7 @@ To use the geometry classes in the right way you have to understand the three di
 		- If you have world coordinates, they can be converted to discrete index coordinates by calling
           Geometry3D::WorldToIndex()\n\n  
 
-\section Section_2 The Geometry Concept
+\section GeometryOverviewPage_Concept The Geometry Concept
 
 As the superclass of all MITK geometries Geometry3D holds:
 	- a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by Geometry3D::GetBoundingBox()
@@ -46,10 +46,10 @@ As the superclass of all MITK geometries Geometry3D holds:
 	  The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
 	- position information in form of a Euclidean transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa,\n
        to be accessed by Geometry3D::GetIndexToWorldTransform()\n
-	   See also: \ref Section_1 "Introduction to Geometries"
+	   See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
 	- Many other properties (e.g. origin, extent, ...) which can be found in the \ref Geometry3D "class documentation"
 	- <b> VERY IMPORTANT:</b>\n A flag called <i>isImageGeometry</i>, which indicates whether the coordinates are center-based or not!\n 
-	  See also: \ref Section_1 "Introduction to Geometries" and \ref Subsection_21 "IMPORTANT: Putting it together for an Image"\n\n	
+	  See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries" and \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"\n\n	
 
 Every data object which is (sub-)class of BaseData has a Geometry3D, to be more specific, a TimeSlicedGeometry, to be accessed by BaseData::GetTimeSlicedGeometry().\n 
 This is because all data objects are objects in space and time. The data values are often stored in index coordinates, e.g., integer pixel/voxel or time indices.\n 
@@ -88,7 +88,7 @@ The DisplayGeometry converts between screen and world coordinates, processes inp
 Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries\n
 An example is the ThinPlateSplineCurvedGeometry.\n
 
-\subsection Subsection_21 IMPORTANT: Putting it together for an Image
+\subsection GeometryOverviewPage_Putting_Together IMPORTANT: Putting it together for an Image
 
 Please read this section accurately if you are working with Images!
 
@@ -122,7 +122,7 @@ If you experience displaced contours, figures or other stuff, it is an indicator
 An image has a TimeSlicedGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry).\n
 As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.\n\n
 
-\section Section_3 Connection between MITK, ITK and VTK Geometries
+\section GeometryOverviewPage_Connection Connection between MITK, ITK and VTK Geometries
 \image html ITK_VTK_MITK_Geometries.png
 \n\n
 	- VTK transformation for rendering

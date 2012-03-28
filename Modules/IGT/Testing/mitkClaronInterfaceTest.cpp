@@ -50,6 +50,16 @@ int mitkClaronInterfaceTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetTipQuaternions(0).empty()),"Testing stub of GetTipQuaternions() ");
     MITK_TEST_CONDITION_REQUIRED(!(myClaronInterface->StartTracking()),"Testing stub of StartTracking() ");
     MITK_TEST_CONDITION_REQUIRED(!(myClaronInterface->StopTracking()),"Testing stub of StopTracking() ");
+    bool success = true;
+    try
+      {
+      myClaronInterface->GrabFrame();
+      }
+    catch(...)
+      {
+      success = false;
+      }
+    MITK_TEST_CONDITION_REQUIRED(success,"Testing stub of GrabFrame() ");
     }
   
   // always end with this!

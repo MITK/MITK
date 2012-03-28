@@ -41,25 +41,29 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
 
 void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 {
-  GetGeometry()->SetIdentity();
-  GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
-  
+
+  // Adjusted this function to fix 
+  // BUG 6951 - Image Cropper - Bounding Box is strange
+  // Still, the behavior of the BoundingObject is really strange.
+  // One would think that writing "setGeometry(aGeometry3D)" here would do the job.
+  // But apparently the boundingObject can only be handled correctly, when it's
+  // indexBounds are from -1 to 1 in all axis (so it is only 2x2x2 Pixels big) and the spacing
+  // specifies it's actual bounds. This behavior needs to be analyzed and maybe changed.
+  // Check also BUG 11406
+
   if (aGeometry3D->GetImageGeometry())
   {
-    // remove 0.5 offset, if necessary
-    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false); 
-    GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
-    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(true);
+    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false);
   }
-  else
-  {
-    GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
-  }
-  
+
+  GetGeometry()->SetIdentity();
+  GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
+    
+  GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)
-    size[i] = aGeometry3D->GetExtentInMM(i)/2.0;
+    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0) -1;
   GetGeometry()->SetSpacing( size );
   GetTimeSlicedGeometry()->UpdateInformation();
 }

@@ -10,7 +10,7 @@ Available sections:
 
 Many of the applications created with the use of MITK share common basic functionalities. Due to this, there is one manual which explains the basic usage of MITK. For more information on the use of the advanced features of an application please take a look the \ref ApplicationsPageApplicationsList , whereas if you are interested in a certain view further information can be found in \ref ModuleListPage .
 
-The basic usage information on MITK can be found in \subpage MITKManualMainPage .
+The basic usage information on MITK can be found in \subpage MITKUserManualPage .
 
 \section ApplicationsPageApplications What are Applications?
 
@@ -20,7 +20,7 @@ A typical example of this would be an application which contains only views rela
   
 \section ApplicationsPageApplicationsList List of Applications
 
-If you are interested in using a specific application, currently developed by the MITK team you might want to take a look first at the \ref MITKManualMainPage . Further information on any application can be found here:
+If you are interested in using a specific application, currently developed by the MITK team you might want to take a look first at the \ref MITKUserManualPage . Further information on any application can be found here:
 <ul>
   <li> \subpage org_extapplication
   <li> \subpage org_dti_atlas_application

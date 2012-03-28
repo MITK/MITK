@@ -39,9 +39,6 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
-  IODataStructures/mitkParticle.cpp
-  IODataStructures/mitkParticleGrid.cpp
-
 # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp

@@ -1,7 +1,7 @@
 /**
 \page BuildInstructionsPage Build Instructions
 
-\section BIZero Introduction
+\section BuildInstructions_Introduction Introduction
 
 The MITK build system (which is based on CMake) supports a "superbuild" process, meaning that it will download, configure, and build
 all required third-party libraries (except Qt) automatically. These instructions will show you how to use the MITK superbuild.
@@ -11,7 +11,7 @@ described below is completely automated. Please see <a href="http://www.mitk.org
 
 For more advanced users, the last sections explain how to inject custom build libraries into the superbuild process.
 
-\section BIOne Prerequisites
+\section BuildInstructions_Prerequisites Prerequisites
 
 You need:
   -# Git from http://git-scm.com (there are also numerous third-party graphical clients available). We recomment using
@@ -20,7 +20,7 @@ You need:
   -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
   (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
   
-\section BIQt A note about Qt
+\section BuildInstructions_Qt A note about Qt
 
 Nokia provides several binary packages for Qt. You must make sure that the package you download matches
 your toolchain. On Linux, getting Qt by installing the packages provided by your Linux package manager is the preferred way.
@@ -48,7 +48,7 @@ nmake install
 \endverbatim
      After "nmake install" completed successfully, you may delete your Qt source directory.
   
-\section BITwo Get a source tree
+\section BuildInstructions_Get_Source Get a source tree
 
 Since MITK is under active development we recommend to use git to get
 the most recent version. To make sure you get a stable tree, check the
@@ -68,7 +68,7 @@ To clone MITK's current git repository do:
 git clone http://git.mitk.org/MITK.git
 \endcode
 
-\section BIThree Build MITK with CMake
+\section BuildInstructions_Build_With_CMake Build MITK with CMake
 
 Create a new directory for the superbuild binary tree, change to it and call CMake:
 
@@ -105,7 +105,7 @@ make -j4
 <b>Windows</b> users using Visual Studio can open the generated <tt>MITK-superbuild.sln</tt> solution file
 in the <tt>MITK-superbuild</tt> directory and start the build by building the <tt>BUILD_ALL</tt> project.
 
-\section BIFour Customize your MITK superbuild
+\section BuildInstructions_Customize Customize your MITK superbuild
 
 The MITK superbuild configured MITK with all needed external libraries. The build directories of these libraries,
 and of MITK itself are located inside the <tt>MITK-superbuild</tt> directory. For example, the directory layout may
@@ -125,7 +125,7 @@ directory (Linux), or by opening MITK-build/MITK.sln and building the project wi
 You may also change the configuration of any project configured via the superbuild process. Make sure to also build
 the changed project and also the projects which depend on it.
 
-\section BIFive Running Applications
+\section BuildInstructions_Running Running Applications
 
 On Linux, just execute the application you want to run. MITK executables are located in
 <tt>MITK-superbuild/MITK-build/bin</tt>
@@ -135,18 +135,18 @@ The MITK build system generated Windows Batch files in the <tt>MITK-build</tt> d
 environment and opens the appropriate Visual Studio solution file. Use (and maybe modify/enhance) these Batch files
 to be able to start and debug MITK applications from inside Visual Studio.
 
-\section BISix Documentation
+\section BuildInstructions_Documentation Documentation
 
 If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get a new project
 (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in 
 the Documentation/Doxygen directory of your MITK-build binary tree or in the <tt>MITK_DOXYGEN_OUTPUT_DIR</tt> CMake variable
 (if specified).
 
-\section BISeven Extend MITK on your own (using the application framework BlueBerry)
+\section BuildInstructions_Extending Extend MITK on your own (using the application framework BlueBerry)
 
 \ref NewPluginPage
 
-\section BIEight Use MITK in your own project (as a toolkit)
+\section BuildInstructions_As_Toolkit Use MITK in your own project (as a toolkit)
 
 In the MITK-build binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
 
@@ -170,7 +170,7 @@ TARGET_LINK_LIBRARIES(Step1 ${QMITK_LIBRARIES})
 \note IMPORTANT: do not include the ITK_USE_FILE in your project when using MITK. There's a conflict in the ITK
  and MITK tree classes which will be resolved soon. 
 
-\section BINine Superbuild Customization
+\section BuildInstructions_Advanced_Customization Superbuild Customization
 
 You can inject pre-build third-party libraries into the MITK superbuild by setting certain CMake variables before
 the first configure step. MITK will then use these third-party libraries instead of downloading and building them

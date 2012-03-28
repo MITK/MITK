@@ -2167,3 +2167,32 @@ void QmitkStdMultiWidget::MouseModeSelected( mitk::MouseModeSwitcher::MouseMode 
   }
 }
 
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane1()
+{
+  return this->m_PlaneNode1;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane2()
+{
+  return this->m_PlaneNode2;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane3()
+{
+  return this->m_PlaneNode3;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
+{
+  switch(id)
+  {
+    case 1: return this->m_PlaneNode1;
+    break;
+    case 2: return this->m_PlaneNode2;
+    break;
+    case 3: return this->m_PlaneNode3;
+    break;
+    default: return NULL;
+  }
+}
+

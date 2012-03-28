@@ -24,7 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QTimer>
-
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include "QmitkEventAdapter.h"
 
 #include "QmitkRenderWindowMenu.h"
@@ -274,3 +275,31 @@ void QmitkRenderWindow::FullScreenMode(bool state)
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
 }  
+
+
+void QmitkRenderWindow::dragEnterEvent( QDragEnterEvent *event )
+{
+  if (event->mimeData()->hasFormat("application/x-mitk-datanodes"))
+  {
+    event->accept();
+  }
+}
+
+void QmitkRenderWindow::dropEvent( QDropEvent * event )
+{
+  if (event->mimeData()->hasFormat("application/x-mitk-datanodes"))
+  {
+    QString arg = QString(event->mimeData()->data("application/x-mitk-datanodes").data());
+    QStringList listOfDataNodes = arg.split(",");
+    std::vector<mitk::DataNode*> vectorOfDataNodePointers;
+
+    for (int i = 0; i < listOfDataNodes.size(); i++)
+    {
+      long val = listOfDataNodes[i].toLong();
+      mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
+      vectorOfDataNodePointers.push_back(node);
+    }
+
+    emit NodesDropped(this, vectorOfDataNodePointers);
+  }
+}

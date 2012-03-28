@@ -1,4 +1,4 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   QmitkCloseProjectAction.cpp
   QmitkDefaultDropTargetListener.cpp
   QmitkFileExitAction.cpp
@@ -7,13 +7,13 @@ SET(SRC_CPP_FILES
   QmitkStatusBar.cpp
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_application_Activator.cpp
   QmitkEditorsPreferencePage.cpp
   QmitkGeneralPreferencePage.cpp
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/QmitkCloseProjectAction.h
   src/QmitkFileExitAction.h
   src/QmitkFileOpenAction.h
@@ -24,24 +24,24 @@ SET(MOC_H_FILES
   src/internal/QmitkGeneralPreferencePage.h
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/QmitkPreferencesDialog.ui
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   plugin.xml
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/resources.qrc
 )
 
-SET(CPP_FILES )
+set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

@@ -1,24 +1,24 @@
-INCLUDE(files.cmake)
+include(files.cmake)
 
-ADD_Executable(PocoTestRunnerUtil ${CPP_FILES})
-TARGET_LINK_LIBRARIES(PocoTestRunnerUtil 
+add_executable(PocoTestRunnerUtil ${CPP_FILES})
+target_link_libraries(PocoTestRunnerUtil 
  PocoUtil
  PocoXML
  PocoFoundation
  CppUnit)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../include
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../Foundation/include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../XML/include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../CppUnit/include
 )
 
-IF (WIN32)
-  TARGET_LINK_LIBRARIES(PocoTestRunnerUtil 
+if(WIN32)
+  target_link_libraries(PocoTestRunnerUtil 
     WinTestRunner
   )
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../CppUnit/WinTestRunner/include)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../CppUnit/WinTestRunner/include)
   add_definitions(-D_AFXDLL)
-ENDIF(WIN32)
+endif(WIN32)
 
-#SET_TARGET_PROPERTIES(PocoTestRunnerUtil PROPERTIES COMPILE_FLAGS "${POCO_UNIX_COMPILE_FLAGS}")
+#set_target_properties(PocoTestRunnerUtil PROPERTIES COMPILE_FLAGS "${POCO_UNIX_COMPILE_FLAGS}")

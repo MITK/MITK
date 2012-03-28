@@ -40,7 +40,7 @@ endforeach()
 # Check if "mbits" is reachable
 file(DOWNLOAD "http://mbits" "${CTEST_SCRIPT_DIRECTORY}/mbits.html" TIMEOUT 2 STATUS _status)
 list(GET _status 0 _status_code)
-if (_status_code EQUAL 6) # couldn't resovle host name
+if(_status_code EQUAL 6) # couldn't resovle host name
   set(MBITS_AVAILABLE 0)
 else()
   set(MBITS_AVAILABLE 1)
@@ -58,7 +58,7 @@ if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL AND MBITS_AVAILABLE)
 endif()
 
 
-if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
+if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(GIT_BRANCH "")
 else()
   set(GIT_BRANCH "-b ${GIT_BRANCH}")
@@ -72,15 +72,15 @@ set(initial_force_build FALSE)
 
 # Set model options
 set(model "")
-if (SCRIPT_MODE STREQUAL "experimental")
+if(SCRIPT_MODE STREQUAL "experimental")
   set(empty_binary_directory FALSE)
   set(initial_force_build TRUE)
   set(model Experimental)
-elseif (SCRIPT_MODE STREQUAL "continuous")
+elseif(SCRIPT_MODE STREQUAL "continuous")
   set(empty_binary_directory FALSE)
   set(initial_force_build FALSE)
   set(model Continuous)
-elseif (SCRIPT_MODE STREQUAL "nightly")
+elseif(SCRIPT_MODE STREQUAL "nightly")
   set(empty_binary_directory TRUE)
   set(initial_force_build TRUE)
   set(model Nightly)
@@ -134,7 +134,7 @@ function(func_build_target target build_dir)
 endfunction()
 
 function(func_test label build_dir)
-  if (NOT TESTING_PARALLEL_LEVEL)
+  if(NOT TESTING_PARALLEL_LEVEL)
     set(TESTING_PARALLEL_LEVEL 8)
   endif()
 
@@ -168,7 +168,7 @@ function(func_test label build_dir)
     message("----------- [ Coverage ${label} ] -----------")
     ctest_coverage(BUILD "${build_dir}" LABELS ${label})
     ctest_submit(PARTS Coverage)
-  endif ()
+  endif()
 
   if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
     if(NOT CTEST_MEMORYCHECK_SUPPRESSIONS_FILE)
@@ -181,14 +181,14 @@ function(func_test label build_dir)
     endif()
     ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL ${label})
     ctest_submit(PARTS MemCheck)
-  endif ()
+  endif()
 
 endfunction()
 
 #---------------------------------------------------------------------
 # run_ctest macro
 #---------------------------------------------------------------------
-MACRO(run_ctest)
+macro(run_ctest)
 
   set(build_warnings 0)
   set(build_errors 0)
@@ -232,7 +232,7 @@ MACRO(run_ctest)
     set(res 1)
 
     # Write initial cache.
-    if (NOT DEFINED BUILD_TESTING)
+    if(NOT DEFINED BUILD_TESTING)
       set(BUILD_TESTING ON)
     endif()
 
@@ -318,7 +318,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         
         func_build_target("${external_project_name}" "${CTEST_BINARY_DIRECTORY}")
         
-        if (NOT build_errors)
+        if(NOT build_errors)
           # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
           file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
           file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
@@ -418,7 +418,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       endforeach()
     endif()
     
-    if (WITH_DOCUMENTATION)
+    if(WITH_DOCUMENTATION)
       message("----------- [ Build Documentation ] -----------")
       set(ctest_use_launchers_orig ${CTEST_USE_LAUNCHERS})
       set(CTEST_USE_LAUNCHERS 0)
@@ -433,18 +433,18 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     set_property(GLOBAL PROPERTY Label SuperBuild)
     
     # Global coverage ... 
-    if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+    if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
       message("----------- [ Global coverage ] -----------")
       ctest_coverage(BUILD "${build_dir}" APPEND)
       ctest_submit(PARTS Coverage)
-    endif ()
+    endif()
     
     # Global dynamic analysis ...
-    if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+    if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
       message("----------- [ Global memcheck ] -----------")
       ctest_memcheck(BUILD "${build_dir}")
       ctest_submit(PARTS MemCheck)
-    endif ()
+    endif()
     
     # Note should be at the end
     ctest_submit(PARTS Notes)

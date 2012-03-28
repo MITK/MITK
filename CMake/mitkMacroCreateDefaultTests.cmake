@@ -10,52 +10,52 @@
 # ${${KITNAME}_CUSTOM_TESTS} : filenames of custom tests which are just added to the TestDriver. Execution
 #                              of these has to be specified manually with the ADD_TEST CMake command.
 # 
-MACRO(MITK_CREATE_DEFAULT_TESTS)
+macro(MITK_CREATE_DEFAULT_TESTS)
   # add tests which need a GUI if it is not disabled
-  IF(NOT MITK_GUI_TESTS_DISABLED)
-    SET( ${KITNAME}_TESTS  ${${KITNAME}_TESTS} ${${KITNAME}_GUI_TESTS} )
-    SET( ${KITNAME}_IMAGE_TESTS  ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_IMAGE_GUI_TESTS} )
-  ENDIF(NOT MITK_GUI_TESTS_DISABLED)
+  if(NOT MITK_GUI_TESTS_DISABLED)
+    set( ${KITNAME}_TESTS  ${${KITNAME}_TESTS} ${${KITNAME}_GUI_TESTS} )
+    set( ${KITNAME}_IMAGE_TESTS  ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_IMAGE_GUI_TESTS} )
+  endif(NOT MITK_GUI_TESTS_DISABLED)
 
   #
   # Create the TestDriver binary which contains all the tests.
   #  
-  CREATE_TEST_SOURCELIST(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 
+  create_test_sourcelist(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 
     ${${KITNAME}_TESTS} ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_CUSTOM_TESTS}
   )
-  ADD_EXECUTABLE(${KITNAME}TestDriver ${MITKTEST_SOURCE})
+  add_executable(${KITNAME}TestDriver ${MITKTEST_SOURCE})
   set_property(TARGET ${KITNAME}TestDriver PROPERTY LABELS ${PROJECT_NAME})
-  TARGET_LINK_LIBRARIES(${KITNAME}TestDriver ${${KITNAME}_CORE_LIBRARIES} ${${KITNAME}_LIBRARIES} ${LIBRARIES_FOR_${KITNAME}_CORE})
+  target_link_libraries(${KITNAME}TestDriver ${${KITNAME}_CORE_LIBRARIES} ${${KITNAME}_LIBRARIES} ${LIBRARIES_FOR_${KITNAME}_CORE})
   #
   # Now tell CMake which tests should be run. This is done automatically 
   # for all tests in ${KITNAME}_TESTS and ${KITNAME}_IMAGE_TESTS. The IMAGE_TESTS
   # are run for each image in the TESTIMAGES list.
   #
-  FOREACH( test ${${KITNAME}_TESTS} )
-    GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-    ADD_TEST(${TName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KITNAME}TestDriver ${TName})
+  foreach( test ${${KITNAME}_TESTS} )
+    get_filename_component(TName ${test} NAME_WE)
+    add_test(${TName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KITNAME}TestDriver ${TName})
     set_property(TEST ${TName} PROPERTY LABELS ${PROJECT_NAME})
-  ENDFOREACH( test )
+  endforeach( test )
 
-  FOREACH(image ${${KITNAME}_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
-    IF(EXISTS ${image})
-      SET(IMAGE_FULL_PATH ${image})
-    ELSE(EXISTS ${image})
+  foreach(image ${${KITNAME}_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
+    if(EXISTS ${image})
+      set(IMAGE_FULL_PATH ${image})
+    else(EXISTS ${image})
       # todo: maybe search other paths as well
       # yes, please in mitk/Testing/Data, too
-      SET(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Data/${image})
-    ENDIF(EXISTS ${image})
+      set(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Data/${image})
+    endif(EXISTS ${image})
 
-    IF(EXISTS ${IMAGE_FULL_PATH})
-    FOREACH( test ${${KITNAME}_IMAGE_TESTS} )
-      GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-      GET_FILENAME_COMPONENT(ImageName ${IMAGE_FULL_PATH} NAME)
-      ADD_TEST(${TName}_${ImageName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KITNAME}TestDriver ${TName} ${IMAGE_FULL_PATH})
+    if(EXISTS ${IMAGE_FULL_PATH})
+    foreach( test ${${KITNAME}_IMAGE_TESTS} )
+      get_filename_component(TName ${test} NAME_WE)
+      get_filename_component(ImageName ${IMAGE_FULL_PATH} NAME)
+      add_test(${TName}_${ImageName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KITNAME}TestDriver ${TName} ${IMAGE_FULL_PATH})
       set_property(TEST ${TName}_${ImageName} PROPERTY LABELS ${PROJECT_NAME})
-    ENDFOREACH( test )
-    ELSE(EXISTS ${IMAGE_FULL_PATH})
-      MESSAGE("!!!!! No such file: ${IMAGE_FULL_PATH} !!!!!")
-    ENDIF(EXISTS ${IMAGE_FULL_PATH})
-  ENDFOREACH( image )
-ENDMACRO(MITK_CREATE_DEFAULT_TESTS)
+    endforeach( test )
+    else(EXISTS ${IMAGE_FULL_PATH})
+      message("!!!!! No such file: ${IMAGE_FULL_PATH} !!!!!")
+    endif(EXISTS ${IMAGE_FULL_PATH})
+  endforeach( image )
+endmacro(MITK_CREATE_DEFAULT_TESTS)
 

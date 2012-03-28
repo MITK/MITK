@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
 QmitkApplicationCursor.cpp
 QmitkEnums.h
 QmitkCustomVariants.h
@@ -29,7 +29,7 @@ QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
 QmitkDataStorageComboBox.h
 QmitkDataStorageTableModel.h
 QmitkLevelWindowPresetDefinitionDialog.h
@@ -51,13 +51,13 @@ QmitkStdMultiWidget.h
 QmitkMouseModeSwitcher.h
 )
 
-SET(UI_FILES
+set(UI_FILES
 QmitkLevelWindowPresetDefinition.ui
 QmitkLevelWindowWidget.ui
 QmitkLevelWindowRangeChange.ui
 QmitkMemoryUsageIndicator.ui
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   Qmitk.qrc  
 )

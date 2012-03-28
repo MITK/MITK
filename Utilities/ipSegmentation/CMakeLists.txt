@@ -1,4 +1,4 @@
-SET(IPSEGMENTATION_FILES
+set(IPSEGMENTATION_FILES
     ipSegmentationError.c
     ipSegmentationNew.c
     ipSegmentationFree.c
@@ -14,9 +14,9 @@ SET(IPSEGMENTATION_FILES
     ipSegmentationUndo.c
 )
 
-INCLUDE_DIRECTORIES(.. ../ann/include ${MITK_INCLUDE_DIRS} ${ANN_INCLUDE_DIR} ../ipPic)
-ADD_LIBRARY(ipSegmentation${LIBPOSTFIX} ${MITK_WIN32_FORCE_STATIC} ${IPSEGMENTATION_FILES})
-TARGET_LINK_LIBRARIES(ipSegmentation ann mitkIpPic)
+include_directories(.. ../ann/include ${MITK_INCLUDE_DIRS} ${ANN_INCLUDE_DIR} ../ipPic)
+add_library(ipSegmentation${LIBPOSTFIX} ${MITK_WIN32_FORCE_STATIC} ${IPSEGMENTATION_FILES})
+target_link_libraries(ipSegmentation ann mitkIpPic)
 
 MITK_CREATE_MODULE_CONF(ipSegmentation
   DEPENDS mitkIpPic ann

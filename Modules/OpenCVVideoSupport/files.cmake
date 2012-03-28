@@ -1,5 +1,5 @@
 
-SET(CPP_FILES
+set(CPP_FILES
     mitkMovieGeneratorOpenCV.cpp
     mitkUndistortCameraImage.cpp
     mitkOpenCVVideoSource.cpp
@@ -7,8 +7,8 @@ SET(CPP_FILES
     mitkImageToOpenCVImageFilter.cpp
 )
 
-IF(MITK_USE_videoInput)
-  SET(CPP_FILES ${CPP_FILES}
+if(MITK_USE_videoInput)
+  set(CPP_FILES ${CPP_FILES}
     mitkVideoInputSource.cpp
   )
-ENDIF(MITK_USE_videoInput)
+endif(MITK_USE_videoInput)

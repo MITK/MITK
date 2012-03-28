@@ -1,4 +1,4 @@
-PROJECT(org_mitk_gui_qt_diffusionimaging)
+project(org_mitk_gui_qt_diffusionimaging)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_EXPORT

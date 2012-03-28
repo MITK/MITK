@@ -1,4 +1,4 @@
-  SET(CPP_FILES
+  set(CPP_FILES
   mitkSpaceNavigatorAddOn.cpp
   mitkSpaceNavigatorDriver.cpp
   mitkSpaceNavigatorEvent.cpp

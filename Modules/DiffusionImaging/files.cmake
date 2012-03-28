@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
 
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
@@ -93,7 +93,7 @@ SET(CPP_FILES
  Tractography/itkStochasticTractographyFilter.h
 )
 
-SET(H_FILES
+set(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
@@ -156,10 +156,10 @@ SET(H_FILES
   Algorithms/itkResidualImageFilter.h
 )
 
-SET( TOOL_FILES
+set( TOOL_FILES
 )
 
-IF(WIN32)
-ENDIF(WIN32)
+if(WIN32)
+endif(WIN32)
 
 #MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp )

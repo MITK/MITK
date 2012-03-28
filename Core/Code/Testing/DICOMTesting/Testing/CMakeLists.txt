@@ -14,7 +14,7 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_DefectImage mitkDICOMTestingSanityTest 0 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
 #see bug 8108
-IF(NOT APPLE)
+if(NOT APPLE)
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
@@ -29,9 +29,9 @@ set(EXPECTED_DUMP expected.dump)
 file(GLOB_RECURSE allInputs ${CURRENT_DATASET_DIR}/${TESTS_DIR}/*/${INPUT_LISTNAME})
 
 function(expectFileExists filename)
-  if (NOT EXISTS ${filename})
+  if(NOT EXISTS ${filename})
     message(SEND_ERROR "Test case expected file ${filename} which does not exist! Please fix your CMake code or file layout.")
-  endif (NOT EXISTS ${filename})
+  endif(NOT EXISTS ${filename})
 endfunction(expectFileExists)
 
 foreach(input ${allInputs})
@@ -62,6 +62,6 @@ foreach(input ${allInputs})
   mitkFunctionAddTestLabel(${testname})
 
 endforeach(input allInputs)
-ENDIF()
+endif()
 
 

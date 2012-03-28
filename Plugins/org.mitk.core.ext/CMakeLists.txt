@@ -1,4 +1,4 @@
-PROJECT(org_mitk_core_ext)
+project(org_mitk_core_ext)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE MITKCOREEXT_EXPORT

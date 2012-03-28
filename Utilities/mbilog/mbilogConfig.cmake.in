@@ -1,7 +1,7 @@
 
-SET(mbilog_IS_ENABLED "1")
-SET(mbilog_INCLUDE_DIRS "@mbilog_INCLUDE_DIRS@")
-SET(mbilog_PROVIDES "mbilog")
-SET(mbilog_DEPENDS "")
-SET(mbilog_PACKAGE_DEPENDS "")
-SET(mbilog_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
+set(mbilog_IS_ENABLED "1")
+set(mbilog_INCLUDE_DIRS "@mbilog_INCLUDE_DIRS@")
+set(mbilog_PROVIDES "mbilog")
+set(mbilog_DEPENDS "")
+set(mbilog_PACKAGE_DEPENDS "")
+set(mbilog_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@")

@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   Algorithms/mitkImageToContourFilter.cpp
   Algorithms/mitkReduceContourSetFilter.cpp
   Algorithms/mitkComputeContourSetNormalsFilter.cpp
@@ -189,12 +189,12 @@ SET(CPP_FILES
   Rendering/vtkMitkOpenGLGPUVolumeRayCastMapperShaders.cpp
 )
 
-IF(WIN32 AND NOT MINGW)
-  SET(CPP_FILES
+if(WIN32 AND NOT MINGW)
+  set(CPP_FILES
     Controllers/mitkMovieGeneratorWin32.cpp
     ${CPP_FILES}
   )
-ENDIF(WIN32 AND NOT MINGW)
+endif(WIN32 AND NOT MINGW)
 
 
 

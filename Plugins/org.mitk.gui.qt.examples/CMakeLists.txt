@@ -1,4 +1,4 @@
-PROJECT(org_mitk_gui_qt_examples)
+project(org_mitk_gui_qt_examples)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
 	EXPORT_DIRECTIVE EXAMPLES_EXPORT

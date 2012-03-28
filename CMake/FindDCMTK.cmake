@@ -35,7 +35,7 @@
 #
 
 # prefer DCMTK_DIR over default system paths like /usr/lib
-SET(CMAKE_PREFIX_PATH ${DCMTK_DIR}/lib ${CMAKE_PREFIX_PATH}) # this is given to FIND_LIBRARY or FIND_PATH
+set(CMAKE_PREFIX_PATH ${DCMTK_DIR}/lib ${CMAKE_PREFIX_PATH}) # this is given to FIND_LIBRARY or FIND_PATH
 
 if(NOT DCMTK_FOUND AND NOT DCMTK_DIR)
   set(DCMTK_DIR

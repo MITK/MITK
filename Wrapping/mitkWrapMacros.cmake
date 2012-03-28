@@ -1,9 +1,9 @@
-MACRO(MITK_WRAP_OBJECT HEADERFILES CLASSNAME WRAPPERNAME DIRECTORY)
-FILE(WRITE ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#include "mitkCSwigMacros.h"\n")
-FOREACH(f ${HEADERFILES})
-	FILE(APPEND ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#include "${f}"\n")
-ENDFOREACH()
-FILE(APPEND ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#ifdef CABLE_CONFIGURATION
+macro(MITK_WRAP_OBJECT HEADERFILES CLASSNAME WRAPPERNAME DIRECTORY)
+file(WRITE ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#include "mitkCSwigMacros.h"\n")
+foreach(f ${HEADERFILES})
+	file(APPEND ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#include "${f}"\n")
+endforeach()
+file(APPEND ${DIRECTORY}/wrap_${CLASSNAME}.cxx "#ifdef CABLE_CONFIGURATION
 
 namespace _cable_
 {
@@ -15,4 +15,4 @@ namespace _cable_
 }
 
 #endif")
-ENDMACRO()
+endmacro()

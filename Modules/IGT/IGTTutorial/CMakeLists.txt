@@ -1,4 +1,4 @@
 MITK_USE_MODULE(MitkIGT)
 
-ADD_EXECUTABLE(IGTTutorialStep1 IGTTutorialStep1.cpp)
-TARGET_LINK_LIBRARIES(IGTTutorialStep1 ${ALL_LIBRARIES})
+add_executable(IGTTutorialStep1 IGTTutorialStep1.cpp)
+target_link_libraries(IGTTutorialStep1 ${ALL_LIBRARIES})

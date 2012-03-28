@@ -1,21 +1,21 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
 
 )
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   mitkDataStorageAccessRule.cpp
   mitkPluginActivator.cpp
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 )
 
-SET(CPP_FILES )
+set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

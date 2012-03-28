@@ -4,4 +4,4 @@ MITK_CREATE_MODULE(mitkCameraCalibration
 )
 
 # add testing dir
-ADD_SUBDIRECTORY(Testing)
+add_subdirectory(Testing)

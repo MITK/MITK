@@ -1,4 +1,4 @@
-PROJECT(org_mitk_gui_qt_coreapplication)
+project(org_mitk_gui_qt_coreapplication)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE MITK_QT_COREAPP

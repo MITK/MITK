@@ -3,4 +3,4 @@ MITK_CREATE_MODULE( PlanarFigure
   DEPENDS Mitk SceneSerializationBase
 )
 
-ADD_SUBDIRECTORY(Testing)
+add_subdirectory(Testing)

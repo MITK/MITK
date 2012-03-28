@@ -35,7 +35,7 @@ For instance a test for the mitkImageVtkMapper2D has to be added like this:
 
 files.cmake
 \code
-SET(MODULE_CUSTOM_TESTS
+set(MODULE_CUSTOM_TESTS
     ...
     mitkImageVtkMapper2D.cpp
 )

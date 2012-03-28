@@ -1,6 +1,6 @@
-IF (APPLE)
-  MESSAGE(STATUS "Module GPGPU is not ported to MacOS yet")
-ELSE(APPLE)
+if(APPLE)
+  message(STATUS "Module GPGPU is not ported to MacOS yet")
+else(APPLE)
 
 MITK_CREATE_MODULE(mitkGPGPU
 #  INCLUDE_DIRS .
@@ -10,5 +10,5 @@ MITK_CREATE_MODULE(mitkGPGPU
   QT_MODULE
 )
 
-ENDIF(APPLE)
+endif(APPLE)
 

@@ -1,7 +1,7 @@
-FIND_PACKAGE(OpenGL)
-IF(NOT OPENGL_FOUND)
-  MESSAGE("GL is required for MITK rendering")
-ENDIF(NOT OPENGL_FOUND )
+find_package(OpenGL)
+if(NOT OPENGL_FOUND)
+  message("GL is required for MITK rendering")
+endif(NOT OPENGL_FOUND )
 
 # Configure the C++ Micro Services Code for MITK
 find_package(ITK REQUIRED)
@@ -25,7 +25,7 @@ add_subdirectory(CppMicroServices)
 
 include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmake)
 
-SET(TOOL_CPPS "")
+set(TOOL_CPPS "")
 
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS 
@@ -44,22 +44,22 @@ MITK_CREATE_MODULE( Mitk
 # symbols from explicitly instantiated templates like
 # mitk::SurfaceVtkWriter<vtkSTLWriter> which is referenced in
 # QmitkCommonFunctionality in the QmitkExt library.
-IF(MINGW)
-  GET_TARGET_PROPERTY(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
-  IF(NOT _mitkCore_MINGW_linkflags)
-    SET(_mitkCore_MINGW_linkflags "")
-  ENDIF(NOT _mitkCore_MINGW_linkflags)
-  SET_TARGET_PROPERTIES(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
-ENDIF(MINGW)
+if(MINGW)
+  get_target_property(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
+  if(NOT _mitkCore_MINGW_linkflags)
+    set(_mitkCore_MINGW_linkflags "")
+  endif(NOT _mitkCore_MINGW_linkflags)
+  set_target_properties(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
+endif(MINGW)
 
 # replacing Mitk by Mitk [due to removing the PROVIDES macro
-TARGET_LINK_LIBRARIES(Mitk ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
-TARGET_LINK_LIBRARIES(Mitk ${OPENGL_LIBRARIES} )
-TARGET_LINK_LIBRARIES(Mitk gdcmCommon gdcmIOD gdcmDSED)
+target_link_libraries(Mitk ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
+target_link_libraries(Mitk ${OPENGL_LIBRARIES} )
+target_link_libraries(Mitk gdcmCommon gdcmIOD gdcmDSED)
 
-IF(MSVC_IDE OR MSVC_VERSION OR MINGW)
-  TARGET_LINK_LIBRARIES(Mitk psapi.lib)
-ENDIF(MSVC_IDE OR MSVC_VERSION OR MINGW)
+if(MSVC_IDE OR MSVC_VERSION OR MINGW)
+  target_link_libraries(Mitk psapi.lib)
+endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 
 # verify ITK has been built with GDCM >= 2.0.14
@@ -73,8 +73,8 @@ endif(GDCM_FULL_VERSION VERSION_LESS MITK_REQUIRED_GDCM_VERSION)
 
 
 # build tests?
-OPTION(BUILD_TESTING "Build the MITK Core tests." ON)
-IF(BUILD_TESTING)
-ENABLE_TESTING()
-ADD_SUBDIRECTORY(Testing)
-ENDIF(BUILD_TESTING)
+option(BUILD_TESTING "Build the MITK Core tests." ON)
+if(BUILD_TESTING)
+enable_testing()
+add_subdirectory(Testing)
+endif(BUILD_TESTING)

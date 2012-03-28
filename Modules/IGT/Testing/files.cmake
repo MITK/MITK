@@ -1,4 +1,4 @@
-SET(MODULE_TESTS
+set(MODULE_TESTS
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
@@ -42,7 +42,7 @@ SET(MODULE_TESTS
    # -----------------------------------------------------------------------
 )
 
-SET(MODULE_CUSTOM_TESTS
+set(MODULE_CUSTOM_TESTS
   mitkNDIAuroraHardwareTest.cpp
   mitkNDIPolarisHardwareTest.cpp
   mitkClaronTrackingDeviceHardwareTest.cpp

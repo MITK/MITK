@@ -3,8 +3,8 @@ MITK_CREATE_MODULE( ImageExtraction
                DEPENDS_INTERNAL pic2vtk
 )
 
-IF(BUILD_TESTING)
+if(BUILD_TESTING)
 
-  ADD_SUBDIRECTORY(Testing)
+  add_subdirectory(Testing)
 
-ENDIF(BUILD_TESTING)
+endif(BUILD_TESTING)

@@ -1,4 +1,4 @@
-PROJECT(org_blueberry_osgi)
+project(org_blueberry_osgi)
 
 MACRO_CREATE_CTK_PLUGIN(
   EXPORT_DIRECTIVE BERRY_OSGI
@@ -6,32 +6,32 @@ MACRO_CREATE_CTK_PLUGIN(
   )
 
 
-ADD_EXECUTABLE(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")
+add_executable(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")
 
-TARGET_LINK_LIBRARIES(${OSGI_APP} ${PROJECT_NAME} mbilog)
-IF (_ctk_test_plugins)
-  ADD_DEPENDENCIES(${OSGI_APP} ${_ctk_test_plugins})
-  ADD_DEPENDENCIES(BlueBerry ${OSGI_APP})
-  SET_PROPERTY(TARGET ${OSGI_APP} APPEND PROPERTY LABELS BlueBerry)
-ENDIF()
+target_link_libraries(${OSGI_APP} ${PROJECT_NAME} mbilog)
+if(_ctk_test_plugins)
+  add_dependencies(${OSGI_APP} ${_ctk_test_plugins})
+  add_dependencies(BlueBerry ${OSGI_APP})
+  set_property(TARGET ${OSGI_APP} APPEND PROPERTY LABELS BlueBerry)
+endif()
 
-CONFIGURE_FILE(src/application/solstice.ini
+configure_file(src/application/solstice.ini
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.ini)
 
 
-ADD_EXECUTABLE(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
+add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
 
-TARGET_LINK_LIBRARIES(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
-IF (_ctk_test_plugins)
-  ADD_DEPENDENCIES(${OSGI_UI_APP} ${_ctk_test_plugins})
-  ADD_DEPENDENCIES(BlueBerry ${OSGI_UI_APP})
-  SET_PROPERTY(TARGET ${OSGI_UI_APP} APPEND PROPERTY LABELS BlueBerry)
-ENDIF()
+target_link_libraries(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
+if(_ctk_test_plugins)
+  add_dependencies(${OSGI_UI_APP} ${_ctk_test_plugins})
+  add_dependencies(BlueBerry ${OSGI_UI_APP})
+  set_property(TARGET ${OSGI_UI_APP} APPEND PROPERTY LABELS BlueBerry)
+endif()
 
-CONFIGURE_FILE(src/application/solstice.ini
+configure_file(src/application/solstice.ini
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.ini)
 
-SET(BLUEBERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
+set(BLUEBERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
 
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/src/berryConfig.h.in" "${CMAKE_CURRENT_BINARY_DIR}/berryConfig.h" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/berryConfig.h.in" "${CMAKE_CURRENT_BINARY_DIR}/berryConfig.h" @ONLY)
 

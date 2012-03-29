@@ -407,6 +407,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
 		Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
 
+		originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
+
 		//the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
 		Point3D sliceOrigin = originalGeometry->GetOrigin();
 
@@ -415,13 +417,34 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
 		//a worldGeometry is no imageGeometry, thus it is manually set to true
 		originalGeometry->ImageGeometryOn();
+		
+
+		
+
+		/*At this point we have to adjust the geometry because the origin isn't correct.
+		The wrong origin is related to the rotation of the current world geometry plane.
+		This causes errors on transfering world to index coordinates. We just shift the
+		origin in each direction about the amount of the expanding (needed while rotating 
+		the plane).
+		*/
+		Vector3D axis0 = originalGeometry->GetAxisVector(0);
+		Vector3D axis1 = originalGeometry->GetAxisVector(1);
+		axis0.Normalize();
+		axis1.Normalize();
+
+		
+
+		//adapt the origin. Note that for orthogonal planes the minima are '0' and thus the origin stays the same.
+		sliceOrigin += (axis0 * (xMin * m_OutPutSpacing[0])) + (axis1 * (yMin * m_OutPutSpacing[1]));
+
 		originalGeometry->SetOrigin(sliceOrigin);
+
+		originalGeometry->Modified();
 
 
 		resultImage->SetGeometry( originalGeometry );
 
-		//resultImage->GetGeometry()->TransferItkToVtkTransform();
-		resultImage->GetGeometry()->Modified();
+		
 
 		/*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
 	}

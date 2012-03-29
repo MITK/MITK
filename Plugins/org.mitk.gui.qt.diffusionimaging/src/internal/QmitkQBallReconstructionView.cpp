@@ -57,6 +57,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <boost/version.hpp>
 
+
 const std::string QmitkQBallReconstructionView::VIEW_ID =
         "org.mitk.views.qballreconstruction";
 
@@ -361,23 +362,28 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
                 if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
                 {
                     mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-                    std::vector<float> * bValues = new std::vector<float>();
-                    std::vector<float>::iterator it;
+
+                    typedef itk::DiffusionMultiShellQballReconstructionImageFilter<DiffusionPixelType,DiffusionPixelType,TTensorPixelType,0,QBALL_ODFSIZE>::GradientIndexMap GradientIndexMap;
+
+                    GradientIndexMap * bValueMap = new GradientIndexMap();
+                    GradientIndexMap::iterator it;
                     if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
                     {
                         mitk::DiffusionImage<DiffusionPixelType>* vols = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData());
-                        vols->GetBvalueList(bValues);
+                        vols->GetBvalueList(bValueMap);
 
                         QString str = QString((dynamic_cast<mitk::StringProperty *>(node->GetPropertyList()->GetProperty("name")))->GetValue());
                         QLabel *label = new QLabel("Image: " + str );
 
                         layout->addWidget(label);
 
-                        for(it =  bValues->begin(); it != bValues->end(); it ++){
+                        for(it = bValueMap->begin(); it != bValueMap->end(); it ++){
+                            if(it->first == 0) continue;
                             QString checkboxName ;
-                            checkboxName.setNum(*it);
+                            checkboxName.setNum(it->first);
 
                             QCheckBox *bValueCheckBox = new QCheckBox(  "B-Value " + checkboxName );
+                            bValueCheckBox->setChecked(true);
                             layout->addWidget(bValueCheckBox);
                         }
 

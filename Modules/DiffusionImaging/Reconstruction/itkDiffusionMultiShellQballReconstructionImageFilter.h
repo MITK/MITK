@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vnl/algo/vnl_svd.h"
 #include "itkVectorContainer.h"
 #include "itkVectorImage.h"
+#include <iomanip>
+
 
 
 namespace itk{
@@ -65,6 +67,10 @@ public:
     /** Container to hold gradient directions of the 'n' DW measurements */
     typedef VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
+    typedef std::map<double, std::vector<unsigned int> > GradientIndexMap;
+    typedef std::map<double, std::vector<unsigned int> >::iterator GradientIndexMapIteraotr;
+    typedef std::vector<unsigned int> IndiciesVector;
+
     // --------------------------------------------------------------------------------------------//
 
     /** Method for creation through the object factory. */
@@ -80,6 +86,10 @@ public:
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
     void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image);
+    void SetGradientIndexMap(const GradientIndexMap * gradientIdexMap)
+    {
+        m_GradientIndexMap = gradientIdexMap;
+    }
 
     /** Get reference image */
     virtual ReferenceImageType * GetReferenceImage()
@@ -130,6 +140,8 @@ protected:
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
+
+
 private:
 
     OdfReconstructionMatrixType m_ReconstructionMatrix;
@@ -153,6 +165,8 @@ private:
 
     typename BZeroImageType::Pointer m_BZeroImage;
 
+    GradientIndexMap * m_GradientIndexMap;
+
     double m_Lambda;
 
     bool m_IsHemisphericalArrangementOfGradientDirections;
@@ -161,6 +175,12 @@ private:
 
     template< class VNLType >
     void printMatrix( VNLType * mat );
+
+    enum GradientDirections
+    {
+        BZero = 0,
+        AllGradients = -1
+    };
 
 };
 

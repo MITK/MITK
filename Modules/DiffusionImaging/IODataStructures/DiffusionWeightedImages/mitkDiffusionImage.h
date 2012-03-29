@@ -125,39 +125,22 @@ public:
     std::vector<int> GetB0Indices();
     bool IsMultiBval();
 
-    void GetBvalueList(std::vector<float> * bValVec)
+    void GetBvalueList(std::map<double, std::vector<unsigned int> > * bValMap)
     {
-        if(bValVec != 0){
-            if(IsMultiBval())
+        if(bValMap != 0){
+            GradientDirectionContainerType::ConstIterator gdcit;
+            for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
             {
-                std::map<double, int> valueMap;
-                std::map<double, int>::iterator it;
-                int gradients = m_OriginalDirections->Size();
-                for (int i=0; i<gradients; i++)
-                {
-                    float currentBvalue = std::floor(GetB_Value(i));
-
-                    float rounded = int((currentBvalue+10)/100)*100;
-
-                    if((valueMap.find( rounded )) == valueMap.end() )
-                    {
-                        valueMap[rounded] = 1;
-                    }else{
-                        valueMap[rounded] += 1;
-                    }
-                }
-
-                for(it = valueMap.begin(); it != valueMap.end(); it ++)
-                {
-                    bValVec->push_back((*it).first);
-                    MITK_INFO  << "BValue : "<< std::setprecision(10)  << (*it).first << " Count : " << (*it).second;
-                }
-
-            }else{
-                bValVec->push_back(GetB_Value());
+                float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
+                double rounded = int((currentBvalue+7.5)/10)*10;
+                (*bValMap)[rounded].push_back(gdcit.Index());
             }
+        }else
+        {
+            MITK_ERROR << "Call method with 0 parameter";
         }
     }
+
 
 protected:
     DiffusionImage();

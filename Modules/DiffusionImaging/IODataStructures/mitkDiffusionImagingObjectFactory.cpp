@@ -64,7 +64,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarCircleMapper3D.h"
 #include "mitkPlanarPolygonMapper3D.h"
 
-
+#include "mitkConnectomicsNetwork.h"
+#include "mitkConnectomicsNetworkIOFactory.h"
+#include "mitkConnectomicsNetworkWriter.h"
+#include "mitkConnectomicsNetworkWriterFactory.h"
+#include "mitkConnectomicsNetworkMapper3D.h"
 
 typedef short DiffusionPixelType;
 typedef char TbssRoiPixelType;
@@ -92,6 +96,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
+	mitk::ConnectomicsNetworkIOFactory::RegisterOneFactory();
 
 
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
@@ -100,6 +105,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
+	mitk::ConnectomicsNetworkWriterFactory::RegisterOneFactory();
 
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
@@ -108,6 +114,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
+	m_FileWriters.push_back( mitk::ConnectomicsNetworkWriter::New().GetPointer() );
 
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
@@ -230,6 +237,13 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::PlanarPolygonMapper3D::New();
       newMapper->SetDataNode(node);
     }
+	
+	classname = "ConnectomicsNetwork";
+    if (node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0) 
+	{
+      newMapper = mitk::ConnectomicsNetworkMapper3D::New();
+      newMapper->SetDataNode(node);
+	}
 
   }
 
@@ -297,6 +311,12 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   {
     mitk::PlanarPolygonMapper3D::SetDefaultProperties(node);
   }
+  
+  classname = "ConnectomicsNetwork";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(node);
+  }
 
 
 }
@@ -341,6 +361,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnf", "Connectomics Network File"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
@@ -356,6 +377,7 @@ void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnf", "Connectomics Network File"));
 }
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()

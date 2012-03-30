@@ -28,6 +28,8 @@ set(INTERNAL_CPP_FILES
   QmitkTbssTableModel.cpp
   QmitkTbssMetaTableModel.cpp
   QmitkTbssSkeletonizationView.cpp
+  Connectomics/QmitkBrainNetworkAnalysisView.cpp
+  Connectomics/QmitkNetworkHistogramCanvas.cpp
 )
 
 set(UI_FILES
@@ -46,6 +48,7 @@ set(UI_FILES
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
   src/internal/QmitkTbssSkeletonizationViewControls.ui
+  src/internal/Connectomics/QmitkBrainNetworkAnalysisViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -72,6 +75,8 @@ set(MOC_H_FILES
   src/QmitkTbssRoiAnalysisWidget.h
   src/QmitkResidualAnalysisWidget.h
   src/QmitkResidualViewWidget.h
+  src/internal/Connectomics/QmitkBrainNetworkAnalysisView.h
+  src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -94,6 +99,7 @@ set(CACHED_RESOURCE_FILES
   resources/IVIM_48.png
   resources/stochFB.png
   resources/tbss.png
+  resources/QmitkBrainNetworkAnalysisViewIcon_48.png
 )
 
 set(QRC_FILES

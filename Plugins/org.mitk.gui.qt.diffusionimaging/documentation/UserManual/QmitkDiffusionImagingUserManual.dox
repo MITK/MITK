@@ -119,5 +119,6 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage screenshot_maker
   \li \subpage org_stochastictracking
   \li \subpage org_ivim
+  \li \subpage org_brainnetworkanalysis
 
 */

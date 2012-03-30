@@ -47,11 +47,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
 :QWidget(parent, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
 :QWidget(parent,f),
 #endif
 
@@ -60,11 +60,12 @@ m_CrosshairMenu(NULL),
 m_Layout(0),
 m_LayoutDesign(0),
 m_OldLayoutDesign(0),
-m_FullScreenMode(false)
+m_FullScreenMode(false),
+m_Entered(false),
+m_Hidden(true),
+m_Renderer(b),
+m_MultiWidget(mw)
 {
-  m_Renderer = b;
-  m_Entered = false;
-  m_Hidden = true;
 
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
 
@@ -773,13 +774,12 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
 {
   if(m_Renderer.IsNotNull())  
   {
-    mitk::DataStorage *ds=m_Renderer->GetDataStorage();
     mitk::DataNode *n;
-    if(ds)
+    if(this->m_MultiWidget)
     {
-      n = ds->GetNamedNode("widget1Plane"); if(n) n->SetVisibility(state);
-      n = ds->GetNamedNode("widget2Plane"); if(n) n->SetVisibility(state);
-      n = ds->GetNamedNode("widget3Plane"); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetVisibility(state);
       m_Renderer->GetRenderingManager()->RequestUpdateAll();
     }
   }

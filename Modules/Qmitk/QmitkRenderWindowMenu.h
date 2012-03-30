@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QmitkExports.h>
+#include "QmitkStdMultiWidget.h"
 #include "mitkBaseRenderer.h"
 
 #include <QWidget>
@@ -32,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QAction>
 #include <QLabel>
 #include <QTimer>
+
+
 
 /**
 * \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow. 
@@ -53,7 +56,7 @@ class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
 
 public:
 
-  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0, mitk::BaseRenderer * b = 0 );
+  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0, mitk::BaseRenderer * b = 0, QmitkStdMultiWidget* mw = 0 );
   virtual ~QmitkRenderWindowMenu();
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes 
@@ -311,6 +314,8 @@ protected:
   private:
   
   mitk::BaseRenderer::Pointer m_Renderer;
+
+  QmitkStdMultiWidget* m_MultiWidget;
 
   ///
   /// a timer for the auto rotate action

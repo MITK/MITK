@@ -217,30 +217,30 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
   QTimer::singleShot(0, this ,SIGNAL( moved() ) );
 }
 
-void QmitkRenderWindow::ActivateMenuWidget( bool state )
-{  
-  m_MenuWidgetActivated = state; 
-  
+void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget )
+{
+  m_MenuWidgetActivated = state;
+
   if(!m_MenuWidgetActivated && m_MenuWidget)
   {
     //disconnect Signal/Slot Connection
     disconnect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
     disconnect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
-    disconnect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );    
-    
+    disconnect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );
+
     delete m_MenuWidget;
     m_MenuWidget = 0;
   }
   else if(m_MenuWidgetActivated && !m_MenuWidget )
   {
     //create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
+    m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer,stdMultiWidget);
     m_MenuWidget->SetLayoutIndex( m_LayoutIndex );
-    
+
     //create Signal/Slot Connection
     connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
     connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
-    connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );    
+    connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );
   }
 }
 

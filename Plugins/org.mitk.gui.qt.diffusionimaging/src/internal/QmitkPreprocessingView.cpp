@@ -357,7 +357,16 @@ void QmitkPreprocessingView::ExtractB0()
       }
     }
 
-    DoExtractB0(set);
+    // call the extraction withou averaging if the check-box is checked
+    if( this->m_Controls->m_CheckExtractAll->isChecked() )
+    {
+      DoExtractBOWithoutAveraging(set);
+    }
+    // call the avereging method otherwise
+    else
+    {
+      DoExtractB0(set);
+    }
 
   }
 }
@@ -404,6 +413,12 @@ void QmitkPreprocessingView::DoExtractB0
     ++itemiter;
   }
 
+
+}
+
+void QmitkPreprocessingView::DoExtractBOWithoutAveraging(
+    mitk::DataStorage::SetOfObjects::Pointer inputImageSet )
+{
 
 }
 

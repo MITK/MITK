@@ -83,11 +83,10 @@ protected slots:
   void AverageGradients();
   void DoAverageGradients(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
+  /** Slot for catching a clicked-signal on the 'Extract BO Image' button */
   void ExtractB0();
-  void DoExtractB0(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   void BrainMask();
-  void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();
@@ -95,6 +94,13 @@ protected slots:
   void DoHalfSphereGradientDirections();
 
 protected:
+  /** Called by ExtractB0 in default case, inserts an averaged b0 image into the data storage */
+  void DoExtractB0(mitk::DataStorage::SetOfObjects::Pointer inImages);
+
+  /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
+  void DoExtractBOWithoutAveraging(mitk::DataStorage::SetOfObjects::Pointer);
+
+  void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
 

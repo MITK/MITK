@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 // itk includes
 #include "itkTimeProbe.h"
 #include "itkB0ImageExtractionImageFilter.h"
+#include "itkB0ImageExtractionToSeparateImageFilter.h"
 #include "itkBrainMaskExtractionImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkVectorContainer.h"
@@ -419,6 +420,47 @@ void QmitkPreprocessingView::DoExtractB0
 void QmitkPreprocessingView::DoExtractBOWithoutAveraging(
     mitk::DataStorage::SetOfObjects::Pointer inputImageSet )
 {
+  // typedefs
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
+  typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
+
+  // check number of selected objects, return if empty
+  int nrFiles = inputImageSet->size();
+  if (!nrFiles)
+    return;
+
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inputImageSet->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inputImageSet->end() );
+
+  std::vector< mitk::DataNode::Pointer > nodes;
+
+  while ( itemiter != itemiterend ) // for all items
+  {
+    DiffusionImageType* vols =
+      static_cast<DiffusionImageType*>(
+      (*itemiter)->GetData());
+
+    std::string nodename;
+    (*itemiter)->GetStringProperty("name", nodename);
+
+    // Extract image using found index
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput(vols->GetVectorImage());
+    filter->SetDirections(vols->GetDirections());
+    filter->Update();
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage->InitializeByItk( filter->GetOutput() );
+    mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    node->SetData( mitkImage );
+    node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
+
+    GetDefaultDataStorage()->Add(node);
+
+    ++itemiter;
+  }
 
 }
 

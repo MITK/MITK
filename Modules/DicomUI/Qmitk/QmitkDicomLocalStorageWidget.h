@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFutureWatcher>
 #include <QTimer>
 
+#include <mitkStatusBar.h>
+#include <mitkProgressBar.h>
 /*!
 \brief QmitkDicomLocalStorageWidget 
 

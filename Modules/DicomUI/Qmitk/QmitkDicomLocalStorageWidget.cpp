@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QModelIndex>
 #include <QMap>
 #include <QVariant>
-#include <mitkStatusBar.h>
-#include <mitkProgressBar.h>
 //#include "QmitkDicomDataEventPublisher.h"
 
 

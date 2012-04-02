@@ -23,10 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryQtEditorPart.h>
 #include <berryIPartListener.h>
 
-//#include <mitkIDataStorageReference.h>
-//#include <mitkIDataStorageService.h>
-//#include <mitkDataStorageEditorInput.h>
-
 #include "ui_QmitkDicomEditorControls.h"
 #include "QmitkDicomDirectoryListener.h"
 #include "QmitkStoreSCPLauncher.h"
@@ -41,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QThread.h>
 #include <QProcess>
 #include <QstringList>
-
+#include <org_mitk_gui_qt_dicom_Export.h>
 /*!
 \brief QmitkDicomEditor
 
@@ -50,7 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
-class QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
+class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
     // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)

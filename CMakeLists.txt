@@ -358,6 +358,9 @@ if(APPLE)
   if(MITK_BUILD_org.mitk.gui.qt.application)
     set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
   endif()
+  if(MITK_BUILD_org.mitk.gui.qt.diffusionimagingapp)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} mitkDiffusion)
+  endif()
 endif(APPLE)
 
 #-----------------------------------------------------------------------------
@@ -724,6 +727,12 @@ if(MITK_BUILD_org.mitk.gui.qt.application)
 endif()
 if(MITK_BUILD_org.mitk.gui.qt.extapplication)
   list(APPEND CPACK_CREATE_DESKTOP_LINKS "ExtApp")
+endif()
+
+if(MITK_BUILD_org.mitk.gui.qt.diffusionimagingapp)
+  include(CMake/CPackOptionsDiffusion.cmake)
+  configure_file(${PROJECT_SOURCE_DIR}/CMake/CPackDiffusionConfig.cmake.in ${PROJECT_BINARY_DIR}/CPackDiffusionConfig.cmake @ONLY)
+  set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackDiffusionConfig.cmake")
 endif()
 
 

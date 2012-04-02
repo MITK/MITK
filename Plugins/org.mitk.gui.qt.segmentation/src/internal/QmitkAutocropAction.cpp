@@ -43,7 +43,24 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
 
         if (image.IsNotNull())
         {
-          node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
+
+          if (image->GetDimension() == 4)
+          {
+            unsigned int timesteps = image->GetDimension(3);
+            for (unsigned int i = 0; i < timesteps; i++)
+            {
+              mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+              imageTimeSelector->SetInput(image);
+              imageTimeSelector->SetTimeNr(i);
+              imageTimeSelector->UpdateLargestPossibleRegion();
+              image->SetVolume( this->IncreaseCroppedImageSize(imageTimeSelector->GetOutput())->GetData(), i);
+            }
+            node->SetData( image ); // bug fix 3145
+          }
+          else
+          {
+            node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
+          }
           // Reinit node
           mitk::RenderingManager::GetInstance()->InitializeViews(
             node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
@@ -68,6 +85,7 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
 {
   typedef itk::Image< short, 3 > ImageType;
   typedef itk::Image< unsigned char, 3 > PADOutputImageType;
+
   ImageType::Pointer itkTransformImage = ImageType::New();
   mitk::CastToItkImage( image, itkTransformImage );
 

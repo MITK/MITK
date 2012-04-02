@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDicomEditor.h"
 
 #include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
 #include <berryPlatform.h>
 
 #include <QLabel>
@@ -44,9 +45,10 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
   berry::IPreferencesService::Pointer prefService= 
-      berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+      berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);    
 
-  m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID);
+  m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID).Cast<berry::IBerryPreferences>();;
+  assert( m_DicomPreferencesNode );
 
   m_MainControl = new QWidget(parent); 
   m_EnableSingleEditing = new QCheckBox;

@@ -271,9 +271,10 @@ namespace itk {
 
         this->ComputeReconstructionMatrix();
 
-        m_BZeroImage = BZeroImageType::New();
         typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >(
           this->ProcessObject::GetInput(0) );
+
+        m_BZeroImage = BZeroImageType::New();
         m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
         m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
         m_BZeroImage->SetDirection( img->GetDirection() );  // Set the image direction
@@ -288,6 +289,14 @@ namespace itk {
         m_ODFSumImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
         m_ODFSumImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
         m_ODFSumImage->Allocate();
+
+        m_CoefficientImage = CoefficientImageType::New();
+        m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+        m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+        m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
+        m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+        m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+        m_CoefficientImage->Allocate();
 
         if(m_NormalizationMethod == QBAR_SOLID_ANGLE ||
           m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
@@ -311,8 +320,11 @@ namespace itk {
         ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);
         oit2.GoToBegin();
 
-        ImageRegionIterator< BlaImage > oit3(m_ODFSumImage, outputRegionForThread);
+        ImageRegionIterator< FloatImageType > oit3(m_ODFSumImage, outputRegionForThread);
         oit3.GoToBegin();
+
+        ImageRegionIterator< CoefficientImageType > oit4(m_CoefficientImage, outputRegionForThread);
+        oit4.GoToBegin();
 
         typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
         typedef typename GradientImagesType::PixelType         GradientVectorType;
@@ -366,6 +378,7 @@ namespace itk {
           b0 /= this->m_NumberOfBaselineImages;
 
           OdfPixelType odf(0.0);
+          typename CoefficientImageType::PixelType coeffPixel(0.0);
           vnl_vector<TO> B(m_NumberOfGradientDirections);
 
           if( (b0 != 0) && (b0 >= m_Threshold) )
@@ -382,6 +395,7 @@ namespace itk {
               coeffs = ( (*m_CoeffReconstructionMatrix) * B );
               coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
               odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
+              coeffPixel = coeffs.data_block();
             }
             else if(m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
             {
@@ -404,17 +418,17 @@ namespace itk {
           }
 
           oit.Set( odf );
-          ++oit;
           oit2.Set( b0 );
           float sum = 0;
           for (int k=0; k<odf.Size(); k++)
             sum += (float) odf[k];
           oit3.Set( sum-1 );
-          ++oit3;
-          ++oit2;
-          ++git; // Gradient  image iterator
-
-
+          oit4.Set(coeffPixel);
+          ++oit;  // odf image iterator
+          ++oit3; // odf sum image iterator
+          ++oit2; // b0 image iterator
+          ++oit4; // coefficient image iterator
+          ++git;  // Gradient  image iterator
         }
 
         std::cout << "One Thread finished reconstruction" << std::endl;

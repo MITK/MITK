@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtPlugin>
 
 #include "QmitkDicomEditor.h"
+#include "QmitkDicomPreferencePage.h"
 
 namespace mitk {
 
@@ -29,6 +30,7 @@ ctkPluginContext* PluginActivator::pluginContext = 0;
 void PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomEditor, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomPreferencePage, context)
   pluginContext = context;
 }
 

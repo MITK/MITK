@@ -18,4 +18,5 @@ option(MITK_BUILD_APP_mitkDiffusion "Build MITK Diffusion executable" OFF)
 set(MITK_APPS
   CoreApp^^MITK_BUILD_APP_CoreApp
   ExtApp^^MITK_BUILD_APP_ExtApp
+  mitkDiffusion^^MITK_BUILD_APP_mitkDiffusion
 )

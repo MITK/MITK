@@ -34,6 +34,54 @@ template< class TInputImagePixelType,
   TInputImagePixelType, TOutputImagePixelType >::GenerateData()
   {
 
+    typename GradientDirectionContainerType::Iterator begin = m_Directions->Begin();
+    typename GradientDirectionContainerType::Iterator end = m_Directions->End();
+
+    // Find the index of the b0 image
+    std::vector<int> indices;
+    int index = 0;
+    while(begin!=end)
+    {
+      GradientDirectionType grad = begin->Value();
+
+      if(grad[0] == 0 && grad[1] == 0 && grad[2] == 0)
+      {
+        indices.push_back(index);
+      }
+      ++index;
+      ++begin;
+    }
+
+    typedef itk::Image<float, 4> TempImageType;
+    TempImageType::Pointer tmp = TempImageType::New();
+    typename TempImageType::RegionType region = this->GetInput()->GetLargestPossibleRegion();
+
+    // allocate image with
+    //  - dimension: [DimX, DimY, DimZ, NumOfb0 ]
+    //  - spacing: old one, 1.0 time
+
+    TempImageType::SpacingType spacing;
+    spacing.Fill(1);
+
+    TempImageType::OriginType origin;
+    origin.Fill(0);
+
+    for (unsigned int i=0; i< 3; i++)
+    {
+      spacing[i] = (this->GetInput()->GetSpacing())[i];
+      origin[i] = (this->GetInput()->GetOrigin())[i];
+    }
+
+    // extract b0 and insert them as a new time step
+    //Sum all images that have zero diffusion weighting (indices stored in vector index)
+    for(std::vector<int>::iterator indexIt = indices.begin();
+      indexIt != indices.end();
+      indexIt++)
+    {
+
+    }
+
+
   }
 
 #endif // ifndef __itkB0ImageExtractionToSeparateImageFilter_txx

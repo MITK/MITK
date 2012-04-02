@@ -16,6 +16,8 @@ include_directories(${ALL_INCLUDE_DIRECTORIES})
 set(DIFFUSIONIMAGINGAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DIFFUSIONAPP_NAME}.provisioning" CACHE INTERNAL "${DIFFUSIONAPP_NAME} provisioning file" FORCE)
 
 set(_plugins
+  org.blueberry.compat
+  org.blueberry.ui.qt.help
   org.mitk.diffusionimaging
   org.mitk.gui.qt.diffusionimagingapp
   org.mitk.gui.qt.common.legacy
@@ -50,3 +52,8 @@ FunctionCreateBlueBerryApplication(
   LINK_LIBRARIES ${ALL_LIBRARIES}
   ${_app_options}
 )
+
+# Add a build time dependency to legacy BlueBerry bundles.
+if(MITK_MODULES_ENABLED_PLUGINS)
+  add_dependencies(ExtApp ${MITK_MODULES_ENABLED_PLUGINS})
+endif()

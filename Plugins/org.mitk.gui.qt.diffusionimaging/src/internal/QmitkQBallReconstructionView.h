@@ -75,6 +75,8 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
 
   static const int nrconvkernels;
 
+
+
 protected slots:
 
   void ReconstructStandard();
@@ -114,6 +116,8 @@ protected:
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+
+   std::map<double , std::vector< unsigned int > > * m_GradientIndexMap;
 
 };
 

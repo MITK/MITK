@@ -365,19 +365,19 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 
                     typedef itk::DiffusionMultiShellQballReconstructionImageFilter<DiffusionPixelType,DiffusionPixelType,TTensorPixelType,0,QBALL_ODFSIZE>::GradientIndexMap GradientIndexMap;
 
-                    GradientIndexMap * bValueMap = new GradientIndexMap();
+                    m_GradientIndexMap = new GradientIndexMap();
                     GradientIndexMap::iterator it;
                     if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
                     {
                         mitk::DiffusionImage<DiffusionPixelType>* vols = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData());
-                        vols->GetBvalueList(bValueMap);
+                        vols->GetBvalueList(m_GradientIndexMap);
 
                         QString str = QString((dynamic_cast<mitk::StringProperty *>(node->GetPropertyList()->GetProperty("name")))->GetValue());
                         QLabel *label = new QLabel("Image: " + str );
 
                         layout->addWidget(label);
 
-                        for(it = bValueMap->begin(); it != bValueMap->end(); it ++){
+                        for(it = m_GradientIndexMap->begin(); it != m_GradientIndexMap->end(); it ++){
                             if(it->first == 0) continue;
                             QString checkboxName ;
                             checkboxName.setNum(it->first);
@@ -969,6 +969,11 @@ void QmitkQBallReconstructionView::TemplatedMultiShellQBallReconstruction(mitk::
     filter->SetBValue(vols->GetB_Value());
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
     filter->SetLambda(lambda);
+    //filter->SetGradientIndexMap(m_GradientIndexMap);
+
+    for(std::map<double , std::vector< unsigned int > >::iterator it = m_GradientIndexMap->begin() ; it != m_GradientIndexMap->end(); it++)
+        MITK_INFO << (*it).first << " Count " << (*it).second.size();
+
 
     filter->Update();
 

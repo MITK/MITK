@@ -61,7 +61,7 @@ public:
     typedef VectorImage< GradientPixelType, 3 >       GradientImagesType;
     /** Holds the ODF reconstruction matrix */
     typedef vnl_matrix< TOdfPixelType >*              OdfReconstructionMatrixType;
-    typedef vnl_matrix< double >                      CoefficientMatrixType;
+    typedef vnl_matrix< double > *                    CoefficientMatrixType;
     /** Holds each magnetic field gradient used to acquire one DWImage */
     typedef vnl_vector_fixed< double, 3 >             GradientDirectionType;
     /** Container to hold gradient directions of the 'n' DW measurements */
@@ -86,7 +86,7 @@ public:
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
     void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image);
-    void SetGradientIndexMap(const GradientIndexMap * gradientIdexMap)
+    void SetGradientIndexMap(GradientIndexMap * gradientIdexMap)
     {
         m_GradientIndexMap = gradientIdexMap;
     }
@@ -98,7 +98,7 @@ public:
     /** Return the gradient direction. idx is 0 based */
     virtual GradientDirectionType GetGradientDirection( unsigned int idx) const
     {
-        if( idx >= m_NumberOfGradientDirections )
+        if( idx >= m_GradientDirectionContainer->Size() )
         {
             itkExceptionMacro( << "Gradient direction " << idx << "does not exist" );
         }
@@ -131,7 +131,7 @@ protected:
     ~DiffusionMultiShellQballReconstructionImageFilter() {};
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void ComputeReconstructionMatrix();
+    void ComputeReconstructionMatrix(std::vector< unsigned int > gradientIndiciesVector);
     bool CheckDuplicateDiffusionGradients();
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
     void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
@@ -140,13 +140,26 @@ protected:
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
-
+    vnl_vector<TOdfPixelType> AnalyticalThreeShellParameterEstimation(const IndiciesVector * shell1, const IndiciesVector * shell2, const IndiciesVector * shell3, vnl_vector<TOdfPixelType> b);
+    void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
 
 private:
+
+    enum ReconstructionType
+    {
+        Analytical3Shells,
+        NumericalNShells,
+        Standard1Shell
+    };
 
     OdfReconstructionMatrixType m_ReconstructionMatrix;
     OdfReconstructionMatrixType m_CoeffReconstructionMatrix;
     OdfReconstructionMatrixType m_SphericalHarmonicBasisMatrix;
+
+
+    CoefficientMatrixType m_SignalInterpolationReonstructionMatrix;
+
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
@@ -171,16 +184,18 @@ private:
 
     bool m_IsHemisphericalArrangementOfGradientDirections;
 
+    bool m_IsArithmeticProgession;
+
     int m_NumberCoefficients;
+
+    ReconstructionType m_ReconstructionType;
+
+
 
     template< class VNLType >
     void printMatrix( VNLType * mat );
 
-    enum GradientDirections
-    {
-        BZero = 0,
-        AllGradients = -1
-    };
+
 
 };
 

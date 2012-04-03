@@ -10,6 +10,6 @@ If you want to start using MITK, you also want to see \ref Development
 \li \subpage OverviewPage
 \li \subpage MicroServices_Overview
 \li \subpage PropertiesPage
-\li \subpage Rendering
+\li \subpage QVTKRendering
 \li \subpage RenderingTests
 */

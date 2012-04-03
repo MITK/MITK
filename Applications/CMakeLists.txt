@@ -19,5 +19,9 @@ if(MITK_USE_QT AND QT4_FOUND)
   if(MITK_BUILD_TUTORIAL)
     add_subdirectory(Tutorial)
   endif()
+  
+  if(MITK_BUILD_APP_mitkDiffusion OR MITK_BUILD_ALL_APPS)
+    add_subdirectory(mitkDiffusion)
+  endif()
 
 endif()

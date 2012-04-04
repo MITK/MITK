@@ -1,5 +1,5 @@
 /**
-\page MITKUserManualPage The MITK User Manual
+\bundlemainpage{MITKUserManualPage} The MITK User Manual
 
 Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them. 
 

@@ -18,9 +18,34 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "mitkNavigationData.h"
 
+#include "itkIndent.h"
+
 class NavigationDataTestClass
   {
   public:
+    static mitk::NavigationData::Pointer GetTestData()
+      {
+      mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
+      mitk::NavigationData::PositionType p;
+      mitk::FillVector3D(p, 44.4, 55.5, 66.66);
+      nd->SetPosition(p);
+      mitk::NavigationData::OrientationType o(1.0, 2.0, 3.0, 4.0);
+      nd->SetOrientation(o);
+      nd->SetDataValid(true);
+      nd->SetTimeStamp(100.111);
+      nd->SetHasPosition(false);
+      nd->SetHasOrientation(false);
+      mitk::NavigationData::CovarianceMatrixType m;
+      m.Fill(17.17);
+      m(2, 2) = 1000.01;
+      nd->SetCovErrorMatrix(m);
+      nd->SetName("my NavigationData");
+      nd->SetPositionAccuracy(100.0);
+      nd->SetOrientationAccuracy(10.0);
+      return nd;
+    
+      }
+
     static void TestInstatiation()
     {
     // Test instantiation of NavigationData
@@ -80,25 +105,8 @@ class NavigationDataTestClass
     static void TestGraft()
     {
     //create test data
-    mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
-    mitk::NavigationData::PositionType p;
-    mitk::FillVector3D(p, 44.4, 55.5, 66.66);
-    nd->SetPosition(p);
-    mitk::NavigationData::OrientationType o(1.0, 2.0, 3.0, 4.0);
-    nd->SetOrientation(o);
-    nd->SetDataValid(true);
-    nd->SetTimeStamp(100.111);
-    nd->SetHasPosition(false);
-    nd->SetHasOrientation(false);
-    mitk::NavigationData::CovarianceMatrixType m;
-    m.Fill(17.17);
-    m(2, 2) = 1000.01;
-    nd->SetCovErrorMatrix(m);
-    nd->SetName("my NavigationData");
-    nd->SetPositionAccuracy(100.0);
-    nd->SetOrientationAccuracy(10.0);
-     
-    
+    mitk::NavigationData::Pointer nd = GetTestData();
+       
     mitk::NavigationData::Pointer graftedCopy = mitk::NavigationData::New();
     graftedCopy->Graft(nd);
 
@@ -114,6 +122,59 @@ class NavigationDataTestClass
 
     MITK_TEST_CONDITION(graftIsEqual, "Graft() produces equal NavigationData object");
     }
+
+  static void TestPrintSelf()
+    {
+    mitk::NavigationData::Pointer nd = GetTestData();
+    itk::Indent myIndent = itk::Indent();
+
+    MITK_TEST_OUTPUT(<<"Testing method PrintSelf(), method output will follow:");
+    bool success = true;
+    try
+      {
+      nd->PrintSelf(std::cout,myIndent);
+      }
+    catch(...)
+      {
+      success = false;
+      }
+    MITK_TEST_CONDITION(success, "Testing method PrintSelf().");
+    }
+
+  static void TestWrongInputs()
+    {
+
+    mitk::NavigationData::Pointer nd = GetTestData();
+    
+
+    // Test CopyInformation
+    bool success = false;
+    try
+    {
+      nd->CopyInformation(NULL);
+    }
+    catch(itk::ExceptionObject e)
+    {
+      success = true;
+    }
+    MITK_TEST_CONDITION(success, "Testing wrong input for method CopyInformation.");
+
+
+    // Test Graft
+    success = false;
+    try
+    {
+      nd->Graft(NULL);
+    }
+    catch(itk::ExceptionObject e)
+    {
+      success = true;
+    }
+    MITK_TEST_CONDITION(success, "Testing wrong input for method Graft.");
+
+
+
+    }
   };
 
 /**
@@ -128,6 +189,9 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   NavigationDataTestClass::TestInstatiation();
   NavigationDataTestClass::TestGetterSetter();
   NavigationDataTestClass::TestGraft();
+  NavigationDataTestClass::TestPrintSelf();
+  NavigationDataTestClass::TestWrongInputs();
+
  
 
 

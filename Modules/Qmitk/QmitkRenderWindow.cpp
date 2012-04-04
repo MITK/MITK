@@ -217,7 +217,7 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
   QTimer::singleShot(0, this ,SIGNAL( moved() ) );
 }
 
-void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget )
+void QmitkRenderWindow::ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget )
 {
   m_MenuWidgetActivated = state;
 

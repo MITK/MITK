@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
 
 
   m_DataStorage->Print( std::cout );
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   // reinit the mitkVTKEventProvider;
   // this is only necessary once after calling 

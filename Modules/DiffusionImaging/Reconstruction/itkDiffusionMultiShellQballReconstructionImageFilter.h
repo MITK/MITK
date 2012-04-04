@@ -86,7 +86,7 @@ public:
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
     void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image);
-    void SetGradientIndexMap(GradientIndexMap * gradientIdexMap)
+    void SetGradientIndexMap(GradientIndexMap gradientIdexMap)
     {
         m_GradientIndexMap = gradientIdexMap;
     }
@@ -107,7 +107,8 @@ public:
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
 
-    vnl_vector<TOdfPixelType> PreNormalize( vnl_vector<TOdfPixelType> vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  );
+    void PreNormalize( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  );
+    void DoubleLogarithm(vnl_vector<TOdfPixelType> & vec);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this
@@ -153,13 +154,15 @@ private:
         Standard1Shell
     };
 
+
+
     OdfReconstructionMatrixType m_ReconstructionMatrix;
     OdfReconstructionMatrixType m_CoeffReconstructionMatrix;
-    OdfReconstructionMatrixType m_SphericalHarmonicBasisMatrix;
+    OdfReconstructionMatrixType m_ODFSphericalHarmonicBasisMatrix;
 
 
-    CoefficientMatrixType m_SignalInterpolationReonstructionMatrix;
-
+    CoefficientMatrixType m_SignalReonstructionMatrix;
+    CoefficientMatrixType m_SHBasisMatrix;
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
@@ -178,7 +181,7 @@ private:
 
     typename BZeroImageType::Pointer m_BZeroImage;
 
-    GradientIndexMap * m_GradientIndexMap;
+    GradientIndexMap m_GradientIndexMap;
 
     double m_Lambda;
 

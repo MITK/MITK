@@ -831,9 +831,9 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
       mitk::DataNode *n;
       if(ds)
       {
-        n = ds->GetNamedNode("widget1Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = ds->GetNamedNode("widget2Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = ds->GetNamedNode("widget3Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane1(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane2(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane3(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
       }
     }
 

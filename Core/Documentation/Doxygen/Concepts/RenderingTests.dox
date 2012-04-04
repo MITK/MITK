@@ -4,10 +4,10 @@ namespace mitk{
 
 Available sections:
 
--# \ref WhatIsARenderingTest "What is an automatic rendering test?"
--# \ref HowToCreateATest "How to create a rendering test"
+-# \ref RenderingTests_WhatIsARenderingTest "What is an automatic rendering test?"
+-# \ref RenderingTests_HowToCreateATest "How to create a rendering test"
 
-\section WhatIsARenderingTest What is an automatic rendering test?
+\section RenderingTests_WhatIsARenderingTest What is an automatic rendering test?
 
 An automatic rendering test is a powerful tool to test rendering results automatically via dashboard.
 Regarding rendering lots of different sources influence the output on the screen (e.g. different
@@ -22,7 +22,7 @@ of failure, a difference can be generated to show exactly which pixels are rende
 Implementing automatic rendering tests for algorithms ensures that algorithms deliver the same output
 as they used to do in previous version of MITK.
 
-\section HowToCreateATest How to create your own automatic rendering test
+\section RenderingTests_HowToCreateATest How to create your own automatic rendering test
 
 To create an automatic rendering test you should use an existing test as example
 (e.g. mitkImageVtkMapper2DTest).

@@ -1,13 +1,15 @@
 /**
 \page BuildToolkits Build Toolkits
 
-\section buildITK ITK
+If you are using the superbuild ITK and VTK will be downloaded and build during the processm by default. Only Qt will have to be build beforehand. You can of course  use your own versions of ITK and VTK during the superbuild as described in BuildInstructions_Advanced_Customization .
+
+\section BuildToolkits_ITK ITK
 
 For building ITK please refer to the ITK documentation 
 
 <a>http://www.itk.org/Wiki/ITK_Getting_Started</a>
 
-\section buildQT QT
+\section BuildToolkits_QT QT
 
 For detailed build instructions please refer to
 
@@ -15,7 +17,7 @@ For detailed build instructions please refer to
 
 (If you are using a version other than QT 4.5 please change the link accordingly.)
 
-\section buildVTK VTK
+\section BuildToolkits_VTK VTK
 
 For building VTK please refer to the VTK documentation 
 

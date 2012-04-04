@@ -26,8 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 
-#include "QmitkStdMultiWidget.h"
-
+class QmitkStdMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 
@@ -74,8 +73,8 @@ public:
   
   void HideRenderWindowMenu( );
 
-  //Activate or Deactivate MenuWidget. 
-  void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = NULL);
+  //Activate or Deactivate MenuWidget.
+  void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
   
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }

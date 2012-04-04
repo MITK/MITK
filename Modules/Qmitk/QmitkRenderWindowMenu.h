@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QmitkExports.h>
-#include "QmitkStdMultiWidget.h"
 #include "mitkBaseRenderer.h"
 
 #include <QWidget>
@@ -34,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLabel>
 #include <QTimer>
 
-
+class QmitkStdMultiWidget;
 
 /**
 * \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow. 

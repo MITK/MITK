@@ -2094,10 +2094,10 @@ void QmitkStdMultiWidget::HideAllWidgetToolbars()
 
 void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
 {
-  mitkWidget1->ActivateMenuWidget( state );
-  mitkWidget2->ActivateMenuWidget( state );
-  mitkWidget3->ActivateMenuWidget( state );
-  mitkWidget4->ActivateMenuWidget( state );
+  mitkWidget1->ActivateMenuWidget( state, this );
+  mitkWidget2->ActivateMenuWidget( state, this );
+  mitkWidget3->ActivateMenuWidget( state, this );
+  mitkWidget4->ActivateMenuWidget( state, this );
 }
 
 bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const
@@ -2164,6 +2164,35 @@ void QmitkStdMultiWidget::MouseModeSelected( mitk::MouseModeSwitcher::MouseMode 
   else
   {
     this->DisableNavigationControllerEventListening();
+  }
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane1()
+{
+  return this->m_PlaneNode1;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane2()
+{
+  return this->m_PlaneNode2;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane3()
+{
+  return this->m_PlaneNode3;
+}
+
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
+{
+  switch(id)
+  {
+    case 1: return this->m_PlaneNode1;
+    break;
+    case 2: return this->m_PlaneNode2;
+    break;
+    case 3: return this->m_PlaneNode3;
+    break;
+    default: return NULL;
   }
 }
 

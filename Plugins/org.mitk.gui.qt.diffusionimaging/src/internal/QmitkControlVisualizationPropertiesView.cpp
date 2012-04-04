@@ -456,9 +456,9 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
   }
 
   mitk::DataNode* n;
-  n = GetDataStorage()->GetNamedNode("widget1Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-  n = GetDataStorage()->GetNamedNode("widget2Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-  n = GetDataStorage()->GetNamedNode("widget3Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+  n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+  n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+  n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
 
   mitk::BaseRenderer::Pointer renderer =
       this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
@@ -484,20 +484,20 @@ void QmitkControlVisualizationPropertiesView::OnTSNumChanged(int num)
   if(num==0)
   {
     mitk::DataNode* n;
-    n = GetDataStorage()->GetNamedNode("widget1Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-    n = GetDataStorage()->GetNamedNode("widget2Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-    n = GetDataStorage()->GetNamedNode("widget3Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
   }
   else
   {
     mitk::DataNode* n;
-    n = GetDataStorage()->GetNamedNode("widget1Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-    n = GetDataStorage()->GetNamedNode("widget2Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-    n = GetDataStorage()->GetNamedNode("widget3Plane"); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
 
-    n = GetDataStorage()->GetNamedNode("widget1Plane"); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    n = GetDataStorage()->GetNamedNode("widget2Plane"); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    n = GetDataStorage()->GetNamedNode("widget3Plane"); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
   }
 
   m_TSLabel->setText(QString::number(num*2+1));

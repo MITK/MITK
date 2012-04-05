@@ -155,9 +155,12 @@ void mitk::ImageWriter::GenerateData()
 
   bool vti = (m_Extension.find(".vti") != std::string::npos);
 
-  // If the extension is NOT .pic and NOT .nrrd the following block is entered
+  // If the extension is NOT .pic and NOT .nrrd and NOT .nii and NOT .nii.gz the following block is entered
   if ( m_Extension.find(".pic") == std::string::npos
-       && m_Extension.find(".nrrd") == std::string::npos)
+       && m_Extension.find(".nrrd") == std::string::npos
+       && m_Extension.find(".nii") == std::string::npos
+       && m_Extension.find(".nii.gz") == std::string::npos
+       )
   {
     if(input->GetDimension() > 3)
     {
@@ -229,7 +232,10 @@ void mitk::ImageWriter::GenerateData()
 */    }
 
     // use the ITK .nrrd Image writer
-    if( m_Extension.find(".nrrd") != std::string::npos )
+    if( m_Extension.find(".nrrd") != std::string::npos
+        || m_Extension.find(".nii") != std::string::npos
+        || m_Extension.find(".nii.gz") != std::string::npos
+        )
     {
         ::itk::OStringStream filename;
         filename <<  this->m_FileName.c_str() << this->m_Extension;

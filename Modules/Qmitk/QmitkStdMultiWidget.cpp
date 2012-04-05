@@ -73,14 +73,9 @@ m_PendingCrosshairPositionEvent(false),
 m_CrosshairNavigationEnabled(false)
 {
   /******************************************************
-   * Store the provided rendering manager, or look up the
-   * global one, and then always use m_RenderingManager
+   * Use the global RenderingManager is none was specified
    * ****************************************************/
-  if (renderingManager != NULL)
-  {
-    m_RenderingManager = renderingManager;
-  }
-  else
+  if (m_RenderingManager == NULL)
   {
     m_RenderingManager = mitk::RenderingManager::GetInstance();
   }

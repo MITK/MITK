@@ -88,7 +88,24 @@ public:
     void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image);
     void SetGradientIndexMap(GradientIndexMap gradientIdexMap)
     {
+
+
         m_GradientIndexMap = gradientIdexMap;
+
+        /*
+        std::stringstream s1, s2, s3;
+        for(int i = 0; i < m_GradientIndexMap[1000].size() ; i++){
+            s1 << m_GradientIndexMap[1000][i] << " ";
+            s2 << m_GradientIndexMap[2000][i] << " ";
+            s3 << m_GradientIndexMap[3000][i] << " ";
+        }
+
+        MITK_INFO << "1 SHELL " << std::endl << s1.str();
+        MITK_INFO << "2 SHELL " << std::endl << s2.str();
+        MITK_INFO << "3 SHELL " << std::endl << s3.str();
+        */
+
+
     }
 
     /** Get reference image */
@@ -107,8 +124,9 @@ public:
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
 
-    void PreNormalize( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  );
+    void PreNormalize( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
     void DoubleLogarithm(vnl_vector<TOdfPixelType> & vec);
+    void Threshold(vnl_vector<TOdfPixelType> & vec, float sigma = 0.0001);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this

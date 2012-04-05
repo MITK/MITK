@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
 #include "mitkRenderWindowFrame.h"
-#include "mitkRenderingManager.h"
 #include "mitkManufacturerLogo.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
@@ -48,6 +47,10 @@ class QGridLayout;
 class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
+
+namespace mitk {
+class RenderingManager;
+}
 
 class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {

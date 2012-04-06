@@ -320,7 +320,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   //### begin set reslice interpolation
   // Initialize the interpolation mode for resampling; switch to nearest
-  // neighbor if the input image is too small.
+  // neighbor if the input image is too small. TODO: WHY THIS SPECIAL CASE???
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
@@ -480,14 +480,16 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
     localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
-    localStorage->m_TSFilter->Modified();
+    //localStorage->m_TSFilter->Modified();
     localStorage->m_TSFilter->Update();
+    MITK_INFO << "TSFilter";
     localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
   }
   else
   {
-    localStorage->m_Reslicer->Modified();
+    //localStorage->m_Reslicer->Modified();
     localStorage->m_Reslicer->Update();
+    MITK_INFO << "Reslicer";
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetOutput();
   }
 
@@ -899,7 +901,7 @@ void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer 
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   //pass the LuT to the RBG filter
-  localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
+  //localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
   mitk::LevelWindow opacLevelWindow;
   if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
   {//pass the opaque level window to the filter

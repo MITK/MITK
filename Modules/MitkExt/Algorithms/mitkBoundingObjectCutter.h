@@ -74,7 +74,7 @@ protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
 
-  virtual const std::type_info& GetOutputPixelType();
+  virtual const PixelType GetOutputPixelType();
 
   virtual void GenerateInputRequestedRegion();
   virtual void GenerateOutputInformation();

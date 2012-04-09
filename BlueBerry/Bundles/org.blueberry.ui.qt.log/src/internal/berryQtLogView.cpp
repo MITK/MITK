@@ -26,6 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryQtLogPlugin.h"
 
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
+#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+
 #include <QHeaderView>
 
 #include <QTimer>
@@ -35,9 +40,20 @@ namespace berry {
 QtLogView::QtLogView(QWidget *parent)
     : QWidget(parent)
 {
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IBerryPreferences::Pointer prefs
+      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
+        .Cast<berry::IBerryPreferences>();
+  
+  bool showAdvancedFields = 
+      prefs->GetBool("ShowAdvancedFields", true) ;
+
   ui.setupUi(this);
   
   model = QtLogPlugin::GetInstance()->GetLogModel();
+  model->SetShowAdvancedFiels( showAdvancedFields );
   
   filterModel = new QSortFilterProxyModel(this);
   filterModel->setSourceModel(model);
@@ -46,9 +62,11 @@ QtLogView::QtLogView(QWidget *parent)
   ui.tableView->setModel(filterModel);
 
   ui.tableView->verticalHeader()->setVisible(false);
+  ui.tableView->horizontalHeader()->setStretchLastSection(true);
              
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
+  ui.ShowAdvancedFields->setChecked( showAdvancedFields );
            
 }
 
@@ -85,5 +103,20 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
   QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
 }
 
+void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
+{
+  QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );  
+  ui.tableView->resizeColumnsToContents();
+
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IBerryPreferences::Pointer prefs
+      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
+        .Cast<berry::IBerryPreferences>();
+  
+  prefs->PutBool("ShowAdvancedFields", checked);
+  prefs->Flush();
+}
 
 }

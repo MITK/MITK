@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeCalculator.h"
 #include "mitkImageAccessByItk.h" 
 #include <itkImageRegionConstIterator.h> 
+
+#include "mitkImageStatisticsHolder.h"
   
 template < typename TPixel, unsigned int VImageDimension >
 void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage)
@@ -98,18 +100,18 @@ void mitk::VolumeCalculator::ComputeVolumeFromImageStatistics()
 
     for(unsigned int t = 0; t < m_Image->GetDimension(3); ++t )
     {
-      m_Volumes[t] = m_Image->GetCountOfMaxValuedVoxels(t) / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+      m_Volumes[t] = m_Image->GetStatistics()->GetCountOfMaxValuedVoxels(t) / 1000.0 * spacing[0] * spacing[1] * spacing[2];
     }
   }
   else if(dim == 3)
   {
     Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
-    m_Volume = m_Image->GetCountOfMaxValuedVoxels() / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+    m_Volume = m_Image->GetStatistics()->GetCountOfMaxValuedVoxels() / 1000.0 * spacing[0] * spacing[1] * spacing[2];
   }
   else if (dim == 2) 
   {
     Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
-    m_Volume = m_Image->GetCountOfMaxValuedVoxels() / 100.0 * spacing[0] * spacing[1];
+    m_Volume = m_Image->GetStatistics()->GetCountOfMaxValuedVoxels() / 100.0 * spacing[0] * spacing[1];
   }
   else itkExceptionMacro(<<"Wrong image dimension...");
 }

@@ -102,8 +102,21 @@ calling object*/
   virtual Pointer Clone() const \
 { \
   Pointer smartPtr = new classname(*this); \
+  smartPtr->UnRegister(); \
   return smartPtr;  \
 }
 
+/** cross-platform deprecation macro
+
+  \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
+*/
+#ifdef __GNUC__
+  #define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+  #define DEPRECATED(func) __declspec(deprecated) func
+#else
+  #pragma message("WARNING: You need to implement DEPRECATED for your compiler!")
+  #define DEPRECATED(func) func
+#endif
 
 #endif // MITK_COMMON_H_DEFINED

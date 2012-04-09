@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIEditorInput.h"
 #include "berryIPartService.h"
 #include "berryISelectionService.h"
+#include "berryIReusableEditor.h"
 
 #include "berryIWorkbenchWindow.h"
 
@@ -502,7 +503,7 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    * @param input
    *            the new input for the reusable editor
    */
-  //virtual void ReuseEditor(IReusableEditor::Pointer editor, IEditorInput* input);
+  virtual void ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input) = 0;
 
   /**
    * Opens an editor on the given input.

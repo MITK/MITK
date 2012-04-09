@@ -56,7 +56,7 @@ namespace mitk{
     * 
     *\warning This method is not tested yet. It is not save to use!
     */
-    const bool IsAtEnd();
+    bool IsAtEnd();
 
   protected:
     NavigationDataPlayerBase();

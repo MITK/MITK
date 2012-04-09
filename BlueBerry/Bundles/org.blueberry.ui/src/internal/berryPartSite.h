@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryServiceLocator.h"
 
-#include "../berryIWorkbenchPartSite.h"
-#include "../berryIWorkbenchPartReference.h"
-#include "../berryISelectionProvider.h"
+#include "berryIWorkbenchPartSite.h"
+#include "berryIWorkbenchPartReference.h"
+#include "berryISelectionProvider.h"
 
 namespace berry {
 

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
+#include "mitkLegacyAdaptors.h"
 #include <ipPic/mitkIpPicTypeMultiplex.h>
 
 template <class T>
@@ -377,7 +378,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   pic_transformed = mitkIpPicNew();
   pic_transformed->dim=3;
   pic_transformed->bpe  = output->GetPixelType().GetBpe();
-  pic_transformed->type = output->GetPixelType().GetType();
+  //pic_transformed->type = output->GetPixelType().GetType();
   pic_transformed->n[0] = output->GetDimension(0);
   pic_transformed->n[1] = output->GetDimension(1);
   pic_transformed->n[2] = output->GetDimension(2);
@@ -426,29 +427,34 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       timeSelector->Update();
 
+      // Cast to pic descriptor for the timeSelector image
+      mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
+      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+
       _mitkIpPicFreeTags(pic_transformed->info->tags_head);
-      pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
+      pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
+
       if(input->GetDimension(2)>1)
       {
-
-        mitkIpPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        mitkIpPicTypeMultiplex9(_transform, timeSelectorPic , pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         //  mitkIpPicPut("1trf.pic",pic_transformed);  
       }
       else
       {
-        mitkIpPicDescriptor *doubleSlice=mitkIpPicCopyHeader(timeSelector->GetOutput()->GetPic(), NULL);
+        mitkIpPicDescriptor *doubleSlice = mitkIpPicCopyHeader( timeSelectorPic , NULL);
         doubleSlice->dim=3;
         doubleSlice->n[2]=2;
         doubleSlice->data=malloc(_mitkIpPicSize(doubleSlice));
-        memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _mitkIpPicSize(doubleSlice)/2);
+        memcpy(doubleSlice->data, timeSelectorPic->data, _mitkIpPicSize(doubleSlice)/2);
         mitkIpPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         mitkIpPicFree(doubleSlice);
       }
-      output->SetPicVolume(pic_transformed, t, n);
+      output->SetVolume(pic_transformed->data, t, n);
     }
   }
   //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);  
   mitkIpPicFree(pic_transformed);
+
   m_TimeOfHeaderInitialization.Modified();
 }
 

@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berrySmartPointer.h>
 
-#include "../berryIEditorPart.h"
-#include "../berryIEditorReference.h"
-#include "../berryIPathEditorInput.h"
-#include "../berryIMemento.h"
+#include "berryIEditorPart.h"
+#include "berryIEditorReference.h"
+#include "berryIPathEditorInput.h"
+#include "berryIMemento.h"
 #include "berryEditorDescriptor.h"
 
 #include <list>

@@ -47,7 +47,7 @@ namespace mitk {
   public:
     mitkClassMacro(FiberBundleXMapper2D, VtkMapper2D);
     itkNewMacro(Self);
-    const mitk::FiberBundleX* GetInput();
+    mitk::FiberBundleX* GetInput();
     
     
     /** \brief Checks whether this mapper needs to update itself and generate
@@ -101,6 +101,8 @@ namespace mitk {
     
     void UpdateShaderParameter(mitk::BaseRenderer*);
    
+  private:
+    vtkSmartPointer<vtkLookupTable> m_lut;
 
   };
 

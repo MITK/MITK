@@ -46,15 +46,8 @@ set(ENV{PATH} "${CTEST_PATH}")
 set(SUPERBUILD_TARGETS "")
 
 # If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
-if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
+if(NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
   set(GIT_REPOSITORY "http://git.mitk.org/MITK.git")
-endif()
-
-#
-# Site specific options
-#
-if(NOT CDASH_ADMIN_URL_PREFIX)
-  set(CDASH_ADMIN_URL_PREFIX "http://mbits")
 endif()
 
 #
@@ -106,7 +99,7 @@ if(MITK_INITIAL_CACHE)
   set(mitk_cache_file "${CTEST_SCRIPT_DIRECTORY}/mitk_initial_cache.txt")
   file(WRITE "${mitk_cache_file}" "${MITK_INITIAL_CACHE}")
   set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
-MITK_INITIAL_CACHE_FILE::INTERNAL=${mitk_cache_file}
+MITK_INITIAL_CACHE_FILE:INTERNAL=${mitk_cache_file}
 ")
 endif()
 

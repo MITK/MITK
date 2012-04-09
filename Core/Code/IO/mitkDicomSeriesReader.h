@@ -25,7 +25,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageSeriesReader.h>
 #include <itkCommand.h>
 
+#ifdef NOMINMAX
+#  define DEF_NOMINMAX
+#  undef NOMINMAX
+#endif
+
 #include <gdcmConfigure.h>
+
+#ifdef DEF_NOMINMAX
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  undef DEF_NOMINMAX
+#endif
 
 #include <gdcmDataSet.h>
 #include <gdcmRAWCodec.h>
@@ -33,7 +45,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <gdcmScanner.h>
 #include <gdcmPixmapReader.h>
 #include <gdcmStringFilter.h>
-
 
 namespace mitk
 {

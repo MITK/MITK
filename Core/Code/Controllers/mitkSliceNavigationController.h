@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 #include <itkCommand.h>
-#include <mitkIpPicTypeMultiplex.h>
 #include <sstream>
 #include "mitkRestorePlanePositionOperation.h"
 
@@ -442,7 +441,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
   protected:
     SliceNavigationController(const char * type = NULL);
     virtual ~SliceNavigationController();
-
+/*
     template <class T>
     static void buildstring( mitkIpPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)
     {
@@ -471,7 +470,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
         s+= "point out of data";
       }
     };
-
+*/
     mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
     mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
 

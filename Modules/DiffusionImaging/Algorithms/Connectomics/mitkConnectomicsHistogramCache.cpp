@@ -1,0 +1,84 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include "mitkConnectomicsHistogramCache.h"
+
+mitk::ConnectomicsHistogramCache::ConnectomicsHistogramCache()
+{
+}
+
+mitk::ConnectomicsHistogramCache::~ConnectomicsHistogramCache()
+{
+}
+
+mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operator[]( mitk::ConnectomicsNetwork::Pointer sp_NetworkData )
+{
+  BaseData *p_BaseData = dynamic_cast< BaseData* >( sp_NetworkData.GetPointer() );
+
+  if(!p_BaseData)
+  {
+    MITK_WARN << "ConnectomicsHistogramCache::operator[] with null connectomics network data called";
+    return 0;
+  }
+
+  ConnectomicsHistogramsCacheElement *elementToUpdate = 0;
+
+  bool first = true;
+
+  for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
+  {
+    ConnectomicsHistogramsCacheElement *e = dynamic_cast<ConnectomicsHistogramsCacheElement *>(*iter);
+    BaseData *p_tmp = e->baseData.GetPointer();
+
+    if(p_tmp == p_BaseData)
+    {
+      if(!first)
+      {
+        cache.erase(iter);
+        cache.push_front(e);
+      }
+      if( p_BaseData->GetMTime() > e->m_LastUpdateTime.GetMTime())
+        goto recomputeElement;
+
+
+      return dynamic_cast<ConnectomicsHistogramsContainer*>( e->GetHistograms() );
+    }
+
+    first = false;
+  }
+
+  if (dynamic_cast<ConnectomicsNetwork*>(p_BaseData))
+  {
+    elementToUpdate = new ConnectomicsHistogramsCacheElement();
+  }
+  else
+  {
+    MITK_WARN << "not supported: " << p_BaseData->GetNameOfClass();
+    return NULL;
+  }
+
+  elementToUpdate->baseData = p_BaseData;
+  cache.push_front(elementToUpdate);
+  TrimCache();
+
+  recomputeElement:
+
+  elementToUpdate->ComputeFromBaseData(p_BaseData);
+  elementToUpdate->m_LastUpdateTime.Modified();
+  return dynamic_cast<ConnectomicsHistogramsContainer*>( elementToUpdate->GetHistograms() );
+}
+

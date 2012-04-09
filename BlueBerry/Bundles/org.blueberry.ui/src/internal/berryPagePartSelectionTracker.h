@@ -18,12 +18,12 @@
 #ifndef BERRYPAGEPARTSELECTIONTRACKER_H_
 #define BERRYPAGEPARTSELECTIONTRACKER_H_
 
-#include "../berryIPartListener.h"
-#include "../berryISelectionChangedListener.h"
-#include "../berryISelectionService.h"
-#include "../berryISelectionProvider.h"
-#include "../berrySelectionChangedEvent.h"
-#include "../berryIWorkbenchPage.h"
+#include "berryIPartListener.h"
+#include "berryISelectionChangedListener.h"
+#include "berryISelectionService.h"
+#include "berryISelectionProvider.h"
+#include "berrySelectionChangedEvent.h"
+#include "berryIWorkbenchPage.h"
 
 #include "berryAbstractPartSelectionTracker.h"
 

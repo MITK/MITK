@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
+#include "mitkIpPic.h"
 
 #ifndef M_PI
   #define M_PI       3.14159265358979323846

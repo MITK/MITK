@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkPicFileWriter.h"
+#include <mitkSTLFileReader.h>
 
 #include <vtkPolyData.h>
 
@@ -45,32 +46,27 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     std::cout<<"no file specified [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  mitk::Surface::Pointer surface = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-  try
-  {
-    std::cout<<argv[1]<<std::endl;
-    factory->SetFileName( argv[1] );
-    factory->Update();
 
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    surface = dynamic_cast<mitk::Surface*>(node->GetData());
-    if(surface.IsNull())
-    {
-      std::cout<<"file not a surface - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-  }
-  catch ( itk::ExceptionObject & ex )
+  if (!mitk::STLFileReader::CanReadFile(argv[1], "", ""))
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    std::cout << "Input file not a valid .stl file [PASSED]\n[TEST DONE]" << std::endl;
+    return EXIT_SUCCESS;
+  }
+
+  mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
+
+  reader->SetFileName(argv[1]);
+  reader->Update();
+
+  mitk::Surface::Pointer surface = NULL;
+
+  surface = reader->GetOutput();
+
+  if(surface.IsNull())
+  {
+    std::cout<<"file not a surface - test will not be applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
   }
 
   std::cout << "Testing number of points of surface: " << std::flush;
@@ -84,7 +80,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
   std::cout << "Testing creation of mitk::Image with same Geometry as Surface: " << std::flush;
   mitk::Image::Pointer image = mitk::Image::New();
   //surface->UpdateOutputInformation(); //is not necessary anymore (bug #1536), should never be neccessary
-  image->Initialize(typeid(unsigned int), *surface->GetGeometry());
+  image->Initialize( mitk::MakeScalarPixelType<unsigned int>(), *surface->GetGeometry());
 
   std::cout << "Testing mitk::SurfaceToImageFilter::MakeOutputBinaryOn(): " << std::flush;
   s2iFilter->MakeOutputBinaryOn();
@@ -105,7 +101,8 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 #ifdef WIN32     // Unix based systems do not seem to resolve pixel type correctly
 
   std::cout << "Testing if result image is of type unsigned char: " << std::flush;
-  std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetItkTypeAsString();
+  //std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetItkTypeAsString();
+  std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetComponentTypeAsString();
   std::cout << std::endl << "XXX: " << typeId << std::endl;
   if( typeId != "unsigned char" )
   {

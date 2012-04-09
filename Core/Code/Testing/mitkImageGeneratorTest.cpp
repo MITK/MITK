@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTestingMacros.h>
 #include "mitkImage.h"
+#include "mitkImageStatisticsHolder.h"
 #include "mitkImageGenerator.h"
 
 int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
@@ -52,11 +53,11 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType() == typeid(float), "Testing if the data type is set correctly.");
     MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType() == typeid(unsigned char), "Testing if the ddata type is set correctly.");
 
-    MITK_TEST_CONDITION_REQUIRED(image2Da->GetScalarValueMax() <= 577, "Testing if max value holds");
-    MITK_TEST_CONDITION_REQUIRED(image2Da->GetScalarValueMin() >= 23, "Testing if min value holds");
+    MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMax() <= 577, "Testing if max value holds");
+    MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMin() >= 23, "Testing if min value holds");
 
-    MITK_TEST_CONDITION_REQUIRED(image3Da->GetScalarValueMax() <= 1000, "Testing if max value holds");
-    MITK_TEST_CONDITION_REQUIRED(image3Da->GetScalarValueMin() >= 0, "Testing if min value holds");
+    MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMax() <= 1000, "Testing if max value holds");
+    MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMin() >= 0, "Testing if min value holds");
 
     MITK_TEST_END();
 }

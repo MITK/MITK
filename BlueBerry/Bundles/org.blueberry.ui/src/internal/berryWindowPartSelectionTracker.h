@@ -21,7 +21,7 @@
 
 #include "berryAbstractPartSelectionTracker.h"
 
-#include "../berryINullSelectionListener.h"
+#include "berryINullSelectionListener.h"
 
 namespace berry {
 

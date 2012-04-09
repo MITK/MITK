@@ -18,7 +18,7 @@
 #ifndef BERRYWORKBENCHSERVICEREGISTRY_H_
 #define BERRYWORKBENCHSERVICEREGISTRY_H_
 
-#include "../services/berryIServiceLocator.h"
+#include "services/berryIServiceLocator.h"
 
 #include <vector>
 #include <map>

@@ -1,4 +1,4 @@
-SET(MODULE_TESTS
+set(MODULE_TESTS
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
@@ -32,9 +32,9 @@ SET(MODULE_TESTS
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
+   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp #deactivated, see bug #10701
    mitkNavigationToolTest.cpp
-   mitkNavigationToolReaderAndWriterTest.cpp #deactivated, see bug #3461
+   mitkNavigationToolReaderAndWriterTest.cpp
    # -----------------------------------------------------------------------
 
    # ------------------ Deavtivated Tests ----------------------------------
@@ -42,7 +42,7 @@ SET(MODULE_TESTS
    # -----------------------------------------------------------------------
 )
 
-SET(MODULE_CUSTOM_TESTS
+set(MODULE_CUSTOM_TESTS
   mitkNDIAuroraHardwareTest.cpp
   mitkNDIPolarisHardwareTest.cpp
   mitkClaronTrackingDeviceHardwareTest.cpp

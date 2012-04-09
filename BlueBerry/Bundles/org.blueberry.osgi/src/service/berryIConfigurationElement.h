@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org_blueberry_osgi_Export.h>
 
-#include "../berryBundleLoader.h"
-#include "../berryPlatformException.h"
+#include "berryBundleLoader.h"
+#include "berryPlatformException.h"
 
 #include "berryExtensionType.h"
 #include "berryIExecutableExtension.h"

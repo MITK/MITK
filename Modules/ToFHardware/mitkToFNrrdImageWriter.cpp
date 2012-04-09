@@ -151,13 +151,14 @@ namespace mitk
       throw std::logic_error("No image type set, please choose between 2D+t and 3D!");
     }
 
-    imageTemplate->Initialize( PixelType(typeid(float)),dimension, dimensions, 1);
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
+    imageTemplate->Initialize( FloatType,dimension, dimensions, 1);
     imageTemplate->SetSlice(floatData, 0, 0, 0);
 
     
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
-    nrrdWriter->SetPixelTypeInfo(*(imageTemplate->GetPixelType().GetTypeId()));
+    nrrdWriter->SetPixelTypeInfo(imageTemplate->GetPixelType().GetTypeId());
     if(imageTemplate->GetPixelType().GetNumberOfComponents() > 1)
     {
       nrrdWriter->SetNumberOfComponents(imageTemplate->GetPixelType().GetNumberOfComponents());

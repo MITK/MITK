@@ -28,22 +28,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace itk{
 /** \class AnalyticalDiffusionQballReconstructionImageFilter
- * \brief This class takes as input one or more reference image (acquired in the 
+ * \brief This class takes as input one or more reference image (acquired in the
  * absence of diffusion sensitizing gradients) and 'n' diffusion
- * weighted images and their gradient directions and computes an image of 
+ * weighted images and their gradient directions and computes an image of
  * orientation distribution function coefficients in a spherical harmonic basis.
  *
  * \par Inputs and Usage
  * \par
- * When you have the 'n' gradient and one or more reference images in a single 
+ * When you have the 'n' gradient and one or more reference images in a single
  * multi-component image (VectorImage), you can specify the images as
  * \code
  *       filter->SetGradientImage( directionsContainer, vectorImage );
  * \endcode
  * Note that this method is used to specify both the reference and gradient images.
- * This is convenient when the DWI images are read in using the 
- * <a href="http://wiki.na-mic.org/Wiki/index.php/NAMIC_Wiki:DTI:Nrrd_format">NRRD</a> 
- * format. Like the Nrrd format, the reference images are those components of the 
+ * This is convenient when the DWI images are read in using the
+ * <a href="http://wiki.na-mic.org/Wiki/index.php/NAMIC_Wiki:DTI:Nrrd_format">NRRD</a>
+ * format. Like the Nrrd format, the reference images are those components of the
  * vectorImage whose gradient direction is (0,0,0). If more than one reference image
  * is present, they are averaged prior to the reconstruction.
  *
@@ -54,11 +54,11 @@ namespace itk{
  * \endcode
  *
  * \par Parameters
- * \li Threshold -  Threshold on the reference image data. The output ODF will 
- * be a null pdf for pixels in the reference image that have a value less 
+ * \li Threshold -  Threshold on the reference image data. The output ODF will
+ * be a null pdf for pixels in the reference image that have a value less
  * than this.
  * \li BValue - See the documentation of SetBValue().
- * \li At least 6 gradient images must be specified for the filter to be able 
+ * \li At least 6 gradient images must be specified for the filter to be able
  * to run. If the input gradient directions g_i are majorly sampled on one half
  * of the sqhere, then each input image I_i will be duplicated and assign -g_i
  * in order to guarantee stability of the algorithm.
@@ -68,29 +68,29 @@ namespace itk{
  * \li BasisFunctionCenters - the centers of the basis functions are used for
  * the sRBF (spherical radial basis functions interpolation). If not set, they
  * will be defaulted to equal m_EquatorNrSamplingPoints
- * 
+ *
  * \par Template parameters
- * The class is templated over 
- * \li the pixel type of the reference and gradient images 
- * (expected to be scalar data types) 
+ * The class is templated over
+ * \li the pixel type of the reference and gradient images
+ * (expected to be scalar data types)
  * \li the internal representation of the ODF pixels (double, float etc).
  * \li the number of OdfDirections
  * \li the number of basis function centers for the sRBF
- *  
+ *
  * \par References:
- * \li<a href="http://www3.interscience.wiley.com/cgi-bin/fulltext/109800293/PDFSTART">[1]</a> 
+ * \li<a href="http://www3.interscience.wiley.com/cgi-bin/fulltext/109800293/PDFSTART">[1]</a>
  * <em>Tuch DS,
  * "Q-ball imaging", Magn Reson Med. 2004 Dec;52(6):1358-72.</em>
- * 
+ *
  */
 
-template< class TReferenceImagePixelType, 
+template< class TReferenceImagePixelType,
           class TGradientImagePixelType,
           class TOdfPixelType,
           int NOrderL,
           int NrOdfDirections>
 class AnalyticalDiffusionQballReconstructionImageFilter :
-  public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >, 
+  public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >,
                              Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
 
@@ -110,35 +110,36 @@ public:
   typedef AnalyticalDiffusionQballReconstructionImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>, 
+  typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>,
           Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
                           Superclass;
-  
+
    /** Method for creation through the object factory. */
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(AnalyticalDiffusionQballReconstructionImageFilter, 
+  itkTypeMacro(AnalyticalDiffusionQballReconstructionImageFilter,
                                                    ImageToImageFilter);
- 
+
   typedef TReferenceImagePixelType                 ReferencePixelType;
 
   typedef TGradientImagePixelType                  GradientPixelType;
 
-  typedef Vector< TOdfPixelType, NrOdfDirections >
-                                                   OdfPixelType;
-
-  /** Reference image data,  This image is aquired in the absence 
-   * of a diffusion sensitizing field gradient */
-  typedef typename Superclass::InputImageType      ReferenceImageType;
-  
-  typedef Image< OdfPixelType, 3 >                 OdfImageType;
-
-  typedef OdfImageType                             OutputImageType;
+  typedef Vector< TOdfPixelType, NrOdfDirections > OdfPixelType;
 
   typedef TOdfPixelType                            BZeroPixelType;
 
-  typedef Image< BZeroPixelType, 3 >      BZeroImageType;
+  /** Reference image data,  This image is aquired in the absence
+   * of a diffusion sensitizing field gradient */
+  typedef typename Superclass::InputImageType       ReferenceImageType;
+
+  typedef Image< OdfPixelType, 3 >                  OdfImageType;
+
+  typedef OdfImageType                              OutputImageType;
+
+  typedef Image< Vector< TOdfPixelType, (unsigned int)((NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL) >, 3 > CoefficientImageType;
+
+  typedef Image< BZeroPixelType, 3 >                BZeroImageType;
 
   typedef typename Superclass::OutputImageRegionType
                                                    OutputImageRegionType;
@@ -146,8 +147,8 @@ public:
   /** Typedef defining one (of the many) gradient images.  */
   typedef Image< GradientPixelType, 3 >            GradientImageType;
 
-  /** An alternative typedef defining one (of the many) gradient images. 
-   * It will be assumed that the vectorImage has the same dimension as the 
+  /** An alternative typedef defining one (of the many) gradient images.
+   * It will be assumed that the vectorImage has the same dimension as the
    * Reference image and a vector length parameter of \c n (number of
    * gradient directions)*/
   typedef VectorImage< GradientPixelType, 3 >      GradientImagesType;
@@ -155,27 +156,27 @@ public:
   /** Holds the ODF reconstruction matrix */
   typedef vnl_matrix< TOdfPixelType >*
                                                    OdfReconstructionMatrixType;
-  
+
   typedef vnl_matrix< double >                     CoefficientMatrixType;
 
   /** Holds each magnetic field gradient used to acquire one DWImage */
   typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
 
   /** Container to hold gradient directions of the 'n' DW measurements */
-  typedef VectorContainer< unsigned int, 
+  typedef VectorContainer< unsigned int,
           GradientDirectionType >                  GradientDirectionContainerType;
-  
+
   /** set method to add gradient directions and its corresponding
-   * image. The image here is a VectorImage. The user is expected to pass the 
-   * gradient directions in a container. The ith element of the container 
-   * corresponds to the gradient direction of the ith component image the 
+   * image. The image here is a VectorImage. The user is expected to pass the
+   * gradient directions in a container. The ith element of the container
+   * corresponds to the gradient direction of the ith component image the
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
-  void SetGradientImage( GradientDirectionContainerType *, 
+  void SetGradientImage( GradientDirectionContainerType *,
                                              const GradientImagesType *image);
-  
+
   /** Get reference image */
-  virtual ReferenceImageType * GetReferenceImage() 
+  virtual ReferenceImageType * GetReferenceImage()
   { return ( static_cast< ReferenceImageType *>(this->ProcessObject::GetInput(0)) ); }
 
   /** Return the gradient direction. idx is 0 based */
@@ -208,9 +209,10 @@ public:
   itkSetMacro( NormalizationMethod, Normalization);
   itkGetMacro( NormalizationMethod, Normalization );
 
-  typedef Image<float, 3> BlaImage;
+  typedef Image<float, 3> FloatImageType;
   itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
-  itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
+  itkGetMacro( ODFSumImage, typename FloatImageType::Pointer);
+  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer);
 
   itkSetMacro( BValue, TOdfPixelType);
 #ifdef GetBValue
@@ -247,15 +249,15 @@ protected:
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   void ComputeReconstructionMatrix();
-  
+
   void BeforeThreadedGenerateData();
-  void ThreadedGenerateData( const 
+  void ThreadedGenerateData( const
       OutputImageRegionType &outputRegionForThread, int);
-  
+
 private:
-  
+
   OdfReconstructionMatrixType                       m_ReconstructionMatrix;
-  
+
   OdfReconstructionMatrixType                       m_CoeffReconstructionMatrix;
 
   OdfReconstructionMatrixType                       m_SphericalHarmonicBasisMatrix;
@@ -287,7 +289,8 @@ private:
 
   vnl_matrix<double>*                               m_B_t;
   vnl_vector<double>*                               m_LP;
-  BlaImage::Pointer m_ODFSumImage;
+  FloatImageType::Pointer m_ODFSumImage;
+  typename CoefficientImageType::Pointer            m_CoefficientImage;
 };
 
 }

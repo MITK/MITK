@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkScreenshotMakerControls</class>
+ <widget class="QWidget" name="QmitkScreenshotMakerControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>430</width>
+    <height>368</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ScreenshotMaker</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_4">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_5">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_3">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>2D Screenshots</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QToolButton" name="btnScreenshot">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font/>
+        </property>
+        <property name="toolTip">
+         <string>Writes a screenshot of the selected (last clicked) render window.</string>
+        </property>
+        <property name="text">
+         <string>Single Screenshot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_Shot">
+        <property name="toolTip">
+         <string>Writes screenshots of the transversal, sagittal and coronal render window.</string>
+        </property>
+        <property name="text">
+         <string>Multiplanar Screenshot</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>3D Screenshots</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QToolButton" name="m_HRScreenshot">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font/>
+        </property>
+        <property name="toolTip">
+         <string>Writes a high resolution screenshot of the 3D render window.</string>
+        </property>
+        <property name="text">
+         <string>High-res Single Screenshot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_AllViews">
+        <property name="toolTip">
+         <string>Writes screenshots of the 3D render window from 3 different angles.</string>
+        </property>
+        <property name="text">
+         <string>High-res Multiplanar Screenshot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Upsampling:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_MagFactor">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="m_View1">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>10</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Rotate 3D camera 45° around x-axis.</string>
+        </property>
+        <property name="text">
+         <string>x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_View2">
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Rotate 3D camera 45° around y-axis.</string>
+        </property>
+        <property name="text">
+         <string>y</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="m_View3">
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Rotate 3D camera 45° around z-axis.</string>
+        </property>
+        <property name="text">
+         <string>z</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>308</width>
+          <height>23</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Background Color:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QPushButton" name="m_BackgroundColor">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>31</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

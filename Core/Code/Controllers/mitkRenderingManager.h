@@ -153,7 +153,7 @@ public:
   //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
-   * geometry. PLATFORM SPECIFIC. */
+   * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
   virtual bool InitializeViews( const Geometry3D *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
@@ -255,10 +255,10 @@ public:
   /** Returns a property list */
   PropertyList::Pointer GetPropertyList() const;
 
-  /** returns a property from m_PropertyList */
+  /** Returns a property from m_PropertyList */
   BaseProperty* GetProperty(const char *propertyKey) const;
 
-  /** retu"Use flexible zooming and padding"rns sets or adds (if not present) a property in m_PropertyList  */
+  /** Sets or adds (if not present) a property in m_PropertyList  */
   void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
 
   /**

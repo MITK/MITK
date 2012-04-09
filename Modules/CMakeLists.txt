@@ -1,12 +1,16 @@
-SET(LIBPOSTFIX "Ext")
+set(LIBPOSTFIX "Ext")
 
-SET(module_dirs
+# Modules must be listed according to their dependencies
+set(module_dirs
     SceneSerializationBase
     PlanarFigure
     ImageExtraction
     ImageStatistics
+    LegacyAdaptors
+    IpPicSupport
     MitkExt
     SceneSerialization
+    Qmitk
     QmitkExt
     GraphAlgorithms
     DiffusionImaging
@@ -23,25 +27,26 @@ SET(module_dirs
     InputDevices
     ToFHardware
     ToFProcessing
-    ToFUI    
+    ToFUI
+    ClippingTools
 )
 
-SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
+set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
 
-FOREACH(module_dir ${module_dirs})
-  ADD_SUBDIRECTORY(${module_dir})
-ENDFOREACH()
+foreach(module_dir ${module_dirs})
+  add_subdirectory(${module_dir})
+endforeach()
 
-IF(MITK_PRIVATE_MODULES)
-  FILE(GLOB all_subdirs RELATIVE ${MITK_PRIVATE_MODULES} ${MITK_PRIVATE_MODULES}/*)
-  FOREACH(subdir ${all_subdirs})
-    STRING(FIND ${subdir} "." _result)
-    IF(_result EQUAL -1)
-      IF(EXISTS ${MITK_PRIVATE_MODULES}/${subdir}/CMakeLists.txt)
-        MESSAGE(STATUS "Found private module ${subdir}")    
-        ADD_SUBDIRECTORY(${MITK_PRIVATE_MODULES}/${subdir} private_modules/${subdir})
-    ENDIF()
-    ENDIF()
-  ENDFOREACH()     
-ENDIF(MITK_PRIVATE_MODULES)
+if(MITK_PRIVATE_MODULES)
+  file(GLOB all_subdirs RELATIVE ${MITK_PRIVATE_MODULES} ${MITK_PRIVATE_MODULES}/*)
+  foreach(subdir ${all_subdirs})
+    string(FIND ${subdir} "." _result)
+    if(_result EQUAL -1)
+      if(EXISTS ${MITK_PRIVATE_MODULES}/${subdir}/CMakeLists.txt)
+        message(STATUS "Found private module ${subdir}")    
+        add_subdirectory(${MITK_PRIVATE_MODULES}/${subdir} private_modules/${subdir})
+    endif()
+    endif()
+  endforeach()     
+endif(MITK_PRIVATE_MODULES)
 

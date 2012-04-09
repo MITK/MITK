@@ -69,6 +69,11 @@ function(mitkFunctionGetVersion source_dir prefix)
   
   set(${prefix}_WC_TYPE ${_wc_type} PARENT_SCOPE)
   set(${prefix}_REVISION_ID ${_wc_id} PARENT_SCOPE)
+  set(_shortid ${_wc_id})
+  if(_wc_type STREQUAL "git")
+    string(SUBSTRING ${_shortid} 0 8 _shortid)
+  endif()
+  set(${prefix}_REVISION_SHORTID ${_shortid} PARENT_SCOPE)
   set(${prefix}_REVISION_NAME ${_wc_name} PARENT_SCOPE)
 
   # For backwards compatibility

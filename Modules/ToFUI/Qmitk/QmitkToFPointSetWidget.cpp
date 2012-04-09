@@ -164,25 +164,31 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     m_MeasurementPointSet3DNode->SetData(measurementPointSet3D);
     dataStorage->Add(m_MeasurementPointSet3DNode);
     // initialize PointSets
-    m_PointSet2D = mitk::PointSet::New();
-    mitk::DataNode::Pointer pointSet2DNode = mitk::DataNode::New();
-    pointSet2DNode->SetName("ToF PointSet 2D");
-    pointSet2DNode->SetVisibility(false,stdMultiWidget->mitkWidget4->GetRenderer());
-    pointSet2DNode->SetData(m_PointSet2D);
-    dataStorage->Add(pointSet2DNode);
-    m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
+    if(!dataStorage->Exists(dataStorage->GetNamedNode("ToF PointSet 2D")))
+    {
+      m_PointSet2D = mitk::PointSet::New();
+      mitk::DataNode::Pointer pointSet2DNode = mitk::DataNode::New();
+      pointSet2DNode->SetName("ToF PointSet 2D");
+      pointSet2DNode->SetVisibility(false,stdMultiWidget->mitkWidget4->GetRenderer());
+      pointSet2DNode->SetData(m_PointSet2D);
+      dataStorage->Add(pointSet2DNode);
+      m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
+    }
     // create observer for m_MeasurementPointSet2D
     itk::SimpleMemberCommand<QmitkToFPointSetWidget>::Pointer pointSetChangedCommand;
     pointSetChangedCommand = itk::SimpleMemberCommand<QmitkToFPointSetWidget>::New();
     pointSetChangedCommand->SetCallbackFunction(this, &QmitkToFPointSetWidget::PointSetChanged);
     m_PointSetChangedObserverTag = m_PointSet2D->AddObserver(itk::ModifiedEvent(), pointSetChangedCommand);
     // initialize 3D point set
-    m_PointSet3DNode = mitk::DataNode::New();
-    m_PointSet3DNode->SetName("ToF PointSet 3D");
-    m_PointSet3DNode->SetFloatProperty("pointsize",5.0f);
-    mitk::PointSet::Pointer pointSet3D = mitk::PointSet::New();
-    m_PointSet3DNode->SetData(pointSet3D);
-    dataStorage->Add(m_PointSet3DNode);
+    if(!dataStorage->Exists(dataStorage->GetNamedNode("ToF PointSet 3D")))
+    {
+      m_PointSet3DNode = mitk::DataNode::New();
+      m_PointSet3DNode->SetName("ToF PointSet 3D");
+      m_PointSet3DNode->SetFloatProperty("pointsize",5.0f);
+      mitk::PointSet::Pointer pointSet3D = mitk::PointSet::New();
+      m_PointSet3DNode->SetData(pointSet3D);
+      dataStorage->Add(m_PointSet3DNode);
+    }
   }
 }
 

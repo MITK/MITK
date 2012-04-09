@@ -20,7 +20,7 @@
 #include "berryEditorRegistry.h"
 #include "berryEditorDescriptor.h"
 #include "berryWorkbenchRegistryConstants.h"
-#include "../berryPlatformUI.h"
+#include "berryPlatformUI.h"
 
 #include <Poco/String.h>
 #include <Poco/StringTokenizer.h>

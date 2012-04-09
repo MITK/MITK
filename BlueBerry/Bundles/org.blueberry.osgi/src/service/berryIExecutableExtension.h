@@ -1,8 +1,8 @@
 #ifndef BERRYIEXECUTABLEEXTENSION_H_
 #define BERRYIEXECUTABLEEXTENSION_H_
 
-#include "../berryObject.h"
-#include "../berrySmartPointer.h"
+#include "berryObject.h"
+#include "berrySmartPointer.h"
 
 #include <QObject>
 

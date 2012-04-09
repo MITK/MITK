@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.InputDevicesPreferencePage" name="Input Devices" class="QmitkInputDevicesPrefPage">
+      <keywordreference id="org.mitk.InputDevicesPreferencePageKeywords"/>
+    </page>
+    <page id="org.mitk.AppInstancesPreferencePage" name="Application Instances"
+          class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
+      <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
+    
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances"/>
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.modules"
+      name="Modules"
+      category="org.mitk.views.general"
+      class="QmitkModuleView"
+      icon="resources/ModuleView.png" />
+  </extension>
+
+</plugin>

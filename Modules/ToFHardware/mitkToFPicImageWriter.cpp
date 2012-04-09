@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPicFileWriter.h>
 #include <mitkPicFileReader.h>
 
+// deprecated support of mitkIpPic
+#include <mitkLegacyAdaptors.h>
+
 // itk includes
 #include "itksys/SystemTools.hxx"
 
@@ -57,21 +60,24 @@ namespace mitk
     unsigned int dimensions[4];
     dimensions[0] = this->m_CaptureWidth;
     dimensions[1] = this->m_CaptureHeight;
+
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
     if (this->m_ToFImageType == ToFImageWriter::ToFImageType2DPlusT)
     {
       dimensions[2] = 1;
       dimensions[3] = 2;
-      this->m_MitkImage->Initialize( PixelType(typeid(float)), 4, dimensions, 1);
+      this->m_MitkImage->Initialize( FloatType, 4, dimensions, 1);
     }
     else
     {
       dimensions[2] = 2;
       dimensions[3] = 1;
-      this->m_MitkImage->Initialize( PixelType(typeid(float)), 3, dimensions, 1);
+      this->m_MitkImage->Initialize( FloatType, 3, dimensions, 1);
     }
     this->m_MitkImage->SetSlice(floatData, 0, 0, 0);
 
-    mitkIpPicDescriptor* pic = this->m_MitkImage->GetPic();
+    mitkIpPicDescriptor* pic = mitkIpPicNew();
+    CastToIpPicDescriptor( this->m_MitkImage, pic);
 
     if (this->m_DistanceImageSelected)
     {
@@ -150,7 +156,8 @@ namespace mitk
 
   void ToFPicImageWriter::ReplacePicFileHeader(FILE* outfile)
   {
-    mitkIpPicDescriptor* pic = this->m_MitkImage->GetPic();
+    mitkIpPicDescriptor* pic = mitkIpPicNew();
+    CastToIpPicDescriptor( this->m_MitkImage, pic);
 
     if (this->m_ToFImageType == ToFImageWriter::ToFImageType2DPlusT)
     {

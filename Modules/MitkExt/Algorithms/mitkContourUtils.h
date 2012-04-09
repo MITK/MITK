@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "MitkExtExports.h"
 #include "mitkContour.h"
+#include "mitkLegacyAdaptors.h"
 
 #include <itkImage.h>
 

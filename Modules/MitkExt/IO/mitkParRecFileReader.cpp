@@ -58,7 +58,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
     bool headerRead = false;
 
-    mitk::PixelType type;
+    bool signedCharType = true;
     unsigned int dimension=0;
     unsigned int dimensions[4]={0,0,1,1};
     float sliceThickness=0.0;
@@ -102,10 +102,8 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         {
           p=strchr(s,':')+1;
           int bpe=atoi(p);
-          if(bpe==8)
-            type=typeid(mitkIpUInt1_t);
-          else
-            type=typeid(mitkIpUInt2_t);
+          if(bpe!=8)
+            signedCharType = false;
         }
         else
         if(strstr(s,"Recon resolution"))
@@ -169,7 +167,15 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
       return;
     }
     
-    output->Initialize(type, dimension, dimensions);
+    // define types
+    mitk::PixelType SCType = mitk::MakeScalarPixelType<signed char>();
+    mitk::PixelType SSType = mitk::MakeScalarPixelType<signed short>();
+
+    if( signedCharType )
+      output->Initialize(SCType, dimension, dimensions);
+    else
+      output->Initialize(SSType, dimension, dimensions);
+
     output->GetSlicedGeometry()->SetSpacing(spacing);
 
     //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);

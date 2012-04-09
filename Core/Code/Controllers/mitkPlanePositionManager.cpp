@@ -59,7 +59,7 @@ unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition ( const Geom
 
 bool mitk::PlanePositionManagerService::RemovePlanePosition( unsigned int ID )
 {
-  if (m_PositionList.size() > ID && ID >= 0)
+  if (m_PositionList.size() > ID)
   {
       m_PositionList.erase(m_PositionList.begin()+ID);
       return true;

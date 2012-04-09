@@ -18,11 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYWORKBENCHWINDOWCONFIGURER_H_
 #define BERRYWORKBENCHWINDOWCONFIGURER_H_
 
-#include "../application/berryIActionBarConfigurer.h"
-#include "../application/berryIWorkbenchConfigurer.h"
-#include "../application/berryIWorkbenchWindowConfigurer.h"
+#include "application/berryIActionBarConfigurer.h"
+#include "application/berryIWorkbenchConfigurer.h"
+#include "application/berryIWorkbenchWindowConfigurer.h"
 
 #include <berryWeakPointer.h>
+
+#include <QSet>
 
 namespace berry
 {
@@ -104,13 +106,13 @@ public:
      * Holds the list drag and drop <code>Transfer</code> for the
      * editor area
      */
-    //private: ArrayList transferTypes = new ArrayList(3);
+    private: QSet<QString> transferTypes;
 
     /**
      * The <code>DropTargetListener</code> implementation for handling a
      * drop into the editor area.
      */
-    //private: DropTargetListener dropTargetListener = null;
+    private: IDropTargetListener::Pointer dropTargetListener;
 
 
     /**
@@ -346,59 +348,22 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#addEditorAreaTransfer
      */
-//    public: void addEditorAreaTransfer(Transfer tranfer) {
-//        if (tranfer != null && !transferTypes.contains(tranfer)) {
-//            transferTypes.add(tranfer);
-//            Transfer[] transfers = new Transfer[transferTypes.size()];
-//            transferTypes.toArray(transfers);
-//            IWorkbenchPage[] pages = window.getPages();
-//            for (int i = 0; i < pages.length; i++) {
-//                WorkbenchPage page = (WorkbenchPage) pages[i];
-//                DropTarget dropTarget = ((EditorSashContainer) page
-//                        .getEditorPresentation().getLayoutPart())
-//                        .getDropTarget();
-//                if (dropTarget != null) {
-//                    dropTarget.setTransfer(transfers);
-//                }
-//            }
-//        }
-//    }
+    public: void AddEditorAreaTransfer(const QStringList& transferTypes);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
      */
-//    public: void configureEditorAreaDropListener(
-//            DropTargetListener dropTargetListener) {
-//        if (dropTargetListener != null) {
-//            this.dropTargetListener = dropTargetListener;
-//            IWorkbenchPage[] pages = window.getPages();
-//            for (int i = 0; i < pages.length; i++) {
-//                WorkbenchPage page = (WorkbenchPage) pages[i];
-//                DropTarget dropTarget = ((EditorSashContainer) page
-//                        .getEditorPresentation().getLayoutPart())
-//                        .getDropTarget();
-//                if (dropTarget != null) {
-//                    dropTarget.addDropListener(this.dropTargetListener);
-//                }
-//            }
-//        }
-//    }
+    public: void ConfigureEditorAreaDropListener(const IDropTargetListener::Pointer &listener);
 
     /**
      * Returns the array of <code>Transfer</code> added by the application
      */
-//    /* package */Transfer[] getTransfers() {
-//        Transfer[] transfers = new Transfer[transferTypes.size()];
-//        transferTypes.toArray(transfers);
-//        return transfers;
-//    }
+public: QStringList GetTransfers() const;
 
     /**
      * Returns the drop listener provided by the application.
      */
-//    /* package */DropTargetListener getDropTargetListener() {
-//        return dropTargetListener;
-//    }
+public: IDropTargetListener::Pointer GetDropTargetListener() const;
 
     /* (non-javadoc)
      * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer

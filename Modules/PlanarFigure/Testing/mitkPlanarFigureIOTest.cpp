@@ -294,8 +294,6 @@ public:
       return false;
     }
 
-    const char* figureName = figure1->GetNameOfClass();
-
     // Test for equal number of control points
     if(figure1->GetNumberOfControlPoints() != figure2->GetNumberOfControlPoints())
     {

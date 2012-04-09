@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryIExtensionPoint.h>
 
-#include "../berryIEditorRegistry.h"
-#include "../berryIFileEditorMapping.h"
+#include "berryIEditorRegistry.h"
+#include "berryIFileEditorMapping.h"
 #include "berryEditorDescriptor.h"
 #include "berryFileEditorMapping.h"
 

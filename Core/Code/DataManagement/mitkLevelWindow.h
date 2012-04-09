@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include <MitkExports.h>
 
-struct mitkIpPicDescriptor;
+//struct mitkIpPicDescriptor;
 
 namespace mitk {
 
@@ -183,12 +183,6 @@ public:
   virtual LevelWindow& operator=(const LevelWindow& levWin);
 
 protected:
-
-  /**!
-  * \brief sets level/window according to the tags in the given mitkIpPicDescriptor
-  * \return @a true if tags where found
-  */
-  bool SetAutoByPicTags(const mitkIpPicDescriptor* pic);
 
   /*!
   * lower bound of current window

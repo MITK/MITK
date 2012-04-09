@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPartPane.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryWorkbenchPageTweaklet.h"
 
 #include "berryWorkbenchPage.h"
 #include "berryPartStack.h"

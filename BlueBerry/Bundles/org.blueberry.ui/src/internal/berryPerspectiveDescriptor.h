@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryIConfigurationElement.h>
 
-#include "../berryIPerspectiveDescriptor.h"
-#include "../berryIPerspectiveFactory.h"
-#include "../berryIMemento.h"
+#include "berryIPerspectiveDescriptor.h"
+#include "berryIPerspectiveFactory.h"
+#include "berryIMemento.h"
 
 #include <string>
 

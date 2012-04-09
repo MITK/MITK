@@ -17,7 +17,7 @@
 
 #include "berryWorkbenchConstants.h"
 
-#include "../berryPlatformUI.h"
+#include "berryPlatformUI.h"
 
 namespace berry
 {

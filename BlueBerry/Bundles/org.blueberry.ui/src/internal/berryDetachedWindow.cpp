@@ -17,12 +17,12 @@
 
 #include "berryDetachedWindow.h"
 
-#include "../berryIWorkbenchPartConstants.h"
-#include "../berryISaveablePart.h"
+#include "berryIWorkbenchPartConstants.h"
+#include "berryISaveablePart.h"
 
 #include "berryWorkbenchWindow.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "berryWorkbenchConstants.h"
 #include "berryEditorManager.h"

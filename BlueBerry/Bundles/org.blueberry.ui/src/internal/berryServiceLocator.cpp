@@ -19,8 +19,8 @@
 
 #include "berryWorkbenchServiceRegistry.h"
 
-#include "../services/berryIServiceFactory.h"
-#include "../services/berryINestable.h"
+#include "services/berryIServiceFactory.h"
+#include "services/berryINestable.h"
 
 #include <Poco/Exception.h>
 

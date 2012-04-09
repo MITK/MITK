@@ -4,8 +4,8 @@
 #include "berryWorkbenchPartReference.h"
 #include "berryIStackableContainer.h"
 
-#include "../berryIEditorReference.h"
-#include "../berryIViewReference.h"
+#include "berryIEditorReference.h"
+#include "berryIViewReference.h"
 
 #include <deque>
 

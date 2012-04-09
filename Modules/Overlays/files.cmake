@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   QmitkOverlay.cpp
   QmitkOverlayController.cpp
   QmitkScalarBar.cpp
@@ -6,7 +6,7 @@ SET(CPP_FILES
   QmitkTextOverlay.cpp
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   QmitkOverlay.h
   QmitkOverlayController.h
   QmitkScalarBar.h

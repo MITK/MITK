@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
 
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
 
@@ -112,21 +112,23 @@ SET(CPP_FILES
  QmitkRegionGrow3DToolGUI.cpp
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
+ 
+ QmitkAdaptiveRegionGrowingWidget.cpp
 
  QmitkModuleTableModel.cpp
  QmitkModulesDialog.cpp
 )
 
-IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
-  SET(CPP_FILES
+if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
+  set(CPP_FILES
     ${CPP_FILES}
     QmitkVtkHistogramWidget.cpp
     QmitkVtkLineProfileWidget.cpp
   )
-ENDIF()
+endif()
 
-IF (NOT APPLE)
-SET(CPP_FILES
+if(NOT APPLE)
+set(CPP_FILES
   ${CPP_FILES}
  QmitkBaseComponent.cpp
  QmitkBaseFunctionalityComponent.cpp
@@ -134,12 +136,12 @@ SET(CPP_FILES
  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
 
  )
-ENDIF()
+endif()
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
 
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
 
 
  QmitkPropertyObservers/QmitkBasePropertyView.h
@@ -218,27 +220,28 @@ SET(MOC_H_FILES
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
+ QmitkAdaptiveRegionGrowingWidget.h
 )
 
-IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
-  SET(MOC_H_FILES
+if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
+  set(MOC_H_FILES
     ${MOC_H_FILES}
     QmitkVtkHistogramWidget.h
     QmitkVtkLineProfileWidget.h
   )
-ENDIF()
+endif()
 
-IF (NOT APPLE)
-SET(MOC_H_FILES
+if(NOT APPLE)
+set(MOC_H_FILES
   ${MOC_H_FILES}
  QmitkBaseComponent.h
  QmitkBaseFunctionalityComponent.h
  QmitkFunctionalityComponentContainer.h
  QmitkFunctionalityComponents/QmitkThresholdComponent.h
 )
-ENDIF()
+endif()
 
-SET(UI_FILES
+set(UI_FILES
   QmitkSliderNavigator.ui
   # QmitkLevelWindowRangeChange.ui
   # QmitkLevelWindowPresetDefinition.ui
@@ -251,8 +254,9 @@ SET(UI_FILES
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
+  QmitkAdaptiveRegionGrowingWidgetControls.ui
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   QmitkExt.qrc
 )

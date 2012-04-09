@@ -131,8 +131,6 @@ public:
   virtual DataObjectPointer MakeOutput(unsigned int idx);
   virtual void* GetData();
 
-  virtual mitkIpPicDescriptor* GetPic();
-
   virtual vtkImageData* GetVtkImageData();
 
 protected:

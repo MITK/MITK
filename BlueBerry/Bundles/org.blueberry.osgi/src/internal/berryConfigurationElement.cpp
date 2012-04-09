@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryConfigurationElement.h"
 #include "berryExtension.h"
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 
 #include <Poco/DOM/NamedNodeMap.h>
 #include <Poco/DOM/NodeList.h>

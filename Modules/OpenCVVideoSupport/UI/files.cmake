@@ -1,15 +1,15 @@
-SET(CPP_FILES
+set(CPP_FILES
   QmitkOpenCVVideoControls.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   QmitkOpenCVVideoControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   QmitkOpenCVVideoControls.h
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   OpenCVVideoSupportUI.qrc
 )

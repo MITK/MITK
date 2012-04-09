@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYVIEWREGISTRY_H_
 #define BERRYVIEWREGISTRY_H_
 
-#include "../berryIViewRegistry.h"
-#include "../berryIViewCategory.h"
-#include "../berryIViewDescriptor.h"
+#include "berryIViewRegistry.h"
+#include "berryIViewCategory.h"
+#include "berryIViewDescriptor.h"
 
 #include "berryCategory.h"
 #include "berryViewDescriptor.h"

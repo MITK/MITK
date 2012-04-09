@@ -1,0 +1,19 @@
+/**
+\page org_igttrackinglab The IGT-TrackingLab
+
+\image html icon.png "Icon of the Module"
+
+Available sections:
+  - \ref QmitkIGTTrackingLabUsersManualOverview
+
+\section QmitkIGTTrackingLabUsersManualOverview
+
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

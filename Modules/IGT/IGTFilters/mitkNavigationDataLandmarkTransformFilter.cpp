@@ -54,11 +54,17 @@ mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFil
 void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform(LandmarkPointContainer& sources, const LandmarkPointContainer& targets)
 {
   if (m_UseICPInitialization == true)
+  {
     if (this->FindCorrespondentLandmarks(sources, targets) == false) // determine landmark correspondences with iterative closest point optimization, sort sort landmarks accordingly
     {
       itkExceptionMacro("Landmark correspondence finding failed.");
     }
-    this->UpdateLandmarkTransform(sources, targets);
+  }
+
+  if(m_SourcePoints.size() != m_TargetPoints.size())// check whether target and source points size are equal itk registration won't work otherways
+    return;
+
+  this->UpdateLandmarkTransform(sources, targets); // if size of source and target points is equal
 }
 
 

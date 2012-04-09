@@ -41,6 +41,7 @@ mitk::PlanarFigureInteractor
 ::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
 : Interactor( type, dataNode ),
 m_Precision( 6.5 ),
+m_MinimumPointDistance( 25.0 ),
 m_IsHovering( false ),
 m_LastPointWasValid( false )
 {
@@ -54,6 +55,13 @@ void mitk::PlanarFigureInteractor::SetPrecision( mitk::ScalarType precision )
 {
   m_Precision = precision;
 }
+
+
+void mitk::PlanarFigureInteractor::SetMinimumPointDistance( ScalarType minimumDistance )
+{
+  m_MinimumPointDistance = minimumDistance;
+}
+
 
 // Overwritten since this class can handle it better!
 float mitk::PlanarFigureInteractor
@@ -114,14 +122,14 @@ bool mitk::PlanarFigureInteractor
   // Get the timestep to also support 3D+t
   const mitk::Event *theEvent = stateEvent->GetEvent();
   int timeStep = 0;
-  mitk::ScalarType timeInMS = 0.0;
+  //mitk::ScalarType timeInMS = 0.0;
 
   if ( theEvent )
   {
     if (theEvent->GetSender() != NULL)
     {
       timeStep = theEvent->GetSender()->GetTimeStep( planarFigure );
-      timeInMS = theEvent->GetSender()->GetTime();
+      //timeInMS = theEvent->GetSender()->GetTime();
     }
   }
 
@@ -228,6 +236,13 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
+      // check if the control points shall be hidden during interaction
+      bool hidecontrolpointsduringinteraction = false;
+      m_DataNode->GetBoolProperty( "planarfigure.hidecontrolpointsduringinteraction", hidecontrolpointsduringinteraction );
+
+      // hide the control points if necessary
+      m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", !hidecontrolpointsduringinteraction );
+
       // Move current control point to this point
       planarFigure->SetCurrentControlPoint( point2D );
 
@@ -255,6 +270,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
@@ -285,7 +301,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      if ( m_LastPointWasValid && planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  )
+      if ( planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  )
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners
@@ -293,6 +309,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->RemoveLastControlPoint();
         planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         m_DataNode->Modified();
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
@@ -409,6 +426,7 @@ bool mitk::PlanarFigureInteractor
       planarFigure->Modified();
       planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
+      m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
       m_DataNode->Modified();
 
       // falls through
@@ -588,6 +606,34 @@ bool mitk::PlanarFigureInteractor
       break;
     }
 
+  case AcENTEROBJECT:
+    {
+      bool selected = false;
+      m_DataNode->GetBoolProperty("selected", selected);
+
+      // no need to invoke this if the figure is already selected
+      if ( !selected )
+      {
+        planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+      }
+  
+      // if this was a right mouse button click, invoke the event
+      if ( theEvent->GetButton() == 2 )
+      {
+        planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
+        ok = true;
+      }
+      else
+      {
+        ok = false;  
+      }
+
+      // we HAVE TO proceed with 'EIDNO' here to ensure correct states
+      // and convenient application behaviour
+      this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+      break;
+    }
+
 
   case AcSELECTPOINT:
     {
@@ -622,6 +668,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->EvaluateFeatures();
         planarFigure->Modified();
 
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         renderer->GetRenderingManager()->RequestUpdateAll();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -731,10 +778,9 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   // Point is inside encompassing rectangle IF
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
-  if ( (crossPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
-    && ( l1 > 0.0 ) && ( l2 > 0.0 ) 
-    || endPoint.SquaredEuclideanDistanceTo( point ) < 20.0 
-    || startPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
+  if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
+      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0 
+      || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
   {
     return true;
   }
@@ -767,7 +813,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
 
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
-  int previousControlPoint = -1;
 
   for ( unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop )
   {
@@ -900,7 +945,7 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   // Check if a previous point has been set
   bool tooClose = false;
 
-  for( int i=0; i<planarFigure->GetNumberOfControlPoints(); i++ )
+  for( int i=0; i < (int)planarFigure->GetNumberOfControlPoints(); i++ )
   {
     if ( i != planarFigure->GetSelectedControlPoint() )
     {
@@ -922,7 +967,7 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
         double b = currentDisplayPosition[1] - previousDisplayPosition[1];
 
         // If point is to close, do not set a new point
-        tooClose = (a * a + b * b < 25.0);
+        tooClose = (a * a + b * b < m_MinimumPointDistance );
       }
       if ( tooClose )
         return false; // abort loop early

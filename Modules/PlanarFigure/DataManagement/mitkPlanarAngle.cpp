@@ -42,7 +42,7 @@ void mitk::PlanarAngle::GeneratePolyLine()
   this->ClearPolyLines();
 
   // Generate poly-line for angle
-  for ( int i=0; i<this->GetNumberOfControlPoints(); i++ )
+  for ( unsigned int i=0; i<this->GetNumberOfControlPoints(); i++ )
   {
     mitk::PlanarFigure::PolyLineElement element( this->GetControlPoint( i ), i );
     this->AppendPointToPolyLine( 0, element );

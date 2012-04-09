@@ -18,8 +18,8 @@
 #ifndef BERRYDEFAULTSTACKPRESENTATIONSITE_H_
 #define BERRYDEFAULTSTACKPRESENTATIONSITE_H_
 
-#include "../presentations/berryIStackPresentationSite.h"
-#include "../presentations/berryStackPresentation.h"
+#include "presentations/berryIStackPresentationSite.h"
+#include "presentations/berryStackPresentation.h"
 
 namespace berry
 {

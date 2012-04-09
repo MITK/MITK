@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorImage.h"
 #include "itkImageFileReader.h"
 #include "mitkTbssImage.h"
-#include "MitkDiffusionImagingExports.h".h"
+#include "MitkDiffusionImagingExports.h"
 
 
 

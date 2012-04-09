@@ -152,7 +152,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
     {
       unsigned int dim[]={ slice->GetDimension(0) + 2, slice->GetDimension(1) + 2 };
       slice = mitk::Image::New();
-      slice-> Initialize(mitk::PixelType(typeid(signed int)), 2, dim);
+      slice-> Initialize(mitk::MakeScalarPixelType<signed int>() , 2, dim);
       unsigned int i;
       signed int *p = (signed int*)slice->GetData();
       unsigned int size = dim[0]*dim[1];
@@ -188,7 +188,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       if ( (slice->GetDimension(0) <3) || (slice->GetDimension(1) <3) ) continue; // not possible shrink the image much further
       unsigned int dim[]={ slice->GetDimension(0) - 2, slice->GetDimension(1) - 2 };
       slice = mitk::Image::New();
-      slice-> Initialize(mitk::PixelType(typeid(signed int)), 2, dim);
+      slice-> Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
       unsigned int i;
       signed int *p = (signed int*)slice->GetData();
       unsigned int size = dim[0]*dim[1];

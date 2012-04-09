@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "service/berryIConfigurationElement.h"
 
-#include "../berryExpression.h"
-#include "../berryElementHandler.h"
-#include "../berryExpressionConverter.h"
+#include "berryExpression.h"
+#include "berryElementHandler.h"
+#include "berryExpressionConverter.h"
 
 namespace berry
 {

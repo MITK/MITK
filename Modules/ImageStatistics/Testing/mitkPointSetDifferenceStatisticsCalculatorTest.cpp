@@ -94,7 +94,7 @@ static void TestSimpleCase()
 }
 };
 
-int mitkPointSetDifferenceStatisticsCalculatorTest(int argc, char* argv[])
+int mitkPointSetDifferenceStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkPointSetDifferenceStatisticsCalculatorTest")

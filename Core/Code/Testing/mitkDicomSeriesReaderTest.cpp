@@ -119,9 +119,9 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
     MITK_TEST_CONDITION(sliceLocation != NULL, "Test if tag for slice location has been set to mitk image");
     if(sliceLocation != NULL)
     {
-      for(int i = 0; i < sliceLocation->GetValue().GetLookupTable().size(); i++)
+      for(int i = 0; i < (int)sliceLocation->GetValue().GetLookupTable().size(); i++)
       {
-        if(i < files->GetValue().GetLookupTable().size())
+        if(i < (int)files->GetValue().GetLookupTable().size())
         {
           MITK_INFO << "Table value: " << sliceLocation->GetValue().GetTableValue(i) << " and File value: " << tagInformations[files->GetValue().GetTableValue(i).c_str()][tagSliceLocation] << std::endl;
           MITK_INFO << "Filename: " << files->GetValue().GetTableValue(i).c_str() << std::endl;
@@ -133,9 +133,9 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
     MITK_TEST_CONDITION(instanceNumber != NULL, "Test if tag for image instance number has been set to mitk image");
     if(instanceNumber != NULL)
     {
-      for(int i = 0; i < instanceNumber->GetValue().GetLookupTable().size(); i++)
+      for(int i = 0; i < (int)instanceNumber->GetValue().GetLookupTable().size(); i++)
       {
-        if(i < files->GetValue().GetLookupTable().size())
+        if(i < (int)files->GetValue().GetLookupTable().size())
         {
           MITK_INFO << "Table value: " << instanceNumber->GetValue().GetTableValue(i) << " and File value: " << tagInformations[files->GetValue().GetTableValue(i).c_str()][tagInstanceNumber] << std::endl;
           MITK_INFO << "Filename: " << files->GetValue().GetTableValue(i).c_str() << std::endl;
@@ -147,9 +147,9 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
     MITK_TEST_CONDITION(SOPInstnaceNumber != NULL, "Test if tag for SOP instance number has been set to mitk image");
     if(SOPInstnaceNumber != NULL)
     {
-      for(int i = 0; i < SOPInstnaceNumber->GetValue().GetLookupTable().size(); i++)
+      for(int i = 0; i < (int)SOPInstnaceNumber->GetValue().GetLookupTable().size(); i++)
       {
-        if(i < files->GetValue().GetLookupTable().size())
+        if(i < (int)files->GetValue().GetLookupTable().size())
         {
           MITK_INFO << "Table value: " << instanceNumber->GetValue().GetTableValue(i) << " and File value: " << tagInformations[files->GetValue().GetTableValue(i).c_str()][tagSOPInstanceNumber] << std::endl;
           MITK_INFO << "Filename: " << files->GetValue().GetTableValue(i).c_str() << std::endl;

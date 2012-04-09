@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/org.blueberry.ui.qt.help">
+        <file>find.png</file>
+        <file>go-home.png</file>
+        <file>go-next.png</file>
+        <file>go-previous.png</file>
+        <file>zoom-in.png</file>
+        <file>zoom-out.png</file>
+        <file>close.png</file>
+        <file>clear.png</file>
+    </qresource>
+</RCC>

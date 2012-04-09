@@ -56,16 +56,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <exception>
 
-
-
 namespace mitk
 {
 
 ImageStatisticsCalculator::ImageStatisticsCalculator()
 : m_MaskingMode( MASKING_MODE_NONE ),
   m_MaskingModeChanged( false ),
-  m_DoIgnorePixelValue(false),
   m_IgnorePixelValue(0.0),
+  m_DoIgnorePixelValue(false),
   m_IgnorePixelValueChanged(false)
 { 
   m_EmptyHistogram = HistogramType::New();
@@ -764,20 +762,42 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     itkExceptionMacro( << "Mask needs to have same spacing as image! (Image spacing: " << imageSpacing << "; Mask spacing: " << maskSpacing << ")" );
   }
 
+  // Make sure that orientation of mask and image are the same
+  typedef typename ImageType::DirectionType DirectionType;
+  DirectionType imageDirection = image->GetDirection();
+  DirectionType maskDirection = maskImage->GetDirection();
+  for( int i = 0; i < imageDirection.ColumnDimensions; ++i )
+  {
+    for( int j = 0; j < imageDirection.ColumnDimensions; ++j )
+    {
+      double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
+      if ( fabs( differenceDirection ) > mitk::eps )
+      {
+        itkExceptionMacro( << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")" );
+      }
+    }
+  }
   
   // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
   PointType imageOrigin = image->GetOrigin();
   PointType maskOrigin = maskImage->GetOrigin();
   long offset[ImageType::ImageDimension];
+
+  typedef itk::ContinuousIndex<double, VImageDimension> ContinousIndexType;
+  ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
+
+  image->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
+  image->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
+
   for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
   {
-    double indexCoordDistance = (maskOrigin[i] - imageOrigin[i]) / imageSpacing[i];
-    double misalignment = indexCoordDistance - floor( indexCoordDistance + 0.5 );
-    if ( fabs( misalignment ) > imageSpacing[i] / 20.0 )
+    double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
+    if ( fabs( misalignment ) > mitk::eps )
     {
       itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
     }
 
+    double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
     offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
   }
 
@@ -945,7 +965,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   bool outOfBounds = false;
   vtkSmartPointer<vtkPoints> points = vtkPoints::New();
   typename PlanarFigure::PolyLineType::const_iterator it;
-  const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
   for ( it = planarFigurePolyline.begin();
         it != planarFigurePolyline.end();
         ++it )

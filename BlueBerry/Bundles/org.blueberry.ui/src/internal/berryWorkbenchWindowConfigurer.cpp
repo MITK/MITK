@@ -18,9 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryWorkbenchWindowConfigurer.h"
 
 #include "berryWorkbenchWindow.h"
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 #include "berryWorkbench.h"
+#include "berryWorkbenchPage.h"
+#include "berryEditorSashContainer.h"
 #include "berryWorkbenchPlugin.h"
+
+#include "berryQtDnDControlWidget.h"
 
 namespace berry
 {
@@ -171,6 +175,48 @@ void WorkbenchWindowConfigurer::SetShowProgressIndicator(bool show)
 {
   showProgressIndicator = show;
   // @issue need to be able to reconfigure after window's controls created
+}
+
+void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfers)
+{
+  if (transfers.isEmpty()) return;
+
+  int oldSize = transferTypes.size();
+  transferTypes.unite(QSet<QString>::fromList(transfers));
+
+  if (transferTypes.size() == oldSize) return;
+
+  WorkbenchPage::Pointer page = window.Lock()->GetActivePage().Cast<WorkbenchPage>();
+  if (page)
+  {
+    QtDnDControlWidget* dropTarget =
+        static_cast<QtDnDControlWidget*>(page->GetEditorPresentation()->GetLayoutPart().Cast<EditorSashContainer>()->GetParent());
+    dropTarget->SetTransferTypes(transferTypes.toList());
+  }
+}
+
+void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(const IDropTargetListener::Pointer& listener)
+{
+  if (listener == 0) return;
+  dropTargetListener = listener;
+
+  WorkbenchPage::Pointer page = window.Lock()->GetActivePage().Cast<WorkbenchPage>();
+  if (page)
+  {
+    QtDnDControlWidget* dropTarget =
+        static_cast<QtDnDControlWidget*>(page->GetEditorPresentation()->GetLayoutPart().Cast<EditorSashContainer>()->GetParent());
+    dropTarget->AddDropListener(listener.GetPointer());
+  }
+}
+
+QStringList WorkbenchWindowConfigurer::GetTransfers() const
+{
+  return transferTypes.toList();
+}
+
+IDropTargetListener::Pointer WorkbenchWindowConfigurer::GetDropTargetListener() const
+{
+  return dropTargetListener;
 }
 
 IActionBarConfigurer::Pointer WorkbenchWindowConfigurer::GetActionBarConfigurer()

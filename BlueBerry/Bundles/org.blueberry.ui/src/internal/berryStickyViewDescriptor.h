@@ -18,7 +18,7 @@
 #ifndef BERRYSTICKYVIEWDESCRIPTOR_H_
 #define BERRYSTICKYVIEWDESCRIPTOR_H_
 
-#include "../berryIStickyViewDescriptor.h"
+#include "berryIStickyViewDescriptor.h"
 
 #include <berryIConfigurationElement.h>
 

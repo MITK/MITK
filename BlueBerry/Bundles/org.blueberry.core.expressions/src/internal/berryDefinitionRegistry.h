@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYDEFINITIONREGISTRY_H_
 #define BERRYDEFINITIONREGISTRY_H_
 
-#include "../berryExpression.h"
+#include "berryExpression.h"
 
 #include "service/berryIConfigurationElement.h"
 

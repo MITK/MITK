@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryObjects.h>
 #include <berryIPreferences.h>
 
-#include "../internal/berryWorkbenchWindowConfigurer.h"
-#include "../internal/berryWorkbenchPlugin.h"
+#include "internal/berryWorkbenchWindowConfigurer.h"
+#include "internal/berryWorkbenchPlugin.h"
 
 namespace berry
 {

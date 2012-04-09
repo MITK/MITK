@@ -61,7 +61,6 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   try
   {
     //file 1
-//    const std::string filename1 = locator->FindFile("Pic3D.pic.gz", "Core/Code/Testing/Data");
     const std::string filename1 = argv[1];
     nodeReader->SetFileName(filename1);
     nodeReader->Update();
@@ -69,7 +68,6 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
     ds->Add(node1);
 
     //file 2
-//    const std::string filename2 = locator->FindFile("BallBinary30x30x30.pic.gz", "Core/Code/Testing/Data");
     const std::string filename2 = argv[2];
     nodeReader->SetFileName(filename2);
     nodeReader->Update();
@@ -78,7 +76,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing");
-    return NULL;
+    return EXIT_FAILURE;
   }
 
   //check for the two images

@@ -22,7 +22,11 @@
 #include "berryWorkbenchPlugin.h"
 #include "berryLayoutTree.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "berryWorkbenchWindowConfigurer.h"
+#include "berryWorkbenchWindow.h"
+#include "berryQtDnDControlWidget.h"
+
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include <Poco/HashMap.h>
 #include <sstream>
@@ -74,6 +78,15 @@ PartStack::Pointer EditorSashContainer::CreateDefaultWorkbook()
   return newWorkbook;
 }
 
+void EditorSashContainer::AddDropSupport()
+{
+  WorkbenchWindowConfigurer::Pointer winConfigurer = page->GetWorkbenchWindow().Cast<WorkbenchWindow>()->GetWindowConfigurer();
+
+  QtDnDControlWidget* dropWidget = static_cast<QtDnDControlWidget*>(GetParent());
+  dropWidget->SetTransferTypes(winConfigurer->GetTransfers());
+  dropWidget->AddDropListener(winConfigurer->GetDropTargetListener().GetPointer());
+}
+
 PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 {
   PartStack::Pointer newWorkbook(new PartStack(page, true, PresentationFactoryUtil::ROLE_EDITOR));
@@ -86,7 +99,8 @@ PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 
 void* EditorSashContainer::CreateParent(void* parentWidget)
 {
-  return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateComposite(parentWidget);
+  //return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateComposite(parentWidget);
+  return new QtDnDControlWidget(static_cast<QWidget*>(parentWidget));
 }
 
 void EditorSashContainer::DisposeParent()
@@ -536,9 +550,8 @@ void EditorSashContainer::CreateControl(void* parent)
 {
   PartSashContainer::CreateControl(parent);
 
-  //TODO DND
-  //let the user drop files/editor input on the editor area
-  //this->AddDropSupport();
+  ///let the user drop files/editor input on the editor area
+  this->AddDropSupport();
 }
 
 bool EditorSashContainer::IsCompressible()

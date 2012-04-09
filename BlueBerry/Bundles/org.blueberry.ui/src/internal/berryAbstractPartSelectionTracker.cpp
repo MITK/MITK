@@ -17,10 +17,10 @@
 
 #include "berryAbstractPartSelectionTracker.h"
 
-#include "../berryIPostSelectionProvider.h"
-#include "../berryINullSelectionListener.h"
+#include "berryIPostSelectionProvider.h"
+#include "berryINullSelectionListener.h"
 
-#include "../util/berrySafeRunnable.h"
+#include "util/berrySafeRunnable.h"
 
 #include <berrySafeRunner.h>
 

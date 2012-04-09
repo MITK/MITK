@@ -519,7 +519,7 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
   if (!original) return;
 
   // actually create a new empty segmentation
-  mitk::PixelType pixelType( typeid(DefaultSegmentationDataType) );
+  mitk::PixelType pixelType( mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
   mitk::Image::Pointer segmentation = mitk::Image::New();
   //segmentation->SetProperty( "organ type", OrganTypeProperty::New( organType ) );
 

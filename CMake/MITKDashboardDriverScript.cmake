@@ -7,7 +7,6 @@
 #-----------------------------------------------------------------------------
 # The following variable are expected to be define in the top-level script:
 set(expected_variables
-  CDASH_ADMIN_URL_PREFIX
   CTEST_NOTES_FILES
   CTEST_SITE
   CTEST_DASHBOARD_ROOT
@@ -38,7 +37,28 @@ foreach(var ${expected_variables})
   endif()
 endforeach()
 
-if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
+# Check if "mbits" is reachable
+file(DOWNLOAD "http://mbits" "${CTEST_SCRIPT_DIRECTORY}/mbits.html" TIMEOUT 2 STATUS _status)
+list(GET _status 0 _status_code)
+if(_status_code EQUAL 6) # couldn't resovle host name
+  set(MBITS_AVAILABLE 0)
+else()
+  set(MBITS_AVAILABLE 1)
+endif()
+
+#
+# Site specific options
+#
+if(NOT CDASH_ADMIN_URL_PREFIX AND MBITS_AVAILABLE)
+  set(CDASH_ADMIN_URL_PREFIX "http://mbits")
+endif()
+
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL AND MBITS_AVAILABLE)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL "http://mbits/dl-cache")
+endif()
+
+
+if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(GIT_BRANCH "")
 else()
   set(GIT_BRANCH "-b ${GIT_BRANCH}")
@@ -52,15 +72,15 @@ set(initial_force_build FALSE)
 
 # Set model options
 set(model "")
-if (SCRIPT_MODE STREQUAL "experimental")
+if(SCRIPT_MODE STREQUAL "experimental")
   set(empty_binary_directory FALSE)
   set(initial_force_build TRUE)
   set(model Experimental)
-elseif (SCRIPT_MODE STREQUAL "continuous")
+elseif(SCRIPT_MODE STREQUAL "continuous")
   set(empty_binary_directory FALSE)
   set(initial_force_build FALSE)
   set(model Continuous)
-elseif (SCRIPT_MODE STREQUAL "nightly")
+elseif(SCRIPT_MODE STREQUAL "nightly")
   set(empty_binary_directory TRUE)
   set(initial_force_build TRUE)
   set(model Nightly)
@@ -114,7 +134,7 @@ function(func_build_target target build_dir)
 endfunction()
 
 function(func_test label build_dir)
-  if (NOT TESTING_PARALLEL_LEVEL)
+  if(NOT TESTING_PARALLEL_LEVEL)
     set(TESTING_PARALLEL_LEVEL 8)
   endif()
 
@@ -148,7 +168,7 @@ function(func_test label build_dir)
     message("----------- [ Coverage ${label} ] -----------")
     ctest_coverage(BUILD "${build_dir}" LABELS ${label})
     ctest_submit(PARTS Coverage)
-  endif ()
+  endif()
 
   if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
     if(NOT CTEST_MEMORYCHECK_SUPPRESSIONS_FILE)
@@ -161,14 +181,14 @@ function(func_test label build_dir)
     endif()
     ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL ${label})
     ctest_submit(PARTS MemCheck)
-  endif ()
+  endif()
 
 endfunction()
 
 #---------------------------------------------------------------------
 # run_ctest macro
 #---------------------------------------------------------------------
-MACRO(run_ctest)
+macro(run_ctest)
 
   set(build_warnings 0)
   set(build_errors 0)
@@ -187,7 +207,7 @@ MACRO(run_ctest)
   
   # Check if a forced run was requested
   set(cdash_remove_rerun_url )
-  if(NOT MITK_NO_CDASH_WEBADMIN)
+  if(CDASH_ADMIN_URL_PREFIX)
     set(cdash_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/${CTEST_BUILD_NAME}")
     set(cdash_remove_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/rerun.php?name=${CTEST_BUILD_NAME}&remove=1")
     file(DOWNLOAD
@@ -212,7 +232,7 @@ MACRO(run_ctest)
     set(res 1)
 
     # Write initial cache.
-    if (NOT DEFINED BUILD_TESTING)
+    if(NOT DEFINED BUILD_TESTING)
       set(BUILD_TESTING ON)
     endif()
 
@@ -225,6 +245,7 @@ MITK_CTEST_SCRIPT_MODE:STRING=${SCRIPT_MODE}
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
 QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 WITH_COVERAGE:BOOL=${WITH_COVERAGE}
+MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}
 ${INITIAL_CMAKECACHE_OPTIONS}
 ")
   endif()
@@ -232,7 +253,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   if(res GREATER 0 OR force_build)
   
     # Clear the forced rerun request
-    if(NOT MITK_NO_CDASH_WEBADMIN AND cdash_remove_rerun_url)
+    if(CDASH_ADMIN_URL_PREFIX AND cdash_remove_rerun_url)
       file(DOWNLOAD "${cdash_remove_rerun_url}" "${CTEST_BINARY_DIRECTORY}/tmp.txt")
       file(REMOVE "${CTEST_BINARY_DIRECTORY}/tmp.txt")
     endif()
@@ -247,7 +268,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
     
-    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res)
+    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res OPTIONS "${SUPERBUILD_CONFIG_OPTIONS}")
     
     if(res)
       math(EXPR build_errors "${build_errors} + 1") 
@@ -297,7 +318,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         
         func_build_target("${external_project_name}" "${CTEST_BINARY_DIRECTORY}")
         
-        if (NOT build_errors)
+        if(NOT build_errors)
           # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
           file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
           file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
@@ -397,7 +418,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       endforeach()
     endif()
     
-    if (WITH_DOCUMENTATION)
+    if(WITH_DOCUMENTATION)
       message("----------- [ Build Documentation ] -----------")
       set(ctest_use_launchers_orig ${CTEST_USE_LAUNCHERS})
       set(CTEST_USE_LAUNCHERS 0)
@@ -412,24 +433,24 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     set_property(GLOBAL PROPERTY Label SuperBuild)
     
     # Global coverage ... 
-    if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+    if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
       message("----------- [ Global coverage ] -----------")
       ctest_coverage(BUILD "${build_dir}" APPEND)
       ctest_submit(PARTS Coverage)
-    endif ()
+    endif()
     
     # Global dynamic analysis ...
-    if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+    if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
       message("----------- [ Global memcheck ] -----------")
       ctest_memcheck(BUILD "${build_dir}")
       ctest_submit(PARTS MemCheck)
-    endif ()
+    endif()
     
     # Note should be at the end
     ctest_submit(PARTS Notes)
     
     # Send status to the "CDash Web Admin"
-    if(NOT MITK_NO_CDASH_WEBADMIN)
+    if(CDASH_ADMIN_URL_PREFIX)
       set(cdash_admin_url "${CDASH_ADMIN_URL_PREFIX}/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
       string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
       file(DOWNLOAD

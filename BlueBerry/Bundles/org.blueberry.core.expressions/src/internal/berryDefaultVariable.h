@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYDEFAULTVARIABLE_H_
 #define BERRYDEFAULTVARIABLE_H_
 
-#include "../berryIEvaluationContext.h"
+#include "berryIEvaluationContext.h"
 
 #include <vector>
 

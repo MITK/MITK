@@ -45,8 +45,8 @@ RenderingManager
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
   m_TimeNavigationController( NULL ),
-  m_ConstrainedPaddingZooming ( true ),
-  m_DataStorage( NULL )
+  m_DataStorage( NULL ),
+  m_ConstrainedPaddingZooming ( true )
 {
   m_ShadingEnabled.assign( 3, false );
   m_ShadingValues.assign( 4, 0.0 );
@@ -230,8 +230,9 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  // If the renderWindow is not valid, we do not want to inadvertantly create an entry.
-  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
+  // do nothing if the renderWindow is not managed by this instance
+  RenderWindowVector::iterator iter = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
+  if ( iter == m_AllRenderWindows.end() )
   {
     return;
   }
@@ -250,8 +251,9 @@ void
 RenderingManager
 ::ForceImmediateUpdate( vtkRenderWindow *renderWindow )
 {
-  // If the renderWindow is not valid, we do not want to inadvertantly create an entry.
-  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
+  // do nothing if the renderWindow is not managed by this instance
+  RenderWindowVector::iterator iter = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
+  if ( iter == m_AllRenderWindows.end() )
   {
     return;
   }

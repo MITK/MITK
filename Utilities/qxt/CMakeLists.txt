@@ -1,9 +1,9 @@
 
-IF(MITK_USE_QT) # only if MITK is built with Qt
+if(MITK_USE_QT) # only if MITK is built with Qt
 
-PROJECT(QXT)
+project(QXT)
 
-SET(QXT_MOC_HEADERS
+set(QXT_MOC_HEADERS
   include/qxtnamespace.h
   
   include/qxtbasespinbox.h
@@ -51,7 +51,7 @@ SET(QXT_MOC_HEADERS
   include/qxttreewidget_p.h
 )
 
-SET(QXT_HEADERS
+set(QXT_HEADERS
   include/qxtglobal.h
   include/qxtconfig.h
   include/qxtpimpl.h
@@ -70,7 +70,7 @@ SET(QXT_HEADERS
   include/qxttreewidgetitem.h
 )
 
-SET(QXT_SOURCES
+set(QXT_SOURCES
   src/qxtglobal.cpp
   
   src/qxtbasespinbox.cpp
@@ -112,20 +112,20 @@ SET(QXT_SOURCES
   src/qxttreewidgetitem.cpp
 )
 
-SET(QT_MT_REQUIRED TRUE)
-SET(QXT_INCLUDE_DIR ${QXT_SOURCE_DIR}/include CACHE PATH "MITK internal qxt include directory")
-INCLUDE_DIRECTORIES(${QXT_INCLUDE_DIR})
+set(QT_MT_REQUIRED TRUE)
+set(QXT_INCLUDE_DIR ${QXT_SOURCE_DIR}/include CACHE PATH "MITK internal qxt include directory")
+include_directories(${QXT_INCLUDE_DIR})
 
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTSVG 1)
-INCLUDE(${QT_USE_FILE})
+find_package(Qt4 REQUIRED)
+set(QT_USE_QTSVG 1)
+include(${QT_USE_FILE})
 QT4_WRAP_CPP(QXT_SOURCES ${QXT_MOC_HEADERS})
 
-ADD_DEFINITIONS(-DBUILD_QXT_GUI)
-ADD_DEFINITIONS(-DBUILD_QXT_CORE)
+add_definitions(-DBUILD_QXT_GUI)
+add_definitions(-DBUILD_QXT_CORE)
 
-ADD_LIBRARY(qxt ${QXT_SOURCES})
-TARGET_LINK_LIBRARIES(qxt ${QT_LIBRARIES})
+add_library(qxt ${QXT_SOURCES})
+target_link_libraries(qxt ${QT_LIBRARIES})
 
 # install only if shared lib (for now)
 
@@ -133,4 +133,4 @@ MITK_CREATE_MODULE_CONF(qxt
   INCLUDE_DIRS include
 )
 
-ENDIF(MITK_USE_QT) # only if MITK is built with Qt
+endif(MITK_USE_QT) # only if MITK is built with Qt

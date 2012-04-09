@@ -17,7 +17,7 @@
 
 #include "berryWWinPartService.h"
 
-#include "../berryIWorkbenchWindow.h"
+#include "berryIWorkbenchWindow.h"
 #include "berryWorkbenchPage.h"
 
 namespace berry

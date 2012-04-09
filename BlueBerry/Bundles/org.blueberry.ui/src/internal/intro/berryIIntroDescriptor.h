@@ -22,7 +22,7 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "../../intro/berryIIntroPart.h"
+#include "intro/berryIIntroPart.h"
 
 #include <berryPlatformException.h>
 #include <berryImageDescriptor.h>

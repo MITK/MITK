@@ -46,6 +46,9 @@ int mitkDataNodeFactoryTest(int, char* argv[])
     
     MITK_TEST_OUTPUT(<< "Test function SetDefaultCommonProperties()");
     mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+
+    MITK_TEST_CONDITION_REQUIRED( node.IsNotNull(), "DataNodeFactory has returned a non-empty node.")
+
     factory->SetDefaultCommonProperties(node);
     // get file path and property
     std::string filePath = itksys::SystemTools::GetFilenamePath(factory->GetFileName());

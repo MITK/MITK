@@ -38,7 +38,8 @@ public:
     float cellcnt_y = (int)((float)height/cellsize) +1;
     float cellcnt_z = (int)((float)depth/cellsize) +1;
     //int cell_capacity = 2048;
-    int cell_capacity = 64;
+    //int cell_capacity = 64;
+    int cell_capacity = 512;
 
     fprintf(stderr,"grid dimensions :  %f x %f x %f\n",cellcnt_x,cellcnt_y,cellcnt_z);
     fprintf(stderr,"grid cell size (mm) :  %f^3\n",cellsize);

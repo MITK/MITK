@@ -19,12 +19,12 @@
 
 #include "berryWorkbenchServiceRegistry.h"
 
-#include "../berryISources.h"
-#include "../berryISourceProvider.h"
-#include "../berryPlatformUI.h"
-#include "../berryImageDescriptor.h"
+#include "berryISources.h"
+#include "berryISourceProvider.h"
+#include "berryPlatformUI.h"
+#include "berryImageDescriptor.h"
 
-#include "../services/berryIServiceFactory.h"
+#include "services/berryIServiceFactory.h"
 
 #include "berryServiceLocator.h"
 #include "berryWorkbenchPlugin.h"

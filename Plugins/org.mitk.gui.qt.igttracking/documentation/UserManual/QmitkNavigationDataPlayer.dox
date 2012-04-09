@@ -1,0 +1,14 @@
+/**
+\page org_navigationdataplayer NavigationData Player
+
+\image html iconNavigationDataPlayer.png "Icon of NavigationData Player"
+
+Available sections:
+  - \ref NavigationDataPlayerOverview
+
+\section NavigationDataPlayerOverview
+The navigation data player plays recorded or artificial navigation data of one ore more tracking tools and visualizes their trajectory. For that purpose select an input file (*.xml only) and select which tracking tool's trajectory should be visualized. If you additionally activate the checkbox "Splines" the trajectory curve will be smoothed via spline interpolation.
+Press the button "start" for starting the player and the visualization. If "Sequential Mode" is checked, the navigation data are played sequentially without regarding the recorded time steps.
+
+*/
+

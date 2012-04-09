@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   ToFCameraPMDDevice::ToFCameraPMDDevice() :
-  m_SourceDataArray(NULL), m_SourceDataBuffer(NULL)
+    m_SourceDataBuffer(NULL), m_SourceDataArray(NULL)
   {
   }
 

@@ -55,8 +55,6 @@ namespace mitk
       itkWarningMacro("cache is empty!");
     }
 
-    int vecsize = m_OutputCache->GetVectorImage()->GetVectorLength();
-
     static_cast<OutputType*>(this->GetOutput())
         ->SetVectorImage(m_OutputCache->GetVectorImage());
     static_cast<OutputType*>(this->GetOutput())

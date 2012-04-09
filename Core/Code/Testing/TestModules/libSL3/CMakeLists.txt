@@ -1,6 +1,0 @@
-MITK_CREATE_MODULE(TestModuleSL3
-  DEPENDS Mitk
-  INTERNAL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../libSL1"
-)
-
-add_dependencies(${TESTDRIVER} TestModuleSL3)

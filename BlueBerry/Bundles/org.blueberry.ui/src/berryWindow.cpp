@@ -385,7 +385,7 @@ void Window::SetShellStyle(int newShellStyle)
 bool Window::Close()
 {
 
-  BERRY_INFO << "Window::Close()";
+//  BERRY_INFO << "Window::Close()";
 
 //  // stop listening for font changes
 //  if (fontChangeListener != null)

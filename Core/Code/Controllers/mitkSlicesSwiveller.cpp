@@ -105,16 +105,16 @@ void SlicesSwiveller::UpdateRelevantSNCs()
     if (!slicedGeometry) continue;
 
     Geometry2D *firstSlice( NULL );
-    Geometry2D *secondSlice( NULL );
+    //Geometry2D *secondSlice( NULL );
     
     if (slicedGeometry->IsValidSlice(0))
     {
       firstSlice = slicedGeometry->GetGeometry2D(0);
     }
-    if (slicedGeometry->IsValidSlice(1)) 
-    {
-      secondSlice = slicedGeometry->GetGeometry2D(1);
-    }
+//    if (slicedGeometry->IsValidSlice(1))
+//    {
+//      secondSlice = slicedGeometry->GetGeometry2D(1);
+//    }
     
     // If the direction vector of these two slices is the same, then accept 
     // this slice stack as rotatable

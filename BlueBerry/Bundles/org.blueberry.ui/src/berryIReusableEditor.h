@@ -32,7 +32,7 @@ namespace berry {
  * the workbench may change its contents instead of
  * opening a new editor.
  */
-struct BERRY_UI IReusableEditor : public IEditorPart {
+struct BERRY_UI IReusableEditor : public virtual IEditorPart {
 
   berryInterfaceMacro(IReusableEditor, berry)
 

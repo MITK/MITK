@@ -17,10 +17,10 @@
 
 #include "berryWorkbenchWindow.h"
 
-#include "../berryIWorkbenchPage.h"
-#include "../berryIPerspectiveDescriptor.h"
-#include "../berryUIException.h"
-#include "../berryConstants.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIPerspectiveDescriptor.h"
+#include "berryUIException.h"
+#include "berryConstants.h"
 
 #include "intro/berryIntroConstants.h"
 #include "berryWorkbenchPlugin.h"
@@ -30,14 +30,14 @@
 #include "berryPartSite.h"
 #include "berryIServiceLocatorCreator.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../tweaklets/berryWorkbenchTweaklet.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryWorkbenchTweaklet.h"
 
-#include "../services/berryIServiceFactory.h"
+#include "services/berryIServiceFactory.h"
 
-#include "../berryPlatformUI.h"
+#include "berryPlatformUI.h"
 
-#include "../berryDebugUtil.h"
+#include "berryDebugUtil.h"
 
 namespace berry
 {
@@ -88,7 +88,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
 WorkbenchWindow::~WorkbenchWindow()
 {
-  BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
+  //BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
 Object::Pointer WorkbenchWindow::GetService(const std::string& key)
@@ -372,7 +372,7 @@ Point WorkbenchWindow::GetInitialSize()
 
 bool WorkbenchWindow::Close()
 {
-  BERRY_INFO << "WorkbenchWindow::Close()";
+  //BERRY_INFO << "WorkbenchWindow::Close()";
 
   if (controlResizeListener)
   {

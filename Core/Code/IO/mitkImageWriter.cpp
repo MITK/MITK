@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkItkPictureWrite.h"
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkPicFileWriter.h"
 #include "mitkImageAccessByItk.h"
 
 #include <itkImageIOBase.h>
@@ -84,7 +83,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo( *(pixelType.GetTypeId()) );
+  imageIO->SetPixelTypeInfo( pixelType.GetTypeId() );
 
   if(pixelType.GetNumberOfComponents() > 1)
     imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
@@ -109,6 +108,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
     ioRegion.SetSize(i, image->GetLargestPossibleRegion().GetSize(i) );
     ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i) );
   }
+
+  //use compression if available
+  imageIO->UseCompressionOn();
 
   imageIO->SetIORegion(ioRegion);
   imageIO->SetFileName(fileName);
@@ -208,7 +210,7 @@ void mitk::ImageWriter::GenerateData()
     // use the PicFileWriter for the .pic data type
     if( m_Extension.find(".pic") != std::string::npos )
     {
-    PicFileWriter::Pointer picWriter = PicFileWriter::New();
+/*    PicFileWriter::Pointer picWriter = PicFileWriter::New();
     size_t found;
     found = m_FileName.find( m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
     if( m_FileName.length() > 3 && found != m_FileName.length() - 4 )
@@ -224,7 +226,7 @@ void mitk::ImageWriter::GenerateData()
     }
     picWriter->SetInputImage( input );
     picWriter->Write();
-    }
+*/    }
 
     // use the ITK .nrrd Image writer
     if( m_Extension.find(".nrrd") != std::string::npos )
@@ -233,7 +235,6 @@ void mitk::ImageWriter::GenerateData()
         filename <<  this->m_FileName.c_str() << this->m_Extension;
         WriteByITK(input, filename.str());
     }
-
   }
   m_MimeType = "application/MITK.Pic";
 

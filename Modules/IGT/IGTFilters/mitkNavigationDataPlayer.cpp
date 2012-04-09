@@ -521,7 +521,7 @@ void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
   InitPlayer();
 }
 
-const bool mitk::NavigationDataPlayer::IsAtEnd()
+bool mitk::NavigationDataPlayer::IsAtEnd()
 {
   return this->m_StreamEnd;
 }

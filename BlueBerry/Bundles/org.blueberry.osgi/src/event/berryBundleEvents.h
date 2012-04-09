@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org_blueberry_osgi_Export.h>
 
-#include "../berryMessage.h"
+#include "berryMessage.h"
 
 #include "berryBundleEvent.h"
 

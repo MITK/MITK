@@ -16,51 +16,56 @@
 #!        be added to the current source directory. The resulting directories
 #!        will be available in the set of include directories of depending plug-ins.
 #! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
-MACRO(MACRO_CREATE_CTK_PLUGIN)
+macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES" "TEST_PLUGIN" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES" "TEST_PLUGIN;NO_QHP_TRANSFORM" ${ARGN})
 
-  MESSAGE(STATUS "Creating CTK plugin ${PROJECT_NAME}")
+  message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 
-  SET(PLUGIN_TARGET ${PROJECT_NAME})
+  set(PLUGIN_TARGET ${PROJECT_NAME})
 
-  INCLUDE(files.cmake)
+  include(files.cmake)
 
-  SET(_PLUGIN_CPP_FILES ${CPP_FILES})
-  SET(_PLUGIN_MOC_H_FILES ${MOC_H_FILES})
-  SET(_PLUGIN_UI_FILES ${UI_FILES})
-  SET(_PLUGIN_CACHED_RESOURCE_FILES ${CACHED_RESOURCE_FILES})
-  SET(_PLUGIN_TRANSLATION_FILES ${TRANSLATION_FILES})
-  SET(_PLUGIN_QRC_FILES ${QRC_FILES})
-  SET(_PLUGIN_H_FILES ${H_FILES})
-  SET(_PLUGIN_TXX_FILES ${TXX_FILES})
-  SET(_PLUGIN_DOX_FILES ${DOX_FILES})
-  SET(_PLUGIN_CMAKE_FILES ${CMAKE_FILES} files.cmake)
-  SET(_PLUGIN_FILE_DEPENDENCIES ${FILE_DEPENDENCIES})
+  set(_PLUGIN_CPP_FILES ${CPP_FILES})
+  set(_PLUGIN_MOC_H_FILES ${MOC_H_FILES})
+  set(_PLUGIN_UI_FILES ${UI_FILES})
+  set(_PLUGIN_CACHED_RESOURCE_FILES ${CACHED_RESOURCE_FILES})
+  set(_PLUGIN_TRANSLATION_FILES ${TRANSLATION_FILES})
+  set(_PLUGIN_QRC_FILES ${QRC_FILES})
+  set(_PLUGIN_H_FILES ${H_FILES})
+  set(_PLUGIN_TXX_FILES ${TXX_FILES})
+  set(_PLUGIN_DOX_FILES ${DOX_FILES})
+  set(_PLUGIN_CMAKE_FILES ${CMAKE_FILES} files.cmake)
+  set(_PLUGIN_FILE_DEPENDENCIES ${FILE_DEPENDENCIES})
 
-  IF(CTK_PLUGINS_OUTPUT_DIR)
-    SET(_output_dir "${CTK_PLUGINS_OUTPUT_DIR}")
-  ELSE()
-    SET(_output_dir "")
-  ENDIF()
+  if(CTK_PLUGINS_OUTPUT_DIR)
+    set(_output_dir "${CTK_PLUGINS_OUTPUT_DIR}")
+  else()
+    set(_output_dir "")
+  endif()
 
-  IF(_PLUGIN_TEST_PLUGIN)
-    SET(is_test_plugin "TEST_PLUGIN")
-  ELSE()
-    SET(is_test_plugin)
-  ENDIF()
+  if(_PLUGIN_TEST_PLUGIN)
+    set(is_test_plugin "TEST_PLUGIN")
+  else()
+    set(is_test_plugin)
+  endif()
 
   #------------------------------------------------------------#
   #------------------ Qt Help support -------------------------#
 
-  SET(PLUGIN_GENERATED_QCH_FILES )
-  IF (BLUEBERRY_USE_QT_HELP AND
+  set(PLUGIN_GENERATED_QCH_FILES )
+  if(BLUEBERRY_USE_QT_HELP AND
       EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
-    SET(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
-    SET(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
-    _FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES )
-    LIST(APPEND _PLUGIN_CACHED_RESOURCE_FILES ${PLUGIN_GENERATED_QCH_FILES})
-  ENDIF()
+    set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
+    set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
+    if(_PLUGIN_NO_QHP_TRANSFORM)
+      set(_use_qhp_xsl 0)
+    else()
+      set(_use_qhp_xsl 1)
+    endif()
+    _FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES ${_use_qhp_xsl})
+    list(APPEND _PLUGIN_CACHED_RESOURCE_FILES ${PLUGIN_GENERATED_QCH_FILES})
+  endif()
 
   # Compute the plugin dependencies
   ctkFunctionGetTargetLibraries(_PLUGIN_target_libraries)
@@ -80,22 +85,32 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
     ${is_test_plugin}
   )
 
-  IF(mbilog_FOUND)
-    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} mbilog)
-  ENDIF()
+  if(mbilog_FOUND)
+    target_link_libraries(${PLUGIN_TARGET} mbilog)
+  endif()
   
-  INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
+  include_directories(${Poco_INCLUDE_DIRS})
 
-  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET}
+  target_link_libraries(${PLUGIN_TARGET}
     optimized PocoFoundation debug PocoFoundationd
     optimized PocoUtil debug PocoUtild
     optimized PocoXML debug PocoXMLd
   )
+  
+  # Set compiler flags
+  get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)
+  if(NOT _plugin_compile_flags)
+    set(_plugin_compile_flags "")
+  endif()
+  if(WIN32)
+    set(_plugin_compile_flags "${_plugin_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  endif()
+  set_target_properties(${PLUGIN_TARGET} PROPERTIES COMPILE_FLAGS "${_plugin_compile_flags}")
 
-  SET(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
-  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-    LIST(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-  ENDIF()
+  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+  endif()
 
   MACRO_ORGANIZE_SOURCES(
     SOURCE ${_PLUGIN_CPP_FILES}
@@ -113,23 +128,23 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
   
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
-  IF(NOT _PLUGIN_TEST_PLUGIN)
-    SET(install_directories "")
-    IF(NOT MACOSX_BUNDLE_NAMES)
-      SET(install_directories bin/plugins)
-    ELSE(NOT MACOSX_BUNDLE_NAMES)
-      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
-        LIST(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
-      ENDFOREACH(bundle_name)
-    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+  if(NOT _PLUGIN_TEST_PLUGIN)
+    set(install_directories "")
+    if(NOT MACOSX_BUNDLE_NAMES)
+      set(install_directories bin/plugins)
+    else(NOT MACOSX_BUNDLE_NAMES)
+      foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
+        list(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
+      endforeach(bundle_name)
+    endif(NOT MACOSX_BUNDLE_NAMES)
 
-    FOREACH(install_subdir ${install_directories})
+    foreach(install_subdir ${install_directories})
 
       MACRO_INSTALL_CTK_PLUGIN(TARGETS ${PLUGIN_TARGET}
                                DESTINATION ${install_subdir})
 
-    ENDFOREACH()
-  ENDIF()
+    endforeach()
+  endif()
 
-ENDMACRO()
+endmacro()
 

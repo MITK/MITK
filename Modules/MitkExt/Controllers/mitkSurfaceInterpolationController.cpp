@@ -24,6 +24,10 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
 
+  m_ReduceFilter->SetUseProgressBar(true);
+  m_NormalsFilter->SetUseProgressBar(true);
+  m_InterpolateSurfaceFilter->SetUseProgressBar(true);
+
   m_Contours = Surface::New();
 
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -115,6 +119,9 @@ void mitk::SurfaceInterpolationController::Interpolate()
   if (m_ListOfContourLists.at(m_CurrentContourListID).size() < 2)
     return;
 
+  //Setting up progress bar
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+
   m_InterpolateSurfaceFilter->Update();
 
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
@@ -136,6 +143,9 @@ void mitk::SurfaceInterpolationController::Interpolate()
   }
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
+
+  //Last progress step
+  mitk::ProgressBar::GetInstance()->Progress(8);
 
   m_InterpolationResult->DisconnectPipeline();
 }

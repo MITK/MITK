@@ -17,8 +17,8 @@
 
 #include "berryWindowPartSelectionTracker.h"
 
-#include "../berryIWorkbenchWindow.h"
-#include "../berryIWorkbenchPage.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPage.h"
 
 namespace berry
 {

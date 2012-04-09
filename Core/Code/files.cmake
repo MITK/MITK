@@ -1,4 +1,4 @@
-SET(H_FILES
+set(H_FILES
   Algorithms/itkImportMitkImageContainer.h
   Algorithms/itkImportMitkImageContainer.txx
   Algorithms/itkLocalVariationImageFilter.h
@@ -54,32 +54,15 @@ SET(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
 
+  Interfaces/mitkIDataNodeReader.h
+
+  IO/mitkPixelTypeTraits.h
+
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
-
-  Service/mitkAny.h
-  Service/mitkGetModuleContext.h
-  Service/mitkItkHashMap.h
-  Service/mitkItkHashSet.h
-  Service/mitkItkHashTable.h
-  Service/mitkModuleAbstractTracked.h
-  Service/mitkModuleAbstractTracked.tpp
-  Service/mitkModuleActivator.h
-  Service/mitkServiceFactory.h
-  Service/mitkServiceTracker.h
-  Service/mitkServiceTracker.tpp
-  Service/mitkServiceTrackerCustomizer.h
-  Service/mitkServiceTrackerPrivate.h
-  Service/mitkServiceTrackerPrivate.tpp
-  Service/mitkServiceUtils.h
-  Service/mitkSharedData.h
-  Service/mitkStaticInit.h
-  Service/mitkTrackedService.h
-  Service/mitkTrackedService.tpp
-  Service/mitkTrackedServiceListener.h
 )
 
-SET(CPP_FILES
+set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkBaseProcess.cpp
   Algorithms/mitkCoreObjectFactoryBase.cpp
@@ -111,6 +94,7 @@ SET(CPP_FILES
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
+  Controllers/mitkCoreActivator.cpp
   Controllers/mitkFocusManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
@@ -134,6 +118,7 @@ SET(CPP_FILES
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
+  DataManagement/mitkChannelDescriptor.cpp
   DataManagement/mitkColorProperty.cpp
   DataManagement/mitkDataStorage.cpp
   #DataManagement/mitkDataTree.cpp
@@ -148,6 +133,8 @@ SET(CPP_FILES
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
   DataManagement/mitkImageDataItem.cpp
+  DataManagement/mitkImageDescriptor.cpp
+  DataManagement/mitkImageStatisticsHolder.cpp
   DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
@@ -232,27 +219,30 @@ SET(CPP_FILES
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkKeyEvent.cpp
   Interactions/mitkVtkEventAdapter.cpp
+  Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
   IO/mitkBaseDataIOFactory.cpp
+  IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
-  IO/mitkIpPicGet.c 
+  #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkImageWriter.cpp
   IO/mitkImageWriterFactory.cpp
   IO/mitkItkImageFileIOFactory.cpp
   IO/mitkItkImageFileReader.cpp
   IO/mitkItkPictureWrite.cpp
+  IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
-  IO/mitkPicFileIOFactory.cpp
-  IO/mitkPicFileReader.cpp
-  IO/mitkPicFileWriter.cpp
-  IO/mitkPicHelper.cpp
-  IO/mitkPicVolumeTimeSeriesIOFactory.cpp
-  IO/mitkPicVolumeTimeSeriesReader.cpp
+  #IO/mitkPicFileIOFactory.cpp
+  #IO/mitkPicFileReader.cpp
+  #IO/mitkPicFileWriter.cpp
+  #IO/mitkPicHelper.cpp
+  #IO/mitkPicVolumeTimeSeriesIOFactory.cpp
+  #IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
   IO/mitkPointSetIOFactory.cpp
   IO/mitkPointSetReader.cpp
@@ -301,30 +291,6 @@ SET(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
-  
-  Service/mitkAny.cpp
-  Service/mitkAtomicInt.cpp
-  Service/mitkCoreActivator.cpp
-  Service/mitkCoreModuleContext.cpp
-  Service/mitkModule.cpp
-  Service/mitkModuleContext.cpp
-  Service/mitkModuleEvent.cpp
-  Service/mitkModuleInfo.cpp
-  Service/mitkModulePrivate.cpp
-  Service/mitkModuleRegistry.cpp
-  Service/mitkModuleUtils.cpp
-  Service/mitkModuleVersion.cpp
-  Service/mitkLDAPExpr.cpp
-  Service/mitkLDAPFilter.cpp
-  Service/mitkServiceEvent.cpp
-  Service/mitkServiceException.cpp
-  Service/mitkServiceListenerEntry.cpp
-  Service/mitkServiceListeners.cpp
-  Service/mitkServiceProperties.cpp
-  Service/mitkServiceReference.cpp
-  Service/mitkServiceReferencePrivate.cpp
-  Service/mitkServiceRegistration.cpp
-  Service/mitkServiceRegistrationPrivate.cpp
-  Service/mitkServiceRegistry.cpp
 )
 
+list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

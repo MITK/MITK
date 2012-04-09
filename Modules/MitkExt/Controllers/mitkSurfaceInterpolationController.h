@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "vtkProperty.h"
 
+#include "mitkProgressBar.h"
 
 namespace mitk
 {

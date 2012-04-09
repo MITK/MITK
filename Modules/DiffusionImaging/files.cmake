@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
 
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
@@ -39,16 +39,6 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
-  # DataStructures -> FiberBundle
-  IODataStructures/FiberBundle/mitkFiberBundle.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleWriter.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleReader.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
-  IODataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
-  IODataStructures/FiberBundle/mitkParticle.cpp
-  IODataStructures/FiberBundle/mitkParticleGrid.cpp
-
 # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
@@ -58,10 +48,8 @@ SET(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
-
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
-
 
   # DataStructures -> Tbss
   IODataStructures/TbssImages/mitkTbssImageSource.cpp
@@ -73,11 +61,20 @@ SET(CPP_FILES
   IODataStructures/TbssImages/mitkTbssImage.cpp
   IODataStructures/TbssImages/mitkTbssRoiImage.cpp
   IODataStructures/TbssImages/mitkNrrdTbssImageWriter.cpp
-  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp 
+  IODataStructures/TbssImages/mitkNrrdTbssImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
-
+  
+  # DataStructures Connectomics
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetwork.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkReader.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkIOFactory.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkSerializer.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkWriter.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkWriterFactory.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkDefinitions.cpp
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsConstantsManager.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
@@ -87,15 +84,14 @@ SET(CPP_FILES
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
-  Rendering/mitkFiberBundleMapper2D.cpp
-  Rendering/mitkFiberBundleMapper3D.cpp
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  Rendering/mitkTbssImageMapper.cpp  
+  Rendering/mitkTbssImageMapper.cpp
   Rendering/mitkPlanarCircleMapper3D.cpp
   Rendering/mitkPlanarPolygonMapper3D.cpp
-  
+  Rendering/mitkConnectomicsNetworkMapper3D.cpp
+
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -103,23 +99,36 @@ SET(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/mitkTractAnalyzer.cpp
+  
+  # Algorithms Connectomics
+  Algorithms/Connectomics/mitkConnectomicsNetworkCreator.cpp
+  Algorithms/Connectomics/mitkConnectomicsHistogramBase.cpp
+  Algorithms/Connectomics/mitkConnectomicsDegreeHistogram.cpp
+  Algorithms/Connectomics/mitkConnectomicsShortestPathHistogram.cpp
+  Algorithms/Connectomics/mitkConnectomicsBetweennessHistogram.cpp
+  Algorithms/Connectomics/mitkConnectomicsHistogramCache.cpp
+  Algorithms/Connectomics/mitkConnectomicsSyntheticNetworkGenerator.cpp
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingPermutationBase.cpp
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingPermutationModularity.cpp
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.cpp
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
 
  # Tractography
  Tractography/itkStochasticTractographyFilter.h
 )
 
-SET(H_FILES
+set(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
-  Rendering/mitkFiberBundleMapper2D.h
-  Rendering/mitkFiberBundleMapper3D.h
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkPlanarCircleMapper3D.h
   Rendering/mitkPlanarPolygonMapper3D.h
+  Rendering/mitkConnectomicsNetworkMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -134,7 +143,6 @@ SET(H_FILES
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
-  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h  
   IODataStructures/TbssImages/mitkTbssImporter.h
 
   # DataStructures -> FiberBundleX
@@ -145,8 +153,16 @@ SET(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
-
-
+  
+  # Datastructures Connectomics
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetwork.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkReader.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkIOFactory.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkSerializer.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkWriter.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkWriterFactory.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkDefinitions.h
+  IODataStructures/ConnectomicsNetwork/mitkConnectomicsConstantsManager.h
 
   # Tractography
   Tractography/itkGibbsTrackingFilter.h
@@ -160,8 +176,9 @@ SET(H_FILES
   Algorithms/itkB0ImageExtractionImageFilter.h
   Algorithms/itkTensorImageToDiffusionImageFilter.h
   Algorithms/itkTensorToL2NormImageFilter.h
-  Algorithms/itkTractsToProbabilityImageFilter.h
+  Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
+  Algorithms/itkTractsToRgbaImageFilter.h
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h
@@ -171,12 +188,28 @@ SET(H_FILES
   Algorithms/itkDistanceMapFilter.h
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
+  Algorithms/itkReduceDirectionGradientsFilter.h
+  Algorithms/itkResidualImageFilter.h
+  
+  # Algorithms Connectomics
+  Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
+  Algorithms/Connectomics/mitkConnectomicsHistogramBase.h
+  Algorithms/Connectomics/mitkConnectomicsDegreeHistogram.h
+  Algorithms/Connectomics/mitkConnectomicsShortestPathHistogram.h
+  Algorithms/Connectomics/mitkConnectomicsBetweennessHistogram.h
+  Algorithms/Connectomics/mitkConnectomicsHistogramCache.h
+  Algorithms/Connectomics/mitkConnectomicsSyntheticNetworkGenerator.h
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingPermutationBase.h
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingPermutationModularity.h
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
+  Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
 )
 
-SET( TOOL_FILES
+set( TOOL_FILES
 )
 
-IF(WIN32)
-ENDIF(WIN32)
+if(WIN32)
+endif(WIN32)
 
 #MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp )

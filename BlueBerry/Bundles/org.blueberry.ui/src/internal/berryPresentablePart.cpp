@@ -17,7 +17,7 @@
 
 #include "berryPresentablePart.h"
 
-#include "../berryIWorkbenchPartConstants.h"
+#include "berryIWorkbenchPartConstants.h"
 #include "berryPartPane.h"
 #include "berryWorkbenchPage.h"
 

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPlanePositionManager_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+//#include "MitkExtExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
 #include <mitkServiceReference.h>
@@ -99,6 +99,6 @@ namespace mitk
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
  };
 }
-MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
+US_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 
 #endif

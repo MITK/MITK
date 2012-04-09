@@ -81,6 +81,7 @@ public:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
     void ShowToolRepresentationColumn(); ///< show or hide the tooltable column "Tool Representation". This SLOT should be called after SIGNAL "Connected" is emitted
     void EnableAddToolsButton(bool enable); ///< enables or disables the Add Tools button
+    void EnableDiscoverNewToolsButton(bool enable); ; ///< enables or disables the Discover new Tools button
 
   protected slots:
     void OnConnect();

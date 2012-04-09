@@ -19,7 +19,7 @@
 
 #include "berryEditorSashContainer.h"
 #include "berryPartSite.h"
-#include "../berryIPageLayout.h"
+#include "berryIPageLayout.h"
 #include "berryPartPane.h"
 
 namespace berry

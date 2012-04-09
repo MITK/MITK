@@ -1,7 +1,7 @@
-PROJECT(MbiLogExample)
-FIND_PACKAGE(MITK)
-INCLUDE_DIRECTORIES(${MITK_INCLUDE_DIRS})
-LINK_DIRECTORIES(${MITK_LINK_DIRECTORIES})
-ADD_EXECUTABLE(MitkLogExample MitkLogExample.cpp)
-TARGET_LINK_LIBRARIES(MitkLogExample ${MITK_LIBRARIES})
+project(MbiLogExample)
+find_package(MITK)
+include_directories(${MITK_INCLUDE_DIRS})
+link_directories(${MITK_LINK_DIRECTORIES})
+add_executable(MitkLogExample MitkLogExample.cpp)
+target_link_libraries(MitkLogExample ${MITK_LIBRARIES})
 

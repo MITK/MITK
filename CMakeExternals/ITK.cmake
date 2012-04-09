@@ -3,44 +3,47 @@
 #-----------------------------------------------------------------------------
 
 # Sanity checks
-IF(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
-  MESSAGE(FATAL_ERROR "ITK_DIR variable is defined but corresponds to non-existing directory")
-ENDIF()
+if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
+  message(FATAL_ERROR "ITK_DIR variable is defined but corresponds to non-existing directory")
+endif()
 
-SET(proj ITK)
-SET(proj_DEPENDENCIES GDCM)
-IF(MITK_USE_Python)
-  LIST(APPEND proj_DEPENDENCIES CableSwig)
-ENDIF()
+set(proj ITK)
+set(proj_DEPENDENCIES GDCM)
+if(MITK_USE_Python)
+  list(APPEND proj_DEPENDENCIES CableSwig)
+endif()
 
-SET(ITK_DEPENDS ${proj})
+set(ITK_DEPENDS ${proj})
 
-IF(NOT DEFINED ITK_DIR)
+if(NOT DEFINED ITK_DIR)
 
-  SET(additional_cmake_args )
-  IF(MINGW)
-    SET(additional_cmake_args
+  set(additional_cmake_args )
+  if(MINGW)
+    set(additional_cmake_args
         -DCMAKE_USE_WIN32_THREADS:BOOL=ON
         -DCMAKE_USE_PTHREADS:BOOL=OFF)
-  ENDIF()
+  endif()
 
-  IF(MITK_USE_Python)
-    LIST(APPEND additional_cmake_args
+  if(MITK_USE_Python)
+    list(APPEND additional_cmake_args
          -DUSE_WRAP_ITK:BOOL=ON
          -DITK_USE_REVIEW:BOOL=ON
          -DCableSwig_DIR:PATH=${CableSwig_DIR}
          -DWRAP_ITK_JAVA:BOOL=OFF
          -DWRAP_ITK_TCL:BOOL=OFF
         )
-  ENDIF()
+  endif()
 
-  IF(GDCM_IS_2_0_18)
-    SET(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-3.20.cmake)
-  ENDIF()
+  if(GDCM_IS_2_0_18)
+    set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-3.20.cmake)
+  endif()
 
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.1.tar.gz
+     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
+     PREFIX ${proj}-cmake
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-3.20.1.tar.gz
+     URL_MD5 90342ffa78bd88ae48b3f62866fbf050
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}
@@ -54,10 +57,10 @@ IF(NOT DEFINED ITK_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  SET(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
-ELSE()
+else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
-ENDIF()
+endif()

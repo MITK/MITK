@@ -1,9 +1,9 @@
-FIND_PACKAGE(ITK)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+find_package(ITK)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-ADD_DEFINITIONS(-DMITK_IPPIC_COMPILE)
+add_definitions(-DMITK_IPPIC_COMPILE)
 
-SET(IPPIC_FILES
+set(IPPIC_FILES
   ipPicInfo.c ipPicType.c                           
   ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c
   ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c       
@@ -18,12 +18,12 @@ SET(IPPIC_FILES
   ipPicTSVSize.c ipPicTSVElements.c
   )
 
-ADD_LIBRARY(mitkIpPic ${MITK_WIN32_FORCE_STATIC} ${IPPIC_FILES})
-IF(USE_ITKZLIB)
-  TARGET_LINK_LIBRARIES(mitkIpPic itkzlib)
-ELSE(USE_ITKZLIB)
-  TARGET_LINK_LIBRARIES(mitkIpPic z)
-ENDIF(USE_ITKZLIB)
+add_library(mitkIpPic ${MITK_WIN32_FORCE_STATIC} ${IPPIC_FILES})
+if(USE_ITKZLIB)
+  target_link_libraries(mitkIpPic itkzlib)
+else(USE_ITKZLIB)
+  target_link_libraries(mitkIpPic z)
+endif(USE_ITKZLIB)
 
 MITK_CREATE_MODULE_CONF(mitkIpPic
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..

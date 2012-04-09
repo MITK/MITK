@@ -15,6 +15,7 @@ namespace mitk
       , m_ShowImagesInDebug(false)
       , m_ShowImagesTimeOut(false)
       , m_Mutex(itk::FastMutexLock::New())
+      , m_DebugImagesOutputDirectory("")
     {
 
     }
@@ -26,6 +27,7 @@ namespace mitk
     size_t m_ShowImagesTimeOut;
     std::ofstream m_Stream;
     itk::FastMutexLock::Pointer m_Mutex;
+    std::string m_DebugImagesOutputDirectory;
   };
 
   EndoDebug::EndoDebug()
@@ -45,6 +47,26 @@ namespace mitk
   {
     static EndoDebug instance;
     return instance;
+  }
+
+  std::string EndoDebug::GetUniqueFileName( const std::string& dir, const std::string& ext )
+  {
+    std::stringstream s;
+    s.precision( 0 );
+
+    std::string filename;
+    int i = 0;
+    while( filename.empty() || itksys::SystemTools::FileExists( (dir+"/"+filename).c_str() ) )
+    {
+      s.str("");
+      s << i;
+      filename = s.str() + "." + ext;
+      ++i;
+    }
+
+    filename = dir+"/"+filename;
+
+    return filename;
   }
 
   std::string EndoDebug::GetFilenameWithoutExtension(const std::string& s)
@@ -137,6 +159,15 @@ namespace mitk
     }
   }
 
+  void EndoDebug::SetDebugImagesOutputDirectory(const std::string& _DebugImagesOutputDirectory)
+  {
+    {
+      itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
+      d->m_DebugImagesOutputDirectory = _DebugImagesOutputDirectory;
+    }
+
+  }
+
   bool EndoDebug::GetDebugEnabled()
   {
     {
@@ -166,6 +197,14 @@ namespace mitk
     {
       itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
       d->m_ShowImagesTimeOut = _ShowImagesTimeOut;
+    }
+  }
+
+  std::string EndoDebug::GetDebugImagesOutputDirectory() const
+  {
+    {
+      itk::MutexLockHolder<itk::FastMutexLock> lock(*d->m_Mutex);
+      return d->m_DebugImagesOutputDirectory;
     }
   }
 

@@ -20,11 +20,11 @@
 #include "berryNativeTabFolder.h"
 #include "berryEmptyTabFolder.h"
 
-#include "../util/berryPresentablePartFolder.h"
-#include "../util/berryTabbedStackPresentation.h"
+#include "internal/util/berryPresentablePartFolder.h"
+#include "internal/util/berryTabbedStackPresentation.h"
 
-#include "../berryQtSash.h"
-#include "../berryQtControlWidget.h"
+#include "internal/berryQtSash.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <QApplication>
 

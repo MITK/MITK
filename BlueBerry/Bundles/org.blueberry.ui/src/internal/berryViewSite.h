@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPartSite.h"
 
-#include "../berryIViewSite.h"
+#include "berryIViewSite.h"
 
 namespace berry {
 

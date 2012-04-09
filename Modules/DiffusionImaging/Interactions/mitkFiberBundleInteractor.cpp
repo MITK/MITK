@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUndoController.h>
 #include <mitkStateEvent.h>
 #include <mitkState.h>
-#include <mitkFiberBundle.h>
+#include <mitkFiberBundleX.h>
 #include "mitkBaseRenderer.h"
 
 #include <vtkLinearTransform.h>
@@ -139,7 +139,7 @@ float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) 
   }
 
   //check on the right data-type
-  mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_DataNode->GetData());
+  mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_DataNode->GetData());
   if (bundle == NULL)
     return 0;
 
@@ -153,7 +153,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
   bool ok = false;//for return type bool
 
   //checking corresponding Data; has to be a PointSet or a subclass
-  mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_DataNode->GetData());
+  mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_DataNode->GetData());
   if (bundle == NULL)
     return false;
 
@@ -211,7 +211,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         // Check if an object is present at the current mouse position
         DataNode *pickedNode = dpe->GetPickedObjectNode();
         if ( pickedNode != m_DataNode )
-        {          
+        {
 //          if(pickedNode == 0)
 //            MITK_INFO << "picked node is NULL, no hovering";
 //          else

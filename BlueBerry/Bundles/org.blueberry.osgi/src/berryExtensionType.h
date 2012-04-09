@@ -120,7 +120,7 @@ void extensionTypeDeleteHelper(T* t)
 }
 
 template <typename T>
-QObject* extensionTypeConstructHelper(const T* t)
+QObject* extensionTypeConstructHelper(const T* /*t*/)
 {
   return new T;
 }

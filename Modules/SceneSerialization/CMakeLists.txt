@@ -5,4 +5,4 @@ MITK_CREATE_MODULE( SceneSerialization
   ADDITIONAL_LIBS optimized PocoFoundation debug PocoFoundationd optimized PocoZip debug PocoZipd
 )
 
-ADD_SUBDIRECTORY(Testing)
+add_subdirectory(Testing)

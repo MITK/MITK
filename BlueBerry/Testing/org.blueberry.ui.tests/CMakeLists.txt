@@ -1,12 +1,12 @@
-PROJECT(org_blueberry_ui_tests)
+project(org_blueberry_ui_tests)
 
 MACRO_CREATE_CTK_PLUGIN(
   EXPORT_DIRECTIVE BERRY_UI_TESTS
   TEST_PLUGIN
 )
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} optimized CppUnit debug CppUnitd)
+target_link_libraries(${PROJECT_NAME} optimized CppUnit debug CppUnitd)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} org_blueberry_ui_qt)
+add_dependencies(${PROJECT_NAME} org_blueberry_ui_qt)
 
 MACRO_TEST_UIPLUGIN()

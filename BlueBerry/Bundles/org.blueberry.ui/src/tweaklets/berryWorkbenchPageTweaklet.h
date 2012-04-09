@@ -19,8 +19,8 @@
 #ifndef BERRYWORKBENCHPAGETWEAKLET_H_
 #define BERRYWORKBENCHPAGETWEAKLET_H_
 
-#include "../internal/berryTweaklets.h"
-#include "../berryIWorkbenchPage.h"
+#include "internal/berryTweaklets.h"
+#include "berryIWorkbenchPage.h"
 
 namespace berry
 {

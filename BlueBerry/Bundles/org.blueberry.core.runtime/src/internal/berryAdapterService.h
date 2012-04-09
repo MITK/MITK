@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryService.h>
 
-#include "../berryIAdapterManager.h"
-#include "../berryIAdapterFactory.h"
+#include "berryIAdapterManager.h"
+#include "berryIAdapterFactory.h"
 
 #include <Poco/HashMap.h>
 

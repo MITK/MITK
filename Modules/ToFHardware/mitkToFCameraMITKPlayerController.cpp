@@ -26,13 +26,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-  ToFCameraMITKPlayerController::ToFCameraMITKPlayerController():m_PixelNumber(0),m_NumberOfBytes(0),
-    m_CaptureWidth(0),m_CaptureHeight(0),m_ConnectionCheck(false),m_InputFileName(""),
-    m_ToFImageType(ToFImageType3D), m_IntensityArray(NULL),m_DistanceArray(NULL),m_AmplitudeArray(NULL),
-    m_DistanceImageFileName(""),m_AmplitudeImageFileName(""),m_IntensityImageFileName(""), m_Extension(""),
-    m_CurrentFrame(-1),m_NumOfFrames(0),
-    m_DistanceImage(0), m_AmplitudeImage(0),m_IntensityImage(0),
-    m_PixelStartInFile(0), m_DistanceInfile(NULL),m_AmplitudeInfile(NULL),m_IntensityInfile(NULL)
+  ToFCameraMITKPlayerController::ToFCameraMITKPlayerController() :
+    m_PixelNumber(0),
+    m_NumberOfBytes(0),
+    m_CaptureWidth(0),
+    m_CaptureHeight(0),
+    m_ConnectionCheck(false),
+    m_InputFileName(""),
+    m_Extension(""),
+    m_ToFImageType(ToFImageType3D),
+    m_DistanceImage(0),
+    m_AmplitudeImage(0),
+    m_IntensityImage(0),
+    m_DistanceInfile(NULL),
+    m_AmplitudeInfile(NULL),
+    m_IntensityInfile(NULL),
+    m_IntensityArray(NULL),
+    m_DistanceArray(NULL),
+    m_AmplitudeArray(NULL),
+    m_DistanceImageFileName(""),
+    m_AmplitudeImageFileName(""),
+    m_IntensityImageFileName(""),
+    m_PixelStartInFile(0),
+    m_CurrentFrame(-1),
+    m_NumOfFrames(0)   
   {
     m_ImageStatus = std::vector<bool>(3,true);
   }

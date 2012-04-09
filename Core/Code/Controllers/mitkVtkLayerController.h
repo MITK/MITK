@@ -28,6 +28,10 @@ class vtkRenderer;
 namespace mitk 
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4251)
+#endif
 
 /**
  * Manages the VTK layer hierarchy
@@ -116,6 +120,10 @@ class MITK_CORE_EXPORT VtkLayerController
     static vtkLayerControllerMapType s_LayerControllerMap;
     
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // Namespace MITK
 

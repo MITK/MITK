@@ -93,7 +93,7 @@ public:
     T_prop = 0.5;
     dthres *= dthres;
     stopprobability = exp(-1/T_prop);
-    del_prob = 0.1;
+     del_prob = 0.1;
   }
 
   void SetTemperature(float temp)
@@ -120,6 +120,8 @@ public:
 
       pVector R;
       enc->drawSpatPosition(&R);
+
+      //fprintf(stderr,"drawn: %f, %f, %f\n",R[0],R[1],R[2]);
       //R.setXYZ(20.5*3, 35.5*3, 1.5*3);
 
       pVector N; N.rand_sphere();

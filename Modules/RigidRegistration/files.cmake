@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   mitkImageRegistrationMethod.cpp
   mitkMetricParameters.cpp
   mitkOptimizerFactory.cpp

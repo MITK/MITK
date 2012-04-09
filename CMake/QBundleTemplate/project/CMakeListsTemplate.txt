@@ -1,55 +1,55 @@
-PROJECT(@CUSTOM_PROJECT_NAME@)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+project(@CUSTOM_PROJECT_NAME@)
+cmake_minimum_required(VERSION 2.6)
 
-SET(BUILD_SHARED_LIBS 1)
+set(BUILD_SHARED_LIBS 1)
 
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all libraries.")
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all executables.")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all libraries.")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all executables.")
 
 # This variable will contain a list of directories
 # which contain your binary plug-ins
-SET(@CUSTOM_PROJECT_NAME@_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "@CUSTOM_PROJECT_NAME@ base plugin directories." FORCE)
+set(@CUSTOM_PROJECT_NAME@_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "@CUSTOM_PROJECT_NAME@ base plugin directories." FORCE)
 
 @FIND_PACKAGE_QT4@
-INCLUDE(${QT_USE_FILE})
+include(${QT_USE_FILE})
 
-SET(MITK_USE_BLUEBERRY 1)
+set(MITK_USE_BLUEBERRY 1)
 # Set the variable below to 0 if you do not want to
 # use the extended MITK functionality
-SET(MITK_USE_EXT 1)
-FIND_PACKAGE(MITK REQUIRED)
+set(MITK_USE_EXT 1)
+find_package(MITK REQUIRED)
 
-ADD_SUBDIRECTORY(Bundles)
+add_subdirectory(Bundles)
 
 # Now build a custom executable to start the
 # BlueBerry Workbench with our plug-ins
-INCLUDE_DIRECTORIES(
+include_directories(
   ${org_blueberry_osgi_INCLUDE_DIRS}
   ${Poco_INCLUDE_DIRS}
   ${mbilog_INCLUDE_DIRS}
 )
 
-LINK_DIRECTORIES("${org.blueberry.osgi_OUT_DIR}/bin" ${Poco_LIBRARY_DIR})
-ADD_EXECUTABLE(@CUSTOM_PROJECT_EXECUTABLE@ @CUSTOM_PROJECT_EXECUTABLE@.cpp)
-TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ org_blueberry_osgi)
+link_directories("${org.blueberry.osgi_OUT_DIR}/bin" ${Poco_LIBRARY_DIR})
+add_executable(@CUSTOM_PROJECT_EXECUTABLE@ @CUSTOM_PROJECT_EXECUTABLE@.cpp)
+target_link_libraries(@CUSTOM_PROJECT_EXECUTABLE@ org_blueberry_osgi)
 
-IF(@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS)
-  ADD_DEPENDENCIES(@CUSTOM_PROJECT_EXECUTABLE@ ${@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS})
-ENDIF()
+if(@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS)
+  add_dependencies(@CUSTOM_PROJECT_EXECUTABLE@ ${@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS})
+endif()
 
 # Configure the application's .ini file
-SET(PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
-SET(PLUGIN_OUTPUT_DIRS "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Bundles")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
+set(PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
+set(PLUGIN_OUTPUT_DIRS "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Bundles")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/@CUSTOM_PROJECT_EXECUTABLE@.ini" @ONLY)
               
 
 # If we are under Windows, create two batch files which correctly
 # set up the environment for the application and for VS 2008
-IF(WIN32)
-  INCLUDE(mitkFunctionCreateWindowsBatchScript)
+if(WIN32)
+  include(mitkFunctionCreateWindowsBatchScript)
   
-  FOREACH(APP_BUILD_TYPE debug release)
+  foreach(APP_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start@CUSTOM_PROJECT_EXECUTABLE@_${APP_BUILD_TYPE}.bat
       ${APP_BUILD_TYPE})
@@ -58,5 +58,5 @@ IF(WIN32)
     mitkFunctionCreateWindowsBatchScript("${CMAKE_CURRENT_SOURCE_DIR}/startVS2008.bat.in"
       "${PROJECT_BINARY_DIR}/startVS2008_${APP_BUILD_TYPE}.bat"
       ${APP_BUILD_TYPE})
-  ENDFOREACH()
-ENDIF(WIN32)
+  endforeach()
+endif(WIN32)

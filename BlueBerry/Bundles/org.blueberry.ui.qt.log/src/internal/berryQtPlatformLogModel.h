@@ -46,6 +46,7 @@ public:
   QtPlatformLogModel(QObject* parent = 0);
   ~QtPlatformLogModel();
 
+  void SetShowAdvancedFiels( bool showAdvancedFiels );
   int rowCount(const QModelIndex&) const;
   int columnCount(const QModelIndex&) const;
   QVariant data(const QModelIndex& index, int) const;
@@ -56,6 +57,7 @@ public:
   void addLogEntry(const PlatformEvent& event);
 
 private:
+  bool m_ShowAdvancedFiels;
 
   typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
 

@@ -2,24 +2,27 @@
 # CableSwig
 #-----------------------------------------------------------------------------
 
-IF(MITK_USE_Python)
+if(MITK_USE_Python)
 
 # Sanity checks
-IF(DEFINED CableSwig_DIR AND NOT EXISTS ${CableSwig_DIR})
-  MESSAGE(FATAL_ERROR "CableSwig_DIR variable is defined but corresponds to non-existing directory")
-ENDIF()
+if(DEFINED CableSwig_DIR AND NOT EXISTS ${CableSwig_DIR})
+  message(FATAL_ERROR "CableSwig_DIR variable is defined but corresponds to non-existing directory")
+endif()
 
-SET(proj CableSwig)
-SET(proj_DEPENDENCIES )
-SET(CableSwig_DEPENDS ${proj})
+set(proj CableSwig)
+set(proj_DEPENDENCIES )
+set(CableSwig_DEPENDS ${proj})
 
-IF(NOT DEFINED CableSwig_DIR)
+if(NOT DEFINED CableSwig_DIR)
 
-  SET(additional_cmake_args )
+  set(additional_cmake_args )
 
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/CableSwig-ITK-3.20.0.tar.gz
+     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
+     PREFIX ${proj}-cmake
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CableSwig-ITK-3.20.0.tar.gz
+     URL_MD5 893882bf8b4fbfbae3fe8c747a75f7a0     
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
@@ -30,12 +33,12 @@ IF(NOT DEFINED CableSwig_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  SET(CableSwig_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(CableSwig_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
-ELSE()
+else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
-ENDIF()
+endif()
 
-ENDIF()
+endif()

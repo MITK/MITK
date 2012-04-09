@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   ToFCameraPMDRawDataDevice::ToFCameraPMDRawDataDevice() :
-  m_SourceDataArray(NULL), m_SourceDataBuffer(NULL), m_ShortSourceData(NULL)
+    m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL)
   {
     m_RawDataSource = ThreadedToFRawDataReconstruction::New();
 

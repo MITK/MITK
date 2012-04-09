@@ -19,9 +19,9 @@
 
 #include "berryIStackableContainer.h"
 #include "berryDetachedWindow.h"
-#include "../berryIWorkbenchWindow.h"
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../berryImageDescriptor.h"
+#include "berryIWorkbenchWindow.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "berryImageDescriptor.h"
 
 namespace berry
 {

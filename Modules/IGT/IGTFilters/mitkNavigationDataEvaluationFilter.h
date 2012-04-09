@@ -82,6 +82,12 @@ namespace mitk {
     double GetPositionErrorMax(int input);
     /** @return Returns the minimum of the errors of all positions to the specified input. */
     double GetPositionErrorMin(int input);
+
+    /** @return Returns a logged point on position i of the specified input. If there is no point on position i the method returns [0,0,0] */
+    mitk::Point3D GetLoggedPosition(int i, int input);
+
+    /** @return Returns a logged orientation on position i of the specified input. If there is no orientation on position i the method returns [0,0,0,0] */
+    mitk::Quaternion GetLoggedOrientation(int i, int input);
       
   protected:
 

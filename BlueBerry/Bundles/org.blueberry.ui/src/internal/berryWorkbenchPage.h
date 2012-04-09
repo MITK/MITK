@@ -21,9 +21,9 @@
 #include <berryIAdaptable.h>
 #include <berryIExtensionPoint.h>
 
-#include "../berryIWorkbenchPage.h"
-#include "../berryIWorkbenchPartReference.h"
-#include "../berryIReusableEditor.h"
+#include "berryIWorkbenchPage.h"
+#include "berryIWorkbenchPartReference.h"
+#include "berryIReusableEditor.h"
 
 #include "berryIStackableContainer.h"
 #include "berryIStickyViewManager.h"

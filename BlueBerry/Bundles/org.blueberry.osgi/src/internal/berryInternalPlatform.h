@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Logger.h>
 #include <Poco/Util/Application.h>
 
-#include "../event/berryPlatformEvents.h"
-#include "../service/berryServiceRegistry.h"
+#include "event/berryPlatformEvents.h"
+#include "service/berryServiceRegistry.h"
 #include "berryExtensionPointService.h"
 
 #include <map>
@@ -86,9 +86,6 @@ private:
 
   void AssertInitialized();
 
-  // Poco::Application method overrides
-  void defineOptions(Poco::Util::OptionSet& options);
-
   void handlePreloadLibraryOption(const std::string &name, const std::string &value);
 
   int main(const std::vector<std::string>& args);
@@ -97,6 +94,9 @@ private:
 
 public:
   virtual ~InternalPlatform();
+
+  // Poco::Application method overrides
+  void defineOptions(Poco::Util::OptionSet& options);
 
   void PrintHelp(const std::string& name, const std::string& value);
 

@@ -22,11 +22,11 @@
 #include "berryWorkbenchPage.h"
 #include "berryLayoutPart.h"
 #include "berryIDragOverListener.h"
-#include "../berryIShellListener.h"
-#include "../guitk/berryGuiTkIControlListener.h"
+#include "berryIShellListener.h"
+#include "guitk/berryGuiTkIControlListener.h"
 
-#include "../berryRectangle.h"
-#include "../berryShell.h"
+#include "berryRectangle.h"
+#include "berryShell.h"
 
 namespace berry
 {

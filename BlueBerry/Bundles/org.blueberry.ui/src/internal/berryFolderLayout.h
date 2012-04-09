@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYFOLDERLAYOUT_H_
 #define BERRYFOLDERLAYOUT_H_
 
-#include "../berryIFolderLayout.h"
+#include "berryIFolderLayout.h"
 
 #include "berryPartStack.h"
 #include "berryViewFactory.h"

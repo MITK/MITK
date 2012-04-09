@@ -233,7 +233,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::DiffImageApplier::ItkImageSwitch2DDiff( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=*(m_SliceDifferenceImage->GetPixelType().GetTypeId());
+  const std::type_info& typeId=m_SliceDifferenceImage->GetPixelType().GetTypeId();
 
   myMITKDiffImageApplierFilterAccessAllTypesByItk( m_SliceDifferenceImage, ItkImageProcessing2DDiff, 2, itkImage );
 }
@@ -242,7 +242,7 @@ void mitk::DiffImageApplier::ItkImageSwitch2DDiff( itk::Image<TPixel,VImageDimen
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::DiffImageApplier::ItkImageSwitch3DDiff( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=*(m_SliceDifferenceImage->GetPixelType().GetTypeId());
+  const std::type_info& typeId=m_SliceDifferenceImage->GetPixelType().GetTypeId();
 
   myMITKDiffImageApplierFilterAccessAllTypesByItk( m_SliceDifferenceImage, ItkImageProcessing3DDiff, 3, itkImage );
 }

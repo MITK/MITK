@@ -4,4 +4,4 @@ MITK_CREATE_MODULE(MitkDeformableRegistration
   EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_EXPORT
 )
 
-ADD_SUBDIRECTORY(Testing)
+add_subdirectory(Testing)

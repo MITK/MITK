@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdlib.h>
 
 mitk::CompressedImageContainer::CompressedImageContainer()
+    : m_PixelType(NULL)
 {
 }
 
@@ -51,8 +52,10 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
   // determine memory size occupied by voxel data
   m_ImageDimension = image->GetDimension();
   m_ImageDimensions.clear();
-  m_PixelType = image->GetPixelType();
-  m_OneTimeStepImageSizeInBytes = m_PixelType.GetBpe() >> 3; // bits per element divided by 8
+
+  m_PixelType = new mitk::PixelType( image->GetPixelType());
+
+  m_OneTimeStepImageSizeInBytes = m_PixelType->GetSize(); // bits per element divided by 8
   for (unsigned int i = 0; i < m_ImageDimension; ++i)
   {
     unsigned int currentImageDimension = image->GetDimension(i);
@@ -131,7 +134,7 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
   for (unsigned int dim = 0; dim < m_ImageDimension; ++dim)
     dims[dim] = m_ImageDimensions[dim];
   
-  image->Initialize( m_PixelType, m_ImageDimension, dims ); // this IS needed, right ?? But it does allocate memory -> does create one big lump of memory (also in windows)
+  image->Initialize( *m_PixelType, m_ImageDimension, dims ); // this IS needed, right ?? But it does allocate memory -> does create one big lump of memory (also in windows)
 
   unsigned int timeStep(0);
   for (std::vector< std::pair<unsigned char*, unsigned long> >::iterator iter = m_ByteBuffers.begin();

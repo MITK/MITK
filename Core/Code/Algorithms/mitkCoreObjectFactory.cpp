@@ -53,14 +53,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
-#include "mitkPicFileIOFactory.h"
+//#include "mitkPicFileIOFactory.h"
 #include "mitkPointSetIOFactory.h"
 #include "mitkItkImageFileIOFactory.h"
 #include "mitkSTLFileIOFactory.h"
 #include "mitkVtkSurfaceIOFactory.h"
 #include "mitkVtkImageIOFactory.h"
 #include "mitkVtiFileIOFactory.h"
-#include "mitkPicVolumeTimeSeriesIOFactory.h"
+//#include "mitkPicVolumeTimeSeriesIOFactory.h"
 
 #include "mitkImageWriterFactory.h"
 #include "mitkPointSetWriterFactory.h"
@@ -136,14 +136,14 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   {
     MITK_DEBUG << "CoreObjectFactory c'tor" << std::endl;
 
-    itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
 
     mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
     mitk::PointSetWriterFactory::RegisterOneFactory();
@@ -316,6 +316,9 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "DKFZ Pic"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq.gz", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "High Dynamic Range File"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "High Dynamic Range File"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "High Dynamic Range File"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "Nearly Raw Raster Data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD with detached header"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mps", "Point sets"));
@@ -336,17 +339,14 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surface files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii.gz", "NIfTI format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze image header files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "Analyze image files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "Analyze compressed image files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", "UMDS GIPL Format Files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl.gz", "UMDS GIPL Format Files"));
 
   //m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface Files"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", "VTK Image Data Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze image header files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "Analyze image files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "Analyze compressed image files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "High Dynamic Range File"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));

@@ -1,0 +1,46 @@
+/**
+  \defgroup org_blueberry_ui_qt_help org.blueberry.ui.qt.help
+  \ingroup BlueBerryPlugins
+
+  \brief Provides access to Qt Help information from inside the Workbench.
+  
+  This plug-in collects all Qt QCH files (*.qch) from plug-ins in the RESOLVED
+  state and registers them internally. The plug-in can be configured using the
+  CTK Config Admin service and it listens to certain event topics on the CTK
+  Event Admin.
+  
+  The following configuration properties for the service PID "org.blueberry.services.help"
+  are supported:
+  
+  - \b homePage A <code>QString</code> property containing the a qthelp url pointing
+                      to the applications home page.
+                      
+  The plug-in subscribes to the following event topics:
+  
+  - \b org/blueberry/help/CONTEXTHELP_REQUESTED signals a request for showing context
+    sensitive help. If no properties are attached to the event, a qthelp url is constructed
+    using the currently active part ID from the workbench. If the url is invalid, the
+    home page is shown instead.
+    <br><br>
+    Supported event properties are:
+      - \e url Show the given url
+      
+  The example below demonstrates how to provide configuration data for the
+  org.blueberry.ui.qt.help plug-in.
+  
+  \snippet org.blueberry.ui.qt.help-config/main.cpp 0
+  
+  Requesting context help may look like this:
+  
+  \snippet org.blueberry.ui.qt.help-config/main.cpp 1
+  
+*/
+
+/**
+  \defgroup org_blueberry_ui_qt_help_internal Internal
+  \ingroup org_blueberry_ui_qt_help
+
+  \brief This subcategory includes the internal classes of the org.blueberry.ui.qt.help plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

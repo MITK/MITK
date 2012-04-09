@@ -1,4 +1,4 @@
-SET(MODULE_TESTS
+set(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkBoundingObjectCutterTest.cpp
   mitkContourMapper2DTest.cpp
@@ -18,7 +18,7 @@ SET(MODULE_TESTS
   mitkUnstructuredGridTest.cpp
   mitkSimpleHistogramTest.cpp
 )
-SET(MODULE_IMAGE_TESTS
+set(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
   mitkCompressedImageContainerTest.cpp
   mitkCylindricToCartesianFilterTest.cpp
@@ -27,14 +27,14 @@ SET(MODULE_IMAGE_TESTS
   mitkOverwriteSliceImageFilterTest.cpp
   mitkSurfaceToImageFilterTest.cpp
 )
-SET(MODULE_CUSTOM_TESTS
+set(MODULE_CUSTOM_TESTS
   mitkLabeledImageToSurfaceFilterTest.cpp
 )
-SET(MODULE_TESTIMAGES
-  US4DCyl.pic.gz
-  Pic3D.pic.gz
-  Pic2DplusT.pic.gz
-  BallBinary30x30x30.pic.gz
+set(MODULE_TESTIMAGES
+  US4DCyl.nrrd
+  Pic3D.nrrd
+  Pic2DplusT.nrrd
+  BallBinary30x30x30.nrrd
   Png2D-bw.png
   binary.stl
   ball.stl

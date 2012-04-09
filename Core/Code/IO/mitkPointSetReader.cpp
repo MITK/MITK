@@ -54,7 +54,7 @@ void mitk::PointSetReader::GenerateData()
     {
       TiXmlHandle docHandle( &doc );
       unsigned int pointSetCounter(0);
-          for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
+      for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
         currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
       {
         mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
@@ -70,8 +70,10 @@ void mitk::PointSetReader::GenerateData()
 
             newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
           }
-        } else {
-            newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
+        } 
+        else 
+        {
+          newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
         }
         this->SetNthOutput( pointSetCounter, newPointSet );
         pointSetCounter++;
@@ -117,6 +119,13 @@ mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer 
         newPointSet->SetPoint(id, point, spec, currentTimeStep);
       }
     }
+  else
+  {
+    if(currentTimeStep != newPointSet->GetTimeSteps()+1)
+    {
+      newPointSet->Expand(currentTimeStep+1);     // expand time step series with empty time step
+    }
+  }
     return newPointSet;
 }
 

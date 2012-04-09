@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "../berryIPropertyTester.h"
+#include "berryIPropertyTester.h"
 
 #include <vector>
 

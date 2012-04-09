@@ -1,12 +1,12 @@
-PROJECT(mitkWrap)
+project(mitkWrap)
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/mitkWrapSetup.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/mitkWrapSetup.cmake)
 
 # Find wrapping language API libraries.
-IF(MITK_USE_Python)
-  INCLUDE(${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
-  FIND_PROGRAM(PYTHON_EXECUTABLE
+if(MITK_USE_Python)
+  include(${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
+  find_program(PYTHON_EXECUTABLE
     NAMES python python2.3 python2.2 python2.1 python2.0 python1.6 python1.5 
     PATHS
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.3\\InstallPath]
@@ -16,21 +16,21 @@ IF(MITK_USE_Python)
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.6\\InstallPath]
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.5\\InstallPath]
     )
-  MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
-ENDIF(MITK_USE_Python)
+  mark_as_advanced(PYTHON_EXECUTABLE)
+endif(MITK_USE_Python)
 
-MARK_AS_ADVANCED(MITK_USE_Python)
-MARK_AS_ADVANCED(CABLE_INDEX)
-MARK_AS_ADVANCED(CSWIG)
-MARK_AS_ADVANCED(GCCXML)
+mark_as_advanced(MITK_USE_Python)
+mark_as_advanced(CABLE_INDEX)
+mark_as_advanced(CSWIG)
+mark_as_advanced(GCCXML)
 
 # set a variable to determine if 
 # the CSwig directory should be used
-SET(MITK_CSWIG_DIR 0)
-IF(MITK_USE_Python)
-  SET(MITK_CSWIG_DIR 1)
-ENDIF(MITK_USE_Python)
+set(MITK_CSWIG_DIR 0)
+if(MITK_USE_Python)
+  set(MITK_CSWIG_DIR 1)
+endif(MITK_USE_Python)
 
-IF(MITK_CSWIG_DIR)
-  SUBDIRS(CSwig)
-ENDIF(MITK_CSWIG_DIR)
+if(MITK_CSWIG_DIR)
+  subdirs(CSwig)
+endif(MITK_CSWIG_DIR)

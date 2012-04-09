@@ -36,8 +36,8 @@ namespace mitk {
                                                     const double randomMax = 1000.0f, const double randMin = 0.0f)
         {
           //set the data type according to the template
-          mitk::PixelType type;
-          type.Initialize(typeid(TPixelType));
+            mitk::PixelType type = MakeScalarPixelType<TPixelType>();
+          //type.Initialize(typeid(TPixelType));
 
           //initialize the MITK image with given dimenion and data type
           mitk::Image::Pointer output = mitk::Image::New();

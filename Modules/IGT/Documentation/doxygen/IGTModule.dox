@@ -7,10 +7,7 @@ These modules for image guided therapy contain functionalities for the tracking 
 
 \section IGTGeneralModulePageModuleList List of IGT Modules
 
-  \li \subpage org_igtnavigationtoolmanager
-  \li \subpage org_toolpairnavigation
-  \li \subpage org_igttrackingtoolbox
-  \li \subpage org_igttutorial
-  \li \subpage org_navigationdataplayer
-  \li \subpage org_igttrackinglab
+  \li \subpage org_mitk_gui_qt_igtnavigation
+  \li \subpage org_mitk_gui_qt_igttracking
+  \li \subpage org_mitk_gui_qt_igtexample
 */

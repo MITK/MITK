@@ -19,7 +19,7 @@
 #define _BERRY_JOBQUEUE_H
 
 #include "berryInternalJob.h" 
-#include "../berryJob.h"
+#include "berryJob.h"
 #include <berryObject.h>
 #include <org_blueberry_core_jobs_Export.h>
 

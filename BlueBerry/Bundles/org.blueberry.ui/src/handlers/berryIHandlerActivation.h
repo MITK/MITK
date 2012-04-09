@@ -19,7 +19,7 @@
 #ifndef BERRYIHANDLERACTIVATION_H_
 #define BERRYIHANDLERACTIVATION_H_
 
-#include "../internal/berryIEvaluationResultCache.h"
+#include "internal/berryIEvaluationResultCache.h"
 
 #include <org_blueberry_ui_Export.h>
 

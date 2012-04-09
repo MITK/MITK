@@ -771,8 +771,8 @@ void StackTrace(void)
 
 # endif
 
-  write(global_output,
-  "No debugger found\n", strlen("No debugger found\n"));
+  (void) write(global_output,
+    "No debugger found\n", strlen("No debugger found\n"));
 
 #elif defined(PLATFORM_WIN32)
   /* Use StackWalk() */

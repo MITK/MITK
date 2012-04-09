@@ -4,4 +4,4 @@ MITK_CREATE_MODULE(MitkRigidRegistration
   EXPORT_DEFINE MITK_RIGIDREGISTRATION_EXPORT
 )
 
-ADD_SUBDIRECTORY(Testing)
+add_subdirectory(Testing)

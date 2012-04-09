@@ -3,91 +3,138 @@
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
 
-MACRO(downloadFile url dest)
-  FILE(DOWNLOAD ${url} ${dest} STATUS status)
-  LIST(GET status 0 error_code)
-  LIST(GET status 1 error_msg)
-  IF(error_code)
-    MESSAGE(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
-  ENDIF()
-ENDMACRO()
+macro(downloadFile url dest)
+  file(DOWNLOAD ${url} ${dest} STATUS status)
+  list(GET status 0 error_code)
+  list(GET status 1 error_msg)
+  if(error_code)
+    message(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
+  endif()
+endmacro()
 
 #-----------------------------------------------------------------------------
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
 if(UNIX AND NOT APPLE)
-#----------------------------- libxt-dev --------------------
-INCLUDE(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+  #----------------------------- libxt-dev --------------------
+  include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 
-set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
-CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
-if(NOT STRING_DEFS_H)
-MESSAGE(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
+  set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
+  CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
+  if(NOT STRING_DEFS_H)
+    message(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
+  endif()
+
+  set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
+  CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
+  if(NOT TIFF_H)
+    message(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
+  endif()
+
+  CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
+  if(NOT LIB_WRAP)
+    message(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+  endif()
+
 endif()
 
-set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
-CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
-if(NOT TIFF_H)
-MESSAGE(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
+
+#-----------------------------------------------------------------------------
+# ExternalProjects
+#-----------------------------------------------------------------------------
+
+set(external_projects
+  VTK
+  GDCM
+  CableSwig
+  ITK
+  Boost
+  DCMTK
+  CTK
+  OpenCV
+  MITKData
+  )
+
+
+set(MITK_USE_CableSwig ${MITK_USE_Python})
+set(MITK_USE_GDCM 1)
+set(MITK_USE_ITK 1)
+set(MITK_USE_VTK 1)
+  
+foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV)
+  if(MITK_USE_${proj})
+    set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
+    mark_as_advanced(EXTERNAL_${proj}_DIR)
+    if(EXTERNAL_${proj}_DIR)
+      set(${proj}_DIR ${EXTERNAL_${proj}_DIR})
+    endif()
+  endif()
+endforeach()
+
+if(MITK_USE_Boost)
+  set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+  mark_as_advanced(EXTERNAL_BOOST_ROOT)
+  if(EXTERNAL_BOOST_ROOT)
+    set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
+  endif()
 endif()
 
-CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
-if(NOT LIB_WRAP)
-MESSAGE(FATAL_ERROR "error: could not find tcpd.h - libwrap0-dev needs to be installed")
+if(BUILD_TESTING)
+  set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
+  mark_as_advanced(EXTERNAL_MITK_DATA_DIR)
+  if(EXTERNAL_MITK_DATA_DIR)
+    set(MITK_DATA_DIR ${EXTERNAL_MITK_DATA_DIR})
+  endif()
 endif()
 
-endif()
-
-#----------------------------- Qt ---------------------------
-if(MITK_USE_QT)
-  find_package(Qt4 REQUIRED)
-  set(vtk_QT_ARGS
-      -DDESIRED_QT_VERSION:STRING=4
-      -DVTK_USE_GUISUPPORT:BOOL=ON
-      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
-      -DVTK_USE_QT:BOOL=ON
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-     )
+# Look for git early on, if needed
+if((BUILD_TESTING AND NOT EXTERNAL_MITK_DATA_DIR) OR
+   (MITK_USE_CTK AND NOT EXTERNAL_CTK_DIR))
+  find_package(Git REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
 # External project settings
 #-----------------------------------------------------------------------------
 
-INCLUDE(ExternalProject)
+include(ExternalProject)
 
-SET(ep_base "${CMAKE_BINARY_DIR}/CMakeExternals")
-SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
+set(ep_base "${CMAKE_BINARY_DIR}/CMakeExternals")
+set_property(DIRECTORY PROPERTY EP_BASE ${ep_base})
 
-SET(ep_install_dir ${ep_base}/Install)
-#SET(ep_build_dir ${ep_base}/Build)
-SET(ep_source_dir ${ep_base}/Source)
-#SET(ep_parallelism_level)
-SET(ep_build_shared_libs ON)
-SET(ep_build_testing OFF)
+set(ep_install_dir ${ep_base}/Install)
+#set(ep_build_dir ${ep_base}/Build)
+set(ep_source_dir ${ep_base}/Source)
+#set(ep_parallelism_level)
+set(ep_build_shared_libs ON)
+set(ep_build_testing OFF)
+
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+endif()
 
 # Compute -G arg for configuring external projects with the same CMake generator:
-IF(CMAKE_EXTRA_GENERATOR)
-  SET(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
-ELSE()
-  SET(gen "${CMAKE_GENERATOR}")
-ENDIF()
+if(CMAKE_EXTRA_GENERATOR)
+  set(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
+else()
+  set(gen "${CMAKE_GENERATOR}")
+endif()
 
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
 ##
 
-IF(MSVC90 OR MSVC10)
-  SET(ep_common_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
-  SET(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
-ELSE()
-  SET(ep_common_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX_EXTRA")
-  SET(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
-ENDIF()
+if(MSVC90 OR MSVC10)
+  set(ep_common_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
+  set(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+else()
+  set(ep_common_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX_EXTRA")
+  set(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
+endif()
 
-SET(ep_common_args
+set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DBUILD_SHARED_LIBS:BOOL=ON
@@ -107,32 +154,16 @@ SET(ep_common_args
   -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_C_FLAGS_RELWITHDEBINFO}
 )
 
-#-----------------------------------------------------------------------------
-# ExternalProjects
-#-----------------------------------------------------------------------------
-
-SET(external_projects
-  VTK
-  GDCM
-  CableSwig
-  ITK
-  Boost
-  DCMTK
-  CTK
-  OpenCV
-  MITKData
-  )
-
 # Include external projects
-FOREACH(p ${external_projects})
-  INCLUDE(CMakeExternals/${p}.cmake)
-ENDFOREACH()
+foreach(p ${external_projects})
+  include(CMakeExternals/${p}.cmake)
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args
 #-----------------------------------------------------------------------------
 
-SET(mitk_cmake_boolean_args
+set(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
@@ -154,14 +185,14 @@ SET(mitk_cmake_boolean_args
 # Create the final variable containing superbuild boolean args
 #-----------------------------------------------------------------------------
 
-SET(mitk_superbuild_boolean_args)
-FOREACH(mitk_cmake_arg ${mitk_cmake_boolean_args})
-  LIST(APPEND mitk_superbuild_boolean_args -D${mitk_cmake_arg}:BOOL=${${mitk_cmake_arg}})
-ENDFOREACH()
+set(mitk_superbuild_boolean_args)
+foreach(mitk_cmake_arg ${mitk_cmake_boolean_args})
+  list(APPEND mitk_superbuild_boolean_args -D${mitk_cmake_arg}:BOOL=${${mitk_cmake_arg}})
+endforeach()
 
-IF(MITK_BUILD_ALL_PLUGINS)
-  LIST(APPEND mitk_superbuild_boolean_args -DBLUEBERRY_BUILD_ALL_PLUGINS:BOOL=ON)
-ENDIF()
+if(MITK_BUILD_ALL_PLUGINS)
+  list(APPEND mitk_superbuild_boolean_args -DBLUEBERRY_BUILD_ALL_PLUGINS:BOOL=ON)
+endif()
 
 #-----------------------------------------------------------------------------
 # MITK Utilities
@@ -189,18 +220,18 @@ ExternalProject_Add(${proj}
 # MITK Configure
 #-----------------------------------------------------------------------------
 
-IF(MITK_INITIAL_CACHE_FILE)
-  SET(mitk_initial_cache_arg -C "${MITK_INITIAL_CACHE_FILE}")
-ENDIF()
+if(MITK_INITIAL_CACHE_FILE)
+  set(mitk_initial_cache_arg -C "${MITK_INITIAL_CACHE_FILE}")
+endif()
 
-SET(mitk_optional_cache_args )
-FOREACH(type RUNTIME ARCHIVE LIBRARY)
-  IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
-    LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
-  ENDIF()
-ENDFOREACH()
+set(mitk_optional_cache_args )
+foreach(type RUNTIME ARCHIVE LIBRARY)
+  if(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
+    list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
+  endif()
+endforeach()
 
-SET(proj MITK-Configure)
+set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
   LIST_SEPARATOR ^^
@@ -249,19 +280,19 @@ ExternalProject_Add(${proj}
 # MITK
 #-----------------------------------------------------------------------------
 
-IF(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
-  SET(mitk_build_cmd "$(MAKE)")
-ELSE()
-  SET(mitk_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build --config ${CMAKE_CFG_INTDIR})
-ENDIF()
+if(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
+  set(mitk_build_cmd "$(MAKE)")
+else()
+  set(mitk_build_cmd ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build --config ${CMAKE_CFG_INTDIR})
+endif()
 
-IF(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
-  SET(MITKBUILD_TARGET_ALL_OPTION "ALL")
-ELSE()
-  SET(MITKBUILD_TARGET_ALL_OPTION "")
-ENDIF()
+if(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
+  set(MITKBUILD_TARGET_ALL_OPTION "ALL")
+else()
+  set(MITKBUILD_TARGET_ALL_OPTION "")
+endif()
 
-ADD_CUSTOM_TARGET(MITK-build ${MITKBUILD_TARGET_ALL_OPTION}
+add_custom_target(MITK-build ${MITKBUILD_TARGET_ALL_OPTION}
   COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
   DEPENDS MITK-Configure
@@ -271,7 +302,7 @@ ADD_CUSTOM_TARGET(MITK-build ${MITKBUILD_TARGET_ALL_OPTION}
 # Custom target allowing to drive the build of the MITK project itself
 #-----------------------------------------------------------------------------
 
-ADD_CUSTOM_TARGET(MITK
+add_custom_target(MITK
   COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
 )

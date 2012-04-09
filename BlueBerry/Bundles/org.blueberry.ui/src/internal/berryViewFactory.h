@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berrySmartPointer.h>
 
-#include "../berryIMemento.h"
-#include "../berryIViewReference.h"
+#include "berryIMemento.h"
+#include "berryIViewReference.h"
 
 #include "berryReferenceCounter.h"
 

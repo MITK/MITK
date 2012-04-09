@@ -27,8 +27,8 @@
 #include "berryIPresentationSerializer.h"
 #include "berryStackDropResult.h"
 
-#include "../berryISizeProvider.h"
-#include "../berryIMemento.h"
+#include "berryISizeProvider.h"
+#include "berryIMemento.h"
 
 namespace berry
 {
@@ -75,6 +75,8 @@ protected:
    * @param stackSite the stack site
    */
   StackPresentation(IStackPresentationSite::Pointer stackSite);
+
+  ~StackPresentation();
 
   /**
    * Returns the presentation site (not null).

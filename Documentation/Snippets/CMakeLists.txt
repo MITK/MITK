@@ -1,6 +1,0 @@
-if(BUILD_TESTING)
-  MITK_USE_MODULE(Mitk)
-  include_directories(${ALL_INCLUDE_DIRECTORIES})
-  link_directories(${ALL_LIBRARY_DIRS})
-  mitkFunctionCompileSnippets("${CMAKE_CURRENT_SOURCE_DIR}" ${ALL_LIBRARIES})
-endif()

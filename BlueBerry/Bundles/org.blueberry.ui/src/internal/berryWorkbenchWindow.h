@@ -18,20 +18,20 @@
 #ifndef BERRYWORKBENCHWINDOW_H_
 #define BERRYWORKBENCHWINDOW_H_
 
-#include "../berryIWorkbenchWindow.h"
+#include "berryIWorkbenchWindow.h"
 
-#include "../berryIPerspectiveListener.h"
-#include "../guitk/berryGuiTkIControlListener.h"
-#include "../berryWindow.h"
+#include "berryIPerspectiveListener.h"
+#include "guitk/berryGuiTkIControlListener.h"
+#include "berryWindow.h"
 
 #include "berryWorkbenchWindowConfigurer.h"
 #include "berryShellPool.h"
 #include "berryServiceLocator.h"
 #include "berryWWinPartService.h"
 
-#include "../application/berryWorkbenchAdvisor.h"
-#include "../application/berryWorkbenchWindowAdvisor.h"
-#include "../application/berryActionBarAdvisor.h"
+#include "application/berryWorkbenchAdvisor.h"
+#include "application/berryWorkbenchWindowAdvisor.h"
+#include "application/berryActionBarAdvisor.h"
 
 #include <list>
 
@@ -169,6 +169,7 @@ protected:
   friend class WorkbenchWindowConfigurer::WindowActionBarConfigurer;
   friend class Workbench;
   friend class LayoutPartSash;
+  friend class EditorSashContainer;
   friend class WorkbenchPage;
   friend class DetachedWindow;
 

@@ -7,15 +7,6 @@ MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
 
-#QT
-if(MITK_USE_QT)
-  find_package(Qt4)
-  # this is not a godd idea since it adds the QT include directories to everything that is built below this directory
-  #include(${QT_USE_FILE})
-
-  # TODO: use fixup_bundle(...)
-  MITK_INSTALL_HELPER_APP(EXECUTABLES "${QT_ASSISTANT_EXECUTABLE}" )
-endif(MITK_USE_QT)
 
 if(WIN32)
   #DCMTK Dlls install target (shared libs on gcc only)

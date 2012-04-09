@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   mitkBSplineRegistration.cpp
   mitkDemonsRegistration.cpp
   mitkSymmetricForcesDemonsRegistration.cpp

@@ -20,8 +20,8 @@
 #include "berryIConfigurationElement.h"
 
 #include "berryIntroDescriptor.h"
-#include "../berryRegistryReader.h"
-#include "../berryWorkbenchPlugin.h"
+#include "internal/berryRegistryReader.h"
+#include "internal/berryWorkbenchPlugin.h"
 
 namespace berry
 {

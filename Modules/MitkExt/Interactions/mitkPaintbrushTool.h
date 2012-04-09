@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFeedbackContourTool.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
+#include "mitkLegacyAdaptors.h"
 
 namespace mitk
 {
@@ -74,9 +75,9 @@ class MitkExt_EXPORT PaintbrushTool : public FeedbackContourTool
     void UpdateContour(const StateEvent* stateEvent);
 
     /**
-      * Check if the current slice has changed
+      * Checks  if the current slice has changed
       */
-    bool CheckIfCurrentSliceHasChanged(const PositionEvent* event);
+    void CheckIfCurrentSliceHasChanged(const PositionEvent* event);
 
     int m_PaintingPixelValue;
     static int m_Size;

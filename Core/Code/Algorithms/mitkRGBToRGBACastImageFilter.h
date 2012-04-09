@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
+#include <itkRGBPixel.h>
+
 namespace itk {
 template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
 }

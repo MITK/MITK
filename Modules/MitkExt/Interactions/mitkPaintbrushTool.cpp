@@ -89,7 +89,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   Image::Pointer temporarySlice = Image::New();
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
+  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
 
@@ -160,6 +162,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   m_MasterContour = contourInImageIndexCoordinates;
 
+  // The PicDescriptor is only REFERENCING(!) the data, the temporarySlice takes care of deleting the data also the descriptor is pointing on
+  // because they got allocated by the ImageDataItem, not the descriptor.
+  stupidClone->data = NULL;
   mitkIpPicFree( stupidClone );
 }
 
@@ -313,44 +318,23 @@ bool mitk::PaintbrushTool::OnInvertLogic(Action* action, const StateEvent* state
   return true;
 }
 
-bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *event)
+void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    if (!workingNode) return false;
+
+    if (!workingNode)
+        return;
+
     Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+
     if ( !image || !planeGeometry )
-      return false;
+        return;
 
     if(m_CurrentPlane.IsNull())
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-
-//        //Workaround because of bug #7079
-//        Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
-
-//        int affectedDimension(-1);
-
-//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-//        {
-//            affectedDimension = 2;
-//        }
-//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-//        {
-//            affectedDimension = 0;
-//        }
-//        if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-//        {
-//            affectedDimension = 1;
-//        }
-
-//        if (affectedDimension != -1)
-//        {
-//            origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
-//            m_WorkingSlice->GetGeometry()->SetOrigin(origin);
-//        }
-//        //Workaround end
 
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
@@ -369,36 +353,11 @@ bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
             m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
             m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
-           //Workaround because of bug #7079
-//           Point3D origin = m_WorkingSlice->GetGeometry()->GetOrigin();
+            m_WorkingNode = mitk::DataNode::New();
+            m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+            m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
 
-//           int affectedDimension(-1);
-
-//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-//           {
-//               affectedDimension = 2;
-//           }
-//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-//           {
-//               affectedDimension = 0;
-//           }
-//           if(event->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-//           {
-//               affectedDimension = 1;
-//           }
-
-//           if (affectedDimension != -1)
-//           {
-//               origin[affectedDimension] = m_CurrentPlane->GetOrigin()[affectedDimension];
-//               m_WorkingSlice->GetGeometry()->SetOrigin(origin);
-//           }
-           //Workaround end
-
-           m_WorkingNode = mitk::DataNode::New();
-           m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-           m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-
-           m_WorkingNode->SetData(m_WorkingSlice);
+            m_WorkingNode->SetData(m_WorkingSlice);
         }
 
     }
@@ -415,8 +374,6 @@ bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
         m_WorkingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
         m_WorkingNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
 
-
         m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
     }
 }
-

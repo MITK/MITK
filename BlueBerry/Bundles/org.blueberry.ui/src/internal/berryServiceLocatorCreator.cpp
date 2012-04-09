@@ -18,8 +18,8 @@
 #include "berryServiceLocatorCreator.h"
 
 #include "berryServiceLocator.h"
-#include "../services/berryIServiceFactory.h"
-#include "../services/berryIDisposable.h"
+#include "services/berryIServiceFactory.h"
+#include "services/berryIDisposable.h"
 
 namespace berry {
 

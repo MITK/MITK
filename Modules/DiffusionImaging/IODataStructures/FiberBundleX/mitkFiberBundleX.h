@@ -1,4 +1,3 @@
-
 /*=========================================================================
 
  Program:   Medical Imaging & Interaction Toolkit
@@ -17,16 +16,14 @@
 
  =========================================================================*/
 
-/* =============== IMPORTANT TODO ===================
- * ==== USE vtkSmartPointer<> when necessary ONLY!!!!
- */
 
 #ifndef _MITK_FiberBundleX_H
 #define _MITK_FiberBundleX_H
 
 //includes for MITK datastructure
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 #include "MitkDiffusionImagingExports.h"
+#include <mitkImage.h>
 
 
 //includes storing fiberdata
@@ -35,6 +32,10 @@
 #include <vtkPoints.h> // my be replaced by class
 #include <vtkDataSet.h>
 
+#include <QStringList>
+
+#include <mitkPlanarFigure.h>
+
 namespace mitk {
 
   /**
@@ -42,82 +43,79 @@ namespace mitk {
   class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
   {
   public:
-  
-    // names of certain arrays (e.g colorcodings, etc.) 
+
+    // fiber colorcodings
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
+    static const char* COLORCODING_CUSTOM;
     static const char* FIBER_ID_ARRAY;
-    
-    /* friend classes wanna access typedefs
-    ContainerPointType, ContainerTractType, ContainerType */
-    friend class FiberBundleXWriter;
-    friend class FiberBundleXReader;
 
-    
-    // ======virtual methods must have======
     virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
     virtual void SetRequestedRegion( itk::DataObject *data );
-    //=======================================
-    
-    mitkClassMacro( FiberBundleX, BaseData );
-    itkNewMacro( Self );
 
-    //custom constructor with passing argument
-    mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>)
+    mitkClassMacro( FiberBundleX, BaseData )
+    itkNewMacro( Self )
+    mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
+    // colorcoding related methods
+    void SetColorCoding(const char*);
+    void SetFAMap(mitk::Image::Pointer);
+    void DoColorCodingOrientationBased();
+    void DoColorCodingFaBased();
+    void DoUseFaFiberOpacity();
+    void ResetFiberOpacity();
 
-    
-    
-    
-    /*====FIBERBUNDLE I/O METHODS====*/
-    void SetFiberPolyData(vtkSmartPointer<vtkPolyData>); //set result of tractography algorithm in vtkPolyData format using vtkPolyLines
+    // fiber smoothing/resampling
+    void ResampleFibers(float pointDistance = 1);
+    void DoFiberSmoothing(int pointsPerCm);
+
+    // add/subtract fibers
+    mitk::FiberBundleX::Pointer AddBundle(mitk::FiberBundleX* fib);
+    mitk::FiberBundleX::Pointer SubtractBundle(mitk::FiberBundleX* fib);
+
+    // fiber subset extraction
+    mitk::FiberBundleX::Pointer ExtractFiberSubset(mitk::PlanarFigure::Pointer pf);
+    std::vector<long> ExtractFiberIdSubset(mitk::PlanarFigure::Pointer pf);
+    vtkSmartPointer<vtkPolyData> GeneratePolyDataByIds( std::vector<long> );
+
+    // get/set data
+    void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
-    char* getCurrentColorCoding();
-    bool isFiberBundleXModified();
-    void setFBXModificationDone();
-    void UpdateFiberGeometry();
-    
-    /*===FIBERBUNDLE PROCESSING METHODS====*/
-    void DoColorCodingOrientationbased();
-    void DoGenerateFiberIds();
-    
-    /*===FIBERBUNDLE ASSESSMENT METHODS====*/
-
-
+    QStringList GetAvailableColorCodings();
+    char* GetCurrentColorCoding();
     itkGetMacro(NumFibers, int);
 
+    // copy fiber bundle
+    mitk::FiberBundleX::Pointer GetDeepCopy();
+
+    void GenerateFiberIds();
 
   protected:
-    FiberBundleX( vtkSmartPointer<vtkPolyData> fiberPolyData = NULL );
+
+    FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();
 
+    itk::Point<float, 3> GetItkPoint(double point[3]);
 
+    // calculate geometry from fiber extent
+    void UpdateFiberGeometry();
+
+    // calculate colorcoding values according to m_CurrentColorCoding
+    void UpdateColorCoding();
 
   private:
-        
-    //      The following polydata variables are used for fiber- and pointbased representation of the tractography results. As VTK suggests, one vtkPolyData is used to manage vertices and the other for polylines.
-    //      FiberPolyData stores all brain fibers using polylines (in world coordinates)
-    //    this variable hosts the smoothed fiber data, this data we generate, therefore a smartpointer structure is recommended
-//    vtkSmartPointer<vtkPolyData> m_FiberPolyData;  is depricated
-//    
-    //    this variable hosts the original fiber data, no smartpointer needed because who or whatever passes this data to FiberBundleX should use vtkSmartPointer structure
-  
-    vtkSmartPointer<vtkPolyData> m_FiberPolyData; //this is a common pointer because fiberDataStructure gets passed to this class. m_FiberStructureData is destroyed in the destructor then.
-    
-    // this variable contains all additional IDs of Fibers which are needed for efficient fiber manipulation such as extracting etc.
-    vtkSmartPointer<vtkDataSet> m_FiberIdDataSet;
-    char* m_currentColorCoding;
 
-    //this flag conzerns only visual representation.
-    bool m_isModified;
+    // actual fiber container
+    vtkSmartPointer<vtkPolyData>  m_FiberPolyData;
 
+    // contains fiber ids
+    vtkSmartPointer<vtkDataSet>   m_FiberIdDataSet;
 
-    int m_NumFibers;
-    
-    
+    char* m_CurrentColorCoding;
+    int   m_NumFibers;
   };
 
 } // namespace mitk

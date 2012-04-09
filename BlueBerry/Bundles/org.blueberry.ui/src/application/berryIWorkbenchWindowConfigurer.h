@@ -22,9 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org_blueberry_ui_Export.h>
 
-#include "../berryShell.h"
-#include "../berryIMemento.h"
-#include "../berryPoint.h"
+#include "berryShell.h"
+#include "berryIMemento.h"
+#include "berryPoint.h"
+#include "berryIDropTargetListener.h"
 
 namespace berry
 {
@@ -244,21 +245,20 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual void setData(String key, Object data);
 
-    /*
-     * Adds the given drag and drop <code>Transfer</code> type to the ones
+    /**
+     * Adds the given drag and drop Mime types to the ones
      * supported for drag and drop on the editor area of this workbench window.
      * <p>
      * The workbench advisor would ordinarily call this method from the
-     * <code>preWindowOpen</code> callback.
+     * <code>PreWindowOpen</code> callback.
      * A newly-created workbench window supports no drag and drop transfer
-     * types. Adding <code>EditorInputTransfer.getInstance()</code>
-     * enables <code>IEditorInput</code>s to be transferred.
+     * types.
      * </p>
      * <p>
      * Note that drag and drop to the editor area requires adding one or more
-     * transfer types (using <code>addEditorAreaTransfer</code>) and
+     * transfer types (using <code>AddEditorAreaTransfer</code>) and
      * configuring a drop target listener
-     * (with <code>configureEditorAreaDropListener</code>)
+     * (with <code>ConfigureEditorAreaDropListener</code>)
      * capable of handling any of those transfer types.
      * </p>
      *
@@ -266,31 +266,30 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      * @see #configureEditorAreaDropListener
      * @see org.blueberry.ui.part.EditorInputTransfer
      */
-    //virtual void addEditorAreaTransfer(Transfer transfer);
+    virtual void AddEditorAreaTransfer(const QStringList& transferTypes) = 0;
 
-    /*
+    /**
      * Configures the drop target listener for the editor area of this workbench window.
      * <p>
      * The workbench advisor ordinarily calls this method from the
-     * <code>preWindowOpen</code> callback.
+     * <code>PreWindowOpen</code> callback.
      * A newly-created workbench window has no configured drop target listener for its
      * editor area.
      * </p>
      * <p>
      * Note that drag and drop to the editor area requires adding one or more
-     * transfer types (using <code>addEditorAreaTransfer</code>) and
+     * transfer types (using <code>AddEditorAreaTransfer</code>) and
      * configuring a drop target listener
-     * (with <code>configureEditorAreaDropListener</code>)
+     * (with <code>ConfigureEditorAreaDropListener</code>)
      * capable of handling any of those transfer types.
      * </p>
      *
      * @param dropTargetListener the drop target listener that will handle
      * requests to drop an object on to the editor area of this window
      *
-     * @see #addEditorAreaTransfer
+     * @see #AddEditorAreaTransfer
      */
-    //virtual void configureEditorAreaDropListener(
-    //        DropTargetListener dropTargetListener);
+    virtual void ConfigureEditorAreaDropListener(const IDropTargetListener::Pointer& dropTargetListener) = 0;
 
 
     /*

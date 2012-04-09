@@ -1,5 +1,5 @@
 
-SET(CPP_FILES
+set(CPP_FILES
 
   mitkGlew.c
 

@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationEvent.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkStatusBar.h"
-#include <mitkIpPicTypeMultiplex.h>
 
 #include "mitkMemoryUtilities.h"
 

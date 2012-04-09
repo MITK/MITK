@@ -49,7 +49,7 @@ void Tweaklets::SetDefault(const TweakKey_base& definition,
 
 void Tweaklets::Clear()
 {
-  std::cout << "Clearing tweaklets\n";
+  // BERRY_DEBUG << "Clearing tweaklets";
   tweaklets.clear();
   defaults.clear();
 }

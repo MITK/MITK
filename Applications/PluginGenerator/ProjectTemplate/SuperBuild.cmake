@@ -1,36 +1,22 @@
 
-#-------------------------- ITK/VTK -------------------------
-# Provide an option to supply pre-built versions of ITK and VTK.
-# If not found, MITK will build them itself during superbuild
-set(VTK_DIR "" CACHE PATH "Use the supplied VTK installation/binary dir instead of superbuilding it")
-set(ITK_DIR "" CACHE PATH "Use the supplied ITK installation/binary dir instead of superbuilding it")
-mark_as_advanced(VTK_DIR ITK_DIR)
+#-----------------------------------------------------------------------------
+# ExternalProjects 
+#-----------------------------------------------------------------------------
 
-#---------------------------- MITK --------------------------
+set(external_projects
+  MITK
+  )
 
-if(MITK_DIR)
-
-  # sanity checks in the case of a pre-built MITK
-  set(my_itk_dir ${ITK_DIR})
-  set(my_vtk_dir ${VTK_DIR})
-  set(my_qmake_executable ${QT_QMAKE_EXECUTABLE})
-
-  find_package(MITK REQUIRED)
-  
-  if(my_itk_dir AND NOT my_itk_dir STREQUAL ${ITK_DIR})
-    message(FATAL_ERROR "ITK packages do not match:\n   ${MY_PROJECT_NAME}: ${my_itk_dir}\n  MITK: ${ITK_DIR}")
-  endif()
-  
-  if(my_vtk_dir AND NOT my_vtk_dir STREQUAL ${VTK_DIR})
-    message(FATAL_ERROR "VTK packages do not match:\n   ${MY_PROJECT_NAME}: ${my_vtk_dir}\n  MITK: ${VTK_DIR}")
-  endif()
-  
-  if(my_qmake_executable AND NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
-    message(FATAL_ERROR "Qt qmake does not match:\n   ${MY_PROJECT_NAME}: ${my_qmake_executable}\n  MITK: ${MITK_QMAKE_EXECUTABLE}")
-  endif()
-  
+set(EXTERNAL_MITK_DIR "${MITK_DIR}" CACHE PATH "Path to MITK build directory")
+mark_as_advanced(EXTERNAL_MITK_DIR)
+if(EXTERNAL_MITK_DIR)
+  set(MITK_DIR ${EXTERNAL_MITK_DIR})
 endif()
 
+# Look for git early on, if needed
+if(NOT MITK_DIR AND MITK_USE_CTK AND NOT CTK_DIR)
+  find_package(Git REQUIRED)
+endif()
 
 #-----------------------------------------------------------------------------
 # External project settings
@@ -76,26 +62,6 @@ set(ep_common_args
   "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS}"
   "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS}"
 )
-
-#-----------------------------------------------------------------------------
-# Git protocol option
-#-----------------------------------------------------------------------------
-
-option(${MY_PROJECT_NAME}_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." OFF)
-mark_as_advanced(${MY_PROJECT_NAME}_USE_GIT_PROTOCOL)
-
-set(git_protocol "git")
-if(NOT ${MY_PROJECT_NAME}_USE_GIT_PROTOCOL)
-  set(git_protocol "http")
-endif()
-
-#-----------------------------------------------------------------------------
-# ExternalProjects 
-#-----------------------------------------------------------------------------
-
-set(external_projects
-  MITK
-  )
 
 # Include external projects
 foreach(p ${external_projects})

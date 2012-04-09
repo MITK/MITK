@@ -3,8 +3,8 @@
 #include "berrySaveablesList.h"
 
 #include "berryPartPane.h"
-#include "../berryIWorkbenchPartConstants.h"
-#include "../berryIWorkbenchPartSite.h"
+#include "berryIWorkbenchPartConstants.h"
+#include "berryIWorkbenchPartSite.h"
 
 #include <berryObjects.h>
 

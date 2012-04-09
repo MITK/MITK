@@ -19,7 +19,7 @@
 #include "berryNativeTabItem.h"
 #include "berryQCTabBar.h"
 
-#include "../berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <berryShell.h>
 #include <berryConstants.h>

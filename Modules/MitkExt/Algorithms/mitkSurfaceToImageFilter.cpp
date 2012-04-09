@@ -65,7 +65,7 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
      (inputImage->GetTimeSlicedGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
-    output->Initialize(mitk::PixelType(typeid(unsigned char)), *inputImage->GetTimeSlicedGeometry());
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeSlicedGeometry());
   else
     output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());  
 
@@ -145,44 +145,38 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   surfaceConverter->SetInput( normalsFilter->GetOutput() );
   normalsFilter->Delete();
 
-  vtkImageData *image = const_cast< mitk::Image * >(this->GetImage())->GetVtkImageData( time );
+  mitk::Image::Pointer binaryImage = mitk::Image::New();
   
-  // Create stencil and use numerical minimum of pixel type as background value
-  vtkImageStencil * stencil = vtkImageStencil::New();
-  stencil->SetInput( image );
-  stencil->ReverseStencilOff();
-  stencil->ReleaseDataFlagOn();
-  stencil->SetStencil( surfaceConverter->GetOutput() );
-  surfaceConverter->Delete();
-
   if (m_MakeOutputBinary)
   {
-    stencil->SetBackgroundValue( image->GetScalarTypeMin() );
+    binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeSlicedGeometry());
+  
+    unsigned int size = sizeof(unsigned char);
+    for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i) 
+      size *= binaryImage->GetDimension(i);
 
-    vtkImageThreshold * threshold = vtkImageThreshold::New();
-    threshold->SetInput( stencil->GetOutput() );
-    threshold->ThresholdByLower( image->GetScalarTypeMin() );
-    threshold->ReplaceInOn();
-    threshold->ReplaceOutOn();
-    threshold->SetInValue( 0 );
-    threshold->SetOutValue( 1 );
-    threshold->SetOutputScalarTypeToUnsignedChar();
-    threshold->Update();
-
-    mitk::Image::Pointer output = this->GetOutput();
-    output->SetVolume( threshold->GetOutput()->GetScalarPointer(), time );
-
-    threshold->Delete();
+    memset(binaryImage->GetData(), 1, size);
   }
-  else
-  {
-    stencil->SetBackgroundValue( m_BackgroundValue );
-    stencil->Update();
 
-    mitk::Image::Pointer output = this->GetOutput();
-    output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
-    MITK_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
-  }
+  vtkImageData *image = m_MakeOutputBinary
+    ? binaryImage->GetVtkImageData(time)
+    : const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
+  
+  // Create stencil and use numerical minimum of pixel type as background value
+  vtkImageStencil *stencil = vtkImageStencil::New();
+  stencil->SetInput(image);
+  stencil->ReverseStencilOff();
+  stencil->ReleaseDataFlagOn();
+  stencil->SetStencil(surfaceConverter->GetOutput());
+  surfaceConverter->Delete();
+
+  stencil->SetBackgroundValue(m_MakeOutputBinary ? 0 : m_BackgroundValue);
+  stencil->Update();
+
+  mitk::Image::Pointer output = this->GetOutput();
+  output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
+  MITK_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
+
   stencil->Delete();
 }
 

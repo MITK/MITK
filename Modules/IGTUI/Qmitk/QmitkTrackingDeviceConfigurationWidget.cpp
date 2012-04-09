@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSerialCommunication.h>
 #include <qscrollbar.h>
 #include <qmessagebox.h>
+#include <qfiledialog.h>
+
+#include <itksys/SystemTools.hxx>
+#include <Poco/Path.h>
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
@@ -30,6 +34,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
+  m_MTCalibrationFile = "";
   
   //reset a few things
   ResetOutput();
@@ -144,6 +149,7 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
     connect( (QObject*)(m_Controls->m_AutoScanPolaris), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
     connect( (QObject*)(m_Controls->m_AutoScanAurora), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
+    connect( (QObject*)(m_Controls->m_SetMTCalibrationFile), SIGNAL(clicked()), this, SLOT(SetMTCalibrationFileClicked()) );
 
     //set a few UI components depending on Windows / Linux
     #ifdef WIN32
@@ -174,10 +180,30 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   //reset output
   ResetOutput();
 
-  //print output
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) AddOutput("<br>NDI Polaris selected");        //NDI Polaris
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) AddOutput("<br>NDI Aurora selected");    //NDI Aurora
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) AddOutput("<br>Microntracker selected"); //ClaronTechnology MicronTracker 2
+  //print output and do further initializations
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
+    {
+    AddOutput("<br>NDI Polaris selected");
+    }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)  //NDI Aurora
+    {
+    AddOutput("<br>NDI Aurora selected");   
+    }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) //ClaronTechnology MicronTracker 2
+    {
+    AddOutput("<br>Microntracker selected");
+    if (!mitk::ClaronTrackingDevice::New()->IsMicronTrackerInstalled())
+      {
+      AddOutput("<br>ERROR: not installed!");
+      }
+    else if (this->m_MTCalibrationFile == "") //if configuration file for MicronTracker is empty: load default 
+      {
+      mitk::ClaronTrackingDevice::Pointer tempDevice = mitk::ClaronTrackingDevice::New();
+      m_MTCalibrationFile = tempDevice->GetCalibrationDir();
+      Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
+      m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+      }
+    }
 
   emit TrackingDeviceSelectionChanged();
 }
@@ -316,6 +342,18 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
   this->setEnabled(true);
   }
 
+void QmitkTrackingDeviceConfigurationWidget::SetMTCalibrationFileClicked()
+  {
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*").toAscii().data();
+  if (filename=="") {return;}
+  else
+    {
+    m_MTCalibrationFile = filename;
+    Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
+    m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+    }
+  }
+
 //######################### internal help methods #######################################
 void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
   {
@@ -361,7 +399,16 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
         }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
         {
-        returnValue = mitk::ClaronTrackingDevice::New();
+        
+        mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
+        if(this->m_MTCalibrationFile=="") AddOutput("<br>Warning: Calibration file is not set!");
+		    else 
+		      {
+          //extract path from calibration file and set the calibration dir of the device
+          std::string path =  itksys::SystemTools::GetFilenamePath(m_MTCalibrationFile);
+          newDevice->SetCalibrationDir(path);
+		      }
+        returnValue = newDevice;
         }
   return returnValue;
   }

@@ -87,25 +87,32 @@ void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
 
   // Initialize RGBA output with same pixel type as input image
   const mitk::PixelType &inputPixelType = input->GetPixelType();
+
+  typedef itk::Image< UCRGBPixelType > UCRGBItkImageType;
+  typedef itk::Image< USRGBPixelType > USRGBItkImageType;
+  typedef itk::Image< FloatRGBPixelType > FloatCRGBItkImageType;
+  typedef itk::Image< DoubleRGBPixelType > DoubleRGBItkImageType;
+
   if ( inputPixelType == typeid( UCRGBPixelType ) )
   {
-    mitk::PixelType outputPixelType( typeid( unsigned char ), 4, itk::ImageIOBase::RGBA );
-    output->Initialize( outputPixelType, *input->GetTimeSlicedGeometry() );
+    const mitk::PixelType refPtype = MakePixelType<UCRGBItkImageType>();
+    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
+
   }
   else if ( inputPixelType == typeid( USRGBPixelType ) )
   {
-    mitk::PixelType outputPixelType( typeid( unsigned short ), 4, itk::ImageIOBase::RGBA );
-    output->Initialize( outputPixelType, *input->GetTimeSlicedGeometry() );
+    const mitk::PixelType refPtype = MakePixelType<USRGBItkImageType>();
+    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
   else if ( inputPixelType == typeid( FloatRGBPixelType ) )
   {
-    mitk::PixelType outputPixelType( typeid( float ), 4, itk::ImageIOBase::RGBA );
-    output->Initialize( outputPixelType, *input->GetTimeSlicedGeometry() );
+    const mitk::PixelType refPtype = MakePixelType<FloatCRGBItkImageType>();
+    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
   else if ( inputPixelType == typeid( DoubleRGBPixelType ) )
   {
-    mitk::PixelType outputPixelType( typeid( double ), 4, itk::ImageIOBase::RGBA );
-    output->Initialize( outputPixelType, *input->GetTimeSlicedGeometry() );
+    const mitk::PixelType refPtype = MakePixelType<DoubleRGBItkImageType>();
+    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
 
   output->SetPropertyList(input->GetPropertyList()->Clone());    

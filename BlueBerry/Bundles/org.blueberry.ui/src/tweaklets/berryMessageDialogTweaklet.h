@@ -20,10 +20,10 @@
 #define BERRYMESSAGEDIALOGTWEAKLET_H_
 
 #include <org_blueberry_ui_Export.h>
-#include "../berryShell.h"
+#include "berryShell.h"
 
-#include "../dialogs/berryIDialog.h"
-#include "../internal/berryTweaklets.h"
+#include "dialogs/berryIDialog.h"
+#include "internal/berryTweaklets.h"
 
 #include <berryMacros.h>
 

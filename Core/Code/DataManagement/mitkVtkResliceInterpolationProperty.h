@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * Encapsulates the enumeration for reslice interpolation. Valid values are 
  * (VTK constant/Id/string representation):
@@ -99,6 +104,10 @@ private:
   VtkResliceInterpolationProperty(const VtkResliceInterpolationProperty&);
   VtkResliceInterpolationProperty& operator=(const VtkResliceInterpolationProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // end of namespace mitk
 

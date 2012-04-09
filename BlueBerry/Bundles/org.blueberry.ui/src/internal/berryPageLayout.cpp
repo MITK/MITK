@@ -24,8 +24,8 @@
 #include "berryFolderLayout.h"
 #include "berryPlaceholderFolderLayout.h"
 
-#include "../berryUIException.h"
-#include "../berryConstants.h"
+#include "berryUIException.h"
+#include "berryConstants.h"
 
 namespace berry
 {

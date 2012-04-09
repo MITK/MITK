@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * Encapsulates the enumeration vtkInterpolation. Valid values are 
  * (VTK constant/Id/string representation):
@@ -101,6 +106,10 @@ private:
   VtkScalarModeProperty(const VtkScalarModeProperty&);
   VtkScalarModeProperty& operator=(const VtkScalarModeProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // end of namespace mitk
 

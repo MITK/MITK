@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
+#include <limits>
+
 mitk::MaskImageFilter::MaskImageFilter() : m_Mask(NULL)
 {
   this->SetNumberOfInputs(2);
@@ -120,9 +122,8 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   if ( !m_OverrideOutsideValue )
     m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
 
-   m_MinValue = (float)(itk::NumericTraits<typename ItkOutputImageType::PixelType>::max());
-   m_MaxValue = (float)(itk::NumericTraits<typename ItkOutputImageType::PixelType>::min());
-
+  m_MinValue = std::numeric_limits<mitk::ScalarType>::max();
+  m_MaxValue = std::numeric_limits<mitk::ScalarType>::min();
 
   for ( inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd(); ++inputIt, ++maskIt, ++outputIt)
   {

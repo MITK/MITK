@@ -429,7 +429,7 @@ static mitk::Image::Pointer GetTestImage()
 
 };
 
-int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
+int mitkImageStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkImageStatisticsCalculatorTest")
@@ -445,7 +445,7 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
     mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom );
 
 
-  for ( int i=0; i<allTestCases.size(); i++ )
+  for ( std::vector<mitkImageStatisticsCalculatorTestClass::testCase>::size_type i=0; i<allTestCases.size(); i++ )
   {
     mitkImageStatisticsCalculatorTestClass::testCase test = allTestCases[i];
 

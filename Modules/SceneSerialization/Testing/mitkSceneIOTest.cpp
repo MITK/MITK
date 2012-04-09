@@ -107,7 +107,7 @@ static mitk::PointSet::Pointer CreatePointSet()
 static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::string surfaceName)
 {
   mitk::Image::Pointer image = LoadImage(imageName);
-  MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image Pic3D.pic.gz");
+  MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image"+imageName);
 
   image->SetProperty("image type", mitk::StringProperty::New("test image") );
   image->SetProperty("greetings", mitk::StringProperty::New("to mom") );
@@ -210,7 +210,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 }
 }; // end test helper class
   
-int mitkSceneIOTest(int  argc, char* argv[])
+int mitkSceneIOTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("SceneIO")
   std::string sceneFileName;

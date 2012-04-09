@@ -17,7 +17,7 @@
 
 #include "berryViewLayout.h"
 
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 
 namespace berry
 {

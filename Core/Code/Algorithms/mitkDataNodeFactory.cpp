@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkXMLImageDataReader.h>
 
 // ITK-related includes
+
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 #include <itkImage.h>
@@ -60,7 +61,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDICOMImageIO2.h>
 #include <itkDICOMSeriesFileNames.h>
 #include <itkGDCMImageIO.h>
+
+#ifdef NOMINMAX
+#  define DEF_NOMINMAX
+#  undef NOMINMAX
+#endif
+
 #include <itkGDCMSeriesFileNames.h>
+
+#ifdef DEF_NOMINMAX
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  undef DEF_NOMINMAX
+#endif
+
 #include <itkNumericSeriesFileNames.h>
 #include <itkCommand.h>
 

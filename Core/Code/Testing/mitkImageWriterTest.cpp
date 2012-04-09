@@ -105,8 +105,6 @@ int mitkImageWriterTest(int  argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED(myImageWriter->GetInput()==image,"test Set/GetInput()");
   myImageWriter->SetFileName(filename);
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFileName(),filename.c_str()),"test Set/GetFileName()");
-  myImageWriter->SetExtension(".pic");
-  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetExtension(),".pic"),"test Set/GetExtension()");
   myImageWriter->SetFilePrefix("pref");
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFilePrefix(),"pref"),"test Set/GetFilePrefix()");
   myImageWriter->SetFilePattern("pattern");
@@ -121,34 +119,27 @@ int mitkImageWriterTest(int  argc , char* argv[])
       myImageWriter->Update();
       std::fstream fin, fin2;
       fin.open(AppendExtension(filename, ".mhd").c_str(),std::ios::in);
+
+      std::string rawExtension = ".raw";
       fin2.open(AppendExtension(filename, ".raw").c_str(),std::ios::in);
+      if( !fin2.is_open() )
+      {
+        rawExtension = ".zraw";
+        fin2.open(AppendExtension(filename, ".zraw").c_str(),std::ios::in);
+      }
+
       MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
       MITK_TEST_CONDITION_REQUIRED(fin2.is_open(),"Write .raw file");
+
       fin.close();
       fin2.close();
       remove(AppendExtension(filename, ".mhd").c_str());
-      remove(AppendExtension(filename, ".raw").c_str());
+      remove(AppendExtension(filename, rawExtension.c_str()).c_str());
     }
     catch (...)
     {
       MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing");
     }
-  }
-
-  // write MITK .pic image
-  try
-  {
-    myImageWriter->SetExtension(".pic");
-    myImageWriter->Update();
-    std::fstream fin;
-    fin.open(AppendExtension(filename, ".pic").c_str(),std::ios::in);
-    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .pic file");
-    fin.close();
-    remove(AppendExtension(filename, ".pic").c_str());
-  }
-  catch (...)
-  {
-    MITK_TEST_FAILED_MSG(<< "Exception during .pic file writing");
   }
 
   //testing more component image writing as nrrd files

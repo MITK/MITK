@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_imagecropper org.mitk.gui.qt.imagecropper
+  \ingroup MITKPlugins
+
+  \brief This is the image cropper plugin. It can crop images.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_imagecropper_internal Internal
+  \ingroup org_mitk_gui_qt_imagecropper
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.imagecropper plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

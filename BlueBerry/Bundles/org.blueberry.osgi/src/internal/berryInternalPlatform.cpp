@@ -36,14 +36,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-#include "../berryPlatform.h"
-#include "../berryPlatformException.h"
-#include "../berryDebugUtil.h"
-#include "../event/berryPlatformEvents.h"
+#include "berryPlatform.h"
+#include "berryPlatformException.h"
+#include "berryDebugUtil.h"
+#include "event/berryPlatformEvents.h"
 #include "berryPlatformLogChannel.h"
-#include "../berryIBundle.h"
+#include "berryIBundle.h"
 #include "berryCodeCache.h"
-#include "../berryBundleLoader.h"
+#include "berryBundleLoader.h"
 #include "berrySystemBundle.h"
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
@@ -150,6 +150,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     dataLocation += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
     m_UserPath.assign(dataLocation.toStdString());
   }
+  BERRY_INFO(m_ConsoleLog) << "Framework storage dir: " << m_UserPath.toString();
 
   Poco::File userFile(m_UserPath);
   
@@ -169,9 +170,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
   fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
-#if defined(Q_CC_GNU) && ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
-  fwProps.insert(ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS, QVariant::fromValue<QLibrary::LoadHints>(QLibrary::ExportExternalSymbolsHint));
-#endif
   if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
   {
     fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
@@ -508,6 +506,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option helpOption("help", "h", "print this help text");
   helpOption.callback(Poco::Util::OptionCallback<InternalPlatform>(this, &InternalPlatform::PrintHelp));
   options.addOption(helpOption);
+
+  Poco::Util::Option newInstanceOption(Platform::ARG_NEWINSTANCE, "", "forces a new instance of this application");
+  newInstanceOption.binding(Platform::ARG_NEWINSTANCE);
+  options.addOption(newInstanceOption);
 
   Poco::Util::Option cleanOption(Platform::ARG_CLEAN, "", "cleans the plugin cache");
   cleanOption.binding(Platform::ARG_CLEAN);

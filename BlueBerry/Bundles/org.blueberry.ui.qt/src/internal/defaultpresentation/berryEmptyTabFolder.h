@@ -18,7 +18,7 @@
 #ifndef BERRYEMPTYTABFOLDER_H_
 #define BERRYEMPTYTABFOLDER_H_
 
-#include "../util/berryAbstractTabFolder.h"
+#include "internal/util/berryAbstractTabFolder.h"
 
 namespace berry
 {

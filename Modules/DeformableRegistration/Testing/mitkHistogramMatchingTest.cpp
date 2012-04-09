@@ -22,13 +22,13 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 {
   //Create Image out of nowhere
   mitk::Image::Pointer image;
-  mitk::PixelType pt(typeid(int));
+  mitk::PixelType pt( mitk::MakeScalarPixelType<int>());
   unsigned int dim[]={100,100,20};
 
   std::cout << "Creating image: ";
   image = mitk::Image::New();
   //image->DebugOn();
-  image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  image->Initialize( mitk::MakeScalarPixelType<int>(), 3, dim);
   int *p = (int*)image->GetData();
 
   int size = dim[0]*dim[1]*dim[2];
@@ -39,13 +39,13 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 
   //Create second Image out of nowhere
   mitk::Image::Pointer image2;
-  mitk::PixelType pt2(typeid(int));
+  mitk::PixelType pt2( mitk::MakeScalarPixelType<int>() );
   unsigned int dim2[]={100,100,20};
 
   std::cout << "Creating image: ";
   image2 = mitk::Image::New();
   //image->DebugOn();
-  image2->Initialize(mitk::PixelType(typeid(int)), 3, dim2);
+  image2->Initialize(mitk::MakeScalarPixelType<int>(), 3, dim2);
   int *p2 = (int*)image2->GetData();
 
   int size2 = dim2[0]*dim2[1]*dim2[2];

@@ -17,10 +17,12 @@ PURPOSE. See the above copyright notices for more information.
 
 #include "MitkExtExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
+#include "mitkProgressBar.h"
+#include "mitkSurface.h"
+
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
-#include "mitkSurface.h"
 #include "vtkDoubleArray.h"
 #include "vtkMath.h"
 #include "vtkCellData.h"
@@ -66,6 +68,20 @@ public:
 
   void SetMaxSpacing(double);
 
+  /**
+    \brief Set whether the mitkProgressBar should be used
+
+    \a Parameter true for using the progress bar, false otherwise
+  */
+  void SetUseProgressBar(bool);
+
+  /**
+    \brief Set the stepsize which the progress bar should proceed
+
+    \a Parameter The stepsize for progressing
+  */
+  void SetProgressStepSize(unsigned int stepSize);
+
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();
@@ -80,6 +96,9 @@ private:
 
   unsigned int m_NegativeNormalCounter;
   unsigned int m_PositiveNormalCounter;
+
+  bool m_UseProgressBar;
+  unsigned int m_ProgressStepSize;
 
 };//class
 

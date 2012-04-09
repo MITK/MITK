@@ -19,7 +19,7 @@
 #ifndef BERRYPERSPECTIVEREGISTRY_H_
 #define BERRYPERSPECTIVEREGISTRY_H_
 
-#include "../berryIPerspectiveRegistry.h"
+#include "berryIPerspectiveRegistry.h"
 
 #include "berryPerspectiveDescriptor.h"
 

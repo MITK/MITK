@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "../berryImageDescriptor.h"
-#include "../berryPlatformUI.h"
+#include "berryImageDescriptor.h"
+#include "berryPlatformUI.h"
 
 namespace berry
 {

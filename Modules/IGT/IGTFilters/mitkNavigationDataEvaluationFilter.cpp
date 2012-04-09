@@ -296,3 +296,20 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
     }
   return returnValue;
 }
+
+mitk::Point3D  mitk::NavigationDataEvaluationFilter::GetLoggedPosition(int i, int input)
+{
+  mitk::Point3D returnValue;
+  if ((m_LoggedPositions[input].size()<=i)||(i<0)) returnValue.Fill(0);
+  else returnValue = m_LoggedPositions[input].at(i);
+  return returnValue;
+}
+
+    
+mitk::Quaternion  mitk::NavigationDataEvaluationFilter::GetLoggedOrientation(int i, int input)
+{
+  mitk::Quaternion returnValue;
+  if ((m_LoggedQuaternions[input].size()<=i)||(i<0)) returnValue.fill(0);
+  else returnValue = m_LoggedQuaternions[input].at(i);
+  return returnValue;
+}

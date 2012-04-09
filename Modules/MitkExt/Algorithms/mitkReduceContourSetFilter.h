@@ -18,6 +18,7 @@
 #include "MitkExtExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkSurface.h"
+#include "mitkProgressBar.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
@@ -77,6 +78,20 @@ namespace mitk {
         //Resets the filter, i.e. removes all inputs and outputs
         void Reset();
 
+        /**
+          \brief Set whether the mitkProgressBar should be used
+
+          \a Parameter true for using the progress bar, false otherwise
+        */
+        void SetUseProgressBar(bool);
+
+        /**
+          \brief Set the stepsize which the progress bar should proceed
+
+          \a Parameter The stepsize for progressing
+        */
+        void SetProgressStepSize(unsigned int stepSize);
+
     protected:
         ReduceContourSetFilter();
         virtual ~ReduceContourSetFilter();
@@ -97,6 +112,9 @@ namespace mitk {
         unsigned int m_StepSize;
         double m_Tolerance;
         unsigned int m_MaxSegmentLenght;
+
+        bool m_UseProgressBar;
+        unsigned int m_ProgressStepSize;
         
     };//class
     

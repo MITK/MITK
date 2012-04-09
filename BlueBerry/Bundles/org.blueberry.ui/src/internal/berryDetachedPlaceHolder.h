@@ -21,8 +21,8 @@
 
 #include "berryContainerPlaceholder.h"
 
-#include "../berryIMemento.h"
-#include "../berryRectangle.h"
+#include "berryIMemento.h"
+#include "berryRectangle.h"
 
 #include <list>
 

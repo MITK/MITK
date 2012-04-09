@@ -20,7 +20,7 @@
 #include <berryPlatformUI.h>
 #include <berryUIException.h>
 
-#include "../util/berryEmptyPerspective.h"
+#include "util/berryEmptyPerspective.h"
 
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
 #include <berryDebugUtil.h>

@@ -18,7 +18,7 @@
 #ifndef BERRYWWINPARTSERVICE_H_
 #define BERRYWWINPARTSERVICE_H_
 
-#include "../berryIPartService.h"
+#include "berryIPartService.h"
 
 #include "berryPartService.h"
 #include "berryWindowSelectionService.h"

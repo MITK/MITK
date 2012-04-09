@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="org_blueberry_ui_qt_log">
+    <file>warning.png</file>
+    <file>error.png</file>
+    <file>information.png</file>
+    <file>fatal.png</file>
+    <file>debug.png</file>
+  </qresource>
+</RCC>

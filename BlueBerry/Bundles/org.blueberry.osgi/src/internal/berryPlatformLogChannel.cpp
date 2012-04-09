@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPlatformLogChannel.h"
 
-#include "../berryPlatform.h"
-#include "../event/berryPlatformEvent.h"
+#include "berryPlatform.h"
+#include "event/berryPlatformEvent.h"
 
 #include "Poco/Any.h"
 

@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPartSite.h"
 #include "berryEditorDescriptor.h"
-#include "../berryIEditorPart.h"
+#include "berryIEditorPart.h"
 #include "berryWorkbenchPage.h"
-#include "../berryIEditorSite.h"
-#include "../berryIEditorReference.h"
+#include "berryIEditorSite.h"
+#include "berryIEditorReference.h"
 
 namespace berry {
 

@@ -17,7 +17,7 @@
 
 #include "berryLog.h"
 
-#include "../tweaklets/berryWorkbenchTweaklet.h"
+#include "tweaklets/berryWorkbenchTweaklet.h"
 
 #include "berryWorkbench.h"
 
@@ -30,12 +30,12 @@
 #include "berryWorkbenchPage.h"
 #include "berryPerspective.h"
 #include "berryPreferenceConstants.h"
-#include "../dialogs/berryMessageDialog.h"
+#include "dialogs/berryMessageDialog.h"
 #include "berryWorkbenchWindow.h"
-#include "../berryImageDescriptor.h"
-#include "../berryDisplay.h"
-#include "../services/berryIServiceFactory.h"
-#include "../util/berrySafeRunnable.h"
+#include "berryImageDescriptor.h"
+#include "berryDisplay.h"
+#include "services/berryIServiceFactory.h"
+#include "util/berrySafeRunnable.h"
 
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchConstants.h"
@@ -902,7 +902,7 @@ bool Workbench::Close()
 
 bool Workbench::Close(int returnCode, bool force)
 {
-  std::cout << "Closing workbench..." << std::endl;
+  BERRY_INFO << "Closing workbench...";
   this->returnCode = returnCode;
   bool ret;
   //BusyIndicator.showWhile(null, new Runnable() {
@@ -1049,7 +1049,7 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
   {
     return false;
   }
-  BERRY_INFO << "Saving state to: " << stateFile.path() << std::endl;
+  //BERRY_INFO << "Saving state to: " << stateFile.path() << std::endl;
   try
   {
     Poco::FileOutputStream stream(stateFile.path());

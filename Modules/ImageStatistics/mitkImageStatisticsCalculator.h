@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <itkTimeStamp.h>
 
+#ifndef __itkHistogram_h
+#include <itkHistogram.h>
+#endif
+
 
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
@@ -65,8 +69,8 @@ public:
     MASKING_MODE_PLANARFIGURE
   };
 
-  typedef mitk::Image::HistogramType HistogramType;
-  typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
+  typedef itk::Statistics::Histogram<double> HistogramType;
+  typedef HistogramType::ConstIterator HistogramConstIteratorType;
 
   struct Statistics
   {

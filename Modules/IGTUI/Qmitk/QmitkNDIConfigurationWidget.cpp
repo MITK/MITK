@@ -353,7 +353,7 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   QString status = "Scanning ";
 #ifdef WIN32
   QString devName;
-  for (unsigned int i = 1; i < 20; ++i)
+  for (unsigned int i = 1; i < 40; ++i)
   {
     if (i<10)
     devName = QString("COM%1").arg(i);
@@ -884,4 +884,8 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
 
 void QmitkNDIConfigurationWidget::EnableAddToolsButton(bool enable) {
   m_Controls->m_AddToolBtn->setEnabled(enable);
+}
+
+void QmitkNDIConfigurationWidget::EnableDiscoverNewToolsButton(bool enable) {
+  m_Controls->m_DiscoverToolsBtn->setEnabled(enable);
 }

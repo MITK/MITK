@@ -20,9 +20,9 @@
 #include "berryILayoutContainer.h"
 #include "berryDetachedWindow.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../berryIWorkbenchWindow.h"
-#include "../berryConstants.h"
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryConstants.h"
 
 
 namespace berry

@@ -83,13 +83,15 @@ int mitkImageToOpenCVImageFilterTest(int /*argc*/, char* /*argv*/[])
   mitk::ImageToOpenCVImageFilter::Pointer _ImageToOpenCVImageFilter =
     mitk::ImageToOpenCVImageFilter::New();
 
-  _ImageToOpenCVImageFilter->SetImage( mitkImage.GetPointer() );
+  _ImageToOpenCVImageFilter->SetImage( mitkImage );
   
   IplImage* openCVImage = _ImageToOpenCVImageFilter->GetOpenCVImage();
 
+  MITK_TEST_CONDITION_REQUIRED( openCVImage != NULL, "Image returned by filter is not null.");
+
   // check byte size
-  const unsigned int expectedSize = size[0] * size[1] * 3 * sizeof( PixelType );
-  const unsigned int realSize = openCVImage->width * openCVImage->height * openCVImage->nChannels * sizeof  ( PixelType );  
+  const unsigned int expectedSize = size[0] * size[1] * 3 * sizeof( unsigned char);// sizeof( PixelType );
+  const unsigned int realSize = openCVImage->width * openCVImage->height * openCVImage->nChannels * sizeof( unsigned char);//* sizeof  ( PixelType );
   MITK_TEST_CONDITION_REQUIRED( expectedSize == realSize, "Test expectedSize == realSize");
 
   // check pixel values

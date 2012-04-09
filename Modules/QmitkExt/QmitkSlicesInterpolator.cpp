@@ -74,10 +74,21 @@ m_3DInterpolationEnabled(false)
 {
 
   m_SurfaceInterpolator = mitk::SurfaceInterpolationController::GetInstance();
-  //Changes due to intergration of 3D interpolation
   QHBoxLayout* layout = new QHBoxLayout(this);
 
-  QGridLayout* grid = new QGridLayout(this);
+  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
+  QGridLayout* grid = new QGridLayout(m_GroupBoxEnableExclusiveInterpolationMode);
+
+  m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(Signal3DInterpolationEnabled(bool)));
+  m_RBtnEnable3DInterpolation->setChecked(true);
+  grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
+
+  m_BtnAccept3DInterpolation = new QPushButton("Accept", this);
+  m_BtnAccept3DInterpolation->setEnabled(false);
+  connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
 
   m_CbShowMarkers = new QCheckBox("Show Position Nodes", this);
   m_CbShowMarkers->setChecked(true);
@@ -85,12 +96,11 @@ m_3DInterpolationEnabled(false)
   connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
   grid->addWidget(m_CbShowMarkers,0,2);
 
-  m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
-  m_BtnAccept3DInterpolation->setEnabled(false);
-  connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
-  grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
+  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
+  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
+  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
 
-  m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
+  m_BtnAcceptInterpolation = new QPushButton("Accept", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
   grid->addWidget(m_BtnAcceptInterpolation,1,1);
@@ -100,23 +110,12 @@ m_3DInterpolationEnabled(false)
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
   grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
 
-  m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
-  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
-  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(Signal3DInterpolationEnabled(bool)));
-  m_RBtnEnable3DInterpolation->setChecked(true);
-  grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
+  m_RBtnDisableInterpolation = new QRadioButton("Disable", this);
+  connect(m_RBtnDisableInterpolation, SIGNAL(toggled(bool)), this, SLOT(OnInterpolationDisabled(bool)));
+  grid->addWidget(m_RBtnDisableInterpolation, 2,0);
 
-  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
-  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
-  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
-
-  m_RBtnDisableInterpolation = new QRadioButton("Disable Interpolation", this);
-  m_RBtnDisableInterpolation->setEnabled(true);
-  grid->addWidget(m_RBtnDisableInterpolation, 2,0,1,2);
-
-  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
-  m_GroupBoxEnableExclusiveInterpolationMode->setLayout(grid);
   layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);
+  this->setLayout(layout);
   
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnInterpolationInfoChanged );
@@ -329,20 +328,21 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
 void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 {
-    OnInterpolationActivated(status);
-    On3DInterpolationActivated(!status);
+  OnInterpolationActivated(status);
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
 {
   On3DInterpolationActivated(status);
-  OnInterpolationActivated(!status);
 }
 
 void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
 {
-  OnInterpolationActivated(!status);
-  On3DInterpolationActivated(!status);
+  if (status)
+  {
+    OnInterpolationActivated(!status);
+    On3DInterpolationActivated(!status);
+  }
 }
 
 void QmitkSlicesInterpolator::OnShowMarkers(bool state)
@@ -585,7 +585,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
     // create a diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();
     diffImage->Initialize( m_Segmentation );
-    mitk::PixelType pixelType( typeid(short signed int) );
+    mitk::PixelType pixelType( mitk::MakeScalarPixelType<short signed int>()  );
     diffImage->Initialize( pixelType, 3, m_Segmentation->GetDimensions() );
     
     memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
@@ -672,19 +672,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 
-    mitk::DataNode* refImageNode = m_ToolManager->GetReferenceData(0);
-
-    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    std::string nameOfResultImage = refImageNode->GetName();
-    nameOfResultImage.append(m_InterpolatedSurfaceNode->GetName());
-    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-    resultNode->SetProperty("3DInterpolationResult", mitk::BoolProperty::New(true));
-    resultNode->SetData( s2iFilter->GetOutput() );
-
-    this->GetDataStorage()->Add(resultNode, refImageNode);
-
-    m_RBtnDisableInterpolation->toggle();
+    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
+    segmentationNode->SetData(s2iFilter->GetOutput());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -911,18 +901,17 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
       {
         mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
         
-        std::string s;
-        if ( renderer->GetCurrentWorldGeometry2DNode() && renderer->GetCurrentWorldGeometry2DNode()->GetName(s) )
+        if ( renderer->GetCurrentWorldGeometry2DNode() )
         {
-          if (s == "widget1Plane")
+          if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane1() )
           {
             TranslateAndInterpolateChangedSlice( event, 2 );
           }
-          else if (s == "widget2Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane2() )
           {
             TranslateAndInterpolateChangedSlice( event, 0 );
           }
-          else if (s == "widget3Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane3() )
           {
             TranslateAndInterpolateChangedSlice( event, 1 );
           }

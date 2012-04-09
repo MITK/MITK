@@ -1,61 +1,58 @@
 #ifndef __itkTractsToFiberEndingsImageFilter_h__
 #define __itkTractsToFiberEndingsImageFilter_h__
 
-#include "itkImageToImageFilter.h"
-#include "itkVectorContainer.h"
-#include "itkRGBAPixel.h"
-#include "mitkFiberBundle.h"
+#include <itkImageSource.h>
+#include <itkImage.h>
+#include <itkVectorContainer.h>
+#include <itkRGBAPixel.h>
+#include <mitkFiberBundleX.h>
 
 namespace itk{
 
-template< class TInputImage, class TOutputPixelType >
-class TractsToFiberEndingsImageFilter :
-    public ImageToImageFilter<TInputImage, itk::Image<TOutputPixelType,3> >
-//huhu    public ImageToImageFilter<TInputImage, itk::Image<float,3> >
+template< class OutputImageType >
+class TractsToFiberEndingsImageFilter : public ImageSource< OutputImageType >
 {
 
 public:
   typedef TractsToFiberEndingsImageFilter Self;
-  typedef ImageToImageFilter<TInputImage, itk::Image<TOutputPixelType,3> > Superclass;
-//huhu  typedef ImageToImageFilter<TInputImage, itk::Image<float,3> > Superclass;
+  typedef ProcessObject Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
-  
+
+  typedef typename OutputImageType::PixelType OutPixelType;
+
   itkNewMacro(Self);
-  itkTypeMacro( TractsToFiberEndingsImageFilter,
-            ImageToImageFilter );
-  
-  /** Types for the Output Image**/
-  typedef TInputImage InputImageType;
-
-  /** Types for the Output Image**/
-  typedef itk::Image<TOutputPixelType,3> OutputImageType;
-
-  /** Type for the directions **/
-  typedef VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > >
-    TractOrientationsType;
-
-  /** Type for the directions container **/
-  typedef VectorContainer< unsigned int, TractOrientationsType >
-    TractOrientationsContainerType;
+  itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource );
 
   /** Upsampling factor **/
   itkSetMacro( UpsamplingFactor, unsigned int);
   itkGetMacro( UpsamplingFactor, unsigned int);
-  
-  itkSetMacro(FiberBundle, mitk::FiberBundle::Pointer);
-  itkGetMacro(FiberBundle, mitk::FiberBundle::Pointer);
+
+  /** Invert Image **/
+  itkSetMacro( InvertImage, bool);
+  itkGetMacro( InvertImage, bool);
+
+  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
+  itkSetMacro( InputImage, typename OutputImageType::Pointer);
+
+  /** Use input image geometry to initialize output image **/
+  itkSetMacro( UseImageGeometry, bool);
+  itkGetMacro( UseImageGeometry, bool);
 
   void GenerateData();
-  
+
 protected:
+
+  itk::Point<float, 3> GetItkPoint(double point[3]);
 
   TractsToFiberEndingsImageFilter();
   virtual ~TractsToFiberEndingsImageFilter();
 
+  mitk::FiberBundleX::Pointer m_FiberBundle;
   unsigned int m_UpsamplingFactor;
-  mitk::FiberBundle::Pointer m_FiberBundle;
-
+  bool m_InvertImage;
+  bool m_UseImageGeometry;
+  typename OutputImageType::Pointer m_InputImage;
 };
 
 }

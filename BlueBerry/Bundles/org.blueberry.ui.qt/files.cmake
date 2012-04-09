@@ -1,4 +1,4 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   berryIQtPreferencePage.cpp
   berryIQtStyleManager.cpp
   berryQCHPluginListener.cpp
@@ -15,7 +15,7 @@ SET(SRC_CPP_FILES
   application/berryQtWorkbenchAdvisor.cpp
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
 
   defaultpresentation/berryEmptyTabFolder.cpp
   defaultpresentation/berryEmptyTabItem.cpp
@@ -32,7 +32,6 @@ SET(INTERNAL_CPP_FILES
   util/berryTabbedStackPresentation.cpp
   util/berryTabFolderEvent.cpp
   
-  berryQtControlWidget.cpp
   berryQtDisplay.cpp
   berryQtDnDTweaklet.cpp
   berryQtFileImageDescriptor.cpp
@@ -53,7 +52,6 @@ SET(INTERNAL_CPP_FILES
   berryQtStyleManager.cpp
   berryQtStylePreferencePage.cpp
   berryQtTracker.cpp
-  berryQtWidgetController.cpp
   berryQtWidgetsTweaklet.cpp
   berryQtWidgetsTweakletImpl.cpp
   berryQtWorkbenchPageTweaklet.cpp
@@ -61,7 +59,7 @@ SET(INTERNAL_CPP_FILES
   berryQtWorkbenchWindow.cpp
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/berryQCHPluginListener.h
   src/berryQtSelectionProvider.h
   
@@ -91,26 +89,26 @@ SET(MOC_H_FILES
   src/internal/berryQtPluginActivator.h
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/berryQtShowViewDialog.ui
   src/internal/berryQtStylePreferencePage.ui
   src/internal/berryQtStatusPart.ui
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   resources/org_blueberry_ui_qt.qrc
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   plugin.xml
 )
 
-SET(CPP_FILES )
+set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

@@ -47,6 +47,7 @@ namespace mitk {
 
   * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
   *
+  *   - \b "Backface Culling": True enables backface culling, which means only front-facing polygons will be visualized. False/disabled by default.
   *   - \b "color": (ColorProperty) Diffuse color of the surface object (this property will be read when material.diffuseColor is not defined)
   *   - \b "Opacity": (FloatProperty) Opacity of the surface object
   *   - \b "material.ambientColor": (ColorProperty) Ambient color  of the surface object

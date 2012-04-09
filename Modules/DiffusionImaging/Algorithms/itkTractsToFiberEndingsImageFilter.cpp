@@ -1,137 +1,135 @@
 #include "itkTractsToFiberEndingsImageFilter.h"
 
-#include "itkBSplineUpsampleImageFilter.h"
-
-#define __CEIL_UCHAR__(val) (val) =       \
-( (val) < 0 ) ? ( 0 ) : ( ( (val)>255 ) ? ( 255 ) : ( (val) ) );
+// VTK
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
 
 namespace itk{
 
-  template< class TInputImage, class TOutputPixelType >
-  TractsToFiberEndingsImageFilter< TInputImage, TOutputPixelType >
-      ::TractsToFiberEndingsImageFilter()
+  template< class OutputImageType >
+  TractsToFiberEndingsImageFilter< OutputImageType >::TractsToFiberEndingsImageFilter()
+    : m_InvertImage(false)
+    , m_UpsamplingFactor(1)
+    , m_InputImage(NULL)
+    , m_UseImageGeometry(false)
   {
-    this->SetNumberOfRequiredInputs(0);
+
   }
 
-  template< class TInputImage, class TOutputPixelType >
-  TractsToFiberEndingsImageFilter< TInputImage, TOutputPixelType >
-      ::~TractsToFiberEndingsImageFilter()
+  template< class OutputImageType >
+  TractsToFiberEndingsImageFilter< OutputImageType >::~TractsToFiberEndingsImageFilter()
   {
   }
 
-  template< class TInputImage, class TOutputPixelType >
-  void TractsToFiberEndingsImageFilter< TInputImage, TOutputPixelType >
-      ::GenerateData()
+  template< class OutputImageType >
+  itk::Point<float, 3> TractsToFiberEndingsImageFilter< OutputImageType >::GetItkPoint(double point[3])
   {
-    MITK_INFO << "Generating 2D fiber endings image";
-    if(&typeid(TOutputPixelType) != &typeid(unsigned char))
-    {
-      MITK_INFO << "Only 'unsigned char' and 'itk::RGBAPixel<unsigned char> supported as OutputPixelType";
-      return;
-    }
+    itk::Point<float, 3> itkPoint;
+    itkPoint[0] = point[0];
+    itkPoint[1] = point[1];
+    itkPoint[2] = point[2];
+    return itkPoint;
+  }
+
+  template< class OutputImageType >
+  void TractsToFiberEndingsImageFilter< OutputImageType >::GenerateData()
+  {
+    // generate upsampled image
     mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
+    typename OutputImageType::Pointer outImage = this->GetOutput();
 
-    typename OutputImageType::Pointer outImage =
-        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-
-    outImage->SetSpacing( geometry->GetSpacing()/m_UpsamplingFactor );   // Set the image spacing
-
-    mitk::Point3D origin = geometry->GetOrigin();
-    mitk::Point3D indexOrigin;
-    geometry->WorldToIndex(origin, indexOrigin);
-    indexOrigin[0] = indexOrigin[0] - .5 * (1.0-1.0/m_UpsamplingFactor);
-    indexOrigin[1] = indexOrigin[1] - .5 * (1.0-1.0/m_UpsamplingFactor);
-    indexOrigin[2] = indexOrigin[2] - .5 * (1.0-1.0/m_UpsamplingFactor);
+    // calculate new image parameters
+    mitk::Vector3D newSpacing;
     mitk::Point3D newOrigin;
-    geometry->IndexToWorld(indexOrigin, newOrigin);
-
-    outImage->SetOrigin( newOrigin );     // Set the image origin
-
-    itk::Matrix<double, 3, 3> matrix;
-    for (int i=0; i<3; i++)
-      for (int j=0; j<3; j++)
-        matrix[j][i] = geometry->GetMatrixColumn(i)[j]/geometry->GetSpacing().GetElement(i);
-    outImage->SetDirection( matrix );  // Set the image direction
-
-    float* bounds = m_FiberBundle->GetBounds();
+    itk::Matrix<double, 3, 3> newDirection;
     ImageRegion<3> upsampledRegion;
-    upsampledRegion.SetSize(0, bounds[0]);
-    upsampledRegion.SetSize(1, bounds[1]);
-    upsampledRegion.SetSize(2, bounds[2]);
-
-    typename InputImageType::RegionType::SizeType upsampledSize = upsampledRegion.GetSize();
-    for (unsigned int n = 0; n < 3; n++)
+    if (m_UseImageGeometry && !m_InputImage.IsNull())
     {
-      upsampledSize[n] = upsampledSize[n] * m_UpsamplingFactor;
+      newSpacing = m_InputImage->GetSpacing()/m_UpsamplingFactor;
+      upsampledRegion = m_InputImage->GetLargestPossibleRegion();
+      newOrigin = m_InputImage->GetOrigin();
+      typename OutputImageType::RegionType::SizeType size = upsampledRegion.GetSize();
+      size[0] *= m_UpsamplingFactor;
+      size[1] *= m_UpsamplingFactor;
+      size[2] *= m_UpsamplingFactor;
+      upsampledRegion.SetSize(size);
+      newDirection = m_InputImage->GetDirection();
     }
-    upsampledRegion.SetSize( upsampledSize );
-    outImage->SetRegions( upsampledRegion );
+    else
+    {
+      newSpacing = geometry->GetSpacing()/m_UpsamplingFactor;
+      newOrigin = geometry->GetOrigin();
+      mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+      newOrigin[0] += bounds.GetElement(0);
+      newOrigin[1] += bounds.GetElement(2);
+      newOrigin[2] += bounds.GetElement(4);
 
+      for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+          newDirection[j][i] = geometry->GetMatrixColumn(i)[j];
+      upsampledRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
+      upsampledRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
+      upsampledRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
+    }
+    typename OutputImageType::RegionType::SizeType upsampledSize = upsampledRegion.GetSize();
+
+    // apply new image parameters
+    outImage->SetSpacing( newSpacing );
+    outImage->SetOrigin( newOrigin );
+    outImage->SetDirection( newDirection );
+    outImage->SetRegions( upsampledRegion );
     outImage->Allocate();
 
     int w = upsampledSize[0];
     int h = upsampledSize[1];
     int d = upsampledSize[2];
 
+    // set/initialize output
+    OutPixelType* outImageBufferPointer = (OutPixelType*)outImage->GetBufferPointer();
+    for (int i=0; i<w*h*d; i++)
+      outImageBufferPointer[i] = 0;
 
-    unsigned char* accuout;
-    accuout = reinterpret_cast<unsigned char*>(outImage->GetBufferPointer());
-    for (int i=0; i<w*h*d; i++) accuout[i] = 0;
+    // resample fiber bundle
+    float minSpacing = 1;
+    if(newSpacing[0]<newSpacing[1] && newSpacing[0]<newSpacing[2])
+        minSpacing = newSpacing[0];
+    else if (newSpacing[1] < newSpacing[2])
+        minSpacing = newSpacing[1];
+    else
+        minSpacing = newSpacing[2];
 
-    typedef mitk::FiberBundle::ContainerTractType   ContainerTractType;
-    typedef mitk::FiberBundle::ContainerType        ContainerType;
-    typedef mitk::FiberBundle::ContainerPointType   ContainerPointType;
-    ContainerType::Pointer tractContainer = m_FiberBundle->GetTractContainer();
+    vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
+    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
+    vLines->InitTraversal();
 
-    for (int i=0; i<tractContainer->Size(); i++)
+    int numFibers = m_FiberBundle->GetNumFibers();
+    for( int i=0; i<numFibers; i++ )
     {
-      ContainerTractType::Pointer tract = tractContainer->GetElement(i);
-      int tractsize = tract->Size();
+      vtkIdType   numPoints(0);
+      vtkIdType*  points(NULL);
+      vLines->GetNextCell ( numPoints, points );
 
-      if (tractsize>1)
+      // fill output image
+      if (numPoints>0)
       {
-        ContainerPointType start = tract->GetElement(0);
-        ContainerPointType end = tract->GetElement(tractsize-1);
+        itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[0]));
+        itk::Index<3> index;
+        outImage->TransformPhysicalPointToIndex(vertex, index);
+        outImage->SetPixel(index, 1);
+      }
 
-        start[0] = (start[0]+0.5) * m_UpsamplingFactor;
-        start[1] = (start[1]+0.5) * m_UpsamplingFactor;
-        start[2] = (start[2]+0.5) * m_UpsamplingFactor;
-
-        // int coordinates inside image?
-        int px = (int) (start[0]);
-        if (px < 0 || px >= w)
-          continue;
-        int py = (int) (start[1]);
-        if (py < 0 || py >= h)
-          continue;
-        int pz = (int) (start[2]);
-        if (pz < 0 || pz >= d)
-          continue;
-
-        accuout[( px   + w*(py  + h*pz  ))] += 1;
-
-
-        end[0] = (end[0]+0.5) * m_UpsamplingFactor;
-        end[1] = (end[1]+0.5) * m_UpsamplingFactor;
-        end[2] = (end[2]+0.5) * m_UpsamplingFactor;
-
-        // int coordinates inside image?
-        px = (int) (end[0]);
-        if (px < 0 || px >= w)
-          continue;
-        py = (int) (end[1]);
-        if (py < 0 || py >= h)
-          continue;
-        pz = (int) (end[2]);
-        if (pz < 0 || pz >= d)
-          continue;
-
-        accuout[( px   + w*(py  + h*pz  ))] += 1;
+      if (numPoints>2)
+      {
+        itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[numPoints-1]));
+        itk::Index<3> index;
+        outImage->TransformPhysicalPointToIndex(vertex, index);
+        outImage->SetPixel(index, 1);
       }
     }
 
-    MITK_INFO << "2D fiber endings image generated";
+    if (m_InvertImage)
+      for (int i=0; i<w*h*d; i++)
+        outImageBufferPointer[i] = 1-outImageBufferPointer[i];
   }
-
 }

@@ -1,7 +1,7 @@
-SET(CPP_FILES
+set(CPP_FILES
   itkShortestPathNode.cpp
 )
-SET(H_FILES
+set(H_FILES
   itkShortestPathCostFunction.h  
   itkShortestPathCostFunctionTbss.h
   itkShortestPathNode.h

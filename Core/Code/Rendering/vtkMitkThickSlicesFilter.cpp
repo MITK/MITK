@@ -125,11 +125,11 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
   int maxX, maxY;
   vtkIdType inIncX, inIncY, inIncZ;
   vtkIdType outIncX, outIncY, outIncZ;
-  int axesNum;
+  //int axesNum;
   int *inExt = inData->GetExtent();
   int *wholeExtent;
   vtkIdType *inIncs;
-  int useYMin, useYMax, useXMin, useXMax;
+  //int useYMin, useYMax, useXMin, useXMax;
 
   // find the region to loop over
   maxX = outExt[1] - outExt[0];
@@ -138,7 +138,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
 //  maxZ = outExt[5] - outExt[4];
 
   // Get the dimensionality of the gradient.
-  axesNum = self->GetDimensionality();
+  //axesNum = self->GetDimensionality();
 
   // Get increments to march through data
   inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ);
@@ -180,12 +180,12 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
         //MIP
         for (idxY = 0; idxY <= maxY; idxY++)
         {
-          useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
-          useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
+          //useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
+          //useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
           for (idxX = 0; idxX <= maxX; idxX++)
           {
-            useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
-            useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
+            //useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
+            //useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
 
             T mip = inPtr[_minZ*inIncs[2]];
             
@@ -212,12 +212,12 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
         //MIP
         for (idxY = 0; idxY <= maxY; idxY++)
         {
-          useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
-          useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
+          //useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
+          //useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
           for (idxX = 0; idxX <= maxX; idxX++)
           {
-            useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
-            useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
+            //useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
+            //useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
 
             double sum = 0;
             
@@ -260,12 +260,12 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
 
       for (idxY = 0; idxY <= maxY; idxY++)
       {
-        useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
-        useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
+        //useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
+        //useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
         for (idxX = 0; idxX <= maxX; idxX++)
         {
-          useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
-          useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
+          //useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
+          //useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
 
           T mip = inPtr[_minZ*inIncs[2]];
           i=0;

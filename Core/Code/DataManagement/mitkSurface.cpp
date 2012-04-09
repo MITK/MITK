@@ -37,12 +37,13 @@ m_CalculateBoundingBox(other.m_CalculateBoundingBox)
 {
   if(other.m_PolyDataSeries.at(0) != NULL)
   {
-    m_PolyDataSeries = std::vector<vtkPolyData*>();
+    this->m_PolyDataSeries = std::vector<vtkPolyData*>();
     for ( VTKPolyDataSeries::const_iterator it = other.m_PolyDataSeries.begin(); it != other.m_PolyDataSeries.end(); ++it )
     {
-      vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+      vtkPolyData* poly = vtkPolyData::New();
       poly->DeepCopy(*it);
-      m_PolyDataSeries.push_back(poly.GetPointer());   
+      m_PolyDataSeries.push_back(poly);
+      //poly->Delete();
     }
   }
   else
@@ -99,6 +100,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   }
   this->Modified();
   m_CalculateBoundingBox = true;
+  this->UpdateOutputInformation();
 }
 
 bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const

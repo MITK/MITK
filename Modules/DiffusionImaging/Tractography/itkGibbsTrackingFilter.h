@@ -10,6 +10,11 @@
 
 #include <fstream>
 #include <QFile>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyLine.h>
 
 namespace itk{
 
@@ -32,8 +37,7 @@ namespace itk{
     typedef TInputROIImage MaskImageType;
     typedef typename MaskImageType::Pointer MaskImageTypePointer;
 
-    typedef std::vector< itk::Point<float, 3> > FiberTractType;
-    typedef std::vector< FiberTractType > FiberBundleType;
+    typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
     typedef Image< float, 3 >                  GfaImageType;
     typedef typename GfaImageType::Pointer     GfaImageTypePointer;
@@ -82,6 +86,9 @@ namespace itk{
     itkSetMacro( SubtractMean, bool);
     itkGetMacro( SubtractMean, bool);
 
+    itkSetMacro( CurvatureHardThreshold, float);
+    itkGetMacro( CurvatureHardThreshold, float);
+
     /** Set/Get the Odf Input Image **/
     itkSetInputMacro(OdfImage, InputQBallImageType, 0);
     itkGetInputMacro(OdfImage, InputQBallImageType, 0);
@@ -117,7 +124,7 @@ namespace itk{
       this->GenerateData();
     }
 
-    FiberBundleType* GetFiberBundle();
+    FiberPolyDataType GetFiberBundle();
     float GetMemoryUsage();
     bool EstimateParticleWeight();
 
@@ -127,6 +134,7 @@ namespace itk{
     virtual ~GibbsTrackingFilter();
 
     void ComputeFiberCorrelation();
+    void ComputeFiberCorrelationOriginal();
 
     void BuildFibers(float* points, int numPoints);
 
@@ -153,13 +161,15 @@ namespace itk{
     bool    m_AbortTracking;
     bool    m_SubtractMean;
     int     m_NumAcceptedFibers;
-    volatile bool    m_BuildFibers;
+    volatile bool   m_BuildFibers;
     unsigned int    m_Steps;
     float   m_Memory;
     float   m_ProposalAcceptance;
+    float   m_CurvatureHardThreshold;
+    float   m_Meanval_sq;
 
     RJMCMC* m_Sampler;
-    FiberBundleType m_FiberBundle;
+    FiberPolyDataType m_FiberPolyData;
     unsigned long m_NumParticles;
     unsigned long m_NumConnections;
   };

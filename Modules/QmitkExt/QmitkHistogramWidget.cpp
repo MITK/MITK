@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkHistogramWidget.h"
+#include "mitkImageStatisticsHolder.h"
 
 #include <qlabel.h>
 #include <qpen.h>
@@ -129,7 +130,7 @@ void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram
 
 void QmitkHistogramWidget::SetHistogram( mitk::Image* mitkImage )
 {
-  this->SetHistogram(mitkImage->GetScalarHistogram());
+  this->SetHistogram(mitkImage->GetStatistics()->GetScalarHistogram());
 }
 
 void QmitkHistogramWidget::SetReport(std::string report)

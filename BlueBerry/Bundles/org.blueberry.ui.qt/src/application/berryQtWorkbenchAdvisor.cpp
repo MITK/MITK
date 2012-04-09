@@ -16,9 +16,8 @@
  =========================================================================*/
 
 #include "berryQtWorkbenchAdvisor.h"
-#include "berryQtAssistantUtil.h"
-#include "../internal/berryQtGlobalEventFilter.h"
-#include "../berryQtPreferences.h"
+#include "internal/berryQtGlobalEventFilter.h"
+#include "berryQtPreferences.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>
@@ -56,12 +55,6 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   QTextCodec* utf8Codec = QTextCodec::codecForName("UTF-8");
   QTextCodec::setCodecForCStrings(utf8Codec);
   QTextCodec::setCodecForTr(utf8Codec);
-}
-
-bool QtWorkbenchAdvisor::PreShutdown()
-{
-  berry::QtAssistantUtil::CloseAssistant();
-  return true;
 }
 
 }

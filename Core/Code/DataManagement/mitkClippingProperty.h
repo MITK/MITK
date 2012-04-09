@@ -30,6 +30,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * \brief Property for clipping datasets; currently only
  * clipping planes are possible
@@ -79,6 +84,10 @@ private:
   virtual bool Assign(const BaseProperty& property);
 
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // namespace mitk
 

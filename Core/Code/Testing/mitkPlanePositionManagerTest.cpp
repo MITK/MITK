@@ -82,6 +82,8 @@ int SetUpBeforeTest()
 
         m_Geometries.push_back(plane);
     }
+
+    return EXIT_SUCCESS;
 }
 
 int testAddPlanePosition()
@@ -148,7 +150,6 @@ int testGetPlanePosition()
     for (unsigned int i = 0; i < m_Geometries.size(); ++i)
     {
         plane = m_Geometries.at(i);
-        mitk::PlaneGeometry* test = m_Geometries.at(i);
         op = m_Service->GetPlanePosition(i);
         error = ( !mitk::Equal(op->GetHeight(),plane->GetExtent(1)) ||
                   !mitk::Equal(op->GetWidth(),plane->GetExtent(0)) ||
@@ -242,7 +243,7 @@ int testRemoveAll()
     return EXIT_SUCCESS;
 }
 
-int mitkPlanePositionManagerTest(int argc, char* argv[])
+int mitkPlanePositionManagerTest(int, char* [])
 {
     MITK_TEST_OUTPUT(<<"Starting Test PlanePositionManager");
     SetUpBeforeTest();

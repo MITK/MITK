@@ -18,9 +18,9 @@
 #ifndef BERRYSERVICELOCATOR_H_
 #define BERRYSERVICELOCATOR_H_
 
-#include "../services/berryIServiceLocator.h"
-#include "../services/berryINestable.h"
-#include "../services/berryIDisposable.h"
+#include "services/berryIServiceLocator.h"
+#include "services/berryINestable.h"
+#include "services/berryIDisposable.h"
 
 #include <map>
 #include <vector>

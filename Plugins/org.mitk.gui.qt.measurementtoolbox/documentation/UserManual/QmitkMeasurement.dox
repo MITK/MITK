@@ -1,0 +1,134 @@
+/**
+\page org_measurement The Measurement Module
+
+\image html Measurement_48.png "Icon of the Module"
+
+\section QmitkMeasurementUserManualOverview Overview
+
+The Measurement module enables the user to interact with 2D images or single slices of 3D image stacks and planar figure data types. It allows to measure distances, angels, pathes and several geometric figures on a dataset. 
+
+Available Sections:
+- \ref QmitkMeasurementUserManualOverview
+- \ref QmitkMeasurementUserManualFeatures
+	- \ref SubOne
+	- \ref SubTwo
+	- \ref SubThree
+	- \ref SubFour
+	- \ref SubFive
+	- \ref SubSix
+	- \ref SubSeven
+- \ref QmitkMeasurementUserManualUsage
+	- \ref One
+	- \ref Two
+	- \ref Three
+	- \ref Four
+
+The workflow to use this module is:
+
+\image html Workflow.png
+
+The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. On pressing the Measurement icon (see picture below the page title) in the view button line the basic appearance of the bundle is as follws.
+
+\image html Basic_Screen_edited.JPG
+
+The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
+
+\section QmitkMeasurementUserManualFeatures Features
+
+The bundle as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
+\image html Measurement_View.JPG
+The first information is the selected image's name (here: DICOM-MRI-Image) followed by the measurement figures button line with the seven measurement figures. From left to right the buttons are connected with the following functions:
+
+\subsection SubOne Draw Line
+Draws a line between two set points and returns the distance between these points.
+
+\subsection SubTwo Draw Path
+Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. Add the final point by double left click.
+
+\subsection SubThree Draw Angle
+Draws two lines from three set points connected in the second set point and returns the inner angle at the second point. 
+
+\subsection SubFour Draw Four Point Angle
+Draws two lines that may but must not intersect from four set points. The returned angle is the one depicted in the icon.
+
+\subsection SubFive Draw Circle
+Draws a circle by setting two points, whereas the first set point is the center and the second the radius of the circle. The measured values are the radius and the included area.
+
+\subsection SubSix Draw Rectangle
+Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
+
+\subsection SubSeven Draw Polygon
+Draws a polygon by setting three or more points. The measured values are the circumference and the included area. Add the final point by double left click.
+
+Below the buttonline the statistics window is situated, it displays the results of the actual measurements from the selected measurement figures. The content of the statistics window can be copied to the clipboard with the correspondig button for further use in a table calculation programm (e.g. Open Office Calc etc.). 
+
+\image html  Image_processed.JPG
+
+The last row contains again a button line to swap from the measurement bundle (activated in the image) to other supported MITK 3M3 bundles.
+  
+\section QmitkMeasurementUserManualUsage Usage
+
+This Section is subdivided into four subsections:
+<ol>
+    <li><b>Add an image</b>
+    <li><b>Work with measurement figures</b>
+    <li><b>Save the image with measurement information</b>
+	<li><b>Remove measurement figures or image</b>
+</ol>
+
+Let's start with subsection 1
+\subsection One 	Add an image
+
+There are two possible ways to add an image to the programm. One is to grap the image with left mouse click from your prefered file browser and simply drag&drop it to the View Plane field. The other way is to use the 
+\image html OpenButton.png
+button in the upper left corner of the application. A dialog window appears showing the file tree of the computer. Navigate to the wanted file and select it with the left mouse click. Afterwards just use the dialog's open button.  
+
+The wanted image appears in the View Plane and in the Data Manager the images name appears as a new tree node. Now the image is loaded it can be adjusted in the usual way ( zoom in/out: right mouse button + moving the mouse up and down, moving the image: press mouse wheel and move the mouse to the wished direction, scroll through the slices( only on 3D images): scroll mouse wheel up and down).
+
+\image html Image_Loaded_Screen.JPG
+
+After the image is loaded the image's name appears in the Data Manager. By left-clicking on the image name the buttonline becomes activated. 
+
+\subsection Two Work with measurement figures
+The measurement module comes with seven measurement figures(see picture below), that can be applied to the images. 
+\image html MeasurementFigureButtonline.jpg
+The results of the measurement with each of these figures is shown in the statistics window and in the lower right corner of the view plane. 
+\image html Image_processed_Screen.JPG
+When applying more then one measurement figure to the image the actual measurement figure is depicted in red and the displayed values belong to this measurement figure. All measurement figures become part of the Data Manager as a node of the image tree.
+
+\subsection Three Save the image with measurement information
+After applying the wanted measurement figures the entire scene consisting of the image and the measurement figures can be saved for future use. Therefore just click the right mouse button when over the image item in the Data Manager and choose the item "Save" in the opening item list. Following to that a save dialog appears where the path to the save folder can be set. Afterwards just accept your choice with the save button.
+
+\subsection Four Remove measurement figures or image
+If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously removing all the dependent measurement figures that belong to the image tree in the Data Manager. To remove just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaneously holding the ctrl-button pressed.
+
+For more detailed usage of the save/remove functionality refer to the Data Manager User Manual.
+
+<!-- <ul>
+  <li> The Measurement Module is able to measure:
+  <ul>
+    <li> Distances between two points
+    <li> Angles between two lines (defined by three points) 
+    <li> Distances along a path 
+    </ul>
+</ul>
+    
+\section QmitkMeasurementUserManualUsage Usage
+To use the Measurement Module, at first a data set must be loaded. That can be done by drag & drop.
+Choose the measurement method you need by pressing the according button. 
+<ul>
+  <li>Points can be set by "shift-clicking" on the place in the data set. 
+  <li>Remove points by pressing the del-button on your keyboard. 
+  <li>You can mark a point by clickon it with the cursor and move it while the mouse button is still pressed. 
+</ul>
+What the different modes mean and how to use them:
+<ul>
+  <li> a) Distances: To measure the distance between two points, you have to set two points. The distance will be displayed on the line between the points.
+  <li> b) Angles: Angles can be measured between two lines. For that you have to set three points. The angle will be displayed between the two lines. 
+  <li> c) Path: Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer pathes) points. The distance and the angles for each part will be displayed next to the path.
+</ul>
+
+\image html MeasurementGUI.png Graphical User Interface of Measurement -->
+
+*/
+

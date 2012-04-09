@@ -24,6 +24,8 @@ PURPOSE. See the above copyright notices for more information.
 
 mitk::ImageToContourFilter::ImageToContourFilter()
 {
+  this->m_UseProgressBar = false;
+  this->m_ProgressStepSize = 1;
 }
 
 mitk::ImageToContourFilter::~ImageToContourFilter()
@@ -52,6 +54,10 @@ void mitk::ImageToContourFilter::GenerateData()
   m_SliceGeometry = sliceImage->GetGeometry();
 
   AccessFixedDimensionByItk(sliceImage, Itk2DContourExtraction, 2);
+
+  //Setting progressbar
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -115,6 +121,16 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction (itk::Image<TPixel, VIma
 void mitk::ImageToContourFilter::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
+}
+
+void mitk::ImageToContourFilter::SetUseProgressBar(bool status)
+{
+  this->m_UseProgressBar = status;
+}
+
+void mitk::ImageToContourFilter::SetProgressStepSize(unsigned int stepSize)
+{
+  this->m_ProgressStepSize = stepSize;
 }
 
 

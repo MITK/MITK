@@ -171,7 +171,7 @@ void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D
   pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
 }
 
-void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+void mitk::Geometry3D::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
   MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
   //BackTransform(atPt3d_mm, vec_mm, vec_units);

@@ -1,0 +1,6 @@
+project(org_mitk_gui_qt_extapplication)
+
+MACRO_CREATE_MITK_CTK_PLUGIN(
+  EXPORT_DIRECTIVE MITK_QT_EXTAPP
+  EXPORTED_INCLUDE_SUFFIXES src
+)

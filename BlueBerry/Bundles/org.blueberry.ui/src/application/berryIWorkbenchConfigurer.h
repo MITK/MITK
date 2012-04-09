@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 
 #include <org_blueberry_ui_Export.h>
-#include "../berryIWorkbench.h"
+#include "berryIWorkbench.h"
 
 #include "berryIWorkbenchWindowConfigurer.h"
 

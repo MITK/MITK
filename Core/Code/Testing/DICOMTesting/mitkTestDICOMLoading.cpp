@@ -126,7 +126,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   SetDefaultLocale();
 
   // basic image data
-  DumpLine( "Pixeltype",    TypeIDToString( *(image->GetPixelType().GetTypeId()) ));
+  DumpLine( "Pixeltype",    TypeIDToString( (image->GetPixelType().GetTypeId()) ));
   DumpLine( "BitsPerPixel", image->GetPixelType().GetBpe() );
   DumpLine( "Dimension",    image->GetDimension() );
 
@@ -247,7 +247,7 @@ mitk::TestDICOMLoading::reduce(const std::string& pString,
 bool
 mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference, 
                                                   const std::string& test,
-                                                  double eps )
+                                                  double /*eps*/ )
 {
   bool result(true);
 

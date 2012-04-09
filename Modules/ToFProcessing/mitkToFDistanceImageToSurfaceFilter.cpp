@@ -32,8 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <math.h>
 
-mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter(): m_CameraIntrinsics(),
-  m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL), m_InterPixelDistance(), m_TextureIndex(0)
+mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
+  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -93,8 +93,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   mitk::Image::Pointer input = this->GetInput();
   assert(input);
   // mesh points
-  unsigned int xDimension = input->GetDimension(0);
-  unsigned int yDimension = input->GetDimension(1);
+  int xDimension = input->GetDimension(0);
+  int yDimension = input->GetDimension(1);
   unsigned int size = xDimension*yDimension; //size of the image-array
   std::vector<bool> isPointValid;
   isPointValid.resize(size);

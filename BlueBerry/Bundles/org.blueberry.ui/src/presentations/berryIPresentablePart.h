@@ -21,9 +21,9 @@
 
 #include <berryMacros.h>
 
-#include "../berryISizeProvider.h"
-#include "../berryRectangle.h"
-#include "../berryIPropertyChangeListener.h"
+#include "berryISizeProvider.h"
+#include "berryRectangle.h"
+#include "berryIPropertyChangeListener.h"
 
 namespace berry {
 

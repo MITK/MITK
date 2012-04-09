@@ -17,9 +17,9 @@
 
 #include "berryWorkbenchConfigurer.h"
 
-#include "../berryPlatformUI.h"
+#include "berryPlatformUI.h"
 #include "berryWorkbenchWindow.h"
-#include "../berryImageDescriptor.h"
+#include "berryImageDescriptor.h"
 #include "berryWorkbench.h"
 
 namespace berry

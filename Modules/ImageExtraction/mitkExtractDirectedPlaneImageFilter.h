@@ -23,6 +23,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToImageFilter.h"
 
 #include "vtkImageReslice.h"
+#include "mitkVtkResliceInterpolationProperty.h"
+
+#define setMacro(name,type) \
+  virtual void Set##name (type _arg) \
+  { \
+    if (this->m_##name != _arg) \
+      { \
+      this->m_##name = _arg; \
+      } \
+  } 
+
+#define getMacro(name,type) \
+  virtual type Get##name () \
+  { \
+	return m_##name; \
+  } 
 
 class vtkPoints;
 
@@ -70,6 +86,12 @@ namespace mitk
     itkSetMacro( InPlaneResampleExtentByGeometry, bool );
     itkGetMacro( InPlaneResampleExtentByGeometry, bool );
 
+	setMacro( ResliceInterpolationProperty, VtkResliceInterpolationProperty* );
+	itkGetMacro( ResliceInterpolationProperty, VtkResliceInterpolationProperty* );
+
+	setMacro( IsMapperMode, bool );
+	getMacro( IsMapperMode, bool );
+
   protected:
 
     ExtractDirectedPlaneImageFilter(); // purposely hidden
@@ -83,11 +105,16 @@ namespace mitk
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       vtkFloatingPointType *bounds );
 
-    const Geometry2D*  m_WorldGeometry;
-    vtkImageReslice *  m_Reslicer;
+    const Geometry2D*	m_WorldGeometry;
+    vtkImageReslice *	m_Reslicer;
+	
+    unsigned int		m_TargetTimestep;
+    bool				m_InPlaneResampleExtentByGeometry;
+	int					m_ThickSlicesMode;
+	int					m_ThickSlicesNum;
+	bool				m_IsMapperMode;
 
-    unsigned int       m_TargetTimestep;
-    bool               m_InPlaneResampleExtentByGeometry;
+	VtkResliceInterpolationProperty* m_ResliceInterpolationProperty;
   };
 
 } // namespace mitk

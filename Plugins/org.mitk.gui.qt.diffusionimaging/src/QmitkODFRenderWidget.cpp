@@ -61,8 +61,8 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
     if(odf[i]<min)
       min = odf[i];
 
-  if (min<0)
-    return;
+//  if (min<0)
+//    return;
 
   for (int i=0; i<QBALL_ODFSIZE; i++)
     if(odf[i]>max)

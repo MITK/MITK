@@ -48,13 +48,17 @@ class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 
+namespace mitk {
+class RenderingManager;
+}
+
 class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -296,6 +300,8 @@ protected:
 
   int m_Layout;
   int m_PlaneMode;
+
+  mitk::RenderingManager* m_RenderingManager;
 
   mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering2;

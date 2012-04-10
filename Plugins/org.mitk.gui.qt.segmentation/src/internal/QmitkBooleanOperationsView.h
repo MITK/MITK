@@ -45,8 +45,14 @@ private:
   void EnableButtons(bool enable = true);
   void DisableButtons();
 
+//  template<typename TPixel, unsigned int VImageDimension>
+//  void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* imageBig, itk::Image<TPixel,VImageDimension>* imageSmall );
+
   QWidget *m_Parent;
   Ui::QmitkBooleanOperationsView m_Controls;
+
+//  mitk::Geometry3D* m_geoBig;
+//  mitk::Geometry3D* m_geoSmall;
 };
 
 #endif

@@ -51,6 +51,7 @@ namespace mitk
     this->m_DistanceArray = NULL;
     this->m_AmplitudeArray = NULL;
     this->m_IntensityArray = NULL;
+    this->m_RGBArray = NULL;
     this->m_SourceDataArray = NULL;
   }
 
@@ -59,6 +60,7 @@ namespace mitk
     delete[] m_DistanceArray;
     delete[] m_AmplitudeArray;
     delete[] m_IntensityArray;
+    delete[] m_RGBArray;
     delete[] m_SourceDataArray;
   }
 
@@ -114,6 +116,10 @@ namespace mitk
     if(this->m_AmplitudeArray == NULL)
     {
       this->m_AmplitudeArray = new float[m_PixelNumber];
+    }
+    if(this->m_RGBArray == NULL)
+    {
+      this->m_RGBArray = new unsigned char[m_PixelNumber*3];
     }
     if(this->m_SourceDataArray == NULL)
     {
@@ -176,7 +182,7 @@ namespace mitk
         {
         
           toFCameraDevice->GetAllImages(toFImageRecorder->m_DistanceArray, toFImageRecorder->m_AmplitudeArray, 
-            toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence );
+            toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence, toFImageRecorder->m_RGBArray );
 
           if (toFImageRecorder->m_ImageSequence >= requiredImageSequence)
           {

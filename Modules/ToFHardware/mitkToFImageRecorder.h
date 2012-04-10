@@ -131,6 +131,7 @@ namespace mitk
     float* m_IntensityArray; ///< array holding the intensity data
     float* m_DistanceArray; ///< array holding the distance data
     float* m_AmplitudeArray; ///< array holding the amplitude data
+    unsigned char* m_RGBArray; ///< array holding the RGB data if available (e.g. for Kinect)
     char* m_SourceDataArray; ///< array holding the source data
 
     // data writing

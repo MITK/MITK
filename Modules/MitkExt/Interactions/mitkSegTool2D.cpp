@@ -206,33 +206,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 	Image::Pointer slice = extractor->GetOutput();
 
-	/*At this point we have to adjust the geometry because reslicing is based on vtk.
-		For oblique planes the calculation of the extent has negative minimum values.
-		As these values are used as some kind of geometry information by the rendering,
-		they have to be considered in the projection function of the conoutring.
-	 */
-
-	//we just shift the origin in each direction
-	Vector3D axis0 = slice->GetGeometry()->GetAxisVector(0);
-	Vector3D axis1 = slice->GetGeometry()->GetAxisVector(1);
-	axis0.Normalize();
-	axis1.Normalize();
-
-	Point3D origin = slice->GetGeometry()->GetOrigin();
-	
-	//these are the negative minimum values.
-	int offsetX = extractor->GetVtkOutput()->GetExtent()[0];
-	int offsetY = extractor->GetVtkOutput()->GetExtent()[2];
-
-	//consider the spacing in each direction
-	Vector3D spacing = slice->GetGeometry()->GetSpacing();
-	
-	//adapt the origin. Note that for orthogonal planes the minima are '0' and thus the origin stays the same.
-	origin += (axis0 * (offsetX * spacing[0])) + (axis1 * (offsetY * spacing[1]));
-
-	slice->GetGeometry()->SetOrigin(origin);
-
-
 	return slice;
 }
 

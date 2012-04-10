@@ -25,17 +25,20 @@ mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 	m_Slice = NULL;
 	m_Image = NULL;
 	m_WorldGeometry = NULL;
+	m_SliceGeometry = NULL;
 	m_ImageIsValid = false;
 }
 
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 																						 vtkImageData* slice,
+																						 AffineGeometryFrame3D* sliceGeometry,
 																						 unsigned int timestep,
 																						 AffineGeometryFrame3D* currentWorldGeometry):Operation(1)
 
 {
 	m_WorldGeometry = currentWorldGeometry->Clone();
+	m_SliceGeometry = sliceGeometry->Clone();
 
 	m_TimeStep = timestep;
 

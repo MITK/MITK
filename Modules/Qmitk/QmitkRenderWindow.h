@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 
+class QmitkStdMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 
@@ -51,7 +52,7 @@ public:
    * reached through to the widget's parent.
    *
    * This reaching through to the parent was implicitly required by QmitkMaterialWidget / QmitkMaterialShowCase.
-   *
+   *QmitkStdMultiWidget
    * The default behaviour of QmitkRenderWindow is now to clear the "accepted" flag
    * of Qt events after they were handled by QVTKWidget. This way parents can also
    * handle events.
@@ -72,8 +73,8 @@ public:
   
   void HideRenderWindowMenu( );
 
-  //Activate or Deactivate MenuWidget. 
-  void ActivateMenuWidget( bool state );
+  //Activate or Deactivate MenuWidget.
+  void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
   
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }

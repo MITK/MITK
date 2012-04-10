@@ -93,6 +93,28 @@ public:
 
   bool GetGradientBackgroundFlag() const;
 
+  /*!
+  \brief Access node of widget plane 1
+  \return DataNode holding widget plane 1
+  */
+  mitk::DataNode::Pointer GetWidgetPlane1();
+  /*!
+  \brief Access node of widget plane 2
+  \return DataNode holding widget plane 2
+  */
+  mitk::DataNode::Pointer GetWidgetPlane2();
+  /*!
+  \brief Access node of widget plane 3
+  \return DataNode holding widget plane 3
+  */
+  mitk::DataNode::Pointer GetWidgetPlane3();
+  /*!
+  \brief Convenience method to access node of widget planes
+  \param id number of widget plane to be returned
+  \return DataNode holding widget plane 3
+  */
+  mitk::DataNode::Pointer GetWidgetPlane(int id);
+
   bool IsColoredRectanglesEnabled() const;
 
   bool IsDepartmentLogoEnabled() const;

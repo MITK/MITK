@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include <mitkImage.h>
+#include <mitkGeometry2D.h>
 #include <cv.h>
+#include "mitkUSImageMetadata.h"
 
 namespace mitk {
 
@@ -30,15 +32,23 @@ namespace mitk {
     * \brief TODO
     * \ingroup US
     */
-  class MitkUS_EXPORT USImage2D : public itk::Object, public IplImage //TODO: doppelvererbung nötig?
+  class MitkUS_EXPORT USImage2D : public itk::Object, public IplImage
     {
     public:
       mitkClassMacro(USImage2D, itk::Object);
       itkNewMacro(Self);
+      itkGetMacro(Geometry, mitk::Geometry2D::Pointer);
+      itkSetMacro(Geometry, mitk::Geometry2D::Pointer);
+      itkGetMacro(Metadata, mitk::USImageMetadata::Pointer);
+      itkSetMacro(Metadata, mitk::USImageMetadata::Pointer);
+
+      int Test();
 
     protected:
       USImage2D();
       virtual ~USImage2D();
+      mitk::Geometry2D::Pointer m_Geometry;
+      mitk::USImageMetadata::Pointer m_Metadata;
 
     };
 } // namespace mitk

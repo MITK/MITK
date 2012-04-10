@@ -27,3 +27,8 @@ mitk::USImage2D::~USImage2D()
 {
 
 }
+
+int mitk::USImage2D::Test()
+{
+return 9;
+}

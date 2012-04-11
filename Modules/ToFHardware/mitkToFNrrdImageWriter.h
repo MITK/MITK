@@ -51,13 +51,14 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
 
   protected:
 
     std::ofstream m_DistanceOutfile; ///< file for distance image
     std::ofstream m_AmplitudeOutfile; ///< file for amplitude image
     std::ofstream m_IntensityOutfile; ///< file for intensity image
+    std::ofstream m_RGBOutfile; ///< file for intensity image
 
   private:
 

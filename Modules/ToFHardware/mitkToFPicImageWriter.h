@@ -57,7 +57,7 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
 
   protected:
     

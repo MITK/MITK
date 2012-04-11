@@ -39,6 +39,7 @@ namespace mitk
     this->CheckForFileExtension(this->m_DistanceImageFileName);
     this->CheckForFileExtension(this->m_AmplitudeImageFileName);
     this->CheckForFileExtension(this->m_IntensityImageFileName);
+    this->CheckForFileExtension(this->m_RGBImageFileName);
 
     this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
     this->m_ImageSizeInBytes = this->m_PixelNumber * sizeof(float);
@@ -54,6 +55,10 @@ namespace mitk
     if (this->m_IntensityImageSelected)
     {
       this->OpenStreamFile(this->m_IntensityOutfile, this->m_IntensityImageFileName);
+    }
+    if (this->m_RGBImageSelected)
+    {
+      this->OpenStreamFile(this->m_RGBOutfile, this->m_RGBImageFileName);
     }
     this->m_NumOfFrames = 0;
   }
@@ -72,9 +77,13 @@ namespace mitk
     {
       this->CloseStreamFile(this->m_IntensityOutfile, this->m_IntensityImageFileName);
     }
+    if (this->m_RGBImageSelected)
+    {
+      this->CloseStreamFile(this->m_RGBOutfile, this->m_RGBImageFileName);
+    }
   }
 
-  void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
+  void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData)
   {
     if (this->m_DistanceImageSelected)
     {
@@ -87,6 +96,10 @@ namespace mitk
     if (this->m_IntensityImageSelected)
     {
       this->m_IntensityOutfile.write(( char* )intensityFloatData, this->m_ImageSizeInBytes);
+    }
+    if (this->m_RGBImageSelected)
+    {
+      this->m_RGBOutfile.write(( unsigned char* )rgbData, this->m_ImageSizeInBytes);
     }
     this->m_NumOfFrames++;
   }
@@ -155,7 +168,6 @@ namespace mitk
     imageTemplate->Initialize( FloatType,dimension, dimensions, 1);
     imageTemplate->SetSlice(floatData, 0, 0, 0);
 
-    
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
     nrrdWriter->SetPixelTypeInfo(imageTemplate->GetPixelType().GetTypeId());

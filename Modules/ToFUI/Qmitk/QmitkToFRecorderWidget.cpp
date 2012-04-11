@@ -172,6 +172,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     bool distanceImageSelected = true;
     bool amplitudeImageSelected = true;
     bool intensityImageSelected = true;
+    bool rgbImageSelected = true;
     bool rawDataSelected = false;
 
     QString tmpFileName("");
@@ -179,7 +180,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     QString imageFileName("");
     mitk::ToFImageWriter::ToFImageType tofImageType;
     tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType, 
-      distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rawDataSelected,
+      distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rgbImageSelected, rawDataSelected,
       NULL, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
 
     if (tmpFileName.isEmpty())
@@ -218,9 +219,13 @@ void QmitkToFRecorderWidget::OnStartRecorder()
         integrationTimeStr.toStdString(), numOfFramesStr.toStdString(), extension, "_AmplitudeImage");
       MITK_INFO << "Save amplitude data to: " << amplImageFileName;
 
-      std::string intenImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(), 
+      std::string intenImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(),
         integrationTimeStr.toStdString(), numOfFramesStr.toStdString(), extension, "_IntensityImage");
       MITK_INFO << "Save intensity data to: " << intenImageFileName;
+
+      std::string rgbImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(),
+        integrationTimeStr.toStdString(), numOfFramesStr.toStdString(), extension, "_RGBImage");
+      MITK_INFO << "Save intensity data to: " << rgbImageFileName;
 
       if (selectedFilter.compare("Text (*.csv)") == 0)
       {
@@ -248,10 +253,12 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       this->m_ToFImageRecorder->SetDistanceImageFileName(distImageFileName);
       this->m_ToFImageRecorder->SetAmplitudeImageFileName(amplImageFileName);
       this->m_ToFImageRecorder->SetIntensityImageFileName(intenImageFileName);
+      this->m_ToFImageRecorder->SetRGBImageFileName(rgbImageFileName);
       this->m_ToFImageRecorder->SetToFImageType(tofImageType);
       this->m_ToFImageRecorder->SetDistanceImageSelected(distanceImageSelected);
       this->m_ToFImageRecorder->SetAmplitudeImageSelected(amplitudeImageSelected);
       this->m_ToFImageRecorder->SetIntensityImageSelected(intensityImageSelected);
+      this->m_ToFImageRecorder->SetRGBImageSelected(rgbImageSelected);
       this->m_ToFImageRecorder->SetRecordMode(this->m_RecordMode);
       this->m_ToFImageRecorder->SetNumOfFrames(numOfFrames);
 
@@ -274,6 +281,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
                                      bool& distanceImageSelected,
                                      bool& amplitudeImageSelected,
                                      bool& intensityImageSelected,
+                                     bool& rgbImageSelected,
                                      bool& rawDataSelected,
                                      QWidget *parent,
                                      const QString &caption,
@@ -299,6 +307,9 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   QCheckBox* intensityImageCheckBox = new QCheckBox;
   intensityImageCheckBox->setText("Intensity image");
   intensityImageCheckBox->setChecked(true);
+  QCheckBox* rgbImageCheckBox = new QCheckBox;
+  rgbImageCheckBox->setText("RGB image");
+  rgbImageCheckBox->setChecked(true);
   QCheckBox* rawDataCheckBox = new QCheckBox;
   rawDataCheckBox->setText("Raw data");
   rawDataCheckBox->setChecked(false);
@@ -307,6 +318,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   checkBoxGroup->addWidget(distanceImageCheckBox);
   checkBoxGroup->addWidget(amplitudeImageCheckBox);
   checkBoxGroup->addWidget(intensityImageCheckBox);
+  checkBoxGroup->addWidget(rgbImageCheckBox);
   checkBoxGroup->addWidget(rawDataCheckBox);
 
   QFileDialog* fileDialog = new QFileDialog(parent, caption, dir, filter);
@@ -350,6 +362,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
     distanceImageSelected = distanceImageCheckBox->isChecked();
     amplitudeImageSelected = amplitudeImageCheckBox->isChecked();
     intensityImageSelected = intensityImageCheckBox->isChecked();
+    rgbImageSelected = rgbImageCheckBox->isChecked();
     rawDataSelected = rawDataCheckBox->isChecked();
 
     selectedFileName = fileDialog->selectedFiles().value(0);

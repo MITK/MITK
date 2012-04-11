@@ -57,20 +57,24 @@ namespace mitk
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
+    itkGetMacro( RGBImageFileName, std::string );
     itkGetMacro( CaptureWidth, int );
     itkGetMacro( CaptureHeight, int );
     itkGetMacro( DistanceImageSelected, bool );
     itkGetMacro( AmplitudeImageSelected, bool );
     itkGetMacro( IntensityImageSelected, bool );
+    itkGetMacro( RGBImageSelected, bool );
     itkGetMacro( NumOfFrames, int );
     itkGetMacro( FileFormat, std::string );
 
     itkSetMacro( DistanceImageFileName, std::string );
     itkSetMacro( AmplitudeImageFileName, std::string );
     itkSetMacro( IntensityImageFileName, std::string );
+    itkSetMacro(RGBImageFileName, std::string );
     itkSetMacro( DistanceImageSelected, bool );
     itkSetMacro( AmplitudeImageSelected, bool );
     itkSetMacro( IntensityImageSelected, bool );
+    itkSetMacro( RGBImageSelected, bool );
     itkSetMacro( NumOfFrames, int );
     itkSetMacro( FileFormat, std::string );
 
@@ -140,7 +144,8 @@ namespace mitk
     std::string m_DistanceImageFileName; ///< file name for saving the distance image
     std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image
     std::string m_IntensityImageFileName; ///< file name for saving the intensity image
-    
+    std::string m_RGBImageFileName; ///< file name for saving the rgb image
+
     int m_NumOfFrames; ///< number of frames to be recorded by this recorder
     ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
     ToFImageRecorder::RecordMode m_RecordMode; ///< mode of recording the images: specified number of frames (PerFrames) or infinite (Infinite)
@@ -149,6 +154,7 @@ namespace mitk
     bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
     bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
     bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
+    bool m_RGBImageSelected; ///< flag indicating if rgb image should be recorded
 
     // threading
     itk::MultiThreader::Pointer m_MultiThreader; ///< member for thread-handling (ITK-based)

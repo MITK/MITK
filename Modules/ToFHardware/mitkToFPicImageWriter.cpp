@@ -114,7 +114,7 @@ namespace mitk
     }
   }
 
-  void ToFPicImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
+  void ToFPicImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData)
   {
     if (this->m_DistanceImageSelected)
     {

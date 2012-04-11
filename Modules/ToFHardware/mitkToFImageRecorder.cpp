@@ -36,6 +36,7 @@ namespace mitk
     this->m_DistanceImageSelected = true;
     this->m_AmplitudeImageSelected = true;
     this->m_IntensityImageSelected = true;
+    this->m_RGBImageSelected = true;
     this->m_Abort = true;
     this->m_CaptureWidth = 0;
     this->m_CaptureHeight = 0;
@@ -47,6 +48,7 @@ namespace mitk
     this->m_DistanceImageFileName = ""; 
     this->m_AmplitudeImageFileName = "";
     this->m_IntensityImageFileName = "";
+    this->m_RGBImageFileName = "";
     this->m_ImageSequence = 0;
     this->m_DistanceArray = NULL;
     this->m_AmplitudeArray = NULL;
@@ -129,12 +131,14 @@ namespace mitk
     this->m_ToFImageWriter->SetDistanceImageFileName(this->m_DistanceImageFileName);
     this->m_ToFImageWriter->SetAmplitudeImageFileName(this->m_AmplitudeImageFileName);
     this->m_ToFImageWriter->SetIntensityImageFileName(this->m_IntensityImageFileName);
+    this->m_ToFImageWriter->SetRGBImageFileName(this->m_RGBImageFileName);
     this->m_ToFImageWriter->SetCaptureWidth(this->m_CaptureWidth);
     this->m_ToFImageWriter->SetCaptureHeight(this->m_CaptureHeight);
     this->m_ToFImageWriter->SetToFImageType(this->m_ToFImageType);
     this->m_ToFImageWriter->SetDistanceImageSelected(this->m_DistanceImageSelected);
     this->m_ToFImageWriter->SetAmplitudeImageSelected(this->m_AmplitudeImageSelected);
     this->m_ToFImageWriter->SetIntensityImageSelected(this->m_IntensityImageSelected);
+    this->m_ToFImageWriter->SetRGBImageSelected(this->m_RGBImageSelected);
     this->m_ToFImageWriter->Open();
 
     this->m_AbortMutex->Lock();
@@ -192,7 +196,7 @@ namespace mitk
             }
             requiredImageSequence = toFImageRecorder->m_ImageSequence + 1;
             toFImageRecorder->m_ToFImageWriter->Add( toFImageRecorder->m_DistanceArray, 
-              toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray );
+              toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray, toFImageRecorder->m_RGBArray );
             numOfFramesRecorded++;
             if (numOfFramesRecorded % n == 0)
             {

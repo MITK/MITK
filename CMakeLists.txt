@@ -734,6 +734,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
 # will be used, if present.
 
 set( activated_apps_no 0 )
+set( use_project_cpack_config NOT ${MITK_BUILD_ALL_APPS} )
 
 foreach(mitk_app ${MITK_APPS})
   # extract option_name
@@ -746,6 +747,10 @@ foreach(mitk_app ${MITK_APPS})
   endif()
 endforeach()
 
+if( NOT activated_apps_no EQUAL 1 )
+  set( use_project_cpack_config OFF )
+endif()
+
 foreach(mitk_app ${MITK_APPS})
   # extract target_dir and option_name
   string(REPLACE "^^" "\\;" target_info ${mitk_app})
@@ -755,7 +760,7 @@ foreach(mitk_app ${MITK_APPS})
   # check if the application is enabled
   if( ${option_name} )
     # check whether application specific configuration files will be used
-	if ( activated_apps_no EQUAL 1 )
+	if ( use_project_cpack_config )
 	  # use files if they exist
       if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )
 	    include( "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )

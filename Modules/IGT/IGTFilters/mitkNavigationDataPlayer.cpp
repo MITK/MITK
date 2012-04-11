@@ -172,13 +172,13 @@ void mitk::NavigationDataPlayer::InitPlayer()
 {
   if (m_Stream == NULL)
   { 
-    StreamInvalid("C1: Playing not possible. Wrong file name or path?");
+    StreamInvalid("Playing not possible. Wrong file name or path?");
     return;
   }
 
   if (!m_Stream->good())
   {
-    StreamInvalid("C2: Playing not possible. Stream is not good!");
+    StreamInvalid("Playing not possible. Stream is not good!");
     return;
   }
   
@@ -187,7 +187,7 @@ void mitk::NavigationDataPlayer::InitPlayer()
   //check if we have a valid version
   if (m_FileVersion < 1)
   {
-    StreamInvalid("C3: Playing not possible. Invalid file version!");
+    StreamInvalid("Playing not possible. Invalid file version!");
     return;
   }
 
@@ -218,12 +218,12 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
 {
   if (stream==NULL)
   {
-    MITK_ERROR << "D1: No input stream set!";
+    MITK_ERROR << "No input stream set!";
     return 0;
   }
   if (!stream->good())
   {
-    MITK_ERROR << "D2: Stream not good!";
+    MITK_ERROR << "Stream not good!";
     return 0;
   }
   int version = 1;
@@ -231,7 +231,7 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
   TiXmlDeclaration* dec = new TiXmlDeclaration();
   *stream >> *dec;
   if(strcmp(dec->Version(),"") == 0){
-    MITK_ERROR << "D3: The input stream seems to have XML incompatible format";
+    MITK_ERROR << "The input stream seems to have XML incompatible format";
     return 0;
   }
   
@@ -507,7 +507,7 @@ void mitk::NavigationDataPlayer::SetStream( PlayerMode  /*mode*/ )
 
 void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
 {
-  if (!stream->good())
+  if ( (stream == NULL) || (!stream->good()))
   {
     m_StreamEnd = true;
     MITK_ERROR << "The stream is not good";

@@ -291,6 +291,8 @@ private:
   vnl_vector<double>*                               m_LP;
   FloatImageType::Pointer m_ODFSumImage;
   typename CoefficientImageType::Pointer            m_CoefficientImage;
+  TOdfPixelType                            m_Delta1;
+  TOdfPixelType                            m_Delta2;
 };
 
 }

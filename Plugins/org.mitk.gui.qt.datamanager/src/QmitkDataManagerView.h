@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /// Qmitk
 #include <QmitkAbstractView.h>
+#include <QmitkNodeDescriptorManager.h>
 
 /// Qt
 #include <QItemSelection>
@@ -219,37 +220,19 @@ protected:
   ///
   bool m_SurfaceDecimation;
 
-  ///# Actions for the Context Menu
-  /// Global Reinit Action
-  QAction* m_GlobalReinitAction;
-  /// Save Action
-  QAction* m_SaveAction;
-  /// Remove Action
-  QAction* m_RemoveAction;
-  /// Reinit Action
-  QAction* m_ReinitAction;
+
+  ///# A list of ALL actions for the Context Menu
+  std::vector< std::pair< QmitkNodeDescriptor*, QAction* > > m_DescriptorActionList;
+
   /// A Slider widget to change the opacity of a node
   QSlider* m_OpacitySlider;
-  /// Opacity action
-  QWidgetAction* m_OpacityAction;
   /// button to change the color of a node
   QPushButton* m_ColorButton;
-  /// Color action
-  QWidgetAction* m_ColorAction;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
-  /// TextureInterpolation action
+  /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
-  /// Show only selected nodes
-  QAction* m_ShowOnlySelectedNodes;
-  /// Toggles visibility of selected nodes
-  QAction* m_ToggleSelectedVisibility;
-  /// Shows infos for selected nodes
-  QAction* m_ActionShowInfoDialog;
   
-  /// Special filter action for images
-  QAction* m_OtsuFilterAction;
-
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;
 

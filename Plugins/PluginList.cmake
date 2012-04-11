@@ -23,7 +23,6 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.examples:OFF
   org.mitk.gui.qt.examplesopencv:OFF
   org.mitk.gui.qt.igtexamples:OFF
-  org.mitk.gui.qt.igtnavigation:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON

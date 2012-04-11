@@ -46,7 +46,7 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, mitk::Da
 //  ds->GetNode(mitk::NodePredicateDataType::New("Image"))->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(254.0, 1.0) ) );
 
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetVtkRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
 //use this to actually show the iamge in a renderwindow
 //  this->GetVtkRenderWindow()->Render();

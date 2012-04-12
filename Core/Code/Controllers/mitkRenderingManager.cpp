@@ -230,9 +230,14 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  // do nothing if the renderWindow is not managed by this instance
-  RenderWindowVector::iterator iter = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
-  if ( iter == m_AllRenderWindows.end() )
+  // If the renderWindow is not valid, we do not want to inadvertantly create
+  // an entry in the m_RenderWindowList map. It is possible if the user is
+  // regularly calling AddRenderer and RemoveRenderer for a rendering update
+  // to come into this method with a renderWindow pointer that is valid in the
+  // sense that the window does exist within the application, but that
+  // renderWindow has been temporarily removed from this RenderingManager for
+  // performance reasons.
+  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
   {
     return;
   }
@@ -251,9 +256,14 @@ void
 RenderingManager
 ::ForceImmediateUpdate( vtkRenderWindow *renderWindow )
 {
-  // do nothing if the renderWindow is not managed by this instance
-  RenderWindowVector::iterator iter = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
-  if ( iter == m_AllRenderWindows.end() )
+  // If the renderWindow is not valid, we do not want to inadvertantly create
+  // an entry in the m_RenderWindowList map. It is possible if the user is
+  // regularly calling AddRenderer and RemoveRenderer for a rendering update
+  // to come into this method with a renderWindow pointer that is valid in the
+  // sense that the window does exist within the application, but that
+  // renderWindow has been temporarily removed from this RenderingManager for
+  // performance reasons.
+  if (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end())
   {
     return;
   }

@@ -964,7 +964,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       MeasureDisplayedGeometry( renderer);
 
     AdaptOdfScalingToImageSpacing(index);
-    SetRendererLightSources(renderer);
+    //SetRendererLightSources(renderer);
     ApplyPropertySettings();
     Slice(renderer, dispGeo);
     m_LastDisplayGeometry = dispGeo;

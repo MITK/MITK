@@ -14,8 +14,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "")
 # version has to be set explicitly to avoid such things as CMake creating the install directory "MITK Diffusion 2011.."
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}${CPACK_PACKAGE_VERSION_MINOR}")
 
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR }/Copyright.txt")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR }/Copyright.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/Copyright.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/Copyright.txt")
 
 if(CMAKE_CL_64)
   set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-win64")

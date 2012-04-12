@@ -429,10 +429,10 @@ void QmitkBrainNetworkAnalysisView::OnNetworkifyPushButtonClicked()
     QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
     return;
   }
-  mitk::DataNode* node = nodes.front();
-  mitk::DataNode* fiberNode = nodes.at(1);
+  mitk::DataNode* firstNode = nodes.front();
+  mitk::DataNode* secondNode = nodes.at(1);
 
-  if (!node)
+  if (!firstNode)
   {
     // Nothing selected. Inform the user and return
     QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
@@ -442,13 +442,21 @@ void QmitkBrainNetworkAnalysisView::OnNetworkifyPushButtonClicked()
   // here we have a valid mitk::DataNode
 
   // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  mitk::BaseData* fiberData = fiberNode->GetData();
-  if (data && fiberData)
+  mitk::BaseData* firstData = firstNode->GetData();
+  mitk::BaseData* secondData = secondNode->GetData();
+  if (firstData && secondData)
   {
     // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberData );
+    mitk::Image* image = dynamic_cast<mitk::Image*>( firstData );
+    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( secondData );
+
+    // check whether order was switched
+    if (! (image && fiberBundle) )
+    {
+      image = dynamic_cast<mitk::Image*>( secondData );
+      fiberBundle = dynamic_cast<mitk::FiberBundleX*>( firstData );
+    }
+
     if (image && fiberBundle)
     {
       m_ConnectomicsNetworkCreator->SetSegmentation( image ); 

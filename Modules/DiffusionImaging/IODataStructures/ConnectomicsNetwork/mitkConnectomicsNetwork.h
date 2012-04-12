@@ -157,7 +157,7 @@ namespace mitk {
     void SetIsModified( bool );
 
     /** Update the bounds of the geometry to fit the network */
-    void mitk::ConnectomicsNetwork::UpdateBounds( );
+    void UpdateBounds( );
 
   protected:
     ConnectomicsNetwork();

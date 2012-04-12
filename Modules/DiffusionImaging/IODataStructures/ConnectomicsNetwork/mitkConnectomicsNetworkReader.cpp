@@ -180,6 +180,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
         }
       }
 
+      m_OutputCache->UpdateBounds();
       MITK_INFO << "Network read";
     }
     catch(...)

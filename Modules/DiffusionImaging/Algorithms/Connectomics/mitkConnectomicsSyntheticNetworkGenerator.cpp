@@ -63,6 +63,8 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::
     MBI_ERROR << "Unrecognized Network ID";
   }
 
+  network->UpdateBounds();
+
   return network;
 
 }

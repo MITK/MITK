@@ -82,9 +82,13 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->convertToRGBAImagePushButton->hide();
     this->m_Controls->networkifyPushButton->show();
     this->m_Controls->networkifyPushButton->setText( "Create Network" );
-    this->m_Controls->modularizePushButton->show();
+    this->m_Controls->modularizePushButton->hide();
 
-    this->m_Controls->syntheticNetworkOptionsGroupBox->hide();
+    this->m_Controls->syntheticNetworkOptionsGroupBox->show();
+    //--------------------------- fill comboBox---------------------------
+    this->m_Controls->syntheticNetworkComboBox->insertItem(0,"Regular lattice");
+    this->m_Controls->syntheticNetworkComboBox->insertItem(1,"Heterogenic sphere");
+    this->m_Controls->syntheticNetworkComboBox->insertItem(2,"Random network");
   }
   else
   {

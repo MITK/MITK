@@ -34,7 +34,8 @@ endforeach()
      #${VTK_INCLUDE_DIRS}
 #    )
      
-foreach(d Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
+#foreach(d Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
+foreach(d Utilities Utilities/ipPic Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
 list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/mbilog)
@@ -79,7 +80,7 @@ set(MITK_LIBRARIES
     ${MITK_CORE_LIBRARIES}
     ${LIBRARIES_FOR_MITK_CORE}
     pic2vtk
-    IIL4MITK
+    #IIL4MITK
     ipSegmentation
     ann 
    )

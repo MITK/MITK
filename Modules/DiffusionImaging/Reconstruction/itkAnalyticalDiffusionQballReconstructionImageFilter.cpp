@@ -52,7 +52,9 @@ namespace itk {
     m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
     m_BValue(1.0),
     m_Lambda(0.0),
-    m_DirectionsDuplicated(false)
+    m_DirectionsDuplicated(false),
+    m_Delta1(0.001),
+    m_Delta2(0.001)
   {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -128,17 +130,7 @@ namespace itk {
       case QBAR_SOLID_ANGLE:
         {
           for(int i=0; i<NrOdfDirections; i++)
-          {
-            odf[i] = odf[i] < 0 ? 0 : odf[i];
             odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
-          }
-          TOdfPixelType sum = 0;
-          for(int i=0; i<NrOdfDirections; i++)
-          {
-            sum += odf[i];
-          }
-          if(sum>0)
-            odf /= sum;
 
           break;
         }
@@ -178,10 +170,8 @@ namespace itk {
             for(int i=0; i<n; i++)
             {
               if (vec[i]<=0)
-              {
-                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
                 vec[i] = 0.001;
-              }
+
               vec[i] = log(vec[i]);
             }
             return vec;
@@ -203,10 +193,8 @@ namespace itk {
             for(int i=0; i<n; i++)
             {
               if (vec[i]<=0)
-              {
-                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
                 vec[i] = 0.001;
-              }
+
               vec[i] = log(vec[i]);
             }
             return vec;
@@ -224,16 +212,18 @@ namespace itk {
             double b0f = (double)b0;
             for(int i=0; i<n; i++)
             {
-              if (vec[i]<=0)
-              {
-                MITK_ERROR << "AnalyticalDiffusionQballReconstructionImageFilter: negative dwi image value";
-                vec[i] = 0.001;
-              }
-              if (b0f==0)
-                b0f = 0.01;
-              if(vec[i] >= b0f)
-                vec[i] = b0f - 0.001;
-              vec[i] = log(-log(vec[i]/b0f));
+              vec[i] = vec[i]/b0f;
+
+              if (vec[i]<0)
+                vec[i] = m_Delta1;
+              else if (vec[i]<m_Delta1)
+                vec[i] = m_Delta1/2 + vec[i]*vec[i]/(2*m_Delta1);
+              else if (vec[i]>=1)
+                vec[i] = 1-m_Delta2/2;
+              else if (vec[i]>=1-m_Delta2)
+                vec[i] = 1-m_Delta2/2-(1-vec[i])*(1-vec[i])/(2*m_Delta2);
+
+              vec[i] = log(-log(vec[i]));
             }
             return vec;
             break;

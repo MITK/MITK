@@ -115,6 +115,7 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);
   m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetActiveCamera(cam);
+  m_RenderWindow->update();
   }
   catch (...)
   {

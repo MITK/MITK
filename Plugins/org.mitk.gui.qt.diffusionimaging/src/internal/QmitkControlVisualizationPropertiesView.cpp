@@ -1136,9 +1136,9 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
   set = ActiveSet("TensorImage");
   SetEnumProp(set,"Normalization", normMeth.GetPointer());
 
-  if(m_MultiWidget)
-    m_MultiWidget->RequestUpdate();
-
+//  if(m_MultiWidget)
+//    m_MultiWidget->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalingFactor)

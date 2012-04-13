@@ -172,7 +172,6 @@ void QmitkODFDetailsView::UpdateOdf()
     m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
     m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
     itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf;
-    itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> originalOdf;
 
     mitk::Point3D world = m_MultiWidget->GetCrossPosition();
     mitk::Point3D index;
@@ -277,8 +276,7 @@ void QmitkODFDetailsView::UpdateOdf()
       overviewText += "Please select a Q-Ball or tensor image\n";
     }
 
-
-    originalOdf = odf;
+    m_Controls->m_ODFDetailsWidget->SetParameters(odf);
 
     switch(m_OdfNormalization)
     {
@@ -295,9 +293,7 @@ void QmitkODFDetailsView::UpdateOdf()
       odf = odf.MinMaxNormalize();
     }
 
-    m_Controls->m_ODFDetailsWidget->SetParameters(originalOdf);
     m_Controls->m_ODFRenderWidget->GenerateODF(odf);
-
     m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
   }
   catch(...)

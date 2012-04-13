@@ -730,9 +730,9 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
 # default CPack configuration. Otherwise that apps configuration
 # will be used, if present.
 
-set( activated_apps_no 0 )
-set( use_project_cpack NOT ${MITK_BUILD_ALL_APPS} )
-set( use_default_config ON )
+set(activated_apps_no 0)
+set(use_default_config ON)
+list(LENGTH MITK_APPS app_count)
 
 foreach(mitk_app ${MITK_APPS})
   # extract option_name
@@ -741,12 +741,19 @@ foreach(mitk_app ${MITK_APPS})
   list(GET target_info_list 1 option_name)
   # check if the application is enabled
   if(${option_name})
-    MATH( EXPR activated_apps_no "${activated_apps_no} + 1" )
+    MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
   endif()
 endforeach()
 
-if( NOT activated_apps_no EQUAL 1 )
-  set( use_project_cpack OFF )
+if(app_count EQUAL 1 AND (activated_apps_no EQUAL 1 OR MITK_BUILD_ALL_APPS))
+  # Corner case if there is only one app in total
+  set(use_project_cpack ON)
+elseif(activated_apps_no EQUAL 1 AND NOT MITK_BUILD_ALL_APPS)
+  # Only one app is enabled (no "build all" flag set)
+  set(use_project_cpack ON)
+else()
+  # Less or more then one app is enabled
+  set(use_project_cpack OFF)
 endif()
 
 foreach(mitk_app ${MITK_APPS})
@@ -756,29 +763,30 @@ foreach(mitk_app ${MITK_APPS})
   list(GET target_info_list 0 target_dir)
   list(GET target_info_list 1 option_name)
   # check if the application is enabled
-  if( ${option_name} )
+  if(${option_name})
     # check whether application specific configuration files will be used
-	if ( use_project_cpack )
-	  # use files if they exist
-      if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )
-	    include( "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )
+    if(use_project_cpack)
+      # use files if they exist
+      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
+        include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
       endif()
-	  
-	  if( EXISTS "${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in" )
-	    configure_file(${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in ${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake @ONLY)
+
+      if(EXISTS "${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in")
         set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake")
-		set( use_default_config OFF )
+        configure_file(${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in
+                       ${CPACK_PROJECT_CONFIG_FILE} @ONLY)
+        set(use_default_config OFF)
       endif()
-	endif()
-	# add link to the list
-	list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+    endif()
+  # add link to the list
+  list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
   endif()
 endforeach()
 
 # if no project specific configuration file was used, use default
-if( use_default_config )
+if(use_default_config)
   configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
-               ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+                 ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
   set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
 endif()
 

@@ -80,6 +80,9 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
+  void UpdateOdf();
 
   Ui::QmitkODFDetailsViewControls* m_Controls;
 
@@ -87,6 +90,7 @@ protected:
   int m_SliceObserverTag1;
   int m_SliceObserverTag2;
   int m_SliceObserverTag3;
+  int m_PropertyObserverTag;
 
   vtkPolyData* m_TemplateOdf;
   vtkSmartPointer<vtkTransform> m_OdfTransform;
@@ -99,6 +103,7 @@ protected:
   vtkRenderWindow* m_VtkRenderWindow;
   vtkRenderWindowInteractor* m_RenderWindowInteractor;
   vtkCamera* m_Camera;
+  mitk::DataNode::Pointer m_SelectedNode;
   std::vector<double> m_Values;
   int m_OdfNormalization;
 };

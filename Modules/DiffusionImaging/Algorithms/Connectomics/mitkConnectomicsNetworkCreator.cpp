@@ -115,6 +115,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 
   // provide network with geometry
   m_ConNetwork->SetGeometry( m_Segmentation->GetGeometry() );
+  m_ConNetwork->UpdateBounds();
   m_ConNetwork->SetIsModified( true );
 
   MBI_INFO << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_INFO_NETWORK_CREATED;

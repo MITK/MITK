@@ -452,3 +452,54 @@ mitk::ConnectomicsNetwork::NetworkEdge mitk::ConnectomicsNetwork::GetEdge( Verte
 {
   return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
 }
+
+void mitk::ConnectomicsNetwork::UpdateBounds( )
+{
+  float min = itk::NumericTraits<float>::min();
+  float max = itk::NumericTraits<float>::max();
+  float bounds[] = {max, min, max, min, max, min};
+
+  std::vector< mitk::ConnectomicsNetwork::NetworkNode > nodeVector = this->GetVectorOfAllNodes();
+
+  if( nodeVector.size() == 0 )
+  {
+    bounds[0] = 0;
+    bounds[1] = 1;
+    bounds[2] = 0;
+    bounds[3] = 1;
+    bounds[4] = 0;
+    bounds[5] = 1;
+  }
+
+  // for each direction, make certain the point is in between
+  for( int index(0), end(nodeVector.size()) ; index < end; index++ )
+  {
+    for( int direction(0); direction < nodeVector.at( index ).coordinates.size(); direction++ )
+    {
+      if( nodeVector.at( index ).coordinates.at(direction) < bounds[ 2 * direction ]  )
+      {
+        bounds[ 2 * direction ] = nodeVector.at( index ).coordinates.at(direction);
+      }
+
+      if( nodeVector.at( index ).coordinates.at(direction) > bounds[ 2 * direction + 1]  )
+      {
+        bounds[ 2 * direction + 1] = nodeVector.at( index ).coordinates.at(direction);
+      }
+    }
+  }
+
+
+  // provide some border margin
+  for(int i=0; i<=4; i+=2)
+  {
+    bounds[i] -=10;
+  }
+
+  for(int i=1; i<=5; i+=2)
+  {
+    bounds[i] +=10;
+  }
+
+  this->GetGeometry()->SetFloatBounds(bounds);
+  this->GetTimeSlicedGeometry()->UpdateInformation();
+}

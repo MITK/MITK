@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkPolyDataAlgorithm.h"
 #include "mitkCommon.h"
+#include <vtkFloatArray.h>
+#include <itkOrientationDistributionFunction.h>
+#include <mitkOdfNormalizationMethodProperty.h>
 
 class MitkDiffusionImaging_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
@@ -29,22 +32,23 @@ public:
   vtkTypeRevisionMacro(vtkOdfSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  typedef itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> OdfType;
   // Description:
   // Construct sphere with radius=0.5 and default resolution 8 in both Phi
   // and Theta directions. Theta ranges from (0,360) and phi (0,180) degrees.
   static vtkOdfSource *New();
-
-  vtkSetMacro(TemplateOdf,vtkPolyData*);
-  vtkGetMacro(TemplateOdf,vtkPolyData*);
-
-  vtkSetMacro(OdfVals,vtkDoubleArray*);
-  vtkGetMacro(OdfVals,vtkDoubleArray*);
 
   vtkSetMacro(Scale,double);
   vtkGetMacro(Scale,double);
 
   vtkSetMacro(AdditionalScale,double);
   vtkGetMacro(AdditionalScale,double);
+
+  vtkSetMacro(Normalization,int);
+  vtkGetMacro(Normalization,int);
+
+  vtkSetMacro(Odf,OdfType);
+  vtkGetMacro(Odf,OdfType);
 
 protected:
   vtkOdfSource();
@@ -53,11 +57,10 @@ protected:
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  vtkPolyData* TemplateOdf;
-  vtkDoubleArray* OdfVals;
-
-  double Scale;
-  double AdditionalScale;
+  OdfType Odf;
+  double  Scale;
+  double  AdditionalScale;
+  int     Normalization;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

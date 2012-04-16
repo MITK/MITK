@@ -8,6 +8,7 @@ Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
 Algorithms/mitkImageToContourFilter.cpp
 Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
 Algorithms/mitkReduceContourSetFilter.cpp
+Algorithms/mitkSegmentationObjectFactory.cpp
 Algorithms/mitkSegmentationSink.cpp
 Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
 Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp

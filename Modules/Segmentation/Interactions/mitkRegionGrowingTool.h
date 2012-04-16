@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 struct mitkIpPicDescriptor;
 
@@ -53,7 +53,7 @@ namespace mitk
 
   $Author$
 */
-class MitkExt_EXPORT RegionGrowingTool : public FeedbackContourTool
+class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 {
   public:
     

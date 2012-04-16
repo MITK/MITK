@@ -15,7 +15,7 @@
 #ifndef mitkReduceContourSetFilter_h_Included
 #define mitkReduceContourSetFilter_h_Included
 
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
@@ -50,7 +50,7 @@ namespace mitk {
   $Author: fetzer$
 */
 
-    class MitkExt_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
+    class Segmentation_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
     {
         
     public:

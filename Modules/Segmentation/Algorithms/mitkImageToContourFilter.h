@@ -16,7 +16,7 @@ PURPOSE. See the above copyright notices for more information.
 #define mitkImageToContourFilter_h_Included
 
 //#include "MitkSBExports.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "itkImage.h"
 #include "mitkImage.h"
 #include "itkContourExtractor2DImageFilter.h"
@@ -40,7 +40,7 @@ namespace mitk {
 
   $Author: fetzer$
 */
-class MitkExt_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
+class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {
  public:
 

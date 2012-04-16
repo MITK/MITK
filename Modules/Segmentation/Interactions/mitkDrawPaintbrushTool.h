@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPaintContourTool_h_Included
 
 #include "mitkPaintbrushTool.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 namespace mitk
 {
@@ -41,7 +41,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MitkExt_EXPORT DrawPaintbrushTool : public PaintbrushTool
+class Segmentation_EXPORT DrawPaintbrushTool : public PaintbrushTool
 {
   public:
 

@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, RegionGrowingTool, "Region growing tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrowingTool, "Region growing tool");
 }
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))

@@ -17,15 +17,14 @@ Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp
 DataManagement/mitkContour.cpp
-DataManagement/mitkContourInteractor.cpp
 DataManagement/mitkContourSet.cpp
-DataManagement/mitkCorrectorTool2D.cpp
-DataManagement/mitkSegTool2D.cpp
 Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp
 Interactions/mitkBinaryThresholdTool.cpp
+Interactions/mitkContourInteractor.cpp
 Interactions/mitkContourTool.cpp
+Interactions/mitkCorrectorTool2D.cpp
 Interactions/mitkCreateSurfaceTool.cpp
 Interactions/mitkDrawPaintbrushTool.cpp
 Interactions/mitkErasePaintbrushTool.cpp
@@ -37,6 +36,7 @@ Interactions/mitkRegionGrow3DTool.cpp
 Interactions/mitkRegionGrowingTool.cpp
 Interactions/mitkSegmentationsProcessingTool.cpp
 Interactions/mitkSetRegionTool.cpp
+Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
 Rendering/mitkContourMapper2D.cpp
 Rendering/mitkContourSetMapper2D.cpp
@@ -45,6 +45,6 @@ Rendering/mitkContourVtkMapper3D.cpp
 Testing/mitkContourMapper2DTest.cpp
 Testing/mitkContourTest.cpp
 Testing/mitkManualSegmentationToSurfaceFilterTest.cpp
-Testing/mitkOverwriteSliceImageFilterTest.cpp
+# Testing/mitkOverwriteSliceImageFilterTest.cpp
 Testing/mitkSegmentationInterpolationTest.cpp
 )

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkAutoCropTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkSegmentationsProcessingTool.h"
 
 namespace mitk
@@ -34,7 +34,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkExt_EXPORT AutoCropTool : public SegmentationsProcessingTool
+class Segmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
 {
   public:
     

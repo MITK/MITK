@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_CONTOUR_H_
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkBaseData.h"
 #include <vtkRenderWindow.h>
 
@@ -33,7 +33,7 @@ namespace mitk
 * This class holds stores vertices for drawing a contour 
 *
 */
-class MitkExt_EXPORT Contour : public BaseData
+class Segmentation_EXPORT Contour : public BaseData
 {
 public:
   mitkClassMacro(Contour, BaseData);

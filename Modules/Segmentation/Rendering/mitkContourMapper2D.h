@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CONTOUR_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkGLMapper2D.h"
 
 
@@ -35,7 +35,7 @@ class Contour;
  * 
  * @ingroup Mapper
  */
-class MitkExt_EXPORT ContourMapper2D : public GLMapper2D
+class Segmentation_EXPORT ContourMapper2D : public GLMapper2D
 {
 public:
     

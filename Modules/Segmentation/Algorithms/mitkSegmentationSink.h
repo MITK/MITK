@@ -19,12 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
 
 #include "mitkNonBlockingAlgorithm.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 namespace mitk 
 {
 
-class MitkExt_EXPORT SegmentationSink : public NonBlockingAlgorithm
+class Segmentation_EXPORT SegmentationSink : public NonBlockingAlgorithm
 {
   public:
     

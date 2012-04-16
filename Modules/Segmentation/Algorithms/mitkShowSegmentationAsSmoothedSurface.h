@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class MitkExt_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
+  class Segmentation_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
   {
   public:
     mitkClassMacro(ShowSegmentationAsSmoothedSurface, SegmentationSink)

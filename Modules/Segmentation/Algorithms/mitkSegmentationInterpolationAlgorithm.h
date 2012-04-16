@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSegmentationInterpolationAlgorithm_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkImage.h"
 
 #include <itkObjectFactory.h>
@@ -49,7 +49,7 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class MitkExt_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
+class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
 {
   public:
     

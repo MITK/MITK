@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDrawPaintbrushTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, DrawPaintbrushTool, "Paintbrush drawing tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, DrawPaintbrushTool, "Paintbrush drawing tool");
 }
 
 mitk::DrawPaintbrushTool::DrawPaintbrushTool()

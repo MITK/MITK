@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCreateSurfaceTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkSegmentationsProcessingTool.h"
 
 namespace mitk
@@ -33,7 +33,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkExt_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
+class Segmentation_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
 {
   public:
     

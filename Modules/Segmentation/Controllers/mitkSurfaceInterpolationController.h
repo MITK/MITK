@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSurfaceInterpolationController_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
 #include "mitkInteractionConst.h"
@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
- class MitkExt_EXPORT SurfaceInterpolationController : public itk::Object
+ class Segmentation_EXPORT SurfaceInterpolationController : public itk::Object
  {
 
   public:

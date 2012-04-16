@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMaskAndCutRoiImageFilter.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, BinaryThresholdTool, "Thresholding tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdTool, "Thresholding tool");
 }
 
 mitk::BinaryThresholdTool::BinaryThresholdTool()

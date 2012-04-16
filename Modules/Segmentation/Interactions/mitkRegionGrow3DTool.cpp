@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRegionGrow3DTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, RegionGrow3DTool, "RegionGrower 3D");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrow3DTool, "RegionGrower 3D");
 }
 
 mitk::RegionGrow3DTool::RegionGrow3DTool(): Tool("PressMoveRelease"),

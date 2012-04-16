@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, CorrectorTool2D, "Correction tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
 }
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)

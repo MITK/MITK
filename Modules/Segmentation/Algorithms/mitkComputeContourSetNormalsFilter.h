@@ -15,7 +15,7 @@ PURPOSE. See the above copyright notices for more information.
 #ifndef mitkComputeContourSetNormalsFilter_h_Included
 #define mitkComputeContourSetNormalsFilter_h_Included
 
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkProgressBar.h"
 #include "mitkSurface.h"
@@ -49,7 +49,7 @@ namespace mitk {
 
    $Author: fetzer$
 */
-class MitkExt_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
+class Segmentation_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
 {
 public:
 

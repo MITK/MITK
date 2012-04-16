@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkFillRegionTool_h_Included
 
 #include "mitkSetRegionTool.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 namespace mitk
 {
@@ -38,7 +38,7 @@ namespace mitk
 
   $Author$
 */
-class MitkExt_EXPORT FillRegionTool : public SetRegionTool
+class Segmentation_EXPORT FillRegionTool : public SetRegionTool
 {
   public:
     

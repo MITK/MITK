@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPaintbrushTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
@@ -44,7 +44,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MitkExt_EXPORT PaintbrushTool : public FeedbackContourTool
+class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
 

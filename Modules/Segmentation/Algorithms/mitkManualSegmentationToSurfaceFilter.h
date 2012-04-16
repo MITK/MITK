@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
 
 #include <mitkImageToSurfaceFilter.h>
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 #include <vtkImageGaussianSmooth.h>
 #include <vtkImageMedian3D.h>
@@ -41,7 +41,7 @@ namespace mitk {
    * @ingroup Process
    */
 
-  class MitkExt_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
+  class Segmentation_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
   {
     public:
       mitkClassMacro(ManualSegmentationToSurfaceFilter,ImageToSurfaceFilter);

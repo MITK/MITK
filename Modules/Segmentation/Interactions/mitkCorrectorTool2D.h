@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
 
 namespace mitk
@@ -47,7 +47,7 @@ class Image;
 
   $Author$
 */
-class MitkExt_EXPORT CorrectorTool2D : public FeedbackContourTool
+class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
 {
   public:
     

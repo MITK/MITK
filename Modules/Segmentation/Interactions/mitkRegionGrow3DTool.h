@@ -19,13 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTool.h"
 #include "mitkPointSet.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
 namespace mitk{
-  class MitkExt_EXPORT RegionGrow3DTool : public Tool
+  class Segmentation_EXPORT RegionGrow3DTool : public Tool
   {
   public:
     mitkClassMacro(RegionGrow3DTool, Tool);

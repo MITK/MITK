@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkContourUtilshIncludett
 
 #include "mitkImage.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkContour.h"
 #include "mitkLegacyAdaptors.h"
 
@@ -33,7 +33,7 @@ namespace mitk
  *
  *  Originally copied from FeedbackContourTool
  */
-class MitkExt_EXPORT ContourUtils : public itk::Object
+class Segmentation_EXPORT ContourUtils : public itk::Object
 {
   public:
     

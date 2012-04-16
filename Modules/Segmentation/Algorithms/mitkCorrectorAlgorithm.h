@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCorrectorAlgorithmhIncluded
 
 #include "mitkImageToImageFilter.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkContour.h"
 #include "ipSegmentation.h"
 
@@ -47,7 +47,7 @@ namespace mitk
  * 
  * \sa CorrectorTool2D
  */
-class MitkExt_EXPORT CorrectorAlgorithm : public ImageToImageFilter
+class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
 {
   public:
 

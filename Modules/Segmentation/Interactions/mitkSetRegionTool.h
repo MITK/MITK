@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
 
 namespace mitk
@@ -44,7 +44,7 @@ class Image;
 
   $Author$
 */
-class MitkExt_EXPORT SetRegionTool : public FeedbackContourTool
+class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
     

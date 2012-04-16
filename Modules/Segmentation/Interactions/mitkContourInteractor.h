@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __ContourInteractor_H
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 
@@ -28,7 +28,7 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
-  class MitkExt_EXPORT ContourInteractor : public mitk::Interactor
+  class Segmentation_EXPORT ContourInteractor : public mitk::Interactor
   {
   public:
     mitkClassMacro(ContourInteractor, Interactor);

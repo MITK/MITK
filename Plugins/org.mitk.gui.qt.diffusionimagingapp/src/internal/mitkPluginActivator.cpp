@@ -35,7 +35,6 @@
 #include "src/internal/QmitkDIAppScreenshotsMoviesPerspective.h"
 #include "src/internal/QmitkDIAppTBSSPerspective.h"
 #include "src/internal/QmitkDIAppVolumeVisualizationPerspective.h"
-#include "src/internal/QmitkDIAppTrackingEvaluationPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -77,7 +76,6 @@ void mitkPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTrackingEvaluationPerspective, context)
 
   delete pluginListener;
   pluginListener = new berry::QCHPluginListener(context);

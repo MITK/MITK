@@ -48,13 +48,17 @@ class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 
+namespace mitk {
+class RenderingManager;
+}
+
 class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -92,6 +96,28 @@ public:
   mitk::SlicesSwiveller * GetSlicesSwiveller() const;
 
   bool GetGradientBackgroundFlag() const;
+
+  /*!
+  \brief Access node of widget plane 1
+  \return DataNode holding widget plane 1
+  */
+  mitk::DataNode::Pointer GetWidgetPlane1();
+  /*!
+  \brief Access node of widget plane 2
+  \return DataNode holding widget plane 2
+  */
+  mitk::DataNode::Pointer GetWidgetPlane2();
+  /*!
+  \brief Access node of widget plane 3
+  \return DataNode holding widget plane 3
+  */
+  mitk::DataNode::Pointer GetWidgetPlane3();
+  /*!
+  \brief Convenience method to access node of widget planes
+  \param id number of widget plane to be returned
+  \return DataNode holding widget plane 3
+  */
+  mitk::DataNode::Pointer GetWidgetPlane(int id);
 
   bool IsColoredRectanglesEnabled() const;
 
@@ -274,6 +300,8 @@ protected:
 
   int m_Layout;
   int m_PlaneMode;
+
+  mitk::RenderingManager* m_RenderingManager;
 
   mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering2;

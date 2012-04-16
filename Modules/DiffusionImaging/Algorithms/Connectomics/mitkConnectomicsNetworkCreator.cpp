@@ -84,8 +84,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
   vLines->InitTraversal();
 
-  //int numFibers = m_FiberBundle->GetNumFibers();
-  int numFibers= 10;
+  int numFibers = m_FiberBundle->GetNumFibers();
   for( int fiberID( 0 ); fiberID < numFibers; fiberID++ )
   {
     vtkIdType   numPointsInCell(0);
@@ -115,6 +114,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 
   // provide network with geometry
   m_ConNetwork->SetGeometry( m_Segmentation->GetGeometry() );
+  m_ConNetwork->UpdateBounds();
   m_ConNetwork->SetIsModified( true );
 
   MBI_INFO << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_INFO_NETWORK_CREATED;

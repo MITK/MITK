@@ -126,21 +126,21 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   //emit StartBlockControls();
 
   mitk::DataNode* n;
-  n = GetDataStorage()->GetNamedNode("widget1Plane");
+  n = this->m_MultiWidget->GetWidgetPlane1();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
 //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
   }
 
-  n = GetDataStorage()->GetNamedNode("widget2Plane");
+  n = this->m_MultiWidget->GetWidgetPlane2();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
 //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
   }
 
-  n = GetDataStorage()->GetNamedNode("widget3Plane");
+  n = this->m_MultiWidget->GetWidgetPlane3();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
@@ -160,21 +160,21 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   if (renderer != NULL)
     this->TakeScreenshot(renderer, 1, fileName+"/coronal.png");
 
-  n = GetDataStorage()->GetNamedNode("widget1Plane");
+  n = this->m_MultiWidget->GetWidgetPlane1();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 1,0,0 ) );
 //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
   }
 
-  n = GetDataStorage()->GetNamedNode("widget2Plane");
+  n = this->m_MultiWidget->GetWidgetPlane2();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 0,1,0 ) );
 //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
   }
 
-  n = GetDataStorage()->GetNamedNode("widget3Plane");
+  n = this->m_MultiWidget->GetWidgetPlane3();
   if(n)
   {
     n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );

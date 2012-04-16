@@ -231,10 +231,7 @@ void QmitkStdMultiWidgetEditor::EnableSlicingPlanes(bool enable)
 
 bool QmitkStdMultiWidgetEditor::IsSlicingPlanesEnabled() const
 {
-  // The QmitkStdMultiWidget has no API for this. Do a poor mans check.
-  mitk::DataStorage::Pointer ds = GetDataStorage();
-  if (ds.IsNull()) return false;
-  mitk::DataNode::Pointer node = ds->GetNamedNode("widget1Plane");
+  mitk::DataNode::Pointer node = this->d->m_StdMultiWidget->GetWidgetPlane1();
   if (node.IsNotNull())
   {
     bool visible = false;

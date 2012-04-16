@@ -1,0 +1,17 @@
+NRRD0004
+# Complete NRRD file format specification at:
+# http://teem.sourceforge.net/nrrd/format.html
+content: SomeIDNumber42
+type: short
+dimension: 3
+space: right-anterior-superior
+sizes: 3 3 1
+thicknesses: 1 1 1
+space directions: (1,0,0) (0,1,0) (0,0,1)
+centerings: cell cell cell
+kinds: space space space
+encoding: ASCII
+space units: "mm" "mm" "mm"
+space origin: (0,0,0)
+
+1 2 3 4 5 6 7 8 9

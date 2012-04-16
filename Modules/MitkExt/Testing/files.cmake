@@ -1,8 +1,6 @@
 set(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkBoundingObjectCutterTest.cpp
-  mitkContourMapper2DTest.cpp
-  mitkContourTest.cpp
   mitkCoreExtObjectFactoryTest
   mitkDataNodeExtTest.cpp
   mitkExternalToolsTest.cpp
@@ -23,7 +21,6 @@ set(MODULE_IMAGE_TESTS
   mitkCompressedImageContainerTest.cpp
   mitkCylindricToCartesianFilterTest.cpp
   #mitkExtractImageFilterTest.cpp
-  mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp
   mitkSurfaceToImageFilterTest.cpp
 )

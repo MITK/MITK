@@ -1,8 +1,4 @@
 set(CPP_FILES
-  Algorithms/mitkImageToContourFilter.cpp
-  Algorithms/mitkReduceContourSetFilter.cpp
-  Algorithms/mitkComputeContourSetNormalsFilter.cpp
-  Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
   Algorithms/mitkMaskAndCutRoiImageFilter.cpp
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
@@ -10,10 +6,7 @@ set(CPP_FILES
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
-  Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
-  Algorithms/mitkContourUtils.cpp
-  Algorithms/mitkCorrectorAlgorithm.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
@@ -26,7 +19,6 @@ set(CPP_FILES
   Algorithms/mitkLabeledImageToSurfaceFilter.cpp
   Algorithms/mitkLabeledImageVolumeCalculator.cpp
   Algorithms/mitkLookupTableSource.cpp
-  Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkMaskImageFilter.cpp
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
@@ -43,10 +35,6 @@ set(CPP_FILES
   Algorithms/mitkSurfaceIndexToWorldTransformFilter.cpp
   Algorithms/mitkPolygonToRingFilter.cpp
   Algorithms/mitkProbeFilter.cpp
-  Algorithms/mitkSegmentationSink.cpp
-  Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
-  Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
-  Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSimpleHistogram.cpp
   Algorithms/mitkSimpleUnstructuredGridHistogram.cpp
   Algorithms/mitkSurfaceToImageFilter.cpp
@@ -55,8 +43,6 @@ set(CPP_FILES
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
-  Controllers/mitkSegmentationInterpolationController.cpp
-  Controllers/mitkSurfaceInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp
@@ -70,8 +56,6 @@ set(CPP_FILES
   DataManagement/mitkColorSequenceRainbow.cpp
   DataManagement/mitkCompressedImageContainer.cpp
   DataManagement/mitkCone.cpp
-  DataManagement/mitkContour.cpp
-  DataManagement/mitkContourSet.cpp
   DataManagement/mitkCuboid.cpp
   DataManagement/mitkCylinder.cpp
   DataManagement/mitkDataStorageSelection.cpp
@@ -113,11 +97,8 @@ set(CPP_FILES
   IO/mitkVtkUnstructuredGridReader.cpp
   IO/mitkVtkVolumeTimeSeriesIOFactory.cpp
   IO/mitkVtkVolumeTimeSeriesReader.cpp
-  Interactions/mitkAutoSegmentationTool.cpp
   Interactions/mitkConferenceEventMapper.cpp
   Interactions/mitkConnectPointsInteractor.cpp
-  Interactions/mitkContourInteractor.cpp
-  Interactions/mitkContourTool.cpp
   #Interactions/mitkCoordinateSupplier.cpp
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
@@ -125,46 +106,25 @@ set(CPP_FILES
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkExtrudedContourInteractor.cpp
-  Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
-  Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
   Interactions/mitkSeedsInteractor.cpp
-  Interactions/mitkSegTool2D.cpp
-  Interactions/mitkSegmentationsProcessingTool.cpp
-  Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
-  Interactions/mitkAddContourTool.cpp
-  Interactions/mitkAutoCropTool.cpp
-  Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkCalculateGrayValueStatisticsTool.cpp
   Interactions/mitkCalculateVolumetryTool.cpp
-  Interactions/mitkCorrectorTool2D.cpp
-  Interactions/mitkCreateSurfaceTool.cpp
-  Interactions/mitkEraseRegionTool.cpp
-  Interactions/mitkFillRegionTool.cpp
-  Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkSubtractContourTool.cpp
-  Interactions/mitkDrawPaintbrushTool.cpp
-  Interactions/mitkErasePaintbrushTool.cpp
+#  Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkMorphologicTool.cpp
   Interactions/mitkErodeTool.cpp
   Interactions/mitkDilateTool.cpp
   Interactions/mitkOpeningTool.cpp
   Interactions/mitkClosingTool.cpp
-  Interactions/mitkBinaryThresholdULTool.cpp
   Interactions/mitkPixelManipulationTool.cpp
-  Interactions/mitkRegionGrow3DTool.cpp
-  Rendering/mitkContourMapper2D.cpp
-  Rendering/mitkContourSetMapper2D.cpp
-  Rendering/mitkContourSetVtkMapper3D.cpp
-  Rendering/mitkContourVtkMapper3D.cpp
   Rendering/mitkEnhancedPointSetVtkMapper3D.cpp
   Rendering/mitkImageBackground2D.cpp
   Rendering/mitkLineMapper2D.cpp

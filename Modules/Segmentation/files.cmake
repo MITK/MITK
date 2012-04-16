@@ -4,7 +4,7 @@ Algorithms/mitkComputeContourSetNormalsFilter.cpp
 Algorithms/mitkContourUtils.cpp
 Algorithms/mitkCorrectorAlgorithm.cpp
 Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
-Algorithms/mitkDiffImageApplier.cpp
+# Algorithms/mitkDiffImageApplier.cpp
 Algorithms/mitkImageToContourFilter.cpp
 Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
 Algorithms/mitkReduceContourSetFilter.cpp
@@ -14,7 +14,7 @@ Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
 Algorithms/mitkShowSegmentationAsSurface.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
-DataManagement/mitkApplyDiffImageOperation.cpp
+# DataManagement/mitkApplyDiffImageOperation.cpp
 DataManagement/mitkContour.cpp
 DataManagement/mitkContourInteractor.cpp
 DataManagement/mitkContourSet.cpp
@@ -25,6 +25,7 @@ Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp
 Interactions/mitkBinaryThresholdTool.cpp
 Interactions/mitkContourTool.cpp
+Interactions/mitkCreateSurfaceTool.cpp
 Interactions/mitkDrawPaintbrushTool.cpp
 Interactions/mitkErasePaintbrushTool.cpp
 Interactions/mitkEraseRegionTool.cpp

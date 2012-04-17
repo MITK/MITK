@@ -862,6 +862,11 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
         DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
       TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
         TensorReconstructionImageFilterType::New();
+
+
+      mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionContainerType::Pointer dirs = vols->GetDirections();
+      itk::VectorImage<DiffusionPixelType, 3>::Pointer img = vols->GetVectorImage();
+
       tensorReconstructionFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       tensorReconstructionFilter->SetBValue(vols->GetB_Value());
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreasholdEdit->text().toFloat() );
@@ -1308,9 +1313,9 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       clock.Stop();
       MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
-      itk::Vector<double,3> v;
-      v[0] = 0; v[1] = 0; v[2] = 0;
-      gradientList.push_back(v);
+      //itk::Vector<double,3> v;
+     // v[0] = 0; v[1] = 0; v[2] = 0;
+      //gradientList.push_back(v);
 
       // TENSORS TO DATATREE
       mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();

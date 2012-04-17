@@ -267,6 +267,18 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
   GradientDirectionContainerType::Pointer newOriginalDirs =
       CalcAveragedDirectionSet(precision, m_OriginalDirections);
 
+
+  for(GradientDirectionContainerType::ConstIterator gdcitNew = newDirs->Begin();
+    gdcitNew != newDirs->End(); ++gdcitNew)
+  {
+     GradientDirectionType g = gdcitNew.Value();
+     std::cout << g[0] << ' ' << g[1] << ' '<<g[2] << '\n';
+
+  }
+  std::cout << std::endl;
+
+
+
   // if sizes equal, we do not need to do anything in this function
   if(m_Directions->size() == newDirs->size() || m_OriginalDirections->size() == newOriginalDirs->size())
     return;
@@ -313,13 +325,13 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     }
   }
 
-  int ind1 = -1;
+  //int ind1 = -1;
   while(!newIt.IsAtEnd())
   {
 
     // progress
-    typename ImageType::IndexType ind = newIt.GetIndex();
-    ind1 = ind.m_Index[2];
+    //typename ImageType::IndexType ind = newIt.GetIndex();
+    //ind1 = ind.m_Index[2];
 
     // init new vector with zeros
     newVec.Fill(0.0);
@@ -335,6 +347,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
       {
         newVec[i] += oldVec[dirIndices[i].at(j)];
       }
+      std::cout << numavg << '\n';
       newVec[i] /= numavg;
     }
 
@@ -343,6 +356,8 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     ++newIt;
     ++oldIt;
   }
+
+  std::cout << std::endl;
 }
 
 template<typename TPixelType>

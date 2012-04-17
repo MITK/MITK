@@ -6,18 +6,18 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
-  QmitkDiffusionImagingAppPerspective.cpp
-  QmitkWelcomePerspective.cpp
-  QmitkDIAppConnectomicsPerspective.cpp
-  QmitkDIAppDicomImportPerspective.cpp
-  QmitkDIAppFiberTractographyPerspective.cpp
-  QmitkDIAppIVIMPerspective.cpp
-  QmitkDIAppPreprocessingReconstructionPerspective.cpp
-  QmitkDIAppQuantificationPerspective.cpp
-  QmitkDIAppScreenshotsMoviesPerspective.cpp
-  QmitkDIAppTBSSPerspective.cpp
-  QmitkDIAppVolumeVisualizationPerspective.cpp
-  QmitkDIAppTrackingEvaluationPerspective.cpp
+  Perspectives/QmitkDiffusionImagingAppPerspective.cpp
+  Perspectives/QmitkWelcomePerspective.cpp
+  Perspectives/QmitkDIAppConnectomicsPerspective.cpp
+  Perspectives/QmitkDIAppDicomImportPerspective.cpp
+  Perspectives/QmitkDIAppFiberTractographyPerspective.cpp
+  Perspectives/QmitkDIAppIVIMPerspective.cpp
+  Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.cpp
+  Perspectives/QmitkDIAppQuantificationPerspective.cpp
+  Perspectives/QmitkDIAppScreenshotsMoviesPerspective.cpp
+  Perspectives/QmitkDIAppTBSSPerspective.cpp
+  Perspectives/QmitkDIAppVolumeVisualizationPerspective.cpp
+  Perspectives/QmitkDIAppTrackingEvaluationPerspective.cpp
 )
 
 set(UI_FILES
@@ -28,18 +28,18 @@ set(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
   src/internal/mitkPluginActivator.h
   src/QmitkDiffusionImagingAppApplication.h
-  src/internal/QmitkDiffusionImagingAppPerspective.h
-  src/internal/QmitkWelcomePerspective.h
-  src/internal/QmitkDIAppConnectomicsPerspective.h
-  src/internal/QmitkDIAppDicomImportPerspective.h
-  src/internal/QmitkDIAppFiberTractographyPerspective.h
-  src/internal/QmitkDIAppIVIMPerspective.h
-  src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h
-  src/internal/QmitkDIAppQuantificationPerspective.h
-  src/internal/QmitkDIAppScreenshotsMoviesPerspective.h
-  src/internal/QmitkDIAppTBSSPerspective.h
-  src/internal/QmitkDIAppVolumeVisualizationPerspective.h
-  src/internal/QmitkDIAppTrackingEvaluationPerspective.h
+  src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
+  src/internal/Perspectives/QmitkWelcomePerspective.h
+  src/internal/Perspectives/QmitkDIAppConnectomicsPerspective.h
+  src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h
+  src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h
+  src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
+  src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h
+  src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h
+  src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h
+  src/internal/Perspectives/QmitkDIAppTBSSPerspective.h
+  src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h
+  src/internal/Perspectives/QmitkDIAppTrackingEvaluationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

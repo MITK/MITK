@@ -131,6 +131,10 @@ protected:
 
   virtual void NodeAdded(const mitk::DataNode *node);
 
+  bool IsPlaneRotated();
+
+  void SliceRotation(const itk::EventObject&);
+
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
@@ -163,6 +167,9 @@ protected:
   // for planarfigure and bundle handling:
   mitk::DataNode* m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
+
+  unsigned long m_SlicesRotationObserverTag1;
+  unsigned long m_SlicesRotationObserverTag2;
 };
 
 

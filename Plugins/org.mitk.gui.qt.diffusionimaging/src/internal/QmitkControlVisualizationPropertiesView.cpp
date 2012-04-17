@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 
 #include "mitkGeometry2D.h"
+#include "mitkSegTool2D.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -434,6 +435,19 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
+  if(m_SlicesRotationObserverTag1 )
+  {
+    mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
+    if( coordinator)
+      coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
+  }
+  if( m_SlicesRotationObserverTag2)
+  {
+    mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
+    if( coordinator )
+      coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
+  }
+
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
 }
 
@@ -529,6 +543,9 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls = new Ui::QmitkControlVisualizationPropertiesViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    // hide warning (ODFs in rotated planes)
+    m_Controls->m_lblRotatedPlanesWarning->hide();
 
     m_MyMenu = new QMenu(parent);
     connect( m_MyMenu, SIGNAL( aboutToShow() ), this, SLOT(OnMenuAboutToShow()) );
@@ -683,7 +700,45 @@ void QmitkControlVisualizationPropertiesView::OnMenuAboutToShow ()
 void QmitkControlVisualizationPropertiesView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
+
+  if (m_MultiWidget)
+  {
+    mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
+    if (coordinator)
+    {
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SliceRotation );
+      m_SlicesRotationObserverTag1 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
+    }
+
+    coordinator = m_MultiWidget->GetSlicesSwiveller();
+    if (coordinator)
+    {
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SliceRotation );
+      m_SlicesRotationObserverTag2 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
+    }
+  }
 }
+
+void QmitkControlVisualizationPropertiesView::SliceRotation(const itk::EventObject&)
+{
+  // test if plane rotated
+  if( m_GlyIsOn_T || m_GlyIsOn_C || m_GlyIsOn_S )
+  {
+    if( this->IsPlaneRotated() )
+    {
+      // show label
+      m_Controls->m_lblRotatedPlanesWarning->show();
+    }
+    else
+    {
+      //hide label
+      m_Controls->m_lblRotatedPlanesWarning->hide();
+    }
+  }
+}
+
 
 void QmitkControlVisualizationPropertiesView::StdMultiWidgetNotAvailable()
 {
@@ -1075,6 +1130,26 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
   VisibleOdfsON(2);
+}
+
+bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
+{
+
+  // for all 2D renderwindows of m_MultiWidget check alignment
+  mitk::PlaneGeometry::ConstPointer displayPlane = dynamic_cast<const mitk::PlaneGeometry*>( m_MultiWidget->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D() );
+  if (displayPlane.IsNull()) return false;
+
+  mitk::Image* currentImage = dynamic_cast<mitk::Image* >( m_NodeUsedForOdfVisualization->GetData() );
+  if( currentImage == NULL )
+  {
+    MITK_ERROR << " Casting problems. Returning false";
+    return false;
+  }
+
+  int affectedDimension(-1);
+  int affectedSlice(-1);
+  return !(mitk::SegTool2D::DetermineAffectedImageSlice( currentImage, displayPlane, affectedDimension, affectedSlice ));
+
 }
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON(int view)

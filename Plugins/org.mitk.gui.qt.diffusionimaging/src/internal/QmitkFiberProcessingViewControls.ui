@@ -15,16 +15,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
-    <number>5</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <property name="rightMargin">
-    <number>5</number>
+    <number>9</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
@@ -71,7 +71,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw circular ROI" extracomment="Draw circular ROI">Draw circular ROI</string>
+            <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -103,7 +103,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw rectangular ROI" extracomment="Draw rectangular ROI">Draw rectangular ROI</string>
+            <string>Draw rectangular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -135,7 +135,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw polygonal ROI" extracomment="Draw polygonal ROI">Draw polygonal ROI</string>
+            <string>Draw polygonal ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -209,7 +209,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Extract fibers passing through selected ROI or composite ROI" extracomment="Extract fibers passing through selected ROI or composite ROI">Extract fibers passing through selected ROI or composite ROI</string>
+            <string>Extract fibers passing through selected ROI or composite ROI. Select ROI and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Extract</string>
@@ -239,7 +239,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common" extracomment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common">Returns fiber bundle containing all fibers the two selected bundles dont't have in common</string>
+            <string>Returns all fibers contained in bundle X that are not contained in bundle Y (not commutative!). Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>Substract</string>
@@ -269,7 +269,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Generate a binary image containing all selected ROIs" extracomment="Generate a binary image containing all selected ROIs">Generate a binary image containing all selected ROIs</string>
+            <string>Merge selected fiber bundles. Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>ROI Image</string>
@@ -299,7 +299,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Merge selected fiber bundles" extracomment="Merge selected fiber bundles">Merge selected fiber bundles</string>
+            <string>Extract fibers passing through selected surface mesh. Select surface mesh and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Join</string>
@@ -342,7 +342,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Extract fibers passing through selected surface mesh" extracomment="Extract fibers passing through selected surface mesh">Extract fibers passing through selected surface mesh</string>
+            <string>Generate a binary image containing all selected ROIs. Select at least one ROI (planar figure) and a reference fiber bundle or image.</string>
            </property>
            <property name="text">
             <string>Extract 3D</string>
@@ -538,7 +538,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string comment="Perform selected operation on fiber bundle" extracomment="Perform selected operation on fiber bundle">Perform selected operation on fiber bundle</string>
+         <string>Perform selected operation on all selected fiber bundles.</string>
         </property>
         <property name="text">
          <string>Generate</string>

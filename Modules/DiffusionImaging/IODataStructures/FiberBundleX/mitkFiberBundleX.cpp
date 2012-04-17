@@ -290,7 +290,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
       vNewLines->InsertNextCell(container);
     }
   }
-
+  if(vNewLines->GetNumberOfCells()==0)
+    return NULL;
   // initialize polydata
   vNewPolyData->SetPoints(vNewPoints);
   vNewPolyData->SetLines(vNewLines);

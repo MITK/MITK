@@ -74,7 +74,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Draw circular ROI.</string>
+            <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -106,7 +106,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Draw rectangular ROI.</string>
+            <string>Draw rectangular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -138,7 +138,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Draw polygonal ROI.</string>
+            <string>Draw polygonal ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -212,7 +212,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Extract fibers passing through selected ROI or composite ROI.</string>
+            <string>Extract fibers passing through selected ROI or composite ROI. Select ROI and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Extract</string>
@@ -242,7 +242,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Returns fiber bundle containing all fibers the two selected bundles dont't have in common.</string>
+            <string>Returns all fibers contained in bundle X that are not contained in bundle Y (not commutative!). Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>Substract</string>
@@ -272,7 +272,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Merge selected fiber bundles.</string>
+            <string>Merge selected fiber bundles. Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>Join</string>
@@ -315,7 +315,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Extract fibers passing through selected surface mesh.</string>
+            <string>Extract fibers passing through selected surface mesh. Select surface mesh and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Extract 3D</string>
@@ -345,7 +345,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Generate a binary image containing all selected ROIs.</string>
+            <string>Generate a binary image containing all selected ROIs. Select at least one ROI (planar figure) and a reference fiber bundle or image.</string>
            </property>
            <property name="text">
             <string>ROI Image</string>
@@ -541,7 +541,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Perform selected operation on fiber bundle.</string>
+         <string>Perform selected operation on all selected fiber bundles.</string>
         </property>
         <property name="text">
          <string>Generate</string>

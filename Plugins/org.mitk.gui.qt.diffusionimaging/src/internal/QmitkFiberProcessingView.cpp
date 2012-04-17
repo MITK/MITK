@@ -1428,7 +1428,14 @@ void QmitkFiberProcessingView::SubstractBundles()
   for (it; it!=m_SelectedFB.end(); ++it)
   {
     newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
+    if (newBundle.IsNull())
+      break;
     name += "-"+QString((*it)->GetName().c_str());
+  }
+  if (newBundle.IsNull())
+  {
+    QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers. Did you select the fiber bundles in the correct order? X-Y is not equal to Y-X!");
+    return;
   }
 
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();

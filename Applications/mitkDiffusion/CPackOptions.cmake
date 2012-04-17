@@ -4,7 +4,7 @@ set(CPACK_PACKAGE_EXECUTABLES "mitkDiffusion;MITK Diffusion")
 set(CPACK_PACKAGE_NAME "MITK-Diffusion")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK application for processing of MR diffusion imaging data.")
 # Major version is the year of release
-set(CPACK_PACKAGE_VERSION_MAJOR "2011")
+set(CPACK_PACKAGE_VERSION_MAJOR "2012")
 # Minor version is assigned depending on the number of releases that year, order is "", "a", "b"..., "z"
 set(CPACK_PACKAGE_VERSION_MINOR "")
 # Patch versioning is not intended to be done
@@ -14,8 +14,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "")
 # version has to be set explicitly to avoid such things as CMake creating the install directory "MITK Diffusion 2011.."
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}${CPACK_PACKAGE_VERSION_MINOR}")
 
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${MITK_SOURCE_DIR}/DiffusionCopyright.txt")
-set(CPACK_RESOURCE_FILE_LICENSE "${MITK_SOURCE_DIR}/DiffusionCopyright.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/Copyright.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/Copyright.txt")
 
 if(CMAKE_CL_64)
   set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-win64")

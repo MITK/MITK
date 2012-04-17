@@ -46,8 +46,6 @@ const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.di
 
 using namespace berry;
 
-const float QmitkDiffusionQuantificationView::m_ScaleDAIValues = 100;
-
 struct DqSelListener : ISelectionListener
 {
 
@@ -369,42 +367,36 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
         newname.append("GFA");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 1:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_HIGH_LOW);
         newname.append("01");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 2:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_HIGH);
         newname.append("02");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 3:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_MAX_ODF_VALUE);
         newname.append("03");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 4:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_DECONVOLUTION_COEFFS);
         newname.append("04");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 5:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_MAX_NORMALIZED_STANDARD);
         newname.append("05");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 6:
@@ -417,35 +409,30 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_NEMATIC_ORDER_PARAMETER);
         newname.append("07");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 8:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_LOW_HIGH);
         newname.append("08");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 9:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_LOW);
         newname.append("09");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 10:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_ODF_VALUE);
         newname.append("10");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 11:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_STD_BY_MAX);
         newname.append("11");
-        scale = m_ScaleDAIValues;
         break;
       }
     case 12:
@@ -458,7 +445,6 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         newname.append(paramString.toAscii());
         gfaFilter->SetParam1(p1);
         gfaFilter->SetParam2(p2);
-        scale = m_ScaleDAIValues;
         break;
       }
     case 13:
@@ -469,14 +455,12 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         newname.append(paramString.toAscii());
         gfaFilter->SetParam1(p1);
         gfaFilter->SetParam2(p2);
-        scale = m_ScaleDAIValues;
         break;
       }
     default:
       {
         newname.append("0");
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
-        scale = m_ScaleDAIValues;
       }
     }
     gfaFilter->Update();
@@ -500,7 +484,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     for (it = it.Begin(); !it.IsAtEnd(); ++it)
     {
       GfaFilterType::OutputImageType::PixelType val = it.Get();
-      ot.Set(val * scale);
+      ot.Set(val * m_Controls->m_ScaleImageValuesBox->value());
       ++ot;
     }
 
@@ -567,7 +551,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     ShiftScaleFilterType::Pointer multi =
       ShiftScaleFilterType::New();
     multi->SetShift(0.0);
-    multi->SetScale(m_ScaleDAIValues);//itk::NumericTraits<RealValueType>::max()
+    multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());//itk::NumericTraits<RealValueType>::max()
 
     typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
 

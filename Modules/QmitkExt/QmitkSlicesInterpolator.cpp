@@ -901,18 +901,17 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
       {
         mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
         
-        std::string s;
-        if ( renderer->GetCurrentWorldGeometry2DNode() && renderer->GetCurrentWorldGeometry2DNode()->GetName(s) )
+        if ( renderer->GetCurrentWorldGeometry2DNode() )
         {
-          if (s == "widget1Plane")
+          if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane1() )
           {
             TranslateAndInterpolateChangedSlice( event, 2 );
           }
-          else if (s == "widget2Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane2() )
           {
             TranslateAndInterpolateChangedSlice( event, 0 );
           }
-          else if (s == "widget3Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane3() )
           {
             TranslateAndInterpolateChangedSlice( event, 1 );
           }

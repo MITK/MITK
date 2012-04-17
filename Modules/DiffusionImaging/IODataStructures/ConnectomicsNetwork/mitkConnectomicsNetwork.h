@@ -156,6 +156,9 @@ namespace mitk {
     /** Set the modified flag */
     void SetIsModified( bool );
 
+    /** Update the bounds of the geometry to fit the network */
+    void UpdateBounds( );
+
   protected:
     ConnectomicsNetwork();
     virtual ~ConnectomicsNetwork();

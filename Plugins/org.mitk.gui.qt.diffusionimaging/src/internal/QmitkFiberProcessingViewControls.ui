@@ -14,17 +14,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
-    <number>5</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <property name="rightMargin">
-    <number>5</number>
+    <number>9</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
@@ -71,7 +74,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw circular ROI" extracomment="Draw circular ROI">Draw circular ROI</string>
+            <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -103,7 +106,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw rectangular ROI" extracomment="Draw rectangular ROI">Draw rectangular ROI</string>
+            <string>Draw rectangular ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -135,7 +138,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Draw polygonal ROI" extracomment="Draw polygonal ROI">Draw polygonal ROI</string>
+            <string>Draw polygonal ROI. Select reference fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string/>
@@ -209,7 +212,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Extract fibers passing through selected ROI or composite ROI" extracomment="Extract fibers passing through selected ROI or composite ROI">Extract fibers passing through selected ROI or composite ROI</string>
+            <string>Extract fibers passing through selected ROI or composite ROI. Select ROI and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Extract</string>
@@ -239,40 +242,10 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common" extracomment="Returns fiber bundle containing all fibers the two selected bundles dont't have in common">Returns fiber bundle containing all fibers the two selected bundles dont't have in common</string>
+            <string>Returns all fibers contained in bundle X that are not contained in bundle Y (not commutative!). Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>Substract</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>11</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string comment="Generate a binary image containing all selected ROIs" extracomment="Generate a binary image containing all selected ROIs">Generate a binary image containing all selected ROIs</string>
-           </property>
-           <property name="text">
-            <string>ROI Image</string>
            </property>
           </widget>
          </item>
@@ -299,7 +272,7 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Merge selected fiber bundles" extracomment="Merge selected fiber bundles">Merge selected fiber bundles</string>
+            <string>Merge selected fiber bundles. Select at least two fiber bundles to execute.</string>
            </property>
            <property name="text">
             <string>Join</string>
@@ -319,7 +292,7 @@
            </property>
           </spacer>
          </item>
-         <item row="2" column="0">
+         <item row="0" column="1">
           <widget class="QCommandLinkButton" name="m_Extract3dButton">
            <property name="enabled">
             <bool>false</bool>
@@ -342,10 +315,40 @@
             </font>
            </property>
            <property name="toolTip">
-            <string comment="Extract fibers passing through selected surface mesh" extracomment="Extract fibers passing through selected surface mesh">Extract fibers passing through selected surface mesh</string>
+            <string>Extract fibers passing through selected surface mesh. Select surface mesh and fiber bundle to execute.</string>
            </property>
            <property name="text">
             <string>Extract 3D</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Generate a binary image containing all selected ROIs. Select at least one ROI (planar figure) and a reference fiber bundle or image.</string>
+           </property>
+           <property name="text">
+            <string>ROI Image</string>
            </property>
           </widget>
          </item>
@@ -407,7 +410,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Create AND composition with selected ROIs" extracomment="Create AND composition with selected ROIs">Create AND composition with selected ROIs</string>
+            <string>Create AND composition with selected ROIs.</string>
            </property>
            <property name="text">
             <string>AND</string>
@@ -426,7 +429,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Create OR composition with selected ROIs" extracomment="Create OR composition with selected ROIs">Create OR composition with selected ROIs</string>
+            <string>Create OR composition with selected ROIs.</string>
            </property>
            <property name="text">
             <string>OR</string>
@@ -445,7 +448,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string comment="Create NOT composition from selected ROI" extracomment="Create NOT composition from selected ROI">Create NOT composition from selected ROI</string>
+            <string>Create NOT composition from selected ROI.</string>
            </property>
            <property name="text">
             <string>NOT</string>
@@ -502,7 +505,7 @@
       <item row="0" column="1">
        <widget class="QSpinBox" name="m_UpsamplingSpinBox">
         <property name="toolTip">
-         <string>Upsampling Factor</string>
+         <string>Upsampling factor</string>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -538,7 +541,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string comment="Perform selected operation on fiber bundle" extracomment="Perform selected operation on fiber bundle">Perform selected operation on fiber bundle</string>
+         <string>Perform selected operation on all selected fiber bundles.</string>
         </property>
         <property name="text">
          <string>Generate</string>
@@ -548,7 +551,7 @@
       <item row="1" column="1">
        <widget class="QCheckBox" name="m_InvertCheckbox">
         <property name="toolTip">
-         <string comment="If selected operation generates an image, the inverse image is returned" extracomment="If selected operation generates an image, the inverse image is returned">If selected operation generates an image, the inverse image is returned</string>
+         <string>If selected operation generates an image, the inverse image is returned.</string>
         </property>
         <property name="text">
          <string>Invert</string>
@@ -578,7 +581,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Resample fibers using a Kochanek spline interpolation</string>
+         <string>Resample fibers using a Kochanek spline interpolation.</string>
         </property>
         <property name="text">
          <string>Smooth Fibers</string>

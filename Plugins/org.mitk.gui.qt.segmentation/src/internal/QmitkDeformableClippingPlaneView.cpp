@@ -370,11 +370,11 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   // set crosshair invisible
   mitk::DataNode* dataNode;
 
-  dataNode = this->GetDataStorage()->GetNamedNode("widget1Plane");
+  dataNode = this->m_MultiWidget->GetWidgetPlane1();
   if(dataNode) dataNode->SetVisibility(false);
-  dataNode = this->GetDataStorage()->GetNamedNode("widget2Plane");
+  dataNode = this->m_MultiWidget->GetWidgetPlane2();
   if(dataNode) dataNode->SetVisibility(false);
-  dataNode = this->GetDataStorage()->GetNamedNode("widget3Plane");
+  dataNode = this->m_MultiWidget->GetWidgetPlane3();
   if(dataNode) dataNode->SetVisibility(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

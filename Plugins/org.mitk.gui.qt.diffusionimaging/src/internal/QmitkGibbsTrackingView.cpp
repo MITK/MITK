@@ -94,11 +94,10 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_QBallImageNode(NULL)
   , m_ItkQBallImage(NULL)
   , m_FiberBundleNode(NULL)
+  , m_MaskImageNode(NULL)
   , m_TrackingWorker(this)
-  , m_QBallSelected(false)
   , m_Iterations(10000000)
   , m_LastStep(0)
-  , m_SaveCounter(0)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -144,31 +143,25 @@ void QmitkGibbsTrackingView::AfterThread()
   mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
   UpdateGUI();
   UpdateTrackingStatus();
-  GenerateFiberBundle(true);
-  QString paramMessage;
+
   if(m_Controls->m_ParticleWeightSlider->value()==0)
   {
     m_Controls->m_ParticleWeightLabel->setText(QString::number(m_GlobalTracker->GetParticleWeight()));
     m_Controls->m_ParticleWeightSlider->setValue(m_GlobalTracker->GetParticleWeight()*10000);
-    paramMessage += "Particle weight was set to " + QString::number(m_GlobalTracker->GetParticleWeight()) + "\n";
   }
   if(m_Controls->m_ParticleWidthSlider->value()==0)
   {
     m_Controls->m_ParticleWidthLabel->setText(QString::number(m_GlobalTracker->GetParticleWidth()));
     m_Controls->m_ParticleWidthSlider->setValue(m_GlobalTracker->GetParticleWidth()*10);
-    paramMessage += "Particle width was set to " + QString::number(m_GlobalTracker->GetParticleWidth()) + " mm\n";
   }
   if(m_Controls->m_ParticleLengthSlider->value()==0)
   {
     m_Controls->m_ParticleLengthLabel->setText(QString::number(m_GlobalTracker->GetParticleLength()));
     m_Controls->m_ParticleLengthSlider->setValue(m_GlobalTracker->GetParticleLength()*10);
-    paramMessage += "Particle length was set to " + QString::number(m_GlobalTracker->GetParticleLength()) + " mm\n";
   }
 
+  GenerateFiberBundle(true);
   m_FiberBundleNode = NULL;
-
-  if (paramMessage.length()>0)
-    QMessageBox::information(NULL, "Automatically selected parameters", paramMessage);
 }
 
 // start tracking timer and update gui elements before tracking is started
@@ -198,7 +191,6 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
     connect( m_Controls->m_TrackingStop, SIGNAL(clicked()), this, SLOT(StopGibbsTracking()) );
     connect( m_Controls->m_TrackingStart, SIGNAL(clicked()), this, SLOT(StartGibbsTracking()) );
-    connect( m_Controls->m_SetMaskButton, SIGNAL(clicked()), this, SLOT(SetMask()) );
     connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
     connect( m_Controls->m_SaveTrackingParameters, SIGNAL(clicked()), this, SLOT(SaveTrackingParameters()) );
     connect( m_Controls->m_LoadTrackingParameters, SIGNAL(clicked()), this, SLOT(LoadTrackingParameters()) );
@@ -329,7 +321,11 @@ void QmitkGibbsTrackingView::StdMultiWidgetNotAvailable()
 // called if datamanager selection changes
 void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  m_QBallSelected = false;
+  if (m_ThreadIsRunning)
+    return;
+
+  m_QBallImageNode = NULL;
+  m_MaskImageNode = NULL;
 
   // iterate all selected objects
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -337,9 +333,13 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     mitk::DataNode::Pointer node = *it;
 
     if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
-    {
-      m_QBallSelected = true;
       m_QBallImageNode = node;
+    else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    {
+      bool isBinary = false;
+      node->GetPropertyValue<bool>("binary", isBinary);
+      if (isBinary)
+        m_MaskImageNode = node;
     }
   }
 
@@ -370,12 +370,20 @@ void QmitkGibbsTrackingView::UpdateTrackingStatus()
 // update gui elements (enable/disable elements and set tooltips)
 void QmitkGibbsTrackingView::UpdateGUI()
 {
-  if (!m_ThreadIsRunning && m_QBallSelected)
+  if (m_QBallImageNode.IsNotNull())
+    m_Controls->m_QballImageLabel->setText(m_QBallImageNode->GetName().c_str());
+  else
+    m_Controls->m_QballImageLabel->setText("-");
+  if (m_MaskImageNode.IsNotNull())
+    m_Controls->m_MaskImageLabel->setText(m_MaskImageNode->GetName().c_str());
+  else
+    m_Controls->m_MaskImageLabel->setText("-");
+
+  if (!m_ThreadIsRunning && m_QBallImageNode.IsNotNull())
   {
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStart->setEnabled(true);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
-    m_Controls->m_MaskFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -387,7 +395,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(true);
-    m_Controls->m_MaskFrame->setEnabled(true);
     m_Controls->m_IterationsSlider->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
@@ -399,7 +406,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStop->setEnabled(true);
     m_Controls->m_TrackingStart->setEnabled(false);
     m_Controls->m_LoadTrackingParameters->setEnabled(false);
-    m_Controls->m_MaskFrame->setEnabled(false);
     m_Controls->m_IterationsSlider->setEnabled(false);
     m_Controls->m_AdvancedFrame->setEnabled(false);
     m_Controls->m_AdvancedFrame->setVisible(false);
@@ -422,7 +428,7 @@ void QmitkGibbsTrackingView::SetMask()
   if (nodes.empty())
   {
     m_MaskImageNode = NULL;
-    m_Controls->m_MaskImageEdit->setText("N/A");
+    m_Controls->m_MaskImageLabel->setText("-");
     return;
   }
 
@@ -435,7 +441,7 @@ void QmitkGibbsTrackingView::SetMask()
     if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
     {
       m_MaskImageNode = node;
-      m_Controls->m_MaskImageEdit->setText(node->GetName().c_str());
+      m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
       return;
     }
   }
@@ -462,7 +468,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     return;
   }
 
-  if (!m_QBallSelected)
+  if (m_QBallImageNode.IsNull())
   {
     // Nothing selected. Inform the user and return
     QMessageBox::information( NULL, "Warning", "Please load and select a qball image before starting image processing.");
@@ -486,7 +492,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   // mask image found?
   // catch exceptions thrown by the itkAccess macros
   try{
-    if(m_Controls->m_MaskImageEdit->text().compare("N/A") != 0)
+    if(m_MaskImageNode.IsNotNull())
     {
       m_MaskImage = 0;
       if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
@@ -528,8 +534,6 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   m_LastStep = 1;
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
-  m_SaveCounter = 0;
-
   // start worker thread
   m_TrackingThread.start(QThread::LowestPriority);
 }
@@ -566,23 +570,18 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
   if (!m_OutputFileName.isEmpty())
   {
     QString filename = m_OutputFileName;
-    if (m_SaveCounter>0 && m_Controls->m_SaveIntermediateCheckbox->isChecked())
-    {
-      filename = QString(itksys::SystemTools::GetFilenamePath(filename.toStdString()).c_str())+"/"+QString(itksys::SystemTools::GetFilenameWithoutExtension(filename.toStdString()).c_str());
-      filename += "_"+QString::number(m_SaveCounter)+".fib";
-    }
     mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
     writer->SetFileName(filename.toStdString());
     writer->SetInputFiberBundleX(m_FiberBundle.GetPointer());
     try
     {
-      MITK_INFO << "Saving " << filename.toStdString();
       writer->Update();
-      m_SaveCounter++;
+      QMessageBox::information(NULL, "Fiber bundle saved to", filename);
     }
     catch (itk::ExceptionObject &ex)
     {
-      MITK_ERROR << QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()).toStdString();
+      QMessageBox::information(NULL, "Fiber bundle could not be saved", QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
+
       if(m_QBallImageNode.IsNull())
         GetDataStorage()->Add(m_FiberBundleNode);
       else
@@ -608,7 +607,6 @@ void QmitkGibbsTrackingView::SetOutputFile()
     m_Controls->m_OutputFileLabel->setText("N/A");
   else
     m_Controls->m_OutputFileLabel->setText(m_OutputFileName);
-  m_SaveCounter = 0;
 }
 
 // save current tracking paramters as xml file (.gtp)

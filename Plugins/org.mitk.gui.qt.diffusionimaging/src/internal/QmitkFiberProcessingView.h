@@ -67,8 +67,8 @@ class QmitkFiberProcessingView : public QmitkFunctionality
 
 public:
 
-  typedef itk::Image< unsigned char, 3 >    UCharImageType;
-  typedef itk::Image< float, 3 >            FloatImageType;
+  typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
+  typedef itk::Image< float, 3 >            itkFloatImageType;
 
   static const std::string VIEW_ID;
 
@@ -179,8 +179,8 @@ private:
   mitk::Image::Pointer            m_InternalImage;
   mitk::PlanarFigure::Pointer     m_PlanarFigure;
   float                           m_UpsamplingFactor;
-  UCharImageType::Pointer         m_InternalImageMask3D;
-  UCharImageType::Pointer         m_PlanarFigureImage;
+  itkUCharImageType::Pointer         m_InternalImageMask3D;
+  itkUCharImageType::Pointer         m_PlanarFigureImage;
   std::vector<mitk::Surface::Pointer> m_Surfaces;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);

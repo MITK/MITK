@@ -720,25 +720,67 @@ add_subdirectory(Documentation)
 
 
 # set MITK cpack variables
+# These are the default variables, which can be overwritten ( see below )
 include(mitkSetupCPack)
 
-if(MITK_BUILD_org.mitk.gui.qt.application)
-  list(APPEND CPACK_CREATE_DESKTOP_LINKS "CoreApp")
-endif()
-if(MITK_BUILD_org.mitk.gui.qt.extapplication)
-  list(APPEND CPACK_CREATE_DESKTOP_LINKS "ExtApp")
+include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
+
+# Check how many apps have been enabled
+# If more than one app has been activated, the we use the 
+# default CPack configuration. Otherwise that apps configuration
+# will be used, if present.
+
+set( activated_apps_no 0 )
+set( use_project_cpack NOT ${MITK_BUILD_ALL_APPS} )
+set( use_default_config ON )
+
+foreach(mitk_app ${MITK_APPS})
+  # extract option_name
+  string(REPLACE "^^" "\\;" target_info ${mitk_app})
+  set(target_info_list ${target_info})
+  list(GET target_info_list 1 option_name)
+  # check if the application is enabled
+  if(${option_name})
+    MATH( EXPR activated_apps_no "${activated_apps_no} + 1" )
+  endif()
+endforeach()
+
+if( NOT activated_apps_no EQUAL 1 )
+  set( use_project_cpack OFF )
 endif()
 
-if(MITK_BUILD_org.mitk.gui.qt.diffusionimagingapp)
-  include(CMake/CPackOptionsDiffusion.cmake)
-  configure_file(${PROJECT_SOURCE_DIR}/CMake/CPackDiffusionConfig.cmake.in ${PROJECT_BINARY_DIR}/CPackDiffusionConfig.cmake @ONLY)
-  set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackDiffusionConfig.cmake")
-endif()
+foreach(mitk_app ${MITK_APPS})
+  # extract target_dir and option_name
+  string(REPLACE "^^" "\\;" target_info ${mitk_app})
+  set(target_info_list ${target_info})
+  list(GET target_info_list 0 target_dir)
+  list(GET target_info_list 1 option_name)
+  # check if the application is enabled
+  if( ${option_name} )
+    # check whether application specific configuration files will be used
+	if ( use_project_cpack )
+	  # use files if they exist
+      if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )
+	    include( "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake" )
+      endif()
+	  
+	  if( EXISTS "${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in" )
+	    configure_file(${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in ${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake @ONLY)
+        set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake")
+		set( use_default_config OFF )
+      endif()
+	endif()
+	# add link to the list
+	list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+  endif()
+endforeach()
 
-
-configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
+# if no project specific configuration file was used, use default
+if( use_default_config )
+  configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
                ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+  set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+endif()
 
 # include CPack model once all variables are set
 include(CPack)

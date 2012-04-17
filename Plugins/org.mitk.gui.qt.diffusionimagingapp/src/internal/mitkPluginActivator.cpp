@@ -22,20 +22,20 @@
 
 #include "src/QmitkDiffusionImagingAppApplication.h"
 
-#include "QmitkWelcomePerspective.h"
+#include "src/internal/Perspectives/QmitkWelcomePerspective.h"
 #include "src/internal/QmitkDiffusionImagingAppIntroPart.h"
-#include "src/internal/QmitkDiffusionImagingAppPerspective.h"
+#include "src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h"
 
-#include "src/internal/QmitkDIAppConnectomicsPerspective.h"
-#include "src/internal/QmitkDIAppDicomImportPerspective.h"
-#include "src/internal/QmitkDIAppFiberTractographyPerspective.h"
-#include "src/internal/QmitkDIAppIVIMPerspective.h"
-#include "src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h"
-#include "src/internal/QmitkDIAppQuantificationPerspective.h"
-#include "src/internal/QmitkDIAppScreenshotsMoviesPerspective.h"
-#include "src/internal/QmitkDIAppTBSSPerspective.h"
-#include "src/internal/QmitkDIAppVolumeVisualizationPerspective.h"
-#include "src/internal/QmitkDIAppTrackingEvaluationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppConnectomicsPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppTBSSPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppTrackingEvaluationPerspective.h"
 
 #include <QFileInfo>
 #include <QDateTime>

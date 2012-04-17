@@ -1313,10 +1313,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       clock.Stop();
       MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
-      //itk::Vector<double,3> v;
-     // v[0] = 0; v[1] = 0; v[2] = 0;
-      //gradientList.push_back(v);
-
       // TENSORS TO DATATREE
       mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
       image->SetVectorImage( filter->GetOutput() );

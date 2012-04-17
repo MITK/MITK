@@ -644,6 +644,9 @@
          </property>
          <item>
           <widget class="QSlider" name="m_NumberBinsSlider">
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="maximum">
             <number>100</number>
            </property>

@@ -2016,6 +2016,8 @@ void QmitkPartialVolumeAnalysisView::NodeChanged(const mitk::DataNode* /*node*/)
 
 void QmitkPartialVolumeAnalysisView::NodeRemoved(const mitk::DataNode* node)
 {
+  if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+    GetDefaultDataStorage()->Remove(m_ClusteringResult);
 
   if(  node == m_SelectedPlanarFigureNodes->GetNode().GetPointer()
     || node == m_SelectedMaskNode.GetPointer() )

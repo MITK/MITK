@@ -149,12 +149,9 @@ private:
   QTimer*         m_TrackingTimer;
   QTime           m_TrackingTime;
   unsigned long   m_ElapsedTime;
-  bool            m_QBallSelected;
-  bool            m_FibSelected;
   unsigned long   m_Iterations;
   int             m_LastStep;
   QString         m_OutputFileName;
-  int m_SaveCounter;
 
   // global tracker and friends
   itk::SmartPointer<GibbsTrackingFilterType> m_GlobalTracker;

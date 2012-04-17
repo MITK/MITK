@@ -20,6 +20,15 @@
    <string>QmitkTemplate</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
+   <property name="topMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -66,7 +75,7 @@
       <item row="0" column="1">
        <widget class="QSlider" name="m_MaxTractLengthSlider">
         <property name="toolTip">
-         <string comment="Maximum tract length in voxel" extracomment="Maximum tract length in voxel">Maximum tract length in voxel</string>
+         <string>Maximum tract length in #voxel.</string>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -85,7 +94,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="m_MaxTractLengthLabel">
         <property name="toolTip">
-         <string>Length of single tracts</string>
+         <string>Maximum tract length in #voxel.</string>
         </property>
         <property name="text">
          <string>Max. Tract Length: 100</string>
@@ -95,7 +104,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="m_SeedsPerVoxelLabel">
         <property name="toolTip">
-         <string>Number of tracts for each seedpoint</string>
+         <string>Number of tracts started in each voxel of the seed ROI.</string>
         </property>
         <property name="text">
          <string>Seeds per Voxel: 1</string>
@@ -105,7 +114,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="m_MaxCacheSizeLabel">
         <property name="toolTip">
-         <string>Likelihood cache in Megabytes</string>
+         <string>Likelihood cache in Megabytes.</string>
         </property>
         <property name="text">
          <string>Max. Chache Size: 1GB</string>
@@ -115,7 +124,7 @@
       <item row="1" column="1">
        <widget class="QSlider" name="m_SeedsPerVoxelSlider">
         <property name="toolTip">
-         <string comment="Number of tracts started in each voxel of the seed ROI" extracomment="Number of tracts started in each voxel of the seed ROI">Number of tracts started in each voxel of the seed ROI</string>
+         <string>Number of tracts started in each voxel of the seed ROI.</string>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -130,6 +139,9 @@
       </item>
       <item row="2" column="1">
        <widget class="QSlider" name="m_MaxCacheSizeSlider">
+        <property name="toolTip">
+         <string>Likelihood cache in Megabytes.</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>

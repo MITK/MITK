@@ -116,8 +116,6 @@ set(CPP_FILES
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
-  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
-  Interactions/mitkCalculateVolumetryTool.cpp
 #  Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkMorphologicTool.cpp
   Interactions/mitkErodeTool.cpp

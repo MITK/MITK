@@ -22,6 +22,8 @@ Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp
 Interactions/mitkBinaryThresholdTool.cpp
+Interactions/mitkCalculateGrayValueStatisticsTool.cpp
+Interactions/mitkCalculateVolumetryTool.cpp
 Interactions/mitkContourInteractor.cpp
 Interactions/mitkContourTool.cpp
 Interactions/mitkCorrectorTool2D.cpp

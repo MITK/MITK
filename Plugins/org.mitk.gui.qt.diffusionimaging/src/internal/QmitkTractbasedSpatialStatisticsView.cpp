@@ -167,10 +167,9 @@ struct TbssSelListener : ISelectionListener
 
       }
 
-
-      m_View->m_Controls->m_Transform->setEnabled(found3dImage);
       m_View->m_Controls->m_CreateRoi->setEnabled(found3dImage);
       m_View->m_Controls->m_ImportFsl->setEnabled(found4dImage);
+
       if(found3dImage)
       {
         m_View->InitPointsets();

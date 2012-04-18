@@ -497,8 +497,23 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
         mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, timeStep );
-        
         m_FeedbackNode->SetData( interpolation );
+
+        // Workaround for Bug 11318
+        if ((interpolation.IsNotNull()) && (interpolation->GetGeometry() != NULL))
+        {
+           if(clickedSliceDimension == 1)
+           {
+              mitk::Point3D orig = interpolation->GetGeometry()->GetOrigin();
+              orig[0] = orig[0]; 
+              orig[1] = orig[1] + 0.5; 
+              orig[2] = orig[2];
+              interpolation->GetGeometry()->SetOrigin(orig);
+           }
+        }
+
+        // Workaround for Bug 11318 END
+        
         m_LastSliceDimension = clickedSliceDimension;
         m_LastSliceIndex = clickedSliceIndex;
       }

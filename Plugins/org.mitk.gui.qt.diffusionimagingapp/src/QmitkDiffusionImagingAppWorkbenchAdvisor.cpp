@@ -50,6 +50,10 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   perspExcludeList.push_back( std::string("org.mitk.extapp.defaultperspective") );
   perspExcludeList.push_back( std::string("org.mitk.perspectives.publicdiffusionimaging") );
   perspExcludeList.push_back( std::string("org.mitk.perspectives.diffusionimaginginternal") );
+  // Exclude the help perspective from org.blueberry.ui.qt.help from
+  // the normal perspective list.
+  // The perspective gets a dedicated menu entry in the help menu
+  perspExcludeList.push_back("org.blueberry.perspectives.help");
 
   std::vector<std::string> viewExcludeList;
 

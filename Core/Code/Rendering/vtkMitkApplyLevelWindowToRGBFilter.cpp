@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
+#include <mitkLogMacros.h>
 
 //used for acos etc.
 #include <cmath>
@@ -35,10 +36,26 @@ vtkMitkApplyLevelWindowToRGBFilter::vtkMitkApplyLevelWindowToRGBFilter():m_MinOq
 vtkMitkApplyLevelWindowToRGBFilter::~vtkMitkApplyLevelWindowToRGBFilter()
 {
 }
+//----------------------------------------------------------------------------
+// Account for the MTime of the transform and its matrix when determining
+// the MTime of the filter
+unsigned long int vtkMitkApplyLevelWindowToRGBFilter::GetMTime()
+{
+  unsigned long mTime=this->vtkObject::GetMTime();
+  unsigned long time;
+
+  if ( this->m_LookupTable != NULL )
+  {
+    time = this->m_LookupTable->GetMTime();
+    mTime = ( time > mTime ? time : mTime );
+  }
+ 
+  return mTime;
+}
 
 void vtkMitkApplyLevelWindowToRGBFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 {
-  if (m_LookupTable != lookupTable || lookupTable->GetMTime() > this->GetMTime())
+  if (m_LookupTable != lookupTable)
   {
     m_LookupTable = lookupTable;
     this->Modified();

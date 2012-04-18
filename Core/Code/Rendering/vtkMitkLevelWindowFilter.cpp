@@ -39,9 +39,27 @@ vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()
 {
 }
 
+unsigned long int vtkMitkLevelWindowFilter::GetMTime()
+{
+  unsigned long mTime=this->vtkObject::GetMTime();
+  unsigned long time;
+
+  if ( this->m_LookupTable != NULL )
+  {
+    time = this->m_LookupTable->GetMTime();
+    mTime = ( time > mTime ? time : mTime );
+  }
+ 
+  return mTime;
+}
+
 void vtkMitkLevelWindowFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 {
-  m_LookupTable = lookupTable;
+ if (m_LookupTable != lookupTable)
+  {
+    m_LookupTable = lookupTable;
+    this->Modified();
+  }
 }
 
 vtkScalarsToColors* vtkMitkLevelWindowFilter::GetLookupTable()

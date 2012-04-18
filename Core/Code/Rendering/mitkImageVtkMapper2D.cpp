@@ -432,14 +432,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
 
-  MITK_INFO << "-------------------------\nboundInitialized = " << boundsInitialized;
-  MITK_INFO << "xMin " << xMin;
-  MITK_INFO << "xMax " << xMax;
-  MITK_INFO << "yMin " << yMin;
-  MITK_INFO << "yMax " << yMax;
-  for (int i = 0; i < 4 ; ++i)
-    MITK_INFO << "sliceBounds[" << i<< "] " <<sliceBounds[i] ;
-  // TODO "clip" by setting background to alpha=0
+  //MITK_INFO << "-------------------------\nboundInitialized = " << boundsInitialized;
+  //MITK_INFO << "xMin " << xMin;
+  //MITK_INFO << "xMax " << xMax;
+  //MITK_INFO << "yMin " << yMin;
+  //MITK_INFO << "yMax " << yMax;
+  //for (int i = 0; i < 4 ; ++i)
+  //  MITK_INFO << "sliceBounds[" << i<< "] " <<sliceBounds[i] ;
+  //// TODO "clip" by setting background to alpha=0
 
 
 
@@ -480,16 +480,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
     localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
-    //localStorage->m_TSFilter->Modified();
-    localStorage->m_TSFilter->Update();
-    MITK_INFO << "TSFilter";
     localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
   }
   else
   {
-    //localStorage->m_Reslicer->Modified();
-    localStorage->m_Reslicer->Update();
-    MITK_INFO << "Reslicer";
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetOutput();
   }
 
@@ -764,7 +758,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
 
   localStorage->m_LevelWindowFilter->SetClippingBounds(bounds);
-
 
   //connect the texture with the output of the RGB filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());

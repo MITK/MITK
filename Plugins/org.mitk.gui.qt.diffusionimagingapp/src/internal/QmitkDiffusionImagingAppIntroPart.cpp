@@ -44,7 +44,7 @@
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
-#include "mitkPluginActivator.h"
+#include "QmitkDiffusionApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 
 #include "mitkBaseDataIOFactory.h"
@@ -57,7 +57,7 @@
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
   : m_Controls(NULL)
 {
-  berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
   workbenchPrefs->Flush();
 }
@@ -67,13 +67,13 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
   // if the workbench is not closing (that means, welcome screen was closed explicitly), set "Show_intro" false
   if (!this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
   {
-    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
     workbenchPrefs->Flush();
   }
   else
   {
-    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
     workbenchPrefs->Flush();
   }

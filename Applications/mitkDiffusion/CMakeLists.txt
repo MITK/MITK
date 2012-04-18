@@ -16,12 +16,31 @@ include_directories(${ALL_INCLUDE_DIRECTORIES})
 set(DIFFUSIONIMAGINGAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DIFFUSIONAPP_NAME}.provisioning" CACHE INTERNAL "${DIFFUSIONAPP_NAME} provisioning file" FORCE)
 
 set(_plugins
+  org.commontk.configadmin
+  org.commontk.eventadmin
+  org.blueberry.osgi
   org.blueberry.compat
+  org.blueberry.core.runtime
+  org.blueberry.core.expressions
+  org.blueberry.solstice.common
+  org.blueberry.core.commands
+  org.blueberry.core.jobs
+  org.blueberry.ui
+  org.blueberry.ui.qt
   org.blueberry.ui.qt.help
+  org.blueberry.ui.qt.log
+  org.blueberry.ui.qt.objectinspector
+  org.mitk.core.services
+  org.mitk.gui.common
+  org.mitk.planarfigure
+  org.mitk.core.ext
   org.mitk.diffusionimaging
-  org.mitk.gui.qt.diffusionimagingapp
-  org.mitk.gui.qt.common.legacy
+  org.mitk.gui.qt.application
   org.mitk.gui.qt.ext
+  org.mitk.gui.qt.diffusionimagingapp
+  org.mitk.gui.qt.common
+  org.mitk.gui.qt.stdmultiwidgeteditor
+  org.mitk.gui.qt.common.legacy
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
@@ -29,7 +48,6 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
-  org.mitk.planarfigure
 )
 
 # Plug-ins listed below will not be

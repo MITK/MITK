@@ -77,8 +77,9 @@ m_MultiWidget(mw)
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
   
-  this->show();
-  this->setWindowOpacity(0.0);
+//  this->show();
+  this->setVisible(false);
+//  this->setWindowOpacity(0.0);
   
   //this->setAttribute( Qt::WA_NoSystemBackground  );
   //this->setBackgroundRole( QPalette::Dark );
@@ -239,8 +240,9 @@ void QmitkRenderWindowMenu::HideMenu( )
   m_Hidden = true;
 
   if( ! m_Entered )
-    setWindowOpacity(0.0f);
-    //hide();
+    setVisible(false);
+//    setWindowOpacity(0.0f);
+//    hide();
 
 }
 
@@ -249,7 +251,8 @@ void QmitkRenderWindowMenu::ShowMenu( )
   MITK_DEBUG << "menu showMenu";
   
   m_Hidden = false;
-  setWindowOpacity(1.0f);
+  setVisible(true);
+//  setWindowOpacity(1.0f);
 }
 
 
@@ -268,7 +271,8 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
   MITK_DEBUG << "menu deferredhidemenu";
   if(m_Hidden)
-    setWindowOpacity(0.0f);
+    setVisible(false);
+//    setWindowOpacity(0.0f);
   ///hide();
 }
 
@@ -411,7 +415,8 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   MITK_DEBUG << "deferred show menu";
   
   show();
-  setWindowOpacity(1.0);
+  setVisible(true);
+//  setWindowOpacity(1.0);
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)

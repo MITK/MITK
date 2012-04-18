@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStandardFileLocations.h>
 #include "mitkNavigationToolReader.h"
 
+//POCO
+#include <Poco/Exception.h>
+
 mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
   {
   m_DataStorage = dataStorage;
@@ -38,7 +41,14 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
   {
   //remove temp directory
   Poco::File myFile(m_tempDirectory);
-  if (myFile.exists()) myFile.remove();
+  try
+    {
+    if (myFile.exists()) myFile.remove();
+    }
+  catch(...)
+    {
+    MITK_ERROR << "Can't remove temp directory " << m_tempDirectory << "!";
+    }
   }
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)

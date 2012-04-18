@@ -98,10 +98,16 @@ struct QbrSelListener : ISelectionListener
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
-          // only look at interesting types
-          if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+          // check if node valid
+          const mitk::BaseData* nodeData = node->GetData();
+
+          if(nodeData)
           {
-            foundDwiVolume = true;
+            // only look at interesting types
+            if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundDwiVolume = true;
+            }
           }
         }
       }
@@ -372,9 +378,15 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+
+        // check if node's data valid
+        const mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
+        {
+        if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
         {
           set->InsertElement(at++, node);
+        }
         }
       }
     }

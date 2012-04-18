@@ -133,35 +133,39 @@ struct TbssSelListener : ISelectionListener
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
           // only look at interesting types
-
-          if(QString("TbssRoiImage").compare(node->GetData()->GetNameOfClass())==0)
+          // check for valid data
+          mitk::BaseData* nodeData = node->GetData();
+          if( nodeData )
           {
-            foundTbssRoi = true;
-            roiImage = static_cast<mitk::TbssRoiImage*>(node->GetData());
-          }
-          else if (QString("TbssImage").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            foundTbss = true;
-            image = static_cast<mitk::TbssImage*>(node->GetData());
-          }
-          else if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            img = static_cast<mitk::Image*>(node->GetData());
-            if(img->GetDimension() == 3)
+            if(QString("TbssRoiImage").compare(nodeData->GetNameOfClass())==0)
             {
-              found3dImage = true;
+              foundTbssRoi = true;
+              roiImage = static_cast<mitk::TbssRoiImage*>(nodeData);
             }
-            else if(img->GetDimension() == 4)
+            else if (QString("TbssImage").compare(nodeData->GetNameOfClass())==0)
             {
-              found4dImage = true;
+              foundTbss = true;
+              image = static_cast<mitk::TbssImage*>(nodeData);
             }
-          }
+            else if(QString("Image").compare(nodeData->GetNameOfClass())==0)
+            {
+              img = static_cast<mitk::Image*>(nodeData);
+              if(img->GetDimension() == 3)
+              {
+                found3dImage = true;
+              }
+              else if(img->GetDimension() == 4)
+              {
+                found4dImage = true;
+              }
+            }
 
-          else if (QString("FiberBundleX").compare(node->GetData()->GetNameOfClass())==0)
+          else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
           {
             foundFiberBundle = true;
-            fib = static_cast<mitk::FiberBundleX*>(node->GetData());
+            fib = static_cast<mitk::FiberBundleX*>(nodeData);
           }
+          } // end CHECK nodeData != NULL
 
         }
 

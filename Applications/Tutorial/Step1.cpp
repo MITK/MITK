@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkPicFileReader.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>
@@ -54,31 +54,26 @@ int main(int argc, char* argv[])
   // Part II: Create some data by reading a file
   //*************************************************************************
 
-  // Create a PicFileReader to read a .pic-file
-  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
+  // Create a DataNodeFactory to read a data format supported
+  // by the DataNodeFactory (many image formats, surface formats, etc.)
+  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
   const char * filename = argv[1];
   try
   {
     reader->SetFileName(filename);
     reader->Update();
+    //*************************************************************************
+    // Part III: Put the data into the datastorage
+    //*************************************************************************
+
+    // Add the node to the DataStorage
+    ds->Add(reader->GetOutput());
   }
   catch(...)
   {
     fprintf( stderr, "Could not open file %s \n\n", filename );
     exit(2);
   }
-
-  //*************************************************************************
-  // Part III: Put the data into the datastorage
-  //*************************************************************************
-
-  // Create a node and add the Image (which is read from the file) to it
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(reader->GetOutput());
-
-  // Add the node to the DataStorage
-  ds->Add(node);
-
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it
@@ -113,8 +108,7 @@ int main(int argc, char* argv[])
   else
     return QtTesting();
 
-  // cleanup: Remove References to node and DataStorage. This will delete the two objects
-  node = NULL;
+  // cleanup: Remove References to DataStorage. This will delete the object
   ds = NULL;
 }
 /**

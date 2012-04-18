@@ -15,20 +15,4 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef IGTEXCEPTION_H_INCLUDED
-#define IGTEXCEPTION_H_INCLUDED
-
-#include <MitkIGTExports.h>
-#include <mitkException.h>
-
-namespace mitk {
-  /**Documentation
-  * \brief An object of this class represents an exception of the MITK-IGT module.
-  *
-  * \ingroup IGT
-  */  class MitkIGT_EXPORT IGTException : public mitk::Exception //perhaps this should later derive from mitk::Exception (if there is an exception handling for complete MITK
-  {
-  
-  };
-} // namespace mitk
-#endif
+#include "mitkException.h"

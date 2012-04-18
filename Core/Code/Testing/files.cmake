@@ -56,6 +56,7 @@ SET(MODULE_TESTS
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   #QmitkRenderingTestHelper.cpp
+  mitkExceptionTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -104,6 +105,5 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              VERSION "0.1.0"
                              EXECUTABLE
                             )
-                            
-SET(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
 
+SET(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)

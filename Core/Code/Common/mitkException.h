@@ -15,20 +15,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef IGTEXCEPTION_H_INCLUDED
-#define IGTEXCEPTION_H_INCLUDED
+#ifndef MITKEXCEPTION_H_INCLUDED
+#define MITKEXCEPTION_H_INCLUDED
 
-#include <MitkIGTExports.h>
-#include <mitkException.h>
+#include <MitkExports.h>
+#include <itkExceptionObject.h>
 
 namespace mitk {
   /**Documentation
-  * \brief An object of this class represents an exception of the MITK-IGT module.
+  * \brief An object of this class represents an exception of the MITK.
   *
-  * \ingroup IGT
-  */  class MitkIGT_EXPORT IGTException : public mitk::Exception //perhaps this should later derive from mitk::Exception (if there is an exception handling for complete MITK
+  */  
+  class MITK_CORE_EXPORT Exception : itk::ExceptionObject 
   {
-  
+  /*
+  public:
+    explicit Exception(const char *file, unsigned int lineNumber=0,
+                  const char *desc="None", const char *loc="Unknown");
+    explicit Exception(const std::string& file, unsigned int lineNumber=0,
+                  const std::string& desc="None",
+                  const std::string& loc="Unknown");
+  */
   };
 } // namespace mitk
 #endif

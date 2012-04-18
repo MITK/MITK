@@ -33,11 +33,11 @@ namespace itk
 
   }
 
-    template <class TDiffusionPixelType, class TTensorPixelType>
-    void
-    FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-    ::GenerateData ( )
-    {
+  template <class TDiffusionPixelType, class TTensorPixelType>
+  void
+  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  ::GenerateData ( )
+  {
 
     typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
     typedef typename GradientImagesType::PixelType         GradientVectorType;
@@ -60,24 +60,24 @@ namespace itk
     vnl_matrix<double> directions(nof-numberb0,3);
 
     for(int i=0; i<nof; i++)
+    {
+      vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
+
+      if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
       {
-       vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
+        numberb0++;
+        b0index[i]=5;
+      }
+      else
+      {
+        b0index[i]=-1;
+        directions[cnt][0] = vec[0];
+        directions[cnt][1] = vec[1];
+        directions[cnt][2] = vec[2];
+        cnt++;
+      }
 
-       if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
-        {
-         numberb0++;
-         b0index[i]=i;
-        }// end if
-       else
-        {
-         b0index[i]=-1;
-         directions[cnt][0] = vec[0];
-         directions[cnt][1] = vec[1];
-         directions[cnt][2] = vec[2];
-         cnt++;
-        }//end else
-
-      }// end for
+    }
 
     vnl_matrix<double> dirsTimesDirsTrans = directions*directions.transpose();
 
@@ -86,55 +86,55 @@ namespace itk
     vnl_vector< double> temporary(3);
 
     for (int i=0;i<nof-numberb0;i++)
-      {    
-       diagonal[i]=dirsTimesDirsTrans[i][i];    
-      }
-    
-    double max_diagonal = diagonal.max_value();
-    double b_value=1000.0;
+    {    
+      diagonal[i]=dirsTimesDirsTrans[i][i];    
+    }
+  
+    double max_diagonal = diagonal.max_value();    
 
-    directions=directions*sqrt(b_value/1000.0)*(1.0/sqrt(max_diagonal));
+    directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
 
 
     for (int i=0;i<nof-numberb0;i++)
-      {   
-       b_vec[i]= dirsTimesDirsTrans[i][i];   
-      }
+    {   
+      b_vec[i]= dirsTimesDirsTrans[i][i];   
+    }
 
     vnl_matrix<double> H(nof-numberb0, 6);
     vnl_matrix<double> temp_3_3(3,3);
     vnl_vector<double> pre_tensor(9);
-  
+
     int etbt[6] = { 0, 4, 8, 1, 5, 2 };
 
     for (int i = 0; i < nof-numberb0; i++) 
+    {
+      for (int j = 0; j < 3; j++) 
+      {
+        temporary[j] = -directions[i][j];
+      }
+      for (int j = 0; j < 3; j++) 
+      {
+       for (int k = 0; k < 3; k++)
        {
-        for (int j = 0; j < 3; j++) 
-          {
-           temporary[j] = -directions[i][j];
-          }
-        for (int j = 0; j < 3; j++) 
-          {
-           for (int k = 0; k < 3; k++)
-             {
-              pre_tensor[k + 3 * j] = temporary[k] * directions[i][j];            
-             }
-           }
-        for (int j = 0; j < 6; j++) 
-          {
-           H[i][j] = pre_tensor[etbt[j]];
-          }
-        for (int j = 0; j < 3; j++) 
-          {
-           H[i][3 + j] *= 2.0;
-          }
-        }
+         pre_tensor[k + 3 * j] = temporary[k] * directions[i][j];            
+       }
+      }
+      for (int j = 0; j < 6; j++) 
+      {
+        H[i][j] = pre_tensor[etbt[j]];
+      }
+      for (int j = 0; j < 3; j++) 
+      {
+        H[i][3 + j] *= 2.0;
+      }
+    }
 
-     vnl_matrix<double> inputtopseudoinverse=H.transpose()*H;
-     vnl_symmetric_eigensystem<double> eig( inputtopseudoinverse);
-     vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
-     
-     itk::Index<3> ix;
+    vnl_matrix<double> inputtopseudoinverse=H.transpose()*H;
+    vnl_symmetric_eigensystem<double> eig( inputtopseudoinverse);
+    vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
+    double temp_pixel;
+   
+    itk::Index<3> ix;
 
     // declaration of corrected diffusion image///
     ImageType::IndexType start;
@@ -150,38 +150,39 @@ namespace itk
     VariableVectorType variableLengthVector;
     variableLengthVector.SetSize(nof);
 
-    // end of the bigest data structure for this filter
-
-    // begening of removing of negative values from the data set
+    // end of the biggest data structure for this filter
+    // begining of removing of negative values from the data set
 
     for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
       {
-        for ( int y=0;y<size[1];y++)
-        {
-          for ( int z=0;z<size[2];z++)
-          {          
-           ix[0] = x;
-           ix[1] = y;
-           ix[2] = z;
-           GradientVectorType pixel2 = gradientImagePointer->GetPixel(ix);
-           for( int f=0;f<nof;f++)
-           {
-             if(pixel2[f]<0.0)
-             {
-             check_the_neighbors(x,y,z,f,size,ix,gradientImagePointer,pixelIndex,corrected_diffusion);
-             }
-             else
-             { 
+        for ( int z=0;z<size[2];z++)
+        {          
+          ix[0] = x;
+          ix[1] = y;
+          ix[2] = z;
+          GradientVectorType pixel2 = gradientImagePointer->GetPixel(ix);
+          for( int f=0;f<nof;f++)
+          {
+            if(pixel2[f]<0.0)
+            {
+              check_the_neighbors(x,y,z,f,size,ix,gradientImagePointer,pixelIndex,corrected_diffusion,temp_pixel);
+              variableLengthVector[f] = temp_pixel;
+            }
+            else
+            { 
               variableLengthVector[f] = pixel2[f];
-             }
-           }
-           pixelIndex[0] = x;
-           pixelIndex[1] = y;
-           pixelIndex[2] = z;
-           corrected_diffusion->SetPixel(pixelIndex, variableLengthVector);
+            }
           }
+          pixelIndex[0] = x;
+          pixelIndex[1] = y;
+          pixelIndex[2] = z;
+          corrected_diffusion->SetPixel(pixelIndex, variableLengthVector);
         }
-    }//end of calling the function for negative data points removal
+      }
+    }
+   
     vnl_vector<double> org_data(nof);
     vnl_vector<double> atten(nof-numberb0);
     double mean_b=0.0;
@@ -196,6 +197,12 @@ namespace itk
     mask->SetRegions(region_mask);
     mask->Allocate();
     ImageType_mask::IndexType pixelIndex_mask;
+
+    //
+    int mask_cnt=0;
+
+    //
+  
     // end of mask declaration
     // start of filling mask
     for(int x=0;x<size[0];x++)
@@ -204,57 +211,75 @@ namespace itk
       {
         for(int z=0;z<size[2];z++)
         {
-         mean_b=0.0;
-         ix[0] = x;
-         ix[1] = y;
-         ix[2] = z;
-         pixelIndex_mask[0] = x;
-         pixelIndex_mask[1] = y;
-         pixelIndex_mask[2] = z;
-         GradientVectorType pixel4 = gradientImagePointer->GetPixel(ix);
-         for (int i=0;i<nof;i++)
-         {
-         if(b0index[i]>0)
-           {
-            mean_b=mean_b + pixel4[i];
-           }
+          mean_b=0.0;
+          ix[0] = x;
+          ix[1] = y;
+          ix[2] = z;
+          pixelIndex_mask[0] = x;
+          pixelIndex_mask[1] = y;
+          pixelIndex_mask[2] = z;
+          GradientVectorType pixel4 = gradientImagePointer->GetPixel(ix);
+          for (int i=0;i<nof;i++)
+          { 
+            if(b0index[i]>0)
+            {
+              mean_b = mean_b + pixel4[i];
+            }
           }
-         if(mean_b>50.0)
-         {
-           pixel = 3.0;
-         }
-         else
-         {
-           pixel=0.0;
-         }
-         mask->SetPixel(pixelIndex_mask, pixel);
+          if(mean_b>50.0)
+          {
+            pixel = 3.0;
+            //
+            mask_cnt++;
+            //
+          }
+          else
+          {
+            pixel=0.0;
+          }
+          mask->SetPixel(pixelIndex_mask, pixel);
         }
       }
+    }
 
-    }// end of generation of mask
+    //
+    std::cout << "Number of voxels in mask: " << mask_cnt << std::endl;
+    //
+    
     // Declaration of tensor image- output of the filter
-    typedef itk::Image<3,DiffusionTensor3D> ImageType_tensorImg;
-    ImageType_tensorImg::IndexType start_tensorImg;
+    typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > TensorImageType;
+    TensorImageType::IndexType start_tensorImg;
     start_tensorImg.Fill(0);
-    ImageType_tensorImg::RegionType region_tensorImg(start_tensorImg,size);
-    ImageType_tensorImg::Pointer tensorImg = ImageType_tensorImg::New();
+    TensorImageType::RegionType region_tensorImg(start_tensorImg,size);
+    TensorImageType::Pointer tensorImg = TensorImageType::New();
     tensorImg->SetRegions(region_tensorImg);
+    tensorImg->SetSpacing(gradientImagePointer->GetSpacing());
+    tensorImg->SetOrigin(gradientImagePointer->GetOrigin());
     tensorImg->Allocate();
-    ImageType_tensorImg::IndexType pixelIndex_tensorImg;
+    itk::Index<3> pixelIndex_tensorImg;
     // end of tensor declaration
     // start of the main loop for removing of voxels with negative eigen values tensors
     //some important variables
     vnl_matrix<double> temp_tensor(3,3);
     vnl_vector<double> eigen_vals(3);
-    double l1;
-    double l2;
-    double l3;
+//    double l1;
+  //  double l2;
+    //double l3;
     int number_of_bads=0;
-    int old_number_of_bads=0;
-    int diff=10000000000000000;
+    int old_number_of_bads=10000000000000000;
+    int diff=1;
+
+    vnl_vector< double> pixel_max(nof);
+    vnl_vector< double> pixel_min(nof);
+
+    for (int i=1;i<nof;i++)
+    {
+      pixel_max[i]=exp(-b_vec[i]*0.01);// here some values for low and high diffusivity were pre define as 0.01 for low and 5 for high
+      pixel_min[i]= exp(-b_vec[i]*5);
+    }
     while(diff>0)
     {
-    for (int x=0;x<size[0];x++)
+      for (int x=0;x<size[0];x++)
       {
         for (int y=0;y<size[1];y++)
         {
@@ -263,19 +288,25 @@ namespace itk
             ix[0] = x;
             ix[1] = y;
             ix[2] = z;
-            GradientVectorType pixel = mask->GetPixel(ix);
-            if(pixel>1.0)
+            pixel = mask->GetPixel(ix);
+            itk::DiffusionTensor3D<float> ten;
+            
+            pixelIndex_tensorImg[0]=x;
+            pixelIndex_tensorImg[1]=y;
+            pixelIndex_tensorImg[2]=z;            
+            
+            if(pixel>2.0)
             {
               ix[0] = x;
               ix[1] = y;
               ix[2] = z;
-              GradientVectorType pixel4 = corrected_diffusion->GetPixel(ix);
+              GradientVectorType pt = corrected_diffusion->GetPixel(ix);
               for (int i=0;i<nof;i++)
               {
-                org_data[i]=pixel4[i];
+                org_data[i]=pt[i];
               }
               calculate_attenuation(org_data,b0index,atten,mean_b,nof);
-              calculate_tensor(pseudoInverse,atten,tensor);
+              calculate_tensor(pseudoInverse,atten,tensor,nof,numberb0);
 
               temp_tensor[0][0]= tensor[0];temp_tensor[0][1]= tensor[3];temp_tensor[0][2]= tensor[5];
               temp_tensor[1][0]= tensor[3];temp_tensor[1][1]= tensor[1];temp_tensor[1][2]= tensor[4];
@@ -284,35 +315,83 @@ namespace itk
               vnl_symmetric_eigensystem <double> eigen_tensor(temp_tensor);
 
               eigen_vals[0]=eigen_tensor.get_eigenvalue(0);eigen_vals[1]=eigen_tensor.get_eigenvalue(1);eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
-
-               pixelIndex_tensorImg[0]=x;
-               pixelIndex_tensorImg[1]=y;
-               pixelIndex_tensorImg[2]=z;
+                     
 
               if( eigen_vals[0]>0.0 && eigen_vals[1]>0.0 && eigen_vals[2]>0.0)
-               {
-                 tensorImg->SetPixel(pixelIndex_tensorImg, tensor);
-                 mask->SetPixel(ix,1.0);
-               }//end of if eigenvalues
-               else
-               {
-                 tensor[0]=0.0;tensor[1]=0.0;tensor[2]=0.0;tensor[3]=0.0;tensor[4]=0.0; pixelIndex_tensorImg[5]=x;
-                 tensorImg->SetPixel(pixelIndex_tensorImg, tensor);
-                 check_the_neighbors(x,y,z,f,size,ix,gradientImagePointer,pixelIndex,corrected_diffusion);
-                 mask->SetPixel(ix,0.0);
-                 number_of_bad++;
-               }// 
+              {
+               
+                
+                ten(0,0) = tensor[0];
+                ten(0,1) = tensor[3];
+                ten(0,2) = tensor[5];
+                ten(1,1) = tensor[1];
+                ten(1,2) = tensor[4];
+                ten(2,2) = tensor[2];
 
+
+               if(x==47 && y==69 && z==28)
+               {
+               std::cout <<"Joe tensor"<< "\n";
+
+              std::cout <<tensor[0]<< "\n";
+              std::cout <<tensor[1]<< "\n";
+              std::cout <<tensor[2]<< "\n";
+              std::cout <<tensor[3]<< "\n";
+              std::cout <<tensor[4]<< "\n";
+              std::cout <<tensor[5]<< "\n";
+
+               }
+
+
+                tensorImg->SetPixel(pixelIndex_tensorImg, ten);
+                mask->SetPixel(ix,1.0);
+              }//end of if eigenvalues
+              else
+              {
+                number_of_bads++;
+                ten.Fill(0.0);
+                tensorImg->SetPixel(pixelIndex_tensorImg, ten);
+
+                for (int f=0;f<nof;f++)
+                {
+                  if(pt[f]>pixel_max[f] || pt[f]<pixel_min[f])
+                  {
+                    check_the_neighbors(x,y,z,f,size,ix,gradientImagePointer,pixelIndex,corrected_diffusion,temp_pixel);
+                    variableLengthVector[f] = temp_pixel;
+                  }
+                  
+                  
+                }
+
+                mask->SetPixel(ix,3.0);
+                corrected_diffusion->SetPixel(ix, variableLengthVector);
+              } 
             }// end of if
+            
+            else if(pixel<1.0)
+            {
+              ten.Fill(0.0);
+              tensorImg->SetPixel(pixelIndex_tensorImg, ten);
+            }
+
 
           }// end of for 3
-
         }
 
       }// end of for 1
       diff=old_number_of_bads-number_of_bads;
       old_number_of_bads=number_of_bads;
-   } 
+      std::cout << "bad voxels: " << number_of_bads << std::endl;
+      number_of_bads=0;
+      
+
+      this->SetNthOutput(0, tensorImg);
+      
+    } //while
+
+   
+
+
   }
   
   
@@ -355,14 +434,16 @@ namespace itk
   }
 
   template <class TDiffusionPixelType, class TTensorPixelType>
-    void
-    FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-    ::check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
-    typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion)   
-    {
-    
+  void
+  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  ::check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
+  typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,
+    ImageType::Pointer corrected_diffusion,double &temp_pixel)   
+  {
+    typedef typename GradientImagesType::PixelType         GradientVectorType;
+  
     int init_i;int init_j;int init_c;int limit_i;int limit_j;int limit_c;
-    double temp_sum=0.0;
+    double tempsum=0.0;
     double temp_number=0.0;
 
 
@@ -388,38 +469,37 @@ namespace itk
           ix[1] = j;
           ix[2] = c;
 
-          GradientVectorType pixel3 = gradientImagePointer->GetPixel(ix);
+          GradientVectorType p = gradientImagePointer->GetPixel(ix);
           
-           if(pixel2[f]<=0.0)
-            {
-             temp_sum[f]=temp_sum[f] + 0;
-             }
-           else
-             {
-               temp_sum[f]=temp_sum[f]+pixel2[f];
-               temp_number[f]=temp_number[f]+1;
-             }
+          if(p[f]<=0.0)
+          {
+            tempsum=tempsum + 0;
+          }
+          else
+          {
+            tempsum=tempsum+p[f];
+            temp_number=temp_number+1;
           }
         }
-      }// end of for 1
-      if (temp_number==0.0)
-        {
-         temp_sum=0.0;
-        }
-       else
-         {
-          tem_sum=temp_sum/temp_number;
-         }
+      }
+    }// end of for 1
+    if (temp_number==0.0)
+    {
+      tempsum=0.0;
+    }
+    else
+    {
+      tempsum=tempsum/temp_number;
+    }
         
-     
-        variableLengthVector[f] = (short)temp_sum;
-  }// end of void check the neighbors
+    temp_pixel = (short)tempsum;
+  }
 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> atten, double mean_b,int nof)
+  ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof)
   {
     mean_b=0.0;
 
@@ -439,13 +519,13 @@ namespace itk
         cnt++;
       }
     }
-  }// end of void calculate attenuation
+  }
 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten,vnl_vector<double> tensor)
+  ::calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten,vnl_vector<double> &tensor, int nof,int numberb0)
   {
     for (int i=0;i<nof-numberb0;i++)
     {
@@ -454,9 +534,9 @@ namespace itk
       tensor = pseudoInverse*atten;
   }// end of void calculate tensor
    
-   } // end of namespace
+} // end of namespace
 
-  }
+
 
   
 

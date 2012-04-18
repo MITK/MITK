@@ -36,7 +36,7 @@ namespace itk
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   class FreeWaterEliminationFilter
-    : public ImageToImageFilter<itk::Image<itk::DiffusionTensor3D<TDiffusionPixelType>,3>, itk::VectorImage<TTensorPixelType,3> >
+    : public ImageToImageFilter< itk::Image< TDiffusionPixelType, 3 >, itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3> >
   {
 
   public:
@@ -162,12 +162,12 @@ namespace itk
   private:
 
   void check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
-  typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion);
+  typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion, double &temp_pixel);
 
-  void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> atten, double mean_b,int nof);
+  void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof);
 
 
-  void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten,vnl_vector<double> tensor);
+  void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
   
 
 
@@ -193,7 +193,7 @@ namespace itk
     /** Number of baseline images */
     unsigned int                                      m_NumberOfBaselineImages;
 
-    mitk::DiffusionImage<short>::Pointer                     m_OutputDiffusionImage;
+    mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
 
 
   };

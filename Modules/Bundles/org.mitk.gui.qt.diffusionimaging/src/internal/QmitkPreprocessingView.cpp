@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNodeObject.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
+#include "mitkTensorImage.h" 
 
 #include "itkB0ImageExtractionImageFilter.h"
 #include "itkBrainMaskExtractionImageFilter.h"
@@ -327,9 +328,17 @@ void QmitkPreprocessingView::DoFreeWaterElimination(mitk::DataStorage::SetOfObje
 
       fweFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       fweFilter->SetBValue(vols->GetB_Value());
-      
-
       fweFilter->Update();
+
+      itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3>::Pointer outputTensorImg = fweFilter->GetOutput();
+
+      mitk::TensorImage::Pointer image = mitk::TensorImage::New();
+      image->InitializeByItk(outputTensorImg.GetPointer());
+      image->SetVolume( outputTensorImg->GetBufferPointer() );
+      mitk::DataNode::Pointer node=mitk::DataNode::New();
+      node->SetData( image );
+      node->SetProperty("name", mitk::StringProperty::New("Tensor Image"));
+      GetDefaultDataStorage()->Add( node );
 
 
       mitk::DiffusionImage<short>::Pointer diffImg = fweFilter->GetOutputDiffusionImage();

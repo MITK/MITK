@@ -265,19 +265,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
       CalcAveragedDirectionSet(precision, m_Directions);
 
   GradientDirectionContainerType::Pointer newOriginalDirs =
-      CalcAveragedDirectionSet(precision, m_OriginalDirections);
-
-
-  for(GradientDirectionContainerType::ConstIterator gdcitNew = newDirs->Begin();
-    gdcitNew != newDirs->End(); ++gdcitNew)
-  {
-     GradientDirectionType g = gdcitNew.Value();
-     std::cout << g[0] << ' ' << g[1] << ' '<<g[2] << '\n';
-
-  }
-  std::cout << std::endl;
-
-
+      CalcAveragedDirectionSet(precision, m_OriginalDirections);  
 
   // if sizes equal, we do not need to do anything in this function
   if(m_Directions->size() == newDirs->size() || m_OriginalDirections->size() == newOriginalDirs->size())
@@ -347,7 +335,11 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
       {
         newVec[i] += oldVec[dirIndices[i].at(j)];
       }
-      std::cout << numavg << '\n';
+      if(numavg == 0)
+      {
+        MITK_ERROR << "mitkDiffusionImage: Error on averaging. Possibly due to corrupted data";
+        return;
+      }
       newVec[i] /= numavg;
     }
 

@@ -17,7 +17,7 @@
 
 #include "QmitkDiffusionImagingAppWorkbenchAdvisor.h"
 
-#include "internal/mitkPluginActivator.h"
+#include "internal/QmitkDiffusionApplicationPlugin.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>
@@ -36,23 +36,6 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer
   berry::QtWorkbenchAdvisor::Initialize(configurer);
 
   configurer->SetSaveAndRestore(true);
-
-  // TODO This should go into the products plugin_customization.ini file (when
-  // the product and branding support is finished, see bug 2146).
-  // This will not work anymore, if bug 2822 is fixed.
-  berry::IPreferencesService::Pointer prefService = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  prefService->GetSystemPreferences()->Put(berry::WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT, berry::WorkbenchPreferenceConstants::RIGHT);
-
-  QString collectionFile = mitkPluginActivator::GetDefault()->GetQtHelpCollectionFile();
-  if (!collectionFile.isEmpty())
-  {
-    berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
-    berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html");
-
-    typedef std::vector<berry::IBundle::Pointer> BundleContainer;
-    BundleContainer bundles = berry::Platform::GetBundles();
-    berry::QtAssistantUtil::RegisterQCHFiles(bundles);
-  }
 
 }
 

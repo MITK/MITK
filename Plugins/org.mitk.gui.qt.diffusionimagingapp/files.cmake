@@ -4,7 +4,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  mitkPluginActivator.cpp
+  QmitkDiffusionApplicationPlugin.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
   Perspectives/QmitkDiffusionImagingAppPerspective.cpp
   Perspectives/QmitkWelcomePerspective.cpp
@@ -25,7 +25,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
-  src/internal/mitkPluginActivator.h
+  src/internal/QmitkDiffusionApplicationPlugin.h
   src/QmitkDiffusionImagingAppApplication.h
   src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
   src/internal/Perspectives/QmitkWelcomePerspective.h
@@ -80,17 +80,3 @@ foreach(file ${INTERNAL_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 
-
-#----------- Qt Help Collection Project -------------#
-
-if(BLUEBERRY_USE_QT_HELP)
-  set(_plugin_qhcp_input "${CMAKE_CURRENT_SOURCE_DIR}/documentation/MitkDiffusionImagingAppQtHelpCollectionProject.qhcp")
-  set(_plugin_qhcp_output "${CMAKE_CURRENT_BINARY_DIR}/MitkDiffusionImagingAppQtHelpCollection.qhc")
-  add_custom_command(OUTPUT ${_plugin_qhcp_output}
-                     COMMAND ${QT_COLLECTIONGENERATOR_EXECUTABLE} ${_plugin_qhcp_input} -o ${_plugin_qhcp_output}
-                     DEPENDS ${_plugin_qhcp_input}
-                     )
-
-  list(APPEND CACHED_RESOURCE_FILES ${_plugin_qhcp_output})
-  #set(FILE_DEPENDENCIES ${_plugin_qhcp_output})
-endif()

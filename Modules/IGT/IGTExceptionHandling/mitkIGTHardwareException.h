@@ -27,7 +27,10 @@ namespace mitk {
   * \ingroup IGT
   */  class MitkIGT_EXPORT IGTHardwareException : public mitk::IGTException
   {
-  
+  public:
+
+    IGTHardwareException(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
+    mitk::IGTException(file,lineNumber,desc,loc){}
   };
 } // namespace mitk
 #endif

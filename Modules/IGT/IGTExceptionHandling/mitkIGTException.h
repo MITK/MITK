@@ -28,6 +28,10 @@ namespace mitk {
   * \ingroup IGT
   */  class MitkIGT_EXPORT IGTException : public mitk::Exception //perhaps this should later derive from mitk::Exception (if there is an exception handling for complete MITK
   {
+  public:
+
+    IGTException(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
+    mitk::Exception(file,lineNumber,desc,loc){}
   
   };
 } // namespace mitk

@@ -46,5 +46,13 @@ PURPOSE.  See the above copyright notices for more information.
   MITK_DEBUG << message.str().c_str(); /* Print a MITK debug message to log exceptions in debug mode. */ \
   throw classname(__FILE__, __LINE__, message.str().c_str(),ITK_LOCATION); /* Explicit naming to work around Intel compiler bug.  */ \
   }
+
+/** Class macro for MITK exception classes.
+  * All MITK exception classes should derive from MITK::Exception.
+  */
+#define mitkExceptionClassMacro(ClassName,SuperClassName) \
+    ClassName(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :\
+    SuperClassName(file,lineNumber,desc,loc){}\
+    itkTypeMacro(ClassName, SuperClassName);\
   
 #endif

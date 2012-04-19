@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkIGTExports.h>
 #include <mitkException.h>
+#include "mitkExceptionMacro.h"
 
 namespace mitk {
   /**Documentation
@@ -30,9 +31,8 @@ namespace mitk {
   {
   public:
 
-    IGTException(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
-    mitk::Exception(file,lineNumber,desc,loc){}
-  
+    mitkExceptionClassMacro(IGTException,mitk::Exception);
+    
   };
 } // namespace mitk
 #endif

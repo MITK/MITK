@@ -16,9 +16,3 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkException.h"
-
-mitk::Exception::Exception(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
-  itk::ExceptionObject(file,lineNumber,desc,loc)
-{
-
-}

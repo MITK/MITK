@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IGTHARDWAREEXCEPTION_H_INCLUDED
 
 #include "mitkIGTException.h"
+#include "mitkExceptionMacro.h"
 
 namespace mitk {
   /**Documentation
@@ -28,9 +29,7 @@ namespace mitk {
   */  class MitkIGT_EXPORT IGTHardwareException : public mitk::IGTException
   {
   public:
-
-    IGTHardwareException(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
-    mitk::IGTException(file,lineNumber,desc,loc){}
+    mitkExceptionClassMacro(IGTHardwareException,mitk::IGTException);
   };
 } // namespace mitk
 #endif

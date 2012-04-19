@@ -23,8 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 class SpecializedTestException : mitk::Exception
   {
   public:
-    SpecializedTestException(const char *file, unsigned int lineNumber, const char *desc, const char *loc) :
-    mitk::Exception(file,lineNumber,desc,loc){}
+    mitkExceptionClassMacro(SpecializedTestException,mitk::Exception);
   };
 
 class ExceptionTestClass : public itk::Object
@@ -33,7 +32,7 @@ public:
   void throwExceptionManually() //this method is ONLY to test the constructor and no code example
                                 //normally exceptions should only be thrown by using the exception macro!
   {
-  throw mitk::Exception("test.cpp",155);
+  throw mitk::Exception("test.cpp",155,"","");
   }
 
   void throwExceptionWithMacro()

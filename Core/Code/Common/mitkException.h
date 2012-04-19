@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include <itkExceptionObject.h>
+#include "mitkExceptionMacro.h"
 
 namespace mitk {
   /**Documentation
@@ -30,11 +31,13 @@ namespace mitk {
   {
   
   public:
-    Exception(const char *file, unsigned int lineNumber=0, const char *desc="None", const char *loc="Unknown");
-
+    Exception(const char *file, unsigned int lineNumber=0,
+                  const char *desc="None", const char *loc="Unknown") :
+    itk::ExceptionObject(file,lineNumber,desc,loc){}
+    
     virtual ~Exception() throw() {}
 
-    itkTypeMacro(Exception, itk::ExceptionObject);
+    itkTypeMacro(ClassName, SuperClassName);
    
   };
 } // namespace mitk

@@ -194,6 +194,8 @@ namespace itk
     ImageType_mask::RegionType region_mask(start_mask,size);
     ImageType_mask::Pointer mask = ImageType_mask::New();
     mask->SetRegions(region_mask);
+    mask->SetSpacing(gradientImagePointer->GetSpacing());
+    mask->SetOrigin(gradientImagePointer->GetOrigin());
     mask->Allocate();
     ImageType_mask::IndexType pixelIndex_mask;
 
@@ -386,14 +388,16 @@ namespace itk
       old_number_of_bads=number_of_bads;
       std::cout << "bad voxels: " << number_of_bads << std::endl;
       number_of_bads=0;
-      
 
-      this->SetNthOutput(0, tensorImg);
       
     } //while
 
-   
-
+    this->SetNthOutput(0, tensorImg);
+    m_VectorImage = corrected_diffusion;
+    m_MaskImage = mask;
+    m_PseudoInverse = pseudoInverse;
+    m_H = H;
+    m_BVec=b_vec;
 
   }
   

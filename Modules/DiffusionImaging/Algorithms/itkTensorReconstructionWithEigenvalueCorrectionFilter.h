@@ -136,13 +136,19 @@ namespace itk
 
     itkGetMacro(PseudoInverse, vnl_matrix<double>);
     itkGetMacro(H, vnl_matrix<double>);
+    itkGetMacro(BVec, vnl_vector<double>);
 
     mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
     {
       return m_OutputDiffusionImage;
     }
 
-    itk::Image<float, 3>::Pointer GetMask()
+    ImageType::Pointer GetVectorImage()
+    {
+      return m_VectorImage;
+    }
+
+    itk::Image<double, 3>::Pointer GetMask()
     {
       return m_MaskImage;
     }
@@ -198,13 +204,16 @@ namespace itk
 
     mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
 
+    ImageType::Pointer                                m_VectorImage;
+
     float                                             m_B0Threshold;
 
 
 
-    itk::Image<float, 3>::Pointer m_MaskImage;
+    itk::Image<double, 3>::Pointer m_MaskImage;
     vnl_matrix<double> m_PseudoInverse;
     vnl_matrix<double> m_H;
+    vnl_vector<double> m_BVec;
 
 
   };

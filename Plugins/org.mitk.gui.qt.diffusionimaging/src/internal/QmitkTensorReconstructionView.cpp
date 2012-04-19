@@ -909,6 +909,26 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
       SetDefaultNodeProperties(node, newname.toStdString());
       nodes.push_back(node);
 
+
+
+      // Free Water elimination
+      if(m_Controls->m_FweCheckbox->isChecked())
+      {
+        typedef itk::VectorImage<short, 3>  ImageType;
+        ImageType* correctedVols = reconFilter->GetVectorImage();
+        itk::Image<double,3>* maskImg = reconFilter->GetMask();
+
+        vnl_matrix<double> pseudoInverse = reconFilter->GetPseudoInverse();
+        vnl_matrix<double> H = reconFilter->GetH();
+        vnl_vector<double> B_Vec = reconFilter->GetBVec();
+
+
+        std::cout << "pause";
+
+      }
+
+
+
       mitk::ProgressBar::GetInstance()->Progress();
 
     }

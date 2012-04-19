@@ -31,12 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 
 // MITK-ToF related includes
+#include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h> // configuration file holding e.g. plugin paths or path to test file directory
 #include <mitkToFDistanceImageToSurfaceFilter.h> // filter from module ToFProcessing that calculates a surface from the given range image
-#include <mitkToFImageGrabberCreator.h> // creator class that provides pre-configured ToFCameraDevices
 #include <mitkToFImageGrabber.h> // allows access to images provided by the ToF camera
-
-
 
 const std::string QmitkToFTutorialView::VIEW_ID = "org.mitk.views.toftutorial";
 
@@ -50,7 +48,6 @@ QmitkToFTutorialView::QmitkToFTutorialView()
 QmitkToFTutorialView::~QmitkToFTutorialView()
 {
 }
-
 
 void QmitkToFTutorialView::CreateQtPartControl( QWidget *parent )
 {
@@ -72,19 +69,18 @@ void QmitkToFTutorialView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMult
   m_MultiWidget = &stdMultiWidget;
 }
 
-
 void QmitkToFTutorialView::StdMultiWidgetNotAvailable()
 {
   m_MultiWidget = NULL;
 }
 
-
 void QmitkToFTutorialView::OnStep1()
 {
   // clean up data storage
   RemoveAllNodesFromDataStorage();
-  // use ToFImageGrabber to create instance of ToFImageGrabber that holds a ToFCameraMITKPlayerDevice for playing ToF data
-  mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
+  // Create an instance of ToFImageGrabber that holds a ToFCameraMITKPlayerDevice for playing ToF data
+  mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabber::New();
+  tofImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
   // set paths to test data
   std::string distanceFileName = MITK_TOF_DATA_DIR;
   distanceFileName.append("/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic"); 

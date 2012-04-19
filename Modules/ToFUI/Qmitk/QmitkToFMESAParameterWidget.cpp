@@ -24,9 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 #include <qcombobox.h>
 
-//mitk headers
-#include <mitkToFImageGrabberCreator.h>
-
 //itk headers
 #include <itksys/SystemTools.hxx>
 

@@ -97,6 +97,7 @@ QmitkDataManagerView::QmitkDataManagerView()
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
+
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -347,7 +348,7 @@ void QmitkDataManagerView::SetFocus()
 void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 {
   QAction* action = qobject_cast<QAction*> ( sender() );
-  
+
   std::map<QAction*, berry::IConfigurationElement::Pointer>::iterator it
     = m_ConfElements.find( action );
   if( it == m_ConfElements.end() )
@@ -390,7 +391,7 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
 {
   if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
     m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
-  
+
   if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
     m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
 
@@ -447,8 +448,6 @@ void QmitkDataManagerView::OpacityChanged(int value)
     node->SetFloatProperty("opacity", opacity);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-
-  MITK_INFO << "slider changed";
 }
 
 void QmitkDataManagerView::OpacityActionChanged()
@@ -462,7 +461,6 @@ void QmitkDataManagerView::OpacityActionChanged()
       m_OpacitySlider->setValue(static_cast<int>(opacity*100));
     }
   }
-  MITK_INFO << "changed";
 }
 
 void QmitkDataManagerView::ColorChanged()
@@ -475,8 +473,6 @@ void QmitkDataManagerView::ColorChanged()
     node->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0,color.green()/255.0,color.blue()/255.0));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-
-  MITK_INFO << "slider changed";
 }
 
 void QmitkDataManagerView::ColorActionChanged()
@@ -500,7 +496,6 @@ void QmitkDataManagerView::ColorActionChanged()
     styleSheet.append(")");
     m_ColorButton->setStyleSheet(styleSheet);
   }
-  MITK_INFO << "changed";
 }
 
 void QmitkDataManagerView::TextureInterpolationChanged()
@@ -865,7 +860,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
 
   }
 }
-void QmitkDataManagerView::NodeTreeViewRowsRemoved ( 
+void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {
   m_CurrentRowCount = m_NodeTreeModel->rowCount();

@@ -136,6 +136,16 @@ class mitkNavigationDataPlayerTestClass
     player->SetStream( mitk::NavigationDataPlayer::NormalFile );
     player->StartPlaying();
     player->Update();
+
+    MITK_TEST_OUTPUT(<<"Test double call of Pause() method!");
+    player->Pause(); //test pause method
+    player->Pause(); //call again to see if this causes an error
+
+    MITK_TEST_OUTPUT(<<"Test double call of Resume() method!");
+    player->Resume(); //test resume method
+    player->Resume(); //call again to see if this causes an error
+
+    player->Update();
     player->StopPlaying();
 
     mitk::NavigationData::Pointer nd = player->GetOutput();
@@ -192,7 +202,7 @@ class mitkNavigationDataPlayerTestClass
       }
     }
     MITK_TEST_OUTPUT(<<"Test pause method!");
-    player->Pause();
+    player->Pause(); 
 
     MITK_TEST_CONDITION_REQUIRED(!player->IsAtEnd(), "Testing method IsAtEnd() #1");
 

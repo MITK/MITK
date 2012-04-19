@@ -134,10 +134,20 @@ namespace itk
     itkSetMacro( BValue, TTensorPixelType);
     itkSetMacro( B0Threshold, float);
 
+    itkGetMacro(PseudoInverse, vnl_matrix<double>);
+    itkGetMacro(H, vnl_matrix<double>);
+
     mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
     {
       return m_OutputDiffusionImage;
     }
+
+    itk::Image<float, 3>::Pointer GetMask()
+    {
+      return m_MaskImage;
+    }
+
+
     //itkGetMacro(OutputDiffusionImage, mitk::DiffusionImage<double>)
 
     //itkGetMacro( GradientDirectionContainer, GradientDirectionContainerType::Pointer);
@@ -189,6 +199,12 @@ namespace itk
     mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
 
     float                                             m_B0Threshold;
+
+
+
+    itk::Image<float, 3>::Pointer m_MaskImage;
+    vnl_matrix<double> m_PseudoInverse;
+    vnl_matrix<double> m_H;
 
 
   };

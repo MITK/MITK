@@ -123,14 +123,14 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
     curveId = this->InsertCurve( "fiber" );
     this->SetCurveData(curveId, (*hist->GetXVals()), (*fiberVals));
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
-    this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(0,1,0,.5), Qt::SolidPattern));
+    this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(1,0,0,.5), Qt::SolidPattern));
     m_Vals.push_back(fiberVals);
 
 
     curveId = this->InsertCurve( "nonfiber" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*nonFiberVals) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
-    this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(1,0,0,.5), Qt::SolidPattern));
+    this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(0,1,0,.5), Qt::SolidPattern));
     m_Vals.push_back(nonFiberVals);
 
 

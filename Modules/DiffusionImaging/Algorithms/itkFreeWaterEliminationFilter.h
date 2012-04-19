@@ -164,7 +164,7 @@ namespace itk
   void check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
   typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion, double &temp_pixel);
 
-  void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof);
+  void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof,int numberb0);
 
 
   void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);

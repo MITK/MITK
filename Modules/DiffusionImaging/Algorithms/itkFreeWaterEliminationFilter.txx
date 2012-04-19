@@ -165,7 +165,7 @@ namespace itk
           GradientVectorType pixel2 = gradientImagePointer->GetPixel(ix);
           for( int f=0;f<nof;f++)
           {
-            if(pixel2[f]<0.0)
+            if(pixel2[f]<=0.0)
             {
               check_the_neighbors(x,y,z,f,size,ix,gradientImagePointer,pixelIndex,corrected_diffusion,temp_pixel);
               variableLengthVector[f] = temp_pixel;
@@ -226,6 +226,7 @@ namespace itk
               mean_b = mean_b + pixel4[i];
             }
           }
+          mean_b=mean_b/numberb0;
           if(mean_b>50.0)
           {
             pixel = 3.0;
@@ -301,11 +302,14 @@ namespace itk
               ix[1] = y;
               ix[2] = z;
               GradientVectorType pt = corrected_diffusion->GetPixel(ix);
+               mean_b=0.0;
+
+  
               for (int i=0;i<nof;i++)
               {
                 org_data[i]=pt[i];
               }
-              calculate_attenuation(org_data,b0index,atten,mean_b,nof);
+              calculate_attenuation(org_data,b0index,atten,mean_b,nof,numberb0);
               calculate_tensor(pseudoInverse,atten,tensor,nof,numberb0);
 
               temp_tensor[0][0]= tensor[0];temp_tensor[0][1]= tensor[3];temp_tensor[0][2]= tensor[5];
@@ -499,7 +503,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-  ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof)
+  ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof, int numberb0)
   {
     mean_b=0.0;
 
@@ -509,13 +513,17 @@ namespace itk
       {
         mean_b=mean_b+org_data[i];
       }
+        
     }
+    mean_b=mean_b/numberb0;
     int cnt=0;
     for (int i=0;i<nof;i++)
     {
       if(b0index[i]<0)
       {
+        //if(org_data[i]<0.001){org_data[i]=0.01;}
         atten[cnt]=org_data[i]/mean_b;
+        double frank=org_data[i]/mean_b;
         cnt++;
       }
     }

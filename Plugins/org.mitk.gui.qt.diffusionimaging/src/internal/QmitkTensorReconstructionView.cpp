@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVector.h"
 #include "itkB0ImageExtractionImageFilter.h"
 
+
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
 #include "mitkOdfNormalizationMethodProperty.h"
@@ -245,6 +246,7 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
 
     Advanced1CheckboxClicked();
     Advanced2CheckboxClicked();
+    Advanced3CheckboxClicked();
     TeemCheckboxClicked();
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
@@ -294,6 +296,7 @@ void QmitkTensorReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_TensorEstimationTeemEstimationMethodCombo), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
     connect( (QObject*)(m_Controls->m_Advanced1), SIGNAL(clicked()), this, SLOT(Advanced1CheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_Advanced2), SIGNAL(clicked()), this, SLOT(Advanced2CheckboxClicked()) );
+    connect( (QObject*)(m_Controls->m_Advanced3), SIGNAL(clicked()), this, SLOT(Advanced3CheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_TensorEstimationManualThreashold), SIGNAL(clicked()), this, SLOT(ManualThresholdClicked()) );
     connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
     connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
@@ -448,6 +451,14 @@ void QmitkTensorReconstructionView::Advanced2CheckboxClicked()
     m_Advanced2->isChecked();
 
   m_Controls->frame_2->setVisible(check);
+}
+
+void QmitkTensorReconstructionView::Advanced3CheckboxClicked()
+{
+  bool check = m_Controls->
+    m_Advanced3->isChecked();
+
+  m_Controls->frame_6->setVisible(check);
 }
 
 void QmitkTensorReconstructionView::ManualThresholdClicked()

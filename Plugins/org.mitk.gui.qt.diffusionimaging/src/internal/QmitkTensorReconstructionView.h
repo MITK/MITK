@@ -84,6 +84,7 @@ protected slots:
   void TeemCheckboxClicked();
   void Advanced1CheckboxClicked();
   void Advanced2CheckboxClicked();
+  void Advanced3CheckboxClicked();
   void ManualThresholdClicked();
   void MethodChoosen(int method);
   void Reconstruct(int method);

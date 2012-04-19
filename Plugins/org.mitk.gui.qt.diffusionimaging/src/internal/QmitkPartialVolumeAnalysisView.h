@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 // itk
 #include <itkTimeStamp.h>
 #include "itkDiffusionTensorPrincipleDirectionImageFilter.h"
+#include <itkExtractChannelFromRgbaImageFilter.h>
 
 // qmitk
 #include "QmitkStepperAdapter.h"
@@ -150,6 +151,7 @@ protected slots:
   void OnRenderWindowDelete(QObject * obj);
 
   void TextIntON();
+  void ExportClusteringResults();
 
 protected:
 

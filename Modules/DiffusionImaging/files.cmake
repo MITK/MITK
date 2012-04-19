@@ -65,7 +65,7 @@ set(CPP_FILES
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriter.cpp
   IODataStructures/TbssImages/mitkNrrdTbssRoiImageWriterFactory.cpp
   IODataStructures/TbssImages/mitkTbssImporter.cpp
-  
+
   # DataStructures Connectomics
   IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetwork.cpp
   IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkReader.cpp
@@ -99,7 +99,7 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/mitkTractAnalyzer.cpp
-  
+
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.cpp
   Algorithms/Connectomics/mitkConnectomicsHistogramBase.cpp
@@ -153,7 +153,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
-  
+
   # Datastructures Connectomics
   IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetwork.h
   IODataStructures/ConnectomicsNetwork/mitkConnectomicsNetworkReader.h
@@ -190,7 +190,8 @@ set(H_FILES
   Algorithms/itkSkeletonizationFilter.h
   Algorithms/itkReduceDirectionGradientsFilter.h
   Algorithms/itkResidualImageFilter.h
-  
+  Algorithms/itkExtractChannelFromRgbaImageFilter.h
+
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
   Algorithms/Connectomics/mitkConnectomicsHistogramBase.h

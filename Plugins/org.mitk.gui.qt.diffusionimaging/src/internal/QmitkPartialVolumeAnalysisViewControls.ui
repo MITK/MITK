@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>343</width>
-    <height>467</height>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -277,6 +277,9 @@
             </property>
             <item>
              <widget class="QSlider" name="m_UpsamplingSlider">
+              <property name="minimum">
+               <number>1</number>
+              </property>
               <property name="maximum">
                <number>50</number>
               </property>
@@ -482,6 +485,17 @@
           <widget class="QRadioButton" name="m_AllRadio">
            <property name="text">
             <string>All</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="m_ExportClusteringResultsButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../org.mitk.gui.qt.measurementtoolbox/resources/measurement.qrc">
+             <normaloff>:/measurement/arrow.png</normaloff>:/measurement/arrow.png</iconset>
            </property>
           </widget>
          </item>
@@ -767,6 +781,7 @@
  </customwidgets>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../org.mitk.gui.qt.measurementtoolbox/resources/measurement.qrc"/>
  </resources>
  <connections/>
 </ui>

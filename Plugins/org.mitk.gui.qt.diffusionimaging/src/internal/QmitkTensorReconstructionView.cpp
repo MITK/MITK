@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVector.h"
 #include "itkB0ImageExtractionImageFilter.h"
 #include "itkTensorReconstructionWithEigenvalueCorrectionFilter.h"
+#include "itkFreeWaterEliminationFilter.h"
 
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
@@ -915,15 +916,30 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
       if(m_Controls->m_FweCheckbox->isChecked())
       {
         typedef itk::VectorImage<short, 3>  ImageType;
-        ImageType* correctedVols = reconFilter->GetVectorImage();
-        itk::Image<double,3>* maskImg = reconFilter->GetMask();
+        ImageType::Pointer correctedVols = reconFilter->GetVectorImage();
+        itk::Image<double,3>::Pointer maskImg = reconFilter->GetMask();
 
         vnl_matrix<double> pseudoInverse = reconFilter->GetPseudoInverse();
         vnl_matrix<double> H = reconFilter->GetH();
         vnl_vector<double> B_Vec = reconFilter->GetBVec();
 
 
-        std::cout << "pause";
+
+
+        typedef itk::FreeWaterEliminationFilter<
+              DiffusionPixelType, TTensorPixelType > FweFilter;
+
+        FweFilter::Pointer fweFilter = FweFilter::New();
+        fweFilter->SetInput(correctedVols);
+        fweFilter->SetCorrectedVols(correctedVols);
+        fweFilter->SetMask(maskImg);
+        fweFilter->SetPseudoInverse(pseudoInverse);
+        fweFilter->SetH(H);
+        fweFilter->SetBVec(B_Vec);
+
+        fweFilter->Update();
+
+
 
       }
 

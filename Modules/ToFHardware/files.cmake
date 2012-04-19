@@ -1,5 +1,4 @@
 set(CPP_FILES
-  mitkToFImageGrabberCreator.cpp
   mitkToFImageGrabber.cpp
   mitkToFOpenCVImageGrabber.cpp
   mitkToFCameraDevice.cpp

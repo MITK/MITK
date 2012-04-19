@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImageDataItem.h>
 #include <mitkPicFileReader.h>
+#include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h>
-#include <mitkToFImageGrabberCreator.h>
 
 static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
 {
@@ -57,7 +57,8 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ToFOpenCVImageGrabber");
 
   std::string dirName = MITK_TOF_DATA_DIR;
-  mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
+  mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabber::New();
+  tofImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
   std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic";
   tofImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
   std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.pic";

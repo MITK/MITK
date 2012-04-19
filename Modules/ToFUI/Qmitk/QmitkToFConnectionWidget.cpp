@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include "mitkToFConfig.h"
-//#include <mitkToFImageGrabberCreator.h>
 #include "mitkToFCameraPMDCamCubeDevice.h"
 #include "mitkToFCameraPMDRawDataCamCubeDevice.h"
 #include "mitkToFCameraPMDCamBoardDevice.h"

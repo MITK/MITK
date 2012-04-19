@@ -28,14 +28,14 @@ namespace mitk {
   */  
   class MITK_CORE_EXPORT Exception : itk::ExceptionObject 
   {
-  /*
+  
   public:
-    explicit Exception(const char *file, unsigned int lineNumber=0,
-                  const char *desc="None", const char *loc="Unknown");
-    explicit Exception(const std::string& file, unsigned int lineNumber=0,
-                  const std::string& desc="None",
-                  const std::string& loc="Unknown");
-  */
+    Exception(const char *file, unsigned int lineNumber=0, const char *desc="None", const char *loc="Unknown");
+
+    virtual ~Exception() throw() {}
+
+    itkTypeMacro(Exception, itk::ExceptionObject);
+   
   };
 } // namespace mitk
 #endif

@@ -23,49 +23,53 @@ PURPOSE.  See the above copyright notices for more information.
 class ExceptionTestClass : public itk::Object
 {
 public: 
-  void throwExceptionManually()
+  void throwExceptionManually() //this method is ONLY to test the constructor and no code example
+                                //normally exceptions should only be thrown by using the exception macro!
   {
-  //throw mitk::Exception();
-  
+  throw mitk::Exception("test.cpp",155);
   }
+
   void throwExceptionWithMacro()
   {
   mitkExceptionMacro("test");
-
   }
 
+  static void TestExceptionConstructor()
+    {
+    bool exceptionThrown = false;
+    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    try
+       {
+       myExceptionTestObject.throwExceptionManually();
+       }
+    catch(mitk::Exception)
+       {
+       exceptionThrown = true;
+       }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkException");
+    }
+
+  static void TestExceptionMacro()
+    {
+    bool exceptionThrown = false;
+    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    try
+     {
+     myExceptionTestObject.throwExceptionWithMacro();
+     }
+    catch(mitk::Exception)
+     {
+     exceptionThrown = true;
+     }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkExceptionMacro");
+    }
 };
 
 int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("ClaronTool");
-
-  bool exceptionThrown = false;
-
-  ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
-  
-  try
-   {
-   myExceptionTestObject.throwExceptionManually();
-   }
-  catch(mitk::Exception)
-   {
-   exceptionThrown = true;
-   }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkException");
-
-
-  exceptionThrown = false;
-  try
-   {
-   myExceptionTestObject.throwExceptionWithMacro();
-   }
-  catch(mitk::Exception)
-   {
-   exceptionThrown = true;
-   }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkExceptionMacro");
-  
+  MITK_TEST_BEGIN("MITKException");
+  ExceptionTestClass::TestExceptionConstructor();
+  ExceptionTestClass::TestExceptionMacro(); 
   MITK_TEST_END();
 
 }

@@ -188,7 +188,7 @@ void mitk::ImageWriter::GenerateData()
         }
         else
         {
-          WriteByITK(input, filename.str());
+          WriteByITK(image, filename.str());
         }
       }
     }

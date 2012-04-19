@@ -204,7 +204,7 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
-  Algorithms/itkFreeWaterEliminationFilter.h
+  Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
 )
 
 set( TOOL_FILES

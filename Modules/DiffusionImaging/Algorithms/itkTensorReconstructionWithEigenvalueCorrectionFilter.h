@@ -14,8 +14,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itk_FreeWaterEliminationFilter_h_
-#define _itk_FreeWaterEliminationFilter_h_
+#ifndef _itk_TensorReconstructionWithEigenvalueCorrectionFilter_h_
+#define _itk_TensorReconstructionWithEigenvalueCorrectionFilter_h_
 
 #include "itkImageToImageFilter.h"
 #include <itkDiffusionTensor3D.h>
@@ -35,13 +35,13 @@ namespace itk
 {
 
   template <class TDiffusionPixelType, class TTensorPixelType>
-  class FreeWaterEliminationFilter
+  class TensorReconstructionWithEigenvalueCorrectionFilter
     : public ImageToImageFilter< itk::Image< TDiffusionPixelType, 3 >, itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3> >
   {
 
   public:
 
-    typedef FreeWaterEliminationFilter                  Self;
+    typedef TensorReconstructionWithEigenvalueCorrectionFilter                  Self;
     typedef SmartPointer<Self>                          Pointer;
     typedef SmartPointer<const Self>                    ConstPointer;
     typedef ImageToImageFilter< Image< TDiffusionPixelType, 3>,
@@ -52,7 +52,7 @@ namespace itk
     itkNewMacro(Self);
 
     /** Runtime information support. */
-    itkTypeMacro(FreeWaterEliminationFilter, ImageToImageFilter);
+    itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter);
 
     typedef TDiffusionPixelType                       ReferencePixelType;
     typedef TDiffusionPixelType                       GradientPixelType;
@@ -132,6 +132,7 @@ namespace itk
     }
 
     itkSetMacro( BValue, TTensorPixelType);
+    itkSetMacro( B0Threshold, float);
 
     mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
     {
@@ -143,8 +144,8 @@ namespace itk
 
   protected:
 
-    FreeWaterEliminationFilter();
-    ~FreeWaterEliminationFilter() {};
+    TensorReconstructionWithEigenvalueCorrectionFilter();
+    ~TensorReconstructionWithEigenvalueCorrectionFilter() {};
 
 
     void GenerateData();
@@ -161,21 +162,13 @@ namespace itk
 
   private:
 
-  void check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
-  typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion, double &temp_pixel);
+    void check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
+    typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion, double &temp_pixel);
 
-  void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof,int numberb0);
-
-
-  void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
-  
+    void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof,int numberb0);
 
 
-
-
-
-
-
+    void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;
@@ -195,6 +188,8 @@ namespace itk
 
     mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
 
+    float                                             m_B0Threshold;
+
 
   };
 
@@ -207,7 +202,7 @@ namespace itk
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkFreeWaterEliminationFilter.txx"
+#include "itkTensorReconstructionWithEigenvalueCorrectionFilter.txx"
 #endif
 
 

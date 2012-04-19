@@ -14,8 +14,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itk_FreeWaterEliminationFilter_txx_
-#define _itk_FreeWaterEliminationFilter_txx_
+#ifndef _itk_TensorReconstructionWithEigenvalueCorrectionFilter_txx_
+#define _itk_TensorReconstructionWithEigenvalueCorrectioFiltern_txx_
 #endif
 #include "itkImageRegionConstIterator.h"
 #include <math.h>
@@ -26,16 +26,15 @@ namespace itk
 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
-  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
-    ::FreeWaterEliminationFilter()
+  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
+    ::TensorReconstructionWithEigenvalueCorrectionFilter()
   {
-
-
+    m_B0Threshold = 50.0;
   }
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
-  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::GenerateData ( )
   {
 
@@ -227,7 +226,7 @@ namespace itk
             }
           }
           mean_b=mean_b/numberb0;
-          if(mean_b>50.0)
+          if(mean_b>m_B0Threshold)
           {
             pixel = 3.0;
             //
@@ -402,7 +401,7 @@ namespace itk
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
-    FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+    TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
     ::SetGradientImage( GradientDirectionContainerType *gradientDirection,
     const GradientImagesType *gradientImage )
   {
@@ -439,7 +438,7 @@ namespace itk
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
-  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
   typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,
     ImageType::Pointer corrected_diffusion,double &temp_pixel)   
@@ -502,7 +501,7 @@ namespace itk
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
-  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof, int numberb0)
   {
     mean_b=0.0;
@@ -532,7 +531,7 @@ namespace itk
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
-  FreeWaterEliminationFilter<TDiffusionPixelType, TTensorPixelType>
+  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten,vnl_vector<double> &tensor, int nof,int numberb0)
   {
     for (int i=0;i<nof-numberb0;i++)

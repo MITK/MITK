@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>1303</height>
+    <height>1458</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -331,7 +331,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="m_ReconstructionThreashold">
+          <widget class="QLineEdit" name="m_ReconstructionThreshold">
            <property name="text">
             <string>0</string>
            </property>

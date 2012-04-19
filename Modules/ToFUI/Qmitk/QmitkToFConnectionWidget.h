@@ -93,7 +93,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     Ui::QmitkToFConnectionWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
-    mitk::ToFCameraDevice::Pointer m_ToFCameraDevice;
 
     int m_IntegrationTime; ///< member for the current integration time of the ToF device
     int m_ModulationFrequency; ///< member for the current modulation frequency of the ToF device

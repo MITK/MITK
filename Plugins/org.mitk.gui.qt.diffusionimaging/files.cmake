@@ -100,6 +100,7 @@ set(CACHED_RESOURCE_FILES
   resources/stochFB.png
   resources/tbss.png
   resources/QmitkBrainNetworkAnalysisViewIcon_48.png
+  resources/arrow.png
 )
 
 set(QRC_FILES

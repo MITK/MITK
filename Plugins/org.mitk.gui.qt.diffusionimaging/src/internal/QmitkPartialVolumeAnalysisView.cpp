@@ -1857,6 +1857,8 @@ void QmitkPartialVolumeAnalysisView::OnRenderWindowDelete(QObject * obj)
 {
   if(obj == m_LastRenderWindow)
     m_LastRenderWindow = 0;
+  if(obj == m_SelectedRenderWindow)
+    m_SelectedRenderWindow = 0;
 }
 
 bool QmitkPartialVolumeAnalysisView::event( QEvent *event )

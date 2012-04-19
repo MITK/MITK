@@ -89,7 +89,6 @@ void mitk::PlanarCircleMapper3D::GenerateData()
 
     m_CircleActor = vtkOpenGLActor::New();
     m_CircleActor->SetMapper(m_VtkCircleDataMapperGL);
-    m_CircleActor->GetProperty()->SetOpacity(0.8);
     m_CircleAssembly->AddPart(m_CircleActor);
   }
   catch(...)
@@ -114,6 +113,8 @@ void mitk::PlanarCircleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
     float polyOpaq;
     this->GetDataNode()->GetOpacity(polyOpaq, NULL);
+    if (polyOpaq>=1) // hack to avoid wrong color if opacity==1
+      polyOpaq = 0.999;
     m_CircleActor->GetProperty()->SetOpacity((double) polyOpaq);
 
     float temprgb[3];

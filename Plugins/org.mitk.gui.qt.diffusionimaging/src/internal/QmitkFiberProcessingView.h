@@ -95,7 +95,7 @@ public:
   void GenerateRoiImage();
   void ProcessSelectedBundles();
   void ResampleSelectedBundles();
-
+  void DoFaColorCoding();
   void Extract3d();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
@@ -175,7 +175,7 @@ private:
   //contains the selected PlanarFigures
   std::vector<mitk::DataNode::Pointer> m_SelectedPF;
 
-  mitk::Image::ConstPointer       m_SelectedImage;
+  mitk::Image::Pointer            m_SelectedImage;
   mitk::Image::Pointer            m_InternalImage;
   mitk::PlanarFigure::Pointer     m_PlanarFigure;
   float                           m_UpsamplingFactor;

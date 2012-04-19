@@ -102,6 +102,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
     connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
     connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
+    connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
   }
 }
 
@@ -734,6 +735,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_Extract3dButton->setEnabled(false);
     m_Controls->m_ResampleFibersButton->setEnabled(false);
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
+    m_Controls->m_FaColorFibersButton->setEnabled(false);
   }
   else
   {
@@ -759,6 +761,9 @@ void QmitkFiberProcessingView::UpdateGui()
       m_Controls->m_JoinBundles->setEnabled(false);
       m_Controls->m_SubstractBundles->setEnabled(false);
     }
+
+    if (m_SelectedImage.IsNotNull())
+      m_Controls->m_FaColorFibersButton->setEnabled(true);
   }
 
   // are planar figures selected?
@@ -945,7 +950,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));
   newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true));
 
-
   newNode->AddProperty( "selected", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
@@ -956,13 +960,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
   newNode->AddProperty( "planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
   newNode->AddProperty( "planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
-
-//  PlanarFigureControlPointStyleProperty::Pointer styleProperty =
-//    dynamic_cast< PlanarFigureControlPointStyleProperty* >( node->GetProperty( "planarfigure.controlpointshape" ) );
-//  if ( styleProperty.IsNotNull() )
-//  {
-//    m_ControlPointShape = styleProperty->GetShape();
-//  }
 
   newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   newNode->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(2.0) );
@@ -1733,5 +1730,30 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
     fib->DoFiberSmoothing(factor);
   }
+}
+
+void QmitkFiberProcessingView::DoFaColorCoding()
+{
+  if (m_SelectedImage.IsNull())
+    return;
+//  mitk::PixelType pType = mitk::MakeScalarPixelType<float>();
+//  if (m_SelectedImage->GetPixelType()!=pType)
+//  {
+//    //mitk::Image bla; bla.GetPixelType().GetNameOfClass()
+//        MITK_INFO << m_SelectedImage->GetPixelType().GetNameOfClass();
+//    QMessageBox::warning(NULL, "Wrong Image Type", "FA/GFA image should be of type float");
+////    return;
+//  }
+
+  for( int i=0; i<m_SelectedFB.size(); i++ )
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+    fib->SetFAMap(m_SelectedImage);
+    fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_FA_BASED);
+    fib->DoColorCodingFaBased();
+  }
+
+  if(m_MultiWidget)
+    m_MultiWidget->RequestUpdate();
 }
 

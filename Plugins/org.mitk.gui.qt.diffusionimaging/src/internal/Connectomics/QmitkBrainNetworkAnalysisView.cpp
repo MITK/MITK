@@ -101,6 +101,8 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->syntheticNetworkComboBox->insertItem(3,"Scale free network");
     this->m_Controls->syntheticNetworkComboBox->insertItem(4,"Small world network");
   }
+
+  this->WipeDisplay();
 }
 
 
@@ -153,16 +155,18 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
     return;
   }
 
-  bool alreadyFiberBundleSelected( false ), alreadyImageSelected( false );
+  bool alreadyFiberBundleSelected( false ), alreadyImageSelected( false ), currentFormatUnknown( true );
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
        ++it )
   {
     mitk::DataNode::Pointer node = *it;
+    currentFormatUnknown = true;
   
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
+      currentFormatUnknown = false;
       if( alreadyImageSelected )
       {
         this->WipeDisplay();
@@ -176,6 +180,7 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
 
     if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
     {
+      currentFormatUnknown = false;
       // a fiber bundle has to be in conjunction with a parcellation
       if( nodes.size() != 2 || alreadyFiberBundleSelected )
       {
@@ -188,10 +193,11 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
       m_Controls->inputImageTwoNameLabel->setVisible( true );
     }
 
-    {
+    { // network section
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
       if( node.IsNotNull() && network )
       {
+        currentFormatUnknown = false;
         if( nodes.size() != 1 )
         {
           // only valid option is a single network
@@ -229,8 +235,14 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
 
         m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
       }
+    } // end network section
+
+    if ( currentFormatUnknown )
+    {
+      this->WipeDisplay();
+      return;
     }
-  }
+  } // end for loop
 }
 
 void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex)

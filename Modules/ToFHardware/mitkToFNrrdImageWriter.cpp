@@ -99,7 +99,7 @@ namespace mitk
     }
     if (this->m_RGBImageSelected)
     {
-      this->m_RGBOutfile.write(( char* )rgbData, this->m_ImageSizeInBytes);
+      this->m_RGBOutfile.write(( char* )rgbData, this->m_PixelNumber*3 * sizeof(unsigned char));
     }
     this->m_NumOfFrames++;
   }

@@ -8,20 +8,24 @@ if(MITK_USE_QT AND QT4_FOUND)
     add_subdirectory(PluginGenerator)
   endif()
   
-  if(MITK_BUILD_APP_CoreApp OR MITK_BUILD_ALL_APPS)
-    add_subdirectory(CoreApp)
-  endif()
-
-  if(MITK_BUILD_APP_ExtApp OR MITK_BUILD_ALL_APPS)
-    add_subdirectory(ExtApp)
+  if(MITK_USE_BLUEBERRY)
+  
+    foreach(mitk_app ${MITK_APPS})
+      # extract target_dir and option_name
+      string(REPLACE "^^" "\\;" target_info ${mitk_app})
+      set(target_info_list ${target_info})
+      list(GET target_info_list 0 target_dir)
+      list(GET target_info_list 1 option_name)
+      # check if the application is enabled
+      if(${option_name} OR MITK_BUILD_ALL_APPS)
+        add_subdirectory(${target_dir})
+      endif()
+    endforeach()
+  
   endif()
 
   if(MITK_BUILD_TUTORIAL)
     add_subdirectory(Tutorial)
-  endif()
-  
-  if(MITK_BUILD_APP_mitkDiffusion OR MITK_BUILD_ALL_APPS)
-    add_subdirectory(mitkDiffusion)
   endif()
 
 endif()

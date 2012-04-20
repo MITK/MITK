@@ -54,13 +54,13 @@ class mitkTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
     virtual void CreateConnections();
 
     /*!
-    \brief returns the ToFImageGrabber which was provided by the ToFImageGrabberCreator after selecting a camera / player
+    \brief returns the ToFImageGrabber which was configured after selecting a camera / player
     \return ToFImageGrabber currently used by the widget
     */
     mitk::ToFImageGrabber* GetToFImageGrabber();
 
     /*!
-    \brief sets the ToFImageGrabber which was provided by the ToFImageGrabberCreator after selecting a camera / player
+    \brief sets the ToFImageGrabber which was configured after selecting a camera / player
     */
     void SetToFImageGrabber(mitk::ToFImageGrabber* aToFImageGrabber);
 

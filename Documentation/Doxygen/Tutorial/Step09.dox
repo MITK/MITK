@@ -10,89 +10,82 @@ The mentioned tool was used to create a plug-in QmitkRegionGrowing.
 Let's first look at what files the BundleGenerator created:
 
 \verbatim
-
 documentation\doxygen\
   modules.dox............................. Doxygen file for documenting your plug-in
-
-META-INF\
-  MANIFEST.MF............................. Information about your plug-in
 
 resources\
   icon.xpm................................ The icon of your plug-in. GIMP or other programs (including your text editor)
                                            can be used to change this
-  QmitkMITKRegionGrowingView.qrc.......... QT file for managing resources
 
 src\internal\
   QmitkMITKRegionGrowingView.cpp.......... The most important file, implementing behaviour
   QmitkMITKRegionGrowingView.h............ Header file of the functionality
   QmitkMITKRegionGrowingViewControls.ui... XML file of the Qt Designer, describes buttons, combo boxes, etc. of your controls
-src\
-  RegiongrowingDll.h...................... Manages the import/export of your plug-in dll
 
 CMakeLists.txt \.......................... Build system related files for CMake
 files.cmake    /
-manifest.cpp \............................ BlueBerry integration
-plugin.xml   /
-
+manifest_headers.cmake.................... Information about your plug-in
+plugin.xml ............................... BlueBerry integration
 \endverbatim
 
 If you are not familiar with Qt development, please look into 
 <a href="http://doc.trolltech.com/4.6/designer-manual.html">this Trolltech page describing .ui files</a> (no, forget about the please, DO it!)
 
-The C++ files implement a subclass of QmitkFunctionality, so they ARE functionalities. In this
-special case of QmitkRegionGrowing, we added the ability to set some seed points and run a region grower.
-If your are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
+The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the ability to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
+
+Since an access to the StdMultiWidget is needed, manifest_headers.cmake has to be edited: 
+\verbatim
+set(Require-Plugin org.mitk.gui.qt.common org.mitk.gui.qt.stdmultiwidgeteditor)
+\endverbatim
 
 To add a PointSet for the seed points:
 QmitkRegionGrowingView.h
 
 Add includes:
 \verbatim
-#include "mitkPointSet.h"
-#include <itkImage.h>
+#include "QmitkPointListWidget.h"
+#include "QmitkStdMultiWidget.h"
+#include "QmitkStdMultiWidgetEditor.h"
 \endverbatim
 
-Add the point set as protected object:
+Add the point set as protected object and add Pointers for a QmitkPointListWidget and a QmitkStdMultiWidget:
 \verbatim
 /// \brief This is the actual seed point data object
 mitk::PointSet::Pointer m_PointSet;
+
+QmitkPointListWidget* lstPoints;
+QmitkStdMultiWidget* m_MultiWidget;
 \endverbatim
  
 QmitkRegionGrowingView.cpp
 
-Add includes:
-\verbatim
-#include "QmitkPointListWidget.h"
-\endverbatim
-
 CreateQtPartControl(): 
 \verbatim
+// create a QmitkPointListWidget and add it to the widget created from .ui file
+lstPoints = new QmitkPointListWidget();
+m_Controls.verticalLayout->addWidget(lstPoints);
+
+// get access to StdMultiWidget by using RenderWindowPart
+QmitkStdMultiWidgetEditor* qSMWE = dynamic_cast<QmitkStdMultiWidgetEditor*>(GetRenderWindowPart());
+m_MultiWidget = qSMWE->GetStdMultiWidget();
+
 // let the point set widget know about the multi widget (crosshair updates)
-m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
-    
+lstPoints->SetMultiWidget( m_MultiWidget );
+      
 // create a new DataTreeNode containing a PointSet with some interaction
 m_PointSet = mitk::PointSet::New();
 
-mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
 pointSetNode->SetData( m_PointSet );
 pointSetNode->SetName("seed points for region growing");
 pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
 pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024) );
 
 // add the pointset to the data tree (for rendering and access by other modules)
-GetDefaultDataStorage()->Add( pointSetNode );
+GetDataStorage()->Add( pointSetNode );
 
 // tell the GUI widget about out point set
-m_Controls->lstPoints->SetPointSetNode( pointSetNode );
-\endverbatim
-
-StdMultiWidgetAvailable(): 
-\verbatim
-m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
-\endverbatim
-StdMultiWidgetNotAvailable(): 
-\verbatim
-m_Controls->lstPoints->SetMultiWidget( NULL );
+lstPoints->SetPointSetNode( pointSetNode );
 \endverbatim
 
 To use the ITK region grower:

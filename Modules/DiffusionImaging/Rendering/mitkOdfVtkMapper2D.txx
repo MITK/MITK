@@ -69,9 +69,6 @@ template<class T, int N>
 vtkSmartPointer<vtkTransform> mitk::OdfVtkMapper2D<T,N>::m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
 
 template<class T, int N>
-vtkSmartPointer<vtkDoubleArray> mitk::OdfVtkMapper2D<T,N>::m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
-
-template<class T, int N>
 vtkSmartPointer<vtkOdfSource> mitk::OdfVtkMapper2D<T,N>::m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
 
 template<class T, int N>
@@ -171,12 +168,6 @@ mitk::OdfVtkMapper2D<T,N>
   m_Clippers2[0]->SetClipFunction( m_ThickPlanes2[0] );
   m_Clippers2[1]->SetClipFunction( m_ThickPlanes2[1] );
   m_Clippers2[2]->SetClipFunction( m_ThickPlanes2[2] );
-
-  m_TemplateOdf = itk::OrientationDistributionFunction<T,N>::GetBaseMesh();
-
-  m_OdfVals->Allocate(N);
-  m_OdfSource->SetTemplateOdf(m_TemplateOdf);
-  m_OdfSource->SetOdfVals(m_OdfVals);
 
   m_ShowMaxNumber = 500;
 }
@@ -299,41 +290,21 @@ void  mitk::OdfVtkMapper2D<T,N>
       odf[i] = (double)odfvals->GetComponent(id,i);
   }
 
-  switch(m_Normalization)
-  {
-  case ODFN_MINMAX:
-    odf = odf.MinMaxNormalize();
-    break;
-  case ODFN_MAX:
-    odf = odf.MaxNormalize();
-    break;
-  case ODFN_NONE:
-    // nothing
-    break;
-  case ODFN_GLOBAL_MAX:
-    // global max not implemented yet
-    break;
-  default:
-    odf = odf.MinMaxNormalize();
-  }
-
   switch(m_ScaleBy)
   {
   case ODFSB_NONE:
-    m_OdfSource->SetAdditionalScale(1.0);
+    m_OdfSource->SetScale(m_Scaling);
     break;
   case ODFSB_GFA:
-    m_OdfSource->SetAdditionalScale(odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2));
+    m_OdfSource->SetScale(m_Scaling*odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2));
     break;
   case ODFSB_PC:
-    m_OdfSource->SetAdditionalScale(odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 0));
+    m_OdfSource->SetScale(m_Scaling*odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 0));
     break;
   }
 
-  for(int i=0; i<N; i++)
-    m_OdfVals->SetComponent(0,i,0.5*odf[i]*m_Scaling);
-
-
+  m_OdfSource->SetNormalization(m_Normalization);
+  m_OdfSource->SetOdf(odf);
   m_OdfSource->Modified();
 }
 
@@ -667,6 +638,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       {
         std::cout << err << std::endl;
       }
+
       m_OdfsPlanes[index]->AddInput(glyphGenerator->GetOutput());
 
       trans->Delete();
@@ -808,8 +780,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 }
 
 template<class T, int N>
-void  mitk::OdfVtkMapper2D<T,N>
-::AdaptOdfScalingToImageSpacing( int index )
+double  mitk::OdfVtkMapper2D<T,N>::GetMinImageSpacing( int index )
 {
   // Spacing adapted scaling
   double spacing[3];
@@ -830,48 +801,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     min = spacing[0];
     min = min > spacing[2] ? spacing[2] : min;
   }
-  m_OdfSource->SetScale(min);
-}
-
-template<class T, int N>
-void  mitk::OdfVtkMapper2D<T,N>
-::SetRendererLightSources( mitk::BaseRenderer *renderer )
-{
-  // Light Sources
-  vtkCollectionSimpleIterator sit;
-  vtkLight* light;
-  for(renderer->GetVtkRenderer()->GetLights()->InitTraversal(sit);
-    (light = renderer->GetVtkRenderer()->GetLights()->GetNextLight(sit)); )
-  {
-    renderer->GetVtkRenderer()->RemoveLight(light);
-  }
-
-  light = vtkLight::New();
-  light->SetFocalPoint(0,0,0);
-  light->SetLightTypeToSceneLight();
-  light->SwitchOn();
-  light->SetIntensity(1.0);
-  light->PositionalOff();
-
-  itk::Point<float> p;
-  int index = GetIndex(renderer);
-  if(index==0)
-  {
-    p[0] = 0; p[1] = 0; p[2] = 10000;
-  }
-  if(index==1)
-  {
-    p[0] = 0; p[1] = 10000; p[2] = 0;
-  }
-  if(index==2)
-  {
-    p[0] = 10000; p[1] = 0; p[2] = 0;
-  }
-
-  mitk::Point3D p2;
-  this->GetInput()->GetGeometry()->IndexToWorld(p,p2);
-  light->SetPosition(p2[0],p2[1],p2[2]);
-  renderer->GetVtkRenderer()->AddLight(light);
+  return min;
 }
 
 template<class T, int N>
@@ -925,7 +855,7 @@ bool mitk::OdfVtkMapper2D<T,N>
   int nonZeros = 0;
   for (int j=0; j<3; j++)
   {
-    if (fabs(n[j])>1e-7){
+    if (fabs(n[j])>mitk::eps){
       nonZeros++;
     }
   }
@@ -963,8 +893,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     OdfDisplayGeometry dispGeo =
       MeasureDisplayedGeometry( renderer);
 
-    AdaptOdfScalingToImageSpacing(index);
-    //SetRendererLightSources(renderer);
+    m_OdfSource->SetAdditionalScale(GetMinImageSpacing(index));
     ApplyPropertySettings();
     Slice(renderer, dispGeo);
     m_LastDisplayGeometry = dispGeo;

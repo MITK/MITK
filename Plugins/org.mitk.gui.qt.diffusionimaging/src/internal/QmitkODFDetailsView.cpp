@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTextEdit>
 #include <mitkTensorImage.h>
 #include <QMessageBox>
+#include <QmitkRenderingManager.h>
 
 const std::string QmitkODFDetailsView::VIEW_ID = "org.mitk.views.odfdetails";
 
@@ -33,6 +34,7 @@ QmitkODFDetailsView::QmitkODFDetailsView()
   , m_Controls( 0 )
   , m_MultiWidget( NULL )
   , m_OdfNormalization(0)
+  , m_SelectedNode(NULL)
 {
   m_VtkActor = vtkActor::New();
   m_VtkMapper = vtkPolyDataMapper::New();
@@ -79,6 +81,7 @@ void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkODFDetailsViewControls;
     m_Controls->setupUi( parent );
     m_Controls->m_OdfBox->setVisible(false);
+    m_Controls->m_ODFRenderWidget->setVisible(false);
   }
 }
 
@@ -130,7 +133,20 @@ void QmitkODFDetailsView::StdMultiWidgetNotAvailable()
   m_MultiWidget = NULL;
 }
 
-void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
+void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+  if (m_SelectedNode.IsNotNull())
+    m_SelectedNode->RemoveObserver( m_PropertyObserverTag );
+  UpdateOdf();
+  if (m_SelectedNode.IsNotNull())
+  {
+    itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
+    command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
+    m_PropertyObserverTag = m_SelectedNode->AddObserver( itk::ModifiedEvent(), command );
+  }
+}
+
+void QmitkODFDetailsView::UpdateOdf()
 {
   try
     {
@@ -138,6 +154,7 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
     if (nodes.empty()) return;
     if (!nodes.front()) return;
+    m_SelectedNode = nodes.front();
 
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(nodes.front()->GetData());
 
@@ -155,7 +172,6 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
     m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
     itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf;
-    itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> originalOdf;
 
     mitk::Point3D world = m_MultiWidget->GetCrossPosition();
     mitk::Point3D index;
@@ -170,6 +186,7 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     // otherwise possible crash for a scenario with multiple nodes
     if (dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()) && ( nodes.front()->GetData()->GetGeometry()->IsInside(world) ) )
     {
+      m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(true);
       OdfVectorImgType::Pointer itkQBallImage = OdfVectorImgType::New();
       mitk::CastToItkImage<OdfVectorImgType>(dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()), itkQBallImage);
@@ -208,6 +225,7 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     }
     else if (dynamic_cast<mitk::TensorImage*>(nodes.front()->GetData()))
     {
+      m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(false);
       TensorImageType::Pointer itkQBallImage = TensorImageType::New();
       mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(nodes.front()->GetData()), itkQBallImage);
@@ -251,9 +269,14 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
       overviewText += "Main Diffusion:\n     "+QString::number(eigenVectors[0][0])+"\n     "+QString::number(eigenVectors[1][0])+"\n     "+QString::number(eigenVectors[2][0])+"\n";
       overviewText += "Values:\n     "+QString::number(tensorelems[0])+"\n     "+QString::number(tensorelems[1])+"\n     "+QString::number(tensorelems[2])+"\n     "+QString::number(tensorelems[3])+"\n     "+QString::number(tensorelems[4])+"\n     "+QString::number(tensorelems[5])+"\n     "+"\n";
     }
+    else
+    {
+      m_Controls->m_ODFRenderWidget->setVisible(false);
+      m_Controls->m_OdfBox->setVisible(false);
+      overviewText += "Please select a Q-Ball or tensor image\n";
+    }
 
-
-    originalOdf = odf;
+    m_Controls->m_ODFDetailsWidget->SetParameters(odf);
 
     switch(m_OdfNormalization)
     {
@@ -264,19 +287,22 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
       odf = odf.MaxNormalize();
       break;
     case 2:
-      // nothing
+      odf = odf.MaxNormalize();
       break;
     default:
       odf = odf.MinMaxNormalize();
     }
 
-    m_Controls->m_ODFDetailsWidget->SetParameters(originalOdf);
     m_Controls->m_ODFRenderWidget->GenerateODF(odf);
-
     m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
   }
   catch(...)
   {
     QMessageBox::critical(0, "Error", "Data could not be analyzed. The image might be corrupted.");
   }
+}
+
+void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
+{
+  UpdateOdf();
 }

@@ -34,6 +34,7 @@ QmitkODFRenderWidget::QmitkODFRenderWidget(QWidget* parent, Qt::WindowFlags f): 
   m_RenderWindow = new QmitkRenderWindow(this, "odf render widget");
   m_RenderWindow->setMaximumSize(300,300);
   m_RenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
+
   //m_RenderWindow->SetLayoutIndex( 3 );
   QmitkODFRenderWidgetLayout->addWidget( m_RenderWindow );
 }
@@ -45,6 +46,8 @@ QmitkODFRenderWidget::~QmitkODFRenderWidget()
 
 void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf )
 {
+  try
+  {
   m_Surface = mitk::Surface::New();
   m_ds = mitk::StandaloneDataStorage::New();
   m_Node = mitk::DataNode::New();
@@ -55,22 +58,6 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   vtkPoints *points = vtkPoints::New();
   vtkFloatArray *scalars = vtkFloatArray::New();
 
-  double max = -10000;
-  double min = 10000;
-  for (int i=0; i<QBALL_ODFSIZE; i++)
-    if(odf[i]<min)
-      min = odf[i];
-
-//  if (min<0)
-//    return;
-
-  for (int i=0; i<QBALL_ODFSIZE; i++)
-    if(odf[i]>max)
-      max = odf[i];
-
-  if (std::fabs(max)<mitk::eps)
-    max = 0.0001;
-
   for (int i=0; i<QBALL_ODFSIZE; i++){
     double p[3];
     m_TemplateOdf->GetPoints()->GetPoint(i,p);
@@ -80,8 +67,8 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
     p[1] *= val;
     p[2] *= val;
     points->InsertPoint(i,p);
-//    scalars->InsertTuple1(i, 1-val/max);
-    scalars->InsertTuple1(i, 1-val/max);
+
+    scalars->InsertTuple1(i, 1-val);
   }
 
   polyData->SetPoints(points);
@@ -128,4 +115,10 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);
   m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetActiveCamera(cam);
+  m_RenderWindow->update();
+  }
+  catch (...)
+  {
+
+  }
 }

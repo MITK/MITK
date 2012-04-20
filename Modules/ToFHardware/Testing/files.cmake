@@ -19,7 +19,6 @@ set(MODULE_TESTS
   mitkToFCameraPMDPlayerDeviceTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
-  mitkToFImageGrabberCreatorTest.cpp
   mitkToFImageRecorderTest.cpp
   mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp

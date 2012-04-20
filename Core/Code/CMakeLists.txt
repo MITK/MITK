@@ -1,7 +1,7 @@
-find_package(OpenGL)
-if(NOT OPENGL_FOUND)
-  message("GL is required for MITK rendering")
-endif(NOT OPENGL_FOUND )
+#FIND_PACKAGE(OpenGL)
+#IF(NOT OPENGL_FOUND)
+#  MESSAGE("GL is required for MITK rendering")
+#ENDIF(NOT OPENGL_FOUND )
 
 # Configure the C++ Micro Services Code for MITK
 find_package(ITK REQUIRED)
@@ -35,7 +35,7 @@ MITK_CREATE_MODULE( Mitk
     ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
     ${CppMicroServices_INTERNAL_INCLUDE_DIRS}
   DEPENDS mbilog tinyxml
-  DEPENDS_INTERNAL IIL4MITK pic2vtk
+  DEPENDS_INTERNAL pic2vtk #IIL4MITK
   PACKAGE_DEPENDS ITK VTK
   EXPORT_DEFINE MITK_CORE_EXPORT
 )
@@ -53,9 +53,9 @@ if(MINGW)
 endif(MINGW)
 
 # replacing Mitk by Mitk [due to removing the PROVIDES macro
-target_link_libraries(Mitk ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
-target_link_libraries(Mitk ${OPENGL_LIBRARIES} )
-target_link_libraries(Mitk gdcmCommon gdcmIOD gdcmDSED)
+TARGET_LINK_LIBRARIES(Mitk ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
+#TARGET_LINK_LIBRARIES(Mitk ${OPENGL_LIBRARIES} )
+TARGET_LINK_LIBRARIES(Mitk gdcmCommon gdcmIOD gdcmDSED)
 
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)
   target_link_libraries(Mitk psapi.lib)

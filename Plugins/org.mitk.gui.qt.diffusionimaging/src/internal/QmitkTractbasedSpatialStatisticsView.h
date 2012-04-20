@@ -142,18 +142,11 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void CopyToClipboard();
 
 
-    void SetDxx();
-    void SetDyy();
-    void SetDzz();
-    void SetDxy();
-    void SetDxz();
-    void SetDyz();
-    void ImportTensorByComps();
+
 
 
   protected:
 
-    void SetTensorComponent(QLineEdit* edit, mitk::DataNode::Pointer node);
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
@@ -257,12 +250,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
 
-    mitk::DataNode::Pointer m_DxxNode;
-    mitk::DataNode::Pointer m_DxyNode;
-    mitk::DataNode::Pointer m_DxzNode;
-    mitk::DataNode::Pointer m_DyzNode;
-    mitk::DataNode::Pointer m_DyyNode;
-    mitk::DataNode::Pointer m_DzzNode;
+
 
 };
 

@@ -131,8 +131,8 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
     // 4. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );
 
-    mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
- 
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   return true;
 }
 

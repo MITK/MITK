@@ -11,7 +11,7 @@ include_directories(.)
 subdirs(
   ann
   ipSegmentation
-  IIL4MITK
+  #IIL4MITK
   pic2vtk
   tinyxml
   Poco

@@ -108,16 +108,20 @@ struct TrSelListener : ISelectionListener
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
-          // only look at interesting types
-          if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+          mitk::BaseData* nodeData = node->GetData();
+          if( nodeData != NULL )
           {
-            foundDwiVolume = true;
-          }
+            // only look at interesting types
+            if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundDwiVolume = true;
+            }
 
-          // only look at interesting types
-          if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            foundTensorVolume = true;
+            // only look at interesting types
+            if(QString("TensorImage").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundTensorVolume = true;
+            }
           }
         }
       }
@@ -185,16 +189,21 @@ m_MultiWidget(NULL)
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+
+        mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
         {
-          diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
-        }
-        else if((QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0))
-        {
-          mitk::TensorImage* mitkVol;
-          mitkVol = static_cast<mitk::TensorImage*>((node)->GetData());
-          mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
-          node->GetStringProperty("name", nodename);
+          if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+          }
+          else if((QString("TensorImage").compare(nodeData->GetNameOfClass())==0))
+          {
+            mitk::TensorImage* mitkVol;
+            mitkVol = static_cast<mitk::TensorImage*>((node)->GetData());
+            mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
+            node->GetStringProperty("name", nodename);
+          }
         }
       }
     }
@@ -328,15 +337,20 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
     if (nodeObj = i->Cast<mitk::DataNodeObject>())
     {
       mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+      // process only on valid nodes
+      mitk::BaseData* nodeData = node->GetData();
+      if(nodeData)
       {
-        diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+        if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+        {
+          diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(nodeData);
 
-        geometry = diffImage->GetGeometry();
+          geometry = diffImage->GetGeometry();
 
-        // Remember the node whose display index must be updated
-        correctNode = mitk::DataNode::New();
-        correctNode = node;
+          // Remember the node whose display index must be updated
+          correctNode = mitk::DataNode::New();
+          correctNode = node;
+        }
       }
     }
   }
@@ -493,23 +507,29 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
 
     for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
+         i != m_CurrentSelection->End();
+         ++i)
     {
 
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+
+        // process only on valid nodes
+        mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
         {
-          diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
-        }
-        else if((QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0))
-        {
-          mitk::TensorImage* mitkVol;
-          mitkVol = static_cast<mitk::TensorImage*>((node)->GetData());
-          mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
-          node->GetStringProperty("name", nodename);
+          if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            diffImage = static_cast<mitk::DiffusionImage<DiffusionPixelType>*>((node)->GetData());
+          }
+          else if((QString("TensorImage").compare(nodeData->GetNameOfClass())==0))
+          {
+            mitk::TensorImage* mitkVol;
+            mitkVol = static_cast<mitk::TensorImage*>(nodeData);
+            mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
+            node->GetStringProperty("name", nodename);
+          }
         }
       }
     }
@@ -862,6 +882,11 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
         DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
       TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
         TensorReconstructionImageFilterType::New();
+
+
+      mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionContainerType::Pointer dirs = vols->GetDirections();
+      itk::VectorImage<DiffusionPixelType, 3>::Pointer img = vols->GetVectorImage();
+
       tensorReconstructionFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       tensorReconstructionFilter->SetBValue(vols->GetB_Value());
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreasholdEdit->text().toFloat() );
@@ -1138,9 +1163,14 @@ void QmitkTensorReconstructionView::TensorsToDWI()
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        const mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
         {
-          set->InsertElement(at++, node);
+          if(QString("TensorImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            set->InsertElement(at++, node);
+          }
         }
       }
     }
@@ -1307,10 +1337,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       filter->Update();
       clock.Stop();
       MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
-
-      itk::Vector<double,3> v;
-      v[0] = 0; v[1] = 0; v[2] = 0;
-      gradientList.push_back(v);
 
       // TENSORS TO DATATREE
       mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();

@@ -42,23 +42,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 #include "mitkProgressBar.h"
-
-// Includes for image processing
 #include "mitkImageCast.h"
 #include "mitkImageToItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkDataNodeObject.h"
 #include "mitkNodePredicateData.h"
-
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkTensorImage.h"
-
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlanarPolygon.h"
-
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
+#include "mitkDiffusionImage.h"
 
 #include <itkVectorImage.h>
 #include "itkTensorDerivedMeasurementsFilter.h"
@@ -68,8 +64,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkMaskImageFilter.h"
 #include "itkCastImageFilter.h"
-
 #include "itkImageMomentsCalculator.h"
+#include <itkResampleImageFilter.h>
+#include <itkGaussianInterpolateImageFunction.h>
+#include <itkNearestNeighborInterpolateImageFunction.h>
 
 #include <vnl/vnl_vector.h>
 
@@ -322,7 +320,86 @@ void QmitkPartialVolumeAnalysisView::CreateConnections()
 
     connect( (QObject*)(m_Controls->m_TextureIntON), SIGNAL(clicked()), this, SLOT(TextIntON()) );
 
+    connect( m_Controls->m_ExportClusteringResultsButton, SIGNAL(clicked()), this, SLOT(ExportClusteringResults()));
   }
+}
+
+void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
+{
+  if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
+    return;
+
+  mitk::DiffusionImage<short>::Pointer diffusionImage = NULL;
+  if (dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImage.GetPointer()))
+    diffusionImage = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImage.GetPointer());
+  else
+    return;
+
+  typedef itk::Image< float, 3 > OutType;
+  mitk::Image::Pointer mitkInImage = dynamic_cast<mitk::Image*>(m_ClusteringResult->GetData());
+  typedef itk::ExtractChannelFromRgbaImageFilter< OutType > ExtractionFilterType;
+
+  typedef itk::Image< itk::RGBAPixel<unsigned char>, 3 > ItkRgbaImageType;
+  typedef mitk::ImageToItk< ItkRgbaImageType > CasterType;
+
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkInImage);
+  caster->Update();
+  ItkRgbaImageType::Pointer itkInImage = caster->GetOutput();
+
+  ExtractionFilterType::Pointer filter = ExtractionFilterType::New();
+  filter->SetInput(itkInImage);
+  filter->SetChannel(ExtractionFilterType::ALPHA);
+  filter->SetReferenceImage(diffusionImage->GetVectorImage());
+  filter->Update();
+
+  OutType::Pointer outImg = filter->GetOutput();
+
+//  mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
+//  itk::Matrix<double, 3, 3> direction;
+//  itk::ImageRegion<3> imageRegion;
+//  for (int i=0; i<3; i++)
+//    for (int j=0; j<3; j++)
+//      direction[j][i] = geometry->GetMatrixColumn(i)[j];
+//  imageRegion.SetSize(0, geometry->GetExtent(0));
+//  imageRegion.SetSize(1, geometry->GetExtent(1));
+//  imageRegion.SetSize(2, geometry->GetExtent(2));
+//  typedef itk::ResampleImageFilter<OutType, OutType, float> ResamplerType;
+//  ResamplerType::Pointer resampler = ResamplerType::New();
+//  resampler->SetOutputSpacing( geometry->GetSpacing() );
+//  resampler->SetOutputOrigin( geometry->GetOrigin() );
+//  resampler->SetOutputDirection( direction );
+//  resampler->SetSize( imageRegion.GetSize() );
+//  resampler->SetInput( outImg );
+//  const itk::Transform<float,3,3>* trafo = geometry->GetParametricTransform();
+//  itk::Transform<float,3,3>::InverseTransformBasePointer t = trafo->GetInverseTransform();
+//  itk::Transform<float,3,3>* invTrafo = dynamic_cast<itk::Transform<float,3,3>*>(t.GetPointer());
+//  resampler->SetTransform(invTrafo);
+
+////  double gausssigma = 10;
+////  double sigma[3];
+////  for( unsigned int d = 0; d < 3; d++ )
+////    sigma[d] = gausssigma * geometry->GetSpacing()[d];
+////  double alpha = 2.0;
+////  typedef itk::GaussianInterpolateImageFunction<OutType, double> InterpolatorType;
+////  typedef itk::NearestNeighborInterpolateImageFunction<OutType, double > InterpolatorType;
+////  typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+////  interpolator->SetInputImage( outImg );
+////  interpolator->SetParameters( sigma, alpha );
+////  resampler->SetInterpolator( interpolator );
+
+//  resampler->Update();
+//  outImg = resampler->GetOutput();
+
+  mitk::Image::Pointer img = mitk::Image::New();
+  img->InitializeByItk(outImg.GetPointer());
+  img->SetVolume(outImg->GetBufferPointer());
+
+  // init data node
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(img);
+  node->SetName("Clustering Result");
+  GetDataStorage()->Add(node);
 }
 
 void QmitkPartialVolumeAnalysisView::EstimateCircle()
@@ -1780,6 +1857,8 @@ void QmitkPartialVolumeAnalysisView::OnRenderWindowDelete(QObject * obj)
 {
   if(obj == m_LastRenderWindow)
     m_LastRenderWindow = 0;
+  if(obj == m_SelectedRenderWindow)
+    m_SelectedRenderWindow = 0;
 }
 
 bool QmitkPartialVolumeAnalysisView::event( QEvent *event )
@@ -1877,6 +1956,7 @@ void QmitkPartialVolumeAnalysisView::GreenRadio(bool checked)
     m_Controls->m_PartialVolumeRadio->setChecked(false);
     m_Controls->m_BlueRadio->setChecked(false);
     m_Controls->m_AllRadio->setChecked(false);
+    m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
   }
 
   m_QuantifyClass = 0;
@@ -1892,6 +1972,7 @@ void QmitkPartialVolumeAnalysisView::PartialVolumeRadio(bool checked)
     m_Controls->m_GreenRadio->setChecked(false);
     m_Controls->m_BlueRadio->setChecked(false);
     m_Controls->m_AllRadio->setChecked(false);
+    m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
   }
 
   m_QuantifyClass = 1;
@@ -1906,6 +1987,7 @@ void QmitkPartialVolumeAnalysisView::BlueRadio(bool checked)
     m_Controls->m_PartialVolumeRadio->setChecked(false);
     m_Controls->m_GreenRadio->setChecked(false);
     m_Controls->m_AllRadio->setChecked(false);
+    m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
   }
 
   m_QuantifyClass = 2;
@@ -1920,6 +2002,7 @@ void QmitkPartialVolumeAnalysisView::AllRadio(bool checked)
     m_Controls->m_BlueRadio->setChecked(false);
     m_Controls->m_PartialVolumeRadio->setChecked(false);
     m_Controls->m_GreenRadio->setChecked(false);
+    m_Controls->m_ExportClusteringResultsButton->setEnabled(false);
   }
 
   m_QuantifyClass = 3;
@@ -2016,6 +2099,8 @@ void QmitkPartialVolumeAnalysisView::NodeChanged(const mitk::DataNode* /*node*/)
 
 void QmitkPartialVolumeAnalysisView::NodeRemoved(const mitk::DataNode* node)
 {
+  if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+    GetDefaultDataStorage()->Remove(m_ClusteringResult);
 
   if(  node == m_SelectedPlanarFigureNodes->GetNode().GetPointer()
     || node == m_SelectedMaskNode.GetPointer() )

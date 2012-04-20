@@ -41,7 +41,14 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
   {
   //remove temp directory
   Poco::File myFile(m_tempDirectory);
-  if (myFile.exists()) myFile.remove(true);
+  try
+    {
+    if (myFile.exists()) myFile.remove();
+    }
+  catch(...)
+    {
+    MITK_ERROR << "Can't remove temp directory " << m_tempDirectory << "!";
+    }
   }
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)

@@ -78,14 +78,19 @@ struct DqSelListener : ISelectionListener
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
           // only look at interesting types
-          if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
+          // process only on valid nodes
+          const mitk::BaseData* nodeData = node->GetData();
+          if(nodeData)
           {
-            foundQBIVolume = true;
-          }
+            if(QString("QBallImage").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundQBIVolume = true;
+            }
 
-          if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            foundTensorVolume = true;
+            if(QString("TensorImage").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundTensorVolume = true;
+            }
           }
         }
       }
@@ -301,9 +306,14 @@ void QmitkDiffusionQuantificationView::TensorQuantify(int method)
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
         {
-          set->InsertElement(at++, node);
+          if(QString("TensorImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            set->InsertElement(at++, node);
+          }
         }
       }
     }

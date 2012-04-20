@@ -105,6 +105,8 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->syntheticNetworkComboBox->insertItem(3,"Scale free network");
     this->m_Controls->syntheticNetworkComboBox->insertItem(4,"Small world network");
   }
+
+  this->WipeDisplay();
 }
 
 
@@ -121,6 +123,13 @@ void QmitkBrainNetworkAnalysisView::StdMultiWidgetNotAvailable()
 
 void QmitkBrainNetworkAnalysisView::WipeDisplay()
 {
+  m_Controls->lblWarning->setVisible( true );
+  m_Controls->inputImageOneNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
+  m_Controls->inputImageOneNameLabel->setVisible( false );
+  m_Controls->inputImageOneLabel->setVisible( false );
+  m_Controls->inputImageTwoNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
+  m_Controls->inputImageTwoNameLabel->setVisible( false );
+  m_Controls->inputImageTwoLabel->setVisible( false );
   m_Controls->numberOfVerticesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfEdgesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfSelfLoopsLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
@@ -134,30 +143,85 @@ void QmitkBrainNetworkAnalysisView::WipeDisplay()
   m_Controls->betweennessNetworkHistogramCanvas->update();
   m_Controls->degreeNetworkHistogramCanvas->update();
   m_Controls->shortestPathNetworkHistogramCanvas->update();
+  m_Controls->betweennessNetworkHistogramCanvas->Clear();
+  m_Controls->degreeNetworkHistogramCanvas->Clear();
+  m_Controls->shortestPathNetworkHistogramCanvas->Clear();
+  m_Controls->betweennessNetworkHistogramCanvas->Replot();
+  m_Controls->degreeNetworkHistogramCanvas->Replot();
+  m_Controls->shortestPathNetworkHistogramCanvas->Replot();
 }
 
 void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   this->WipeDisplay();
 
+  // Valid options are either
+  // 1 image (parcellation)
+  //
+  // 1 image (parcellation)
+  // 1 fiber bundle
+  //
+  // 1 network
+  if( nodes.size() > 2 )
+  {
+    return;
+  }
+
+  bool alreadyFiberBundleSelected( false ), alreadyImageSelected( false ), currentFormatUnknown( true );
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
        ++it )
   {
     mitk::DataNode::Pointer node = *it;
+    currentFormatUnknown = true;
   
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
+      currentFormatUnknown = false;
+      if( alreadyImageSelected )
+      {
+        this->WipeDisplay();
+        return;
+      }
+      alreadyImageSelected = true;
       m_Controls->lblWarning->setVisible( false );
-      return;
+      m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
+      m_Controls->inputImageOneNameLabel->setVisible( true );
+      m_Controls->inputImageOneLabel->setVisible( true );
     }
 
+    if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
     {
+      currentFormatUnknown = false;
+      // a fiber bundle has to be in conjunction with a parcellation
+      if( nodes.size() != 2 || alreadyFiberBundleSelected )
+      {
+        this->WipeDisplay();
+        return;
+      }
+      alreadyFiberBundleSelected = true;
+      m_Controls->lblWarning->setVisible( false );
+      m_Controls->inputImageTwoNameLabel->setText(node->GetName().c_str());
+      m_Controls->inputImageTwoNameLabel->setVisible( true );
+      m_Controls->inputImageTwoLabel->setVisible( true );
+    }
+
+    { // network section
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
       if( node.IsNotNull() && network )
       {
+        currentFormatUnknown = false;
+        if( nodes.size() != 1 )
+        {
+          // only valid option is a single network
+          this->WipeDisplay();
+          return;
+        }
         m_Controls->lblWarning->setVisible( false );
+        m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
+        m_Controls->inputImageOneNameLabel->setVisible( true );
+        m_Controls->inputImageOneLabel->setVisible( true );
 
         int noVertices = network->GetNumberOfVertices();
         int noEdges = network->GetNumberOfEdges();
@@ -185,13 +249,15 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
         double efficiency = histogramContainer->GetShortestPathHistogram()->GetEfficiency();
 
         m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
-
-        return;
       }
-    }
-  }
+    } // end network section
 
-  m_Controls->lblWarning->setVisible( true );
+    if ( currentFormatUnknown )
+    {
+      this->WipeDisplay();
+      return;
+    }
+  } // end for loop
 }
 
 void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex)

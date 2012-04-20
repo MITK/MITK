@@ -241,7 +241,7 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkComboBoxCurrentIndexChange
 void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked()
 {
   // warn if trying to create a very big network
-  // big network is a network with > 10000 nodes (estimate)
+  // big network is a network with > 5000 nodes (estimate)
   // this might fill up the memory to the point it freezes
   int numberOfNodes( 0 );
   switch (m_currentIndex) {
@@ -249,6 +249,7 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked(
     numberOfNodes = this->m_Controls->parameterOneSpinBox->value() 
       * this->m_Controls->parameterOneSpinBox->value() 
       * this->m_Controls->parameterOneSpinBox->value();
+    break;
   case 1:
     numberOfNodes = this->m_Controls->parameterOneSpinBox->value();
     break;
@@ -266,12 +267,12 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked(
 
   }
 
-  if( numberOfNodes > 10000 )
+  if( numberOfNodes > 5000 )
   {
     QMessageBox msgBox;
     msgBox.setText("Trying to generate very large network.");
     msgBox.setIcon( QMessageBox::Warning );
-    msgBox.setInformativeText("You are trying to generate a network with more than 10000 nodes, this is very resource intensive and might lead to program instability. Proceed with network generation?");
+    msgBox.setInformativeText("You are trying to generate a network with more than 5000 nodes, this is very resource intensive and might lead to program instability. Proceed with network generation?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
     int ret = msgBox.exec();

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QWidget;
 class QCheckBox;
+class QLineEdit;
 
 class DICOM_EXPORT QmitkDicomPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -73,6 +74,8 @@ protected:
     QCheckBox* m_ShowHelperObjects;
     QCheckBox* m_ShowNodesContainingNoData;
     QCheckBox* m_UseSurfaceDecimation;
+    QLineEdit* m_DatabaseDirectory;
+    QLineEdit* m_ListenerDirectory;
 
 };
 #endif // QmitkQmitkDicomPreferencePage_h

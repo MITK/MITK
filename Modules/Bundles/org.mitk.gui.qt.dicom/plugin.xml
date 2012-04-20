@@ -8,4 +8,10 @@
       icon="resources/icon.xpm" >
     </editor>
   </extension>
+  
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.QmitkDicomPreferencePage" name="Dicom Editor" class="QmitkDicomPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
 </plugin>

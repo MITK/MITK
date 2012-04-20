@@ -50,14 +50,29 @@ void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
   m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID).Cast<berry::IBerryPreferences>();;
   assert( m_DicomPreferencesNode );
 
-  m_MainControl = new QWidget(parent); 
-  m_EnableSingleEditing = new QCheckBox;
-  m_PlaceNewNodesOnTop = new QCheckBox;
-  m_ShowHelperObjects = new QCheckBox;
-  m_ShowNodesContainingNoData = new QCheckBox;
-  m_UseSurfaceDecimation = new QCheckBox;
+    m_MainControl = new QWidget(parent);
+    m_EnableSingleEditing = new QCheckBox;
+    m_PlaceNewNodesOnTop= new QCheckBox;
+    m_ShowHelperObjects= new QCheckBox;
+    m_ShowNodesContainingNoData= new QCheckBox;
+    m_UseSurfaceDecimation= new QCheckBox;
+//  QString pluginDirectory;
+//mitk::PluginActivator::getContext()->getDataFile(pluginDirectory);
+//pluginDirectory.append("/");
+//QString databaseDirectory;
+////databaseDirectory.append(pluginDirectory);
+//databaseDirectory.append(QString("C:/DicomDatabase"));
+//QDir tmp(databaseDirectory);
+//tmp.mkpath(databaseDirectory);
+//m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);
+//QString listenerDirectory("C:/DICOMListenerDirectory");
+//StartDicomDirectoryListener(listenerDirectory);
+//QmitkStoreSCPLauncherBuilder builder;
+//builder.AddPort()->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(listenerDirectory);
+//m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
+//m_StoreSCPLauncher->StartStoreSCP();
 
-    QFormLayout *formLayout = new QFormLayout; 
+  QFormLayout *formLayout = new QFormLayout; 
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
   formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
   formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);

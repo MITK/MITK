@@ -136,6 +136,9 @@ void QmitkBrainNetworkAnalysisView::WipeDisplay()
   m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(   NULL );
   m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       NULL );
   m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( NULL );
+  m_Controls->betweennessNetworkHistogramCanvas->Clear();
+  m_Controls->degreeNetworkHistogramCanvas->Clear();
+  m_Controls->shortestPathNetworkHistogramCanvas->Clear();
   m_Controls->betweennessNetworkHistogramCanvas->update();
   m_Controls->degreeNetworkHistogramCanvas->update();
   m_Controls->shortestPathNetworkHistogramCanvas->update();

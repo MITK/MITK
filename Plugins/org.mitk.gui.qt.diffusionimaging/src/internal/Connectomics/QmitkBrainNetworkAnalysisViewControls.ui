@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>941</height>
+    <height>1012</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,13 +21,58 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="lblWarning">
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+    <widget class="QGroupBox" name="inputDataGroupBox">
+     <property name="title">
+      <string>Data</string>
      </property>
-     <property name="text">
-      <string>Please select data!</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="lblWarning">
+        <property name="styleSheet">
+         <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+        </property>
+        <property name="text">
+         <string>Please select data!</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="inputImageOneLabel">
+          <property name="text">
+           <string>Image 1:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="inputImageOneNameLabel">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="inputImageTwoLabel">
+          <property name="text">
+           <string>Image 2:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="inputImageTwoNameLabel">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

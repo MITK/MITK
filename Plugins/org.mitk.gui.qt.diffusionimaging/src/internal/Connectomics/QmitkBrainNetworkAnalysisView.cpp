@@ -117,6 +117,11 @@ void QmitkBrainNetworkAnalysisView::StdMultiWidgetNotAvailable()
 
 void QmitkBrainNetworkAnalysisView::WipeDisplay()
 {
+  m_Controls->lblWarning->setVisible( true );
+  m_Controls->inputImageOneNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
+  m_Controls->inputImageOneNameLabel->setVisible( false );
+  m_Controls->inputImageTwoNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
+  m_Controls->inputImageTwoNameLabel->setVisible( false );
   m_Controls->numberOfVerticesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfEdgesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfSelfLoopsLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
@@ -136,6 +141,19 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
 {
   this->WipeDisplay();
 
+  // Valid options are either
+  // 1 image (parcellation)
+  //
+  // 1 image (parcellation)
+  // 1 fiber bundle
+  //
+  // 1 network
+  if( nodes.size() > 2 )
+  {
+    return;
+  }
+
+  bool alreadyFiberBundleSelected( false ), alreadyImageSelected( false );
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
@@ -145,15 +163,44 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
   
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
+      if( alreadyImageSelected )
+      {
+        this->WipeDisplay();
+        return;
+      }
+      alreadyImageSelected = true;
       m_Controls->lblWarning->setVisible( false );
-      return;
+      m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
+      m_Controls->inputImageOneNameLabel->setVisible( true );
+    }
+
+    if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+    {
+      // a fiber bundle has to be in conjunction with a parcellation
+      if( nodes.size() != 2 || alreadyFiberBundleSelected )
+      {
+        this->WipeDisplay();
+        return;
+      }
+      alreadyFiberBundleSelected = true;
+      m_Controls->lblWarning->setVisible( false );
+      m_Controls->inputImageTwoNameLabel->setText(node->GetName().c_str());
+      m_Controls->inputImageTwoNameLabel->setVisible( true );
     }
 
     {
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
       if( node.IsNotNull() && network )
       {
+        if( nodes.size() != 1 )
+        {
+          // only valid option is a single network
+          this->WipeDisplay();
+          return;
+        }
         m_Controls->lblWarning->setVisible( false );
+        m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
+        m_Controls->inputImageOneNameLabel->setVisible( true );
 
         int noVertices = network->GetNumberOfVertices();
         int noEdges = network->GetNumberOfEdges();
@@ -181,13 +228,9 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
         double efficiency = histogramContainer->GetShortestPathHistogram()->GetEfficiency();
 
         m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
-
-        return;
       }
     }
   }
-
-  m_Controls->lblWarning->setVisible( true );
 }
 
 void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex)

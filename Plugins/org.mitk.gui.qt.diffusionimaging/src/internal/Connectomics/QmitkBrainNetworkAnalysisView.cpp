@@ -122,8 +122,10 @@ void QmitkBrainNetworkAnalysisView::WipeDisplay()
   m_Controls->lblWarning->setVisible( true );
   m_Controls->inputImageOneNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->inputImageOneNameLabel->setVisible( false );
+  m_Controls->inputImageOneLabel->setVisible( false );
   m_Controls->inputImageTwoNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->inputImageTwoNameLabel->setVisible( false );
+  m_Controls->inputImageTwoLabel->setVisible( false );
   m_Controls->numberOfVerticesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfEdgesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->numberOfSelfLoopsLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
@@ -176,6 +178,7 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
       m_Controls->lblWarning->setVisible( false );
       m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
       m_Controls->inputImageOneNameLabel->setVisible( true );
+      m_Controls->inputImageOneLabel->setVisible( true );
     }
 
     if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
@@ -191,6 +194,7 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
       m_Controls->lblWarning->setVisible( false );
       m_Controls->inputImageTwoNameLabel->setText(node->GetName().c_str());
       m_Controls->inputImageTwoNameLabel->setVisible( true );
+      m_Controls->inputImageTwoLabel->setVisible( true );
     }
 
     { // network section
@@ -207,6 +211,7 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
         m_Controls->lblWarning->setVisible( false );
         m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
         m_Controls->inputImageOneNameLabel->setVisible( true );
+        m_Controls->inputImageOneLabel->setVisible( true );
 
         int noVertices = network->GetNumberOfVertices();
         int noEdges = network->GetNumberOfEdges();

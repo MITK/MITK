@@ -93,6 +93,7 @@ namespace itk
     itkSetMacro(PseudoInverse, vnl_matrix<double>);
     itkSetMacro(H, vnl_matrix<double>);
     itkSetMacro(BVec, vnl_vector<double>);
+    itkSetMacro(B0Mask, vnl_vector<double>);
 
 
     void SetCorrectedVols(ImageType::Pointer correctedVols)
@@ -105,6 +106,11 @@ namespace itk
       m_MaskImage = mask;
     }
 
+    itk::Image<float,3>::Pointer GetFreeWaterImage()
+    {
+      return m_FWImage;
+    }
+
 
 
 
@@ -112,6 +118,11 @@ namespace itk
 
     FreeWaterEliminationFilter();
     ~FreeWaterEliminationFilter() {};
+
+
+    void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof, int numberb0);
+
+    void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten,vnl_vector<double> &tensor, int nof,int numberb0);
 
 
     void GenerateData();
@@ -147,7 +158,9 @@ namespace itk
     vnl_matrix<double> m_PseudoInverse;
     vnl_matrix<double> m_H;
     vnl_vector<double> m_BVec;
+    vnl_vector<double> m_B0Mask;
 
+    itk::Image<float,3>::Pointer m_FWImage;
 
   };
 

@@ -398,6 +398,7 @@ namespace itk
     m_PseudoInverse = pseudoInverse;
     m_H = H;
     m_BVec=b_vec;
+    m_B0Mask=b0index;
 
   }
   
@@ -472,6 +473,7 @@ namespace itk
 
         for (int c=init_c;c<limit_c;c+=2)
         {
+
           ix[0] = i;
           ix[1] = j;
           ix[2] = c;
@@ -485,7 +487,9 @@ namespace itk
           else
           {
             tempsum=tempsum+p[f];
+
             temp_number=temp_number+1;
+
           }
         }
       }
@@ -509,6 +513,7 @@ namespace itk
   ::calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index,vnl_vector<double> &atten, double mean_b,int nof, int numberb0)
   {
     mean_b=0.0;
+
 
     for (int i=0;i<nof;i++)
     {

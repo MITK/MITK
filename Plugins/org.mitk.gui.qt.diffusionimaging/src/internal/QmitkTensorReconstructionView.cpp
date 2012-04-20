@@ -922,7 +922,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
         vnl_matrix<double> pseudoInverse = reconFilter->GetPseudoInverse();
         vnl_matrix<double> H = reconFilter->GetH();
         vnl_vector<double> B_Vec = reconFilter->GetBVec();
-
+        vnl_vector<double> B0Mask = reconFilter->GetB0Mask();
 
 
 
@@ -936,14 +936,51 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
         fweFilter->SetPseudoInverse(pseudoInverse);
         fweFilter->SetH(H);
         fweFilter->SetBVec(B_Vec);
+        fweFilter->SetB0Mask(B0Mask);
 
         fweFilter->Update();
 
 
 
+
+        // Retrieve corrected tensor image
+        itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3>::Pointer corrTensorImg = fweFilter->GetOutput();
+
+
+        mitk::TensorImage::Pointer corrTensMitk = mitk::TensorImage::New();
+        corrTensMitk->InitializeByItk( corrTensorImg.GetPointer() );
+        corrTensMitk->SetVolume( corrTensorImg->GetBufferPointer() );
+        mitk::DataNode::Pointer node2=mitk::DataNode::New();
+        node2->SetData( corrTensMitk );
+
+        newname = newname.append(nodename.c_str());
+        newname = newname.append("fwe_dti");
+
+        SetDefaultNodeProperties(node2, newname.toStdString());
+        nodes.push_back(node2);
+
+
+
+
+
+        // Retrieve free water map
+        itk::Image<float,3>::Pointer fwImage = fweFilter->GetFreeWaterImage();
+        mitk::Image::Pointer fwImageMitk = mitk::Image::New();
+        mitk::CastToMitkImage(fwImage, fwImageMitk);
+
+        mitk::DataNode::Pointer node3=mitk::DataNode::New();
+        node3->SetData( fwImageMitk );
+
+        newname = newname.append(nodename.c_str());
+        newname = newname.append("_fwe");
+
+        SetDefaultNodeProperties(node3, newname.toStdString());
+        nodes.push_back(node3);
+
+
+
+
       }
-
-
 
       mitk::ProgressBar::GetInstance()->Progress();
 

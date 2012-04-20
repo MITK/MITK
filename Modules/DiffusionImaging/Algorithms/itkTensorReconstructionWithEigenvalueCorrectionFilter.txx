@@ -142,6 +142,8 @@ namespace itk
     ImageType::RegionType region(start,size);
     ImageType::Pointer corrected_diffusion = ImageType::New();
     corrected_diffusion->SetRegions(region);
+    corrected_diffusion->SetSpacing(gradientImagePointer->GetSpacing());
+    corrected_diffusion->SetOrigin(gradientImagePointer->GetOrigin());
     corrected_diffusion->SetVectorLength(nof);
     corrected_diffusion->Allocate();
     ImageType::IndexType pixelIndex;

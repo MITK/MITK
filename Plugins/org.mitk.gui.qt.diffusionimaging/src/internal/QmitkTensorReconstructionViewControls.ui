@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>1458</height>
+    <height>1486</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -330,13 +330,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="m_ReconstructionThreshold">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="m_FweCheckbox">
            <property name="text">
@@ -344,6 +337,13 @@
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="m_ReconstructionThreshold">
+           <property name="text">
+            <string>50</string>
            </property>
           </widget>
          </item>

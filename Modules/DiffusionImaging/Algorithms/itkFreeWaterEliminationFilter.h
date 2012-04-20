@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 typedef itk::VectorImage<short, 3>  ImageType;
+typedef itk::VectorImage<float, 3> FloatVectorImageType;
 
 
 

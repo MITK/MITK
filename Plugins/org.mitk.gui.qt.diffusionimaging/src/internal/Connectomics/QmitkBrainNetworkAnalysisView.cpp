@@ -240,6 +240,58 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkComboBoxCurrentIndexChange
 
 void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked()
 {
+  // warn if trying to create a very big network
+  // big network is a network with > 10000 nodes (estimate)
+  // this might fill up the memory to the point it freezes
+  int numberOfNodes( 0 );
+  switch (m_currentIndex) {
+  case 0:
+    numberOfNodes = this->m_Controls->parameterOneSpinBox->value() 
+      * this->m_Controls->parameterOneSpinBox->value() 
+      * this->m_Controls->parameterOneSpinBox->value();
+  case 1:
+    numberOfNodes = this->m_Controls->parameterOneSpinBox->value();
+    break;
+  case 2:
+    numberOfNodes = this->m_Controls->parameterOneSpinBox->value();
+    break;
+  case 3:
+    // not implemented yet
+    break;
+  case 4:
+    // not implemented yet
+    break;
+  default:
+    break;
+
+  }
+
+  if( numberOfNodes > 10000 )
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Trying to generate very large network.");
+    msgBox.setIcon( QMessageBox::Warning );
+    msgBox.setInformativeText("You are trying to generate a network with more than 10000 nodes, this is very resource intensive and might lead to program instability. Proceed with network generation?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+  case QMessageBox::Yes:
+    // continue
+    break;
+  case QMessageBox::No:
+    // stop
+    return;
+    break;
+
+  default:
+    // should never be reached
+    break;
+    }
+  }
+
+  // proceed
   mitk::ConnectomicsSyntheticNetworkGenerator::Pointer generator = mitk::ConnectomicsSyntheticNetworkGenerator::New();
 
   mitk::DataNode::Pointer networkNode = mitk::DataNode::New();

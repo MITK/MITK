@@ -158,7 +158,7 @@ namespace itk
 
 
             // Hard coded. check!
-            mean_b=1.0;
+           // mean_b=1.0;
 
             if(MD < 2.3)
             {
@@ -308,7 +308,7 @@ namespace itk
     regTensorImg->Allocate();
 
 
-    for(int t=0; t<10; t++)
+    for(int t=0; t<50; t++)
     {
 
       std::cout << "beltrami iteration " << t << std::endl;
@@ -595,6 +595,20 @@ namespace itk
         }
 
 
+
+
+         //replace tensorImg with regTensorImg
+         for ( int x=0;x<size[0];x++)
+         {
+           for ( int y=0;y<size[1];y++)
+           {
+             for ( int z=0;z<size[2];z++)
+             {
+               ix[0]=x; ix[1]=y; ix[2]=z;
+               tensorImg->SetPixel(ix, regTensorImg->GetPixel(ix));
+             }
+           }
+        }
 
       }
 

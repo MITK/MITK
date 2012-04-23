@@ -55,8 +55,8 @@ namespace itk
     int numberb0=0;
     vnl_vector< double > b0index(nof);
     int cnt=0;
-    
-    vnl_matrix<double> directions(nof-numberb0,3);
+
+
 
     for(int i=0; i<nof; i++)
     {
@@ -65,6 +65,19 @@ namespace itk
       if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
       {
         numberb0++;
+      }
+    }
+
+    
+    //vnl_matrix<double> directions(nof-numberb0,3);
+    vnl_matrix<double> directions(nof-numberb0,3);
+
+    for(int i=0; i<nof; i++)
+    {
+      vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
+
+      if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
+      {        
         b0index[i]=5;
       }
       else
@@ -93,6 +106,10 @@ namespace itk
 
     directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
 
+    directions.print(std::cout);
+    std::cout << std::endl;
+
+    dirsTimesDirsTrans = directions*directions.transpose();
 
     for (int i=0;i<nof-numberb0;i++)
     {   
@@ -100,6 +117,7 @@ namespace itk
     }
 
     vnl_matrix<double> H(nof-numberb0, 6);
+    vnl_matrix<double> H_org(nof-numberb0, 6);
     vnl_matrix<double> temp_3_3(3,3);
     vnl_vector<double> pre_tensor(9);
 
@@ -127,6 +145,8 @@ namespace itk
         H[i][3 + j] *= 2.0;
       }
     }
+
+    H_org=H;
 
     vnl_matrix<double> inputtopseudoinverse=H.transpose()*H;
     vnl_symmetric_eigensystem<double> eig( inputtopseudoinverse);
@@ -398,7 +418,7 @@ namespace itk
     m_VectorImage = corrected_diffusion;
     m_MaskImage = mask;
     m_PseudoInverse = pseudoInverse;
-    m_H = H;
+    m_H = H_org;
     m_BVec=b_vec;
     m_B0Mask=b0index;
 

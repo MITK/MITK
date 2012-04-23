@@ -124,9 +124,15 @@ public:
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
 
-    void PreNormalize( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+    void S_S0Normalization( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+    void S_S0Normalization( vnl_matrix<TOdfPixelType> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+
     void DoubleLogarithm(vnl_vector<TOdfPixelType> & vec);
+
     void Threshold(vnl_vector<TOdfPixelType> & vec, float sigma = 0.0001);
+    void Threshold(vnl_matrix<TOdfPixelType> & mat, float sigma = 0.0001);
+
+    void Projection1( vnl_matrix<TOdfPixelType> & mat, float sigma = 0.0001);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this

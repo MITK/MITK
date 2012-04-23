@@ -142,7 +142,6 @@ namespace itk
             calculate_tensor(m_PseudoInverse,atten,tensor,nof,number_b0);
 
 
-
             temp_tensor[0][0]= tensor[0];temp_tensor[0][1]= tensor[3];temp_tensor[0][2]= tensor[5];
             temp_tensor[1][0]= tensor[3];temp_tensor[1][1]= tensor[1];temp_tensor[1][2]= tensor[4];
             temp_tensor[2][0]= tensor[5];temp_tensor[2][1]= tensor[4];temp_tensor[2][2]= tensor[2];
@@ -157,11 +156,16 @@ namespace itk
 
             MD=(tensor[0]+tensor[1]+tensor[2])/3.0;// calculating of mean_diffusivity
 
+
+            // Hard coded. check!
+            mean_b=1.0;
+
             if(MD < 2.3)
             {
               f_vec[0] = ((exp(-mean_b*eigs[0]))-(exp(-mean_b*3.0)))/((exp(-2.5*mean_b))-(exp(-mean_b*3.0)));
-              f_vec[2] = ((exp(-mean_b*eigs[1]))-(exp(-mean_b*3.0)))/((exp(-0.01*mean_b))-(exp(-mean_b*3.0)));
               f_vec[1] = ((exp(-mean_b*MD))-(exp(-mean_b*3.0)))/((exp(-0.6*mean_b))-(exp(-mean_b*3.0)));
+              f_vec[2] = ((exp(-mean_b*eigs[1]))-(exp(-mean_b*3.0)))/((exp(-0.01*mean_b))-(exp(-mean_b*3.0)));
+
 
               if(f_vec[2]>1.0)
                 f_vec[2]=1.0;
@@ -183,7 +187,7 @@ namespace itk
 
               if(f_vec[1]<f_vec[2])
               {
-                f_vec[1]=(f_vec[0]+ f_vec[2])/2.0;
+                f_vec[1]=(f_vec[0] + f_vec[2])/2.0;
               }// finish of f_map calculation
 
 
@@ -201,11 +205,6 @@ namespace itk
               }// estimation of new attenuation value- after subtracting initial water part
 
               calculate_tensor(m_PseudoInverse,atten,tensor,nof,number_b0);
-
-
-
-
-
 
               ten(0,0) = tensor[0]; ten(0,1) = tensor[3]; ten(0,2) = tensor[5];
               ten(1,1) = tensor[1]; ten(1,2) = tensor[4]; ten(2,2) = tensor[2];
@@ -300,13 +299,19 @@ namespace itk
 
     /// end of [parameter declaration
 
-    for(int t=0; t<50; t++)
+
+    // Copy of tensorImage
+    TensorImageType::Pointer regTensorImg = TensorImageType::New();
+    regTensorImg->SetRegions(tensorImg->GetLargestPossibleRegion().GetSize());
+    regTensorImg->SetSpacing(tensorImg->GetSpacing());
+    regTensorImg->SetOrigin(tensorImg->GetOrigin());
+    regTensorImg->Allocate();
+
+
+    for(int t=0; t<10; t++)
     {
 
       std::cout << "beltrami iteration " << t << std::endl;
-
-
-
 
 
       for ( int x=0;x<size[0];x++)
@@ -317,34 +322,9 @@ namespace itk
           {
 
 
-
-            if (temporary_component_x != temporary_component_x)
-            {
-              std::cout << "nan" << std::endl;
-            }
-            if (temporary_component_y != temporary_component_y)
-            {
-              std::cout << "nan" << std::endl;
-            }
-            if (temporary_component_z != temporary_component_z)
-            {
-              std::cout << "nan" << std::endl;
-            }
-
-
              ix[0]=x; ix[1]=y; ix[2]=z;
              pixel = m_MaskImage->GetPixel(ix);
 
-             if(x==22 && y==48 && z==21)
-             {
-               std::cout << "follow" << std::endl;
-             }
-
-
-             if(x==21 && y==48 && z==20)
-             {
-               std::cout << "follow" << std::endl;
-             }
 
              if(pixel>0.0)
              {
@@ -504,22 +484,20 @@ namespace itk
                   regulated_tensors[t_id]=dt_reg*(temporary_mask_px*temporary_component_x + temporary_mask_py*temporary_component_y + temporary_mask_pz*temporary_component_z);
                   temp_tensor_n[t_id][0]=tensor[t_id];
 
+
+
                 }
+
+
 
                 // setting ix to original positio15n- it is used later on
                 ix[0]=x; ix[1]=y; ix[2]=z;
 
                 temp_sum_comp=0.0;
 
-                if(rom[0][0] != rom[0][0])
-                {
-                  std::cout << "nan" << std::endl;
-                }
+
                 rom=m_H*temp_tensor_n;
-                if (rom[0][0] != rom[0][0])
-                {
-                  std::cout << "nan" << std::endl;
-                }
+
 
 
                 GradientVectorType data_vec = m_CorrectedVols->GetPixel(ix);
@@ -586,7 +564,9 @@ namespace itk
 
                 ten(0,0) = tensor[0]; ten(0,1) = tensor[3]; ten(0,2) = tensor[5];
                 ten(1,1) = tensor[1]; ten(1,2) = tensor[4]; ten(2,2) = tensor[2];
-                tensorImg->SetPixel(ix, ten);// saving new tensor
+                //tensorImg->SetPixel(ix, ten);// saving new tensor
+                regTensorImg->SetPixel(ix, ten);// saving new tensor
+
                 f_vec[1]= f_vec[1]- 0.01*temp_sum_comp;
                 if (f_vec[1]<f_vec[2])
                 {
@@ -613,6 +593,9 @@ namespace itk
             }
           }
         }
+
+
+
       }
 
 

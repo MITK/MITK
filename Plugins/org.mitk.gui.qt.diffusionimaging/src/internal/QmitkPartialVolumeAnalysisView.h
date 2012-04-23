@@ -18,9 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QmitkPartialVolumeAnalysisView_H__INCLUDED)
 #define QmitkPartialVolumeAnalysisView_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+//#include "QmitkFunctionality.h"
 #include "ui_QmitkPartialVolumeAnalysisViewControls.h"
 
+#include <QmitkAbstractView.h>
+#include <berryIWorkbenchPartReference.h>
+#include <mitkIZombieViewPart.h>
 
 // berry
 #include <berryISelectionListener.h>
@@ -53,7 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkPartialVolumeAnalysisView : public QmitkFunctionality//, public itk::ProcessObject
+class QmitkPartialVolumeAnalysisView : public QmitkAbstractView, public mitk::IZombieViewPart//, public itk::ProcessObject
 {
   Q_OBJECT
 
@@ -94,11 +97,19 @@ public:
 
   virtual bool event( QEvent *event );
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
 
   virtual void Activated();
 
   virtual void Deactivated();
+
+  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer reference);
+
+  virtual void Hidden();
+
+  virtual void Visible();
+
+  virtual void SetFocus();
 
   bool AssertDrawingIsPossible(bool checked);
 
@@ -153,7 +164,7 @@ protected slots:
 
 protected:
 
-  void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
+  //void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
 
   /** \brief Issues a request to update statistics by sending an event to the
   * Qt event processing queue.
@@ -174,8 +185,6 @@ protected:
   void RemoveOrphanImages();
 
   void Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgNULL=false, bool clearImageOnFirstArgNULL=false );
-
-  void Visible( );
 
   void SetMeasurementInfoToRenderWindow(const QString& text);
 
@@ -243,6 +252,8 @@ protected:
   bool m_GaussianSigmaChangedSliding;
   bool m_NumberBinsSliding;
   bool m_UpsamplingChangedSliding;
+
+  bool m_Visible;
 
   mitk::DataNode::Pointer m_ClusteringResult;
 

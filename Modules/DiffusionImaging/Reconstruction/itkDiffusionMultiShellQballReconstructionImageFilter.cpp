@@ -143,9 +143,9 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   vOnes.fill(1.0);
 
   vnl_matrix<TOdfPixelType> T0(E.rows(), E.cols());
-  vnl_matrix<bool> C(E.rows(), 7);
-  vnl_matrix<bool> A(E.rows(), 7);
-  vnl_matrix<bool> B(E.rows(), 7);
+  vnl_matrix<unsigned char> C(E.rows(), 7);
+  vnl_matrix<TOdfPixelType> A(E.rows(), 7);
+  vnl_matrix<TOdfPixelType> B(E.rows(), 7);
 
   vnl_vector<TOdfPixelType> s0(E.rows());
   vnl_vector<TOdfPixelType> a0(E.rows());
@@ -182,37 +182,37 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
     b0 = E(i,1) / s0[i];
   }
 
-  ta = 3*a0;
-  tb = 3*b0;
-  e = tb - (2*ta);
-  m = (2*tb) + ta;
+  ta = a0 * 3.0;
+  tb = b0 * 3.0;
+  e = tb - (ta * 2.0);
+  m = (tb *  2.0 ) + ta;
 
   for(int i = 0; i < E.rows(); i++)
   {
     C(i,0) = tb[i] < 1+3*delta && 0.5+1.5*(sF+1)*delta < ta[i] && ta[i] < 1-3* (sF+2) *delta;
     C(i,1) = e[i] <= -1 +3*(2*sF+5)* delta && ta[i] >= 1-3*(sF+2)*delta;
-    C(i,2) = m[i] > 3 -3*sF*delta && -1+3*(2*sF+5)*d < e[i] && e<-3*sF*d;
-    C(i,3) = m[i] >= 3-3*sF*d && e >= -3 *sF * delta;
-    C(i,4) = 2.5 + 1.5*(5+sF)*delta < m[i] && m < 3-3*sF*delta && e> -3*sF*delta;
-    C(i,5) = ta[i] <= 0.5+1.5 *delta(sF+1)*delta && m[i] <= 2.5 + 1.5 *(5+sF) * delta;
+    C(i,2) = m[i] > 3 -3*sF*delta && -1+3*(2*sF+5)*delta < e[i] && e[i]<-3*sF*delta;
+    C(i,3) = m[i] >= 3-3*sF*delta && e[i] >= -3 *sF * delta;
+    C(i,4) = 2.5 + 1.5*(5+sF)*delta < m[i] && m[i] < 3-3*sF*delta && e[i] > -3*sF*delta;
+    C(i,5) = ta[i] <= 0.5+1.5 *delta*(sF+1)*delta && m[i] <= 2.5 + 1.5 *(5+sF) * delta;
     C(i,6) = !( C(i,0) || C(i,1) || C(i,2) || C(i,3) || C(i,4) || C(i,5) ); // ~ANY(C(i,[0-5] ),2)
   }
 
   A.set_column(0, a0);
-  A.set_column(1, (1/3 - (sF+2) * delta ) * vOnes);
-  A.set_column(2, 0.2+0.8 * a0 - 0.4 * b0 -d/sF);
-  A.set_column(3, (0.2 + delta /sF)*vOnes);
-  A.set_column(4, 0.2 * a0 + 0.4 * b0 + 2*d/sF);
-  A.set_column(5, (1/6+0.5*(sF+1)*delat) * vOnes);
+  A.set_column(1, vOnes * (1/3 - (sF+2) * delta ));
+  A.set_column(2, (a0*0.8)+ 0.2 - (b0 * 0.4) -delta/sF);
+  A.set_column(3, vOnes * (0.2 + delta /sF));
+  A.set_column(4, a0 * 0.2 + (b0 * 0.4) + 2*delta/sF);
+  A.set_column(5, vOnes * (1/6+0.5*(sF+1)*delta));
   A.set_column(6, a0);
 
 
   B.set_column(0, (1/3 +delta) * vOnes );
   B.set_column(1, (1/3 +delta) * vOnes );
-  B.set_column(2, 0.4 * 0.4 * a0 + 0.2 * b0 - 2*d/sF );
-  B.set_column(3, (0.4 - 3* delta / sF) * vOnes );
-  B.set_column(4, 0.4 * a0 + 0.8 * b0 - delta /sF);
-  B.set_column(5, (1/3+d) * vOnes);
+  B.set_column(2, (-(a0 * 0.4)) + 0.4 +  ((b0 * 0.2) - 2*delta/sF) ); //FLAG
+  B.set_column(3, vOnes * (0.4 - 3* delta / sF));
+  B.set_column(4, a0 * 0.4 + (b0 * 0.8) - delta /sF);
+  B.set_column(5, vOnes * (1/3+delta));
   B.set_column(6, b0 );
 
   for(int i = 0 ; i < E.rows(); i++)
@@ -259,7 +259,7 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::S_S0Normalization( vnl_matrix<TOdfPixelType> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 )
+::S_S0Normalization( vnl_matrix<TOdfPixelType> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
 {
   double b0f = (double)b0;
   for(int i = 0; i < mat.rows(); i++)

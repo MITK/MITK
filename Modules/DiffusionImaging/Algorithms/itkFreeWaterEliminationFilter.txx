@@ -99,6 +99,7 @@ namespace itk
     vnl_vector<double> tensor(6);
     vnl_vector<double> atten(nof-number_b0);
     vnl_matrix<double> temp_tensor(3,3);
+    vnl_matrix<double> copy(nof-number_b0,6);
     vnl_vector<double> eigen_vals(3);
     vnl_vector<double> f_vec(3);
     vnl_vector<double> eigs(2);
@@ -118,6 +119,19 @@ namespace itk
 
           if(pixel>0.0)
           {
+
+            if(x==22 && y==48 && z==20)
+            {
+               std::cout <<"21 48 20 tensor"<< "\n";
+               std::cout <<tensor[0]<< "\n";
+               std::cout <<tensor[1]<< "\n";
+               std::cout <<tensor[2]<< "\n";
+               std::cout <<tensor[3]<< "\n";
+               std::cout <<tensor[4]<< "\n";
+               std::cout <<tensor[5]<< "\n" <<std::endl;
+            }
+
+
             GradientVectorType data_vec = m_CorrectedVols->GetPixel(ix);
             for (int i=0;i<nof;i++)
             {
@@ -126,18 +140,6 @@ namespace itk
 
             calculate_attenuation(org_data,m_B0Mask,atten,mean_b,nof,number_b0);
             calculate_tensor(m_PseudoInverse,atten,tensor,nof,number_b0);
-
-
-            if(x==47 && y==69 && z==28)
-            {
-               std::cout <<"Joe tensor"<< "\n";
-               std::cout <<tensor[0]<< "\n";
-               std::cout <<tensor[1]<< "\n";
-               std::cout <<tensor[2]<< "\n";
-               std::cout <<tensor[3]<< "\n";
-               std::cout <<tensor[4]<< "\n";
-               std::cout <<tensor[5]<< "\n";
-            }
 
 
 
@@ -158,22 +160,42 @@ namespace itk
             if(MD < 2.3)
             {
               f_vec[0] = ((exp(-mean_b*eigs[0]))-(exp(-mean_b*3.0)))/((exp(-2.5*mean_b))-(exp(-mean_b*3.0)));
-              if(f_vec[0]>1.0){f_vec[0]=1.0;}
-              if(f_vec[0]<0.0){f_vec[0]=0.0;}// finish max value for the voxel
+              f_vec[2] = ((exp(-mean_b*eigs[1]))-(exp(-mean_b*3.0)))/((exp(-0.01*mean_b))-(exp(-mean_b*3.0)));
+              f_vec[1] = ((exp(-mean_b*MD))-(exp(-mean_b*3.0)))/((exp(-0.6*mean_b))-(exp(-mean_b*3.0)));
 
-              f_vec[1] =((exp(-mean_b*MD))-(exp(-mean_b*3.0)))/((exp(-0.6*mean_b))-(exp(-mean_b*3.0)));
+              if(f_vec[2]>1.0)
+                f_vec[2]=1.0;
+
+              if(f_vec[2]<0.0)
+                f_vec[2]=0.0;// finish min value for the voxel
+
+              if(f_vec[0]>1.0)
+                f_vec[0]=1.0;
+
+              if(f_vec[0]<0.0)
+                f_vec[0]=0.0;// finish max value for the voxel
+
+
               if(f_vec[1]>f_vec[0])
               {
                 f_vec[1]=(f_vec[0]+ f_vec[2])/2.0;
               }
-              if(f_vec[1]<f_vec[2]){f_vec[1]=(f_vec[0]+ f_vec[2])/2.0;}// finish of f_map calculation
 
-              f_vec[2] = ((exp(-mean_b*eigs[1]))-(exp(-mean_b*3.0)))/((exp(-0.01*mean_b))-(exp(-mean_b*3.0)));
-              if(f_vec[2]>1.0){f_vec[2]=1.0;}
-              if(f_vec[2]<0.0){f_vec[2]=0.0;}// finish min value for the voxel
+              if(f_vec[1]<f_vec[2])
+              {
+                f_vec[1]=(f_vec[0]+ f_vec[2])/2.0;
+              }// finish of f_map calculation
+
+
+
 
               for (int i=0;i<nof-number_b0;i++)
               {
+
+               if(f_vec[1] == 0)
+               {
+                 std::cout << "f_vec[1] == 0" << std::endl;
+               }
                atten[i]= (atten[i]-(exp(-3.0*m_BVec[i])*(1.0-f_vec[1])))/f_vec[1];
                if (atten[i]<0.1){atten[i]=0.01;}
               }// estimation of new attenuation value- after subtracting initial water part
@@ -182,16 +204,7 @@ namespace itk
 
 
 
-              if(x==47 && y==69 && z==28)
-              {
-                 std::cout <<"Joe tensor again"<< "\n";
-                 std::cout <<tensor[0]<< "\n";
-                 std::cout <<tensor[1]<< "\n";
-                 std::cout <<tensor[2]<< "\n";
-                 std::cout <<tensor[3]<< "\n";
-                 std::cout <<tensor[4]<< "\n";
-                 std::cout <<tensor[5]<< "\n" <<std::endl;
-              }
+
 
 
               ten(0,0) = tensor[0]; ten(0,1) = tensor[3]; ten(0,2) = tensor[5];
@@ -267,12 +280,13 @@ namespace itk
     vnl_matrix<double> rom(nof-number_b0,1);
 
     double temp_sum_comp=0.0;
-    vnl_matrix<double> inverse_transposed = m_H.transpose();
+    copy=m_H;
+    vnl_matrix<double> inverse_transposed = copy.transpose();
     vnl_matrix<double> temporary_attenuation(nof-number_b0,1);
     vnl_matrix<double> tct(6,1);
     vnl_vector <double> regulated_tensors (6);
 
-    double mult =0.0;float tensor_n_x=0.0;float tensor_n_y=0.0;float tensor_n_z=0.0;
+    double mult =0.0;double tensor_n_x=0.0;double tensor_n_y=0.0;double tensor_n_z=0.0;
 
     // all of this is declared because of the shifting that exist in Beltrami -Iwasawa method.
 
@@ -291,14 +305,46 @@ namespace itk
 
       std::cout << "beltrami iteration " << t << std::endl;
 
+
+
+
+
       for ( int x=0;x<size[0];x++)
       {
         for ( int y=0;y<size[1];y++)
         {
           for ( int z=0;z<size[2];z++)
           {
+
+
+
+            if (temporary_component_x != temporary_component_x)
+            {
+              std::cout << "nan" << std::endl;
+            }
+            if (temporary_component_y != temporary_component_y)
+            {
+              std::cout << "nan" << std::endl;
+            }
+            if (temporary_component_z != temporary_component_z)
+            {
+              std::cout << "nan" << std::endl;
+            }
+
+
              ix[0]=x; ix[1]=y; ix[2]=z;
              pixel = m_MaskImage->GetPixel(ix);
+
+             if(x==22 && y==48 && z==21)
+             {
+               std::cout << "follow" << std::endl;
+             }
+
+
+             if(x==21 && y==48 && z==20)
+             {
+               std::cout << "follow" << std::endl;
+             }
 
              if(pixel>0.0)
              {
@@ -350,7 +396,7 @@ namespace itk
                     tensor_y_n[1]=ten(1,1);
                     tensor_y_n[4]=ten(1,2);
                     tensor_y_n[2]=ten(2,2);
-                    tensor_x=(tensor[t_id]-tensor_y_n[t_id])*pixel_y_n*pixel;
+                    tensor_y=(tensor[t_id]-tensor_y_n[t_id])*pixel_y_n*pixel;
                     mask_y=pixel_y_n*pixel;
                   }
                   if (z>0)
@@ -361,9 +407,14 @@ namespace itk
                     ix[2]=z-1;
                     pixel_z_n = m_MaskImage->GetPixel(ix);
                     ten = tensorImg->GetPixel(ix);
-                    tensor_z_n[0]=ten(0,0);tensor_z_n[3]=ten(0,1);tensor_z_n[5]=ten(0,2); tensor_z_n[1]=ten(1,1);tensor_z_n[4]=ten(1,2);tensor_z_n[2]=ten(2,2);
+                    tensor_z_n[0]=ten(0,0);
+                    tensor_z_n[3]=ten(0,1);
+                    tensor_z_n[5]=ten(0,2);
+                    tensor_z_n[1]=ten(1,1);
+                    tensor_z_n[4]=ten(1,2);
+                    tensor_z_n[2]=ten(2,2);
 
-                    tensor_x=(tensor[t_id]-tensor_z_n[t_id])*pixel_z_n*pixel;
+                    tensor_z=(tensor[t_id]-tensor_z_n[t_id])*pixel_z_n*pixel;
                     mask_z=pixel_z_n*pixel;
                   }
 
@@ -371,7 +422,8 @@ namespace itk
 
                   if (x==(size[0]-1))
                   {
-                    temporary_mask_px =pixel*mult; temporary_component_x=0;
+                    temporary_mask_px =pixel*mult;
+                    temporary_component_x=0;
                   }
 
                   if (y==(size[1]-1))
@@ -396,6 +448,12 @@ namespace itk
                     ix[2]=z;
                     pixel_x_p = m_MaskImage->GetPixel(ix);
                     ten = tensorImg->GetPixel(ix);
+
+                    if(ten(0,0) != ten(0,0))
+                    {
+                      std::cout << "bad tensor" << std::endl;
+                    }
+
                     tensor_x_p[0]=ten(0,0);
                     tensor_x_p[3]=ten(0,1);
                     tensor_x_p[5]=ten(0,2);

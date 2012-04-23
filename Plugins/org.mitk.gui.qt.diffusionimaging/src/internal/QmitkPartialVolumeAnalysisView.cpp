@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkStdMultiWidget.h"
+#include "QmitkStdMultiWidgetEditor.h"
 #include "QmitkSliderNavigatorWidget.h"
 
 #include "mitkNodePredicateDataType.h"
@@ -77,7 +78,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define PVA_PI M_PI
 
 const std::string QmitkPartialVolumeAnalysisView::VIEW_ID =
-"org.mitk.views.partialvolumeanalysisview";
+    "org.mitk.views.partialvolumeanalysisview";
 
 class QmitkRequestStatisticsUpdateEvent : public QEvent
 {
@@ -85,7 +86,7 @@ public:
   enum Type
   {
     StatisticsUpdateRequest = QEvent::MaxUser - 1025
-                            };
+  };
 
   QmitkRequestStatisticsUpdateEvent()
     : QEvent( (QEvent::Type) StatisticsUpdateRequest ) {};
@@ -111,46 +112,47 @@ inline bool my_isnan(float x)
 }
 
 QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*parent*/, const char * /*name*/)
-  : QmitkFunctionality(),
-  m_Controls( NULL ),
-  m_TimeStepperAdapter( NULL ),
-  m_MeasurementInfoRenderer(0),
-  m_MeasurementInfoAnnotation(0),
-  m_SelectedImageNodes(  ),
-  m_SelectedImage( NULL ),
-  m_SelectedMaskNode( NULL ),
-  m_SelectedImageMask( NULL ),
-  m_SelectedPlanarFigureNodes(0),
-  m_SelectedPlanarFigure( NULL ),
-  m_IsTensorImage(false),
-  m_FAImage(0),
-  m_RDImage(0),
-  m_ADImage(0),
-  m_MDImage(0),
-  m_CAImage(0),
-  //  m_DirectionImage(0),
-  m_DirectionComp1Image(0),
-  m_DirectionComp2Image(0),
-  m_AngularErrorImage(0),
-  m_SelectedRenderWindow(NULL),
-  m_LastRenderWindow(NULL),
-  m_ImageObserverTag( -1 ),
-  m_ImageMaskObserverTag( -1 ),
-  m_PlanarFigureObserverTag( -1 ),
-  m_CurrentStatisticsValid( false ),
-  m_StatisticsUpdatePending( false ),
-  m_GaussianSigmaChangedSliding(false),
-  m_NumberBinsSliding(false),
-  m_UpsamplingChangedSliding(false),
-  m_ClusteringResult(NULL),
-  m_EllipseCounter(0),
-  m_RectangleCounter(0),
-  m_PolygonCounter(0),
-  m_CurrentFigureNodeInitialized(false),
-  m_QuantifyClass(2),
-  m_IconTexOFF(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntOFFIcon.png")),
-  m_IconTexON(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntONIcon.png")),
-  m_TexIsOn(true)
+  : //QmitkFunctionality(),
+    m_Controls( NULL ),
+    m_TimeStepperAdapter( NULL ),
+    m_MeasurementInfoRenderer(0),
+    m_MeasurementInfoAnnotation(0),
+    m_SelectedImageNodes(  ),
+    m_SelectedImage( NULL ),
+    m_SelectedMaskNode( NULL ),
+    m_SelectedImageMask( NULL ),
+    m_SelectedPlanarFigureNodes(0),
+    m_SelectedPlanarFigure( NULL ),
+    m_IsTensorImage(false),
+    m_FAImage(0),
+    m_RDImage(0),
+    m_ADImage(0),
+    m_MDImage(0),
+    m_CAImage(0),
+    //  m_DirectionImage(0),
+    m_DirectionComp1Image(0),
+    m_DirectionComp2Image(0),
+    m_AngularErrorImage(0),
+    m_SelectedRenderWindow(NULL),
+    m_LastRenderWindow(NULL),
+    m_ImageObserverTag( -1 ),
+    m_ImageMaskObserverTag( -1 ),
+    m_PlanarFigureObserverTag( -1 ),
+    m_CurrentStatisticsValid( false ),
+    m_StatisticsUpdatePending( false ),
+    m_GaussianSigmaChangedSliding(false),
+    m_NumberBinsSliding(false),
+    m_UpsamplingChangedSliding(false),
+    m_ClusteringResult(NULL),
+    m_EllipseCounter(0),
+    m_RectangleCounter(0),
+    m_PolygonCounter(0),
+    m_CurrentFigureNodeInitialized(false),
+    m_QuantifyClass(2),
+    m_IconTexOFF(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntOFFIcon.png")),
+    m_IconTexON(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntONIcon.png")),
+    m_TexIsOn(true),
+    m_Visible(false)
 {
 
 }
@@ -168,8 +170,8 @@ QmitkPartialVolumeAnalysisView::~QmitkPartialVolumeAnalysisView()
     m_SelectedPlanarFigure->RemoveObserver( m_InitializedObserverTag );
   }
 
-  this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
-                                                 , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage );
+  this->GetDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+      , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage );
 
   m_SelectedPlanarFigureNodes->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
                                                            , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
@@ -219,7 +221,7 @@ void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
   m_MeasurementInfoRenderer = vtkRenderer::New();
   m_MeasurementInfoRenderer->AddActor(m_MeasurementInfoAnnotation);
 
-  m_SelectedPlanarFigureNodes = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
+  m_SelectedPlanarFigureNodes = mitk::DataStorageSelection::New(this->GetDataStorage(), false);
 
   m_SelectedPlanarFigureNodes->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
                                                         , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
@@ -230,7 +232,7 @@ void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
   m_SelectedPlanarFigureNodes->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
                                                             , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
 
-  m_SelectedImageNodes = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
+  m_SelectedImageNodes = mitk::DataStorageSelection::New(this->GetDataStorage(), false);
 
   m_SelectedImageNodes->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
                                                      , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
@@ -241,8 +243,8 @@ void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
   m_SelectedImageNodes->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
                                                  , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeRemoved ) );
 
-  this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
-                                                           , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage ) );
+  this->GetDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                    , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage ) );
 
   Select(NULL,true,true);
 
@@ -498,17 +500,12 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
 
 }
 
-void QmitkPartialVolumeAnalysisView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
-{
-  QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
-}
-
 bool QmitkPartialVolumeAnalysisView::AssertDrawingIsPossible(bool checked)
 {
   if (m_SelectedImageNodes->GetNode().IsNull())
   {
     checked = false;
-    this->HandleException("Please select an image!", this->m_Parent, true);
+    this->HandleException("Please select an image!", dynamic_cast<QWidget *>(this->parent()), true);
     return false;
   }
 
@@ -555,7 +552,7 @@ void QmitkPartialVolumeAnalysisView::ActionDrawPolygonTriggered()
 }
 
 void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
-                                                        const char *propertyKey, mitk::BaseProperty *property )
+                                                            const char *propertyKey, mitk::BaseProperty *property )
 {
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
@@ -571,15 +568,16 @@ void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, m_SelectedImageNodes->GetNode() );
 
-  std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> selectedNodes = this->GetDataManagerSelection();
   for(unsigned int i = 0; i < selectedNodes.size(); i++)
   {
     selectedNodes[i]->SetSelected(false);
   }
-  selectedNodes = m_SelectedPlanarFigureNodes->GetNodes();
-  for(unsigned int i = 0; i < selectedNodes.size(); i++)
+
+  std::vector<mitk::DataNode *> selectedPFNodes = m_SelectedPlanarFigureNodes->GetNodes();
+  for(unsigned int i = 0; i < selectedPFNodes.size(); i++)
   {
-    selectedNodes[i]->SetSelected(false);
+    selectedPFNodes[i]->SetSelected(false);
   }
   newNode->SetSelected(true);
 
@@ -623,71 +621,35 @@ void QmitkPartialVolumeAnalysisView::PlanarFigureFocus(mitk::DataNode* node)
     {
       mitk::Point3D centerP = _PlaneGeometry->GetOrigin();
       m_SelectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-          centerP, _PlaneGeometry->GetNormal());
+            centerP, _PlaneGeometry->GetNormal());
       m_SelectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-          centerP);
+            centerP);
     }
   }
 }
 
 void QmitkPartialVolumeAnalysisView::FindRenderWindow(mitk::DataNode* node)
 {
-
-  if(node)
+  if (node && dynamic_cast<mitk::PlanarFigure*> (node->GetData()))
   {
-    mitk::PlanarFigure* _PlanarFigure = 0;
-    _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+    m_SelectedRenderWindow = 0;
+    bool PlanarFigureInitializedWindow = false;
 
-    if (_PlanarFigure)
+    foreach(QmitkRenderWindow * window, this->GetRenderWindowPart()->GetRenderWindows().values())
     {
-      m_SelectedRenderWindow = 0;
-      QmitkRenderWindow* RenderWindow1 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow1();
-      QmitkRenderWindow* RenderWindow2 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow2();
-      QmitkRenderWindow* RenderWindow3 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow3();
-      QmitkRenderWindow* RenderWindow4 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow4();
-
-      bool PlanarFigureInitializedWindow = false;
-
-      // find initialized renderwindow
-      if (node->GetBoolProperty("PlanarFigureInitializedWindow",
-                                PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+      if (!m_SelectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, window->GetRenderer()))
       {
-        m_SelectedRenderWindow = RenderWindow1;
+        m_SelectedRenderWindow = window;
       }
-
-      if (!m_SelectedRenderWindow && node->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow2->GetRenderer()))
-      {
-        m_SelectedRenderWindow = RenderWindow2;
-      }
-
-      if (!m_SelectedRenderWindow && node->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow3->GetRenderer()))
-      {
-        m_SelectedRenderWindow = RenderWindow3;
-      }
-
-      if (!m_SelectedRenderWindow && node->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow4->GetRenderer()))
-      {
-        m_SelectedRenderWindow = RenderWindow4;
-      }
-
     }
   }
 }
 
-void QmitkPartialVolumeAnalysisView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+
+void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
 {
 
-  if ( !this->IsVisible() )
+  if ( !m_Visible )
   {
     return;
   }
@@ -825,7 +787,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
 
         // Add change listeners to selected objects
         m_ImageObserverTag = m_SelectedImage->AddObserver(
-            itk::ModifiedEvent(), changeListener );
+              itk::ModifiedEvent(), changeListener );
 
         m_Controls->m_SimilarAnglesFrame->setVisible(false);
         m_Controls->m_SimilarAnglesLabel->setVisible(false);
@@ -863,7 +825,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
         m_SelectedImageMask = NULL;
 
         m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
-            mitk::EndInteractionPlanarFigureEvent(), changeListener );
+              mitk::EndInteractionPlanarFigureEvent(), changeListener );
 
         if(!m_CurrentFigureNodeInitialized)
         {
@@ -903,7 +865,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
         m_SelectedPlanarFigureNodes->RemoveAllNodes();
 
         m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver(
-            itk::ModifiedEvent(), changeListener );
+              itk::ModifiedEvent(), changeListener );
 
         m_Controls->m_SelectedMaskLabel->setText( m_SelectedMaskNode->GetName().c_str() );
 
@@ -932,7 +894,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
 
         // Add change listeners to selected objects
         m_ImageObserverTag = m_SelectedImage->AddObserver(
-            itk::ModifiedEvent(), changeListener );
+              itk::ModifiedEvent(), changeListener );
 
         m_Controls->m_SimilarAnglesFrame->setVisible(true);
         m_Controls->m_SimilarAnglesLabel->setVisible(true);
@@ -980,8 +942,8 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
     }
 
     if( m_SelectedImage.IsNull()
-      || (m_SelectedPlanarFigure.IsNull() && m_SelectedImageMask.IsNull()) )
-      {
+        || (m_SelectedPlanarFigure.IsNull() && m_SelectedImageMask.IsNull()) )
+    {
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
       m_Controls->m_ErrorMessageLabel->hide();
@@ -1075,57 +1037,57 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
       // clipboard
       QString clipboardText("FA\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
       clipboardText = clipboardText
-                      .arg(red_fa[0]).arg(red_fa[1])
-                      .arg(gray_fa[0]).arg(gray_fa[1])
-                      .arg(green_fa[0]).arg(green_fa[1]);
+          .arg(red_fa[0]).arg(red_fa[1])
+          .arg(gray_fa[0]).arg(gray_fa[1])
+          .arg(green_fa[0]).arg(green_fa[1]);
       QString clipboardText3("RD\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
       clipboardText3 = clipboardText3
-                       .arg(red_rd[0]).arg(red_rd[1])
-                       .arg(gray_rd[0]).arg(gray_rd[1])
-                       .arg(green_rd[0]).arg(green_rd[1]);
+          .arg(red_rd[0]).arg(red_rd[1])
+          .arg(gray_rd[0]).arg(gray_rd[1])
+          .arg(green_rd[0]).arg(green_rd[1]);
       QString clipboardText4("AD\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
       clipboardText4 = clipboardText4
-                       .arg(red_ad[0]).arg(red_ad[1])
-                       .arg(gray_ad[0]).arg(gray_ad[1])
-                       .arg(green_ad[0]).arg(green_ad[1]);
+          .arg(red_ad[0]).arg(red_ad[1])
+          .arg(gray_ad[0]).arg(gray_ad[1])
+          .arg(green_ad[0]).arg(green_ad[1]);
       QString clipboardText5("MD\t%1\t%2\t\t%3\t%4\t\t%5\t%6");
       clipboardText5 = clipboardText5
-                       .arg(red_md[0]).arg(red_md[1])
-                       .arg(gray_md[0]).arg(gray_md[1])
-                       .arg(green_md[0]).arg(green_md[1]);
+          .arg(red_md[0]).arg(red_md[1])
+          .arg(gray_md[0]).arg(gray_md[1])
+          .arg(green_md[0]).arg(green_md[1]);
 
       QApplication::clipboard()->setText(clipboardText+clipboardText3+clipboardText4+clipboardText5, QClipboard::Clipboard);
 
       // now paint infos also on renderwindow
       QString plainInfoText("%1  %2  %3        \n");
       plainInfoText = plainInfoText
-                      .arg("Red  ", 20)
-                      .arg("Gray ", 20)
-                      .arg("Green", 20);
+          .arg("Red  ", 20)
+          .arg("Gray ", 20)
+          .arg("Green", 20);
 
       QString plainInfoText0("FA:%1 ± %2%3 ± %4%5 ± %6\n");
       plainInfoText0 = plainInfoText0
-                       .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(gray_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(gray_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(green_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(green_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(gray_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(gray_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(green_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(green_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText3("RDx10³:%1 ± %2%3 ± %4%5 ± %6\n");
       plainInfoText3 = plainInfoText3
-                       .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * gray_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * green_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * gray_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * green_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText4("ADx10³:%1 ± %2%3 ± %4%5 ± %6\n");
       plainInfoText4 = plainInfoText4
-                       .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * gray_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * green_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * gray_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * green_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText5("MDx10³:%1 ± %2%3 ± %4%5 ± %6");
       plainInfoText5 = plainInfoText5
-                       .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * gray_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
-                       .arg(1000.0 * green_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * gray_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
+          .arg(1000.0 * green_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       this->SetMeasurementInfoToRenderWindow(plainInfoText+plainInfoText0+plainInfoText3+plainInfoText4+plainInfoText5);
 
@@ -1146,15 +1108,15 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
       // clipboard
       QString clipboardText("%1\t%2\t\t%3\t%4\t\t%5\t%6");
       clipboardText = clipboardText.arg(red[0]).arg(red[1])
-                      .arg(gray[0]).arg(gray[1])
-                      .arg(green[0]).arg(green[1]);
+          .arg(gray[0]).arg(gray[1])
+          .arg(green[0]).arg(green[1]);
       QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
 
       // now paint infos also on renderwindow
       QString plainInfoText("Red: %1 ± %2\nGray: %3 ± %4\nGreen: %5 ± %6");
       plainInfoText = plainInfoText.arg(red[0]).arg(red[1])
-                      .arg(gray[0]).arg(gray[1])
-                      .arg(green[0]).arg(green[1]);
+          .arg(gray[0]).arg(gray[1])
+          .arg(green[0]).arg(green[1]);
 
       this->SetMeasurementInfoToRenderWindow(plainInfoText);
 
@@ -1189,39 +1151,39 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
       // clipboard
       QString clipboardText("FA\t%1\t%2\t");
       clipboardText = clipboardText
-                      .arg(red_fa[0]).arg(red_fa[1]);
+          .arg(red_fa[0]).arg(red_fa[1]);
       QString clipboardText3("RD\t%1\t%2\t");
       clipboardText3 = clipboardText3
-                       .arg(red_rd[0]).arg(red_rd[1]);
+          .arg(red_rd[0]).arg(red_rd[1]);
       QString clipboardText4("AD\t%1\t%2\t");
       clipboardText4 = clipboardText4
-                       .arg(red_ad[0]).arg(red_ad[1]);
+          .arg(red_ad[0]).arg(red_ad[1]);
       QString clipboardText5("MD\t%1\t%2\t");
       clipboardText5 = clipboardText5
-                       .arg(red_md[0]).arg(red_md[1]);
+          .arg(red_md[0]).arg(red_md[1]);
 
       QApplication::clipboard()->setText(clipboardText+clipboardText3+clipboardText4+clipboardText5, QClipboard::Clipboard);
 
       // now paint infos also on renderwindow
       QString plainInfoText("%1        \n");
       plainInfoText = plainInfoText
-                      .arg("Red  ", 20);
+          .arg("Red  ", 20);
 
       QString plainInfoText0("FA:%1 ± %2\n");
       plainInfoText0 = plainInfoText0
-                       .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText3("RDx10³:%1 ± %2\n");
       plainInfoText3 = plainInfoText3
-                       .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText4("ADx10³:%1 ± %2\n");
       plainInfoText4 = plainInfoText4
-                       .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       QString plainInfoText5("MDx10³:%1 ± %2");
       plainInfoText5 = plainInfoText5
-                       .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
+          .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
 
       this->SetMeasurementInfoToRenderWindow(plainInfoText+plainInfoText0+plainInfoText3+plainInfoText4+plainInfoText5);
 
@@ -1272,7 +1234,7 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
 
   if(m_ClusteringResult.IsNotNull())
   {
-    GetDefaultDataStorage()->Remove(m_ClusteringResult);
+    this->GetDataStorage()->Remove(m_ClusteringResult);
   }
 
   m_ClusteringResult = mitk::DataNode::New();
@@ -1281,14 +1243,14 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
   m_ClusteringResult->SetBoolProperty("texture interpolation", m_TexIsOn);
   m_ClusteringResult->SetData(clusteredImage);
   m_ClusteringResult->SetName("Clusterprobs");
-  GetDefaultDataStorage()->Add(m_ClusteringResult, m_SelectedImageNodes->GetNode());
+  this->GetDataStorage()->Add(m_ClusteringResult, m_SelectedImageNodes->GetNode());
 
   if(m_SelectedPlanarFigure.IsNotNull() && m_SelectedPlanarFigureNodes->GetNode().IsNotNull())
   {
     m_SelectedPlanarFigureNodes->GetNode()->SetIntProperty( "layer", 1001 );
   }
 
-  GetActiveStdMultiWidget()->RequestUpdate();
+  this->RequestRenderWindowUpdate();
 
 }
 
@@ -1307,7 +1269,15 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
   // Remove any cached images that are no longer referenced elsewhere
   this->RemoveOrphanImages();
 
-  QmitkStdMultiWidget *multiWidget = this->GetActiveStdMultiWidget();
+
+  QmitkStdMultiWidget *multiWidget = 0;
+  QmitkStdMultiWidgetEditor * multiWidgetEdit = 0;
+
+  multiWidgetEdit = dynamic_cast<QmitkStdMultiWidgetEditor *>(this->GetRenderWindowPart());
+  if(multiWidgetEdit){
+    multiWidget = multiWidgetEdit->GetStdMultiWidget();
+  }
+
   if ( multiWidget == NULL )
   {
     return;
@@ -1439,7 +1409,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     progressListener = ITKCommandType::New();
     progressListener->SetCallbackFunction( this, &QmitkPartialVolumeAnalysisView::UpdateProgressBar );
     unsigned long progressObserverTag = m_CurrentStatisticsCalculator
-                                        ->AddObserver( itk::ProgressEvent(), progressListener );
+        ->AddObserver( itk::ProgressEvent(), progressListener );
 
     ClusteringType::ParamsType *cparams = 0;
     ClusteringType::ClusterResultType *cresult = 0;
@@ -1496,7 +1466,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
             else
             {
               m_CurrentPerformClusteringResults =
-                clusterer->PerformClustering(imgToCluster, histogram, m_QuantifyClass);
+                  clusterer->PerformClustering(imgToCluster, histogram, m_QuantifyClass);
             }
 
             pFiberImg = m_CurrentPerformClusteringResults->clusteredImage;
@@ -1508,9 +1478,9 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
           if(m_IsTensorImage)
           {
             m_AngularErrorImage = clusterer->CaculateAngularErrorImage(
-                m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1),
-                m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2),
-                pFiberImg);
+                  m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1),
+                  m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2),
+                  pFiberImg);
 
             //          GetDefaultDataStorage()->Remove(m_newnode2);
             //          m_newnode2 = mitk::DataNode::New();
@@ -1572,7 +1542,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
       //      m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
       m_Controls->m_HistogramWidget->SetParameters(
-          cparams, cresult, chist );
+            cparams, cresult, chist );
       //      m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
 
     }
@@ -1626,32 +1596,45 @@ void QmitkPartialVolumeAnalysisView::SetMeasurementInfoToRenderWindow(const QStr
     {
       m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
       mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->InsertForegroundRenderer(
-          m_MeasurementInfoRenderer, true);
+            m_MeasurementInfoRenderer, true);
     }
     else
     {
       if (mitk::VtkLayerController::GetInstance(
-          m_LastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
-              m_MeasurementInfoRenderer))
+            m_LastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
+            m_MeasurementInfoRenderer))
         mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
-            m_MeasurementInfoRenderer);
+              m_MeasurementInfoRenderer);
     }
   }
   else
   {
+    QmitkStdMultiWidget *multiWidget = 0;
+    QmitkStdMultiWidgetEditor * multiWidgetEdit = 0;
+
+    multiWidgetEdit = dynamic_cast<QmitkStdMultiWidgetEditor *>(this->GetRenderWindowPart());
+    if(multiWidgetEdit){
+      multiWidget = multiWidgetEdit->GetStdMultiWidget();
+    }
+
+    if ( multiWidget == NULL )
+    {
+      return;
+    }
+
     if (!text.isEmpty())
     {
       m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
-      mitk::VtkLayerController::GetInstance(this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(
-          m_MeasurementInfoRenderer, true);
+      mitk::VtkLayerController::GetInstance(multiWidget->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(
+            m_MeasurementInfoRenderer, true);
     }
     else
     {
       if (mitk::VtkLayerController::GetInstance(
-          this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderWindow()) ->IsRendererInserted(
-              m_MeasurementInfoRenderer))
-        mitk::VtkLayerController::GetInstance(this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer(
-            m_MeasurementInfoRenderer);
+            multiWidget->GetRenderWindow1()->GetRenderWindow()) ->IsRendererInserted(
+            m_MeasurementInfoRenderer))
+        mitk::VtkLayerController::GetInstance(multiWidget->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer(
+              m_MeasurementInfoRenderer);
     }
   }
 }
@@ -1682,7 +1665,7 @@ void QmitkPartialVolumeAnalysisView::RemoveOrphanImages()
     ++it;
 
     mitk::NodePredicateData::Pointer hasImage = mitk::NodePredicateData::New( image );
-    if ( this->GetDefaultDataStorage()->GetNode( hasImage ) == NULL )
+    if ( this->GetDataStorage()->GetNode( hasImage ) == NULL )
     {
       if ( m_SelectedImage == image )
       {
@@ -1876,10 +1859,6 @@ bool QmitkPartialVolumeAnalysisView::event( QEvent *event )
   return false;
 }
 
-void QmitkPartialVolumeAnalysisView::Visible()
-{
-  this->OnSelectionChanged( this->GetDataManagerSelection() );
-}
 
 bool QmitkPartialVolumeAnalysisView::IsExclusiveFunctionality() const
 {
@@ -1888,18 +1867,21 @@ bool QmitkPartialVolumeAnalysisView::IsExclusiveFunctionality() const
 
 void QmitkPartialVolumeAnalysisView::Activated()
 {
-  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
+
+  MITK_INFO << "QmitkPartialVolumeAnalysisView:Activated";
+
+  //this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
 
-  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
+  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
   mitk::DataNode* node = 0;
   mitk::PlanarFigure* figure = 0;
   mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
 
   // finally add all nodes to the model
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-    ; it++)
-    {
+      ; it++)
+  {
     node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
@@ -1920,20 +1902,26 @@ void QmitkPartialVolumeAnalysisView::Activated()
 
 void QmitkPartialVolumeAnalysisView::Deactivated()
 {
-  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-  //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
+  MITK_INFO << "QmitkPartialVolumeAnalysisView:Deactivated";
+}
+
+void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer reference)
+{
+  MITK_INFO << "QmitkPartialVolumeAnalysisView:ActivatedZombieView";
+
+  //this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
 
   this->SetMeasurementInfoToRenderWindow("");
 
-  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
+  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
   mitk::DataNode* node = 0;
   mitk::PlanarFigure* figure = 0;
   mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
 
   // finally add all nodes to the model
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-    ; it++)
-    {
+      ; it++)
+  {
     node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
@@ -1945,9 +1933,24 @@ void QmitkPartialVolumeAnalysisView::Deactivated()
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
     }
   }
-
   m_Visible = false;
 }
+
+void QmitkPartialVolumeAnalysisView::Hidden()
+{
+
+}
+
+void QmitkPartialVolumeAnalysisView::Visible()
+{
+  //this->OnSelectionChanged( this->Get, this->GetDataManagerSelection() );
+}
+
+void QmitkPartialVolumeAnalysisView::SetFocus()
+{
+
+}
+
 
 void QmitkPartialVolumeAnalysisView::GreenRadio(bool checked)
 {
@@ -2077,7 +2080,7 @@ void QmitkPartialVolumeAnalysisView::ToClipBoard()
   std::vector<std::vector<double>* > vals  = m_Controls->m_HistogramWidget->m_Vals;
   QString clipboardText;
   for (std::vector<std::vector<double>* >::iterator it = vals.begin(); it
-                                                         != vals.end(); ++it)
+       != vals.end(); ++it)
   {
     for (std::vector<double>::iterator it2 = (**it).begin(); it2 != (**it).end(); ++it2)
     {
@@ -2103,8 +2106,8 @@ void QmitkPartialVolumeAnalysisView::NodeRemoved(const mitk::DataNode* node)
     GetDefaultDataStorage()->Remove(m_ClusteringResult);
 
   if(  node == m_SelectedPlanarFigureNodes->GetNode().GetPointer()
-    || node == m_SelectedMaskNode.GetPointer() )
-    {
+       || node == m_SelectedMaskNode.GetPointer() )
+  {
     this->Select(NULL,true,false);
     SetMeasurementInfoToRenderWindow("");
   }
@@ -2143,7 +2146,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
       if(oldInteractor.IsNotNull())
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
 
-      this->GetDefaultDataStorage()->Remove(m_SelectedPlanarFigureNodes->GetNode());
+      this->GetDataStorage()->Remove(m_SelectedPlanarFigureNodes->GetNode());
     }
 
   }
@@ -2164,6 +2167,6 @@ void QmitkPartialVolumeAnalysisView::TextIntON()
 
     m_ClusteringResult->SetBoolProperty("texture interpolation", !m_TexIsOn);
     m_TexIsOn = !m_TexIsOn;
-    GetActiveStdMultiWidget()->RequestUpdate();
+    this->RequestRenderWindowUpdate();
   }
 }

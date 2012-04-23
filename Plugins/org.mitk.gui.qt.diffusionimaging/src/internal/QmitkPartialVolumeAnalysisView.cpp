@@ -37,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
 #include "QmitkSliderNavigatorWidget.h"
+#include <QMessageBox>
 
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
@@ -200,8 +201,6 @@ void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkPartialVolumeAnalysisViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
-
-    m_Controls->m_ErrorMessageLabel->hide();
   }
 
   SetHistogramVisibility();
@@ -910,7 +909,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
 
     if(m_SelectedPlanarFigure.IsNull() && m_SelectedImageMask.IsNull() )
     {
-      m_Controls->m_SelectedMaskLabel->setText( "None" );
+      m_Controls->m_SelectedMaskLabel->setText( "-" );
       m_Controls->m_ResampleOptionsFrame->setEnabled(false);
       m_Controls->m_HistogramWidget->setEnabled(false);
       m_Controls->m_ClassSelector->setEnabled(false);
@@ -933,7 +932,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
     {
       m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
       m_Controls->m_OpacityFrame->setEnabled(false);
-      m_Controls->m_SelectedImageLabel->setText( "None" );
+      m_Controls->m_SelectedImageLabel->setText( "-" );
     }
     else
     {
@@ -946,7 +945,6 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
     {
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
-      m_Controls->m_ErrorMessageLabel->hide();
     }
     else
     {
@@ -1289,10 +1287,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     // cannot be calculated currently.
     if ( !m_IsTensorImage && m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
     {
-      std::stringstream message;
-      message << "Non-tensor multi-component images not supported.";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
-      m_Controls->m_ErrorMessageLabel->show();
+      QMessageBox::information( NULL, "Warning", "Non-tensor multi-component images not supported.");
 
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
@@ -1392,7 +1387,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     {
       m_CurrentStatisticsCalculator->SetMaskingModeToNone();
 
-      maskName = "None";
+      maskName = "-";
       maskType = "";
       maskDimension = 0;
     }
@@ -1508,21 +1503,13 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     }
     catch ( const std::runtime_error &e )
     {
-      // In case of exception, print error message on GUI
-      std::stringstream message;
-      message << e.what();
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
-      m_Controls->m_ErrorMessageLabel->show();
+      QMessageBox::information( NULL, "Warning", e.what());
     }
     catch ( const std::exception &e )
     {
       MITK_ERROR << "Caught exception: " << e.what();
 
-      // In case of exception, print error message on GUI
-      std::stringstream message;
-      message << "Error in calculating histogram: " << e.what();
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
-      m_Controls->m_ErrorMessageLabel->show();
+      QMessageBox::information( NULL, "Warning", e.what());
     }
 
     m_CurrentStatisticsCalculator->RemoveObserver( progressObserverTag );
@@ -1535,8 +1522,6 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
       if ( statisticsChanged )
       {
         // Do not show any error messages
-        m_Controls->m_ErrorMessageLabel->hide();
-
         m_CurrentStatisticsValid = true;
       }
 
@@ -1548,7 +1533,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
     }
     else
     {
-      m_Controls->m_SelectedMaskLabel->setText( "None" );
+      m_Controls->m_SelectedMaskLabel->setText( "-" );
 
       // Clear statistics and histogram
       m_Controls->m_HistogramWidget->ClearItemModel();

@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -23,13 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include "berryISelectionListener.h"
-#include "berryIStructuredSelection.h"
-
 #include "ui_QmitkDiffusionQuantificationViewControls.h"
-
-
-
 /*!
  * \ingroup org_mitk_gui_qt_diffusionquantification_internal
  *
@@ -71,7 +65,7 @@ class QmitkDiffusionQuantificationView : public QmitkFunctionality
 protected slots:
 
   void GFACheckboxClicked();
-  
+
   void GFA();
   void Curvature();
   void FA();
@@ -82,21 +76,23 @@ protected slots:
   void MD();
 
   void QBIQuantify(int method);
-  void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages, 
+  void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
 
   void TensorQuantify(int method);
-  void TensorQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages, 
+  void TensorQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
 
 protected:
 
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
   Ui::QmitkDiffusionQuantificationViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
-
-  berry::ISelectionListener::Pointer m_SelListener;
-  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+  mitk::DataStorage::SetOfObjects::Pointer m_QBallImages;
+  mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
 
   static const float m_ScaleDAIValues;
 };

@@ -66,12 +66,15 @@ QWidget* QmitkOverlay::GetWidget()
 
 void QmitkOverlay::AddDropShadow( QWidget* widget )
 {
-  QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(widget);
-  effect->setOffset( QPointF( 1.0, 1.0 ) );
-  effect->setBlurRadius( 0 );
-  effect->setColor( Qt::black );
-  
-  widget->setGraphicsEffect( effect );
+  if (m_Widget) 
+  {
+    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(widget);
+    effect->setOffset( QPointF( 1.0, 1.0 ) );
+    effect->setBlurRadius( 0 );
+    effect->setColor( Qt::black );
+
+    widget->setGraphicsEffect( effect );
+  }
 }
 
 

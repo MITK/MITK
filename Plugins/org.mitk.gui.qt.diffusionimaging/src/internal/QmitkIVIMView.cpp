@@ -43,6 +43,8 @@ QmitkIVIMView::QmitkIVIMView()
   , m_MultiWidget( NULL )
   , m_Active(false)
   , m_SliceObserverTag1(0), m_SliceObserverTag2(0), m_SliceObserverTag3(0)
+  , m_DiffusionImageNode(NULL)
+  , m_MaskImageNode(NULL)
 {
 }
 
@@ -122,8 +124,7 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
 
   m_Controls->m_VisualizeResultsWidget->setVisible(m_Controls->m_DisplayResultsCheckbox->isChecked());
   m_Controls->m_MethodCombo->setVisible(m_Controls->m_ChooseMethod->isChecked());
-
-//  m_Controls->m_ADCBValues->setVisible(m_Controls->m_CheckADC->isChecked());
+  m_Controls->m_Warning->setVisible(false);
 
   MethodCombo(m_Controls->m_MethodCombo->currentIndex());
 
@@ -275,32 +276,34 @@ void QmitkIVIMView::StdMultiWidgetNotAvailable()
 void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   bool foundOneDiffusionImage = false;
+  m_Controls->m_DiffusionImageLabel->setText("-");
+  m_Controls->m_MaskImageLabel->setText("-");
 
   // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-  it != nodes.end();
-  ++it )
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
 
-    if( node.IsNotNull() )
+    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
-      mitk::DiffusionImage<short>* img = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
-      if( img )
+      if( dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
       {
-        if(!foundOneDiffusionImage )
+        m_DiffusionImageNode = node;
+        foundOneDiffusionImage = true;
+        m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
+      }
+      else
+      {
+        bool isBinary = false;
+        node->GetPropertyValue<bool>("binary", isBinary);
+        if (isBinary)
         {
-          foundOneDiffusionImage = true;
-        }
-        else
-        {
-          foundOneDiffusionImage = false;
+          m_MaskImageNode = node;
+          m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
         }
       }
     }
   }
-
-//  m_Controls->m_ADCBValues->setVisible( foundOneDiffusionImage && m_Controls->m_CheckADC->isChecked() );
 
   m_Controls->m_ButtonStart->setEnabled( foundOneDiffusionImage );
   m_Controls->m_ButtonAutoThres->setEnabled( foundOneDiffusionImage );
@@ -437,7 +440,7 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
-  if(!m_Controls)
+  if(!m_Controls || m_DiffusionImageNode.IsNull())
     return;
 
   m_Controls->m_Warning->setVisible(false);
@@ -448,49 +451,11 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 
   if(!m_Controls->m_DisplayResultsCheckbox->isChecked()) return;
 
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-  if (!nodes.front()) return;
-  if (nodes.size()>2) return;
 
-  mitk::DiffusionImage<short>* diffusionImg = 0;
-  mitk::DiffusionImage<short>* img1 =
-      dynamic_cast<mitk::DiffusionImage<short>*>(
-          nodes.front()->GetData());
-
-  mitk::DiffusionImage<short>* img2 = 0;
-  mitk::Image* maskImg = 0;
-  if(nodes.size()>1)
-  {
-    if(img1)
-    {
-      if(strcmp(nodes.at(1)->GetData()->GetNameOfClass(), "Image") != 0 )
-        return;
-
-      maskImg = dynamic_cast<mitk::Image*>(
-          nodes.at(1)->GetData());
-
-      diffusionImg = img1;
-    }
-    else
-    {
-      if(strcmp(nodes.front()->GetData()->GetNameOfClass(), "Image") != 0 )
-        return;
-
-      maskImg = dynamic_cast<mitk::Image*>(
-          nodes.front()->GetData());
-
-      diffusionImg = dynamic_cast<mitk::DiffusionImage<short>*>(
-              nodes.at(1)->GetData());
-    }
-  }
-  else
-  {
-    diffusionImg = img1;
-  }
-
-  if (nodes.size()==2 && (!diffusionImg || !maskImg || m_Controls->m_MethodCombo->currentIndex() == 4 )) return;
-  if (nodes.size()==1 && !diffusionImg) return;
+  mitk::DiffusionImage<short>::Pointer diffusionImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_DiffusionImageNode->GetData());
+  mitk::Image::Pointer maskImg = NULL;
+  if (m_MaskImageNode.IsNotNull())
+    maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
 
   IVIMFilterType::GradientDirectionContainerType::ConstIterator gdcit =
       diffusionImg->GetDirections()->Begin();
@@ -519,7 +484,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
   VecImgType::Pointer vecimg = (VecImgType*)diffusionImg->GetVectorImage().GetPointer();
 
   VecImgType::Pointer roiImage = VecImgType::New();
-  if(maskImg == 0)
+  if(maskImg.IsNull())
   {
     int roisize = 0;
     if(m_Controls->m_MethodCombo->currentIndex() == 4)

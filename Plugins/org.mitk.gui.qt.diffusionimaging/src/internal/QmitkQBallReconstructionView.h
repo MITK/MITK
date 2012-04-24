@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -86,23 +86,26 @@ protected slots:
   //void AnalyticallyReconstructNonNegSolidAngle();
   //void AnalyticallyReconstructAdc();
   //void AnalyticallyReconstructRaw();
-  
+
   void AdvancedCheckboxClicked();
   void MethodChoosen(int method);
-  
+
   void Reconstruct(int method, int normalization);
-  
+
   void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
   void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
 
 protected:
+
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
   Ui::QmitkQBallReconstructionViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   template<int L>
-  void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols, 
+  void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);

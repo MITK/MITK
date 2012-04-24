@@ -28,10 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
 
-#include <berryIPartListener.h>
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 typedef short DiffusionPixelType;
 
 struct TrSelListener;
@@ -114,8 +110,10 @@ protected:
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-  berry::ISelectionListener::Pointer m_SelListener;
-  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+  mitk::DataNode::Pointer m_DiffusionImage;
+  mitk::DataNode::Pointer m_TensorImage;
+  mitk::DataStorage::SetOfObjects::Pointer m_DiffusionImages;
+  mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
 };
 
 

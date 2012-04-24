@@ -27,10 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDiffusionImage.h"
 
-#include <berryIPartListener.h>
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 typedef short DiffusionPixelType;
 
 struct PrpSelListener;
@@ -81,13 +77,8 @@ class QmitkPreprocessingView : public QmitkFunctionality
 protected slots:
 
   void AverageGradients();
-  void DoAverageGradients(mitk::DataStorage::SetOfObjects::Pointer inImages);
-
   void ExtractB0();
-  void DoExtractB0(mitk::DataStorage::SetOfObjects::Pointer inImages);
-
   void BrainMask();
-  void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();
@@ -96,15 +87,17 @@ protected slots:
 
 protected:
 
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
   Ui::QmitkPreprocessingViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-  berry::ISelectionListener::Pointer m_SelListener;
-  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
   mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
+  mitk::DataStorage::SetOfObjects::Pointer m_SelectedDiffusionNodes;
 };
 
 

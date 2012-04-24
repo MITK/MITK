@@ -813,66 +813,70 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<TO> PValues(Shell1Indiecies.size());
 
 
-      bool notCompliedWithConditions = false;
+
+
 
       for( unsigned int i = 0; i< Shell1Indiecies.size(); i++ )
       {
 
 
 
-        float E1 = E(i,0);
-        float E2 = E(i,1);
-        float E3 = E(i,2);
+        TO E1 = E(i,0);
+        TO E2 = E(i,1);
+        TO E3 = E(i,2);
 
-        float P2 = E2-E1*E1;
-        float A = (E3 -E1*E2) / ( 2* P2);
-        float B2 = A * A -(E1 * E3 - E2 * E2) /P2;
-        float B = 0;
+        /* if(!(0 < E3) || (!(E3 < E2)) || (!(E2 < E1)) || (!(E1 < 1)) || (!(E1 * E1 < E2)) || (!(E2 * E2 < E1 * E3)) || (!(E3-E1*E2 < E2 - E1*E1 + E1*E3 -E2*E2)))
+        {
+          MITK_INFO << "0 < " << E3 << " < " << E2 << " < " << E1 << " < 1 " ;
+
+        }*/
+
+        TO P2 = E2-E1*E1;
+        TO A = (E3 -E1*E2) / ( 2* P2);
+        TO B2 = A * A -(E1 * E3 - E2 * E2) /P2;
+        TO B = 0;
         if(B2 > 0) B = sqrt(B2);
 
 
-
-        AlphaValues[i] = A + B;
-        BetaValues[i] = A - B;
-        LAValues[i] = 0.5 + ((E1 - A)/(2*B));
-
-        // Needed for Projection 2
-        {
-          float P = 0;
+          TO P = 0;
           if(P2 > 0) P = sqrt(P2);
           PValues[i] = P;
-        }
 
+
+        TO alpha = A + B;
+        TO beta = A - B;
+        AlphaValues[i] = alpha;
+        BetaValues[i] = beta;
+
+        TO lambda = 0.5 + 0.5 * sqrt(1-(((2*P)/(alpha - beta)) * ((2*P)/(alpha - beta))) );
+        TO ER1 = std::fabs(lambda * (alpha - beta) + beta - E1) + std::fabs(lambda * (alpha * alpha - beta * beta) + beta * beta - E2) + std::fabs(lambda * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+        TO ER2 = std::fabs((1-lambda) * (alpha - beta) + beta - E1) + std::fabs((1-lambda) * (alpha * alpha - beta * beta) + beta * beta - E2) + std::fabs((1-lambda) * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+        // Needed for Projection 2
+
+        if(ER1 < ER2) LAValues[i] = lambda;
+        if(ER1 >= ER2) LAValues[i] = 1 - lambda;
       }
-
 
       Projection2(PValues, AlphaValues, BetaValues, m_Lambda);
 
-      if(!notCompliedWithConditions){
+      Threshold(AlphaValues);
+      Threshold(BetaValues);
 
-        Threshold(AlphaValues);
-        Threshold(BetaValues);
+      DoubleLogarithm(AlphaValues);
+      DoubleLogarithm(BetaValues);
 
-        DoubleLogarithm(AlphaValues);
-        DoubleLogarithm(BetaValues);
-
-        vnl_vector<TO> SignalVector(Shell1Indiecies.size());
-        for( unsigned int i = 0; i< AlphaValues.size(); i++ )
-        {
-          SignalVector = LAValues[i] * AlphaValues + LAValues[i] * BetaValues;
-        }
-
-        vnl_vector<TO> coeffs(m_NumberCoefficients);
-
-        coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
-        coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
-
-        odf = ( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      }else{
-        odf.Fill(1/252);
-        wrongODF ++;
+      vnl_vector<TO> SignalVector(Shell1Indiecies.size());
+      for( unsigned int i = 0; i< AlphaValues.size(); i++ )
+      {
+        SignalVector = LAValues[i] * AlphaValues + LAValues[i] * BetaValues;
       }
 
+      vnl_vector<TO> coeffs(m_NumberCoefficients);
+
+      coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
+      coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+
+      odf = ( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
     }
     // set ODF to ODF-Image
     oit.Set( odf );

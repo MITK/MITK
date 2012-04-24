@@ -1,168 +1,168 @@
-PROJECT(BlueBerry)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+project(BlueBerry)
+cmake_minimum_required(VERSION 2.8.4)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
-INCLUDE(MacroParseArguments)
-INCLUDE(MacroConvertSchema)
-INCLUDE(MacroOrganizeSources)
-INCLUDE(MacroCreateCTKPlugin)
-INCLUDE(MacroCreateQtHelp)
-INCLUDE(MacroInstallCTKPlugin)
-INCLUDE(FunctionCreateProvisioningFile)
+include(MacroParseArguments)
+include(MacroConvertSchema)
+include(MacroOrganizeSources)
+include(MacroCreateCTKPlugin)
+include(MacroCreateQtHelp)
+include(MacroInstallCTKPlugin)
+include(FunctionCreateProvisioningFile)
 
-IF(MSVC)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250 /wd4275 /wd4251 /wd4503")
-ENDIF()
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250 /wd4275 /wd4251 /wd4503")
+endif()
 
-IF (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-ENDIF ()
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+endif()
 
-FIND_PACKAGE(mbilog REQUIRED)
-INCLUDE_DIRECTORIES(${mbilog_INCLUDE_DIRS})
+find_package(mbilog REQUIRED)
+include_directories(${mbilog_INCLUDE_DIRS})
 
 
-FIND_PACKAGE(Qt4 4.6.2 REQUIRED)
+find_package(Qt4 4.6.2 REQUIRED)
 
-IF(QT_QMAKE_CHANGED)
-  SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
-  SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
-  SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
-  SET(QT_XMLPATTERNS_EXECUTABLE NOTFOUND)
-ENDIF()
+if(QT_QMAKE_CHANGED)
+  set(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
+  set(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
+  set(QT_ASSISTANT_EXECUTABLE NOTFOUND)
+  set(QT_XMLPATTERNS_EXECUTABLE NOTFOUND)
+endif()
 
-FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
+find_program(QT_HELPGENERATOR_EXECUTABLE
   NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
-FIND_PROGRAM(QT_COLLECTIONGENERATOR_EXECUTABLE
+find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
   NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
-FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
+find_program(QT_ASSISTANT_EXECUTABLE
   NAMES assistant-qt4 assistant4 assistant
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
-FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
+find_program(QT_XMLPATTERNS_EXECUTABLE
   NAMES xmlpatterns
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
-OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+option(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
 
-MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP
+mark_as_advanced(BLUEBERRY_USE_QT_HELP
                  QT_HELPGENERATOR_EXECUTABLE
                  QT_COLLECTIONGENERATOR_EXECUTABLE
                  QT_ASSISTANT_EXECUTABLE
                  QT_XMLPATTERNS_EXECUTABLE)
 
-SET(_doxygen_too_old 1)
-IF(BLUEBERRY_USE_QT_HELP)
-  FIND_PACKAGE(Doxygen)
-  IF(DOXYGEN_FOUND)
-    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
+set(_doxygen_too_old 1)
+if(BLUEBERRY_USE_QT_HELP)
+  find_package(Doxygen)
+  if(DOXYGEN_FOUND)
+    execute_process(COMMAND ${DOXYGEN_EXECUTABLE} --version
                     OUTPUT_VARIABLE _doxygen_version)
-    IF(${_doxygen_version} VERSION_GREATER 1.6.0 OR
+    if(${_doxygen_version} VERSION_GREATER 1.6.0 OR
        ${_doxygen_version} VERSION_EQUAL 1.6.0)
-      SET(_doxygen_too_old 0)
-    ENDIF()
-  ENDIF()
+      set(_doxygen_too_old 0)
+    endif()
+  endif()
 
-  IF(_doxygen_too_old)
-    MESSAGE("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
-    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
-  ENDIF()
+  if(_doxygen_too_old)
+    message("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
+    set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  endif()
 
-  IF(NOT QT_HELPGENERATOR_EXECUTABLE)
-    MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
-    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
-  ENDIF()
+  if(NOT QT_HELPGENERATOR_EXECUTABLE)
+    message("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
+    set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  endif()
 
-  IF(NOT QT_XMLPATTERNS_EXECUTABLE)
-    MESSAGE("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
-    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
-  ENDIF()
-ENDIF(BLUEBERRY_USE_QT_HELP)
+  if(NOT QT_XMLPATTERNS_EXECUTABLE)
+    message("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
+    set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  endif()
+endif(BLUEBERRY_USE_QT_HELP)
 
-INCLUDE(${QT_USE_FILE})
+include(${QT_USE_FILE})
 
 # =========  CTK specific CMake stuff ============
-CMAKE_POLICY(SET CMP0012 NEW)
+cmake_policy(SET CMP0012 NEW)
 
-FIND_PACKAGE(CTK REQUIRED)
+find_package(CTK REQUIRED)
 
 # Extract all library names starting with org_blueberry_
-MACRO(GetMyTargetLibraries all_target_libraries varname)
-  SET(re_ctkplugin "^org_blueberry_[a-zA-Z0-9_]+$")
-  SET(_tmp_list)
-  LIST(APPEND _tmp_list ${all_target_libraries})
+macro(GetMyTargetLibraries all_target_libraries varname)
+  set(re_ctkplugin "^org_blueberry_[a-zA-Z0-9_]+$")
+  set(_tmp_list)
+  list(APPEND _tmp_list ${all_target_libraries})
   ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})
-ENDMACRO()
+endmacro()
 # ================================================
 
-OPTION(BLUEBERRY_BUILD_ALL_PLUGINS "Build all BlueBerry plugins (overriding selection)" OFF)
-MARK_AS_ADVANCED(BLUEBERRY_BUILD_ALL_PLUGINS)
+option(BLUEBERRY_BUILD_ALL_PLUGINS "Build all BlueBerry plugins (overriding selection)" OFF)
+mark_as_advanced(BLUEBERRY_BUILD_ALL_PLUGINS)
 
-IF(BLUEBERRY_BUILD_ALL_PLUGINS)
-  SET(BLUEBERRY_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
-ENDIF()
+if(BLUEBERRY_BUILD_ALL_PLUGINS)
+  set(BLUEBERRY_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
+endif()
 
-OPTION(BLUEBERRY_STATIC "Build all plugins as static libraries" OFF)
-MARK_AS_ADVANCED(BLUEBERRY_STATIC)
+option(BLUEBERRY_STATIC "Build all plugins as static libraries" OFF)
+mark_as_advanced(BLUEBERRY_STATIC)
 
-OPTION(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
-MARK_AS_ADVANCED(BLUEBERRY_DEBUG_SMARTPOINTER)
+option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
+mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 
-FIND_PACKAGE(Poco REQUIRED)
-FIND_PACKAGE(Ant)
-FIND_PACKAGE(Eclipse)
+find_package(Poco REQUIRED)
+find_package(Ant)
+find_package(Eclipse)
 
-SET(BLUEBERRY_SOURCE_DIR ${BlueBerry_SOURCE_DIR})
-SET(BLUEBERRY_BINARY_DIR ${BlueBerry_BINARY_DIR})
+set(BLUEBERRY_SOURCE_DIR ${BlueBerry_SOURCE_DIR})
+set(BLUEBERRY_BINARY_DIR ${BlueBerry_BINARY_DIR})
 
-SET(BLUEBERRY_PLUGINS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
-SET(BLUEBERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
+set(BLUEBERRY_PLUGINS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
+set(BLUEBERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
 
-SET(OSGI_APP solstice)
-SET(OSGI_UI_APP solstice_ui)
+set(OSGI_APP solstice)
+set(OSGI_UI_APP solstice_ui)
 
-IF (Eclipse_DIR)
-  SET(BLUEBERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")
-ELSE ()
-  SET(BLUEBERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
-ENDIF ()
+if(Eclipse_DIR)
+  set(BLUEBERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")
+else()
+  set(BLUEBERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
+endif()
 
-SET(BLUEBERRY_DEBUG_POSTFIX d)
+set(BLUEBERRY_DEBUG_POSTFIX d)
 
 # Testing options
 
-OPTION(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BUILD_TESTING})
+option(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BUILD_TESTING})
 
-IF(WIN32)
-  SET(_gui_testing_default "ON")
-ELSE()
-  SET(_gui_testing_default "OFF")
-ENDIF()
+if(WIN32)
+  set(_gui_testing_default "ON")
+else()
+  set(_gui_testing_default "OFF")
+endif()
 
-OPTION(BLUEBERRY_ENABLE_GUI_TESTING "Enable the BlueBerry GUI tests" ${_gui_testing_default})
-MARK_AS_ADVANCED(BLUEBERRY_ENABLE_GUI_TESTING)
+option(BLUEBERRY_ENABLE_GUI_TESTING "Enable the BlueBerry GUI tests" ${_gui_testing_default})
+mark_as_advanced(BLUEBERRY_ENABLE_GUI_TESTING)
 
-IF(BLUEBERRY_BUILD_TESTING)
-  ENABLE_TESTING()
-ENDIF()
+if(BLUEBERRY_BUILD_TESTING)
+  enable_testing()
+endif()
 
 
 # Add CTK plugins
 
-SET(_ctk_plugins
+set(_ctk_plugins
   Bundles/org.blueberry.osgi:ON
   Bundles/org.blueberry.compat:OFF
   Bundles/org.blueberry.core.runtime:OFF
@@ -177,59 +177,59 @@ SET(_ctk_plugins
   Bundles/org.blueberry.ui.qt.objectinspector:OFF
 )
 
-SET(_ctk_test_plugins )
+set(_ctk_test_plugins )
 
-SET(_ctk_plugins_include_dirs
+set(_ctk_plugins_include_dirs
   ${Poco_INCLUDE_DIRS}
 )
 
-SET(_ctk_plugins_link_dirs
+set(_ctk_plugins_link_dirs
   ${Poco_LIBRARY_DIR}
 )
 
-INCLUDE_DIRECTORIES(${_ctk_plugins_include_dirs})
-LINK_DIRECTORIES(${_ctk_plugins_link_dirs})
+include_directories(${_ctk_plugins_include_dirs})
+link_directories(${_ctk_plugins_link_dirs})
 
-IF(BLUEBERRY_BUILD_TESTING)
-  INCLUDE(berryTestingHelpers)
+if(BLUEBERRY_BUILD_TESTING)
+  include(berryTestingHelpers)
 
-  SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
-  GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
-  IF(APPLE AND _is_macosx_bundle) 
-    SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
-  ENDIF()
+  set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
+  get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  if(APPLE AND _is_macosx_bundle) 
+    set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
+  endif()
 
-  SET(_ctk_testinfrastructure_plugins
+  set(_ctk_testinfrastructure_plugins
     Bundles/org.blueberry.test:ON
     Bundles/org.blueberry.uitest:ON
   )
 
-  SET(_ctk_test_plugins
+  set(_ctk_test_plugins
 #    Testing/org.blueberry.core.runtime.tests:ON
 #    Testing/org.blueberry.osgi.tests:ON
   )
   
-  IF(BLUEBERRY_ENABLE_GUI_TESTING)
-#    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
+  if(BLUEBERRY_ENABLE_GUI_TESTING)
+#    list(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 
-    SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
-    GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
-    IF(APPLE AND _is_macosx_bundle)
-      SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
-    ENDIF()
-  ENDIF()
-ENDIF()
+    set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
+    get_target_property(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
+    if(APPLE AND _is_macosx_bundle)
+      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
+    endif()
+  endif()
+endif()
 
-SET(BLUEBERRY_TESTING_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerryTesting.provisioning")
+set(BLUEBERRY_TESTING_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerryTesting.provisioning")
 
-ADD_CUSTOM_TARGET(BlueBerry)
+add_custom_target(BlueBerry)
 
 ctkMacroSetupPlugins(${_ctk_plugins} ${_ctk_testinfrastructure_plugins} ${_ctk_test_plugins}
                      BUILD_OPTION_PREFIX BLUEBERRY_BUILD_
                      BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
                      COMPACT_OPTIONS)
 
-SET(BLUEBERRY_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry.provisioning")
+set(BLUEBERRY_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry.provisioning")
 FunctionCreateProvisioningFile(
   FILE ${BLUEBERRY_PROVISIONING_FILE}
   PLUGINS ${_ctk_plugins}
@@ -246,27 +246,27 @@ if(${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES)
 endif()
 set_property(TARGET ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES} PROPERTY LABELS BlueBerry)
 
-SET(BB_PLUGIN_USE_FILE "${BlueBerry_BINARY_DIR}/BlueBerryPluginUseFile.cmake")
-IF(${PROJECT_NAME}_PLUGIN_LIBRARIES)
+set(BB_PLUGIN_USE_FILE "${BlueBerry_BINARY_DIR}/BlueBerryPluginUseFile.cmake")
+if(${PROJECT_NAME}_PLUGIN_LIBRARIES)
   ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
-ELSE()
-  FILE(REMOVE ${BB_PLUGIN_USE_FILE})
-  SET(BB_PLUGIN_USE_FILE )
-ENDIF()
+else()
+  file(REMOVE ${BB_PLUGIN_USE_FILE})
+  set(BB_PLUGIN_USE_FILE )
+endif()
 
 # CTK Plugin Exports
-SET(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
+set(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
 GetMyTargetLibraries("${${PROJECT_NAME}_PLUGIN_LIBRARIES}" my_plugin_targets)
-SET(additional_export_targets mbilog PocoFoundation PocoUtil PocoXML)
-IF(BLUEBERRY_BUILD_TESTING)
-  LIST(APPEND additional_export_targets CppUnit)
-ENDIF()
+set(additional_export_targets mbilog PocoFoundation PocoUtil PocoXML)
+if(BLUEBERRY_BUILD_TESTING)
+  list(APPEND additional_export_targets CppUnit)
+endif()
 export(TARGETS ${my_plugin_targets} ${additional_export_targets}
        FILE ${BB_PLUGIN_EXPORTS_FILE})
 
 
-ADD_SUBDIRECTORY(Documentation)
+add_subdirectory(Documentation)
 
-CONFIGURE_FILE(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
+configure_file(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
 
 

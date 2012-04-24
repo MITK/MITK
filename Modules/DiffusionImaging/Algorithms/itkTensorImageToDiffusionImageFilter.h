@@ -74,11 +74,17 @@ namespace itk
     void SetBValue( const double& bval)
     { m_BValue = bval; }
 
+    itkSetMacro(Min, OutputScalarType);
+    itkSetMacro(Max, OutputScalarType);
+
+
   protected:
     TensorImageToDiffusionImageFilter()
     {
       m_BValue = 1.0;
       m_BaselineImage = 0;
+      m_Min = 0.0;
+      m_Max = 10000.0;
     };
     ~TensorImageToDiffusionImageFilter(){};
 
@@ -94,6 +100,8 @@ namespace itk
   
     //void GenerateData();
 
+
+
   private:
 
     TensorImageToDiffusionImageFilter (const Self&);
@@ -102,6 +110,9 @@ namespace itk
     GradientListType                     m_GradientList;
     double                               m_BValue;
     typename BaselineImageType::Pointer  m_BaselineImage;
+
+    OutputScalarType                     m_Min;
+    OutputScalarType                     m_Max;
 
   };    
 

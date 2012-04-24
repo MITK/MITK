@@ -44,7 +44,7 @@
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
-#include "mitkPluginActivator.h"
+#include "QmitkDiffusionApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 
 #include "mitkBaseDataIOFactory.h"
@@ -57,7 +57,7 @@
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
   : m_Controls(NULL)
 {
-  berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
   workbenchPrefs->Flush();
 }
@@ -67,13 +67,13 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
   // if the workbench is not closing (that means, welcome screen was closed explicitly), set "Show_intro" false
   if (!this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
   {
-    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
     workbenchPrefs->Flush();
   }
   else
   {
-    berry::IPreferences::Pointer workbenchPrefs = mitkPluginActivator::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
     workbenchPrefs->Flush();
   }
@@ -154,67 +154,6 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
-
-      mitk::DataStorageEditorInput::Pointer editorInput;
-      editorInput = new mitk::DataStorageEditorInput();
-      berry::IEditorPart::Pointer editor = GetIntroSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-
-
-      QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-      mitk::DataStorage::Pointer dataStorage;
-
-      if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
-      {
-        editorInput = new mitk::DataStorageEditorInput();
-        dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
-      }
-      else
-      {
-        multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-        multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-        dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
-      }
-
-      bool dsmodified = false;
-     if(dataStorage.IsNotNull() && dsmodified)
-      {
-        // get all nodes that have not set "includeInBoundingBox" to false
-        mitk::NodePredicateNot::Pointer pred
-            = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-                                                                           , mitk::BoolProperty::New(false)));
-
-        mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
-
-        if(rs->Size() > 0)
-        {
-          // calculate bounding geometry of these nodes
-          mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
-          // initialize the views to the bounding geometry
-          mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-        }
-      }
-
-    }
-    // searching for the load
-    if(urlHostname.contains(QByteArray("perspectives")) )
-    {
-      // the simplified method removes every whitespace
-      // ( whitespace means any character for which the standard C++ isspace() method returns true)
-      urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
-
-      // is working fine as long as the perspective id is valid, if not the application crashes
-      GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
-
-      mitk::DataStorageEditorInput::Pointer editorInput;
-      editorInput = new mitk::DataStorageEditorInput();
-      GetIntroSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-    }
-    else
-    {
-      MITK_INFO << "Unkown mitk action keyword (see documentation for mitk links)" ;
     }
   }
   // if the scheme is set to http, by default no action is performed, if an external webpage needs to be

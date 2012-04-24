@@ -26,7 +26,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include "mitkToFConfig.h"
-#include <mitkToFImageGrabberCreator.h>
+#include "mitkToFCameraPMDCamCubeDevice.h"
+#include "mitkToFCameraPMDRawDataCamCubeDevice.h"
+#include "mitkToFCameraPMDCamBoardDevice.h"
+#include "mitkToFCameraPMDRawDataCamBoardDevice.h"
+#include "mitkToFCameraPMDO3Device.h"
+#include "mitkToFCameraPMDPlayerDevice.h"
+#include "mitkToFCameraPMDMITKPlayerDevice.h"
+#include "mitkToFCameraMITKPlayerDevice.h"
+#include "mitkToFCameraMESASR4000Device.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -37,8 +45,7 @@ QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFl
 {
   this->m_IntegrationTime = 0;
   this->m_ModulationFrequency = 0;
-  this->m_ToFImageGrabber = NULL;
-
+  this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   m_Controls = NULL;
   CreateQtPartControl(this);
 }
@@ -170,45 +177,45 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
     if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamCubeImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamCubeDevice::New());
     }
     else if (selectedCamera == "PMD CamCubeRaw 2.0/3.0")
     { //PMD CamCube
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamCubeImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamCubeDevice::New());
     }
     else if (selectedCamera == "PMD CamBoard")
     { //PMD CamBoard
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDCamBoardImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamBoardDevice::New());
     }
     else if (selectedCamera == "PMD CamBoardRaw")
     { //PMD CamBoard
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDRawDataCamBoardImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamBoardDevice::New());
     }
     else if (selectedCamera == "PMD O3D")
     {//PMD O3
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDO3ImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDO3Device::New());
     }
     else if (selectedCamera == "MESA Swissranger 4000")
     {//MESA SR4000
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMESASR4000ImageGrabber();
-    }
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
+   }
     else if (selectedCamera == "PMD Player")
     {//PMD player
       playerMode = true;
       fileFilter.append("PMD Files (*.pmd)");
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDPlayerImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDPlayerDevice::New());
     }
     else if (selectedCamera == "PMD Raw Data Player")
     {//PMD MITK player
       playerMode = true;
       fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataDevice::New());
     }
     else if (selectedCamera == "MITK Player")
     {//MITK player
       playerMode = true;
       fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
-      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMITKPlayerImageGrabber();
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
     }
 
     // if a player was selected ...
@@ -338,7 +345,6 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     m_Controls->m_SelectCameraCombobox->setEnabled(true);
     this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
 
-    this->m_ToFImageGrabber = NULL;
     // send disconnect signal to the caller functionality
     emit ToFCameraDisconnected();
 

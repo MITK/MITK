@@ -1,19 +1,19 @@
 # Files which should be processed by Qts moc
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/berryCTKPluginActivator.h
   src/internal/berryExtensionPointService.h
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
   plugin.xml
 )
 
-SET(EVENT_CPP_FILES
+set(EVENT_CPP_FILES
   berryBundleEvent.cpp
   berryPlatformEvent.cpp
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   berryBundle.cpp
   berryBundleContext.cpp
   berryBundleDirectory.cpp
@@ -33,13 +33,13 @@ SET(INTERNAL_CPP_FILES
   berrySystemBundleManifest.cpp
 )
 
-SET(SERVICE_CPP_FILES
+set(SERVICE_CPP_FILES
   berryIExtensionPointService.cpp
   berryService.cpp
   berryServiceRegistry.cpp
 )
 
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   berryDebugBreakpointManager.cpp
   berryException.cpp
   berryExtensionType.cpp
@@ -59,20 +59,20 @@ SET(SRC_CPP_FILES
   application/berryStarter.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+set(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${EVENT_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/event/${file})
+  set(CPP_FILES ${CPP_FILES} src/event/${file})
 endforeach(file ${EVENT_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 
 foreach(file ${SERVICE_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/service/${file})
+  set(CPP_FILES ${CPP_FILES} src/service/${file})
 endforeach(file ${SERVICE_CPP_FILES})

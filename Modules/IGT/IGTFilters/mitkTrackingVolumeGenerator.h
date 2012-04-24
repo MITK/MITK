@@ -49,37 +49,55 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   {
   public:
 
-      mitkClassMacro(TrackingVolumeGenerator, mitk::SurfaceSource)
-      itkNewMacro(Self);
+    mitkClassMacro(TrackingVolumeGenerator, mitk::SurfaceSource)
+    itkNewMacro(Self);
 
 
-      /**
-      * \brief        Sets the tracking device type of the volume. After doing this
-      *               the tracking volume gets generated and set to the correct dimensions in the correct
-      *               coordinate system. The TV of a VirtualTrackingDevice is always a 400*400 cube.
-      * \param type   The type of the tracking device (currently supported:NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker).
-      */
-      void SetTrackingDeviceType(mitk::TrackingDeviceType deviceType);
+    /**
+    * \brief        Deprecated! Use set DeviceData instead.
+    *               Sets the tracking device type of the volume. Warning: there are different possible volumes for some device types.
+    *               In this case a default volume is chosen automatically. All tracking volumes are defined by TrackingDeviceData
+    *               objects (see file mitkTrackingTypes.h) for a list.
+    *
+    *               After setting the device type the tracking volume gets generated (by a default volume for this type as mentioned above)
+    *               and set to the correct dimensions in the correct coordinate system. The TV of a VirtualTrackingDevice is always a 400*400 cube.
+    * \param type   The type of the tracking device (currently supported:NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker; see file mitkTrackingTypes.h for a always up to date list).
+    */
+    void SetTrackingDeviceType(mitk::TrackingDeviceType deviceType);
+
+    /**
+    * \return       Returns the tracking device type of the current device. Warning: there are different possible volumes for some device types.
+    *               Use GetTrackingDeviceData to get a unambiguous assignment to a tracking volume.
+    */
 	  mitk::TrackingDeviceType GetTrackingDeviceType() const;
 
-	  void SetTrackingDeviceData(mitk::TrackingDeviceData deviceData);
-	  mitk::TrackingDeviceData GetTrackingDeviceData() const;
+	  
+    /**
+    * \brief        Sets the tracking device data object which will be used to generate the volume. Each tracking device data object
+    *               has an unambiguous assignment to a tracking volume. See file mitkTrackingTypes.h for a list of all availiable object.
+    */
+    void SetTrackingDeviceData(mitk::TrackingDeviceData deviceData);
+	  
+    /**
+    * \return       Returns the current tracking device data of the generator. See file mitkTrackingTypes.h for the definition of tracking device data objects.
+    */
+    mitk::TrackingDeviceData GetTrackingDeviceData() const;
 
-	 
 
-
-      /**
-      * \brief        Deprecated! Use set DeviceData instead. Sets the tracking device type of the volume. After doing this
-      *               the tracking volume gets generatet and is set to the correct dimensions in the correct
-      *               coordinate system. The TV of a VirtualTrackingDevice is always a 400*400 cube.
-      * \param tracker  The tracking device the tracking volume has to be created for (currently supported:NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker).
-      */
-      void SetTrackingDevice(mitk::TrackingDevice::Pointer tracker);
+    /**
+    * \brief        Deprecated! Use set DeviceData instead. Sets the tracking device type of the volume. After doing this
+    *               the tracking volume gets generated and is set to the correct dimensions in the correct
+    *               coordinate system. The TV of a VirtualTrackingDevice is always a 400*400 cube.
+    * \param tracker  The tracking device the tracking volume has to be created for (currently supported: NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker; see file mitkTrackingTypes.h for a always up to date list).
+    */
+    void SetTrackingDevice(mitk::TrackingDevice::Pointer tracker);
 
 
   protected:
       TrackingVolumeGenerator();
-	  mitk::TrackingDeviceData m_Data;
+
+      /** \brief Holds the current tracking device data object, which is used to generate the volume. */
+	    mitk::TrackingDeviceData m_Data;
 
       void GenerateData();
   };

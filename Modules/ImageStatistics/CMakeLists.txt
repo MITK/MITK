@@ -2,8 +2,8 @@ MITK_CREATE_MODULE( ImageStatistics
                DEPENDS Mitk ImageExtraction PlanarFigure
 )
 
-IF(BUILD_TESTING)
+if(BUILD_TESTING)
 
-  ADD_SUBDIRECTORY(Testing)
+  add_subdirectory(Testing)
 
-ENDIF(BUILD_TESTING)
+endif(BUILD_TESTING)

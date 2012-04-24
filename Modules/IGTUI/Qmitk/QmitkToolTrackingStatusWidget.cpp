@@ -110,7 +110,7 @@ void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Poin
 }
 
 
-void QmitkToolTrackingStatusWidget::Refresh()
+void QmitkToolTrackingStatusWidget::Refresh(int posPrecision, int quatPrecision)
 {
 
   if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
@@ -132,12 +132,12 @@ void QmitkToolTrackingStatusWidget::Refresh()
     if (m_ShowPositions)
       {
       mitk::Point3D position = navData->GetPosition();
-      pos = " [" + QString::number(position[0]) + ";" + QString::number(position[1]) + ";" + QString::number(position[2]) + "]";
+      pos = " [" + QString::number(position[0],'f',posPrecision) + ";" + QString::number(position[1],'f',posPrecision) + ";" + QString::number(position[2],'f',posPrecision) + "]";
       }
     if (m_ShowQuaternions)
       {
       mitk::Quaternion quaternion = navData->GetOrientation();
-      quat = " / [qx:" + QString::number(quaternion.x()) + ";qy:" + QString::number(quaternion.y()) + ";qz:" + QString::number(quaternion.z()) + ";qr:" + QString::number(quaternion.r()) + "]";
+      quat = " / [qx:" + QString::number(quaternion.x(),'f',quatPrecision) + ";qy:" + QString::number(quaternion.y(),'f',quatPrecision) + ";qz:" + QString::number(quaternion.z(),'f',quatPrecision) + ";qr:" + QString::number(quaternion.r()) + "]";
       }
 
     

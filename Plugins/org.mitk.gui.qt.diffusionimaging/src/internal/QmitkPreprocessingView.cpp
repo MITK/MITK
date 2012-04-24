@@ -97,11 +97,16 @@ struct PrpSelListener : ISelectionListener
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
+          // process only on valid nodes
+          mitk::BaseData* nodeData = node->GetData();
+          if(nodeData)
+          {
           // only look at interesting types
-          if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+          if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
           {
             foundDwiVolume = true;
-            m_View->m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData());
+            m_View->m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(nodeData);
+          }
           }
         }
       }
@@ -343,16 +348,22 @@ void QmitkPreprocessingView::ExtractB0()
 
     int at = 0;
     for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
+         i != m_CurrentSelection->End();
+         ++i)
     {
 
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+
+        // process only on valid nodes
+        const mitk::BaseData* nodeData = node->GetData();
+        if(nodeData)
         {
-          set->InsertElement(at++, node);
+          if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            set->InsertElement(at++, node);
+          }
         }
       }
     }
@@ -424,9 +435,15 @@ void QmitkPreprocessingView::AverageGradients()
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        const mitk::BaseData* nodeData = node->GetData();
+
+        if(nodeData)
         {
-          set->InsertElement(at++, node);
+          if(QString("DiffusionImage").compare(nodeData->GetNameOfClass())==0)
+          {
+            set->InsertElement(at++, node);
+          }
         }
       }
     }
@@ -477,9 +494,15 @@ void QmitkPreprocessingView::BrainMask()
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        const mitk::BaseData* nodeData = node->GetData();
+
+        if(nodeData)
         {
-          set->InsertElement(at++, node);
+          if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+          {
+            set->InsertElement(at++, node);
+          }
         }
       }
     }

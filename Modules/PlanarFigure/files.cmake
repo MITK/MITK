@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp
   Algorithms/mitkPlanarFigureSource.cpp

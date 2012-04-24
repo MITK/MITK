@@ -1,4 +1,4 @@
-PROJECT(org_mitk_core_services)
+project(org_mitk_core_services)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE MITK_CORE_SERVICES_PLUGIN

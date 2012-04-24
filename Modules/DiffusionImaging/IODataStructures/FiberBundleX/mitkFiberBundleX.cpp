@@ -290,7 +290,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
       vNewLines->InsertNextCell(container);
     }
   }
-
+  if(vNewLines->GetNumberOfCells()==0)
+    return NULL;
   // initialize polydata
   vNewPolyData->SetPoints(vNewPoints);
   vNewPolyData->SetLines(vNewLines);
@@ -554,7 +555,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
     px[0] = pointSet->GetPoint(i)[0];
     px[1] = pointSet->GetPoint(i)[1];
     px[2] = pointSet->GetPoint(i)[2];
-    double faPixelValue = FAimage->GetPixelValueByWorldCoordinate(px) * 0.01;
+    double faPixelValue = 1-FAimage->GetPixelValueByWorldCoordinate(px);
     //        faValues->InsertNextTuple1(faPixelValue);
     faValues->InsertValue(i, faPixelValue);
     //        MITK_DEBUG << faPixelValue;

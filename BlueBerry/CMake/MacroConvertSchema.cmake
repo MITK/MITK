@@ -5,29 +5,29 @@
 #                      [WORKING_DIR working_dir]
 #                     )
 
-MACRO(MACRO_CONVERT_SCHEMA)
+macro(MACRO_CONVERT_SCHEMA)
 
 MACRO_PARSE_ARGUMENTS(_SCHEMA "INPUT;OUTPUT_DIR;TARGET_NAME;DEPENDS;WORKING_DIR" "" ${ARGN})
 
-SET(XP_ANT_TASKS)
-FOREACH(_file ${_SCHEMA_INPUT})
-  SET(XP_ANT_TASKS "${XP_ANT_TASKS}
+set(XP_ANT_TASKS)
+foreach(_file ${_SCHEMA_INPUT})
+  set(XP_ANT_TASKS "${XP_ANT_TASKS}
   <pde.convertSchemaToHTML manifest=\"${_file}\" destination=\"\${dest}\" />")
-ENDFOREACH(_file ${_SCHEMA_INPUT})
+endforeach(_file ${_SCHEMA_INPUT})
 
-SET(XP_DOC_DESTINATION "${_SCHEMA_OUTPUT_DIR}")
+set(XP_DOC_DESTINATION "${_SCHEMA_OUTPUT_DIR}")
 
-IF(NOT _SCHEMA_WORKING_DIR)
-  SET(_SCHEMA_WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR})
-ENDIF(NOT _SCHEMA_WORKING_DIR)
+if(NOT _SCHEMA_WORKING_DIR)
+  set(_SCHEMA_WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR})
+endif(NOT _SCHEMA_WORKING_DIR)
 
-CONFIGURE_FILE("${BLUEBERRY_SOURCE_DIR}/Build/ConvertSchemaToHTML/buildExtPointDoc.xml.in" 
+configure_file("${BLUEBERRY_SOURCE_DIR}/Build/ConvertSchemaToHTML/buildExtPointDoc.xml.in" 
   "${_SCHEMA_WORKING_DIR}/buildExtPointDoc.xml" @ONLY)
   
-ADD_CUSTOM_TARGET(${_SCHEMA_TARGET_NAME} 
+add_custom_target(${_SCHEMA_TARGET_NAME} 
                   ant -f ${_SCHEMA_WORKING_DIR}/buildExtPointDoc.xml
                   DEPENDS ${_SCHEMA_DEPENDS}
                   WORKING_DIRECTORY ${_SCHEMA_WORKING_DIR}
                   VERBATIM)
 
-ENDMACRO(MACRO_CONVERT_SCHEMA)
+endmacro(MACRO_CONVERT_SCHEMA)

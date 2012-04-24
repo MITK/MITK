@@ -102,6 +102,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
     connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
     connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
+    connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
   }
 }
 
@@ -211,27 +212,46 @@ void QmitkFiberProcessingView::Extract3d()
 }
 void QmitkFiberProcessingView::GenerateRoiImage(){
 
-  if (m_SelectedImage.IsNull() || m_SelectedPF.empty())
+  if (m_SelectedPF.empty())
     return;
 
-  mitk::Image* image = const_cast<mitk::Image*>(m_SelectedImage.GetPointer());
+  mitk::Geometry3D::Pointer geometry;
+  if (m_SelectedImage.IsNotNull())
+    geometry = m_SelectedImage->GetGeometry();
+  else if (!m_SelectedFB.empty())
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
+    geometry = fib->GetGeometry();
+  }
+  else
+    return;
 
-  UCharImageType::Pointer temp = UCharImageType::New();
-  mitk::CastToItkImage<UCharImageType>(m_SelectedImage, temp);
+  itk::Matrix<double, 3, 3> direction;
+  itk::ImageRegion<3> imageRegion;
+  for (int i=0; i<3; i++)
+    for (int j=0; j<3; j++)
+      direction[j][i] = geometry->GetMatrixColumn(i)[j];
+  imageRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
+  imageRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
+  imageRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
 
-  m_PlanarFigureImage = UCharImageType::New();
-  m_PlanarFigureImage->SetSpacing( temp->GetSpacing() );   // Set the image spacing
-  m_PlanarFigureImage->SetOrigin( temp->GetOrigin() );     // Set the image origin
-  m_PlanarFigureImage->SetDirection( temp->GetDirection() );  // Set the image direction
-  m_PlanarFigureImage->SetRegions( temp->GetLargestPossibleRegion() );
+  m_PlanarFigureImage = itkUCharImageType::New();
+  m_PlanarFigureImage->SetSpacing( geometry->GetSpacing() );   // Set the image spacing
+  m_PlanarFigureImage->SetOrigin( geometry->GetOrigin() );     // Set the image origin
+  m_PlanarFigureImage->SetDirection( direction );  // Set the image direction
+  m_PlanarFigureImage->SetRegions( imageRegion );
   m_PlanarFigureImage->Allocate();
   m_PlanarFigureImage->FillBuffer( 0 );
 
+  Image::Pointer tmpImage = Image::New();
+  tmpImage->InitializeByItk(m_PlanarFigureImage.GetPointer());
+  tmpImage->SetVolume(m_PlanarFigureImage->GetBufferPointer());
+
   for (int i=0; i<m_SelectedPF.size(); i++)
-    CompositeExtraction(m_SelectedPF.at(i), image);
+    CompositeExtraction(m_SelectedPF.at(i), tmpImage);
 
   DataNode::Pointer node = DataNode::New();
-  Image::Pointer tmpImage = Image::New();
+  tmpImage = Image::New();
   tmpImage->InitializeByItk(m_PlanarFigureImage.GetPointer());
   tmpImage->SetVolume(m_PlanarFigureImage->GetBufferPointer());
   node->SetData(tmpImage);
@@ -414,11 +434,11 @@ template < typename TPixel, unsigned int VImageDimension >
   MITK_INFO << "InternalCalculateMaskFromPlanarFigure() start";
 
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::CastImageFilter< ImageType, UCharImageType > CastFilterType;
+  typedef itk::CastImageFilter< ImageType, itkUCharImageType > CastFilterType;
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".
-  UCharImageType::Pointer newMaskImage = UCharImageType::New();
+  itkUCharImageType::Pointer newMaskImage = itkUCharImageType::New();
   newMaskImage->SetSpacing( image->GetSpacing() );   // Set the image spacing
   newMaskImage->SetOrigin( image->GetOrigin() );     // Set the image origin
   newMaskImage->SetDirection( image->GetDirection() );  // Set the image direction
@@ -549,8 +569,8 @@ template < typename TPixel, unsigned int VImageDimension >
 
 
   // Export from ITK to VTK (to use a VTK filter)
-  typedef itk::VTKImageImport< UCharImageType > ImageImportType;
-  typedef itk::VTKImageExport< UCharImageType > ImageExportType;
+  typedef itk::VTKImageImport< itkUCharImageType > ImageImportType;
+  typedef itk::VTKImageExport< itkUCharImageType > ImageExportType;
 
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( newMaskImage );
@@ -582,7 +602,7 @@ template < typename TPixel, unsigned int VImageDimension >
   m_InternalImageMask3D = itkImporter->GetOutput();
   m_InternalImageMask3D->SetDirection(image->GetDirection());
 
-  itk::ImageRegionConstIterator<UCharImageType>
+  itk::ImageRegionConstIterator<itkUCharImageType>
       itmask(m_InternalImageMask3D, m_InternalImageMask3D->GetLargestPossibleRegion());
   itk::ImageRegionIterator<ImageType>
       itimage(image, image->GetLargestPossibleRegion());
@@ -632,7 +652,7 @@ template < typename TPixel, unsigned int VImageDimension >
   itk::ImageRegion<3> cropRegion = itk::ImageRegion<3>(index, size);
 
   // crop internal mask
-  typedef itk::RegionOfInterestImageFilter< UCharImageType, UCharImageType > ROIMaskFilterType;
+  typedef itk::RegionOfInterestImageFilter< itkUCharImageType, itkUCharImageType > ROIMaskFilterType;
   typename ROIMaskFilterType::Pointer roi2 = ROIMaskFilterType::New();
   roi2->SetRegionOfInterest(cropRegion);
   roi2->SetInput(m_InternalImageMask3D);
@@ -649,7 +669,7 @@ template < typename TPixel, unsigned int VImageDimension >
 
   const Geometry3D *intImageGeometry3D = tmpImage->GetGeometry( 0 );
 
-  typedef itk::ImageRegionIteratorWithIndex<UCharImageType> IteratorType;
+  typedef itk::ImageRegionIteratorWithIndex<itkUCharImageType> IteratorType;
   IteratorType imageIterator (m_InternalImageMask3D, m_InternalImageMask3D->GetRequestedRegion());
   imageIterator.GoToBegin();
   while ( !imageIterator.IsAtEnd() )
@@ -714,6 +734,8 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->doExtractFibersButton->setEnabled(false);
     m_Controls->m_Extract3dButton->setEnabled(false);
     m_Controls->m_ResampleFibersButton->setEnabled(false);
+    m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
+    m_Controls->m_FaColorFibersButton->setEnabled(false);
   }
   else
   {
@@ -739,6 +761,9 @@ void QmitkFiberProcessingView::UpdateGui()
       m_Controls->m_JoinBundles->setEnabled(false);
       m_Controls->m_SubstractBundles->setEnabled(false);
     }
+
+    if (m_SelectedImage.IsNotNull())
+      m_Controls->m_FaColorFibersButton->setEnabled(true);
   }
 
   // are planar figures selected?
@@ -752,7 +777,7 @@ void QmitkFiberProcessingView::UpdateGui()
   }
   else
   {
-    if ( m_SelectedImage.IsNotNull() )
+    if ( m_SelectedImage.IsNotNull() || !m_SelectedFB.empty() )
       m_Controls->m_GenerateRoiImage->setEnabled(true);
     else
       m_Controls->m_GenerateRoiImage->setEnabled(false);
@@ -925,7 +950,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));
   newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true));
 
-
   newNode->AddProperty( "selected", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
   newNode->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
@@ -936,13 +960,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   newNode->AddProperty( "planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
   newNode->AddProperty( "planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
   newNode->AddProperty( "planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
-
-//  PlanarFigureControlPointStyleProperty::Pointer styleProperty =
-//    dynamic_cast< PlanarFigureControlPointStyleProperty* >( node->GetProperty( "planarfigure.controlpointshape" ) );
-//  if ( styleProperty.IsNotNull() )
-//  {
-//    m_ControlPointShape = styleProperty->GetShape();
-//  }
 
   newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   newNode->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(2.0) );
@@ -1408,7 +1425,14 @@ void QmitkFiberProcessingView::SubstractBundles()
   for (it; it!=m_SelectedFB.end(); ++it)
   {
     newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
+    if (newBundle.IsNull())
+      break;
     name += "-"+QString((*it)->GetName().c_str());
+  }
+  if (newBundle.IsNull())
+  {
+    QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers. Did you select the fiber bundles in the correct order? X-Y is not equal to Y-X!");
+    return;
   }
 
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
@@ -1706,5 +1730,30 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
     fib->DoFiberSmoothing(factor);
   }
+}
+
+void QmitkFiberProcessingView::DoFaColorCoding()
+{
+  if (m_SelectedImage.IsNull())
+    return;
+//  mitk::PixelType pType = mitk::MakeScalarPixelType<float>();
+//  if (m_SelectedImage->GetPixelType()!=pType)
+//  {
+//    //mitk::Image bla; bla.GetPixelType().GetNameOfClass()
+//        MITK_INFO << m_SelectedImage->GetPixelType().GetNameOfClass();
+//    QMessageBox::warning(NULL, "Wrong Image Type", "FA/GFA image should be of type float");
+////    return;
+//  }
+
+  for( int i=0; i<m_SelectedFB.size(); i++ )
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+    fib->SetFAMap(m_SelectedImage);
+    fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_FA_BASED);
+    fib->DoColorCodingFaBased();
+  }
+
+  if(m_MultiWidget)
+    m_MultiWidget->RequestUpdate();
 }
 

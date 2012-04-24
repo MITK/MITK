@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 
+class QmitkStdMultiWidget;
+class QDragEnterEvent;
+class QDropEvent;
+
 /**
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
@@ -48,7 +52,7 @@ public:
    * reached through to the widget's parent.
    *
    * This reaching through to the parent was implicitly required by QmitkMaterialWidget / QmitkMaterialShowCase.
-   *
+   *QmitkStdMultiWidget
    * The default behaviour of QmitkRenderWindow is now to clear the "accepted" flag
    * of Qt events after they were handled by QVTKWidget. This way parents can also
    * handle events.
@@ -69,8 +73,8 @@ public:
   
   void HideRenderWindowMenu( );
 
-  //Activate or Deactivate MenuWidget. 
-  void ActivateMenuWidget( bool state );
+  //Activate or Deactivate MenuWidget.
+  void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
   
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
@@ -106,6 +110,12 @@ protected:
     // overloaded leave handler
     virtual void leaveEvent(QEvent*);
 
+    /// \brief Simply says we accept the event type.
+    virtual void dragEnterEvent( QDragEnterEvent *event );
+
+    /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
+    virtual void dropEvent( QDropEvent * event );
+
 #ifndef QT_NO_WHEELEVENT
     // overload wheel mouse event
     virtual void wheelEvent(QWheelEvent*);
@@ -124,6 +134,9 @@ signals:
   void moved();
 
   void resized();
+
+  /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
+  void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
 
 protected slots:  
 

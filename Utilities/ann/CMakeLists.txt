@@ -1,12 +1,12 @@
-PROJECT(ANN)
+project(ANN)
 
-SET(ANN_HEADERS
+set(ANN_HEADERS
   include/ANN/ANN.h
   include/ANN/ANNperf.h
   include/ANN/ANNx.h
 )
   
-SET(ANN_SOURCES
+set(ANN_SOURCES
   src/ANN.cpp
   src/bd_fix_rad_search.cpp
   src/bd_pr_search.cpp
@@ -23,11 +23,11 @@ SET(ANN_SOURCES
   src/perf.cpp
 )
 
-INCLUDE_DIRECTORIES(${ANN_SOURCE_DIR}/include)
-IF(NOT BUILD_SHARED_LIBS)
-  ADD_DEFINITIONS( -DANN_STATIC_LIB )
-ENDIF()
-ADD_LIBRARY(ann ${ANN_HEADERS} ${ANN_SOURCES})
+include_directories(${ANN_SOURCE_DIR}/include)
+if(NOT BUILD_SHARED_LIBS)
+  add_definitions( -DANN_STATIC_LIB )
+endif()
+add_library(ann ${ANN_HEADERS} ${ANN_SOURCES})
 
 MITK_CREATE_MODULE_CONF(ann
   INCLUDE_DIRS include

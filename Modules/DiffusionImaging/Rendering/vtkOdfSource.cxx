@@ -16,6 +16,7 @@ vtkStandardNewMacro(vtkOdfSource);
 
 vtkOdfSource::vtkOdfSource()
 {
+  Scale = 1;
   this->SetNumberOfInputPorts(0);
 }
 
@@ -25,6 +26,7 @@ int vtkOdfSource::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
+  vtkPolyData* TemplateOdf = OdfType::GetBaseMesh();
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
@@ -32,66 +34,64 @@ int vtkOdfSource::RequestData(
   vtkPolyData *output = vtkPolyData::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkPoints *newPoints;
-  newPoints = vtkPoints::New();
-  int numPoints = TemplateOdf->GetPoints()->GetNumberOfPoints();
-  newPoints->Allocate(numPoints);
-  for(int j=0; j<numPoints; j++){
-    double p[3];
-    TemplateOdf->GetPoints()->GetPoint(j,p);
-    if(OdfVals->GetNumberOfComponents())
-    {
-      double val = OdfVals->GetComponent(0,j);
-      //if(val >= 0.2)
-      //  val = 0.4;
-      p[0] *= val*Scale*AdditionalScale;
-      p[1] *= val*Scale*AdditionalScale;
-      p[2] *= val*Scale*AdditionalScale;
-      //double tmp = p[0];
-      //p[0] = p[1] * val;
-      //p[1] = tmp  * -val;
-      //p[2] *= val;
-    }
-    newPoints->InsertNextPoint(p);
+  OdfType colorOdf;
+  switch(Normalization)
+  {
+  case mitk::ODFN_MINMAX:
+    Odf = Odf.MinMaxNormalize();
+    colorOdf = Odf;
+    break;
+  case mitk::ODFN_MAX:
+    Odf = Odf.MaxNormalize();
+    colorOdf = Odf;
+    break;
+  case mitk::ODFN_NONE:
+    colorOdf = Odf.MaxNormalize();
+    break;
+  default:
+    Odf = Odf.MinMaxNormalize();
+    colorOdf = Odf;
   }
-  output->SetPoints(newPoints);
-  newPoints->Delete();
 
+
+  vtkIdType cellId = 0;
+  vtkIdType npts; vtkIdType *pts;
+  vtkPoints *newPoints;
   vtkCellArray* polys = TemplateOdf->GetPolys();
   output->SetPolys(polys);
-
-  //vtkCellArray *newPolys;
-  //newPolys = vtkCellArray::New();
-  //int numCells = polys->GetNumberOfCells();
-  //newPolys->Allocate(numCells);
-  //polys->InitTraversal();
-  //vtkIdType npts; vtkIdType *pts;
-  //while(polys->GetNextCell(npts,pts))
-  //{
-  //  newPolys->InsertNextCell(npts, pts);
-  //}
-  //output->SetPolys(newPolys);
-  //newPolys->Delete();
-
   vtkDoubleArray* colors = vtkDoubleArray::New();
   int numCells = polys->GetNumberOfCells();
   colors->Allocate(numCells);
   polys->InitTraversal();
-  vtkIdType cellId = 0;
-  vtkIdType npts; vtkIdType *pts;
+  newPoints = vtkPoints::New();
+  int numPoints = TemplateOdf->GetPoints()->GetNumberOfPoints();
+  newPoints->Allocate(numPoints);
+
   while(polys->GetNextCell(npts,pts))
   {
     double val = 0;
     for(int i=0; i<npts; i++)
     {
       vtkIdType pointId = pts[i];
-      val += OdfVals->GetComponent(0,pointId);
+      val += colorOdf.GetElement(pointId);
     }
     val /= npts;
-    colors->SetComponent(0,cellId++,-(val-0.5/*level*/)*(1/0.5/*window*/));
+    colors->SetComponent(0,cellId++, 1-val);
   }
+
+  for(int j=0; j<numPoints; j++){
+    double p[3];
+    TemplateOdf->GetPoints()->GetPoint(j,p);
+    double val = Odf.GetElement(j);
+    p[0] *= val*Scale*AdditionalScale*0.5;
+    p[1] *= val*Scale*AdditionalScale*0.5;
+    p[2] *= val*Scale*AdditionalScale*0.5;
+    newPoints->InsertNextPoint(p);
+  }
+  output->SetPoints(newPoints);
   output->GetCellData()->SetScalars(colors);
   colors->Delete();
+  newPoints->Delete();
   return 1;
 }
 

@@ -4,4 +4,4 @@ MITK_CREATE_MODULE( Overlays
                     QT_MODULE
 )
 
-#ADD_SUBDIRECTORY(Testing)
+#add_subdirectory(Testing)

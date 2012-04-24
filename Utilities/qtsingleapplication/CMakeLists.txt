@@ -33,5 +33,5 @@ target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
 MITK_CREATE_MODULE_CONF(qtsingleapplication)
 
-ENDIF(MITK_USE_QT) # only if MITK is built with Qt
+endif(MITK_USE_QT) # only if MITK is built with Qt
 

@@ -1,4 +1,4 @@
-PROJECT(org_mitk_gui_qt_stdmultiwidgeteditor)
+project(org_mitk_gui_qt_stdmultiwidgeteditor)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE ORG_MITK_GUI_QT_STDMULTIWIDGETEDITOR

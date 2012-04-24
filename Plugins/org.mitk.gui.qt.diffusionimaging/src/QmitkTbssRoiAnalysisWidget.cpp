@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 
 QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
@@ -219,6 +220,187 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
   this->Replot();
 
 }
+
+
+
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img)
+{
+  this->Clear();
+
+
+
+  std::vector<TractType>::iterator it = tracts.begin();
+
+
+  // Match points on tracts. Take the smallest tract and match all others on this one
+
+
+  int min = std::numeric_limits<int>::max();
+  TractType smallestTract;
+  while(it != tracts.end())
+  {
+    TractType tract = *it;
+    if(tract.size()<min)
+    {
+      smallestTract = tract;
+      min = tract.size();
+    }
+    ++it;
+  }
+
+
+
+
+
+
+  it = tracts.begin();
+  while(it != tracts.end())
+  {
+    TractType tract = *it;
+    if(tract == smallestTract)
+    {
+      ++it;
+      continue;
+    }
+
+    // Finding correspondences between points
+    std::vector<int> correspondingIndices;
+    TractType correspondingPoints;
+
+    for(int i=0; i<smallestTract.size(); i++)
+    {
+      PointType p = smallestTract[i];
+
+      double minDist = std::numeric_limits<float>::max();
+      int correspondingIndex = 0;
+      PointType correspondingPoint;
+
+      // Search for the point on the second tract with the smallest distance
+      // to p and memorize it
+      for(int j=0; j<tract.size(); j++)
+      {
+        PointType p2 = tract[j];
+        double dist = fabs( p.EuclideanDistanceTo(p2) );
+        if(dist < minDist)
+        {
+          correspondingIndex = j;
+          correspondingPoint = p2;
+          minDist = dist;
+        }
+      }
+
+
+      correspondingIndices.push_back(correspondingIndex);
+      correspondingPoints.push_back(correspondingPoint);
+
+
+    }
+
+    if(smallestTract.size() != correspondingIndices.size())
+    {
+
+      MITK_ERROR << "smallest tract and correspondingIndices have no equal size";
+      continue;
+    }
+
+
+    std::cout << "corresponding points\n";
+
+    for(int i=0; i<smallestTract.size(); i++)
+    {
+      PointType p = smallestTract[i];
+      PointType p2 = correspondingPoints[i];
+
+      std::cout << "[" << p[0] << ", " << p[1] << ", " << p[2] << ", ["
+                   << p2[0] << ", " << p2[1] << ", " << p2[2] << "]\n";
+    }
+
+
+    std::cout << std::endl;
+
+    ++it;
+  }
+
+
+
+
+  // Get the values along the curves from a 3D images. should also contain info about the position on screen.
+  std::vector< std::vector <double > > profiles;
+
+  it = tracts.begin();
+  while(it != tracts.end())
+  {
+    std::cout << "Tract\n";
+    TractType tract = *it;
+    TractType::iterator tractIt = tract.begin();
+
+    std::vector<double> profile;
+
+    while(tractIt != tract.end())
+    {
+      PointType p = *tractIt;
+      std::cout << p[0] << ' ' << p[1] << ' ' << p[2] << '\n';
+
+
+      // Get value from image
+      profile.push_back( (double)img->GetPixelValueByWorldCoordinate(p) );
+
+      ++tractIt;
+    }
+
+    profiles.push_back(profile);
+    std::cout << std::endl;
+
+    ++it;
+  }
+
+
+
+
+  std::string title = "Fiber bundle plot";
+  this->SetPlotTitle( title.c_str() );
+  QPen pen( Qt::SolidLine );
+  pen.setWidth(2);
+
+
+  std::vector< std::vector<double> >::iterator profit = profiles.begin();
+
+  int id=0;
+
+
+  while(profit != profiles.end())
+  {
+    std::vector<double> profile = *profit;
+
+
+
+    std::vector<double> xAxis;
+    for(int i=0; i<profile.size(); ++i)
+    {
+      xAxis.push_back((double)i);
+    }
+
+    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    this->SetCurveData( curveId, xAxis, profile );
+
+    ++profit;
+    id++;
+
+  }
+
+  this->Replot();
+
+
+
+
+
+
+
+
+
+
+}
+
 
 void QmitkTbssRoiAnalysisWidget::Boxplots()
 {

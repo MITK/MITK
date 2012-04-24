@@ -1,7 +1,7 @@
 
 # Plug-ins must be ordered according to their dependencies
 
-SET(MITK_EXT_PLUGINS
+set(MITK_EXT_PLUGINS
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
@@ -23,7 +23,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.examples:OFF
   org.mitk.gui.qt.examplesopencv:OFF
   org.mitk.gui.qt.igtexamples:OFF
-  org.mitk.gui.qt.igtnavigation:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON

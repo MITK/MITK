@@ -40,7 +40,14 @@ mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
   {
   //remove temp directory
   Poco::File myFile(m_tempDirectory);
-  if (myFile.exists()) myFile.remove();
+  try
+    {
+    if (myFile.exists()) myFile.remove();
+    }
+  catch(...)
+    {
+    MITK_ERROR << "Can't remove temp directory " << m_tempDirectory << "!";
+    }
   }
 
 bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage)

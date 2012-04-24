@@ -13,6 +13,6 @@ at the top of each header.
 
 If we wouldn't do this change in the original headers, we would have to put a line
 
-ADD_DEFINITIONS(-DTIXML_USE_XML)
+add_definitions(-DTIXML_USE_XML)
 
 into each MITK module/application that wants to use TinyXML with STL strings.

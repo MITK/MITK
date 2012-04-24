@@ -2,26 +2,26 @@
 # DCMTK
 #-----------------------------------------------------------------------------
 
-IF(MITK_USE_DCMTK)
+if(MITK_USE_DCMTK)
 
   # Sanity checks
-  IF(DEFINED DCMTK_DIR AND NOT EXISTS ${DCMTK_DIR})
-    MESSAGE(FATAL_ERROR "DCMTK_DIR variable is defined but corresponds to non-existing directory")
-  ENDIF()
+  if(DEFINED DCMTK_DIR AND NOT EXISTS ${DCMTK_DIR})
+    message(FATAL_ERROR "DCMTK_DIR variable is defined but corresponds to non-existing directory")
+  endif()
   
-  SET(proj DCMTK)
-  SET(proj_DEPENDENCIES )
-  SET(DCMTK_DEPENDS ${proj})
+  set(proj DCMTK)
+  set(proj_DEPENDENCIES )
+  set(DCMTK_DEPENDS ${proj})
 
-  IF(NOT DEFINED DCMTK_DIR)
-    IF(UNIX)
-      SET(DCMTK_CXX_FLAGS "-fPIC")
-      SET(DCMTK_C_FLAGS "-fPIC")
-    ENDIF(UNIX)
-    IF(DCMTK_DICOM_ROOT_ID)
-      SET(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
-      SET(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
-    ENDIF()
+  if(NOT DEFINED DCMTK_DIR)
+    if(UNIX)
+      set(DCMTK_CXX_FLAGS "-fPIC")
+      set(DCMTK_C_FLAGS "-fPIC")
+    endif(UNIX)
+    if(DCMTK_DICOM_ROOT_ID)
+      set(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
+      set(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
+    endif()
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
@@ -46,11 +46,11 @@ IF(MITK_USE_DCMTK)
          -DDCMTK_FORCE_FPIC_ON_UNIX:BOOL=ON
       DEPENDS ${proj_DEPENDENCIES}
       )
-    SET(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
     
-  ELSE()
+  else()
   
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   
-  ENDIF()
-ENDIF()     
+  endif()
+endif()     

@@ -7,6 +7,6 @@ MITK_CREATE_MODULE(MitkIGTUI
 )
 
 ## create IGTUI config
-CONFIGURE_FILE(mitkIGTUIConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTUIConfig.h @ONLY)
+configure_file(mitkIGTUIConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTUIConfig.h @ONLY)
 
 

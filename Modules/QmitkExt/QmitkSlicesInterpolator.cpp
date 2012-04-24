@@ -85,7 +85,7 @@ m_3DInterpolationEnabled(false)
   m_RBtnEnable3DInterpolation->setChecked(true);
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
 
-  m_BtnAccept3DInterpolation = new QPushButton("Accept...", this);
+  m_BtnAccept3DInterpolation = new QPushButton("Accept", this);
   m_BtnAccept3DInterpolation->setEnabled(false);
   connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
   grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
@@ -100,7 +100,7 @@ m_3DInterpolationEnabled(false)
   connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
   grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
 
-  m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
+  m_BtnAcceptInterpolation = new QPushButton("Accept", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
   grid->addWidget(m_BtnAcceptInterpolation,1,1);
@@ -110,7 +110,7 @@ m_3DInterpolationEnabled(false)
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
   grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
 
-  m_RBtnDisableInterpolation = new QRadioButton("Disable Interpolation", this);
+  m_RBtnDisableInterpolation = new QRadioButton("Disable", this);
   connect(m_RBtnDisableInterpolation, SIGNAL(toggled(bool)), this, SLOT(OnInterpolationDisabled(bool)));
   grid->addWidget(m_RBtnDisableInterpolation, 2,0);
 
@@ -497,8 +497,23 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
         mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, timeStep );
-        
         m_FeedbackNode->SetData( interpolation );
+
+        // Workaround for Bug 11318
+        if ((interpolation.IsNotNull()) && (interpolation->GetGeometry() != NULL))
+        {
+           if(clickedSliceDimension == 1)
+           {
+              mitk::Point3D orig = interpolation->GetGeometry()->GetOrigin();
+              orig[0] = orig[0]; 
+              orig[1] = orig[1] + 0.5; 
+              orig[2] = orig[2];
+              interpolation->GetGeometry()->SetOrigin(orig);
+           }
+        }
+
+        // Workaround for Bug 11318 END
+        
         m_LastSliceDimension = clickedSliceDimension;
         m_LastSliceIndex = clickedSliceIndex;
       }
@@ -672,19 +687,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 
-    mitk::DataNode* refImageNode = m_ToolManager->GetReferenceData(0);
-
-    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    std::string nameOfResultImage = refImageNode->GetName();
-    nameOfResultImage.append(m_InterpolatedSurfaceNode->GetName());
-    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-    resultNode->SetProperty("3DInterpolationResult", mitk::BoolProperty::New(true));
-    resultNode->SetData( s2iFilter->GetOutput() );
-
-    this->GetDataStorage()->Add(resultNode, refImageNode);
-
-    m_RBtnDisableInterpolation->toggle();
+    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
+    segmentationNode->SetData(s2iFilter->GetOutput());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -911,18 +916,17 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
       {
         mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
         
-        std::string s;
-        if ( renderer->GetCurrentWorldGeometry2DNode() && renderer->GetCurrentWorldGeometry2DNode()->GetName(s) )
+        if ( renderer->GetCurrentWorldGeometry2DNode() )
         {
-          if (s == "widget1Plane")
+          if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane1() )
           {
             TranslateAndInterpolateChangedSlice( event, 2 );
           }
-          else if (s == "widget2Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane2() )
           {
             TranslateAndInterpolateChangedSlice( event, 0 );
           }
-          else if (s == "widget3Plane")
+          else if ( renderer->GetCurrentWorldGeometry2DNode()==this->m_MultiWidget->GetWidgetPlane3() )
           {
             TranslateAndInterpolateChangedSlice( event, 1 );
           }

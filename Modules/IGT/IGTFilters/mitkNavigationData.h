@@ -143,7 +143,9 @@ namespace mitk {
       virtual void CopyInformation(const DataObject* data);
 
       /**
-      * \brief print object information
+      * \brief Prints the object information to the given stream os.
+      * \param os The stream which is used to print the output.
+      * \param indent Defines the indentation of the output.
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

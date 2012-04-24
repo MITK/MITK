@@ -180,6 +180,64 @@
     <event NAME="clear" ID="1100" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- Puncture Application -->
     <event NAME="print" ID="3001" TYPE="Type_Application" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!-- A-->
+    <event NAME="A" ID="4001" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_A" />
+    <!-- B-->
+    <event NAME="B" ID="4002" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_B" />
+    <!-- C-->
+    <event NAME="C" ID="4003" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_C" />
+    <!-- D-->
+    <event NAME="D" ID="4004" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_D" />
+    <!-- F-->
+    <event NAME="F" ID="4005" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_F" />
+    <!-- G-->
+    <event NAME="G" ID="4006" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_G" />
+    <!-- I-->
+    <event NAME="I" ID="4007" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_I" />
+    <!-- J-->
+    <event NAME="J" ID="4008" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_J" />
+    <!-- K-->
+    <event NAME="K" ID="4009" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_K" />
+    <!-- L-->
+    <event NAME="L" ID="4010" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_L" />        
+    <!-- M-->
+    <event NAME="M" ID="4011" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_M" />        
+    <!-- O-->
+    <event NAME="O" ID="4012" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_O" />        
+    <!-- Q-->
+    <event NAME="Q" ID="4013" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Q" />        
+    <!-- U-->
+    <event NAME="U" ID="4014" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_U" />        
+    <!-- V-->
+    <event NAME="V" ID="4015" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_V" />
+    <!-- W-->
+    <event NAME="W" ID="4016" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_W" />                    
+    <!-- X-->
+    <event NAME="X" ID="4017" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_X" />                    
+    <!-- Y-->
+    <event NAME="Y" ID="4018" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Y" />                    
+    <!-- Z-->
+    <event NAME="Z" ID="4019" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Z" />
+    <!-- 1-->
+    <event NAME="1" ID="4020" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_1" />                    
+    <!-- 2-->
+    <event NAME="2" ID="4021" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_2" />                    
+    <!-- 3-->
+    <event NAME="3" ID="4022" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_3" />                    
+    <!-- 4-->
+    <event NAME="4" ID="4023" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_4" />                    
+    <!-- 5-->
+    <event NAME="5" ID="4024" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_5" />                    
+    <!-- 6-->
+    <event NAME="6" ID="4025" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_6" />                    
+    <!-- 7-->
+    <event NAME="7" ID="4026" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_7" />                    
+    <!-- 8-->
+    <event NAME="8" ID="4027" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_8" />                    
+    <!-- 9-->
+    <event NAME="9" ID="4028" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_9" />
+    <!-- 0 (zero) -->
+    <event NAME="0" ID="4029" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_0" />                                                                
   </events>
   <!-- Beginning of state machine patterns-->
   <!-- TutorialStep10Begin -->

@@ -1,7 +1,7 @@
 # Called by DCMTK.cmake (ExternalProject_Add) as a patch for DCMTK.
 # Makes pdf2dcm use "DOC" as modality for Encapsulated PDFs
 
-#message ("Patching dcmdata/apps/pdf2dcm.cc to use modality 'DOC'. Using template ${TEMPLATE_FILE}")
+#message("Patching dcmdata/apps/pdf2dcm.cc to use modality 'DOC'. Using template ${TEMPLATE_FILE}")
 
 # read whole file
 file(STRINGS dcmdata/apps/pdf2dcm.cc sourceCode NEWLINE_CONSUME)

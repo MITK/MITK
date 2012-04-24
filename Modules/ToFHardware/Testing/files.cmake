@@ -1,4 +1,4 @@
-SET(MODULE_TESTS
+set(MODULE_TESTS
   mitkThreadedToFRawDataReconstructionTest.cpp
   mitkToFCameraMITKPlayerControllerTest.cpp
   mitkToFCameraMITKPlayerDeviceTest.cpp
@@ -19,7 +19,6 @@ SET(MODULE_TESTS
   mitkToFCameraPMDPlayerDeviceTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
-  mitkToFImageGrabberCreatorTest.cpp
   mitkToFImageRecorderTest.cpp
   mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp

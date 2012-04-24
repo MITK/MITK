@@ -1,15 +1,15 @@
-FIND_PACKAGE(VTK)
-INCLUDE(${VTK_USE_FILE})
+find_package(VTK)
+include(${VTK_USE_FILE})
 # mitkGL.h is in Core/Rendering :(
-FIND_PACKAGE(OpenGL)
-IF(NOT OPENGL_FOUND)
-  MESSAGE("GL is required for MITK rendering")
-ENDIF(NOT OPENGL_FOUND )
-INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-INCLUDE_DIRECTORIES(../ipPic)
+find_package(OpenGL)
+if(NOT OPENGL_FOUND)
+  message("GL is required for MITK rendering")
+endif(NOT OPENGL_FOUND )
+include_directories(${OPENGL_INCLUDE_DIR})
+include_directories(../ipPic)
 
-ADD_LIBRARY(IIL4MITK ${MITK_WIN32_FORCE_STATIC} image.cpp  item.cpp  picimage.cpp  texture.cpp)
-TARGET_LINK_LIBRARIES(IIL4MITK ${OPENGL_LIBRARIES} ${IPPIC_LIBRARIES})
+add_library(IIL4MITK ${MITK_WIN32_FORCE_STATIC} image.cpp  item.cpp  picimage.cpp  texture.cpp)
+target_link_libraries(IIL4MITK ${OPENGL_LIBRARIES} ${IPPIC_LIBRARIES})
 MITK_CREATE_MODULE_CONF(IIL4MITK
   DEPENDS mitkIpPic
 )

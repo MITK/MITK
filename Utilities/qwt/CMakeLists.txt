@@ -1,9 +1,9 @@
 
-IF(MITK_USE_QT) # only if MITK is built with Qt
+if(MITK_USE_QT) # only if MITK is built with Qt
 
-PROJECT(QWT)
+project(QWT)
 
-SET(QWT_MOC_HEADERS
+set(QWT_MOC_HEADERS
   include/qwt_abstract_slider.h
   include/qwt_analog_clock.h
   include/qwt_compass.h
@@ -29,7 +29,7 @@ SET(QWT_MOC_HEADERS
   include/qwt_wheel.h
 )
 
-SET(QWT_HEADERS 
+set(QWT_HEADERS 
   include/qwt_abstract_scale_draw.h  
   include/qwt_data.h  
   include/qwt_layout_metrics.h    
@@ -103,7 +103,7 @@ SET(QWT_HEADERS
   include/qwt_scale_map.h
 
 )
-SET(QWT_SOURCES 
+set(QWT_SOURCES 
   src/qwt_abstract_scale.cpp
   src/qwt_double_interval.cpp
   src/qwt_panner.cpp
@@ -174,19 +174,19 @@ SET(QWT_SOURCES
   src/qwt_scale_draw.cpp
 )
 
-SET(QT_MT_REQUIRED TRUE)
-SET(QWT_INCLUDE_DIR ${QWT_SOURCE_DIR}/include CACHE PATH "MITK internal qwt include directory")
-INCLUDE_DIRECTORIES(${QWT_INCLUDE_DIR})
+set(QT_MT_REQUIRED TRUE)
+set(QWT_INCLUDE_DIR ${QWT_SOURCE_DIR}/include CACHE PATH "MITK internal qwt include directory")
+include_directories(${QWT_INCLUDE_DIR})
 
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTSVG 1)
-INCLUDE(${QT_USE_FILE})
+find_package(Qt4 REQUIRED)
+set(QT_USE_QTSVG 1)
+include(${QT_USE_FILE})
 QT4_WRAP_CPP(QWT_SOURCES ${QWT_MOC_HEADERS})
 
-ADD_DEFINITIONS(-DQWT_DLL)
-ADD_DEFINITIONS(-DQWT_MAKEDLL)
-ADD_LIBRARY(qwt ${QWT_SOURCES})
-TARGET_LINK_LIBRARIES(qwt ${QT_LIBRARIES})
+add_definitions(-DQWT_DLL)
+add_definitions(-DQWT_MAKEDLL)
+add_library(qwt ${QWT_SOURCES})
+target_link_libraries(qwt ${QT_LIBRARIES})
 
 # install only if shared lib (for now)
 
@@ -194,5 +194,5 @@ MITK_CREATE_MODULE_CONF(qwt
   INCLUDE_DIRS include
 )
 
-ENDIF(MITK_USE_QT) # only if MITK is built with Qt
+endif(MITK_USE_QT) # only if MITK is built with Qt
 

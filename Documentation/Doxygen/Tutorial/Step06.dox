@@ -4,7 +4,7 @@
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
 We will see how MITK images can be accessed as ITK images.
-We now load the image file only (mitk/Core/Code/Testing/Data/Pic3D.pic.gz) since the surface will be the result of the region-growing.
+We now load the image file only (bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd) since the surface will be the result of the region-growing.
 
 \image html step6_result.png 
 
@@ -19,7 +19,7 @@ The source is now split among several files:
 
 The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.
 Like in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
-Function names start with capital letters. To learn more about style conventions in MITK read \ref StylesAndNotesPage "The MITK Style Guide".
+Function names start with capital letters. To learn more about style conventions in MITK read \ref StyleGuideAndNotesPage "The MITK Style Guide".
 
 \dontinclude Step6.cpp
 

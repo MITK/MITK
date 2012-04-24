@@ -115,5 +115,11 @@
   </extension>
 
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.brainnetworkanalysis"
+          name="Brain Network Analysis"
+          class="QmitkBrainNetworkAnalysisView"
+          icon="resources/QmitkBrainNetworkAnalysisViewIcon_48.png" />
+  </extension>
 
 </plugin>

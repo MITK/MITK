@@ -28,9 +28,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 {
+  try
+    {
     std::string volumeDir = MITK_ROOT;
     volumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( volumeDir.c_str(), false ); //add this directory to StdFileLocations for the search
+    }
+  catch(std::exception e)
+    {
+    MITK_ERROR << "Error: cannot add path to mitk standard file locations";
+    //TODO: add appropriate error handling as soon as there is an error handling concept for MITK
+    }
 
 	m_Data = mitk::DeviceDataUnspecified;
 }

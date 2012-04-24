@@ -1,8 +1,8 @@
-PROJECT(org_blueberry_uitest)
+project(org_blueberry_uitest)
 
 MACRO_CREATE_CTK_PLUGIN(
   EXPORT_DIRECTIVE BERRY_UITEST_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src src/harness src/util
 )
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} optimized CppUnit debug CppUnitd)
+target_link_libraries(${PROJECT_NAME} optimized CppUnit debug CppUnitd)

@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
  mitkEndoDebug.cpp
  mitkTransform.cpp
  mitkCameraIntrinsics.cpp

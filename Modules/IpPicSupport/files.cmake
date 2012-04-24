@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   mitkIpPicGet.c
   mitkPicFileWriter.cpp
   mitkPicFileReader.cpp

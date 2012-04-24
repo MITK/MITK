@@ -86,17 +86,22 @@ struct TbssSkeletonizationSelListener : ISelectionListener
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
           // only look at interesting types
+          // from valid nodes
+          mitk::BaseData* nodeData = node->GetData();
 
-          if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+          if(nodeData)
           {
-            mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-            if(img->GetDimension() == 3)
+            if(QString("Image").compare(nodeData->GetNameOfClass())==0)
             {
-              found3dImage = true;
-            }
-            else if(img->GetDimension() == 4)
-            {
-              found4dImage = true;
+              mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+              if(img->GetDimension() == 3)
+              {
+                found3dImage = true;
+              }
+              else if(img->GetDimension() == 4)
+              {
+                found4dImage = true;
+              }
             }
           }
         }
@@ -233,12 +238,18 @@ void QmitkTbssSkeletonizationView::Skeletonize()
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
-        if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        mitk::BaseData* nodeData = node->GetData();
+
+        if(nodeData)
         {
-          mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-          if(img->GetDimension() == 3)
+          if(QString("Image").compare(nodeData->GetNameOfClass())==0)
           {
-            meanImage = img;
+            mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+            if(img->GetDimension() == 3)
+            {
+              meanImage = img;
+            }
           }
         }
       }
@@ -285,16 +296,22 @@ void QmitkTbssSkeletonizationView::Project()
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
-        if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+        // process only on valid nodes
+        mitk::BaseData* nodeData = node->GetData();
+
+        if(nodeData)
         {
-          mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-          if(img->GetDimension() == 3)
+          if(QString("Image").compare(nodeData->GetNameOfClass())==0)
           {
-            meanImage = img;
-          }
-          else if(img->GetDimension() == 4)
-          {
-            subjects = img;
+            mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+            if(img->GetDimension() == 3)
+            {
+              meanImage = img;
+            }
+            else if(img->GetDimension() == 4)
+            {
+              subjects = img;
+            }
           }
         }
 

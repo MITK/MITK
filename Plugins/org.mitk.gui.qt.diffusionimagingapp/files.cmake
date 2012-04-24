@@ -1,48 +1,46 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   QmitkDiffusionImagingAppApplication.cpp
   QmitkDiffusionImagingAppWorkbenchAdvisor.cpp
 )
 
-SET(INTERNAL_CPP_FILES
-  mitkPluginActivator.cpp
+set(INTERNAL_CPP_FILES
+  QmitkDiffusionApplicationPlugin.cpp
   QmitkDiffusionImagingAppIntroPart.cpp
-  QmitkDiffusionImagingAppPerspective.cpp
-  QmitkWelcomePerspective.cpp
-  QmitkDIAppConnectomicsPerspective.cpp
-  QmitkDIAppDicomImportPerspective.cpp
-  QmitkDIAppFiberTractographyPerspective.cpp
-  QmitkDIAppIVIMPerspective.cpp
-  QmitkDIAppPreprocessingReconstructionPerspective.cpp
-  QmitkDIAppQuantificationPerspective.cpp
-  QmitkDIAppScreenshotsMoviesPerspective.cpp
-  QmitkDIAppTBSSPerspective.cpp
-  QmitkDIAppVolumeVisualizationPerspective.cpp
-  QmitkDIAppTrackingEvaluationPerspective.cpp
+  Perspectives/QmitkDiffusionImagingAppPerspective.cpp
+  Perspectives/QmitkWelcomePerspective.cpp
+  Perspectives/QmitkDIAppConnectomicsPerspective.cpp
+  Perspectives/QmitkDIAppDicomImportPerspective.cpp
+  Perspectives/QmitkDIAppFiberTractographyPerspective.cpp
+  Perspectives/QmitkDIAppIVIMPerspective.cpp
+  Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.cpp
+  Perspectives/QmitkDIAppQuantificationPerspective.cpp
+  Perspectives/QmitkDIAppScreenshotsMoviesPerspective.cpp
+  Perspectives/QmitkDIAppTBSSPerspective.cpp
+  Perspectives/QmitkDIAppVolumeVisualizationPerspective.cpp
 )
 
-SET(UI_FILES
+set(UI_FILES
   src/internal/QmitkWelcomeScreenViewControls.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/QmitkDiffusionImagingAppIntroPart.h
-  src/internal/mitkPluginActivator.h
+  src/internal/QmitkDiffusionApplicationPlugin.h
   src/QmitkDiffusionImagingAppApplication.h
-  src/internal/QmitkDiffusionImagingAppPerspective.h
-  src/internal/QmitkWelcomePerspective.h
-  src/internal/QmitkDIAppConnectomicsPerspective.h
-  src/internal/QmitkDIAppDicomImportPerspective.h
-  src/internal/QmitkDIAppFiberTractographyPerspective.h
-  src/internal/QmitkDIAppIVIMPerspective.h
-  src/internal/QmitkDIAppPreprocessingReconstructionPerspective.h
-  src/internal/QmitkDIAppQuantificationPerspective.h
-  src/internal/QmitkDIAppScreenshotsMoviesPerspective.h
-  src/internal/QmitkDIAppTBSSPerspective.h
-  src/internal/QmitkDIAppVolumeVisualizationPerspective.h
-  src/internal/QmitkDIAppTrackingEvaluationPerspective.h
+  src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
+  src/internal/Perspectives/QmitkWelcomePerspective.h
+  src/internal/Perspectives/QmitkDIAppConnectomicsPerspective.h
+  src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h
+  src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h
+  src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
+  src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h
+  src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h
+  src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h
+  src/internal/Perspectives/QmitkDIAppTBSSPerspective.h
+  src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
 # list of resource files which can be used by the plug-in
 # system without loading the plug-ins shared library,
 # for example the icon used in the menu and tabs for the
@@ -66,33 +64,19 @@ SET(CACHED_RESOURCE_FILES
   resources/perspectives/volumevizualization.png
 )
 
-SET(QRC_FILES
+set(QRC_FILES
 # uncomment the following line if you want to use Qt resources
   resources/welcome/QmitkWelcomeScreenView.qrc
   resources/org_mitk_gui_qt_diffusionimagingapp.qrc
 )
 
-# SET(CPP_FILES)
+# set(CPP_FILES)
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 
-
-#----------- Qt Help Collection Project -------------#
-
-IF (BLUEBERRY_USE_QT_HELP)
-  SET(_plugin_qhcp_input "${CMAKE_CURRENT_SOURCE_DIR}/documentation/MitkDiffusionImagingAppQtHelpCollectionProject.qhcp")
-  SET(_plugin_qhcp_output "${CMAKE_CURRENT_BINARY_DIR}/MitkDiffusionImagingAppQtHelpCollection.qhc")
-  ADD_CUSTOM_COMMAND(OUTPUT ${_plugin_qhcp_output}
-                     COMMAND ${QT_COLLECTIONGENERATOR_EXECUTABLE} ${_plugin_qhcp_input} -o ${_plugin_qhcp_output}
-                     DEPENDS ${_plugin_qhcp_input}
-                     )
-
-  LIST(APPEND CACHED_RESOURCE_FILES ${_plugin_qhcp_output})
-  #SET(FILE_DEPENDENCIES ${_plugin_qhcp_output})
-ENDIF()

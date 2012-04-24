@@ -46,7 +46,7 @@ set(ENV{PATH} "${CTEST_PATH}")
 set(SUPERBUILD_TARGETS "")
 
 # If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
-if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
+if(NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
   set(GIT_REPOSITORY "http://git.mitk.org/MITK.git")
 endif()
 

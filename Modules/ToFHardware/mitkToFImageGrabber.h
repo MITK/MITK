@@ -32,8 +32,7 @@ namespace mitk
   * \brief Image source providing ToF images. Interface for filters provided in ToFProcessing module
   *
   * This class internally holds a ToFCameraDevice to access the images acquired by a ToF camera.
-  * A pre-configured instance for a specific ToF camera (e.g. PMD CamCube 3) can be obtained using
-  * the class ToFImageGrabberCreator.
+  *
   * Provided images include: distance image (output 0), amplitude image (output 1), intensity image (output 2)
   *
   * \ingroup ToFHardware

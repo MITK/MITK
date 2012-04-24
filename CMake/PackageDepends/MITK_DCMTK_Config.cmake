@@ -1,48 +1,48 @@
-IF(MITK_USE_DCMTK)
+if(MITK_USE_DCMTK)
 
-IF(NOT DCMTK_DIR)
-  SET(DCMTK_DIR "$ENV{DCMTK_DIR}" CACHE PATH "Location of DCMTK")
-  SET(DCMTK_DIR "$ENV{DCMTK_DIR}")
-  IF(NOT DCMTK_DIR)
-    MESSAGE(FATAL_ERROR "DCMTK_DIR not set. Cannot proceed.")
-  ENDIF(NOT DCMTK_DIR)
-ENDIF(NOT DCMTK_DIR)
+if(NOT DCMTK_DIR)
+  set(DCMTK_DIR "$ENV{DCMTK_DIR}" CACHE PATH "Location of DCMTK")
+  set(DCMTK_DIR "$ENV{DCMTK_DIR}")
+  if(NOT DCMTK_DIR)
+    message(FATAL_ERROR "DCMTK_DIR not set. Cannot proceed.")
+  endif(NOT DCMTK_DIR)
+endif(NOT DCMTK_DIR)
 
-FIND_PACKAGE(DCMTK)
+find_package(DCMTK)
     
-IF(NOT DCMTK_FOUND)
-  MESSAGE(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")
-ENDIF(NOT DCMTK_FOUND)
+if(NOT DCMTK_FOUND)
+  message(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")
+endif(NOT DCMTK_FOUND)
 
-IF( NOT WIN32 )
-  SET(MISSING_LIBS_REQUIRED_BY_DCMTK wrap tiff z)
-ENDIF( NOT WIN32 )
+if( NOT WIN32 )
+  set(MISSING_LIBS_REQUIRED_BY_DCMTK wrap tiff z)
+endif( NOT WIN32 )
 
-SET(QT_USE_QTSQL 1)
+set(QT_USE_QTSQL 1)
 
-IF(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
+if(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
 
-FILE(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
-  IF(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
-  # MESSAGE(STATUS "Found DCMTK newer that 3.5.4 ...")
-  SET(MITK_USE_DCMTK_NEWER_THAN_3_5_4 TRUE)
+file(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
+  if(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
+  # message(STATUS "Found DCMTK newer that 3.5.4 ...")
+  set(MITK_USE_DCMTK_NEWER_THAN_3_5_4 TRUE)
   # assume the new oflog library is located next to the others
   # this can be removed if FindDCMTK is adapted for 3.5.5 
-  GET_FILENAME_COMPONENT(_DCMTK_lib_dir ${DCMTK_ofstd_LIBRARY} PATH)
-  FIND_LIBRARY(DCMTK_oflog_LIBRARY oflog ${_DCMTK_lib_dir} )
-  LIST(APPEND DCMTK_LIBRARIES ${DCMTK_oflog_LIBRARY})
-  ENDIF(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
-ENDIF(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
+  get_filename_component(_DCMTK_lib_dir ${DCMTK_ofstd_LIBRARY} PATH)
+  find_library(DCMTK_oflog_LIBRARY oflog ${_DCMTK_lib_dir} )
+  list(APPEND DCMTK_LIBRARIES ${DCMTK_oflog_LIBRARY})
+  endif(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
+endif(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
 
 #
 # Usually all code should be adapted to DCMTK 3.6
 # If necessary you could configure the MITK_USE_DCMTK_NEWER_THAN_3_5_4 variable
 # to configure a header file for ifdefs:
-# CONFIGURE_FILE( mitkDCMTKConfig.h.in mitkDCMTKConfig.h )
+# configure_file( mitkDCMTKConfig.h.in mitkDCMTKConfig.h )
 
-LIST(APPEND ALL_INCLUDE_DIRECTORIES ${DCMTK_INCLUDE_DIR} ${DCMTK_DIR}/include)
-LIST(APPEND ALL_LIBRARIES ${DCMTK_LIBRARIES} ${MISSING_LIBS_REQUIRED_BY_DCMTK})
+list(APPEND ALL_INCLUDE_DIRECTORIES ${DCMTK_INCLUDE_DIR} ${DCMTK_DIR}/include)
+list(APPEND ALL_LIBRARIES ${DCMTK_LIBRARIES} ${MISSING_LIBS_REQUIRED_BY_DCMTK})
 #link_directories()
 
-ENDIF(MITK_USE_DCMTK)
+endif(MITK_USE_DCMTK)
 

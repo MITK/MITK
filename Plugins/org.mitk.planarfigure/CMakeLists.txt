@@ -1,4 +1,4 @@
-PROJECT(org_mitk_planarfigure)
+project(org_mitk_planarfigure)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE ORG_MITK_PLANARFIGURE_EXPORT

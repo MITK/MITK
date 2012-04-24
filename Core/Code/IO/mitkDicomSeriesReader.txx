@@ -39,11 +39,13 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   {
     mitk::Image::Pointer image = mitk::Image::New();
     CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
+    bool initialize_node = false;
 
     /* special case for Philips 3D+t ultrasound images */ 
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
       ReadPhilips3DDicom(filenames.front().c_str(), image);
+      initialize_node = true;
     }
     else
     {
@@ -58,8 +60,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
+        initialize_node = true;
       }
-      else
+      else if (volume_count > 1)
       {
         // It is 3D+t! Read it and store into mitk image
         typedef itk::Image<PixelType, 4> ImageType;
@@ -116,15 +119,20 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           reader->Update();
           image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
         }
+        
+        initialize_node = true;
       }
     }
 
-    // forward some image properties to node
-    node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
+	if (initialize_node)
+	{
+	  // forward some image properties to node
+      node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
-    node.SetData( image );
-    setlocale(LC_NUMERIC, previousCLocale);
-    std::cin.imbue(previousCppLocale);
+      node.SetData( image );
+      setlocale(LC_NUMERIC, previousCLocale);
+      std::cin.imbue(previousCppLocale);
+    }
   }
   catch (std::exception& e)
   {

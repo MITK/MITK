@@ -6,6 +6,6 @@ MITK_CREATE_MODULE(mitkOpenCVVideoSupportUI
 )
 
 # no tests yet
-#IF(BUILD_TESTING)
-	#ADD_SUBDIRECTORY(Testing)
-#ENDIF(BUILD_TESTING)
+#if(BUILD_TESTING)
+	#add_subdirectory(Testing)
+#endif(BUILD_TESTING)

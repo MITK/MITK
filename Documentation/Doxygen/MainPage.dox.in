@@ -17,7 +17,7 @@ for developing interactive medical imaging software covered neither by VTK nor I
 \li multiple, consistent views on the same data. For example, when you have three orthogonal
 2D-views and a 3D view and data consisting of a green surface, the surface will be visible and green 
 in all views (as contour lines in 2D, as a surface in 3D), and when you move the surface, it will 
-move in all views. When you try to realize this with basic VTK, you will need to coordinate the 
+move in all views. When you try to implement this with basic VTK, you will need to coordinate the 
 position/orientation/color/... of all the views somewhere in your program - exactly this can MITK 
 do for you.
 \li interactions that create and/or modify data (not only actors as in basic VTK) 

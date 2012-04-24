@@ -1,4 +1,4 @@
-PROJECT(org_mitk_gui_qt_ugvisualization)
+project(org_mitk_gui_qt_ugvisualization)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE UGVISUALIZATION_EXPORT

@@ -1,18 +1,18 @@
-PROJECT(TINY_XML)
+project(TINY_XML)
 
-SET(TINY_XML_HEADERS
+set(TINY_XML_HEADERS
   tinystr.h
   tinyxml.h
 )
   
-SET(TINY_XML_SOURCES
+set(TINY_XML_SOURCES
   tinyxml.cpp
   tinyxmlparser.cpp
   tinyxmlerror.cpp
   tinystr.cpp
 )
 
-ADD_DEFINITIONS(-DTIXML_USE_STL)
-ADD_LIBRARY(tinyxml${LIBPOSTFIX} ${MITK_WIN32_FORCE_STATIC} ${TINY_XML_HEADERS} ${TINY_XML_SOURCES})
+add_definitions(-DTIXML_USE_STL)
+add_library(tinyxml${LIBPOSTFIX} ${MITK_WIN32_FORCE_STATIC} ${TINY_XML_HEADERS} ${TINY_XML_SOURCES})
 MITK_CREATE_MODULE_CONF( tinyxml )
 

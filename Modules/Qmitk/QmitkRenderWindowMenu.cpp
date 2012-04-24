@@ -47,11 +47,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
 :QWidget(parent, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
 :QWidget(parent,f),
 #endif
 
@@ -60,11 +60,12 @@ m_CrosshairMenu(NULL),
 m_Layout(0),
 m_LayoutDesign(0),
 m_OldLayoutDesign(0),
-m_FullScreenMode(false)
+m_FullScreenMode(false),
+m_Entered(false),
+m_Hidden(true),
+m_Renderer(b),
+m_MultiWidget(mw)
 {
-  m_Renderer = b;
-  m_Entered = false;
-  m_Hidden = true;
 
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
 
@@ -76,8 +77,9 @@ m_FullScreenMode(false)
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
   
-  this->show();
-  this->setWindowOpacity(0.0);
+//  this->show();
+  this->setVisible(false);
+//  this->setWindowOpacity(0.0);
   
   //this->setAttribute( Qt::WA_NoSystemBackground  );
   //this->setBackgroundRole( QPalette::Dark );
@@ -238,8 +240,9 @@ void QmitkRenderWindowMenu::HideMenu( )
   m_Hidden = true;
 
   if( ! m_Entered )
-    setWindowOpacity(0.0f);
-    //hide();
+    setVisible(false);
+//    setWindowOpacity(0.0f);
+//    hide();
 
 }
 
@@ -248,7 +251,8 @@ void QmitkRenderWindowMenu::ShowMenu( )
   MITK_DEBUG << "menu showMenu";
   
   m_Hidden = false;
-  setWindowOpacity(1.0f);
+  setVisible(true);
+//  setWindowOpacity(1.0f);
 }
 
 
@@ -267,7 +271,8 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
   MITK_DEBUG << "menu deferredhidemenu";
   if(m_Hidden)
-    setWindowOpacity(0.0f);
+    setVisible(false);
+//    setWindowOpacity(0.0f);
   ///hide();
 }
 
@@ -410,7 +415,8 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   MITK_DEBUG << "deferred show menu";
   
   show();
-  setWindowOpacity(1.0);
+  setVisible(true);
+//  setWindowOpacity(1.0);
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
@@ -773,13 +779,12 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
 {
   if(m_Renderer.IsNotNull())  
   {
-    mitk::DataStorage *ds=m_Renderer->GetDataStorage();
     mitk::DataNode *n;
-    if(ds)
+    if(this->m_MultiWidget)
     {
-      n = ds->GetNamedNode("widget1Plane"); if(n) n->SetVisibility(state);
-      n = ds->GetNamedNode("widget2Plane"); if(n) n->SetVisibility(state);
-      n = ds->GetNamedNode("widget3Plane"); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetVisibility(state);
       m_Renderer->GetRenderingManager()->RequestUpdateAll();
     }
   }
@@ -831,9 +836,9 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
       mitk::DataNode *n;
       if(ds)
       {
-        n = ds->GetNamedNode("widget1Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = ds->GetNamedNode("widget2Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = ds->GetNamedNode("widget3Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane1(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane2(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane3(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
       }
     }
 

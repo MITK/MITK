@@ -145,36 +145,41 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
       {
       case DcmIoType::UCHAR:
         DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::CHAR:
         DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::USHORT:
         DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::SHORT:
         DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::UINT:
         DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::INT:
         DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::ULONG:
         DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::LONG:
         DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::FLOAT:
         DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       case DcmIoType::DOUBLE:
         DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, callback);
-        return true;
+        break;
       default:
         MITK_ERROR << "Found unsupported DICOM pixel type: (enum value) " << io->GetComponentType();
+      }
+      
+      if (node.GetData())
+      {
+        return true;
       }
     }
   }
@@ -736,14 +741,28 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
           try {
             // check whether this and the previous block share a comon origin
             // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
-            std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
-            std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+            
+            const char 
+                *origin_value = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient ),
+                *previous_origin_value = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient ),
+                *destination_value = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient ),
+                *previous_destination_value = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+         
+            if (!origin_value || !previous_origin_value || !destination_value || !previous_destination_value)
+            {
+              identicalOrigins = false;
+            } 
+            else
+            { 
+              std::string thisOriginString = origin_value;
+              std::string previousOriginString = previous_origin_value;
 
-            // also compare last origin, because this might differ if z-spacing is different
-            std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
-            std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+              // also compare last origin, because this might differ if z-spacing is different
+              std::string thisDestinationString = destination_value;
+              std::string previousDestinationString = previous_destination_value;
 
-            identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+              identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+            }
 
           } catch(...)
           {
@@ -958,18 +977,30 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   if ( fabs(dist1 - dist2) < mitk::eps)
   {
-    gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time (may be missing, so we check existence first)
+    gdcm::Attribute<0x0008,0x0032> acq_time1;   // Acquisition time (may be missing, so we check existence first)
     gdcm::Attribute<0x0008,0x0032> acq_time2;
 
-    if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)))
-      acq_time1.Set(ds1);
+    gdcm::Attribute<0x0020,0x0012> acq_number1; // Acquisition number (may also be missing, so we check existence first)
+    gdcm::Attribute<0x0020,0x0012> acq_number2;
 
-    if (ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+    if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)) && ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+    {
+      acq_time1.Set(ds1);
       acq_time2.Set(ds2);
 
-    // TODO this could lead to comparison of unset times (does Attribute initialize to good defaults?)
-    // exception: same position: compare by acquisition time
-    return acq_time1 < acq_time2;
+      return acq_time1 < acq_time2;
+    }
+    else if (ds1.FindDataElement(gdcm::Tag(0x0020,0x0012)) && ds2.FindDataElement(gdcm::Tag(0x0020,0x0012)))
+    {
+      acq_number1.Set(ds1);
+      acq_number2.Set(ds2);
+
+      return acq_number1 < acq_number2;
+    }
+    else
+    {
+      return true;
+    }
   }
   else
   {

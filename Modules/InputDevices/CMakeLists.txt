@@ -1,2 +1,2 @@
-ADD_SUBDIRECTORY(WiiMote)
-ADD_SUBDIRECTORY(SpaceNavigator)
+add_subdirectory(WiiMote)
+add_subdirectory(SpaceNavigator)

@@ -1,4 +1,4 @@
-SET(H_FILES
+set(H_FILES
   Algorithms/itkImportMitkImageContainer.h
   Algorithms/itkImportMitkImageContainer.txx
   Algorithms/itkLocalVariationImageFilter.h
@@ -62,7 +62,7 @@ SET(H_FILES
   Interactions/mitkEventMapperAddOn.h
 )
 
-SET(CPP_FILES
+set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkBaseProcess.cpp
   Algorithms/mitkCoreObjectFactoryBase.cpp

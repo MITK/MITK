@@ -40,9 +40,10 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-class mitkRenderingManagerTestClass { public:
+class mitkRenderingManagerTestClass
+{
 
-
+public:
 
 static void TestPropertyList(mitk::RenderingManager::Pointer renderingManager)
 {
@@ -118,11 +119,57 @@ static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager
 
 }
 
+static void TestAddRemoveRenderWindow()
+{
+  mitk::RenderingManager::Pointer myRenderingManager = mitk::RenderingManager::New();
+
+
+  //mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+
+  //myRenderingManager->SetDataStorage(ds);
+
+  {
+    vtkRenderWindow* vtkRenWin = vtkRenderWindow::New();
+
+    MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetAllRegisteredRenderWindows().size() == 0, "Render window list must be empty")
+
+    // Add Render Window
+    myRenderingManager->AddRenderWindow(vtkRenWin);
+
+    MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetAllRegisteredRenderWindows().size() == 1, "Render window list must contain one item")
+
+    // Remove Render Window
+    myRenderingManager->RemoveRenderWindow(vtkRenWin);
+
+    MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetAllRegisteredRenderWindows().size() == 0, "Render window list must be empty")
+
+    // Test if the Render Window was removed properly. This should not do anything
+    MITK_TEST_OUTPUT(<< "Call RequestUpdate on removed render window")
+    myRenderingManager->RequestUpdate(vtkRenWin);
+    MITK_TEST_OUTPUT(<< "Call ForceImmediateUpdate on removed render window")
+    myRenderingManager->ForceImmediateUpdate(vtkRenWin);
+
+    MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetAllRegisteredRenderWindows().size() == 0, "Render window list must be empty")
+
+    // Delete vtk variable correctly
+    vtkRenWin->Delete();
+  }
+
+  // Check that the previous calls to RequestUpdate and ForceImmediateUpdate
+  // did not modify the internal vtkRenderWindow list. This should not crash.
+  MITK_TEST_OUTPUT(<< "Call RequestUpdateAll after deleting render window")
+  myRenderingManager->RequestUpdateAll();
+  MITK_TEST_OUTPUT(<< "Call ForceImmediateUpdateAll after deleting render window")
+  myRenderingManager->ForceImmediateUpdateAll();
+}
+
 }; //mitkDataNodeTestClass
 int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("RenderingManager")
+
+  mitkRenderingManagerTestClass::TestAddRemoveRenderWindow();
 
   mitk::RenderingManager::Pointer globalRenderingManager = mitk::RenderingManager::GetInstance();
 

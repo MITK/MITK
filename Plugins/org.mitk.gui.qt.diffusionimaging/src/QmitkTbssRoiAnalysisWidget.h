@@ -42,6 +42,12 @@ typedef itk::VectorImage<float,3>     VectorImageType;
 
 typedef std::vector< itk::Index<3> > RoiType;
 
+
+typedef itk::Point<float,3>               PointType;
+typedef std::vector< PointType>           TractType;
+typedef std::vector< TractType > TractContainerType;
+
+
 /** 
  * \brief Widget for displaying boxplots
  * framework
@@ -63,6 +69,10 @@ public:
   }
 
   void DrawProfiles(std::string preprocessed);
+
+
+  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img);
+
 
   void Boxplots();
 

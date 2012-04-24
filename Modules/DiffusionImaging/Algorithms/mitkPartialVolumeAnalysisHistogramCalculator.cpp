@@ -605,8 +605,6 @@ namespace mitk
     }
     resampler->SetOutputSpacing( spacing );
 
-    MITK_INFO << "resampling spacing: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2];
-
     // Size
     typename ResamplerType::SizeType size;
     size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
@@ -614,8 +612,6 @@ namespace mitk
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
     MITK_INFO << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
-
-    MITK_INFO << "resampling size: " << size[0] << ", " << size[1] << ", " << size[2];
 
     // Origin
     typename mitk::Point3D orig = planegeo->GetOrigin();
@@ -627,7 +623,6 @@ namespace mitk
     {
       float thickyyy = m_PlanarFigureThickness;
       thickyyy/=upsamp;
-      MITK_INFO << "setting origin2-="<<thickyyy << " (before " << corrorig[2] << ")";
       corrorig[2] -= thickyyy; // klaus add -= (float)m_PlanarFigureThickness/upsamp statt += 0
     }
     planegeo3D->IndexToWorld(corrorig,corrorig);
@@ -1057,7 +1052,6 @@ namespace mitk
       // further due to a bug in vtkPolyDataToImageStencil
       if ( !imageGeometry3D->IsInside( point3D ) )
       {
-        MITK_INFO << point3D << " not inside resampled image plane.. :(";
         outOfBounds = true;
       }
 

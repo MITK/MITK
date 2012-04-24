@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStandardFileLocations.h>
 #include "mitkNavigationToolReader.h"
 
+//POCO
+#include <Poco/Exception.h>
+
 mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
   {
   m_DataStorage = dataStorage;
@@ -38,18 +41,31 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
   {
   //remove temp directory
   Poco::File myFile(m_tempDirectory);
-  if (myFile.exists()) myFile.remove();
+  try
+    {
+    if (myFile.exists()) myFile.remove();
+    }
+  catch(...)
+    {
+    MITK_ERROR << "Can't remove temp directory " << m_tempDirectory << "!";
+    }
   }
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
+  bool success = false;
+  
   //decomress zip file into temporary directory
-  decomressFiles(filename,m_tempDirectory);
+  success = decomressFiles(filename,m_tempDirectory);
+  
+  //currently returns an empty storage in case of an error. TODO when exception handling is availiable in MITK: Throw an exception?
+  if (!success) {return mitk::NavigationToolStorage::New();} 
   
   //now read all files and convert them to navigation tools
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New(m_DataStorage);
   bool cont = true;
-  for (int i=0; cont==true; i++)
+  int i;
+  for (i=0; cont==true; i++)
     {
     std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
@@ -58,6 +74,11 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     else returnValue->AddTool(readTool);
     //delete file
     std::remove(fileName.c_str());
+    }
+  if(i==1)
+    {
+    m_ErrorMessage = "Error: did not find any tool. \n Is this a tool storage file?";
+    MITK_ERROR << "Error: did not find any tool. Is this a tool storage file?";
     }
   return returnValue;
   }
@@ -79,8 +100,18 @@ bool mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filenam
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
     return false;
     }
-  Poco::Zip::Decompress unzipper( file, Poco::Path( path ) );
-  unzipper.decompressAllFiles();
-  file.close();
+  try
+    {
+    Poco::Zip::Decompress unzipper( file, Poco::Path( path ) );
+    unzipper.decompressAllFiles();
+    file.close();
+    }
+  catch(Poco::IllegalStateException e) //temporary solution: replace this by defined exception handling later!
+    {
+    m_ErrorMessage = "Error: wrong file format! \n (please only load tool storage files)";
+    MITK_ERROR << "Error: wrong file format! (please only load tool storage files)";
+    return false;
+    }
+
   return true;
   }

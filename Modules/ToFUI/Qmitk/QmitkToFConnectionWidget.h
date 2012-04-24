@@ -54,7 +54,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     virtual void CreateConnections();
 
     /*!
-    \brief returns the ToFImageGrabber which was provided by the ToFImageGrabberCreator after selecting a camera / player
+    \brief returns the ToFImageGrabber which was configured after selecting a camera / player
     \return ToFImageGrabber currently used by the widget
     */
     mitk::ToFImageGrabber* GetToFImageGrabber();
@@ -79,7 +79,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
   
     /*!
     \brief slot called when the "Connect Camera" button was pressed
-    * According to the selection in the camera combo box, the ToFImageGrabberCreator provides
+    * According to the selection in the camera combo box, the widget provides
     * the desired instance of the ToFImageGrabber
     */
     void OnConnectCamera();
@@ -92,7 +92,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     Ui::QmitkToFConnectionWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
-    mitk::ToFImageGrabber* m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
+    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
 
     int m_IntegrationTime; ///< member for the current integration time of the ToF device
     int m_ModulationFrequency; ///< member for the current modulation frequency of the ToF device

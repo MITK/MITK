@@ -1,7 +1,7 @@
 
 #MACRO_CREATE_MITK_PLUGIN(QmitkExt)
 
-PROJECT(org_mitk_gui_qt_basicimageprocessing)
+project(org_mitk_gui_qt_basicimageprocessing)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
 	EXPORT_DIRECTIVE BASICIMAGEPROCESSING_EXPORT

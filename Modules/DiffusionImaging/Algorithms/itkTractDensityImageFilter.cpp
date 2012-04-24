@@ -150,6 +150,9 @@ namespace itk{
           pz -= 1;
           frac_z += 1;
         }
+        frac_x = 1-frac_x;
+        frac_y = 1-frac_y;
+        frac_z = 1-frac_z;
 
         // int coordinates inside image?
         if (px < 0 || px >= w-1)

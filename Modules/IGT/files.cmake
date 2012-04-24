@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   IGTFilters/mitkNavigationDataLandmarkTransformFilter.cpp
   IGTFilters/mitkNavigationDataReferenceTransformFilter.cpp
   IGTFilters/mitkNavigationDataTransformFilter.cpp
@@ -42,18 +42,18 @@ SET(CPP_FILES
   IGTToolManagement/mitkNavigationToolWriter.cpp
 )
 
-IF(MITK_USE_MICRON_TRACKER)
-  SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterface.cpp)
-ELSE()
-  SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterfaceStub.cpp)
-ENDIF(MITK_USE_MICRON_TRACKER)
+if(MITK_USE_MICRON_TRACKER)
+  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterface.cpp)
+else()
+  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterfaceStub.cpp)
+endif(MITK_USE_MICRON_TRACKER)
 
-IF(MITK_USE_MICROBIRD_TRACKER)
-  SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp)
-ENDIF(MITK_USE_MICROBIRD_TRACKER)
+if(MITK_USE_MICROBIRD_TRACKER)
+  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp)
+endif(MITK_USE_MICROBIRD_TRACKER)
 
-IF(WIN32)
-  SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
-ELSE()
-  SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
-ENDIF(WIN32)
+if(WIN32)
+  set(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
+else()
+  set(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
+endif(WIN32)

@@ -1,4 +1,4 @@
-PROJECT(poco)
+project(poco)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -18,9 +18,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${COMMON_CXX} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 #see Bug #5281
-IF(NOT MSVC)
+if(NOT MSVC)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-ENDIF(NOT MSVC)
+endif(NOT MSVC)
 
 # Set the library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -33,13 +33,13 @@ else(POCO_STATIC)
 endif(POCO_STATIC)
 
 # whether unit tests should be build
-set (POCO_ENABLE_TESTS FALSE CACHE BOOL "Build the Poco unit tests")
+set(POCO_ENABLE_TESTS FALSE CACHE BOOL "Build the Poco unit tests")
   mark_as_advanced(POCO_ENABLE_TESTS)
 set(ENABLE_TESTS ${POCO_ENABLE_TESTS})
 
-IF (ENABLE_TESTS)
-  ENABLE_TESTING()
-ENDIF (ENABLE_TESTS)
+if(ENABLE_TESTS)
+  enable_testing()
+endif(ENABLE_TESTS)
 
 # Set local include path
 #include_directories( CppUnit/include  Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include)
@@ -61,35 +61,35 @@ if(CMAKE_SYSTEM MATCHES "Windows")
   set(SYSLIBS iphlpapi gdi32)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
-if (CMAKE_SYSTEM MATCHES "Linux")
+if(CMAKE_SYSTEM MATCHES "Linux")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64)
   set(SYSLIBS  pthread dl rt)
 endif(CMAKE_SYSTEM MATCHES "Linux")
 
-if (CMAKE_SYSTEM MATCHES "SunOS")
+if(CMAKE_SYSTEM MATCHES "SunOS")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
   set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
 endif(CMAKE_SYSTEM MATCHES "SunOS")
 
-if (CMAKE_COMPILER_IS_MINGW)
+if(CMAKE_COMPILER_IS_MINGW)
     add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
     add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
   #link_directories(/usr/local/lib /usr/lib)
   #include_directories(/usr/local/include /usr/include)
-endif (CMAKE_COMPILER_IS_MINGW)
+endif(CMAKE_COMPILER_IS_MINGW)
 
-if (CMAKE_COMPILER_IS_CYGWIN)
+if(CMAKE_COMPILER_IS_CYGWIN)
 #    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
-endif (CMAKE_COMPILER_IS_CYGWIN)
+endif(CMAKE_COMPILER_IS_CYGWIN)
 
 # SunPro C++
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
   add_definitions( -D_BSD_SOURCE -library=stlport4)
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+endif(${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
 add_subdirectory(Foundation)
 add_subdirectory(XML)
@@ -106,15 +106,15 @@ add_subdirectory(CppUnit)
 #add_subdirectory(WebWidgets)
 add_subdirectory(Zip)
 
-if (ENABLE_TESTS)
+if(ENABLE_TESTS)
   add_subdirectory(Foundation/testsuite)
   add_subdirectory(XML/testsuite)
   add_subdirectory(Util/testsuite)
   add_subdirectory(Zip/testsuite)
-endif (ENABLE_TESTS)
+endif(ENABLE_TESTS)
 
 
 # Enable packaging
 
-INCLUDE(InstallRequiredSystemLibraries)
+include(InstallRequiredSystemLibraries)
 

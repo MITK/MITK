@@ -89,7 +89,7 @@ set(CMAKE_MODULE_PATH
   )
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
+# CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
 include(mitkMacroEmptyExternalProject)
@@ -117,9 +117,9 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
     endif()
   else()
     if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
-      SET(output_dir ${MITK_BINARY_DIR}/bin)
+      set(output_dir ${MITK_BINARY_DIR}/bin)
     else()
-      SET(output_dir ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
+      set(output_dir ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
     endif()
   endif()
   set(CMAKE_${type}_OUTPUT_DIRECTORY ${output_dir} CACHE INTERNAL "Single output directory for building all libraries.")
@@ -281,7 +281,7 @@ endif()
 #*****************************************************************************
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
+# CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
 include(CheckCXXSourceCompiles)
@@ -357,6 +357,9 @@ if(APPLE)
   endif()
   if(MITK_BUILD_org.mitk.gui.qt.application)
     set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+  endif()
+  if(MITK_BUILD_org.mitk.gui.qt.diffusionimagingapp)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} mitkDiffusion)
   endif()
 endif(APPLE)
 
@@ -532,7 +535,7 @@ if(MITK_USE_BLUEBERRY)
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
     # check if the application is enabled and if target_libraries.cmake exists
-    if (${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+    if(${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       foreach(_target_dep ${target_libraries})
         if(_target_dep MATCHES org_blueberry_)
@@ -623,13 +626,13 @@ if(MITK_USE_BLUEBERRY)
   endif() 
 
   # Specify which plug-ins belong to this project
-  MACRO(GetMyTargetLibraries all_target_libraries varname)
-    SET(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
-    SET(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
-    SET(_tmp_list)
-    LIST(APPEND _tmp_list ${all_target_libraries})
+  macro(GetMyTargetLibraries all_target_libraries varname)
+    set(re_ctkplugin_mitk "^org_mitk_[a-zA-Z0-9_]+$")
+    set(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
+    set(_tmp_list)
+    list(APPEND _tmp_list ${all_target_libraries})
     ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
-  ENDMACRO()
+  endmacro()
 
   # Get infos about application directories and build options
   include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
@@ -717,19 +720,79 @@ add_subdirectory(Documentation)
 
 
 # set MITK cpack variables
+# These are the default variables, which can be overwritten ( see below )
 include(mitkSetupCPack)
 
-if(MITK_BUILD_org.mitk.gui.qt.application)
-  list(APPEND CPACK_CREATE_DESKTOP_LINKS "CoreApp")
-endif()
-if(MITK_BUILD_org.mitk.gui.qt.extapplication)
-  list(APPEND CPACK_CREATE_DESKTOP_LINKS "ExtApp")
+set(use_default_config ON)
+
+# MITK_APPS is set in Applications/AppList.cmake (included somewhere above
+# if MITK_USE_BLUEBERRY is set to ON).
+if(MITK_APPS)
+
+  set(activated_apps_no 0)
+  list(LENGTH MITK_APPS app_count)
+
+  # Check how many apps have been enabled
+  # If more than one app has been activated, the we use the 
+  # default CPack configuration. Otherwise that apps configuration
+  # will be used, if present.
+  foreach(mitk_app ${MITK_APPS})
+    # extract option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 1 option_name)
+    # check if the application is enabled
+    if(${option_name})
+      MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
+    endif()
+  endforeach()
+
+  if(app_count EQUAL 1 AND (activated_apps_no EQUAL 1 OR MITK_BUILD_ALL_APPS))
+    # Corner case if there is only one app in total
+    set(use_project_cpack ON)
+  elseif(activated_apps_no EQUAL 1 AND NOT MITK_BUILD_ALL_APPS)
+    # Only one app is enabled (no "build all" flag set)
+    set(use_project_cpack ON)
+  else()
+    # Less or more then one app is enabled
+    set(use_project_cpack OFF)
+  endif()
+
+  foreach(mitk_app ${MITK_APPS})
+    # extract target_dir and option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 0 target_dir)
+    list(GET target_info_list 1 option_name)
+    # check if the application is enabled
+    if(${option_name})
+      # check whether application specific configuration files will be used
+      if(use_project_cpack)
+        # use files if they exist
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
+          include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
+        endif()
+
+        if(EXISTS "${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in")
+          set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake")
+          configure_file(${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in
+                         ${CPACK_PROJECT_CONFIG_FILE} @ONLY)
+          set(use_default_config OFF)
+        endif()
+      endif()
+    # add link to the list
+    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+    endif()
+  endforeach()
+
 endif()
 
-
-configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
-               ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+# if no application specific configuration file was used, use default
+if(use_default_config)
+  configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
+                 ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+  set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+endif()
 
 # include CPack model once all variables are set
 include(CPack)
@@ -771,7 +834,7 @@ set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 file(GLOB _MODULES_CONF_FILES RELATIVE ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME} ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
-SET(MITK_MODULE_NAMES)
+set(MITK_MODULE_NAMES)
 foreach(_module ${_MODULES_CONF_FILES})
   string(REPLACE Config.cmake "" _module_name ${_module})
   list(APPEND MITK_MODULE_NAMES ${_module_name})

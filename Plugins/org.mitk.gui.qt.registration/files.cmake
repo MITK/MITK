@@ -1,8 +1,8 @@
-SET(SRC_CPP_FILES
+set(SRC_CPP_FILES
   
 )
 
-SET(INTERNAL_CPP_FILES
+set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   #DeformableRegistration
   QmitkDeformableRegistrationView.cpp
@@ -17,7 +17,7 @@ SET(INTERNAL_CPP_FILES
   
 )
 
-SET(UI_FILES
+set(UI_FILES
   #DeformableRegistration
   src/internal/QmitkDeformableRegistrationViewControls.ui
   # PointBasedRegistration
@@ -27,7 +27,7 @@ SET(UI_FILES
   src/internal/QmitkRigidRegistrationSelector.ui
 )
 
-SET(MOC_H_FILES
+set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   #DeformableRegistration
   src/internal/QmitkDeformableRegistrationView.h
@@ -40,7 +40,7 @@ SET(MOC_H_FILES
 
 )
 
-SET(CACHED_RESOURCE_FILES
+set(CACHED_RESOURCE_FILES
 # list of resource files which can be used by the plug-in
 # system without loading the plug-ins shared library,
 # for example the icon used in the menu and tabs for the
@@ -54,7 +54,7 @@ SET(CACHED_RESOURCE_FILES
   resources/RigidRegistration.xpm
 )
 
-SET(QRC_FILES
+set(QRC_FILES
   #DeformableRegistration
   resources/QmitkDeformableRegistrationView.qrc
   # PointBasedRegistration
@@ -63,15 +63,15 @@ SET(QRC_FILES
   resources/QmitkRigidRegistrationView.qrc
 )
 
-SET(CPP_FILES 
+set(CPP_FILES 
 
 )
 
 foreach(file ${SRC_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/${file})
+  set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 

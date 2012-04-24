@@ -33,7 +33,7 @@ if(${_ok1} OR ${_ok2})
   message(SEND_ERROR "could not determine linux release!")
 endif()
 
-SET(LINUX_DISTRIBUTION ${_distrib})
-SET(LINUX_RELEASE ${_release})
+set(LINUX_DISTRIBUTION ${_distrib})
+set(LINUX_RELEASE ${_release})
 
 endmacro()

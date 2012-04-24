@@ -51,6 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMultiplyImageFilter.h>
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
+#include <mitkProgressBar.h>
 
 
 #include <mitkVectorImageMapper2D.h>
@@ -62,6 +63,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkArrowSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
+#include <vtkCellArray.h>
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -73,6 +75,9 @@ PURPOSE.  See the above copyright notices for more information.
 // #include "mitkImageMapperGL2D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkTensorImage.h"
+
+#include "itkDiffusionTensor3D.h"
 
 
 #define SEARCHSIGMA 10 /* length in linear voxel dimens
@@ -109,9 +114,12 @@ struct TbssSelListener : ISelectionListener
       bool foundTbss = false;
       bool found3dImage = false;
       bool found4dImage = false;
+      bool foundFiberBundle = false;
 
       mitk::TbssRoiImage* roiImage;
       mitk::TbssImage* image;
+      mitk::Image* img;
+      mitk::FiberBundleX* fib;
 
 
       // iterate selection
@@ -125,38 +133,47 @@ struct TbssSelListener : ISelectionListener
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
           // only look at interesting types
-
-          if(QString("TbssRoiImage").compare(node->GetData()->GetNameOfClass())==0)
+          // check for valid data
+          mitk::BaseData* nodeData = node->GetData();
+          if( nodeData )
           {
-            foundTbssRoi = true;
-            roiImage = static_cast<mitk::TbssRoiImage*>(node->GetData());
-          }
-          else if (QString("TbssImage").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            foundTbss = true;
-            image = static_cast<mitk::TbssImage*>(node->GetData());
-          }
-          else if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-          {
-            mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-            if(img->GetDimension() == 3)
+            if(QString("TbssRoiImage").compare(nodeData->GetNameOfClass())==0)
             {
-              found3dImage = true;
+              foundTbssRoi = true;
+              roiImage = static_cast<mitk::TbssRoiImage*>(nodeData);
             }
-            else if(img->GetDimension() == 4)
+            else if (QString("TbssImage").compare(nodeData->GetNameOfClass())==0)
             {
-              found4dImage = true;
+              foundTbss = true;
+              image = static_cast<mitk::TbssImage*>(nodeData);
             }
-          }
+            else if(QString("Image").compare(nodeData->GetNameOfClass())==0)
+            {
+              img = static_cast<mitk::Image*>(nodeData);
+              if(img->GetDimension() == 3)
+              {
+                found3dImage = true;
+              }
+              else if(img->GetDimension() == 4)
+              {
+                found4dImage = true;
+              }
+            }
 
+          else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
+          {
+            foundFiberBundle = true;
+            fib = static_cast<mitk::FiberBundleX*>(nodeData);
+          }
+          } // end CHECK nodeData != NULL
 
         }
 
       }
 
-
       m_View->m_Controls->m_CreateRoi->setEnabled(found3dImage);
       m_View->m_Controls->m_ImportFsl->setEnabled(found4dImage);
+
       if(found3dImage)
       {
         m_View->InitPointsets();
@@ -165,6 +182,11 @@ struct TbssSelListener : ISelectionListener
       if(foundTbss && foundTbssRoi)
       {
         m_View->Plot(image, roiImage);
+      }
+
+      if(found3dImage == true && foundFiberBundle)
+      {
+        m_View->PlotFiberBundle(fib, img);
       }
 
     }
@@ -323,6 +345,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
   }
 }
+
 
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
 {
@@ -998,7 +1021,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
       mitk::Point3D p2 = m_PointSetNode->GetPoint(i+1);
 
 
-      itk::Index<3> StartPoint;
+      itk::Index<3> StartPoint; mitk::ProgressBar::GetInstance()->Progress();
+
       itk::Index<3> EndPoint;
       image->GetGeometry()->WorldToIndex(p,StartPoint);
       image->GetGeometry()->WorldToIndex(p2,EndPoint);
@@ -1015,7 +1039,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
         itk::Index<3> ix = *it;
 
         if (!(ix==EndPoint))
-        {
+        { mitk::ProgressBar::GetInstance()->Progress();
+
           totalPath.push_back(ix);
           std::stringstream ss;
           ss << ix[0] << " " << ix[1] << " " << ix[2] << "\n";
@@ -1087,7 +1112,57 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 }
 
 
+void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img)
+{
+  int num = fib->GetNumFibers();
+  std::cout << "number of fibers: " << num << std::endl;
 
+  vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
+
+  vtkCellArray* lines = fiberPolyData->GetLines();
+  lines->InitTraversal();
+
+  int lineSize = lines->GetSize();
+  std::cout << "line size: " << lineSize << std::cout;
+
+  typedef itk::Point<float,3>               PointType;
+  typedef std::vector< PointType>           TractType;
+  typedef std::vector< TractType > TractContainerType;
+
+
+  TractContainerType tracts;
+
+  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+  {
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+    TractType singleTract;
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    {
+      // push back point
+      double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+      PointType point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+
+      singleTract.push_back( point );
+
+    }
+
+    tracts.push_back(singleTract);
+  }
+
+
+
+  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img);
+
+
+
+
+}
 
 
 void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::TbssRoiImage* roiImage)

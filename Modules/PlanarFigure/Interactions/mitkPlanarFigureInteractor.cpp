@@ -427,9 +427,11 @@ bool mitk::PlanarFigureInteractor
       planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
       m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
+      m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
       m_DataNode->Modified();
 
       // falls through
+      break;
     }
 
   case AcCHECKHOVERING:

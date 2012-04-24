@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 #include <math.h>
-
+#include <mitkDiffusionImage.h>
 
 
 typedef itk::VectorImage<short, 3>  ImageType;

@@ -50,7 +50,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_OverviewBox">
      <property name="title">
       <string>Overview</string>
      </property>

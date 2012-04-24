@@ -134,7 +134,7 @@ void QmitkODFDetailsView::StdMultiWidgetNotAvailable()
 
 void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  if (m_SelectedNode.IsNotNull())
+  if (m_ImageNode.IsNotNull())
     m_ImageNode->RemoveObserver( m_PropertyObserverTag );
 
   m_ImageNode = NULL;
@@ -166,8 +166,14 @@ void QmitkODFDetailsView::UpdateOdf()
   try
     {
     m_Values.clear();
+    m_Controls->m_OverviewBox->setVisible(true);
     if (m_ImageNode.IsNull() || !m_MultiWidget)
+    {
+      m_Controls->m_ODFRenderWidget->setVisible(false);
+      m_Controls->m_OdfBox->setVisible(false);
+      m_Controls->m_OverviewBox->setVisible(false);
       return;
+    }
 
     // ODF Normalization Property
     mitk::OdfNormalizationMethodProperty* nmp = dynamic_cast<mitk::OdfNormalizationMethodProperty*>(m_ImageNode->GetProperty( "Normalization" ));
@@ -282,7 +288,7 @@ void QmitkODFDetailsView::UpdateOdf()
     {
       m_Controls->m_ODFRenderWidget->setVisible(false);
       m_Controls->m_OdfBox->setVisible(false);
-      overviewText += "Please select a Q-Ball or tensor image\n";
+      overviewText += "Please reinit image geometry.\n";
     }
 
     m_Controls->m_ODFDetailsWidget->SetParameters(odf);

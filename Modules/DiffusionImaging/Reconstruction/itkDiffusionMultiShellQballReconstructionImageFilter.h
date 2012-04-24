@@ -133,6 +133,7 @@ public:
     void Threshold(vnl_matrix<TOdfPixelType> & mat, float sigma = 0.0001);
 
     void Projection1( vnl_matrix<TOdfPixelType> & mat, float delta = 0.0001);
+    void Projection2( vnl_vector<TOdfPixelType> & A, vnl_vector<TOdfPixelType> & alpha, vnl_vector<TOdfPixelType> & beta, float delta = 0.0001);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this

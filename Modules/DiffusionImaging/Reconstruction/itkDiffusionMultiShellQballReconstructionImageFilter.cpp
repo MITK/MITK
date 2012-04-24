@@ -137,7 +137,7 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
 ::Projection1( vnl_matrix<TOdfPixelType> & E, float delta )
 {
 
-  double sF = sqrt(5.0);
+  const double sF = sqrt(5.0);
 
   vnl_vector<TOdfPixelType> vOnes(E.rows());
   vOnes.fill(1.0);
@@ -238,6 +238,158 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
     E(i,2) = exp(-((1-a[i]-b[i])*s0[i]));
   }
 }
+
+
+double pow2(double val)
+{
+  return val * val;
+}
+
+
+template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
+void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
+::Projection2( vnl_vector<TOdfPixelType> & A, vnl_vector<TOdfPixelType> & a, vnl_vector<TOdfPixelType> & b, float delta0)
+{
+
+  const double s6 = sqrt(6);
+  const double s15 = s6/2;
+
+  vnl_vector<TOdfPixelType> delta(a.size());
+  delta.fill(delta0);
+
+  vnl_matrix<TOdfPixelType> AM(a.size(), 15);
+  vnl_matrix<TOdfPixelType> aM(a.size(), 15);
+  vnl_matrix<TOdfPixelType> bM(a.size(), 15);
+
+  vnl_matrix<unsigned char> B(a.size(), 15);
+
+
+  AM.set_column(0, A);
+  AM.set_column(1, A);
+  AM.set_column(2, A);
+  AM.set_column(3, delta);
+  AM.set_column(4, (A+a-b) - (delta*s6));
+  AM.set_column(5, delta);
+  AM.set_column(6, delta);
+  AM.set_column(7, delta);
+  AM.set_column(8, A);
+  AM.set_column(9, (a*2+A - ( delta * (2 * (s6 + 1)) ))*0.2);
+  AM.set_column(10, ((b*(-2)) + (A + 2) + (- delta * (2 * (s6 +1) ) ) ) *0.2);
+  AM.set_column(11, delta);
+  AM.set_column(12, delta);
+  AM.set_column(13, delta);
+  AM.set_column(14, (delta * (-(1 + s15))) + 0.5 );
+
+
+  aM.set_column(0, a);
+  aM.set_column(1, a);
+  aM.set_column(2, -delta + 1);
+  aM.set_column(3, a);
+  aM.set_column(4, ((A * 2) + (a * 5) + ( b ) + (delta * s6)) / 6);
+  aM.set_column(5, a);
+  aM.set_column(6, -delta + 1);
+  aM.set_column(7, ((a+b) * 0.5) + (delta * (1 + s15)));
+  aM.set_column(8, -delta + 1);
+  aM.set_column(9, ( (a * 4) + (A * 2) + (delta * (s6 + 1)) )*0.2);
+  aM.set_column(10, -delta + 1);
+  aM.set_column(11, delta*(s6 +3));
+  aM.set_column(12, -delta + 1);
+  aM.set_column(13, -delta + 1);
+  aM.set_column(14, -delta + 1);
+
+  bM.set_column(0, b);
+  bM.set_column(1, delta);
+  bM.set_column(2, b);
+  bM.set_column(3, b);
+  bM.set_column(4, (( A * (-2) ) + a + ( b * 5 ) - ( delta* s6 )  ) / 6);
+  bM.set_column(5, delta);
+  bM.set_column(6, b);
+  bM.set_column(7, ((a+b) * 0.5) - (delta * (1 + s15)));
+  bM.set_column(8, delta);
+  bM.set_column(9, delta);
+  bM.set_column(10, ( (b * 4) - (A * 2) + ((- (delta * (s6 + 1))) + 1) )*0.2);
+  bM.set_column(11, delta);
+  bM.set_column(12, delta);
+  bM.set_column(13, (- (delta * (s6 + 3)))  + 1);
+  bM.set_column(14, delta);
+
+  delta0 *= 0.99;
+
+  for(int i = 0 ; i < a.size(); i ++)
+  {
+    for(int j = 0 ; j < 15; j ++)
+    {
+      B(i,j) = delta0 < AM(i,j) && 2 * (AM(i,j) + delta0 * s15) < aM(i,j) - bM(i,j) && bM(i,j) > delta0 && aM(i,j) < 1- delta0;
+    }
+  }
+
+  vnl_matrix<TOdfPixelType> R2(a.size(), 15);
+  vnl_matrix<TOdfPixelType> A_(a.size(), 15);
+  vnl_matrix<TOdfPixelType> a_(a.size(), 15);
+  vnl_matrix<TOdfPixelType> b_(a.size(), 15);
+
+
+
+  vnl_matrix<TOdfPixelType> OnesVecMat(1, 15);
+  OnesVecMat.fill(1.0);
+
+  vnl_matrix<TOdfPixelType> AVecMat(a.size(), 1);
+  AVecMat.set_column(0,A);
+
+  vnl_matrix<TOdfPixelType> aVecMat(a.size(), 1);
+  aVecMat.set_column(0,a);
+
+  vnl_matrix<TOdfPixelType> bVecMat(a.size(), 1);
+  bVecMat.set_column(0,b);
+
+  A_ = AM - (AVecMat * OnesVecMat);
+  a_ = aM - (aVecMat * OnesVecMat);
+  b_ = bM - (bVecMat * OnesVecMat);
+
+  for(int i = 0 ; i < a.size(); i++)
+    for(int j = 0 ; j < 15; j++)
+    {
+      A_(i,j) *= A_(i,j);
+      a_(i,j) *= a_(i,j);
+      b_(i,j) *= b_(i,j);
+    }
+
+
+  R2 = A_ + a_ + b_;
+
+  for(int i = 0 ; i < a.size(); i ++)
+  {
+    for(int j = 0 ; j < 15; j ++)
+    {
+      if(B(i,j) == 0) R2(i,j) = 9999;
+    }
+  }
+
+  std::vector<unsigned int> indicies(a.size());
+
+  // suche den spalten-index der zu der kleinsten Zahl einer Zeile korrespondiert
+  for(int i = 0 ; i < a.size(); i++)
+  {
+    unsigned int index = 0;
+    double minvalue = 999;
+    for(int j = 0 ; j < 15 ; j++)
+    {
+      if(R2(i,j) < minvalue){
+        minvalue = R2(i,j);
+        index = j;
+      }
+    }
+    indicies[i] = index;
+  }
+
+  for(int i = 0 ; i < a.size(); i++)
+  {
+    A[i] = AM(i,indicies[i]);
+    a[i] = aM(i,indicies[i]);
+    b[i] = bM(i,indicies[i]);
+  }
+}
+
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
@@ -639,51 +791,62 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       E.set_column(1,SHApproximatedSignal2);
       E.set_column(2,SHApproximatedSignal3);
 
+
       // Si/S0
       S_S0Normalization(E,b0);
 
 
+      //MITK_INFO << E;
+      //exit(0);
+
       //Implements Eq. [19] and Fig. 4.
-      Threshold(E, m_Threshold);
+      Threshold(E, m_Lambda);
 
       //inqualities [31]. Taking the lograithm of th first tree inqualities
       //convert the quadratic inqualities to linear ones.
-      Projection1(E, m_Threshold);
+      Projection1(E, m_Lambda);
 
 
       vnl_vector<TO> AlphaValues(Shell1Indiecies.size());
       vnl_vector<TO> BetaValues(Shell1Indiecies.size());
       vnl_vector<TO> LAValues(Shell1Indiecies.size());
+      vnl_vector<TO> PValues(Shell1Indiecies.size());
+
 
       bool notCompliedWithConditions = false;
 
       for( unsigned int i = 0; i< Shell1Indiecies.size(); i++ )
       {
-        float E1 = Shell1OriginalSignal[i];
-        float E2 = SHApproximatedSignal2[i];
-        float E3 = SHApproximatedSignal3[i];
-
-        if(!(0 < E3) || (!(E3 < E2)) || (!(E2 < E1)) || (!(E1 < 1)) || (!(E1 * E1 < E2)) || (!(E2 * E2 < E1 * E3)) || (!(E3-E1*E2 < E2 - E1*E1 + E1*E3 -E2*E2)))
-        {
-          notCompliedWithConditions = true;
-          break;
-        }
 
 
-        float A = (E3 -E1*E2) / (2*(E2-E1*E1)) ;
-        float B = sqrt( A * A - ((E1*E3 - E2 * E2) / (E2-E1*E1)) );
-        //MITK_INFO << A << "   " << B;
+
+        float E1 = E(i,0);
+        float E2 = E(i,1);
+        float E3 = E(i,2);
+
+        float P2 = E2-E1*E1;
+        float A = (E3 -E1*E2) / ( 2* P2);
+        float B2 = A * A -(E1 * E3 - E2 * E2) /P2;
+        float B = 0;
+        if(B2 > 0) B = sqrt(B2);
+
+
 
         AlphaValues[i] = A + B;
         BetaValues[i] = A - B;
         LAValues[i] = 0.5 + ((E1 - A)/(2*B));
 
-        if(A != A || B != B || LAValues[i] != LAValues[i])
+        // Needed for Projection 2
         {
-          //    MITK_INFO << A << " " << B << " " << LAValues[i];
+          float P = 0;
+          if(P2 > 0) P = sqrt(P2);
+          PValues[i] = P;
         }
 
       }
+
+
+      Projection2(PValues, AlphaValues, BetaValues, m_Lambda);
 
       if(!notCompliedWithConditions){
 

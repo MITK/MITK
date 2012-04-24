@@ -87,6 +87,7 @@ struct QbrSelListener : ISelectionListener
     if(m_View->m_CurrentSelection)
     {
       bool foundDwiVolume = false;
+      m_View->m_Controls->m_DiffusionImageLabel->setText("-");
 
       // iterate selection
       for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
@@ -102,6 +103,7 @@ struct QbrSelListener : ISelectionListener
           if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
           {
             foundDwiVolume = true;
+            m_View->m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
           }
         }
       }
@@ -237,6 +239,11 @@ void QmitkQBallReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
 
   }
+}
+
+void QmitkQBallReconstructionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+
 }
 
 void QmitkQBallReconstructionView::Activated()

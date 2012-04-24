@@ -33,6 +33,7 @@ QmitkODFDetailsView::QmitkODFDetailsView()
   , m_Controls( 0 )
   , m_MultiWidget( NULL )
   , m_OdfNormalization(0)
+  , m_ImageNode(NULL)
 {
   m_VtkActor = vtkActor::New();
   m_VtkMapper = vtkPolyDataMapper::New();
@@ -106,7 +107,6 @@ void QmitkODFDetailsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMulti
     command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
     m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
   }
-
 }
 
 void QmitkODFDetailsView::StdMultiWidgetNotAvailable()
@@ -130,22 +130,35 @@ void QmitkODFDetailsView::StdMultiWidgetNotAvailable()
   m_MultiWidget = NULL;
 }
 
+void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+  m_ImageNode = NULL;
+  m_Controls->m_InputImageLabel->setText("-");
+  // iterate selection
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+
+    if( node.IsNotNull() && (dynamic_cast<mitk::QBallImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
+    {
+      m_Controls->m_InputImageLabel->setText(node->GetName().c_str());
+      m_ImageNode = node;
+    }
+  }
+}
+
 void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
+
   try
     {
     m_Values.clear();
-    std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-    if (nodes.empty()) return;
-    if (!nodes.front()) return;
 
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(nodes.front()->GetData());
-
-    if (!img) return;
-    if (!m_MultiWidget) return;
+    if (m_ImageNode.IsNull() || !m_MultiWidget)
+      return;
 
     // ODF Normalization Property
-    mitk::OdfNormalizationMethodProperty* nmp = dynamic_cast<mitk::OdfNormalizationMethodProperty*>(nodes.front()->GetProperty( "Normalization" ));
+    mitk::OdfNormalizationMethodProperty* nmp = dynamic_cast<mitk::OdfNormalizationMethodProperty*>(m_ImageNode->GetProperty( "Normalization" ));
     if(nmp)
       m_OdfNormalization = nmp->GetNormalization();
 
@@ -159,6 +172,7 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
 
     mitk::Point3D world = m_MultiWidget->GetCrossPosition();
     mitk::Point3D index;
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
     img->GetTimeSlicedGeometry()->WorldToIndex(world, index);
 
     float sum = 0;
@@ -166,13 +180,16 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
     float min = itk::NumericTraits<float>::max();
     QString values;
     QString overviewText;
+
     // check if dynamic_cast successfull and if the crosshair position is inside of the geometry of the ODF data
     // otherwise possible crash for a scenario with multiple nodes
-    if (dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()) && ( nodes.front()->GetData()->GetGeometry()->IsInside(world) ) )
+    if (dynamic_cast<mitk::QBallImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
     {
       m_Controls->m_OdfBox->setVisible(true);
       OdfVectorImgType::Pointer itkQBallImage = OdfVectorImgType::New();
-      mitk::CastToItkImage<OdfVectorImgType>(dynamic_cast<mitk::QBallImage*>(nodes.front()->GetData()), itkQBallImage);
+      mitk::CastToItkImage<OdfVectorImgType>(dynamic_cast<mitk::QBallImage*>(m_ImageNode->GetData()), itkQBallImage);
+
+      m_Controls->m_InputImageLabel->setText(m_ImageNode->GetName().c_str());
 
       OdfVectorImgType::IndexType ind;
       ind[0] = (int)(index[0]+0.5);
@@ -206,11 +223,11 @@ void QmitkODFDetailsView::OnSliceChanged(const itk::EventObject& /*e*/)
 
       m_Controls->m_OdfValuesTextEdit->setText(values);
     }
-    else if (dynamic_cast<mitk::TensorImage*>(nodes.front()->GetData()))
+    else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()))
     {
       m_Controls->m_OdfBox->setVisible(false);
       TensorImageType::Pointer itkQBallImage = TensorImageType::New();
-      mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(nodes.front()->GetData()), itkQBallImage);
+      mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()), itkQBallImage);
 
       TensorImageType::IndexType ind;
       ind[0] = (int)(index[0]+0.5);

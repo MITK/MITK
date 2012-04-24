@@ -80,6 +80,7 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
   Ui::QmitkODFDetailsViewControls* m_Controls;
 
@@ -101,6 +102,8 @@ protected:
   vtkCamera* m_Camera;
   std::vector<double> m_Values;
   int m_OdfNormalization;
+
+  mitk::DataNode::Pointer m_ImageNode;
 };
 
 

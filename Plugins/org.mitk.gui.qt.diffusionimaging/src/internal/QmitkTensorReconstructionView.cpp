@@ -1,4 +1,4 @@
-/*=========================================================================
+  /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
@@ -46,7 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVector.h"
 #include "itkB0ImageExtractionImageFilter.h"
 #include "itkTensorReconstructionWithEigenvalueCorrectionFilter.h"
-#include "itkFreeWaterEliminationFilter.h"
+//#include "itkFreeWaterEliminationFilter.h"
 
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
@@ -910,7 +910,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
       SetDefaultNodeProperties(node, newname.toStdString());
       nodes.push_back(node);
 
-
+/*
 
       // Free Water elimination
       if(m_Controls->m_FweCheckbox->isChecked())
@@ -981,6 +981,8 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 
 
       }
+
+      */
 
       mitk::ProgressBar::GetInstance()->Progress();
 

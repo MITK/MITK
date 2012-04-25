@@ -125,15 +125,16 @@ public:
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
 
     void S_S0Normalization( vnl_vector<TOdfPixelType> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
-    void S_S0Normalization( vnl_matrix<TOdfPixelType> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+    void S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
 
+    void DoubleLogarithm(vnl_vector<double> & vec);
     void DoubleLogarithm(vnl_vector<TOdfPixelType> & vec);
 
-    void Threshold(vnl_vector<TOdfPixelType> & vec, float sigma = 0.0001);
-    void Threshold(vnl_matrix<TOdfPixelType> & mat, float sigma = 0.0001);
+    void Threshold(vnl_vector<double> & vec, float sigma = 0.0001);
+    void Threshold(vnl_matrix<double> & mat, float sigma = 0.0001);
 
-    void Projection1( vnl_matrix<TOdfPixelType> & mat, float delta = 0.0001);
-    void Projection2( vnl_vector<TOdfPixelType> & A, vnl_vector<TOdfPixelType> & alpha, vnl_vector<TOdfPixelType> & beta, float delta = 0.0001);
+    void Projection1( vnl_matrix<double> & mat, float delta = 0.0001);
+    void Projection2( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, float delta = 0.0001);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this

@@ -9,8 +9,6 @@ Available sections:
   - \ref QmitkStochasticTrackingUserManualReferences
 
 \image html stochastictrackingview.png Stochastic Tracking View
-\image html segmentationview.png Segmentation View to define ROIs
-
 
 \section QmitkStochasticTrackingUserManualInputData Input Data
 

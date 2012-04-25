@@ -68,6 +68,50 @@ namespace itk
       }
     }
 
+
+    itk::Vector<double,3u> spacing_term = gradientImagePointer->GetSpacing();
+    itk::Matrix<double,3u,3u> direction_term = gradientImagePointer->GetDirection();
+
+    vnl_vector <double> spacing_vnl(3);
+    vnl_matrix <double> dir_vnl (3,3);
+
+
+
+    for (int i=0;i<3;i++)
+    {
+
+        spacing_vnl[i]=spacing_term[i];
+
+        for(int j=0;j<3;j++)
+        {
+            dir_vnl[i][j]=direction_term[i][j];
+
+        }
+    }
+
+    vnl_matrix <double> vox_dim_step (3,3);
+
+
+    for (int i=0;i<3;i++)
+    {
+
+        for(int j=0;j<3;j++)
+        {
+            vox_dim_step[i][j]=spacing_vnl[i]*dir_vnl[i][j];
+
+        }
+    }
+
+    vnl_symmetric_eigensystem <double> eigen_spacing(vox_dim_step);
+
+    vnl_vector <double> vox_dim (3);
+
+    vox_dim[0]=eigen_spacing.get_eigenvalue(0);
+    vox_dim[1]=eigen_spacing.get_eigenvalue(1);
+    vox_dim[2]=eigen_spacing.get_eigenvalue(2);
+
+    vox_dim=vox_dim/(vox_dim.min_value());
+
     
     //vnl_matrix<double> directions(nof-numberb0,3);
     vnl_matrix<double> directions(nof-numberb0,3);
@@ -421,6 +465,7 @@ namespace itk
     m_H = H_org;
     m_BVec=b_vec;
     m_B0Mask=b0index;
+    m_Voxdim = vox_dim;
 
   }
   

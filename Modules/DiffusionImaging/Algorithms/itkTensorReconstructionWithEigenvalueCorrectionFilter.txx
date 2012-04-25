@@ -195,6 +195,11 @@ namespace itk
     vnl_matrix<double> inputtopseudoinverse=H.transpose()*H;
     vnl_symmetric_eigensystem<double> eig( inputtopseudoinverse);
     vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
+
+    pseudoInverse.print(std::cout);
+    std::cout << std::endl;
+
+
     double temp_pixel;
    
     itk::Index<3> ix;

@@ -23,15 +23,12 @@ class mitkUSImage2DTestClass
 {
 public:
 
-  // Anm: Implementierung der einzelben Testmethoden
+  // Anm: Implementierung der einzelnen Testmethoden
 
   static void TestInstantiation()
   {
     // let's create an object of our class
-    //mitk::ClaronTrackingDevice::Pointer testInstance;
-    //testInstance = mitk::ClaronTrackingDevice::New();
-    MITK_TEST_CONDITION_REQUIRED(true, "Rigid Test")
-      mitk::USImage2D::Pointer us2d = mitk::USImage2D::New();
+    mitk::USImage2D::Pointer us2d = mitk::USImage2D::New();
     MITK_TEST_CONDITION_REQUIRED(us2d.IsNotNull(), "UsImage2D not null after instantiation");
   }
 
@@ -40,9 +37,7 @@ public:
 };
 
 /**
-* This function is testing methods of the class ClaronTrackingDevice which are independent from the hardware. For more tests we would need 
-* the MicronTracker hardware, so only a few simple tests, which can run without the hardware are tested here. More tests can be found in the 
-* class ClaronTrackingDeviceHardwareTests which tests the interaction with the hardware. 
+* This function is testing methods of the class USImage2D.
 */
 int mitkUSImage2DTest(int /* argc */, char* /*argv*/[])
 {

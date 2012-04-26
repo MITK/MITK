@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKUSIMAGESOURCE_H_HEADER_INCLUDED_
-#define MITKUSIMAGESOURCE_H_HEADER_INCLUDED_
+#ifndef MITKUSImageVideoSource_H_HEADER_INCLUDED_
+#define MITKUSImageVideoSource_H_HEADER_INCLUDED_
 
 #include <itkProcessObject.h>
 #include "mitkUSImage.h"
@@ -29,10 +29,10 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USImageSource : public itk::ProcessObject
+  class MitkUS_EXPORT USImageVideoSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacro(USImageSource, itk::ProcessObject);
+    mitkClassMacro(USImageVideoSource, itk::ProcessObject);
 
     /**
     *\brief return the output (output with id 0) of the filter
@@ -67,15 +67,15 @@ namespace mitk {
     * from being an output of its current source.  When the data object
     * is disconnected, the ProcessObject needs to construct a replacement
     * output data object so that the ProcessObject is in a valid state.
-    * Subclasses of USImageSource that have outputs of different
+    * Subclasses of USImageVideoSource that have outputs of different
     * data types must overwrite this method so that proper output objects
     * are created.
     */
     virtual DataObjectPointer MakeOutput(unsigned int idx);
 
   protected:
-    USImageSource();
-    virtual ~USImageSource();
+    USImageVideoSource();
+    virtual ~USImageVideoSource();
   };
 } // namespace mitk
-#endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */
+#endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */

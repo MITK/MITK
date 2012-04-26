@@ -15,22 +15,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkUSImageSource.h"
+#include "mitkUSImageVideoSource.h"
 
 
 
-mitk::USImageSource::USImageSource()
+mitk::USImageVideoSource::USImageVideoSource()
 : itk::ProcessObject()
 {
 }
 
 
-mitk::USImageSource::~USImageSource()
+mitk::USImageVideoSource::~USImageVideoSource()
 {
 }
 
 
-mitk::USImage* mitk::USImageSource::GetOutput()
+mitk::USImage* mitk::USImageVideoSource::GetOutput()
 {
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
@@ -39,7 +39,7 @@ mitk::USImage* mitk::USImageSource::GetOutput()
 }
 
 
-mitk::USImage* mitk::USImageSource::GetOutput(unsigned int idx)
+mitk::USImage* mitk::USImageVideoSource::GetOutput(unsigned int idx)
 {
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
@@ -47,13 +47,13 @@ mitk::USImage* mitk::USImageSource::GetOutput(unsigned int idx)
 }
 
 
-void mitk::USImageSource::GraftOutput(itk::DataObject *graft)
+void mitk::USImageVideoSource::GraftOutput(itk::DataObject *graft)
 {
   this->GraftNthOutput(0, graft);
 }
 
 
-void mitk::USImageSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
+void mitk::USImageVideoSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
   if ( idx >= this->GetNumberOfOutputs() )
   {
@@ -76,7 +76,7 @@ void mitk::USImageSource::GraftNthOutput(unsigned int idx, itk::DataObject *graf
 }
 
 
-itk::ProcessObject::DataObjectPointer mitk::USImageSource::MakeOutput( unsigned int /*idx */)
+itk::ProcessObject::DataObjectPointer mitk::USImageVideoSource::MakeOutput( unsigned int /*idx */)
 {
   mitk::USImage::Pointer p = mitk::USImage::New();
   return static_cast<itk::DataObject*>(p.GetPointer());

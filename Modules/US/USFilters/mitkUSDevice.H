@@ -54,7 +54,7 @@ namespace mitk {
       /**
       * \brief Deactivates the currently active probe.
       */
-      //virtual void DeactivateProbe();
+      virtual void DeactivateProbe();
 
       /**
       * \brief Removes a probe from the ist of currently added probes.

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::USDevice::USDevice() : itk::Object()
 {
- // m_ConnectedProbes = new std::vector<mitk::USProbe::Pointer>();
+
 }
 
 mitk::USDevice::~USDevice()
@@ -47,6 +47,10 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   }
   // index now contains the position of the original instance of this probe
   m_ActiveProbe = m_ConnectedProbes[index];
+}
+
+void mitk::USDevice::DeactivateProbe(){
+  m_ActiveProbe = 0;
 }
 
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()

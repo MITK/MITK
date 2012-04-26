@@ -84,6 +84,10 @@ public:
     // We after activation, we expect the device to activate probeA, which is the first-connected identical version.
     device->ActivateProbe(identicalProbe);
     MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe() == probeA, "probe A should be active");
+   
+    // And we deactivate it again...
+    device->DeactivateProbe();
+    MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe().IsNull(), "After deactivation, no probe should be active");
   }
  
 

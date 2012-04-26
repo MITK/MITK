@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::USImage2D::USImage2D() : IplImage()
 {
-
+ 
 }
 
 mitk::USImage2D::~USImage2D()
@@ -28,7 +28,4 @@ mitk::USImage2D::~USImage2D()
 
 }
 
-int mitk::USImage2D::Test()
-{
-return 9;
-}
+

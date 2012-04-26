@@ -31,6 +31,8 @@ public:
     //mitk::ClaronTrackingDevice::Pointer testInstance;
     //testInstance = mitk::ClaronTrackingDevice::New();
     MITK_TEST_CONDITION_REQUIRED(true, "Rigid Test")
+      mitk::USImage2D::Pointer us2d = mitk::USImage2D::New();
+    MITK_TEST_CONDITION_REQUIRED(us2d.IsNotNull(), "UsImage2D not null after instantiation");
   }
 
  

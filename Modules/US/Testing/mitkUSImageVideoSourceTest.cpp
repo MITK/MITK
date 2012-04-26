@@ -45,7 +45,7 @@ public:
 };
 
 /**
-* This function is testing methods of the class USImage2D.
+* This function is testing methods of the class USImageVideoSource.
 */
 int mitkUSImageVideoSourceTest(int /* argc */, char* /*argv*/[])
 {

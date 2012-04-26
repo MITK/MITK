@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
-#define MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
+#ifndef MITKUSProbe_H_HEADER_INCLUDED_
+#define MITKUSProbe_H_HEADER_INCLUDED_
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
@@ -27,27 +27,34 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
     /**Documentation
-    * \brief TODO
+    * \brief Right now, the US Probe is only a fancy name for a string. Later, it could handle probe specific parameters
+    *  like the current frequency etc. It is able to compare itself to other probes for device managment thoiugh.
+    *  Be sure to check the isEqualTo() method if you expand this class to see if it needs work.
     * \ingroup US
     */
-  class MitkUS_EXPORT USImageMetadata : public itk::Object
+  class MitkUS_EXPORT USProbe : public itk::Object
     {
     public:
-      mitkClassMacro(USImageMetadata,itk::Object);
+      mitkClassMacro(USProbe,itk::Object);
       itkNewMacro(Self);
+
+      /**
+      * \brief Compares this probe to another probe and returns true if they are equal in terms of name AND NAME ONLY
+      *  be sure to sufficiently extend this method along with further capabilities probes
+      */
+      bool IsEqualToProbe(mitk::USProbe::Pointer probe);
+
     
       //## getter and setter ##
-      itkGetMacro(Device, std::string);
-      itkSetMacro(Device, std::string);
-      itkGetMacro(Probe, std::string);
-      itkSetMacro(Probe, std::string);
+
+      itkGetMacro(Name, std::string);
+      itkSetMacro(Name, std::string);
 
     protected:
-      USImageMetadata();
-      virtual ~USImageMetadata();
+      USProbe();
+      virtual ~USProbe();
 
-      std::string m_Device;
-      std::string m_Probe;
+      std::string m_Name;
 
     
 

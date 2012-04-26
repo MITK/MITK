@@ -1,0 +1,82 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2008-02-25 17:27:17 +0100 (Mo, 25 Feb 2008) $
+Version:   $Revision: 7837 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include "mitkUSDevice.h"
+#include "mitkUSProbe.h"
+#include "mitkTestingMacros.h"
+
+
+class mitkUSDeviceTestClass
+{
+public:
+
+  // Anm: Implementierung der einzelnen Testmethoden
+
+  static void TestInstantiation()
+  {
+    // let's create an object of our class
+    mitk::USDevice::Pointer device = mitk::USDevice::New();
+    MITK_TEST_CONDITION_REQUIRED(device.IsNotNull(), "USDevice should not be null after instantiation");
+  }
+
+   static void TestAddProbe()
+  {
+    mitk::USDevice::Pointer device = mitk::USDevice::New();
+    // create probes
+    mitk::USProbe::Pointer usSource = mitk::USProbe::New();
+    mitk::USProbe::Pointer probeA = mitk::USProbe::New();
+    mitk::USProbe::Pointer probeB = mitk::USProbe::New();
+    mitk::USProbe::Pointer identicalProbe = mitk::USProbe::New(); // only this one should be identical
+
+    // give my babys some names
+    probeA->SetName("ProbeA");
+    probeB->SetName("ProbeB");
+    identicalProbe->SetName("ProbeA");
+    // I'm gonna be a bad father...
+
+    //right now, list of devices should be empty
+    MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 0, "Newly created device should have no probes connected");
+    
+    // Connect Probe A
+    device->AddProbe(probeA);
+    MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 1, "Device should add one new probe");
+
+    // Connect Probe B
+    device->AddProbe(probeB);
+    MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 2, "Device should add another probe");
+
+    // Connect identical Probe
+    device->AddProbe(identicalProbe);
+    MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 2, "Device should not have added identical probe");
+  }
+
+ 
+
+};
+
+/**
+* This function is testing methods of the class USDevice.
+*/
+int mitkUSDeviceTest(int /* argc */, char* /*argv*/[])
+{
+  MITK_TEST_BEGIN("mitkUSDeviceTest");
+
+    mitkUSDeviceTestClass::TestInstantiation();
+    mitkUSDeviceTestClass::TestAddProbe();
+
+  MITK_TEST_END();
+}

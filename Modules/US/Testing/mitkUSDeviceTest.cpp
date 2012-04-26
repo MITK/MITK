@@ -64,6 +64,27 @@ public:
     MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 2, "Device should not have added identical probe");
   }
 
+
+  static void TestActivateProbe()
+  {
+     mitk::USDevice::Pointer device = mitk::USDevice::New();
+    // create probes
+    mitk::USProbe::Pointer usSource = mitk::USProbe::New();
+    mitk::USProbe::Pointer probeA = mitk::USProbe::New();
+    mitk::USProbe::Pointer probeB = mitk::USProbe::New();
+    mitk::USProbe::Pointer identicalProbe = mitk::USProbe::New(); // only this one should be identical
+
+    // names
+    probeA->SetName("ProbeA");
+    probeB->SetName("ProbeB");
+    identicalProbe->SetName("ProbeA");
+    device->AddProbe(probeA);
+    device->AddProbe(probeB);
+
+    // We after activation, we expect the device to activate probeA, which is the first-connected identical version.
+    device->ActivateProbe(identicalProbe);
+    MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe() == probeA, "probe A should be active");
+  }
  
 
 };
@@ -77,6 +98,7 @@ int mitkUSDeviceTest(int /* argc */, char* /*argv*/[])
 
     mitkUSDeviceTestClass::TestInstantiation();
     mitkUSDeviceTestClass::TestAddProbe();
+    mitkUSDeviceTestClass::TestActivateProbe();
 
   MITK_TEST_END();
 }

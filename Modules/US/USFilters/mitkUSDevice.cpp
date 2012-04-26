@@ -37,6 +37,18 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
   this->m_ConnectedProbes.push_back(probe);
 }
 
+void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
+  // currently, we can just add the probe. This behaviour must be changed, should more complicated SDK applications emerge 
+  AddProbe(probe);
+  int index = -1;
+  for(int i = 0; i < m_ConnectedProbes.size(); i++)
+  {
+    if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) index = i;
+  }
+  // index now contains the position of the original instance of this probe
+  m_ActiveProbe = m_ConnectedProbes[index];
+}
+
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()
 {
   return m_ConnectedProbes;

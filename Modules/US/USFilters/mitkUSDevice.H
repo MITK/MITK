@@ -49,7 +49,7 @@ namespace mitk {
       *  Usually, a VideoDevice will just add a probe it want's to connect to,
       *  but an SDK Device might require adding a probe first.
       */
-      //virtual void ActivateProbe(mitk::USProbe probe);
+      virtual void ActivateProbe(mitk::USProbe::Pointer probe);
 
       /**
       * \brief Deactivates the currently active probe.
@@ -59,9 +59,11 @@ namespace mitk {
       /**
       * \brief Removes a probe from the ist of currently added probes.
       */
-      //virtual void removeProbe(mitk::USProbe probe);
+      //virtual void removeProbe(mitk::USProbe::Pointer probe);
     
       std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
+
+      itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
 
     protected:
       USDevice();

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
+    <width>338</width>
     <height>498</height>
    </rect>
   </property>
@@ -158,6 +158,9 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <widget class="QFrame" name="frame">
+        <property name="toolTip">
+         <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them anyway by taking into account all directions within a certain radius.</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -171,7 +174,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QCheckBox" name="m_DicomLoadAverageDuplicatesCheckbox">
            <property name="text">
-            <string>Avg. dupl. grad., blur=</string>
+            <string>Merge duplicate gradients:</string>
            </property>
           </widget>
          </item>
@@ -180,8 +183,11 @@ p, li { white-space: pre-wrap; }
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="toolTip">
+            <string/>
+           </property>
            <property name="decimals">
-            <number>6</number>
+            <number>4</number>
            </property>
            <property name="maximum">
             <double>2.000000000000000</double>
@@ -198,39 +204,13 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="m_Advanced">
+       <widget class="QCheckBox" name="m_DuplicateID">
+        <property name="toolTip">
+         <string>Select this option if you are sure that your DICOM dataset contains multiple Study Instance UID or Series Instance UID. It will ignore that fact and attempt to import all images as one.</string>
+        </property>
         <property name="text">
-         <string>Advanced</string>
+         <string>Merge duplicate study IDs</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="m_AdvancedFrame">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QCheckBox" name="m_DicomLoadDKFZ">
-           <property name="text">
-            <string>Correct DKFZ Gradient Scheme</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="m_DuplicateID">
-           <property name="toolTip">
-            <string>Select this option if you are sure that your DICOM dataset contains multiple Study Instance UID or Series Instance UID. It will ignore that fact and attempt to import all images as one.</string>
-           </property>
-           <property name="text">
-            <string>merge duplicate study IDs</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
       </item>
       <item>
@@ -258,6 +238,9 @@ p, li { white-space: pre-wrap; }
              <width>30</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Files are automaticall saved to disc. If the files can not be written, they are added to the data manager.</string>
            </property>
            <property name="text">
             <string>Set</string>

@@ -140,6 +140,7 @@ set(H_FILES
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkDiffusionMultiShellQballReconstructionImageFilter.h
   Reconstruction/mitkSphericalHarmonicsFunctions.h
+  Reconstruction/mitkVNLVectorFunctions.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
   Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h

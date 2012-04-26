@@ -33,8 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 
 #include "mitkSphericalHarmonicsFunctions.h"
+#include "mitkVNLVectorFunctions.h"
 #include "itkPointShell.h"
 #include <memory>
+
 
 namespace itk {
 
@@ -681,6 +683,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
 
+
   int wrongODF = 0;
 
   typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -868,8 +871,18 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         AlphaValues[i] = alpha;
         BetaValues[i] = beta;
 
+         /*TO lambda = 0.5 + 0.5 * sqrt(1-std::pow( (2*P) / (alpha - beta) , 2 ) );
+        if(lambda != lambda) MITK_INFO << "FAIL";
+        TO ER1 = std::fabs(lambda * (alpha - beta) + beta - E1)
+            + std::fabs(lambda * (alpha * alpha - beta * beta) + beta * beta - E2)
+            + std::fabs(lambda * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+        TO ER2 = std::fabs((1-lambda) * (alpha - beta) + beta - E1)
+            + std::fabs((1-lambda) * (alpha * alpha - beta * beta) + beta * beta - E2)
+            + std::fabs((1-lambda) * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+        // Needed for Projection 2
 
-        double lambda = 0.5 + ((E1-A)/(2*B));
+        if(ER1 < ER2) LAValues[i] = lambda;
+        if(ER1 >= ER2) LAValues[i] = 1 - lambda;
         if(lambda != lambda)
         {
           MITK_INFO << "FAIL";
@@ -879,21 +892,57 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
           MITK_INFO << B;
           MITK_INFO << alpha;
           MITK_INFO << beta;
-        }
-        /*TO lambda = 0.5 + 0.5 * sqrt(1-(((2*P)/(alpha - beta)) * ((2*P)/(alpha - beta))) );
-        if(lambda != lambda) MITK_INFO << "FAIL";
-        TO ER1 = std::fabs(lambda * (alpha - beta) + beta - E1) + std::fabs(lambda * (alpha * alpha - beta * beta) + beta * beta - E2) + std::fabs(lambda * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
-        TO ER2 = std::fabs((1-lambda) * (alpha - beta) + beta - E1) + std::fabs((1-lambda) * (alpha * alpha - beta * beta) + beta * beta - E2) + std::fabs((1-lambda) * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
-        // Needed for Projection 2
-
-        if(ER1 < ER2) LAValues[i] = lambda;
-        if(ER1 >= ER2) LAValues[i] = 1 - lambda;*/
-
-        LAValues[i] = lambda;
+        }*/
+        // double lambda = 0.5 + ((E1-A)/(2*B));
+        //LAValues[i] = lambda;
 
       }
 
       Projection2(PValues, AlphaValues, BetaValues);
+
+      vnl_vector<double> lambda(AlphaValues.size());
+      vnl_vector<double> ER1(AlphaValues.size());
+      vnl_vector<double> ER2(AlphaValues.size());
+      lambda.fill(0.0);
+      ER1.fill(0.0);
+      ER2.fill(0.0);
+
+      for(int i = 0 ; i < PValues.size() ; i++)
+      {
+        lambda[i] = 0.5 + 0.5 * std::sqrt(1 - std::pow((PValues[i] * 2 ) / (AlphaValues[i] - BetaValues[i]), 2));
+      }
+
+#define element_abs mitk::mitk_vnl_function::element_abs<double>
+#define element_pow mitk::mitk_vnl_function::element_pow<double>
+#define element_smallerThan mitk::mitk_vnl_function::element_condition_smallerThan<double>
+#define element_greaterThanEqual mitk::mitk_vnl_function::element_condition_greaterThanEqual<double>
+
+      ER1 = element_abs(element_product(lambda, AlphaValues - BetaValues) + (BetaValues - E.get_column(0) ) )
+          + element_abs(element_product(lambda, element_pow(AlphaValues, 2) - element_pow(BetaValues, 2)) + (element_pow(BetaValues,2) - E.get_column(1) ) )
+          + element_abs(element_product(lambda, element_pow(AlphaValues, 3) - element_pow(BetaValues, 3)) + (element_pow(BetaValues,3) - E.get_column(2) ) );
+
+      ER2 = element_abs(element_product((-lambda + 1), AlphaValues - BetaValues) + (BetaValues - E.get_column(0) ) )
+          + element_abs(element_product((-lambda + 1), element_pow(AlphaValues, 2) - element_pow(BetaValues, 2)) + (element_pow(BetaValues,2) - E.get_column(1) ) )
+          + element_abs(element_product((-lambda + 1), element_pow(AlphaValues, 3) - element_pow(BetaValues, 3)) + (element_pow(BetaValues,3) - E.get_column(2) ) );
+
+      LAValues = element_smallerThan(ER1, ER2, lambda) + element_greaterThanEqual(ER1, ER2, (-lambda + 1));
+
+#undef element_abs
+#undef element_pow
+#undef element_smallerThan
+#undef element_greaterThanEqual
+      //if(ER1 < ER2) LAValues[i] = lambda;
+      //if(ER1 >= ER2) LAValues[i] = 1 - lambda;
+
+      /*TO lambda = 0.5 + 0.5 * sqrt(1-std::pow( (2*P) / (alpha - beta) , 2 ) );
+     if(lambda != lambda) MITK_INFO << "FAIL";
+     TO ER1 = std::fabs(lambda * (alpha - beta) + beta - E1)
+         + std::fabs(lambda * (alpha * alpha - beta * beta) + beta * beta - E2)
+         + std::fabs(lambda * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+     TO ER2 = std::fabs((1-lambda) * (alpha - beta) + beta - E1)
+         + std::fabs((1-lambda) * (alpha * alpha - beta * beta) + beta * beta - E2)
+         + std::fabs((1-lambda) * (alpha * alpha * alpha - beta * beta * beta) + beta* beta *beta - E3 );
+      */
 
       Threshold(AlphaValues);
       Threshold(BetaValues);
@@ -916,6 +965,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       odf = ( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
     }
+
+    for(int i = 0; i < odf.Size(); i++){
+      odf[i] *= QBALL_ANAL_RECON_PI*4/NODF;
+    }
+
     // set ODF to ODF-Image
     oit.Set( odf );
     ++oit;

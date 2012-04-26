@@ -38,10 +38,10 @@ namespace mitk {
     
       //## getter and setter ##
       //NavigationToolType:
-      itkGetMacro(Device,std::string);
-      itkSetMacro(Device,std::string);
-      itkGetMacro(Probe,std::string);
-      itkSetMacro(Probe,std::string);
+      itkGetMacro(Device, std::string);
+      itkSetMacro(Device, std::string);
+      itkGetMacro(Probe, std::string);
+      itkSetMacro(Probe, std::string);
 
     protected:
       USImageMetadata();

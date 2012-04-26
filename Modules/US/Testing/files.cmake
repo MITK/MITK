@@ -1,5 +1,6 @@
 SET(MODULE_TESTS
    mitkUSImage2DTest.cpp
+   mitkUSImageVideoSourceTest.cpp
 
    # -----------------------------------------------------------------------
 

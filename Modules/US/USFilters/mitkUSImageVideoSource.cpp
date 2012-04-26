@@ -22,11 +22,29 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::USImageVideoSource::USImageVideoSource()
 : itk::ProcessObject()
 {
+    m_IsVideoReady = false;
+    m_IsMetadataReady = false;
+    m_IsGeometryReady = false;
 }
 
 
 mitk::USImageVideoSource::~USImageVideoSource()
 {
+}
+
+
+
+void mitk::USImageVideoSource::OpenVideoFile(std::string path)
+{
+  m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
+
+  // Example: "C:\\Users\\maerz\\Videos\\Debut\\us.avi"
+  m_OpenCVVideoSource->SetVideoFileInput(path.c_str(),true,false); //wenn kein Bild erscheint, Passwort für G eingeben
+  m_OpenCVVideoSource->StartCapturing();
+  m_OpenCVVideoSource->FetchFrame();
+  
+  // Let's see if we have been successful
+  m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
 }
 
 

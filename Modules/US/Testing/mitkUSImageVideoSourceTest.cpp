@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkUSImage2D.h"
+#include "mitkUSImageVideoSource.h"
 #include "mitkTestingMacros.h"
 
 
-class mitkUSImage2DTestClass
+class mitkUSImageVideoSourceTestClass
 {
 public:
 
@@ -28,8 +28,16 @@ public:
   static void TestInstantiation()
   {
     // let's create an object of our class
-    mitk::USImage2D::Pointer us2d = mitk::USImage2D::New();
-    MITK_TEST_CONDITION_REQUIRED(us2d.IsNotNull(), "UsImage2D should not be null after instantiation");
+    mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
+    MITK_TEST_CONDITION_REQUIRED(usSource.IsNotNull(), "USImageVideoSource should not be null after instantiation");
+  }
+
+    static void TestOpenVideoFile()
+  {
+    mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
+    // "C:\\Users\\maerz\\Videos\\Debut\\us.avi"
+    usSource->OpenVideoFile("C:\\Users\\maerz\\Videos\\Debut\\us.avi");
+    MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Video File");
   }
 
  
@@ -39,11 +47,12 @@ public:
 /**
 * This function is testing methods of the class USImage2D.
 */
-int mitkUSImage2DTest(int /* argc */, char* /*argv*/[])
+int mitkUSImageVideoSourceTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("mitkUSImage2DTest");
+  MITK_TEST_BEGIN("mitkUSImageVideoSourceTest");
 
-    mitkUSImage2DTestClass::TestInstantiation();
+    mitkUSImageVideoSourceTestClass::TestInstantiation();
+    mitkUSImageVideoSourceTestClass::TestOpenVideoFile();
 
   MITK_TEST_END();
 }

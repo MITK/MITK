@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 #include "mitkUSImage.h"
+#include "mitkOpenCVVideoSource.h"
 
 namespace mitk {
 
@@ -33,6 +34,14 @@ namespace mitk {
   {
   public:
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);
+    itkNewMacro(Self);
+
+    /**
+    *\brief Opens a video file for streaming. If nothing goes wrong, the 
+    * VideoSource is ready to deliver images after calling this function.
+    */
+    void OpenVideoFile(std::string path);
+
 
     /**
     *\brief return the output (output with id 0) of the filter
@@ -73,9 +82,31 @@ namespace mitk {
     */
     virtual DataObjectPointer MakeOutput(unsigned int idx);
 
+    // Getter & Setter
+    itkGetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
+    itkSetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
+    itkGetMacro(IsVideoReady, bool);
+    itkGetMacro(IsMetadataReady, bool);
+    itkGetMacro(IsGeometryReady, bool);
+
   protected:
     USImageVideoSource();
     virtual ~USImageVideoSource();
+
+    /**
+    * \brief The source of the video
+    */
+    mitk::OpenCVVideoSource::Pointer m_OpenCVVideoSource;
+
+    /**
+    * \brief The Following flags are used internally, to assure that all necessary steps are taken before capturing
+    */
+   bool m_IsVideoReady;
+   bool m_IsMetadataReady;
+   bool m_IsGeometryReady;
+
+    
+
   };
 } // namespace mitk
 #endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */

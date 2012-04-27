@@ -175,69 +175,54 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
 
 void QmitkOverlayController::AdjustOverlayPosition()
 {
+  QWidget* widget;
+  QPoint pos;
+
   // setting position of top-left overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::top_Left ]->isVisible() )
-  {
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint(0,0) );
-    m_PositionedOverlays[ QmitkOverlay::top_Left ]->move( pos.x(), pos.y() );
-  }
+  pos = m_RenderWindow->mapToGlobal( QPoint(0,0) );
+  m_PositionedOverlays[ QmitkOverlay::top_Left ]->move( pos.x(), pos.y() );
+
 
   // setting position of top-center overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::top_Center ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::top_Center ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width()/2, 0 ) ) ;
-    widget->move( pos.x() - widget->size().width()/2, pos.y() );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::top_Center ];
+  pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width()/2, 0 ) ) ;
+  widget->move( pos.x() - widget->size().width()/2, pos.y() );
+
 
   // setting position of top-right overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::top_Right ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::top_Right ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), 0 ) ) ;
-    widget->move( pos.x() - widget->size().width(), pos.y() );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::top_Right ];
+  pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), 0 ) ) ;
+  widget->move( pos.x() - widget->size().width(), pos.y() );
+
 
   // setting position of middle-left overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::middle_Left ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::middle_Left ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height()/2 ) ) ;
-    widget->move( pos.x(), pos.y() - widget->size().height()/2 );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::middle_Left ];
+  pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height()/2 ) ) ;
+  widget->move( pos.x(), pos.y() - widget->size().height()/2 );
+
 
   // setting position of middle-right overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::middle_Right ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::middle_Right ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), m_RenderWindow->size().height()/2 ) ) ;
-    widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height()/2 );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::middle_Right ];
+  pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), m_RenderWindow->size().height()/2 ) ) ;
+  widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height()/2 );
+
 
   // setting position of bottom-left overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::bottom_Left ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Left ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height() ) ) ;
-    widget->move( pos.x(), pos.y() - widget->size().height() );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::bottom_Left ];
+  pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height() ) ) ;
+  widget->move( pos.x(), pos.y() - widget->size().height() );
+
 
   // setting position of bottom-center overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::bottom_Center ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Center ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width()/2, m_RenderWindow->size().height() ) ) ;
-    widget->move( pos.x() - widget->size().width()/2, pos.y() - widget->size().height() );
-  }
+  widget = m_PositionedOverlays[ QmitkOverlay::bottom_Center ];
+  pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width()/2, m_RenderWindow->size().height() ) ) ;
+  widget->move( pos.x() - widget->size().width()/2, pos.y() - widget->size().height() );
+
 
   // setting position of bottom-right overlay-container
-  if ( m_PositionedOverlays[ QmitkOverlay::bottom_Right ]->isVisible() )
-  {
-    QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Right ];
-    QPoint pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width(), m_RenderWindow->size().height() ) ) ;
-    widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height() );
-  }
-
+  widget = m_PositionedOverlays[ QmitkOverlay::bottom_Right ];
+  pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width(), m_RenderWindow->size().height() ) ) ;
+  widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height() );
 } 
 
 

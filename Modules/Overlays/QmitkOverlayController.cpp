@@ -271,8 +271,6 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     m_AllOverlays.push_back( overlay );
     this->RestackOverlays( pos );
 
-    // make sure the widget containing the added overlay is shown ...
-    m_PositionedOverlays[ pos ]->show();
     // ... and reset the position of the widgets
     this->AdjustOverlayPosition();
   }

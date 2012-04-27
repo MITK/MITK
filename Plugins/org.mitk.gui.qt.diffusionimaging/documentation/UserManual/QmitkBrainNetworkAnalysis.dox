@@ -41,6 +41,7 @@ To calculate network statistics select a network in the datamanager. At this tim
   <li> The average degree of the nodes in the network
   <li> The connection density the network (the number of edges divided by the number of possible edges)
   <li> The unweighted efficiency of the network ( 1 divided by average path length, this is zero for disconnected graphs)
+  <li> The global clustering
 </ul>
 
 Furthermore some statistics are calculated on a per node basis and displayed as histograms:
@@ -49,6 +50,13 @@ Furthermore some statistics are calculated on a per node basis and displayed as 
   <li> The degree of each node
   <li> The (unweighted) betweenness centrality of each node
   <li> The spread of shortest paths between each pair of nodes (For disconnected graphs the shortest paths with infinite length are omitted for readability)
+</ul>
+
+Additionally you have the option to create artificial networks, for testing purposes. Currently choices are:
+<ul>
+  <li> A regular lattice, where each node is placed in a cubic pattern and only connected to its neighbours
+  <li> A heterogenic sphere, where one node is placed in the center and connected to all nodes on the shell
+  <li> A random network, where nodes are randomly placed on a spherical shell and randomly connected
 </ul>
 
 \section QmitkBrainNetworkAnalysisUserManualTrouble Troubleshooting

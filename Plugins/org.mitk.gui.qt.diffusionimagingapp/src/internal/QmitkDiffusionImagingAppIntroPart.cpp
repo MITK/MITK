@@ -24,7 +24,12 @@
 #include <berryIPerspectiveRegistry.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryIPreferences.h>
+
 #include <berryIEditorReference.h>
+#include <berryIEditorInput.h>
+
+#include <mitkIDataStorageService.h>
+#include <mitkDataStorageEditorInput.h>
 
 #include <mitkLogMacros.h>
 
@@ -42,10 +47,9 @@
 #include <QByteArray>
 #include <QDesktopServices>
 
-#include "QmitkStdMultiWidget.h"
-#include "QmitkStdMultiWidgetEditor.h"
-#include "mitkPluginActivator.h"
+#include "QmitkDiffusionApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
+#include <string>
 
 #include "mitkBaseDataIOFactory.h"
 #include "mitkSceneIO.h"
@@ -154,6 +158,30 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
+
+      // search the Workbench for opened StdMultiWidgets to ensure the focus does not stay on the welcome screen and is switched to
+      // an StdMultiWidget if one available
+      mitk::IDataStorageService::Pointer service =
+          berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+      berry::IEditorInput::Pointer editorInput;
+      editorInput = new mitk::DataStorageEditorInput( service->GetActiveDataStorage() );
+
+      // the solution is not clean, but the dependency to the StdMultiWidget was removed in order to fix a crash problem
+      // as described in Bug #11715
+      // This is the correct way : use the static string ID variable
+      // berry::IEditorPart::Pointer editor = GetIntroSite()->GetPage()->FindEditors( editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID );
+      // QuickFix: we use the same string for an local variable
+      const std::string stdEditorID = "org.mitk.editors.stdmultiwidget";
+
+      // search for opened StdMultiWidgetEditors
+      std::vector<berry::IEditorReference::Pointer> editorList = GetIntroSite()->GetPage()->FindEditors( editorInput, stdEditorID, 1 );
+
+      // if an StdMultiWidgetEditor open was found, give focus to it
+      if(editorList.size())
+      {
+        GetIntroSite()->GetPage()->Activate( editorList[0]->GetPart(true) );
+      }
+
     }
   }
   // if the scheme is set to http, by default no action is performed, if an external webpage needs to be

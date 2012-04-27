@@ -47,6 +47,9 @@ namespace mitk
     /** Create Synthetic Networks */
     mitk::ConnectomicsNetwork::Pointer CreateSyntheticNetwork(int networkTypeId, int paramterOne, double parameterTwo);
 
+    /** Return whether the last attempted network generation was a success*/
+    bool WasGenerationSuccessfull();
+
   protected:
 
     //////////////////// Functions ///////////////////////
@@ -76,6 +79,8 @@ namespace mitk
 
     /////////////////////// Variables ////////////////////////
 
+    /** Store whether the network generated last was generated properly */
+    bool m_LastGenerationWasSuccess;
   };
 
 }// end namespace mitk

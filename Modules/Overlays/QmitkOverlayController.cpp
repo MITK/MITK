@@ -228,16 +228,16 @@ void QmitkOverlayController::AdjustOverlayPosition()
 
 void QmitkOverlayController::SetOverlayVisibility( bool visible )
 {
-  // setting visibility of all registered overlays to 'visible'
-  foreach( QmitkOverlay* overlay, m_AllOverlays )
+  OverlayPositionMap::iterator overlayIter;
+  for ( overlayIter=m_PositionedOverlays.begin(); overlayIter!=m_PositionedOverlays.end(); overlayIter++ )
   {
     if ( visible )
     {
-      overlay->GetWidget()->show();
+      (overlayIter->second)->show();
     }
     else
     {
-      overlay->GetWidget()->hide();
+      (overlayIter->second)->hide();
     }
   }
 }

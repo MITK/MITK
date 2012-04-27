@@ -171,16 +171,19 @@ void QmitkBrainNetworkAnalysisView::OnSelectionChanged( std::vector<mitk::DataNo
 
         mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );
         mitk::ConnectomicsHistogramsContainer *histogramContainer = histogramCache[ connectomicsNetwork ];
-        m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  histogramContainer->GetBetweennessHistogram() );
-        m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       histogramContainer->GetDegreeHistogram() );
-        m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( histogramContainer->GetShortestPathHistogram() );
-        m_Controls->betweennessNetworkHistogramCanvas->DrawProfiles();
-        m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
-        m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
+        if(histogramContainer)
+        {
+          m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  histogramContainer->GetBetweennessHistogram() );
+          m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       histogramContainer->GetDegreeHistogram() );
+          m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( histogramContainer->GetShortestPathHistogram() );
+          m_Controls->betweennessNetworkHistogramCanvas->DrawProfiles();
+          m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
+          m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
 
-        double efficiency = histogramContainer->GetShortestPathHistogram()->GetEfficiency();
+          double efficiency = histogramContainer->GetShortestPathHistogram()->GetEfficiency();
 
-        m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
+          m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
+        }
 
         return;
       }
@@ -248,7 +251,14 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked(
   ////add network to datastorage
   networkNode->SetData( generator->CreateSyntheticNetwork( m_currentIndex, parameterOne, parameterTwo ) );
   networkNode->SetName( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_CNF_NAME );
-  this->GetDefaultDataStorage()->Add( networkNode );
+  if( generator->WasGenerationSuccessfull() )
+  {
+    this->GetDefaultDataStorage()->Add( networkNode );
+  }
+  else
+  {
+    MITK_WARN << "Problem occured during synthetic network generation.";
+  }
 
   return;  
 }

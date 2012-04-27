@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vxl/core/vnl/vnl_math.h"
 
 mitk::ConnectomicsSyntheticNetworkGenerator::ConnectomicsSyntheticNetworkGenerator()
+: m_LastGenerationWasSuccess( false )
 {
 }
 
@@ -40,6 +41,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::
 {
   mitk::ConnectomicsNetwork::Pointer network = mitk::ConnectomicsNetwork::New();
 
+  m_LastGenerationWasSuccess = false;
   // give the network an artificial geometry
   network->SetGeometry( this->GenerateDefaultGeometry() );
 
@@ -141,6 +143,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
         if ( idToVertexMap.count( vertexID ) > 0 )
         {
           MITK_ERROR << "Aborting network creation, duplicate vertex ID generated.";
+          m_LastGenerationWasSuccess = false;
           return;
         }
         idToVertexMap.insert( std::pair< int, mitk::ConnectomicsNetwork::VertexDescriptorType >( vertexID, newVertex) );
@@ -200,6 +203,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
       } // end for( int loopZ( 0 ); loopZ < cubeExtent; loopZ++  )
     } // end for( int loopY( 0 ); loopY < cubeExtent; loopY++  )
   } // end for( int loopX( 0 ); loopX < cubeExtent; loopX++  )
+  m_LastGenerationWasSuccess = true;
 }
 
 void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfaceNetwork( 
@@ -266,6 +270,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfa
 
     network->AddEdge( newVertex, centerVertex, loopID, 0, edgeWeight);
   }
+  m_LastGenerationWasSuccess = true;
 }
 
 void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork(
@@ -315,6 +320,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
     if ( idToVertexMap.count( loopID ) > 0 )
     {
       MITK_ERROR << "Aborting network creation, duplicate vertex ID generated.";
+      m_LastGenerationWasSuccess = false;
       return;
     }
     idToVertexMap.insert( std::pair< int, mitk::ConnectomicsNetwork::VertexDescriptorType >( loopID, newVertex) );
@@ -347,4 +353,10 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
       }
     } // end for( int innerLoopID( loopID ); innerLoopID < numberOfPoints; innerLoopID++  )
   } // end for( int loopID( 0 ); loopID < numberOfPoints; loopID++  )
+  m_LastGenerationWasSuccess = true;
+}
+
+bool mitk::ConnectomicsSyntheticNetworkGenerator::WasGenerationSuccessfull()
+{
+  return m_LastGenerationWasSuccess;
 }

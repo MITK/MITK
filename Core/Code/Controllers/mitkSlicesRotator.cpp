@@ -188,7 +188,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
     displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
     Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
-    Vector2D origin = displayGeometry->GetOriginInMM();
+    //Vector2D origin = displayGeometry->GetOriginInMM();
 
     displayGeometry->MoveBy( vector2DDisplayDiff );
 
@@ -225,7 +225,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
       displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
       Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
-      Vector2D origin = displayGeometry->GetOriginInMM();
+      //Vector2D origin = displayGeometry->GetOriginInMM();
 
       displayGeometry->MoveBy( vector2DDisplayDiff );
 
@@ -250,9 +250,9 @@ void SlicesRotator::UpdateRelevantSNCs()
     if (!slicedGeometry) continue;
 
     Geometry2D* firstSlice(NULL);
-    Geometry2D* secondSlice(NULL);
+    //Geometry2D* secondSlice(NULL);
     if (slicedGeometry->IsValidSlice(0))  firstSlice = slicedGeometry->GetGeometry2D(0);
-    if (slicedGeometry->IsValidSlice(1)) secondSlice = slicedGeometry->GetGeometry2D(1);
+    //if (slicedGeometry->IsValidSlice(1)) secondSlice = slicedGeometry->GetGeometry2D(1);
     
     // if the direction vector of these two slices is the same, then accept this slice stack as rotatable
     Vector3D right1 = firstSlice->GetAxisVector(0);
@@ -392,7 +392,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
         Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
-        Vector2D origin = displayGeometry->GetOriginInMM();
+        //Vector2D origin = displayGeometry->GetOriginInMM();
         // MITK_INFO << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
         // MITK_INFO << "  Diff   - " << vector2DDisplayDiff << std::endl;
         // MITK_INFO << "  Origin - " << origin << std::endl;
@@ -454,7 +454,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       Geometry2D* geometryToBeRotated = NULL;  // this one is grabbed
       Geometry2D* otherGeometry = NULL;        // this is also visible (for calculation of intersection)
       Geometry2D* clickedGeometry = NULL;      // the event originates from this one
-      SlicedGeometry3D* clickedSlicedGeometry;
+      //SlicedGeometry3D* clickedSlicedGeometry;
 
       for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
       {
@@ -487,7 +487,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         if ( *iter == renderer->GetSliceNavigationController() ) // don't rotate the one where the user clicked
         {
           clickedGeometry = geometry2D;
-          clickedSlicedGeometry = const_cast<SlicedGeometry3D*>(slicedGeometry);
+          //clickedSlicedGeometry = const_cast<SlicedGeometry3D*>(slicedGeometry);
         }
         else
         {

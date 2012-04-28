@@ -1,5 +1,5 @@
 /**
-  \defgroup org_blueberry_ui_qt_objectinspector org.blueberry.ui.qt.objectinspector Plugin
+  \defgroup org_blueberry_ui_qt_objectinspector org.blueberry.ui.qt.objectinspector
   \ingroup BlueBerryPlugins
 
   \brief Describe your plugin here.

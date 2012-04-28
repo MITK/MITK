@@ -1,29 +1,23 @@
 
 /**
 
-\defgroup MicroServices Micro Services Classes
+\addtogroup MicroServices
 \ingroup Core
 
-\brief This category includes classes related to the MITK Micro Services component.
-
-The MITK Micro Services component provides a dynamic service registry based on the service layer
-as specified in the OSGi R4.2 specifications.
-
-For further information, see the separate \ref MicroServices_Overview page.
 */
 
 /**
 
-\page MicroServices_Overview The MITK Micro Services
+\defgroup MicroServices_Interfaces Micro Services Interfaces
+\ingroup Core
 
-The MITK Micro Services component provides a dynamic service registry based on the service layer
-as specified in the OSGi R4.2 specifications. It enables users to realize a service oriented
-approach within their software stack. The advantages include higher reuse of components, looser
-coupling, better organization of responsibilities, cleaner API contracts, etc.
+\brief Classes (interfaces) in this category are explicitely designed for usage with the MITK Micro Services.
 
-Following is a list of use cases and common patterns
+All classes in this category are structs with no non-static members and only pure virtual functions
+(except for an inlined virtual destructor). Such a class will be called a \e interface.
 
-- \subpage MicroServices_EmulateSingleton
-
-
+These interfaces are meant to be implemented by MITK module developers to enhance or overwrite certain
+aspects of the MITK toolkit. All implementations must be registered in the implementing module's
+\e activator (see mitk::ModuleActivator) using the module's mitk::ModuleContext instance.
 */
+

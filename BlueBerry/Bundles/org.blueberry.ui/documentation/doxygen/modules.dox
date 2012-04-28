@@ -1,5 +1,5 @@
 /**
-  \defgroup org_blueberry_ui org.blueberry.ui Plugin
+  \defgroup org_blueberry_ui org.blueberry.ui
   \ingroup BlueBerryPlugins
 
   \brief This is the user interface plugin. It provides a GUI-Toolkit independent framework

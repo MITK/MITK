@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_stdmultiwidgeteditor org.mitk.gui.qt.stdmultiwidgeteditor
+  \ingroup MITKPlugins
+
+  \brief Contributes a QmitkStdMultiWidget based render window editor to the MITK Workbench.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_stdmultiwidgeteditor_internal Internal
+  \ingroup org_mitk_gui_qt_stdmultiwidgeteditor
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.stdmultiwidgeteditor plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

@@ -326,6 +326,23 @@ static void CheckPlanesOutsideOfBoundingBox(mitk::Geometry3D::Pointer geometry3D
 }
 
 
+static void CheckIntersectionPointsOfTwoGeometry3D(mitk::Geometry3D::Pointer firstGeometry3D, mitk::Geometry3D::Pointer secondGeometry3D)
+{
+  mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
+  mitk::Image::Pointer firstImage = mitk::Image::New();
+  firstImage->SetGeometry(firstGeometry3D);
+
+  calculator->SetInput( secondGeometry3D, firstImage);
+  calculator->Update();
+
+  mitk::ClippedSurfaceBoundsCalculator::OutputType minMax = calculator->GetMinMaxSpatialDirectionZ();
+  minMax = calculator->GetMinMaxSpatialDirectionZ();
+  MITK_INFO << "min: " << minMax.first << " max: " << minMax.second;
+
+  MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 19, "Check if plane is from slice 0 to slice 19");
+}
+
+
 int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
 {
   // always start with this!
@@ -374,11 +391,34 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
   mitk::Geometry3D::Pointer geometry3D = dynamic_cast< mitk::Geometry3D* > ( slicedGeometry3D.GetPointer() );
   geometry3D->SetImageGeometry(true);
 
+  //Define origin for second Geometry3D;
+  mitk::Point3D origin2;
+  origin2[0] = 511;
+  origin2[1] = 60;
+  origin2[2] = 0;
+
+ //Define normal:
+  mitk::Vector3D normal2;
+  mitk::FillVector3D(normal2, 0, 1, 0);
+
+  //Initialize PlaneGeometry:
+  mitk::PlaneGeometry::Pointer planeGeometry2 = mitk::PlaneGeometry::New();
+  planeGeometry2->InitializePlane(origin2, normal2);
+
+  //Initialize SlicedGeometry3D:
+  mitk::SlicedGeometry3D::Pointer secondSlicedGeometry3D = mitk::SlicedGeometry3D::New();
+  secondSlicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::Geometry2D*>(planeGeometry2.GetPointer()), 20);
+  mitk::Geometry3D::Pointer secondGeometry3D = dynamic_cast< mitk::Geometry3D* > ( secondSlicedGeometry3D.GetPointer() );
+  secondGeometry3D->SetImageGeometry(true);
+
+
   /***************************************************************/
 
   CheckPlanesInsideBoundingBoxOnlyOnOneSlice(geometry3D);
   CheckPlanesOutsideOfBoundingBox(geometry3D);
   CheckPlanesInsideBoundingBox(geometry3D);
+  CheckIntersectionPointsOfTwoGeometry3D(geometry3D, secondGeometry3D);
+  
 
   /** ToDo:
   *  test also rotated 3D geometry!

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_datamanager org.mitk.gui.qt.datamanager
+  \ingroup MITKPlugins
+
+  \brief This is the datamanager plugin. It provides means to query mitk::DataStorage objects and to change properties of the contained nodes.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_datamanager_internal Internal
+  \ingroup org_mitk_gui_qt_datamanager
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.datamanager plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

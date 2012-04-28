@@ -6,13 +6,8 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 INCLUDE(MacroParseArguments)
 INCLUDE(MacroConvertSchema)
 INCLUDE(MacroOrganizeSources)
-INCLUDE(berryPluginHelpers)
-INCLUDE(MacroCollectPlugins)
-INCLUDE(MacroParseManifest)
-INCLUDE(MacroCreatePlugin)
 INCLUDE(MacroCreateCTKPlugin)
 INCLUDE(MacroCreateQtHelp)
-INCLUDE(MacroInstallPlugin)
 INCLUDE(MacroInstallCTKPlugin)
 INCLUDE(FunctionCreateProvisioningFile)
 
@@ -27,103 +22,77 @@ ENDIF ()
 FIND_PACKAGE(mbilog REQUIRED)
 INCLUDE_DIRECTORIES(${mbilog_INCLUDE_DIRS})
 
-OPTION(BLUEBERRY_USE_QT "Use the Qt GUI toolkit" OFF)
 
-IF(NOT DESIRED_QT_VERSION)
-  SET(DESIRED_QT_VERSION 4 CACHE STRING "Desired Qt version" FORCE)
-  MARK_AS_ADVANCED(DESIRED_QT_VERSION)
+FIND_PACKAGE(Qt4 4.6.2 REQUIRED)
+
+IF(QT_QMAKE_CHANGED)
+  SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
+  SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
+  SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
+  SET(QT_XMLPATTERNS_EXECUTABLE NOTFOUND)
 ENDIF()
 
-IF(BLUEBERRY_USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
-  MESSAGE("Attention: Qt4 GUI libraries are required to build the BlueBerry Qt plug-ins.")
-ENDIF()
+FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
+  NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+  PATHS ${QT_BINARY_DIR}
+  NO_DEFAULT_PATH
+)
 
-IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
-  SET(BUILD_QT_PLUGINS 1)
-  FIND_PACKAGE(Qt4 4.6.2 REQUIRED)
+FIND_PROGRAM(QT_COLLECTIONGENERATOR_EXECUTABLE
+  NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+  PATHS ${QT_BINARY_DIR}
+  NO_DEFAULT_PATH
+)
 
-  IF(QT_QMAKE_CHANGED)
-    SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
-    SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
-    SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
-    SET(QT_XMLPATTERNS_EXECUTABLE NOTFOUND)
+FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
+  NAMES assistant-qt4 assistant4 assistant
+  PATHS ${QT_BINARY_DIR}
+  NO_DEFAULT_PATH
+)
+
+FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
+  NAMES xmlpatterns
+  PATHS ${QT_BINARY_DIR}
+  NO_DEFAULT_PATH
+)
+
+OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+
+MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP
+                 QT_HELPGENERATOR_EXECUTABLE
+                 QT_COLLECTIONGENERATOR_EXECUTABLE
+                 QT_ASSISTANT_EXECUTABLE
+                 QT_XMLPATTERNS_EXECUTABLE)
+
+SET(_doxygen_too_old 1)
+IF(BLUEBERRY_USE_QT_HELP)
+  FIND_PACKAGE(Doxygen)
+  IF(DOXYGEN_FOUND)
+    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
+                    OUTPUT_VARIABLE _doxygen_version)
+    IF(${_doxygen_version} VERSION_GREATER 1.6.0 OR
+       ${_doxygen_version} VERSION_EQUAL 1.6.0)
+      SET(_doxygen_too_old 0)
+    ENDIF()
   ENDIF()
 
-  FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  FIND_PROGRAM(QT_COLLECTIONGENERATOR_EXECUTABLE
-    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
-    NAMES assistant-qt4 assistant4 assistant
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
-    NAMES xmlpatterns
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
-
-  MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP
-                   QT_HELPGENERATOR_EXECUTABLE
-                   QT_COLLECTIONGENERATOR_EXECUTABLE
-                   QT_ASSISTANT_EXECUTABLE
-                   QT_XMLPATTERNS_EXECUTABLE)
-
-  SET(_doxygen_too_old 1)
-  IF(BLUEBERRY_USE_QT_HELP)
-    FIND_PACKAGE(Doxygen)
-    IF(DOXYGEN_FOUND)
-      EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
-                      OUTPUT_VARIABLE _doxygen_version)
-      IF(${_doxygen_version} VERSION_GREATER 1.6.0 OR
-         ${_doxygen_version} VERSION_EQUAL 1.6.0)
-        SET(_doxygen_too_old 0)
-      ENDIF()
-    ENDIF()
-  ELSE(BLUEBERRY_USE_QT_HELP)
-  
-  CONFIGURE_FILE(../Documentation/pregenerated/MITKBlankPage.qch
-                 ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
-                 COPYONLY)
-
-  CONFIGURE_FILE(../Documentation/pregenerated/MitkExtQtHelpCollection.qhc
-                 ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
-                 COPYONLY)
-  
-  ENDIF(BLUEBERRY_USE_QT_HELP)
-
-  IF (BLUEBERRY_USE_QT_HELP AND _doxygen_too_old)
+  IF(_doxygen_too_old)
     MESSAGE("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
 
-  IF(BLUEBERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
+  IF(NOT QT_HELPGENERATOR_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
 
-  IF(BLUEBERRY_USE_QT_HELP AND NOT QT_XMLPATTERNS_EXECUTABLE)
+  IF(NOT QT_XMLPATTERNS_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
+ENDIF(BLUEBERRY_USE_QT_HELP)
 
-  INCLUDE(${QT_USE_FILE})
-ELSE()
-  FIND_PACKAGE(Qt4 4.6.2 COMPONENTS QtCore REQUIRED)
-  INCLUDE(${QT_USE_FILE})
-ENDIF()
+INCLUDE(${QT_USE_FILE})
 
 # =========  CTK specific CMake stuff ============
 CMAKE_POLICY(SET CMP0012 NEW)
@@ -164,14 +133,6 @@ SET(BLUEBERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
 
 SET(OSGI_APP solstice)
 SET(OSGI_UI_APP solstice_ui)
-
-# Force should be removed after everybody has configured their old binary tree
-SET(BLUEBERRY_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry CACHE PATH "Directory where to build the BlueBerry Bundles" FORCE)
-MARK_AS_ADVANCED(BLUEBERRY_PLUGINS_OUTPUT_DIR)
-
-# Clear the cache variables
-SET(BLUEBERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
-SET(BLUEBERRY_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
 
 IF (Eclipse_DIR)
   SET(BLUEBERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")

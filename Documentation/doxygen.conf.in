@@ -196,7 +196,8 @@ TAB_SIZE               = 8
 ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "BlueBerry=\if BLUEBERRY" \
                          "endBlueBerry=\endif" \
-                         "bundlemainpage{1}=\page \1"
+                         "bundlemainpage{1}=\page \1" \
+                         "embmainpage{1}=\page \1"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C
 # sources only. Doxygen will then generate output that is more tailored for C.
@@ -632,9 +633,9 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = ./ \
-                         @MITK_SOURCE_DIR@ \
-                         @MITK_BINARY_DIR@ \
+INPUT                  = @MITK_SOURCE_DIR@/Core \
+                         /home/sascha/git/uServices \
+                         @MITK_SOURCE_DIR@/Documentation \
                          @MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@
 
 # This tag can be used to specify the character encoding of the source files
@@ -686,6 +687,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/Documentation/Snippets/ \
                          @MITK_SOURCE_DIR@/Core/Testing/ \
+                         @MITK_SOURCE_DIR@/Core/Code/Service/ \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
                          @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \

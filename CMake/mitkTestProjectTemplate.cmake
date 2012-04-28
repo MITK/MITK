@@ -51,14 +51,14 @@ if(BUILD_TESTING)
                            LABELS "MITK;BlueBerry")
     endforeach()
   else()
-    add_test(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
-             ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${CMAKE_BUILD_TYPE} --target ${proj})
+    add_test(NAME mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
+             COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${CMAKE_BUILD_TYPE} --target ${proj})
     set_tests_properties(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS mitkProjectTemplateCleanTest2
                          LABELS "MITK;BlueBerry")
                          
-    add_test(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
-             ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
+    add_test(NAME mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
+             COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
     set_tests_properties(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
                          LABELS "MITK;BlueBerry")
@@ -81,8 +81,8 @@ if(BUILD_TESTING)
                            TIMEOUT 3600 
                            LABELS "MITK;BlueBerry")
     elseif(CMAKE_BUILD_TYPE)
-      add_test(mitkProjectTemplatePackageTest
-               ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config ${CMAKE_BUILD_TYPE} --target package)
+      add_test(NAME mitkProjectTemplatePackageTest
+               COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config ${CMAKE_BUILD_TYPE} --target package)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
                            TIMEOUT 3600

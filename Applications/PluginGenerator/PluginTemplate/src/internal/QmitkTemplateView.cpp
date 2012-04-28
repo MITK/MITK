@@ -6,7 +6,6 @@ $(license)
 
 // Qmitk
 #include "$(view-file-name).h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -14,13 +13,9 @@ $(license)
 
 const std::string $(view-class-name)::VIEW_ID = "$(view-id)";
 
-$(view-class-name)::$(view-class-name)()
-: QmitkFunctionality()
+void $(view-class-name)::SetFocus()
 {
-}
-
-$(view-class-name)::~$(view-class-name)()
-{
+  m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
 void $(view-class-name)::CreateQtPartControl( QWidget *parent )
@@ -30,15 +25,12 @@ void $(view-class-name)::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
 }
 
-void $(view-class-name)::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void $(view-class-name)::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
+                                             const QList<mitk::DataNode::Pointer>& nodes )
 { 
   // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-       it != nodes.end();
-       ++it )
+  foreach( mitk::DataNode::Pointer node, nodes )
   {
-    mitk::DataNode::Pointer node = *it;
-  
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_Controls.labelWarning->setVisible( false );
@@ -54,7 +46,7 @@ void $(view-class-name)::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
 
 void $(view-class-name)::DoImageProcessing()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
   mitk::DataNode* node = nodes.front();

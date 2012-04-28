@@ -255,10 +255,10 @@ public:
   /** Returns a property list */
   PropertyList::Pointer GetPropertyList() const;
 
-  /** returns a property from m_PropertyList */
+  /** Returns a property from m_PropertyList */
   BaseProperty* GetProperty(const char *propertyKey) const;
 
-  /** retu"Use flexible zooming and padding"rns sets or adds (if not present) a property in m_PropertyList  */
+  /** Sets or adds (if not present) a property in m_PropertyList  */
   void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
 
   /**

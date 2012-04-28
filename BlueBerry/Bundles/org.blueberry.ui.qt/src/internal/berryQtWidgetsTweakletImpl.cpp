@@ -21,7 +21,7 @@
 
 #include "berryQtSash.h"
 #include "berryQtShell.h"
-#include "berryQtControlWidget.h"
+#include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>
 

@@ -3,11 +3,37 @@ IF(NOT OPENGL_FOUND)
   MESSAGE("GL is required for MITK rendering")
 ENDIF(NOT OPENGL_FOUND )
 
+# Configure the C++ Micro Services Code for MITK
+find_package(ITK REQUIRED)
+include(${ITK_USE_FILE})
+
+set(US_NAMESPACE "mitk")
+set(US_HEADER_PREFIX "mitk")
+set(US_BASECLASS_NAME "itk::LightObject")
+set(US_BASECLASS_HEADER "itkLightObject.h")
+set(US_BASECLASS_PACKAGE "ITK")
+set(US_ENABLE_THREADING_SUPPORT 1)
+set(US_EMBEDDING_LIBRARY Mitk)
+set(US_BUILD_TESTING ${BUILD_TESTING})
+if(BUILD_TESTING)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Testing)
+  set(US_BASECLASS_HEADER "uServicesBaseObject.h")
+  set(US_TEST_LABELS MITK-Core)
+endif()  
+
+add_subdirectory(CppMicroServices)
+
+include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmake)
+
 SET(TOOL_CPPS "")
 
 MITK_CREATE_MODULE( Mitk
-  INCLUDE_DIRS Algorithms DataManagement Controllers Interactions IO Rendering Service ${MITK_BINARY_DIR}
-  INTERNAL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
+  INCLUDE_DIRS 
+    ${CppMicroServices_INCLUDE_DIRS} Algorithms DataManagement Controllers
+    Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
+  INTERNAL_INCLUDE_DIRS
+    ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
+    ${CppMicroServices_INTERNAL_INCLUDE_DIRS}
   DEPENDS mbilog tinyxml
   DEPENDS_INTERNAL IIL4MITK pic2vtk
   PACKAGE_DEPENDS ITK VTK

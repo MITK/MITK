@@ -47,21 +47,7 @@ private:
 
   // DropTarget dropTarget;
 
-  //TODO DND
-  // void AddDropSupport() {
-  //        if (dropTarget == null) {
-  //            WorkbenchWindowConfigurer winConfigurer = ((WorkbenchWindow) page
-  //                    .getWorkbenchWindow()).getWindowConfigurer();
-  //
-  //            dropTarget = new DropTarget(getControl(), DND.DROP_DEFAULT
-  //                    | DND.DROP_COPY | DND.DROP_LINK);
-  //            dropTarget.setTransfer(winConfigurer.getTransfers());
-  //            if (winConfigurer.getDropTargetListener() != null) {
-  //                dropTarget.addDropListener(winConfigurer
-  //                        .getDropTargetListener());
-  //            }
-  //        }
-  //    }
+  void AddDropSupport();
 
   PartStack::Pointer NewEditorWorkbook();
 

@@ -201,7 +201,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         NodesVectorType::iterator otherPlanesIt = m_OtherGeometry2Ds.begin();
         NodesVectorType::iterator otherPlanesEnd = m_OtherGeometry2Ds.end();
 
-        int mainLineThickSlicesMode = 0;
+        //int mainLineThickSlicesMode = 0;
         int mainLineThickSlicesNum = 1;
 
         DataNode* dataNodeOfInputPlaneGeometry = NULL;
@@ -220,10 +220,10 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             otherPlane, otherCrossLine ) )
           {
             dataNodeOfInputPlaneGeometry = (*otherPlanesIt);
-            if( dataNodeOfInputPlaneGeometry )
-            {
-              mainLineThickSlicesMode = this->DetermineThickSliceMode(dataNodeOfInputPlaneGeometry, mainLineThickSlicesNum);
-            }
+//            if( dataNodeOfInputPlaneGeometry )
+//            {
+//              mainLineThickSlicesMode = this->DetermineThickSliceMode(dataNodeOfInputPlaneGeometry, mainLineThickSlicesNum);
+//            }
             break;
           }
           otherPlanesIt++;
@@ -269,7 +269,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         }
 
 
-        int otherLineThickSlicesMode = 0;
+        //int otherLineThickSlicesMode = 0;
         int otherLineThickSlicesNum = 1;
 
         // by default, there is no gap for the helper lines
@@ -289,7 +289,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
             && worldPlaneGeometry->IntersectionLine( 
                  otherPlane, otherCrossLine ) )
           {
-            otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
+            //otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
             Vector3D normal = otherPlane->GetNormal();
 
             double otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );

@@ -123,6 +123,13 @@ endif()
 #-----------------------------------------------------------------------------
 
 find_package(MITK REQUIRED)
+
+if(COMMAND mitkFunctionCheckMitkCompatibility)
+  mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
+else()
+  message(SEND_ERROR "Your MITK version is too old. Please use Git hash b86bf28 or newer")
+endif()
+
 link_directories(${MITK_LINK_DIRECTORIES})
 
 #-----------------------------------------------------------------------------

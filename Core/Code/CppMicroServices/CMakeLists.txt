@@ -238,8 +238,10 @@ elseif(MSVC90 OR MSVC10)
   set(US_CXX_FLAGS "/MP ${US_CXX_FLAGS}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+if(NOT US_IS_EMBEDDED)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+endif()
 
 #-----------------------------------------------------------------------------
 # US include dirs and libraries
@@ -269,7 +271,7 @@ endif()
 
 # link libraries for the CppMicroServices lib
 set(_link_libraries )
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
 list(APPEND US_LINK_LIBRARIES ${_link_libraries})

@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include <itkObject.h>
+#include "mitkUSDevice.h"
+#include "mitkUSProbe.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {
@@ -33,21 +35,21 @@ namespace mitk {
   class MitkUS_EXPORT USImageMetadata : public itk::Object
     {
     public:
-      mitkClassMacro(USImageMetadata,itk::Object);
+      mitkClassMacro(USImageMetadata, itk::Object);
       itkNewMacro(Self);
     
       //## getter and setter ##
-      itkGetMacro(Device, std::string);
-      itkSetMacro(Device, std::string);
-      itkGetMacro(Probe, std::string);
-      itkSetMacro(Probe, std::string);
+      itkGetMacro(Device, mitk::USDevice::Pointer);
+      itkSetMacro(Device, mitk::USDevice::Pointer);
+      itkGetMacro(Probe,  mitk::USProbe::Pointer);
+      itkSetMacro(Probe,  mitk::USProbe::Pointer);
 
     protected:
       USImageMetadata();
       virtual ~USImageMetadata();
 
-      std::string m_Device;
-      std::string m_Probe;
+      USDevice::Pointer m_Device;
+      USProbe::Pointer  m_Probe;
 
     
 

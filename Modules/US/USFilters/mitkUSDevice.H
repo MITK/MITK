@@ -23,19 +23,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUSProbe.h"
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
-#include <itkObject.h>
+#include <mitkImageSource.h>
 #include <itkObjectFactory.h>
 
 namespace mitk {
 
     /**Documentation
-    * \brief A device holds information about it's model, make and the connected Probes. It could 
+    * \brief A device holds information about it's model, make and the connected probes.
     * \ingroup US
     */
   class MitkUS_EXPORT USDevice : public itk::Object
     {
     public:
-      mitkClassMacro(USDevice,itk::Object);
+      mitkClassMacro(USDevice,mitk::ImageSource);
       itkNewMacro(Self);
 
       /**

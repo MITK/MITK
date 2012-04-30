@@ -22,8 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include <itkObject.h>
-#include "mitkUSDevice.h"
-#include "mitkUSProbe.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {
@@ -39,17 +37,32 @@ namespace mitk {
       itkNewMacro(Self);
     
       //## getter and setter ##
-      itkGetMacro(Device, mitk::USDevice::Pointer);
-      itkSetMacro(Device, mitk::USDevice::Pointer);
-      itkGetMacro(Probe,  mitk::USProbe::Pointer);
-      itkSetMacro(Probe,  mitk::USProbe::Pointer);
+      itkGetMacro(DeviceManufacturer, std::string);
+      itkSetMacro(DeviceManufacturer, std::string);
+      itkGetMacro(DeviceModel, std::string);
+      itkSetMacro(DeviceModel, std::string);
+      itkGetMacro(DeviceComment, std::string);
+      itkSetMacro(DeviceComment, std::string);
+      itkGetMacro(ProbeName,  std::string);
+      itkSetMacro(ProbeName,  std::string);
+      itkGetMacro(ProbeFrequency,  std::string);
+      itkSetMacro(ProbeFrequency,  std::string);
+      itkGetMacro(Zoom,  std::string);
+      itkSetMacro(Zoom,  std::string);
+      itkGetMacro(IsVideoOnly, bool);
+      itkSetMacro(IsVideoOnly, bool);
 
     protected:
       USImageMetadata();
       virtual ~USImageMetadata();
 
-      USDevice::Pointer m_Device;
-      USProbe::Pointer  m_Probe;
+      std::string m_DeviceManufacturer;
+      std::string m_DeviceModel;
+      std::string m_DeviceComment;
+      std::string m_ProbeName;
+      std::string m_ProbeFrequency;
+      std::string m_Zoom;
+      bool m_IsVideoOnly;
 
     
 

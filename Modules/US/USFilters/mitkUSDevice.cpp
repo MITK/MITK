@@ -16,11 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkUSDevice.h"
+#include "mitkUSImageMetadata.h"
 
 
-mitk::USDevice::USDevice() : itk::Object()
+mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVideoOnly) : itk::Object()
 {
-
+  m_Metadata = mitk::USImageMetadata::New();
+  m_Metadata->SetDeviceManufacturer(manufacturer);
+  m_Metadata->SetDeviceModel(model);
+  m_Metadata->SetIsVideoOnly(isVideoOnly);
 }
 
 mitk::USDevice::~USDevice()
@@ -38,7 +42,7 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 }
 
 void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
-  // currently, we can just add the probe. This behaviour must be changed, should more complicated SDK applications emerge 
+  // currently, we may just add the probe. This behaviour must be changed, should more complicated SDK applications emerge 
   AddProbe(probe);
   int index = -1;
   for(int i = 0; i < m_ConnectedProbes.size(); i++)
@@ -51,6 +55,24 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
 
 void mitk::USDevice::DeactivateProbe(){
   m_ActiveProbe = 0;
+}
+
+ //########### GETTER & SETTER ##################//
+
+std::string mitk::USDevice::GetDeviceManufacturer(){
+  return this->m_Metadata->GetDeviceManufacturer();
+}
+
+std::string mitk::USDevice::GetDeviceModel(){
+  return this->m_Metadata->GetDeviceModel();
+}
+
+std::string mitk::USDevice::GetDeviceComment(){
+  return this->m_Metadata->GetDeviceComment();
+}
+
+bool mitk::USDevice::GetIsVideoOnly(){
+  return this->m_Metadata->GetIsVideoOnly();
 }
 
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()

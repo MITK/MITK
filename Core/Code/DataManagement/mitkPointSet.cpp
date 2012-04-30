@@ -26,10 +26,17 @@ mitk::PointSet::PointSet()
   this->InitializeEmpty();
 }
 
-mitk::PointSet::PointSet(const PointSet &other): BaseData(other), 
-m_PointSetSeries(other.m_PointSetSeries), 
-m_CalculateBoundingBox(other.m_CalculateBoundingBox)
+mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
 {
+   this->Expand(other.GetTimeSteps());
+   for (int t=0; t < other.GetTimeSteps(); t++)
+   {
+      for (int i=0; i< other.GetSize(t); i++)
+      {
+         this->InsertPoint(i, other.GetPoint(i,t), t);
+      }
+   }
+   this->SetGeometry(other.GetGeometry());   
 }
 
 mitk::PointSet::~PointSet()

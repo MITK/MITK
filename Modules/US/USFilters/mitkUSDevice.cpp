@@ -24,7 +24,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
-  m_Metadata->SetIsVideoOnly(isVideoOnly);
+  m_Metadata->SetDeviceIsVideoOnly(isVideoOnly);
 }
 
 mitk::USDevice::~USDevice()
@@ -72,7 +72,7 @@ std::string mitk::USDevice::GetDeviceComment(){
 }
 
 bool mitk::USDevice::GetIsVideoOnly(){
-  return this->m_Metadata->GetIsVideoOnly();
+  return this->m_Metadata->GetDeviceIsVideoOnly();
 }
 
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()

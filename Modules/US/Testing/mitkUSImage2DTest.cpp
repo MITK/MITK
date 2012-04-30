@@ -29,7 +29,7 @@ public:
   {
     // let's create an object of our class
     mitk::USImage2D::Pointer us2d = mitk::USImage2D::New();
-    MITK_TEST_CONDITION_REQUIRED(us2d.IsNotNull(), "UsImage2D should not be null after instantiation");
+    MITK_TEST_CONDITION_REQUIRED(us2d.IsNotNull(), "USImage2D should not be null after instantiation");
   }
 
  

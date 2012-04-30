@@ -78,6 +78,12 @@ namespace mitk {
     protected:
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
+      /**
+      * \brief This metadata set is privately used to imprint Images with Metadata later.
+      *        At instantiation time, it only contains Information about the Device,
+               At scan time, it integrates this data with the probe information and imprints it on 
+               the produced images. This field is intentionally hidden from outside interference.
+      */
       mitk::USImageMetadata::Pointer m_Metadata;
 
       

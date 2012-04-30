@@ -49,8 +49,20 @@ namespace mitk {
       itkSetMacro(ProbeFrequency,  std::string);
       itkGetMacro(Zoom,  std::string);
       itkSetMacro(Zoom,  std::string);
-      itkGetMacro(IsVideoOnly, bool);
-      itkSetMacro(IsVideoOnly, bool);
+      itkGetMacro(DeviceIsVideoOnly, bool);
+      itkSetMacro(DeviceIsVideoOnly, bool);
+
+      // The following constants define how metadata is written to and read from an mitk image
+      // when defining new properties, add them here, define them in the cpp, and add them to 
+      // USImage's getMetadata and setMetadata methods as well
+      static const char* PROP_DEV_MANUFACTURER;
+      static const char* PROP_DEV_MODEL;
+      static const char* PROP_DEV_COMMENT;
+      static const char* PROP_DEV_ISVIDEOONLY;
+      static const char* PROP_PROBE_NAME;
+      static const char* PROP_PROBE_FREQUENCY;
+      static const char* PROP_ZOOM;
+      
 
     protected:
       USImageMetadata();
@@ -62,7 +74,9 @@ namespace mitk {
       std::string m_ProbeName;
       std::string m_ProbeFrequency;
       std::string m_Zoom;
-      bool m_IsVideoOnly;
+      bool m_DeviceIsVideoOnly;
+
+      
 
     
 

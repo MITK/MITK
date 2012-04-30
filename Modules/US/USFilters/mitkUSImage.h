@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
     /**Documentation
-    * \brief This specialization of mitk::Image only appends necessary Metadata to an MITK image. Otherwise it can safely be treated it's mother class.
+    * \brief This specialization of mitk::Image only appends necessary Metadata to an MITK image. Otherwise it can safely be treated like it's mother class.
     * \ingroup US
     */
   class MitkUS_EXPORT USImage : public mitk::Image
@@ -36,16 +36,21 @@ namespace mitk {
       mitkClassMacro(USImage, mitk::Image);
       itkNewMacro(Self);
 
-      itkGetMacro(Metadata, mitk::USImageMetadata::Pointer);   
-      itkSetMacro(Metadata, mitk::USImageMetadata::Pointer);
+      /**
+      * \brief reads out this image's Metadata set from the properties and returns a corresponding USImageMetadata object.
+      */
+      mitk::USImageMetadata::Pointer GetMetadata();
+
+      /**
+      * \brief writes the information of the metadata object into the image's properties.
+      */
+      void SetMetadata(mitk::USImageMetadata::Pointer metadata);
+
 
     protected:
       USImage();
-      virtual ~USImage();
-      USImageMetadata::Pointer m_Metadata; 
+      virtual ~USImage();    
       
-
-
 
     };
 } // namespace mitk

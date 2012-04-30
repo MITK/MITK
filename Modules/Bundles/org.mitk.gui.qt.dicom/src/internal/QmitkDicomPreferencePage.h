@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QString>
 #include <QStringList>
 
+#include "ui_DicomPreferencePage.h"
+#include "berryIQtPreferencePage.h"
 #include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_dicom_Export.h>
 #include <berryIPreferences.h>
@@ -67,15 +69,20 @@ public:
     virtual void Update();
 
 protected:
-    berry::IPreferences::Pointer m_DicomPreferencesNode;
     QWidget* m_MainControl;
-    QCheckBox* m_EnableSingleEditing;
-    QCheckBox* m_PlaceNewNodesOnTop;
-    QCheckBox* m_ShowHelperObjects;
-    QCheckBox* m_ShowNodesContainingNoData;
-    QCheckBox* m_UseSurfaceDecimation;
-    QLineEdit* m_DatabaseDirectory;
-    QLineEdit* m_ListenerDirectory;
+    Ui::DicomPreferencePage* m_Controls;
+    berry::IPreferences::Pointer m_DicomPreferencesNode;
+
+    QFormLayout *formLayout;
+    QLabel *label;
+    QLineEdit *DatabaseLineEdit;
+    QLabel *label_2;
+    QLineEdit *ListenerLineEdit;
+    QFrame *frame;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *pushButton;
+    QPushButton *pushButton_2;
+
 
 };
 #endif // QmitkQmitkDicomPreferencePage_h

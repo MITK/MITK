@@ -21,20 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIBerryPreferences.h>
 #include <berryPlatform.h>
 
-#include <QLabel>
-#include <QPushButton>
-#include <QFormLayout>
-#include <QCheckBox>
-
 QmitkDicomPreferencePage::QmitkDicomPreferencePage() 
 : m_MainControl(0)
 {
-   
+
 }
 
 QmitkDicomPreferencePage::~QmitkDicomPreferencePage()
 {
-
 }
 
 void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
@@ -44,43 +38,48 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService= 
-      berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);    
+    berry::IPreferencesService::Pointer prefService= 
+        berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);    
 
-  m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID).Cast<berry::IBerryPreferences>();;
-  assert( m_DicomPreferencesNode );
+    m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID).Cast<berry::IBerryPreferences>();;
+    assert( m_DicomPreferencesNode );
 
     m_MainControl = new QWidget(parent);
-    m_EnableSingleEditing = new QCheckBox;
-    m_PlaceNewNodesOnTop= new QCheckBox;
-    m_ShowHelperObjects= new QCheckBox;
-    m_ShowNodesContainingNoData= new QCheckBox;
-    m_UseSurfaceDecimation= new QCheckBox;
-//  QString pluginDirectory;
-//mitk::PluginActivator::getContext()->getDataFile(pluginDirectory);
-//pluginDirectory.append("/");
-//QString databaseDirectory;
-////databaseDirectory.append(pluginDirectory);
-//databaseDirectory.append(QString("C:/DicomDatabase"));
-//QDir tmp(databaseDirectory);
-//tmp.mkpath(databaseDirectory);
-//m_Controls.internalDataWidget->SetDatabaseDirectory(databaseDirectory);
-//QString listenerDirectory("C:/DICOMListenerDirectory");
-//StartDicomDirectoryListener(listenerDirectory);
-//QmitkStoreSCPLauncherBuilder builder;
-//builder.AddPort()->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(listenerDirectory);
-//m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
-//m_StoreSCPLauncher->StartStoreSCP();
+    m_MainControl->setWindowTitle(QApplication::translate("DicomPreferencePage", "Form", 0, QApplication::UnicodeUTF8));
+    formLayout = new QFormLayout(m_MainControl);
+    formLayout->setObjectName(QString::fromUtf8("formLayout"));
+    formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    label = new QLabel(m_MainControl);
+    label->setObjectName(QString::fromUtf8("label"));
+    label->setText(QApplication::translate("DicomPreferencePage", "Database directory:", 0, QApplication::UnicodeUTF8));
 
-  QFormLayout *formLayout = new QFormLayout; 
-  formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
-  formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
-  formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);
-  formLayout->addRow("&Show nodes containing no data", m_ShowNodesContainingNoData);
-  formLayout->addRow("&Use surface decimation:", m_UseSurfaceDecimation);
+    formLayout->setWidget(0, QFormLayout::LabelRole, label);
 
-  m_MainControl->setLayout(formLayout);
-  this->Update();
+    DatabaseLineEdit = new QLineEdit(m_MainControl);
+    DatabaseLineEdit->setObjectName(QString::fromUtf8("DatabaseLineEdit"));
+
+    formLayout->setWidget(0, QFormLayout::FieldRole, DatabaseLineEdit);
+
+    label_2 = new QLabel(m_MainControl);
+    label_2->setObjectName(QString::fromUtf8("label_2"));
+    label_2->setText(QApplication::translate("DicomPreferencePage", "Dicom listener directory:", 0, QApplication::UnicodeUTF8));
+
+    formLayout->setWidget(1, QFormLayout::LabelRole, label_2);
+
+    ListenerLineEdit = new QLineEdit(m_MainControl);
+    ListenerLineEdit->setObjectName(QString::fromUtf8("ListenerLineEdit"));
+
+    formLayout->setWidget(1, QFormLayout::FieldRole, ListenerLineEdit);
+
+    frame = new QFrame(m_MainControl);
+    frame->setObjectName(QString::fromUtf8("frame"));
+    frame->setFrameShape(QFrame::StyledPanel);
+    frame->setFrameShadow(QFrame::Raised);
+
+    formLayout->setWidget(3, QFormLayout::FieldRole, frame);
+
+            
+
 }
 
 QWidget* QmitkDicomPreferencePage::GetQtControl() const
@@ -88,31 +87,15 @@ QWidget* QmitkDicomPreferencePage::GetQtControl() const
     return m_MainControl;
 }
 
-bool QmitkDicomPreferencePage::PerformOk()
-{
-  m_DicomPreferencesNode->PutBool("Single click property editing"
-                                        , m_EnableSingleEditing->isChecked());
-  m_DicomPreferencesNode->PutBool("Place new nodes on top"
-                                        , m_PlaceNewNodesOnTop->isChecked());
-  m_DicomPreferencesNode->PutBool("Show helper objects"
-                                        , m_ShowHelperObjects->isChecked());
-  m_DicomPreferencesNode->PutBool("Show nodes containing no data"
-                                        , m_ShowNodesContainingNoData->isChecked());
-  m_DicomPreferencesNode->PutBool("Use surface decimation"
-                                        , m_UseSurfaceDecimation->isChecked());
-  return true;
-}
-
 void QmitkDicomPreferencePage::PerformCancel()
 {
+}
 
+bool QmitkDicomPreferencePage::PerformOk()
+{
+    return true;
 }
 
 void QmitkDicomPreferencePage::Update()
 {
-  m_EnableSingleEditing->setChecked(m_DicomPreferencesNode->GetBool("Single click property editing", true));
-  m_PlaceNewNodesOnTop->setChecked(m_DicomPreferencesNode->GetBool("Place new nodes on top", true));
-  m_ShowHelperObjects->setChecked(m_DicomPreferencesNode->GetBool("Show helper objects", false));
-  m_ShowNodesContainingNoData->setChecked(m_DicomPreferencesNode->GetBool("Show nodes containing no data", false));
-  m_UseSurfaceDecimation->setChecked(m_DicomPreferencesNode->GetBool("Use surface decimation", true));
 }

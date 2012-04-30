@@ -65,7 +65,7 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         return;
     }
 
-
+ MITK_INFO << "MapperFBX 2D  update: ";
     // Calculate time step of the input data for the specified renderer (integer value)
     // this method is implemented in mitkMapper
     this->CalculateTimeStep( renderer );

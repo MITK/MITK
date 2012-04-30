@@ -130,6 +130,10 @@ protected:
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
   virtual void NodeAdded(const mitk::DataNode *node);
+  void SetFiberBundleCustomColor(const itk::EventObject& /*e*/);
+  bool IsPlaneRotated();
+
+  void SliceRotation(const itk::EventObject&);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
@@ -163,6 +167,11 @@ protected:
   // for planarfigure and bundle handling:
   mitk::DataNode* m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
+
+  unsigned long m_SlicesRotationObserverTag1;
+  unsigned long m_SlicesRotationObserverTag2;
+  unsigned long m_FiberBundleObserverTag;
+  mitk::ColorProperty::Pointer m_Color;
 };
 
 

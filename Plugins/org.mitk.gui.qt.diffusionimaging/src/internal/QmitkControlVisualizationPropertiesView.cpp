@@ -200,18 +200,40 @@ struct CvpSelListener : ISelectionListener
           label = label.arg(range*0.1);
           m_View->m_Controls->label_range->setText(label);
 
-//          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
-//          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
-//          m_View->m_Controls->m_Color->setAutoFillBackground(true);
-//          QString styleSheet = "background-color:rgb(";
-//          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
-//          styleSheet.append(",");
-//          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
-//          styleSheet.append(",");
-//          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
-//          styleSheet.append(")");
-//          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
+          mitk::BaseData* nodeData = node->GetData();
 
+          if(dynamic_cast<mitk::FiberBundleX*>(nodeData) != 0)
+          {
+            m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
+            m_View->m_SelectedNode = node;
+
+            if(m_View->m_CurrentPickingNode != 0 && node.GetPointer() != m_View->m_CurrentPickingNode)
+              m_View->m_Controls->m_Crosshair->setEnabled(false);
+            else
+              m_View->m_Controls->m_Crosshair->setEnabled(true);
+
+            float val;
+            node->GetFloatProperty("TubeRadius", val);
+            m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
+
+            QString label = "Radius %1";
+            label = label.arg(val);
+            m_View->m_Controls->label_tuberadius->setText(label);
+
+            int width;
+            node->GetIntProperty("LineWidth", width);
+            m_View->m_Controls->m_LineWidth->setValue(width);
+
+            label = "Width %1";
+            label = label.arg(width);
+            m_View->m_Controls->label_linewidth->setText(label);
+
+            float range;
+            node->GetFloatProperty("Fiber2DSliceThickness",range);
+            label = "Range %1";
+            label = label.arg(range*0.1);
+            m_View->m_Controls->label_range->setText(label);
+          }
 
         }
       }
@@ -420,7 +442,9 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
   m_CurrentPickingNode(0),
   m_GlyIsOn_S(false),
   m_GlyIsOn_C(false),
-  m_GlyIsOn_T(false)
+  m_GlyIsOn_T(false),
+  m_FiberBundleObserverTag(0),
+  m_Color(NULL)
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;
@@ -580,7 +604,8 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     m_Controls->m_ScalingFrame->setVisible(false);
     m_Controls->m_NormalizationFrame->setVisible(false);
-
+    m_Controls->frame_tube->setVisible(false);
+    m_Controls->frame_wire->setVisible(false);
   }
 
 
@@ -799,6 +824,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
   // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->label_channel->setVisible(false);
+
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
     mitk::DataNode::Pointer node = *it;
@@ -807,6 +833,17 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     {
       m_Controls->m_DisplayIndex->setVisible(true);
       m_Controls->label_channel->setVisible(true);
+    }
+    else if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
+    {
+      if (m_Color.IsNotNull())
+        m_Color->RemoveObserver(m_FiberBundleObserverTag);
+
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor );
+      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", NULL));
+      if (m_Color.IsNotNull())
+        m_FiberBundleObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
     }
   }
 
@@ -1326,6 +1363,27 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationTube()
   }
 }
 
+void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const itk::EventObject& /*e*/)
+{
+  float color[3];
+  m_SelectedNode->GetColor(color);
+  m_Controls->m_Color->setAutoFillBackground(true);
+  QString styleSheet = "background-color:rgb(";
+  styleSheet.append(QString::number(color[0]*255.0));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color[1]*255.0));
+  styleSheet.append(",");
+  styleSheet.append(QString::number(color[2]*255.0));
+  styleSheet.append(")");
+  m_Controls->m_Color->setStyleSheet(styleSheet);
+
+  m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color[0], color[1], color[2]));
+  mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+  fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
+  m_SelectedNode->Modified();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+}
+
 void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
 {
   if(m_SelectedNode)
@@ -1347,6 +1405,7 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
     fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
+    m_SelectedNode->Modified();
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
@@ -1355,13 +1414,17 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring(
 {
   if(m_SelectedNode)
   {
+    MITK_INFO << "reset colorcoding to oBased";
     m_Controls->m_Color->setAutoFillBackground(true);
     QString styleSheet = "background-color:rgb(255,255,255)";
     m_Controls->m_Color->setStyleSheet(styleSheet);
+//    m_SelectedNode->SetProperty("color",NULL);
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(1.0, 1.0, 1.0));
 
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
     fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED);
+    fib->DoColorCodingOrientationBased();
+    m_SelectedNode->Modified();
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }

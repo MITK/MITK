@@ -601,6 +601,36 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_FaColorFibersButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Resample fibers using a Kochanek spline interpolation.</string>
+        </property>
+        <property name="text">
+         <string>FA Color Coding</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

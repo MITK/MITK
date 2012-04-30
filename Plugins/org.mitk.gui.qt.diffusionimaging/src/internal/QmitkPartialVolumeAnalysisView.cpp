@@ -501,7 +501,9 @@ void QmitkPartialVolumeAnalysisView::ActionDrawEllipseTriggered()
     return;
 
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
-  this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
+  // using PV_ prefix for planar figures from this view
+  // to distinguish them from that ones created throught the measurement view
+  this->AddFigureToDataStorage(figure, QString("PV_Circle%1").arg(++m_EllipseCounter));
 
   MITK_INFO << "PlanarCircle created ...";
 }
@@ -513,7 +515,9 @@ void QmitkPartialVolumeAnalysisView::ActionDrawRectangleTriggered()
     return;
 
   mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
-  this->AddFigureToDataStorage(figure, QString("Rectangle%1").arg(++m_RectangleCounter));
+  // using PV_ prefix for planar figures from this view
+  // to distinguish them from that ones created throught the measurement view
+  this->AddFigureToDataStorage(figure, QString("PV_Rectangle%1").arg(++m_RectangleCounter));
 
   MITK_INFO << "PlanarRectangle created ...";
 }
@@ -526,7 +530,9 @@ void QmitkPartialVolumeAnalysisView::ActionDrawPolygonTriggered()
 
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
-  this->AddFigureToDataStorage(figure, QString("Polygon%1").arg(++m_PolygonCounter));
+  // using PV_ prefix for planar figures from this view
+  // to distinguish them from that ones created throught the measurement view
+  this->AddFigureToDataStorage(figure, QString("PV_Polygon%1").arg(++m_PolygonCounter));
 
   MITK_INFO << "PlanarPolygon created ...";
 }

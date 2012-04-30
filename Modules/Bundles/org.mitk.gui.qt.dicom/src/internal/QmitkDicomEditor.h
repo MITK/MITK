@@ -33,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTextEdit>
 #include <QModelIndex>
 #include <QString>
+#include <QMap>
+#include <QVariant>
 #include <QStringList>
 #include <QThread.h>
 #include <QProcess>

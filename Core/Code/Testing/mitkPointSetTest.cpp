@@ -606,5 +606,16 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(clonePS.GetPointer() != pointSet.GetPointer(), "Testing that the clone is not the source PS!");
   MITK_TEST_CONDITION_REQUIRED(clonePS->GetGeometry()->GetCenter() == pointSet->GetGeometry()->GetCenter() , "Testing if the geometry is cloned correctly!");
   MITK_TEST_CONDITION_REQUIRED(clonePS->GetPropertyList()->GetMap()->size() == pointSet->GetPropertyList()->GetMap()->size() , "Testing if the property list is cloned correctly!");
+  // Also testing, that clone is independent from original
+  mitk::Point3D p, p2;
+  p.Fill(42);
+  p2.Fill(84);
+  clonePS->InsertPoint(0,p);
+  pointSet->InsertPoint(0,p2);
+  p = clonePS->GetPoint(0);
+  p2 = pointSet->GetPoint(0);
+  MITK_TEST_CONDITION_REQUIRED(p != p2, "Testing that the clone is independent from source!");
+
+
   MITK_TEST_END();
 }

@@ -246,6 +246,14 @@ bool HelpPage::acceptNavigationRequest(QWebFrame *,
   const bool closeNewTab = m_CloseNewTabIfNeeded;
   m_CloseNewTabIfNeeded = false;
 
+  // open in an external browser if a http link
+  const QUrl &url = request.url();
+  if (url.scheme() == QLatin1String("http"))
+  {
+    QDesktopServices::openUrl(url);
+    return false;
+  }
+
 //  const QUrl &url = request.url();
 //  if (AbstractHelpWebView::launchWithExternalApp(url))
 //  {

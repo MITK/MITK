@@ -182,7 +182,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     if (fbx->GetCurrentColorCoding() != NULL){
 //        localStorage->m_PointMapper->SelectColorArray("");
         localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding());
-        MITK_INFO << "MapperFBX 2D: " << fbx->GetCurrentColorCoding();
+        MITK_DEBUG << "MapperFBX 2D: " << fbx->GetCurrentColorCoding();
 
         if(fbx->GetCurrentColorCoding() == fbx->COLORCODING_CUSTOM){
             float temprgb[3];

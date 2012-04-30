@@ -67,7 +67,6 @@ namespace mitk
     FILE* m_DistanceOutfile; ///< file for distance image
     FILE* m_AmplitudeOutfile; ///< file for amplitude image
     FILE* m_IntensityOutfile; ///< file for intensity image
-    FILE* m_RGBOutfile; ///< file for RGB image
 
   private:
     /*!

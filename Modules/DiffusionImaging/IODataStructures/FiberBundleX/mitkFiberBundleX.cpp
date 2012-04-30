@@ -909,7 +909,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure::P
     clipperlines->InitTraversal();
     long numOfLineCells = clipperlines->GetNumberOfCells();
     long numofClippedPoints = clipperout->GetNumberOfPoints();
-    pointindexFiberMap.reserve(numofClippedPoints);
+    pointindexFiberMap.resize(numofClippedPoints);
 
 
     //prepare resulting vector

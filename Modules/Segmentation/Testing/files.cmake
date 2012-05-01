@@ -1,11 +1,13 @@
 set(MODULE_TESTS
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
-  mitkSegmentationInterpolationTest.cpp
+  mitkDataNodeSegmentationTest.cpp
+#  mitkSegmentationInterpolationTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
+  mitkOverwriteSliceImageFilterTest.cpp
 )
 set(MODULE_CUSTOM_TESTS
 )

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStandardFileLocations.h"
 #include "mitkDataNodeFactory.h"
 #include "ipSegmentation.h"
-#include "mitkCompareImageSliceTestHelper.h"
+#include "mitkCompareImageSliceTestHelper.h"s
 
 class mitkSegmentationInterpolationTestClass
 {
@@ -99,7 +99,7 @@ bool mitkSegmentationInterpolationTestClass::CreateSegmentation()
   pad[1]=3;
   pad[2]=4;
 
-  m_Image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  m_Image->Initialize( mitk::MakeScalarPixelType<int>(), 3, dim);
 
   return true;
 }

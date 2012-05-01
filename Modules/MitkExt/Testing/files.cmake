@@ -12,16 +12,15 @@ set(MODULE_TESTS
   mitkPointLocatorTest.cpp
   # mitkSegmentationInterpolationTest.cpp
   # mitkTestTemplate.cpp
-  mitkToolManagerTest.cpp
   mitkUnstructuredGridTest.cpp
   mitkSimpleHistogramTest.cpp
+  mitkToolManagerTest.cpp
 )
 set(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
   mitkCompressedImageContainerTest.cpp
   mitkCylindricToCartesianFilterTest.cpp
   #mitkExtractImageFilterTest.cpp
-  mitkOverwriteSliceImageFilterTest.cpp
   mitkSurfaceToImageFilterTest.cpp
 )
 set(MODULE_CUSTOM_TESTS

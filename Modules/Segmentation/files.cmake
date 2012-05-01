@@ -1,12 +1,15 @@
 set(CPP_FILES
 Algorithms/mitkCalculateSegmentationVolume.cpp
 Algorithms/mitkComputeContourSetNormalsFilter.cpp
+Algorithms/mitkContourSetToPointSetFilter.cpp
 Algorithms/mitkContourUtils.cpp
 Algorithms/mitkCorrectorAlgorithm.cpp
 Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
-# Algorithms/mitkDiffImageApplier.cpp
+Algorithms/mitkDiffImageApplier.cpp
 Algorithms/mitkImageToContourFilter.cpp
 Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
+Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
+Algorithms/mitkOverwriteSliceImageFilter.cpp
 Algorithms/mitkReduceContourSetFilter.cpp
 Algorithms/mitkSegmentationObjectFactory.cpp
 Algorithms/mitkSegmentationSink.cpp
@@ -18,10 +21,12 @@ Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp
 DataManagement/mitkContour.cpp
 DataManagement/mitkContourSet.cpp
+DataManagement/mitkExtrudedContour.cpp
 Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp
 Interactions/mitkBinaryThresholdTool.cpp
+Interactions/mitkBinaryThresholdULTool.cpp
 Interactions/mitkCalculateGrayValueStatisticsTool.cpp
 Interactions/mitkCalculateVolumetryTool.cpp
 Interactions/mitkContourInteractor.cpp
@@ -31,6 +36,7 @@ Interactions/mitkCreateSurfaceTool.cpp
 Interactions/mitkDrawPaintbrushTool.cpp
 Interactions/mitkErasePaintbrushTool.cpp
 Interactions/mitkEraseRegionTool.cpp
+Interactions/mitkExtrudedContourInteractor.cpp
 Interactions/mitkFeedbackContourTool.cpp
 Interactions/mitkFillRegionTool.cpp
 Interactions/mitkPaintbrushTool.cpp
@@ -44,9 +50,4 @@ Rendering/mitkContourMapper2D.cpp
 Rendering/mitkContourSetMapper2D.cpp
 Rendering/mitkContourSetVtkMapper3D.cpp
 Rendering/mitkContourVtkMapper3D.cpp
-Testing/mitkContourMapper2DTest.cpp
-Testing/mitkContourTest.cpp
-Testing/mitkManualSegmentationToSurfaceFilterTest.cpp
-# Testing/mitkOverwriteSliceImageFilterTest.cpp
-Testing/mitkSegmentationInterpolationTest.cpp
 )

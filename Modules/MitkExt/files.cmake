@@ -6,9 +6,7 @@ set(CPP_FILES
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
-  Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
-  Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
@@ -22,8 +20,6 @@ set(CPP_FILES
   Algorithms/mitkMaskImageFilter.cpp
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
-  Algorithms/mitkOverwriteSliceImageFilter.cpp
-  Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
@@ -63,7 +59,6 @@ set(CPP_FILES
   DataManagement/mitkDrawOperation.cpp
   DataManagement/mitkEllipsoid.cpp
   DataManagement/mitkExternAbstractTransformGeometry.cpp
-  DataManagement/mitkExtrudedContour.cpp
   DataManagement/mitkFrameOfReferenceUIDManager.cpp
   DataManagement/mitkGridRepresentationProperty.cpp
   DataManagement/mitkGridVolumeMapperProperty.cpp
@@ -105,7 +100,6 @@ set(CPP_FILES
   Interactions/mitkAffineInteractor3D.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
-  Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
   Interactions/mitkPointInteractor.cpp

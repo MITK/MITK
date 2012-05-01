@@ -1,0 +1,10 @@
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.h:2:#ifndef __itkAdaptiveThresholdIterator_h
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.h:3:#define __itkAdaptiveThresholdIterator_h
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.h:247:#include "itkAdaptiveThresholdIterator.txx"
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.txx:1:#ifndef _itkAdaptiveThresholdIterator_txx
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.txx:2:#define _itkAdaptiveThresholdIterator_txx
+Modules/Segmentation/Algorithms/itkAdaptiveThresholdIterator.txx:4:#include "itkAdaptiveThresholdIterator.h"
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.h:12:  *        iterator (such as itkAdaptiveThresholdIterator)
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.txx:8:#include "itkAdaptiveThresholdIterator.h"
+mbi-sb/QFunctionalities/QmitkFailSafeRegionGrowing/QmitkFailSafeRegionGrowing.cpp:78:#include <itkAdaptiveThresholdIterator.h>
+mbi/Plugins/org.mbi.gui.qt.failsaferegiongrowing/src/internal/QmitkFailSafeRegionGrowing.cpp:75:#include <itkAdaptiveThresholdIterator.h>

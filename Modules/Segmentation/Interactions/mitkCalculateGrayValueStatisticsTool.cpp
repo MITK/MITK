@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkHistogram.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
 }
 
 mitk::CalculateGrayValueStatisticsTool::CalculateGrayValueStatisticsTool()

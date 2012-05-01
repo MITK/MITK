@@ -43,6 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
 
+#include "mitkSegmentationObjectFactory.h"
+
 const std::string QmitkSegmentationView::VIEW_ID =
 "org.mitk.views.segmentation";
 
@@ -54,6 +56,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_MultiWidget(NULL)
 ,m_RenderingManagerObserverTag(0)
 {
+  RegisterSegmentationObjectFactory();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()

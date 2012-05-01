@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkAddContourTool.h"
 #include "mitkGlobalInteraction.h"
 
 class mitkToolManagerTestClass { public:

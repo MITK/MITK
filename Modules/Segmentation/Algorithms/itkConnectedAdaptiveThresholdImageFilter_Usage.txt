@@ -1,0 +1,16 @@
+Modules/QmitkExt/QmitkAdaptiveRegionGrowingWidget.cpp:33:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.h:1:#ifndef __itkConnectedAdaptiveThresholdImageFilter_h
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.h:2:#define __itkConnectedAdaptiveThresholdImageFilter_h
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.h:117:#include "itkConnectedAdaptiveThresholdImageFilter.txx"
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.txx:2:#ifndef _itkConnectedAdaptiveThresholdImageFilter_txx
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.txx:3:#define _itkConnectedAdaptiveThresholdImageFilter_txx
+Modules/Segmentation/Algorithms/itkConnectedAdaptiveThresholdImageFilter.txx:5:#include "itkConnectedAdaptiveThresholdImageFilter.h"
+Modules/Segmentation/Interactions/mitkRegionGrow3DTool.cpp:27:#include "itkConnectedAdaptiveThresholdImageFilter.h"
+mbi-sb/BundlesQt/org.mitk.gui.qt.patchproposalplanning/src/internal/QmitkPatchProposalPlanningView.cpp:68:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi-sb/QApplications/VesselnessTools/RegionGrowPhilipp.cpp:4:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi-sb/QFunctionalities/QmitkAortaPlanning/QmitkAortaPlanning.cpp:71:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi-sb/QFunctionalities/QmitkFailSafeRegionGrowing/QmitkFailSafeRegionGrowing.cpp:73:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi/Modules/LiverSegmentation/mitkVesselSegmentationTool.cpp:11://#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi/Modules/VesselSegmentationUI/Qmitk/QmitkAdaptiveRegionGrowingView.cpp:46:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi/Modules/VesselSegmentationUI/Qmitk/QmitkBoostVesselTreeSegmentationView.cpp:47:#include <itkConnectedAdaptiveThresholdImageFilter.h>
+mbi/Plugins/org.mbi.gui.qt.failsaferegiongrowing/src/internal/QmitkFailSafeRegionGrowing.cpp:71:#include <itkConnectedAdaptiveThresholdImageFilter.h>

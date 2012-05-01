@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkOverwriteSliceImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkImageToImageFilter.h"
 
 #include <itkImage.h>
@@ -52,7 +52,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkExt_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
+class Segmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
 {
   public:
 

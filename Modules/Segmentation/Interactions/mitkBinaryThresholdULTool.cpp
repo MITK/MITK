@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPadImageFilter.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkExt_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
 }
 
 mitk::BinaryThresholdULTool::BinaryThresholdULTool()

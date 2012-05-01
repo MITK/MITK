@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkOverwriteDirectedPlaneImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkImageToImageFilter.h"
 
 #include <itkImage.h>
@@ -52,7 +52,7 @@ namespace mitk
 
   Last contributor: $Author: maleike $
 */
-class MitkExt_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
+class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
 {
   public:
 

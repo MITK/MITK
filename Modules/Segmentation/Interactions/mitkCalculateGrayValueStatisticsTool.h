@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCalculateGrayValueStatisticsTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkSegmentationsProcessingTool.h"
 
 #ifndef __itkHistogram_h
@@ -41,7 +41,7 @@ namespace mitk
 
  Last contributor: $Author$
 */
-class MitkExt_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
+class Segmentation_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
 {
   public:
 

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _mitkContourSetToPointSetFilter_h__
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
 #include "mitkContourSet.h"
@@ -35,7 +35,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class MitkExt_EXPORT ContourSetToPointSetFilter : public PointSetSource
+class Segmentation_EXPORT ContourSetToPointSetFilter : public PointSetSource
 {
 public:
   mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);

@@ -44,6 +44,10 @@ m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStati
 
   this->Initialize( other.GetPixelType(), other.GetDimension(), other.GetDimensions());
 
+  //Since the above called "Initialize" method doesn't take the geometry into account we need to set it
+  //here manually
+  this->SetGeometry(dynamic_cast<mitk::Geometry3D*>(other.GetGeometry()->Clone().GetPointer()));
+
   if (this->GetDimension() > 3)
   {
     const unsigned int time_steps = this->GetDimension(3);

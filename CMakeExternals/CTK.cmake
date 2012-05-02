@@ -26,6 +26,18 @@ IF(MITK_USE_CTK)
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
       )
     ENDIF()
+
+    if(MITK_USE_DCMTK)
+      list(APPEND ctk_optional_cache_args
+           -DDCMTK_DIR:PATH=${DCMTK_DIR}
+          )
+      list(APPEND proj_DEPENDENCIES DCMTK)
+    else()
+      list(APPEND ctk_optional_cache_args
+           -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
+          )
+    endif()
+
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
@@ -53,7 +65,6 @@ IF(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
-        -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
       DEPENDS ${proj_DEPENDENCIES}
      )
   SET(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)

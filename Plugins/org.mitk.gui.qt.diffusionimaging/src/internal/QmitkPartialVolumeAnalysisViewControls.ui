@@ -47,7 +47,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Diffusion Image:</string>
+         <string>Tensor/Scalar Image:</string>
         </property>
        </widget>
       </item>

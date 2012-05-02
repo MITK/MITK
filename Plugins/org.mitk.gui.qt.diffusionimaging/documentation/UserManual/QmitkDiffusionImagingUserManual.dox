@@ -120,5 +120,5 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_stochastictracking
   \li \subpage org_ivim
   \li \subpage org_brainnetworkanalysis
-
+  \li \subpage org_tractbasedspatialstatistics
 */

@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <QDateTime>
 #include <string>
-#include <strstream>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
 #include "mitkCoreObjectFactory.h"

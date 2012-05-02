@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 2.8.4)
+if(APPLE)
+  # With XCode 4.3, the SDK location changed. Older CMake
+  # versions are not able to find it.
+  cmake_minimum_required(VERSION 2.8.8)
+else()
+  cmake_minimum_required(VERSION 2.8.4)
+endif()
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -140,7 +146,7 @@ option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
-option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
+option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
@@ -166,9 +172,15 @@ if(MITK_USE_BLUEBERRY)
   endif()
 endif()
   
-if(MITK_USE_CTK AND NOT MITK_USE_QT)
-  message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
-  set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
+if(MITK_USE_CTK)
+  if(NOT MITK_USE_QT)
+    message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
+    set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
+  endif()
+  if(NOT MITK_USE_DCMTK)
+    message("Setting MITK_USE_DCMTK to ON because DCMTK needs to be build for CTK")
+    set(MITK_USE_DCMTK ON CACHE BOOL "Use DCMTK in MITK" FORCE)
+  endif()
 endif()
 
 if(MITK_USE_QT)

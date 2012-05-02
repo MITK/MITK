@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
+#include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPlane.h"
 #include "vtkPlaneCollection.h"

@@ -266,9 +266,15 @@ int mitkImageTest(int argc, char* argv[])
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
   MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
 
+  // testing the clone method of mitk::Image
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetPixelType() == image->GetPixelType(), "Clone (testing pixel type)");
+  // After cloning an image the geometry of both images should be equal too
+  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetOrigin() == image->GetGeometry()->GetOrigin(), "Clone (testing origin)");
+  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetSpacing() == image->GetGeometry()->GetSpacing(), "Clone (testing spacing)");
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()),
+                               "Clone (testing transformation matrix)");
 
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {

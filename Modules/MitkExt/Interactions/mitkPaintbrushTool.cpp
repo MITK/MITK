@@ -367,8 +367,6 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
 
         m_WorkingNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
         m_WorkingNode->SetProperty( "color", workingNode->GetProperty("color") );
-        m_WorkingNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(true) );
-        m_WorkingNode->SetProperty( "layer", mitk::IntProperty::New( 100 ) );
         m_WorkingNode->SetProperty( "name", mitk::StringProperty::New("Paintbrush_Node") );
         m_WorkingNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
         m_WorkingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>343</width>
-    <height>467</height>
+    <width>360</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Diffusion Image:</string>
+         <string>Tensor/Scalar Image:</string>
         </property>
        </widget>
       </item>

@@ -53,7 +53,27 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
               imageTimeSelector->SetInput(image);
               imageTimeSelector->SetTimeNr(i);
               imageTimeSelector->UpdateLargestPossibleRegion();
-              image->SetVolume( this->IncreaseCroppedImageSize(imageTimeSelector->GetOutput())->GetData(), i);
+
+              // We split a long nested code line into separate calls for debugging:
+              mitk::ImageSource::OutputImageType *_3dSlice = imageTimeSelector->GetOutput();
+              mitk::Image::Pointer _cropped3dSlice = this->IncreaseCroppedImageSize(_3dSlice);
+
+              // +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++
+              void *_data = _cropped3dSlice->GetData();
+
+              // <ToBeRemoved>
+              // We write some stripes into the image
+              int depth = _cropped3dSlice->GetDimension(2);
+              int height = _cropped3dSlice->GetDimension(1);
+              int width = _cropped3dSlice->GetDimension(0);
+
+              for (int z = 0; z < depth; ++z)
+                for (int y = 0; y < height; ++y)
+                  for (int x = 0; x < width; ++x)
+                    reinterpret_cast<unsigned char *>(_data)[(width * height * z) + (width * y) + x] = x & 1;
+              // </ToBeRemoved>
+
+              image->SetVolume(_data, i);
             }
             node->SetData( image ); // bug fix 3145
           }

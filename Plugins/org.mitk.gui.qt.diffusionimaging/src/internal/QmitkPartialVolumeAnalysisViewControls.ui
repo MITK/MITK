@@ -156,6 +156,9 @@
                 <height>30</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Draw circular ROI</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -185,6 +188,9 @@
                 <height>30</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Draw quadratic ROI</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -213,6 +219,9 @@
                 <width>30</width>
                 <height>30</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Draw polygonal ROI</string>
               </property>
               <property name="text">
                <string/>

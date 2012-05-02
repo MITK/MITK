@@ -72,7 +72,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Generate pointset displaying the gradient vectors.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -191,7 +191,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Mirror all gradients around one axis.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -255,7 +255,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere.</string>
         </property>
         <property name="statusTip">
          <string/>

@@ -26,7 +26,7 @@ if(MITK_USE_OpenCV)
     if(MITK_USE_QT)
       list(APPEND additional_cmake_args
            -DWITH_QT:BOOL=ON
-           -DWITH_QT_OPENGL:BOOL=ON
+           -DWITH_QT_OPENGL:BOOL=OFF
            -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
           )
     endif()     

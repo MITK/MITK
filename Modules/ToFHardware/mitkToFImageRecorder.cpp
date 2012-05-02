@@ -91,11 +91,6 @@ namespace mitk
       this->m_ToFImageWriter = ToFNrrdImageWriter::New();
       this->m_ToFImageWriter->SetExtension(m_FileFormat);
     }
-    else if(this->m_FileFormat.compare(".pic") == 0)
-    {
-      this->m_ToFImageWriter = ToFPicImageWriter::New();
-      this->m_ToFImageWriter->SetExtension(m_FileFormat);
-    }
     else
     {
       throw std::logic_error("No file format specified!");

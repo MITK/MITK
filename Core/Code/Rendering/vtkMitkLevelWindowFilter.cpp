@@ -244,46 +244,53 @@ template <class T>
   // Loop through ouput pixels
   while (!outputIt.IsAtEnd())
   {
-    T* inputSI = inputIt.BeginSpan();
     unsigned char* outputSI = outputIt.BeginSpan();
     unsigned char* outputSIEnd = outputIt.EndSpan();
 
-    int x= outExt[0];
-
-    while (outputSI != outputSIEnd)
+    if( y >= clippingBounds[2] && y < clippingBounds[3] )
     {
-      /*
-         TODO
-         - input: grauwert-bild, bounds
-         - output rgba
+      T* inputSI = inputIt.BeginSpan();
 
-         r = g = b = lookuptable(grauwert * l/w)
-         a = outOfImage ? 0 : 1
-      */
-      double grayValue;
+      int x= outExt[0];
 
-      // fetching original value
-      grayValue = static_cast<double>(*inputSI); inputSI++;
+      while (outputSI != outputSIEnd)
+      {
+        if ( x >= clippingBounds[0] && x < clippingBounds[1])
+        {
+          // fetching original value
+          double grayValue = static_cast<double>(*inputSI);
 
-      // applying lookuptable
-      unsigned char *RGBA = lookupTable->MapValue( grayValue );
+          // applying lookuptable
+          int *RGBA = reinterpret_cast<int *>(lookupTable->MapValue( grayValue ));
 
-      // clipping
-      unsigned char alpha =
-          ( x >= clippingBounds[0] )
-       && ( x  < clippingBounds[1] )
-       && ( y >= clippingBounds[2] )
-       && ( y  < clippingBounds[3] )
-        ? RGBA[3] : 0;
+          // storing
+          * reinterpret_cast<int*>(outputSI) = *RGBA;
+          outputSI+=4;
+        }
+        else
+        {
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
+        }
 
-      // storing
-      *outputSI = RGBA[0]; outputSI++;
-      *outputSI = RGBA[1]; outputSI++;
-      *outputSI = RGBA[2]; outputSI++;
-      *outputSI = alpha; outputSI++;
+        inputSI++;
+        x++;
+      }
 
-      x++;
     }
+    else
+    {
+      while (outputSI != outputSIEnd)
+      {
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+      }
+    }
+
     inputIt.NextSpan();
     outputIt.NextSpan();
     y++;

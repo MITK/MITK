@@ -183,6 +183,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetSaveFil
 
 void mitk::CoreExtObjectFactory::CreateFileExtensionsMap()
 {
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mitk", "MITK scene files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));

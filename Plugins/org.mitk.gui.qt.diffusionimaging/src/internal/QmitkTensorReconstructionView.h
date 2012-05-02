@@ -80,11 +80,13 @@ protected slots:
   void TeemCheckboxClicked();
   void Advanced1CheckboxClicked();
   void Advanced2CheckboxClicked();
+  void Advanced3CheckboxClicked();
   void ManualThresholdClicked();
   void MethodChoosen(int method);
   void Reconstruct(int method);
   void TeemReconstruction();
   void ItkReconstruction();
+  void ReconstructionWithCorrection();
   void ResidualCalculation();
   void ResidualClicked(int slice, int volume);
 
@@ -93,6 +95,8 @@ protected:
   void ItkTensorReconstruction
     (mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TeemTensorReconstruction
+    (mitk::DataStorage::SetOfObjects::Pointer inImages);  
+  void TensorReconstructionWithCorr
     (mitk::DataStorage::SetOfObjects::Pointer inImages);
 
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );

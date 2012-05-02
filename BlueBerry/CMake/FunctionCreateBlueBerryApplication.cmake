@@ -78,10 +78,12 @@ link_directories(${MITK_LINK_DIRECTORIES})
 # -----------------------------------------------------------------------
 # Add executable icon (Windows)
 # -----------------------------------------------------------------------
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
-  set(WINDOWS_ICON_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
-endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
+set(WINDOWS_ICON_RESOURCE_FILE "")
+if(WIN32)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
+    set(WINDOWS_ICON_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
+  endif()
+endif()
 
 # -----------------------------------------------------------------------
 # Create the executable and link libraries
@@ -101,14 +103,13 @@ endif()
 # -----------------------------------------------------------------------
 # Add executable icon (Mac)
 # -----------------------------------------------------------------------
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
-  set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
-  if(APPLE)
+if(APPLE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
     file(COPY ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_APP_NAME}.app/Contents/Resources/")
     file(INSTALL ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${_APP_NAME}.app/Contents/Resources/")
-  endif(APPLE)
-endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
+  endif()
+endif()
 
 # -----------------------------------------------------------------------
 # Set build time dependencies

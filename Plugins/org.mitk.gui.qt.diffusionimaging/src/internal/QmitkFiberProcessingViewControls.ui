@@ -624,10 +624,10 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Resample fibers using a Kochanek spline interpolation.</string>
+         <string>Apply float image values (0-1) as color coding to the selected fiber bundle.</string>
         </property>
         <property name="text">
-         <string>FA Color Coding</string>
+         <string>Color By Scalar Map</string>
         </property>
        </widget>
       </item>

@@ -33,6 +33,7 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkApplyLevelWindowToRGBFilter;
+class vtkMitkLevelWindowFilter;
 
 namespace mitk {
 
@@ -171,6 +172,8 @@ namespace mitk {
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+      
+      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -258,7 +261,7 @@ namespace mitk {
     void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
 
     /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+    void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );
 
     /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
     Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous

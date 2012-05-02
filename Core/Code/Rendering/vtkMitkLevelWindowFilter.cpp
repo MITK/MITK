@@ -15,11 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "vtkMitkApplyLevelWindowToRGBFilter.h"
+#include "vtkMitkLevelWindowFilter.h"
 #include <vtkImageData.h>
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
-#include <mitkLogMacros.h>
 
 //used for acos etc.
 #include <cmath>
@@ -27,19 +26,20 @@ PURPOSE.  See the above copyright notices for more information.
 //used for PI
 #include <itkMath.h>
 
+#include <mitkLogMacros.h>
+
 static const double PI = itk::Math::pi;
 
-vtkMitkApplyLevelWindowToRGBFilter::vtkMitkApplyLevelWindowToRGBFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
+vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
+{
+  SetNumberOfThreads(1);
+}
+
+vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()
 {
 }
 
-vtkMitkApplyLevelWindowToRGBFilter::~vtkMitkApplyLevelWindowToRGBFilter()
-{
-}
-//----------------------------------------------------------------------------
-// Account for the MTime of the transform and its matrix when determining
-// the MTime of the filter
-unsigned long int vtkMitkApplyLevelWindowToRGBFilter::GetMTime()
+unsigned long int vtkMitkLevelWindowFilter::GetMTime()
 {
   unsigned long mTime=this->vtkObject::GetMTime();
   unsigned long time;
@@ -53,16 +53,16 @@ unsigned long int vtkMitkApplyLevelWindowToRGBFilter::GetMTime()
   return mTime;
 }
 
-void vtkMitkApplyLevelWindowToRGBFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
+void vtkMitkLevelWindowFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 {
-  if (m_LookupTable != lookupTable)
+ if (m_LookupTable != lookupTable)
   {
     m_LookupTable = lookupTable;
     this->Modified();
   }
 }
 
-vtkScalarsToColors* vtkMitkApplyLevelWindowToRGBFilter::GetLookupTable()
+vtkScalarsToColors* vtkMitkLevelWindowFilter::GetLookupTable()
 {
   return m_LookupTable;
 }
@@ -124,20 +124,22 @@ void HSItoRGB(T* HSI, T* RGB)
   RGB[2] = (T)(B<0?0:(B>255?255:B));
 }
 
+
 //Internal method which should never be used anywhere else and should not be in th header.
 //----------------------------------------------------------------------------
 // This templated function executes the filter for any type of data.
 template <class T>
-    void vtkCalculateIntensityFromLookupTable(vtkMitkApplyLevelWindowToRGBFilter *self,
-                                              vtkImageData *inData,
-                                              vtkImageData *outData,
-                                              int outExt[6], T *)
+    void vtkApplyLookupTableOnRGBPlus(vtkMitkLevelWindowFilter* self,
+                                              vtkImageData* inData,
+                                              vtkImageData* outData,
+                                              int outExt[6],
+                                              vtkFloatingPointType* clippingBounds,
+                                              T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<T> outputIt(outData, outExt);
   vtkLookupTable* lookupTable;
-  int maxC;
-  int indexComponents = 3; //RGB case
+  const int maxC = inData->GetNumberOfScalarComponents();
   double imgRange[2];
   double tableRange[2];
 
@@ -149,9 +151,6 @@ template <class T>
   //parameters for RGB level window
   double scale = (tableRange[1] -tableRange[0] > 0 ? 255.0 / (tableRange[1] - tableRange[0]) : 0.0);
   double bias = tableRange[0] * scale;
-
-  // find the region to loop over
-  maxC = inData->GetNumberOfScalarComponents();
 
   //parameters for opaque level window
   double scaleOpac = (self->GetMaxOpacity() -self->GetMinOpacity() > 0 ? 255.0 / (self->GetMaxOpacity() - self->GetMinOpacity()) : 0.0);
@@ -182,10 +181,11 @@ template <class T>
       *outputSI = static_cast<T>(rgb[1]); outputSI++;
       *outputSI = static_cast<T>(rgb[2]); outputSI++;
 
+      unsigned char finalAlpha = 255;
+
       //RGBA case
       if(maxC >= 4)
       {
-        indexComponents = 4; //now its the RGBA case
         // level/window mechanism for opacity
         alpha = static_cast<double>(*inputSI); inputSI++;
         alpha = alpha * scaleOpac - biasOpac;
@@ -197,20 +197,98 @@ template <class T>
         {
           alpha = 0.0;
         }
-        *outputSI = static_cast<T>(alpha); outputSI++;
+        finalAlpha = static_cast<T>(alpha);
+
+
+        for( int c = 4; c < maxC; c++ )
+          inputSI++;
       }
 
-      for (int i = indexComponents; i < maxC; i++)
-      {
-        *outputSI++ = *inputSI++;
-      }
+      *outputSI = static_cast<T>(finalAlpha); outputSI++;
+
     }
     inputIt.NextSpan();
     outputIt.NextSpan();
   }
 }
 
-void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
+//Internal method which should never be used anywhere else and should not be in th header.
+//----------------------------------------------------------------------------
+// This templated function executes the filter for any type of data.
+template <class T>
+    void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
+                                              vtkImageData *inData,
+                                              vtkImageData *outData,
+                                              int outExt[6],
+                                              vtkFloatingPointType* clippingBounds,
+                                              T *)
+{
+  vtkImageIterator<T> inputIt(inData, outExt);
+  vtkImageIterator<unsigned char> outputIt(outData, outExt);
+  vtkLookupTable* lookupTable;
+
+  double tableRange[2];
+
+  lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
+  lookupTable->GetTableRange(tableRange);
+
+  double scale = (tableRange[1] -tableRange[0] > 0 ? 255.0 / (tableRange[1] - tableRange[0]) : 0.0);
+  double bias = - tableRange[0] * scale;
+
+  bias += 0.5;
+
+  int y = outExt[2];
+
+  // Loop through ouput pixels
+  while (!outputIt.IsAtEnd())
+  {
+    T* inputSI = inputIt.BeginSpan();
+    unsigned char* outputSI = outputIt.BeginSpan();
+    unsigned char* outputSIEnd = outputIt.EndSpan();
+
+    int x= outExt[0];
+
+    while (outputSI != outputSIEnd)
+    {
+      /*
+         TODO
+         - input: grauwert-bild, bounds
+         - output rgba
+
+         r = g = b = lookuptable(grauwert * l/w)
+         a = outOfImage ? 0 : 1
+      */
+      double grayValue;
+
+      // fetching original value
+      grayValue = static_cast<double>(*inputSI); inputSI++;
+
+      // applying lookuptable
+      unsigned char *RGBA = lookupTable->MapValue( grayValue );
+
+      // clipping
+      unsigned char alpha =
+          ( x >= clippingBounds[0] )
+       && ( x  < clippingBounds[1] )
+       && ( y >= clippingBounds[2] )
+       && ( y  < clippingBounds[3] )
+        ? RGBA[3] : 0;
+
+      // storing
+      *outputSI = RGBA[0]; outputSI++;
+      *outputSI = RGBA[1]; outputSI++;
+      *outputSI = RGBA[2]; outputSI++;
+      *outputSI = alpha; outputSI++;
+
+      x++;
+    }
+    inputIt.NextSpan();
+    outputIt.NextSpan();
+    y++;
+  }
+}
+
+void vtkMitkLevelWindowFilter::ExecuteInformation()
 {
   vtkImageData *input = this->GetInput();
   vtkImageData *output = this->GetOutput();
@@ -222,68 +300,84 @@ void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
   }
   output->CopyTypeSpecificInformation( input );
 
+  // TODO make output RGBA
+  output->SetScalarTypeToUnsignedChar();
+  output->SetNumberOfScalarComponents(4);
+
   int extent[6];
   input->GetWholeExtent(extent);
   output->SetExtent(extent);
   output->SetWholeExtent(extent);
   output->SetUpdateExtent(extent);
   output->AllocateScalars();
-
-  //switch (input->GetScalarType())
-  //{
-  //  vtkTemplateMacro(
-  //      vtkCalculateIntensityFromLookupTable( this,
-  //                                            input,
-  //                                            output, extent,
-  //                                            static_cast<VTK_TT *>(0)));
-  //default:
-  //  vtkErrorMacro(<< "Execute: Unknown ScalarType");
-  //  return;
-  //}
 }
 
 //Method to run the filter in different threads.
-void vtkMitkApplyLevelWindowToRGBFilter::ThreadedExecute(vtkImageData *inData,
+void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
                                                          vtkImageData *outData,
                                                          int extent[6], int /*id*/)
 {
-  std::cout << "RGB" << std::flush;
-
-  switch (inData->GetScalarType())
+  if(inData->GetNumberOfScalarComponents() > 2)
   {
-    vtkTemplateMacro(
-        vtkCalculateIntensityFromLookupTable( this,
-                                              inData,
-                                              outData,
-                                              extent,
-                                              static_cast<VTK_TT *>(0)));
-  default:
-    vtkErrorMacro(<< "Execute: Unknown ScalarType");
-    return;
+    switch (inData->GetScalarType())
+    {
+      vtkTemplateMacro(
+          vtkApplyLookupTableOnRGBPlus( this,
+                                                inData,
+                                                outData,
+                                                extent,
+                                                m_ClippingBounds,
+                                                static_cast<VTK_TT *>(0)));
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return;
+    }
+  }
+  else
+  {
+    switch (inData->GetScalarType())
+    {
+      vtkTemplateMacro(
+          vtkApplyLookupTableOnScalars( this,
+                                                inData,
+                                                outData,
+                                                extent,
+                                                m_ClippingBounds,
+                                                static_cast<VTK_TT *>(0)));
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return;
+    }
   }
 }
 
-void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation(
+void vtkMitkLevelWindowFilter::ExecuteInformation(
     vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
 {
 }
 
-void vtkMitkApplyLevelWindowToRGBFilter::SetMinOpacity(double minOpacity)
+void vtkMitkLevelWindowFilter::SetMinOpacity(double minOpacity)
 {
   m_MinOqacity = minOpacity;
 }
 
-inline double vtkMitkApplyLevelWindowToRGBFilter::GetMinOpacity() const
+inline double vtkMitkLevelWindowFilter::GetMinOpacity() const
 {
   return m_MinOqacity;
 }
 
-void vtkMitkApplyLevelWindowToRGBFilter::SetMaxOpacity(double maxOpacity)
+void vtkMitkLevelWindowFilter::SetMaxOpacity(double maxOpacity)
 {
   m_MaxOpacity = maxOpacity;
 }
 
-inline double vtkMitkApplyLevelWindowToRGBFilter::GetMaxOpacity() const
+inline double vtkMitkLevelWindowFilter::GetMaxOpacity() const
 {
   return m_MaxOpacity;
+}
+
+void vtkMitkLevelWindowFilter::SetClippingBounds(vtkFloatingPointType* bounds) // TODO does vtkFloatingPointType[4] work??
+{
+  for (unsigned int i = 0 ; i < 4; ++i)
+    m_ClippingBounds[i] = bounds[i];
 }

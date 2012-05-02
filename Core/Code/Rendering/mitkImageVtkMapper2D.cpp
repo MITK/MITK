@@ -480,6 +480,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
     localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
+    localStorage->m_TSFilter->Update();
     localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
   }
   else
@@ -510,9 +511,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
 
 
-  MITK_INFO << "-------------------------anyPartVisible = " << anyPartVisible;
-  for (int i = 0; i < 4 ; ++i)
-    MITK_INFO << "textureClippingBounds[" << i<< "] " <<textureClippingBounds[i] ;
+ // MITK_INFO << "-------------------------anyPartVisible = " << anyPartVisible;
+ // for (int i = 0; i < 4 ; ++i)
+ //   MITK_INFO << "textureClippingBounds[" << i<< "] " <<textureClippingBounds[i] ;
   // TODO "clip" by setting background to alpha=0
 
 

@@ -291,6 +291,7 @@ set(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

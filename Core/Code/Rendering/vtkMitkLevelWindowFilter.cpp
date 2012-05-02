@@ -32,7 +32,9 @@ static const double PI = itk::Math::pi;
 
 vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
 {
-  SetNumberOfThreads(1);
+//  SetNumberOfThreads(1);
+
+  MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
 
 vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()

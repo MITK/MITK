@@ -14,6 +14,12 @@ IF(MITK_USE_DCMTK)
   SET(DCMTK_DEPENDS ${proj})
 
   IF(NOT DEFINED DCMTK_DIR)
+  
+    SET(revision_tag ae3b946f)
+    #IF(${proj}_REVISION_TAG)
+    #  SET(revision_tag ${${proj}_REVISION_TAG})
+    #ENDIF()
+  
     IF(UNIX)
       SET(DCMTK_CXX_FLAGS "-fPIC")
       SET(DCMTK_C_FLAGS "-fPIC")
@@ -26,10 +32,9 @@ IF(MITK_USE_DCMTK)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.0.tar.gz
-      URL_MD5 19409e039e29a330893caea98715390e
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20120222.tar.gz
+      URL_MD5 86fa9e0f91e4e0c6b44d513ea48391d6
       INSTALL_DIR ${proj}-install
-      PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-3.6.cmake 
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
@@ -38,6 +43,7 @@ IF(MITK_USE_DCMTK)
          "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${DCMTK_C_FLAGS}"
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+         -DDCMTK_WITH_DOXYGEN:BOOL=OFF
          -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894

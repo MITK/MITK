@@ -278,6 +278,8 @@ void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
   bool foundOneDiffusionImage = false;
   m_Controls->m_DiffusionImageLabel->setText("-");
   m_Controls->m_MaskImageLabel->setText("-");
+  m_MaskImageNode = NULL;
+  m_DiffusionImageNode = NULL;
 
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -440,12 +442,12 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
+  m_Controls->m_Warning->setVisible(false);
   if(!m_Controls || m_DiffusionImageNode.IsNull())
     return;
 
-  m_Controls->m_Warning->setVisible(false);
-  if(!m_Active)
-     return;
+//  if(!m_Active)
+//     return;
 
   m_Controls->m_VisualizeResultsWidget->setVisible(false);
 

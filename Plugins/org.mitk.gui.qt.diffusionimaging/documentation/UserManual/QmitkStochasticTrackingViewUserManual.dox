@@ -13,19 +13,16 @@ Available sections:
 \section QmitkStochasticTrackingUserManualInputData Input Data
 
 Mandatory Input:
-\li For a successful execution of the stochastic tractography filter, a DWI input and a binary image defining the desired ROI are required. The ROI serves as the origin from where on the fibers are beeing tracked. Both, DWI and ROI data can be imported via drag n’ drop or via the opening dialog box provided by MITK. Alternatively, the segmentation view offers tools for generating ROI data.
 
 \li One DWI Image image selected in the datamanager
 \li One or more ROIs selected in the datamanager
 
+For a successful execution of the stochastic tractography filter, a DWI input and a binary image defining the desired ROI are required. The ROI serves as the origin from where on the fibers are beeing tracked. To generate the seed ROI the segmentation view in the quantification perspective can be used or a binary image can be loaded.
 
 \section QmitkStochasticTrackingUserManualParameters Input Parameters
 
-
-\li Parameters such as max. tract length (Tract_len), number of total tracts per voxel (TotalTracts) and likelihood cache size in MB (Lkhd chache) are individually set by the user.
-
+\li Parameters such as max. tract length, number of seeds per voxel and likelihood cache size in MB can be controlled individually.
 \li After successfully setting necessary Input and Parameter, pressing the command button executes the algorithm.
-
 
 \section QmitkStochasticTrackingUserManualReferences References
 

@@ -40,7 +40,14 @@ namespace mitk {
     *\brief Opens a video file for streaming. If nothing goes wrong, the 
     * VideoSource is ready to deliver images after calling this function.
     */
-    void OpenVideoFile(std::string path);
+    void SetVideoFileInput(std::string path);
+
+    /**
+    *\brief Opens a video device for streaming. Takes the Device id. Try -1 for "grab the first you can get"
+    * which works quite well if only one device is available. If nothing goes wrong, the 
+    * VideoSource is ready to deliver images after calling this function.
+    */
+    void SetCameraInput(int deviceID);
 
 
     /**

@@ -23,8 +23,6 @@ class mitkUSImageVideoSourceTestClass
 {
 public:
 
-  // Anm: Implementierung der einzelnen Testmethoden
-
   static void TestInstantiation()
   {
     // let's create an object of our class
@@ -36,8 +34,15 @@ public:
   {
     mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
     // "C:\\Users\\maerz\\Videos\\Debut\\us.avi"
-    usSource->OpenVideoFile("C:\\Users\\maerz\\Videos\\Debut\\us.avi");
+    usSource->SetVideoFileInput("C:\\Users\\maerz\\Videos\\Debut\\us.avi");
     MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Video File");
+  }
+
+  static void TestOpenDevice()
+  {
+    mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
+    usSource->SetCameraInput(-1);
+    MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Camera device");
   }
 
  
@@ -53,6 +58,7 @@ int mitkUSImageVideoSourceTest(int /* argc */, char* /*argv*/[])
 
     mitkUSImageVideoSourceTestClass::TestInstantiation();
     mitkUSImageVideoSourceTestClass::TestOpenVideoFile();
+    mitkUSImageVideoSourceTestClass::TestOpenDevice();
 
   MITK_TEST_END();
 }

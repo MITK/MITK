@@ -34,12 +34,23 @@ mitk::USImageVideoSource::~USImageVideoSource()
 
 
 
-void mitk::USImageVideoSource::OpenVideoFile(std::string path)
+void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 {
   m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
 
   // Example: "C:\\Users\\maerz\\Videos\\Debut\\us.avi"
-  m_OpenCVVideoSource->SetVideoFileInput(path.c_str(),true,false); //wenn kein Bild erscheint, Passwort für G eingeben
+  m_OpenCVVideoSource->SetVideoFileInput(path.c_str(),true,false); 
+  m_OpenCVVideoSource->StartCapturing();
+  m_OpenCVVideoSource->FetchFrame();
+  
+  // Let's see if we have been successful
+  m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
+}
+
+    
+void mitk::USImageVideoSource::SetCameraInput(int deviceID){
+  this->m_OpenCVVideoSource->SetVideoCameraInput(deviceID);
+
   m_OpenCVVideoSource->StartCapturing();
   m_OpenCVVideoSource->FetchFrame();
   

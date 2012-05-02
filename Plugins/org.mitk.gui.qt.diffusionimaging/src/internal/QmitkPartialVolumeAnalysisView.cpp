@@ -329,15 +329,34 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
   if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
     return;
 
-  mitk::DiffusionImage<short>::Pointer diffusionImage = NULL;
-  if (dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImage.GetPointer()))
-    diffusionImage = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImage.GetPointer());
-  else
-    return;
+  mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
+
+  itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
+
+  mitk::Vector3D newSpacing = geometry->GetSpacing();
+  mitk::Point3D newOrigin = geometry->GetOrigin();
+  mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+  newOrigin[0] += bounds.GetElement(0);
+  newOrigin[1] += bounds.GetElement(2);
+  newOrigin[2] += bounds.GetElement(4);
+  itk::Matrix<double, 3, 3> newDirection;
+  itk::ImageRegion<3> imageRegion;
+  for (int i=0; i<3; i++)
+    for (int j=0; j<3; j++)
+      newDirection[j][i] = geometry->GetMatrixColumn(i)[j]/newSpacing[j];
+  imageRegion.SetSize(0, geometry->GetExtent(0));
+  imageRegion.SetSize(1, geometry->GetExtent(1));
+  imageRegion.SetSize(2, geometry->GetExtent(2));
+
+  // apply new image parameters
+  referenceImage->SetSpacing( newSpacing );
+  referenceImage->SetOrigin( newOrigin );
+  referenceImage->SetDirection( newDirection );
+  referenceImage->SetRegions( imageRegion );
+  referenceImage->Allocate();
 
   typedef itk::Image< float, 3 > OutType;
   mitk::Image::Pointer mitkInImage = dynamic_cast<mitk::Image*>(m_ClusteringResult->GetData());
-  typedef itk::ExtractChannelFromRgbaImageFilter< OutType > ExtractionFilterType;
 
   typedef itk::Image< itk::RGBAPixel<unsigned char>, 3 > ItkRgbaImageType;
   typedef mitk::ImageToItk< ItkRgbaImageType > CasterType;
@@ -347,52 +366,15 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
   caster->Update();
   ItkRgbaImageType::Pointer itkInImage = caster->GetOutput();
 
+  typedef itk::ExtractChannelFromRgbaImageFilter< itk::Image< short, 3>, OutType > ExtractionFilterType;
   ExtractionFilterType::Pointer filter = ExtractionFilterType::New();
   filter->SetInput(itkInImage);
   filter->SetChannel(ExtractionFilterType::ALPHA);
-  filter->SetReferenceImage(diffusionImage->GetVectorImage());
+  filter->SetReferenceImage(referenceImage);
   filter->Update();
-
   OutType::Pointer outImg = filter->GetOutput();
 
-//  mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
-//  itk::Matrix<double, 3, 3> direction;
-//  itk::ImageRegion<3> imageRegion;
-//  for (int i=0; i<3; i++)
-//    for (int j=0; j<3; j++)
-//      direction[j][i] = geometry->GetMatrixColumn(i)[j];
-//  imageRegion.SetSize(0, geometry->GetExtent(0));
-//  imageRegion.SetSize(1, geometry->GetExtent(1));
-//  imageRegion.SetSize(2, geometry->GetExtent(2));
-//  typedef itk::ResampleImageFilter<OutType, OutType, float> ResamplerType;
-//  ResamplerType::Pointer resampler = ResamplerType::New();
-//  resampler->SetOutputSpacing( geometry->GetSpacing() );
-//  resampler->SetOutputOrigin( geometry->GetOrigin() );
-//  resampler->SetOutputDirection( direction );
-//  resampler->SetSize( imageRegion.GetSize() );
-//  resampler->SetInput( outImg );
-//  const itk::Transform<float,3,3>* trafo = geometry->GetParametricTransform();
-//  itk::Transform<float,3,3>::InverseTransformBasePointer t = trafo->GetInverseTransform();
-//  itk::Transform<float,3,3>* invTrafo = dynamic_cast<itk::Transform<float,3,3>*>(t.GetPointer());
-//  resampler->SetTransform(invTrafo);
-
-////  double gausssigma = 10;
-////  double sigma[3];
-////  for( unsigned int d = 0; d < 3; d++ )
-////    sigma[d] = gausssigma * geometry->GetSpacing()[d];
-////  double alpha = 2.0;
-////  typedef itk::GaussianInterpolateImageFunction<OutType, double> InterpolatorType;
-////  typedef itk::NearestNeighborInterpolateImageFunction<OutType, double > InterpolatorType;
-////  typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
-////  interpolator->SetInputImage( outImg );
-////  interpolator->SetParameters( sigma, alpha );
-////  resampler->SetInterpolator( interpolator );
-
-//  resampler->Update();
-//  outImg = resampler->GetOutput();
-
-  mitk::Image::Pointer img = mitk::Image::New();
-  img->InitializeByItk(outImg.GetPointer());
+  mitk::Image::Pointer img = mitk::Image::New();  img->InitializeByItk(outImg.GetPointer());
   img->SetVolume(outImg->GetBufferPointer());
 
   // init data node

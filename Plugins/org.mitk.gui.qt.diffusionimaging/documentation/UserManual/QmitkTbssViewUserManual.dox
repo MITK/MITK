@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.mitk.views.tractbasedspatialstatistics} The TBSS Module
+\page org_tractbasedspatialstatistics The TBSS Module
 
 \image html tbss.png "Icon of the Module"
 
@@ -47,9 +47,6 @@ y selecting a tbss image with group information and a region of interest image (
 
 \section QmitkTractbasedSpatialStatisticsUserManualTroubleshooting Troubleshooting
 
-No known problems.
-
-<B>All other problems.</B><BR>
 Please report to the MITK mailing list.
 See http://www.mitk.org/wiki/Mailinglist on how to do this.
 
@@ -59,3 +56,4 @@ See http://www.mitk.org/wiki/Mailinglist on how to do this.
 1. S.M. Smith, M. Jenkinson, H. Johansen-Berg, D. Rueckert, T.E. Nichols, C.E. Mackay, K.E. Watkins, O. Ciccarelli, M.Z. Cader, P.M. Matthews, and T.E.J. Behrens. Tract-based spatial statistics: Voxelwise analysis of multi-subject diffusion data. NeuroImage, 31:1487-1505, 2006.
 
 2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-219, 2004.
+*/

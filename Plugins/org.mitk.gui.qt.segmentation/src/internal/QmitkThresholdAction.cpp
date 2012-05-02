@@ -8,6 +8,7 @@
 // Qt
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QApplication>
 
 using namespace berry;
 using namespace mitk;
@@ -29,7 +30,7 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   m_ThresholdingToolManager->RegisterClient();
   m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
 
-  m_ThresholdingDialog = new QDialog;
+  m_ThresholdingDialog = new QDialog(QApplication::activeWindow());
   connect(m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)));
 
   QVBoxLayout *layout = new QVBoxLayout;

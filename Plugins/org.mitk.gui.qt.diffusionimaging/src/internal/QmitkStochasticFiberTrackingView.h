@@ -91,6 +91,7 @@ private:
 
   mitk::Image::Pointer m_SeedRoi;
   mitk::DiffusionImage<short>::Pointer m_DiffusionImage;
+  mitk::DataNode::Pointer m_DiffusionImageNode;
 
   typedef itk::Image< unsigned char, 3 > BinaryImageType;
   PTFilterType::TractContainerType::Pointer m_tractcontainer;

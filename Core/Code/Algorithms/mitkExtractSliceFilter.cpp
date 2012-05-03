@@ -328,8 +328,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
 	/*========== BEGIN setup extent of the slice ==========*/
 	int xMin, xMax, yMin, yMax;
 	bool boundsInitialized = false;
+	vtkFloatingPointType sliceBounds[6];
 	if(m_WorldGeometry->GetReferenceGeometry()){
-		vtkFloatingPointType sliceBounds[6];
+		
 
 		for ( int i = 0; i < 6; ++i )
 		{
@@ -445,6 +446,16 @@ void mitk::ExtractSliceFilter::GenerateData(){
 		resultImage->SetGeometry( originalGeometry );
 
 		
+		/*the bounds as well as the extent of the worldGeometry are not adapted correctly during crosshair rotation.
+			This is only a quick fix and has to be evaluated.
+			The new bounds are set via the max values of the calcuted slice extent. It will look like [ 0, x, 0, y, 0, 1].
+		*/
+		mitk::BoundingBox::BoundsArrayType boundsCopy;
+		boundsCopy[0] = boundsCopy[2] = boundsCopy[4] = 0;
+		boundsCopy[5] = 1;
+		boundsCopy[1] =  xMax - xMin;
+		boundsCopy[3] =  yMax - yMin;
+		resultImage->GetGeometry()->SetBounds(boundsCopy);
 
 		/*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
 	}

@@ -193,7 +193,7 @@ void QmitkODFDetailsView::UpdateOdf()
     img->GetTimeSlicedGeometry()->WorldToIndex(world, index);
 
     float sum = 0;
-    float max = itk::NumericTraits<float>::min();
+    float max = itk::NumericTraits<float>::NonpositiveMin();
     float min = itk::NumericTraits<float>::max();
     QString values;
     QString overviewText;

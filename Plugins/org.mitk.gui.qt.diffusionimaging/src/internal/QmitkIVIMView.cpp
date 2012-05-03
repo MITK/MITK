@@ -145,34 +145,39 @@ void QmitkIVIMView::MethodCombo(int val)
   switch(val)
   {
   case 0:
-    m_Controls->dstar->setVisible(false);
-    m_Controls->thres->setVisible(false);
-    m_Controls->thres_2->setVisible(true);
-    m_Controls->m_RegFrame->setVisible(false);
+    m_Controls->m_DstarFrame->setVisible(false);
+    m_Controls->m_NeglSiFrame->setVisible(true);
+    m_Controls->m_NeglBframe->setVisible(false);
+    m_Controls->m_IterationsFrame->setVisible(false);
+    m_Controls->m_LambdaFrame->setVisible(false);
     break;
   case 1:
-    m_Controls->dstar->setVisible(true);
-    m_Controls->thres->setVisible(false);
-    m_Controls->thres_2->setVisible(true);
-    m_Controls->m_RegFrame->setVisible(false);
+    m_Controls->m_DstarFrame->setVisible(true);
+    m_Controls->m_NeglSiFrame->setVisible(true);
+    m_Controls->m_NeglBframe->setVisible(false);
+    m_Controls->m_IterationsFrame->setVisible(false);
+    m_Controls->m_LambdaFrame->setVisible(false);
     break;
   case 2:
-    m_Controls->dstar->setVisible(false);
-    m_Controls->thres->setVisible(true);
-    m_Controls->thres_2->setVisible(true);
-    m_Controls->m_RegFrame->setVisible(false);
+    m_Controls->m_DstarFrame->setVisible(false);
+    m_Controls->m_NeglSiFrame->setVisible(true);
+    m_Controls->m_NeglBframe->setVisible(true);
+    m_Controls->m_IterationsFrame->setVisible(false);
+    m_Controls->m_LambdaFrame->setVisible(false);
     break;
   case 3:
-    m_Controls->dstar->setVisible(false);
-    m_Controls->thres->setVisible(true);
-    m_Controls->thres_2->setVisible(true);
-    m_Controls->m_RegFrame->setVisible(false);
+    m_Controls->m_DstarFrame->setVisible(false);
+    m_Controls->m_NeglSiFrame->setVisible(true);
+    m_Controls->m_NeglBframe->setVisible(true);
+    m_Controls->m_IterationsFrame->setVisible(false);
+    m_Controls->m_LambdaFrame->setVisible(false);
     break;
   case 4:
-    m_Controls->dstar->setVisible(false);
-    m_Controls->thres->setVisible(true);
-    m_Controls->thres_2->setVisible(true);
-    m_Controls->m_RegFrame->setVisible(true);
+    m_Controls->m_DstarFrame->setVisible(false);
+    m_Controls->m_NeglSiFrame->setVisible(false);
+    m_Controls->m_NeglBframe->setVisible(false);
+    m_Controls->m_IterationsFrame->setVisible(false);
+    m_Controls->m_LambdaFrame->setVisible(false);
     break;
   }
 

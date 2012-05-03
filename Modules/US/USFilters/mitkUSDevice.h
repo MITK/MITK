@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include "mitkUSProbe.h"
 #include "mitkUSImageMetadata.h"
+#include "mitkUSImage.h"
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
@@ -36,11 +37,14 @@ namespace mitk {
     * if one of these functionalities is not supported by a subclass, it will throw an unsupported Operation Exception.
     * \ingroup US
     */
-  class MitkUS_EXPORT USDevice : public itk::Object
+   class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
       mitkNewMacro3Param(Self, std::string, std::string, bool);
+
+
+      
 
       /**
       * \brief Add a probe to the device without connecting to it.

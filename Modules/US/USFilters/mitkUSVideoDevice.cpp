@@ -19,16 +19,29 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 
-mitk::USVideoDevice::USVideoDevice(int deviceNumber) : itk::Object()
+mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model, true)
 {
   m_Source = mitk::USImageVideoSource::New();
-
+  m_Source->SetCameraInput(videoDeviceNumber);
 }
-
-
 
 
 mitk::USVideoDevice::~USVideoDevice()
 {
+  
+}
+
+void mitk::USVideoDevice::GenerateData()
+{
+
+  mitk::USImage::Pointer result = mitk::USImage::New();
+  // Set Metadata
+  result->SetMetadata(this->m_Metadata);
+
+  // 1) get Image from Source
+
+  // 2) Process Image as necessary 
+
+  // 3) Set Output
 
 }

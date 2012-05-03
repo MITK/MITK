@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
-#include <itkObject.h>
+#include "mitkUSDevice.h"
 #include <itkObjectFactory.h>
 #include "mitkUSImageVideoSource.h"
 
@@ -31,13 +31,13 @@ namespace mitk {
     * \brief TODO
     * \ingroup US
     */
-  class MitkUS_EXPORT USVideoDevice : public itk::Object
+  class MitkUS_EXPORT USVideoDevice : public mitk::USDevice
     {
     public:
-      mitkClassMacro(USVideoDevice,itk::Object);
-      mitkNewMacro1Param(Self, int);
+      mitkClassMacro(USVideoDevice, mitk::USDevice);
+      mitkNewMacro3Param(Self, int, std::string, std::string);
 
-    
+      void GenerateData();
 
     
       //## getter and setter ##
@@ -46,7 +46,7 @@ namespace mitk {
      // itkSetMacro(Name, std::string);
 
     protected:
-      USVideoDevice(int deviceNumber);
+      USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model);
       virtual ~USVideoDevice();
 
       mitk::USImageVideoSource::Pointer m_Source;

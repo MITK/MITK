@@ -49,6 +49,10 @@ namespace mitk {
     */
     void SetCameraInput(int deviceID);
 
+    /**
+    *\brief Grabs the next frame from the Video input
+    */
+    void GenerateData();
 
     /**
     *\brief return the output (output with id 0) of the filter

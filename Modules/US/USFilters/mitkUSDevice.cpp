@@ -19,12 +19,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUSImageMetadata.h"
 
 
-mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVideoOnly) : itk::Object()
+mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVideoOnly) : mitk::ImageSource()
 {
+  // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
   m_Metadata->SetDeviceIsVideoOnly(isVideoOnly);
+  
+  //set number of outputs
+  this->SetNumberOfOutputs(1);
+
+  //create a new output
+  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  this->SetNthOutput(0,newOutput);
 }
 
 mitk::USDevice::~USDevice()

@@ -24,12 +24,9 @@ set(_plugins
   org.blueberry.core.expressions
   org.blueberry.solstice.common
   org.blueberry.core.commands
-  org.blueberry.core.jobs
   org.blueberry.ui
   org.blueberry.ui.qt
   org.blueberry.ui.qt.help
-  org.blueberry.ui.qt.log
-  org.blueberry.ui.qt.objectinspector
   org.mitk.core.services
   org.mitk.gui.common
   org.mitk.planarfigure

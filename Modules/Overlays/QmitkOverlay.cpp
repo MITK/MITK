@@ -27,12 +27,13 @@ QmitkOverlay::QmitkOverlay( const char* id )
 , m_Position(top_Left)
 , m_Layer(-1)
 , m_Widget(NULL)
+, m_WidgetIsCustom(false)
 {
 }
 
 QmitkOverlay::~QmitkOverlay()
 {
-  if (m_Widget) 
+  if ( m_Widget && !m_WidgetIsCustom ) 
   {
     m_Widget->deleteLater();
     m_Widget = NULL;

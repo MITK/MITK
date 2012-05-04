@@ -33,6 +33,7 @@ void QmitkCustomWidgetOverlay::SetWidget( QWidget* widget )
   if ( widget != NULL )
   {
     m_Widget = widget;
+    m_WidgetIsCustom = true;
   }
 }
 

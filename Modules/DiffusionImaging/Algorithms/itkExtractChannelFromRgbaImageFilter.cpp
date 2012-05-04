@@ -59,6 +59,7 @@ namespace itk{
     while(!rgbaIt.IsAtEnd()){
 
       InPixelType x = rgbaIt.Get();
+      ++rgbaIt;
 
       itk::Point<float, 3> vertex;
       itk::Index<3> index = rgbaIt.GetIndex();
@@ -139,7 +140,6 @@ namespace itk{
 //      outputImage->SetPixel(index, outputImage->GetPixel(index)+out);
 //      counterImage->SetPixel(index, counterImage->GetPixel(index)+1);
 
-      ++rgbaIt;
     }
 
     typedef ImageRegionIterator< OutputImageType > OutImageIteratorType;

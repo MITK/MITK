@@ -47,6 +47,9 @@ void QmitkFiducialRegistrationWidget::CreateQtPartControl(QWidget *parent)
     // hide additional image fiducial button
     m_Controls->m_AddImageFiducialBtn->setHidden(true);
 
+    m_Controls->m_spaceHolderGroupBox->setStyleSheet("QGroupBox {border: 0px transparent;}");
+    m_Controls->m_spaceHolderGroupBox2->setStyleSheet("QGroupBox {border: 0px transparent;}");
+
     this->CreateConnections();
   }
 }
@@ -66,9 +69,9 @@ void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMo
   {
     this->HideContinousRegistrationRadioButton(true);
     this->HideStaticRegistrationRadioButton(true);
+    this->HideFiducialRegistrationGroupBox();
     this->HideUseICPRegistrationCheckbox(true);
     this->HideImageFiducialButton(false);
-    this->m_Controls->registrationGroupBox->setTitle("");
     this->m_Controls->sourceLandmarksGroupBox->setTitle("Target/Reference landmarks");
     this->m_Controls->targetLandmarksGroupBox->setTitle("Source Landmarks");
     this->m_Controls->m_AddImageFiducialBtn->setText("Add target landmark");
@@ -78,9 +81,9 @@ void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMo
   {
     this->HideContinousRegistrationRadioButton(false);
     this->HideStaticRegistrationRadioButton(false);
+    this->HideFiducialRegistrationGroupBox();
     this->HideUseICPRegistrationCheckbox(false);
     this->HideImageFiducialButton(true);
-    this->m_Controls->registrationGroupBox->setTitle("Select fiducials in image and OR (world)");
     this->m_Controls->sourceLandmarksGroupBox->setTitle("Image fiducials");
     this->m_Controls->targetLandmarksGroupBox->setTitle("OR fiducials");
     this->m_Controls->m_AddImageFiducialBtn->setText("Add image fiducial");
@@ -156,11 +159,25 @@ mitk::DataNode::Pointer QmitkFiducialRegistrationWidget::GetTrackerFiducialsNode
 void QmitkFiducialRegistrationWidget::HideStaticRegistrationRadioButton( bool on )
 {
   m_Controls->m_rbStaticRegistration->setHidden(on);
+  HideFiducialRegistrationGroupBox();
 }
 
 void QmitkFiducialRegistrationWidget::HideContinousRegistrationRadioButton( bool on )
 {
   m_Controls->m_rbContinousRegistration->setHidden(on);
+  HideFiducialRegistrationGroupBox();
+}
+
+void QmitkFiducialRegistrationWidget::HideFiducialRegistrationGroupBox()
+{
+  if (m_Controls->m_rbStaticRegistration->isHidden() && m_Controls->m_rbContinousRegistration->isHidden())
+  {
+    m_Controls->m_gbFiducialRegistration->setHidden(true);
+  }
+  else
+  {
+    m_Controls->m_gbFiducialRegistration->setHidden(false);
+  }
 }
 
 void QmitkFiducialRegistrationWidget::HideUseICPRegistrationCheckbox( bool on )
@@ -171,10 +188,26 @@ void QmitkFiducialRegistrationWidget::HideUseICPRegistrationCheckbox( bool on )
 void QmitkFiducialRegistrationWidget::HideImageFiducialButton( bool on )
 {
   m_Controls->m_AddImageFiducialBtn->setHidden(on);
+  AdjustButtonSpacing();
+
 }
 
 void QmitkFiducialRegistrationWidget::HideTrackingFiducialButton( bool on )
 {
   m_Controls->m_AddTrackingFiducialBtn->setHidden(on);
+  AdjustButtonSpacing();
 }
 
+void QmitkFiducialRegistrationWidget::AdjustButtonSpacing()
+{
+  if (m_Controls->m_AddImageFiducialBtn->isHidden() && m_Controls->m_AddTrackingFiducialBtn->isHidden())
+  {
+    m_Controls->m_spaceHolderGroupBox->setHidden(true);
+    m_Controls->m_spaceHolderGroupBox2->setHidden(true);
+  }
+  else
+  {
+    m_Controls->m_spaceHolderGroupBox->setHidden(false);
+    m_Controls->m_spaceHolderGroupBox2->setHidden(false);
+  }
+}

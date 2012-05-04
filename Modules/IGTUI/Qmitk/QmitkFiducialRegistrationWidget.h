@@ -68,9 +68,11 @@ public:
   bool UseICPIsChecked(); ///< returns true if automatic correspondences search is activated else false
   void HideStaticRegistrationRadioButton(bool on); ///< show or hide  "static Fiducial Registration" radio button in the UI
   void HideContinousRegistrationRadioButton(bool on); ///< show or hide  "hybrid continuous Fiducial Registration" radio button in the UI
+  void HideFiducialRegistrationGroupBox(); ///< show or hide  "Fiducial Registration method" groupbox in the UI, depending on the visibility of the radio buttons
   void HideUseICPRegistrationCheckbox(bool on); ///< show or hide  "Find fiducial correspondences (needs 6+ fiducial pairs)" check box in the UI
   void HideImageFiducialButton(bool on); ///< show or hide  "Add image fiducial" button in the UI
   void HideTrackingFiducialButton(bool on); ///< show or hide  "Add tracking fiducial" button in the UI
+  void AdjustButtonSpacing(); ///< Rearrange spacing when buttons are turned on or off
 
 
   signals:

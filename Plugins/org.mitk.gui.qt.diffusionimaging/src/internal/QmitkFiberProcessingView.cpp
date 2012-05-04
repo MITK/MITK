@@ -700,7 +700,8 @@ template < typename TPixel, unsigned int VImageDimension >
       index[1] = point[1];
       index[2] = point[2];
 
-      m_PlanarFigureImage->SetPixel(index, 1);
+      if (pfImageGeometry3D->IsIndexInside(index))
+        m_PlanarFigureImage->SetPixel(index, 1);
     }
     ++imageIterator;
   }

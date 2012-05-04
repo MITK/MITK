@@ -162,17 +162,17 @@ namespace mitk
     /*!
     \brief get a bool from the property list
     */
-    static bool GetBoolProperty(BaseProperty* propertyValue, bool& boolValue);
+    bool GetBoolProperty(const char *propertyKey, bool& boolValue);
 
     /*!
     \brief get a string from the property list
     */
-    static bool GetStringProperty(BaseProperty* propertyValue, std::string& string);
+    bool GetStringProperty(const char *propertyKey, std::string& string);
 
     /*!
     \brief get an int from the property list
     */
-    static bool GetIntProperty(BaseProperty* propertyValue, int& integer);
+    bool GetIntProperty(const char *propertyKey, int& integer);
 
   protected:
 

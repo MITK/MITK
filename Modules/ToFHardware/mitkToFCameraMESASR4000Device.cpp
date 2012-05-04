@@ -49,7 +49,7 @@ namespace mitk
     ToFCameraMESASR4000Controller::Pointer myController = dynamic_cast<mitk::ToFCameraMESASR4000Controller*>(this->m_Controller.GetPointer());
 
     bool boolValue = false;
-    GetBoolProperty(propertyValue, boolValue);
+    GetBoolProperty(propertyKey, boolValue);
     if (strcmp(propertyKey, "SetFPN") == 0)
     {
       myController->SetFPN(boolValue);

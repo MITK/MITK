@@ -368,13 +368,13 @@ namespace mitk
     if (strcmp(propertyKey, "ModulationFrequency") == 0)
     {
       int modulationFrequency = 0;
-      GetIntProperty(propertyValue, modulationFrequency);
+      GetIntProperty(propertyKey, modulationFrequency);
       m_Controller->SetModulationFrequency(modulationFrequency);
     }
     else if (strcmp(propertyKey, "IntegrationTime") == 0)
     {
       int integrationTime = 0;
-      GetIntProperty(propertyValue, integrationTime);
+      GetIntProperty(propertyKey, integrationTime);
       m_Controller->SetIntegrationTime(integrationTime);
     }
   }

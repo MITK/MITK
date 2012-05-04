@@ -328,7 +328,7 @@ namespace mitk
     ToFCameraMITKPlayerController::Pointer myController = dynamic_cast<mitk::ToFCameraMITKPlayerController*>(this->m_Controller.GetPointer());
 
     std::string strValue;
-    GetStringProperty(propertyValue, strValue);
+    GetStringProperty(propertyKey, strValue);
     if (strcmp(propertyKey, "DistanceImageFileName") == 0)
     {
       myController->SetDistanceImageFileName(strValue);

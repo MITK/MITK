@@ -68,9 +68,9 @@ namespace mitk
     return this->m_PropertyList->GetProperty(propertyKey);
   }
 
-  bool ToFCameraDevice::GetBoolProperty(BaseProperty* propertyValue, bool& boolValue)
+  bool ToFCameraDevice::GetBoolProperty(const char *propertyKey, bool& boolValue)
   {
-    mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(propertyValue);
+    mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(this->GetProperty(propertyKey));
     if(boolprop.IsNull())
       return false;
 
@@ -78,9 +78,9 @@ namespace mitk
     return true;
   }
 
-  bool ToFCameraDevice::GetStringProperty(BaseProperty* propertyValue, std::string& string)
+  bool ToFCameraDevice::GetStringProperty(const char *propertyKey, std::string& string)
   {
-    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(propertyValue);
+    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(this->GetProperty(propertyKey));
     if(stringProp.IsNull())
     {
       return false;
@@ -91,9 +91,9 @@ namespace mitk
       return true;
     }
   }
-  bool ToFCameraDevice::GetIntProperty(BaseProperty* propertyValue, int& integer)
+  bool ToFCameraDevice::GetIntProperty(const char *propertyKey, int& integer)
   {
-    mitk::IntProperty::Pointer intProp = dynamic_cast<mitk::IntProperty*>(propertyValue);
+    mitk::IntProperty::Pointer intProp = dynamic_cast<mitk::IntProperty*>(this->GetProperty(propertyKey));
     if(intProp.IsNull())
     {
       return false;

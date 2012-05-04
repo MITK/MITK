@@ -120,6 +120,8 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     QTimer* m_Frametimer; ///< Timer used to continuously update the images
 
+    QString m_SelectedCamera; ///< String holding the selected camera
+
     mitk::Image::Pointer m_MitkDistanceImage; ///< member holding a pointer to the distance image of the selected camera
     mitk::Image::Pointer m_MitkAmplitudeImage; ///< member holding a pointer to the amplitude image of the selected camera
     mitk::Image::Pointer m_MitkIntensityImage; ///< member holding a pointer to the intensity image of the selected camera

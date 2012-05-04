@@ -197,16 +197,14 @@ namespace mitk
   int ToFImageGrabber::GetIntegrationTime()
   {
     int integrationTime = 0;
-    BaseProperty* property = this->m_ToFCameraDevice->GetProperty("IntegrationTime");
-    this->m_ToFCameraDevice->GetIntProperty(property,integrationTime);
+    this->m_ToFCameraDevice->GetIntProperty("IntegrationTime",integrationTime);
     return integrationTime;
   }
 
   int ToFImageGrabber::GetModulationFrequency()
   {
     int modulationFrequency = 0;
-    BaseProperty* property = this->m_ToFCameraDevice->GetProperty("ModulationFrequency");
-    this->m_ToFCameraDevice->GetIntProperty(property,modulationFrequency);
+    this->m_ToFCameraDevice->GetIntProperty("ModulationFrequency",modulationFrequency);
     return modulationFrequency;
   }
   void ToFImageGrabber::SetBoolProperty( const char* propertyKey, bool boolValue )

@@ -274,30 +274,36 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
           if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + distanceImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
           }
           if (!itksys::SystemTools::FileExists(amplitudeImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + amplitudeImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
           }
           if (!itksys::SystemTools::FileExists(intensityImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + intensityImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
           }
           if (!itksys::SystemTools::FileExists(rgbImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + rgbImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", "");
           }
-          //set the file names
-          this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
-          this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
-          this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
-          this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
-
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
+          }
         }
         catch (std::exception &e)
         {

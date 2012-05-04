@@ -79,6 +79,12 @@ namespace mitk
     */
     virtual void GetIntensities(float* intensityArray, int& imageSequence);
     /*!
+    \brief gets the rgb data from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
+    \param rgbArray contains the returned rgb data as an array.
+    \param imageSequence the actually captured image sequence number
+    */
+    virtual void GetRgb(unsigned char* rgbArray, int& imageSequence);
+    /*!
     \brief gets the distance data from the ToF camera measuring the distance between the camera and the different object points in millimeters. Caution! The user is responsible for allocating and deleting the images.
     \param distanceArray contains the returned distances data as an array.
     \param imageSequence the actually captured image sequence number
@@ -143,6 +149,7 @@ namespace mitk
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
     float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
+    unsigned char** m_RGBDataBuffer; ///< buffer holding the last rgb images
 
   };
 } //END mitk namespace

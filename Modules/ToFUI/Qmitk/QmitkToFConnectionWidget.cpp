@@ -258,7 +258,11 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           }
           if (found == std::string::npos)
           {
-            msg = msg + "Input file name must end with \"_DistanceImage.pic\", \"_AmplitudeImage.pic\" or \"_IntensityImage.pic\"!";
+            found = baseFilename.rfind("_RGBImage");
+          }
+          if (found == std::string::npos)
+          {
+            msg = msg + "Input file name must end with \"_DistanceImage\", \"_AmplitudeImage\", \"_IntensityImage\" or \"_RGBImage\"!";
             throw std::logic_error(msg.c_str());
           }
           std::string baseFilenamePrefix = baseFilename.substr(0,found);
@@ -266,6 +270,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           std::string distanceImageFileName = dir + "/" + baseFilenamePrefix + "_DistanceImage" + extension;
           std::string amplitudeImageFileName = dir + "/" + baseFilenamePrefix + "_AmplitudeImage" + extension;
           std::string intensityImageFileName = dir + "/" + baseFilenamePrefix + "_IntensityImage" + extension;
+          std::string rgbImageFileName = dir + "/" + baseFilenamePrefix + "_RGBImage" + extension;
 
           if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
           {
@@ -282,10 +287,16 @@ void QmitkToFConnectionWidget::OnConnectCamera()
             msg = msg + "Inputfile not exist! " + intensityImageFileName;
             throw std::logic_error(msg.c_str());
           }
+          if (!itksys::SystemTools::FileExists(rgbImageFileName.c_str(), true))
+          {
+            msg = msg + "Inputfile not exist! " + rgbImageFileName;
+            throw std::logic_error(msg.c_str());
+          }
           //set the file names
           this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
           this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
           this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
+          this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
 
         }
         catch (std::exception &e)

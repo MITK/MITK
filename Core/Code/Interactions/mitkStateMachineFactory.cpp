@@ -427,7 +427,7 @@ mitk::State* mitk::StateMachineFactory::GetState( const char * type, int StateId
   //check if the state exists
   AllStateMachineMapType::iterator i = m_AllStateMachineMap.find( type );
   if ( i == m_AllStateMachineMap.end() )
-    return false;
+    return NULL;
 
   //get the statemachine of the state
   StateMachineMapType* sm = m_AllStateMachineMap[type];

@@ -137,7 +137,7 @@ public:
 
   typedef OdfImageType                              OutputImageType;
 
-  typedef Image< Vector< TOdfPixelType, (unsigned int)((NOrderL*NOrderL + NOrderL + 2.0)/2.0 + NOrderL) >, 3 > CoefficientImageType;
+  typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
 
   typedef Image< BZeroPixelType, 3 >                BZeroImageType;
 

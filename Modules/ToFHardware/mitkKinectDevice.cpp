@@ -436,17 +436,17 @@ namespace mitk
   {
     ToFCameraDevice::SetProperty(propertyKey,propertyValue);
     this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-    //if (strcmp(propertyKey, "ModulationFrequency") == 0)
-    //{
-    //  int modulationFrequency = 0;
-    //  GetIntProperty(propertyValue, modulationFrequency);
-    //  m_Controller->SetModulationFrequency(modulationFrequency);
-    //}
-    //else if (strcmp(propertyKey, "IntegrationTime") == 0)
-    //{
-    //  int integrationTime = 0;
-    //  GetIntProperty(propertyValue, integrationTime);
-    //  m_Controller->SetIntegrationTime(integrationTime);
-    //}
+    if (strcmp(propertyKey, "RGB") == 0)
+    {
+      bool rgb = false;
+      GetBoolProperty(propertyKey, rgb);
+      m_Controller->SetUseIR(!rgb);
+    }
+    else if (strcmp(propertyKey, "IR") == 0)
+    {
+      bool ir = false;
+      GetBoolProperty(propertyKey, ir);
+      m_Controller->SetUseIR(ir);
+    }
   }
 }

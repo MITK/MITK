@@ -44,6 +44,9 @@ namespace mitk
 
     itkGetConstMacro(CaptureHeight,unsigned int);
     itkGetConstMacro(CaptureWidth,unsigned int);
+    itkGetConstMacro(UseIR,bool);
+
+    itkSetMacro(UseIR,bool);
 
     /*!
     \brief opens a connection to the Kinect camera.

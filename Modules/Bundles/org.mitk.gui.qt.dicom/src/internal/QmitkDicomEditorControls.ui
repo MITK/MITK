@@ -113,6 +113,16 @@
         </widget>
        </widget>
       </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -140,15 +150,8 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-    <sender>QmitkDicomExternalDataWidget</sender>
-    <signal>SignalChangePage(int)</signal>
-    <receiver>QmitkDicomEditor</receiver>
-    <slot>OnChangePage(int)</slot>
-  </connection>
-  </connections>
-  <slots>
-    <slot>OnChangePage(int)</slot>
-  </slots>
+ <connections/>
+ <slots>
+  <slot>OnChangePage(int)</slot>
+ </slots>
 </ui>

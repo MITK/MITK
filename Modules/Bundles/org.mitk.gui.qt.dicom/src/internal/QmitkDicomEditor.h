@@ -74,11 +74,14 @@ public:
     void DoSaveAs() {}
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
-
+    
 signals:
 
 
     protected slots:
+
+        /// \brief Called when StoreSCP shold be started or updated
+        void UpdateStartStoreSCP();
 
         /// \brief Called when import is finished
         void OnDicomImportFinished(const QString& path);
@@ -95,22 +98,27 @@ signals:
         /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
         void OnViewButtonAddToDataManager(const QStringList& eventProperties);
 
-        void StartDicomDirectoryListener(QString& directory);
+        void StartDicomDirectoryListener();
 
         void OnChangePage(int);
-        /// To be called when an entry of the tree list is collapsed
-        //void OnTreeCollapsed(const QModelIndex& index);
-
-        /// To be called when an entry of the tree list is expanded
-        //void OnTreeExpanded(const QModelIndex& index);
 
         void TestHandler();
 
+        void SetDatabaseDirectory(const QString& databaseDirectory);
+    
+        void SetListenerDirectory(const QString& listenerDirectory);
+
 protected:
+
+    /// \brief Called when StoreSCP shold start
+    void StartStoreSCP();
+
+    /// \brief Called when StoreSCP should stop
+    void StopStoreSCP();
 
     void CreateQtPartControl(QWidget *parent);
 
-    void SetupDefaults();
+    void QmitkDicomEditor::SetPluginDirectory();
 
     Events::Types GetPartEventTypes() const;
 
@@ -121,7 +129,10 @@ protected:
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
     DicomEventHandler* m_Handler;
     QmitkDicomDataEventPublisher* m_Publisher;
- 
+    QString* m_PluginDirectory;
+    QString* m_ListenerDirectory;
+    QString* m_DatabaseDirectory;
+
 };
 
 #endif // QmitkDicomEditor_h

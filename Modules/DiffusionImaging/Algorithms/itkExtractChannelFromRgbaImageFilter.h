@@ -8,7 +8,7 @@
 
 namespace itk{
 
-template< class OutputImageType >
+template< class ReferenceImageType, class OutputImageType >
 class ExtractChannelFromRgbaImageFilter : public ImageToImageFilter< itk::Image<itk::RGBAPixel<unsigned char>,3>, OutputImageType >
 {
 
@@ -30,8 +30,6 @@ public:
   typedef typename OutputImageType::PixelType OutPixelType;
   typedef typename InputImageType::PixelType InPixelType;
 
-  typedef itk::VectorImage< short int, 3 > ReferenceImageType;
-
   itkNewMacro(Self);
   itkTypeMacro( ExtractChannelFromRgbaImageFilter, ImageSource );
 
@@ -40,14 +38,14 @@ public:
   void GenerateData();
 
   itkSetMacro(Channel, Channel)
-  itkSetMacro(ReferenceImage, ReferenceImageType::Pointer)
+  itkSetMacro(ReferenceImage, typename ReferenceImageType::Pointer)
 
 protected:
 
   ExtractChannelFromRgbaImageFilter();
   virtual ~ExtractChannelFromRgbaImageFilter();
   Channel m_Channel;
-  ReferenceImageType::Pointer m_ReferenceImage;
+  typename ReferenceImageType::Pointer m_ReferenceImage;
 };
 
 }

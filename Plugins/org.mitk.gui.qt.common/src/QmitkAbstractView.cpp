@@ -121,11 +121,11 @@ public:
   }
 
   /**
-   * reactions to selection events from data manager (and potential other senders)
+   * reactions to selection events from views
    */
   void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
   {
-    if(sourcepart.IsNull() || sourcepart->GetSite()->GetId() != "org.mitk.views.datamanager")
+    if(sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
       return;
 
     mitk::DataNodeSelection::ConstPointer _DataNodeSelection
@@ -242,7 +242,7 @@ void QmitkAbstractView::AfterCreateQtPartControl()
   d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
         new berry::SelectionChangedAdapter<QmitkAbstractViewPrivate>(d.data(),
                                                              &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ d->m_BlueBerrySelectionListener);
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
   
   // EMULATE INITIAL SELECTION EVENTS
 
@@ -477,7 +477,6 @@ mitk::IDataStorageReference::Pointer QmitkAbstractView::GetDataStorageReference(
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const
 {
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  // buffer for the data manager selection
   mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
   return d->DataNodeSelectionToQList(currentSelection);
 }
@@ -485,7 +484,6 @@ QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetDataManagerSelection() const
 {
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-    // buffer for the data manager selection
   mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
   return d->DataNodeSelectionToQList(currentSelection);
 }

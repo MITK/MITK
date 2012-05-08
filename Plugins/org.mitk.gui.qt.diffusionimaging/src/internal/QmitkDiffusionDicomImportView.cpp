@@ -75,7 +75,6 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
 
     AverageClicked();
-    AdvancedCheckboxClicked();
   }
 }
 
@@ -91,7 +90,6 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()), this, SLOT(AverageClicked()) );
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
-    connect( m_Controls->m_Advanced, SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
     connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
   }
 }
@@ -101,14 +99,6 @@ void QmitkDiffusionDicomImport::Remove()
 {
   int i = m_Controls->listWidget->currentRow();
   m_Controls->listWidget->takeItem(i);
-}
-
-void QmitkDiffusionDicomImport::AdvancedCheckboxClicked()
-{
-  bool check = m_Controls->
-    m_Advanced->isChecked();
-
-  m_Controls->m_AdvancedFrame->setVisible(check);
 }
 
 void QmitkDiffusionDicomImport::OutputSet()
@@ -617,10 +607,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
         diffImage->SetDirections(directions);
         diffImage->SetOriginalDirections(directions);
-        if(m_Controls->m_DicomLoadDKFZ->isChecked())
-        {
-          diffImage->CorrectDKFZBrokenGradientScheme(m_Controls->m_Blur->value());
-        }
         diffImage->SetVectorImage(vecImage);
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
@@ -634,9 +620,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           logfile << "Averaging gradient directions\n";
           diffImage->AverageRedundantGradients(m_Controls->m_Blur->value());
         }
-
-        //if(m_Controls->m_DicomLoadDuplicateIfSingleSliceCheckbox->isChecked())
-        //  diffVolumes->DuplicateIfSingleSlice();
 
         QString descr = QString("%1_%2_%3")
                         .arg(((inHeaders)[0])->seriesDescription.c_str())
@@ -660,7 +643,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           QString fullpath = QString("%1/%2.dwi")
                              .arg(m_OutputFolderName)
                              .arg(descr);
-          //std::string pathstring = itksys::SystemTools::ConvertToOutputPath(fullpath.toStdString().c_str());
 
           writer->SetFileName(fullpath.toStdString());
           writer->SetInput(diffImage);

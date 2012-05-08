@@ -37,7 +37,9 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
 
   ConnectomicsHistogramsCacheElement *elementToUpdate = 0;
 
-  bool first = true;
+  bool first( true );
+
+  bool found( false );
 
   for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
   {
@@ -52,33 +54,43 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
         cache.push_front(e);
       }
       if( p_BaseData->GetMTime() > e->m_LastUpdateTime.GetMTime())
-        goto recomputeElement;
+      {
+        // found but needs an update
+        found = true;
+        elementToUpdate = e;
+        break;
+      }
 
-
+      // found but no update needed
       return dynamic_cast<ConnectomicsHistogramsContainer*>( e->GetHistograms() );
     }
 
     first = false;
   }
 
-  if (dynamic_cast<ConnectomicsNetwork*>(p_BaseData))
+  if( !found )
   {
-    elementToUpdate = new ConnectomicsHistogramsCacheElement();
+    if (dynamic_cast<ConnectomicsNetwork*>(p_BaseData))
+    {
+      elementToUpdate = new ConnectomicsHistogramsCacheElement();
+    }
+    else
+    {
+      MITK_WARN << "not supported: " << p_BaseData->GetNameOfClass();
+      return NULL;
+    }
+
+    elementToUpdate->baseData = p_BaseData;
+    cache.push_front(elementToUpdate);
+    TrimCache();
   }
-  else
+
+  if(elementToUpdate)
   {
-    MITK_WARN << "not supported: " << p_BaseData->GetNameOfClass();
-    return NULL;
+    elementToUpdate->ComputeFromBaseData(p_BaseData);
+    elementToUpdate->m_LastUpdateTime.Modified();
+    return dynamic_cast<ConnectomicsHistogramsContainer*>( elementToUpdate->GetHistograms() );
   }
-
-  elementToUpdate->baseData = p_BaseData;
-  cache.push_front(elementToUpdate);
-  TrimCache();
-
-  recomputeElement:
-
-  elementToUpdate->ComputeFromBaseData(p_BaseData);
-  elementToUpdate->m_LastUpdateTime.Modified();
-  return dynamic_cast<ConnectomicsHistogramsContainer*>( elementToUpdate->GetHistograms() );
+  return NULL;
 }
 

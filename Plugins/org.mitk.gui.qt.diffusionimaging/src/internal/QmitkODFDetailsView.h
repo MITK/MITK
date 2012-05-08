@@ -103,9 +103,10 @@ protected:
   vtkRenderWindow* m_VtkRenderWindow;
   vtkRenderWindowInteractor* m_RenderWindowInteractor;
   vtkCamera* m_Camera;
-  mitk::DataNode::Pointer m_SelectedNode;
   std::vector<double> m_Values;
   int m_OdfNormalization;
+
+  mitk::DataNode::Pointer m_ImageNode;
 };
 
 

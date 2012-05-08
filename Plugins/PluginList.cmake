@@ -28,6 +28,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
+  org.mitk.gui.qt.meshdecimation:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.python.console:OFF

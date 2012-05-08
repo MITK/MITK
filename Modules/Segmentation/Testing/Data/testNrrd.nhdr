@@ -1,0 +1,20 @@
+NRRD0005
+content: SomeIDNumber42
+type: short
+dimension: 4
+space: right-anterior-superior
+sizes: 2 2 2 2
+thicknesses:  NaN  NaN 2.5  NaN
+space directions: (2,0,0) (0,2.5,0) (0,0,2) none
+centerings: cell cell cell none
+kinds: space space space list
+endian: little
+encoding: ascii
+space units: "mm" "mm" "mm"
+space origin: (0,0,0)
+data file: testNrrd.ascii
+measurement frame: (1,0,0) (0,0,1) (0,1,0)
+modality:=DWMRI
+DWMRI_b-value:=1000
+DWMRI_gradient_0000:= 0  0  0
+DWMRI_gradient_0001:= 1  0  1

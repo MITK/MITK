@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <QDateTime>
 #include <string>
-#include <strstream>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
 #include "mitkCoreObjectFactory.h"
@@ -36,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPNGWriter.h>
 #include <vtkCellArray.h>
 #include <vtkTriangleFilter.h>
+#include <QApplication>
+#include <QMessageBox>
 
 #include <Poco/Path.h>
 
@@ -482,6 +483,7 @@ void CommonFunctionality::HandleGZExtension(std::string &baseFileName, std::stri
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
+  std::string defaultExtension = ".nrrd";
 
   std::string fileName;
 
@@ -531,23 +533,45 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     }
     // check if extension is suitable for writing image data
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();    
     if (!imageWriter->IsExtensionValid(extension))
     {
+      // muellerm, 12-05-02, using default file extension
+      // if no valid extension was given, see bug 11799
+
+      MITK_WARN << extension << " extension is unknown. Writing image to file " << fileName
+                   << defaultExtension;
+      extension = defaultExtension;
+      baseFilename = itksys::SystemTools::GetFilenameName( fileName );
+      //MITK_INFO << baseFilename;
+
+      /*
       QString message;
       message.append("File extension not suitable for writing image data. Choose one extension of this list: ");
       message.append(imageWriter->GetPossibleFileExtensionsAsString().c_str());
       QMessageBox::critical(NULL,"ERROR",message);
       return "";
+      */
     }
 
     dir += "/";
     dir += baseFilename;
+
+    if( itksys::SystemTools::FileExists( (dir + extension).c_str() ) )
+    {
+      int answer = QMessageBox::question( QApplication::topLevelWidgets().at(0), "Warning",
+                                          QString("File %1 already exists. Overwrite?").arg( QString::fromStdString(dir + extension) ),
+                                          QMessageBox::Yes,
+                                          QMessageBox::No );
+      if( answer == QMessageBox::No )
+        return "";
+    }
    
     imageWriter->SetInput(image);
     imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());
     imageWriter->Write();
+    fileName = dir + extension;
   }
   catch ( itk::ExceptionObject &err)
   {

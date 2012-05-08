@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
+#include <sstream>
+
 #include "mitkGeometry3D.h"
 #include "mitkMatrixConvert.h"
 #include "mitkRotationOperation.h"
@@ -554,11 +556,9 @@ void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
   Compose(itkTransform, pre);
 }
 
-const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
+const std::string mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
 {
-  static char buffer[255];  
-  for ( int j=0; j<255; j++) buffer[j] = '\0';
-  ostrstream out( buffer, 255 );
+  std::ostringstream out;
 
   out << '[';
 
@@ -577,7 +577,7 @@ const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType
 
   out << "]\0";
 
-  return buffer;
+  return out.str();
 }
 
 void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const

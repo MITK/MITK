@@ -10,20 +10,20 @@
 
 namespace itk{
 
-  template< class OutputImageType >
-  ExtractChannelFromRgbaImageFilter< OutputImageType >::ExtractChannelFromRgbaImageFilter():
+  template< class ReferenceImageType, class OutputImageType >
+  ExtractChannelFromRgbaImageFilter< ReferenceImageType, OutputImageType >::ExtractChannelFromRgbaImageFilter():
     m_Channel(RED)
   {
 
   }
 
-  template< class OutputImageType >
-  ExtractChannelFromRgbaImageFilter< OutputImageType >::~ExtractChannelFromRgbaImageFilter()
+  template< class ReferenceImageType, class OutputImageType >
+  ExtractChannelFromRgbaImageFilter< ReferenceImageType, OutputImageType >::~ExtractChannelFromRgbaImageFilter()
   {
   }
 
-  template< class OutputImageType >
-  void ExtractChannelFromRgbaImageFilter< OutputImageType >::GenerateData()
+  template< class ReferenceImageType, class OutputImageType >
+  void ExtractChannelFromRgbaImageFilter< ReferenceImageType, OutputImageType >::GenerateData()
   {
 
     typename InputImageType::Pointer rgbaImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
@@ -59,6 +59,7 @@ namespace itk{
     while(!rgbaIt.IsAtEnd()){
 
       InPixelType x = rgbaIt.Get();
+      ++rgbaIt;
 
       itk::Point<float, 3> vertex;
       itk::Index<3> index = rgbaIt.GetIndex();
@@ -136,10 +137,6 @@ namespace itk{
       counterImageBufferPointer[( px+1 + w*(py+1+ h*pz  ))] += 1;
       counterImageBufferPointer[( px+1 + w*(py+1+ h*pz+h))] += 1;
 
-//      outputImage->SetPixel(index, outputImage->GetPixel(index)+out);
-//      counterImage->SetPixel(index, counterImage->GetPixel(index)+1);
-
-      ++rgbaIt;
     }
 
     typedef ImageRegionIterator< OutputImageType > OutImageIteratorType;

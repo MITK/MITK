@@ -15,15 +15,13 @@ Available sections:
   - \ref QmitkDiffusionImagingUserManualTechnicalDetail
   - \ref QmitkDiffusionImagingUserManualSubManuals
 
-\image html overview.png The MITK Diffusion Imaging Module
-
 \section QmitkDiffusionImagingUserManualIssues Known Issues
 
 \li <b>Dicom Import:</b> The dicom import has so far only been implemented for Siemens dicom images. MITK-DI is capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
 
 \section QmitkDiffusionImagingUserManualPreprocessing Preprocessing
 
-The preprocessing view gives an overview over the important features of a diffusion weighted image like the number of gradient directions, b-value and the measurement frame. Additionally it allows the extraction of the B0 image and the generation of a binary brain mask. The image volume can be modified by applying a new mesurement frame, which is useful if the measurement frame is not set correctly in the image header, or by averaging redundant gradient directions.
+The preprocessing view gives an overview over the important features of a diffusion weighted image like the number of gradient directions, b-value and the measurement frame. Additionally it allows the extraction of the B0 image, reduction of gradient directions and the generation of a binary brain mask. The image volume can be modified by applying a new mesurement frame, which is useful if the measurement frame is not set correctly in the image header, or by averaging redundant gradient directions.
 
 \image html prepro1.png Preprocessing
 
@@ -120,5 +118,5 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_stochastictracking
   \li \subpage org_ivim
   \li \subpage org_brainnetworkanalysis
-
+  \li \subpage org_tractbasedspatialstatistics
 */

@@ -35,7 +35,7 @@ void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<
 
   std::vector<double> xVals;
   std::vector<double> yVals;
-  float max = itk::NumericTraits<float>::min();
+  float max = itk::NumericTraits<float>::NonpositiveMin();
   float min = itk::NumericTraits<float>::max();
 
   for (int i=0; i<QBALL_ODFSIZE; i++){

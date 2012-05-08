@@ -26,8 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 //Basedata Test
-#include <mitkContour.h>
-#include <mitkContourSet.h>
 #include <mitkItkBaseDataAdapter.h>
 #include <mitkMesh.h>
 #include <mitkSeedsImage.h>
@@ -38,15 +36,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkMapper.h>
 #include <mitkMapper2D.h>
 #include <mitkVtkMapper2D.h>
-#include <mitkContourMapper2D.h>
-#include <mitkContourSetMapper2D.h>
 #include <mitkMeshMapper2D.h>
 #include <mitkUnstructuredGridMapper2D.h>
 #include <mitkLineMapper2D.h>
 #include <mitkSplineMapper2D.h>
 
-#include <mitkContourSetVtkMapper3D.h>
-#include <mitkContourVtkMapper3D.h>
 #include <mitkMeshVtkMapper3D.h>
 #include <mitkUnstructuredGridVtkMapper3D.h>
 #include <mitkLineVtkMapper3D.h>
@@ -54,8 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Interactors
 #include <mitkConnectPointsInteractor.h>
-#include <mitkContourInteractor.h>
-#include <mitkExtrudedContourInteractor.h>
 #include <mitkPointInteractor.h>
 #include <mitkPointSelectorInteractor.h>
 #include <mitkSeedsInteractor.h>
@@ -90,14 +82,6 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a NULL pointer was set correctly" )
 
-  baseData = mitk::Contour::New();
-  dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a Contour object was set correctly" )
-
-  baseData = mitk::ContourSet::New();
-  dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a ContourSet object was set correctly" )
-  
   baseData = mitk::ItkBaseDataAdapter::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a ItkBaseDataAdapter object was set correctly" )
@@ -130,16 +114,6 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetMapper(0,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(0), "Testing if a NULL pointer was set correctly" )
 
-  mapper = mitk::ContourMapper2D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::ContourSetMapper2D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourSetMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-  
   mapper = mitk::MeshMapper2D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a MeshMapper2D was set correctly" )
@@ -158,17 +132,6 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   mapper = mitk::SplineMapper2D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SplineMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  //3D Mappers
-  mapper = mitk::ContourSetVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourSetVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::ContourVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::MeshVtkMapper3D::New();
@@ -204,12 +167,6 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 
   interactor = mitk::ConnectPointsInteractor::New("AffineInteractions click to select", dataNode);
   MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ConnectPointsInteractor was set correctly" )
-
-  interactor = mitk::ContourInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ContourInteractor was set correctly" )
-
-  interactor = mitk::ExtrudedContourInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ExtrudedContourInteractor was set correctly" )
 
   interactor = mitk::PointInteractor::New("AffineInteractions click to select", dataNode);
   MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a PointInteractor was set correctly" )

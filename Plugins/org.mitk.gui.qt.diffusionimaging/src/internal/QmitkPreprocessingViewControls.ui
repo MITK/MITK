@@ -24,6 +24,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="title">
+      <string>Data</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Diffusion Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_DiffusionImageLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
       <string>Info</string>
@@ -45,7 +68,7 @@
          <string>-</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -62,7 +85,7 @@
          <string>-</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -72,7 +95,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Generate pointset displaying the gradient vectors.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -191,7 +214,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Mirror all gradients around one axis.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -255,7 +278,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere.</string>
         </property>
         <property name="statusTip">
          <string/>

@@ -36,11 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkXMLPUnstructuredGridWriter.h>
 
 #include "mitkCone.h"
-#include "mitkContour.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContourSetMapper2D.h"
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkContourVtkMapper3D.h"
 #include "mitkCuboid.h"
 #include "mitkCylinder.h"
 #include "mitkEllipsoid.h"
@@ -96,16 +91,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<Contour*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if((dynamic_cast<ContourSet*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourSetMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridMapper2D::New();
@@ -122,16 +107,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
     else if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if((dynamic_cast<Contour*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourVtkMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if((dynamic_cast<ContourSet*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
@@ -183,6 +158,9 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetSaveFil
 
 void mitk::CoreExtObjectFactory::CreateFileExtensionsMap()
 {
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mitk", "MITK scene files")); //a better place to add this file ending might be the scene serialization class
+                                                                                                 //at the moment this is not done because there is a plan to restructure the
+                                                                                                 //ObjectFactories. When this is done we have to check where we want to add this file ending.
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));

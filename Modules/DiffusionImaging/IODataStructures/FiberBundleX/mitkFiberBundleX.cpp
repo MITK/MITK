@@ -909,7 +909,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure::P
     clipperlines->InitTraversal();
     long numOfLineCells = clipperlines->GetNumberOfCells();
     long numofClippedPoints = clipperout->GetNumberOfPoints();
-    pointindexFiberMap.reserve(numofClippedPoints);
+    pointindexFiberMap.resize(numofClippedPoints);
 
 
     //prepare resulting vector
@@ -972,7 +972,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure::P
 
 void mitk::FiberBundleX::UpdateFiberGeometry()
 {
-  if (m_NumFibers<=0)
+  if (m_NumFibers<=0) // no fibers present; apply default geometry
   {
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->SetImageGeometry(true);
@@ -981,7 +981,7 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     SetGeometry(geometry);
     return;
   }
-  float min = itk::NumericTraits<float>::min();
+  float min = itk::NumericTraits<float>::NonpositiveMin();
   float max = itk::NumericTraits<float>::max();
   float b[] = {max, min, max, min, max, min};
 
@@ -1013,7 +1013,6 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         b[5]=p[2];
     }
   }
-
   // provide some border margin
   for(int i=0; i<=4; i+=2)
     b[i] -=10;
@@ -1021,7 +1020,6 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     b[i] +=10;
 
   mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-  geometry->SetImageGeometry(true);
   geometry->SetFloatBounds(b);
   this->SetGeometry(geometry);
 }

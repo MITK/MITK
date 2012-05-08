@@ -10,6 +10,7 @@ set(module_dirs
     IpPicSupport
     MitkExt
     SceneSerialization
+    Segmentation
     Qmitk
     QmitkExt
     GraphAlgorithms

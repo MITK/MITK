@@ -76,18 +76,39 @@ include_directories(
 link_directories(${MITK_LINK_DIRECTORIES})
 
 # -----------------------------------------------------------------------
+# Add executable icon (Windows)
+# -----------------------------------------------------------------------
+set(WINDOWS_ICON_RESOURCE_FILE "")
+if(WIN32)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
+    set(WINDOWS_ICON_RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/${_APP_NAME}.rc")
+  endif()
+endif()
+
+# -----------------------------------------------------------------------
 # Create the executable and link libraries
 # -----------------------------------------------------------------------
 
 if(_APP_SHOW_CONSOLE)
-  add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES})
+  add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
-  add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES})
+  add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
 
 target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
   target_link_libraries(${_APP_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
+endif()
+
+# -----------------------------------------------------------------------
+# Add executable icon (Mac)
+# -----------------------------------------------------------------------
+if(APPLE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
+    file(COPY ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_APP_NAME}.app/Contents/Resources/")
+    file(INSTALL ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${_APP_NAME}.app/Contents/Resources/")
+  endif()
 endif()
 
 # -----------------------------------------------------------------------

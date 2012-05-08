@@ -334,7 +334,7 @@ showPerspectiveToolbar(false),
 showVersionInfo(true),
 showMitkVersionInfo(true),
 showViewMenuItem(true),
-showNewWindowMenuItem(true),
+showNewWindowMenuItem(false),
 showClosePerspectiveMenuItem(true),
 dropTargetListener(new QmitkDefaultDropTargetListener)
 {

@@ -103,6 +103,7 @@ void QmitkStochasticFiberTrackingView::StdMultiWidgetNotAvailable()
 
 void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
+  m_DiffusionImageNode = NULL;
   m_DiffusionImage = NULL;
   m_SeedRoi = NULL;
   m_Controls->m_DiffusionImageLabel->setText("-");
@@ -119,6 +120,7 @@ void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::Dat
     {
       if( dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
       {
+        m_DiffusionImageNode = node;
         m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
         m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
       }
@@ -202,14 +204,19 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
   binaryImageToItk1->SetInput( m_SeedRoi );
   binaryImageToItk1->Update();
 
+  vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
+
   itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
   it.Begin();
+  mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
 
   while(!it.IsAtEnd())
   {
     itk::ImageConstIterator<BinaryImageType>::PixelType tmpPxValue = it.Get();
 
     if(tmpPxValue != 0){
+      mitk::Point3D point;
       itk::ImageRegionConstIterator< BinaryImageType >::IndexType seedIdx = it.GetIndex();
       trackingFilter->SetSeedIndex(seedIdx);
       trackingFilter->Update();
@@ -219,42 +226,41 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
       PTFilterType::TractContainerType::Pointer container_tmp = trackingFilter->GetOutputTractContainer();
       PTFilterType::TractContainerType::Iterator elIt = container_tmp->Begin();
       PTFilterType::TractContainerType::Iterator end = container_tmp->End();
+      bool addTract = true;
 
       while( elIt != end ){
-        PTFilterType::TractContainerType::Element tract_tmp = elIt.Value();
-        m_tractcontainer->InsertElement(m_tractcontainer->Size(),tract_tmp);
+        PTFilterType::TractContainerType::Element tract = elIt.Value();
+        PTFilterType::TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist = tract->GetVertexList();
+
+        vtkSmartPointer<vtkPolyLine> vPolyLine = vtkSmartPointer<vtkPolyLine>::New();
+        for( int j=0; j<(int)vertexlist->Size(); j++)
+        {
+          PTFilterType::TractContainerType::Element::ObjectType::VertexListType::Element vertex = vertexlist->GetElement(j);
+          mitk::Point3D index;
+          index[0] = (float)vertex[0];
+          index[1] = (float)vertex[1];
+          index[2] = (float)vertex[2];
+
+          if (geom->IsIndexInside(index))
+          {
+            geom->IndexToWorld(index, point);
+            vtkIdType id = vPoints->InsertNextPoint(point.GetDataPointer());
+            vPolyLine->GetPointIds()->InsertNextId(id);
+          }
+          else
+          {
+            addTract = false;
+            break;
+          }
+        }
+
+        if (addTract)
+          vCellArray->InsertNextCell(vPolyLine);
+
         ++elIt;
       }
     }
     ++it;
-  }
-
-  /* allocate the VTK Polydata to output the tracts */
-  vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
-
-  for( int i=0; i<(int)m_tractcontainer->Size(); i++ )
-  {
-    mitk::Point3D point;
-
-    PTFilterType::TractContainerType::Element tract = m_tractcontainer->GetElement(i);
-    PTFilterType::TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist = tract->GetVertexList();
-
-    vtkSmartPointer<vtkPolyLine> vPolyLine = vtkSmartPointer<vtkPolyLine>::New();
-    for( int j=0; j<(int)vertexlist->Size(); j++)
-    {
-      PTFilterType::TractContainerType::Element::ObjectType::VertexListType::Element vertex = vertexlist->GetElement(j);
-      mitk::Point3D index;
-      index[0] = (float)vertex[0];
-      index[1] = (float)vertex[1];
-      index[2] = (float)vertex[2];
-
-      m_DiffusionImage->GetGeometry()->IndexToWorld(index, point);
-
-      vtkIdType id = vPoints->InsertNextPoint(point.GetDataPointer());
-      vPolyLine->GetPointIds()->InsertNextId(id);
-    }
-    vCellArray->InsertNextCell(vPolyLine);
   }
 
   vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -264,7 +270,9 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
   mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
   fbNode->SetData(fib);
-  fbNode->SetName("GroupFinberBundle");
+  QString name(m_DiffusionImageNode->GetName().c_str());
+  name += "_FiberBundle";
+  fbNode->SetName(name.toStdString());
   fbNode->SetVisibility(true);
   GetDataStorage()->Add(fbNode);
 }

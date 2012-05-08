@@ -19,6 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
+// this is needed for memcopy in ITK
+// can be removed when fixed in ITK
+#include <cstring>
+
 #include <itkPoint.h>
 #include <float.h>
 #include <itkIndex.h>

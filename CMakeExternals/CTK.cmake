@@ -15,10 +15,10 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
     
-    set(revision_tag 6925794b)
-    #if(${proj}_REVISION_TAG)
-    #  set(revision_tag ${${proj}_REVISION_TAG})
-    #endif()
+    set(revision_tag 70c0a8d3)
+    #IF(${proj}_REVISION_TAG)
+    #  SET(revision_tag ${${proj}_REVISION_TAG})
+    #ENDIF()
     
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
@@ -26,18 +26,30 @@ if(MITK_USE_CTK)
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
       )
     endif()
-    foreach(type RUNTIME ARCHIVE LIBRARY)
-      if(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
-        list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
-      endif()
-    endforeach()
+
+    if(MITK_USE_DCMTK)
+      list(APPEND ctk_optional_cache_args
+           -DDCMTK_DIR:PATH=${DCMTK_DIR}
+          )
+      list(APPEND proj_DEPENDENCIES DCMTK)
+    else()
+      list(APPEND ctk_optional_cache_args
+           -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
+          )
+    endif()
+
+    FOREACH(type RUNTIME ARCHIVE LIBRARY)
+      IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
+        LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
+      ENDIF()
+    ENDFOREACH()
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 43430cee2dfec2519cbe33cbfebc3eaf
+      URL_MD5 a3130b2c3e7a1d320740938f61b65840
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

@@ -216,9 +216,7 @@ void QmitkFiberProcessingView::GenerateRoiImage(){
     return;
 
   mitk::Geometry3D::Pointer geometry;
-  if (m_SelectedImage.IsNotNull())
-    geometry = m_SelectedImage->GetGeometry();
-  else if (!m_SelectedFB.empty())
+  if (!m_SelectedFB.empty())
   {
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
     geometry = fib->GetGeometry();
@@ -226,18 +224,27 @@ void QmitkFiberProcessingView::GenerateRoiImage(){
   else
     return;
 
+  mitk::Vector3D spacing = geometry->GetSpacing();
+  spacing /= m_UpsamplingFactor;
+
+  mitk::Point3D newOrigin = geometry->GetOrigin();
+  mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+  newOrigin[0] += bounds.GetElement(0);
+  newOrigin[1] += bounds.GetElement(2);
+  newOrigin[2] += bounds.GetElement(4);
+
   itk::Matrix<double, 3, 3> direction;
   itk::ImageRegion<3> imageRegion;
   for (int i=0; i<3; i++)
     for (int j=0; j<3; j++)
-      direction[j][i] = geometry->GetMatrixColumn(i)[j];
+      direction[j][i] = geometry->GetMatrixColumn(i)[j]/spacing[j];
   imageRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
   imageRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
   imageRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
 
   m_PlanarFigureImage = itkUCharImageType::New();
-  m_PlanarFigureImage->SetSpacing( geometry->GetSpacing() );   // Set the image spacing
-  m_PlanarFigureImage->SetOrigin( geometry->GetOrigin() );     // Set the image origin
+  m_PlanarFigureImage->SetSpacing( spacing );   // Set the image spacing
+  m_PlanarFigureImage->SetOrigin( newOrigin );     // Set the image origin
   m_PlanarFigureImage->SetDirection( direction );  // Set the image direction
   m_PlanarFigureImage->SetRegions( imageRegion );
   m_PlanarFigureImage->Allocate();
@@ -693,7 +700,8 @@ template < typename TPixel, unsigned int VImageDimension >
       index[1] = point[1];
       index[2] = point[2];
 
-      m_PlanarFigureImage->SetPixel(index, 1);
+      if (pfImageGeometry3D->IsIndexInside(index))
+        m_PlanarFigureImage->SetPixel(index, 1);
     }
     ++imageIterator;
   }
@@ -777,7 +785,7 @@ void QmitkFiberProcessingView::UpdateGui()
   }
   else
   {
-    if ( m_SelectedImage.IsNotNull() || !m_SelectedFB.empty() )
+    if ( !m_SelectedFB.empty() )
       m_Controls->m_GenerateRoiImage->setEnabled(true);
     else
       m_Controls->m_GenerateRoiImage->setEnabled(false);

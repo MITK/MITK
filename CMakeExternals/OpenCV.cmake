@@ -21,6 +21,15 @@ if(MITK_USE_OpenCV)
            -DBUILD_NEW_PYTHON_SUPPORT:BOOL=ON
           )
     endif()
+    
+    # 12-05-02, muellerm, added QT usage by OpenCV if QT is used in MITK
+    if(MITK_USE_QT)
+      list(APPEND additional_cmake_args
+           -DWITH_QT:BOOL=ON
+           -DWITH_QT_OPENGL:BOOL=OFF
+           -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+          )
+    endif()     
 
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.3.0.tar.bz2)
     set(opencv_url_md5 4e353dfb04b53bea37407f397aabf069)

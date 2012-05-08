@@ -213,24 +213,25 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
     C(i,4) = 2.5 + 1.5*(5+sF)*delta < m[i] && m[i] < 3-3*sF*delta && e[i] > -3*sF*delta;
     C(i,5) = ta[i] <= 0.5+1.5 *(sF+1)*delta && m[i] <= 2.5 + 1.5 *(5+sF) * delta;
     C(i,6) = !( C(i,0) || C(i,1) || C(i,2) || C(i,3) || C(i,4) || C(i,5) ); // ~ANY(C(i,[0-5] ),2)
+
+    A(i,0)=(bool)C(i,0) * a0(i);
+    A(i,1)=(bool)C(i,1) * (1.0/3.0-(sF+2)*delta);
+    A(i,2)=(bool)C(i,2) * (0.2+0.8*a0(i)-0.4*b0(i)-delta/sF);
+    A(i,3)=(bool)C(i,3) * (0.2+delta/sF);
+    A(i,4)=(bool)C(i,4) * (0.2*a0(i)+0.4*b0(i)+2*delta/sF);
+    A(i,5)=(bool)C(i,5) * (1.0/6.0+0.5*(sF+1)*delta);
+    A(i,6)=(bool)C(i,6) * a0(i);
+
+    B(i,0)=(bool)C(i,0) * (1.0/3.0+delta);
+    B(i,1)=(bool)C(i,1) * (1.0/3.0+delta);
+    B(i,2)=(bool)C(i,2) * (0.4-0.4*a0(i)+0.2*b0(i)-2*delta/sF);
+    B(i,3)=(bool)C(i,3) * (0.4-3*delta/sF);
+    B(i,4)=(bool)C(i,4) * (0.4*a0(i)+0.8*b0(i)-delta/sF);
+    B(i,5)=(bool)C(i,5) * (1.0/3.0+delta);
+    B(i,6)=(bool)C(i,6) * b0(i);
   }
 
-  A.set_column(0, a0);
-  A.set_column(1, vOnes * (1/3 - (sF+2) * delta ));
-  A.set_column(2, (a0*0.8)+ 0.2 - (b0 * 0.4) - (delta/sF));
-  A.set_column(3, vOnes * (0.2 + (delta /sF)));
-  A.set_column(4, (a0 * 0.2) + (b0 * 0.4) + 2*(delta/sF));
-  A.set_column(5, vOnes * (1/6+0.5*(sF+1)*delta));
-  A.set_column(6, a0);
 
-
-  B.set_column(0, vOnes * (1/3 +delta) );
-  B.set_column(1, vOnes * (1/3 +delta) );
-  B.set_column(2, (-(a0 * 0.4)) + 0.4 +  ((b0 * 0.2) - 2*(delta/sF)) ); //FLAG
-  B.set_column(3, vOnes * (0.4 - 3* delta / sF));
-  B.set_column(4, (a0 * 0.4) + (b0 * 0.8) - delta /sF);
-  B.set_column(5, vOnes * (1/3 +delta) );
-  B.set_column(6, b0 );
 
   for(int i = 0 ; i < E.rows(); i++)
   {
@@ -238,11 +239,8 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
     double sumB = 0;
     for(int j = 0 ; j < 7; j++)
     {
-      if(C(i,j) != 0)
-      {
         sumA += A(i,j);
         sumB += B(i,j);
-      }
     }
     a[i] = sumA;
     b[i] = sumB;
@@ -266,7 +264,7 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
 {
 
   const double s6 = sqrt(6);
-  const double s15 = s6/2;
+  const double s15 = s6/2.0;
 
   vnl_vector<double> delta(a.size());
   delta.fill(delta0);
@@ -286,31 +284,31 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   AM.set_column(1, A);
   AM.set_column(2, A);
   AM.set_column(3, delta);
-  AM.set_column(4, (A+a-b - (delta*s6))/3);
+  AM.set_column(4, (A+a-b - (delta*s6))/3.0);
   AM.set_column(5, delta);
   AM.set_column(6, delta);
   AM.set_column(7, delta);
   AM.set_column(8, A);
-  AM.set_column(9, (a*2 + A - ( delta * (2 * (s6 + 1)) ))*0.2);
-  AM.set_column(10, ((b*(-2)) + (A + 2) -  delta * (2 * (s6 +1) ) ) *0.2);
+  AM.set_column(9, 0.2*(a*2+A-2*(s6+1)*delta));
+  AM.set_column(10,0.2*(b*(-2)+A+2-2*(s6+1)*delta));
   AM.set_column(11, delta);
   AM.set_column(12, delta);
   AM.set_column(13, delta);
-  AM.set_column(14, (delta * (-(1 + s15))) + 0.5 );
+  AM.set_column(14, 0.5-(1+s15)*delta);
 
 
   aM.set_column(0, a);
   aM.set_column(1, a);
   aM.set_column(2, -delta + 1);
   aM.set_column(3, a);
-  aM.set_column(4, ((A * 2) + (a * 5) + ( b ) + (delta * s6)) / 6);
+  aM.set_column(4, (A*2+a*5+b+s6*delta)/6.0);
   aM.set_column(5, a);
   aM.set_column(6, -delta + 1);
-  aM.set_column(7, ((a+b) * 0.5) + (delta * (1 + s15)));
+  aM.set_column(7, 0.5*(a+b)+(1+s15)*delta);
   aM.set_column(8, -delta + 1);
-  aM.set_column(9, ( (a * 4) + (A * 2) + (delta * (s6 + 1)) )*0.2);
+  aM.set_column(9, 0.2*(a*4+A*2+(s6+1)*delta));
   aM.set_column(10, -delta + 1);
-  aM.set_column(11, delta*(s6 +3));
+  aM.set_column(11, (s6+3)*delta);
   aM.set_column(12, -delta + 1);
   aM.set_column(13, -delta + 1);
   aM.set_column(14, -delta + 1);
@@ -319,16 +317,16 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   bM.set_column(1, delta);
   bM.set_column(2, b);
   bM.set_column(3, b);
-  bM.set_column(4, (( A * (-2) ) + a + ( b * 5 ) - ( delta* s6 )  ) / 6);
+  bM.set_column(4, (A*(-2)+a+b*5-s6*delta)/6.0);
   bM.set_column(5, delta);
   bM.set_column(6, b);
-  bM.set_column(7, ((a+b) * 0.5) - (delta * (1 + s15)));
+  bM.set_column(7, 0.5*(a+b)-(1+s15)*delta);
   bM.set_column(8, delta);
   bM.set_column(9, delta);
-  bM.set_column(10, ( (b * 4) - (A * 2) + 1 + (- (delta * (s6 + 1))) )*0.2);
+  bM.set_column(10, 0.2*(b*4-A*2+1-(s6+1)*delta));
   bM.set_column(11, delta);
   bM.set_column(12, delta);
-  bM.set_column(13, (- (delta * (s6 + 3)))  + 1);
+  bM.set_column(13, -delta*(s6+3) + 1);
   bM.set_column(14, delta);
 
   delta0 *= 0.99;
@@ -383,7 +381,7 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   {
     for(int j = 0 ; j < 15; j ++)
     {
-      if(B(i,j) == 0) R2(i,j) = 9999;
+      if(B(i,j) == 0) R2(i,j) = 1e20;
     }
   }
 
@@ -954,7 +952,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       SignalVector.fill(0.0);
       for( unsigned int i = 0; i< AlphaValues.size(); i++ )
       {
-        SignalVector[i] = static_cast<TO>(LAValues[i] * AlphaValues[i] + LAValues[i] * BetaValues[i]);
+        SignalVector[i] = static_cast<TO>(LAValues[i] * AlphaValues[i] + (1-LAValues[i]) * BetaValues[i]);
       }
 
       vnl_vector<TO> coeffs(m_NumberCoefficients);

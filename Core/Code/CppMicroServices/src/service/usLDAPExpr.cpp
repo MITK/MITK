@@ -489,7 +489,7 @@ bool LDAPExpr::CompareString( const std::string& s1, int op, const std::string& 
 std::string LDAPExpr::FixupString( const std::string& s )
 {
   std::string sb;
-  int len = s.length();
+  std::size_t len = s.length();
   for(int i=0; i<len; i++)
   {
     char c = s.at(i);
@@ -572,7 +572,7 @@ LDAPExpr LDAPExpr::ParseExpr( ParseState& ps )
     ps.skipWhite();
   } while (ps.peek() == '(');
 
-  int n = v.size();
+  std::size_t n = v.size();
   if (!ps.prefix(")") || n == 0 || (op == NOT && n > 1))
     ps.error(MALFORMED);
 
@@ -713,8 +713,8 @@ void LDAPExpr::ParseState::skipWhite()
 
 std::string LDAPExpr::ParseState::getAttributeName()
 {
-  int start = m_pos;
-  int n = -1;
+  std::size_t start = m_pos;
+  std::size_t n = -1;
   for(;; m_pos++)
   {
     Byte c = peek();

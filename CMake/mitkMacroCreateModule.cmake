@@ -17,6 +17,7 @@
 #!     [EXPORT_DEFINE <declspec macro name for dll exports>]
 #!     [QT_MODULE]
 #!     [HEADERS_ONLY]
+#!     [WARNINGS_AS_ERRORS]
 #! \endcode
 #!
 #! \param MODULE_NAME_IN The name for the new module
@@ -25,7 +26,7 @@
 macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE
                         "SUBPROJECTS;VERSION;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
-                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT"
+                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT;WARNINGS_AS_ERRORS"
                         ${ARGN})
                         
   set(MODULE_NAME ${MODULE_NAME_IN})
@@ -135,6 +136,14 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
               set(module_compile_flags "${module_compile_flags} -fvisibility=hidden -fvisibility-inlines-hidden")
             endif()
           endif()
+
+          if(MODULE_WARNINGS_AS_ERRORS)
+            if(MSVC_VERSION)
+              mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
+            else()
+              mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
+            endif()
+          endif(MODULE_WARNINGS_AS_ERRORS)
 
           if(NOT MODULE_NO_INIT)
             list(APPEND CPP_FILES ${module_init_src_file})

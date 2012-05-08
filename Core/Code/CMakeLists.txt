@@ -38,7 +38,8 @@ MITK_CREATE_MODULE( Mitk
   DEPENDS_INTERNAL pic2vtk #IIL4MITK
   PACKAGE_DEPENDS ITK VTK
   EXPORT_DEFINE MITK_CORE_EXPORT
-  WARNINGS_AS_ERRORS
+  # too optimistic for now
+  # WARNINGS_AS_ERRORS
 )
 
 # this is needed for libraries which link to Mitk and need

@@ -4,6 +4,7 @@ SET(MODULE_TESTS
    mitkUSImageVideoSourceTest.cpp
    mitkUSProbeTest.cpp
    mitkUSDeviceTest.cpp
+   mitkUSPipelineTest.cpp
 
    # -----------------------------------------------------------------------
 

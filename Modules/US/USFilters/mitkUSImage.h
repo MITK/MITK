@@ -35,6 +35,8 @@ namespace mitk {
     public:
       mitkClassMacro(USImage, mitk::Image);
       itkNewMacro(Self);
+      // Macro to create an mitkUSImage from an mitkImage 
+      mitkNewMacro1Param(Self, mitk::Image::Pointer);
 
       /**
       * \brief reads out this image's Metadata set from the properties and returns a corresponding USImageMetadata object.
@@ -49,6 +51,10 @@ namespace mitk {
 
     protected:
       USImage();
+      /**
+      * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
+      */
+      USImage(mitk::Image::Pointer image);
       virtual ~USImage();    
       
 

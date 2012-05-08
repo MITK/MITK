@@ -16,15 +16,19 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkUSImageVideoSource.h"
+#include "mitkImage.h"
+#include <cv.h>
+
 
 
 
 mitk::USImageVideoSource::USImageVideoSource()
-: itk::ProcessObject()
+: itk::Object()
 {
     m_IsVideoReady = false;
     m_IsMetadataReady = false;
     m_IsGeometryReady = false;
+    this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
 }
 
 
@@ -58,61 +62,21 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID){
   m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
 }
 
-void mitk::USImageVideoSource::GenerateData()
-{
+
+mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage(){
+  mitk::USImage::Pointer result;
+  mitk::Image::Pointer normalImage;
+
+  IplImage* iplImage = cvCreateImage(cvSize(640,480),IPL_DEPTH_8U,3); 
+  m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(iplImage);
   
+  this->m_OpenCVToMitkFilter->SetOpenCVImage(iplImage);
+  this->m_OpenCVToMitkFilter->Update();
 
-}
-
-
-mitk::USImage* mitk::USImageVideoSource::GetOutput()
-{
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(0));
-}
-
-
-mitk::USImage* mitk::USImageVideoSource::GetOutput(unsigned int idx)
-{
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
-}
-
-
-void mitk::USImageVideoSource::GraftOutput(itk::DataObject *graft)
-{
-  this->GraftNthOutput(0, graft);
-}
-
-
-void mitk::USImageVideoSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
-{
-  if ( idx >= this->GetNumberOfOutputs() )
-  {
-    itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }
-
-  if ( !graft )
-  {
-    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
-  }
-
-  itk::DataObject* output = this->GetOutput(idx);
-  if ( !output )
-  {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
-  }
-  // Call Graft on USImage to copy member data
-  output->Graft( graft );
-}
-
-
-itk::ProcessObject::DataObjectPointer mitk::USImageVideoSource::MakeOutput( unsigned int /*idx */)
-{
-  mitk::USImage::Pointer p = mitk::USImage::New();
-  return static_cast<itk::DataObject*>(p.GetPointer());
+  normalImage = this->m_OpenCVToMitkFilter->GetOutput(0);
+  result = mitk::USImage::New(normalImage);
+  
+  
+  cvReleaseImage (&iplImage);
+  return result;
 }

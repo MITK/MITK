@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProcessObject.h>
 #include "mitkUSImage.h"
 #include "mitkOpenCVVideoSource.h"
+#include "mitkOpenCVToMitkImageFilter.h"
 
 namespace mitk {
 
@@ -30,7 +31,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USImageVideoSource : public itk::ProcessObject
+  class MitkUS_EXPORT USImageVideoSource : public itk::Object
   {
   public:
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);
@@ -49,50 +50,8 @@ namespace mitk {
     */
     void SetCameraInput(int deviceID);
 
-    /**
-    *\brief Grabs the next frame from the Video input
-    */
-    void GenerateData();
-
-    /**
-    *\brief return the output (output with id 0) of the filter
-    */
-    USImage* GetOutput(void);
-
-    /**
-    *\brief return the output with id idx of the filter
-    */
-    USImage* GetOutput(unsigned int idx);
-
-      
-    /**
-    *\brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::GraftNthOutput for details
-    */
-    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
-
-    /**
-    * \brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::Graft Output for details
-    */
-    virtual void GraftOutput(itk::DataObject *graft);
-
-    /**
-    * \brief Make a DataObject of the correct type to used as the specified output.
-    *
-    * This method is automatically called when DataObject::DisconnectPipeline()
-    * is called.  DataObject::DisconnectPipeline, disconnects a data object
-    * from being an output of its current source.  When the data object
-    * is disconnected, the ProcessObject needs to construct a replacement
-    * output data object so that the ProcessObject is in a valid state.
-    * Subclasses of USImageVideoSource that have outputs of different
-    * data types must overwrite this method so that proper output objects
-    * are created.
-    */
-    virtual DataObjectPointer MakeOutput(unsigned int idx);
-
+    mitk::USImage::Pointer GetNextImage();
+    
     // Getter & Setter
     itkGetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
     itkSetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
@@ -100,9 +59,11 @@ namespace mitk {
     itkGetMacro(IsMetadataReady, bool);
     itkGetMacro(IsGeometryReady, bool);
 
+
   protected:
     USImageVideoSource();
     virtual ~USImageVideoSource();
+    
 
     /**
     * \brief The source of the video
@@ -115,7 +76,7 @@ namespace mitk {
    bool m_IsVideoReady;
    bool m_IsMetadataReady;
    bool m_IsGeometryReady;
-
+   mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
     
 
   };

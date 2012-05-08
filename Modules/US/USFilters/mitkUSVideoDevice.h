@@ -36,6 +36,7 @@ namespace mitk {
     public:
       mitkClassMacro(USVideoDevice, mitk::USDevice);
       mitkNewMacro3Param(Self, int, std::string, std::string);
+      mitkNewMacro3Param(Self, std::string, std::string, std::string);
 
       void GenerateData();
 
@@ -47,6 +48,7 @@ namespace mitk {
 
     protected:
       USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model);
+      USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model);
       virtual ~USVideoDevice();
 
       mitk::USImageVideoSource::Pointer m_Source;

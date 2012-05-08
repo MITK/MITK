@@ -21,10 +21,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model, true)
 {
+  this->SetNumberOfInputs(1);
+  this->SetNumberOfOutputs(1);
   m_Source = mitk::USImageVideoSource::New();
   m_Source->SetCameraInput(videoDeviceNumber);
 }
 
+mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model, true)
+{
+  this->SetNumberOfInputs(1);
+  this->SetNumberOfOutputs(1);
+  m_Source = mitk::USImageVideoSource::New();
+  m_Source->SetVideoFileInput(videoFilePath);
+}
 
 mitk::USVideoDevice::~USVideoDevice()
 {
@@ -33,15 +42,11 @@ mitk::USVideoDevice::~USVideoDevice()
 
 void mitk::USVideoDevice::GenerateData()
 {
-
-  mitk::USImage::Pointer result = mitk::USImage::New();
+  mitk::USImage::Pointer result;
+  result = m_Source->GetNextImage();
+  
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
 
-  // 1) get Image from Source
-
-  // 2) Process Image as necessary 
-
-  // 3) Set Output
-
+  this->SetNthOutput(0, result);
 }

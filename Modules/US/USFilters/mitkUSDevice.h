@@ -71,6 +71,50 @@ namespace mitk {
     
       std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
 
+          /**
+    *\brief Grabs the next frame from the Video input
+    */
+    void GenerateData();
+
+    /**
+    *\brief return the output (output with id 0) of the filter
+    */
+    USImage* GetOutput(void);
+
+    /**
+    *\brief return the output with id idx of the filter
+    */
+    USImage* GetOutput(unsigned int idx);
+
+      
+    /**
+    *\brief Graft the specified DataObject onto this ProcessObject's output.
+    *
+    * See itk::ImageSource::GraftNthOutput for details
+    */
+    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
+
+    /**
+    * \brief Graft the specified DataObject onto this ProcessObject's output.
+    *
+    * See itk::ImageSource::Graft Output for details
+    */
+    virtual void GraftOutput(itk::DataObject *graft);
+
+    /**
+    * \brief Make a DataObject of the correct type to used as the specified output.
+    *
+    * This method is automatically called when DataObject::DisconnectPipeline()
+    * is called.  DataObject::DisconnectPipeline, disconnects a data object
+    * from being an output of its current source.  When the data object
+    * is disconnected, the ProcessObject needs to construct a replacement
+    * output data object so that the ProcessObject is in a valid state.
+    * Subclasses of USImageVideoSource that have outputs of different
+    * data types must overwrite this method so that proper output objects
+    * are created.
+    */
+    virtual DataObjectPointer MakeOutput(unsigned int idx);
+
       //########### GETTER & SETTER ##################//
 
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);

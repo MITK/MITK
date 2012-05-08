@@ -43,6 +43,7 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
+         -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
          -DDCMTK_FORCE_FPIC_ON_UNIX:BOOL=ON
       DEPENDS ${proj_DEPENDENCIES}
       )

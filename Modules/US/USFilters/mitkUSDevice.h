@@ -33,14 +33,15 @@ namespace mitk {
 
     /**Documentation
     * \brief A device holds information about it's model, make and the connected probes. It is the
-    * common superclass for all Devices and acts as an image source for mitk Images as well as openCV Images.
-    * if one of these functionalities is not supported by a subclass, it will throw an unsupported Operation Exception.
+    * common superclass for all Devices and acts as an image source for mitkUSImages. It is the Base class
+    * for all US Devices, and every new device should extend it.
     * \ingroup US
     */
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
+      // Expects a manufacturer, a model and a flag wheter this is a video-only device or not
       mitkNewMacro3Param(Self, std::string, std::string, bool);
 
 
@@ -71,49 +72,49 @@ namespace mitk {
     
       std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
 
-          /**
-    *\brief Grabs the next frame from the Video input
-    */
-    void GenerateData();
+      /**
+        *\brief Grabs the next frame from the Video input
+      */
+       void GenerateData();
 
-    /**
-    *\brief return the output (output with id 0) of the filter
-    */
-    USImage* GetOutput(void);
+      /**
+      *\brief return the output (output with id 0) of the filter
+      */
+      USImage* GetOutput(void);
 
-    /**
-    *\brief return the output with id idx of the filter
-    */
-    USImage* GetOutput(unsigned int idx);
+      /**
+      *\brief return the output with id idx of the filter
+      */
+      USImage* GetOutput(unsigned int idx);
 
       
-    /**
-    *\brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::GraftNthOutput for details
-    */
-    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
+      /**
+      *\brief Graft the specified DataObject onto this ProcessObject's output.
+      *
+      * See itk::ImageSource::GraftNthOutput for details
+      */
+      virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
 
-    /**
-    * \brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::Graft Output for details
-    */
-    virtual void GraftOutput(itk::DataObject *graft);
+      /**
+      * \brief Graft the specified DataObject onto this ProcessObject's output.
+      *
+      * See itk::ImageSource::Graft Output for details
+      */
+      virtual void GraftOutput(itk::DataObject *graft);
 
-    /**
-    * \brief Make a DataObject of the correct type to used as the specified output.
-    *
-    * This method is automatically called when DataObject::DisconnectPipeline()
-    * is called.  DataObject::DisconnectPipeline, disconnects a data object
-    * from being an output of its current source.  When the data object
-    * is disconnected, the ProcessObject needs to construct a replacement
-    * output data object so that the ProcessObject is in a valid state.
-    * Subclasses of USImageVideoSource that have outputs of different
-    * data types must overwrite this method so that proper output objects
-    * are created.
-    */
-    virtual DataObjectPointer MakeOutput(unsigned int idx);
+      /**
+      * \brief Make a DataObject of the correct type to used as the specified output.
+      *
+      * This method is automatically called when DataObject::DisconnectPipeline()
+      * is called.  DataObject::DisconnectPipeline, disconnects a data object
+      * from being an output of its current source.  When the data object
+      * is disconnected, the ProcessObject needs to construct a replacement
+      * output data object so that the ProcessObject is in a valid state.
+      * Subclasses of USImageVideoSource that have outputs of different
+      * data types must overwrite this method so that proper output objects
+      * are created.
+      */
+      virtual DataObjectPointer MakeOutput(unsigned int idx);
 
       //########### GETTER & SETTER ##################//
 

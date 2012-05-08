@@ -37,7 +37,6 @@ mitk::USImageVideoSource::~USImageVideoSource()
 }
 
 
-
 void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 {
   m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();

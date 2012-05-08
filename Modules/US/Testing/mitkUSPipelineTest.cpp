@@ -30,10 +30,10 @@ public:
    // Set up a pipeline
     mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
     MITK_TEST_CONDITION_REQUIRED(videoDevice.IsNotNull(), "videoDevice should not be null after instantiation");
-    videoDevice->GenerateData();
+    videoDevice->Update();
     mitk::USImage::Pointer result = videoDevice->GetOutput(0);
     MITK_TEST_CONDITION_REQUIRED(result.IsNotNull(), "resulting images should not be null");
-    MITK_TEST_CONDITION_REQUIRED(result->GetMetadata()->GetDeviceModel().compare("Model") == 0   , "resulting images should have their metadata Set correctly");
+    MITK_TEST_CONDITION_REQUIRED(result->GetMetadata()->GetDeviceModel().compare("Model") == 0   , "resulting images should have their metadata set correctly");
 
   }
 

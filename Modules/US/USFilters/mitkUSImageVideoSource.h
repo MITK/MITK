@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * \brief TODO
+  * \brief This class can be pointed to a video file or a videodevice and delivers USImages with default metadata Sets
   *
   * \ingroup US
   */
@@ -50,6 +50,10 @@ namespace mitk {
     */
     void SetCameraInput(int deviceID);
 
+    /**
+    *\brief Retrieves the next frame. This will typically be the next frame in a file
+    * or the last cahced file in a devcie.
+    */
     mitk::USImage::Pointer GetNextImage();
     
     // Getter & Setter

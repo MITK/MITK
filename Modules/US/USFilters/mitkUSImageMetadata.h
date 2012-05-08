@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
     /**Documentation
-    * \brief TODO
+    * \brief This class encapsulates all necessary metadata to describe a US Image.
     * \ingroup US
     */
   class MitkUS_EXPORT USImageMetadata : public itk::Object
@@ -35,6 +35,7 @@ namespace mitk {
     public:
       mitkClassMacro(USImageMetadata, itk::Object);
       itkNewMacro(Self);
+
     
       //## getter and setter ##
       itkGetMacro(DeviceManufacturer, std::string);
@@ -65,6 +66,9 @@ namespace mitk {
       
 
     protected:
+      /**
+      * \brief Creates a new Metadata with all fields set to default values.
+      */
       USImageMetadata();
       virtual ~USImageMetadata();
 

@@ -28,6 +28,7 @@ namespace mitk {
 
     /**Documentation
     * \brief This specialization of mitk::Image only appends necessary Metadata to an MITK image. Otherwise it can safely be treated like it's mother class.
+    *  to generate a USImage from an standard mitk:Image, call the appropriate constructor USImage( *image)
     * \ingroup US
     */
   class MitkUS_EXPORT USImage : public mitk::Image
@@ -50,12 +51,15 @@ namespace mitk {
 
 
     protected:
+      /**
+      * \brief this constructor creates an empty USImage. The Metadata are set to default.
+      */
       USImage();
       /**
       * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
       */
       USImage(mitk::Image::Pointer image);
-      virtual ~USImage();    
+      virtual ~USImage();
       
 
     };

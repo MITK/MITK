@@ -29,11 +29,12 @@ mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
 {
   this->Initialize(image);
   this->SetVolume(image->GetData());
+  this->SetMetadata(mitk::USImageMetadata::New());
 }
 
 mitk::USImage::~USImage()
 {
-
+  this->SetMetadata(mitk::USImageMetadata::New());
 }
 
 mitk::USImageMetadata::Pointer mitk::USImage::GetMetadata(){
@@ -47,7 +48,6 @@ mitk::USImageMetadata::Pointer mitk::USImage::GetMetadata(){
   result->SetProbeFrequency(    this->GetProperty(mitk::USImageMetadata::PROP_PROBE_FREQUENCY)->GetValueAsString());
   result->SetZoom(              this->GetProperty(mitk::USImageMetadata::PROP_ZOOM)->GetValueAsString());
   
-
   return result;
 }
 
@@ -61,3 +61,4 @@ void mitk::USImage::SetMetadata(mitk::USImageMetadata::Pointer metadata){
   this->SetProperty(mitk::USImageMetadata::PROP_PROBE_FREQUENCY, mitk::StringProperty::New(metadata->GetProbeFrequency())); 
   this->SetProperty(mitk::USImageMetadata::PROP_ZOOM, mitk::StringProperty::New(metadata->GetZoom())); 
 }
+

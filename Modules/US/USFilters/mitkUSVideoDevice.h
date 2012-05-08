@@ -28,14 +28,19 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
     /**Documentation
-    * \brief TODO
+    * \brief A VideoDevcie is the common Class for video only devcies. The capture Video Input either from
+    *  a file or from a devcie, and transform the output into an mitkUSImage with attached Metadata.
+    *  This simple implementation does only capture and display 2D Images without cropping or registration.
+    *  One can simply inherit from this class and overwrite the handle 2D and handle 3D methods to get full access to the data
     * \ingroup US
     */
   class MitkUS_EXPORT USVideoDevice : public mitk::USDevice
     {
     public:
       mitkClassMacro(USVideoDevice, mitk::USDevice);
+      // To open a devcie (DeviceID, Manufacturer, Model)
       mitkNewMacro3Param(Self, int, std::string, std::string);
+      // To open A VideoFile (Path, Manufacturer, Model)
       mitkNewMacro3Param(Self, std::string, std::string, std::string);
 
       void GenerateData();

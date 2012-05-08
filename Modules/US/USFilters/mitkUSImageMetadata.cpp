@@ -29,10 +29,18 @@ const char* mitk::USImageMetadata::PROP_ZOOM              = "US_Zoom_Factor";
 
 mitk::USImageMetadata::USImageMetadata() : itk::Object()
 {
-
+  // Set Default Values
+  this->SetDeviceComment("None");
+  this->SetDeviceIsVideoOnly(true);
+  this->SetDeviceManufacturer("Unknown Manufacturer");
+  this->SetDeviceModel("Unknown Model");
+  this->SetProbeFrequency("Unknown Frequency");
+  this->SetProbeName("Unknown Probe");
+  this->SetZoom("Unknown Zoom Factor");
 }
 
 mitk::USImageMetadata::~USImageMetadata()
 {
 
 }
+

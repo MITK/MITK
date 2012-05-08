@@ -490,7 +490,7 @@ std::string LDAPExpr::FixupString( const std::string& s )
 {
   std::string sb;
   std::size_t len = s.length();
-  for(int i=0; i<len; i++)
+  for(std::size_t i=0; i<len; i++)
   {
     char c = s.at(i);
     if (!std::isspace(c))

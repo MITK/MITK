@@ -261,7 +261,12 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       {
         for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
         {
-          myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
+          //need to modify the length
+          typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer grads = input->GetDirections();
+          typename mitk::DiffusionImage<TPixelType>::GradientDirectionType direction = grads->ElementAt(i);
+          direction.normalize();
+          myfile2 << direction.get(j) << " ";
+          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
         }
         myfile2 << std::endl;
       }

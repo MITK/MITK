@@ -300,8 +300,8 @@ class mitkNavigationDataPlayerTestClass
 
     //case 6: empty stream
     player = mitk::NavigationDataPlayer::New();
-    std::ifstream myEmptyStream = std::ifstream("");
-    player->SetStream( &myEmptyStream );
+    std::ifstream* myEmptyStream = new std::ifstream("");
+    player->SetStream( myEmptyStream );
     player->StartPlaying();
     player->Update();
     player->StopPlaying();
@@ -310,8 +310,8 @@ class mitkNavigationDataPlayerTestClass
     //case 7: wrong stream
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-    std::ifstream myWrongStream = std::ifstream(file.c_str());
-    player->SetStream( &myWrongStream );
+    std::ifstream* myWrongStream = new std::ifstream(file.c_str());
+    player->SetStream( myWrongStream );
     player->StartPlaying();
     player->Update();
     player->StopPlaying();
@@ -327,8 +327,9 @@ class mitkNavigationDataPlayerTestClass
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#8: Tested invalid file version. Application should not crash.");
 
-
-
+	//clean up
+	delete myEmptyStream;
+	delete myWrongStream;
     }
 
   };

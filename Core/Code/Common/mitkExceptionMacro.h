@@ -37,6 +37,9 @@ PURPOSE.  See the above copyright notices for more information.
  */
 #define mitkThrow() mitk::ExceptionMessagePseudoStream(__FILE__,__LINE__,ITK_LOCATION,mitk::Exception(__FILE__,__LINE__,"",ITK_LOCATION))
 
+//Todo: how to solve this?
+//#define mitkThrow(classname) mitk::ExceptionMessagePseudoStream(__FILE__,__LINE__,ITK_LOCATION,classname(__FILE__,__LINE__,"",ITK_LOCATION))
+
 /** The exception macro is used to print error information / throw an exception 
  *  (i.e., usually a condition that results in program failure). 
  *

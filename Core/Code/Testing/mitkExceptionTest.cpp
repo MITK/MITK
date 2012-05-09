@@ -45,6 +45,11 @@ public:
   mitkThrow()<<"TEST EXCEPION THROWING WITH mitkThrow()";
   }
 
+  void throwExceptionWithThrowMacro(std::string message)
+  {
+  mitkThrow()<<message;
+  }
+
   void throwSpecializedExceptionWithMacro1()
   {
   mitkSpecializedExceptionMacro("TEST EXCEPION SPECIALIZED THROWING", mitk::Exception);
@@ -116,8 +121,11 @@ public:
 
   static void TestMitkThrowMacro()
     {
+
     bool exceptionThrown = false;
     ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    
+    //case 1: test throwing
     try
      {
      myExceptionTestObject.throwExceptionWithThrowMacro();
@@ -127,6 +135,22 @@ public:
      exceptionThrown = true;
      }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkThrow()");
+
+    //case 2: test message text
+
+    exceptionThrown = false;   
+    std::string messageText = "";
+    
+    try
+     {
+     myExceptionTestObject.throwExceptionWithThrowMacro("test123");
+     }
+    catch(mitk::Exception e)
+     {
+     exceptionThrown = true;
+     messageText = e.GetDescription();
+     }
+    MITK_TEST_CONDITION_REQUIRED(messageText=="test123","Testing message test of mitkThrow()");
     }
 };
 

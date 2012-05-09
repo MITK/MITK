@@ -20,14 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkExports.h>
 #include <itkExceptionObject.h>
-#include "mitkExceptionMacro.h"
 
 namespace mitk {
   /**Documentation
   * \brief An object of this class represents an exception of the MITK.
   *
   */  
-  class MITK_CORE_EXPORT Exception : itk::ExceptionObject 
+  class MITK_CORE_EXPORT Exception : public itk::ExceptionObject 
   {
   
   public:

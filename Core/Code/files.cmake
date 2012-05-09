@@ -60,7 +60,7 @@ SET(H_FILES
 
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
-  
+
   Common/mitkExceptionMacro.h
 )
 

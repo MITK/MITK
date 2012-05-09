@@ -40,6 +40,11 @@ public:
   mitkExceptionMacro("TEST EXCEPION THROWING");
   }
 
+  void throwExceptionWithThrowMacro()
+  {
+  mitkThrow()<<"TEST EXCEPION THROWING WITH mitkThrow()";
+  }
+
   void throwSpecializedExceptionWithMacro1()
   {
   mitkSpecializedExceptionMacro("TEST EXCEPION SPECIALIZED THROWING", mitk::Exception);
@@ -108,6 +113,21 @@ public:
      }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkSpecializedExceptionMacro (Case 2: specialized Exception)");
     }
+
+  static void TestMitkThrowMacro()
+    {
+    bool exceptionThrown = false;
+    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    try
+     {
+     myExceptionTestObject.throwExceptionWithThrowMacro();
+     }
+    catch(mitk::Exception)
+     {
+     exceptionThrown = true;
+     }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkThrow()");
+    }
 };
 
 int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
@@ -116,6 +136,7 @@ int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
   ExceptionTestClass::TestExceptionConstructor();
   ExceptionTestClass::TestExceptionMacro();
   ExceptionTestClass::TestSpecializedExceptionMacro();
+  ExceptionTestClass::TestMitkThrowMacro();
   MITK_TEST_END();
 
 }

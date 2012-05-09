@@ -50,6 +50,11 @@ public:
   mitkThrow()<<message;
   }
 
+  void throwSpecializedExceptionWithThrowMacro(std::string message)
+  {
+  mitkThrow(mitk::Exception)<<message;
+  }
+
   void throwSpecializedExceptionWithMacro1()
   {
   mitkSpecializedExceptionMacro("TEST EXCEPION SPECIALIZED THROWING", mitk::Exception);
@@ -126,6 +131,7 @@ public:
     ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
     
     //case 1: test throwing
+    
     try
      {
      myExceptionTestObject.throwExceptionWithThrowMacro();
@@ -151,6 +157,21 @@ public:
      messageText = e.GetDescription();
      }
     MITK_TEST_CONDITION_REQUIRED(messageText=="test123","Testing message test of mitkThrow()");
+
+    //case 3: specialized exception
+
+    try
+     {
+     myExceptionTestObject.throwSpecializedExceptionWithThrowMacro("test123");
+     }
+    catch(mitk::Exception e)
+     {
+     exceptionThrown = true;
+     messageText = e.GetDescription();
+     }
+    MITK_TEST_CONDITION_REQUIRED(messageText=="test123","Testing message test of mitkThrow()");
+
+    
     }
 };
 

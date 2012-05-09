@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySafeRunnable.h"
 
 #include <typeinfo>
-#include <berrySolsticeExceptions.h>
+#include <berryOperationCanceledException.h>
 
 namespace berry
 {

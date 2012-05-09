@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void NamedHandleObjectWithState::AddState(const std::string& stateId,
+void NamedHandleObjectWithState::AddState(const QString& stateId,
     const State::Pointer state)
 {
   if (!state)
@@ -33,9 +33,9 @@ void NamedHandleObjectWithState::AddState(const std::string& stateId,
   states[stateId] = state;
 }
 
-std::string NamedHandleObjectWithState::GetDescription() const
+QString NamedHandleObjectWithState::GetDescription() const
 {
-  const std::string description(NamedHandleObject::GetDescription()); // Trigger a NDE.
+  const QString description(NamedHandleObject::GetDescription()); // Trigger a NDE.
 
   const State::ConstPointer
       descriptionState(this->GetState(INamedHandleStateIds::DESCRIPTION));
@@ -51,9 +51,9 @@ std::string NamedHandleObjectWithState::GetDescription() const
   return description;
 }
 
-std::string NamedHandleObjectWithState::GetName() const
+QString NamedHandleObjectWithState::GetName() const
 {
-  const std::string name(NamedHandleObject::GetName()); // Trigger a NDE, if necessary.
+  const QString name(NamedHandleObject::GetName()); // Trigger a NDE, if necessary.
 
   const State::ConstPointer
       nameState(this->GetState(INamedHandleStateIds::NAME));
@@ -70,47 +70,46 @@ std::string NamedHandleObjectWithState::GetName() const
 }
 
 State::Pointer NamedHandleObjectWithState::GetState(
-    const std::string& stateId) const
+    const QString& stateId) const
 {
   if (states.empty())
   {
     return State::Pointer(0);
   }
 
-  std::map<std::string, State::Pointer>::const_iterator iter = states.find(stateId);
-  return iter->second;
+  QHash<QString, State::Pointer>::const_iterator iter = states.find(stateId);
+  return iter.value();
 }
 
-std::vector<std::string> NamedHandleObjectWithState::GetStateIds() const
+QStringList NamedHandleObjectWithState::GetStateIds() const
 {
   if (states.empty())
   {
-    return std::vector<std::string>();
+    return QStringList();
   }
 
-  std::vector<std::string> stateIds;
-  for (std::map<std::string, State::Pointer>::const_iterator iter = states.begin();
+  QStringList stateIds;
+  for (QHash<QString, State::Pointer>::const_iterator iter = states.begin();
       iter != states.end(); ++iter)
   {
-    stateIds.push_back(iter->first);
+    stateIds.push_back(iter.key());
   }
   return stateIds;
 }
 
-void NamedHandleObjectWithState::RemoveState(const std::string& id)
+void NamedHandleObjectWithState::RemoveState(const QString& id)
 {
-  if (id.empty())
+  if (id.isEmpty())
   {
-    throw Poco::InvalidArgumentException("Cannot remove an empty id"); //$NON-NLS-1$
+    throw ctkInvalidArgumentException("Cannot remove an empty id");
   }
 
-  states.erase(id);
+  states.remove(id);
 }
 
-NamedHandleObjectWithState::NamedHandleObjectWithState(const std::string& id)
-: NamedHandleObject(id)
+NamedHandleObjectWithState::NamedHandleObjectWithState(const QString& id)
+  : NamedHandleObject(id)
 {
-
 }
 
 }

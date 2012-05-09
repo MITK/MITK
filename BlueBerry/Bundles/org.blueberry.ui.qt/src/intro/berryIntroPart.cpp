@@ -166,17 +166,17 @@ void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
   // Save config element.
   configElement = cfig;
 
-  cfig->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL, titleLabel);
+  titleLabel = cfig->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL).toStdString();
 
   // Icon.
-  std::string strIcon;
-  if (!cfig->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, strIcon))
+  QString strIcon = cfig->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
+  if (strIcon.isEmpty())
   {
     return;
   }
 
   imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
-      configElement->GetContributor(), strIcon);
+        configElement->GetContributor(), strIcon);
 
   if (!imageDescriptor)
   {

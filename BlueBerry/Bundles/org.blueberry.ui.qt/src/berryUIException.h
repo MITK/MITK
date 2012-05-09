@@ -28,11 +28,11 @@ namespace berry {
  * @{
  */
 
-POCO_DECLARE_EXCEPTION(BERRY_UI_QT, UIException, PlatformException);
+CTK_DECLARE_EXCEPTION(BERRY_UI_QT, UIException, PlatformException)
 
-POCO_DECLARE_EXCEPTION(BERRY_UI_QT, WorkbenchException, UIException);
+CTK_DECLARE_EXCEPTION(BERRY_UI_QT, WorkbenchException, UIException)
 
-POCO_DECLARE_EXCEPTION(BERRY_UI_QT, PartInitException, WorkbenchException);
+CTK_DECLARE_EXCEPTION(BERRY_UI_QT, PartInitException, WorkbenchException)
 
 /*@}*/
 }

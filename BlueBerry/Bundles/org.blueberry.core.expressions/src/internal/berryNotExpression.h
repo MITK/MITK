@@ -36,11 +36,11 @@ public:
 
   NotExpression(Expression::Pointer expression);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
   void CollectExpressionInfo(ExpressionInfo* info);
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
 
   protected:

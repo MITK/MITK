@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYGUIWIDGETSTWEAKLET_H_
 #define BERRYGUIWIDGETSTWEAKLET_H_
 
-#include <berryMacros.h>
-
 #include "internal/berryTweaklets.h"
 #include "guitk/berryGuiTkISelectionListener.h"
 #include "guitk/berryGuiTkIControlListener.h"

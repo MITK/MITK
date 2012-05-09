@@ -18,11 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPreferencesService.h"
 
-#include "Poco/File.h"
-
-#include <vector>
-#include <string>
-
 namespace berry
 {
   struct IBerryPreferencesService : public IPreferencesService
@@ -34,12 +29,12 @@ namespace berry
     /// Existing properties will be overridden!
     /// Returns true if the preferences could be imported.
     ///
-    virtual void ImportPreferences(Poco::File f, std::string name="") = 0;
+    virtual void ImportPreferences(const QString& f, const QString& name="") = 0;
 
     ///
     /// Exports the current system preferences to the given file.
     ///
-    virtual void ExportPreferences(Poco::File f, std::string name="") = 0;
+    virtual void ExportPreferences(const QString& f, const QString& name="") = 0;
 
   };
 }  // namespace berry

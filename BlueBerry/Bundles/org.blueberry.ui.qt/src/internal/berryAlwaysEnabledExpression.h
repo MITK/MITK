@@ -40,7 +40,7 @@ public:
   /*
    * @see Expression#Evaluate(IEvaluationContext)
    */
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
 private:
 

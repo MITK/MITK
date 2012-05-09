@@ -30,10 +30,10 @@ NotExpression::NotExpression(Expression::Pointer expression)
   fExpression= expression;
 }
 
-EvaluationResult
-NotExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+NotExpression::Evaluate(IEvaluationContext* context) const
 {
-  return fExpression->Evaluate(context).Not();
+  return fExpression->Evaluate(context)->Not();
 }
 
 void
@@ -43,16 +43,13 @@ NotExpression::CollectExpressionInfo(ExpressionInfo* info)
 }
 
 bool
-NotExpression::operator==(Expression& object)
+NotExpression::operator==(const Object* object) const
 {
-  try {
-    NotExpression& that = dynamic_cast<NotExpression&>(object);
-    return this->fExpression == that.fExpression;
-  }
-  catch (std::bad_cast)
+  if (const NotExpression* that = dynamic_cast<const NotExpression*>(object))
   {
-    return false;
+    return this->fExpression == that->fExpression;
   }
+  return false;
 }
 
 std::size_t

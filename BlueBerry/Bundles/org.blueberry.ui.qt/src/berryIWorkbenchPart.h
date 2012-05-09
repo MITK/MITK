@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryMacros.h>
 
-#include <map>
 
 namespace berry {
 
@@ -172,7 +171,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      * @return the name of this view, or the empty string if the name is being managed
      * by the workbench (not <code>null</code>)
      */
-    virtual std::string GetPartName() const = 0;
+    virtual QString GetPartName() const = 0;
 
     /**
      * Returns the content description of this part. The content description is an optional
@@ -185,7 +184,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @return the content description of this part (not <code>null</code>)
      */
-    virtual std::string GetContentDescription() const = 0;
+    virtual QString GetContentDescription() const = 0;
 
     /**
      * Returns the title image of this workbench part.  If this value changes
@@ -213,7 +212,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @return the workbench part title tool tip (not <code>null</code>)
      */
-    virtual std::string GetTitleToolTip() const = 0;
+    virtual QString GetTitleToolTip() const = 0;
 
     /**
      * Removes the given property listener from this workbench part.
@@ -230,7 +229,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *            the arbitrary property. Must not be <code>null</code>.
      * @return the property value, or <code>null</code>.
      */
-    virtual std::string GetPartProperty(const std::string& key) const = 0;
+    virtual QString GetPartProperty(const QString& key) const = 0;
 
     /**
      * Set an arbitrary property on the part. It is the implementor's
@@ -245,7 +244,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *            the property value. A <code>null</code> value will remove
      *            that property.
      */
-    virtual void SetPartProperty(const std::string& key, const std::string& value) = 0;
+    virtual void SetPartProperty(const QString& key, const QString& value) = 0;
 
     /**
      * Return an unmodifiable map of the arbitrary properties. This method can
@@ -253,7 +252,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @return A Map of the properties. Must not be <code>null</code>.
      */
-    virtual const std::map<std::string, std::string>& GetPartProperties() const = 0;
+    virtual const QHash<QString, QString>& GetPartProperties() const = 0;
 
     /**
      * Asks this part to take focus within the workbench.

@@ -225,6 +225,8 @@ protected:
    */
   virtual void CreateDefaultContents(Shell::Pointer shell);
 
+  void CreateTrimWidgets(SmartPointer<Shell> shell);
+
   /**
    * Returns the unique object that applications use to configure this window.
    * <p>

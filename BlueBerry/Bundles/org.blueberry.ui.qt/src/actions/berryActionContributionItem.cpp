@@ -17,7 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryActionContributionItem.h"
 
+#include <berryIContributionManager.h>
 #include <berryAction.h>
+
+#include <QMenu>
 
 namespace berry {
 
@@ -183,11 +186,6 @@ ActionContributionItem::~ActionContributionItem()
   //holdMenu = null;
 }
 
-QWidget* ActionContributionItem::GetWidget() const
-{
-  return widget;
-}
-
 ContributionItem::Modes ActionContributionItem::GetMode() const
 {
   return mode;
@@ -195,19 +193,19 @@ ContributionItem::Modes ActionContributionItem::GetMode() const
 
 bool ActionContributionItem::IsDynamic() const
 {
-  if (widget instanceof MenuItem)
-  {
-    // Optimization. Only recreate the item is the check or radio style
-    // has changed.
-    boolean itemIsCheck = (widget.getStyle() & SWT.CHECK) != 0;
-    boolean actionIsCheck = getAction() != null
-        && getAction().getStyle() == IAction.AS_CHECK_BOX;
-    boolean itemIsRadio = (widget.getStyle() & SWT.RADIO) != 0;
-    boolean actionIsRadio = getAction() != null
-        && getAction().getStyle() == IAction.AS_RADIO_BUTTON;
-    return (itemIsCheck != actionIsCheck)
-        || (itemIsRadio != actionIsRadio);
-  }
+//  if (qobject_cast<QMenu*>(action->parentWidget()))
+//  {
+//    // Optimization. Only recreate the item is the check or radio style
+//    // has changed.
+//    boolean itemIsCheck = (widget.getStyle() & SWT.CHECK) != 0;
+//    boolean actionIsCheck = getAction() != null
+//        && getAction().getStyle() == IAction.AS_CHECK_BOX;
+//    boolean itemIsRadio = (widget.getStyle() & SWT.RADIO) != 0;
+//    boolean actionIsRadio = getAction() != null
+//        && getAction().getStyle() == IAction.AS_RADIO_BUTTON;
+//    return (itemIsCheck != actionIsCheck)
+//        || (itemIsRadio != actionIsRadio);
+//  }
   return false;
 }
 
@@ -221,7 +219,7 @@ bool ActionContributionItem::IsVisible() const
   return ContributionItem::IsVisible() && IsCommandActive();
 }
 
-void ActionContributionItem::SetMode(int mode)
+void ActionContributionItem::SetMode(Modes mode)
 {
   this->mode = mode;
   Update();
@@ -725,10 +723,11 @@ bool ActionContributionItem::IsEnabledAllowed() const
 
 bool ActionContributionItem::IsCommandActive() const
 {
-  IAction actionToCheck = getAction();
+  Action* actionToCheck = GetAction();
 
-  if (actionToCheck != null) {
-    String commandId = actionToCheck.getActionDefinitionId();
+  if (actionToCheck != 0)
+  {
+    QString commandId = actionToCheck->GetActionDefinitionId();
     ExternalActionManager.ICallback callback = ExternalActionManager
         .getInstance().getCallback();
 

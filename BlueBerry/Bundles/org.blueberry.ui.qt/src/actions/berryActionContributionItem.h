@@ -92,20 +92,6 @@ public:
   Action* GetAction() const;
 
   /**
-   * Return the widget associated with this contribution item. It should not
-   * be cached, as it can be disposed and re-created by its containing
-   * ContributionManager, which controls all of the widgets lifecycle methods.
-   * <p>
-   * This can be used to set layout data on the widget if appropriate. The
-   * actual type of the widget can be any valid control for this
-   * ContributionItem's current ContributionManager.
-   * </p>
-   *
-   * @return the widget, or <code>null</code> depending on the lifecycle.
-   */
-  QWidget* GetWidget() const;
-
-  /**
    * Returns the presentation mode, which is the bitwise-or of the
    * <code>MODE_*</code> constants. The default mode setting is 0, meaning
    * that for menu items, both text and image are shown (if present), but for

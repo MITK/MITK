@@ -49,8 +49,8 @@ struct Events {
 
     Event commandManagerChanged;
 
-    void AddListener(ICommandManagerListener::Pointer listener);
-    void RemoveListener(ICommandManagerListener::Pointer listener);
+    void AddListener(ICommandManagerListener* listener);
+    void RemoveListener(ICommandManagerListener* listener);
 
   private:
     typedef MessageDelegate1<ICommandManagerListener, const SmartPointer<const CommandManagerEvent> > Delegate;

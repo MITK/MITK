@@ -32,18 +32,18 @@ class IntroRegistry : public IIntroRegistry {
 
 private:
 
-  static const std::string TAG_INTRO; // = "intro";
-  static const std::string TAG_INTROPRODUCTBINDING; // = "introProductBinding";
-  static const std::string ATT_INTROID; // = "introId";
-  static const std::string ATT_PRODUCTID; // = "productId";
+  static const QString TAG_INTRO; // = "intro";
+  static const QString TAG_INTROPRODUCTBINDING; // = "introProductBinding";
+  static const QString ATT_INTROID; // = "introId";
+  static const QString ATT_PRODUCTID; // = "productId";
 
   /**
    * @param targetProductId
    * @param extensions
    * @return
    */
-  std::string GetIntroForProduct(const std::string& targetProductId,
-      const std::vector<const IExtension*>& extensions) const;
+  QString GetIntroForProduct(const QString& targetProductId,
+                             const QList<SmartPointer<IExtension> >& extensions) const;
 
 public:
 
@@ -66,14 +66,14 @@ public:
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroForProduct(java.lang.String)
    */
-  IIntroDescriptor::Pointer GetIntroForProduct(const std::string& targetProductId) const;
+  IIntroDescriptor::Pointer GetIntroForProduct(const QString& targetProductId) const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntro(java.lang.String)
    */
-  IIntroDescriptor::Pointer GetIntro(const std::string& id) const;
+  IIntroDescriptor::Pointer GetIntro(const QString& id) const;
 
 };
 

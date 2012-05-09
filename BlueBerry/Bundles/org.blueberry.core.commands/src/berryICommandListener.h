@@ -47,8 +47,8 @@ struct ICommandListener : public virtual Object {
 
     Event commandChanged;
 
-    void AddListener(ICommandListener::Pointer listener);
-    void RemoveListener(ICommandListener::Pointer listener);
+    void AddListener(ICommandListener* listener);
+    void RemoveListener(ICommandListener* listener);
 
   private:
     typedef MessageDelegate1<ICommandListener, const SmartPointer<const CommandEvent> > Delegate;

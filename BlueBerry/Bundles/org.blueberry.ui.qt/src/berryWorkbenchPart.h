@@ -54,21 +54,21 @@ public:
   ~WorkbenchPart();
 
 private:
-  std::string m_Title;
+  QString m_Title;
   SmartPointer<ImageDescriptor> m_ImageDescriptor;
   void* m_TitleImage;
-  std::string m_ToolTip;
+  QString m_ToolTip;
 
   IConfigurationElement::Pointer m_ConfigElement;
   IWorkbenchPartSite::Pointer m_PartSite;
-  std::string m_PartName;
-  std::string m_ContentDescription;
+  QString m_PartName;
+  QString m_ContentDescription;
 
-  std::map<std::string, std::string> partProperties;
+  QHash<QString, QString> partProperties;
   IPropertyChangeListener::Events partChangeEvents;
 
-  void InternalSetContentDescription(const std::string& description);
-  void InternalSetPartName(const std::string& partName);
+  void InternalSetContentDescription(const QString& description);
+  void InternalSetPartName(const QString& partName);
 
 protected:
   WorkbenchPart();
@@ -125,7 +125,7 @@ protected:
    *
    * @param toolTip the new tool tip text, or <code>null</code> to clear
    */
-  virtual void SetTitleToolTip(const std::string& toolTip);
+  virtual void SetTitleToolTip(const QString& toolTip);
 
   /**
    * Sets the name of this part. The name will be shown in the tab area for
@@ -134,7 +134,7 @@ protected:
    *
    * @param partName the part name, as it should be displayed in tabs.
    */
-  virtual void SetPartName(const std::string& partName);
+  virtual void SetPartName(const QString& partName);
 
   /**
    * Sets the content description for this part. The content description is typically
@@ -148,10 +148,10 @@ protected:
    *
    * @param description the content description
    */
-  virtual void SetContentDescription(const std::string& description);
+  virtual void SetContentDescription(const QString& description);
 
-  void FirePropertyChanged(const std::string& key,
-      const std::string& oldValue, const std::string& newValue);
+  void FirePropertyChanged(const QString& key,
+      const QString& oldValue, const QString& newValue);
 
   void FirePropertyChange(int propertyId);
 
@@ -164,17 +164,17 @@ public:
 
   void RemovePropertyListener(IPropertyChangeListener::Pointer l);
 
-  void SetPartProperty(const std::string& key, const std::string& value);
+  void SetPartProperty(const QString& key, const QString& value);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPart3#getPartProperty(java.lang.String)
    */
-  std::string GetPartProperty(const std::string& key) const;
+  QString GetPartProperty(const QString& key) const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPart3#getPartProperties()
    */
-  const std::map<std::string, std::string>& GetPartProperties() const;
+  const QHash<QString, QString>& GetPartProperties() const;
 
   /**
    * {@inheritDoc}
@@ -188,7 +188,7 @@ public:
    * this executable extension.
    */
   void SetInitializationData(IConfigurationElement::Pointer cfig,
-          const std::string& propertyName, Object::Pointer data);
+          const QString& propertyName, Object::Pointer data);
 
   /*
    * Creates the controls for this workbench part.
@@ -225,7 +225,7 @@ public:
    * Parts should call setPartName to change their part name.
    * </p>
    */
-  std::string GetPartName() const;
+  QString GetPartName() const;
 
   /**
    * {@inheritDoc}
@@ -234,7 +234,7 @@ public:
    * Parts should call setContentDescription to change their content description.
    * </p>
    */
-  std::string GetContentDescription() const;
+  QString GetContentDescription() const;
 
 
   /* (non-Javadoc)
@@ -247,7 +247,7 @@ public:
    *
    * @return the tool tip text
    */
-  std::string GetTitleToolTip() const;
+  QString GetTitleToolTip() const;
 
 };
 

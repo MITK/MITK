@@ -16,7 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIntroRegistry.h"
 
-#include "berryIConfigurationElement.h"
+#include <berryIConfigurationElement.h>
+#include <berryIExtension.h>
 
 #include "berryIntroDescriptor.h"
 #include "internal/berryRegistryReader.h"
@@ -25,29 +26,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string IntroRegistry::TAG_INTRO = "intro";
-const std::string IntroRegistry::TAG_INTROPRODUCTBINDING = "introProductBinding";
-const std::string IntroRegistry::ATT_INTROID = "introId";
-const std::string IntroRegistry::ATT_PRODUCTID = "productId";
+const QString IntroRegistry::TAG_INTRO = "intro";
+const QString IntroRegistry::TAG_INTROPRODUCTBINDING = "introProductBinding";
+const QString IntroRegistry::ATT_INTROID = "introId";
+const QString IntroRegistry::ATT_PRODUCTID = "productId";
 
-std::string IntroRegistry::GetIntroForProduct(
-    const std::string& targetProductId,
-    const std::vector<const IExtension*>& extensions) const
+QString IntroRegistry::GetIntroForProduct(
+    const QString& targetProductId,
+    const QList<IExtension::Pointer>& extensions) const
 {
-  for (std::size_t i = 0; i < extensions.size(); i++)
+  for (int i = 0; i < extensions.size(); i++)
   {
-    std::vector<IConfigurationElement::Pointer> elements(
-        extensions[i] ->GetConfigurationElements());
-    for (std::size_t j = 0; j < elements.size(); j++)
+    QList<IConfigurationElement::Pointer> elements(
+        extensions[i]->GetConfigurationElements());
+    for (int j = 0; j < elements.size(); j++)
     {
       if (elements[j]->GetName() == TAG_INTROPRODUCTBINDING)
       {
-        std::string introId;
-        bool hasIntroId = elements[j]->GetAttribute(ATT_INTROID, introId);
-        std::string productId;
-        bool hasProductId = elements[j]->GetAttribute(ATT_PRODUCTID, productId);
+        QString introId = elements[j]->GetAttribute(ATT_INTROID);
+        QString productId = elements[j]->GetAttribute(ATT_PRODUCTID);
 
-        if (!hasIntroId || !hasProductId)
+        if (introId.isEmpty() || productId.isEmpty())
         {
           //TODO IStatus
           /*
@@ -60,8 +59,8 @@ std::string IntroRegistry::GetIntroForProduct(
            WorkbenchPlugin.log("Invalid intro binding", status); //$NON-NLS-1$
            */
           WorkbenchPlugin::Log(
-              elements[j]->GetDeclaringExtension()->GetNamespace()
-                  + ": Invalid intro binding. introId and productId must be defined");
+                elements[j]->GetDeclaringExtension()->GetNamespaceIdentifier().toStdString()
+                + ": Invalid intro binding. introId and productId must be defined");
           continue;
         }
 
@@ -82,23 +81,23 @@ int IntroRegistry::GetIntroCount() const
 
 std::vector<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
 {
-  const IExtensionPoint* point =
-      Platform::GetExtensionPointService()->GetExtensionPoint(
-          PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
+  IExtensionPoint::Pointer point =
+      Platform::GetExtensionRegistry()->GetExtensionPoint(
+        PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
   if (!point)
   {
     return std::vector<IIntroDescriptor::Pointer>();
   }
 
-  std::vector<const IExtension*> extensions(point->GetExtensions());
+  QList<IExtension::Pointer> extensions(point->GetExtensions());
   extensions = RegistryReader::OrderExtensions(extensions);
 
   std::vector<IIntroDescriptor::Pointer> list;
-  for (std::size_t i = 0; i < extensions.size(); i++)
+  for (int i = 0; i < extensions.size(); i++)
   {
-    std::vector<IConfigurationElement::Pointer> elements(
-        extensions[i] ->GetConfigurationElements());
-    for (std::size_t j = 0; j < elements.size(); j++)
+    QList<IConfigurationElement::Pointer> elements(
+        extensions[i]->GetConfigurationElements());
+    for (int j = 0; j < elements.size(); j++)
     {
       if (elements[j]->GetName() == TAG_INTRO)
       {
@@ -107,7 +106,8 @@ std::vector<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
           IIntroDescriptor::Pointer
               descriptor(new IntroDescriptor(elements[j]));
           list.push_back(descriptor);
-        } catch (CoreException& e)
+        }
+        catch (const CoreException& e)
         {
           // log an error since its not safe to open a dialog here
           //TODO IStatus
@@ -121,21 +121,21 @@ std::vector<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
 }
 
 IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
-    const std::string& targetProductId) const
+    const QString& targetProductId) const
 {
-  const IExtensionPoint* point =
-      Platform::GetExtensionPointService()->GetExtensionPoint(
-          PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
+  IExtensionPoint::Pointer point =
+      Platform::GetExtensionRegistry()->GetExtensionPoint(
+       PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
   if (!point)
   {
     return IIntroDescriptor::Pointer();
   }
 
-  std::vector<const IExtension*> extensions(point->GetExtensions());
+  QList<IExtension::Pointer> extensions(point->GetExtensions());
   extensions = RegistryReader::OrderExtensions(extensions);
 
-  std::string targetIntroId = GetIntroForProduct(targetProductId, extensions);
-  if (targetIntroId.empty())
+  QString targetIntroId = GetIntroForProduct(targetProductId, extensions);
+  if (targetIntroId.isEmpty())
   {
     return IIntroDescriptor::Pointer();
   }
@@ -155,7 +155,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
   return descriptor;
 }
 
-IIntroDescriptor::Pointer IntroRegistry::GetIntro(const std::string& id) const
+IIntroDescriptor::Pointer IntroRegistry::GetIntro(const QString& id) const
 {
   std::vector<IIntroDescriptor::Pointer> intros(GetIntros());
   for (std::size_t i = 0; i < intros.size(); i++)

@@ -30,6 +30,11 @@ QAction* ContributionItem::Fill(QMenu* /*menu*/, QAction * /*before*/)
   return 0;
 }
 
+QAction *ContributionItem::Fill(QMenuBar* /*menu*/, QAction* /*before*/)
+{
+  return 0;
+}
+
 QAction* ContributionItem::Fill(QToolBar* /*parent*/, QAction * /*before*/)
 {
   return 0;

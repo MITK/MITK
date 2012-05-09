@@ -62,7 +62,7 @@ public:
    *
    * @return The id; may be <code>null</code>.
    */
-   std::string GetId() const;
+   QString GetId() const;
 
   /**
    * The current value associated with this state. This can be any type of
@@ -89,7 +89,7 @@ public:
    * @param id
    *            The id; must not be <code>null</code>.
    */
-  void SetId(const std::string& id);
+  void SetId(const QString& id);
 
   /**
    * Sets the value for this state object.
@@ -117,7 +117,7 @@ private:
    * The identifier of the state; may be <code>null</code> if it has not
    * been initialized.
    */
-  std::string id;
+  QString id;
 
   /**
    * The value held by this state; may be anything at all.

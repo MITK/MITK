@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Any.h"
 
 #include <vector>
-#include <map>
+
+#include <QHash>
 
 namespace berry {
 
@@ -43,9 +44,9 @@ class BERRY_EXPRESSIONS EvaluationContext : public IEvaluationContext
 private:
   IEvaluationContext* fParent;
   Object::Pointer fDefaultVariable;
-  std::map<std::string, Object::Pointer> fVariables;
+  QHash<QString, Object::Pointer> fVariables;
   std::vector<IVariableResolver*> fVariableResolvers;
-  bool fAllowPluginActivation;
+  int fAllowPluginActivation;
 
 public:
 
@@ -56,7 +57,7 @@ public:
    * @param parent the parent context. Can be <code>null</code>.
    * @param defaultVariable the default variable
    */
-  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable);
+  EvaluationContext(IEvaluationContext* parent, const Object::Pointer& defaultVariable);
 
   /**
    * Create a new evaluation context with the given parent and default
@@ -69,7 +70,8 @@ public:
    *
    * @see #resolveVariable(String, Object[])
    */
-  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable, std::vector<IVariableResolver*> resolvers);
+  EvaluationContext(IEvaluationContext* parent, const Object::Pointer& defaultVariable,
+                    const std::vector<IVariableResolver*>& resolvers);
 
 
   /**
@@ -100,22 +102,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const std::string& name, Object::Pointer value);
+  void AddVariable(const QString& name, const Object::Pointer& value);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer RemoveVariable(const std::string& name);
+  Object::Pointer RemoveVariable(const QString& name);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetVariable(const std::string& name) const;
+  Object::Pointer GetVariable(const QString &name) const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args);
+  Object::Pointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args);
 };
 
 }  // namespace berry

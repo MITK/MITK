@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string WorkbenchServiceRegistry::WORKBENCH_LEVEL = "workbench"; //$NON-NLS-1$
+const std::string WorkbenchServiceRegistry::WORKBENCH_LEVEL = "workbench";
 
 const std::string WorkbenchServiceRegistry::EXT_ID_SERVICES =
     "org.blueberry.ui.services"; //$NON-NLS-1$
@@ -45,20 +45,24 @@ WorkbenchServiceRegistry* WorkbenchServiceRegistry::registry = 0;
 const IServiceLocator::Pointer WorkbenchServiceRegistry::GLOBAL_PARENT =
     IServiceLocator::Pointer(new GlobalParentLocator());
 
-std::string* WorkbenchServiceRegistry::supportedLevels()
+QStringList WorkbenchServiceRegistry::SupportedLevels()
 {
-  static std::string levels[] = {
-  ISources::ACTIVE_CONTEXT_NAME(),
-  ISources::ACTIVE_SHELL_NAME(),
-  ISources::ACTIVE_WORKBENCH_WINDOW_NAME(),
-  ISources::ACTIVE_EDITOR_ID_NAME(),
-  ISources::ACTIVE_PART_ID_NAME(),
-  ISources::ACTIVE_SITE_NAME() };
+  struct _Levels {
+    QStringList levels;
+    _Levels()
+    {
+      levels << ISources::ACTIVE_CONTEXT_NAME()
+             << ISources::ACTIVE_SHELL_NAME()
+             << ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+             << ISources::ACTIVE_EDITOR_ID_NAME()
+             << ISources::ACTIVE_PART_ID_NAME()
+             << ISources::ACTIVE_SITE_NAME();
+    }
+  };
+  static _Levels _levels;
 
-  return levels;
+  return _levels.levels;
 }
-
-const unsigned int WorkbenchServiceRegistry::supportedLevelsCount = 6;
 
 WorkbenchServiceRegistry::WorkbenchServiceRegistry()
 {
@@ -143,7 +147,7 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
 
 const IExtensionPoint* WorkbenchServiceRegistry::GetExtensionPoint()
 {
-  IExtensionPointService::Pointer reg = Platform::GetExtensionPointService();
+  IExtensionPointService* reg = Platform::GetExtensionPointService();
   const IExtensionPoint* ep = reg->GetExtensionPoint(EXT_ID_SERVICES);
   return ep;
 }
@@ -168,10 +172,11 @@ void WorkbenchServiceRegistry::ProcessVariables(
     else
     {
       bool found = false;
-      const std::string* const supportedLevels = this->supportedLevels();
-      for (unsigned int j = 0; j < supportedLevelsCount && !found; j++)
+      QStringList supportedLevels = this->SupportedLevels();
+      QString qlevel = QString::fromStdString(level);
+      for (unsigned int j = 0; j < supportedLevels.size() && !found; j++)
       {
-        if (supportedLevels[j] == level)
+        if (supportedLevels[j] == qlevel)
         {
           found = true;
         }
@@ -181,9 +186,9 @@ void WorkbenchServiceRegistry::ProcessVariables(
         level = WORKBENCH_LEVEL;
       }
     }
-    int existingPriority = SourcePriorityNameMapping::GetMapping(level);
+    int existingPriority = SourcePriorityNameMapping::GetMapping(QString::fromStdString(level));
     int newPriority = existingPriority << 1;
-    SourcePriorityNameMapping::AddMapping(name, newPriority);
+    SourcePriorityNameMapping::AddMapping(QString::fromStdString(name), newPriority);
   }
 }
 

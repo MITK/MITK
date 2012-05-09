@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryISourceProvider.h"
 
+#include <berryISourceProviderListener.h>
+
 namespace berry {
 
 struct IServiceLocator;
@@ -57,7 +59,7 @@ protected:
    *            The new value for the source; may be <code>null</code>.
    */
   void FireSourceChanged(int sourcePriority,
-      const std::string& sourceName, Object::Pointer sourceValue);
+                         const QString& sourceName, Object::Pointer sourceValue);
 
   /**
    * Notifies all listeners that multiple sources have changed.
@@ -71,7 +73,7 @@ protected:
    *            <code>null</code>, but the values may be <code>null</code>.
    */
   void FireSourceChanged(int sourcePriority,
-      const std::map<std::string, Object::Pointer>& sourceValuesByName);
+                         const QHash<QString, Object::Pointer>& sourceValuesByName);
 
   /**
    * Logs a debugging message in an appropriate manner. If the message is
@@ -94,10 +96,9 @@ private:
 
 public:
 
-  void AddSourceProviderListener(ISourceProviderListener::Pointer listener);
+  void AddSourceProviderListener(ISourceProviderListener* listener);
 
-  void RemoveSourceProviderListener(
-      ISourceProviderListener::Pointer listener);
+  void RemoveSourceProviderListener(ISourceProviderListener *listener);
 
   /**
    * This method is called when the source provider is instantiated by

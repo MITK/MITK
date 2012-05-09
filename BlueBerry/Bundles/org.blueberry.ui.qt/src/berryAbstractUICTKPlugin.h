@@ -17,13 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYABSTRACTUICTKPLUGIN_H_
 #define BERRYABSTRACTUICTKPLUGIN_H_
 
+#include <org_blueberry_ui_qt_Export.h>
+
+#include <berrySmartPointer.h>
+
 #include <ctkPluginActivator.h>
 
-#include <berryIPreferencesService.h>
-
-#include "berryIWorkbench.h"
-
 namespace berry {
+
+struct IPreferencesService;
+struct IWorkbench;
+
+class ImageDescriptor;
 
 /**
  * \ingroup org_blueberry_ui_qt
@@ -107,7 +112,7 @@ private:
      * The name of the dialog settings file (value
      * <code>"dialog_settings.xml"</code>).
      */
-   static const std::string FN_DIALOG_SETTINGS;
+   static const QString FN_DIALOG_SETTINGS;
 
     /**
      * Storage for dialog and wizard data; <code>null</code> if not yet
@@ -118,7 +123,7 @@ private:
     /**
      * Storage for preferences.
      */
-    IPreferencesService::Pointer preferencesService;
+    mutable IPreferencesService* preferencesService;
 
     /**
      * The registry for all graphic images; <code>null</code> if not yet
@@ -131,6 +136,8 @@ private:
      */
     //BundleListener bundleListener;
 
+    ctkPluginContext* context;
+
 
 public:
 
@@ -142,8 +149,6 @@ public:
      * the associated bundle is being activated.
      */
    AbstractUICTKPlugin();
-
-
 
     /**
      * Returns the dialog settings for this UI plug-in.
@@ -193,7 +198,7 @@ public:
      *
      * @return the preferences service
      */
-    IPreferencesService::Pointer GetPreferencesService();
+    IPreferencesService* GetPreferencesService() const;
 
     /**
      * Returns the Platform UI workbench.
@@ -317,7 +322,7 @@ public:
      * @since 3.0
      */
     static SmartPointer<ImageDescriptor> ImageDescriptorFromPlugin(
-        const std::string& pluginId, const std::string& imageFilePath);
+        const QString& pluginId, const QString& imageFilePath);
 
 };
 

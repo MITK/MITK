@@ -136,12 +136,12 @@ protected:
     /* (non-Javadoc)
      * @see org.blueberry.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
      */
-    virtual void SetContentDescription(const std::string& description);
+    virtual void SetContentDescription(const QString& description);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.part.WorkbenchPart#setPartName(java.lang.String)
      */
-    virtual void SetPartName(const std::string& partName);
+    virtual void SetPartName(const QString& partName);
 
     /**
      * Checks that the given site is valid for this type of part.
@@ -191,7 +191,7 @@ public:
      *
      * @return the tool tip text
      */
-  std::string GetTitleToolTip() const;
+  QString GetTitleToolTip() const;
 
     /* (non-Javadoc)
      * Initializes the editor part with a site and input.

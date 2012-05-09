@@ -42,7 +42,7 @@ void ViewRegistryReader::ReadViews(ViewRegistry* out)
       WorkbenchRegistryConstants::PL_VIEWS);
 }
 
-void ViewRegistryReader::ReadCategory(IConfigurationElement::Pointer element)
+void ViewRegistryReader::ReadCategory(const IConfigurationElement::Pointer& element)
 {
   try
   {
@@ -57,7 +57,7 @@ void ViewRegistryReader::ReadCategory(IConfigurationElement::Pointer element)
   }
 }
 
-bool ViewRegistryReader::ReadElement(IConfigurationElement::Pointer element)
+bool ViewRegistryReader::ReadElement(const SmartPointer<IConfigurationElement> &element)
 {
   std::string elementName = element->GetName();
   if (elementName == WorkbenchRegistryConstants::TAG_VIEW)
@@ -80,7 +80,7 @@ bool ViewRegistryReader::ReadElement(IConfigurationElement::Pointer element)
   return false;
 }
 
-void ViewRegistryReader::ReadSticky(IConfigurationElement::Pointer element)
+void ViewRegistryReader::ReadSticky(const SmartPointer<IConfigurationElement> &element)
 {
   try
   {
@@ -96,7 +96,7 @@ void ViewRegistryReader::ReadSticky(IConfigurationElement::Pointer element)
   }
 }
 
-void ViewRegistryReader::ReadView(IConfigurationElement::Pointer element)
+void ViewRegistryReader::ReadView(const SmartPointer<IConfigurationElement> &element)
 {
   try
   {

@@ -75,7 +75,7 @@ struct BERRY_UI_QT ImageDescriptor : public Object {
    * @param pluginid the plugin id of the plugin which contains the file
    * @return a new image descriptor
    */
-  static Pointer CreateFromFile(const std::string& filename, const std::string& pluginid = "");
+  static Pointer CreateFromFile(const QString& filename, const QString& pluginid = "");
 
   /**
    * Creates and returns a new image descriptor for the given image. Note

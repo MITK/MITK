@@ -56,7 +56,7 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void Add(Action* action);
+  //void Add(Action* action);
 
   /*
    * Method declared on IContributionManager.
@@ -66,7 +66,7 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void AppendToGroup(const QString& groupName, Action* action);
+  //void AppendToGroup(const QString& groupName, Action* action);
 
   /*
    * Method declared on IContributionManager.
@@ -121,7 +121,7 @@ public:
   /*
    * (non-Javadoc) Method declared on IContributionManager.
    */
-  void InsertAfter(const QString& ID, Action* action);
+  //void InsertAfter(const QString& ID, Action* action);
 
   /*
    * (non-Javadoc) Method declared on IContributionManager.
@@ -131,7 +131,7 @@ public:
   /*
    * (non-Javadoc) Method declared on IContributionManager.
    */
-  void InsertBefore(const QString& ID, Action* action);
+  //void InsertBefore(const QString& ID, Action* action);
 
   /*
    * Method declared on IContributionManager.
@@ -156,7 +156,7 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void PrependToGroup(const QString& groupName, Action* action);
+  //void PrependToGroup(const QString& groupName, Action* action);
 
   /*
    * Method declared on IContributionManager.

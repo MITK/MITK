@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void ParameterType::AddListener(const IParameterTypeListener::Pointer listener)
+void ParameterType::AddListener(IParameterTypeListener* listener)
 {
   parameterTypeEvents.AddListener(listener);
 }
@@ -72,24 +72,22 @@ bool ParameterType::IsCompatible(const Object::ConstPointer value) const
   if (!this->IsDefined())
   {
     throw NotDefinedException(
-        "Cannot use IsCompatible() with an undefined ParameterType"); //$NON-NLS-1$
+        "Cannot use IsCompatible() with an undefined ParameterType");
   }
   return parameterTypeConverter->IsCompatible(value);
 }
 
-void ParameterType::RemoveListener(
-    const IParameterTypeListener::Pointer listener)
+void ParameterType::RemoveListener(IParameterTypeListener* listener)
 {
   parameterTypeEvents.RemoveListener(listener);
 }
 
-std::string ParameterType::ToString() const
+QString ParameterType::ToString() const
 {
-  if (str.empty())
+  if (str.isEmpty())
   {
-    std::stringstream stringBuffer;
+    QTextStream stringBuffer(&str);
     stringBuffer << "ParameterType(" << id << "," << defined << ")";
-    str = stringBuffer.str();
   }
   return str;
 }
@@ -108,7 +106,7 @@ void ParameterType::Undefine()
   this->FireParameterTypeChanged(event);
 }
 
-ParameterType::ParameterType(const std::string& id) :
+ParameterType::ParameterType(const QString& id) :
   HandleObject(id)
 {
 
@@ -119,7 +117,7 @@ void ParameterType::FireParameterTypeChanged(const SmartPointer<
 {
   if (!event)
   {
-    throw Poco::NullPointerException("Cannot send a null event to listeners."); //$NON-NLS-1$
+    throw ctkInvalidArgumentException("Cannot send a null event to listeners.");
   }
 
   parameterTypeEvents.parameterTypeChanged(event);

@@ -70,83 +70,81 @@ WorkbenchPlugin::~WorkbenchPlugin()
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
-    IConfigurationElement::Pointer element, const std::string& extensionName)
+    const IConfigurationElement::Pointer& element, const QString& extensionName)
 {
+  if (!element->GetAttribute(extensionName).isNull()) return true;
 
-  std::string attr;
-  if (element->GetAttribute(extensionName, attr))
-    return true;
-  std::string elementText(element->GetValue());
-  if (elementText != "")
-    return true;
+  QString elementText = element->GetValue();
+  if (!elementText.isEmpty()) return true;
 
-  IConfigurationElement::vector children(element->GetChildren(extensionName));
+  QList<IConfigurationElement::Pointer> children(element->GetChildren(extensionName));
   if (children.size() == 1)
   {
-    if (children[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS, attr))
+    if (!(children[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS).IsNull()))
       return true;
   }
   return false;
 }
 
 bool WorkbenchPlugin::IsBundleLoadedForExecutableExtension(
-    IConfigurationElement::Pointer element, const std::string& extensionName)
+    const IConfigurationElement::Pointer& element, const QString& extensionName)
 {
-  IBundle::Pointer bundle(WorkbenchPlugin::GetBundleForExecutableExtension(element, extensionName));
+  QSharedPointer<ctkPlugin> plugin = WorkbenchPlugin::GetBundleForExecutableExtension(element, extensionName);
 
-  if (bundle.IsNull())
+  if (plugin.isNull())
     return true;
-  return bundle->GetState() == IBundle::BUNDLE_ACTIVE;
+  return plugin->GetState() == ctkPlugin::ACTIVE;
 }
 
-IBundle::Pointer WorkbenchPlugin::GetBundleForExecutableExtension(
-    IConfigurationElement::Pointer element, const std::string& extensionName)
+QSharedPointer<ctkPlugin> WorkbenchPlugin::GetBundleForExecutableExtension(
+    const IConfigurationElement::Pointer& element, const QString& extensionName)
 {
   // this code is derived heavily from
   // ConfigurationElement.createExecutableExtension.
-  std::string prop;
-  std::string executable;
-  std::string contributorName;
-  std::string::size_type i;
+  QString prop;
+  QString executable;
+  QString contributorName;
+  int i = 0;
 
-  if (extensionName != "")
-    element->GetAttribute(extensionName, prop);
+  if (!extensionName.isNull())
+    prop = element->GetAttribute(extensionName);
   else
   {
     // property not specified, try as element value
     prop = element->GetValue();
-    if (prop != "")
+    if (!prop.isNull())
     {
-      Poco::trimInPlace(prop);
+      prop = prop.trimmed();
+      if (prop.isEmpty())
+        prop = QString();
     }
   }
 
-  if (prop == "")
+  if (prop.isNull())
   {
     // property not defined, try as a child element
-    IConfigurationElement::vector exec(element->GetChildren(extensionName));
-    if (exec.size() != 0)
-      exec[0]->GetAttribute("plugin", contributorName); //$NON-NLS-1$
+    QList<IConfigurationElement::Pointer> exec(element->GetChildren(extensionName));
+    if (!exec.isEmpty())
+      contributorName = exec[0]->GetAttribute("plugin");
   }
   else
   {
     // simple property or element value, parse it into its components
-    i = prop.find_first_of(':');
-    if (i != std::string::npos)
-      executable = Poco::trim(prop.substr(0, i));
+    i = prop.indexOf(':');
+    if (i != -1)
+      executable = prop.left(i).trimmed();
     else
       executable = prop;
 
-    i = executable.find_first_of('/');
-    if (i != std::string::npos)
-      contributorName = Poco::trim(executable.substr(0, i));
-
+    i = executable.indexOf('/');
+    if (i != -1)
+      contributorName = executable.left(i).trimmed();
   }
 
-  if (contributorName == "")
+  if (contributorName.isNull())
     contributorName = element->GetContributor();
 
-  return Platform::GetBundle(contributorName);
+  return Platform::GetPlugin(contributorName);
 }
 
 WorkbenchPlugin* WorkbenchPlugin::GetDefault()
@@ -250,9 +248,9 @@ IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
   return presentationFactory;
 }
 
-void WorkbenchPlugin::Log(const std::string& message)
+void WorkbenchPlugin::Log(const QString& message)
 {
-  BERRY_INFO << "LOG: " << message << std::endl;
+  BERRY_INFO << "LOG: " << message.toStdString() << std::endl;
   //inst->GetLog().log(message);
 }
 
@@ -263,16 +261,16 @@ void WorkbenchPlugin::Log(const Poco::RuntimeException& exc)
 }
 
 
-void WorkbenchPlugin::Log(const std::string& message, const Poco::RuntimeException& t)
+void WorkbenchPlugin::Log(const QString& message, const Poco::RuntimeException& t)
 {
-  PlatformException exc(message, t);
+  PlatformException exc(message.toStdString(), t);
   WorkbenchPlugin::Log(exc);
 }
 
-void WorkbenchPlugin::Log(const std::string& clazz,
-    const std::string& methodName, const Poco::RuntimeException& t)
+void WorkbenchPlugin::Log(const QString& clazz,
+    const QString& methodName, const Poco::RuntimeException& t)
 {
-  std::string msg = "Exception in " + clazz + "." + methodName + ": "
+  QString msg = QString("Exception in ") + clazz + "." + methodName + ": "
       + t.what();
 
   WorkbenchPlugin::Log(msg, t);

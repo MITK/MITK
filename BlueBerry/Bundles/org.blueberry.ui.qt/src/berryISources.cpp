@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryISources.h"
 
+#include <QString>
+
 namespace berry
 {
 
@@ -49,11 +51,11 @@ int ISources::ACTIVE_CONTEXT()
   return val;
 }
 
-const std::string ISources::ACTIVE_CONTEXT_NAME()
+const QString ISources::ACTIVE_CONTEXT_NAME()
 {
-  static const std::string val = "activeContexts";
+  static const QString val = "activeContexts";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_ACTION_SETS()
 {
@@ -61,11 +63,11 @@ int ISources::ACTIVE_ACTION_SETS()
   return val;
 }
 
-const std::string ISources::ACTIVE_ACTION_SETS_NAME()
+const QString ISources::ACTIVE_ACTION_SETS_NAME()
 {
-  static const std::string val = "activeActionSets";
+  static const QString val = "activeActionSets";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_SHELL()
 {
@@ -73,11 +75,11 @@ int ISources::ACTIVE_SHELL()
   return val;
 }
 
-const std::string ISources::ACTIVE_SHELL_NAME()
+const QString ISources::ACTIVE_SHELL_NAME()
 {
-  static const std::string val = "activeShell";
+  static const QString val = "activeShell";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_WORKBENCH_WINDOW_SHELL()
 {
@@ -85,11 +87,11 @@ int ISources::ACTIVE_WORKBENCH_WINDOW_SHELL()
   return val;
 }
 
-const std::string ISources::ACTIVE_WORKBENCH_WINDOW_SHELL_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_SHELL_NAME()
 {
-  static const std::string val = "activeWorkbenchWindowShell";
+  static const QString val = "activeWorkbenchWindowShell";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_WORKBENCH_WINDOW()
 {
@@ -97,11 +99,11 @@ int ISources::ACTIVE_WORKBENCH_WINDOW()
   return val;
 }
 
-const std::string ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
 {
-  static const std::string val = "activeWorkbenchWindow";
+  static const QString val = "activeWorkbenchWindow";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE()
 {
@@ -109,26 +111,26 @@ int ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE()
   return val;
 }
 
-const std::string ISources::ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME()
 {
-  static const std::string val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+  static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
       + ".isCoolbarVisible";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME()
 {
-  static const std::string val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+  static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
       + ".isPerspectiveBarVisible";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME()
 {
-  static const std::string val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+  static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
       + ".activePerspective";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_EDITOR()
 {
@@ -136,11 +138,11 @@ int ISources::ACTIVE_EDITOR()
   return val;
 }
 
-const std::string ISources::ACTIVE_EDITOR_NAME()
+const QString ISources::ACTIVE_EDITOR_NAME()
 {
-  static const std::string val = "activeEditor";
+  static const QString val = "activeEditor";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_EDITOR_ID()
 {
@@ -148,11 +150,11 @@ int ISources::ACTIVE_EDITOR_ID()
   return val;
 }
 
-const std::string ISources::ACTIVE_EDITOR_ID_NAME()
+const QString ISources::ACTIVE_EDITOR_ID_NAME()
 {
-  static const std::string val = "activeEditorId";
+  static const QString val = "activeEditorId";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_PART()
 {
@@ -160,11 +162,11 @@ int ISources::ACTIVE_PART()
   return val;
 }
 
-const std::string ISources::ACTIVE_PART_NAME()
+const QString ISources::ACTIVE_PART_NAME()
 {
-  static const std::string val = "activePart";
+  static const QString val = "activePart";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_PART_ID()
 {
@@ -172,11 +174,11 @@ int ISources::ACTIVE_PART_ID()
   return val;
 }
 
-const std::string ISources::ACTIVE_PART_ID_NAME()
+const QString ISources::ACTIVE_PART_ID_NAME()
 {
-  static const std::string val = "activePartId";
+  static const QString val = "activePartId";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_SITE()
 {
@@ -184,23 +186,23 @@ int ISources::ACTIVE_SITE()
   return val;
 }
 
-const std::string ISources::ACTIVE_SITE_NAME()
+const QString ISources::ACTIVE_SITE_NAME()
 {
-  static const std::string val = "activeSite";
+  static const QString val = "activeSite";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::SHOW_IN_SELECTION()
+const QString ISources::SHOW_IN_SELECTION()
 {
-  static const std::string val = "showInSelection";
+  static const QString val = "showInSelection";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::SHOW_IN_INPUT()
+const QString ISources::SHOW_IN_INPUT()
 {
-  static const std::string val = "showInInput";
+  static const QString val = "showInInput";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_CURRENT_SELECTION()
 {
@@ -208,11 +210,11 @@ int ISources::ACTIVE_CURRENT_SELECTION()
   return val;
 }
 
-const std::string ISources::ACTIVE_CURRENT_SELECTION_NAME()
+const QString ISources::ACTIVE_CURRENT_SELECTION_NAME()
 {
-  static const std::string val = "selection";
+  static const QString val = "selection";
   return val;
-} //$NON-NLS-1$
+}
 
 int ISources::ACTIVE_MENU()
 {
@@ -220,34 +222,34 @@ int ISources::ACTIVE_MENU()
   return val;
 }
 
-const std::string ISources::ACTIVE_MENU_NAME()
+const QString ISources::ACTIVE_MENU_NAME()
 {
-  static const std::string val = "activeMenu";
+  static const QString val = "activeMenu";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_MENU_SELECTION_NAME()
+const QString ISources::ACTIVE_MENU_SELECTION_NAME()
 {
-  static const std::string val = "activeMenuSelection";
+  static const QString val = "activeMenuSelection";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_MENU_EDITOR_INPUT_NAME()
+const QString ISources::ACTIVE_MENU_EDITOR_INPUT_NAME()
 {
-  static const std::string val = "activeMenuEditorInput";
+  static const QString val = "activeMenuEditorInput";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_FOCUS_CONTROL_NAME()
+const QString ISources::ACTIVE_FOCUS_CONTROL_NAME()
 {
-  static const std::string val = "activeFocusControl";
+  static const QString val = "activeFocusControl";
   return val;
-} //$NON-NLS-1$
+}
 
-const std::string ISources::ACTIVE_FOCUS_CONTROL_ID_NAME()
+const QString ISources::ACTIVE_FOCUS_CONTROL_ID_NAME()
 {
-  static const std::string val = "activeFocusControlId";
+  static const QString val = "activeFocusControlId";
   return val;
-} //$NON-NLS-1$
+}
 
 }

@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+class CommandManager;
 class ViewRegistry;
 class EditorRegistry;
 class WorkbenchWindowConfigurer;
@@ -444,6 +445,14 @@ private:
    * initialized during workbench during the <code>init</code> method.
    */
   ServiceLocator::Pointer serviceLocator;
+
+  /**
+   * The single instance of the command manager used by the workbench. This is
+   * initialized in <code>Workbench.init(Display)</code> and then never
+   * changed. This value will only be <code>null</code> if the
+   * initialization call has not yet completed.
+   */
+  QScopedPointer<CommandManager> commandManager;
 
   /**
    * A count of how many plug-ins were loaded while restoring the workbench

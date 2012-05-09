@@ -113,9 +113,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_CurrentRowCount = 0;
   m_Parent = parent;
   //# Preferences
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node(VIEW_ID))
@@ -225,7 +223,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,reinitAction));
 
   // find contextMenuAction extension points and add them to the node descriptor
-  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+  berry::IExtensionPointService* extensionPointService = berry::Platform::GetExtensionPointService();
   berry::IConfigurationElement::vector cmActions(
     extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
   berry::IConfigurationElement::vector::iterator cmActionsIt;

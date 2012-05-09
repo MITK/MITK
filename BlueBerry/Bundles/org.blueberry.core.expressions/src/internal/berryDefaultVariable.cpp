@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 DefaultVariable::DefaultVariable(IEvaluationContext* parent,
-    Object::Pointer defaultVariable)
+                                 const Object::Pointer& defaultVariable)
 {
   poco_check_ptr(parent);
 
@@ -60,23 +60,23 @@ bool DefaultVariable::GetAllowPluginActivation() const
   return fParent->GetAllowPluginActivation();
 }
 
-void DefaultVariable::AddVariable(const std::string& name, Object::Pointer value)
+void DefaultVariable::AddVariable(const QString& name, const Object::Pointer& value)
 {
   fManagedPool->AddVariable(name, value);
 }
 
-Object::Pointer DefaultVariable::RemoveVariable(const std::string& name)
+Object::Pointer DefaultVariable::RemoveVariable(const QString &name)
 {
   return fManagedPool->RemoveVariable(name);
 }
 
-Object::Pointer DefaultVariable::GetVariable(const std::string& name) const
+Object::Pointer DefaultVariable::GetVariable(const QString &name) const
 {
   return fManagedPool->GetVariable(name);
 }
 
-Object::Pointer DefaultVariable::ResolveVariable(const std::string& name,
-    std::vector<Object::Pointer>& args)
+Object::Pointer DefaultVariable::ResolveVariable(const QString &name,
+                                                 const QList<Object::Pointer>& args)
 {
   return fManagedPool->ResolveVariable(name, args);
 }

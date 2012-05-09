@@ -21,27 +21,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::size_t CompositeExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::CompositeExpression");
+const uint CompositeExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::CompositeExpression");
 
 void CompositeExpression::Add(Expression::Pointer expression)
 {
   fExpressions.push_back(expression);
 }
 
-void CompositeExpression::GetChildren(std::vector<Expression::Pointer>& children)
+QList<Expression::Pointer> CompositeExpression::GetChildren()
 {
-  children = fExpressions;
+  return fExpressions;
 }
 
-EvaluationResult CompositeExpression::EvaluateAnd(IEvaluationContext* scope)
+EvaluationResult::ConstPointer CompositeExpression::EvaluateAnd(IEvaluationContext* scope) const
 {
   if (fExpressions.size() == 0)
     return EvaluationResult::TRUE_EVAL;
-  EvaluationResult result = EvaluationResult::TRUE_EVAL;
-  std::vector<Expression::Pointer>::iterator iter;
-  for (iter= fExpressions.begin(); iter != fExpressions.end(); ++iter)
+  EvaluationResult::ConstPointer result = EvaluationResult::TRUE_EVAL;
+  foreach (Expression::Pointer iter, fExpressions)
   {
-    result = result.And((*iter)->Evaluate(scope));
+    result = result->And(iter->Evaluate(scope));
     // keep iterating even if we have a not loaded found. It can be
     // that we find a FALSE_EVAL which will result in a better result.
     if (result == EvaluationResult::FALSE_EVAL)
@@ -50,15 +49,14 @@ EvaluationResult CompositeExpression::EvaluateAnd(IEvaluationContext* scope)
   return result;
 }
 
-EvaluationResult CompositeExpression::EvaluateOr(IEvaluationContext* scope)
+EvaluationResult::ConstPointer CompositeExpression::EvaluateOr(IEvaluationContext* scope) const
 {
   if (fExpressions.size() == 0)
     return EvaluationResult::TRUE_EVAL;
-  EvaluationResult result = EvaluationResult::FALSE_EVAL;
-  std::vector<Expression::Pointer>::iterator iter;
-  for (iter= fExpressions.begin(); iter != fExpressions.end(); ++iter)
+  EvaluationResult::ConstPointer result = EvaluationResult::FALSE_EVAL;
+  foreach (Expression::Pointer iter, fExpressions)
   {
-    result = result.Or((*iter)->Evaluate(scope));
+    result = result->Or(iter->Evaluate(scope));
     if (result == EvaluationResult::TRUE_EVAL)
       return result;
   }
@@ -70,14 +68,13 @@ void CompositeExpression::CollectExpressionInfo(ExpressionInfo* info)
   if (fExpressions.size() == 0)
     return;
 
-  std::vector<Expression::Pointer>::iterator iter;
-  for (iter= fExpressions.begin(); iter != fExpressions.end(); ++iter)
+  foreach (Expression::Pointer iter, fExpressions)
   {
-    (*iter)->CollectExpressionInfo(info);
+    iter->CollectExpressionInfo(info);
   }
 }
 
-std::size_t CompositeExpression::ComputeHashCode()
+uint CompositeExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions);
 }

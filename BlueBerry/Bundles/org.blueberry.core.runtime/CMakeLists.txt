@@ -1,5 +1,32 @@
 project(org_blueberry_core_runtime)
 
-MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE BERRY_RUNTIME
-                        EXPORTED_INCLUDE_SUFFIXES src)
+MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE org_blueberry_core_runtime_EXPORT
+                        EXPORTED_INCLUDE_SUFFIXES src src/application src/service src/registry)
+
+add_executable(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")
+
+target_link_libraries(${OSGI_APP} ${PROJECT_NAME} mbilog)
+if(_ctk_test_plugins)
+  add_dependencies(${OSGI_APP} ${_ctk_test_plugins})
+  add_dependencies(BlueBerry ${OSGI_APP})
+  set_property(TARGET ${OSGI_APP} APPEND PROPERTY LABELS BlueBerry)
+endif()
+
+configure_file(src/application/solstice.ini
+               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.ini)
+
+
+add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
+
+target_link_libraries(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
+if(_ctk_test_plugins)
+  add_dependencies(${OSGI_UI_APP} ${_ctk_test_plugins})
+  add_dependencies(BlueBerry ${OSGI_UI_APP})
+  set_property(TARGET ${OSGI_UI_APP} APPEND PROPERTY LABELS BlueBerry)
+endif()
+
+configure_file(src/application/solstice.ini
+               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.ini)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/berryConfig.h.in" "${CMAKE_CURRENT_BINARY_DIR}/berryConfig.h" @ONLY)
 

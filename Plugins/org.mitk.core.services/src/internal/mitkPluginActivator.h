@@ -17,18 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCORESERVICESPLUGIN_H_
 #define MITKCORESERVICESPLUGIN_H_
 
-#include <berryPlugin.h>
-#include <berryIBundleContext.h>
+#include <ctkPluginActivator.h>
 
-#include "mitkIDataStorageService.h"
+#include <berrySmartPointer.h>
+
 #include <usServiceEvent.h>
 
-namespace us {
+namespace us
+{
 class ModuleContext;
 }
 
 namespace mitk
 {
+struct IDataStorageService;
 
 class org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
@@ -43,6 +45,7 @@ public:
   static const std::string PLUGIN_ID;
 
   org_mitk_core_services_Activator();
+  ~org_mitk_core_services_Activator();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
@@ -51,7 +54,8 @@ public:
 
 private:
 
-  mitk::IDataStorageService::Pointer dataStorageService;
+  berry::SmartPointer<IDataStorageService> dataStorageService;
+
   QMap<long, QObject*> mapMitkIdToAdapter;
   QMap<long, ctkServiceRegistration> mapMitkIdToRegistration;
 

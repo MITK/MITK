@@ -45,10 +45,10 @@ class BERRY_UI_QT HandlerUtil {
 
 private:
 
-  static void NoVariableFound(ExecutionEvent::Pointer event, const std::string& name);
+  static void NoVariableFound(ExecutionEvent::Pointer event, const QString& name);
 
-  static void IncorrectTypeFound(ExecutionEvent::Pointer event, const std::string& name,
-      const std::string& expectedType, const std::string& wrongType);
+  static void IncorrectTypeFound(ExecutionEvent::Pointer event, const QString& name,
+      const QString& expectedType, const QString& wrongType);
 
 
 public:
@@ -65,7 +65,7 @@ public:
    * @return The object from the application context, or <code>null</code>
    *         if it could not be found.
    */
-  static Object::Pointer GetVariable(ExecutionEvent::Pointer event, const std::string& name);
+  static Object::Pointer GetVariable(ExecutionEvent::Pointer event, const QString& name);
 
   /**
    * Extract the variable.
@@ -79,7 +79,7 @@ public:
    * @throws ExecutionException
    *             if the variable is not found.
    */
-  static Object::Pointer GetVariableChecked(ExecutionEvent::Pointer event, const std::string& name);
+  static Object::Pointer GetVariableChecked(ExecutionEvent::Pointer event, const QString& name);
 
   /**
    * Extract the variable.
@@ -92,7 +92,7 @@ public:
    *         if it could not be found.
    * @since 3.4
    */
-  static Object::Pointer GetVariable(Object::Pointer context, const std::string& name);
+  static Object::Pointer GetVariable(Object::Pointer context, const QString& name);
 
   /**
    * Return the active contexts.

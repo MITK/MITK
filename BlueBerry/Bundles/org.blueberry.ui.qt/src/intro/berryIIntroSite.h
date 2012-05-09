@@ -47,7 +47,7 @@ struct BERRY_UI_QT IIntroSite : public IWorkbenchSite {
    *
    * @return the registry extension id
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Returns the unique identifier of the plug-in that defines this intro
@@ -56,7 +56,7 @@ struct BERRY_UI_QT IIntroSite : public IWorkbenchSite {
    * @return the unique identifier of the declaring plug-in
    * @see org.eclipse.core.runtime.IPluginDescriptor#getUniqueIdentifier()
    */
-  virtual std::string GetPluginId() const = 0;
+  virtual QString GetPluginId() const = 0;
 
   /**
    * Returns the action bars for this part site.

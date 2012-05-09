@@ -19,22 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-bool AndExpression::operator==(Expression& object)
+bool AndExpression::operator==(const Object* object) const
 {
-  try
+  if(const AndExpression* that = dynamic_cast<const AndExpression*>(object))
   {
-    AndExpression& that = dynamic_cast<AndExpression&>(object);
-    return this->Equals(this->fExpressions, that.fExpressions);
+    return this->Equals(this->fExpressions, that->fExpressions);
   }
-  catch (std::bad_cast exc)
-  {
-    return false;
-  }
-
+  return false;
 }
 
-EvaluationResult
-AndExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+AndExpression::Evaluate(IEvaluationContext* context) const
 {
   return this->EvaluateAnd(context);
 }

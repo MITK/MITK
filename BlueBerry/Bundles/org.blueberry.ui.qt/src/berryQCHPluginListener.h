@@ -23,11 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginEvent.h>
 
-#include <berryIExtensionPointService.h>
-
 #include <org_blueberry_ui_qt_Export.h>
 
 class ctkPlugin;
+class ctkPluginContext;
 
 namespace berry {
 

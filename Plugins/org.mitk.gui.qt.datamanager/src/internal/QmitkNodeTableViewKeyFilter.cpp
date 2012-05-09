@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QKeySequence>
 #include "../QmitkDataManagerView.h"
 
+#include "berryIPreferencesService.h"
+
 QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerView )
 : QObject(_DataManagerView)
 {
-  m_PreferencesService =
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  m_PreferencesService = berry::Platform::GetPreferencesService();
 }
 
 bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
@@ -32,8 +33,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
   QmitkDataManagerView* _DataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
   if (event->type() == QEvent::KeyPress && _DataManagerView)
   {
-    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
-    berry::IPreferences::Pointer nodeTableKeyPrefs = prefService->GetSystemPreferences()->Node("/Data Manager/Hotkeys");
+    berry::IPreferences::Pointer nodeTableKeyPrefs = m_PreferencesService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
 
     QKeySequence _MakeAllInvisible = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+, V")));
     QKeySequence _ToggleVisibility = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V")));

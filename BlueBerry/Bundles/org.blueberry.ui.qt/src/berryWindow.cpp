@@ -14,12 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryWindow.h"
 
 #include "berryConstants.h"
 #include "berrySameShellProvider.h"
 #include "berryMenuManager.h"
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include <QMainWindow>
 

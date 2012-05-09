@@ -55,7 +55,7 @@ struct BERRY_UI_QT IPathEditorInput : public IEditorInput {
      *
      * @return a local file system path
      */
-   virtual Poco::Path GetPath() const = 0;
+   virtual QString GetPath() const = 0;
 };
 
 }

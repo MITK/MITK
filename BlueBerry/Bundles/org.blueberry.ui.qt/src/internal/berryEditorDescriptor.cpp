@@ -31,7 +31,7 @@ const int EditorDescriptor::OPEN_INPLACE = 0x02;
 
 const int EditorDescriptor::OPEN_EXTERNAL = 0x04;
 
-EditorDescriptor::EditorDescriptor(const std::string& id2,
+EditorDescriptor::EditorDescriptor(const QString& id2,
     IConfigurationElement::Pointer element) :
   testImage(true), matchingStrategyChecked(false), openMode(0)
 {
@@ -55,7 +55,7 @@ EditorDescriptor::EditorDescriptor() :
 //  }
 //
 //  // Get the contributor class name.
-//  std::string className;
+//  QString className;
 //  if (!configurationElement->GetAttribute(IWorkbenchRegistryConstants::ATT_CONTRIBUTOR_CLASS, className))
 //  {
 //    return IEditorActionBarContributor::Pointer();
@@ -76,14 +76,14 @@ EditorDescriptor::EditorDescriptor() :
 //  return contributor;
 //}
 
-std::string EditorDescriptor::GetEditorClassName() const
+QString EditorDescriptor::GetEditorClassName() const
 {
   if (configurationElement.IsNull())
   {
     return className;
   }
   return RegistryReader::GetClassValue(configurationElement,
-      WorkbenchRegistryConstants::ATT_CLASS);
+      WorkbenchRegistryConstants::ATT_CLASS).toStdString();
 }
 
 IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement() const
@@ -93,19 +93,11 @@ IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement() const
 
 IEditorPart::Pointer EditorDescriptor::CreateEditor()
 {
-  IEditorPart::Pointer extension(
-      configurationElement->CreateExecutableExtension<IEditorPart> (
-          WorkbenchRegistryConstants::ATT_CLASS));
-  if (extension.IsNull())
-  {
-    // support legacy BlueBerry extensions
-    extension = configurationElement->CreateExecutableExtension<IEditorPart> (
-          WorkbenchRegistryConstants::ATT_CLASS, IEditorPart::GetManifestName());
-  }
-  return extension;
+  return configurationElement->CreateExecutableExtension<IEditorPart> (
+          WorkbenchRegistryConstants::ATT_CLASS);
 }
 
-std::string EditorDescriptor::GetFileName() const
+QString EditorDescriptor::GetFileName() const
 {
   //if (program == null)
   //{
@@ -113,15 +105,12 @@ std::string EditorDescriptor::GetFileName() const
   {
     return fileName;
   }
-  std::string val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND,
-      val);
-  return val;
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND).toStdString();
   //}
   //return program.getName();
 }
 
-std::string EditorDescriptor::GetId() const
+QString EditorDescriptor::GetId() const
 {
   //if (program == null)
   //{
@@ -129,9 +118,7 @@ std::string EditorDescriptor::GetId() const
   {
     return id;
   }
-  std::string val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, val);
-  return val;
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID).toStdString();
   //}
   //return Util.safeString(program.getName());
 }
@@ -143,8 +130,8 @@ SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
     testImage = false;
     if (!imageDesc)
     {
-      std::string imageFileName(this->GetImageFilename());
-      std::string command(this->GetFileName());
+      QString imageFileName(this->GetImageFilename());
+      QString command(this->GetFileName());
       if (!imageFileName.empty() && configurationElement)
       {
         imageDesc = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
@@ -181,19 +168,19 @@ void EditorDescriptor::VerifyImage() const
   //    }
 }
 
-std::string EditorDescriptor::GetImageFilename() const
+QString EditorDescriptor::GetImageFilename() const
 {
   if (!configurationElement)
   {
     return imageFilename;
   }
-  std::string filename;
+  QString filename;
   configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON,
       filename);
   return filename;
 }
 
-std::string EditorDescriptor::GetLabel() const
+QString EditorDescriptor::GetLabel() const
 {
   //if (program == null)
   //{
@@ -201,26 +188,26 @@ std::string EditorDescriptor::GetLabel() const
   {
     return editorName;
   }
-  std::string val;
+  QString val;
   configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
   return val;
   //}
   //return program.getName();
 }
 
-std::string EditorDescriptor::GetLauncher() const
+QString EditorDescriptor::GetLauncher() const
 {
   if (configurationElement.IsNull())
   {
     return launcherName;
   }
-  std::string val;
+  QString val;
   configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LAUNCHER,
       val);
   return val;
 }
 
-std::string EditorDescriptor::GetPluginID() const
+QString EditorDescriptor::GetPluginID() const
 {
   if (!configurationElement.IsNull())
   {
@@ -353,7 +340,7 @@ int EditorDescriptor::GetOpenMode() const
   }
 }
 
-void EditorDescriptor::SetClassName(const std::string& newClassName)
+void EditorDescriptor::SetClassName(const QString& newClassName)
 {
   className = newClassName;
 }
@@ -364,22 +351,22 @@ void EditorDescriptor::SetConfigurationElement(
   configurationElement = newConfigurationElement;
 }
 
-void EditorDescriptor::SetFileName(const std::string& aFileName)
+void EditorDescriptor::SetFileName(const QString& aFileName)
 {
   fileName = aFileName;
 }
 
-void EditorDescriptor::SetID(const std::string& anID)
+void EditorDescriptor::SetID(const QString& anID)
 {
   id = anID;
 }
 
-void EditorDescriptor::SetLauncher(const std::string& newLauncher)
+void EditorDescriptor::SetLauncher(const QString& newLauncher)
 {
   launcherName = newLauncher;
 }
 
-void EditorDescriptor::SetName(const std::string& newName)
+void EditorDescriptor::SetName(const QString& newName)
 {
   editorName = newName;
 }
@@ -389,23 +376,22 @@ void EditorDescriptor::SetOpenMode(int mode)
   openMode = mode;
 }
 
-void EditorDescriptor::SetPluginIdentifier(const std::string& anID)
+void EditorDescriptor::SetPluginIdentifier(const QString& anID)
 {
   pluginIdentifier = anID;
 }
 
-std::string EditorDescriptor::ToString() const
+QString EditorDescriptor::ToString() const
 {
-  return "EditorDescriptor(id=" + this->GetId() + ", label=" + this->GetLabel()
-      + ")"; //$NON-NLS-2$ //$NON-NLS-3$//$NON-NLS-1$
+  return "EditorDescriptor(id=" + this->GetId() + ", label=" + this->GetLabel() + ")";
 }
 
-std::string EditorDescriptor::GetLocalId() const
+QString EditorDescriptor::GetLocalId() const
 {
   return this->GetId();
 }
 
-std::string EditorDescriptor::GetPluginId() const
+QString EditorDescriptor::GetPluginId() const
 {
   return this->GetPluginID();
 }
@@ -417,7 +403,7 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
     matchingStrategyChecked = true;
     if (/*program == null &&*/!configurationElement.IsNull())
     {
-      std::string strategy;
+      QString strategy;
       if (configurationElement->GetAttribute(
           WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY, strategy))
       {

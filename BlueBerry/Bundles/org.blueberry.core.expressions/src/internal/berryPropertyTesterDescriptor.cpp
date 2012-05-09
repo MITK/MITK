@@ -19,57 +19,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatform.h"
 #include "berryPlatformException.h"
 
+#include <berryIConfigurationElement.h>
+
 #include "Poco/String.h"
 
 namespace berry
 {
 
-const std::string PropertyTesterDescriptor::PROPERTIES= "properties"; //$NON-NLS-1$
-const std::string PropertyTesterDescriptor::NAMESPACE= "namespace"; //$NON-NLS-1$
-const std::string PropertyTesterDescriptor::CLASS= "class"; //$NON-NLS-1$
+const QString PropertyTesterDescriptor::PROPERTIES= "properties";
+const QString PropertyTesterDescriptor::NAMESPACE= "namespace";
+const QString PropertyTesterDescriptor::CLASS= "class";
 
-PropertyTesterDescriptor::PropertyTesterDescriptor(IConfigurationElement::Pointer element)
+PropertyTesterDescriptor::PropertyTesterDescriptor(const IConfigurationElement::Pointer& element)
  : fConfigElement(element)
 {
-  fNamespace = "";
-  fConfigElement->GetAttribute(NAMESPACE, fNamespace);
-  if (fNamespace.size() == 0)
+  fNamespace = fConfigElement->GetAttribute(NAMESPACE);
+  if (fNamespace.isNull())
   {
-    throw new CoreException("No namespace");
+    throw CoreException("No namespace");
   }
-  std::string buffer(",");
-  std::string properties = "";
-  fConfigElement->GetAttribute(PROPERTIES, properties);
-  if (properties.size() == 0)
+  QString buffer(",");
+  QString properties = fConfigElement->GetAttribute(PROPERTIES);
+  if (properties.isNull())
   {
-    throw new CoreException("No properties");
+    throw CoreException("No properties");
   }
-  Poco::translateInPlace(buffer, "\r\n\t ", "");
-//  std::string::iterator iter;
-//  for (iter = properties.begin(); iter != properties.end(); ++iter)
-//  {
-//    char ch= properties.charAt(i);
-//    if (!Character.isWhitespace(ch))
-//    buffer.append(ch);
-//  }
-//  buffer.append(',');
+  foreach(QChar ch, properties)
+  {
+    if (!ch.isSpace())
+    {
+      buffer.append(ch);
+    }
+  }
+  buffer.append(',');
   fProperties = buffer;
 }
 
-PropertyTesterDescriptor::PropertyTesterDescriptor(IConfigurationElement::Pointer element, const std::string& namespaze, const std::string& properties)
+PropertyTesterDescriptor::PropertyTesterDescriptor(const IConfigurationElement::Pointer& element,
+                                                   const QString& namespaze, const QString& properties)
  : fConfigElement(element), fNamespace(namespaze), fProperties(properties)
 {
 
 }
 
-const std::string&
+QString
 PropertyTesterDescriptor::GetProperties()
 {
   return fProperties;
 }
 
-const std::string&
-PropertyTesterDescriptor::GetNamespace()
+QString PropertyTesterDescriptor::GetNamespace()
 {
   return fNamespace;
 }
@@ -81,9 +80,9 @@ PropertyTesterDescriptor::GetExtensionElement()
 }
 
 bool
-PropertyTesterDescriptor::Handles(const std::string& namespaze, const std::string& property)
+PropertyTesterDescriptor::Handles(const QString &namespaze, const QString &property)
 {
-  return fNamespace == namespaze && fProperties.find("," + property + ",") != std::string::npos;
+  return fNamespace == namespaze && fProperties.contains("," + property + ",");
 }
 
 bool
@@ -95,24 +94,19 @@ PropertyTesterDescriptor::IsInstantiated()
 bool
 PropertyTesterDescriptor::IsDeclaringPluginActive()
 {
-  IBundle::Pointer fBundle= Platform::GetBundle(fConfigElement->GetContributor());
-  return fBundle->IsActive();
+  QSharedPointer<ctkPlugin> plugin = Platform::GetPlugin(fConfigElement->GetContributor());
+  return plugin->getState() == ctkPlugin::ACTIVE;
 }
 
 IPropertyTester*
 PropertyTesterDescriptor::Instantiate()
 {
-  IPropertyTester* tester = fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS);
-  if (tester == 0)
-  {
-    // support legacy BlueBerry extension
-    tester = fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS, IPropertyTester::GetManifestName());
-  }
-  return tester;
+  return fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS);
 }
 
 bool
-PropertyTesterDescriptor::Test(Object::Pointer  /*receiver*/, const std::string&  /*method*/, std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
+PropertyTesterDescriptor::Test(Object::Pointer  /*receiver*/, const QString &  /*method*/,
+                               const QList<Object::Pointer> &  /*args*/, Object::Pointer  /*expectedValue*/)
 {
   poco_bugcheck_msg("Method should never be called");
   return false;

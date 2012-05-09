@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   berryAbstractSourceProvider.cpp
-  berryAbstractUIPlugin.cpp
   berryAbstractUICTKPlugin.cpp
   berryConstants.cpp
   berryDisplay.cpp
@@ -239,6 +238,7 @@ set(INTERNAL_CPP_FILES
   berryAlwaysEnabledExpression.cpp
   berryBundleUtility.cpp
   berryCommandContributionItemParameter.cpp
+  berryCommandService.cpp
   berryContainerPlaceholder.cpp
   berryContributionRoot.cpp
   berryDetachedPlaceHolder.cpp
@@ -254,7 +254,13 @@ set(INTERNAL_CPP_FILES
   berryEditorRegistryReader.cpp
   berryEditorSashContainer.cpp
   berryEditorSite.cpp
+  berryElementReference.cpp
   berryErrorViewPart.cpp
+  berryEvaluationAuthority.cpp
+  berryEvaluationReference.cpp
+  berryEvaluationResultCache.cpp
+  berryEvaluationService.cpp
+  berryExpressionAuthority.cpp
   berryFileEditorMapping.cpp
   berryFolderLayout.cpp
   berryIDragOverListener.cpp
@@ -269,6 +275,7 @@ set(INTERNAL_CPP_FILES
   berryLayoutPartSash.cpp
   berryLayoutTree.cpp
   berryLayoutTreeNode.cpp
+  berryMMMenuListener.cpp
   berryNullEditorInput.cpp
   berryPageLayout.cpp
   berryPagePartSelectionTracker.cpp
@@ -367,6 +374,8 @@ set(MOC_H_FILES
 
   src/berryQCHPluginListener.h
   src/berryQtSelectionProvider.h
+
+  src/internal/berryMMMenuListener.h
 
   src/internal/defaultpresentation/berryNativeTabFolder.h
   src/internal/defaultpresentation/berryNativeTabItem.h

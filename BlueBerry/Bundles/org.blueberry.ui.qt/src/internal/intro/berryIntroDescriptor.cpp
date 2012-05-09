@@ -28,8 +28,8 @@ IntroDescriptor::IntroDescriptor(IConfigurationElement::Pointer configElement)
     throw (CoreException) :
   element(configElement)
 {
-  std::string val;
-  if (!configElement->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS, val))
+  QString val = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS);
+  if (val.isEmpty())
   {
     //TODO IStatus
     /*
@@ -38,47 +38,35 @@ IntroDescriptor::IntroDescriptor(IConfigurationElement::Pointer configElement)
         "Invalid extension (Missing class name): " + getId(), //$NON-NLS-1$
         null));
         */
-    throw CoreException(configElement->GetContributor() + ": Invalid extension (Missing className): " + GetId());
+    throw CoreException(configElement->GetContributor().toStdString() +
+                        ": Invalid extension (Missing className): " + GetId().toStdString());
   }
 }
 
 SmartPointer<IIntroPart> IntroDescriptor::CreateIntro() throw (CoreException)
 {
-  IIntroPart::Pointer intro(element->CreateExecutableExtension<IIntroPart>(
-      WorkbenchRegistryConstants::ATT_CLASS));
-  if (intro.IsNull())
-  {
-    intro = element->CreateExecutableExtension<IIntroPart>(
-          WorkbenchRegistryConstants::ATT_CLASS, IIntroPart::GetManifestName());
-  }
+  IIntroPart::Pointer intro(element->CreateExecutableExtension<IIntroPart>(WorkbenchRegistryConstants::ATT_CLASS));
   return intro;
 }
 
 IntroContentDetector::Pointer IntroDescriptor::GetIntroContentDetector()
     throw (CoreException)
 {
-  std::string val;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR, val))
+  QString val = element->GetAttribute(WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR);
+  if (val.isEmpty())
   {
     return IntroContentDetector::Pointer(0);
   }
 
   IntroContentDetector::Pointer detector(
-    element->CreateExecutableExtension<IntroContentDetector>(
-      WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR));
-  if (detector.IsNull())
-  {
-    // support legacy BlueBerry extensions
-    detector = element->CreateExecutableExtension<IntroContentDetector>(
-          WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR, IntroContentDetector::GetManifestName());
-  }
+    element->CreateExecutableExtension<IntroContentDetector>(WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR));
   return detector;
 }
 
 int IntroDescriptor::GetRole() const
 {
-  std::string role;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_ROLE, role))
+  QString role = element->GetAttribute(WorkbenchRegistryConstants::ATT_ROLE);
+  if (role.isEmpty())
   {
     return IntroConstants::INTRO_ROLE_VIEW;
   }
@@ -87,14 +75,12 @@ int IntroDescriptor::GetRole() const
   else return IntroConstants::INTRO_ROLE_VIEW;
 }
 
-std::string IntroDescriptor::GetId() const
+QString IntroDescriptor::GetId() const
 {
-  std::string id;
-  element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
-  return id;
+  return element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
 }
 
-std::string IntroDescriptor::GetPluginId() const
+QString IntroDescriptor::GetPluginId() const
 {
   return element->GetContributor();
 }
@@ -105,14 +91,14 @@ ImageDescriptor::Pointer IntroDescriptor::GetImageDescriptor() const
   {
     return imageDescriptor;
   }
-  std::string iconName;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, iconName))
+  QString iconName = element->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
+  if (iconName.isEmpty())
   {
     return ImageDescriptor::Pointer();
   }
 
   imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
-      element->GetContributor(), iconName);
+        element->GetContributor(), iconName);
   return imageDescriptor;
 }
 
@@ -121,11 +107,9 @@ IConfigurationElement::Pointer IntroDescriptor::GetConfigurationElement() const
   return element;
 }
 
-std::string IntroDescriptor::GetLabelOverride() const
+QString IntroDescriptor::GetLabelOverride() const
 {
-  std::string label;
-  element->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL, label);
-  return label;
+  return element->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL);
 }
 
 }

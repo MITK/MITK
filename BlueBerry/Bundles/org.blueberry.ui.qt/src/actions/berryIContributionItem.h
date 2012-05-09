@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QStatusBar;
 class QMenu;
+class QMenuBar;
 class QToolBar;
 class QAction;
 
@@ -64,6 +65,16 @@ struct IContributionItem : public virtual Object
    * @param parent the parent control
    */
   virtual void Fill(QStatusBar* parent) = 0;
+
+  /**
+   * Fills the given menu bar with controls representing this contribution item.
+   * Used by <code>MenuBarManager</code>.
+   *
+   * @param parent the parent menu
+   * @param index the index where the controls are inserted,
+   *   or <code>-1</code> to insert at the end
+   */
+  virtual QAction* Fill(QMenuBar* parent, QAction* before) = 0;
 
   /**
    * Fills the given menu with controls representing this contribution item.

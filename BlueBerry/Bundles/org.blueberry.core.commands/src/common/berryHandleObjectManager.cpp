@@ -16,26 +16,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryHandleObjectManager.h"
 
+#include "berryHandleObject.h"
+
 namespace berry
 {
 
-void HandleObjectManager::CheckId(const std::string& id) const
+void HandleObjectManager::CheckId(const QString& id) const
 {
-  if (id.empty())
+  if (id.isEmpty())
   {
-    throw std::invalid_argument(
-        "The handle object must not have a zero-length identifier"); //$NON-NLS-1$
+    throw ctkInvalidArgumentException(
+          "The handle object must not have a zero-length identifier");
   }
 }
 
-Poco::HashSet<std::string> HandleObjectManager::GetDefinedHandleObjectIds() const
+QSet<QString> HandleObjectManager::GetDefinedHandleObjectIds() const
 {
-  Poco::HashSet<std::string> definedHandleObjectIds(definedHandleObjects.size());
-  for (Poco::HashSet<HandleObject::Pointer, HandleObject::Hash>::ConstIterator iter =
-      definedHandleObjects.begin(); iter != definedHandleObjects.end(); ++iter)
+  QSet<QString> definedHandleObjectIds;
+  definedHandleObjectIds.reserve(definedHandleObjects.size());
+  foreach (HandleObject::Pointer ho, definedHandleObjects)
   {
-    const std::string id((*iter)->GetId());
-    definedHandleObjectIds.insert(id);
+    definedHandleObjectIds.insert(ho->GetId());
   }
   return definedHandleObjectIds;
 }

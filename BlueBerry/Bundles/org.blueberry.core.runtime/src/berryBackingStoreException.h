@@ -27,7 +27,7 @@ namespace berry
    *
    * @version $Revision$
    */
-  POCO_DECLARE_EXCEPTION(BERRY_RUNTIME, BackingStoreException, Poco::RuntimeException);
+  POCO_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BackingStoreException, Poco::RuntimeException);
 }
 
 #endif /* BERRYBACKINGSTOREEXCEPTION_H_ */

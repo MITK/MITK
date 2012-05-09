@@ -104,7 +104,7 @@ struct BERRY_UI_QT ISources {
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    * @since 3.2
    */
-  static const std::string ACTIVE_CONTEXT_NAME(); // = "activeContexts"; //$NON-NLS-1$
+  static const QString ACTIVE_CONTEXT_NAME(); // = "activeContexts";
 
   /**
    * The priority given when the source includes a particular action set.
@@ -117,7 +117,7 @@ struct BERRY_UI_QT ISources {
    * {@link ISourceProvider} and {@link IEvaluationContext}.
    * @since 3.2
    */
-  static const std::string ACTIVE_ACTION_SETS_NAME(); // = "activeActionSets"(); //$NON-NLS-1$
+  static const QString ACTIVE_ACTION_SETS_NAME(); // = "activeActionSets"();
 
   /**
    * The priority given when the source includes the currently active shell.
@@ -128,7 +128,7 @@ struct BERRY_UI_QT ISources {
    * The variable name for the active shell. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const std::string ACTIVE_SHELL_NAME(); // = "activeShell"(); //$NON-NLS-1$
+  static const QString ACTIVE_SHELL_NAME(); // = "activeShell"();
 
   /**
    * The priority given when the source includes the currently active
@@ -143,7 +143,7 @@ struct BERRY_UI_QT ISources {
    * <code>IEvaluationContext</code>.
    * @since 3.2
    */
-  static const std::string ACTIVE_WORKBENCH_WINDOW_SHELL_NAME(); // = "activeWorkbenchWindowShell"(); //$NON-NLS-1$
+  static const QString ACTIVE_WORKBENCH_WINDOW_SHELL_NAME(); // = "activeWorkbenchWindowShell"();
 
   /**
    * The priority given when the source includes the currently active
@@ -155,7 +155,7 @@ struct BERRY_UI_QT ISources {
    * The variable name for the active workbench window. This is for use with
    * the <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const std::string ACTIVE_WORKBENCH_WINDOW_NAME(); // = "activeWorkbenchWindow"(); //$NON-NLS-1$
+  static const QString ACTIVE_WORKBENCH_WINDOW_NAME(); // = "activeWorkbenchWindow"();
 
   /**
    * The priority given when the source includes subordinate properties of the currently active
@@ -172,8 +172,8 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-     // + ".isCoolbarVisible"(); //$NON-NLS-1$
+  static const QString ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
+     // + ".isCoolbarVisible"();
 
   /**
    * The variable name for the perspective bar visibility state of the active
@@ -182,8 +182,8 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-     // + ".isPerspectiveBarVisible"(); //$NON-NLS-1$
+  static const QString ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
+     // + ".isPerspectiveBarVisible"();
 
   /**
    * The variable name for the current perspective of the active workbench
@@ -192,8 +192,8 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.4
    */
-  static const std::string ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-   //+ ".activePerspective"(); //$NON-NLS-1$
+  static const QString ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
+   //+ ".activePerspective"();
 
   /**
    * The priority given when the source includes the active editor part.
@@ -205,7 +205,7 @@ struct BERRY_UI_QT ISources {
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    * @since 3.2
    */
-  static const std::string ACTIVE_EDITOR_NAME(); // = "activeEditor"(); //$NON-NLS-1$
+  static const QString ACTIVE_EDITOR_NAME(); // = "activeEditor"();
 
   /**
    * The priority given when the source includes the active editor identifier.
@@ -220,7 +220,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.2
    */
-  static const std::string ACTIVE_EDITOR_ID_NAME(); // = "activeEditorId"(); //$NON-NLS-1$
+  static const QString ACTIVE_EDITOR_ID_NAME(); // = "activeEditorId"();
 
   /**
    * The priority given when the source includes the active part.
@@ -231,7 +231,7 @@ struct BERRY_UI_QT ISources {
    * The variable name for the active part. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const std::string ACTIVE_PART_NAME(); // = "activePart"(); //$NON-NLS-1$
+  static const QString ACTIVE_PART_NAME(); // = "activePart"();
 
   /**
    * The priority given when the source includes the active part id.
@@ -246,7 +246,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.2
    */
-  static const std::string ACTIVE_PART_ID_NAME(); // = "activePartId"(); //$NON-NLS-1$
+  static const QString ACTIVE_PART_ID_NAME(); // = "activePartId"();
 
   /**
    * The priority given when the source includes the active workbench site. In
@@ -259,7 +259,7 @@ struct BERRY_UI_QT ISources {
    * The variable name for the active workbench site. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const std::string ACTIVE_SITE_NAME(); // = "activeSite"(); //$NON-NLS-1$
+  static const QString ACTIVE_SITE_NAME(); // = "activeSite"();
 
   /**
    * The variable for the showIn selection.  This is for use with the
@@ -267,7 +267,7 @@ struct BERRY_UI_QT ISources {
    * @since 3.4
    * @see IShowInSource
    */
-  static const std::string SHOW_IN_SELECTION(); // = "showInSelection"(); //$NON-NLS-1$
+  static const QString SHOW_IN_SELECTION(); // = "showInSelection"();
 
   /**
    * The variable for the showIn input.  This is for use with the
@@ -275,7 +275,7 @@ struct BERRY_UI_QT ISources {
    * @since 3.4
    * @see IShowInSource
    */
-  static const std::string SHOW_IN_INPUT(); // = "showInInput"(); //$NON-NLS-1$
+  static const QString SHOW_IN_INPUT(); // = "showInInput"();
 
   /**
    * The priority given when the source includes the current selection.
@@ -287,7 +287,7 @@ struct BERRY_UI_QT ISources {
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    * @since 3.2
    */
-  static const std::string ACTIVE_CURRENT_SELECTION_NAME(); // = "selection"(); //$NON-NLS-1$
+  static const QString ACTIVE_CURRENT_SELECTION_NAME(); // = "selection"();
 
   /**
    * The priority given when the source includes the current menu.
@@ -300,7 +300,7 @@ struct BERRY_UI_QT ISources {
    * {@link ISourceProvider} and {@link IEvaluationContext}.
    * @since 3.2
    */
-  static const std::string ACTIVE_MENU_NAME(); // = "activeMenu"(); //$NON-NLS-1$
+  static const QString ACTIVE_MENU_NAME(); // = "activeMenu"();
 
   /**
    * The variable name for the <b>local</b> selection, available while a
@@ -308,7 +308,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_MENU_SELECTION_NAME(); // = "activeMenuSelection"();  //$NON-NLS-1$
+  static const QString ACTIVE_MENU_SELECTION_NAME(); // = "activeMenuSelection"();
 
   /**
    * The variable name for the <b>local</b> editor input which is sometimes
@@ -316,7 +316,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_MENU_EDITOR_INPUT_NAME(); // = "activeMenuEditorInput"();  //$NON-NLS-1$
+  static const QString ACTIVE_MENU_EDITOR_INPUT_NAME(); // = "activeMenuEditorInput"();
 
   /**
    * The variable name for the active focus Control, when provided by the
@@ -324,7 +324,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_FOCUS_CONTROL_NAME(); // = "activeFocusControl"(); //$NON-NLS-1$
+  static const QString ACTIVE_FOCUS_CONTROL_NAME(); // = "activeFocusControl"();
 
   /**
    * The variable name for the active focus Control id, when provided by the
@@ -332,7 +332,7 @@ struct BERRY_UI_QT ISources {
    *
    * @since 3.3
    */
-  static const std::string ACTIVE_FOCUS_CONTROL_ID_NAME(); // = "activeFocusControlId"(); //$NON-NLS-1$
+  static const QString ACTIVE_FOCUS_CONTROL_ID_NAME(); // = "activeFocusControlId"();
 };
 
 }

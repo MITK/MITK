@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatformUI.h"
 
 #include "berryPlatform.h"
-#include "service/berryIConfigurationElement.h"
-#include "service/berryIExtensionPointService.h"
+#include "berryIConfigurationElement.h"
+#include "berryIExtensionPointService.h"
 
 #include "internal/berryWorkbench.h"
 
@@ -28,9 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string PlatformUI::PLUGIN_ID = "org.blueberry.ui";
-const std::string PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID + ".workbench";
-const std::string PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID + ".views";
+const QString PlatformUI::PLUGIN_ID = "org.blueberry.ui";
+const QString PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID + ".workbench";
+const QString PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID + ".views";
 
 const int PlatformUI::RETURN_OK = 0;
 const int PlatformUI::RETURN_RESTART = 1;

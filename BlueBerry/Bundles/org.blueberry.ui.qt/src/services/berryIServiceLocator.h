@@ -58,7 +58,7 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object {
    * @return The service, or <code>null</code> if no such service could be
    *         found.
    */
-  virtual Object::Pointer GetService(const std::string& api) = 0;
+  virtual Object::Pointer GetService(const QString& api) = 0;
 
   /**
    * Whether this service exists within the scope of this service locator.
@@ -72,7 +72,7 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object {
    * @return <code>true</code> iff the service locator can find a service
    *         for the given API; <code>false</code> otherwise.
    */
-  virtual bool HasService(const std::string& api) const = 0;
+  virtual bool HasService(const QString& api) const = 0;
 
 };
 

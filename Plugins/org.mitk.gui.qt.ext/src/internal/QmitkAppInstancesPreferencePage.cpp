@@ -34,10 +34,7 @@ void QmitkAppInstancesPreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   prefs = prefService->GetSystemPreferences()->Node("/General");
 
   Update();

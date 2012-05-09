@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryWorkbenchPart.h"
 
-#include "berryAbstractUIPlugin.h"
 #include "berryIWorkbenchPartConstants.h"
 #include "berryImageDescriptor.h"
 #include <berrySafeRunner.h>
@@ -69,7 +68,7 @@ WorkbenchPart::WorkbenchPart()
 }
 
 void WorkbenchPart::InternalSetContentDescription(
-    const std::string& description)
+    const QString& description)
 {
   //assert(description != 0)
 
@@ -83,7 +82,7 @@ void WorkbenchPart::InternalSetContentDescription(
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_CONTENT_DESCRIPTION);
 }
 
-void WorkbenchPart::InternalSetPartName(const std::string& partName)
+void WorkbenchPart::InternalSetPartName(const QString& partName)
 {
   //partName = Util.safeString(partName);
 
@@ -140,7 +139,7 @@ void WorkbenchPart::SetTitleImage(void* titleImage)
   }
 }
 
-void WorkbenchPart::SetTitleToolTip(const std::string& toolTip)
+void WorkbenchPart::SetTitleToolTip(const QString& toolTip)
 {
   //toolTip = Util.safeString(toolTip);
   //Do not send changes if they are the same
@@ -152,7 +151,7 @@ void WorkbenchPart::SetTitleToolTip(const std::string& toolTip)
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void WorkbenchPart::SetPartName(const std::string& partName)
+void WorkbenchPart::SetPartName(const QString& partName)
 {
 
   InternalSetPartName(partName);
@@ -160,15 +159,15 @@ void WorkbenchPart::SetPartName(const std::string& partName)
   //setDefaultTitle();
 }
 
-void WorkbenchPart::SetContentDescription(const std::string& description)
+void WorkbenchPart::SetContentDescription(const QString& description)
 {
   InternalSetContentDescription(description);
 
   //setDefaultTitle();
 }
 
-void WorkbenchPart::FirePropertyChanged(const std::string& key,
-    const std::string& oldValue, const std::string& newValue)
+void WorkbenchPart::FirePropertyChanged(const QString& key,
+    const QString& oldValue, const QString& newValue)
 {
   ObjectString::Pointer objOldVal(new ObjectString(oldValue));
   ObjectString::Pointer objNewVal(new ObjectString(newValue));
@@ -218,12 +217,12 @@ void WorkbenchPart::RemovePropertyListener(IPropertyChangeListener::Pointer l)
   partChangeEvents.RemoveListener(l);
 }
 
-void WorkbenchPart::SetPartProperty(const std::string& key,
-    const std::string& value)
+void WorkbenchPart::SetPartProperty(const QString& key,
+    const QString& value)
 {
-  std::map<std::string, std::string>::iterator iter = partProperties.find(
+  std::map<QString, QString>::iterator iter = partProperties.find(
       key);
-  std::string oldValue;
+  QString oldValue;
   if (iter != partProperties.end())
     oldValue = iter->second;
 
@@ -238,15 +237,15 @@ void WorkbenchPart::SetPartProperty(const std::string& key,
   this->FirePropertyChanged(key, oldValue, value);
 }
 
-std::string WorkbenchPart::GetPartProperty(const std::string& key) const
+QString WorkbenchPart::GetPartProperty(const QString& key) const
 {
-  std::map<std::string, std::string>::const_iterator itr = partProperties.find(key);
+  QHash<QString, QString>::const_iterator itr = partProperties.find(key);
   if (itr == partProperties.end()) return "";
 
-  return itr->second;
+  return itr.value();
 }
 
-const std::map<std::string, std::string>& WorkbenchPart::GetPartProperties() const
+const QHash<QString, QString> &WorkbenchPart::GetPartProperties() const
 {
   return partProperties;
 }
@@ -256,12 +255,12 @@ IWorkbenchPartSite::Pointer WorkbenchPart::GetSite() const
   return this->m_PartSite;
 }
 
-std::string WorkbenchPart::GetPartName() const
+QString WorkbenchPart::GetPartName() const
 {
   return this->m_PartName;
 }
 
-std::string WorkbenchPart::GetContentDescription() const
+QString WorkbenchPart::GetContentDescription() const
 {
   return this->m_ContentDescription;
 }
@@ -277,39 +276,40 @@ void* WorkbenchPart::GetTitleImage() const
   //return GetDefaultImage();
 }
 
-std::string WorkbenchPart::GetTitleToolTip() const
+QString WorkbenchPart::GetTitleToolTip() const
 {
   return this->m_ToolTip;
 }
 
 void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const std::string&  /*propertyName*/, Object::Pointer  /*data*/)
+    const QString&  /*propertyName*/, Object::Pointer  /*data*/)
 {
   // Save config element.
   m_ConfigElement = cfig;
 
   // Part name and title.
-  cfig->GetAttribute("name", m_PartName);
+  m_PartName = cfig->GetAttribute("name").toStdString();
   m_Title = m_PartName;
 
   // Icon.
-  std::string strIcon;
-  cfig->GetAttribute("icon", strIcon);//$NON-NLS-1$
-  if (strIcon.empty()) {
+  QString strIcon = cfig->GetAttribute("icon");
+  if (strIcon.isEmpty())
+  {
     return;
   }
 
   m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-     m_ConfigElement->GetContributor(), strIcon);
+        m_ConfigElement->GetContributor(), strIcon);
 
   if (!m_ImageDescriptor)
   {
     // try legacy BlueBerry code
     m_ImageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
-       m_ConfigElement->GetContributor(), strIcon);
+          m_ConfigElement->GetContributor(), strIcon);
   }
 
-  if (!m_ImageDescriptor) {
+  if (!m_ImageDescriptor)
+  {
     return;
   }
 

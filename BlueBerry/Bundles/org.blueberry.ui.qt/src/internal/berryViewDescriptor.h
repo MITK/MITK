@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewDescriptor.h"
 #include "berryIPluginContribution.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include <string>
 #include <vector>
 
 namespace berry
 {
+
+struct IConfigurationElement;
 struct IHandlerActivation;
 
 /**
@@ -38,10 +38,10 @@ class ViewDescriptor : public IViewDescriptor, public IPluginContribution
 {
 private:
 
-  std::string id;
+  QString id;
   mutable SmartPointer<ImageDescriptor> imageDescriptor;
   IConfigurationElement::Pointer configElement;
-  std::vector<std::string> categoryPath;
+  std::vector<QString> categoryPath;
 
   /**
    * The activation token returned when activating the show view handler with
@@ -59,7 +59,7 @@ public:
    * @param e the configuration element
    * @throws CoreException thrown if there are errors in the configuration
    */
-  ViewDescriptor(IConfigurationElement::Pointer e);
+  ViewDescriptor(const SmartPointer<IConfigurationElement>& e);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#createView()
@@ -69,7 +69,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
-  const std::vector<std::string>& GetCategoryPath() const;
+  const std::vector<QString>& GetCategoryPath() const;
 
   /**
    * Return the configuration element for this descriptor.
@@ -81,14 +81,14 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getDescription()
    */
-  std::string GetDescription() const;
+  QString GetDescription() const;
 
-  std::vector< std::string> GetKeywordReferences() const;
+  std::vector<std::string> GetKeywordReferences() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getId()
    */
-  std::string GetId() const;
+  QString GetId() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getImageDescriptor()
@@ -98,14 +98,14 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getLabel()
    */
-  std::string GetLabel() const;
+  QString GetLabel() const;
 
   /**
    * Return the accelerator attribute.
    *
    * @return the accelerator attribute
    */
-  std::string GetAccelerator() const;
+  QString GetAccelerator() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getAllowMultiple()
@@ -150,7 +150,7 @@ protected:
   /* (non-Javadoc)
    * @see IAdaptable#GetAdapterImpl(const std::type_info&)
    */
-  Poco::Any GetAdapter(const std::string& adapter);
+  Poco::Any GetAdapter(const QString& adapter);
 
 private:
   /**
@@ -158,6 +158,7 @@ private:
    */
   void LoadFromExtension();
 };
+
 }
 
 #endif /*BERRYVIEWDESCRIPTOR_H_*/

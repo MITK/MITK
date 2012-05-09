@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYCOMMANDTRACING_H_
 #define BERRYCOMMANDTRACING_H_
 
-#include <string>
+#include <QString>
 
 namespace berry {
 
@@ -39,7 +39,7 @@ public:
   /**
    * The separator to place between the component and the message.
    */
-  static const std::string SEPARATOR; // = " >>> ";
+  static const QString SEPARATOR; // = " >>> ";
 
   /**
    * <p>
@@ -57,8 +57,8 @@ public:
    * @param message
    *            The message to print to standard out; may be empty
    */
-  static void PrintTrace(const std::string& component,
-      const std::string& message);
+  static void PrintTrace(const QString& component,
+                         const QString& message);
 
 private:
 

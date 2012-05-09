@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPlatform.h"
 #include "berryPlatformException.h"
-#include "service/berryIExtensionPointService.h"
+#include "berryIExtensionRegistry.h"
+#include "berryIConfigurationElement.h"
 
 namespace berry {
 
-std::map<std::string, Expression::Pointer>& DefinitionRegistry::GetCache()
+QHash<QString, Expression::Pointer>& DefinitionRegistry::GetCache()
 {
   return cache;
 }
@@ -34,7 +35,7 @@ DefinitionRegistry::DefinitionRegistry()
   //Platform.getExtensionRegistry().addRegistryChangeListener(this, "org.blueberry.core.expressions"); //$NON-NLS-1$
 }
 
-Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id)
+Expression::Pointer DefinitionRegistry::GetExpression(const QString& id)
 {
   Expression::Pointer cachedExpression= this->GetCache()[id];
   if (!cachedExpression.IsNull())
@@ -42,15 +43,15 @@ Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id)
     return cachedExpression;
   }
 
-  IExtensionPointService::Pointer service = Platform::GetExtensionPointService();
-  IConfigurationElement::vector ces(
-    service->GetConfigurationElementsFor("org.blueberry.core.expressions.definitions"));
+  IExtensionRegistry* registry = Platform::GetExtensionRegistry();
+  QList<IConfigurationElement::Pointer> ces =
+      registry->GetConfigurationElementsFor("org.blueberry.core.expressions.definitions");
 
   Expression::Pointer foundExpression;
-  for (IConfigurationElement::vector::iterator i= ces.begin(); i != ces.end(); ++i)
+  for (QList<IConfigurationElement::Pointer>::iterator i= ces.begin(); i != ces.end(); ++i)
   {
-    std::string cid;
-    if ((*i)->GetAttribute("id", cid))
+    QString cid = (*i)->GetAttribute("id");
+    if (!cid.isNull())
     {
       if (cid == id)
       {
@@ -59,25 +60,25 @@ Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id)
           foundExpression= this->GetExpression(id, *i);
           break;
         }
-        catch (InvalidServiceObjectException e)
+        catch (const InvalidServiceObjectException& e)
         {
-          throw CoreException("Missing expression", id);
+          throw CoreException(QString("Missing expression: ") + id);
         }
       }
     }
   }
   if (foundExpression.IsNull())
   {
-    throw CoreException("Missing expression", id);
+    throw CoreException(QString("Missing expression: ") + id);
   }
 
   return foundExpression;
 }
 
-Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id,
-    IConfigurationElement::Pointer element)
+Expression::Pointer DefinitionRegistry::GetExpression(const QString& id,
+                                                      const IConfigurationElement::Pointer& element)
 {
-  IConfigurationElement::vector children(element->GetChildren());
+  QList<IConfigurationElement::Pointer> children(element->GetChildren());
   Expression::Pointer expr= ExpressionConverter::GetDefault()->Perform(children[0]);
   if (!expr.IsNull())
   {

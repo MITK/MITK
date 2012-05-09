@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressionInfo.h"
 #include "berryIEvaluationContext.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 namespace berry {
+
+struct IConfigurationElement;
 
 class EqualsExpression : public Expression {
   /**
@@ -41,15 +41,15 @@ public:
 
   EqualsExpression(const Object::Pointer expectedValue);
 
-  EqualsExpression(SmartPointer<IConfigurationElement> element);
+  EqualsExpression(const SmartPointer<IConfigurationElement>& element);
 
   EqualsExpression(Poco::XML::Element* element);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
   void CollectExpressionInfo(ExpressionInfo* info);
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
 protected:
 

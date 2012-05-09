@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryViewDescriptor.h"
 
-#include "service/berryIConfigurationElement.h"
+#include "berryIConfigurationElement.h"
 #include "berryPlatformException.h"
 
 #include "berryRegistryReader.h"
@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-ViewDescriptor::ViewDescriptor(IConfigurationElement::Pointer e) :
+ViewDescriptor::ViewDescriptor(const IConfigurationElement::Pointer& e) :
   configElement(e)
 {
   this->LoadFromExtension();
@@ -53,7 +53,7 @@ IViewPart::Pointer ViewDescriptor::CreateView()
   return part;
 }
 
-const std::vector<std::string>& ViewDescriptor::GetCategoryPath() const
+const std::vector<QString>& ViewDescriptor::GetCategoryPath() const
 {
   return categoryPath;
 }
@@ -63,12 +63,12 @@ IConfigurationElement::Pointer ViewDescriptor::GetConfigurationElement() const
   return configElement;
 }
 
-std::string ViewDescriptor::GetDescription() const
+QString ViewDescriptor::GetDescription() const
 {
   return RegistryReader::GetDescription(configElement);
 }
 
-std::string ViewDescriptor::GetId() const
+QString ViewDescriptor::GetId() const
 {
   return id;
 }
@@ -87,7 +87,7 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
   {
     return imageDescriptor;
   }
-  std::string iconName;
+  QString iconName;
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, iconName);
   // If the icon attribute was omitted, use the default one
   if (iconName.empty())
@@ -97,7 +97,7 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
     return ImageDescriptor::GetMissingImageDescriptor();
   }
   const IExtension* extension(configElement->GetDeclaringExtension());
-  const std::string extendingPluginId(extension->GetNamespace());
+  const QString extendingPluginId(extension->GetNamespace());
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
   if (!imageDescriptor)
@@ -116,16 +116,16 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
   return imageDescriptor;
 }
 
-std::string ViewDescriptor::GetLabel() const
+QString ViewDescriptor::GetLabel() const
 {
-  std::string label;
+  QString label;
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, label);
   return label;
 }
 
-std::string ViewDescriptor::GetAccelerator() const
+QString ViewDescriptor::GetAccelerator() const
 {
-  std::string accel;
+  QString accel;
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ACCELERATOR, accel);
   return accel;
 }
@@ -138,7 +138,7 @@ bool ViewDescriptor::GetAllowMultiple() const
 }
 
 bool ViewDescriptor::IsRestorable() const {
-  std::string string;
+  QString string;
   if (configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE, string))
   {
     return Poco::icompare(string, "true") == 0;
@@ -148,7 +148,7 @@ bool ViewDescriptor::IsRestorable() const {
   }
 }
 
-Poco::Any ViewDescriptor::GetAdapter(const std::string& adapter)
+Poco::Any ViewDescriptor::GetAdapter(const QString& adapter)
 {
   if (adapter == IConfigurationElement::GetStaticClassName())
   {
@@ -215,7 +215,7 @@ void ViewDescriptor::LoadFromExtension()
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
 
   // Sanity check.
-  std::string name;
+  QString name;
   if ((configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, name) == false)
       || (RegistryReader::GetClassValue(configElement,
               WorkbenchRegistryConstants::ATT_CLASS) == ""))
@@ -224,7 +224,7 @@ void ViewDescriptor::LoadFromExtension()
         "Invalid extension (missing label or class name)", id);
   }
 
-  std::string category;
+  QString category;
   if (configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
   {
     Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);

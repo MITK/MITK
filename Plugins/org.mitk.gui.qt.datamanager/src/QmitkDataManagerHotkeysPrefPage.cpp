@@ -44,8 +44,8 @@ void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
-  IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
-  berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/Data Manager/Hotkeys");
+  IPreferencesService* prefService = Platform::GetPreferencesService();
+  berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = _DataManagerHotkeysPreferencesNode;
 
   m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+, V");

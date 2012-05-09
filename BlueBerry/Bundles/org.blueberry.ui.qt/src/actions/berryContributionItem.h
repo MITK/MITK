@@ -85,6 +85,12 @@ public:
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
+  QAction* Fill(QMenuBar* menu, QAction* before);
+
+  /**
+   * The default implementation of this <code>IContributionItem</code>
+   * method does nothing. Subclasses may override.
+   */
   QAction* Fill(QToolBar* parent, QAction* before);
 
   /**

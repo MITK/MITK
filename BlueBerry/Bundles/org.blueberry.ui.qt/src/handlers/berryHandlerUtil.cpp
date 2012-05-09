@@ -25,32 +25,32 @@ namespace berry
 {
 
 void HandlerUtil::NoVariableFound(ExecutionEvent::Pointer event,
-    const std::string& name)
+    const QString& name)
 {
-  throw ExecutionException("No " + name //$NON-NLS-1$
-      + " found while executing " + event->GetCommand()->GetId()); //$NON-NLS-1$
+  throw ExecutionException("No " + name.toStdString() +
+                           " found while executing " + event->GetCommand()->GetId());
 }
 
 void HandlerUtil::IncorrectTypeFound(ExecutionEvent::Pointer event,
-    const std::string& name, const std::string& expectedType,
-    const std::string& wrongType)
+    const QString& name, const QString& expectedType,
+    const QString& wrongType)
 {
-  throw ExecutionException("Incorrect type for " //$NON-NLS-1$
-      + name
-      + " found while executing " //$NON-NLS-1$
+  throw ExecutionException("Incorrect type for "
+      + name.toStdString()
+      + " found while executing "
       + event->GetCommand()->GetId()
-      + ", expected " + expectedType //$NON-NLS-1$
-      + " found " + wrongType); //$NON-NLS-1$
+      + ", expected " + expectedType.toStdString()
+      + " found " + wrongType.toStdString());
 }
 
 Object::Pointer HandlerUtil::GetVariable(
-    ExecutionEvent::Pointer event, const std::string& name)
+    ExecutionEvent::Pointer event, const QString& name)
 {
   return event->GetApplicationContext().Cast<const IEvaluationContext>()->GetVariable(name);
 }
 
 Object::Pointer HandlerUtil::GetVariableChecked(
-    ExecutionEvent::Pointer event, const std::string& name)
+    ExecutionEvent::Pointer event, const QString& name)
 {
   Object::Pointer o(HandlerUtil::GetVariable(event, name));
   if (o.IsNull())
@@ -61,7 +61,7 @@ Object::Pointer HandlerUtil::GetVariableChecked(
 }
 
 Object::Pointer HandlerUtil::GetVariable(
-    Object::Pointer context, const std::string& name)
+    Object::Pointer context, const QString& name)
 {
   IEvaluationContext::Pointer eval(context.Cast<IEvaluationContext>());
   if (eval.IsNotNull())
@@ -127,7 +127,7 @@ ObjectString::Pointer HandlerUtil::GetActiveEditorIdChecked(
   if (o.Cast<ObjectString>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_EDITOR_ID_NAME(),
-        "std::string", o->GetClassName());
+        "QString", o->GetClassName());
   }
   return o.Cast<ObjectString>();
 }
@@ -167,7 +167,7 @@ ObjectString::Pointer HandlerUtil::GetActivePartIdChecked(
   if (o.Cast<ObjectString>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_ID_NAME(),
-        "std::string", o->GetClassName());
+        "QString", o->GetClassName());
   }
   return o.Cast<ObjectString>();
 }

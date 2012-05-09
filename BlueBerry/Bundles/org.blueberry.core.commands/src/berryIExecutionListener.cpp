@@ -29,26 +29,26 @@ IExecutionListener::Events::~Events()
 
 void
 IExecutionListener::Events
-::AddListener(IExecutionListener::Pointer l)
+::AddListener(IExecutionListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  notHandled += NotHandledDelegate(l.GetPointer(), &IExecutionListener::NotHandled);
-  postExecuteFailure += PostExecuteFailureDelegate(l.GetPointer(), &IExecutionListener::PostExecuteFailure);
-  postExecuteSuccess += PostExecuteSuccessDelegate(l.GetPointer(), &IExecutionListener::PostExecuteSuccess);
-  preExecute += PreExecuteDelegate(l.GetPointer(), &IExecutionListener::PreExecute);
+  notHandled += NotHandledDelegate(l, &IExecutionListener::NotHandled);
+  postExecuteFailure += PostExecuteFailureDelegate(l, &IExecutionListener::PostExecuteFailure);
+  postExecuteSuccess += PostExecuteSuccessDelegate(l, &IExecutionListener::PostExecuteSuccess);
+  preExecute += PreExecuteDelegate(l, &IExecutionListener::PreExecute);
 }
 
 void
 IExecutionListener::Events
-::RemoveListener(IExecutionListener::Pointer l)
+::RemoveListener(IExecutionListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  notHandled -= NotHandledDelegate(l.GetPointer(), &IExecutionListener::NotHandled);
-  postExecuteFailure -= PostExecuteFailureDelegate(l.GetPointer(), &IExecutionListener::PostExecuteFailure);
-  postExecuteSuccess -= PostExecuteSuccessDelegate(l.GetPointer(), &IExecutionListener::PostExecuteSuccess);
-  preExecute -= PreExecuteDelegate(l.GetPointer(), &IExecutionListener::PreExecute);
+  notHandled -= NotHandledDelegate(l, &IExecutionListener::NotHandled);
+  postExecuteFailure -= PostExecuteFailureDelegate(l, &IExecutionListener::PostExecuteFailure);
+  postExecuteSuccess -= PostExecuteSuccessDelegate(l, &IExecutionListener::PostExecuteSuccess);
+  preExecute -= PreExecuteDelegate(l, &IExecutionListener::PreExecute);
 }
 
 bool

@@ -25,20 +25,20 @@ namespace berry {
 
 void
 ICommandListener::Events
-::AddListener(ICommandListener::Pointer l)
+::AddListener(ICommandListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  commandChanged += Delegate(l.GetPointer(), &ICommandListener::CommandChanged);
+  commandChanged += Delegate(l, &ICommandListener::CommandChanged);
 }
 
 void
 ICommandListener::Events
-::RemoveListener(ICommandListener::Pointer l)
+::RemoveListener(ICommandListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  commandChanged -= Delegate(l.GetPointer(), &ICommandListener::CommandChanged);
+  commandChanged -= Delegate(l, &ICommandListener::CommandChanged);
 }
 
 }

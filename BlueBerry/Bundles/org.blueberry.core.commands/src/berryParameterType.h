@@ -69,7 +69,7 @@ public:
    * @param listener
    *            The listener to be added; must not be <code>null</code>.
    */
-void  AddListener(const IParameterTypeListener::Pointer listener);
+void  AddListener(IParameterTypeListener* listener);
 
   /**
    * Compares this parameter type with another object by comparing each of the
@@ -133,7 +133,7 @@ void  AddListener(const IParameterTypeListener::Pointer listener);
    *            already registered with this instance, no operation is
    *            performed.
    */
-  void RemoveListener(const IParameterTypeListener::Pointer listener);
+  void RemoveListener(IParameterTypeListener* listener);
 
   /**
    * The string representation of this parameter type. For debugging purposes
@@ -141,7 +141,7 @@ void  AddListener(const IParameterTypeListener::Pointer listener);
    *
    * @return The string representation; never <code>null</code>.
    */
-  std::string ToString() const;
+  QString ToString() const;
 
   /**
    * Makes this parameter type become undefined. Notification is sent to all
@@ -164,7 +164,7 @@ protected:
    *            <code>null</code>, and must be unique amongst all parameter
    *            types.
    */
-  ParameterType(const std::string& id);
+  ParameterType(const QString& id);
 
 private:
 

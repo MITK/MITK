@@ -16,44 +16,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryFileEditorInput.h"
 
-#include <Poco/File.h>
 
 namespace berry {
 
-FileEditorInput::FileEditorInput(const Poco::Path& path)
+FileEditorInput::FileEditorInput(const QString& path)
  : m_Path(path)
 {
 
 }
 
-Poco::Path FileEditorInput::GetPath() const
+QString FileEditorInput::GetPath() const
 {
-   return m_Path;
+   return m_Path.absolutePath();
 }
 
 bool FileEditorInput::Exists() const
 {
-  Poco::File file(m_Path);
-  return file.exists();
+  return m_Path.exists();
 }
 
-std::string FileEditorInput::GetName() const
+QString FileEditorInput::GetName() const
 {
-  return m_Path.getFileName();
+  return m_Path.fileName();
 }
 
-std::string FileEditorInput::GetToolTipText() const
+QString FileEditorInput::GetToolTipText() const
 {
-  return m_Path.toString();
+  return m_Path.absolutePath();
 }
 
 bool FileEditorInput::operator==(const Object* o) const
 {
   if (const IPathEditorInput* other = dynamic_cast<const IPathEditorInput*>(o))
   {
-    return other->GetPath().toString() == this->GetPath().toString();
+    return other->GetPath() == this->GetPath();
   }
-
   return false;
 }
 

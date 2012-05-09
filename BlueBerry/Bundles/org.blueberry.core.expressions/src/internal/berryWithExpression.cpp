@@ -19,56 +19,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressions.h"
 #include "berryEvaluationContext.h"
 
-#include <Poco/Hash.h>
+#include <berryIConfigurationElement.h>
+#include <berryPlatformException.h>
 
 namespace berry {
 
-const std::string WithExpression::ATT_VARIABLE= "variable";
+const QString WithExpression::ATT_VARIABLE= "variable";
 
-const std::size_t WithExpression::HASH_INITIAL= Poco::hash("berry::WithExpression");
+const uint WithExpression::HASH_INITIAL= qHash("berry::WithExpression");
 
-WithExpression::WithExpression(IConfigurationElement::Pointer configElement)
+WithExpression::WithExpression(const IConfigurationElement::Pointer& configElement)
 {
-  bool result = configElement->GetAttribute(ATT_VARIABLE, fVariable);
-  Expressions::CheckAttribute(ATT_VARIABLE, result);
+  fVariable = configElement->GetAttribute(ATT_VARIABLE);
+  Expressions::CheckAttribute(ATT_VARIABLE, fVariable);
 }
 
 WithExpression::WithExpression(Poco::XML::Element* element)
 {
-  fVariable = element->getAttribute(ATT_VARIABLE);
-  Expressions::CheckAttribute(ATT_VARIABLE, fVariable.length()> 0);
+  fVariable = QString::fromStdString(element->getAttribute(ATT_VARIABLE.toStdString()));
+  Expressions::CheckAttribute(ATT_VARIABLE, fVariable.length() > 0 ? fVariable : QString());
 }
 
-WithExpression::WithExpression(const std::string& variable)
+WithExpression::WithExpression(const QString& variable)
  : fVariable(variable)
 {
 
 }
 
 bool
-WithExpression::operator==(Expression& object)
+WithExpression::operator==(const Object* object) const
 {
-  try
+  if (const WithExpression* that = dynamic_cast<const WithExpression*>(object))
   {
-    WithExpression& that = dynamic_cast<WithExpression&>(object);
-    return this->fVariable == that.fVariable &&
-            this->Equals(this->fExpressions, that.fExpressions);
+    return this->fVariable == that->fVariable &&
+            this->Equals(this->fExpressions, that->fExpressions);
   }
-  catch (std::bad_cast)
-  {
-    return false;
-  }
+  return false;
 }
 
-EvaluationResult
-WithExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+WithExpression::Evaluate(IEvaluationContext* context) const
 {
   Object::Pointer variable(context->GetVariable(fVariable));
   if (variable.IsNull())
   {
-    throw CoreException("Variable not defined", fVariable);
+    throw CoreException(QString("Variable not defined: ") + fVariable);
   }
-  return this->EvaluateAnd(new EvaluationContext(context, variable));
+  EvaluationContext::Pointer scope(new EvaluationContext(context, variable));
+  return this->EvaluateAnd(scope.GetPointer());
 }
 
 void
@@ -83,11 +81,11 @@ WithExpression::CollectExpressionInfo(ExpressionInfo* info)
   info->MergeExceptDefaultVariable(other);
 }
 
-std::size_t
+uint
 WithExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
-  * HASH_FACTOR + Poco::hash(fVariable);
+  * HASH_FACTOR + qHash(fVariable);
 }
 
 }

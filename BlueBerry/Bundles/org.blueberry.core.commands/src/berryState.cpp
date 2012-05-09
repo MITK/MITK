@@ -34,7 +34,7 @@ void State::FireStateChanged(Object::Pointer oldValue)
   stateEvents.stateChanged(State::Pointer(this), oldValue);
 }
 
-std::string State::GetId() const
+QString State::GetId() const
 {
   return id;
 }
@@ -44,7 +44,7 @@ Object::Pointer State::GetValue() const
   return value;
 }
 
-void State::SetId(const std::string& id)
+void State::SetId(const QString& id)
 {
   this->id = id;
 }

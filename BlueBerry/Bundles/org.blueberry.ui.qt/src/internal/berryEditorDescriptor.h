@@ -57,21 +57,21 @@ public:
 
 private:
 
-  std::string editorName;
+  QString editorName;
 
-  std::string imageFilename;
+  QString imageFilename;
 
   mutable SmartPointer<ImageDescriptor> imageDesc;
 
   mutable bool testImage;
 
-  std::string className;
+  QString className;
 
-  std::string launcherName;
+  QString launcherName;
 
-  std::string fileName;
+  QString fileName;
 
-  std::string id;
+  QString id;
 
   bool matchingStrategyChecked;
   IEditorMatchingStrategy::Pointer matchingStrategy;
@@ -79,7 +79,7 @@ private:
   //Program program;
 
   //The id of the plugin which contributed this editor, null for external editors
-  std::string pluginIdentifier;
+  QString pluginIdentifier;
 
   int openMode;
 
@@ -92,7 +92,7 @@ private:
    * @param id2
    */
   /* package */
-public: EditorDescriptor(const std::string& id2, IConfigurationElement::Pointer element);
+public: EditorDescriptor(const QString& id2, IConfigurationElement::Pointer element);
 
   /**
    * Create a new instance of an editor descriptor. Limited
@@ -107,7 +107,7 @@ public: EditorDescriptor();
    * @param filename the external editor full path and filename
    * @return the editor descriptor
    */
-  //public: static EditorDescriptor::Pointer CreateForProgram(const std::string& filename) {
+  //public: static EditorDescriptor::Pointer CreateForProgram(const QString& filename) {
   //        if (filename == null) {
   //            throw new IllegalArgumentException();
   //        }
@@ -143,7 +143,7 @@ public: EditorDescriptor();
    * Return the program called programName. Return null if it is not found.
    * @return org.blueberry.swt.program.Program
    */
-  //private: static Program FindProgram(const std::string& programName) {
+  //private: static Program FindProgram(const QString& programName) {
   //
   //        Program[] programs = Program.getPrograms();
   //        for (int i = 0; i < programs.length; i++) {
@@ -167,7 +167,7 @@ public: EditorDescriptor();
    *
    * @return the class name
    */
-public: std::string GetEditorClassName() const;
+public: QString GetEditorClassName() const;
 
   /**
    * Return the configuration element used to define this editor, or <code>null</code>.
@@ -189,14 +189,14 @@ public: SmartPointer<IEditorPart> CreateEditor();
    *
    * @return the file name to execute
    */
-public: std::string GetFileName() const;
+public: QString GetFileName() const;
 
   /**
    * Return the id for this editor.
    *
    * @return the id
    */
-public: std::string GetId() const;
+public: QString GetId() const;
 
   /**
    * Return the image descriptor describing this editor.
@@ -218,28 +218,28 @@ private: void VerifyImage() const;
    *
    * @return the image file name
    */
-public: std::string GetImageFilename() const;
+public: QString GetImageFilename() const;
 
   /**
    * Return the user printable label for this editor.
    *
    * @return the label
    */
-public: std::string GetLabel() const;
+public: QString GetLabel() const;
 
   /**
    * Returns the class name of the launcher.
    *
    * @return the launcher class name
    */
-public: std::string GetLauncher() const;
+public: QString GetLauncher() const;
 
   /**
    * Return the contributing plugin id.
    *
    * @return the contributing plugin id
    */
-public: std::string GetPluginID() const;
+public: QString GetPluginID() const;
 
   /**
    * Get the program for the receiver if there is one.
@@ -287,7 +287,7 @@ private: int GetOpenMode() const;
   /**
    * Set the class name of an internal editor.
    */
-  /* package */public: void SetClassName(const std::string& newClassName);
+  /* package */public: void SetClassName(const QString& newClassName);
 
   /**
    * Set the configuration element which contributed this editor.
@@ -298,14 +298,14 @@ private: int GetOpenMode() const;
   /**
    * Set the filename of an external editor.
    */
-  /* package */public: void SetFileName(const std::string& aFileName);
+  /* package */public: void SetFileName(const QString& aFileName);
 
   /**
    * Set the id of the editor.
    * For internal editors this is the id as provided in the extension point
    * For external editors it is path and filename of the editor
    */
-  /* package */public: void SetID(const std::string& anID);
+  /* package */public: void SetID(const QString& anID);
 
   /**
    * The Image to use to repesent this editor
@@ -320,7 +320,7 @@ private: int GetOpenMode() const;
    * The name of the image to use for this editor.
    */
   /* package */
-  //    public: void SetImageFilename(const std::string& aFileName) {
+  //    public: void SetImageFilename(const QString& aFileName) {
   //        imageFilename = aFileName;
   //    }
 
@@ -329,12 +329,12 @@ private: int GetOpenMode() const;
    *
    * @param newLauncher the new launcher
    */
-  /* package */public: void SetLauncher(const std::string& newLauncher);
+  /* package */public: void SetLauncher(const QString& newLauncher);
 
   /**
    * The label to show for this editor.
    */
-  /* package */public: void SetName(const std::string& newName);
+  /* package */public: void SetName(const QString& newName);
 
   /**
    * Sets the open mode of this editor descriptor.
@@ -348,7 +348,7 @@ public: void SetOpenMode(int mode);
   /**
    * The id of the plugin which contributed this editor, null for external editors.
    */
-  /* package */public: void SetPluginIdentifier(const std::string& anID);
+  /* package */public: void SetPluginIdentifier(const QString& anID);
 
   /**
    * Set the receivers program.
@@ -366,17 +366,17 @@ public: void SetOpenMode(int mode);
   /**
    * For debugging purposes only.
    */
-public: std::string ToString() const;
+public: QString ToString() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.activities.support.IPluginContribution#getLocalId()
    */
-public: std::string GetLocalId() const;
+public: QString GetLocalId() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.activities.support.IPluginContribution#getPluginId()
    */
-public: std::string GetPluginId() const;
+public: QString GetPluginId() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorDescriptor#getEditorManagementPolicy()

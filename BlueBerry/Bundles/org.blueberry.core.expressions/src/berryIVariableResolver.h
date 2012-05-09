@@ -19,6 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_expressions_Export.h>
 
+#include <QList>
+
+#include <berryObject.h>
+
 namespace berry {
 
 /**
@@ -46,7 +50,7 @@ struct BERRY_EXPRESSIONS IVariableResolver {
    * @exception CoreException if an errors occurs while resolving
    *  the variable
    */
-  virtual Object::Pointer Resolve(const std::string& name, std::vector<Object::Pointer> args) = 0;
+  virtual Object::Pointer Resolve(const QString& name, const QList<Object::Pointer>& args) = 0;
 };
 
 }  // namespace berry

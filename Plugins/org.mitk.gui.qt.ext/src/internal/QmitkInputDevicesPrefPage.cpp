@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIInputDeviceDescriptor.h>
 #include <mitkCoreExtConstants.h>
 
+#include "QmitkCommonExtPlugin.h"
+
 
 QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
 : m_MainControl(0)
 {
   // gets the old setting of the preferences and loads them into the preference node
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES);
 }
 
@@ -50,9 +50,7 @@ void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
   m_MainControl = new QWidget(parent);
   QVBoxLayout *layout = new QVBoxLayout;
 
-  mitk::IInputDeviceRegistry::Pointer inputDeviceRegistry =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IInputDeviceRegistry>(mitk::CoreExtConstants::INPUTDEVICE_SERVICE);
-  std::vector<mitk::IInputDeviceDescriptor::Pointer> temp(inputDeviceRegistry->GetInputDevices());
+  std::vector<mitk::IInputDeviceDescriptor::Pointer> temp(GetInputDeviceRegistry()->GetInputDevices());
 
   for(std::vector<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
   {
@@ -97,9 +95,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 {
   bool result = true;
 
-  mitk::IInputDeviceRegistry::Pointer inputDeviceRegistry =
-    berry::Platform::GetServiceRegistry().
-    GetServiceById<mitk::IInputDeviceRegistry>(mitk::CoreExtConstants::INPUTDEVICE_SERVICE);
+  mitk::IInputDeviceRegistry* inputDeviceRegistry = GetInputDeviceRegistry();
 
   QHashIterator<QCheckBox*, std::string> it(m_InputDevices);
   while (it.hasNext())
@@ -121,9 +117,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
       // because otherwise the mitk::WiiMoteActivator class
       // cannot distinguish the two different modes without
       // changing the interface for all input devices
-      berry::IPreferencesService::Pointer prefService =
-        berry::Platform::GetServiceRegistry().
-        GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
       if (prefService)
       {
@@ -185,4 +179,12 @@ void QmitkInputDevicesPrefPage::Update()
         (this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION,false));
     }
   }
+}
+
+mitk::IInputDeviceRegistry *QmitkInputDevicesPrefPage::GetInputDeviceRegistry() const
+{
+  ctkServiceReference serviceRef = QmitkCommonExtPlugin::getContext()->getServiceReference<mitk::IInputDeviceRegistry>();
+  if (!serviceRef) return 0;
+
+  return QmitkCommonExtPlugin::getContext()->getService<mitk::IInputDeviceRegistry>(serviceRef);
 }

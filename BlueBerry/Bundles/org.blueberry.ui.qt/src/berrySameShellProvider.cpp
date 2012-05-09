@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "berrySameShellProvider.h"
-
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
+
+#include "berrySameShellProvider.h"
 
 namespace berry
 {

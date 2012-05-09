@@ -17,16 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIPREFERENCESSERVICE_H_
 
 #include "service/berryService.h"
-#include <org_blueberry_core_runtime_Export.h>
-#include "berryIPreferences.h"
 
-#include <vector>
-#include <string>
+#include <org_blueberry_core_runtime_Export.h>
 
 #include <QtPlugin>
 
 namespace berry
 {
+
+  struct IPreferences;
 
   /**
    * The Preferences Service.
@@ -42,12 +41,12 @@ namespace berry
    * <code>PreferencesService</code> object to that bundle.
    *
    */
-  struct BERRY_RUNTIME IPreferencesService : public Service
+  struct org_blueberry_core_runtime_EXPORT IPreferencesService : public Service
   {
     ///
     /// A unique ID for the Service.
     ///
-    static const std::string ID;
+    static const QString ID;
 
     berryInterfaceMacro(IPreferencesService, berry);
 
@@ -56,7 +55,7 @@ namespace berry
      *
      * @return The root system node for the calling bundle.
      */
-    virtual IPreferences::Pointer GetSystemPreferences() = 0;
+    virtual SmartPointer<IPreferences> GetSystemPreferences() = 0;
 
     /**
      * Returns the root node for the specified user and the calling bundle.
@@ -64,14 +63,14 @@ namespace berry
      * @param name The user for which to return the preference root node.
      * @return The root node for the specified user and the calling bundle.
      */
-    virtual IPreferences::Pointer GetUserPreferences(std::string name) = 0;
+    virtual SmartPointer<IPreferences> GetUserPreferences(const QString& name) = 0;
 
     /**
      * Returns the names of users for which node trees exist.
      *
      * @return The names of users for which node trees exist.
      */
-    virtual std::vector<std::string> GetUsers() const = 0;
+    virtual QStringList GetUsers() const = 0;
   };
 }  // namespace berry
 

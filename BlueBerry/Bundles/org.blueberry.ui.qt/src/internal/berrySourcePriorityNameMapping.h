@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryExpression.h>
 
-#include <map>
-#include <string>
+#include <QHash>
+#include <QString>
 
 namespace berry {
 
@@ -61,7 +61,7 @@ private:
   * The map of source priorities indexed by name. This value is never
   * <code>null</code>.
   */
-  static std::map<std::string,int> sourcePrioritiesByName;
+  static QHash<QString,int> sourcePrioritiesByName;
 
   /**
    * This class should not be instantiated.
@@ -73,7 +73,7 @@ public:
   /**
    * The variable name to use when boosting priority on an activation.
    */
-  static const std::string LEGACY_LEGACY_NAME(); // = "LEGACY"; //$NON-NLS-1$
+  static const QString LEGACY_LEGACY_NAME(); // = "LEGACY";
 
   /**
    * The value returned if there is source priority for the given name
@@ -109,8 +109,8 @@ public:
    *            simply a single bit shifted to a particular place.
    * @see ISources
    */
-  static void AddMapping(const std::string& sourceName,
-      int sourcePriority);
+  static void AddMapping(const QString& sourceName,
+                         int sourcePriority);
 
   /**
    * Computes the source priority for the given expression. The source
@@ -137,7 +137,7 @@ public:
    * @return The source priority that matches, if any;
    *         <code>NO_SOURCE_PRIORITY</code> if none is found.
    */
-  static int GetMapping(const std::string& sourceName);
+  static int GetMapping(const QString& sourceName);
 
 };
 

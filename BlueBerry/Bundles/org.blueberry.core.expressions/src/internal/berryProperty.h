@@ -38,14 +38,14 @@ public:
 
 private:
   Object::Pointer fType;
-  std::string fNamespace;
-  std::string fName;
+  QString fNamespace;
+  QString fName;
 
   IPropertyTester::Pointer fTester;
 
   friend class TypeExtensionManager;
   /* package */ Property(Object::Pointer type,
-      const std::string& namespaze, const std::string& name);
+                         const QString& namespaze, const QString& name);
 
   /* package */ void SetPropertyTester(IPropertyTester::Pointer tester);
 
@@ -56,7 +56,8 @@ public:
 
   bool IsValidCacheEntry(bool forcePluginActivation);
 
-  bool Test(Object::Pointer receiver, std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
+  bool Test(Object::Pointer receiver, const QList<Object::Pointer>& args,
+            Object::Pointer expectedValue);
 
   bool operator==(Property& obj);
 

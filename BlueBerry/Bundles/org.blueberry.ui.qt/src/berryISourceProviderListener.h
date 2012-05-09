@@ -42,19 +42,19 @@ namespace berry {
  */
 struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
 
-  berryInterfaceMacro(ISourceProviderListener, berry);
+  berryInterfaceMacro(ISourceProviderListener, berry)
 
   struct Events {
-    Message2<int, const std::map<std::string, Object::Pointer>& > multipleSourcesChanged;
-    Message3<int, const std::string&, Object::Pointer> singleSourceChanged;
+    Message2<int, const QHash<QString, Object::Pointer>& > multipleSourcesChanged;
+    Message3<int, const QString&, Object::Pointer> singleSourceChanged;
 
-    void AddListener(ISourceProviderListener::Pointer l);
-    void RemoveListener(ISourceProviderListener::Pointer l);
+    void AddListener(ISourceProviderListener* l);
+    void RemoveListener(ISourceProviderListener* l);
 
   private:
 
-    typedef MessageDelegate2<ISourceProviderListener, int, const std::map<std::string, Object::Pointer>& > Delegate2;
-    typedef MessageDelegate3<ISourceProviderListener, int, const std::string&, Object::Pointer> Delegate3;
+    typedef MessageDelegate2<ISourceProviderListener, int, const QHash<QString, Object::Pointer>& > Delegate2;
+    typedef MessageDelegate3<ISourceProviderListener, int, const QString&, Object::Pointer> Delegate3;
   };
 
   /**
@@ -74,7 +74,7 @@ struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-      const std::map<std::string, Object::Pointer>& sourceValuesByName) = 0;
+                             const QHash<QString, Object::Pointer>& sourceValuesByName) = 0;
 
   /**
    * Handles a change to one source. The source priority should indicate the
@@ -92,7 +92,7 @@ struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-      const std::string& sourceName, Object::Pointer sourceValue) = 0;
+                             const QString& sourceName, Object::Pointer sourceValue) = 0;
 };
 
 }

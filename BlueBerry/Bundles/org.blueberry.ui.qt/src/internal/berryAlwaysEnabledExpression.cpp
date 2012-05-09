@@ -21,7 +21,7 @@ namespace berry {
 
 const SmartPointer<AlwaysEnabledExpression> AlwaysEnabledExpression::INSTANCE(new AlwaysEnabledExpression());
 
-EvaluationResult AlwaysEnabledExpression::Evaluate(IEvaluationContext* /*context*/)
+EvaluationResult::ConstPointer AlwaysEnabledExpression::Evaluate(IEvaluationContext* /*context*/) const
 {
   return EvaluationResult::TRUE_EVAL;
 }

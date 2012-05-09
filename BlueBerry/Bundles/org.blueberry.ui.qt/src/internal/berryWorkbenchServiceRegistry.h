@@ -71,8 +71,7 @@ private:
 
   const IExtensionPoint* GetExtensionPoint();
 
-  static std::string* supportedLevels();
-  static const unsigned int supportedLevelsCount;
+  static QStringList SupportedLevels();
 
   void ProcessVariables(
       const std::vector<SmartPointer<IConfigurationElement> >& children);

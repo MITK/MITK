@@ -17,10 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYREGISTRYREADER_H_
 #define BERRYREGISTRYREADER_H_
 
-#include "service/berryIConfigurationElement.h"
-#include "service/berryIExtension.h"
+#include <berrySmartPointer.h>
+
+#include <QList>
 
 namespace berry {
+
+struct IExtension;
+struct IConfigurationElement;
 
 /**
  * \ingroup org_blueberry_ui_internal
@@ -54,24 +58,25 @@ protected:
      * Logs the error in the workbench log using the provided
      * text and the information in the configuration element.
      */
-   static void LogError(IConfigurationElement::Pointer element, const std::string& text);
+   static void LogError(const SmartPointer<IConfigurationElement>& element,
+                        const QString& text);
 
     /**
      * Logs a very common registry error when a required attribute is missing.
      */
-    static void LogMissingAttribute(IConfigurationElement::Pointer element,
-            const std::string& attributeName);
+    static void LogMissingAttribute(const SmartPointer<IConfigurationElement>& element,
+                                    const QString& attributeName);
 
     /**
      * Logs a very common registry error when a required child is missing.
      */
-    static void LogMissingElement(IConfigurationElement::Pointer element,
-            const std::string& elementName);
+    static void LogMissingElement(const SmartPointer<IConfigurationElement> element,
+                                  const QString& elementName);
 
     /**
      * Logs a registry error when the configuration element is unknown.
      */
-    static void LogUnknownElement(IConfigurationElement::Pointer element);
+    static void LogUnknownElement(const SmartPointer<IConfigurationElement>& element);
 
 
 public:
@@ -83,7 +88,7 @@ public:
      * @param extensions the extensions to order
      * @return ordered extensions
      */
-    static const std::vector<const IExtension*> OrderExtensions(const std::vector<const IExtension*>& extensions);
+    static QList<SmartPointer<IExtension> > OrderExtensions(const QList<SmartPointer<IExtension> >& extensions);
 
 
 protected:
@@ -97,14 +102,14 @@ protected:
      *
      * @return true if element was recognized, false if not.
      */
-    virtual bool ReadElement(IConfigurationElement::Pointer element) = 0;
+    virtual bool ReadElement(const IConfigurationElement::Pointer& element) = 0;
 
     /**
      * Read the element's children. This is called by
      * the subclass' readElement method when it wants
      * to read the children of the element.
      */
-    virtual void ReadElementChildren(IConfigurationElement::Pointer element);
+    virtual void ReadElementChildren(const IConfigurationElement::Pointer& element);
 
     /**
      * Read each element one at a time by calling the
@@ -112,13 +117,13 @@ protected:
      *
      * Logs an error if the element was not recognized.
      */
-    virtual void ReadElements(const std::vector<IConfigurationElement::Pointer>& elements);
+    virtual void ReadElements(const QList<IConfigurationElement::Pointer>& elements);
 
     /**
      * Read one extension by looping through its
      * configuration elements.
      */
-    virtual void ReadExtension(const IExtension* extension);
+    virtual void ReadExtension(const SmartPointer<IExtension>& extension);
 
 
 public:
@@ -131,17 +136,16 @@ public:
      * @param pluginId the plugin id of the extenion point
      * @param extensionPoint the extension point id
      */
-    virtual void ReadRegistry(const std::string& pluginId,
-            const std::string& extensionPoint);
+    virtual void ReadRegistry(const QString& pluginId,
+                              const QString& extensionPoint);
 
     /**
      * Utility for extracting the description child of an element.
      *
      * @param configElement the element
      * @return the description
-     * @since 3.1
      */
-    static std::string GetDescription(IConfigurationElement::Pointer configElement);
+    static QString GetDescription(const SmartPointer<IConfigurationElement>& configElement);
 
     /**
    * Utility for extracting the value of a class attribute or a nested class
@@ -153,9 +157,9 @@ public:
    * @param classAttributeName
    *            the name of the class attribute to check
    * @return the value of the attribute or nested class element
-   * @since 3.1
    */
-    static std::string GetClassValue(IConfigurationElement::Pointer configElement, const std::string& classAttributeName);
+    static QString GetClassValue(const SmartPointer<IConfigurationElement>& configElement,
+                                 const QString& classAttributeName);
 };
 
 }

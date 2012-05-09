@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "common/berryCommandExceptions.h"
 #include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
@@ -84,8 +83,7 @@ struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
    *             if an object cannot be produced from the
    *             <code>parameterValue</code> string
    */
-  virtual Object::Pointer ConvertToObject(const std::string& parameterValue)
-      throw(ParameterValueConversionException) = 0;
+  virtual Object::Pointer ConvertToObject(const QString& parameterValue) = 0;
 
   /**
    * Converts a command parameter value object into a string that encodes a
@@ -99,8 +97,7 @@ struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
    *             if a string reference or serialization cannot be provided for
    *             the <code>parameterValue</code>
    */
-  virtual std::string ConvertToString(const Object::Pointer parameterValue)
-      throw(ParameterValueConversionException) = 0;
+  virtual QString ConvertToString(const Object::Pointer parameterValue) = 0;
 
 };
 

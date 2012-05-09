@@ -55,7 +55,7 @@ struct BERRY_UI_QT IIntroDescriptor : public Object {
    *
    * @return the id of the part
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Returns the descriptor of the image for this part.
@@ -70,7 +70,7 @@ struct BERRY_UI_QT IIntroDescriptor : public Object {
    * @return the label override string or the empty string if one has not
    *         been specified
    */
-  virtual std::string GetLabelOverride() const = 0;
+  virtual QString GetLabelOverride() const = 0;
 };
 
 }

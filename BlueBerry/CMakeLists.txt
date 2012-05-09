@@ -183,11 +183,8 @@ endif()
 # Add CTK plugins
 
 set(_ctk_plugins
-  Bundles/org.blueberry.osgi:ON
-  Bundles/org.blueberry.compat:OFF
-  Bundles/org.blueberry.core.runtime:OFF
+  Bundles/org.blueberry.core.runtime:ON
   Bundles/org.blueberry.core.expressions:OFF
-  Bundles/org.blueberry.solstice.common:OFF
   Bundles/org.blueberry.core.commands:OFF
   Bundles/org.blueberry.core.jobs:OFF
   Bundles/org.blueberry.ui.qt:OFF

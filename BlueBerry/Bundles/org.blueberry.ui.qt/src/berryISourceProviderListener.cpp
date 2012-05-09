@@ -18,20 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-void ISourceProviderListener::Events::AddListener(ISourceProviderListener::Pointer l)
+void ISourceProviderListener::Events::AddListener(ISourceProviderListener* l)
 {
   if (l == 0) return;
 
-  multipleSourcesChanged += Delegate2(l.GetPointer(), &ISourceProviderListener::SourceChanged);
-  singleSourceChanged += Delegate3(l.GetPointer(), &ISourceProviderListener::SourceChanged);
+  multipleSourcesChanged += Delegate2(l, &ISourceProviderListener::SourceChanged);
+  singleSourceChanged += Delegate3(l, &ISourceProviderListener::SourceChanged);
 }
 
-void ISourceProviderListener::Events::RemoveListener(ISourceProviderListener::Pointer l)
+void ISourceProviderListener::Events::RemoveListener(ISourceProviderListener* l)
 {
   if (l == 0) return;
 
-  multipleSourcesChanged -= Delegate2(l.GetPointer(), &ISourceProviderListener::SourceChanged);
-  singleSourceChanged -= Delegate3(l.GetPointer(), &ISourceProviderListener::SourceChanged);
+  multipleSourcesChanged -= Delegate2(l, &ISourceProviderListener::SourceChanged);
+  singleSourceChanged -= Delegate3(l, &ISourceProviderListener::SourceChanged);
 }
 
 }

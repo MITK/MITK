@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryGuiTkEvent.h"
 
-#include <sstream>
+#include <QTextStream>
 
 namespace berry {
 
@@ -31,15 +31,16 @@ text(""), doit(true)
 
 }
 
-std::string Event::ToString() const
+QString Event::ToString() const
 {
-  std::stringstream stream;
+  QString str;
+  QTextStream stream(&str);
   stream << "GUI SelectionEvent: " << " item=" << item << " detail=" << detail
       << " x=" << x << " y=" << y << " width=" << width << " height=" << height
       << " stateMask=" << stateMask << " text=" << text << " doit=" << doit
-      << std::endl;
+      << '\n';
 
-  return stream.str();
+  return str();
 }
 
 }

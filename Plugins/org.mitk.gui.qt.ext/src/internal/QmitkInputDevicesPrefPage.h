@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class QCheckBox;
 
+namespace mitk {
+struct IInputDeviceRegistry;
+}
+
 class QmitkInputDevicesPrefPage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
@@ -82,6 +86,8 @@ protected:
   QRadioButton* m_WiiMoteSurfaceInteraction;
 
   berry::IPreferences::Pointer m_InputDevicesPrefNode;
+
+  mitk::IInputDeviceRegistry* GetInputDeviceRegistry() const;
 
 };
 

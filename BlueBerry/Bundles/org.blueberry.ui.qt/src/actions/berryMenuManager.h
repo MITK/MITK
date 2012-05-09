@@ -25,11 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIcon>
 
 class QMenu;
-class QMenuBar;
+class QMenuProxy;
 class QAction;
 
 namespace berry
 {
+
+class MMMenuListener;
 
 /**
  * A menu manager is a contribution manager which realizes itself and its items
@@ -47,6 +49,8 @@ public:
 
 private:
 
+  friend class MMMenuListener;
+
   /**
    * The menu id.
    */
@@ -62,9 +66,10 @@ private:
    * The menu control; <code>null</code> before
    * creation and after disposal.
    */
-  QMenu* menu;
-  QMenuBar* menuBar;
+  QMenuProxy* menu;
   QAction* menuItem;
+
+  QScopedPointer<MMMenuListener> menuListener;
 
   /**
    * The menu item widget; <code>null</code> before
@@ -161,7 +166,7 @@ public:
    * @param parent the parent control
    * @return the menu control
    */
-  QMenu* CreateMenu(QWidget* parent);
+  QMenu* CreateContextMenu(QWidget* parent);
 
   /**
    * Creates and returns a Qt menu bar control for this menu,
@@ -188,6 +193,11 @@ public:
    * @see IContributionItem#Fill(QMenu*, int)
    */
   QAction* Fill(QMenu* parent, QAction *before);
+
+  /*
+   * @see IContributionItem#Fill(QMenuBar*, int)
+   */
+  QAction* Fill(QMenuBar* parent, QAction *before);
 
   /*
    * @see IMenuManager#FindMenuUsingPath(const QString&)
@@ -394,6 +404,8 @@ private:
    * Does nothing if this menu is not a submenu.
    */
   void UpdateMenuItem();
+
+  QAction* FillMenu(QWidget* parent, QAction* before);
 
 protected:
 

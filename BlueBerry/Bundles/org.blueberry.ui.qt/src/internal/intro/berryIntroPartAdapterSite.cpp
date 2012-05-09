@@ -29,17 +29,17 @@ IntroPartAdapterSite::IntroPartAdapterSite(IWorkbenchPartSite::Pointer site,
 
 }
 
-Object::Pointer IntroPartAdapterSite::GetService(const std::string& key)
+Object::Pointer IntroPartAdapterSite::GetService(const QString& key)
 {
   return partSite->GetService(key);
 }
 
-bool IntroPartAdapterSite::HasService(const std::string& key) const
+bool IntroPartAdapterSite::HasService(const QString& key) const
 {
   return partSite->HasService(key);
 }
 
-std::string IntroPartAdapterSite::GetId() const
+QString IntroPartAdapterSite::GetId() const
 {
   return descriptor->GetId();
 }
@@ -49,7 +49,7 @@ SmartPointer<IWorkbenchPage> IntroPartAdapterSite::GetPage()
   return partSite->GetPage();
 }
 
-std::string IntroPartAdapterSite::GetPluginId() const
+QString IntroPartAdapterSite::GetPluginId() const
 {
   return descriptor->GetPluginId();
 }

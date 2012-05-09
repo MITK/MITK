@@ -61,7 +61,7 @@ struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
    *
    * @return the id of the editor
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Returns the descriptor of the image for this editor.
@@ -75,7 +75,7 @@ struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
    *
    * @return the editor label
    */
-  virtual std::string GetLabel() const = 0;
+  virtual QString GetLabel() const = 0;
 
   /**
    * Returns whether this editor descriptor will open a regular editor

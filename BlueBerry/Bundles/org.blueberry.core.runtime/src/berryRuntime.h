@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-struct BERRY_RUNTIME Runtime
+struct org_blueberry_core_runtime_EXPORT Runtime
 {
   static const std::string ADAPTER_SERVICE_ID;
 };

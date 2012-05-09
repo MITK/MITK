@@ -76,7 +76,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *            The listener to add; must not be <code>null</code>.
    * @see #removeExecutionListener(IExecutionListener)
    */
-  virtual void AddExecutionListener(SmartPointer<IExecutionListener> listener) = 0;
+  virtual void AddExecutionListener(IExecutionListener* listener) = 0;
 
   /**
    * Sets the name and description of the category for uncategorized commands.
@@ -223,7 +223,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * @throws NotDefinedException
    *             If the given command is not defined.
    */
-  virtual QString GetHelpContextId(SmartPointer<const Command> command) const = 0;
+  virtual QString GetHelpContextId(const SmartPointer<const Command>& command) const = 0;
 
   /**
    * Gets the help context identifier for a particular command. The command's
@@ -271,7 +271,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * @param listener
    *            The listener to remove; must not be <code>null</code>.
    */
-  virtual void RemoveExecutionListener(SmartPointer<IExecutionListener> listener) = 0;
+  virtual void RemoveExecutionListener(IExecutionListener* listener) = 0;
 
   /**
    * Sets the help context identifier to associate with a particular handler.
@@ -284,7 +284,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *            <code>null</code> if the help context identifier should be
    *            removed.
    */
-  virtual void SetHelpContextId(SmartPointer<IHandler> handler, const QString& helpContextId) = 0;
+  virtual void SetHelpContextId(const SmartPointer<IHandler>& handler, const QString& helpContextId) = 0;
 
   /**
    * Register that this element accepts callbacks for this parameterized
@@ -309,8 +309,8 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * @see #unregisterElement(IElementReference)
    */
   virtual SmartPointer<IElementReference> RegisterElementForCommand(
-      SmartPointer<ParameterizedCommand> command,
-      SmartPointer<UIElement> element) = 0;
+      const SmartPointer<ParameterizedCommand>& command,
+      const SmartPointer<UIElement>& element) = 0;
 
   /**
    * Re-register a callback element provided by the ICommandService. This
@@ -327,7 +327,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *            The reference to re-register. Must not be <code>null</code>.
    * @see #unregisterElement(IElementReference)
    */
-  virtual void RegisterElement(SmartPointer<IElementReference> elementReference) = 0;
+  virtual void RegisterElement(const SmartPointer<IElementReference>& elementReference) = 0;
 
   /**
    * Unregister an element callback. It will be removed from the
@@ -338,7 +338,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *            The callback reference that was provided by the command
    *            service on registration. Must not be <code>null</code>.
    */
-  virtual void UnregisterElement(SmartPointer<IElementReference> elementReference) = 0;
+  virtual void UnregisterElement(const SmartPointer<IElementReference>& elementReference) = 0;
 
   /**
    * Refresh any elements registered against the command with the given id.

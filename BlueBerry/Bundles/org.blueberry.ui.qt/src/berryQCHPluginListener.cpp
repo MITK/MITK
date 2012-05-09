@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQCHPluginListener.h"
 
 #include <ctkPlugin.h>
+#include <ctkPluginContext.h>
 
 #include <QDir>
 #include <QDateTime>
 
 #include "berryQtAssistantUtil.h"
+#include <berryLog.h>
 
 namespace berry {
 

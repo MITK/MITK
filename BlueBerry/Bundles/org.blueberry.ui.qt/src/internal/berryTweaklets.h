@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
+#include <berryPlatformException.h>
+
 #include <QString>
 
 namespace berry {
@@ -126,17 +128,16 @@ private:
         ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets"); //$NON-NLS-1$
     for (unsigned int i = 0; i < elements.size(); i++)
     {
-      std::string attr;
-      if (elements[i]->GetAttribute("definition", attr) &&
-          definition.tweakClass == QString::fromStdString(attr))
+      QString attr = elements[i]->GetAttribute("definition");
+      if (!attr.isNull() && definition.tweakClass == attr)
       {
         try
         {
-          QObject* tweaklet = elements[i]->CreateExecutableExtension<QObject>("implementation");
+          QObject* tweaklet = elements[i]->CreateExecutableExtension("implementation");
           tweaklets.insert(definition, tweaklet);
           return tweaklet;
         }
-        catch (CoreException e)
+        catch (const CoreException& e)
         {
           //StatusManager.getManager().handle(
           //    StatusUtil.newStatus(IStatus.ERR,

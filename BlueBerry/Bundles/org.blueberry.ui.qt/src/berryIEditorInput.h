@@ -65,7 +65,7 @@ namespace berry
  */
 struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
 {
-  berryInterfaceMacro(IEditorInput, berry);
+  berryInterfaceMacro(IEditorInput, berry)
 
   ~IEditorInput();
 
@@ -109,7 +109,7 @@ struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
    *
    * @return the name string; never <code>null</code>;
    */
-  virtual std::string GetName() const = 0;
+  virtual QString GetName() const = 0;
 
   /**
    * Returns an object that can be used to save the state of this editor
@@ -129,7 +129,7 @@ struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
    *
    * @return the tool tip text; never <code>null</code>.
    */
-  virtual std::string GetToolTipText() const = 0;
+  virtual QString GetToolTipText() const = 0;
 
   /**
    * Returns true if two editor inputs are the same

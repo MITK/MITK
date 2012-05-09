@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 
 #include <berryIExtensionPoint.h>
-#include <berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
 #include <berryPlatform.h>
 
 #include "berryAbstractUICTKPlugin.h"
@@ -178,8 +178,8 @@ public:
    * @return whether or not the extension is declared
    * @since 3.3
    */
-  static bool HasExecutableExtension(IConfigurationElement::Pointer element,
-      const std::string& extensionName);
+  static bool HasExecutableExtension(const IConfigurationElement::Pointer& element,
+                                     const QString& extensionName);
 
   /**
    * Checks to see if the provided element has the syntax for an executable
@@ -199,10 +199,9 @@ public:
    * @return whether or not the bundle expressed by the above criteria is
    *         active. If the bundle cannot be determined then the state of the
    *         bundle that declared the element is returned.
-   * @since 3.3
    */
   static bool IsBundleLoadedForExecutableExtension(
-      IConfigurationElement::Pointer element, const std::string& extensionName);
+      const IConfigurationElement::Pointer& element, const QString& extensionName);
 
   /**
    * Returns the bundle that contains the class referenced by an executable
@@ -221,9 +220,9 @@ public:
    * @return the bundle referenced by the extension. If that bundle cannot be
    *         determined the bundle that declared the element is returned. Note
    *         that this may be <code>null</code>.
-   * @since 3.3
    */
-  static IBundle::Pointer GetBundleForExecutableExtension(IConfigurationElement::Pointer element, const std::string& extensionName);
+  static QSharedPointer<ctkPlugin> GetBundleForExecutableExtension(
+      const IConfigurationElement::Pointer& element, const QString& extensionName);
 
 
   /**
@@ -284,50 +283,52 @@ private:
      * @return the instantiated extension object, or <code>null</code> if not found
      */
     template<class C>
-    C* CreateExtension(const std::string extensionPointId, const std::string& elementName,
-            const std::string& targetID) {
-        const IExtensionPoint* extensionPoint = Platform::GetExtensionPointService()
-                ->GetExtensionPoint("" + PlatformUI::PLUGIN_ID + "." + extensionPointId);
-        if (extensionPoint == 0) {
-            WorkbenchPlugin
-                    ::Log("Unable to find extension. Extension point: " + extensionPointId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+    C* CreateExtension(const QString& extensionPointId, const QString& elementName,
+                       const QString& targetID)
+    {
+        const IExtensionPoint* extensionPoint = Platform::GetExtensionRegistry()
+            ->GetExtensionPoint(PlatformUI::PLUGIN_ID + "." + extensionPointId);
+        if (extensionPoint == 0)
+        {
+            WorkbenchPlugin::Log("Unable to find extension. Extension point: " +
+                                 extensionPointId + " not found");
             return 0;
         }
 
         // Loop through the config elements.
         IConfigurationElement::Pointer targetElement(0);
-        IConfigurationElement::vector elements(Platform::GetExtensionPointService()
-                                               ->GetConfigurationElementsFor("" + PlatformUI::PLUGIN_ID + "." + extensionPointId));
-        for (unsigned int j = 0; j < elements.size(); j++) {
-            if (elementName == "" || elementName == elements[j]->GetName()) {
-                std::string strID;
-                elements[j]->GetAttribute("id", strID);
-                if (targetID == strID) {
+        QList<IConfigurationElement::Pointer> elements(
+              Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID + "." + extensionPointId));
+        for (unsigned int j = 0; j < elements.size(); j++)
+        {
+            if (elementName == "" || elementName == elements[j]->GetName())
+            {
+                QString strID = elements[j]->GetAttribute("id");
+                if (targetID == strID)
+                {
                     targetElement = elements[j];
                     break;
                 }
             }
         }
-        if (targetElement.IsNull()) {
+        if (targetElement.IsNull())
+        {
             // log it since we cannot safely display a dialog.
-            WorkbenchPlugin::Log("Unable to find extension: " + targetID //$NON-NLS-1$
-                    + " in extension point: " + extensionPointId); //$NON-NLS-1$
+            WorkbenchPlugin::Log("Unable to find extension: " + targetID
+                                 + " in extension point: " + extensionPointId);
             return 0;
         }
 
         // Create the extension.
-        try {
-            C* impl = targetElement->CreateExecutableExtension<C>("class"); //$NON-NLS-1$
-            if (impl == 0)
-            {
-              // support legacy BlueBerry extensions
-              impl = targetElement->CreateExecutableExtension<C>("class", C::GetManifestName());
-            }
-            return impl;
-        } catch (CoreException e) {
+        try
+        {
+            return targetElement->CreateExecutableExtension<C>("class");
+        }
+        catch (const CoreException& e)
+        {
             // log it since we cannot safely display a dialog.
-            WorkbenchPlugin::Log("Unable to create extension: " + targetID //$NON-NLS-1$
-                    + " in extension point: " + extensionPointId); //$NON-NLS-1$
+            WorkbenchPlugin::Log("Unable to create extension: " + targetID
+                                 + " in extension point: " + extensionPointId);
         }
         return 0;
     }
@@ -387,7 +388,7 @@ public:
      * @param message
      *            A high level UI message describing when the problem happened.
      */
-    static void Log(const std::string& message);
+    static void Log(const QString &message);
 
     /**
      * Log the throwable.
@@ -409,7 +410,7 @@ public:
    * @param t
    *            The throwable from where the problem actually occurred.
    */
-    static void Log(const std::string& message, const Poco::RuntimeException& t);
+    static void Log(const QString &message, const Poco::RuntimeException& t);
 
     /**
      * Logs the given throwable to the platform log, indicating the class and
@@ -426,7 +427,7 @@ public:
      * @param t
      *            The throwable from where the problem actually occurred.
      */
-    static void Log(const std::string& clazz, const std::string& methodName, const Poco::RuntimeException& t);
+    static void Log(const QString &clazz, const QString &methodName, const Poco::RuntimeException& t);
 
 
     /*

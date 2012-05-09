@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryImageDescriptor.h"
 
-#include <string>
 
 namespace berry
 {
@@ -48,7 +47,7 @@ struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
    *
    * @return the id of the part
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Returns the descriptor of the image for this part.
@@ -62,7 +61,7 @@ struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
    *
    * @return the part label
    */
-  virtual std::string GetLabel() const = 0;
+  virtual QString GetLabel() const = 0;
 
   virtual ~IWorkbenchPartDescriptor();
 };

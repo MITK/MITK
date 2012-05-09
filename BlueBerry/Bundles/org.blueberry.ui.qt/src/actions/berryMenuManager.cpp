@@ -19,8 +19,73 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIContributionManagerOverrides.h"
 #include "berrySubContributionItem.h"
 
+#include "internal/berryMMMenuListener.h"
+
 #include <QMenu>
 #include <QMenuBar>
+
+
+class QMenuProxy
+{
+
+public:
+
+  QMenu* menu;
+  QMenuBar* menuBar;
+
+  enum Type {
+    MenuBar,
+    Menu
+  };
+
+  QMenuProxy(Type type, QWidget* parent = 0)
+    : menu(0), menuBar(0)
+  {
+    switch (type)
+    {
+    case MenuBar: menuBar = new QMenuBar(parent);
+    case Menu: menu = new QMenu(parent);
+    }
+  }
+
+  bool isMenuBar() const
+  {
+    return menuBar != 0;
+  }
+
+  void setTitle(const QString& title)
+  {
+    if (menu)
+      menu->setTitle(title);
+  }
+
+  void setIcon(const QIcon& icon)
+  {
+    if (menu)
+      menu->setIcon(icon);
+  }
+
+  QList<QAction*> actions() const
+  {
+    return menu ? menu->actions() : menuBar->actions();
+  }
+
+  void removeAction(QAction* action)
+  {
+    menu ? menu->removeAction(action) : menuBar->removeAction(action);
+  }
+
+  bool isEnabled() const
+  {
+    return menu ? menu->isEnabled() : menuBar->isEnabled();
+  }
+
+  void setEnabled(bool enabled)
+  {
+    menu ? menu->setEnabled(enabled) : menuBar->setEnabled(enabled);
+  }
+
+};
 
 namespace berry
 {
@@ -29,12 +94,12 @@ struct NullOverrides: public IContributionManagerOverrides
 {
 public:
 
-  int GetEnabled(const IContributionItem::Pointer& /*item*/) const
+  int GetEnabled(IContributionItem* /*item*/) const
   {
     return -1;
   }
 
-  int GetVisible(const IContributionItem::Pointer& /*item*/) const
+  int GetVisible(IContributionItem* /*item*/) const
   {
     return -1;
   }
@@ -67,14 +132,16 @@ public:
 //};
 
 MenuManager::MenuManager(const QString& text, const QString& id)
-  : id(id), menu(0), menuBar(0), menuItem(0), menuText(text), parent(0)
+  : id(id), menu(0), menuItem(0), menuListener(new MMMenuListener(this))
+  , menuText(text), parent(0)
   , removeAllWhenShown(false), visible(true)
 {
 
 }
 
 MenuManager::MenuManager(const QString& text, const QIcon& image, const QString& id)
-  : id(id), menu(0), menuBar(0), menuItem(0), menuText(text), image(image)
+  : id(id), menu(0), menuItem(0), menuListener(new MMMenuListener(this))
+  , menuText(text), image(image)
   , parent(0), removeAllWhenShown(false), visible(true)
 {
 
@@ -87,7 +154,7 @@ bool MenuManager::IsDirty() const
 
 MenuManager::~MenuManager()
 {
-
+  delete menu;
 }
 
 //void MenuManager::AddMenuListener(SmartPointer<IMenuListener> listener)
@@ -95,24 +162,24 @@ MenuManager::~MenuManager()
 //  menuEvents.AddListener(listener);
 //}
 
-QMenu* MenuManager::CreateMenu(QWidget* parent)
+QMenu* MenuManager::CreateContextMenu(QWidget* parent)
 {
   if (!menu)
   {
-    menu = new QMenu(parent);
+    menu = new QMenuProxy(QMenuProxy::Menu, parent);
     this->InitializeMenu();
   }
-  return menu;
+  menu->menu;
 }
 
 QMenuBar* MenuManager::CreateMenuBar(QWidget* parent)
 {
-  if (!menuBar)
+  if (!menu)
   {
-    menuBar = new QMenuBar(parent);
+    menu = new QMenuProxy(QMenuProxy::MenuBar, parent);
     this->Update(false);
   }
-  return menuBar;
+  return menu->menuBar;
 }
 
 void MenuManager::Fill(QStatusBar* /*parent*/)
@@ -126,13 +193,40 @@ QAction* MenuManager::Fill(QToolBar* /*parent*/, QAction* /*before*/)
 
 QAction* MenuManager::Fill(QMenu* parent, QAction* before)
 {
+   return this->FillMenu(parent, before);
+}
+
+QAction* MenuManager::Fill(QMenuBar* parent, QAction* before)
+{
+  return this->FillMenu(parent, before);
+}
+
+QAction* MenuManager::FillMenu(QWidget* parent, QAction* before)
+{
   if (!menuItem)
   {
-    CreateMenu(parent);
-    menuItem = parent->insertMenu(before, menu);
+    menuItem = new QAction(parent);
+    if (parent)
+    {
+      parent->insertAction(before, menuItem);
+    }
+
+    menuItem->setText(GetMenuText());
+    menuItem->setIcon(image);
+
+    if(!menu)
+    {
+      menu = new QMenuProxy(QMenuProxy::Menu, parent);
+    }
+
+    if (!menu->isMenuBar())
+      menuItem->setMenu(menu->menu);
+
+    this->InitializeMenu();
+
     this->SetDirty(true);
-    return menuItem;
   }
+  return menuItem;
 }
 
 IMenuManager::Pointer MenuManager::FindMenuUsingPath(const QString& path) const
@@ -175,7 +269,7 @@ QString MenuManager::GetId() const
 
 QMenu* MenuManager::GetMenu() const
 {
-  return menu;
+  return menu->menu;
 }
 
 QString MenuManager::GetMenuText() const
@@ -380,6 +474,10 @@ void MenuManager::InitializeMenu()
   menu->setIcon(GetImage());
 
   //menuListener = new GuiTkMenuListener(MenuManager::Pointer(this));
+  if (!menu->isMenuBar())
+  {
+    QObject::connect(menu->menu, SIGNAL(aboutToShow()), menuListener.data(), SLOT(HandleAboutToShow()));
+  }
   //menu->AddMenuListener(menuListener);
 
   // Don't do an update(true) here, in case menu is never opened.
@@ -436,7 +534,14 @@ void MenuManager::UpdateMenuItem()
 
 void MenuManager::DoItemFill(IContributionItem::Pointer ci, QAction* before)
 {
-  ci->Fill(menu, before);
+  if (menu->isMenuBar())
+  {
+    ci->Fill(menu->menuBar, before);
+  }
+  else
+  {
+    ci->Fill(menu->menu, before);
+  }
 }
 
 void MenuManager::Update(bool force, bool recursive)
@@ -532,7 +637,7 @@ void MenuManager::Update(bool force, bool recursive)
         else
         {
           int start = menu->actions().size();
-          this->DoItemFill(src, menu->actions().at(destIx-1));
+          this->DoItemFill(src, destIx < 1 ? 0 : menu->actions().at(destIx-1));
           int newItems = menu->actions().size() - start;
           for (int i = 0; i < newItems; ++i)
           {
@@ -592,4 +697,3 @@ void MenuManager::Update(bool force, bool recursive)
 }
 
 }
-

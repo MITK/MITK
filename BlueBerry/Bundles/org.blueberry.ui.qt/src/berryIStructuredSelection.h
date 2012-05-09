@@ -20,8 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryISelection.h"
 
-#include <berryObjectVector.h>
+#include <berryObjectList.h>
 #include <org_blueberry_ui_qt_Export.h>
+
 namespace berry
 {
 
@@ -30,10 +31,10 @@ namespace berry
  */
 struct BERRY_UI_QT IStructuredSelection : public ISelection {
 
-  typedef ObjectVector<Object::Pointer> ContainerType;
+  typedef ObjectList<Object::Pointer> ContainerType;
   typedef ContainerType::const_iterator iterator;
 
-  berryInterfaceMacro(IStructuredSelection, berry);
+  berryInterfaceMacro(IStructuredSelection, berry)
 
   /**
    * Returns the first element in this selection, or <code>null</code>

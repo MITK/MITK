@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPreferencesDialog.h"
 
-#include "internal/org_mitk_gui_qt_application_Activator.h"
-
 #include "berryPlatform.h"
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionPointService.h"
 #include "berryIExtension.h"
 #include <berryIBerryPreferencesService.h>
 #include <berryIQtPreferencePage.h>
+
+#include "internal/org_mitk_gui_qt_application_Activator.h"
 
 #include <ui_QmitkPreferencesDialog.h>
 
@@ -71,13 +71,11 @@ public:
   QmitkPreferencesDialogPrivate()
     : m_CurrentPage(0)
   {
-    // m_PreferencesService
-    m_PreferencesService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    berry::IExtensionPointService* xpService = berry::Platform::GetExtensionPointService();
 
     // m_PrefPages
-    berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
-    berry::IConfigurationElement::vector prefPages(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.preferencePages"));
-    berry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));
+    berry::IConfigurationElement::vector prefPages(xpService->GetConfigurationElementsFor("org.blueberry.ui.preferencePages"));
+    berry::IConfigurationElement::vector keywordExts(xpService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));
     berry::IConfigurationElement::vector::iterator prefPagesIt;
     std::string id;
     std::string name;
@@ -138,11 +136,6 @@ public:
   }
 
   ///
-  /// The Preferences Service to retrieve and store preferences.
-  ///
-  berry::IPreferencesService::WeakPtr m_PreferencesService;
-
-  ///
   /// Saves all treewidgetitems in a map, the key is the id of the preferencepage.
   ///
   std::vector<PrefPage> m_PrefPages;
@@ -198,27 +191,24 @@ void QmitkPreferencesDialog::OnImportButtonClicked()
 
   try
   {
-    berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
-    if(prefService.IsNotNull())
+    berry::IBerryPreferencesService* berryPrefService =
+        dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
+    if(berryPrefService != 0)
     {
-      berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
-      if(berryPrefService != 0)
+      static QString importDir = "";
+      QString fileName = QFileDialog::getOpenFileName(this, tr("Choose file to import preferences"),
+                                                      importDir, tr("XML files (*.xml)"));
+
+      if(!fileName.isEmpty())
       {
-        static QString importDir = "";
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Choose file to import preferences"),
-                                                        importDir, tr("XML files (*.xml)"));
+        importDir = QFileInfo(fileName).absoluteDir().path();
+        Poco::File f(fileName.toLocal8Bit().data());
+        berryPrefService->ImportPreferences(f, "");
+        berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
+        if(prefPage)
+          prefPage->Update();
 
-        if(!fileName.isEmpty())
-        {
-          importDir = QFileInfo(fileName).absoluteDir().path();
-          Poco::File f(fileName.toLocal8Bit().data());
-          berryPrefService->ImportPreferences(f, "");
-          berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
-          if(prefPage)
-            prefPage->Update();
-
-          MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
-        }
+        MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
       }
     }
   }
@@ -238,28 +228,25 @@ void QmitkPreferencesDialog::OnExportButtonClicked()
 {
   try
   {
-    berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
-    if(prefService.IsNotNull())
+    berry::IBerryPreferencesService* berryPrefService =
+        dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
+    if(berryPrefService != 0)
     {
-      berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
-      if(berryPrefService != 0)
-      {
-        SavePreferences();
-        static QString exportDir = "";
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Choose file to export preferences"),
-                                                        exportDir, tr("XML files (*.xml)"));
+      SavePreferences();
+      static QString exportDir = "";
+      QString fileName = QFileDialog::getSaveFileName(this, tr("Choose file to export preferences"),
+                                                      exportDir, tr("XML files (*.xml)"));
 
-        if(!fileName.isEmpty())
+      if(!fileName.isEmpty())
+      {
+        if(QFileInfo(fileName).suffix() != ".xml")
         {
-          if(QFileInfo(fileName).suffix() != ".xml")
-          {
-            fileName += ".xml";
-          }
-          exportDir = QFileInfo(fileName).absoluteDir().path();
-          Poco::File f(fileName.toLocal8Bit().data());
-          berryPrefService->ExportPreferences(f, "");
-          MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
+          fileName += ".xml";
         }
+        exportDir = QFileInfo(fileName).absoluteDir().path();
+        Poco::File f(fileName.toLocal8Bit().data());
+        berryPrefService->ExportPreferences(f, "");
+        MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
       }
     }
   }
@@ -293,11 +280,7 @@ void QmitkPreferencesDialog::SavePreferences()
    * performed and confirmed.
    *
    */
-  berry::IPreferencesService::Pointer prefService = d->m_PreferencesService.Lock();
-  if (prefService)
-  {
-    prefService->GetSystemPreferences()->Flush();
-  }
+  berry::Platform::GetPreferencesService()->GetSystemPreferences()->Flush();
 }
 
 void QmitkPreferencesDialog::OnDialogAccepted()

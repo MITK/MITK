@@ -48,8 +48,8 @@ struct BERRY_COMMANDS IParameterTypeListener : public virtual Object {
 
     Event parameterTypeChanged;
 
-    void AddListener(IParameterTypeListener::Pointer listener);
-    void RemoveListener(IParameterTypeListener::Pointer listener);
+    void AddListener(IParameterTypeListener* listener);
+    void RemoveListener(IParameterTypeListener* listener);
 
     typedef MessageDelegate1<IParameterTypeListener, const SmartPointer<const ParameterTypeEvent> > Delegate;
   };

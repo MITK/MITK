@@ -55,22 +55,22 @@ protected:
   /**
    * Reads the category element.
    */
-  void ReadCategory(IConfigurationElement::Pointer element);
+  void ReadCategory(const SmartPointer<IConfigurationElement>& element);
 
   /**
    * readElement method comment.
    */
-  bool ReadElement(IConfigurationElement::Pointer element);
+  bool ReadElement(const SmartPointer<IConfigurationElement>& element);
 
   /**
    * Reads the sticky view element.
    */
-  void ReadSticky(IConfigurationElement::Pointer element);
+  void ReadSticky(const SmartPointer<IConfigurationElement>& element);
 
   /**
    * Reads the view element.
    */
-  void ReadView(IConfigurationElement::Pointer element);
+  void ReadView(const SmartPointer<IConfigurationElement>& element);
 
 private:
 

@@ -50,7 +50,7 @@ namespace berry {
  * @see IAdapterManager
  * @see PlatformObject
  */
-struct BERRY_RUNTIME IAdaptable {
+struct org_blueberry_core_runtime_EXPORT IAdaptable {
 
 public:
 

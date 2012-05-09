@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryViewRegistryReader.h"
 #include "berryStickyViewDescriptor.h"
 
-#include "service/berryIExtensionPoint.h"
+#include "berryIExtensionPoint.h"
 
 #include <vector>
 #include <string>

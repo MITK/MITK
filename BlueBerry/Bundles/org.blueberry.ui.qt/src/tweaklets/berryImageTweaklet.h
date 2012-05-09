@@ -34,7 +34,7 @@ struct BERRY_UI_QT ImageTweaklet
 {
   static Tweaklets::TweakKey<ImageTweaklet> KEY;
 
-  virtual SmartPointer<ImageDescriptor> CreateFromFile(const std::string& filename, const std::string& pluginid) = 0;
+  virtual SmartPointer<ImageDescriptor> CreateFromFile(const QString& filename, const QString& pluginid) = 0;
   virtual SmartPointer<ImageDescriptor> CreateFromImage(void* img) = 0;
   virtual SmartPointer<ImageDescriptor> GetMissingImageDescriptor() = 0;
 

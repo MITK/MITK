@@ -57,14 +57,14 @@ public:
 //        return viewSite.getAdapter(adapter);
 //    }
 
-    Object::Pointer GetService(const std::string& key);
+    Object::Pointer GetService(const QString& key);
 
-    bool HasService(const std::string& key) const;
+    bool HasService(const QString& key) const;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getId()
      */
-    std::string GetId() const;
+    QString GetId() const;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getPage()
@@ -74,7 +74,7 @@ public:
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getPluginId()
      */
-    std::string GetPluginId() const;
+    QString GetPluginId() const;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getSelectionProvider()

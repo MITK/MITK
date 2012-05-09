@@ -19,28 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryRuntime.h>
 #include <berryIAdapterManager.h>
-#include <berryObject.h>
+#include <berryIConfigurationElement.h>
 
 #include "berryExpressions.h"
 #include "berryDefaultVariable.h"
 
-#include <Poco/Hash.h>
-#include <Poco/Exception.h>
-#include <Poco/Bugcheck.h>
+#include <Poco/DOM/Node.h>
 
 namespace berry {
 
-const std::string AdaptExpression::ATT_TYPE= "type"; //$NON-NLS-1$
+const QString AdaptExpression::ATT_TYPE= "type";
 
 /**
  * The seed for the hash code for all adapt expressions.
  */
-const std::size_t AdaptExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::AdaptExpression");
+const uint AdaptExpression::HASH_INITIAL = qHash("berry::AdaptExpression");
 
 AdaptExpression::AdaptExpression(IConfigurationElement::Pointer configElement)
 {
-  bool attr = configElement->GetAttribute(ATT_TYPE, fTypeName);
-  Expressions::CheckAttribute(ATT_TYPE, attr);
+  fTypeName = configElement->GetAttribute(ATT_TYPE);
+  Expressions::CheckAttribute(ATT_TYPE, fTypeName);
 }
 
 AdaptExpression::AdaptExpression(Poco::XML::Node* /*element*/)
@@ -50,7 +48,7 @@ AdaptExpression::AdaptExpression(Poco::XML::Node* /*element*/)
   //Expressions::CheckAttribute(ATT_TYPE, fTypeName.length() > 0 ? fTypeName : null);
 }
 
-AdaptExpression::AdaptExpression(const std::string& typeName)
+AdaptExpression::AdaptExpression(const QString& typeName)
 {
   poco_assert(typeName.size() != 0);
   fTypeName= typeName;
@@ -67,7 +65,7 @@ AdaptExpression::AdaptExpression(const std::string& typeName)
 //      && equals(this.fExpressions, that.fExpressions);
 //}
 
-std::size_t
+uint
 AdaptExpression::ComputeHashCode()
 {
   throw Poco::NotImplementedException("ComputeHashCode not implemented");
@@ -78,21 +76,24 @@ AdaptExpression::ComputeHashCode()
 /* (non-Javadoc)
  * @see Expression#evaluate(IVariablePool)
  */
-EvaluationResult
-AdaptExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+AdaptExpression::Evaluate(IEvaluationContext* context) const
 {
   if (fTypeName.size() == 0)
     return EvaluationResult::FALSE_EVAL;
-  Object::Pointer var(context->GetDefaultVariable());
+  Object::Pointer var = context->GetDefaultVariable();
   Object::Pointer adapted;
   IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
-  if (Expressions::IsInstanceOf(var, fTypeName)) {
-    adapted= var;
-  } else {
-    if (!manager->HasAdapter(var->GetClassName(), fTypeName))
+  if (Expressions::IsInstanceOf(var.GetPointer(), fTypeName))
+  {
+    adapted = var;
+  }
+  else
+  {
+    if (!manager->HasAdapter(var->GetClassName(), fTypeName.toStdString()))
       return EvaluationResult::FALSE_EVAL;
 
-    Poco::Any anyAdapted(manager->GetAdapter(var.GetPointer(), fTypeName));
+    Poco::Any anyAdapted(manager->GetAdapter(var.GetPointer(), fTypeName.toStdString()));
     if (!anyAdapted.empty() && anyAdapted.type() == typeid(Object::Pointer))
     {
       adapted = Poco::AnyCast<Object::Pointer>(anyAdapted);
@@ -100,14 +101,19 @@ AdaptExpression::Evaluate(IEvaluationContext* context)
   }
   // the adapted result is null but hasAdapter returned TRUE_EVAL check
   // if the adapter is loaded.
-  if (adapted.IsNull()) {
-    if (manager->QueryAdapter(var->GetClassName(), fTypeName) == IAdapterManager::NOT_LOADED) {
+  if (adapted.IsNull())
+  {
+    if (manager->QueryAdapter(var->GetClassName(), fTypeName.toStdString()) == IAdapterManager::NOT_LOADED)
+    {
       return EvaluationResult::NOT_LOADED;
-    } else {
+    }
+    else
+    {
       return EvaluationResult::FALSE_EVAL;
     }
   }
-  return this->EvaluateAnd(new DefaultVariable(context, adapted));
+  DefaultVariable scope(context, adapted);
+  return this->EvaluateAnd(&scope);
 }
 
 void

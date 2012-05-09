@@ -194,8 +194,8 @@ bool berry::XMLMemento::GetFloat(const std::string& key, double& value) const
       return true;
     }
 
-    WorkbenchPlugin::Log("Memento problem - invalid float for key: " + key
-        + " value: " + attr, e);
+    WorkbenchPlugin::Log("Memento problem - invalid float for key: " + QString::fromStdString(key)
+        + " value: " + QString::fromStdString(attr), e);
     return false;
   }
 
@@ -224,8 +224,8 @@ bool berry::XMLMemento::GetInteger(const std::string& key, int& value) const
     value = Poco::NumberParser::parse(attr);
   } catch (const Poco::SyntaxException& e)
   {
-    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
-        + " value: " + attr, e);
+    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + QString::fromStdString(key)
+                         + " value: " + QString::fromStdString(attr), e);
     return false;
   }
 

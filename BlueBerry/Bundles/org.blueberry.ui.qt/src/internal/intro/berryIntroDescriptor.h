@@ -62,9 +62,9 @@ public:
   /*
    * @see IIntroDescriptor#GetId()
    */
-  std::string GetId() const;
+  QString GetId() const;
 
-  std::string GetPluginId() const;
+  QString GetPluginId() const;
 
   /*
    * @see IIntroDescriptor#GetImageDescriptor()
@@ -81,7 +81,7 @@ public:
   /*
    * @see IIntroDescriptor#GetLabelOverride()
    */
-  std::string GetLabelOverride() const;
+  QString GetLabelOverride() const;
 
 };
 

@@ -47,8 +47,8 @@ struct ICommandCategoryListener : public virtual Object {
 
     Event categoryChanged;
 
-    void AddListener(ICommandCategoryListener::Pointer listener);
-    void RemoveListener(ICommandCategoryListener::Pointer listener);
+    void AddListener(ICommandCategoryListener* listener);
+    void RemoveListener(ICommandCategoryListener* listener);
 
 
     typedef MessageDelegate1<ICommandCategoryListener, const SmartPointer<const CommandCategoryEvent> > Delegate;

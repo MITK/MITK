@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCoreExtConstants.h>
 
-#include "mitkIInputDeviceRegistry.h"
-
 const std::string mitk::CoreExtConstants::INPUTDEVICE_SERVICE = "org.mitk.core.ext.services.inputdeviceregistry";
 const std::string mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES = "org.mitk.core.ext.preferences.inputdevices";
 const std::string mitk::CoreExtConstants::INPUTDEVICE_EXTENSION_NAME = "org.mitk.core.ext.inputdevices";

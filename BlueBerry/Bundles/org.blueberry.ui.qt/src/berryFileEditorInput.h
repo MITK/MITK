@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYFILEEDITORINPUT_H_
 
 #include "berryIPathEditorInput.h"
+
 #include <org_blueberry_ui_qt_Export.h>
 
+#include <QFileInfo>
 
 namespace berry {
 
@@ -31,21 +33,21 @@ public:
 
   berryObjectMacro(FileEditorInput);
 
-  FileEditorInput(const Poco::Path& path);
+  FileEditorInput(const QString& path);
 
-  Poco::Path GetPath() const;
+  QString GetPath() const;
 
   bool Exists() const;
 
-  std::string GetName() const ;
+  QString GetName() const ;
 
-  std::string GetToolTipText() const;
+  QString GetToolTipText() const;
 
   bool operator==(const Object* o) const;
 
 private:
 
-  Poco::Path m_Path;
+  QFileInfo m_Path;
 };
 
 }

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryConfig.h>
 #include <berryLog.h>
+#include <berryPlatform.h>
 #include <berryIBundleStorage.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>

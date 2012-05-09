@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCommand.h"
 
-#include <map>
+#include <QHash>
 
 namespace berry {
 
@@ -46,7 +46,7 @@ public:
 
   berryObjectMacro(ExecutionEvent);
 
-  typedef std::map<std::string, std::string> ParameterMap;
+  typedef QHash<QString, QString> ParameterMap;
 
 private:
 
@@ -142,7 +142,7 @@ public:
    *             reason
    * @since 3.2
    */
-  const Object::ConstPointer GetObjectParameterForExecution(const std::string& parameterId) const;
+  const Object::ConstPointer GetObjectParameterForExecution(const QString& parameterId) const;
 
   /**
    * Returns the value of the parameter with the given id.
@@ -152,7 +152,7 @@ public:
    * @return The parameter value; <code>null</code> if the parameter cannot
    *         be found.
    */
-  std::string GetParameter(const std::string parameterId) const;
+  QString GetParameter(const QString &parameterId) const;
 
   /**
    * Returns all of the parameters.
@@ -172,7 +172,7 @@ public:
    * The string representation of this execution event -- for debugging
    * purposes only. This string should not be shown to an end user.
    */
-  std::string ToString() const;
+  QString ToString() const;
 };
 
 }

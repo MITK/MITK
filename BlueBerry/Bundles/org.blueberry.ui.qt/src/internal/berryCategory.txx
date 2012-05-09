@@ -48,8 +48,7 @@ template<class T>
 Category<T>::Category(IConfigurationElement::Pointer configElement)
  : configurationElement(configElement) {
 
-  std::string id;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
+  QString id = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
 
   if (id == "" || GetLabel() == "")
   {
@@ -94,9 +93,8 @@ std::string Category<T>::GetLabel() const
   if (configurationElement.IsNull())
     return name;
 
-  std::string val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
-  return val;
+  QString val = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
+  return val.toStdString();
 }
 
 template<class T>
@@ -123,9 +121,8 @@ std::string Category<T>::GetRawParentPath() const
   if (configurationElement.IsNull())
     return "";
 
-  std::string raw;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_PARENT_CATEGORY, raw);
-  return raw;
+  QString raw = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_PARENT_CATEGORY);
+  return raw.toStdString();
 }
 
 template<class T>

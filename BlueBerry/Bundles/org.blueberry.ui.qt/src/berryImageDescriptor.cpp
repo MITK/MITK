@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-ImageDescriptor::Pointer ImageDescriptor::CreateFromFile(const std::string& filename, const std::string& pluginid)
+ImageDescriptor::Pointer ImageDescriptor::CreateFromFile(const QString& filename, const QString& pluginid)
 {
   return Tweaklets::Get(ImageTweaklet::KEY)->CreateFromFile(filename, pluginid);
 }

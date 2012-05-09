@@ -82,7 +82,7 @@ namespace berry
  * @see IAdaptable
  * @see IAdapterFactory
  */
-struct BERRY_RUNTIME IAdapterManager: public Object
+struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
 {
 
   berryInterfaceMacro(IAdapterManager, berry);

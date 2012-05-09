@@ -19,27 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 EvaluationContext::EvaluationContext(IEvaluationContext* parent,
-                                     Object::Pointer defaultVariable)
+                                     const Object::Pointer& defaultVariable)
+  : fParent(parent), fDefaultVariable(defaultVariable), fAllowPluginActivation(-1)
 {
-  poco_assert(defaultVariable.IsNotNull());
-
-  fParent = parent;
-  fDefaultVariable = defaultVariable;
-  fAllowPluginActivation = parent->GetAllowPluginActivation();
+  poco_assert(defaultVariable != 0);
 }
 
 EvaluationContext::EvaluationContext(IEvaluationContext* parent,
-    Object::Pointer defaultVariable,
-    std::vector<IVariableResolver*> resolvers)
+                                     const Object::Pointer& defaultVariable,
+                                     const std::vector<IVariableResolver*>& resolvers)
+  : fParent(parent), fDefaultVariable(defaultVariable),
+    fVariableResolvers(resolvers), fAllowPluginActivation(-1)
 {
-  poco_assert(defaultVariable.IsNotNull());
-
+  poco_assert(defaultVariable != 0);
   poco_assert(resolvers.size() != 0);
-
-  fParent= parent;
-  fDefaultVariable= defaultVariable;
-  fVariableResolvers= resolvers;
-  fAllowPluginActivation = parent->GetAllowPluginActivation();
 }
 
 IEvaluationContext*
@@ -65,17 +58,25 @@ EvaluationContext::GetDefaultVariable() const
 void
 EvaluationContext::SetAllowPluginActivation(bool value)
 {
-  fAllowPluginActivation= value;
+  fAllowPluginActivation= value ? 1 : 0;
 }
 
 bool
 EvaluationContext::GetAllowPluginActivation() const
 {
+  if (fAllowPluginActivation < 0)
+  {
+    if (fParent)
+    {
+      return fParent->GetAllowPluginActivation();
+    }
+    return false;
+  }
   return fAllowPluginActivation;
 }
 
 void
-EvaluationContext::AddVariable(const std::string& name, Object::Pointer value)
+EvaluationContext::AddVariable(const QString &name, const Object::Pointer& value)
 {
   poco_assert(name.size() != 0);
   poco_assert(value.IsNotNull());
@@ -84,25 +85,26 @@ EvaluationContext::AddVariable(const std::string& name, Object::Pointer value)
 }
 
 Object::Pointer
-EvaluationContext::RemoveVariable(const std::string& name)
+EvaluationContext::RemoveVariable(const QString &name)
 {
   poco_assert(name.size() != 0);
 
   Object::Pointer elem(fVariables[name]);
-  fVariables.erase(name);
+  fVariables.remove(name);
   return elem;
 }
 
 Object::Pointer
-EvaluationContext::GetVariable(const std::string& name) const
+EvaluationContext::GetVariable(const QString& name) const
 {
   poco_assert(name.size() != 0);
 
   Object::Pointer result;
 
-  std::map<std::string, Object::Pointer>::const_iterator iter(fVariables.find(name));
-  if (iter != fVariables.end()) {
-    result = iter->second;
+  QHash<QString, Object::Pointer>::const_iterator iter(fVariables.find(name));
+  if (iter != fVariables.end())
+  {
+    result = iter.value();
   }
 
   if (!result.IsNull())
@@ -115,7 +117,7 @@ EvaluationContext::GetVariable(const std::string& name) const
 }
 
 Object::Pointer
-EvaluationContext::ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args)
+EvaluationContext::ResolveVariable(const QString &name, const QList<Object::Pointer>& args)
 {
   if (fVariableResolvers.size() > 0) {
     for (unsigned int i= 0; i < fVariableResolvers.size(); ++i) {

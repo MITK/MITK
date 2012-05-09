@@ -18,16 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYISOURCEPROVIDER_H_
 #define BERRYISOURCEPROVIDER_H_
 
-#include <org_blueberry_ui_qt_Export.h>
-#include "berryISourceProviderListener.h"
+#include <berryObject.h>
 
-#include <map>
-#include <vector>
-#include <string>
+#include <QHash>
+#include <QStringList>
 
 #include <QObject>
 
 namespace berry {
+
+struct ISourceProviderListener;
 
 /**
  * <p>
@@ -45,11 +45,11 @@ namespace berry {
  * @see org.blueberry.ui.handlers.IHandlerService
  * @see org.blueberry.ui.ISources
  */
-struct BERRY_UI_QT ISourceProvider : public virtual Object {
+struct ISourceProvider : public virtual Object {
 
-  berryInterfaceMacro(ISourceProvider, berry);
+  berryInterfaceMacro(ISourceProvider, berry)
 
-  typedef std::map<std::string, Object::Pointer> StateMapType;
+  typedef QHash<QString, Object::Pointer> StateMapType;
 
   ~ISourceProvider();
 
@@ -61,8 +61,7 @@ struct BERRY_UI_QT ISourceProvider : public virtual Object {
    * @param listener
    *            The listener to add; must not be <code>null</code>.
    */
-  virtual void AddSourceProviderListener(ISourceProviderListener::Pointer listener) = 0;
-
+  virtual void AddSourceProviderListener(ISourceProviderListener* listener) = 0;
 
   /**
    * Returns the current state of the sources tracked by this provider. This
@@ -88,7 +87,7 @@ struct BERRY_UI_QT ISourceProvider : public virtual Object {
    * @return An array of source names. This value should never be
    *         <code>null</code> or empty.
    */
-  virtual std::vector<std::string> GetProvidedSourceNames() = 0;
+  virtual QStringList GetProvidedSourceNames() = 0;
 
   /**
    * Removes a listener from this source provider. This listener will be
@@ -97,7 +96,7 @@ struct BERRY_UI_QT ISourceProvider : public virtual Object {
    * @param listener
    *            The listener to remove; must not be <code>null</code>.
    */
-  virtual void RemoveSourceProviderListener(ISourceProviderListener::Pointer listener) = 0;
+  virtual void RemoveSourceProviderListener(ISourceProviderListener* listener) = 0;
 };
 
 }

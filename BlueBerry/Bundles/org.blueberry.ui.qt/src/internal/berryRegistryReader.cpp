@@ -14,13 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIExtension.h>
+#include <berryIConfigurationElement.h>
 
 #include "berryRegistryReader.h"
 
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryImageDescriptor.h"
+
+namespace {
+
+bool CompareExtensionsByContributor(const berry::IExtension::Pointer& e1,
+                                    const berry::IExtension::Pointer& e2)
+{
+  return e1->GetContributor().compare(e2->GetContributor(), Qt::CaseInsensitive) < 0;
+}
+
+}
 
 namespace berry
 {
@@ -33,15 +45,15 @@ RegistryReader::~RegistryReader()
 {
 }
 
-void RegistryReader::LogError(IConfigurationElement::Pointer element,
-    const std::string& text)
+void RegistryReader::LogError(const IConfigurationElement::Pointer& element,
+                              const QString& text)
 {
-  const IExtension* extension = element->GetDeclaringExtension();
-  std::string buf = "Plugin " + extension->GetNamespace() + ", extension "
+  IExtension::Pointer extension = element->GetDeclaringExtension();
+  QString buf = QString("Plugin ") + extension->GetNamespace() + ", extension "
       + extension->GetExtensionPointIdentifier();
   // look for an ID if available - this should help debugging
-  std::string id;
-  if (element->GetAttribute("id", id))
+  QString id = element->GetAttribute("id");
+  if (!id.isEmpty())
   {
     buf.append(", id ");
     buf.append(id);
@@ -51,43 +63,44 @@ void RegistryReader::LogError(IConfigurationElement::Pointer element,
 }
 
 void RegistryReader::LogMissingAttribute(
-    IConfigurationElement::Pointer element, const std::string& attributeName)
+    const IConfigurationElement::Pointer& element, const QString& attributeName)
 {
-  RegistryReader::LogError(element, "Required attribute '" + attributeName + "' not defined");//$NON-NLS-2$//$NON-NLS-1$
+  RegistryReader::LogError(element, "Required attribute '" + attributeName + "' not defined");
 }
 
 void RegistryReader::LogMissingElement(
-    IConfigurationElement::Pointer element, const std::string& elementName)
+    const IConfigurationElement::Pointer& element, const QString& elementName)
 {
-  RegistryReader::LogError(element, "Required sub element '" + elementName + "' not defined");//$NON-NLS-2$//$NON-NLS-1$
+  RegistryReader::LogError(element, "Required sub element '" + elementName + "' not defined");
 }
 
 void RegistryReader::LogUnknownElement(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  RegistryReader::LogError(element, "Unknown extension tag found: " + element->GetName());//$NON-NLS-1$
+  RegistryReader::LogError(element, "Unknown extension tag found: " + element->GetName());
 }
 
-const std::vector<const IExtension*> RegistryReader::OrderExtensions(
-    const std::vector<const IExtension*>& extensions)
+const QList<IExtension::Pointer> RegistryReader::OrderExtensions(
+    const QList<IExtension::Pointer>& extensions)
 {
   // By default, the order is based on plugin id sorted
   // in ascending order. The order for a plugin providing
   // more than one extension for an extension point is
   // dependent in the order listed in the XML file.
-  std::vector<const IExtension*> sortedExtension(extensions);
-  std::stable_sort(sortedExtension.begin(), sortedExtension.end());
+  QList<IExtension::Pointer> sortedExtension(extensions);
+  qStableSort(sortedExtension.begin(), sortedExtension.end(),
+              CompareExtensionsByContributor);
   return sortedExtension;
 }
 
 void RegistryReader::ReadElementChildren(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
   this->ReadElements(element->GetChildren());
 }
 
 void RegistryReader::ReadElements(
-    const std::vector<IConfigurationElement::Pointer>& elements)
+    const QList<IConfigurationElement::Pointer>& elements)
 {
   for (unsigned int i = 0; i < elements.size(); i++)
   {
@@ -98,20 +111,20 @@ void RegistryReader::ReadElements(
   }
 }
 
-void RegistryReader::ReadExtension(const IExtension* extension)
+void RegistryReader::ReadExtension(const IExtension::Pointer& extension)
 {
   this->ReadElements(extension->GetConfigurationElements());
 }
 
 void RegistryReader::ReadRegistry(
-    const std::string& pluginId, const std::string& extensionPoint)
+    const QString& pluginId, const QString& extensionPoint)
 {
-  const IExtensionPoint* point = Platform::GetExtensionPointService()->GetExtensionPoint(pluginId + "." + extensionPoint);
+  IExtensionPoint::Pointer point = Platform::GetExtensionRegistry()->GetExtensionPoint(pluginId + "." + extensionPoint);
   if (point == 0)
   {
     return;
   }
-  std::vector<const IExtension*> extensions(point->GetExtensions());
+  QList<IExtension::Pointer> extensions(point->GetExtensions());
   extensions = this->OrderExtensions(extensions);
   for (unsigned int i = 0; i < extensions.size(); i++)
   {
@@ -119,33 +132,32 @@ void RegistryReader::ReadRegistry(
   }
 }
 
-std::string RegistryReader::GetDescription(IConfigurationElement::Pointer configElement)
+QString RegistryReader::GetDescription(const IConfigurationElement::Pointer& configElement)
 {
-  IConfigurationElement::vector children(configElement->GetChildren(WorkbenchRegistryConstants::TAG_DESCRIPTION));
+  QList<IConfigurationElement::Pointer> children(configElement->GetChildren(WorkbenchRegistryConstants::TAG_DESCRIPTION));
   if (children.size() >= 1)
   {
     return children[0]->GetValue();
   }
-  return "";//$NON-NLS-1$
+  return "";
 }
 
-std::string RegistryReader::GetClassValue(
-    IConfigurationElement::Pointer configElement,
-    const std::string& classAttributeName)
+QString RegistryReader::GetClassValue(
+    const IConfigurationElement::Pointer& configElement,
+    const QString& classAttributeName)
 {
-  std::string className;
-  if (configElement->GetAttribute(classAttributeName, className))
+  QString className = configElement->GetAttribute(classAttributeName);
+  if (!className.isEmpty())
   {
     return className;
   }
-  IConfigurationElement::vector candidateChildren(configElement->GetChildren(classAttributeName));
-  if (candidateChildren.size() == 0)
+  QList<IConfigurationElement::Pointer> candidateChildren(configElement->GetChildren(classAttributeName));
+  if (candidateChildren.isEmpty())
   {
     return "";
   }
 
-  candidateChildren[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS, className);
-  return className;
+  return candidateChildren[0]->GetAttribute(QString::fromStdString(WorkbenchRegistryConstants::ATT_CLASS));
 }
 
 }

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
+#include "berryIPreferencesService.h"
 
 #include <QIcon>
 #include <QImage>
@@ -28,9 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
+const QString AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
 
 AbstractUICTKPlugin::AbstractUICTKPlugin()
+  : context(0)
 {
 
 }
@@ -52,13 +54,17 @@ AbstractUICTKPlugin::AbstractUICTKPlugin()
 //    }
 
 
-IPreferencesService::Pointer AbstractUICTKPlugin::GetPreferencesService()
+IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
 {
   // Create the preference store lazily.
   if (preferencesService == 0)
   {
-    preferencesService = Platform::GetServiceRegistry().GetServiceById<
-        IPreferencesService> (IPreferencesService::ID);
+    ctkServiceReference serviceRef = context->getServiceReference<IPreferencesService>();
+    if (!serviceRef)
+    {
+      BERRY_ERROR << "Preferences service not available";
+    }
+    preferencesService = context->getService<IPreferencesService>(serviceRef);
   }
   return preferencesService;
 }
@@ -183,7 +189,7 @@ IWorkbench* AbstractUICTKPlugin::GetWorkbench()
 
 void AbstractUICTKPlugin::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  this->context = context;
 
   // Should only attempt refreshPluginActions() once the bundle
   // has been fully started.  Otherwise, action delegates
@@ -221,6 +227,8 @@ void AbstractUICTKPlugin::start(ctkPluginContext* context)
 void AbstractUICTKPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+  this->context = 0;
   //  try
   //  {
   //    if (bundleListener != null)
@@ -237,21 +245,21 @@ void AbstractUICTKPlugin::stop(ctkPluginContext* context)
 }
 
 SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-    const std::string& pluginId, const std::string& imageFilePath)
+    const QString& pluginId, const QString& imageFilePath)
 {
-  if (pluginId.empty() || imageFilePath.empty())
+  if (pluginId.isEmpty() || imageFilePath.isEmpty())
   {
-    throw Poco::InvalidArgumentException();
+    throw ctkInvalidArgumentException("argument cannot be empty");
   }
 
   // if the plug-in is not ready then there is no image
-  QSharedPointer<ctkPlugin> plugin = BundleUtility::FindPlugin(QString::fromStdString(pluginId));
+  QSharedPointer<ctkPlugin> plugin = BundleUtility::FindPlugin(pluginId);
   if (!BundleUtility::IsReady(plugin))
   {
     return ImageDescriptor::Pointer(0);
   }
 
-  QByteArray imgContent = plugin->getResource(QString::fromStdString(imageFilePath));
+  QByteArray imgContent = plugin->getResource(imageFilePath);
   QImage image = QImage::fromData(imgContent);
   QPixmap pixmap = QPixmap::fromImage(image);
   QIcon* icon = new QIcon(pixmap);

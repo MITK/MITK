@@ -23,7 +23,7 @@ namespace berry
 
 void PropertyTester::InternalInitialize(PropertyTesterDescriptor::Pointer descriptor)
 {
-  fProperties= descriptor->GetProperties();
+  fProperties = descriptor->GetProperties();
   fNamespace= descriptor->GetNamespace();
   fConfigElement= descriptor->GetExtensionElement();
 }
@@ -34,11 +34,10 @@ PropertyTesterDescriptor::Pointer PropertyTester::InternalCreateDescriptor()
   return tester;
 }
 
-bool PropertyTester::Handles(const std::string& namespaze,
-    const std::string& property)
+bool PropertyTester::Handles(const QString &namespaze,
+    const QString &property)
 {
-  return fNamespace == namespaze && fProperties.find("," + property
-      + ",") != std::string::npos;
+  return fNamespace == namespaze && fProperties.contains("," + property + ",");
 }
 
 bool PropertyTester::IsInstantiated()
@@ -48,8 +47,8 @@ bool PropertyTester::IsInstantiated()
 
 bool PropertyTester::IsDeclaringPluginActive()
 {
-  IBundle::Pointer bundle= Platform::GetBundle(fConfigElement->GetContributor());
-  return bundle->IsActive();
+  QSharedPointer<ctkPlugin> plugin = Platform::GetPlugin(fConfigElement->GetContributor());
+  return plugin->getState() == ctkPlugin::ACTIVE;
 }
 
 IPropertyTester* PropertyTester::Instantiate()

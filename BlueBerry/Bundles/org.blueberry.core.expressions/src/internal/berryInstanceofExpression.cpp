@@ -17,36 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryInstanceofExpression.h"
 
 #include "berryExpressions.h"
-
-#include "Poco/Hash.h"
+#include <berryIConfigurationElement.h>
 
 namespace berry {
 
-const std::size_t InstanceofExpression::HASH_INITIAL= Poco::Hash<std::string>()("berry::InstanceofExpression");
+const uint InstanceofExpression::HASH_INITIAL= qHash("berry::InstanceofExpression");
 
-InstanceofExpression::InstanceofExpression(IConfigurationElement::Pointer element)
+InstanceofExpression::InstanceofExpression(const IConfigurationElement::Pointer& element)
 {
-  bool result = element->GetAttribute(ATT_VALUE, fTypeName);
-  Expressions::CheckAttribute(ATT_VALUE, result);
+  fTypeName = element->GetAttribute(ATT_VALUE);
+  Expressions::CheckAttribute(ATT_VALUE, fTypeName);
 }
 
 InstanceofExpression::InstanceofExpression(Poco::XML::Element* element)
 {
-  fTypeName = element->getAttribute(ATT_VALUE);
-  Expressions::CheckAttribute(ATT_VALUE, fTypeName.size() > 0);
+  std::string value = element->getAttribute(ATT_VALUE.toStdString());
+  fTypeName = value.size() > 0 ? QString::fromStdString(value) : QString();
+  Expressions::CheckAttribute(ATT_VALUE, fTypeName);
 }
 
-InstanceofExpression::InstanceofExpression(const std::string& typeName)
+InstanceofExpression::InstanceofExpression(const QString& typeName)
  : fTypeName(typeName)
 {
 
 }
 
-EvaluationResult
-InstanceofExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+InstanceofExpression::Evaluate(IEvaluationContext* context) const
 {
   Object::Pointer element= context->GetDefaultVariable();
-  return EvaluationResult::ValueOf(Expressions::IsInstanceOf(element, fTypeName));
+  return EvaluationResult::ValueOf(Expressions::IsInstanceOf(element.GetPointer(), fTypeName));
 }
 
 void
@@ -56,29 +56,25 @@ InstanceofExpression::CollectExpressionInfo(ExpressionInfo* info)
 }
 
 bool
-InstanceofExpression::operator==(Expression& object)
+InstanceofExpression::operator==(const Object* object) const
 {
-  try
+  if (const InstanceofExpression* that = dynamic_cast<const InstanceofExpression*>(object))
   {
-    InstanceofExpression& that = dynamic_cast<InstanceofExpression&>(object);
-    return this->fTypeName == that.fTypeName;
+    return this->fTypeName == that->fTypeName;
   }
-  catch (std::bad_cast)
-  {
-    return false;
-  }
+  return false;
 }
 
-std::string
-InstanceofExpression::ToString()
+QString
+InstanceofExpression::ToString() const
 {
-  return "<instanceof value=\"" + fTypeName + "\"/>"; ;
+  return QString("<instanceof value=\"") + fTypeName + "\"/>";
 }
 
-std::size_t
+uint
 InstanceofExpression::ComputeHashCode()
 {
-  return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fTypeName);
+  return HASH_INITIAL * HASH_FACTOR + qHash(fTypeName);
 }
 
 }

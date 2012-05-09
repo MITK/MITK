@@ -279,6 +279,10 @@ org_mitk_core_services_Activator::org_mitk_core_services_Activator()
 {
 }
 
+org_mitk_core_services_Activator::~org_mitk_core_services_Activator()
+{
+}
+
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

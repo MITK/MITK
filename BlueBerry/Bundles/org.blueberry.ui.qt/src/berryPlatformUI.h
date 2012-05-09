@@ -45,9 +45,9 @@ class BERRY_UI_QT PlatformUI
 {
 public:
 
-  static const std::string PLUGIN_ID;
-  static const std::string XP_WORKBENCH;
-  static const std::string XP_VIEWS;
+  static const QString PLUGIN_ID;
+  static const QString XP_WORKBENCH;
+  static const QString XP_VIEWS;
 
   /**
    * Return code (value 0) indicating that the workbench terminated normally.

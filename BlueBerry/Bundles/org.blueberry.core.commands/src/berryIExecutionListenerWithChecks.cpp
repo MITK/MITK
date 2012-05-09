@@ -25,31 +25,31 @@ namespace berry {
 
 void
 IExecutionListenerWithChecks::Events
-::AddListener(IExecutionListener::Pointer l)
+::AddListener(IExecutionListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
   IExecutionListener::Events::AddListener(l);
 
-  if (IExecutionListenerWithChecks::Pointer cl = l.Cast<IExecutionListenerWithChecks>())
+  if (IExecutionListenerWithChecks* cl = dynamic_cast<IExecutionListenerWithChecks*>(l))
   {
-    notDefined += NotDefinedDelegate(cl.GetPointer(), &IExecutionListenerWithChecks::NotDefined);
-    notEnabled += NotEnabledDelegate(cl.GetPointer(), &IExecutionListenerWithChecks::NotEnabled);
+    notDefined += NotDefinedDelegate(cl, &IExecutionListenerWithChecks::NotDefined);
+    notEnabled += NotEnabledDelegate(cl, &IExecutionListenerWithChecks::NotEnabled);
   }
 }
 
 void
 IExecutionListenerWithChecks::Events
-::RemoveListener(IExecutionListener::Pointer l)
+::RemoveListener(IExecutionListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
   IExecutionListener::Events::RemoveListener(l);
 
-  if (IExecutionListenerWithChecks::Pointer cl = l.Cast<IExecutionListenerWithChecks>())
+  if (IExecutionListenerWithChecks* cl = dynamic_cast<IExecutionListenerWithChecks*>(l))
   {
-    notDefined -= NotDefinedDelegate(cl.GetPointer(), &IExecutionListenerWithChecks::NotDefined);
-    notEnabled -= NotEnabledDelegate(cl.GetPointer(), &IExecutionListenerWithChecks::NotEnabled);
+    notDefined -= NotDefinedDelegate(cl, &IExecutionListenerWithChecks::NotDefined);
+    notEnabled -= NotEnabledDelegate(cl, &IExecutionListenerWithChecks::NotEnabled);
   }
 }
 

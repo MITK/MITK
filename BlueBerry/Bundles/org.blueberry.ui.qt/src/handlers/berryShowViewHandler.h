@@ -45,7 +45,7 @@ private:
   /**
    * The name of the parameter providing the view identifier.
    */
-  static const std::string PARAMETER_NAME_VIEW_ID;
+  static const QString PARAMETER_NAME_VIEW_ID;
 
 public:
 
@@ -72,7 +72,7 @@ private:
    * @throws PartInitException
    *             If the part could not be initialized.
    */
-  void OpenView(const std::string& viewId, IWorkbenchWindow::Pointer activeWorkbenchWindow);
+  void OpenView(const QString& viewId, IWorkbenchWindow::Pointer activeWorkbenchWindow);
 };
 
 }

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYINAMEDHANDLESTATEIDS_H_
 #define BERRYINAMEDHANDLESTATEIDS_H_
 
-#include <string>
+#include <QString>
 
 namespace berry {
 
@@ -38,13 +38,13 @@ struct INamedHandleStateIds {
    * The state id used for overriding the description of a named handle
    * object. This state's value must return a {@link String}.
    */
-  static const std::string DESCRIPTION; // = "DESCRIPTION";
+  static const QString DESCRIPTION; // = "DESCRIPTION";
 
   /**
    * The state id used for overriding the name of a named handle object. This
    * state's value must return a {@link String}.
    */
-  static const std::string NAME; // = "NAME";
+  static const QString NAME; // = "NAME";
 };
 
 }

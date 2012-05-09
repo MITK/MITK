@@ -42,7 +42,7 @@ void EditorPart::SetInputWithNotify(IEditorInput::Pointer input)
   }
 }
 
-void EditorPart::SetContentDescription(const std::string& description)
+void EditorPart::SetContentDescription(const QString& description)
 {
 //  if (compatibilityTitleListener != null)
 //  {
@@ -53,7 +53,7 @@ void EditorPart::SetContentDescription(const std::string& description)
   WorkbenchPart::SetContentDescription(description);
 }
 
-void EditorPart::SetPartName(const std::string& partName)
+void EditorPart::SetPartName(const QString& partName)
 {
 //  if (compatibilityTitleListener != null)
 //  {
@@ -80,7 +80,7 @@ IEditorSite::Pointer EditorPart::GetEditorSite() const
   return this->GetSite().Cast<IEditorSite>();
 }
 
-std::string EditorPart::GetTitleToolTip() const
+QString EditorPart::GetTitleToolTip() const
 {
   if (editorInput.IsNull())
   {

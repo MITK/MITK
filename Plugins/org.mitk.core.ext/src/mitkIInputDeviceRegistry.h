@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIINPUTDEVICEREGISTRY_H_
 #define MITKIINPUTDEVICEREGISTRY_H_
 
-#include <org_mitk_core_ext_Export.h>
-
-#include <berryService.h>
-
-#include <vector>
-#include <string>
-
 #include <QtPlugin>
 
 #include "mitkIInputDeviceDescriptor.h"
@@ -45,7 +38,7 @@ namespace mitk
    * @noimplement This interface is not intended to be implemented by clients.
    * @ingroup org_mitk_core_ext
    */
-  struct MITKCOREEXT_EXPORT IInputDeviceRegistry: public berry::Service
+  struct IInputDeviceRegistry
   {
     berryInterfaceMacro(IInputDeviceRegistry, mitk);
 

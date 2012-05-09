@@ -22,16 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-std::map<std::string,int> SourcePriorityNameMapping::sourcePrioritiesByName;
+QHash<QString,int> SourcePriorityNameMapping::sourcePrioritiesByName;
 
 SourcePriorityNameMapping::SourcePriorityNameMapping()
 {
   // This class should not be instantiated.
 }
 
-const std::string SourcePriorityNameMapping::LEGACY_LEGACY_NAME()
+const QString SourcePriorityNameMapping::LEGACY_LEGACY_NAME()
 {
-  static const std::string val = "LEGACY";
+  static const QString val = "LEGACY";
   return val;
 }
 
@@ -80,7 +80,7 @@ SourcePriorityNameMapping::Initializer::Initializer()
 
 SourcePriorityNameMapping::Initializer SourcePriorityNameMapping::initializer;
 
-void SourcePriorityNameMapping::AddMapping(const std::string& sourceName,
+void SourcePriorityNameMapping::AddMapping(const QString& sourceName,
     int sourcePriority)
 {
   if (sourceName == "")
@@ -90,7 +90,7 @@ void SourcePriorityNameMapping::AddMapping(const std::string& sourceName,
 
   if (sourcePrioritiesByName.find(sourceName) == sourcePrioritiesByName.end())
   {
-    sourcePrioritiesByName.insert(std::make_pair(sourceName, sourcePriority));
+    sourcePrioritiesByName.insert(sourceName, sourcePriority);
   }
 }
 
@@ -117,21 +117,18 @@ int SourcePriorityNameMapping::ComputeSourcePriority(
   for (std::set<std::string>::iterator iter = sourceNames.begin();
        iter != sourceNames.end(); ++iter)
   {
-    sourcePriority |= GetMapping(*iter);
+    sourcePriority |= GetMapping(QString::fromStdString(*iter));
   }
 
   return sourcePriority;
 }
 
-int SourcePriorityNameMapping::GetMapping(const std::string& sourceName)
+int SourcePriorityNameMapping::GetMapping(const QString& sourceName)
 {
-  std::map<std::string, int>::iterator mapping = sourcePrioritiesByName.find(
-      sourceName);
-  if (mapping != sourcePrioritiesByName.end())
+  if (sourcePrioritiesByName.contains(sourceName))
   {
-    return mapping->second;
+    return sourcePrioritiesByName[sourceName];
   }
-
   return NO_SOURCE_PRIORITY();
 }
 

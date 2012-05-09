@@ -39,6 +39,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchConstants.h"
 #include "berryWorkbenchMenuService.h"
+#include "berryEvaluationService.h"
+#include "berryCommandService.h"
+#include "berryCommandManager.h"
+#include "berryParameterType.h"
+
+#include <berryCommandCategory.h>
+#include <berryIHandler.h>
 
 #include <Poco/Thread.h>
 #include <Poco/Bugcheck.h>
@@ -226,9 +233,10 @@ void Workbench::ServiceLocatorOwner::Dispose()
   workbench->Close(PlatformUI::RETURN_RESTART, true);
 }
 
-Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor) :
-  progressCount(-1), serviceLocatorOwner(new ServiceLocatorOwner(this)),
-      largeUpdates(0), introManager(0), isStarting(true), isClosing(false)
+Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
+  : commandManager(0), progressCount(-1)
+  , serviceLocatorOwner(new ServiceLocatorOwner(this))
+  , largeUpdates(0), introManager(0), isStarting(true), isClosing(false)
 {
   poco_check_ptr(display)
 ;  poco_check_ptr(advisor);
@@ -305,16 +313,12 @@ bool Workbench::Init()
   // TODO Correctly order service initialization
   // there needs to be some serious consideration given to
   // the services, and hooking them up in the correct order
-  //final EvaluationService restrictionService = new EvaluationService();
-  //final EvaluationService evaluationService = new EvaluationService();
+  EvaluationService::Pointer evaluationService(new EvaluationService());
 
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  //        serviceLocator.registerService(IRestrictionService.class,
-  //            restrictionService);
-  //        serviceLocator.registerService(IEvaluationService.class,
-  //            evaluationService);
+  serviceLocator->RegisterService(IEvaluationService::GetManifestName(), evaluationService);
   //      }
   //    });
 
@@ -596,26 +600,26 @@ void Workbench::InitializeDefaultServices()
       service);
   //      }});
   //
-  //    /*
-  //     * Phase 1 of the initialization of commands. When this phase completes,
-  //     * all the services and managers will exist, and be accessible via the
-  //     * getService(Object) method.
-  //     */
+
+  /*
+   * Phase 1 of the initialization of commands. When this phase completes,
+   * all the services and managers will exist, and be accessible via the
+   * getService(Object) method.
+   */
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
   //        Command.DEBUG_COMMAND_EXECUTION = Policy.DEBUG_COMMANDS;
-  //        commandManager = new CommandManager();
+  commandManager.reset(new CommandManager());
   //      }});
   //
   //    final CommandService [] commandService = new CommandService[1];
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  //        commandService[0] = new CommandService(commandManager);
-  //        commandService[0].readRegistry();
-  //        serviceLocator.registerService(ICommandService.class, commandService[0]);
-  //
+  ICommandService::Pointer commandService(new CommandService(commandManager.data()));
+  commandService->ReadRegistry();
+  serviceLocator->RegisterService(ICommandService::GetManifestName(), commandService);
   //      }});
   //
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {

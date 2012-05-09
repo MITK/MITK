@@ -27,13 +27,13 @@ namespace berry
 bool AbstractSourceProvider::DEBUG = true; //Policy.DEBUG_SOURCES;
 
 void AbstractSourceProvider::FireSourceChanged(int sourcePriority,
-    const std::string& sourceName, Object::Pointer sourceValue)
+    const QString &sourceName, Object::Pointer sourceValue)
 {
   sourceEvents.singleSourceChanged(sourcePriority, sourceName, sourceValue);
 }
 
 void AbstractSourceProvider::FireSourceChanged(int sourcePriority,
-    const std::map<std::string, Object::Pointer>& sourceValuesByName)
+    const QHash<QString, Object::Pointer> &sourceValuesByName)
 {
   sourceEvents.multipleSourcesChanged(sourcePriority, sourceValuesByName);
 }
@@ -47,7 +47,7 @@ void AbstractSourceProvider::LogDebuggingInfo(const std::string& message)
 }
 
 void AbstractSourceProvider::AddSourceProviderListener(
-    ISourceProviderListener::Pointer listener)
+    ISourceProviderListener* listener)
 {
   if (listener == 0)
   {
@@ -58,7 +58,7 @@ void AbstractSourceProvider::AddSourceProviderListener(
 }
 
 void AbstractSourceProvider::RemoveSourceProviderListener(
-    ISourceProviderListener::Pointer listener)
+    ISourceProviderListener* listener)
 {
   if (listener == 0)
   {

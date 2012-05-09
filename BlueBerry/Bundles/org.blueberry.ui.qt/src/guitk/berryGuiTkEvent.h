@@ -126,7 +126,7 @@ public:
    * Setting this field will change the text that is about to
    * be inserted or deleted.
    */
-  std::string text;
+  QString text;
 
   /**
    * depending on the event, a flag indicating whether the operation
@@ -135,7 +135,7 @@ public:
    */
   bool doit;
 
-  std::string ToString() const;
+  QString ToString() const;
 
 };
 

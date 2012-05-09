@@ -31,7 +31,7 @@ struct IPropertyChangeListener;
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
  */
-struct IEvaluationReference : public IEvaluationResultCache
+struct IEvaluationReference : public virtual IEvaluationResultCache
 {
 
   berryInterfaceMacro(IEvaluationReference, berry)
@@ -41,7 +41,7 @@ struct IEvaluationReference : public IEvaluationResultCache
    *
    * @return the listener for updates.
    */
-  virtual SmartPointer<IPropertyChangeListener> GetListener() = 0;
+  virtual SmartPointer<IPropertyChangeListener> GetListener() const = 0;
 
   /**
    * The property used in change notifications.

@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMainWindow>
 #include <QHBoxLayout>
+#include <QMenuBar>
 
 namespace berry
 {
@@ -747,6 +748,11 @@ void WorkbenchWindow::CreateDefaultContents(Shell::Pointer shell)
 
   // Create the client composite area (where page content goes).
   CreatePageComposite(shell->GetControl());
+}
+
+void WorkbenchWindow::CreateTrimWidgets(SmartPointer<Shell> shell)
+{
+  // do nothing -- trim widgets are created in CreateDefaultContents
 }
 
 bool WorkbenchWindow::UnableToRestorePage(IMemento::Pointer pageMem)

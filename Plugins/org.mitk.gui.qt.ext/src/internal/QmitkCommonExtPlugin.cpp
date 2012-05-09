@@ -167,9 +167,7 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   mainWindow->activateWindow();
 
   // Get the preferences for the instantiation behavior
-  berry::IPreferencesService::Pointer prefService
-      = berry::Platform::GetServiceRegistry()
-      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
   bool newInstanceAlways = prefs->GetBool("newInstance.always", false);
   bool newInstanceScene = prefs->GetBool("newInstance.scene", true);

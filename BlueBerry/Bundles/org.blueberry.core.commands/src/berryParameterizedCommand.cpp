@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryObjectString.h>
 
-#include <sstream>
-#include <Poco/Hash.h>
 
 namespace berry
 {
@@ -39,14 +37,13 @@ const int INDEX_PARAMETER_NAME = 1;
 const int INDEX_PARAMETER_VALUE_NAME = 2;
 const int INDEX_PARAMETER_VALUE_VALUE = 3;
 
-const std::size_t ParameterizedCommand::HASH_CODE_NOT_COMPUTED = 0;
-const std::size_t ParameterizedCommand::HASH_FACTOR = 89;
-const std::size_t ParameterizedCommand::HASH_INITIAL = Poco::hash(
-    "berry::ParameterizedCommand");
+const uint ParameterizedCommand::HASH_CODE_NOT_COMPUTED = 0;
+const uint ParameterizedCommand::HASH_FACTOR = 89;
+const uint ParameterizedCommand::HASH_INITIAL = qHash("berry::ParameterizedCommand");
 
-ParameterizedCommand::ParameterizedCommand(const SmartPointer<Command> command,
-    const std::vector<Parameterization>& params) :
-  command(command), hashCode(HASH_CODE_NOT_COMPUTED)
+ParameterizedCommand::ParameterizedCommand(const SmartPointer<Command>& command,
+                                           const QList<Parameterization>& params)
+  : command(command), hashCode(HASH_CODE_NOT_COMPUTED)
 {
   if (!command)
   {
@@ -54,7 +51,7 @@ ParameterizedCommand::ParameterizedCommand(const SmartPointer<Command> command,
         "A parameterized command cannot have a null command");
   }
 
-  std::vector<IParameter::Pointer> parameters;
+  QList<IParameter::Pointer> parameters;
   try
   {
     parameters = command->GetParameters();
@@ -136,16 +133,16 @@ SmartPointer<Command> ParameterizedCommand::GetCommand() const
   return command;
 }
 
-std::string ParameterizedCommand::GetId() const
+QString ParameterizedCommand::GetId() const
 {
   return command->GetId();
 }
 
-std::string ParameterizedCommand::GetName() const
+QString ParameterizedCommand::GetName() const
 {
-  if (name.empty())
+  if (name.isEmpty())
   {
-    std::stringstream nameBuffer;
+    QTextStream nameBuffer(&name);
     nameBuffer << command->GetName() << " (";
     const unsigned int parameterizationCount = (unsigned int) parameterizations.size();
     for (unsigned int i = 0; i < parameterizationCount; i++)
@@ -172,24 +169,23 @@ std::string ParameterizedCommand::GetName() const
 
       nameBuffer << ")";
     }
-    name = nameBuffer.str();
   }
   return name;
 }
 
-std::map<std::string, std::string> ParameterizedCommand::GetParameterMap() const
+QHash<QString, QString> ParameterizedCommand::GetParameterMap() const
 {
-  std::map<std::string, std::string> parameterMap;
+  QHash<QString, QString> parameterMap;
   for (unsigned int i = 0; i < parameterizations.size(); i++)
   {
     const Parameterization& parameterization = parameterizations[i];
-    parameterMap.insert(std::make_pair(parameterization.GetParameter()->GetId(),
-            parameterization.GetValue()));
+    parameterMap.insert(parameterization.GetParameter()->GetId(),
+                        parameterization.GetValue());
   }
   return parameterMap;
 }
 
-std::size_t ParameterizedCommand::HashCode() const
+uint ParameterizedCommand::HashCode() const
 {
   if (hashCode == HASH_CODE_NOT_COMPUTED)
   {
@@ -208,16 +204,17 @@ std::size_t ParameterizedCommand::HashCode() const
   return hashCode;
 }
 
-std::string ParameterizedCommand::Serialize()
+QString ParameterizedCommand::Serialize()
 {
-  const std::string escapedId(this->Escape(this->GetId()));
+  const QString escapedId(this->Escape(this->GetId()));
 
   if (parameterizations.empty())
   {
     return escapedId;
   }
 
-  std::stringstream buffer;
+  QString str;
+  QTextStream buffer(&str);
   buffer << CommandManager::PARAMETER_START_CHAR;
 
   for (unsigned int i = 0; i < parameterizations.size(); i++)
@@ -230,48 +227,49 @@ std::string ParameterizedCommand::Serialize()
     }
 
     const Parameterization& parameterization = parameterizations[i];
-    const std::string parameterId(parameterization.GetParameter()->GetId());
-    const std::string escapedParameterId(this->Escape(parameterId));
+    const QString parameterId(parameterization.GetParameter()->GetId());
+    const QString escapedParameterId(this->Escape(parameterId));
 
     buffer << escapedParameterId;
 
-    const std::string parameterValue(parameterization.GetValue());
-    if (!parameterValue.empty())
+    const QString parameterValue(parameterization.GetValue());
+    if (!parameterValue.isEmpty())
     {
-      const std::string escapedParameterValue(this->Escape(parameterValue));
+      const QString escapedParameterValue(this->Escape(parameterValue));
       buffer << CommandManager::ID_VALUE_CHAR
-      << escapedParameterValue;
+             << escapedParameterValue;
     }
   }
 
   buffer << CommandManager::PARAMETER_END_CHAR;
 
-  return buffer.str();
+  return str;
 }
 
-std::string ParameterizedCommand::ToString() const
+QString ParameterizedCommand::ToString() const
 {
-  std::stringstream buffer;
+  QString str;
+  QTextStream buffer(&str);
   buffer << "ParameterizedCommand(" << command->ToString() << ","
-  << CommandUtils::ToString(parameterizations) << ")";
-  return buffer.str();
+         << CommandUtils::ToString(parameterizations) << ")";
+  return str;
 }
 
-std::vector<ParameterizedCommand::Pointer>
+QList<ParameterizedCommand::Pointer>
 ParameterizedCommand::GenerateCombinations(const SmartPointer<Command> command)
 {
-  std::vector<IParameter::Pointer> parameters(command->GetParameters());
+  QList<IParameter::Pointer> parameters(command->GetParameters());
 
-  typedef std::vector<std::list<Parameterization> > ExpandedParamsType;
+  typedef QList<QList<Parameterization> > ExpandedParamsType;
   const ExpandedParamsType expansion(ExpandParameters(0, parameters));
-  std::vector<ParameterizedCommand::Pointer> combinations;
+  QList<ParameterizedCommand::Pointer> combinations;
 
   for (ExpandedParamsType::const_iterator expansionItr = expansion.begin();
       expansionItr != expansion.end(); ++expansionItr)
   {
-    std::list<Parameterization> combination(*expansionItr);
+    QList<Parameterization> combination(*expansionItr);
 
-    std::vector<Parameterization> parameterizations(combination.begin(), combination.end());
+    QList<Parameterization> parameterizations(combination);
     ParameterizedCommand::Pointer pCmd(new ParameterizedCommand(command,
             parameterizations));
     combinations.push_back(pCmd);
@@ -281,24 +279,24 @@ ParameterizedCommand::GenerateCombinations(const SmartPointer<Command> command)
 }
 
 ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartPointer<Command> command,
-    const std::map<std::string, Object::Pointer>& parameters)
+                                                                    const QHash<QString, Object::Pointer>& parameters)
 {
   // no parameters
   if (parameters.empty())
   {
-    ParameterizedCommand::Pointer pCmd(new ParameterizedCommand(command, std::vector<Parameterization>()));
+    ParameterizedCommand::Pointer pCmd(new ParameterizedCommand(command, QList<Parameterization>()));
     return pCmd;
   }
 
   try
   {
-    std::vector<Parameterization> parms;
+    QList<Parameterization> parms;
 
     // iterate over given parameters
-    for (std::map<std::string, Object::Pointer>::const_iterator i = parameters.begin();
+    for (QHash<QString, Object::Pointer>::const_iterator i = parameters.begin();
         i != parameters.end(); ++i)
     {
-      std::string key(i->first);
+      QString key(i.key());
 
       // get the parameter from the command
       IParameter::Pointer parameter(command->GetParameter(key));
@@ -311,7 +309,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
       ParameterType::Pointer parameterType(command->GetParameterType(key));
       if (!parameterType)
       {
-        std::string val(*(i->second.Cast<ObjectString>()));
+        QString val(*(i.value().Cast<ObjectString>()));
         parms.push_back(Parameterization(parameter, val));
       }
       else
@@ -320,12 +318,12 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
             ->GetValueConverter());
         if (valueConverter)
         {
-          std::string val(valueConverter->ConvertToString(i->second));
+          QString val(valueConverter->ConvertToString(i.value()));
           parms.push_back(Parameterization(parameter, val));
         }
         else
         {
-          std::string val(*(i->second.Cast<ObjectString>()));
+          QString val(*(i.value().Cast<ObjectString>()));
           parms.push_back(Parameterization(parameter, val));
         }
       }
@@ -345,16 +343,16 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
   return ParameterizedCommand::Pointer(0);
 }
 
-std::string ParameterizedCommand::Escape(const std::string& rawText)
+QString ParameterizedCommand::Escape(const QString& rawText)
 {
 
-  std::string buffer;
+  QString buffer;
 
-  for (std::string::const_iterator i = rawText.begin();
+  for (QString::const_iterator i = rawText.begin();
       i != rawText.end(); ++i)
   {
 
-    std::string::value_type c = *i;
+    QString::value_type c = *i;
     if (c == CommandManager::PARAMETER_START_CHAR ||
         c == CommandManager::PARAMETER_END_CHAR ||
         c == CommandManager::ID_VALUE_CHAR ||
@@ -367,17 +365,17 @@ std::string ParameterizedCommand::Escape(const std::string& rawText)
     buffer += c;
   }
 
-  if (buffer.empty())
+  if (buffer.isEmpty())
   {
     return rawText;
   }
   return buffer;
 }
 
-std::vector<std::list<Parameterization> > ParameterizedCommand::ExpandParameters(
-    unsigned int startIndex, const std::vector<IParameter::Pointer>& parameters)
+QList<QList<Parameterization> > ParameterizedCommand::ExpandParameters(
+    unsigned int startIndex, const QList<IParameter::Pointer>& parameters)
 {
-  typedef std::vector<std::list<Parameterization> > ReturnType;
+  typedef QList<QList<Parameterization> > ReturnType;
 
   const unsigned int nextIndex = startIndex + 1;
   const bool noMoreParameters = (nextIndex >= parameters.size());
@@ -387,16 +385,16 @@ std::vector<std::list<Parameterization> > ParameterizedCommand::ExpandParameters
 
   if (parameter->IsOptional())
   {
-    parameterizations.push_back(std::list<Parameterization>());
+    parameterizations.push_back(QList<Parameterization>());
   }
 
   IParameter::ParameterValues parameterValues(parameter->GetValues());
   for (IParameter::ParameterValues::iterator parameterValueItr =
       parameterValues.begin(); parameterValueItr != parameterValues.end(); ++parameterValueItr)
   {
-    std::list<Parameterization> combination;
+    QList<Parameterization> combination;
     combination.push_back(
-        Parameterization(parameter, parameterValueItr->second));
+        Parameterization(parameter, parameterValueItr.value()));
     parameterizations.push_back(combination);
   }
 
@@ -422,9 +420,8 @@ std::vector<std::list<Parameterization> > ParameterizedCommand::ExpandParameters
     for (ReturnType::iterator combinationItr = parameterizations.begin(); combinationItr
         != parameterizations.end(); ++combinationItr)
     {
-      std::list<Parameterization> newCombination(*combinationItr);
-      newCombination.insert(newCombination.end(), suffixItr->begin(),
-          suffixItr->end());
+      QList<Parameterization> newCombination(*combinationItr);
+      newCombination.append(*suffixItr);
       returnValue.push_back(newCombination);
     }
   }

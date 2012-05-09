@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_expressions_Export.h>
 
+#include <berryObject.h>
+
 namespace berry {
 
 /**
@@ -140,7 +142,8 @@ namespace berry {
  * </p>
  * @since 3.0
  */
-class BERRY_EXPRESSIONS EvaluationResult {
+class BERRY_EXPRESSIONS EvaluationResult : public Object
+{
 
 private:
   int fValue;
@@ -152,28 +155,32 @@ private:
 public:
 
   /** The evaluation result representing the value FALSE */
-  static const EvaluationResult FALSE_EVAL;
+  static const SmartPointer<const EvaluationResult> FALSE_EVAL;
   /** The evaluation result representing the value TRUE */
-  static const EvaluationResult TRUE_EVAL;
+  static const SmartPointer<const EvaluationResult> TRUE_EVAL;
   /** The evaluation result representing the value NOT_LOADED */
-  static const EvaluationResult NOT_LOADED;
+  static const SmartPointer<const EvaluationResult> NOT_LOADED;
 
 private:
 
-  static const EvaluationResult AND[3][3];
-  static const EvaluationResult OR[3][3];
-  static const EvaluationResult NOT[3];
+  static const SmartPointer<const EvaluationResult> AND[3][3];
+  static const SmartPointer<const EvaluationResult> OR[3][3];
+  static const SmartPointer<const EvaluationResult> NOT[3];
 
   /*
    * No instances outside of <code>EvaluationResult</code>
    */
   EvaluationResult(int value);
 
+  EvaluationResult(const EvaluationResult& o);
+
 public:
 
-  bool operator==(const EvaluationResult&);
+  berryObjectMacro(berry::EvaluationResult)
 
-  bool operator!=(const EvaluationResult&);
+  bool operator==(const Object*) const;
+
+  bool operator!=(const Object*) const;
 
   /**
    * Returns an <code>EvaluationResult</code> whose value is <code>this &amp;&amp; other)</code>.
@@ -182,7 +189,7 @@ public:
    *
    * @return <code>this &amp;&amp; other</code> as defined by the evaluation result
    */
-  EvaluationResult And(EvaluationResult other);
+  EvaluationResult::ConstPointer And(const EvaluationResult::ConstPointer& other) const;
 
   /**
    * Returns an <code>EvaluationResult</code> whose value is <code>this || other)</code>.
@@ -191,14 +198,14 @@ public:
    *
    * @return <code>this || other</code> as defined by the evaluation result
    */
-  EvaluationResult Or(EvaluationResult other);
+  EvaluationResult::ConstPointer Or(const EvaluationResult::ConstPointer& other) const;
 
   /**
    * Returns the inverted value of this evaluation result
    *
    * @return the inverted value of this evaluation result
    */
-  EvaluationResult Not();
+  EvaluationResult::ConstPointer Not() const;
 
   /**
    * Returns an evaluation result instance representing the
@@ -212,7 +219,7 @@ public:
    * @return the expression result representing the boolean
    *  value
    */
-  static EvaluationResult ValueOf(bool b);
+  static EvaluationResult::ConstPointer ValueOf(bool b);
 
   /**
    * For debugging purpose only
@@ -220,7 +227,7 @@ public:
    * @return a string representing this object. The result is not
    *  human readable
    */
-  std::string ToString();
+  QString ToString() const;
 };
 
 }  // namespace berry

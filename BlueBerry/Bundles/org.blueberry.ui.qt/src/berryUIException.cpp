@@ -16,14 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryUIException.h"
 
-#include <typeinfo>
-
 namespace berry {
 
-POCO_IMPLEMENT_EXCEPTION(UIException, PlatformException, "UI exception");
+CTK_IMPLEMENT_EXCEPTION(UIException, PlatformException, "UI exception")
 
-POCO_IMPLEMENT_EXCEPTION(WorkbenchException, UIException, "Workbench error");
+CTK_IMPLEMENT_EXCEPTION(WorkbenchException, UIException, "Workbench error")
 
-POCO_IMPLEMENT_EXCEPTION(PartInitException, WorkbenchException, "Part initialization error");
+CTK_IMPLEMENT_EXCEPTION(PartInitException, WorkbenchException, "Part initialization error")
 
 }

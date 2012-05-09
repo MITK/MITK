@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_expressions_Export.h>
 
-#include <vector>
-
 namespace berry {
 
 /**
@@ -39,7 +37,7 @@ struct BERRY_EXPRESSIONS IIterable : public Object {
 
   berryObjectMacro(IIterable);
 
-  typedef std::vector<Object::Pointer>::iterator iterator;
+  typedef QList<Object::Pointer>::iterator iterator;
 
   virtual ~IIterable() {}
 

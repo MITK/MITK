@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIEvaluationContext.h"
 
-#include <vector>
-
 namespace berry {
 
 class DefaultVariable : public IEvaluationContext {
@@ -40,7 +38,7 @@ public:
      *  be <code>null</code>.
      * @param defaultVariable the default variable
      */
-  DefaultVariable(IEvaluationContext* parent, Object::Pointer defaultVariable);
+  DefaultVariable(IEvaluationContext* parent, const Object::Pointer& defaultVariable);
 
   /**
    * {@inheritDoc}
@@ -70,22 +68,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const std::string& name, Object::Pointer value);
+  void AddVariable(const QString& name, const Object::Pointer& value);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer RemoveVariable(const std::string& name);
+  Object::Pointer RemoveVariable(const QString& name);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetVariable(const std::string& name) const;
+  Object::Pointer GetVariable(const QString& name) const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args);
+  Object::Pointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args);
 };
 
 }  // namespace berry

@@ -30,9 +30,9 @@ class mitkNavigationDataPlayerTestClass
   public:
     static void TestInstantiation()
     {
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
-  
+
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
     // it makes no sense to continue without an object.
@@ -43,9 +43,9 @@ class mitkNavigationDataPlayerTestClass
     {
     std::string tmp = "";
 
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
-      
+
     std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
 
     player->SetFileName( file );
@@ -88,7 +88,7 @@ class mitkNavigationDataPlayerTestClass
     timer->Initialize();
 
     itk::Object::Pointer obj = itk::Object::New();
-    
+
     mitk::Point3D oldPos;
     oldPos[0] = 1;
     oldPos[1] = 0;
@@ -101,7 +101,7 @@ class mitkNavigationDataPlayerTestClass
       player->Update();
       pnt = player->GetOutput()->GetPosition();
       if ( pnt != oldPos )
-      { 
+      {
         times.push_back( timer->GetElapsed(obj) );
         points.push_back(oldPos);
         oldPos = pnt;
@@ -117,16 +117,16 @@ class mitkNavigationDataPlayerTestClass
       MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-150 && times[i]<refTimes[i]+150), "checking for more or less correct time-line"  );
       MITK_TEST_CONDITION_REQUIRED(points[i] == refPoints[i], "checking if the point coordinates are correct")
       }
-    
+
     }
 
     static void TestPauseAndResume()
     {
     std::string tmp = "";
 
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
-      
+
     std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
 
     player->SetFileName( file );
@@ -179,7 +179,7 @@ class mitkNavigationDataPlayerTestClass
     timer->Initialize();
 
     itk::Object::Pointer obj = itk::Object::New();
-    
+
     mitk::Point3D oldPos;
     oldPos[0] = 1;
     oldPos[1] = 0;
@@ -195,14 +195,14 @@ class mitkNavigationDataPlayerTestClass
       player->Update();
       pnt = player->GetOutput()->GetPosition();
       if ( pnt != oldPos )
-      { 
+      {
         times.push_back( timer->GetElapsed(obj) );
         points.push_back(oldPos);
         oldPos = pnt;
       }
     }
     MITK_TEST_OUTPUT(<<"Test pause method!");
-    player->Pause(); 
+    player->Pause();
 
     MITK_TEST_CONDITION_REQUIRED(!player->IsAtEnd(), "Testing method IsAtEnd() #1");
 
@@ -213,13 +213,13 @@ class mitkNavigationDataPlayerTestClass
       player->Update();
       pnt = player->GetOutput()->GetPosition();
       if ( pnt != oldPos )
-      { 
+      {
         times.push_back( timer->GetElapsed(obj) );
         points.push_back(oldPos);
         oldPos = pnt;
       }
     }
-    
+
 
     player->StopPlaying();
 
@@ -231,14 +231,14 @@ class mitkNavigationDataPlayerTestClass
       MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-150 && times[i]<refTimes[i]+150), "checking for more or less correct time-line"  );
       MITK_TEST_CONDITION_REQUIRED(points[i] == refPoints[i], "checking if the point coordinates are correct")
       }
-    
+
     MITK_TEST_CONDITION_REQUIRED(player->IsAtEnd(), "Testing method IsAtEnd() #2");
     }
 
     static void TestInvalidStream()
     {
     MITK_TEST_OUTPUT(<<"#### Testing invalid input data: errors are expected. ####");
-    
+
     //declarate test variables
     mitk::NavigationDataPlayer::Pointer player;
     std::string file;
@@ -299,7 +299,8 @@ class mitkNavigationDataPlayerTestClass
 
     //case 6: empty stream
     player = mitk::NavigationDataPlayer::New();
-    player->SetStream( new std::ifstream("") );
+    std::ifstream myEmptyStream = std::ifstream("");
+    player->SetStream( &myEmptyStream );
     player->StartPlaying();
     player->Update();
     player->StopPlaying();
@@ -308,7 +309,8 @@ class mitkNavigationDataPlayerTestClass
     //case 7: wrong stream
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-    player->SetStream( new std::ifstream(file.c_str()) );
+    std::ifstream myWrongStream = std::ifstream(file.c_str());
+    player->SetStream( &myWrongStream );
     player->StartPlaying();
     player->Update();
     player->StopPlaying();
@@ -325,7 +327,7 @@ class mitkNavigationDataPlayerTestClass
     MITK_TEST_OUTPUT(<<"#8: Tested invalid file version. Application should not crash.");
 
 
-       
+
     }
 
   };

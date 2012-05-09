@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 class mitkNavigationDataPlayerTestClass
   {

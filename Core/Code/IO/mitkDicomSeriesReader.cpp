@@ -388,6 +388,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   bool fromFirstToSecondOriginInitialized(false);
   Point3D thisOrigin;
   Point3D lastOrigin;
+  lastOrigin.Fill(0.0f);
   Point3D lastDifferentOrigin;
   lastDifferentOrigin.Fill(0.0f);
 

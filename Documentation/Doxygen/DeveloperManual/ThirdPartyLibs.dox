@@ -1,6 +1,44 @@
 /**
 \page thirdpartylibs Third-party libraries
 
+The following third-party libraries can be used with MITK by default and can, in part, be automatically downloaded during superbuild.
+
+\par Boost
+
+http://www.boost.org/
+
+\par CTK
+
+http://www.commontk.org/
+
+\par DCMTK
+
+http://dicom.offis.de/dcmtk.php.en
+
+\par GDCM
+
+http://gdcm.sourceforge.net/
+
+\par KWStlye
+
+http://public.kitware.com/KWStyle/
+
+\par ITK
+
+http://www.itk.org/
+
+\par OpenCV
+
+http://opencv.willowgarage.com/wiki/Welcome
+
+\par Qt
+
+http://qt.nokia.com/
+
+\par VTK
+
+http://www.vtk.org/
+
 The following third-party libraries are distributed with MITK and used in several places.
 
 \par ANN (A Library for Approximate Nearest Neighbor Searching)
@@ -10,7 +48,6 @@ http://www.cs.umd.edu/~mount/ANN/ (Version 1.1)
 \par GLEW (The OpenGL Extension Wrangler Library)
 
 http://glew.sourceforge.net/ (Version 1.5.1?)
-
 
 \par POCO (Portable Components, Basic Edition)
 
@@ -32,4 +69,5 @@ http://www.grinninglizard.com/tinyxml/index.html (Version 2.5.5)
 
 http://www.objectclub.jp/download/vecmath_e (Version 1.2-1.4)
 
+For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.
 */

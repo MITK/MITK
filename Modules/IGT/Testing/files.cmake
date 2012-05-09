@@ -22,7 +22,6 @@ set(MODULE_TESTS
    mitkTrackingVolumeGeneratorTest.cpp
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
-# This test fails randomly, see bug #8033
    mitkVirtualTrackingDeviceTest.cpp
    mitkNavigationDataPlayerTest.cpp
    mitkTrackingDeviceSourceTest.cpp
@@ -32,7 +31,7 @@ set(MODULE_TESTS
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp #deactivated, see bug #10701
+   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
    # -----------------------------------------------------------------------

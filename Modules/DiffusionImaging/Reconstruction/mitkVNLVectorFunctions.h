@@ -38,6 +38,17 @@ vnl_vector<T> element_abs (vnl_vector<T> const& v1)
   return result;
 }
 
+template<class CurrentValue, class WntValue>
+vnl_vector<WntValue> element_cast (vnl_vector<CurrentValue> const& v1)
+{
+  vnl_vector<WntValue> result(v1.size());
+
+  for(int i = 0 ; i < v1.size(); i++)
+       result[i] = static_cast<WntValue>(v1[i]);
+
+  return result;
+}
+
 
 template<class T>
 vnl_vector<T> element_pow (vnl_vector<T> const& v1, int p)

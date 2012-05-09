@@ -34,23 +34,36 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   rescaler->SetInput(itkImage);
   rescaler->SetOutputMinimum(0);
   rescaler->SetOutputMaximum(255);
-  itk::NumericSeriesFileNames::Pointer numericFileNameWriter = itk::NumericSeriesFileNames::New();
   itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
 
-  int numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
-  std::string finalFileName = fileName;
-  std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
-  if(pos==std::string::npos)
-    finalFileName.append(".%d.png");
-  else
-    finalFileName.insert(pos,".%d");
+  // Fix initialize the numberOfSlices to one as default
+  // test if image has dimension >2 to set the number of slices according to the value of GetSize()[2]
+  int numberOfSlices = 1;
+  if( VImageDimension > 2 )
+  {
+    itk::NumericSeriesFileNames::Pointer numericFileNameWriter = itk::NumericSeriesFileNames::New();
+    numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
 
-  numericFileNameWriter->SetEndIndex(numberOfSlices);
-  numericFileNameWriter->SetSeriesFormat(finalFileName.c_str());
-  numericFileNameWriter->Modified();
+    std::string finalFileName = fileName;
+    std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
+    if(pos==std::string::npos)
+      finalFileName.append(".%d.png");
+    else
+      finalFileName.insert(pos,".%d");
+
+    numericFileNameWriter->SetEndIndex(numberOfSlices);
+    numericFileNameWriter->SetSeriesFormat(finalFileName.c_str());
+    numericFileNameWriter->Modified();
+    writer->SetFileNames(numericFileNameWriter->GetFileNames());
+  }
+  // if the given image is an 2D-png image, do not use the numericFileNameWriter
+  // to generate the name, since it alters the fileName given as parameter
+  else
+  {
+    writer->SetFileName(fileName);
+  }
 
   writer->SetInput( rescaler->GetOutput() );
-  writer->SetFileNames(numericFileNameWriter->GetFileNames());
   writer->Update();
 }
 

@@ -46,6 +46,9 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
 
           if (image->GetDimension() == 4)
           {
+            MITK_INFO << "4D AUTOCROP DOES NOT WORK AT THE MOMENT";
+            throw "4D AUTOCROP DOES NOT WORK AT THE MOMENT";
+
             unsigned int timesteps = image->GetDimension(3);
             for (unsigned int i = 0; i < timesteps; i++)
             {
@@ -63,6 +66,8 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
 
               // <ToBeRemoved>
               // We write some stripes into the image
+              if ((i & 1) == 0) 
+              {
               int depth = _cropped3dSlice->GetDimension(2);
               int height = _cropped3dSlice->GetDimension(1);
               int width = _cropped3dSlice->GetDimension(0);
@@ -72,6 +77,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
                   for (int x = 0; x < width; ++x)
                     reinterpret_cast<unsigned char *>(_data)[(width * height * z) + (width * y) + x] = x & 1;
               // </ToBeRemoved>
+              }
 
               image->SetVolume(_data, i);
             }

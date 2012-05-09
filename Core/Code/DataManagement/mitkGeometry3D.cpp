@@ -40,7 +40,7 @@ mitk::Geometry3D::Geometry3D()
   m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   Initialize();
 }
-mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(),  m_ParametricBoundingBox(other.m_ParametricBoundingBox),m_TimeBounds(other.m_TimeBounds), 
+mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(), mitk::OperationActor(), m_ParametricBoundingBox(other.m_ParametricBoundingBox),m_TimeBounds(other.m_TimeBounds), 
   m_ImageGeometry(other.m_ImageGeometry), m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ) , m_Origin(other.m_Origin)
 {
   // AffineGeometryFrame

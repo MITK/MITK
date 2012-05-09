@@ -29,7 +29,7 @@ mitk::PointSet::PointSet()
 mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
 {
    this->Expand(other.GetTimeSteps());
-   for (int t=0; t < other.GetTimeSteps(); t++)
+   for (unsigned int t=0; t < other.GetTimeSteps(); t++)
    {
       for (int i=0; i< other.GetSize(t); i++)
       {

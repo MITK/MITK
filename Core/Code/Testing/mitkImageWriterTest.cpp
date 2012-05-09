@@ -158,6 +158,29 @@ int mitkImageWriterTest(int  argc , char* argv[])
     MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
   }
 
+  // testing image writing as png files
+  // test only for 2D images since the PNG is using a series writer in case a 3D image
+  // should be saved -> the output name comparison would fail and also the use case
+  // is very uncommon
+  // write ITK .mhd image (2D and 3D only)
+  if( image->GetDimension() == 2 )
+  {
+    try
+    {
+      myImageWriter->SetExtension(".png");
+      myImageWriter->Update();
+      std::fstream fin;
+      fin.open(AppendExtension(filename, ".png").c_str(),std::ios::in);
+      MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .png file");
+      fin.close();
+      remove(AppendExtension(filename, ".png").c_str());
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      MITK_TEST_FAILED_MSG(<< "Exception during .png file writing: " << e.what() );
+    }
+  }
+
 
   // test for exception handling
   try

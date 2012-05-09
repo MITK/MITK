@@ -714,7 +714,7 @@ void LDAPExpr::ParseState::skipWhite()
 std::string LDAPExpr::ParseState::getAttributeName()
 {
   std::size_t start = m_pos;
-  std::size_t n = -1;
+  int n = -1;
   for(;; m_pos++)
   {
     Byte c = peek();

@@ -389,6 +389,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   Point3D thisOrigin;
   Point3D lastOrigin;
   Point3D lastDifferentOrigin;
+  lastDifferentOrigin.Fill(0.0f);
+
   bool lastOriginInitialized(false);
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";

@@ -31,7 +31,7 @@ namespace mitk
   class DataStorage;
 }
 
-class mitkRenderingTestHelper
+class MITK_CORE_EXPORT mitkRenderingTestHelper
 {
   public:
     mitkRenderingTestHelper(int width, int height, mitk::DataStorage* ds);

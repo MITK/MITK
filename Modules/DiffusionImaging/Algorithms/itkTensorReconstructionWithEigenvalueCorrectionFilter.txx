@@ -105,11 +105,11 @@ namespace itk
 
       if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
       {
-        m_B0Mask[i]=5;
+        m_B0Mask[i]=1;
       }
       else
       {
-        m_B0Mask[i]=-1;
+        m_B0Mask[i]=0;
         directions[cnt][0] = vec[0];
         directions[cnt][1] = vec[1];
         directions[cnt][2] = vec[2];
@@ -245,7 +245,7 @@ namespace itk
           GradientVectorType pixel = m_GradientImagePointer->GetPixel(ix);
           for (int i=0;i<nof;i++)
           {
-            if(m_B0Mask[i]>0)
+            if(m_B0Mask[i]==1)
             {
               mean_b = mean_b + pixel[i];
             }
@@ -522,7 +522,7 @@ namespace itk
 
     for (int i=0;i<nof;i++)
     {
-      if(m_B0Mask[i]==0)
+      if(m_B0Mask[i]==1)
       {
         mean_b=mean_b+org_data[i];
       }
@@ -532,7 +532,7 @@ namespace itk
     int cnt=0;
     for (int i=0;i<nof;i++)
     {
-      if(m_B0Mask[i]==1)
+      if(m_B0Mask[i]==0)
       {
         //if(org_data[i]<0.001){org_data[i]=0.01;}
         atten[cnt]=org_data[i]/mean_b;

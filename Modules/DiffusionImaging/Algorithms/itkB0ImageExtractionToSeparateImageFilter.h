@@ -41,6 +41,11 @@ public:
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
 
+  /** typedefs from superclass */
+  typedef typename Superclass::GradientDirectionType GradientDirectionType;
+  typedef typename Superclass::GradientDirectionContainerType GradientDirectionContainerType;
+  typedef typename GradientDirectionContainerType::Iterator GradContainerIteratorType;
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
@@ -54,6 +59,8 @@ protected:
   virtual ~B0ImageExtractionToSeparateImageFilter(){};
 
   void GenerateData();
+
+  using Superclass::m_Directions;
 };
 
 } // end namespace itk

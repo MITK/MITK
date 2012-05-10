@@ -34,8 +34,8 @@ template< class TInputImagePixelType,
   TInputImagePixelType, TOutputImagePixelType >::GenerateData()
   {
 
-    typename GradientDirectionContainerType::Iterator begin = m_Directions->Begin();
-    typename GradientDirectionContainerType::Iterator end = m_Directions->End();
+    GradContainerIteratorType begin = m_Directions->Begin();
+    GradContainerIteratorType end = m_Directions->End();
 
     // Find the index of the b0 image
     std::vector<int> indices;
@@ -52,9 +52,13 @@ template< class TInputImagePixelType,
       ++begin;
     }
 
+    // declare the output image
     typedef itk::Image<float, 4> TempImageType;
     TempImageType::Pointer tmp = TempImageType::New();
-    typename TempImageType::RegionType region = this->GetInput()->GetLargestPossibleRegion();
+
+    // get the input region
+    typename Superclass::InputImageType::RegionType inputRegion =
+        this->GetInput()->GetLargestPossibleRegion();
 
     // allocate image with
     //  - dimension: [DimX, DimY, DimZ, NumOfb0 ]
@@ -63,7 +67,7 @@ template< class TInputImagePixelType,
     TempImageType::SpacingType spacing;
     spacing.Fill(1);
 
-    TempImageType::OriginType origin;
+    TempImageType::PointType origin;
     origin.Fill(0);
 
     for (unsigned int i=0; i< 3; i++)

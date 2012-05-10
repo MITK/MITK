@@ -37,6 +37,33 @@ namespace mitk {
     virtual ~Exception() throw() {}
 
     itkTypeMacro(ClassName, SuperClassName);
+
+    /** \brief Definition of the bit shift operator for this class.*/
+    template <class T> inline Exception& operator<<(const T& data)
+    {
+      std::stringstream ss;
+      ss << this->GetDescription() << data;
+      this->SetDescription(ss.str());
+      return *this;
+    }
+
+    /** \brief Definition of the bit shift operator for this class (for non const data).*/
+    template <class T> inline Exception& operator<<(T& data)
+    {
+      std::stringstream ss;
+      ss << this->GetDescription() << data;
+      this->SetDescription(ss.str());
+      return *this;
+    }
+
+    /** \brief Definition of the bit shift operator for this class (for functions).*/
+    inline Exception& operator<<(std::ostream& (*func)(std::ostream&))
+    {
+      std::stringstream ss;
+      ss << this->GetDescription() << func;
+      this->SetDescription(ss.str());
+      return *this;
+    }
    
   };
 } // namespace mitk

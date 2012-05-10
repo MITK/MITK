@@ -34,7 +34,7 @@ SET(MODULE_TESTS
    mitkNavigationToolStorageTest.cpp
    #mitkNavigationToolStorageSerializerAndDeserializerTest.cpp #deactivated, see bug #10701
    mitkNavigationToolTest.cpp
-   mitkNavigationToolReaderAndWriterTest.cpp 
+   mitkNavigationToolReaderAndWriterTest.cpp
    # -----------------------------------------------------------------------
 
    # ------------------ Deavtivated Tests ----------------------------------

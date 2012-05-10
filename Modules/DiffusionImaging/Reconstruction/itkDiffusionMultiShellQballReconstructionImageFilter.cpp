@@ -145,32 +145,20 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   vOnes.fill(1.0);
 
   vnl_matrix<double> T0(E.rows(), E.cols());
-  T0.fill(0.0);
   vnl_matrix<unsigned char> C(E.rows(), 7);
-  C.fill(0);
   vnl_matrix<double> A(E.rows(), 7);
-  A.fill(0.0);
   vnl_matrix<double> B(E.rows(), 7);
-  B.fill(0.0);
 
   vnl_vector<double> s0(E.rows());
-  s0.fill(0.0);
   vnl_vector<double> a0(E.rows());
-  a0.fill(0.0);
   vnl_vector<double> b0(E.rows());
-  b0.fill(0.0);
   vnl_vector<double> ta(E.rows());
-  ta.fill(0.0);
   vnl_vector<double> tb(E.rows());
-  tb.fill(0.0);
   vnl_vector<double> e(E.rows());
-  e.fill(0.0);
   vnl_vector<double> m(E.rows());
-  m.fill(0.0);
   vnl_vector<double> a(E.rows());
-  a.fill(0.0);
   vnl_vector<double> b(E.rows());
-  b.fill(0.0);
+
 
   // logarithmierung aller werte in E
   for(int i = 0 ; i < E.rows(); i++)
@@ -270,15 +258,9 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   delta.fill(delta0);
 
   vnl_matrix<double> AM(a.size(), 15);
-  AM.fill(0.0);
   vnl_matrix<double> aM(a.size(), 15);
-  aM.fill(0.0);
   vnl_matrix<double> bM(a.size(), 15);
-  bM.fill(0.0);
-
   vnl_matrix<unsigned char> B(a.size(), 15);
-  B.fill(0);
-
 
   AM.set_column(0, A);
   AM.set_column(1, A);
@@ -340,13 +322,9 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   }
 
   vnl_matrix<double> R2(a.size(), 15);
-  R2.fill(0.0);
   vnl_matrix<double> A_(a.size(), 15);
-  A_.fill(0.0);
   vnl_matrix<double> a_(a.size(), 15);
-  a_.fill(0.0);
   vnl_matrix<double> b_(a.size(), 15);
-  b_.fill(0.0);
 
 
 
@@ -675,14 +653,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 #include <vnl/algo/vnl_levenberg_marquardt.h>
 #include <vnl/algo/vnl_lsqr.h>
 
-class LMFunction : public vnl_least_squares_function
-{
-    void f(vnl_vector<double> const& x, vnl_vector<double>& fx)
-    {
-
-    }
-};
-
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -690,7 +660,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
 
 
-  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
+  //vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
 
 }
 
@@ -765,6 +735,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   // iterate overall voxels of the gradient image region
   while( ! git.IsAtEnd() )
   {
+
     GradientVectorType b = git.Get();
 
     // compute the average bzero signal
@@ -871,6 +842,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     ++git;
   }
+
+
+
   MITK_INFO << "THREAD FINISHED";
   delete E;
   delete AlphaValues;
@@ -895,6 +869,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   itk::TimeProbe clock;
   clock.Start();
+
+
   switch(m_ReconstructionType)
   {
   case Standard1Shell:

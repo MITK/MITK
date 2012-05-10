@@ -735,8 +735,10 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionImage<DiffusionPixelType>* vols =
-        static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+      typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageType;
+
+      DiffusionImageType* vols =
+        static_cast<DiffusionImageType*>(
         (*itemiter)->GetData());
 
       std::string nodename;
@@ -760,7 +762,44 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
       reconFilter->SetB0Threshold(b0Threshold);
       reconFilter->Update();
 
-      itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3>::Pointer outputTensorImg = reconFilter->GetOutput();
+      typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
+      TensorImageType::Pointer outputTensorImg = reconFilter->GetOutput();
+
+
+      typedef itk::ImageRegionIterator<TensorImageType> TensorImageIteratorType;
+      TensorImageIteratorType tensorIt(outputTensorImg, outputTensorImg->GetRequestedRegion());
+      tensorIt.GoToBegin();
+
+      int negatives = 0;
+      while(!tensorIt.IsAtEnd())
+      {
+
+        typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
+        TensorType tensor = tensorIt.Get();
+
+
+        TensorType::EigenValuesArrayType ev;
+        tensor.ComputeEigenValues(ev);
+
+        for(unsigned int i=0; i<ev.Size(); i++)
+        {
+
+
+
+          if(ev[i] < 0.0)
+          {
+            tensor.Fill(0.0);
+            tensorIt.Set(tensor);
+            negatives++;
+            break;
+          }
+        }
+
+
+        ++tensorIt;
+      }
+
+      std::cout << negatives << " tensors with negative eigenvalues" << std::endl;
 
 
       mitk::TensorImage::Pointer image = mitk::TensorImage::New();
@@ -775,6 +814,48 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 
       SetDefaultNodeProperties(node, newname.toStdString());
       nodes.push_back(node);
+
+
+      // Corrected diffusion image
+      typedef itk::VectorImage<short, 3>  ImageType;
+      ImageType::Pointer correctedVols = reconFilter->GetVectorImage();
+
+      DiffusionImageType::Pointer correctedDiffusion = DiffusionImageType::New();
+      correctedDiffusion->SetVectorImage(correctedVols);
+      correctedDiffusion->SetDirections(vols->GetDirections());
+      correctedDiffusion->SetB_Value(vols->GetB_Value());
+      correctedDiffusion->SetOriginalDirections(vols->GetDirections());
+      correctedDiffusion->InitializeFromVectorImage();
+
+      mitk::DataNode::Pointer diffNode=mitk::DataNode::New();
+      diffNode->SetData( correctedDiffusion );
+
+      QString diffname;
+      diffname = diffname.append(nodename.c_str());
+      diffname = diffname.append("corrDiff");
+
+      SetDefaultNodeProperties(diffNode, diffname.toStdString());
+      nodes.push_back(diffNode);
+
+
+
+      // B0 mask as used in tensorreconstructionwithcorrectionfilter
+      typedef itk::Image<short, 3> MaskImageType;
+      MaskImageType::Pointer mask = reconFilter->GetMask();
+      mitk::Image::Pointer mitkMask;
+      mitk::CastToMitkImage(mask, mitkMask);
+      mitk::DataNode::Pointer maskNode=mitk::DataNode::New();
+      maskNode->SetData( mitkMask );
+
+      QString maskname;
+      maskname = maskname.append(nodename.c_str());
+      maskname = maskname.append("_mask");
+
+      SetDefaultNodeProperties(maskNode, maskname.toStdString());
+      nodes.push_back(maskNode);
+
+
+
 
 
       mitk::ProgressBar::GetInstance()->Progress();

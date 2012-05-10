@@ -1256,6 +1256,7 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
 
   m_Controls->m_ItkReconstruction->setEnabled(foundDwiVolume);
   m_Controls->m_TeemReconstruction->setEnabled(foundDwiVolume);
+  m_Controls->m_ReconstructionWithCorrection->setEnabled(foundDwiVolume);
 
   m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
   m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);

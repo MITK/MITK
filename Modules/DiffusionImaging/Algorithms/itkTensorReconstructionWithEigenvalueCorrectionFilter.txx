@@ -353,48 +353,10 @@ namespace itk
 
               if( eigen_vals[0]>0.0 && eigen_vals[1]>0.0 && eigen_vals[2]>0.0)
               {
-                ten(0,0) = tensor[0];
-                ten(0,1) = tensor[3];
-                ten(0,2) = tensor[5];
-                ten(1,1) = tensor[1];
-                ten(1,2) = tensor[4];
-                ten(2,2) = tensor[2];
-
-/*
-                if(x==47 && y==69 && z==28)
-                {
-                   std::cout <<"Joe tensor"<< "\n";
-
-                   std::cout <<tensor[0]<< "\n";
-                   std::cout <<tensor[1]<< "\n";
-                   std::cout <<tensor[2]<< "\n";
-                   std::cout <<tensor[3]<< "\n";
-                   std::cout <<tensor[4]<< "\n";
-                   std::cout <<tensor[5]<< "\n" << std::endl;
-
-                }
-*/
-
-
-
                 tensorImg->SetPixel(ix, ten);
-
               }//end of if eigenvalues
               else
               {
-
-                ten(0,0) = tensor[0];
-                ten(0,1) = tensor[3];
-                ten(0,2) = tensor[5];
-                ten(1,1) = tensor[1];
-                ten(1,2) = tensor[4];
-                ten(2,2) = tensor[2];
-
-                ten.ComputeEigenValues(eigenvalues);
-
-                // Eigenvalues negative here too?
-
-
                 number_of_bads++;
                 ten.Fill(0.0);
                 tensorImg->SetPixel(ix, ten);
@@ -410,7 +372,7 @@ namespace itk
 
                 corrected_diffusion->SetPixel(ix, variableLengthVector);
               }
-            }// end of if
+            }
 
             else
             {
@@ -419,17 +381,18 @@ namespace itk
             }
 
 
-          }// end of for 3
+          }
         }
 
-      }// end of for 1
+      }
+
       diff=old_number_of_bads-number_of_bads;
       old_number_of_bads=number_of_bads;
       std::cout << "bad voxels: " << number_of_bads << std::endl;
       number_of_bads=0;
 
 
-    } //while
+    }
 
 
 

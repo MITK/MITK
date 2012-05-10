@@ -169,6 +169,7 @@ protected:
     vnl_vector<TOdfPixelType> AnalyticalThreeShellParameterEstimation(const IndiciesVector * shell1, const IndiciesVector * shell2, const IndiciesVector * shell3, vnl_vector<TOdfPixelType> b);
     void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
 
 private:
 

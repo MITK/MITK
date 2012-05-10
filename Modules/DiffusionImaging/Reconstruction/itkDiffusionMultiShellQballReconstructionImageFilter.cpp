@@ -672,6 +672,27 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 }
 
 #include <itkTimeProbe.h>
+#include <vnl/algo/vnl_levenberg_marquardt.h>
+#include <vnl/algo/vnl_lsqr.h>
+
+class LMFunction : public vnl_least_squares_function
+{
+    void f(vnl_vector<double> const& x, vnl_vector<double>& fx)
+    {
+
+    }
+};
+
+
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+{
+
+
+  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
+
+}
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -907,7 +928,7 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
         // Compute SHBasisFunctions
         double phi = (*QBallReference)(0,i);
         double th = (*QBallReference)(1,i);
-        (*SHBasisOutput)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
+        (*SHBasisOutput)(i,j) = mitk::mitk_sh_functions::Yj(m,k,th,phi);
 
         // Laplacian Baltrami Order Association
         if(LaplaciaBaltramiOutput)
@@ -932,7 +953,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   for(int i=0; i<m_NumberCoefficients; i++)
   {
-    (*FRTMatrixOutput)(i,i) = 2.0 * QBALL_ANAL_RECON_PI * mitk::ShericalHarmonicsFunctions::legendre0((*SHOrderAssociationReference)[i]);
+    (*FRTMatrixOutput)(i,i) = 2.0 * QBALL_ANAL_RECON_PI * mitk::mitk_sh_functions::legendre0((*SHOrderAssociationReference)[i]);
   }
 }
 
@@ -1001,7 +1022,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
       double y = this->m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(1);
       double z = this->m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(2);
       double cart[3];
-      mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+      mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
       (*Q)(0,j) = cart[0];
       (*Q)(1,j) = cart[1];
       (*Q)(2,j++) = cart[2];
@@ -1015,7 +1036,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
         double y = this->m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(1);
         double z = this->m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(2);
         double cart[3];
-        mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+        mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
         (*Q)(0,j) = cart[0];
         (*Q)(1,j) = cart[1];
         (*Q)(2,j++) = cart[2];
@@ -1072,7 +1093,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
     double y = (*U)(1,i);
     double z = (*U)(2,i);
     double cart[3];
-    mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+    mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
     (*U)(0,i) = cart[0];
     (*U)(1,i) = cart[1];
     (*U)(2,i) = cart[2];
@@ -1087,7 +1108,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
         int j = (k*k + k + 2)/2 + m - 1;
         double phi = (*U)(0,i);
         double th = (*U)(1,i);
-        (*m_ODFSphericalHarmonicBasisMatrix)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
+        (*m_ODFSphericalHarmonicBasisMatrix)(i,j) = mitk::mitk_sh_functions::Yj(m,k,th,phi);
       }
     }
   }

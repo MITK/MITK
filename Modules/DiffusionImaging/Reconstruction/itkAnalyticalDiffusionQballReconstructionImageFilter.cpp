@@ -511,7 +511,7 @@ namespace itk {
               double y = gdcit.Value().get(1);
               double z = gdcit.Value().get(2);
               double cart[3];
-              mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+              mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
               (*Q)(0,i) = cart[0];
               (*Q)(1,i) = cart[1];
               (*Q)(2,i++) = cart[2];
@@ -528,7 +528,7 @@ namespace itk {
                 double y = gdcit.Value().get(1);
                 double z = gdcit.Value().get(2);
                 double cart[3];
-                mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+                mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
                 (*Q)(0,i) = cart[0];
                 (*Q)(1,i) = cart[1];
                 (*Q)(2,i++) = cart[2];
@@ -563,7 +563,7 @@ namespace itk {
               (*lj)[j] = k;
               double phi = (*Q)(0,i);
               double th = (*Q)(1,i);
-              (*B)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
+              (*B)(i,j) = mitk::mitk_sh_functions::Yj(m,k,th,phi);
               //std::cout << "B(" << i << "," << j << ") = Yj(" << m << "," << k << "," << th << "," << phi << ") = " << (*B)(i,j) << std::endl;
             }
           }
@@ -583,12 +583,12 @@ namespace itk {
           if(m_NormalizationMethod == QBAR_SOLID_ANGLE ||
             m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
           {
-            (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*mitk::ShericalHarmonicsFunctions::legendre0((*lj)[i]);
+            (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*mitk::mitk_sh_functions::legendre0((*lj)[i]);
             (*m_LP)(i) *= (*P)(i,i);
           }
           else
           {
-            (*P)(i,i) = mitk::ShericalHarmonicsFunctions::legendre0((*lj)[i]);
+            (*P)(i,i) = mitk::mitk_sh_functions::legendre0((*lj)[i]);
           }
         }
         m_B_t = new vnl_matrix<double>(B->transpose());
@@ -652,7 +652,7 @@ namespace itk {
           double y = (*U)(1,i);
           double z = (*U)(2,i);
           double cart[3];
-          mitk::ShericalHarmonicsFunctions::Cart2Sph(x,y,z,cart);
+          mitk::mitk_sh_functions::Cart2Sph(x,y,z,cart);
           (*U)(0,i) = cart[0];
           (*U)(1,i) = cart[1];
           (*U)(2,i) = cart[2];
@@ -667,7 +667,7 @@ namespace itk {
               int j = (k*k + k + 2)/2 + m - 1;
               double phi = (*U)(0,i);
               double th = (*U)(1,i);
-              (*m_SphericalHarmonicBasisMatrix)(i,j) = mitk::ShericalHarmonicsFunctions::Yj(m,k,th,phi);
+              (*m_SphericalHarmonicBasisMatrix)(i,j) = mitk::mitk_sh_functions::Yj(m,k,th,phi);
               (*sphericalHarmonicBasisMatrix2)(i,j) = (*m_SphericalHarmonicBasisMatrix)(i,j);
             }
           }

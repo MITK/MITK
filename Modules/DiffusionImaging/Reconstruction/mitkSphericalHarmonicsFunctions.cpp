@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #if BOOST_VERSION / 100000 > 0
 #if BOOST_VERSION / 100 % 1000 > 34
 #include <boost/math/special_functions/legendre.hpp>
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 #endif
 #endif
 
@@ -31,7 +32,7 @@ namespace mitk{
 
 #define SPHERICAL_HARMONICS_PI       M_PI
 
-double mitk::ShericalHarmonicsFunctions::factorial(int number) {
+double mitk::mitk_sh_functions::factorial(int number) {
     if(number <= 1) return 1;
     double result = 1.0;
     for(int i=1; i<=number; i++)
@@ -39,7 +40,7 @@ double mitk::ShericalHarmonicsFunctions::factorial(int number) {
     return result;
 }
 
-void mitk::ShericalHarmonicsFunctions::Cart2Sph(double x, double y, double z, double *cart)
+void mitk::mitk_sh_functions::Cart2Sph(double x, double y, double z, double *cart)
 {
     double phi, th, rad;
     rad = sqrt(x*x+y*y+z*z);
@@ -52,7 +53,7 @@ void mitk::ShericalHarmonicsFunctions::Cart2Sph(double x, double y, double z, do
     cart[2] = rad;
 }
 
-double mitk::ShericalHarmonicsFunctions::legendre0(int l)
+double mitk::mitk_sh_functions::legendre0(int l)
 {
     if( l%2 != 0 )
     {
@@ -68,78 +69,23 @@ double mitk::ShericalHarmonicsFunctions::legendre0(int l)
     }
 }
 
-double mitk::ShericalHarmonicsFunctions::spherical_harmonic(int m,int l,double theta,double phi, bool complexPart)
-{
-    if( theta < 0 || theta > SPHERICAL_HARMONICS_PI )
-    {
-        std::cout << "bad range" << std::endl;
-        return 0;
-    }
 
-    if( phi < 0 || phi > 2*SPHERICAL_HARMONICS_PI )
-    {
-        std::cout << "bad range" << std::endl;
-        return 0;
-    }
-
-    double pml = 0;
-    double fac1 = factorial(l+m);
-    double fac2 = factorial(l-m);
-
-    if( m<0 )
-    {
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-        pml = ::boost::math::legendre_p<double>(l, -m, cos(theta));
-#else
-        std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-#endif
-#else
-        std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-#endif
-        double mypow = pow(-1.0,-m);
-        double myfac = (fac1/fac2);
-        pml *= mypow*myfac;
-    }
-    else
-    {
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
-        pml = ::boost::math::legendre_p<double>(l, m, cos(theta));
-#endif
-#endif
-    }
-
-    //std::cout << "legendre(" << l << "," << m << "," << cos(theta) << ") = " << pml << std::endl;
-
-    double retval = sqrt(((2.0*(double)l+1.0)/(4.0*SPHERICAL_HARMONICS_PI))*(fac2/fac1)) * pml;
-    if( !complexPart )
-    {
-        retval *= cos(m*phi);
-    }
-    else
-    {
-        retval *= sin(m*phi);
-    }
-    //std::cout << retval << std::endl;
-    return retval;
-}
-
-double mitk::ShericalHarmonicsFunctions::Yj(int m, int k, double theta, double phi)
+double mitk::mitk_sh_functions::Yj(int m, int k, double theta, double phi)
 {
     if( -k <= m && m < 0 )
     {
-        return sqrt(2.0) * spherical_harmonic(m,k,theta,phi,false);
+        return sqrt(2.0) * ::boost::math::spherical_harmonic_r<double, double>(k,m,theta,phi);;
     }
 
     if( m == 0 )
-        return spherical_harmonic(0,k,theta,phi,false);
+        return  ::boost::math::spherical_harmonic_r<double, double>(k,m,theta,phi);
 
     if( 0 < m && m <= k )
     {
-        return sqrt(2.0) * spherical_harmonic(m,k,theta,phi,true);
+        return sqrt(2.0) * ::boost::math::spherical_harmonic_i<double, double>(k,m,theta,phi);
     }
 
     return 0;
 }
+
 }

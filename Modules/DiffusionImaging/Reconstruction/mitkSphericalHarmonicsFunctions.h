@@ -22,16 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk{
 
-class MitkDiffusionImaging_EXPORT ShericalHarmonicsFunctions{
+namespace mitk_sh_functions{
 
-public :
-   static double factorial(int number);
-   static void Cart2Sph(double x, double y, double z, double* cart);
-   static double legendre0(int l);
-   static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
-   static double Yj(int m, int k, double theta, double phi);
+   double factorial(int number);
+   void Cart2Sph(double x, double y, double z, double* cart);
+   double legendre0(int l);
+   double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
+   double Yj(int m, int k, double theta, double phi);
 
-};
+}
 }
 
 #endif //__mitkSphericalHarmonicsHandler_h_

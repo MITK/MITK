@@ -73,7 +73,7 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
   for ( int i = 0;i < noValues;i++ )
   {
     m_LookupTable->GetTableValue ( i, rgba );
-    rgba[ 3 ] = opacity;
+    rgba[ 3 ] *= opacity;
     m_LookupTable->SetTableValue ( i, rgba );
   }
   this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed

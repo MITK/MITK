@@ -714,7 +714,8 @@ void LDAPExpr::ParseState::skipWhite()
 std::string LDAPExpr::ParseState::getAttributeName()
 {
   std::size_t start = m_pos;
-  int n = -1;
+  std::size_t n = 0;
+  bool nIsSet = false;
   for(;; m_pos++)
   {
     Byte c = peek();
@@ -726,9 +727,10 @@ std::string LDAPExpr::ParseState::getAttributeName()
     else if (!std::isspace(c))
     {
       n = m_pos - start + 1;
+      nIsSet = true;
     }
   }
-  if (n == -1)
+  if (!nIsSet)
   {
     return std::string();
   }

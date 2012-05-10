@@ -239,8 +239,8 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
     double sumB = 0;
     for(int j = 0 ; j < 7; j++)
     {
-        sumA += A(i,j);
-        sumB += B(i,j);
+      sumA += A(i,j);
+      sumB += B(i,j);
     }
     a[i] = sumA;
     b[i] = sumB;
@@ -492,6 +492,9 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::BeforeThreadedGenerateData()
 {
+  itk::TimeProbe clock;
+  clock.Start();
+
   if( m_NumberOfGradientDirections < (((L+1)*(L+2))/2) /* && m_NumberOfGradientDirections < 6 */ )
   {
     itkExceptionMacro( << "At least " << ((L+1)*(L+2))/2 << " gradient directions are required" );
@@ -569,6 +572,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     break;
   }
 
+  clock.Stop();
+  MITK_INFO << "Before GenerateData : " << clock.GetTotal();
 
 }
 
@@ -728,11 +733,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   //  N :    :    :
   //    :    :    :
   //
-  vnl_matrix< double > E(Shell1Indiecies.size(), 3);
-  vnl_vector< double > Shell1OriginalSignal(Shell1Indiecies.size()); //E1
-  vnl_vector< double > Shell2OriginalSignal(Shell1Indiecies.size()); //E2
-  vnl_vector< double > Shell3OriginalSignal(Shell1Indiecies.size()); //E3
-
+  vnl_matrix< double > * E = new vnl_matrix<double>(Shell1Indiecies.size(), 3);
+  vnl_vector<double> * AlphaValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * BetaValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * LAValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * PValues = new vnl_vector<double>(Shell1Indiecies.size());
+  OdfPixelType odf(0.0);
   //------------------------- Preperations Zone END ---------------------------------
 
   // iterate overall voxels of the gradient image region
@@ -748,114 +754,81 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
     b0 /= BZeroIndicies.size();
 
-    // ODF Vector
-    OdfPixelType odf(0.0);
-
     if( (b0 != 0) && (b0 >= m_Threshold) )
     {
 
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
       {
-        Shell1OriginalSignal[i] = static_cast<double>(b[Shell1Indiecies[i]]);
-        Shell2OriginalSignal[i] = static_cast<double>(b[Shell2Indiecies[i]]);
-        Shell3OriginalSignal[i] = static_cast<double>(b[Shell3Indiecies[i]]);
+        E->put(i,0, static_cast<double>(b[Shell1Indiecies[i]]));
+        E->put(i,1, static_cast<double>(b[Shell2Indiecies[i]]));
+        E->put(i,2, static_cast<double>(b[Shell3Indiecies[i]]));
       }
 
-      E.set_column(0,Shell1OriginalSignal);
-      /*Approximated-Signal by SH fit - using the specific shell directions and values values*/
-      E.set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * Shell2OriginalSignal));
-      E.set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * Shell3OriginalSignal));
-
+      //Approximated-Signal by SH fit - using the specific shell directions and values
+      E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
+      E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
 
       // Si/S0
-      S_S0Normalization(E,b0);
+      S_S0Normalization(*E,b0);
 
       //Implements Eq. [19] and Fig. 4.
-      Threshold(E);
+      Threshold(*E);
 
       //inqualities [31]. Taking the lograithm of th first tree inqualities
       //convert the quadratic inqualities to linear ones.
-      Projection1(E);
+      Projection1(*E);
 
-
-      vnl_vector<double> AlphaValues(Shell1Indiecies.size());
-      vnl_vector<double> BetaValues(Shell1Indiecies.size());
-      vnl_vector<double> LAValues(Shell1Indiecies.size());
-      vnl_vector<double> PValues(Shell1Indiecies.size());
+      double E1, E2, E3, P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
 
       for( unsigned int i = 0; i< Shell1Indiecies.size(); i++ )
       {
 
+        E1 = E->get(i,0);
+        E2 = E->get(i,1);
+        E3 = E->get(i,2);
 
-
-        double E1 = E(i,0);
-        double E2 = E(i,1);
-        double E3 = E(i,2);
-
-        /* if(!(0 < E3) || (!(E3 < E2)) || (!(E2 < E1)) || (!(E1 < 1)) || (!(E1 * E1 < E2)) || (!(E2 * E2 < E1 * E3)) || (!(E3-E1*E2 < E2 - E1*E1 + E1*E3 -E2*E2)))
-        {
-          MITK_INFO << "0 < " << E3 << " < " << E2 << " < " << E1 << " < 1 " ;
-
-        }*/
-
-        double P2 = E2-E1*E1;
-        double A = (E3 -E1*E2) / ( 2* P2);
-        double B2 = A * A -(E1 * E3 - E2 * E2) /P2;
-        double B = 0;
+        P2 = E2-E1*E1;
+        A = (E3 -E1*E2) / ( 2* P2);
+        B2 = A * A -(E1 * E3 - E2 * E2) /P2;
+        B = 0;
         if(B2 > 0) B = sqrt(B2);
 
-        double P = 0;
+        P = 0;
         if(P2 > 0) P = sqrt(P2);
-        PValues[i] = P;
 
-        double alpha = A + B;
-        double beta = A - B;
-        AlphaValues[i] = alpha;
-        BetaValues[i] = beta;
+        alpha = A + B;
+        beta = A - B;
+
+
+        lambda = 0.5 + 0.5 * std::sqrt(1 - std::pow((P * 2 ) / (alpha - beta), 2));;
+        ER1 = std::fabs(lambda * (alpha - beta) + (beta - E1 ))
+            + std::fabs(lambda * (std::pow(alpha, 2) - std::pow(beta, 2)) + (std::pow(beta, 2) - E2 ))
+            + std::fabs(lambda * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
+        ER2 = std::fabs((lambda-1) * (alpha - beta) + (beta - E1 ))
+            + std::fabs((lambda-1) * (std::pow(alpha, 2) - std::pow(beta, 2)) + (std::pow(beta, 2) - E2 ))
+            + std::fabs((lambda-1) * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
+
+
+        PValues->put(i, P);
+        AlphaValues->put(i, alpha);
+        BetaValues->put(i, beta);
+        LAValues->put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
+
       }
 
-      Projection2(PValues, AlphaValues, BetaValues);
+      Projection2(*PValues, *AlphaValues, *BetaValues);
 
-      vnl_vector<double> lambda(AlphaValues.size());
-      vnl_vector<double> ER1(AlphaValues.size());
-      vnl_vector<double> ER2(AlphaValues.size());
+      Threshold(*AlphaValues);
+      Threshold(*BetaValues);
 
-      for(int i = 0 ; i < PValues.size() ; i++)
-      {
-        lambda[i] = 0.5 + 0.5 * std::sqrt(1 - std::pow((PValues[i] * 2 ) / (AlphaValues[i] - BetaValues[i]), 2));
-      }
-
-#define element_abs mitk::mitk_vnl_function::element_abs<double>
-#define element_pow mitk::mitk_vnl_function::element_pow<double>
-#define element_smallerThan mitk::mitk_vnl_function::element_condition_smallerThan<double>
-#define element_greaterThanEqual mitk::mitk_vnl_function::element_condition_greaterThanEqual<double>
-
-      ER1 = element_abs(element_product(lambda, AlphaValues - BetaValues) + (BetaValues - E.get_column(0) ) )
-          + element_abs(element_product(lambda, element_pow(AlphaValues, 2) - element_pow(BetaValues, 2)) + (element_pow(BetaValues,2) - E.get_column(1) ) )
-          + element_abs(element_product(lambda, element_pow(AlphaValues, 3) - element_pow(BetaValues, 3)) + (element_pow(BetaValues,3) - E.get_column(2) ) );
-
-      ER2 = element_abs(element_product((-lambda + 1), AlphaValues - BetaValues) + (BetaValues - E.get_column(0) ) )
-          + element_abs(element_product((-lambda + 1), element_pow(AlphaValues, 2) - element_pow(BetaValues, 2)) + (element_pow(BetaValues,2) - E.get_column(1) ) )
-          + element_abs(element_product((-lambda + 1), element_pow(AlphaValues, 3) - element_pow(BetaValues, 3)) + (element_pow(BetaValues,3) - E.get_column(2) ) );
-
-      LAValues = element_smallerThan(ER1, ER2, lambda) + element_greaterThanEqual(ER1, ER2, (-lambda + 1));
-
-#undef element_abs
-#undef element_pow
-#undef element_smallerThan
-#undef element_greaterThanEqual
-
-      Threshold(AlphaValues);
-      Threshold(BetaValues);
-
-      DoubleLogarithm(AlphaValues);
-      DoubleLogarithm(BetaValues);
+      DoubleLogarithm(*AlphaValues);
+      DoubleLogarithm(*BetaValues);
 
       //L * A + (1-L) * B = S
       //L * A + B - L * B = S
       //L*(A - B) + B = S
 
-      vnl_vector<double> SignalVector(element_product(LAValues,AlphaValues-BetaValues) + BetaValues);
+      vnl_vector<double> SignalVector(element_product((*LAValues) , (*AlphaValues)-(*BetaValues)) + (*BetaValues));
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
 
       // the first coeff is a fix value
@@ -870,16 +843,19 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     // set ODF to ODF-Image
     oit.Set( odf );
     ++oit;
-    // MITK_INFO << odf;
+
     // set b0(average) to b0-Image
     oit2.Set( b0 );
     ++oit2;
 
     ++git;
-
   }
-    MITK_INFO << "THREAD FINISHED";
-
+  MITK_INFO << "THREAD FINISHED";
+  delete E;
+  delete AlphaValues;
+  delete BetaValues;
+  delete PValues;
+  delete LAValues;
 }
 
 

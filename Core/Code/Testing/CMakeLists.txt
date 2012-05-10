@@ -38,7 +38,10 @@ set_property(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
 endif()
 
 add_test(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
+add_test(mitkImageWriterTest_2DPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/Png2D-bw.png)
 set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
+set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABLES MITK-Core)
+
 
 add_subdirectory(DICOMTesting)
 

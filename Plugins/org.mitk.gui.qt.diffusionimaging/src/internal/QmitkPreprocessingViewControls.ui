@@ -335,6 +335,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="m_CheckExtractAll">
+        <property name="text">
+         <string>Extract all B0 into separate files</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

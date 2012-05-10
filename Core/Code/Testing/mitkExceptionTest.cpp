@@ -50,11 +50,6 @@ public:
   throw mitk::Exception("testfile.cpp",155,message1.c_str(),"") << message2;
   }
 
-  void throwExceptionWithMacro()
-  {
-  mitkExceptionMacro("TEST EXCEPION THROWING");
-  }
-
   void throwExceptionWithThrowMacro()
   {
   mitkThrow()<<"TEST EXCEPION THROWING WITH mitkThrow()";
@@ -73,16 +68,6 @@ public:
   void throwSpecializedExceptionWithThrowMacro2(std::string message)
   {
   mitkThrowException(SpecializedTestException)<<message;
-  }
-
-  void throwSpecializedExceptionWithMacro1()
-  {
-  mitkSpecializedExceptionMacro("TEST EXCEPION SPECIALIZED THROWING", mitk::Exception);
-  }
-
-  void throwSpecializedExceptionWithMacro2()
-  {
-  mitkSpecializedExceptionMacro("TEST EXCEPION SPECIALIZED THROWING", SpecializedTestException);
   }
 
   static void TestExceptionConstructor()
@@ -149,50 +134,6 @@ public:
      exceptionThrown = true;
      }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown && (thrownMessage == std::string("message1 and message2")),"Testing throwing and streaming of mitk::Exception together.")
-    }
-
-  static void TestExceptionMacro()
-    {
-    bool exceptionThrown = false;
-    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
-    try
-     {
-     myExceptionTestObject.throwExceptionWithMacro();
-     }
-    catch(mitk::Exception)
-     {
-     exceptionThrown = true;
-     }
-    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkExceptionMacro");
-    }
-
-  static void TestSpecializedExceptionMacro()
-    {
-    
-    //########## case 1: standard MITK::Exception ###############
-    bool exceptionThrown = false;
-    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
-    try
-     {
-     myExceptionTestObject.throwSpecializedExceptionWithMacro1();
-     }
-    catch(mitk::Exception)
-     {
-     exceptionThrown = true;
-     }
-    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkSpecializedExceptionMacro (Case 1: MITK::Exception)");
-
-    //########## case 2: specialized Exception ###############
-    exceptionThrown = false;
-    try
-     {
-     myExceptionTestObject.throwSpecializedExceptionWithMacro2();
-     }
-    catch(SpecializedTestException)
-     {
-     exceptionThrown = true;
-     }
-    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkSpecializedExceptionMacro (Case 2: specialized Exception)");
     }
 
   static void TestMitkThrowMacro()
@@ -268,13 +209,9 @@ public:
 int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("MITKException");
-
   ExceptionTestClass::TestExceptionConstructor();
   ExceptionTestClass::TestExceptionMessageStream();
   ExceptionTestClass::TestExceptionMessageStreamThrowing();
-  
-  ExceptionTestClass::TestExceptionMacro();
-  ExceptionTestClass::TestSpecializedExceptionMacro();
   ExceptionTestClass::TestMitkThrowMacro();
   MITK_TEST_END();
 

@@ -23,8 +23,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief An object of this class represents an exception of the MITK.
+  * \brief   An object of this class represents an exception of MITK.
+  *          Please don't instantiate exceptions manually, but use the
+  *          exception macros (file mitkExceptionMacro.h) instead.
+  *          Simple use in your code is:
   *
+  *                  mitkThrow() << "optional exception message";
+  *
+  *          You can also define specialized exceptions which must inherit
+  *          from this class. Please always use the mitkExceptionClassMacro
+  *          when implementing specialized exceptions. A simple implementation
+  *          can look like:
+  *
+  *          class MyException : public mitk::Exception
+  *             {
+  *             public:
+  *             mitkExceptionClassMacro(MyException,mitk::Exception);
+  *             };
+  *
+  *          You can then throw your specialized exceptions by using the macro
+  *
+  *                 mitkThrowException(MyException) << "optional exception message";
   */  
   class MITK_CORE_EXPORT Exception : public itk::ExceptionObject 
   {

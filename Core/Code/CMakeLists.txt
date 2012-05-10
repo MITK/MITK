@@ -19,7 +19,7 @@ if(BUILD_TESTING)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Testing)
   set(US_BASECLASS_HEADER "uServicesBaseObject.h")
   set(US_TEST_LABELS MITK-Core)
-endif()  
+endif()
 
 add_subdirectory(CppMicroServices)
 
@@ -28,8 +28,8 @@ include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmak
 set(TOOL_CPPS "")
 
 MITK_CREATE_MODULE( Mitk
-  INCLUDE_DIRS 
-    ${CppMicroServices_INCLUDE_DIRS} Algorithms DataManagement Controllers
+  INCLUDE_DIRS
+    ${CppMicroServices_INCLUDE_DIRS} Algorithms Common DataManagement Controllers
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
@@ -74,8 +74,8 @@ endif(GDCM_FULL_VERSION VERSION_LESS MITK_REQUIRED_GDCM_VERSION)
 
 
 # build tests?
-option(BUILD_TESTING "Build the MITK Core tests." ON)
-if(BUILD_TESTING)
-enable_testing()
-add_subdirectory(Testing)
-endif(BUILD_TESTING)
+OPTION(BUILD_TESTING "Build the MITK Core tests." ON)
+IF(BUILD_TESTING)
+ENABLE_TESTING()
+ADD_SUBDIRECTORY(Testing)
+ENDIF(BUILD_TESTING)

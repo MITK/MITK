@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConfig.h"
 #include "mitkLogMacros.h"
 #include "mitkExportMacros.h"
+#include "mitkExceptionMacro.h"
 
 #ifndef MITK_UNMANGLE_IPPIC
 #define mitkIpPicDescriptor mitkIpPicDescriptor
@@ -96,7 +97,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
     return this->m_##name.GetPointer(); \
   }
 
-/** Creates a Clone() method for "Classname". Returns a smartPtr of a clone of the 
+/** Creates a Clone() method for "Classname". Returns a smartPtr of a clone of the
 calling object*/
 #define mitkCloneMacro(classname) \
   virtual Pointer Clone() const \

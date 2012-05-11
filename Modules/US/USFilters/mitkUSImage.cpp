@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::USImage::USImage() : mitk::Image()
 {
-
+  this->SetMetadata(mitk::USImageMetadata::New());
 }
 
 mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
@@ -34,7 +34,7 @@ mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
 
 mitk::USImage::~USImage()
 {
-  this->SetMetadata(mitk::USImageMetadata::New());
+ 
 }
 
 mitk::USImageMetadata::Pointer mitk::USImage::GetMetadata(){

@@ -67,7 +67,7 @@ namespace mitk {
 
     protected:
       /**
-      * \brief Creates a new Metadata with all fields set to default values.
+      * \brief Creates a new metadata object with all fields set to default values.
       */
       USImageMetadata();
       virtual ~USImageMetadata();

@@ -42,6 +42,7 @@ mitk::USVideoDevice::~USVideoDevice()
 
 void mitk::USVideoDevice::GenerateData()
 {
+ // MITK_INFO << "Generate called in USVideoDevice!";
   mitk::USImage::Pointer result;
   result = m_Source->GetNextImage();
   
@@ -49,4 +50,5 @@ void mitk::USVideoDevice::GenerateData()
   result->SetMetadata(this->m_Metadata);
 
   this->SetNthOutput(0, result);
+ // MITK_INFO << "Successfully generated Image in USVideoDevice!";
 }

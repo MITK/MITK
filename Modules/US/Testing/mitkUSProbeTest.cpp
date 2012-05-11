@@ -23,7 +23,6 @@ class mitkUSProbeTestClass
 {
 public:
 
-  // Anm: Implementierung der einzelnen Testmethoden
 
   static void TestInstantiation()
   {

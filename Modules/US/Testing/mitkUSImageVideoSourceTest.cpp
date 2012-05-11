@@ -30,14 +30,25 @@ public:
     MITK_TEST_CONDITION_REQUIRED(usSource.IsNotNull(), "USImageVideoSource should not be null after instantiation");
   }
 
-    static void TestOpenVideoFile()
+    static void TestOpenVideoFile(std::string videoFilePath)
   {
     mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
-    // "C:\\Users\\maerz\\Videos\\Debut\\us.avi"
-    usSource->SetVideoFileInput("C:\\Users\\maerz\\Videos\\Debut\\us.avi");
+
+    usSource->SetVideoFileInput(videoFilePath);
     MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Video File");
+    mitk::USImage::Pointer frame;
+    frame = usSource->GetNextImage();
+    MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "First frame should not be null.");
+    frame = usSource->GetNextImage();
+    MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Second frame should not be null.");
+    frame = usSource->GetNextImage();
+    MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Third frame should not be null.");
+    frame = usSource->GetNextImage();
+    MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fourth frame should not be null.");
+    frame = usSource->GetNextImage();
+    MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fifth frame should not be null.");
   }
-/** This TEst will fail if no device is attached. Since it basically covers the same non- Opencvfunctionality as TestOpenVideoFile, it is ommited
+/** This Test will fail if no device is attached. Since it basically covers the same non-OpenCV Functionality as TestOpenVideoFile, it is ommited
   static void TestOpenDevice()
   {
     mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();
@@ -53,13 +64,13 @@ public:
 /**
 * This function is testing methods of the class USImageVideoSource.
 */
-int mitkUSImageVideoSourceTest(int /* argc */, char* /*argv*/[])
+int mitkUSImageVideoSourceTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkUSImageVideoSourceTest");
 
-    mitkUSImageVideoSourceTestClass::TestInstantiation();
-    mitkUSImageVideoSourceTestClass::TestOpenVideoFile();
-    //mitkUSImageVideoSourceTestClass::TestOpenDevice();
+  mitkUSImageVideoSourceTestClass::TestInstantiation();
+  mitkUSImageVideoSourceTestClass::TestOpenVideoFile(argv[1]);
+  //mitkUSImageVideoSourceTestClass::TestOpenDevice();
 
   MITK_TEST_END();
 }

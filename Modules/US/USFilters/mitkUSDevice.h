@@ -33,7 +33,7 @@ namespace mitk {
 
     /**Documentation
     * \brief A device holds information about it's model, make and the connected probes. It is the
-    * common superclass for all Devices and acts as an image source for mitkUSImages. It is the Base class
+    * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
     * for all US Devices, and every new device should extend it.
     * \ingroup US
     */
@@ -41,7 +41,10 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
-      // Expects a manufacturer, a model and a flag wheter this is a video-only device or not
+      /**
+      * \brief Enforces minimal Metadata to be set. The isVideoOnly flag indicates that this class 
+      *        only handles a videostream and does not receive Metadata from the physical device itself.
+      */
       mitkNewMacro3Param(Self, std::string, std::string, bool);
 
 
@@ -49,13 +52,13 @@ namespace mitk {
 
       /**
       * \brief Add a probe to the device without connecting to it.
-      *  This should usually be done before connecting to the probe
+      *  This should usually be done before connecting to the probe.
       */
       virtual void AddProbe(mitk::USProbe::Pointer probe);
 
       /**
       * \brief Connect to a probe and activate it. The probe should be added first.
-      *  Usually, a VideoDevice will just add a probe it want's to connect to,
+      *  Usually, a VideoDevice will simply add a probe it wants to connect to,
       *  but an SDK Device might require adding a probe first.
       */
       virtual void ActivateProbe(mitk::USProbe::Pointer probe);
@@ -70,12 +73,10 @@ namespace mitk {
       */
       //virtual void removeProbe(mitk::USProbe::Pointer probe);
     
-      std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
-
       /**
-        *\brief Grabs the next frame from the Video input
+      *  \brief Returns a vector containing all connected probes.
       */
-       void GenerateData();
+      std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
 
       /**
       *\brief return the output (output with id 0) of the filter
@@ -118,6 +119,9 @@ namespace mitk {
 
       //########### GETTER & SETTER ##################//
 
+      /**
+      * \brief Returns the currently active probe or null, if none is active
+      */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
@@ -128,10 +132,10 @@ namespace mitk {
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
       /**
-      * \brief This metadata set is privately used to imprint Images with Metadata later.
+      * \brief This metadata set is privately used to imprint USImages with Metadata later.
       *        At instantiation time, it only contains Information about the Device,
-               At scan time, it integrates this data with the probe information and imprints it on 
-               the produced images. This field is intentionally hidden from outside interference.
+      *        At scan time, it integrates this data with the probe information and imprints it on 
+      *        the produced images. This field is intentionally hidden from outside interference.
       */
       mitk::USImageMetadata::Pointer m_Metadata;
 
@@ -143,6 +147,10 @@ namespace mitk {
       USDevice(std::string manufacturer, std::string model, bool isVideoOnly);
       virtual ~USDevice();
 
+      /**
+      *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
+      */
+       void GenerateData();
 
     };
 } // namespace mitk

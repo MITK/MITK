@@ -28,10 +28,11 @@ namespace mitk {
 
     /**Documentation
     * \brief Right now, the US Probe is only a fancy name for a string. Later, it could handle probe specific parameters
-    *  like the current frequency etc. It is able to compare itself to other probes for device managment thoiugh.
-    *  Be sure to check the isEqualTo() method if you expand this class to see if it needs work.
+    *  like the current frequency etc. It is able to compare itself to other probes for device managment though.
+    *  
     * \ingroup US
     */
+    //Be sure to check the isEqualTo() method if you expand this class to see if it needs work!
   class MitkUS_EXPORT USProbe : public itk::Object
     {
     public:
@@ -40,7 +41,7 @@ namespace mitk {
 
       /**
       * \brief Compares this probe to another probe and returns true if they are equal in terms of name AND NAME ONLY
-      *  be sure to sufficiently extend this method along with further capabilities probes
+      *  be sure to sufficiently extend this method along with further capabilities probes.
       */
       bool IsEqualToProbe(mitk::USProbe::Pointer probe);
 

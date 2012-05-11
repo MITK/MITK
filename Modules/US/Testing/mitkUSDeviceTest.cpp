@@ -25,8 +25,6 @@ class mitkUSDeviceTestClass
 {
 public:
 
-  // Anm: Implementierung der einzelnen Testmethoden
-
   static void TestInstantiation()
   {
     // let's create an object of our class
@@ -93,7 +91,7 @@ public:
     device->DeactivateProbe();
     MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe().IsNull(), "After deactivation, no probe should be active");
   }
- 
+
 
 };
 

@@ -28,7 +28,7 @@ namespace mitk {
 
     /**Documentation
     * \brief This specialization of mitk::Image only appends necessary Metadata to an MITK image. Otherwise it can safely be treated like it's mother class.
-    *  to generate a USImage from an standard mitk:Image, call the appropriate constructor USImage( *image)
+    *  To generate an USImage from a standard mitkImage, call the appropriate constructor USImage(image::Pointer)
     * \ingroup US
     */
   class MitkUS_EXPORT USImage : public mitk::Image
@@ -36,27 +36,31 @@ namespace mitk {
     public:
       mitkClassMacro(USImage, mitk::Image);
       itkNewMacro(Self);
-      // Macro to create an mitkUSImage from an mitkImage 
+      /**
+      * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
+      *  The image data is shared, so don't continue to manipulate the original image.
+      */
       mitkNewMacro1Param(Self, mitk::Image::Pointer);
 
       /**
-      * \brief reads out this image's Metadata set from the properties and returns a corresponding USImageMetadata object.
+      * \brief Reads out this image's Metadata set from the properties and returns a corresponding USImageMetadata object.
       */
       mitk::USImageMetadata::Pointer GetMetadata();
 
       /**
-      * \brief writes the information of the metadata object into the image's properties.
+      * \brief Writes the information of the metadata object into the image's properties.
       */
       void SetMetadata(mitk::USImageMetadata::Pointer metadata);
 
 
     protected:
       /**
-      * \brief this constructor creates an empty USImage. The Metadata are set to default.
+      * \brief This constructor creates an empty USImage. The Metadata are set to default.
       */
       USImage();
       /**
       * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
+      *  The image data is shared, so don't continue to manipulate the original image.
       */
       USImage(mitk::Image::Pointer image);
       virtual ~USImage();

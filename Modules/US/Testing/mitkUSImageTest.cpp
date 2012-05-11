@@ -24,8 +24,6 @@ class mitkUSImageTestClass
 {
 public:
 
-  // Anm: Implementierung der einzelnen Testmethoden
-
   static void TestInstantiation()
   {
     // let's create an object of our class

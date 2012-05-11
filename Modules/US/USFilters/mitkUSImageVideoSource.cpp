@@ -63,8 +63,11 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID){
 
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage(){
+ // MITK_INFO << "GetNextImage called in USVideoSource!";
   mitk::USImage::Pointer result;
   mitk::Image::Pointer normalImage;
+  
+  m_OpenCVVideoSource->FetchFrame();
 
   IplImage* iplImage = cvCreateImage(cvSize(640,480),IPL_DEPTH_8U,3); 
   m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(iplImage);
@@ -77,5 +80,6 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage(){
   
   
   cvReleaseImage (&iplImage);
+ // MITK_INFO << "GetNextImage completed in USVideoSource!";
   return result;
 }

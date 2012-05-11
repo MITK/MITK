@@ -18,41 +18,63 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef ITKB0IMAGEEXTRACTIONTOSEPARATEIMAGEFILTER_H
 #define ITKB0IMAGEEXTRACTIONTOSEPARATEIMAGEFILTER_H
 
-#include "itkB0ImageExtractionImageFilter.h"
+#include "itkImageToImageFilter.h"
 
 namespace itk
 {
- /** \class B0ImageExtractionToSeparateImageFilter
-   \brief This class extends the B0ImageExtractionImageFilter, it returns a time-sliced image containing
-   all available b0 images for given DWI Image
+/** \class B0ImageExtractionToSeparateImageFilter
+   \brief This class has an advanced functionality to the B0ImageExtractionImageFilter, however the b0 images are
+    stored in a 3D+t image with each b0 image beeing a separate timestep and not averaged to a single 3D volume
    */
 
 template< class TInputImagePixelType,
-class TOutputImagePixelType >
+          class TOutputImagePixelType >
 class B0ImageExtractionToSeparateImageFilter :
-    public B0ImageExtractionImageFilter< TInputImagePixelType, TOutputImagePixelType >
+    public ImageToImageFilter< VectorImage<TInputImagePixelType, 3>,
+    Image< TOutputImagePixelType, 4 > >
 {
 public:
 
-  /** basic typedefs */
-  typedef B0ImageExtractionImageFilter<
-    TInputImagePixelType, TOutputImagePixelType > Superclass;
   typedef B0ImageExtractionToSeparateImageFilter  Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
 
+  typedef TInputImagePixelType                    InputPixelType;
+  typedef TOutputImagePixelType                   OutputPixelType;
+
+  typedef ImageToImageFilter< VectorImage<TInputImagePixelType, 3>,
+      Image< TOutputImagePixelType, 4 > >         Superclass;
+
   /** typedefs from superclass */
-  typedef typename Superclass::GradientDirectionType GradientDirectionType;
-  typedef typename Superclass::GradientDirectionContainerType GradientDirectionContainerType;
+  typedef typename Superclass::InputImageType     InputImageType;
+  typedef typename Superclass::OutputImageType    OutputImageType;
+
+  typedef typename Superclass::OutputImageRegionType
+  OutputImageRegionType;
+
+  typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
+
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType >
+  GradientDirectionContainerType;
+
   typedef typename GradientDirectionContainerType::Iterator GradContainerIteratorType;
-  typedef typename Superclass::InputImageType InputImageType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** Runtime information support. */
   itkTypeMacro(B0ImageExtractionToSeparateImageFilter,
-    B0ImageExtractionImageFilter);
+               ImageToImageFilter);
+
+  GradientDirectionContainerType::Pointer GetDirections()
+  {
+    return m_Directions;
+  }
+
+  void SetDirections( GradientDirectionContainerType::Pointer directions )
+  {
+    this->m_Directions = directions;
+  }
 
 protected:
 
@@ -61,7 +83,7 @@ protected:
 
   void GenerateData();
 
-  using Superclass::m_Directions;
+  GradientDirectionContainerType::Pointer m_Directions;
 };
 
 } // end namespace itk

@@ -23,9 +23,8 @@ template< class TInputImagePixelType,
           class TOutputImagePixelType>
   itk::B0ImageExtractionToSeparateImageFilter< TInputImagePixelType, TOutputImagePixelType >
   ::B0ImageExtractionToSeparateImageFilter()
-    : B0ImageExtractionImageFilter< TInputImagePixelType, TOutputImagePixelType >()
   {
-
+    this->SetNumberOfRequiredInputs( 1 );
   }
 
 template< class TInputImagePixelType,

@@ -61,24 +61,24 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 }
 
 
-template< class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
-typename itk::DiffusionMultiShellQballReconstructionImageFilter< TReferenceImagePixelType,TGradientImagePixelType,TOdfPixelType, NOrderL,NrOdfDirections>::OdfPixelType itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, NOrderL, NrOdfDirections>
-::Normalize( OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
+template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
+void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
+::Normalize( OdfPixelType  & out)
 {
+
   for(int i=0; i<NrOdfDirections; i++)
   {
-    odf[i] = odf[i] < 0 ? 0 : odf[i];
-    odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
+    out[i] = out[i] < 0 ? 0 : out[i];
+    out[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
   }
-  TOdfPixelType sum = 0;
+  /*TOdfPixelType sum = 0;
   for(int i=0; i<NrOdfDirections; i++)
   {
-    sum += odf[i];
+    sum += out[i];
   }
   if(sum>0)
-    odf /= sum;
-
-  return odf;
+    out /= sum;
+    */
 }
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
@@ -284,7 +284,7 @@ void itk::DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixel
   AM.set_column(1, A);
   AM.set_column(2, A);
   AM.set_column(3, delta);
-  AM.set_column(4, (A+a-b - (delta*s6))/3.0);
+  AM.set_column(4, (A+a-b-s6*delta)/3.0);
   AM.set_column(5, delta);
   AM.set_column(6, delta);
   AM.set_column(7, delta);
@@ -591,10 +591,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   oit.GoToBegin();
 
   // ImageRegionIterator for the BZero (output) image
-  ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);
-  oit2.GoToBegin();
+  ImageRegionConstIterator< BZeroImageType > bzeroImageIterator(m_BZeroImage, outputRegionForThread);
+  bzeroImageIterator.GoToBegin();
 
-  IndiciesVector BZeroIndicies = m_GradientIndexMap[0];
   IndiciesVector SignalIndicies = m_GradientIndexMap[1];
 
   // if the gradient directiosn aragement is hemispherical, duplicate all gradient directions
@@ -620,21 +619,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   while( ! git.IsAtEnd() )
   {
     GradientVectorType b = git.Get();
-
-    // compute the average bzero signal
-    typename NumericTraits<ReferencePixelType>::AccumulateType b0 = NumericTraits<ReferencePixelType>::Zero;
-    for(unsigned int i = 0; i < BZeroIndicies.size(); ++i)
-    {
-      b0 += b[BZeroIndicies[i]];
-    }
-    b0 /= BZeroIndicies.size();
-
     // ODF Vector
     OdfPixelType odf(0.0);
 
     // Create the Signal Vector
     vnl_vector<double> SignalVector(m_NumberOfGradientDirections);
-    if( (b0 != 0) && (b0 >= m_Threshold) )
+    if( (bzeroImageIterator.Get() != 0) && (bzeroImageIterator.Get() >= m_Threshold) )
     {
 
       for( unsigned int i = 0; i< SignalIndicies.size(); i++ )
@@ -644,7 +634,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // apply threashold an generate ln(-ln(E)) signal
       // Replace SignalVector with PreNormalized SignalVector
-      S_S0Normalization(SignalVector, b0);
+      S_S0Normalization(SignalVector, bzeroImageIterator.Get());
       DoubleLogarithm(SignalVector);
 
       // ODF coeffs-vector
@@ -655,15 +645,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       odf = mitk::mitk_vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
+      Normalize(odf);
     }
     // set ODF to ODF-Image
     oit.Set( odf );
     ++oit;
-
-    // set b0(average) to b0-Image
-    oit2.Set( b0 );
-    ++oit2;
-
+    ++bzeroImageIterator;
     ++git;
 
   }
@@ -675,13 +662,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 #include <vnl/algo/vnl_levenberg_marquardt.h>
 #include <vnl/algo/vnl_lsqr.h>
 
-class LMFunction : public vnl_least_squares_function
-{
-    void f(vnl_vector<double> const& x, vnl_vector<double>& fx)
-    {
-
-    }
-};
 
 
 template< class T, class TG, class TO, int L, int NODF>
@@ -690,52 +670,21 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
 
 
-  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
+//  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
 
 }
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+::GenerateAveragedBZeroImage(const OutputImageRegionType& outputRegionForThread)
 {
+  typedef typename GradientImagesType::PixelType         GradientVectorType;
 
-
-  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-
-  ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
-  oit.GoToBegin();
-
-  ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);
-  oit2.GoToBegin();
+  ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
+  bzeroIterator.GoToBegin();
 
   IndiciesVector BZeroIndicies = m_GradientIndexMap[0];
 
-  //MAP-Pair(B-value, SignalShell1Indiecies)
-  GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
-  // it = b-vlaue = 0
-
-  it++;
-  // it = b-value = 1000
-  IndiciesVector Shell1Indiecies = (*it).second;
-
-  it++;
-  // it = b-value = 2000
-  IndiciesVector Shell2Indiecies = (*it).second;
-
-  it++;
-  // it = b-value = 3000
-  IndiciesVector Shell3Indiecies = (*it).second;
-
-  if(m_IsHemisphericalArrangementOfGradientDirections){
-    int NumbersOfGradientIndicies = Shell1Indiecies.size();
-    for (int i = 0 ; i < NumbersOfGradientIndicies; i++){
-      Shell1Indiecies.push_back(Shell1Indiecies[i]);
-      Shell2Indiecies.push_back(Shell2Indiecies[i]);
-      Shell3Indiecies.push_back(Shell3Indiecies[i]);
-    }
-  }
-
-  // Get input gradient image pointer
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
 
   //  Const ImageRegionIterator for input gradient image
@@ -743,26 +692,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   GradientIteratorType git(gradientImagePointer, outputRegionForThread );
   git.GoToBegin();
 
-  typedef typename GradientImagesType::PixelType         GradientVectorType;
 
-  //------------------------- Preperations Zone ------------------------------------
-
-  // N x 3
-
-  //  x E1 , E2 , E3
-  //
-  //  N :    :    :
-  //    :    :    :
-  //
-  vnl_matrix< double > * E = new vnl_matrix<double>(Shell1Indiecies.size(), 3);
-  vnl_vector<double> * AlphaValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * BetaValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * LAValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * PValues = new vnl_vector<double>(Shell1Indiecies.size());
-  OdfPixelType odf(0.0);
-  //------------------------- Preperations Zone END ---------------------------------
-
-  // iterate overall voxels of the gradient image region
   while( ! git.IsAtEnd() )
   {
     GradientVectorType b = git.Get();
@@ -775,9 +705,75 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
     b0 /= BZeroIndicies.size();
 
-    if( (b0 != 0) && (b0 >= m_Threshold) )
-    {
+    bzeroIterator.Set(b0);
+    ++bzeroIterator;
+    ++git;
+  }
+}
 
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+{
+
+  typedef typename GradientImagesType::PixelType         GradientVectorType;
+
+  // Input Gradient Image and Output ODF Image
+  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
+
+
+  // Define Image iterators
+  ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
+  ImageRegionConstIterator< BZeroImageType > bzeroImageIterator(m_BZeroImage, outputRegionForThread);
+  ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
+
+  // All iterators seht to Begin of the specific OutputRegion
+  odfOutputImageIterator.GoToBegin();
+  bzeroImageIterator.GoToBegin();
+  gradientInputImageIterator.GoToBegin();
+
+  // Get Shell Indicies for all non-BZero Gradients
+  // it MUST be a arithmetic progression eg.: 1000, 2000, 3000
+  GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
+  it++;
+  // it = b-value = 1000
+  IndiciesVector Shell1Indiecies = (*it).second;
+  it++;
+  // it = b-value = 2000
+  IndiciesVector Shell2Indiecies = (*it).second;
+  it++;
+  // it = b-value = 3000
+  IndiciesVector Shell3Indiecies = (*it).second;
+
+
+  // if input data is a hemispherical arragement, duplicate eache gradient for each shell
+  if(m_IsHemisphericalArrangementOfGradientDirections){
+    int NumbersOfGradientIndicies = Shell1Indiecies.size();
+    for (int i = 0 ; i < NumbersOfGradientIndicies; i++){
+      Shell1Indiecies.push_back(Shell1Indiecies[i]);
+      Shell2Indiecies.push_back(Shell2Indiecies[i]);
+      Shell3Indiecies.push_back(Shell3Indiecies[i]);
+    }
+  }
+
+  // Nx3 Signal Vector with E(0) = Shell 1, E(1) = Shell 2, E(2) = Shell 3
+  vnl_matrix< double > * E = new vnl_matrix<double>(Shell1Indiecies.size(), 3);
+
+  vnl_vector<double> * AlphaValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * BetaValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * LAValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> * PValues = new vnl_vector<double>(Shell1Indiecies.size());
+
+  OdfPixelType odf(0.0);
+
+  // iterate overall voxels of the gradient image region
+  while( ! gradientInputImageIterator.IsAtEnd() )
+  {
+    if( (bzeroImageIterator.Get() != 0) && (bzeroImageIterator.Get() >= m_Threshold) )
+    {
+      // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
+      GradientVectorType b = gradientInputImageIterator.Get();
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
       {
         E->put(i,0, static_cast<double>(b[Shell1Indiecies[i]]));
@@ -786,11 +782,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       }
 
       //Approximated-Signal by SH fit - using the specific shell directions and values
+      // approximated Signal : S = SHBasis * Coeffs
+      // with Coeffs : C = (B_T * B + lambda * L) ^ -1 * B_T * OS
+      // OS := Original-Signal
       E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
       E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
 
-      // Si/S0
-      S_S0Normalization(*E,b0);
+      // Normalize the Signal: Si/S0
+      S_S0Normalization(*E,bzeroImageIterator.Get());
 
       //Implements Eq. [19] and Fig. 4.
       Threshold(*E);
@@ -836,7 +835,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         LAValues->put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
 
       }
-
       Projection2(*PValues, *AlphaValues, *BetaValues);
 
       Threshold(*AlphaValues);
@@ -844,10 +842,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       DoubleLogarithm(*AlphaValues);
       DoubleLogarithm(*BetaValues);
-
-      //L * A + (1-L) * B = S
-      //L * A + B - L * B = S
-      //L*(A - B) + B = S
 
       vnl_vector<double> SignalVector(element_product((*LAValues) , (*AlphaValues)-(*BetaValues)) + (*BetaValues));
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
@@ -857,19 +851,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = mitk::mitk_vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
-      Normalize(odf,b0);
+      //odf *= (QBALL_ANAL_RECON_PI*4/NODF);
+      Normalize(odf);
     }
 
     // set ODF to ODF-Image
-    oit.Set( odf );
-    ++oit;
-
-    // set b0(average) to b0-Image
-    oit2.Set( b0 );
-    ++oit2;
-
-    ++git;
+    odfOutputImageIterator.Set( odf );
+    ++odfOutputImageIterator;
+    // iterate
+    ++bzeroImageIterator;
+    ++gradientInputImageIterator;
   }
   MITK_INFO << "THREAD FINISHED";
   delete E;
@@ -894,6 +885,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
 {
   itk::TimeProbe clock;
+  clock.Start();
+  GenerateAveragedBZeroImage(outputRegionForThread);
+  clock.Stop();
+  MITK_INFO << "Bzero ImageRegion in : " << clock.GetTotal() << " TU";
+
   clock.Start();
   switch(m_ReconstructionType)
   {

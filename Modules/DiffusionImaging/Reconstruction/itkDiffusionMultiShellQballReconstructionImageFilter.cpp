@@ -443,14 +443,17 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->m_GradientDirectionContainer = gradientDirection;
   this->m_NumberOfBaselineImages = 0;
 
-  for(GradientDirectionContainerType::Iterator it = gradientDirection->Begin(); it != gradientDirection->End(); it++)
+  GradientDirectionContainerType::ConstIterator gdcit;
+  for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
   {
-    if( it.Value().one_norm() <= 0.0 )
-      this->m_NumberOfBaselineImages ++;
-    else
-      it.Value() = it.Value() / it.Value().two_norm();
+      double twonorm = gdcit.Value().two_norm();
+      double currentBvalue = (twonorm * twonorm);
+      MITK_INFO << currentBvalue;
+      double rounded = int((currentBvalue+7.5)/10)*10;
+      m_GradientIndexMap[rounded].push_back(gdcit.Index());
   }
 
+  this->m_NumberOfBaselineImages = m_GradientIndexMap[0].size();
   this->m_NumberOfGradientDirections = gradientDirection->Size() - this->m_NumberOfBaselineImages;
 
   // ensure that the gradient image we received has as many components as
@@ -492,31 +495,26 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
   m_BZeroImage->Allocate();
 
+
+
+
+
   // if no GradientIndexMap is set take all Gradients to GradientIndicies-Vector and add this to GradientIndexMap[ALL]
   // add All Bzero
   if(m_GradientIndexMap.size() == 0){
 
     // split for all gradient directions the image in baseline-indicies and gradient-indicies for a fast access
-    GradientDirectionContainerType::ConstIterator gdcit;
-    for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
-    {
-      if(gdcit.Value().one_norm() <= 0.0) // if vector length at current position is 0, it is a basline signal
-      {
-        m_GradientIndexMap[0].push_back(gdcit.Index());
-      }else{ // it is a gradient signal of length != 0
-        m_GradientIndexMap[1].push_back(gdcit.Index());
-      }
-    }
+
     m_ReconstructionType = Standard1Shell;
   }else if(m_GradientIndexMap.size() == 4){
 
     GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
     it++;
-    int b1 = (*it).first;
+    const int b1 = (*it).first;
     it++;
-    int b2 = (*it).first;
+    const int b2 = (*it).first;
     it++;
-    int b3 = (*it).first;
+    const int b3 = (*it).first;
 
 
     if(b2 - b1 == b1 && b3 - b2 == b1 )
@@ -623,7 +621,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       odf = mitk::mitk_vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
-      Normalize(odf);
+      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
     }
     // set ODF to ODF-Image
     oit.Set( odf );
@@ -829,8 +827,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = mitk::mitk_vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      //odf *= (QBALL_ANAL_RECON_PI*4/NODF);
-      Normalize(odf);
+      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
+      //Normalize(odf);
     }
 
     // set ODF to ODF-Image
@@ -866,10 +864,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
 {
   itk::TimeProbe clock;
-  clock.Start();
+
   GenerateAveragedBZeroImage(outputRegionForThread);
-  clock.Stop();
-  MITK_INFO << "Bzero ImageRegion in : " << clock.GetTotal() << " TU";
 
   clock.Start();
   switch(m_ReconstructionType)

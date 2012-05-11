@@ -90,7 +90,7 @@ public:
     {
 
 
-        m_GradientIndexMap = gradientIdexMap;
+      //  m_GradientIndexMap = gradientIdexMap;
 
         /*
         std::stringstream s1, s2, s3;

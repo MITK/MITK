@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExceptionMacro.h"
 #include "mitkTestingMacros.h"
 #include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
 class SpecializedTestException : public mitk::Exception
   {
@@ -29,6 +31,9 @@ class SpecializedTestException : public mitk::Exception
 class ExceptionTestClass : public itk::Object
 {
 public: 
+  mitkClassMacro( ExceptionTestClass , itk::Object );
+  itkNewMacro(Self);
+
   void throwExceptionManually() 
   //this method is ONLY to test the constructor and no code example
   //normally exceptions should only be thrown by using the exception macro!
@@ -73,10 +78,10 @@ public:
   static void TestExceptionConstructor()
     {
     bool exceptionThrown = false;
-    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
     try
        {
-       myExceptionTestObject.throwExceptionManually();
+       myExceptionTestObject->throwExceptionManually();
        }
     catch(mitk::Exception)
        {
@@ -88,7 +93,7 @@ public:
     exceptionThrown = false;
     try
        {
-       myExceptionTestObject.throwSpecializedExceptionManually();
+       myExceptionTestObject->throwSpecializedExceptionManually();
        }
     catch(SpecializedTestException)
        {
@@ -122,11 +127,11 @@ public:
   static void TestExceptionMessageStreamThrowing()
     {
     bool exceptionThrown = false;
-    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
     std::string thrownMessage = "";
     try
      {
-     myExceptionTestObject.throwExceptionManually("message1"," and message2");
+     myExceptionTestObject->throwExceptionManually("message1"," and message2");
      }
     catch(mitk::Exception e)
      {
@@ -140,13 +145,13 @@ public:
     {
 
     bool exceptionThrown = false;
-    ExceptionTestClass myExceptionTestObject = ExceptionTestClass();
+    ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
     
     //case 1: test throwing
     
     try
      {
-     myExceptionTestObject.throwExceptionWithThrowMacro();
+     myExceptionTestObject->throwExceptionWithThrowMacro();
      }
     catch(mitk::Exception)
      {
@@ -161,7 +166,7 @@ public:
     
     try
      {
-     myExceptionTestObject.throwExceptionWithThrowMacro("test123");
+     myExceptionTestObject->throwExceptionWithThrowMacro("test123");
      }
     catch(mitk::Exception e)
      {
@@ -178,7 +183,7 @@ public:
 
     try
      {
-     myExceptionTestObject.throwSpecializedExceptionWithThrowMacro("test123");
+     myExceptionTestObject->throwSpecializedExceptionWithThrowMacro("test123");
      }
     catch(mitk::Exception e)
      {
@@ -194,7 +199,7 @@ public:
 
     try
      {
-     myExceptionTestObject.throwSpecializedExceptionWithThrowMacro2("test123");
+     myExceptionTestObject->throwSpecializedExceptionWithThrowMacro2("test123");
      }
     catch(SpecializedTestException e)
      {

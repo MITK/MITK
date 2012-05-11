@@ -37,7 +37,7 @@ template< class TInputImagePixelType,
     GradContainerIteratorType begin = m_Directions->Begin();
     GradContainerIteratorType end = m_Directions->End();
 
-    // Find the index of the b0 image
+    // Find the indices of the b0 images in the diffusion image
     std::vector<int> indices;
     int index = 0;
     while(begin!=end)
@@ -53,8 +53,9 @@ template< class TInputImagePixelType,
     }
 
     // declare the output image
-    typedef itk::Image<float, 4> TempImageType;
-    TempImageType::Pointer tmp = TempImageType::New();
+    // this will have the b0 images stored as timesteps
+    typedef itk::Image<float, 4> OutputImageType;
+    OutputImageType::Pointer outputImage = OutputImageType::New();
 
     // get the input region
     typename Superclass::InputImageType::RegionType inputRegion =
@@ -64,20 +65,35 @@ template< class TInputImagePixelType,
     //  - dimension: [DimX, DimY, DimZ, NumOfb0 ]
     //  - spacing: old one, 1.0 time
 
-    TempImageType::SpacingType spacing;
+    OutputImageType::SpacingType spacing;
     spacing.Fill(1);
 
-    TempImageType::PointType origin;
+    OutputImageType::PointType origin;
     origin.Fill(0);
 
+    OutputImageType::RegionType outputRegion;
+
+    // the spacing and origin corresponds to the respective values in the input image (3D)
+    // the same for the region
     for (unsigned int i=0; i< 3; i++)
     {
       spacing[i] = (this->GetInput()->GetSpacing())[i];
       origin[i] = (this->GetInput()->GetOrigin())[i];
+      outputRegion.SetSize(i, this->GetInput()->GetLargestPossibleRegion().GetSize()[i]);
+      outputRegion.SetIndex(i, this->GetInput()->GetLargestPossibleRegion().GetIndex()[i]);
     }
 
+    // number of timesteps = number of b0 images
+    outputRegion.SetSize(3, indices.size());
+    outputRegion.SetIndex( 3, 0 );
+
+    outputImage->SetSpacing( spacing );
+    outputImage->SetOrigin( origin );
+    // FIXME: direction matrix
+    outputImage->SetRegions( outputRegion );
+    outputImage->Allocate();
+
     // extract b0 and insert them as a new time step
-    //Sum all images that have zero diffusion weighting (indices stored in vector index)
     for(std::vector<int>::iterator indexIt = indices.begin();
       indexIt != indices.end();
       indexIt++)

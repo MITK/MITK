@@ -180,7 +180,7 @@ namespace mbilog {
 
 //  /** \brief templated backend: one can define a class and a method to create a new backend. */
 //  template<typename T>
-//  struct DelegateBackend : public AbstractBackend
+//  struct DelegateBackend : public BackendBase
 //  {
 //
 //    typedef void(T::*Callback)(const mbilog::LogMessage&);

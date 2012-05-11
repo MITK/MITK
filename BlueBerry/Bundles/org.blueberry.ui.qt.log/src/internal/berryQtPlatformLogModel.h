@@ -81,7 +81,7 @@ private:
     
   };
     
-  class QtLogBackend : public mbilog::AbstractBackend
+  class QtLogBackend : public mbilog::BackendBase
   {
     public:
     

@@ -2,10 +2,21 @@ project(mbilog)
 
 set(MBILOG_HEADERS
   mbilog.h
+  mbilogLoggingTypes.h
+  mbilogTextDictionary.h
+  mbilogExports.h
+  mbilogLogMessage.h
+  mbilogBackendBase.h
+  mbilogTextBackendBase.h
+  mbilogBackendCout.h
 )
-  
+
 set(MBILOG_SOURCES
   mbilog.cpp
+  mbilogLogMessage.cpp
+  mbilogBackendCout.cpp
+  mbilogBackendBase.cpp
+  mbilogTextBackendBase.cpp
 )
 
 option(MBILOG_ENABLE_DEBUG_MESSAGES "Enable extra debug log output" OFF) 
@@ -30,4 +41,3 @@ add_library(mbilog ${MBILOG_HEADERS} ${MBILOG_SOURCES})
 
 # mbilog is independent of mitk, and cant use mitk macros i.e. MITK_CREATE_MODULE_CONF( mbilog )
 # configuring happens through ../CMakeList.txt and mbilogConfig.cmake.in
-

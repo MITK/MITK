@@ -122,7 +122,7 @@ public:
         return m_GradientDirectionContainer->ElementAt( idx+1 );
     }
 
-    OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
+    void Normalize(OdfPixelType & odf );
 
     void S_S0Normalization( vnl_vector<double> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
     void S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
@@ -170,6 +170,7 @@ protected:
     void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void GenerateAveragedBZeroImage(const OutputImageRegionType& outputRegionForThread);
 
 private:
 

@@ -93,12 +93,38 @@ template< class TInputImagePixelType,
     outputImage->SetRegions( outputRegion );
     outputImage->Allocate();
 
+    // input iterator
+    itk::ImageRegionConstIterator<InputImageType> inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
+
+    // we want to iterate separately over each 3D volume of the output image
+    // so reset the regions last dimension
+    outputRegion.SetSize(3,1);
+    unsigned int currentTimeStep = 0;
+
+
     // extract b0 and insert them as a new time step
     for(std::vector<int>::iterator indexIt = indices.begin();
       indexIt != indices.end();
       indexIt++)
     {
+      // set the time step
+      outputRegion.SetIndex(3, currentTimeStep);
+      itk::ImageRegionIterator< OutputImageType> outputIt( outputImage.GetPointer(), outputRegion );
 
+      // iterate over the current b0 image and store it to corresponding place
+      outputIt = outputIt.Begin();
+      while( !outputIt.IsAtEnd() && !inputIt.IsAtEnd() )
+      {
+        // the input vector
+        typename InputImageType::PixelType vec = inputIt.Get();
+
+        outputIt.Set( vec[*indexIt]);
+        ++outputIt;
+        ++inputIt;
+      }
+
+      // increase time step
+      currentTimeStep++;
     }
 
 

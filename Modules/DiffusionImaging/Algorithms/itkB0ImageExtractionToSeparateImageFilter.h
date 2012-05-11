@@ -45,6 +45,7 @@ public:
   typedef typename Superclass::GradientDirectionType GradientDirectionType;
   typedef typename Superclass::GradientDirectionContainerType GradientDirectionContainerType;
   typedef typename GradientDirectionContainerType::Iterator GradContainerIteratorType;
+  typedef typename Superclass::InputImageType InputImageType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);

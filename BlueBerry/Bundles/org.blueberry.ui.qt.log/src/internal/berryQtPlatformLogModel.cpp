@@ -68,7 +68,7 @@ void QtPlatformLogModel::slotFlushLogEntries()
 void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
 {
   m_Mutex.lock();
-  mbilog::BackendCout::FormatSmart(msg);
+  //mbilog::BackendCout::FormatSmart(msg); FormatSmart is not static any more. So commented out this statement. Todo: fix
   m_Active->push_back(ExtendedLogMessage(msg));
   m_Mutex.unlock();
 

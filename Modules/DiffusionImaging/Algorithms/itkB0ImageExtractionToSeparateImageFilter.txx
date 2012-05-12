@@ -128,6 +128,7 @@ TInputImagePixelType, TOutputImagePixelType >::GenerateData()
 
       // iterate over the current b0 image and store it to corresponding place
       outputIt = outputIt.Begin();
+      inputIt = inputIt.Begin();
       while( !outputIt.IsAtEnd() && !inputIt.IsAtEnd() )
         {
           // the input vector

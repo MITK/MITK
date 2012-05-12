@@ -47,10 +47,10 @@ public:
 
   /** typedefs from superclass */
   typedef typename Superclass::InputImageType     InputImageType;
-  typedef typename Superclass::OutputImageType    OutputImageType;
+  //typedef typename Superclass::OutputImageType    OutputImageType;
+  typedef Image< TOutputImagePixelType, 4 >       OutputImageType;
 
-  typedef typename Superclass::OutputImageRegionType
-  OutputImageRegionType;
+  typedef typename OutputImageType::RegionType    OutputImageRegionType;
 
   typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
 
@@ -82,6 +82,18 @@ protected:
   virtual ~B0ImageExtractionToSeparateImageFilter(){};
 
   void GenerateData();
+
+  /** The dimension of the output does not match the dimension of the input
+    hence we need to re-implement the CopyInformation method to avoid
+    executing the default implementation which tries to copy the input information to the
+    output
+  */
+  virtual void CopyInformation( const DataObject *data);
+
+  /** Override of the ProcessObject::GenerateOutputInformation() because of different
+    dimensionality of the input and the output
+  */
+  virtual void GenerateOutputInformation();
 
   GradientDirectionContainerType::Pointer m_Directions;
 };

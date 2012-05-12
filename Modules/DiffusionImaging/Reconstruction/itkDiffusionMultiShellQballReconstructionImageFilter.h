@@ -85,28 +85,8 @@ public:
    * corresponds to the gradient direction of the ith component image the
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
-    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image);
-    void SetGradientIndexMap(GradientIndexMap gradientIdexMap)
-    {
+    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image, int BvalueRef );//, std::vector<bool> listOfUserSelctedBValues );
 
-
-      //  m_GradientIndexMap = gradientIdexMap;
-
-        /*
-        std::stringstream s1, s2, s3;
-        for(int i = 0; i < m_GradientIndexMap[1000].size() ; i++){
-            s1 << m_GradientIndexMap[1000][i] << " ";
-            s2 << m_GradientIndexMap[2000][i] << " ";
-            s3 << m_GradientIndexMap[3000][i] << " ";
-        }
-
-        MITK_INFO << "1 SHELL " << std::endl << s1.str();
-        MITK_INFO << "2 SHELL " << std::endl << s2.str();
-        MITK_INFO << "3 SHELL " << std::endl << s3.str();
-        */
-
-
-    }
 
     /** Get reference image */
     virtual ReferenceImageType * GetReferenceImage()
@@ -157,7 +137,7 @@ protected:
     ~DiffusionMultiShellQballReconstructionImageFilter() {};
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void ComputeReconstructionMatrix(std::vector< unsigned int > gradientIndiciesVector);
+    void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
     void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
@@ -176,14 +156,14 @@ private:
 
     enum ReconstructionType
     {
-        Analytical3Shells,
-        NumericalNShells,
-        Standard1Shell
+        Mode_Analytical3Shells,
+        Mode_NumericalNShells,
+        Mode_Standard1Shell
     };
 
 
 
-    CoefficientMatrixType m_ReconstructionMatrix;
+    //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
     CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
     CoefficientMatrixType m_SignalReonstructionMatrix;
@@ -215,6 +195,8 @@ private:
     bool m_IsArithmeticProgession;
 
     int m_NumberCoefficients;
+
+    int m_RefBValue;
 
     ReconstructionType m_ReconstructionType;
 

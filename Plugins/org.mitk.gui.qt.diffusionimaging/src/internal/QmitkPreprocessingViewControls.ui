@@ -337,8 +337,11 @@
       </item>
       <item>
        <widget class="QCheckBox" name="m_CheckExtractAll">
+        <property name="toolTip">
+         <string>Create a 3D+t data set containing all b0 images as timesteps</string>
+        </property>
         <property name="text">
-         <string>Extract all B0 into separate files</string>
+         <string>Extract all B0 without averaging</string>
         </property>
        </widget>
       </item>

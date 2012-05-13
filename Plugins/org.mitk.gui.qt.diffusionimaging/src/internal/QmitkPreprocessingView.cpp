@@ -142,6 +142,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_ButtonBrainMask->setEnabled(foundDwiVolume);
   m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
   m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
+  m_Controls->m_CheckExtractAll->setEnabled(foundDwiVolume);
   m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
   m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
   m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);

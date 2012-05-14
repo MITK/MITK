@@ -19,8 +19,50 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "mitkUSImageToUSImageFilter.h"
 #include "mitkPadImageFilter.h"
-#include "mitkTestUSFilter.h"
 
+// START TESTFILER
+// This is an specialization of the USImageToUSImageFIlter
+
+  class TestUSFilter : public mitk::USImageToUSImageFilter
+    {
+    protected:
+      TestUSFilter() : mitk::USImageToUSImageFilter(){};
+      virtual ~TestUSFilter(){};
+
+    public:
+      mitkClassMacro(TestUSFilter, mitk::USImageToUSImageFilter);
+      itkNewMacro(Self);
+
+    virtual void GenerateOutputInformation()
+      {     
+      MITK_INFO << "GenerateOutputInformation called in Testfilter!";
+      mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput(0);
+      mitk::Image::Pointer output = this->GetOutput(0);
+      itkDebugMacro(<<"GenerateOutputInformation()");
+     if(inputImage.IsNull()) return;
+     };
+    
+
+    void GenerateData()
+      {
+      MITK_INFO << "GenerateData called in Testfilter!";
+      //mitk::Image::Pointer ni = const_cast<mitk::Image*>(this->GetInput(0));
+      mitk::USImage::Pointer ni = this->GetInput(0);
+      mitk::USImage::Pointer result = mitk::USImage::New();
+
+      result->Initialize(ni);
+      result->SetImportVolume(ni->GetData());
+
+      mitk::USImageMetadata::Pointer meta = ni->GetMetadata();
+      meta->SetDeviceComment("Test");
+      result->SetMetadata(meta);
+      SetNthOutput(0, result);
+      MITK_INFO << "GenerateData completed in Testfilter!";
+      };
+    };
+
+ 
+// END TESTFILTER
 
 class mitkUSPipelineTestClass
 {
@@ -31,7 +73,7 @@ public:
   {   
    // Set up a pipeline
     mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
-    mitk::TestUSFilter::Pointer filter = mitk::TestUSFilter::New();
+    TestUSFilter::Pointer filter = TestUSFilter::New();
     videoDevice->Update();
     filter->SetInput(videoDevice->GetOutput());
     filter->Update();

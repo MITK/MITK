@@ -1,4 +1,6 @@
-set(CPP_FILES
+SET(CPP_FILES
+  mitkKinectDevice.cpp
+  mitkToFImageGrabberCreator.cpp
   mitkToFImageGrabber.cpp
   mitkToFOpenCVImageGrabber.cpp
   mitkToFCameraDevice.cpp
@@ -19,77 +21,85 @@ set(CPP_FILES
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
   mitkToFNrrdImageWriter.cpp
-  mitkToFPicImageWriter.cpp
   mitkToFImageCsvWriter.cpp
   mitkThreadedToFRawDataReconstruction.cpp
 )
 
-if(MITK_USE_TOF_PMDCAMCUBE)
-set(CPP_FILES ${CPP_FILES}
+IF(MITK_USE_TOF_PMDCAMCUBE)
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDMITKPlayerController.cpp
   mitkToFCameraPMDCamCubeController.cpp
   mitkToFCameraPMDController.cpp
 )
-if(WIN32)
-  if(CMAKE_CL_64)
-    set(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
-  else(CMAKE_CL_64)
-    set(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerController.cpp)
-  endif(CMAKE_CL_64)
-else(WIN32)
-    set(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
-endif(WIN32)
-else()
-set(CPP_FILES ${CPP_FILES}	
+IF(WIN32)
+  IF(CMAKE_CL_64)
+    SET(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
+  ELSE(CMAKE_CL_64)
+    SET(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerController.cpp)
+  ENDIF(CMAKE_CL_64)
+ELSE(WIN32)
+    SET(CPP_FILES ${CPP_FILES} mitkToFCameraPMDPlayerControllerStub.cpp)
+ENDIF(WIN32)
+ELSE()
+SET(CPP_FILES ${CPP_FILES}	
   mitkToFCameraPMDMITKPlayerControllerStub.cpp
   mitkToFCameraPMDCamCubeControllerStub.cpp
   mitkToFCameraPMDPlayerControllerStub.cpp
 )
-endif(MITK_USE_TOF_PMDCAMCUBE)
+ENDIF(MITK_USE_TOF_PMDCAMCUBE)
 
-if(MITK_USE_TOF_PMDCAMBOARD)
-set(CPP_FILES ${CPP_FILES}
+IF(MITK_USE_TOF_PMDCAMBOARD)
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamBoardController.cpp
   mitkToFCameraPMDController.cpp
 )
-else()
-set(CPP_FILES ${CPP_FILES}
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamBoardControllerStub.cpp
 )
-endif(MITK_USE_TOF_PMDCAMBOARD)
+ENDIF(MITK_USE_TOF_PMDCAMBOARD)
 
 
-if(MITK_USE_TOF_PMDO3)
-set(CPP_FILES ${CPP_FILES}
+IF(MITK_USE_TOF_PMDO3)
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDO3Controller.cpp
   mitkToFCameraPMDController.cpp
 )
-else()
-set(CPP_FILES ${CPP_FILES}
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDO3ControllerStub.cpp
 )
-endif(MITK_USE_TOF_PMDO3)
+ENDIF(MITK_USE_TOF_PMDO3)
 
-if(NOT MITK_USE_TOF_PMDCAMCUBE)
-if(NOT MITK_USE_TOF_PMDCAMBOARD)
-if(NOT MITK_USE_TOF_PMDO3)
-set(CPP_FILES ${CPP_FILES}
+IF(NOT MITK_USE_TOF_PMDCAMCUBE)
+IF(NOT MITK_USE_TOF_PMDCAMBOARD)
+IF(NOT MITK_USE_TOF_PMDO3)
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDControllerStub.cpp
 )
-endif(NOT MITK_USE_TOF_PMDO3)
-endif(NOT MITK_USE_TOF_PMDCAMBOARD)
-endif(NOT MITK_USE_TOF_PMDCAMCUBE)
+ENDIF(NOT MITK_USE_TOF_PMDO3)
+ENDIF(NOT MITK_USE_TOF_PMDCAMBOARD)
+ENDIF(NOT MITK_USE_TOF_PMDCAMCUBE)
 
-if(MITK_USE_TOF_MESASR4000)
-set(CPP_FILES ${CPP_FILES}
+IF(MITK_USE_TOF_MESASR4000)
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraMESASR4000Controller.cpp
   mitkToFCameraMESAController.cpp
 )
-else()
-set(CPP_FILES ${CPP_FILES}
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraMESAControllerStub.cpp
   mitkToFCameraMESASR4000ControllerStub.cpp
 )
-endif(MITK_USE_TOF_MESASR4000)
+ENDIF(MITK_USE_TOF_MESASR4000)
 
+IF(MITK_USE_TOF_KINECT)
+SET(CPP_FILES ${CPP_FILES}
+  mitkKinectController.cpp
+)
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
+  mitkKinectControllerStub.cpp
+)
+ENDIF(MITK_USE_TOF_KINECT)
 

@@ -267,7 +267,7 @@ namespace mitk
   }
 
   void ToFCameraPMDRawDataDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                                        int requiredImageSequence, int& capturedImageSequence)
+                                        int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
     {
@@ -387,13 +387,13 @@ namespace mitk
     if (strcmp(propertyKey, "ModulationFrequency") == 0)
     {
       int modulationFrequency = 0;
-      GetIntProperty(propertyValue, modulationFrequency);
+      GetIntProperty(propertyKey, modulationFrequency);
       m_Controller->SetModulationFrequency(modulationFrequency);
     }
     else if (strcmp(propertyKey, "IntegrationTime") == 0)
     {
       int integrationTime = 0;
-      GetIntProperty(propertyValue, integrationTime);
+      GetIntProperty(propertyKey, integrationTime);
       m_Controller->SetIntegrationTime(integrationTime);
     }
   }

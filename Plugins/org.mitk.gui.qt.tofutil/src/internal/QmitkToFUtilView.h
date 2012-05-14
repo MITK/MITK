@@ -120,6 +120,8 @@ class QmitkToFUtilView : public QmitkFunctionality
 
     QTimer* m_Frametimer; ///< Timer used to continuously update the images
 
+    QString m_SelectedCamera; ///< String holding the selected camera
+
     mitk::Image::Pointer m_MitkDistanceImage; ///< member holding a pointer to the distance image of the selected camera
     mitk::Image::Pointer m_MitkAmplitudeImage; ///< member holding a pointer to the amplitude image of the selected camera
     mitk::Image::Pointer m_MitkIntensityImage; ///< member holding a pointer to the intensity image of the selected camera
@@ -128,6 +130,7 @@ class QmitkToFUtilView : public QmitkFunctionality
     mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode holding the distance image of the selected camera
     mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode holding the amplitude image of the selected camera
     mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode holding the intensity image of the selected camera
+    mitk::DataNode::Pointer m_RGBImageNode; ///< DataNode holding the rgb image of the selected camera
     mitk::DataNode::Pointer m_SurfaceNode; ///< DataNode holding the surface generated from the distanc image of the selected camera
 
     // ToF processing and recording filter

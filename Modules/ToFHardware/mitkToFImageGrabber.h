@@ -151,6 +151,7 @@ namespace mitk
     float* m_DistanceArray; ///< member holding the current distance array
     float* m_AmplitudeArray; ///< member holding the current amplitude array
     char* m_SourceDataArray;///< member holding the current source data array
+    unsigned char* m_RgbDataArray; ///< member holding the current rgb data array
     unsigned long m_DeviceObserverTag; ///< tag of the oberver for the the ToFCameraDevice
 
     ToFImageGrabber();

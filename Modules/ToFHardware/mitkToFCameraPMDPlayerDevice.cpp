@@ -39,7 +39,7 @@ namespace mitk
     ToFCameraPMDPlayerController::Pointer myController = dynamic_cast<mitk::ToFCameraPMDPlayerController*>(this->m_Controller.GetPointer());
 
     std::string strValue;
-    GetStringProperty(propertyValue, strValue);
+    GetStringProperty(propertyKey, strValue);
     if (strcmp(propertyKey, "PMDFileName") == 0)
     {
       myController->SetPMDFileName(strValue);

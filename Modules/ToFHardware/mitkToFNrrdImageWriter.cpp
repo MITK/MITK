@@ -39,6 +39,7 @@ namespace mitk
     this->CheckForFileExtension(this->m_DistanceImageFileName);
     this->CheckForFileExtension(this->m_AmplitudeImageFileName);
     this->CheckForFileExtension(this->m_IntensityImageFileName);
+    this->CheckForFileExtension(this->m_RGBImageFileName);
 
     this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
     this->m_ImageSizeInBytes = this->m_PixelNumber * sizeof(float);
@@ -54,6 +55,10 @@ namespace mitk
     if (this->m_IntensityImageSelected)
     {
       this->OpenStreamFile(this->m_IntensityOutfile, this->m_IntensityImageFileName);
+    }
+    if (this->m_RGBImageSelected)
+    {
+      this->OpenStreamFile(this->m_RGBOutfile, this->m_RGBImageFileName);
     }
     this->m_NumOfFrames = 0;
   }
@@ -72,9 +77,13 @@ namespace mitk
     {
       this->CloseStreamFile(this->m_IntensityOutfile, this->m_IntensityImageFileName);
     }
+    if (this->m_RGBImageSelected)
+    {
+      this->CloseStreamFile(this->m_RGBOutfile, this->m_RGBImageFileName);
+    }
   }
 
-  void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
+  void ToFNrrdImageWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData)
   {
     if (this->m_DistanceImageSelected)
     {
@@ -87,6 +96,10 @@ namespace mitk
     if (this->m_IntensityImageSelected)
     {
       this->m_IntensityOutfile.write(( char* )intensityFloatData, this->m_ImageSizeInBytes);
+    }
+    if (this->m_RGBImageSelected)
+    {
+      this->m_RGBOutfile.write(( char* )rgbData, this->m_PixelNumber*3 * sizeof(unsigned char));
     }
     this->m_NumOfFrames++;
   }
@@ -119,13 +132,6 @@ namespace mitk
 
   void ToFNrrdImageWriter::ConvertStreamToNrrdFormat( std::string fileName )
   {
-
-    float* floatData = new float[this->m_PixelNumber];
-    for(int i=0; i<this->m_PixelNumber; i++)
-    {
-      floatData[i] = i + 0.0;
-    }
-
     Image::Pointer imageTemplate = Image::New();
     int dimension ;
     unsigned int* dimensions;
@@ -150,12 +156,31 @@ namespace mitk
     {
       throw std::logic_error("No image type set, please choose between 2D+t and 3D!");
     }
+    float* floatData;
+    unsigned char* rgbData;
+    if (fileName==this->m_RGBImageFileName)
+    {
+      rgbData = new unsigned char[this->m_PixelNumber*3];
+      for(int i=0; i<this->m_PixelNumber*3; i++)
+      {
+        rgbData[i] = i + 0.0;
+      }
+      mitk::PixelType RGBType = MakePixelType<unsigned char, itk::RGBPixel<unsigned char>, 3>();
+      imageTemplate->Initialize( RGBType,dimension, dimensions, 1);
+      imageTemplate->SetSlice(rgbData, 0, 0, 0);
+    }
+    else
+    {
+      floatData = new float[this->m_PixelNumber];
+      for(int i=0; i<this->m_PixelNumber; i++)
+      {
+        floatData[i] = i + 0.0;
+      }
+      mitk::PixelType FloatType = MakeScalarPixelType<float>();
+      imageTemplate->Initialize( FloatType,dimension, dimensions, 1);
+      imageTemplate->SetSlice(floatData, 0, 0, 0);
+    }
 
-    mitk::PixelType FloatType = MakeScalarPixelType<float>();
-    imageTemplate->Initialize( FloatType,dimension, dimensions, 1);
-    imageTemplate->SetSlice(floatData, 0, 0, 0);
-
-    
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
     nrrdWriter->SetPixelTypeInfo(imageTemplate->GetPixelType().GetTypeId());
@@ -193,16 +218,36 @@ namespace mitk
     nrrdWriter->SetUseStreamedWriting(true);
 
     std::ifstream stream(fileName.c_str(), std::ifstream::binary);
-    unsigned int size = this->m_PixelNumber * this->m_NumOfFrames;
-    unsigned int sizeInBytes = size * sizeof(float);
-    float* data = new float[size];
-    stream.read((char*)data, sizeInBytes);
-    nrrdWriter->Write(data);
-    stream.close();
+    if (fileName==m_RGBImageFileName)
+    {
+      unsigned int size = this->m_PixelNumber*3 * this->m_NumOfFrames;
+      unsigned int sizeInBytes = size * sizeof(unsigned char);
+      unsigned char* data = new unsigned char[size];
+      stream.read((char*)data, sizeInBytes);
+      nrrdWriter->Write(data);
+      stream.close();
+      delete[] data;
+    }
+    else
+    {
+      unsigned int size = this->m_PixelNumber * this->m_NumOfFrames;
+      unsigned int sizeInBytes = size * sizeof(float);
+      float* data = new float[size];
+      stream.read((char*)data, sizeInBytes);
+      nrrdWriter->Write(data);
+      stream.close();
+      delete[] data;
+    }
 
-    delete[] data;
     delete[] dimensions;
-    delete[] floatData;
+    if (fileName==m_RGBImageFileName)
+    {
+      delete[] rgbData;
+    }
+    else
+    {
+      delete[] floatData;
+    }
   }
 
 } // end namespace mitk

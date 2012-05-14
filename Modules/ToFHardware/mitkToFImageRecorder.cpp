@@ -36,6 +36,7 @@ namespace mitk
     this->m_DistanceImageSelected = true;
     this->m_AmplitudeImageSelected = true;
     this->m_IntensityImageSelected = true;
+    this->m_RGBImageSelected = true;
     this->m_Abort = true;
     this->m_CaptureWidth = 0;
     this->m_CaptureHeight = 0;
@@ -47,10 +48,12 @@ namespace mitk
     this->m_DistanceImageFileName = ""; 
     this->m_AmplitudeImageFileName = "";
     this->m_IntensityImageFileName = "";
+    this->m_RGBImageFileName = "";
     this->m_ImageSequence = 0;
     this->m_DistanceArray = NULL;
     this->m_AmplitudeArray = NULL;
     this->m_IntensityArray = NULL;
+    this->m_RGBArray = NULL;
     this->m_SourceDataArray = NULL;
   }
 
@@ -59,6 +62,7 @@ namespace mitk
     delete[] m_DistanceArray;
     delete[] m_AmplitudeArray;
     delete[] m_IntensityArray;
+    delete[] m_RGBArray;
     delete[] m_SourceDataArray;
   }
 
@@ -87,11 +91,6 @@ namespace mitk
       this->m_ToFImageWriter = ToFNrrdImageWriter::New();
       this->m_ToFImageWriter->SetExtension(m_FileFormat);
     }
-    else if(this->m_FileFormat.compare(".pic") == 0)
-    {
-      this->m_ToFImageWriter = ToFPicImageWriter::New();
-      this->m_ToFImageWriter->SetExtension(m_FileFormat);
-    }
     else
     {
       throw std::logic_error("No file format specified!");
@@ -115,6 +114,10 @@ namespace mitk
     {
       this->m_AmplitudeArray = new float[m_PixelNumber];
     }
+    if(this->m_RGBArray == NULL)
+    {
+      this->m_RGBArray = new unsigned char[m_PixelNumber*3];
+    }
     if(this->m_SourceDataArray == NULL)
     {
       this->m_SourceDataArray = new char[m_SourceDataSize];
@@ -123,12 +126,14 @@ namespace mitk
     this->m_ToFImageWriter->SetDistanceImageFileName(this->m_DistanceImageFileName);
     this->m_ToFImageWriter->SetAmplitudeImageFileName(this->m_AmplitudeImageFileName);
     this->m_ToFImageWriter->SetIntensityImageFileName(this->m_IntensityImageFileName);
+    this->m_ToFImageWriter->SetRGBImageFileName(this->m_RGBImageFileName);
     this->m_ToFImageWriter->SetCaptureWidth(this->m_CaptureWidth);
     this->m_ToFImageWriter->SetCaptureHeight(this->m_CaptureHeight);
     this->m_ToFImageWriter->SetToFImageType(this->m_ToFImageType);
     this->m_ToFImageWriter->SetDistanceImageSelected(this->m_DistanceImageSelected);
     this->m_ToFImageWriter->SetAmplitudeImageSelected(this->m_AmplitudeImageSelected);
     this->m_ToFImageWriter->SetIntensityImageSelected(this->m_IntensityImageSelected);
+    this->m_ToFImageWriter->SetRGBImageSelected(this->m_RGBImageSelected);
     this->m_ToFImageWriter->Open();
 
     this->m_AbortMutex->Lock();
@@ -176,7 +181,7 @@ namespace mitk
         {
         
           toFCameraDevice->GetAllImages(toFImageRecorder->m_DistanceArray, toFImageRecorder->m_AmplitudeArray, 
-            toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence );
+            toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence, toFImageRecorder->m_RGBArray );
 
           if (toFImageRecorder->m_ImageSequence >= requiredImageSequence)
           {
@@ -186,7 +191,7 @@ namespace mitk
             }
             requiredImageSequence = toFImageRecorder->m_ImageSequence + 1;
             toFImageRecorder->m_ToFImageWriter->Add( toFImageRecorder->m_DistanceArray, 
-              toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray );
+              toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray, toFImageRecorder->m_RGBArray );
             numOfFramesRecorded++;
             if (numOfFramesRecorded % n == 0)
             {

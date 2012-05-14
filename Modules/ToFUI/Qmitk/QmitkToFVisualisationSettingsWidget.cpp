@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToFVisualisationSettingsWidget.h"
 
+#include <mitkImageStatisticsHolder.h>
+
 //QT headers
 #include <QPlastiqueStyle>
 #include <QString>
@@ -124,11 +126,12 @@ void QmitkToFVisualisationSettingsWidget::UpdateRanges()
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
 } 
 
-void QmitkToFVisualisationSettingsWidget::Initialize(mitk::Image* distanceImage, mitk::Image* amplitudeImage, mitk::Image* intensityImage)
+void QmitkToFVisualisationSettingsWidget::Initialize(mitk::Image* distanceImage, mitk::Image* amplitudeImage, mitk::Image* intensityImage, mitk::Image* rgbImage)
 {
   this->m_MitkDistanceImage = distanceImage;
   this->m_MitkAmplitudeImage = amplitudeImage;
   this->m_MitkIntensityImage = intensityImage;
+  this->m_RGBImage = rgbImage;
 
   if (!m_MitkDistanceImage && !m_MitkAmplitudeImage && !m_MitkIntensityImage)
   {
@@ -140,41 +143,26 @@ void QmitkToFVisualisationSettingsWidget::Initialize(mitk::Image* distanceImage,
     int numberOfImages = 0;
     if (m_MitkDistanceImage)
     {
-      m_RangeSliderMin = distanceImage->GetScalarValueMin();
-      m_RangeSliderMax = distanceImage->GetScalarValueMax();
-
       m_Widget1ColorTransferFunction = vtkColorTransferFunction::New();
       this->m_Widget1TransferFunctionType = 1;
       m_Controls->m_SelectTransferFunctionTypeCombobox->setCurrentIndex(this->m_Widget1TransferFunctionType);
-      ResetTransferFunction(this->m_Widget1ColorTransferFunction, this->m_Widget1TransferFunctionType ,distanceImage->GetScalarValueMin(), distanceImage->GetScalarValueMax());
-      UpdateCanvas();
-
-      int border = (m_RangeSliderMax - m_RangeSliderMin) * 0.1;
-      m_Controls->m_RangeSlider->setMinimum(m_RangeSliderMin - border);
-      m_Controls->m_RangeSlider->setMaximum(m_RangeSliderMax + border);
-      m_Controls->m_RangeSliderMinEdit->setText(QString("").setNum(m_RangeSliderMin - border));
-      m_Controls->m_RangeSliderMaxEdit->setText(QString("").setNum(m_RangeSliderMax + border));
-      m_Controls->m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
-
-      UpdateRanges();
       numberOfImages++;
     }
     if (m_MitkAmplitudeImage)
     {
       m_Widget2ColorTransferFunction = vtkColorTransferFunction::New();
       this->m_Widget2TransferFunctionType = 0;
-      ResetTransferFunction(this->m_Widget2ColorTransferFunction, this->m_Widget2TransferFunctionType, amplitudeImage->GetScalarValueMin(), amplitudeImage->GetScalarValueMax());
       numberOfImages++;
     }
     if (m_MitkIntensityImage)
     {
       m_Widget3ColorTransferFunction = vtkColorTransferFunction::New();
       this->m_Widget3TransferFunctionType = 0;
-      ResetTransferFunction(this->m_Widget3ColorTransferFunction, this->m_Widget3TransferFunctionType, intensityImage->GetScalarValueMin(), intensityImage->GetScalarValueMax());
       numberOfImages++;
     }
     m_Controls->m_SelectWidgetCombobox->setMaxCount(numberOfImages);
   }
+  this->OnTransferFunctionReset();
 }
 
 void QmitkToFVisualisationSettingsWidget::UpdateCanvas()
@@ -285,22 +273,22 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
   if (currentWidgetIndex == 0)
   {
     // use second minimum to draw 0 values (that are usually segmented) black
-    m_RangeSliderMin = this->m_MitkDistanceImage->GetScalarValue2ndMin();
-    m_RangeSliderMax = this->m_MitkDistanceImage->GetScalarValueMaxNoRecompute();
+    m_RangeSliderMin = this->m_MitkDistanceImage->GetStatistics()->GetScalarValue2ndMin();
+    m_RangeSliderMax = this->m_MitkDistanceImage->GetStatistics()->GetScalarValueMaxNoRecompute();
     ResetTransferFunction(this->m_Widget1ColorTransferFunction, currentTransferFunctionTypeIndex, this->m_RangeSliderMin, this->m_RangeSliderMax);
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget1ColorTransferFunction );
   }
   else if (currentWidgetIndex == 1)
   {
-    m_RangeSliderMin = this->m_MitkAmplitudeImage->GetScalarValueMin();
-    m_RangeSliderMax = this->m_MitkAmplitudeImage->GetScalarValueMaxNoRecompute();
+    m_RangeSliderMin = this->m_MitkAmplitudeImage->GetStatistics()->GetScalarValueMin();
+    m_RangeSliderMax = this->m_MitkAmplitudeImage->GetStatistics()->GetScalarValueMaxNoRecompute();
     ResetTransferFunction(this->m_Widget2ColorTransferFunction, currentTransferFunctionTypeIndex, this->m_RangeSliderMin, this->m_RangeSliderMax);
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget2ColorTransferFunction );
   }
   else if (currentWidgetIndex == 2)
   {
-    m_RangeSliderMin = this->m_MitkIntensityImage->GetScalarValueMin();
-    m_RangeSliderMax = this->m_MitkIntensityImage->GetScalarValueMaxNoRecompute();
+    m_RangeSliderMin = this->m_MitkIntensityImage->GetStatistics()->GetScalarValueMin();
+    m_RangeSliderMax = this->m_MitkIntensityImage->GetStatistics()->GetScalarValueMaxNoRecompute();
     ResetTransferFunction(this->m_Widget3ColorTransferFunction, currentTransferFunctionTypeIndex, this->m_RangeSliderMin, this->m_RangeSliderMax);
     m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget3ColorTransferFunction );
   }

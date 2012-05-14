@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice() : 
-  m_DistanceDataBuffer(NULL), m_AmplitudeDataBuffer(NULL), m_IntensityDataBuffer(NULL)
+    m_DistanceDataBuffer(NULL), m_AmplitudeDataBuffer(NULL), m_IntensityDataBuffer(NULL), m_RGBDataBuffer(NULL)
   {
     m_Controller = ToFCameraMITKPlayerController::New();
   }
@@ -73,6 +73,7 @@ namespace mitk
       this->m_Controller->GetDistances(this->m_DistanceDataBuffer[this->m_FreePos]);
       this->m_Controller->GetAmplitudes(this->m_AmplitudeDataBuffer[this->m_FreePos]);
       this->m_Controller->GetIntensities(this->m_IntensityDataBuffer[this->m_FreePos]);
+      this->m_Controller->GetRgb(this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
       this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
       this->m_ImageSequence++;
@@ -148,6 +149,7 @@ namespace mitk
         toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_Controller->GetRgb(toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->Modified();
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1
@@ -244,8 +246,23 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
+  void ToFCameraMITKPlayerDevice::GetRgb(unsigned char* rgbArray, int& imageSequence)
+  {
+    m_ImageMutex->Lock();
+    /*!!!!!!!!!!!!!!!!!!!!!!
+      TODO Buffer handling???
+    !!!!!!!!!!!!!!!!!!!!!!!!*/
+    // write intensity image data to unsigned char array
+    for (int i=0; i<this->m_PixelNumber*3; i++)
+    {
+      rgbArray[i] = this->m_RGBDataBuffer[this->m_CurrentPos][i];
+    }
+    imageSequence = this->m_ImageSequence;
+    m_ImageMutex->Unlock();
+  }
+
   void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* /*sourceDataArray*/,
-    int requiredImageSequence, int& capturedImageSequence)
+    int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     /*!!!!!!!!!!!!!!!!!!!!!!
       TODO Document this method!
@@ -280,7 +297,7 @@ namespace mitk
       pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
     }
 
-    if(this->m_DistanceDataBuffer&&this->m_AmplitudeDataBuffer&&this->m_IntensityDataBuffer)
+    if(this->m_DistanceDataBuffer&&this->m_AmplitudeDataBuffer&&this->m_IntensityDataBuffer&&this->m_RGBDataBuffer)
     {
       // write image data to float arrays
       for (int i=0; i<this->m_PixelNumber; i++)
@@ -288,6 +305,11 @@ namespace mitk
         distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+        rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+      }
+      for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
+      {
+        rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
       }
     }
     m_ImageMutex->Unlock();
@@ -306,7 +328,7 @@ namespace mitk
     ToFCameraMITKPlayerController::Pointer myController = dynamic_cast<mitk::ToFCameraMITKPlayerController*>(this->m_Controller.GetPointer());
 
     std::string strValue;
-    GetStringProperty(propertyValue, strValue);
+    GetStringProperty(propertyKey, strValue);
     if (strcmp(propertyKey, "DistanceImageFileName") == 0)
     {
       myController->SetDistanceImageFileName(strValue);
@@ -318,6 +340,10 @@ namespace mitk
     else if (strcmp(propertyKey, "IntensityImageFileName") == 0)
     {
       myController->SetIntensityImageFileName(strValue);
+    }
+    else if (strcmp(propertyKey, "RGBImageFileName") == 0)
+    {
+      myController->SetRGBImageFileName(strValue);
     }
   }
 
@@ -347,6 +373,14 @@ namespace mitk
       }
       delete[] this->m_IntensityDataBuffer;
     }
+    if (m_RGBDataBuffer)
+    {
+      for(int i=0; i<this->m_MaxBufferSize; i++)
+      {
+        delete[] this->m_RGBDataBuffer[i];
+      }
+      delete[] this->m_RGBDataBuffer;
+    }
   }
 
   void ToFCameraMITKPlayerDevice::AllocateDataBuffers()
@@ -368,6 +402,11 @@ namespace mitk
     for(int i=0; i<this->m_MaxBufferSize; i++)
     {
       this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
+    }
+    this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
+    for(int i=0; i<this->m_MaxBufferSize; i++)
+    {
+      this->m_RGBDataBuffer[i] = new unsigned char[this->m_PixelNumber*3];
     }
   }
 }

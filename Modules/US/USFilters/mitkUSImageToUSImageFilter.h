@@ -33,15 +33,15 @@ namespace mitk {
   class MitkUS_EXPORT USImageToUSImageFilter : public mitk::ImageToImageFilter
     {
     public:
-      mitkClassMacro(USImageToUSImageFilter,itk::Object);
+      mitkClassMacro(USImageToUSImageFilter, mitk::ImageToImageFilter);
       itkNewMacro(Self);
-/*
+
       // ---- OVERRIDDEN INHERITED METHODS ---- //
       virtual void SetInput (const mitk::USImage *image);
       virtual void SetInput (unsigned int index, const mitk::USImage *image);
 
       virtual mitk::USImage::Pointer GetOutput(unsigned int idx);
-  */    
+      virtual mitk::USImage::Pointer GetInput (unsigned int idx);
 
     protected:
       USImageToUSImageFilter();

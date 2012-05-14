@@ -6,4 +6,6 @@ USFilters/mitkUSDevice.cpp
 USFilters/mitkUSVideoDevice.cpp
 USFilters/mitkUSProbe.cpp
 USFilters/mitkUSImageToUSImageFilter.cpp
+
+USFilters/mitkTestUSFilter.cpp
 )

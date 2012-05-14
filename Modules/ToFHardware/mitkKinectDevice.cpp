@@ -388,38 +388,13 @@ namespace mitk
       // write image data to float arrays
       for (int i=0; i<this->m_PixelNumber; i++)
       {
-        distanceArray[i] = this->m_DistanceDataBuffer[pos][i] /* * 1000 */;
+        distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
-        rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+        rgbDataArray[i*3] = this->m_RGBDataBuffer[pos][i*3];
+        rgbDataArray[i*3+1] = this->m_RGBDataBuffer[pos][i*3+1];
+        rgbDataArray[i*3+2] = this->m_RGBDataBuffer[pos][i*3+2];
       }
-      for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
-      {
-        rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
-      }
-
-
-      /*
-      this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], this->m_DistanceArray);
-      this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[pos], this->m_AmplitudeArray);
-      this->m_Controller->GetIntensities(this->m_SourceDataBuffer[pos], this->m_IntensityArray);
-
-      int u, v;
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-      for (int j=0; j<this->m_CaptureWidth; j++)
-      {
-      u = i*this->m_CaptureWidth+j;
-      v = (i+1)*this->m_CaptureWidth-1-j;
-      distanceArray[u] = 1000 * this->m_DistanceArray[v]; // unit in mm
-      //distanceArray[u] = this->m_DistanceArray[v]; // unit in meter
-      amplitudeArray[u] = this->m_AmplitudeArray[v];
-      intensityArray[u] = this->m_IntensityArray[v];
-      }
-      }
-
-      memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
-      */
     }
     else
     {

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "@MITK_SOURCE_DIR@/Core/Code/DataManagement/mitkExportMacros.h"
+#include <mitkExportMacros.h>
 
 #ifndef @MODULE_NAME@_EXPORTS_H
   #define @MODULE_NAME@_EXPORTS_H

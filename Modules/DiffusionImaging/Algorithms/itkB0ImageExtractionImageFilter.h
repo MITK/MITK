@@ -72,7 +72,7 @@ namespace itk{
   protected:
     
     B0ImageExtractionImageFilter();
-    ~B0ImageExtractionImageFilter() {};
+    virtual ~B0ImageExtractionImageFilter() {};
     
     void GenerateData();
 

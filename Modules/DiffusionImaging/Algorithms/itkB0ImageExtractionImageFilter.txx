@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkB0ImageExtractionImageFilter.h"
 
+
 namespace itk {
 
   template< class TInputImagePixelType, 

@@ -964,11 +964,13 @@ void QmitkQBallReconstructionView::TemplatedMultiShellQBallReconstruction(mitk::
 {
     typedef itk::DiffusionMultiShellQballReconstructionImageFilter<DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
     typename FilterType::Pointer filter = FilterType::New();
-    filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
+
+    filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() , vols->GetB_Value() );
     filter->SetBValue(vols->GetB_Value());
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
     filter->SetLambda(lambda);
-    filter->SetGradientIndexMap(m_GradientIndexMap);
+    filter->SetNumberOfThreads(1);
+    //filter->SetGradientIndexMap(m_GradientIndexMap);
 
     //for(std::map<double , std::vector< unsigned int > >::iterator it = m_GradientIndexMap->begin() ; it != m_GradientIndexMap->end(); it++)
     //    MITK_INFO << (*it).first << " Count " << (*it).second.size();

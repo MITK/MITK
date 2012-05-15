@@ -1,21 +1,26 @@
 #define MITK_WRAP_PACKAGE "mitkAlgorithmsPython"
 //#include "wrap_MITKAlgorithms.cxx"
-/*=========================================================================
+/*===================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: wrap_ITKAlgorithms.cxx,v $
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+/*===================================================================
+
+This file is based heavily on a corresponding ITK filter.
+
+===================================================================*/
 #ifdef CABLE_CONFIGURATION
 
 namespace _cable_

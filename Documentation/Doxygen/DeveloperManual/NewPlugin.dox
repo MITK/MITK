@@ -29,7 +29,7 @@ Plug-in options
   -pn, --plugin-name              The plug-in's human readable name
 
 Project options
-  --project-copyright             Path to a file containing copyright information (default: :/MITKCopyright.txt)
+  --project-copyright             Path to a file containing copyright information (default: :/LICENSE.txt)
   --project-name                  The project name
   --project-app-name              The application name
 

@@ -255,7 +255,7 @@ int main(int argc, char** argv)
   parser.addArgument("view-name", "vn", QVariant::String, "* The View's human readable name");
 
   parser.beginGroup("Project options");
-  parser.addArgument("project-copyright", "", QVariant::String, "  Path to a file containing copyright information", ":/MITKCopyright.txt");
+  parser.addArgument("project-copyright", "", QVariant::String, "  Path to a file containing copyright information", ":/LICENSE.txt");
   parser.addArgument("project-name", "", QVariant::String, "  The project name");
   parser.setExactMatchRegularExpression("--project-name", "^[a-zA-Z_\\-]+$", "Project name invalid");
   parser.addArgument("project-app-name", "", QVariant::String, "  The application name");

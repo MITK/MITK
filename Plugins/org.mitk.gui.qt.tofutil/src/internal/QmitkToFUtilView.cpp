@@ -227,66 +227,67 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
 
 void QmitkToFUtilView::OnToFCameraStarted()
 {
-    if (m_ToFImageGrabber.IsNotNull())
+  if (m_ToFImageGrabber.IsNotNull())
+  {
+    // initial update of image grabber
+    this->m_ToFImageGrabber->Update();
+
+    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+
+    // initial update of composite filter
+    this->m_ToFCompositeFilter->Update();
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+    this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+    this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+
+    this->UseToFVisibilitySettings(true);
+
+    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+    // initialize visualization widget
+    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+
+    this->m_Frametimer->start(0);
+
+    if (m_Controls->m_TextureCheckBox->isChecked())
     {
-        // initial update of image grabber
-        this->m_ToFImageGrabber->Update();
-
-        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-        this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-        this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-        // initial update of composite filter
-        this->m_ToFCompositeFilter->Update();
-        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-        this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-        this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-        this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-        this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-        this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
-
-        this->UseToFVisibilitySettings(true);
-
-        this->m_Frametimer->start(0);
-
-        m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-        // initialize visualization widget
-        m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_MitkDistanceImage, this->m_MitkAmplitudeImage, this->m_MitkIntensityImage);
-
-        if (m_Controls->m_TextureCheckBox->isChecked())
-        {
-            OnTextureCheckBoxChecked(true);
-        }
-        if (m_Controls->m_VideoTextureCheckBox->isChecked())
-        {
-            OnVideoTextureCheckBoxChecked(true);
-        }
+      OnTextureCheckBoxChecked(true);
     }
-    m_Controls->m_TextureCheckBox->setEnabled(true);
-    // initialize point set measurement
-    m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
+    if (m_Controls->m_VideoTextureCheckBox->isChecked())
+    {
+      OnVideoTextureCheckBoxChecked(true);
+    }
+  }
+  m_Controls->m_TextureCheckBox->setEnabled(true);
+  // initialize point set measurement
+  m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
-    this->m_Frametimer->stop();
+  this->m_Frametimer->stop();
 }
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
-    if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
-    {
-        MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
-        this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
-        this->m_Controls->m_TextureCheckBox->setEnabled(false);
-        this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-        this->m_Controls->m_SurfaceCheckBox->setChecked(false);
-        this->m_Controls->m_TextureCheckBox->setChecked(false);
+  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+  {
+    MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
+    this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
+    this->m_Controls->m_TextureCheckBox->setEnabled(false);
+    this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+    this->m_Controls->m_SurfaceCheckBox->setChecked(false);
+    this->m_Controls->m_TextureCheckBox->setChecked(false);
         this->m_Controls->m_VideoTextureCheckBox->setChecked(false);
     }
     else
@@ -304,22 +305,6 @@ void QmitkToFUtilView::OnUpdateCamera()
         this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
         ProcessVideoTransform();
     }
-
-    vtkColorTransferFunction* colorTransferFunction1;
-    colorTransferFunction1 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget1ColorTransferFunction();
-    mitk::TransferFunction::Pointer tf1 = mitk::TransferFunction::New();
-    tf1->SetColorTransferFunction( colorTransferFunction1 );
-    m_DistanceImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf1));
-    vtkColorTransferFunction* colorTransferFunction2;
-    colorTransferFunction2 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget2ColorTransferFunction();
-    mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
-    tf2->SetColorTransferFunction( colorTransferFunction2 );
-    m_AmplitudeImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf2));
-    vtkColorTransferFunction* colorTransferFunction3;
-    colorTransferFunction3 = m_Controls->m_ToFVisualisationSettingsWidget->GetWidget3ColorTransferFunction();
-    mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
-    tf3->SetColorTransferFunction( colorTransferFunction3 );
-    m_IntensityImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf3));
 
     if (m_Controls->m_SurfaceCheckBox->isChecked())
     {

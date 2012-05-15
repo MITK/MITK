@@ -90,7 +90,6 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
           stepper->Previous();
         }
       }
-      this->InvokeEvent( EndScrollInteractionEvent() );
     }
       ok = true;
       break;
@@ -159,7 +158,6 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         // set the new position
         sliceNaviController->GetSlice()->SetPos( newPos );
 
-        this->InvokeEvent( EndScrollInteractionEvent() );
       }
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
@@ -167,6 +165,8 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
     }
   case AcFINISHMOVE:
     {
+      this->InvokeEvent( EndScrollInteractionEvent() );
+      
       ok = true;
       break;
     }

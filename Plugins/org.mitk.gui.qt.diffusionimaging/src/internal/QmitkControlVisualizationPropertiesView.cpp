@@ -831,7 +831,14 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
   if (dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData()))
   {
     mitk::DiffusionImage<short>::Pointer dimg = dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData());
-    notConst->SetIntProperty("DisplayChannel", dimg->GetB0Indices().front());
+
+    // if there is no b0 image in the dataset, the GetB0Indices() returns a vector of size 0
+    // and hence we cannot set the Property directly to .front()
+    int displayChannelPropertyValue = 0;
+    if( dimg->GetB0Indices().size() > 0)
+      displayChannelPropertyValue = dimg->GetB0Indices().front();
+
+    notConst->SetIntProperty("DisplayChannel", displayChannelPropertyValue );
   }
 }
 

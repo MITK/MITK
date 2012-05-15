@@ -11,20 +11,19 @@ set(PROJECT_STATIC_VAR "MITK_STATIC")
 set(DOXYGEN_INGROUP "MITKPlugins")
 set(DEFAULT_CREATE_PLUGIN_MACRO "MACRO_CREATE_MITK_PLUGIN()")
 set(DEFAULT_CREATE_GUI_PLUGIN_MACRO "MACRO_CREATE_MITK_PLUGIN(QmitkExt)")
-set(PLUGIN_COPYRIGHT "/*=========================================================================
+set(PLUGIN_COPYRIGHT "/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 16706 $ 
- 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+The Medical Imaging Interaction Toolkit (MITK)
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-=========================================================================*/")
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/")
 

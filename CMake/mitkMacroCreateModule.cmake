@@ -143,6 +143,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             else()
               mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
               mitkFunctionCheckCompilerFlags("-Wno-c++0x-static-nonintegral-init" module_compile_flags)
+              mitkFunctionCheckCompilerFlags("-Wno-gnu" module_compile_flags)
             endif()
           endif(MODULE_WARNINGS_AS_ERRORS)
 

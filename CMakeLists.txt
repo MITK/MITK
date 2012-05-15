@@ -844,6 +844,15 @@ configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
 
+set(VISIBILITY_AVAILABLE 0)
+set(visibility_test_flag "")
+mitkFunctionCheckCompilerFlags("-fvisibility=hidden" visibility_test_flag)
+if(visibility_test_flag)
+  # The compiler understands -fvisiblity=hidden (probably gcc >= 4 or Clang)
+  set(VISIBILITY_AVAILABLE 1)
+endif()
+configure_file(mitkExportMacros.h.in ${MITK_BINARY_DIR}/mitkExportMacros.h)
+
 configure_file(mitkVersion.h.in ${MITK_BINARY_DIR}/mitkVersion.h)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 

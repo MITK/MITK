@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKEXPORTMACROS_H
 #define MITKEXPORTMACROS_H
 
+#cmakedefine VISIBILITY_AVAILABLE
+
 /**
   * Macros for import/export declarations
   */
@@ -26,16 +28,14 @@ PURPOSE.  See the above copyright notices for more information.
   #define MITK_EXPORT __declspec(dllexport)
   #define MITK_IMPORT __declspec(dllimport)
   #define MITK_LOCAL
+#elif defined(VISIBILITY_AVAILABLE)
+  #define MITK_EXPORT __attribute__ ((visibility ("default")))
+  #define MITK_IMPORT __attribute__ ((visibility ("default")))
+  #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
 #else
-  #if __GNUC__ >= 4
-    #define MITK_EXPORT __attribute__ ((visibility ("default")))
-    #define MITK_IMPORT __attribute__ ((visibility ("default")))
-    #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
-  #else
-    #define MITK_EXPORT
-    #define MITK_IMPORT
-    #define MITK_LOCAL
-  #endif
+  #define MITK_EXPORT
+  #define MITK_IMPORT
+  #define MITK_LOCAL
 #endif
 
 #endif // MITKEXPORTMACROS_H

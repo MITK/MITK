@@ -1,19 +1,24 @@
-/*=========================================================================
+/*===================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkContourExtractor2DImageFilter.txx,v $
-  Language:  C++
-  Date:      $Date: 2009-05-13 22:11:57 $
-  Version:   $Revision: 1.12 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+/*===================================================================
+
+This file is based heavily on a corresponding ITK filter.
+
+===================================================================*/
 
 #ifndef __itkContourExtractor2DImageFilter_txx
 #define __itkContourExtractor2DImageFilter_txx

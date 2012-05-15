@@ -45,6 +45,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
 
+#include <list>
+
 #if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
   #include "mitkvtkLassoStencilSource.h"
 #else
@@ -299,42 +301,41 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   this->ExtractImageAndMask( timeStep );
 
 
-  Statistics *statistics;
-  HistogramType::ConstPointer *histogram;
+  StatisticsContainer *statisticsContainer;
+  HistogramContainer *histogramContainer;
   switch ( m_MaskingMode )
   {
   case MASKING_MODE_NONE:
   default:
+    if(!m_DoIgnorePixelValue)
     {
-   if(!m_DoIgnorePixelValue)
-      {
-      statistics = &m_ImageStatisticsVector[timeStep];
-    histogram = &m_ImageHistogramVector[timeStep];
+      statisticsContainer = &m_ImageStatisticsVector[timeStep];
+      histogramContainer = &m_ImageHistogramVector[timeStep];
 
-    m_ImageStatisticsTimeStampVector[timeStep].Modified();
-    m_ImageStatisticsCalculationTriggerVector[timeStep] = false;
-  }
-   else
-   {
-     statistics = &m_MaskedImageStatisticsVector[timeStep];
-     histogram = &m_MaskedImageHistogramVector[timeStep];
+      m_ImageStatisticsTimeStampVector[timeStep].Modified();
+      m_ImageStatisticsCalculationTriggerVector[timeStep] = false;
+    }
+    else
+    {
+      statisticsContainer = &m_MaskedImageStatisticsVector[timeStep];
+      histogramContainer = &m_MaskedImageHistogramVector[timeStep];
 
-     m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
-     m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
-   }
+      m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
+      m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
+    }
     break;
-  }
+
   case MASKING_MODE_IMAGE:
-    statistics = &m_MaskedImageStatisticsVector[timeStep];
-    histogram = &m_MaskedImageHistogramVector[timeStep];
+    statisticsContainer = &m_MaskedImageStatisticsVector[timeStep];
+    histogramContainer = &m_MaskedImageHistogramVector[timeStep];
 
     m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
     m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
     break;
 
   case MASKING_MODE_PLANARFIGURE:
-    statistics = &m_PlanarFigureStatisticsVector[timeStep];
-    histogram = &m_PlanarFigureHistogramVector[timeStep];
+    statisticsContainer = &m_PlanarFigureStatisticsVector[timeStep];
+    histogramContainer = &m_PlanarFigureHistogramVector[timeStep];
 
     m_PlanarFigureStatisticsTimeStampVector[timeStep].Modified();
     m_PlanarFigureStatisticsCalculationTriggerVector[timeStep] = false;
@@ -350,8 +351,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
         m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         3,
-        *statistics,
-        histogram );
+        statisticsContainer,
+        histogramContainer );
     }
     else
     {
@@ -360,8 +361,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
         InternalCalculateStatisticsMasked,
         3,
         m_InternalImageMask3D.GetPointer(),
-        *statistics,
-        histogram );
+        statisticsContainer,
+        histogramContainer );
     }
   }
   else if ( m_InternalImage->GetDimension() == 2 )
@@ -372,8 +373,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
         m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         2,
-        *statistics,
-        histogram );
+        statisticsContainer,
+        histogramContainer );
     }
     else
     {
@@ -382,8 +383,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
         InternalCalculateStatisticsMasked,
         2,
         m_InternalImageMask2D.GetPointer(),
-        *statistics,
-        histogram );
+        statisticsContainer,
+        histogramContainer );
     }
   }
   else
@@ -401,11 +402,38 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 
 
 const ImageStatisticsCalculator::HistogramType *
-ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
+ImageStatisticsCalculator::GetHistogram( unsigned int timeStep, unsigned int label ) const
 {
   if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return NULL;
+  }
+
+  switch ( m_MaskingMode )
+  {
+  case MASKING_MODE_NONE:
+  default:
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageHistogramVector[timeStep][label];
+
+      return m_ImageHistogramVector[timeStep][label];
+    }
+
+  case MASKING_MODE_IMAGE:
+    return m_MaskedImageHistogramVector[timeStep][label];
+
+  case MASKING_MODE_PLANARFIGURE:
+    return m_PlanarFigureHistogramVector[timeStep][label];
+  }
+}
+
+const ImageStatisticsCalculator::HistogramContainer &
+ImageStatisticsCalculator::GetHistogramVector( unsigned int timeStep ) const
+{
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  {
+    return m_EmptyHistogramContainer;
   }
 
   switch ( m_MaskingMode )
@@ -429,11 +457,38 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 
 
 const ImageStatisticsCalculator::Statistics &
-ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
+ImageStatisticsCalculator::GetStatistics( unsigned int timeStep, unsigned int label ) const
 {
   if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return m_EmptyStatistics;
+  }
+
+  switch ( m_MaskingMode )
+  {
+  case MASKING_MODE_NONE:
+  default:
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageStatisticsVector[timeStep][label];
+
+      return m_ImageStatisticsVector[timeStep][label];
+    }
+  case MASKING_MODE_IMAGE:
+    return m_MaskedImageStatisticsVector[timeStep][label];
+
+  case MASKING_MODE_PLANARFIGURE:
+    return m_PlanarFigureStatisticsVector[timeStep][label];
+  }
+}
+
+
+const ImageStatisticsCalculator::StatisticsContainer &
+ImageStatisticsCalculator::GetStatisticsVector( unsigned int timeStep ) const
+{
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  {
+    return m_EmptyStatisticsContainer;
   }
 
   switch ( m_MaskingMode )
@@ -453,6 +508,7 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
     return m_PlanarFigureStatisticsVector[timeStep];
   }
 }
+
 
 
 void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
@@ -636,8 +692,8 @@ bool ImageStatisticsCalculator::GetPrincipalAxis(
 template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   const itk::Image< TPixel, VImageDimension > *image,
-  Statistics &statistics,
-  typename HistogramType::ConstPointer *histogram )
+  StatisticsContainer *statisticsContainer,
+  HistogramContainer* histogramContainer )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -645,6 +701,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   typedef itk::Statistics::ScalarImageToHistogramGenerator< ImageType >
     HistogramGeneratorType;
+
+  statisticsContainer->clear();
+  histogramContainer->clear();
 
   // Progress listening...
   typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
@@ -670,7 +729,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   histogramGenerator->SetHistogramMin( -1024.0 );
   histogramGenerator->SetHistogramMax( 2048.0 );
   histogramGenerator->Compute();
-  *histogram = histogramGenerator->GetOutput();
+
+  histogramContainer->push_back( histogramGenerator->GetOutput() );
 
   // Calculate statistics (separate filter)
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
@@ -686,6 +746,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   this->InvokeEvent( itk::EndEvent() );
 
+  Statistics statistics;
+  statistics.Label = 1;
   statistics.N = image->GetBufferedRegion().GetNumberOfPixels();
   statistics.Min = statisticsFilter->GetMinimum();
   statistics.Max = statisticsFilter->GetMaximum();
@@ -694,12 +756,14 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.Sigma = statisticsFilter->GetSigma();
   statistics.RMS = sqrt( statistics.Mean * statistics.Mean 
     + statistics.Sigma * statistics.Sigma );
+
+  statisticsContainer->push_back( statistics );
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-    void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
-        const itk::Image< TPixel, VImageDimension > *image,
-        itk::Image< unsigned short, VImageDimension > *maskImage )
+void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
+  const itk::Image< TPixel, VImageDimension > *image,
+  itk::Image< unsigned short, VImageDimension > *maskImage )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -724,12 +788,12 @@ template < typename TPixel, unsigned int VImageDimension >
   }
 }
 
-    template < typename TPixel, unsigned int VImageDimension >
+template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   const itk::Image< TPixel, VImageDimension > *image,
   itk::Image< unsigned short, VImageDimension > *maskImage,
-  Statistics &statistics,
-  typename HistogramType::ConstPointer *histogram )
+  StatisticsContainer* statisticsContainer,
+  HistogramContainer* histogramContainer )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -744,6 +808,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   typedef itk::ExtractImageFilter< ImageType, ImageType > ExtractImageFilterType;
 
+  statisticsContainer->clear();
+  histogramContainer->clear();
 
 
   // Make sure that mask is set
@@ -885,35 +951,46 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   labelStatisticsFilter->RemoveObserver( observerTag );
 
 
-  // Find label of mask (other than 0)
+  // Find all relevant labels of mask (other than 0)
+  std::list< int > relevantLabels;
   bool maskNonEmpty = false;
   unsigned int i;
   for ( i = 1; i < 4096; ++i )
   {
     if ( labelStatisticsFilter->HasLabel( i ) )
     {
+      relevantLabels.push_back( i );
       maskNonEmpty = true;
-      break;
     }
   }
 
 
   if ( maskNonEmpty )
   {
-    *histogram = labelStatisticsFilter->GetHistogram( i );
-    statistics.N = labelStatisticsFilter->GetCount( i );
-    statistics.Min = labelStatisticsFilter->GetMinimum( i );
-    statistics.Max = labelStatisticsFilter->GetMaximum( i );
-    statistics.Mean = labelStatisticsFilter->GetMean( i );
-    statistics.Median = labelStatisticsFilter->GetMedian( i );
-    statistics.Sigma = labelStatisticsFilter->GetSigma( i );
-    statistics.RMS = sqrt( statistics.Mean * statistics.Mean 
-      + statistics.Sigma * statistics.Sigma );
+    std::list< int >::iterator it;
+    for ( it = relevantLabels.begin(), i = 0;
+          it != relevantLabels.end();
+          ++it, ++i )
+    {
+      histogramContainer->push_back( HistogramType::ConstPointer( labelStatisticsFilter->GetHistogram( (*it) ) ) );
+
+      Statistics statistics;
+      statistics.Label = (*it);
+      statistics.N = labelStatisticsFilter->GetCount( *it );
+      statistics.Min = labelStatisticsFilter->GetMinimum( *it );
+      statistics.Max = labelStatisticsFilter->GetMaximum( *it );
+      statistics.Mean = labelStatisticsFilter->GetMean( *it );
+      statistics.Median = labelStatisticsFilter->GetMedian( *it );
+      statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
+      statistics.RMS = sqrt( statistics.Mean * statistics.Mean 
+        + statistics.Sigma * statistics.Sigma );
+      statisticsContainer->push_back( statistics );
+    }
   }
   else
   {
-    *histogram = m_EmptyHistogram;
-    statistics.Reset();
+    histogramContainer->push_back( HistogramType::ConstPointer( m_EmptyHistogram ) );
+    statisticsContainer->push_back( Statistics() );;
   }
 }
 

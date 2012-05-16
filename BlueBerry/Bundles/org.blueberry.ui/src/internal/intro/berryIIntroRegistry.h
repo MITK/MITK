@@ -29,7 +29,7 @@ namespace berry {
  *
  * @since 3.0
  */
-struct IIntroRegistry {
+struct BERRY_UI IIntroRegistry {
 
     virtual ~IIntroRegistry();
     /**

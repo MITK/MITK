@@ -23,9 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QPoint>
 
+#include <org_blueberry_ui_qt_Export.h>
+
 namespace berry {
 
-struct TabDragHandler {
+struct BERRY_UI_QT TabDragHandler {
 
     virtual ~TabDragHandler();
 

@@ -140,6 +140,7 @@ set(SRC_CPP_FILES
   #handlers
   handlers/berryHandlerUtil.cpp
   handlers/berryIHandlerActivation.cpp
+  handlers/berryIHandlerService.cpp
   handlers/berryShowViewHandler.cpp
   
   #src

@@ -34,7 +34,7 @@ namespace berry {
  * @see SelectionChangedEvent
  *
  **/
-struct ISelection : public Object
+struct BERRY_UI ISelection : public Object
 {
   berryInterfaceMacro(ISelection, berry)
 

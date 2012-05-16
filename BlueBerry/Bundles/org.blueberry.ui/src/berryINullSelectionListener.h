@@ -39,7 +39,7 @@ namespace berry
  * @see ISelectionListener
  *
  */
-struct INullSelectionListener : public ISelectionListener {
+struct BERRY_UI INullSelectionListener : public ISelectionListener {
   berryInterfaceMacro(INullSelectionListener, berry)
 
   ~INullSelectionListener();

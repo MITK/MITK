@@ -44,7 +44,7 @@ namespace berry
  * </pre>
  * </p>
  */
-struct IPreferencePage: virtual public Object
+struct BERRY_UI IPreferencePage: virtual public Object
 {
 
   berryInterfaceMacro(IPreferencePage, berry)

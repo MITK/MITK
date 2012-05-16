@@ -22,9 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPresentationSerializer.h>
 #include <berryIMemento.h>
 
+#include <org_blueberry_ui_qt_Export.h>
+
 namespace berry {
 
-struct TabOrder {
+struct BERRY_UI_QT TabOrder {
 
     virtual ~TabOrder();
   

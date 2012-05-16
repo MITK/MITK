@@ -48,7 +48,7 @@ namespace berry
 struct BERRY_UI IIntroManager
 {
 
-  virtual ~IIntroManager() {}
+  virtual ~IIntroManager();
   /**
    * Closes the given intro part.
    *

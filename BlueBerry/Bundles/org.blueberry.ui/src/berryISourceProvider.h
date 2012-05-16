@@ -52,6 +52,8 @@ struct BERRY_UI ISourceProvider : public virtual Object {
 
   typedef std::map<std::string, Object::Pointer> StateMapType;
 
+  ~ISourceProvider();
+
 
   /**
    * Adds a listener to this source provider. This listener will be notified

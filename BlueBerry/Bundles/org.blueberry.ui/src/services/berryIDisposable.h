@@ -54,6 +54,8 @@ struct BERRY_UI IDisposable : public virtual Object
 
   berryInterfaceMacro(IDisposable, berry)
 
+  ~IDisposable();
+
   /**
    * Disposes of this service. All resources must be freed. All listeners must
    * be detached. Dispose will only be called once during the life cycle of a

@@ -38,6 +38,8 @@ struct IDropTarget : public Object {
 
   berryObjectMacro(IDropTarget);
 
+  ~IDropTarget();
+
   /**
    * Drops the object in this position
    */

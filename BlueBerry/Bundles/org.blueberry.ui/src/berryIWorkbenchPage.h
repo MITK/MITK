@@ -208,6 +208,8 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    */
   static const int MATCH_ID; // = 2;
 
+  ~IWorkbenchPage();
+
 
   /**
    * Activates the given part. The part will be brought to the front and given

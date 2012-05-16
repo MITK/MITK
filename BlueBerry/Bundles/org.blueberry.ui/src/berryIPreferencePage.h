@@ -50,6 +50,8 @@ struct IPreferencePage: virtual public Object
 
   berryInterfaceMacro(IPreferencePage, berry)
 
+  ~IPreferencePage();
+
   /**
      * Initializes this preference page for the given workbench.
      * <p>

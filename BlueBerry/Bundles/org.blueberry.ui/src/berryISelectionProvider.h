@@ -37,7 +37,9 @@ namespace berry
  */
 struct BERRY_UI ISelectionProvider : public virtual Object {
 
-  berryInterfaceMacro(ISelectionProvider, berry);
+  berryInterfaceMacro(ISelectionProvider, berry)
+
+  ~ISelectionProvider();
 
     /**
      * Adds a listener for selection changes in this selection provider.

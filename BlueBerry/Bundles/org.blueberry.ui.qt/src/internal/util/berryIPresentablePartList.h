@@ -27,9 +27,7 @@ namespace berry
 struct IPresentablePartList
 {
 
-  virtual ~IPresentablePartList()
-  {
-  }
+  virtual ~IPresentablePartList();
 
   virtual void Insert(IPresentablePart::Pointer part, int idx) = 0;
 

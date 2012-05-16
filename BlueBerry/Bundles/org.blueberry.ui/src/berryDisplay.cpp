@@ -23,6 +23,11 @@ namespace berry {
 
 Display* Display::instance = 0;
 
+Display::~Display()
+{
+
+}
+
 Display* Display::GetDefault()
 {
   poco_assert(instance);

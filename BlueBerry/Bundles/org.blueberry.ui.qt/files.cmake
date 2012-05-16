@@ -25,12 +25,16 @@ set(INTERNAL_CPP_FILES
   defaultpresentation/berryQtWorkbenchPresentationFactory.cpp
   
   util/berryAbstractTabFolder.cpp
+  util/berryAbstractTabItem.cpp
+  util/berryIPresentablePartList.cpp
   util/berryLeftToRightTabOrder.cpp
   util/berryPartInfo.cpp
   util/berryPresentablePartFolder.cpp
   util/berryReplaceDragHandler.cpp
   util/berryTabbedStackPresentation.cpp
+  util/berryTabDragHandler.cpp
   util/berryTabFolderEvent.cpp
+  util/berryTabOrder.cpp
   
   berryQtDisplay.cpp
   berryQtDnDTweaklet.cpp

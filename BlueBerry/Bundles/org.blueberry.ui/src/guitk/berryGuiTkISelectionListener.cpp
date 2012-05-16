@@ -21,6 +21,10 @@ namespace berry {
 
 namespace GuiTk {
 
+ISelectionListener::~ISelectionListener()
+{
+}
+
 void
 ISelectionListener::Events
 ::AddListener(ISelectionListener::Pointer l)

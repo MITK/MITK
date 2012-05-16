@@ -36,7 +36,7 @@ struct BERRY_UI IReusableEditor : public virtual IEditorPart {
 
   berryInterfaceMacro(IReusableEditor, berry)
 
-  virtual ~IReusableEditor() {}
+  virtual ~IReusableEditor();
 
     /**
      * Sets the input to this editor.

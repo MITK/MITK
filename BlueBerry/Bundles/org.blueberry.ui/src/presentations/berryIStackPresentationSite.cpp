@@ -23,4 +23,9 @@ int IStackPresentationSite::STATE_MINIMIZED = 0;
 int IStackPresentationSite::STATE_MAXIMIZED = 1;
 int IStackPresentationSite::STATE_RESTORED = 2;
 
+IStackPresentationSite::~IStackPresentationSite()
+{
+
+}
+
 }

@@ -36,4 +36,9 @@ const int IPresentablePart::PROP_PANE_MENU = 0x302;
 const int IPresentablePart::PROP_PREFERRED_SIZE =
     IWorkbenchPartConstants::PROP_PREFERRED_SIZE;
 
+IPresentablePart::~IPresentablePart()
+{
+
+}
+
 }

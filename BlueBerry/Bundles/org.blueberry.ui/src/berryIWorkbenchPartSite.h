@@ -39,6 +39,8 @@ struct BERRY_UI IWorkbenchPartSite : public IWorkbenchSite
 
   berryInterfaceMacro(IWorkbenchPartSite, berry);
 
+  ~IWorkbenchPartSite();
+
   /**
    * Returns the part registry extension id for this workbench site's part.
    * <p>

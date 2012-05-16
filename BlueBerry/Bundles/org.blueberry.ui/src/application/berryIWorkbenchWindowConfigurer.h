@@ -56,6 +56,8 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
 
   berryInterfaceMacro(IWorkbenchWindowConfigurer, berry);
 
+  ~IWorkbenchWindowConfigurer();
+
   /**
      * Returns the underlying workbench window.
      *

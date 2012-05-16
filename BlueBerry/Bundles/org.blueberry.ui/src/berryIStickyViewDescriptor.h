@@ -42,6 +42,8 @@ struct BERRY_UI IStickyViewDescriptor : public Object {
 
   berryObjectMacro(IStickyViewDescriptor)
 
+  ~IStickyViewDescriptor();
+
   /**
    * Return the id of the view to be made sticky.
    *

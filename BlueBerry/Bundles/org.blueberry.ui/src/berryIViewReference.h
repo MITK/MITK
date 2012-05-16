@@ -35,6 +35,8 @@ struct BERRY_UI IViewReference : virtual public IWorkbenchPartReference {
 
   berryInterfaceMacro(IViewReference, berry);
 
+  ~IViewReference();
+
     /**
      * Returns the secondary ID for the view.
      *

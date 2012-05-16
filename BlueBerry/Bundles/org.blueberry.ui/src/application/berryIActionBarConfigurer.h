@@ -46,6 +46,8 @@ struct BERRY_UI IActionBarConfigurer : public Object {
 
   berryInterfaceMacro(IActionBarConfigurer, berry);
 
+  ~IActionBarConfigurer();
+
     /**
      * Returns the workbench window configurer for the window
      * containing this configurer's action bars.

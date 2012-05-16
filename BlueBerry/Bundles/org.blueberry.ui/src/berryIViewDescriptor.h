@@ -53,6 +53,8 @@ struct BERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdapt
 
   berryInterfaceMacro(IViewDescriptor, berry);
 
+  ~IViewDescriptor();
+
   /**
    * Creates an instance of the view defined in the descriptor.
    *

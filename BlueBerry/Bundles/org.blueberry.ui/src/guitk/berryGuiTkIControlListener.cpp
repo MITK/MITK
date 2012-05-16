@@ -21,6 +21,10 @@ namespace berry {
 
 namespace GuiTk {
 
+IControlListener::~IControlListener()
+{
+}
+
 void
 IControlListener::Events
 ::AddListener(IControlListener::Pointer l)

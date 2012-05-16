@@ -49,7 +49,7 @@ struct BERRY_UI IPathEditorInput : public IEditorInput {
 
   berryInterfaceMacro(IPathEditorInput, berry)
 
-  virtual ~IPathEditorInput() {}
+  virtual ~IPathEditorInput();
 
     /**
      * Returns the local file system path of the file underlying this editor input.

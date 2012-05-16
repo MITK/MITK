@@ -243,10 +243,7 @@ berryInterfaceMacro(IMemento, berry)
    */
   virtual void PutTextData(const std::string& data) = 0;
 
-  virtual ~IMemento()
-  {
-  }
-  ;
+  virtual ~IMemento();
 };
 
 } // namespace berry

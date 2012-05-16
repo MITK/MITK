@@ -50,7 +50,7 @@ struct BERRY_UI IFileEditorMapping : public Object {
 
   berryInterfaceMacro(IFileEditorMapping, berry)
 
-  virtual ~IFileEditorMapping() {}
+  virtual ~IFileEditorMapping();
 
     /**
      * Returns the default editor registered for this type mapping.

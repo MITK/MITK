@@ -24,4 +24,6 @@ const QString IRenderWindowPart::DECORATION_LOGO = "logo";
 const QString IRenderWindowPart::DECORATION_MENU = "menu";
 const QString IRenderWindowPart::DECORATION_BACKGROUND = "background";
 
+IRenderWindowPart::~IRenderWindowPart() {}
+
 }

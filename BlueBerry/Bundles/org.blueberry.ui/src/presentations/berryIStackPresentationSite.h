@@ -49,6 +49,8 @@ struct BERRY_UI IStackPresentationSite : public Object
 
   static int STATE_RESTORED; // = 2;
 
+  ~IStackPresentationSite();
+
   /**
    * Sets the state of the container. Called by the presentation when the
    * user causes the the container to be minimized, maximized, etc.

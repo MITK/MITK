@@ -50,8 +50,7 @@ struct BERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
 
   berryInterfaceMacro(IEditorDescriptor, berry);
 
-  virtual ~IEditorDescriptor()
-  {}
+  virtual ~IEditorDescriptor();
 
   /**
    * Returns the editor id.

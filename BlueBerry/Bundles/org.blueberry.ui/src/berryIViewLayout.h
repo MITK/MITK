@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIVIEWLAYOUT_H_
 #define BERRYIVIEWLAYOUT_H_
 
+#include <org_blueberry_ui_Export.h>
+
 #include <berryMacros.h>
 #include <berryObject.h>
 
@@ -38,7 +40,7 @@ struct BERRY_UI IViewLayout : public Object {
 
   berryInterfaceMacro(IViewLayout, berry)
 
-  virtual  ~IViewLayout() {}
+  virtual  ~IViewLayout();
 
     /**
      * Returns whether the view is closeable.

@@ -21,26 +21,66 @@ set(SRC_CPP_FILES
   berryFileEditorInput.cpp
   berryGeometry.cpp
   berryIDropTargetListener.cpp
+  berryIEditorDescriptor.cpp
+  berryIEditorInput.cpp
+  berryIEditorMatchingStrategy.cpp
+  berryIEditorPart.cpp
+  berryIEditorReference.cpp
   berryIEditorRegistry.cpp
+  berryIEditorSite.cpp
+  berryIFileEditorMapping.cpp
+  berryIFolderLayout.cpp
   berryImageDescriptor.cpp
   berryIMemento.cpp
+  berryINullSelectionListener.cpp
   berryIPageLayout.cpp
   berryIPartListener.cpp
+  berryIPageService.cpp
+  berryIPartService.cpp
+  berryIPathEditorInput.cpp
+  berryIPerspectiveDescriptor.cpp
+  berryIPerspectiveFactory.cpp
   berryIPerspectiveListener.cpp
+  berryIPerspectiveRegistry.cpp
+  berryIPlaceholderFolderLayout.cpp
+  berryIPostSelectionProvider.cpp
+  berryIPreferencePage.cpp
   berryIPropertyChangeListener.cpp
+  berryIReusableEditor.cpp
   berryISaveablePart.cpp
   berryISaveablesLifecycleListener.cpp
+  berryISaveablesSource.cpp
+  berryISelection.cpp
   berryISelectionChangedListener.cpp
   berryISelectionListener.cpp
+  berryISelectionProvider.cpp
+  berryISelectionService.cpp
   berryIShellListener.cpp
+  berryIShellProvider.cpp
   berryISizeProvider.cpp
+  berryISourceProvider.cpp
   berryISourceProviderListener.cpp
   berryISources.cpp
+  berryIStickyViewDescriptor.cpp
   berryIStructuredSelection.cpp
+  berryIViewCategory.cpp
+  berryIViewDescriptor.cpp
+  berryIViewLayout.cpp
+  berryIViewPart.cpp
+  berryIViewReference.cpp
+  berryIViewRegistry.cpp
+  berryIViewSite.cpp
   berryIWindowListener.cpp
+  berryIWorkbench.cpp
   berryIWorkbenchListener.cpp
   berryIWorkbenchPage.cpp
+  berryIWorkbenchPart.cpp
   berryIWorkbenchPartConstants.cpp
+  berryIWorkbenchPartDescriptor.cpp
+  berryIWorkbenchPartReference.cpp
+  berryIWorkbenchPartSite.cpp
+  berryIWorkbenchSite.cpp
+  berryIWorkbenchWindow.cpp
   berryPlatformUI.cpp
   berryPoint.cpp
   berryPropertyChangeEvent.cpp
@@ -60,6 +100,9 @@ set(SRC_CPP_FILES
   
   #application
   application/berryActionBarAdvisor.cpp
+  application/berryIActionBarConfigurer.cpp
+  application/berryIWorkbenchConfigurer.cpp
+  application/berryIWorkbenchWindowConfigurer.cpp
   application/berryWorkbenchAdvisor.cpp
   application/berryWorkbenchWindowAdvisor.cpp
   
@@ -83,6 +126,7 @@ set(SRC_CPP_FILES
   
   #dialogs
   dialogs/berryIDialog.cpp
+  dialogs/berryIShowViewDialog.cpp
   dialogs/berryMessageDialog.cpp
   
   #guitk
@@ -99,19 +143,31 @@ set(SRC_CPP_FILES
   handlers/berryShowViewHandler.cpp
   
   #src
+  intro/berryIIntroManager.cpp
   intro/berryIntroPart.cpp
+  intro/berryIIntroPart.cpp
+  intro/berryIIntroSite.cpp
+
+  #services
+  services/berryIDisposable.cpp
+  services/berryINestable.cpp
+  services/berryIServiceFactory.cpp
+  services/berryIServiceLocator.cpp
+  services/berryIServiceWithSources.cpp
   
   #tweaklets
   tweaklets/berryDnDTweaklet.cpp
   tweaklets/berryGuiWidgetsTweaklet.cpp
   tweaklets/berryImageTweaklet.cpp
   tweaklets/berryMessageDialogTweaklet.cpp
+  tweaklets/berryITracker.cpp
   tweaklets/berryWorkbenchPageTweaklet.cpp
   tweaklets/berryWorkbenchTweaklet.cpp
   
   #presentations
   presentations/berryIPresentablePart.cpp
   presentations/berryIPresentationFactory.cpp
+  presentations/berryIPresentationSerializer.cpp
   presentations/berryIStackPresentationSite.cpp
   presentations/berryStackDropResult.cpp
   presentations/berryStackPresentation.cpp
@@ -120,6 +176,7 @@ set(SRC_CPP_FILES
   testing/berryTestableObject.cpp
   
   #util
+  util/berryISafeRunnableRunner.cpp
   util/berrySafeRunnable.cpp
   
 )
@@ -129,6 +186,8 @@ set(INTERNAL_CPP_FILES
 
   #intro
   intro/berryEditorIntroAdapterPart.cpp
+  intro/berryIIntroDescriptor.cpp
+  intro/berryIIntroRegistry.cpp
   intro/berryIntroConstants.cpp
   intro/berryIntroDescriptor.cpp
   intro/berryIntroPartAdapterSite.cpp
@@ -157,6 +216,16 @@ set(INTERNAL_CPP_FILES
   berryFileEditorMapping.cpp
   berryFolderLayout.cpp
   berryIDragOverListener.cpp
+  berryIDropTarget.cpp
+  berryIEvaluationResultCache.cpp
+  berryIEvaluationResultCache.cpp
+  berryILayoutContainer.cpp
+  berryILayoutContainer.cpp
+  berryIServiceLocatorCreator.cpp
+  berryIStackableContainer.cpp
+  berryIStickyViewManager.cpp
+  berryIWorkbenchLocationService.cpp
+  berryIWorkbenchLocationService.cpp
   berryLayoutHelper.cpp
   berryLayoutPart.cpp
   berryLayoutPartSash.cpp

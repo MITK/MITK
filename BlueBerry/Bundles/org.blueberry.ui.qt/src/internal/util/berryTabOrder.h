@@ -27,7 +27,7 @@ namespace berry {
 
 struct TabOrder {
 
-    virtual ~TabOrder() {}
+    virtual ~TabOrder();
   
     /**
      * Adds a part due to a user action that opened a part

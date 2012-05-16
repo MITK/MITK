@@ -68,6 +68,8 @@ struct BERRY_UI IEditorInput : public Object // public IAdaptable
 {
   berryInterfaceMacro(IEditorInput, berry);
 
+  ~IEditorInput();
+
   /**
    * Returns whether the editor input exists.
    * <p>

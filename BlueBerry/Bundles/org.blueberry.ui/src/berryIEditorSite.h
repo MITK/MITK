@@ -36,7 +36,7 @@ struct BERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
 
   berryInterfaceMacro(IEditorSite, berry);
 
-  virtual ~IEditorSite() {}
+  virtual ~IEditorSite();
 
     /**
      * Returns the action bar contributor for this editor.

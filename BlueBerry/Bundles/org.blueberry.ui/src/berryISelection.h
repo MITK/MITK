@@ -37,7 +37,9 @@ namespace berry {
  **/
 struct ISelection : public Object
 {
-  berryInterfaceMacro(ISelection, berry);
+  berryInterfaceMacro(ISelection, berry)
+
+  ~ISelection();
 
   /**
    * Returns whether this selection is empty.

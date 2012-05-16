@@ -78,7 +78,7 @@ struct BERRY_UI IViewRegistry
    */
   virtual std::vector<IStickyViewDescriptor::Pointer> GetStickyViews() const = 0;
 
-  virtual ~IViewRegistry() {}
+  virtual ~IViewRegistry();
 };
 
 }

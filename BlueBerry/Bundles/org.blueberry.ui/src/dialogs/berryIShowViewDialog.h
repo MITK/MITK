@@ -33,6 +33,8 @@ struct BERRY_UI IShowViewDialog : public IDialog
 {
   berryInterfaceMacro(IShowViewDialog, berry);
 
+  ~IShowViewDialog();
+
 
   virtual std::vector<IViewDescriptor::Pointer> GetSelection() = 0;
 

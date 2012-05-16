@@ -21,4 +21,8 @@ namespace berry {
 
 const std::string IMemento::TAG_ID = "IMemento.internal.id";
 
+IMemento::~IMemento()
+{
+}
+
 }

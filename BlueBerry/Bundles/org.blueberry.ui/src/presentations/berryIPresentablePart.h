@@ -42,6 +42,8 @@ struct BERRY_UI IPresentablePart : public Object, public ISizeProvider {
 
   berryInterfaceMacro(IPresentablePart, berry);
 
+  ~IPresentablePart();
+
     /**
      * The property id for <code>isDirty</code>.
      */

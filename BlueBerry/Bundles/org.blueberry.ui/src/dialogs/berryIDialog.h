@@ -60,7 +60,10 @@ struct BERRY_UI IDialog : public virtual Object
 
   enum ReturnCode { OK, CANCEL };
 
+  ~IDialog();
+
   virtual int Open() = 0;
+
 };
 
 }

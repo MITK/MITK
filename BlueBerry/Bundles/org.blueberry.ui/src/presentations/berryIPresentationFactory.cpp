@@ -22,6 +22,11 @@
 namespace berry
 {
 
+IPresentationFactory::~IPresentationFactory()
+{
+
+}
+
 int IPresentationFactory::SASHTYPE_NORMAL = 0;
 int IPresentationFactory::SASHTYPE_FLOATING = 1 << 1;
 int IPresentationFactory::SASHORIENTATION_HORIZONTAL = Constants::HORIZONTAL; // 1<<8

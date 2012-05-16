@@ -47,6 +47,8 @@ struct BERRY_UI IHandlerActivation : public IEvaluationResultCache {
 
   berryInterfaceMacro(IHandlerActivation, berry)
 
+  ~IHandlerActivation();
+
   /**
    * The depth at which the root exists.
    *

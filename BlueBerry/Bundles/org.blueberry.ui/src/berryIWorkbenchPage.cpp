@@ -53,4 +53,8 @@ const std::string IWorkbenchPage::EDITOR_ID_ATTR = "org.blueberry.ui.editorID"; 
 
   const int IWorkbenchPage::MATCH_ID = 2;
 
+  IWorkbenchPage::~IWorkbenchPage()
+  {
+
+  }
 }

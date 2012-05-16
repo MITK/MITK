@@ -65,7 +65,7 @@ struct BERRY_UI IPerspectiveDescriptor : public Object {
 
   berryInterfaceMacro(IPerspectiveDescriptor, berry)
 
-  virtual ~IPerspectiveDescriptor() {}
+  virtual ~IPerspectiveDescriptor();
 
     /**
      * Returns the description of this perspective.

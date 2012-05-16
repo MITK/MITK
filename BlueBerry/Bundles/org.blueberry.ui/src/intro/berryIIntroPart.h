@@ -59,6 +59,8 @@ struct BERRY_UI IIntroPart : public virtual Object { // IAdaptable {
 
   berryInterfaceMacro(IIntroPart, berry)
 
+  ~IIntroPart();
+
     /**
    * The property id for <code>getTitleImage</code> and
    * <code>getTitle</code>.

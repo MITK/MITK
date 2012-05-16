@@ -22,6 +22,10 @@
 
 namespace berry {
 
+IPropertyChangeListener::~IPropertyChangeListener()
+{
+}
+
 void
 IPropertyChangeListener::Events
 ::AddListener(IPropertyChangeListener::Pointer listener)

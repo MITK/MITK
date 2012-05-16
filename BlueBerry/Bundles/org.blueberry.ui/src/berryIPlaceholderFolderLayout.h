@@ -43,7 +43,7 @@ struct BERRY_UI IPlaceholderFolderLayout : public Object {
 
   berryInterfaceMacro(IPlaceholderFolderLayout, berry)
 
-  virtual ~IPlaceholderFolderLayout() {}
+  virtual ~IPlaceholderFolderLayout();
 
     /**
      * Adds a view placeholder to this folder.

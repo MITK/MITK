@@ -40,7 +40,7 @@ public:
 
   berryManifestMacro(IPresentationFactory, berry);
 
-  virtual ~IPresentationFactory() {}
+  virtual ~IPresentationFactory();
 
   /**
    * Bit value for the createSash method's 'style' parameter.

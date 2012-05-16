@@ -111,6 +111,8 @@ namespace berry
   {
     berryInterfaceMacro(IPreferences, berry)
 
+    virtual ~IPreferences();
+
     /**
      * Associates the specified value with the specified key in this node.
      * 

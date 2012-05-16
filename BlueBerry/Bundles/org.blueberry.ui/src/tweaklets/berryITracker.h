@@ -37,7 +37,7 @@ namespace berry {
 struct ITracker
 {
 
-  virtual ~ITracker() {}
+  virtual ~ITracker();
   
   virtual Rectangle GetRectangle() = 0;
   virtual void SetRectangle(const Rectangle& rectangle) = 0;

@@ -52,9 +52,12 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   nd0->SetOrientation(initialOri);
   nd0->SetPositionAccuracy(initialError);
   nd0->SetDataValid(initialValid);
+  nd0->SetName("testName");
 
-  
   MITK_TEST_CONDITION(myFilter->GetOutput() == NULL, "testing GetOutput()");
+
+  MITK_TEST_CONDITION(myFilter->GetInput() == NULL, "testing GetInput() without SetInput()");
+  MITK_TEST_CONDITION(myFilter->GetInput(0) == NULL, "testing GetInput(0) without SetInput()");
 
   myFilter->SetInput(nd0);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd0, "testing Set-/GetInput()");
@@ -62,6 +65,23 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_CONDITION(myFilter->GetOutput() != NULL, "testing GetOutput() after SetInput()");
   MITK_TEST_CONDITION(myFilter->GetOutput(0) != NULL, "testing GetOutput() after SetInput()");
   MITK_TEST_CONDITION(myFilter->GetOutput(0) != nd0, "testing GetOutput() different object than input");
+
+  // check getInput() string input
+  MITK_TEST_CONDITION(myFilter->GetInput("invalidName") == NULL, "testing GetInput(string) invalid string");
+  MITK_TEST_CONDITION(myFilter->GetInput("testName") == nd0, "testing GetInput(string) valid string");
+
+  // check getInputIndex() string input
+  bool throwsException = false;
+  try {
+    myFilter->GetInputIndex("invalidName");
+  }
+  catch(std::invalid_argument e) {
+    throwsException = true;
+  }
+  MITK_TEST_CONDITION_REQUIRED(throwsException, "testing GetInputIndex(string) invalid string");
+
+  MITK_TEST_CONDITION(myFilter->GetInputIndex("testName") == 0, "testing GetInputIndex(string) valid string");
+
 
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->Graft(nd0);

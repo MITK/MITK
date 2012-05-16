@@ -14,23 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QDialog>
+#include <ui_QmitkAboutDialogGUI.h>
 #include "QmitkExtExports.h"
-#include <QWidget>
-#include <mitkCommon.h>
-
 
 class QmitkExt_EXPORT QmitkAboutDialog : public QDialog
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkAboutDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+  virtual ~QmitkAboutDialog();
 
-    QmitkAboutDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-    virtual ~QmitkAboutDialog();
+  QString GetAboutText() const;
+  QString GetCaptionText() const;
+  QString GetRevisionText() const;
+
+  void SetAboutText(const QString &text);
+  void SetCaptionText(const QString &text);
+  void SetRevisionText(const QString &text);
 
 protected slots:
+  void ShowModules();
 
-    void ShowModules();
-
+private:
+  Ui::QmitkAboutDialog m_GUI;
 };

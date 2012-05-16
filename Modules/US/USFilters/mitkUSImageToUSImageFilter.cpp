@@ -27,7 +27,7 @@ mitk::USImageToUSImageFilter::~USImageToUSImageFilter()
 {
 
 }
-/*
+
       // ---- OVERRIDDEN INHERITED METHODS ---- //
 void 	mitk::USImageToUSImageFilter::SetInput (const mitk::USImage * image){
   mitk::ImageToImageFilter::SetInput(image);
@@ -44,4 +44,11 @@ mitk::USImage::Pointer mitk::USImageToUSImageFilter::GetOutput(unsigned int idx)
   return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
-*/
+mitk::USImage::Pointer mitk::USImageToUSImageFilter::GetInput(unsigned int idx){
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  mitk::USImage::Pointer result = static_cast<USImage*>(this->ProcessObject::GetInput(idx));
+  return result;
+}
+
+

@@ -50,7 +50,8 @@ void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 }
 
     
-void mitk::USImageVideoSource::SetCameraInput(int deviceID){
+void mitk::USImageVideoSource::SetCameraInput(int deviceID)
+{
   m_OpenCVVideoSource->SetVideoCameraInput(deviceID);
 
   m_OpenCVVideoSource->StartCapturing();
@@ -61,24 +62,22 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID){
 }
 
 
-mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage(){
- // MITK_INFO << "GetNextImage called in USVideoSource!";
-  mitk::USImage::Pointer result;
-  mitk::Image::Pointer normalImage;
-  
+mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
+{
   m_OpenCVVideoSource->FetchFrame();
 
+  // This is a bit of a workaround: We only need to initialize an OpenCV Image. Actual
+  // Initialization happens inside the OpenCVVideoSource
   IplImage* iplImage = cvCreateImage(cvSize(640,480),IPL_DEPTH_8U,3); 
   m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(iplImage);
   
   this->m_OpenCVToMitkFilter->SetOpenCVImage(iplImage);
   this->m_OpenCVToMitkFilter->Update();
 
-  normalImage = this->m_OpenCVToMitkFilter->GetOutput(0);
-  result = mitk::USImage::New(normalImage);
-  
+  // OpenCVToMitkImageFilter returns a standard mit::image. We then transform it into an USImage
+  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
   
   cvReleaseImage (&iplImage);
- // MITK_INFO << "GetNextImage completed in USVideoSource!";
+
   return result;
 }

@@ -1213,12 +1213,18 @@ bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
 {
   // check the validity of input
   if( rhs == NULL || lhs == NULL )
+  {
+    MITK_INFO << "[AreIdentical( Image )] Input null. ";
     return false;
+  }
 
   // dimensionality
   const unsigned int rhsDimension = rhs->GetDimension();
   if( rhsDimension != lhs->GetDimension() )
+  {
+    MITK_INFO << "[AreIdentical( Image )] Dimensionality differs.";
     return false;
+  }
 
   // compare each dimension
   bool dimensionsIdentical = true;
@@ -1228,11 +1234,17 @@ bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
       dimensionsIdentical = false;
   }
   if(!dimensionsIdentical)
+  {
+    MITK_INFO << "[AreIdentical( Image )] Some dimension differs.";
     return false;
+  }
 
   // compare geometry
   if( !AreIdentical(rhs->GetGeometry(), lhs->GetGeometry()) )
+  {
+    MITK_INFO << "[AreIdentical( Image )] --> Geometry3D differs.";
     return false;
+  }
 
   // compare voxel values
 

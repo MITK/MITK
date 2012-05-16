@@ -743,15 +743,24 @@ bool mitk::AreIdentical(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs
 {
   // check the validity of input
   if( rhs == NULL || lhs == NULL )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Input null.";
     return false;
+  }
 
   // spacing
   if( !Equal( rhs->GetSpacing(), lhs->GetSpacing() ))
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Spacing differs.";
     return false;
+  }
 
   // origin
   if( !Equal( rhs->GetOrigin(), lhs->GetOrigin() ))
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Origin differs.";
     return false;
+  }
 
   // compare each view axis and extent
   bool viewAxisIdentical = true;
@@ -765,12 +774,19 @@ bool mitk::AreIdentical(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs
       extentsIdentical = false;
   }
   if( !viewAxisIdentical || !extentsIdentical )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Axis AND/OR Extent differ";
     return false;
+  }
+
 
   // index to world transform
   if( !mitk::MatrixEqualElementWise( rhs->GetIndexToWorldTransform()->GetMatrix(),
                                      lhs->GetIndexToWorldTransform()->GetMatrix()) )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] I2W Transformation matrix differs.";
     return false;
+  }
 
   return true;
 }

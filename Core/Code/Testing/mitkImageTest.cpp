@@ -222,104 +222,111 @@ int mitkImageTest(int argc, char* argv[])
 
   // testing access by index coordinates and by world coordinates
 
-  MITK_TEST_CONDITION_REQUIRED(argc == 2, "Check if test image is accessible!"); 
-  const std::string filename = std::string(argv[1]);
-  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
-  try
+
+
+  // PERFORM TESTS ON IMAGE FROM HDD, IF FILENAME WAS PROVIDED
+  if (argc > 1)
   {
-    imageReader->SetFileName(filename);
-    imageReader->Update();
+     MITK_TEST_CONDITION_REQUIRED(argc == 2, "Check if test image is accessible!"); 
+     const std::string filename = std::string(argv[1]);
+     mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+     try
+     {
+        imageReader->SetFileName(filename);
+        imageReader->Update();
+     }
+     catch(...) {
+        MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
+        return 0;
+     }  
+
+     mitk::Image::Pointer image = imageReader->GetOutput();
+
+     // generate a random point in world coordinates
+     mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;
+     xMaxIndex.Fill(0.0f);
+     yMaxIndex.Fill(0.0f);
+     zMaxIndex.Fill(0.0f);
+     xMaxIndex[0] = image->GetLargestPossibleRegion().GetSize()[0];
+     yMaxIndex[1] = image->GetLargestPossibleRegion().GetSize()[1];
+     zMaxIndex[2] = image->GetLargestPossibleRegion().GetSize()[2];
+     image->GetGeometry()->IndexToWorld(xMaxIndex, xMax);
+     image->GetGeometry()->IndexToWorld(yMaxIndex, yMax);
+     image->GetGeometry()->IndexToWorld(zMaxIndex, zMax);
+     MITK_INFO << "Origin " << image->GetGeometry()->GetOrigin()[0] << " "<< image->GetGeometry()->GetOrigin()[1] << " "<< image->GetGeometry()->GetOrigin()[2] << "";
+     MITK_INFO << "MaxExtend " << xMax[0] << " "<< yMax[1] << " "<< zMax[2] << "";
+     mitk::Point3D point;
+
+     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+     randomGenerator->Initialize( std::rand() );      // initialize with random value, to get sensible random points for the image
+     point[0] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[0], xMax[0]);
+     point[1] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[1], yMax[1]);
+     point[2] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[2], zMax[2]);
+     MITK_INFO << "RandomPoint " << point[0] << " "<< point[1] << " "<< point[2] << "";
+
+     // test values and max/min
+     mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
+     mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
+     mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
+     MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
+     MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
+
+     mitk::Image::Pointer cloneImage = image->Clone();
+     MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
+     MITK_TEST_CONDITION_REQUIRED(cloneImage->GetPixelType() == image->GetPixelType(), "Clone (testing pixel type)");
+
+     for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
+     {
+        MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
+     }
+
+     //access via itk
+     if(image->GetDimension()> 3)    // CastToItk only works with 3d images so we need to check for 4d images
+     {
+        mitk::ImageTimeSelector::Pointer selector = mitk::ImageTimeSelector::New();
+        selector->SetTimeNr(0);
+        selector->SetInput(image);
+        selector->Update();
+        image = selector->GetOutput();
+     }
+
+     if(image->GetDimension()==3)
+     {
+        typedef itk::Image<float,3> ItkFloatImage3D;
+        ItkFloatImage3D::Pointer itkimage;
+        mitk::CastToItkImage(image, itkimage);
+        MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
+
+        mitk::Point3D itkPhysicalPoint;
+        image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
+        MITK_INFO << "ITKPoint " << itkPhysicalPoint[0] << " "<< itkPhysicalPoint[1] << " "<< itkPhysicalPoint[2] << "";
+
+        mitk::Point3D backTransformedPoint;
+        image->GetGeometry()->ItkPhysicalPointToWorld(itkPhysicalPoint, backTransformedPoint);
+
+        MITK_TEST_CONDITION_REQUIRED( mitk::Equal(point,backTransformedPoint), "Testing world->itk-physical->world consistency");
+
+        itk::Index<3> idx;  
+        bool status = itkimage->TransformPhysicalPointToIndex(itkPhysicalPoint, idx);
+
+        MITK_INFO << "ITK Index " << idx[0] << " "<< idx[1] << " "<< idx[2] << "";
+
+        if(status)
+        {
+           float valByItk = itkimage->GetPixel(idx);
+           MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk, value), "Compare value of pixel returned by mitk in comparison to itk");
+        }
+        else
+        {
+           MITK_WARN<< "Index is out buffered region!";
+        }
+     }
+     else
+     {
+        MITK_INFO << "Image does not contain three dimensions, some test cases are skipped!";
+     } 
   }
-  catch(...) {
-    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
-    return 0;
-  }  
-  
-  mitk::Image::Pointer image = imageReader->GetOutput();
-  
-  // generate a random point in world coordinates
-  mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;
-  xMaxIndex.Fill(0.0f);
-  yMaxIndex.Fill(0.0f);
-  zMaxIndex.Fill(0.0f);
-  xMaxIndex[0] = image->GetLargestPossibleRegion().GetSize()[0];
-  yMaxIndex[1] = image->GetLargestPossibleRegion().GetSize()[1];
-  zMaxIndex[2] = image->GetLargestPossibleRegion().GetSize()[2];
-  image->GetGeometry()->IndexToWorld(xMaxIndex, xMax);
-  image->GetGeometry()->IndexToWorld(yMaxIndex, yMax);
-  image->GetGeometry()->IndexToWorld(zMaxIndex, zMax);
-  MITK_INFO << "Origin " << image->GetGeometry()->GetOrigin()[0] << " "<< image->GetGeometry()->GetOrigin()[1] << " "<< image->GetGeometry()->GetOrigin()[2] << "";
-  MITK_INFO << "MaxExtend " << xMax[0] << " "<< yMax[1] << " "<< zMax[2] << "";
-  mitk::Point3D point;
-
-  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randomGenerator->Initialize( std::rand() );      // initialize with random value, to get sensible random points for the image
-  point[0] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[0], xMax[0]);
-  point[1] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[1], yMax[1]);
-  point[2] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[2], zMax[2]);
-  MITK_INFO << "RandomPoint " << point[0] << " "<< point[1] << " "<< point[2] << "";
-
-  // test values and max/min
-  mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
-  mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
-  mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
-  MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
-  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
-
-  mitk::Image::Pointer cloneImage = image->Clone();
-  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
-  MITK_TEST_CONDITION_REQUIRED(cloneImage->GetPixelType() == image->GetPixelType(), "Clone (testing pixel type)");
-
-  for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
-  {
-    MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
-  }
-
-  //access via itk
-  if(image->GetDimension()> 3)    // CastToItk only works with 3d images so we need to check for 4d images
-  {
-    mitk::ImageTimeSelector::Pointer selector = mitk::ImageTimeSelector::New();
-    selector->SetTimeNr(0);
-    selector->SetInput(image);
-    selector->Update();
-    image = selector->GetOutput();
-  }
-
-  if(image->GetDimension()==3)
-  {
-    typedef itk::Image<float,3> ItkFloatImage3D;
-    ItkFloatImage3D::Pointer itkimage;
-    mitk::CastToItkImage(image, itkimage);
-    MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
-
-    mitk::Point3D itkPhysicalPoint;
-    image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
-    MITK_INFO << "ITKPoint " << itkPhysicalPoint[0] << " "<< itkPhysicalPoint[1] << " "<< itkPhysicalPoint[2] << "";
-
-    mitk::Point3D backTransformedPoint;
-    image->GetGeometry()->ItkPhysicalPointToWorld(itkPhysicalPoint, backTransformedPoint);
-
-    MITK_TEST_CONDITION_REQUIRED( mitk::Equal(point,backTransformedPoint), "Testing world->itk-physical->world consistency");
-
-    itk::Index<3> idx;  
-    bool status = itkimage->TransformPhysicalPointToIndex(itkPhysicalPoint, idx);
-
-    MITK_INFO << "ITK Index " << idx[0] << " "<< idx[1] << " "<< idx[2] << "";
-   
-    if(status)
-    {
-      float valByItk = itkimage->GetPixel(idx);
-      MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk, value), "Compare value of pixel returned by mitk in comparison to itk");
-    }
-    else
-    {
-      MITK_WARN<< "Index is out buffered region!";
-    }
-  }
-  else
-  {
-    MITK_INFO << "Image does not contain three dimensions, some test cases are skipped!";
-  } 
+ 
   
   // clone generated 3D image with one slice in z direction (cf. bug 11058)
   unsigned int* threeDdim = new unsigned int[3];
@@ -332,5 +339,16 @@ int mitkImageTest(int argc, char* argv[])
   // check that the clone image has the same dimensionality as the source image
   MITK_TEST_CONDITION_REQUIRED( cloneThreeDImage->GetDimension() == 3, "Testing if the clone image initializes with 3D!");
 
+
+  // Testing for Bug-11600
+  // Create a new image, store into datamanger, press reinit/global reinit.. should not crash
+  mitk::Image::Pointer newImageEmpty = mitk::Image::New();
+  MITK_TEST_CONDITION_REQUIRED( newImageEmpty.IsNotNull(), "An image was created. ");
+  MITK_TEST_CONDITION_REQUIRED( newImageEmpty->IsInitialized(), "Image::IsInitialized() ?");
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetDimension(0) > 0, "x-Dimension > 0");
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetDimension(1) > 0, "y-Dimension > 0");
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetDimension(2) > 0, "z-Dimension > 0");
+
+  
   MITK_TEST_END();
 }

@@ -30,7 +30,7 @@ namespace berry {
 
 class Perspective;
 
-struct IStickyViewManager : public Object {
+struct BERRY_UI IStickyViewManager : public Object {
 
   berryInterfaceMacro(IStickyViewManager, berry)
 

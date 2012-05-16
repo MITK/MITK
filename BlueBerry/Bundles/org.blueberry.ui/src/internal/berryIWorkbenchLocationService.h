@@ -21,6 +21,7 @@
 
 #include <berryObject.h>
 #include <berryMacros.h>
+#include <org_blueberry_ui_Export.h>
 
 namespace berry {
 
@@ -34,7 +35,7 @@ struct IPageSite;
  *
  * @since 3.4
  */
-struct IWorkbenchLocationService : public Object {
+struct BERRY_UI IWorkbenchLocationService : public Object {
 
   berryInterfaceMacro(IWorkbenchLocationService, berry)
 

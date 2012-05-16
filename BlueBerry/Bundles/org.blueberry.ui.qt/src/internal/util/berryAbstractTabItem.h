@@ -24,9 +24,11 @@
 
 #include "berryPartInfo.h"
 
+#include <org_blueberry_ui_qt_Export.h>
+
 namespace berry {
 
-struct AbstractTabItem {
+struct BERRY_UI_QT AbstractTabItem {
 
     virtual ~AbstractTabItem();
 

@@ -39,7 +39,7 @@ namespace berry {
  * @see IWorkbench#getPerspectiveRegistry
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IPerspectiveRegistry {
+struct BERRY_UI IPerspectiveRegistry {
 
     virtual ~IPerspectiveRegistry();
   

@@ -31,7 +31,7 @@ namespace berry {
  * \ingroup org_blueberry_ui_internal
  *
  */
-struct IStackableContainer : virtual public Object {
+struct BERRY_UI IStackableContainer : virtual public Object {
 
   berryObjectMacro(IStackableContainer);
 

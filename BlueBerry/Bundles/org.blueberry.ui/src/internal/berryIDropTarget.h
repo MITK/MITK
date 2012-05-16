@@ -34,7 +34,7 @@ namespace berry {
  *
  * @see IDragOverListener
  */
-struct IDropTarget : public Object {
+struct BERRY_UI IDropTarget : public Object {
 
   berryObjectMacro(IDropTarget);
 

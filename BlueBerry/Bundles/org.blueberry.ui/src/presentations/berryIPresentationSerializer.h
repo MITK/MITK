@@ -34,7 +34,7 @@ namespace berry {
  * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IPresentationSerializer {
+struct BERRY_UI IPresentationSerializer {
     /**
      * Returns a unique identifier for the given part. The identifier can later
      * be used to restore the original part by calling getPart(...). This identifier

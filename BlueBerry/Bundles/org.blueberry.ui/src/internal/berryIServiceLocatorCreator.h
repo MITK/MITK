@@ -22,6 +22,8 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
+#include <org_blueberry_ui_Export.h>
+
 
 namespace berry {
 
@@ -45,7 +47,7 @@ struct IDisposable;
  *
  * @since 3.4
  */
-struct IServiceLocatorCreator : public virtual Object {
+struct BERRY_UI IServiceLocatorCreator : public virtual Object {
 
   berryInterfaceMacro(IServiceLocatorCreator, berry);
 

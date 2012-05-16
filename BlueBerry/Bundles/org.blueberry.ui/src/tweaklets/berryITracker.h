@@ -34,7 +34,7 @@ namespace berry {
  *  typically used to represent window geometries in a lightweight manner.
  *
  */
-struct ITracker
+struct BERRY_UI ITracker
 {
 
   virtual ~ITracker();

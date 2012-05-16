@@ -31,7 +31,7 @@ namespace berry {
  * \ingroup org_blueberry_ui_internal
  *
  */
-struct ILayoutContainer : virtual public Object {
+struct BERRY_UI ILayoutContainer : virtual public Object {
 
   berryObjectMacro(ILayoutContainer);
 

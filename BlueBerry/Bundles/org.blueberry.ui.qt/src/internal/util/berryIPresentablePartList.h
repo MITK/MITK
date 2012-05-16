@@ -21,10 +21,12 @@
 #include <berryIPresentablePart.h>
 #include <vector>
 
+#include <org_blueberry_ui_qt_Export.h>
+
 namespace berry
 {
 
-struct IPresentablePartList
+struct BERRY_UI_QT IPresentablePartList
 {
 
   virtual ~IPresentablePartList();

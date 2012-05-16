@@ -21,6 +21,7 @@
 
 #include <berryObject.h>
 #include <berryMacros.h>
+#include <org_blueberry_ui_Export.h>
 
 namespace berry {
 
@@ -40,7 +41,7 @@ class Expression;
  * @see org.eclipse.ui.ISources
  * @see org.eclipse.ui.ISourceProvider
  */
-struct IEvaluationResultCache : public Object {
+struct BERRY_UI IEvaluationResultCache : public Object {
 
   berryInterfaceMacro(IEvaluationResultCache, berry)
 

@@ -1209,7 +1209,7 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
-bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
+bool mitk::compare::IsEqual(const mitk::Image* rhs, const mitk::Image* lhs)
 {
   // check the validity of input
   if( rhs == NULL || lhs == NULL )
@@ -1240,7 +1240,7 @@ bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
   }
 
   // compare geometry
-  if( !AreIdentical(rhs->GetGeometry(), lhs->GetGeometry()) )
+  if( !IsEqual(rhs->GetGeometry(), lhs->GetGeometry()) )
   {
     MITK_INFO << "[AreIdentical( Image )] --> Geometry3D differs.";
     return false;

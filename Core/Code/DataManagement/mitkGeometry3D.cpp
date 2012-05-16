@@ -739,7 +739,7 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   this->SetImageGeometry(isAnImageGeometry);
 }
 
-bool mitk::AreIdentical(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs)
+bool mitk::compare::IsEqual(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs)
 {
   // check the validity of input
   if( rhs == NULL || lhs == NULL )

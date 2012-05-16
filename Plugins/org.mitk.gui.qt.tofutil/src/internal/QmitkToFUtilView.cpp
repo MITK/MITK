@@ -44,7 +44,7 @@ QmitkToFUtilView::QmitkToFUtilView()
     : QmitkFunctionality()
     , m_Controls(NULL), m_MultiWidget( NULL )
     , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
-    , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_SurfaceNode(NULL)
+    , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
     , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
     , m_SurfaceDisplayCount(0), m_2DDisplayCount(0)
     , m_RealTimeClock(NULL)
@@ -245,6 +245,17 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
 
+    std::string rgbFileName;
+    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
+    if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+    {
+      this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+    }
+    else
+    {
+      this->m_RGBImageNode = NULL;
+    }
+
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
@@ -280,6 +291,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
+  m_SelectedCamera = selected;
   if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
@@ -458,6 +470,7 @@ mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName,
         node = mitk::DataNode::New();
         node->SetData(data);
         node->SetName(nodeName);
+        node->SetBoolProperty("binary",false);
         this->GetDefaultDataStorage()->Add(node);
     }
     else
@@ -496,6 +509,13 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
         this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
         this->m_IntensityImageNode->GetPropertyList()->DeleteProperty("LookupTable");
+    }
+    if ((m_RGBImageNode.IsNotNull()))
+    {
+      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
     }
     // initialize images
     if (m_MitkDistanceImage.IsNotNull())

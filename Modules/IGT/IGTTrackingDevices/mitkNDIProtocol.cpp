@@ -1417,6 +1417,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
   else
     fullcommand = command + " " + p;          // command string format 2: without crc
 
+  
+  m_TrackingDevice->ClearReceiveBuffer(); // This is a workaround for a linux specific issue:
+  // after sending the TSTART command and expecting an "okay" there are some unexpected bytes left in the buffer.
+  // this issue is explained in bug 11825
+
   returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);
 
   if (returnValue != NDIOKAY)                 // check for send error

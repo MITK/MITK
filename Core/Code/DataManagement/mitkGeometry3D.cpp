@@ -738,3 +738,40 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
 
   this->SetImageGeometry(isAnImageGeometry);
 }
+
+bool mitk::AreIdentical(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs)
+{
+  // check the validity of input
+  if( rhs == NULL || lhs == NULL )
+    return false;
+
+  // spacing
+  if( !Equal( rhs->GetSpacing(), lhs->GetSpacing() ))
+    return false;
+
+  // origin
+  if( !Equal( rhs->GetOrigin(), lhs->GetOrigin() ))
+    return false;
+
+  // compare each view axis and extent
+  bool viewAxisIdentical = true;
+  bool extentsIdentical = true;
+  for( unsigned int i=0; i< 3; i++)
+  {
+    if( !mitk::Equal( rhs->GetAxisVector(i), lhs->GetAxisVector(i)) )
+      viewAxisIdentical = false;
+
+    if( !mitk::Equal( rhs->GetExtent(i), lhs->GetExtent(i)) )
+      extentsIdentical = false;
+  }
+  if( !viewAxisIdentical || !extentsIdentical )
+    return false;
+
+  // index to world transform
+  if( !mitk::MatrixEqualElementWise( rhs->GetIndexToWorldTransform()->GetMatrix(),
+                                     lhs->GetIndexToWorldTransform()->GetMatrix()) )
+    return false;
+
+  return true;
+}
+

@@ -657,6 +657,14 @@ private:
   Point3D m_Origin;
 };
 
+/**
+  \brief A function comparing two geometries for beeing identical
+
+  The function compares the spacing, origin, axisvectors, extents and the matrix of the
+  IndexToWorldTransform (elementwise)
+  */
+bool MITK_CORE_EXPORT AreIdentical( const mitk::Geometry3D* rhs, const mitk::Geometry3D* lhs);
+
 } // namespace mitk
 
 #endif /* GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

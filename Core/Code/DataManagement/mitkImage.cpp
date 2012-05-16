@@ -1246,7 +1246,14 @@ bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
     return false;
   }
 
-  // compare voxel values
+  // pixel type
+  if( !(rhs->GetPixelType() == lhs->GetPixelType()) )
+  {
+    MITK_INFO << "[AreIdentical( Image )] PixelType differs.";
+    return false;
+  }
+
+  // compare pixel values
 
 
   return true;

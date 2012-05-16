@@ -27,7 +27,8 @@ namespace berry {
 
 struct TabDragHandler {
 
-    virtual ~TabDragHandler() {}
+    virtual ~TabDragHandler();
+
     /**
      * Returns the StackDropResult for the location being dragged over.
      *

@@ -38,7 +38,7 @@ namespace berry {
  */
 struct BERRY_UI IPartService {
 
-  virtual ~IPartService() {}
+  virtual ~IPartService();
 
   /**
    * Adds the given observer for part lifecycle events.

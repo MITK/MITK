@@ -21,6 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+IPropertyChangeListener::~IPropertyChangeListener()
+{
+}
+
 void
 IPropertyChangeListener::Events
 ::AddListener(IPropertyChangeListener::Pointer listener)

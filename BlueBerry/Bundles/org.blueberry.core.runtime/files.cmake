@@ -6,6 +6,8 @@ set(MOC_H_FILES
 set(SRC_CPP_FILES
   berryIAdaptable.cpp
   berryIAdapterManager.cpp
+  berryIPreferences.cpp
+  berryIBerryPreferences.cpp
   berryIPreferencesService.cpp
   berryPlatformObject.cpp
   berryRuntime.cpp

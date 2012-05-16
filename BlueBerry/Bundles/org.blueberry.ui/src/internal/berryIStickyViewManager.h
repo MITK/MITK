@@ -33,6 +33,8 @@ struct IStickyViewManager : public Object {
 
   berryInterfaceMacro(IStickyViewManager, berry)
 
+  ~IStickyViewManager();
+
   virtual void Remove(const std::string& perspectiveId) = 0;
 
   virtual void Add(const std::string& perspectiveId, const std::set<std::string>& stickyViewSet) = 0;

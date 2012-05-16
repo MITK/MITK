@@ -36,6 +36,8 @@ struct IStackableContainer : virtual public Object {
 
   typedef std::list<StackablePart::Pointer> ChildrenType;
 
+  ~IStackableContainer();
+
   virtual bool AllowsAdd(StackablePart::Pointer toAdd) = 0;
 
     /**

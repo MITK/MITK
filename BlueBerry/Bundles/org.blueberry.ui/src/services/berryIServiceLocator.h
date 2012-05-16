@@ -47,6 +47,8 @@ struct BERRY_UI IServiceLocator : public virtual Object {
 
   berryInterfaceMacro(IServiceLocator, berry)
 
+  ~IServiceLocator();
+
   /**
    * Retrieves the service corresponding to the given API.
    *

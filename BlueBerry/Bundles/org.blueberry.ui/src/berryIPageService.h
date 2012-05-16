@@ -47,8 +47,9 @@ struct IWorkbenchPage;
  */
 struct BERRY_UI IPageService {
 
-    virtual ~IPageService() {}
-    /**
+    virtual ~IPageService();
+
+   /**
      * Adds the given listener for page lifecycle events.
      * Has no effect if an identical listener is already registered.
    * <p>

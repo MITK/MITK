@@ -27,7 +27,7 @@ namespace berry {
 
 struct AbstractTabItem {
 
-    virtual ~AbstractTabItem() {}
+    virtual ~AbstractTabItem();
 
     virtual QRect GetBounds() = 0;
     virtual void SetInfo(const PartInfo& info) = 0;

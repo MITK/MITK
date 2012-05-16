@@ -37,6 +37,8 @@ struct IIntroDescriptor : public Object {
 
   berryInterfaceMacro(IIntroDescriptor, berry)
 
+  ~IIntroDescriptor();
+
   /**
    * Creates an instance of the intro part defined in the descriptor.
    */

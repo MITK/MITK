@@ -43,6 +43,8 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
 
   berryInterfaceMacro(IWorkbenchConfigurer, berry);
 
+  ~IWorkbenchConfigurer();
+
     /**
      * Restore status code indicating that the saved state
      * could not be restored, but that startup should continue

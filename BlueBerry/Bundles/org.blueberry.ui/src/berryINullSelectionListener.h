@@ -41,6 +41,8 @@ namespace berry
  */
 struct INullSelectionListener : public ISelectionListener {
   berryInterfaceMacro(INullSelectionListener, berry)
+
+  ~INullSelectionListener();
 };
 
 /**

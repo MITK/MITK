@@ -48,6 +48,8 @@ struct IServiceLocatorCreator : public virtual Object {
 
   berryInterfaceMacro(IServiceLocatorCreator, berry);
 
+  ~IServiceLocatorCreator();
+
   /**
    * Creates a service locator that can be used for hosting a new service
    * context. It will have the appropriate child services created as needed,

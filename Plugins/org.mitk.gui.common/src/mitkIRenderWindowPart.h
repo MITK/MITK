@@ -67,7 +67,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   static const QString DECORATION_MENU; // = "menu"
   static const QString DECORATION_BACKGROUND; // = "background;
 
-  virtual ~IRenderWindowPart() {}
+  virtual ~IRenderWindowPart();
 
   /**
    * Get the currently active (focused) render window.

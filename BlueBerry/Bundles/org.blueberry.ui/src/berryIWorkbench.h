@@ -86,7 +86,7 @@ struct BERRY_UI IWorkbench : public IServiceLocator {
 
   berryInterfaceMacro(IWorkbench, berry)
 
-  virtual ~IWorkbench() {}
+  virtual ~IWorkbench();
 
   /**
    * Returns the display for this workbench.

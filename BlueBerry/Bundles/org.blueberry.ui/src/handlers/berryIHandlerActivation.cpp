@@ -23,5 +23,10 @@ namespace berry {
 
 const int IHandlerActivation::ROOT_DEPTH = 1;
 
+IHandlerActivation::~IHandlerActivation()
+{
+
+}
+
 }
 

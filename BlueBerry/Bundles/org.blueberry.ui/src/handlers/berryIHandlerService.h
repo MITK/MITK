@@ -29,6 +29,7 @@ class ExecutionEvent;
 class ParameterizedCommand;
 class Expression;
 class UIElement;
+class IEvaluationContext;
 
 struct IHandler;
 struct IHandlerActivation;
@@ -56,6 +57,8 @@ struct IHandlerActivation;
 struct BERRY_UI IHandlerService : public IServiceWithSources {
 
   berryInterfaceMacro(IHandlerService, berry)
+
+  ~IHandlerService();
 
   /**
    * <p>

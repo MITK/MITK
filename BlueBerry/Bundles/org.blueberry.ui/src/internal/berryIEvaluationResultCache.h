@@ -43,6 +43,8 @@ struct IEvaluationResultCache : public Object {
 
   berryInterfaceMacro(IEvaluationResultCache, berry)
 
+  ~IEvaluationResultCache();
+
   /**
    * Clears the cached computation of the <code>evaluate</code> method, if
    * any. This method is only intended for internal use. It provides a

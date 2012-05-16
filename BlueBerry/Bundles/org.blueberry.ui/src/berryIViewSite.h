@@ -37,7 +37,7 @@ struct BERRY_UI IViewSite : public virtual IWorkbenchPartSite {
 
   berryInterfaceMacro(IViewSite, berry)
 
-  virtual ~IViewSite() {}
+  virtual ~IViewSite();
 
     /**
      * Returns the action bars for this part site.

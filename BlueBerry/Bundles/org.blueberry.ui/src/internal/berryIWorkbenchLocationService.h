@@ -37,6 +37,8 @@ struct IWorkbenchLocationService : public Object {
 
   berryInterfaceMacro(IWorkbenchLocationService, berry)
 
+  ~IWorkbenchLocationService();
+
   /**
    * Get the service scope.
    *

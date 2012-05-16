@@ -78,9 +78,7 @@ struct BERRY_UI IControlListener: public virtual Object
     typedef MessageDelegate1<IControlListener, ControlEvent::Pointer> Delegate;
   };
 
-  virtual ~IControlListener()
-  {
-  }
+  virtual ~IControlListener();
 
   virtual Events::Types GetEventTypes() const = 0;
 

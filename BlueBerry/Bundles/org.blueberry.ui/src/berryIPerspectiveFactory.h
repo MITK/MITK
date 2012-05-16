@@ -85,7 +85,9 @@ namespace berry {
  */
 struct BERRY_UI IPerspectiveFactory : public Object {
 
-  berryInterfaceMacro(IPerspectiveFactory, berry);
+  berryInterfaceMacro(IPerspectiveFactory, berry)
+
+  ~IPerspectiveFactory();
 
   /**
    * Creates the initial layout for a page.

@@ -64,9 +64,7 @@ struct BERRY_UI IWorkbenchPartDescriptor : public Object
    */
   virtual std::string GetLabel() const = 0;
 
-  virtual ~IWorkbenchPartDescriptor()
-  {
-  }
+  virtual ~IWorkbenchPartDescriptor();
 };
 
 } // namespace berry

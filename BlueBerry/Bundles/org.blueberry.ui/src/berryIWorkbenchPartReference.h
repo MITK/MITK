@@ -41,6 +41,8 @@ struct BERRY_UI IWorkbenchPartReference : public Object {
 
   berryInterfaceMacro(IWorkbenchPartReference, berry);
 
+  ~IWorkbenchPartReference();
+
     /**
      * Returns the IWorkbenchPart referenced by this object.
      * Returns <code>null</code> if the editors was not instantiated or

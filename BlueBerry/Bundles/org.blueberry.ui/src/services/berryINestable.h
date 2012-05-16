@@ -60,6 +60,8 @@ struct BERRY_UI INestable : public virtual Object
 
   berryInterfaceMacro(INestable, berry)
 
+  ~INestable();
+
   /**
    * Notifies this service that the component within which it exists has
    * become active. The service should modify its state as appropriate.

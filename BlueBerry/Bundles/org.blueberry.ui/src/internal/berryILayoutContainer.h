@@ -34,6 +34,8 @@ struct ILayoutContainer : virtual public Object {
 
   berryObjectMacro(ILayoutContainer);
 
+  ~ILayoutContainer();
+
   typedef std::list<LayoutPart::Pointer> ChildrenType;
 
   virtual bool AllowsAdd(LayoutPart::Pointer toAdd) = 0;

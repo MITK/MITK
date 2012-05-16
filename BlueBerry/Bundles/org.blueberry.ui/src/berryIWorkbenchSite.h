@@ -62,7 +62,7 @@ struct BERRY_UI IWorkbenchSite : public IServiceLocator { // IAdaptable, IShellP
 
   berryInterfaceMacro(IWorkbenchSite, berry);
 
-  virtual ~IWorkbenchSite() {}
+  virtual ~IWorkbenchSite();
 
   /**
    * Returns the page containing this workbench site.

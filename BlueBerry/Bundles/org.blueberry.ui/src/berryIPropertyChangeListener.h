@@ -48,9 +48,7 @@ struct BERRY_UI IPropertyChangeListener: public virtual Object
 
   berryInterfaceMacro(IPropertyChangeListener, berry);
 
-  virtual ~IPropertyChangeListener()
-  {
-  }
+  virtual ~IPropertyChangeListener();
 
   struct BERRY_UI Events {
 

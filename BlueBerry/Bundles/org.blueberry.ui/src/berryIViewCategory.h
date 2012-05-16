@@ -38,7 +38,7 @@ struct BERRY_UI IViewCategory : public Object
   virtual std::vector<std::string> GetPath() const = 0;
   virtual const std::vector<IViewDescriptor::Pointer>& GetViews() const = 0;
 
-  virtual ~IViewCategory() {}
+  virtual ~IViewCategory();
 };
 
 }

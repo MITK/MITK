@@ -41,6 +41,8 @@ struct BERRY_UI IServiceFactory : public virtual Object {
 
   berryInterfaceMacro(IServiceFactory, berry);
 
+  ~IServiceFactory();
+
   /**
    * When a service locator cannot find a service it will request one from the
    * registry, which will call this factory create method.

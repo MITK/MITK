@@ -37,7 +37,9 @@ namespace berry
  */
 struct BERRY_UI IPostSelectionProvider : public ISelectionProvider {
 
-  berryInterfaceMacro(IPostSelectionProvider, berry);
+  berryInterfaceMacro(IPostSelectionProvider, berry)
+
+  ~IPostSelectionProvider();
 
     /**
      * Adds a listener for post selection changes in this selection provider.

@@ -70,11 +70,9 @@ struct IEditorSite;
 struct BERRY_UI IEditorPart : public virtual IWorkbenchPart,
                                public ISaveablePart {
 
-  berryInterfaceMacro(IEditorPart, berry);
+  berryInterfaceMacro(IEditorPart, berry)
 
-  virtual ~IEditorPart()
-  {
-  }
+  virtual ~IEditorPart();
 
 
   /**

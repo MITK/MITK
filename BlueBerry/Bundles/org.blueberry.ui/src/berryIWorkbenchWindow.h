@@ -197,7 +197,7 @@ struct BERRY_UI IWorkbenchWindow : public IPageService, public IServiceLocator, 
   virtual SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input) = 0;
 
 
-  virtual ~IWorkbenchWindow() {}
+  virtual ~IWorkbenchWindow();
 
 };
 

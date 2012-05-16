@@ -66,7 +66,9 @@ namespace berry {
  */
 struct BERRY_UI ISaveablesSource : public virtual Object {
 
-  berryInterfaceMacro(ISaveablesSource, berry);
+  berryInterfaceMacro(ISaveablesSource, berry)
+
+  ~ISaveablesSource();
 
   /**
    * Returns the saveables presented by the workbench part. If the return

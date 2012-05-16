@@ -36,6 +36,8 @@ struct BERRY_UI IIntroSite : public IWorkbenchSite {
 
   berryInterfaceMacro(IIntroSite, berry)
 
+  ~IIntroSite();
+
   /**
    * Returns the part registry extension id for this intro site's part.
    * <p>

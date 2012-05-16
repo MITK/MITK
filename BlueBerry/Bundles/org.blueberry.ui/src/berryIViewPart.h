@@ -75,7 +75,7 @@ struct BERRY_UI IViewPart : public virtual IWorkbenchPart {
 
   berryInterfaceMacro(IViewPart, berry)
 
-  virtual ~IViewPart() {}
+  virtual ~IViewPart();
 
     /**
      * Returns the site for this view.

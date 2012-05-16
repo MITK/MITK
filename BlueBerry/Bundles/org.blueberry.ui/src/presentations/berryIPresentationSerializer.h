@@ -58,7 +58,7 @@ struct IPresentationSerializer {
      */
     virtual IPresentablePart::Pointer GetPart(const std::string& id) = 0;
 
-    virtual ~IPresentationSerializer() {}
+    virtual ~IPresentationSerializer();
 };
 
 }

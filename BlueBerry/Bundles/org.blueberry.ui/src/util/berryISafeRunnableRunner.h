@@ -44,6 +44,8 @@ public:
 
   berryInterfaceMacro(ISafeRunnableRunner, berry)
 
+  ~ISafeRunnableRunner();
+
   /**
    * Runs the runnable.  All <code>ISafeRunnableRunners</code> must catch any exception
    * thrown by the <code>ISafeRunnable</code> and pass the exception to

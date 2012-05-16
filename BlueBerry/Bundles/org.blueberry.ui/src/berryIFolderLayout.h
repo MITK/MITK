@@ -38,6 +38,8 @@ struct BERRY_UI IFolderLayout : public IPlaceholderFolderLayout {
 
   berryInterfaceMacro(IFolderLayout, berry)
 
+  ~IFolderLayout();
+
     /**
      * Adds a view with the given compound id to this folder.
      * See the {@link IPageLayout} type documentation for more details about compound ids.

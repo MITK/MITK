@@ -39,6 +39,8 @@ struct BERRY_UI IServiceWithSources : public IDisposable {
 
   berryInterfaceMacro(IServiceWithSources, berry)
 
+  ~IServiceWithSources();
+
   /**
    * Adds a source provider to this service. A source provider will notify the
    * service when the source it provides changes. An example of a source might

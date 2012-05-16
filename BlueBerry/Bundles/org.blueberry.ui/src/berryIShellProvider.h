@@ -37,6 +37,8 @@ struct BERRY_UI IShellProvider : public virtual Object {
 
   berryInterfaceMacro(IShellProvider, berry);
 
+  ~IShellProvider();
+
     /**
      * Returns the current shell (or null if none). This return value may
      * change over time, and should not be cached.

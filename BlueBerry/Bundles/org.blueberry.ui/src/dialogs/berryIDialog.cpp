@@ -24,4 +24,9 @@ const int IDialog::INFORMATION = 2;
 const int IDialog::QUESTION = 3;
 const int IDialog::WARNING = 4;
 
+IDialog::~IDialog()
+{
+
+}
+
 }

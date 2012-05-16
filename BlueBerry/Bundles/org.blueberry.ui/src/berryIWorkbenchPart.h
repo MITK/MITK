@@ -112,7 +112,7 @@ struct BERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
 
   berryInterfaceMacro(IWorkbenchPart, berry)
 
-  virtual ~IWorkbenchPart() {}
+  virtual ~IWorkbenchPart();
 
     /**
      * The property id for <code>getTitle</code>, <code>getTitleImage</code>

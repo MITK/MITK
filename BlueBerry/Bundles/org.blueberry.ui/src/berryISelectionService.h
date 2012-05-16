@@ -54,7 +54,7 @@ struct BERRY_UI ISelectionService {
 
   };
 
-  virtual ~ISelectionService() {}
+  virtual ~ISelectionService();
 
   //virtual SelectionEvents& GetSelectionEvents(const std::string& partId = "") = 0;
 

@@ -39,7 +39,7 @@ struct BERRY_UI IEditorMatchingStrategy : public Object {
 
   berryInterfaceMacro(IEditorMatchingStrategy, berry);
 
-  ~IEditorMatchingStrategy() {}
+  ~IEditorMatchingStrategy();
 
   /**
    * Returns whether the editor represented by the given editor reference

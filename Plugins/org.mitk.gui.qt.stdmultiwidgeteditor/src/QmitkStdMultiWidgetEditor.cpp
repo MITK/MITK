@@ -258,7 +258,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 {
   if (d->m_StdMultiWidget == 0)
   {
-    QVBoxLayout* layout = new QVBoxLayout(parent);
+    QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0,0,0,0);
 
     if (d->m_MouseModeToolbar == NULL)

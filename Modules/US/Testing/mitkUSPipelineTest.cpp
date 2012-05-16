@@ -35,10 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 
     virtual void GenerateOutputInformation()
       {     
-      MITK_INFO << "GenerateOutputInformation called in Testfilter!";
       mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput(0);
-      mitk::Image::Pointer output = this->GetOutput(0);
-      itkDebugMacro(<<"GenerateOutputInformation()");
+      mitk::Image::Pointer output      = (mitk::Image*) this->GetOutput(0);    
      if(inputImage.IsNull()) return;
      };
     

@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToFHardwareExports.h"
 #include "mitkCommon.h"
+#include "mitkToFConfig.h"
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 
-#ifdef MITK_TOF_USE_KINECT
+#ifdef MITK_USE_TOF_KINECT
 #include <XnCppWrapper.h>
 #endif
 
@@ -88,13 +89,11 @@ namespace mitk
     ~KinectController();
 
     bool ErrorText(unsigned int error);
-
-#ifdef MITK_TOF_USE_KINECT
+#ifdef MITK_USE_TOF_KINECT
     xn::Context m_Context; ///< OpenNI context
     xn::DepthGenerator m_DepthGenerator; ///< Depth generator to access depth image of kinect
     xn::ImageGenerator m_ImageGenerator; ///< Image generator to access RGB image of kinect
     xn::IRGenerator m_IRGenerator; ///< IR generator to access IR image of kinect
-    //xn::IRGenerator m_IRGenerator;
 #endif
 
     bool m_ConnectionCheck; ///< check if camera is connected or not

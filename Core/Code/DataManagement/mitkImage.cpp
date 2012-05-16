@@ -1209,6 +1209,37 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
+bool mitk::AreIdentical(const mitk::Image* rhs, const mitk::Image* lhs)
+{
+  // check the validity of input
+  if( rhs == NULL || lhs == NULL )
+    return false;
+
+  // dimensionality
+  const unsigned int rhsDimension = rhs->GetDimension();
+  if( rhsDimension != lhs->GetDimension() )
+    return false;
+
+  // compare each dimension
+  bool dimensionsIdentical = true;
+  for( unsigned int i=0; i< rhsDimension; i++)
+  {
+    if( rhs->GetDimension(i) != lhs->GetDimension(i) )
+      dimensionsIdentical = false;
+  }
+  if(!dimensionsIdentical)
+    return false;
+
+  // compare geometry
+  if( !AreIdentical(rhs->GetGeometry(), lhs->GetGeometry()) )
+    return false;
+
+  // compare voxel values
+
+
+  return true;
+}
+
 #include "mitkImageStatisticsHolder.h"
 
 //##Documentation

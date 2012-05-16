@@ -604,6 +604,14 @@ protected:
 
 };
 
+/**
+  \brief A function comparing two images for beeing identical
+
+  Identical means same dimensionality, same dimensions and same orientation for the geometry and identical voxel values in case of integral pixel types
+  and a difference in the voxel values of less then mitk::eps for floating point pixel types.
+  */
+bool MITK_CORE_EXPORT AreIdentical( const mitk::Image* rhs, const mitk::Image* lhs);
+
 //##Documentation
 //## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
 //##

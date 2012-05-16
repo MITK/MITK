@@ -91,6 +91,10 @@ public:
   virtual bool IsValidTime(int t) const;
 
   //##Documentation
+  //## @brief Returns true if TimeSliceGeometry is valid
+  virtual bool IsValid() const;
+
+  //##Documentation
   //## @brief Convert time in ms to a time step
   virtual int MSToTimeStep(mitk::ScalarType time_in_ms) const;
 

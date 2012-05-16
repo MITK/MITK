@@ -358,6 +358,12 @@ bool mitk::TimeSlicedGeometry::IsValidTime(int t) const
   return (t>=0) && (t< (int)m_TimeSteps);
 }
 
+bool mitk::TimeSlicedGeometry::IsValid() const
+{
+   return Superclass::IsValid() && (m_TimeSteps > 0);
+}
+
+
 void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timeslicedgeometry, unsigned int t, unsigned int endtimeindex)
 {
   if(endtimeindex >= timeslicedgeometry->GetTimeSteps())

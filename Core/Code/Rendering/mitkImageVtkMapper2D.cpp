@@ -152,7 +152,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
 
-  if ( input == NULL )
+  if ( input == NULL || input->IsInitialized() == false )
   {
     return;
   }
@@ -254,8 +254,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the
     // correct position during 3D mapping.
-    boundsInitialized = this->CalculateClippedPlaneBounds(
-        worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
+    if (worldGeometry->HasReferenceGeometry())
+    {
+       boundsInitialized = this->CalculateClippedPlaneBounds(
+          worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
+    }    
   }
   else
   {

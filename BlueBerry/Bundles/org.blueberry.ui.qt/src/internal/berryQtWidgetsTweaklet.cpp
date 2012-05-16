@@ -1,7 +1,7 @@
 
 /*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+BlueBerry Platform
 
 Copyright (c) German Cancer Research Center, 
 Division of Medical and Biological Informatics.

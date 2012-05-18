@@ -322,7 +322,3 @@ KinectController::~KinectController()
     }
   }
 }
-
-
-
-

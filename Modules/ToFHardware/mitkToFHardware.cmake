@@ -18,7 +18,7 @@ SET(MITK_TOF_AVAILABLE_CAMERAS MITK Player)
 
 OPTION(MITK_ENABLE_TOF_HARDWARE "Support for range cameras" OFF)
 IF(MITK_ENABLE_TOF_HARDWARE)
-	
+
 #Begin PMD Camcube hardware
 OPTION(MITK_USE_TOF_PMDCAMCUBE "Enable support for PMD camcube" OFF)
 
@@ -115,9 +115,7 @@ OPTION(MITK_USE_TOF_KINECT "Enable support for Kinect camera" OFF)
 # only if Kinect is enabled
 IF(MITK_USE_TOF_KINECT)
   FIND_LIBRARY(MITK_KINECT_LIB libOpenNI DOC "Kinect access library.")
-  GET_FILENAME_COMPONENT(MITK_KINECT_SDK_DIR ${MITK_KINECT_LIB} PATH)
-  SET(MITK_KINECT_SDK_DIR ${MITK_KINECT_SDK_DIR}/..)
-  FIND_PATH(MITK_KINECT_INCLUDE_DIR XnCppWrapper.h ${MITK_KINECT_SDK_DIR}/Include DOC  "Include directory of Kinect camera.")
+  FIND_PATH(MITK_KINECT_INCLUDE_DIR XnCppWrapper.h DOC  "Include directory of Kinect camera.")
   SET(MITK_TOF_AVAILABLE_CAMERAS ${MITK_TOF_AVAILABLE_CAMERAS},Microsoft Kinect)
 #TODO Installer specific stuff
 #  IF(WIN32)

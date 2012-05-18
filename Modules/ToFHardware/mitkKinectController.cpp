@@ -55,9 +55,9 @@ namespace mitk
         for ( unsigned int i = 0; i < NumModes; i++ )
         {
           std::cout << "DepthModes #" << i << std::endl;
-          std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
+          std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
+          std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
+          std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
         }
         delete[] SupportedModes;
       }
@@ -79,9 +79,9 @@ namespace mitk
         for ( unsigned int i = 0; i < NumModes; i++ )
         {
           std::cout << "Mode #" << i << std::endl;
-          std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
+          std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
+          std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
+          std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
         }
         delete[] SupportedModes;
       }
@@ -101,9 +101,9 @@ namespace mitk
           for ( unsigned int i = 0; i < NumModes; i++ )
           {
             std::cout << "ImageModes #" << i << std::endl;
-            std::cout << "	Nx=" << SupportedModes[i].nXRes << std::endl;
-            std::cout << "	Ny=" << SupportedModes[i].nYRes << std::endl;
-            std::cout << "	FPS=" << SupportedModes[i].nFPS << std::endl;
+            std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
+            std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
+            std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
           }
           delete[] SupportedModes;
         }

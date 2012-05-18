@@ -35,7 +35,7 @@ class Step6 : public QWidget
   Q_OBJECT
 public:
   Step6( int argc, char* argv[], QWidget *parent=0 );
-  ~Step6() {};
+  ~Step6() {}
 
   virtual void Initialize();
 

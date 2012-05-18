@@ -14,7 +14,7 @@ if(NOT MITK_DIR)
 
   option(MITK_USE_SUPERBUILD "Use superbuild for MITK" ON)
   option(MITK_USE_BLUEBERRY "Build the BlueBerry platform in MITK" ON)
-  option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" OFF)
+  option(MITK_BUILD_EXAMPLES "Build the MITK examples" OFF)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   option(MITK_BUILD_TESTING "Build the MITK unit tests" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
@@ -47,7 +47,7 @@ if(NOT MITK_DIR)
   set(mitk_cmake_boolean_args
     MITK_USE_SUPERBUILD
     MITK_USE_BLUEBERRY
-    MITK_BUILD_TUTORIAL
+    MITK_BUILD_EXAMPLES
     MITK_BUILD_ALL_PLUGINS
     MITK_USE_CTK
     MITK_USE_DCMTK

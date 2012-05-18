@@ -16,6 +16,7 @@
 #! \param LINK_LIBRARIES A list of libraries to be linked with the executable.
 #! \param SHOW_CONSOLE (option) Show the console output window (on Windows).
 #! \param NO_PROVISIONING (option) Do not create provisioning files.
+#! \param NO_INSTALL (option) Do not install this executable
 #!
 #! Assuming that there exists a file called <code>MyApp.cpp</code>, an example call looks like:
 #! \code
@@ -29,7 +30,7 @@
 #!
 function(FunctionCreateBlueBerryApplication)
 
-macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES" "SHOW_CONSOLE;NO_PROVISIONING" ${ARGN})
+macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES" "SHOW_CONSOLE;NO_PROVISIONING;NO_INSTALL" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -166,23 +167,27 @@ endif(WIN32)
 # Install support
 # -----------------------------------------------------------------------
 
-# This installs all third-party CTK plug-ins
-FunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
+if(NOT _APP_NO_INSTALL)
 
-# Install the executable
-MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} GLOB_PLUGINS )
+  # This installs all third-party CTK plug-ins
+  FunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
 
-if(NOT _APP_NO_PROVISIONING)
-  # Install the provisioning file
-  mitkFunctionInstallProvisioningFiles(${_prov_file})
+  # Install the executable
+  MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} GLOB_PLUGINS )
+
+  if(NOT _APP_NO_PROVISIONING)
+    # Install the provisioning file
+    mitkFunctionInstallProvisioningFiles(${_prov_file})
+  endif()
+
+  # On Linux, create a shell script to start a relocatable application
+  if(UNIX AND NOT APPLE)
+    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${_APP_NAME}.sh)
+  endif()
+
+  # Tell cpack the executables that you want in the start menu as links
+  set(MITK_CPACK_PACKAGE_EXECUTABLES ${MITK_CPACK_PACKAGE_EXECUTABLES} "${_APP_NAME};${_APP_DESCRIPTION}" CACHE INTERNAL "Collecting windows shortcuts to executables")
+
 endif()
-
-# On Linux, create a shell script to start a relocatable application
-if(UNIX AND NOT APPLE)
-  install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${_APP_NAME}.sh)
-endif()
-
-# Tell cpack the executables that you want in the start menu as links
-set(MITK_CPACK_PACKAGE_EXECUTABLES ${MITK_CPACK_PACKAGE_EXECUTABLES} "${_APP_NAME};${_APP_DESCRIPTION}" CACHE INTERNAL "Collecting windows shortcuts to executables")
 
 endfunction()

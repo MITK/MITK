@@ -25,10 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 
-#ifdef MITK_USE_TOF_KINECT
-#include <XnCppWrapper.h>
-#endif
-
 namespace mitk
 {
   /**
@@ -45,11 +41,11 @@ namespace mitk
 
     itkNewMacro( Self );
 
-    itkGetConstMacro(CaptureHeight,unsigned int);
-    itkGetConstMacro(CaptureWidth,unsigned int);
-    itkGetConstMacro(UseIR,bool);
+    unsigned int GetCaptureWidth() const;
+    unsigned int GetCaptureHeight() const;
+    bool GetUseIR() const;
 
-    itkSetMacro(UseIR,bool);
+    void SetUseIR(bool useIR);
 
     /*!
     \brief opens a connection to the Kinect camera.
@@ -88,22 +84,9 @@ namespace mitk
 
     ~KinectController();
 
-    bool ErrorText(unsigned int error);
-#ifdef MITK_USE_TOF_KINECT
-    xn::Context m_Context; ///< OpenNI context
-    xn::DepthGenerator m_DepthGenerator; ///< Depth generator to access depth image of kinect
-    xn::ImageGenerator m_ImageGenerator; ///< Image generator to access RGB image of kinect
-    xn::IRGenerator m_IRGenerator; ///< IR generator to access IR image of kinect
-#endif
-
-    bool m_ConnectionCheck; ///< check if camera is connected or not
-
-    bool m_UseIR; ///< flag indicating whether IR image is used or not
-
-    unsigned int m_CaptureWidth; ///< image width
-    unsigned int m_CaptureHeight; ///< image height
-
   private:
+    class KinectControllerPrivate;
+    KinectControllerPrivate *d;
 
   };
 } //END mitk namespace

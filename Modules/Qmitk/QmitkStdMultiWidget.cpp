@@ -1621,7 +1621,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   // find image with largest layer, that is the image shown on top in the render window
   for (unsigned int x = 0; x < nodes->size(); x++)
   {
-    if(nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos))
+    if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
+         nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
     {
       int layer = 0;
       if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;

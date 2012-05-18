@@ -29,10 +29,10 @@ mitk::Image::Image() :
 m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL),
   m_ImageStatistics(NULL)
 {
-  m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
-  FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
+   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
+   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
-  m_Initialized = false;
+   m_Initialized = false;
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(NULL),

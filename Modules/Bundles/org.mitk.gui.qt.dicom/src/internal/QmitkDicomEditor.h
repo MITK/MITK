@@ -81,7 +81,7 @@ signals:
     protected slots:
 
         /// \brief Called when StoreSCP shold be started or updated
-        void UpdateStartStoreSCP();
+        void StartStopStoreSCP();
 
         /// \brief Called when import is finished
         void OnDicomImportFinished(const QString& path);
@@ -126,6 +126,7 @@ protected:
 
     QThread* m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
+    QmitkStoreSCPLauncherBuilder builder;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
     DicomEventHandler* m_Handler;
     QmitkDicomDataEventPublisher* m_Publisher;

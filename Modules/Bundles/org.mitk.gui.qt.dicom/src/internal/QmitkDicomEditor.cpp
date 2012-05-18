@@ -93,7 +93,8 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     SetDatabaseDirectory("DatabaseDirectory");
     SetListenerDirectory("ListenerDirectory");
     StartDicomDirectoryListener();
-    //StartStoreSCP();
+
+    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));

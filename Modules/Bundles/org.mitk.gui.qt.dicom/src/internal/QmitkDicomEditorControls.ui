@@ -115,11 +115,17 @@
       </item>
       <item>
        <widget class="QRadioButton" name="radioButton">
+        <property name="toolTip">
+         <string>Switch the storage service provider (STORESCP) on or of.</string>
+        </property>
         <property name="text">
-         <string/>
+         <string>Storage provider is not running! </string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>

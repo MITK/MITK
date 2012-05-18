@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.osgi.applications">
+    <application id="org.mitk.example.minimalapplication">
+      <run class="MinimalApplication"/>
+    </application>
+  </extension>
+  
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.minimalperspective"
+      name="Minimal Example Perspective"
+      class="MinimalPerspective">
+    </perspective>
+  </extension>
+  
+</plugin>

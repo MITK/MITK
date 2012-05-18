@@ -14,26 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef STEP7_H
-#define STEP7_H
+#ifndef STEP8_H
+#define STEP8_H
 
 #include "Step6.h"
 
 #ifndef DOXYGEN_IGNORE
-class Step7 : public Step6
+class Step8 : public Step6
 {
   Q_OBJECT
 public:
-  Step7( int argc, char* argv[], QWidget *parent=0 );
-  ~Step7() {};
+  Step8( int argc, char* argv[], QWidget *parent=0 );
+  ~Step8() {}
 
+protected:
+  virtual void SetupWidgets();
 protected slots:
-  virtual void StartRegionGrowing();
 };
 #endif // DOXYGEN_IGNORE
 
-#endif // STEP7_H
+#endif // STEP8_H
 
 /**
-\example Step7.h
+\example Step8.h
 */

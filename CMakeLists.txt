@@ -141,7 +141,8 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
-option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
+set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
+option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
@@ -261,6 +262,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
+  MITK-Examples
   Unlabeled # special "subproject" catching all unlabeled targets and tests
   )
 
@@ -891,4 +893,14 @@ endif(WIN32)
 # This must come after MITKConfig.h was generated, since applications
 # might do a find_package(MITK REQUIRED).
 add_subdirectory(Applications)
+
+#-----------------------------------------------------------------------------
+# MITK Examples
+#-----------------------------------------------------------------------------
+
+if(MITK_BUILD_EXAMPLES)
+  # This must come after MITKConfig.h was generated, since applications
+  # might do a find_package(MITK REQUIRED).
+  add_subdirectory(Examples)
+endif()
 

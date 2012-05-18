@@ -24,8 +24,4 @@ if(MITK_USE_QT AND QT4_FOUND)
   
   endif()
 
-  if(MITK_BUILD_TUTORIAL)
-    add_subdirectory(Tutorial)
-  endif()
-
 endif()

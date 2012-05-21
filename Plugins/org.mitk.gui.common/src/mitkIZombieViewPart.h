@@ -21,7 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkILifecycleAwarePart.h"
 
+namespace berry{
+struct IWorkbenchPartReference;
+template<class T> class SmartPointer;
+}
+
 namespace mitk {
+
 
 /**
  * \ingroup org_mitk_gui_common
@@ -42,8 +48,10 @@ namespace mitk {
  *
  * \see ILifecycleAwarePart
  */
-struct IZombieViewPart : public virtual ILifecycleAwarePart
+struct MITK_GUI_COMMON_PLUGIN IZombieViewPart : public virtual ILifecycleAwarePart
 {
+
+  ~IZombieViewPart();
 
   /**
    * Called when another Zombie View was activated. This usually means that this part
@@ -51,7 +59,7 @@ struct IZombieViewPart : public virtual ILifecycleAwarePart
    *
    * \param zombieView The newly activate Zombie View.
    */
-  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView) = 0;
+  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) = 0;
 
 };
 

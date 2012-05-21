@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkIZombieViewPart.h"
 
-#include "berryIWorkbenchPartReference.h"
-
 namespace mitk {
 
 IZombieViewPart::~IZombieViewPart()

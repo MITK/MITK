@@ -160,17 +160,21 @@ namespace mitk
               std::vector<std::string> tokens;
               this->Tokenize(metaString, tokens, " ");
 
-              if(tokens.size()==2)
+
+              std::pair< std::string, int > p;
+
+              p.first="";
+              for (int i=0; i<tokens.size()-1;i++)
               {
-
-                std::cout << tokens.at(0) << " " << tokens.at(1) << std::endl;
-
-                std::pair< std::string, int > p;
-                p.first = tokens.at(0);
-                std::string s = tokens.at(1);
-                p.second = atoi(tokens.at(1).c_str());
-                groups.push_back(p);
+                p.first.append(" ");
+                p.first.append(tokens.at(i));
               }
+
+              std::cout << p.first << std::endl;
+
+              p.second = atoi(tokens.at(tokens.size()-1 ).c_str());
+              groups.push_back(p);
+
 
 
             }

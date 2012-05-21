@@ -1,0 +1,23 @@
+namespace mitk{
+/**
+\page ExceptionPage Exception Handling Concept
+
+Available sections:
+
+-# \ref Sec1 "Section 1"
+-# \ref Sec2 "Section 2"
+
+\section Sec1 Section 1
+
+TODO
+
+\section Sec2 Section 2
+
+TODO
+
+\code
+set(MODULE_CUSTOM_TESTS
+    ...
+    mitkImageVtkMapper2D.cpp
+)
+\endcode

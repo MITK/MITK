@@ -69,8 +69,6 @@ class QmitkToFUtilView : public QmitkAbstractView
     virtual void Activated();
     /// \brief Called when the functionality is deactivated
     virtual void Deactivated();
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
 
     void SetFocus();
 

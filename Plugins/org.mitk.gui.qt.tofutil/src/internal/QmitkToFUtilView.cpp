@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 // Blueberry
 #include <mitkIRenderingManager.h>
+#include <mitkIRenderWindowPart.h>
 #include <mitkILinkedRenderWindowPart.h>
 
 // Qmitk
@@ -66,6 +67,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
+    Deactivated();
     OnToFCameraStopped();
     OnToFCameraDisconnected();
 }
@@ -73,6 +75,7 @@ QmitkToFUtilView::~QmitkToFUtilView()
 void QmitkToFUtilView::SetFocus()
 {
   m_Controls->m_ToFConnectionWidget->setFocus();
+//  Activated();
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
@@ -95,18 +98,6 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
         connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
         connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
     }
-}
-
-
-void QmitkToFUtilView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-    m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkToFUtilView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
 }
 
 void QmitkToFUtilView::Activated()
@@ -207,7 +198,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
             this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
             this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
         }
-        m_MultiWidget->DisableGradientBackground(); //todo no replacement in renderwindowpart
+        GetRenderWindowPart()->EnableDecorations(false, QStringList(QString("background")));
     }
     catch (std::logic_error& e)
     {

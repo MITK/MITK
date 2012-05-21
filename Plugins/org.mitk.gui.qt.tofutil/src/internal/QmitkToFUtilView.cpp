@@ -111,17 +111,24 @@ void QmitkToFUtilView::StdMultiWidgetNotAvailable()
 
 void QmitkToFUtilView::Activated()
 {
-    // configure views
-    m_MultiWidget->SetWidgetPlanesVisibility(false);
-    m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SliceLockedOn();
-    m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SliceLockedOn();
-    m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOn();
-    m_MultiWidget->ResetCrosshair();
+    // configure views    
+    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+    if(linkedRenderWindowPart == 0)
+    {
+        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+    }
+    else
+    {
+        linkedRenderWindowPart->EnableSlicingPlanes(false);
+    }
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOn();
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
+    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
-
 
     this->UseToFVisibilitySettings(true);
 
@@ -138,13 +145,13 @@ void QmitkToFUtilView::Activated()
 void QmitkToFUtilView::Deactivated()
 {
     m_MultiWidget->SetWidgetPlanesVisibility(true);
-    m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SliceLockedOff();
-    m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-    m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SliceLockedOff();
-    m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
-    m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SliceLockedOff();
-    m_MultiWidget->ResetCrosshair();
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
+    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
 
     this->UseToFVisibilitySettings(false);
 
@@ -200,7 +207,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
             this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
             this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
         }
-        m_MultiWidget->DisableGradientBackground();
+        m_MultiWidget->DisableGradientBackground(); //todo no replacement in renderwindowpart
     }
     catch (std::logic_error& e)
     {
@@ -282,6 +289,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
   }
   m_Controls->m_TextureCheckBox->setEnabled(true);
   // initialize point set measurement
+  //TODO refactor tofMeasurementWidget to use IRenderWindowPart and not StdMultiWidget
   m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDataStorage(),m_MitkDistanceImage);
 }
 
@@ -338,11 +346,11 @@ void QmitkToFUtilView::OnUpdateCamera()
                         this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
             mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
-            m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(0,0,-50);
-            m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0,-1,0);
-            m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(0,0,surfaceCenter[2]);
-            m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(40);
-            m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(1, 10000);
+            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(0,0,-50);
+            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0,-1,0);
+            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(0,0,surfaceCenter[2]);
+            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(40);
+            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(1, 10000);
         }
         this->m_SurfaceDisplayCount++;
 
@@ -533,15 +541,5 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
             this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->GetRenderWindow()) );
         }
         this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
-
-        mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-        if(linkedRenderWindowPart == 0)
-        {
-            MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
-        }
-        else
-        {
-            linkedRenderWindowPart->EnableSlicingPlanes(false);
-        }
     }
 }

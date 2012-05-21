@@ -7,11 +7,15 @@ set(SRC_CPP_FILES
   mitkDataNodeSelection.cpp
   mitkDataStorageEditorInput.cpp
   mitkILifecycleAwarePart.h
+  mitkILifecycleAwarePart.cpp
   mitkILinkedRenderWindowPart.h
+  mitkILinkedRenderWindowPart.cpp
   mitkIRenderingManager.cpp
   mitkIRenderWindowPart.cpp
   mitkIRenderWindowPartListener.h
+  mitkIRenderWindowPartListener.cpp
   mitkIZombieViewPart.h
+  mitkIZombieViewPart.cpp
   mitkWorkbenchUtil.cpp
 )
 

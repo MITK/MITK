@@ -18,13 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkToFUtilView_h
 #define QmitkToFUtilView_h
 
-//#include <QmitkFunctionality.h>
 #include <QmitkOverlayController.h>
 #include <QmitkAbstractView.h>
 
 #include <ui_QmitkToFUtilViewControls.h>
 
-#include <QTimer>
+class QTimer;
 
 #include <mitkRealTimeClock.h>
 #include <mitkToFImageGrabber.h>

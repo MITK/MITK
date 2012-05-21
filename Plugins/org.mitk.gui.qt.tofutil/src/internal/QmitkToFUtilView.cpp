@@ -75,7 +75,6 @@ QmitkToFUtilView::~QmitkToFUtilView()
 void QmitkToFUtilView::SetFocus()
 {
   m_Controls->m_ToFConnectionWidget->setFocus();
-//  Activated();
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
@@ -102,7 +101,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 
 void QmitkToFUtilView::Activated()
 {
-    // configure views    
+    // configure views
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
     if(linkedRenderWindowPart == 0)
     {
@@ -135,7 +134,15 @@ void QmitkToFUtilView::Activated()
 
 void QmitkToFUtilView::Deactivated()
 {
-    m_MultiWidget->SetWidgetPlanesVisibility(true);
+    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+    if(linkedRenderWindowPart == 0)
+    {
+        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+    }
+    else
+    {
+        linkedRenderWindowPart->EnableSlicingPlanes(true);
+    }
     GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
     GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
@@ -207,8 +214,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
         return;
     }
 
-    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
-
+    this->RequestRenderWindowUpdate();
 }
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
@@ -221,7 +227,7 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
         this->m_VideoSource->StopCapturing();
         this->m_VideoSource = NULL;
     }
-    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+    this->RequestRenderWindowUpdate();
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()
@@ -352,7 +358,7 @@ void QmitkToFUtilView::OnUpdateCamera()
         this->m_MitkDistanceImage->Update();
     }
 
-    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+    this->RequestRenderWindowUpdate();
 
     this->m_2DDisplayCount++;
     if ((this->m_2DDisplayCount % this->m_StepsForFramerate) == 0)

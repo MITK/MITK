@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-std::string ViewRegistryReader::GENERAL_VIEW_ID = "org.blueberry.ui";
+QString ViewRegistryReader::GENERAL_VIEW_ID = "org.blueberry.ui";
 
 ViewRegistryReader::ViewRegistryReader() :
   RegistryReader()
@@ -59,7 +59,7 @@ void ViewRegistryReader::ReadCategory(const IConfigurationElement::Pointer& elem
 
 bool ViewRegistryReader::ReadElement(const SmartPointer<IConfigurationElement> &element)
 {
-  std::string elementName = element->GetName();
+  QString elementName = element->GetName();
   if (elementName == WorkbenchRegistryConstants::TAG_VIEW)
   {
     this->ReadView(element);

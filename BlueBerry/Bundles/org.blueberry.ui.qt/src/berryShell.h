@@ -135,8 +135,8 @@ public:
 
   berryObjectMacro(Shell);
 
-  Object::Pointer GetData(const std::string& id = "") const;
-  void SetData(Object::Pointer data, const std::string& id = "");
+  Object::Pointer GetData(const QString& id = "") const;
+  void SetData(Object::Pointer data, const QString& id = "");
 
   void SetBounds(int x, int y, int width, int height);
 
@@ -167,7 +167,7 @@ public:
 
   virtual QWidget* GetControl() = 0;
 
-  virtual void SetImages(const std::vector<void*>& images) = 0;
+  virtual void SetImages(const QList<void*>& images) = 0;
 
   /**
    * Returns <code>true</code> if the receiver is currently
@@ -294,7 +294,7 @@ public:
     *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     * </ul>
     */
-   virtual std::vector<Shell::Pointer> GetShells() = 0;
+   virtual QList<Shell::Pointer> GetShells() = 0;
 
    /**
      * Returns the receiver's style information.
@@ -320,7 +320,7 @@ public:
 
 private:
 
-  std::map<std::string, Object::Pointer> data;
+  QHash<QString, Object::Pointer> data;
 
 };
 

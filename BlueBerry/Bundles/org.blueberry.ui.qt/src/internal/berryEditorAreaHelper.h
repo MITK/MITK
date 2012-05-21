@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryLayoutPart.h"
 #include "berryEditorReference.h"
 
-#include <vector>
-#include <list>
-
 namespace berry {
 
 class EditorSashContainer;
@@ -93,7 +90,7 @@ public:
     /**
      * @see IEditorPresentation
      */
-    std::string GetActiveEditorWorkbookID();
+    QString GetActiveEditorWorkbookID();
 
     SmartPointer<PartStack> GetActiveWorkbook();
 
@@ -122,7 +119,7 @@ public:
      * @param workbookId workbook that will contain the editor (or null if the editor
      * should be added to the default workbook)
      */
-    void AddEditor(EditorReference::Pointer ref, const std::string& workbookId);
+    void AddEditor(EditorReference::Pointer ref, const QString& workbookId);
 
     /**
      * @see IPersistablePart
@@ -144,7 +141,7 @@ public:
     /**
      * @see IEditorPresentation
      */
-    void SetActiveEditorWorkbookFromID(const std::string& id);
+    void SetActiveEditorWorkbookFromID(const QString& id);
 
     void SetActiveWorkbook(SmartPointer<PartStack> workbook, bool hasFocus);
 
@@ -161,11 +158,11 @@ public:
      * Method getWorkbooks.
      * @return ArrayList
      */
-    std::list<SmartPointer<PartStack> > GetWorkbooks();
+    QList<SmartPointer<PartStack> > GetWorkbooks();
 
-    std::list<IEditorReference::Pointer> GetEditors();
+    QList<IEditorReference::Pointer> GetEditors();
 
-    SmartPointer<PartStack> GetWorkbookFromID(const std::string& workbookId);
+    SmartPointer<PartStack> GetWorkbookFromID(const QString& workbookId);
 
     void UpdateStackButtons();
 };

@@ -38,7 +38,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 #-----------------------------------------------------------------------------
 
 set(_plugins_for_all_demos
-  org.blueberry.compat
 )
 
 file(GLOB _demo_configurations Configurations/*.cmake)

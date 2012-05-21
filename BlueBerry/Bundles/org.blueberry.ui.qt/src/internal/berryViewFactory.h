@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryReferenceCounter.h"
 
-#include <map>
-#include <vector>
 
 namespace berry {
 
@@ -43,8 +41,8 @@ class ViewFactory { // implements IExtensionChangeHandler {
 
 private:
 
-   std::map<std::string, IMemento::Pointer> mementoTable;
-   ReferenceCounter<std::string, IViewReference::Pointer> counter;
+   QHash<QString, IMemento::Pointer> mementoTable;
+   ReferenceCounter<QString, IViewReference::Pointer> counter;
 
     WorkbenchPage* page;
 
@@ -55,7 +53,7 @@ public:
     /**
      * Separates a view's primary id from its secondary id in view key strings.
      */
-    static const std::string ID_SEP; // = ":"; //$NON-NLS-1$
+    static const QString ID_SEP; // = ":"
 
     /**
      * Returns a string representing a view with the given id and (optional) secondary id,
@@ -65,7 +63,7 @@ public:
      * @param secondaryId secondary id of the view or <code>null</code>
      * @return the key
      */
-    static std::string GetKey(const std::string& id, const std::string& secondaryId);
+    static QString GetKey(const QString& id, const QString& secondaryId);
 
     /**
      * Returns a string representing the given view reference, suitable for use as a key in a map.
@@ -73,21 +71,21 @@ public:
      * @param viewRef the view reference
      * @return the key
      */
-    static std::string GetKey(IViewReference::Pointer viewRef);
+    static QString GetKey(IViewReference::Pointer viewRef);
 
     /**
      * Extracts ths primary id portion of a compound id.
      * @param compoundId a compound id of the form: primaryId [':' secondaryId]
      * @return the primary id
      */
-    static std::string ExtractPrimaryId(const std::string& compoundId);
+    static QString ExtractPrimaryId(const QString& compoundId);
 
     /**
      * Extracts ths secondary id portion of a compound id.
      * @param compoundId a compound id of the form: primaryId [':' secondaryId]
      * @return the secondary id, or <code>null</code> if none
      */
-    static std::string ExtractSecondaryId(const std::string& compoundId);
+    static QString ExtractSecondaryId(const QString& compoundId);
 
     /**
      * Returns whether the given view id contains a wildcard. Wildcards cannot
@@ -99,7 +97,7 @@ public:
      *
      * @since 3.1
      */
-    static bool HasWildcard(const std::string& viewId);
+    static bool HasWildcard(const QString& viewId);
 
 
     /**
@@ -117,24 +115,24 @@ public:
      * disposed when releaseView is called an equal number of times
      * to createView.
      */
-    IViewReference::Pointer CreateView(const std::string& id, const std::string& secondaryId = "");
+    IViewReference::Pointer CreateView(const QString& id, const QString& secondaryId = "");
 
     /**
      * Returns the set of views being managed by this factory
      *
      * @return the set of views being managed by this factory
      */
-    std::vector<IViewReference::Pointer> GetViewReferences();
+    QList<IViewReference::Pointer> GetViewReferences();
 
     /**
      * Returns the view with the given id, or <code>null</code> if not found.
      */
-    IViewReference::Pointer GetView(const std::string& id);
+    IViewReference::Pointer GetView(const QString& id);
 
     /**
      * Returns the view with the given id and secondary id, or <code>null</code> if not found.
      */
-    IViewReference::Pointer GetView(const std::string& id, const std::string& secondaryId);
+    IViewReference::Pointer GetView(const QString& id, const QString& secondaryId);
 
     /**
      * @return the <code>IViewRegistry</code> used by this factory.
@@ -145,7 +143,7 @@ public:
     /**
      * Returns a list of views which are open.
      */
-    std::vector<IViewReference::Pointer> GetViews();
+    QList<IViewReference::Pointer> GetViews();
 
     /**
      * @return the <code>WorkbenchPage</code> used by this factory.
@@ -185,7 +183,7 @@ public:
     // for dynamic UI
     void RestoreViewState(IMemento::Pointer memento);
 
-    IMemento::Pointer GetViewState(const std::string& key);
+    IMemento::Pointer GetViewState(const QString& key);
 
 };
 

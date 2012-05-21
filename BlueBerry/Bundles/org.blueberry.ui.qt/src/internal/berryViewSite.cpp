@@ -27,8 +27,8 @@ namespace berry
 {
 
 ViewSite::ViewSite(IViewReference::Pointer ref, IViewPart::Pointer view,
-    WorkbenchPage* page, const std::string& id,
-    const std::string& pluginId, const std::string& registeredName)
+    WorkbenchPage* page, const QString& id,
+    const QString& pluginId, const QString& registeredName)
 : PartSite(ref, view, page)
 {
   SetId(id);
@@ -43,7 +43,7 @@ ViewSite::ViewSite(IViewReference::Pointer ref, IViewPart::Pointer view,
   SetConfigurationElement(desc.Cast<ViewDescriptor>()->GetConfigurationElement());
 }
 
-std::string ViewSite::GetSecondaryId()
+QString ViewSite::GetSecondaryId()
 {
   return GetPartReference().Cast<IViewReference>()->GetSecondaryId();
 }

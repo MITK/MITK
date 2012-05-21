@@ -37,8 +37,8 @@ void PartService::FirePartDeactivated(IWorkbenchPartReference::Pointer ref)
   partEvents.partDeactivated(ref);
 }
 
-PartService::PartService(const std::string& debugListenersKey,
-    const std::string& debugListeners2Key)
+PartService::PartService(const QString& debugListenersKey,
+    const QString& debugListeners2Key)
 {
   this->debugListeners2Key = debugListeners2Key;
   this->debugListenersKey = debugListenersKey;

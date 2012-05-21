@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string EditorSashContainer::DEFAULT_WORKBOOK_ID =
+const QString EditorSashContainer::DEFAULT_WORKBOOK_ID =
     "DefaultEditorWorkbook";
 
 void EditorSashContainer::AddChild(const RelationshipInfo& info)
@@ -59,7 +59,7 @@ void EditorSashContainer::ChildRemoved(LayoutPart::Pointer child)
 
   if (child.Cast<PartStack> () != 0)
   {
-    editorWorkbooks.remove(child.Cast<PartStack>());
+    editorWorkbooks.removeAll(child.Cast<PartStack>());
     if (activeEditorWorkbook == child)
     {
       this->SetActiveWorkbook(PartStack::Pointer(0), false);
@@ -89,9 +89,10 @@ void EditorSashContainer::AddDropSupport()
 PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 {
   PartStack::Pointer newWorkbook(new PartStack(page, true, PresentationFactoryUtil::ROLE_EDITOR));
-  std::stringstream buf;
+  QString str;
+  QTextStream buf(&str);
   buf << newWorkbook->GetClassName() << newWorkbook.GetPointer();
-  newWorkbook->SetID(buf.str());
+  newWorkbook->SetID(str);
 
   return newWorkbook;
 }
@@ -136,7 +137,7 @@ LayoutPart::Pointer EditorSashContainer::GetVisiblePart(
   return refPart->GetSelection();
 }
 
-EditorSashContainer::EditorSashContainer(const std::string& editorId,
+EditorSashContainer::EditorSashContainer(const QString& editorId,
     WorkbenchPage* page, void* parent)
  : PartSashContainer(editorId, page, parent)
 {
@@ -230,12 +231,12 @@ PartStack::Pointer EditorSashContainer::GetActiveWorkbook()
   return activeEditorWorkbook;
 }
 
-std::string EditorSashContainer::GetActiveWorkbookID()
+QString EditorSashContainer::GetActiveWorkbookID()
 {
   return this->GetActiveWorkbook()->GetID();
 }
 
-std::list<PartStack::Pointer> EditorSashContainer::GetEditorWorkbooks()
+QList<PartStack::Pointer> EditorSashContainer::GetEditorWorkbooks()
 {
   return editorWorkbooks;
 }
@@ -264,13 +265,13 @@ void EditorSashContainer::RemoveAllEditors()
   PartStack::Pointer currentWorkbook = this->GetActiveWorkbook();
 
   // Iterate over a copy so the original can be modified.
-  std::list<PartStack::Pointer> workbooks(editorWorkbooks);
-  for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();
+  QList<PartStack::Pointer> workbooks(editorWorkbooks);
+  for (QList<PartStack::Pointer>::iterator iter = workbooks.begin();
        iter != workbooks.end(); ++iter)
   {
     PartStack::Pointer workbook = *iter;
-    std::list<LayoutPart::Pointer> children = workbook->GetChildren();
-    for (std::list<LayoutPart::Pointer>::iterator childIter = children.begin();
+    QList<LayoutPart::Pointer> children = workbook->GetChildren();
+    for (QList<LayoutPart::Pointer>::iterator childIter = children.begin();
          childIter != children.end(); ++childIter)
     {
       workbook->Remove(*childIter);
@@ -352,18 +353,18 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
 
 
   // Restore the relationship/layout
-  std::vector<IMemento::Pointer> infos(memento->GetChildren(WorkbenchConstants::TAG_INFO));
-  Poco::HashMap<std::string, LayoutPart::Pointer> mapIDtoPart(infos.size());
+  QList<IMemento::Pointer> infos(memento->GetChildren(WorkbenchConstants::TAG_INFO));
+  QHash<QString, LayoutPart::Pointer> mapIDtoPart;
 
   for (std::size_t i = 0; i < infos.size(); i++)
   {
     // Get the info details.
     IMemento::Pointer childMem = infos[i];
-    std::string partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
-    std::string relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
+    QString partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
+    QString relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
     int relationship = 0;
     int left = 0, right = 0;
-    if (!relativeID.empty())
+    if (!relativeID.isEmpty())
     {
       childMem->GetInteger(WorkbenchConstants::TAG_RELATIONSHIP, relationship);
       childMem->GetInteger(WorkbenchConstants::TAG_RATIO_LEFT, left);
@@ -399,7 +400,7 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
 //            public void runWithException() throws Throwable
 //              {
                 // Add the part to the layout
-                if (relativeID.empty())
+                if (relativeID.isEmpty())
                 {
                   Add(workbook);
                 }
@@ -426,7 +427,7 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
 
 bool EditorSashContainer::SaveState(IMemento::Pointer memento)
 {
-  std::vector<RelationshipInfo> relationships(ComputeRelation());
+  QList<RelationshipInfo> relationships(ComputeRelation());
 //  MultiStatus
 //      result =
 //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, 0);
@@ -499,9 +500,9 @@ void EditorSashContainer::SetActiveWorkbook(PartStack::Pointer newWorkbook,
   this->UpdateTabList();
 }
 
-void EditorSashContainer::SetActiveWorkbookFromID(const std::string& id)
+void EditorSashContainer::SetActiveWorkbookFromID(const QString& id)
 {
-  for (std::list<PartStack::Pointer>::iterator iter = editorWorkbooks.begin();
+  for (QList<PartStack::Pointer>::iterator iter = editorWorkbooks.begin();
        iter != editorWorkbooks.end(); ++iter)
   {
     PartStack::Pointer workbook = *iter;
@@ -512,9 +513,9 @@ void EditorSashContainer::SetActiveWorkbookFromID(const std::string& id)
   }
 }
 
-PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const std::string& id)
+PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const QString& id)
 {
-  for (std::list<PartStack::Pointer>::iterator iter = editorWorkbooks.begin();
+  for (QList<PartStack::Pointer>::iterator iter = editorWorkbooks.begin();
        iter != editorWorkbooks.end(); ++iter)
   {
     PartStack::Pointer workbook = *iter;
@@ -579,8 +580,8 @@ bool EditorSashContainer::IsPaneType(LayoutPart::Pointer toTest)
 
 bool EditorSashContainer::RestorePresentationState(IMemento::Pointer  /*areaMem*/)
 {
-  std::list<PartStack::Pointer> workbooks = this->GetEditorWorkbooks();
-  for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();
+  QList<PartStack::Pointer> workbooks = this->GetEditorWorkbooks();
+  for (QList<PartStack::Pointer>::iterator iter = workbooks.begin();
        iter != workbooks.end(); ++iter)
   {
     PartStack::Pointer workbook = *iter;
@@ -589,8 +590,7 @@ bool EditorSashContainer::RestorePresentationState(IMemento::Pointer  /*areaMem*
     {
       continue;
     }
-    std::list<IPresentablePart::Pointer> listParts = workbook->GetPresentableParts();
-    std::vector<IPresentablePart::Pointer> parts(listParts.begin(), listParts.end());
+    QList<IPresentablePart::Pointer> parts = workbook->GetPresentableParts();
     PresentationSerializer serializer(parts);
     //StartupThreading.runWithoutExceptions(new StartupRunnable()
     //    {

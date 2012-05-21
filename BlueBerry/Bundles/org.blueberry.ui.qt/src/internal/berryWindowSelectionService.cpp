@@ -33,7 +33,7 @@ IWorkbenchWindow* WindowSelectionService::GetWindow() const
 }
 
 AbstractPartSelectionTracker::Pointer WindowSelectionService::CreatePartTracker(
-    const std::string& partId) const
+    const QString& partId) const
 {
   AbstractPartSelectionTracker::Pointer tracker(new WindowPartSelectionTracker(
       GetWindow(), partId));

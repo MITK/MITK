@@ -108,7 +108,7 @@ void PresentablePartFolder::InternalRemove(IPresentablePart::Pointer toRemove)
   if (std::find(partList.begin(), partList.end(), toRemove) != partList.end())
   {
     toRemove->RemovePropertyListener(childPropertyChangeListener);
-    partList.remove(toRemove);
+    partList.removeAll(toRemove);
   }
 }
 
@@ -170,7 +170,7 @@ PresentablePartFolder::~PresentablePartFolder()
 {
   Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetShell(folder->GetControl())->RemoveShellListener(
       shellListener);
-  for (std::list<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
+  for (QList<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
       != partList.end(); ++iter)
   {
     (*iter)->RemovePropertyListener(childPropertyChangeListener);
@@ -232,10 +232,10 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 
 }
 
-std::vector<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
+QList<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
 {
-  std::vector<AbstractTabItem*> items = folder->GetItems();
-  std::vector<IPresentablePart::Pointer> result;
+  QList<AbstractTabItem*> items = folder->GetItems();
+  QList<IPresentablePart::Pointer> result;
 
   for (unsigned int i = 0; i < items.size(); i++)
   {
@@ -307,7 +307,7 @@ void PresentablePartFolder::Move(IPresentablePart::Pointer part, int newIndex)
   //}
 }
 
-std::size_t PresentablePartFolder::Size()
+int PresentablePartFolder::Size()
 {
   return folder->GetItemCount();
 }

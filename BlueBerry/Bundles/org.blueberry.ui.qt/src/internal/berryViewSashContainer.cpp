@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryImageDescriptor.h"
 
-#include <Poco/HashMap.h>
-
 namespace berry
 {
 
@@ -54,33 +52,33 @@ bool ViewSashContainer::RestoreState(IMemento::Pointer memento)
   //
   bool result = true;
   // Read the info elements.
-  std::vector<IMemento::Pointer> children(memento->GetChildren(WorkbenchConstants::TAG_INFO));
+  QList<IMemento::Pointer> children(memento->GetChildren(WorkbenchConstants::TAG_INFO));
 
   // Create a part ID to part hashtable.
-  Poco::HashMap<std::string, LayoutPart::Pointer> mapIDtoPart(children.size());
+  QHash<QString, LayoutPart::Pointer> mapIDtoPart;
 
   // Loop through the info elements.
   for (std::size_t i = 0; i < children.size(); i++)
   {
   // Get the info details.
   IMemento::Pointer childMem = children[i];
-  std::string partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
-  std::string relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
+  QString partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
+  QString relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
   int relationship = 0;
   int left = 0, right = 0;
-  if (!relativeID.empty())
+  if (!relativeID.isEmpty())
   {
     childMem->GetInteger(WorkbenchConstants::TAG_RELATIONSHIP, relationship);
 
     childMem->GetInteger(WorkbenchConstants::TAG_RATIO_LEFT, left);
     childMem->GetInteger(WorkbenchConstants::TAG_RATIO_RIGHT, right);
   }
-  std::string strFolder; childMem->GetString(WorkbenchConstants::TAG_FOLDER, strFolder);
+  QString strFolder; childMem->GetString(WorkbenchConstants::TAG_FOLDER, strFolder);
 
   // Create the part.
   LayoutPart::Pointer part;
 
-  if (strFolder.empty())
+  if (strFolder.isEmpty())
   {
     // this is the editor area
     part = new PartPlaceholder(partID);
@@ -108,7 +106,7 @@ bool ViewSashContainer::RestoreState(IMemento::Pointer memento)
 //    public void runWithException() throws Throwable
 //      {
         // Add the part to the layout
-        if (relativeID.empty())
+        if (relativeID.isEmpty())
         {
           this->Add(myPart);
         }
@@ -134,7 +132,7 @@ bool ViewSashContainer::RestoreState(IMemento::Pointer memento)
 
 bool ViewSashContainer::SaveState(IMemento::Pointer memento)
 {
-  std::vector<RelationshipInfo> relationships = this->ComputeRelation();
+  QList<RelationshipInfo> relationships = this->ComputeRelation();
 
   bool result = true;
 //  MultiStatus

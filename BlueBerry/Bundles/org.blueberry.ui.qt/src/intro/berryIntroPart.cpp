@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berrySafeRunner.h>
 #include <berryObjects.h>
 #include <berryIWorkbenchPartConstants.h>
-#include <berryAbstractUIPlugin.h>
+#include <berryAbstractUICTKPlugin.h>
 
 #include "util/berrySafeRunnable.h"
 #include "internal/berryWorkbenchRegistryConstants.h"
@@ -50,7 +50,7 @@ private:
   PropertyChangeEvent::Pointer event;
 };
 
-std::string IntroPart::GetDefaultTitle() const
+QString IntroPart::GetDefaultTitle() const
 {
   return "Welcome";
 }
@@ -102,7 +102,7 @@ void IntroPart::SetTitleImage(void* titleImage)
   FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void IntroPart::SetTitle(const std::string& titleLabel)
+void IntroPart::SetTitle(const QString& titleLabel)
 {
   if (this->titleLabel == titleLabel)
     return;
@@ -134,9 +134,9 @@ void* IntroPart::GetTitleImage() const
   return GetDefaultImage();
 }
 
-std::string IntroPart::GetPartName() const
+QString IntroPart::GetPartName() const
 {
-  if (!titleLabel.empty())
+  if (!titleLabel.isEmpty())
   {
     return titleLabel;
   }
@@ -160,13 +160,13 @@ void IntroPart::SaveState(IMemento::Pointer /*memento*/)
 }
 
 void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const std::string& /*propertyName*/, Object::Pointer /*data*/)
+    const QString& /*propertyName*/, Object::Pointer /*data*/)
 {
 
   // Save config element.
   configElement = cfig;
 
-  titleLabel = cfig->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL).toStdString();
+  titleLabel = cfig->GetAttribute(WorkbenchRegistryConstants::ATT_LABEL);
 
   // Icon.
   QString strIcon = cfig->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
@@ -175,7 +175,7 @@ void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
     return;
   }
 
-  imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+  imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         configElement->GetContributor(), strIcon);
 
   if (!imageDescriptor)

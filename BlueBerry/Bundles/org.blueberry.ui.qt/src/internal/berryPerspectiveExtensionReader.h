@@ -33,69 +33,69 @@ class PerspectiveExtensionReader: public RegistryReader
 {
 private:
 
-  std::string targetID;
+  QString targetID;
 
   PageLayout::Pointer pageLayout;
 
-  std::vector<std::string> includeOnlyTags;
+  QList<QString> includeOnlyTags;
 
-  static const std::string VAL_LEFT; // = "left";//$NON-NLS-1$
+  static const QString VAL_LEFT; // = "left";//$NON-NLS-1$
 
-  static const std::string VAL_RIGHT; // = "right";//$NON-NLS-1$
+  static const QString VAL_RIGHT; // = "right";//$NON-NLS-1$
 
-  static const std::string VAL_TOP; // = "top";//$NON-NLS-1$
+  static const QString VAL_TOP; // = "top";//$NON-NLS-1$
 
-  static const std::string VAL_BOTTOM; // = "bottom";//$NON-NLS-1$
+  static const QString VAL_BOTTOM; // = "bottom";//$NON-NLS-1$
 
-  static const std::string VAL_STACK; // = "stack";//$NON-NLS-1$
+  static const QString VAL_STACK; // = "stack";//$NON-NLS-1$
 
-  static const std::string VAL_FAST; // = "fast";//$NON-NLS-1$
+  static const QString VAL_FAST; // = "fast";//$NON-NLS-1$
 
-  static const std::string VAL_TRUE; // = "true";//$NON-NLS-1$
+  static const QString VAL_TRUE; // = "true";//$NON-NLS-1$
 
   // VAL_FALSE added by dan_rubel@instantiations.com
   // TODO: this logic is backwards... we should be checking for true, but
   // technically this is API now...
-  //static const std::string VAL_FALSE; // = "false";//$NON-NLS-1$
+  //static const QString VAL_FALSE; // = "false";//$NON-NLS-1$
 
   // IExtensionTracker tracker;
 
   /**
    * Returns whether the given tag should be included.
    */
-  bool IncludeTag(const std::string& tag);
+  bool IncludeTag(const QString& tag);
 
   /**
    * Process an action set.
    */
-  bool ProcessActionSet(IConfigurationElement::Pointer element);
+  bool ProcessActionSet(const IConfigurationElement::Pointer& element);
 
   /**
    * Process an extension.
    * Assumption: Extension is for current perspective.
    */
-  bool ProcessExtension(IConfigurationElement::Pointer element);
+  bool ProcessExtension(const IConfigurationElement::Pointer& element);
 
   /**
    * Process a perspective shortcut
    */
-  bool ProcessPerspectiveShortcut(IConfigurationElement::Pointer element);
+  bool ProcessPerspectiveShortcut(const IConfigurationElement::Pointer& element);
 
   /**
    * Process a show in element.
    */
-  bool ProcessShowInPart(IConfigurationElement::Pointer element);
+  bool ProcessShowInPart(const IConfigurationElement::Pointer& element);
 
   // processView(IConfigurationElement) modified by dan_rubel@instantiations.com
   /**
    * Process a view
    */
-  bool ProcessView(IConfigurationElement::Pointer element);
+  bool ProcessView(const IConfigurationElement::Pointer& element);
 
   /**
    * Process a view shortcut
    */
-  bool ProcessViewShortcut(IConfigurationElement::Pointer element);
+  bool ProcessViewShortcut(const IConfigurationElement::Pointer& element);
 
   /**
    * Process a wizard shortcut
@@ -104,7 +104,7 @@ private:
 
 protected:
 
-  bool ReadElement(IConfigurationElement::Pointer element);
+  bool ReadElement(const IConfigurationElement::Pointer& element);
 
 public:
 
@@ -120,7 +120,7 @@ public:
    * @param id the id
    * @param out the layout
    */
-  void ExtendLayout(const std::string& id,
+  void ExtendLayout(const QString& id,
       PageLayout::Pointer out);
 
   /**
@@ -128,7 +128,7 @@ public:
    *
    * @param tags the tags to include
    */
-  void SetIncludeOnlyTags(const std::vector<std::string>& tags);
+  void SetIncludeOnlyTags(const QList<QString>& tags);
 };
 
 }

@@ -77,12 +77,12 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
   virtual void* GetParent(void* widget) = 0;
   virtual bool SetParent(void* widget, void* parent) = 0;
 
-  virtual void SetData(void* widget, const std::string& id, Object::Pointer data) = 0;
-  virtual Object::Pointer GetData(void* widget, const std::string& id) = 0;
+  virtual void SetData(void* widget, const QString& id, Object::Pointer data) = 0;
+  virtual Object::Pointer GetData(void* widget, const QString& id) = 0;
 
   virtual Point GetCursorLocation() = 0;
   virtual void* GetCursorControl() = 0;
-  virtual void* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location) = 0;
+  virtual void* FindControl(const QList<Shell::Pointer>& shells, const Point& location) = 0;
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -116,7 +116,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
 
   virtual void* CreateComposite(void* parent) = 0;
 
-  virtual std::vector<Shell::Pointer> GetShells() = 0;
+  virtual QList<Shell::Pointer> GetShells() = 0;
   virtual Shell::Pointer GetShell(void* widget) = 0;
   virtual Shell::Pointer GetActiveShell() = 0;
 

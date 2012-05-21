@@ -112,7 +112,7 @@ This element is used to define commands. A command represents an request from th
          <attribute name="returnTypeId" type="string">
             <annotation>
                <documentation>
-                  The id of a &lt;code&gt;commandParameterType&lt;/code&gt; indicating the type of value returned by this command.  Specifying a &lt;code&gt;returnTypeId&lt;/code&gt; allows clients executing the command to associate the value returned with a type and to convert the value to a std::string form that may be stored and/or passed to another command that accepts parameters of the same type.
+                  The id of a &lt;code&gt;commandParameterType&lt;/code&gt; indicating the type of value returned by this command.  Specifying a &lt;code&gt;returnTypeId&lt;/code&gt; allows clients executing the command to associate the value returned with a type and to convert the value to a QString form that may be stored and/or passed to another command that accepts parameters of the same type.
                </documentation>
             </annotation>
          </attribute>

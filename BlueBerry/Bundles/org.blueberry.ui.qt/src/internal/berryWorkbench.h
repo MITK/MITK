@@ -114,14 +114,14 @@ public:
    *
    * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Object)
    */
-  Object::Pointer GetService(const std::string& key);
+  Object::Pointer GetService(const QString& key);
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.services.IServiceLocator#hasService(java.lang.Object)
    */
-  bool HasService(const std::string& key) const;
+  bool HasService(const QString& key) const;
 
   /*
    * Method declared on IWorkbench.
@@ -173,15 +173,15 @@ public:
   IPerspectiveRegistry* GetPerspectiveRegistry();
 
   std::size_t GetWorkbenchWindowCount();
-  std::vector<IWorkbenchWindow::Pointer> GetWorkbenchWindows();
-  IWorkbenchWindow::Pointer OpenWorkbenchWindow(const std::string& perspectiveId,
+  QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows();
+  IWorkbenchWindow::Pointer OpenWorkbenchWindow(const QString& perspectiveId,
         IAdaptable* input);
   IWorkbenchWindow::Pointer OpenWorkbenchWindow(IAdaptable* input);
 
-  IWorkbenchPage::Pointer ShowPerspective(const std::string& perspectiveId,
+  IWorkbenchPage::Pointer ShowPerspective(const QString& perspectiveId,
       IWorkbenchWindow::Pointer window);
 
-  IWorkbenchPage::Pointer ShowPerspective(const std::string& perspectiveId,
+  IWorkbenchPage::Pointer ShowPerspective(const QString& perspectiveId,
         IWorkbenchWindow::Pointer window, IAdaptable* input);
 
   bool SaveAllEditors(bool confirm);
@@ -231,7 +231,7 @@ public:
    *
    * @return the default perspective id, or <code>null</code>
    */
-  std::string GetDefaultPerspectiveId();
+  QString GetDefaultPerspectiveId();
 
   /**
    * Returns the default workbench window page input.
@@ -247,7 +247,7 @@ public:
    * @return the presentation ID
    * @see IWorkbenchPreferenceConstants#PRESENTATION_FACTORY_ID
    */
-  std::string GetPresentationId();
+  QString GetPresentationId();
 
   void UpdateTheme();
 
@@ -430,9 +430,9 @@ private:
   static WorkbenchTestable::Pointer testableObject;
 
   static const unsigned int VERSION_STRING_COUNT; // = 1;
-  static const std::string VERSION_STRING[1];
+  static const QString VERSION_STRING[1];
 
-  static const std::string DEFAULT_WORKBENCH_STATE_FILENAME; // = "workbench.xml";
+  static const QString DEFAULT_WORKBENCH_STATE_FILENAME; // = "workbench.xml";
 
   IWorkbenchListener::Events workbenchEvents;
   IWindowListener::Events windowEvents;
@@ -465,7 +465,7 @@ private:
    * event that not all windows have been restored, this field allows the
    * openWindowsAfterRestore method to open some windows.
    */
-  std::vector<WorkbenchWindow::Pointer> createdWindows;
+  QList<WorkbenchWindow::Pointer> createdWindows;
 
   struct ServiceLocatorOwner : public IDisposable
   {
@@ -513,7 +513,7 @@ private:
 
   int returnCode;
 
-  std::string factoryID;
+  QString factoryID;
 
   /**
    * Creates a new workbench.
@@ -589,7 +589,7 @@ private:
   /*
    * Answer the workbench state file.
    */
-  bool GetWorkbenchStateFile(Poco::File& file);
+  QString GetWorkbenchStateFile() const;
 
   /*
    * Shuts down the application.
@@ -601,7 +601,7 @@ private:
    *
    * Assumes that busy cursor is active.
    */
-  IWorkbenchWindow::Pointer BusyOpenWorkbenchWindow(const std::string& perspID,
+  IWorkbenchWindow::Pointer BusyOpenWorkbenchWindow(const QString& perspID,
       IAdaptable* input);
 };
 

@@ -54,7 +54,7 @@ class PartStack;
 class PartSashContainer: public LayoutPart, public ILayoutContainer, public IDragOverListener {
 
 public:
-  berryObjectMacro(PartSashContainer);
+  berryObjectMacro(PartSashContainer)
 
   friend class LayoutTree;
   friend class LayoutTreeNode;
@@ -136,7 +136,7 @@ private:
 
     public:
 
-      berryObjectMacro(SashContainerDropTarget);
+      berryObjectMacro(SashContainerDropTarget)
 
       SashContainerDropTarget(PartSashContainer* partSashContainer, Object::Pointer sourcePart,
           int side, int cursor, Object::Pointer targetPart);
@@ -161,7 +161,7 @@ public:
    *
    * GUI specializations must hook
    */
-  PartSashContainer(const std::string& id, WorkbenchPage*  page,
+  PartSashContainer(const QString& id, WorkbenchPage*  page,
       void* parentWidget);
 
   ~PartSashContainer();
@@ -186,7 +186,7 @@ public:
    * @return
    */
 private:
-  std::vector<SmartPointer<PartPane> > GetVisibleParts(Object::Pointer pane);
+  QList<SmartPointer<PartPane> > GetVisibleParts(Object::Pointer pane);
 
   /**
    * Find the sashs around the specified part.
@@ -218,7 +218,7 @@ public:
 
 
 protected:
-  virtual void DropObject(const std::vector<PartPane::Pointer>& toDrop,
+  virtual void DropObject(const QList<PartPane::Pointer>& toDrop,
         LayoutPart::Pointer visiblePart,
             Object::Pointer targetPart, int side);
   /**
@@ -288,7 +288,7 @@ protected:
    * parts.
    */
 public:
-  virtual std::vector<RelationshipInfo> ComputeRelation();
+  virtual QList<RelationshipInfo> ComputeRelation();
 
 public:
   virtual void SetActive(bool isActive);
@@ -650,7 +650,7 @@ protected:
    * @param buf
    */
 public:
-  void DescribeLayout(std::string& buf) const;
+  void DescribeLayout(QString& buf) const;
 
   /**
    * Adds a new child to the container relative to some part

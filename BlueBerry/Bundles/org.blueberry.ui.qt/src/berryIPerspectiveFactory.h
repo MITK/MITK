@@ -59,7 +59,7 @@ namespace berry {
  * <pre>
  * public: void CreateInitialLayout(IPageLayout layout) {
  *    // Get the editor area.
- *    std::string editorArea = layout->GetEditorArea();
+ *    QString editorArea = layout->GetEditorArea();
  *
  *    // Top left: Resource Navigator view and Bookmarks view placeholder
  *    IFolderLayout::Pointer topLeft = layout->CreateFolder("topLeft", IPageLayout::LEFT, 0.25f,

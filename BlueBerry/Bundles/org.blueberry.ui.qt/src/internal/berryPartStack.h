@@ -31,10 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "presentations/berryIPresentationFactory.h"
 
-#include <vector>
-#include <list>
-#include <map>
-
 namespace berry {
 
 /**
@@ -51,11 +47,13 @@ class PartStack : public LayoutPart, public ILayoutContainer {
   friend class PartSashContainer;
   friend class DetachedWindow;
 
-public: berryObjectMacro(PartStack);
+public:
+
+  berryObjectMacro(PartStack)
 
     public: static const int PROP_SELECTION; // = 0x42;
 
-    private: typedef std::list<LayoutPart::Pointer> ChildVector;
+    private: typedef QList<LayoutPart::Pointer> ChildVector;
     private: ChildVector children;
 
     private: WorkbenchPage* page;
@@ -64,10 +62,10 @@ public: berryObjectMacro(PartStack);
 
     private: bool allowStateChanges;
 
-    private: typedef std::list<IPresentablePart::Pointer> PresentableVector;
+    private: typedef QList<IPresentablePart::Pointer> PresentableVector;
     private: PresentableVector presentableParts;
 
-    private: std::map<std::string, std::string> properties;
+    private: QHash<QString, QString> properties;
 
     protected: int appearance;
 
@@ -116,7 +114,7 @@ public: berryObjectMacro(PartStack);
 
           void Close(IPresentablePart::Pointer part);
 
-         void Close(const std::vector<IPresentablePart::Pointer>& parts);
+         void Close(const QList<IPresentablePart::Pointer>& parts);
 
          void DragStart(IPresentablePart::Pointer beingDragged,
                 Point& initialLocation, bool keyboard);
@@ -143,7 +141,7 @@ public: berryObjectMacro(PartStack);
 
          PresentableVector GetPartList();
 
-         std::string GetProperty(const std::string& id);
+         QString GetProperty(const QString& id);
     };
 
       DefaultStackPresentationSite::Pointer presentationSite;
@@ -163,7 +161,7 @@ public: berryObjectMacro(PartStack);
 
         public:
 
-          berryObjectMacro(PartStackDropResult);
+          berryObjectMacro(PartStackDropResult)
 
         /**
          * Resets the target of this drop result (allows the same drop result object to be
@@ -242,7 +240,7 @@ public: berryObjectMacro(PartStack);
 
     public: int GetAppearance() const;
 
-    public: std::string GetID() const;
+    public: QString GetID() const;
 
     protected: bool IsStandalone();
 
@@ -264,7 +262,7 @@ public: berryObjectMacro(PartStack);
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#describeLayout(java.lang.StringBuffer)
      */
-    public: void DescribeLayout(std::string& buf) const;
+    public: void DescribeLayout(QString& buf) const;
 
     /**
      * See IVisualContainer#add
@@ -288,7 +286,7 @@ public: berryObjectMacro(PartStack);
     /**
      * @param parts
      */
-    protected: void Close(const std::vector<IPresentablePart::Pointer>& parts);
+    protected: void Close(const QList<IPresentablePart::Pointer>& parts);
 
     /**
      * @param part
@@ -707,7 +705,7 @@ public: berryObjectMacro(PartStack);
 
     public: void ShowPartList();
 
-    public: std::vector<void*> GetTabList(LayoutPart::Pointer part);
+    public: QList<void*> GetTabList(LayoutPart::Pointer part);
 
     /**
      *
@@ -745,9 +743,9 @@ public: berryObjectMacro(PartStack);
     // Support for passing perspective layout properties to the presentation
 
 
-    public: std::string GetProperty(const std::string& id);
+    public: QString GetProperty(const QString& id);
 
-    public: void SetProperty(const std::string& id, const std::string& value);
+    public: void SetProperty(const QString& id, const QString& value);
 
     /**
      * Copies all appearance related data from this stack to the given stack.

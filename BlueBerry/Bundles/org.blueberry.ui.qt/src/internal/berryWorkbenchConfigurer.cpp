@@ -55,32 +55,31 @@ void WorkbenchConfigurer::SetSaveAndRestore(bool enabled)
   saveAndRestore = enabled;
 }
 
-Object::Pointer WorkbenchConfigurer::GetData(const std::string& key) const
+Object::Pointer WorkbenchConfigurer::GetData(const QString& key) const
 {
-  if (key.empty())
+  if (key.isEmpty())
   {
     throw Poco::InvalidArgumentException();
   }
-  Poco::HashMap<std::string, Object::Pointer>::ConstIterator i =
-      extraData.find(key);
+  QHash<QString, Object::Pointer>::ConstIterator i = extraData.find(key);
   if (i != extraData.end())
-    return i->second;
+    return i.value();
   return Object::Pointer(0);
 }
 
-void WorkbenchConfigurer::SetData(const std::string& key, Object::Pointer data)
+void WorkbenchConfigurer::SetData(const QString& key, Object::Pointer data)
 {
-  if (key.empty())
+  if (key.isEmpty())
   {
-    throw Poco::InvalidArgumentException();
+    throw ctkInvalidArgumentException("Key must not be empty");
   }
   if (data)
   {
-    extraData.insert(std::make_pair(key, data));
+    extraData.insert(key, data);
   }
   else
   {
-    extraData.erase(key);
+    extraData.remove(key);
   }
 }
 

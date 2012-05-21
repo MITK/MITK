@@ -109,7 +109,7 @@ void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
 
   if (wrapper->RemoveListener(listener) == 0)
   {
-    selectionListenerMap.erase(wrapper);
+    selectionListenerMap.remove(wrapper);
     delete wrapper;
   }
 }
@@ -229,7 +229,7 @@ bool QtWidgetsTweakletImpl::SetParent(QWidget* widget, QWidget* parent)
   return false;
 }
 
-void QtWidgetsTweakletImpl::SetData(QWidget* object, const std::string& id, Object::Pointer data)
+void QtWidgetsTweakletImpl::SetData(QWidget* object, const QString& id, Object::Pointer data)
 {
   if (object == 0) return;
 
@@ -237,14 +237,14 @@ void QtWidgetsTweakletImpl::SetData(QWidget* object, const std::string& id, Obje
   if (data != 0)
     variant.setValue(data);
 
-  object->setProperty(id.c_str(), variant);
+  object->setProperty(qPrintable(id), variant);
 }
 
-Object::Pointer QtWidgetsTweakletImpl::GetData(QWidget* object, const std::string& id)
+Object::Pointer QtWidgetsTweakletImpl::GetData(QWidget* object, const QString& id)
 {
   if (object == 0) return Object::Pointer(0);
 
-  QVariant variant = object->property(id.c_str());
+  QVariant variant = object->property(qPrintable(id));
   if (variant.isValid())
   {
     return variant.value<Object::Pointer>();
@@ -263,9 +263,9 @@ QWidget* QtWidgetsTweakletImpl::GetCursorControl()
   return QApplication::widgetAt(QCursor::pos());
 }
 
-QWidget* QtWidgetsTweakletImpl::FindControl(const std::vector<Shell::Pointer>& shells, const Point& location)
+QWidget* QtWidgetsTweakletImpl::FindControl(const QList<Shell::Pointer>& shells, const Point& location)
 {
-  for (std::vector<Shell::Pointer>::const_iterator iter = shells.begin();
+  for (QList<Shell::Pointer>::const_iterator iter = shells.begin();
       iter != shells.end(); ++iter)
   {
     QWidget* shellWidget = static_cast<QWidget*>((*iter)->GetControl());
@@ -365,13 +365,12 @@ QWidget* QtWidgetsTweakletImpl::CreateComposite(QWidget* parent)
 
 void QtWidgetsTweakletImpl::DisposeShell(Shell::Pointer shell)
 {
-  shellList.remove(shell);
+  shellList.removeAll(shell);
 }
 
-std::vector<Shell::Pointer> QtWidgetsTweakletImpl::GetShells()
+QList<Shell::Pointer> QtWidgetsTweakletImpl::GetShells()
 {
-  std::vector<Shell::Pointer> shells(shellList.begin(), shellList.end());
-  return shells;
+  return shellList;
 }
 
 Shell::Pointer QtWidgetsTweakletImpl::GetShell(QWidget* widget)

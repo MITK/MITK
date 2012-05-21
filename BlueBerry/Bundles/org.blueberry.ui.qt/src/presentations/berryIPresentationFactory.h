@@ -145,7 +145,7 @@ public:
      *
      * @return a globally unique identifier for this type of presentation factory.
      */
-    virtual std::string GetId() = 0;
+    virtual QString GetId() = 0;
 
     /**
      * Creates the Sash control that is used to separate view and editor parts.

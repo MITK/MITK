@@ -19,29 +19,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 
 #include <berryIPageLayout.h>
-
-#include <Poco/String.h>
+#include <berryPlatformException.h>
 
 namespace berry
 {
 
-const std::string StickyViewDescriptor::STICKY_FOLDER_RIGHT =
+const QString StickyViewDescriptor::STICKY_FOLDER_RIGHT =
     "stickyFolderRight";
-const std::string StickyViewDescriptor::STICKY_FOLDER_LEFT = "stickyFolderLeft";
-const std::string StickyViewDescriptor::STICKY_FOLDER_TOP = "stickyFolderTop";
-const std::string StickyViewDescriptor::STICKY_FOLDER_BOTTOM =
+const QString StickyViewDescriptor::STICKY_FOLDER_LEFT = "stickyFolderLeft";
+const QString StickyViewDescriptor::STICKY_FOLDER_TOP = "stickyFolderTop";
+const QString StickyViewDescriptor::STICKY_FOLDER_BOTTOM =
     "stickyFolderBottom";
 
-StickyViewDescriptor::StickyViewDescriptor(
-    IConfigurationElement::Pointer element) throw (CoreException)
+StickyViewDescriptor::StickyViewDescriptor(IConfigurationElement::Pointer element)
 {
   this->configurationElement = element;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
-  if (id.empty())
+  this->id = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (id.isEmpty())
   {
     //TODO IStatus
 //    throw new CoreException(new Status(IStatus.ERROR, element .getNamespace(),
-//        0, "Invalid extension (missing id) ", null));//$NON-NLS-1$
+//        0, "Invalid extension (missing id) ", null));
     throw CoreException(element->GetContributor() + ": Invalid extension (missing id)");
   }
 }
@@ -55,20 +53,18 @@ int StickyViewDescriptor::GetLocation() const
 {
   int direction = IPageLayout::RIGHT;
 
-  std::string location;
-  configurationElement->GetAttribute(
-      WorkbenchRegistryConstants::ATT_LOCATION, location);
-  if (!location.empty())
+  QString location = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LOCATION);
+  if (!location.isEmpty())
   {
-    if (Poco::icompare(location, "left") == 0)
+    if (location.compare("left", Qt::CaseInsensitive) == 0)
     {
       direction = IPageLayout::LEFT;
     }
-    else if (Poco::icompare(location, "top") == 0)
+    else if (location.compare("top", Qt::CaseInsensitive) == 0)
     {
       direction = IPageLayout::TOP;
     }
-    else if (Poco::icompare(location, "bottom") == 0)
+    else if (location.compare("bottom", Qt::CaseInsensitive) == 0)
     {
       direction = IPageLayout::BOTTOM;
       //no else for right - it is the default value;
@@ -77,7 +73,7 @@ int StickyViewDescriptor::GetLocation() const
   return direction;
 }
 
-std::string StickyViewDescriptor::GetId() const
+QString StickyViewDescriptor::GetId() const
 {
   return id;
 }
@@ -85,10 +81,8 @@ std::string StickyViewDescriptor::GetId() const
 bool StickyViewDescriptor::IsCloseable() const
 {
   bool closeable = true;
-  std::string closeableString;
-  configurationElement->GetAttribute(
-      WorkbenchRegistryConstants::ATT_CLOSEABLE, closeableString);
-  closeable = closeableString != "false";
+  QString closeableString = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_CLOSEABLE);
+  closeable = (closeableString != "false");
 
   return closeable;
 }
@@ -96,9 +90,7 @@ bool StickyViewDescriptor::IsCloseable() const
 bool StickyViewDescriptor::IsMoveable() const
 {
   bool moveable = true;
-  std::string moveableString;
-  configurationElement->GetAttribute(
-      WorkbenchRegistryConstants::ATT_MOVEABLE, moveableString);
+  QString moveableString = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_MOVEABLE);
   moveable = moveableString != "false";
 
   return moveable;

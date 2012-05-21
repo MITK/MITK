@@ -32,21 +32,21 @@ public:
   QtMessageDialogTweaklet();
   QtMessageDialogTweaklet(const QtMessageDialogTweaklet& other);
 
-  bool OpenConfirm(Shell::Pointer, const std::string& title,
-      const std::string& message);
-  void OpenError(Shell::Pointer, const std::string& title,
-      const std::string& message);
-  void OpenInformation(Shell::Pointer, const std::string& title,
-      const std::string& message);
-  bool OpenQuestion(Shell::Pointer, const std::string& title,
-      const std::string& message);
-  void OpenWarning(Shell::Pointer, const std::string& title,
-      const std::string& message);
+  bool OpenConfirm(Shell::Pointer, const QString& title,
+      const QString& message);
+  void OpenError(Shell::Pointer, const QString& title,
+      const QString& message);
+  void OpenInformation(Shell::Pointer, const QString& title,
+      const QString& message);
+  bool OpenQuestion(Shell::Pointer, const QString& title,
+      const QString& message);
+  void OpenWarning(Shell::Pointer, const QString& title,
+      const QString& message);
 
   IDialog::Pointer MessageDialog(Shell::Pointer parentShell,
-      const std::string& dialogTitle, void* dialogTitleImage,
-      const std::string& dialogMessage, int dialogImageType, const std::vector<
-          std::string>& dialogButtonLabels, int defaultIndex);
+      const QString& dialogTitle, void* dialogTitleImage,
+      const QString& dialogMessage, int dialogImageType, const QList<
+          QString>& dialogButtonLabels, int defaultIndex);
 
 };
 

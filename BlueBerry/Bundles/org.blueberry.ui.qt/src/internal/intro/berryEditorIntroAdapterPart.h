@@ -28,8 +28,6 @@ namespace berry
 
 /**
  * Simple editor that will wrap an <code>IIntroPart</code>.
- *
- * @since 3.0
  */
 class EditorIntroAdapterPart: public EditorPart
 {
@@ -131,7 +129,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  std::string GetPartName();
+  QString GetPartName();
 
   void Init(IEditorSite::Pointer site, IEditorInput::Pointer input);
 

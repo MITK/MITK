@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string IMemento::TAG_ID = "IMemento.internal.id";
+const QString IMemento::TAG_ID = "IMemento.internal.id";
 
 IMemento::~IMemento()
 {

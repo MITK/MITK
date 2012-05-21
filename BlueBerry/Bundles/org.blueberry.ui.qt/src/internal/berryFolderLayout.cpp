@@ -32,7 +32,7 @@ FolderLayout::FolderLayout(PageLayout::Pointer pageLayout, PartStack::Pointer fo
   this->pageLayout = pageLayout;
 }
 
-void FolderLayout::AddPlaceholder(const std::string& viewId)
+void FolderLayout::AddPlaceholder(const QString& viewId)
 {
   if (!pageLayout->CheckValidPlaceholderId(viewId))
   {
@@ -47,7 +47,7 @@ void FolderLayout::AddPlaceholder(const std::string& viewId)
   folder->Add(newPart);
 }
 
-void FolderLayout::AddView(const std::string& viewId)
+void FolderLayout::AddView(const QString& viewId)
 {
   pageLayout->AddShowViewShortcut(viewId);
   if (pageLayout->CheckPartInLayout(viewId))
@@ -61,31 +61,31 @@ void FolderLayout::AddView(const std::string& viewId)
         ViewFactory::ExtractPrimaryId(viewId));
     if (descriptor == 0)
     {
-      throw PartInitException("View descriptor not found: " + viewId); //$NON-NLS-1$
+      throw PartInitException("View descriptor not found: " + viewId);
     }
 
       PartPane::Pointer newPart = LayoutHelper::CreateView(pageLayout->GetViewFactory(), viewId);
       this->LinkPartToPageLayout(viewId, newPart);
       folder->Add(newPart);
   }
-  catch (PartInitException& e)
+  catch (const PartInitException& e)
   {
     // cannot safely open the dialog so log the problem
-    WorkbenchPlugin::Log(this->GetClassName(), "AddView(const std::string&)", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetClassName(), "AddView(const QString&)", e);
   }
 }
 
-std::string FolderLayout::GetProperty(const std::string& id)
+QString FolderLayout::GetProperty(const QString& id)
 {
   return folder->GetProperty(id);
 }
 
-void FolderLayout::SetProperty(const std::string& id, const std::string& value)
+void FolderLayout::SetProperty(const QString& id, const QString& value)
 {
   folder->SetProperty(id, value);
 }
 
-void FolderLayout::LinkPartToPageLayout(const std::string& viewId,
+void FolderLayout::LinkPartToPageLayout(const QString& viewId,
     LayoutPart::Pointer newPart)
 {
   pageLayout->SetRefPart(viewId, newPart);

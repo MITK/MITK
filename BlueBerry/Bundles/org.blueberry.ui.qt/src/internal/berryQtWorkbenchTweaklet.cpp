@@ -52,7 +52,7 @@ bool QtWorkbenchTweaklet::IsRunning()
 }
 
 IDialog::Pointer
-QtWorkbenchTweaklet::CreateStandardDialog(const std::string& dialogid)
+QtWorkbenchTweaklet::CreateStandardDialog(const QString& dialogid)
 {
   if (dialogid == DIALOG_ID_SHOW_VIEW)
     return IDialog::Pointer(new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry()));

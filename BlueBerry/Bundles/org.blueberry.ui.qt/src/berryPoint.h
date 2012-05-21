@@ -101,7 +101,7 @@ public:
    *
    * @return a string representation of the point
    */
-  std::string ToString();
+  QString ToString() const;
 
 };
 

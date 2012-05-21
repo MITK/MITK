@@ -36,11 +36,11 @@ class EditorSashContainer: public PartSashContainer
 {
 
 public:
-  berryObjectMacro(EditorSashContainer);
+  berryObjectMacro(EditorSashContainer)
 
 private:
 
-  std::list<PartStack::Pointer> editorWorkbooks;
+  QList<PartStack::Pointer> editorWorkbooks;
 
   PartStack::Pointer activeEditorWorkbook;
 
@@ -117,9 +117,9 @@ protected:
 
 public:
 
-  static const std::string DEFAULT_WORKBOOK_ID;
+  static const QString DEFAULT_WORKBOOK_ID;
 
-  EditorSashContainer(const std::string& editorId, WorkbenchPage* page,
+  EditorSashContainer(const QString& editorId, WorkbenchPage* page,
       void* parent);
 
   bool AllowsAdd(LayoutPart::Pointer layoutPart);
@@ -156,12 +156,12 @@ public:
   /**
    * Return the editor workbook id which is active.
    */
-  std::string GetActiveWorkbookID();
+  QString GetActiveWorkbookID();
 
   /**
    * Return the all the editor workbooks.
    */
-  std::list<PartStack::Pointer> GetEditorWorkbooks();
+  QList<PartStack::Pointer> GetEditorWorkbooks();
 
   /**
    * Return the all the editor workbooks.
@@ -201,9 +201,9 @@ public:
   /**
    * Set the editor workbook which is active.
    */
-  void SetActiveWorkbookFromID(const std::string& id);
+  void SetActiveWorkbookFromID(const QString& id);
 
-  PartStack::Pointer GetWorkbookFromID(const std::string& id);
+  PartStack::Pointer GetWorkbookFromID(const QString& id);
 
   /**
    * Updates the editor area's tab list to include the active

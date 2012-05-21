@@ -86,7 +86,7 @@ protected:
 
 public:
 
-  berryObjectMacro(ViewPart);
+  berryObjectMacro(ViewPart)
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(0));
 

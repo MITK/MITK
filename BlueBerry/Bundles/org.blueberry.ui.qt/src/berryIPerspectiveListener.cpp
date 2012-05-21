@@ -67,12 +67,12 @@ void IPerspectiveListener::PerspectiveActivated(SmartPointer<IWorkbenchPage> /*p
 {}
 
 void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/, const std::string&  /*changeId*/)
+          IPerspectiveDescriptor::Pointer  /*perspective*/, const QString&  /*changeId*/)
 {}
 
 void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*page*/,
           IPerspectiveDescriptor::Pointer /*perspective*/,
-          IWorkbenchPartReference::Pointer  /*partRef*/, const std::string&  /*changeId*/)
+          IWorkbenchPartReference::Pointer  /*partRef*/, const QString&  /*changeId*/)
 {}
 
 void IPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> /*page*/,

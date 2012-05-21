@@ -61,17 +61,17 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
   return control;
 }
 
-Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(void* parent, const std::string& title, const std::string& msg)
+Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(void* parent, const QString& title, const QString& msg)
 {
   Ui::QtStatusPart statusPart;
   statusPart.setupUi(static_cast<QWidget*>(parent));
-  statusPart.m_TitleLabel->setText(QString::fromStdString(title));
-  statusPart.m_DetailsLabel->setText(QString::fromStdString(msg));
+  statusPart.m_TitleLabel->setText(title);
+  statusPart.m_DetailsLabel->setText(msg);
 
   return Object::Pointer(0);
 }
 
-IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const std::string&  /*partName*/, const std::string&  /*msg*/)
+IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const QString&  /*partName*/, const QString&  /*msg*/)
 {
   return IEditorPart::Pointer(0);
 }

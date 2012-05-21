@@ -26,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryDebugUtil.h>
 
-#include <Poco/RegularExpression.h>
-
 namespace berry
 {
 
@@ -165,16 +163,15 @@ DnDTweaklet::CursorType PerspectiveHelper::ActualDropTarget::GetCursor()
   return DnDTweaklet::CURSOR_OFFSCREEN;
 }
 
-PerspectiveHelper::MatchingPart::MatchingPart(const std::string& pid,
-    const std::string& sid, LayoutPart::Pointer part)
+PerspectiveHelper::MatchingPart::MatchingPart(const QString& pid,
+    const QString& sid, LayoutPart::Pointer part)
 {
   this->pid = pid;
   this->sid = sid;
   this->part = part;
   this->len = pid.size() + sid.size();
-  this->hasWildcard = (pid.find_first_of(PartPlaceholder::WILD_CARD)
-      != std::string::npos) || (sid.find_first_of(PartPlaceholder::WILD_CARD)
-      != std::string::npos);
+  this->hasWildcard = (pid.indexOf(PartPlaceholder::WILD_CARD) != -1) ||
+                      (sid.indexOf(PartPlaceholder::WILD_CARD) != -1);
 }
 
 bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1, const MatchingPart& m2) const
@@ -242,9 +239,9 @@ void PerspectiveHelper::Activate(void* parent)
 
   // Activate main layout
   // make sure all the views have been properly parented
-  std::vector<PartPane::Pointer> children;
+  QList<PartPane::Pointer> children;
   this->CollectViewPanes(children, mainLayout->GetChildren());
-  for (std::vector<PartPane::Pointer>::iterator iter = children.begin();
+  for (QList<PartPane::Pointer>::iterator iter = children.begin();
       iter != children.end(); ++iter)
   {
     PartPane::Pointer part = *iter;
@@ -289,8 +286,8 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
   // Look for a placeholder.
   PartPlaceholder::Pointer placeholder;
   LayoutPart::Pointer testPart;
-  std::string primaryId = part->GetID();
-  std::string secondaryId;
+  QString primaryId = part->GetID();
+  QString secondaryId;
 
   IViewReference::Pointer ref;
   if (part.Cast<PartPane> () != 0)
@@ -348,7 +345,7 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
       {
         //Create a detached window add the part on it.
         DetachedPlaceHolder::Pointer holder = container.Cast<DetachedPlaceHolder>();
-        detachedPlaceHolderList.remove(holder);
+        detachedPlaceHolderList.removeAll(holder);
         container->Remove(testPart);
         DetachedWindow::Pointer window(new DetachedWindow(page));
         detachedWindowList.push_back(window);
@@ -360,8 +357,8 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
         // add part to detached window.
         PartPane::Pointer pane = part.Cast<PartPane>();
         window->Add(pane);
-        std::list<LayoutPart::Pointer> otherChildren = holder->GetChildren();
-        for (std::list<LayoutPart::Pointer>::iterator iter = otherChildren.begin();
+        QList<LayoutPart::Pointer> otherChildren = holder->GetChildren();
+        for (QList<LayoutPart::Pointer>::iterator iter = otherChildren.begin();
             iter != otherChildren.end(); ++iter)
         {
           part->GetContainer()->Add(*iter);
@@ -495,13 +492,13 @@ bool PerspectiveHelper::IsPartVisible(IWorkbenchPartReference::Pointer partRef)
   return true;
 }
 
-bool PerspectiveHelper::WillPartBeVisible(const std::string& partId)
+bool PerspectiveHelper::WillPartBeVisible(const QString& partId)
 {
   return this->WillPartBeVisible(partId, 0);
 }
 
-bool PerspectiveHelper::WillPartBeVisible(const std::string& partId,
-    const std::string& secondaryId)
+bool PerspectiveHelper::WillPartBeVisible(const QString& partId,
+    const QString& secondaryId)
 {
   LayoutPart::Pointer part = this->FindPart(partId, secondaryId);
   if (part == 0)
@@ -526,10 +523,10 @@ bool PerspectiveHelper::WillPartBeVisible(const std::string& partId,
   return true;
 }
 
-std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders()
+QList<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders()
 {
   // Scan the main window.
-  std::vector<PartPlaceholder::Pointer> results = this->CollectPlaceholders(
+  QList<PartPlaceholder::Pointer> results = this->CollectPlaceholders(
       mainLayout->GetChildren());
 
   // Scan each detached window.
@@ -539,10 +536,10 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders()
         winIter != detachedWindowList.end(); ++winIter)
     {
       DetachedWindow::Pointer win = *winIter;
-      std::list<LayoutPart::Pointer> moreResults = win->GetChildren();
+      QList<LayoutPart::Pointer> moreResults = win->GetChildren();
       if (moreResults.size()> 0)
       {
-        for (std::list<LayoutPart::Pointer>::iterator iter = moreResults.begin();
+        for (QList<LayoutPart::Pointer>::iterator iter = moreResults.begin();
             iter != moreResults.end(); ++iter)
         {
           if (iter->Cast<PartPlaceholder>() != 0)
@@ -554,21 +551,21 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders()
   return results;
 }
 
-std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
-    const std::list<LayoutPart::Pointer>& parts)
+QList<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
+    const QList<LayoutPart::Pointer>& parts)
 {
-  std::vector<PartPlaceholder::Pointer> result;
+  QList<PartPlaceholder::Pointer> result;
 
-  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
+  for (QList<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     if (ILayoutContainer::Pointer container = part.Cast<ILayoutContainer>())
     {
       // iterate through sub containers to find sub-parts
-      std::vector<PartPlaceholder::Pointer> newParts = this->CollectPlaceholders(
+      QList<PartPlaceholder::Pointer> newParts = this->CollectPlaceholders(
             container->GetChildren());
-      result.insert(result.end(), newParts.begin(), newParts.end());
+      result.append(newParts);
     }
     else if (PartPlaceholder::Pointer placeholder = part.Cast<PartPlaceholder>())
     {
@@ -579,7 +576,7 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
   return result;
 }
 
-void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result)
+void PerspectiveHelper::CollectViewPanes(QList<PartPane::Pointer>& result)
 {
   // Scan the main window.
   this->CollectViewPanes(result, mainLayout->GetChildren());
@@ -596,10 +593,10 @@ void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result)
   }
 }
 
-void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result,
-    const std::list<LayoutPart::Pointer>& parts)
+void PerspectiveHelper::CollectViewPanes(QList<PartPane::Pointer>& result,
+    const QList<LayoutPart::Pointer>& parts)
 {
-  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
+  for (QList<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
@@ -628,7 +625,7 @@ void PerspectiveHelper::Deactivate()
 
   // Reparent all views to the main window
   void* parent = mainLayout->GetParent();
-  std::vector<PartPane::Pointer> children;
+  QList<PartPane::Pointer> children;
   this->CollectViewPanes(children, mainLayout->GetChildren());
 
   for (DetachedWindowsType::iterator winIter = detachedWindowList.begin();
@@ -639,7 +636,7 @@ void PerspectiveHelper::Deactivate()
   }
 
   // *** Do we even need to do this if detached windows not supported?
-  for (std::vector<PartPane::Pointer>::iterator itr = children.begin();
+  for (QList<PartPane::Pointer>::iterator itr = children.begin();
       itr != children.end(); ++itr)
   {
     PartPane::Pointer part = *itr;
@@ -666,7 +663,7 @@ PerspectiveHelper::~PerspectiveHelper()
   mainLayout->DisposeSashes();
 }
 
-void PerspectiveHelper::DescribeLayout(std::string& buf) const
+void PerspectiveHelper::DescribeLayout(QString& buf) const
 {
 
   if (detachable)
@@ -679,12 +676,12 @@ void PerspectiveHelper::DescribeLayout(std::string& buf) const
           winIter != detachedWindowList.end(); ++winIter)
       {
         DetachedWindow::ConstPointer window = *winIter;
-        std::list<LayoutPart::Pointer> children = window->GetChildren();
+        QList<LayoutPart::Pointer> children = window->GetChildren();
         unsigned int j = 0;
         if (children.size() != 0)
         {
           buf.append("dWindow ("); //$NON-NLS-1$
-          for (std::list<LayoutPart::Pointer>::iterator partIter = children.begin();
+          for (QList<LayoutPart::Pointer>::iterator partIter = children.begin();
               partIter != children.end(); ++partIter, ++j)
           {
             if (partIter->Cast<PartPlaceholder>() != 0)
@@ -726,7 +723,7 @@ void PerspectiveHelper::DerefPart(LayoutPart::Pointer part)
   //      {
   //        ViewStack vs =
   //            (ViewStack) ((ContainerPlaceholder) parentPart).getRealContainer();
-  //        std::vector<LayoutPart::Pointer> kids = vs.getChildren();
+  //        QList<LayoutPart::Pointer> kids = vs.getChildren();
   //        for (int i = 0; i < kids.length; i++)
   //        {
   //          if (kids[i].Cast<PartPlaceholder> () != 0)
@@ -826,7 +823,7 @@ void PerspectiveHelper::DerefPart(LayoutPart::Pointer part)
         if (parentContainer != 0)
         {
           parentContainer->Remove(parent);
-          parent->Print(std::cout);
+          parent->Print(qDebug());
           parent->Dispose();
         }
       }
@@ -842,7 +839,7 @@ void PerspectiveHelper::DerefPart(LayoutPart::Pointer part)
       //oldShell.setRedraw(true);
       DetachedWindow::Pointer w = oldShell->GetData().Cast<DetachedWindow>();
       oldShell->Close();
-      detachedWindowList.remove(w);
+      detachedWindowList.removeAll(w);
     }
     else
     {
@@ -872,7 +869,7 @@ void PerspectiveHelper::DerefPart(LayoutPart::Pointer part)
         detachedPlaceHolderList.push_back(placeholder);
         DetachedWindow::Pointer w = oldShell->GetData().Cast<DetachedWindow>();
         oldShell->Close();
-        detachedWindowList.remove(w);
+        detachedWindowList.removeAll(w);
       }
     }
   }
@@ -1040,19 +1037,19 @@ void PerspectiveHelper::EnableAllDrag()
   DragUtil::AddDragTarget(0, dragTarget);
 }
 
-LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& id)
+LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id)
 {
   return this->FindPart(id, "");
 }
 
-LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
-    const std::string& secondaryId)
+LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
+    const QString& secondaryId)
 {
 
   //BERRY_INFO << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
 
   // check main window.
-  std::vector<MatchingPart> matchingParts;
+  QList<MatchingPart> matchingParts;
   LayoutPart::Pointer part = (secondaryId != "") ? this->FindPart(primaryId, secondaryId,
       mainLayout->GetChildren(), matchingParts) : this->FindPart(primaryId,
       mainLayout->GetChildren(), matchingParts);
@@ -1102,11 +1099,11 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
   return LayoutPart::Pointer(0);
 }
 
-LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& id,
-    const std::list<LayoutPart::Pointer>& parts,
-    std::vector<MatchingPart>& matchingParts)
+LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id,
+    const QList<LayoutPart::Pointer>& parts,
+    QList<MatchingPart>& matchingParts)
 {
-  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
+  for (QList<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
@@ -1129,8 +1126,8 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     else if (part->IsPlaceHolder()
              && part.Cast<PartPlaceholder>()->HasWildCard())
     {
-      Poco::RegularExpression re(id, Poco::RegularExpression::RE_CASELESS);
-      if (re.match(part->GetID()))
+      QRegExp re(id, Qt::CaseInsensitive);
+      if (re.exactMatch(part->GetID()))
       {
         matchingParts.push_back(MatchingPart(part->GetID(), "", part));
       }
@@ -1155,12 +1152,12 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& id,
   return LayoutPart::Pointer(0);
 }
 
-LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
-    const std::string& secondaryId,
-    const std::list<LayoutPart::Pointer>& parts,
-    std::vector<MatchingPart>& matchingParts)
+LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
+    const QString& secondaryId,
+    const QList<LayoutPart::Pointer>& parts,
+    QList<MatchingPart>& matchingParts)
 {
-  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
+  for (QList<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
@@ -1188,10 +1185,10 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
 
     else if (part.Cast<PartPlaceholder> () != 0)
     {
-      std::string id = part->GetID();
+      QString id = part->GetID();
 
       // optimization: don't bother parsing id if it has no separator -- it can't match
-      std::string phSecondaryId = ViewFactory::ExtractSecondaryId(id);
+      QString phSecondaryId = ViewFactory::ExtractSecondaryId(id);
       if (phSecondaryId == "")
       {
         // but still need to check for wildcard case
@@ -1202,18 +1199,18 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
         continue;
       }
 
-      std::string phPrimaryId = ViewFactory::ExtractPrimaryId(id);
+      QString phPrimaryId = ViewFactory::ExtractPrimaryId(id);
       // perfect matching pair
       if (phPrimaryId == primaryId && phSecondaryId == secondaryId)
       {
         return part;
       }
       // check for partial matching pair
-      Poco::RegularExpression pre(phPrimaryId, Poco::RegularExpression::RE_CASELESS);
-      if (pre.match(primaryId))
+      QRegExp pre(phPrimaryId, Qt::CaseInsensitive);
+      if (pre.exactMatch(primaryId))
       {
-        Poco::RegularExpression sre(phSecondaryId, Poco::RegularExpression::RE_CASELESS);
-        if (sre.match(secondaryId))
+        QRegExp sre(phSecondaryId, Qt::CaseInsensitive);
+        if (sre.exactMatch(secondaryId))
         {
           matchingParts.push_back(MatchingPart(phPrimaryId, phSecondaryId, part));
         }
@@ -1223,13 +1220,13 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
   return LayoutPart::Pointer(0);
 }
 
-bool PerspectiveHelper::HasPlaceholder(const std::string& id)
+bool PerspectiveHelper::HasPlaceholder(const QString& id)
 {
   return this->HasPlaceholder(id, 0);
 }
 
-bool PerspectiveHelper::HasPlaceholder(const std::string& primaryId,
-    const std::string& secondaryId)
+bool PerspectiveHelper::HasPlaceholder(const QString& primaryId,
+    const QString& secondaryId)
 {
   LayoutPart::Pointer testPart;
   if (secondaryId == "")
@@ -1275,7 +1272,7 @@ void PerspectiveHelper::RemovePart(LayoutPart::Pointer part)
   ILayoutContainer::Pointer container = part->GetContainer();
   if (container != 0)
   {
-    std::string placeHolderId = part->GetPlaceHolderId();
+    QString placeHolderId = part->GetPlaceHolderId();
     container->Replace(part, LayoutPart::Pointer(new PartPlaceholder(placeHolderId)));
 
 //    // If the parent is root we're done. Do not try to replace
@@ -1286,10 +1283,10 @@ void PerspectiveHelper::RemovePart(LayoutPart::Pointer part)
 //    }
 
     // If the parent is empty replace it with a placeholder.
-    std::list<LayoutPart::Pointer> children = container->GetChildren();
+    QList<LayoutPart::Pointer> children = container->GetChildren();
 
     bool allInvisible = true;
-    for (std::list<LayoutPart::Pointer>::iterator childIter = children.begin();
+    for (QList<LayoutPart::Pointer>::iterator childIter = children.begin();
         childIter != children.end(); ++childIter)
     {
       if (childIter->Cast<PartPlaceholder> () == 0)
@@ -1328,7 +1325,7 @@ void PerspectiveHelper::RemovePart(LayoutPart::Pointer part)
       {
         DetachedPlaceHolder::Pointer placeholder(
         new DetachedPlaceHolder("", oldShell->GetBounds())); //$NON-NLS-1$
-        for (std::list<LayoutPart::Pointer>::iterator childIter2 = children.begin();
+        for (QList<LayoutPart::Pointer>::iterator childIter2 = children.begin();
             childIter2 != children.end(); ++childIter2)
         {
           (*childIter2)->GetContainer()->Remove(*childIter2);
@@ -1338,7 +1335,7 @@ void PerspectiveHelper::RemovePart(LayoutPart::Pointer part)
         detachedPlaceHolderList.push_back(placeholder);
         DetachedWindow::Pointer w = oldShell->GetData().Cast<DetachedWindow>();
         oldShell->Close();
-        detachedWindowList.remove(w);
+        detachedWindowList.removeAll(w);
       }
 
     }
@@ -1350,7 +1347,7 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(LayoutPart::Pointer part)
 
   // Look for a PartPlaceholder that will tell us how to position this
   // object
-  std::vector<PartPlaceholder::Pointer> placeholders = this->CollectPlaceholders();
+  QList<PartPlaceholder::Pointer> placeholders = this->CollectPlaceholders();
   for (unsigned int i = 0; i < placeholders.size(); i++)
   {
     if (placeholders[i]->GetID() == part->GetID())
@@ -1390,9 +1387,9 @@ bool PerspectiveHelper::RestoreState(IMemento::Pointer memento)
   // Restore each floating window.
   if (detachable)
   {
-    std::vector<IMemento::Pointer> detachedWindows(memento->GetChildren(
+    QList<IMemento::Pointer> detachedWindows(memento->GetChildren(
         WorkbenchConstants::TAG_DETACHED_WINDOW));
-    for (std::vector<IMemento::Pointer>::iterator iter = detachedWindows.begin();
+    for (QList<IMemento::Pointer>::iterator iter = detachedWindows.begin();
         iter != detachedWindows.end(); ++iter)
     {
       DetachedWindow::Pointer win(new DetachedWindow(page));
@@ -1400,9 +1397,9 @@ bool PerspectiveHelper::RestoreState(IMemento::Pointer memento)
       win->RestoreState(*iter);
     }
 
-    std::vector<IMemento::Pointer> childrenMem(memento->GetChildren(
+    QList<IMemento::Pointer> childrenMem(memento->GetChildren(
         WorkbenchConstants::TAG_HIDDEN_WINDOW));
-    for (std::vector<IMemento::Pointer>::iterator iter = childrenMem.begin();
+    for (QList<IMemento::Pointer>::iterator iter = childrenMem.begin();
         iter != childrenMem.end(); ++iter)
     {
       DetachedPlaceHolder::Pointer holder(
@@ -1465,19 +1462,19 @@ void PerspectiveHelper::UpdateBoundsMap()
 
   // Walk the layout gathering the current bounds of each stack
   // and the editor area
-  std::list<LayoutPart::Pointer> kids = mainLayout->GetChildren();
-  for (std::list<LayoutPart::Pointer>::iterator iter = kids.begin();
+  QList<LayoutPart::Pointer> kids = mainLayout->GetChildren();
+  for (QList<LayoutPart::Pointer>::iterator iter = kids.begin();
       iter != kids.end(); ++iter)
   {
     if (iter->Cast<PartStack> () != 0)
     {
       PartStack::Pointer vs = iter->Cast<PartStack>();
-      boundsMap.insert(std::make_pair(vs->GetID(), vs->GetBounds()));
+      boundsMap.insert(vs->GetID(), vs->GetBounds());
     }
     else if (iter->Cast<EditorSashContainer> () != 0)
     {
       EditorSashContainer::Pointer esc = iter->Cast<EditorSashContainer>();
-      boundsMap.insert(std::make_pair(esc->GetID(), esc->GetBounds()));
+      boundsMap.insert(esc->GetID(), esc->GetBounds());
     }
   }
 }
@@ -1487,7 +1484,7 @@ void PerspectiveHelper::ResetBoundsMap()
   boundsMap.clear();
 }
 
-Rectangle PerspectiveHelper::GetCachedBoundsFor(const std::string& id)
+Rectangle PerspectiveHelper::GetCachedBoundsFor(const QString& id)
 {
   return boundsMap[id];
 }

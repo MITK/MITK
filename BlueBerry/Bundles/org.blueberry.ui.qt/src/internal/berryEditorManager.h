@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIMemento.h"
 #include "berryEditorDescriptor.h"
 
-#include <list>
-#include <vector>
 
 namespace berry
 {
@@ -68,11 +66,11 @@ class EditorManager
 
   WorkbenchPage* page;
 
-  //std::map<std::string, EditorActionBars::Pointer> actionCache = new HashMap();
+  //QHash<QString, EditorActionBars::Pointer> actionCache = new HashMap();
 
-  static const std::string PIN_EDITOR_KEY; // = "PIN_EDITOR"; //$NON-NLS-1$
+  static const QString PIN_EDITOR_KEY; // = "PIN_EDITOR"; //$NON-NLS-1$
 
-  //static const std::string PIN_EDITOR = "ovr16/pinned_ovr.gif"; //$NON-NLS-1$
+  //static const QString PIN_EDITOR = "ovr16/pinned_ovr.gif"; //$NON-NLS-1$
 
   // When the user removes or adds the close editors automatically preference
   // the icon should be removed or added accordingly
@@ -81,9 +79,9 @@ class EditorManager
   // Handler for the pin editor keyboard shortcut
   //IHandlerActivation pinEditorHandlerActivation = null;
 
-  static const std::string RESOURCES_TO_SAVE_MESSAGE; // = "Select resources to save:";
+  static const QString RESOURCES_TO_SAVE_MESSAGE; // = "Select resources to save:";
 
-  static const std::string SAVE_RESOURCES_TITLE; // = "Save Resources";
+  static const QString SAVE_RESOURCES_TITLE; // = "Save Resources";
 
 public:
 
@@ -138,7 +136,7 @@ private:
   /**
    * Answer a list of dirty editors.
    */
-  std::vector<IEditorPart::Pointer> CollectDirtyEditors();
+  QList<IEditorPart::Pointer> CollectDirtyEditors();
 
   /**
    * Returns whether the manager contains an editor.
@@ -192,7 +190,7 @@ public:
    * @since 3.1
    */
 public:
-  IEditorPart::Pointer FindEditor(const std::string& editorId,
+  IEditorPart::Pointer FindEditor(const QString& editorId,
       IEditorInput::Pointer input, int matchFlags);
 
   /**
@@ -210,8 +208,8 @@ public:
    * @since 3.1
    */
 public:
-  std::vector<IEditorReference::Pointer> FindEditors(
-      IEditorInput::Pointer input, const std::string& editorId, int matchFlags);
+  QList<IEditorReference::Pointer> FindEditors(
+      IEditorInput::Pointer input, const QString& editorId, int matchFlags);
 
   /**
    * Returns an open editor matching the given editor id and/or editor input.
@@ -229,9 +227,9 @@ public:
    * @since 3.1
    */
 private:
-  void FindEditors(std::list<SmartPointer<IEditorReference> >& editorList,
-      IEditorInput::Pointer input, const std::string& editorId, int matchFlags,
-      std::vector<IEditorReference::Pointer>& result);
+  void FindEditors(QList<SmartPointer<IEditorReference> >& editorList,
+      IEditorInput::Pointer input, const QString& editorId, int matchFlags,
+      QList<IEditorReference::Pointer>& result);
 
   /**
    * Answer the number of editors.
@@ -249,13 +247,13 @@ private:
    * See IWorkbenchPage.
    */
 public:
-  std::vector<IEditorPart::Pointer> GetDirtyEditors();
+  QList<IEditorPart::Pointer> GetDirtyEditors();
 
   /*
    * See IWorkbenchPage.
    */
 public:
-  std::list<IEditorReference::Pointer> GetEditors();
+  QList<IEditorReference::Pointer> GetEditors();
 
   /*
    * See IWorkbenchPage#getFocusEditor
@@ -290,7 +288,7 @@ private:
    * @throws PartInitException
    */
 public:
-  IEditorReference::Pointer OpenEditor(const std::string& editorId,
+  IEditorReference::Pointer OpenEditor(const QString& editorId,
       IEditorInput::Pointer input, bool setVisible, IMemento::Pointer editorState);
 
   /*
@@ -311,7 +309,7 @@ public:
   /*
    * Opens an editor part.
    */
-private: void CreateEditorTab(SmartPointer<EditorReference> ref, const std::string& workbookId);
+private: void CreateEditorTab(SmartPointer<EditorReference> ref, const QString& workbookId);
 
   /*
    * Create the site and initialize it with its action bars.
@@ -376,7 +374,7 @@ public:
    *         canceled the save or an error occurred while saving
    */
 public:
-  static bool SaveAll(const std::vector<IWorkbenchPart::Pointer>& dirtyParts,
+  static bool SaveAll(const QList<IWorkbenchPart::Pointer>& dirtyParts,
       bool confirm, bool closing, bool addNonPartSources, SmartPointer<IWorkbenchWindow>);
 
   /*
@@ -409,8 +407,8 @@ private:
    */
 private:
   void RestoreEditorState(IMemento::Pointer editorMem,
-      std::vector<IEditorReference::Pointer>& visibleEditors,
-      std::vector<IEditorReference::Pointer>& activeEditor);
+      QList<IEditorReference::Pointer>& visibleEditors,
+      QList<IEditorReference::Pointer>& activeEditor);
 
   // for dynamic UI
 protected:

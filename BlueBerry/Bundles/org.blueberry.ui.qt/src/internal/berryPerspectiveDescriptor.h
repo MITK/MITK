@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPerspectiveFactory.h"
 #include "berryIMemento.h"
 
-#include <string>
 
 namespace berry {
+
 /**
  * \ingroup org_blueberry_ui_internal
  *
@@ -44,22 +44,23 @@ namespace berry {
  *
  */
 class PerspectiveDescriptor : public IPerspectiveDescriptor {
+
 public:
   berryObjectMacro(PerspectiveDescriptor);
 
 private:
 
-  std::string id;
+  QString id;
 
-   std::string pluginId;
+   QString pluginId;
 
-   std::string originalId;
+   QString originalId;
 
-   std::string label;
+   QString label;
 
-   std::string className;
+   QString className;
 
-   std::string description;
+   QString description;
 
    bool singleton;
 
@@ -81,7 +82,7 @@ private:
    * @param originalDescriptor
    *            the descriptor that this descriptor is based on
    */
-  public: PerspectiveDescriptor(const std::string& id, const std::string& label,
+  public: PerspectiveDescriptor(const QString& id, const QString& label,
       PerspectiveDescriptor::Pointer originalDescriptor);
 
   /**
@@ -94,7 +95,7 @@ private:
    * @throws CoreException
    *             thrown if there are any missing attributes
    */
-  public: PerspectiveDescriptor(const std::string& id, IConfigurationElement::Pointer configElement);
+  public: PerspectiveDescriptor(const QString& id, IConfigurationElement::Pointer configElement);
 
   /**
    * Creates a factory for a predefined perspective. If the perspective is not
@@ -116,9 +117,11 @@ private:
    *
    * @see org.blueberry.ui.IPerspectiveDescriptor#getDescription()
    */
-  public: std::string GetDescription() const;
-public: void SetDescription(std::string desc) {description = desc; }
-  std::vector< std::string> GetKeywordReferences() const;
+  public: QString GetDescription() const;
+
+  public: void SetDescription(std::string desc) {description = desc; }
+
+  std::vector<std::string> GetKeywordReferences() const;
 
   /**
    * Returns whether or not this perspective is fixed.
@@ -132,9 +135,9 @@ public: void SetDescription(std::string desc) {description = desc; }
    *
    * @see org.blueberry.ui.IPerspectiveDescriptor#getId()
    */
-  public: std::string GetId() const;
+  public: QString GetId() const;
 
-  public: std::string GetPluginId() const;
+  public: QString GetPluginId() const;
 
   /*
    * (non-Javadoc)
@@ -148,13 +151,13 @@ public: void SetDescription(std::string desc) {description = desc; }
    *
    * @see org.blueberry.ui.IPerspectiveDescriptor#getLabel()
    */
-  public: std::string GetLabel() const;
+  public: QString GetLabel() const;
   /**
    * Return the original id of this descriptor.
    *
    * @return the original id of this descriptor
    */
-  public: std::string GetOriginalId() const;
+  public: QString GetOriginalId() const;
 
   /**
    * Returns <code>true</code> if this perspective has a custom definition.
@@ -226,7 +229,7 @@ public: void SetDescription(std::string desc) {description = desc; }
    * @return the factory class name for this descriptor
    * @since 3.1
    */
-  public: std::string GetFactoryClassName() const;
+  public: QString GetFactoryClassName() const;
 
   /**
    * Return the category path of this descriptor
@@ -235,6 +238,7 @@ public: void SetDescription(std::string desc) {description = desc; }
    */
   public: std::vector<std::string> GetCategoryPath();
 };
+
 }
 
 #endif /*BERRYPERSPECTIVEDESCRIPTOR_H_*/

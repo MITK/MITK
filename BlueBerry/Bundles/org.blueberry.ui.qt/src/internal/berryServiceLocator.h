@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "services/berryINestable.h"
 #include "services/berryIDisposable.h"
 
-#include <map>
-#include <vector>
-#include <string>
-#include <typeinfo>
 
 namespace berry
 {
@@ -44,26 +40,26 @@ private:
   {
 
     const IServiceLocator::WeakPtr locator;
-    const std::string& key;
+    const QString& key;
 
   public:
 
     ParentLocator(const IServiceLocator::WeakPtr parent,
-        const std::string& serviceInterface);
+        const QString& serviceInterface);
 
     /*
      * (non-Javadoc)
      *
      * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Class)
      */
-    Object::Pointer GetService(const std::string& api);
+    Object::Pointer GetService(const QString& api);
 
     /*
      * (non-Javadoc)
      *
      * @see org.blueberry.ui.services.IServiceLocator#hasService(java.lang.Class)
      */
-    bool HasService(const std::string& api) const;
+    bool HasService(const QString& api) const;
   };
 
   const SmartPointer<const IServiceFactory> factory;
@@ -79,7 +75,7 @@ private:
    * The map of services This value is <code>null</code> until a service is
    * registered.
    */
-  typedef std::map<const std::string, Object::Pointer> KeyToServiceMapType;
+  typedef QHash<const QString, Object::Pointer> KeyToServiceMapType;
   mutable KeyToServiceMapType services;
 
   bool disposed;
@@ -114,9 +110,9 @@ public:
 
   void Dispose();
 
-  Object::Pointer GetService(const std::string& key);
+  Object::Pointer GetService(const QString& key);
 
-  bool HasService(const std::string& key) const;
+  bool HasService(const QString& key) const;
 
   /**
    * Registers a service with this locator. If there is an existing service
@@ -130,7 +126,7 @@ public:
    *            The service to register. This must be some implementation of
    *            <code>api</code>. This value must not be <code>null</code>.
    */
-  void RegisterService(const std::string& api, Object::Pointer service) const;
+  void RegisterService(const QString& api, Object::Pointer service) const;
 
   /**
    * @return
@@ -142,7 +138,7 @@ public:
    * (because the plug-in containing the AbstractServiceFactory is no longer
    * available). Notify the owner of the locator about this.
    */
-  void UnregisterServices(const std::vector<std::string>& serviceNames);
+  void UnregisterServices(const QList<QString> &serviceNames);
 
 };
 

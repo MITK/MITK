@@ -15,10 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "berryIWorkbenchPartConstants.h"
 
+#include <QString>
+
 namespace berry
 {
 
-const std::string IWorkbenchPartConstants::INTEGER_PROPERTY = "org.blueberry.ui.integerproperty";
+const QString IWorkbenchPartConstants::INTEGER_PROPERTY = "org.blueberry.ui.integerproperty";
 
 const int IWorkbenchPartConstants::PROP_TITLE = 0x001;
 const int IWorkbenchPartConstants::PROP_DIRTY = 0x101;

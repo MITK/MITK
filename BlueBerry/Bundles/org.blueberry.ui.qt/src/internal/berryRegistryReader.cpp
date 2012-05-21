@@ -48,9 +48,9 @@ RegistryReader::~RegistryReader()
 void RegistryReader::LogError(const IConfigurationElement::Pointer& element,
                               const QString& text)
 {
-  IExtension::Pointer extension = element->GetDeclaringExtension();
-  QString buf = QString("Plugin ") + extension->GetNamespace() + ", extension "
-      + extension->GetExtensionPointIdentifier();
+  const IExtension* extension = element->GetDeclaringExtension();
+  QString buf = QString("Plugin ") + extension->GetContributor() + ", extension "
+      + extension->GetExtensionPointUniqueIdentifier();
   // look for an ID if available - this should help debugging
   QString id = element->GetAttribute("id");
   if (!id.isEmpty())
@@ -80,7 +80,7 @@ void RegistryReader::LogUnknownElement(
   RegistryReader::LogError(element, "Unknown extension tag found: " + element->GetName());
 }
 
-const QList<IExtension::Pointer> RegistryReader::OrderExtensions(
+QList<IExtension::Pointer> RegistryReader::OrderExtensions(
     const QList<IExtension::Pointer>& extensions)
 {
   // By default, the order is based on plugin id sorted
@@ -157,7 +157,7 @@ QString RegistryReader::GetClassValue(
     return "";
   }
 
-  return candidateChildren[0]->GetAttribute(QString::fromStdString(WorkbenchRegistryConstants::ATT_CLASS));
+  return candidateChildren[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS);
 }
 
 }

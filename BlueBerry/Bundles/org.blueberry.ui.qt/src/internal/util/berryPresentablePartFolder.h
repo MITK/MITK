@@ -39,7 +39,7 @@ private:
   QWidget* contentProxy;
   static PartInfo tempPartInfo;
 
-  std::list<IPresentablePart::Pointer> partList;
+  QList<IPresentablePart::Pointer> partList;
   bool isVisible;
 
   /**
@@ -138,7 +138,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.IPresentablePartList#getPartList()
    */
-  std::vector<IPresentablePart::Pointer> GetPartList();
+  QList<IPresentablePart::Pointer> GetPartList();
 
   /**
    * Adds the given presentable part directly into this presentation at the
@@ -164,7 +164,7 @@ public:
   /**
    * Returns the number of parts in this folder
    */
-  std::size_t Size();
+  int Size();
 
   void SetBounds(const QRect& bounds);
 

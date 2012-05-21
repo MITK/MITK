@@ -103,7 +103,7 @@ struct BERRY_UI_QT ISaveablesSource : public virtual Object {
    *
    * @see ISaveablesLifecycleListener
    */
-  virtual std::vector<Saveable::Pointer> GetSaveables() = 0;
+  virtual QList<Saveable::Pointer> GetSaveables() = 0;
 
   /**
    * Returns the saveables currently active in the workbench part.
@@ -115,7 +115,7 @@ struct BERRY_UI_QT ISaveablesSource : public virtual Object {
    *
    * @return the saveables currently active in the workbench part
    */
-  virtual std::vector<Saveable::Pointer> GetActiveSaveables() = 0;
+  virtual QList<Saveable::Pointer> GetActiveSaveables() = 0;
 };
 
 }

@@ -47,7 +47,7 @@ struct BERRY_UI_QT IWorkbenchLocationService : public Object
    * @return the service scope. May return <code>null</code>.
    * @see IServiceScopes#PARTSITE_SCOPE
    */
-  virtual std::string GetServiceScope() const = 0;
+  virtual QString GetServiceScope() const = 0;
 
   /**
    * A more numeric representation of the service level.

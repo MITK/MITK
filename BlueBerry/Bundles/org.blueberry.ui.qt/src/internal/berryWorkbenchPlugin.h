@@ -68,7 +68,7 @@ class WorkbenchPlugin : public QObject, public AbstractUICTKPlugin {
 
 private:
 
-  //static const std::string UI_BUNDLE_ACTIVATOR = "org.blueberry.ui.internal.UIPlugin"; //$NON-NLS-1$
+  //static const QString UI_BUNDLE_ACTIVATOR = "org.blueberry.ui.internal.UIPlugin"; //$NON-NLS-1$
 
     // Default instance of the receiver
     static WorkbenchPlugin* inst;
@@ -133,7 +133,7 @@ public:
 
 //    template<class E>
 //    static E* CreateExtension(IConfigurationElement::ConstPointer element,
-//            const std::string& classAttribute) {
+//            const QString& classAttribute) {
 //        try {
 //            // If plugin has been loaded create extension.
 //            // Otherwise, show busy cursor then create extension.
@@ -286,7 +286,7 @@ private:
     C* CreateExtension(const QString& extensionPointId, const QString& elementName,
                        const QString& targetID)
     {
-        const IExtensionPoint* extensionPoint = Platform::GetExtensionRegistry()
+        IExtensionPoint::Pointer extensionPoint = Platform::GetExtensionRegistry()
             ->GetExtensionPoint(PlatformUI::PLUGIN_ID + "." + extensionPointId);
         if (extensionPoint == 0)
         {
@@ -394,7 +394,7 @@ public:
      * Log the throwable.
      * @param t
      */
-    static void Log(const Poco::RuntimeException& exc);
+    static void Log(const ctkRuntimeException& exc);
 
 
     /**
@@ -410,7 +410,7 @@ public:
    * @param t
    *            The throwable from where the problem actually occurred.
    */
-    static void Log(const QString &message, const Poco::RuntimeException& t);
+    static void Log(const QString &message, const ctkRuntimeException& t);
 
     /**
      * Logs the given throwable to the platform log, indicating the class and
@@ -427,7 +427,7 @@ public:
      * @param t
      *            The throwable from where the problem actually occurred.
      */
-    static void Log(const QString &clazz, const QString &methodName, const Poco::RuntimeException& t);
+    static void Log(const QString &clazz, const QString &methodName, const ctkRuntimeException& t);
 
 
     /*
@@ -443,7 +443,7 @@ public:
      * @return an array of bundles in the workbench or an empty array if none
      * @since 3.0
      */
-    //const std::vector<IBundle::Pointer> GetBundles();
+    //const QList<IBundle::Pointer> GetBundles();
 
     /**
      * Returns the bundle context associated with the workbench plug-in.
@@ -473,7 +473,7 @@ public:
      * location is available.
      * @since 3.1
      */
-    bool GetDataPath(Poco::Path& path);
+    QString GetDataLocation() const;
 
 };
 

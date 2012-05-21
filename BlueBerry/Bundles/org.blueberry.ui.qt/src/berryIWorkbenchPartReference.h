@@ -37,9 +37,10 @@ struct IWorkbenchPage;
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct BERRY_UI_QT IWorkbenchPartReference : public Object {
+struct BERRY_UI_QT IWorkbenchPartReference : public Object
+{
 
-  berryInterfaceMacro(IWorkbenchPartReference, berry);
+  berryInterfaceMacro(IWorkbenchPartReference, berry)
 
   ~IWorkbenchPartReference();
 
@@ -60,12 +61,12 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object {
     /**
      * @see IWorkbenchPart#getTitleToolTip
      */
-    virtual std::string GetTitleToolTip() const = 0;
+    virtual QString GetTitleToolTip() const = 0;
 
     /**
      * @see IWorkbenchPartSite#getId
      */
-    virtual std::string GetId() const = 0;
+    virtual QString GetId() const = 0;
 
     /**
      * @see IWorkbenchPart#addPropertyListener
@@ -89,7 +90,7 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object {
      *
      * @since 3.0
      */
-    virtual std::string GetPartName() const = 0;
+    virtual QString GetPartName() const = 0;
 
     /**
      * Returns the content description for the part (or the empty string if none)
@@ -98,7 +99,7 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object {
      *
      * @since 3.0
      */
-    virtual std::string GetContentDescription() const = 0;
+    virtual QString GetContentDescription() const = 0;
 
     /**
       * Returns true if the part is pinned otherwise returns false.
@@ -125,7 +126,7 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object {
    * @return The String property, or <code>null</code>.
    * @since 3.3
    */
-   virtual std::string GetPartProperty(const std::string& key) const = 0;
+   virtual QString GetPartProperty(const QString& key) const = 0;
 
     /**
    * Add a listener for changes in the arbitrary properties set.

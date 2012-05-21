@@ -31,10 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewReference.h"
 #include "berryIViewPart.h"
 
-#include <map>
-#include <vector>
-#include <string>
-
 namespace berry {
 
 class ViewFactory;
@@ -48,7 +44,7 @@ class Perspective : public Object {
 
 public:
 
-  berryObjectMacro(Perspective);
+  berryObjectMacro(Perspective)
 
   friend class WorkbenchPage;
 
@@ -57,9 +53,9 @@ public:
 private:
 
   ViewFactory* viewFactory;
-  std::map<std::string, ViewLayoutRec::Pointer> mapIDtoViewLayoutRec;
+  QHash<QString, ViewLayoutRec::Pointer> mapIDtoViewLayoutRec;
 
-  static const std::string VERSION_STRING; // = "0.016";//$NON-NLS-1$
+  static const QString VERSION_STRING; // = "0.016";
 
   /**
    * Reference to the part that was previously active
@@ -83,13 +79,13 @@ protected:
 
     //ArrayList alwaysOffActionSets;
 
-    std::vector<std::string> showViewShortcuts;
+    QList<QString> showViewShortcuts;
 
-    std::vector<std::string> perspectiveShortcuts;
+    QList<QString> perspectiveShortcuts;
 
     bool fixed;
 
-    std::vector<std::string> showInPartIds;
+    QList<QString> showInPartIds;
 
     //HashMap showInTimes;
 
@@ -164,7 +160,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      *
      * @param viewId the view ID
      */
-    public: IViewReference::Pointer FindView(const std::string& viewId);
+    public: IViewReference::Pointer FindView(const QString& viewId);
 
     /**
      * Finds the view with the given id and secondary id that is open in this page,
@@ -173,7 +169,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * @param viewId the view ID
      * @param secondaryId the secondary ID
      */
-    public: IViewReference::Pointer FindView(const std::string& id, const std::string& secondaryId);
+    public: IViewReference::Pointer FindView(const QString& id, const QString& secondaryId);
 
     /**
      * Returns the window's client composite widget
@@ -197,7 +193,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      *
      * @return an array of perspective identifiers
      */
-    public: std::vector<std::string> GetPerspectiveShortcuts();
+    public: QList<QString> GetPerspectiveShortcuts();
 
     /**
      * Returns the presentation.
@@ -209,7 +205,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      *
      * @return an array of view identifiers
      */
-    public: std::vector<std::string> GetShowViewShortcuts();
+    public: QList<QString> GetShowViewShortcuts();
 
     /**
      * Returns the view factory.
@@ -219,7 +215,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * See IWorkbenchPage.
      */
-    public: std::vector<IViewReference::Pointer> GetViewReferences();
+    public: QList<IViewReference::Pointer> GetViewReferences();
 
 
     /**
@@ -253,7 +249,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * or null if not found.  If create is true, it creates the record
      * if not already created.
      */
-    private: ViewLayoutRec::Pointer GetViewLayoutRec(const std::string& viewId, bool create);
+    private: ViewLayoutRec::Pointer GetViewLayoutRec(const QString& viewId, bool create);
 
     /**
      * Returns true if a layout or perspective is fixed.
@@ -282,7 +278,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     private: void LoadCustomPersp(PerspectiveDescriptor::Pointer persp);
 
     private: void UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
-            const std::string& status);
+            const QString& status);
 
     /**
      * Create a presentation for a perspective.
@@ -364,7 +360,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * The user successfully performed a Show In... action on the specified part.
      * Update the history.
      */
-    public: void PerformedShowIn(const std::string& partId);
+    public: void PerformedShowIn(const QString& partId);
 
 
     /**
@@ -373,7 +369,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     public: bool RestoreState(IMemento::Pointer memento);
 
-    bool CreateReferences(const std::vector<IMemento::Pointer>& views);
+    bool CreateReferences(const QList<IMemento::Pointer>& views);
 
     /**
      * Fills a presentation with layout data.
@@ -397,7 +393,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Returns the Show In... part ids read from the registry.
      */
-    protected: std::vector<std::string> GetShowInIdsFromRegistry();
+    protected: QList<QString> GetShowInIdsFromRegistry();
 
     /**
      * Save the layout.
@@ -446,19 +442,19 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Sets the perspective actions for this page.
      * This is List of Strings.
      */
-    public: void SetPerspectiveActionIds(const std::vector<std::string>& list);
+    public: void SetPerspectiveActionIds(const QList<QString>& list);
 
     /**
      * Sets the ids of the parts to list in the Show In... prompter.
      * This is a List of Strings.
      */
-    public: void SetShowInPartIds(const std::vector<std::string>& list);
+    public: void SetShowInPartIds(const QList<QString>& list);
 
     /**
      * Sets the ids of the views to list in the Show View shortcuts.
      * This is a List of Strings.
      */
-    public: void SetShowViewActionIds(const std::vector<std::string>& list);
+    public: void SetShowViewActionIds(const QList<QString>& list);
 
 
     /**
@@ -493,12 +489,12 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * @return The reference to the specified view. This may be null if the
      * view fails to create (i.e. thrown a PartInitException)
      */
-    public: IViewReference::Pointer GetViewReference(const std::string& viewId, const std::string& secondaryId);
+    public: IViewReference::Pointer GetViewReference(const QString& viewId, const QString& secondaryId);
 
     /**
      * Shows the view with the given id and secondary id.
      */
-    public: IViewPart::Pointer ShowView(const std::string& viewId, const std::string& secondaryId);
+    public: IViewPart::Pointer ShowView(const QString& viewId, const QString& secondaryId);
 
 
     /**
@@ -596,7 +592,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf) const;
+    public: void DescribeLayout(QString& buf) const;
 
     /**
      * Sanity-checks the LayoutParts in this perspective. Throws an Assertation exception

@@ -42,13 +42,13 @@ class LayoutPart : virtual public Object, public virtual ISizeProvider
 
 public:
 
-  berryObjectMacro(LayoutPart);
+  berryObjectMacro(LayoutPart)
 
 protected: SmartPointer<ILayoutContainer> container;
 
-    protected: std::string id;
+    protected: QString id;
 
-    public: static const std::string PROP_VISIBILITY;// = "PROP_VISIBILITY"; //$NON-NLS-1$
+    public: static const QString PROP_VISIBILITY;// = "PROP_VISIBILITY";
 
     /**
      * Number of times deferUpdates(true) has been called without a corresponding
@@ -59,7 +59,7 @@ protected: SmartPointer<ILayoutContainer> container;
     /**
      * PresentationPart constructor comment.
      */
-    public: LayoutPart(const std::string& id);
+    public: LayoutPart(const QString& id);
 
     public: virtual ~LayoutPart();
 
@@ -126,7 +126,7 @@ protected: SmartPointer<ILayoutContainer> container;
     /**
      * Gets the ID for this part.
      */
-    public: virtual std::string GetID() const;
+    public: virtual QString GetID() const;
 
     public: virtual bool IsCompressible();
 
@@ -214,7 +214,7 @@ protected: SmartPointer<ILayoutContainer> container;
     /**
      * Sets the part ID.
      */
-    public: virtual void SetID(const std::string& str);
+    public: virtual void SetID(const QString& str);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.IWorkbenchDragDropPart#getPart()
@@ -270,14 +270,14 @@ protected: SmartPointer<ILayoutContainer> container;
      *
      * @param buf
      */
-    public: virtual void DescribeLayout(std::string& buf) const;
+    public: virtual void DescribeLayout(QString& buf) const;
 
     /**
      * Returns an id representing this part, suitable for use in a placeholder.
      *
      * @since 3.0
      */
-    public: virtual std::string GetPlaceHolderId();
+    public: virtual QString GetPlaceHolderId();
 
     public: virtual void ResizeChild(LayoutPart::Pointer childThatChanged);
 
@@ -297,7 +297,7 @@ protected: SmartPointer<ILayoutContainer> container;
      */
     public: virtual void TestInvariants();
 
-    public: virtual std::string ToString();
+    public: virtual QString ToString();
 };
 
 }

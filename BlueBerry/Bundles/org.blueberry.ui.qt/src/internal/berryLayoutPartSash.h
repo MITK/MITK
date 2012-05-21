@@ -133,7 +133,7 @@ public:
    *
    */
 public:
-  std::string GetID();
+  QString GetID();
 
 protected:
 

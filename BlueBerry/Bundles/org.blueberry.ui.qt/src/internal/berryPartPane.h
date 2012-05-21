@@ -42,7 +42,7 @@ class PartPane : public LayoutPart,
 {
 
 public:
-  berryObjectMacro(PartPane);
+  berryObjectMacro(PartPane)
 
   friend class PartSashContainer;
   friend class EditorSashContainer;
@@ -369,7 +369,7 @@ public:
      *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf) const;
+    public: void DescribeLayout(QString& buf) const;
 
     /**
      * @return

@@ -161,7 +161,7 @@ If no value is supplied, a default ratio will be used.
          <attribute name="allowMultiple" type="boolean">
             <annotation>
                <documentation>
-                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(std::string id, std::string secondaryId).  The default is false.
+                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(QString id, QString secondaryId).  The default is false.
                </documentation>
             </annotation>
          </attribute>

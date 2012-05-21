@@ -49,9 +49,9 @@ IEvaluationReference::Pointer EvaluationService::AddEvaluationListener(const Sma
 
 void EvaluationService::AddEvaluationReference(const SmartPointer<IEvaluationReference>& ref)
 {
-  std::string msg("Invalid type: ");
+  QString msg("Invalid type: ");
   msg.append(ref->GetClassName());
-  Q_ASSERT_X(ref.Cast<EvaluationReference>(), "AddEvaluationReference", msg.c_str());
+  Q_ASSERT_X(ref.Cast<EvaluationReference>(), "AddEvaluationReference", qPrintable(msg));
   evaluationAuthority->AddEvaluationListener(ref);
 }
 

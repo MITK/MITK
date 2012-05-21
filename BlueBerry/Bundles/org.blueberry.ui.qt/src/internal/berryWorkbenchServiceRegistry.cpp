@@ -35,9 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string WorkbenchServiceRegistry::WORKBENCH_LEVEL = "workbench";
+const QString WorkbenchServiceRegistry::WORKBENCH_LEVEL = "workbench";
 
-const std::string WorkbenchServiceRegistry::EXT_ID_SERVICES =
+const QString WorkbenchServiceRegistry::EXT_ID_SERVICES =
     "org.blueberry.ui.services"; //$NON-NLS-1$
 
 WorkbenchServiceRegistry* WorkbenchServiceRegistry::registry = 0;
@@ -78,24 +78,23 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::ServiceFactoryHandle(
 }
 
 WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry::LoadFromRegistry(
-    const std::string& key)
+    const QString& key)
 {
   ServiceFactoryHandle::Pointer result;
-  const std::vector<IConfigurationElement::Pointer> serviceFactories =
+  const QList<IConfigurationElement::Pointer> serviceFactories =
       this->GetExtensionPoint()->GetConfigurationElements();
   try
   {
     bool done = false;
     for (unsigned int i = 0; i < serviceFactories.size() && !done; i++)
     {
-      std::vector<IConfigurationElement::Pointer> serviceNameElements =
+      QList<IConfigurationElement::Pointer> serviceNameElements =
           serviceFactories[i]->GetChildren(
               WorkbenchRegistryConstants::TAG_SERVICE);
       for (unsigned int j = 0; j < serviceNameElements.size() && !done; j++)
       {
-        std::string serviceName;
-        serviceNameElements[j]->GetAttribute(
-            WorkbenchRegistryConstants::ATTR_SERVICE_CLASS, serviceName);
+        QString serviceName = serviceNameElements[j]->GetAttribute(
+              WorkbenchRegistryConstants::ATTR_SERVICE_CLASS);
         if (key == serviceName)
         {
           done = true;
@@ -110,26 +109,25 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
         {
           // support legacy BlueBerry extensions
           f = serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
-                WorkbenchRegistryConstants::ATTR_FACTORY_CLASS, IServiceFactory::GetManifestName());
+                WorkbenchRegistryConstants::ATTR_FACTORY_CLASS);
         }
         ServiceFactoryHandle::Pointer handle(new ServiceFactoryHandle(f));
 //        PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 //            serviceFactories[i].getDeclaringExtension(), handle,
 //            IExtensionTracker.REF_WEAK);
 
-        std::vector<std::string> serviceNames;
+        QList<QString> serviceNames;
         for (unsigned int j = 0; j < serviceNameElements.size(); j++)
         {
-          std::string serviceName;
-          serviceNameElements[j]->GetAttribute(
-              WorkbenchRegistryConstants::ATTR_SERVICE_CLASS, serviceName);
+          QString serviceName = serviceNameElements[j]->GetAttribute(
+                WorkbenchRegistryConstants::ATTR_SERVICE_CLASS);
           if (factories.find(serviceName) != factories.end())
           {
             WorkbenchPlugin::Log("Factory already exists for "  + serviceName);
           }
           else
           {
-            factories.insert(std::make_pair(serviceName, handle));
+            factories.insert(serviceName, handle);
             serviceNames.push_back(serviceName);
           }
         }
@@ -137,35 +135,32 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
         result = handle;
       }
     }
-  } catch (CoreException& e)
+  } catch (const CoreException& e)
   {
     //StatusManager.getManager().handle(e.getStatus());
-    BERRY_ERROR << "CoreException: " << e.displayText() << std::endl;
+    BERRY_ERROR << "CoreException: " << e.what() << std::endl;
   }
   return result;
 }
 
-const IExtensionPoint* WorkbenchServiceRegistry::GetExtensionPoint()
+IExtensionPoint::Pointer WorkbenchServiceRegistry::GetExtensionPoint() const
 {
-  IExtensionPointService* reg = Platform::GetExtensionPointService();
-  const IExtensionPoint* ep = reg->GetExtensionPoint(EXT_ID_SERVICES);
-  return ep;
+  IExtensionRegistry* reg = Platform::GetExtensionRegistry();
+  return reg->GetExtensionPoint(EXT_ID_SERVICES);
 }
 
 void WorkbenchServiceRegistry::ProcessVariables(
-    const std::vector<IConfigurationElement::Pointer>& children)
+    const QList<IConfigurationElement::Pointer>& children) const
 {
   for (unsigned int i = 0; i < children.size(); i++)
   {
-    std::string name;
-    children[i]->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, name);
-    if (name.empty())
+    QString name = children[i]->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
+    if (name.isEmpty())
     {
       continue;
     }
-    std::string level;
-    children[i]->GetAttribute(WorkbenchRegistryConstants::ATT_PRIORITY_LEVEL, level);
-    if (level.empty())
+    QString level = children[i]->GetAttribute(WorkbenchRegistryConstants::ATT_PRIORITY_LEVEL);
+    if (level.isEmpty())
     {
       level = WORKBENCH_LEVEL;
     }
@@ -173,10 +168,9 @@ void WorkbenchServiceRegistry::ProcessVariables(
     {
       bool found = false;
       QStringList supportedLevels = this->SupportedLevels();
-      QString qlevel = QString::fromStdString(level);
-      for (unsigned int j = 0; j < supportedLevels.size() && !found; j++)
+      for (int j = 0; j < supportedLevels.size() && !found; j++)
       {
-        if (supportedLevels[j] == qlevel)
+        if (supportedLevels[j] == level)
         {
           found = true;
         }
@@ -186,20 +180,20 @@ void WorkbenchServiceRegistry::ProcessVariables(
         level = WORKBENCH_LEVEL;
       }
     }
-    int existingPriority = SourcePriorityNameMapping::GetMapping(QString::fromStdString(level));
+    int existingPriority = SourcePriorityNameMapping::GetMapping(level);
     int newPriority = existingPriority << 1;
-    SourcePriorityNameMapping::AddMapping(QString::fromStdString(name), newPriority);
+    SourcePriorityNameMapping::AddMapping(name, newPriority);
   }
 }
 
 Object::Pointer WorkbenchServiceRegistry::GlobalParentLocator::GetService(
-    const std::string& /*api*/)
+    const QString& /*api*/)
 {
   return Object::Pointer(0);
 }
 
 bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
-    const std::string& /*api*/) const
+    const QString& /*api*/) const
 {
   return false;
 }
@@ -213,7 +207,7 @@ WorkbenchServiceRegistry* WorkbenchServiceRegistry::GetRegistry()
   return registry;
 }
 
-Object::Pointer WorkbenchServiceRegistry::GetService(const std::string& key,
+Object::Pointer WorkbenchServiceRegistry::GetService(const QString& key,
     const IServiceLocator::Pointer parentLocator, const ServiceLocator::ConstPointer locator)
 {
   ServiceFactoryHandle::Pointer handle(factories[key]);
@@ -233,11 +227,11 @@ Object::Pointer WorkbenchServiceRegistry::GetService(const std::string& key,
   return Object::Pointer(0);
 }
 
-std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders()
+QList<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() const
 {
-  std::vector<ISourceProvider::Pointer> providers;
-  const IExtensionPoint* ep = this->GetExtensionPoint();
-  std::vector<IConfigurationElement::Pointer> elements =
+  QList<ISourceProvider::Pointer> providers;
+  IExtensionPoint::Pointer ep = this->GetExtensionPoint();
+  QList<IConfigurationElement::Pointer> elements =
       ep->GetConfigurationElements();
   for (unsigned int i = 0; i < elements.size(); i++)
   {
@@ -252,7 +246,7 @@ std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProvide
         {
           // support legacy BlueBerry extensions
           provider = elements[i]->CreateExecutableExtension<ISourceProvider>(
-                WorkbenchRegistryConstants::ATTR_PROVIDER, ISourceProvider::GetManifestName());
+                WorkbenchRegistryConstants::ATTR_PROVIDER);
         }
         providers.push_back(provider);
         this->ProcessVariables(elements[i]->GetChildren(
@@ -260,7 +254,7 @@ std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProvide
       } catch (CoreException& e)
       {
         //StatusManager.getManager().handle(e.getStatus());
-        BERRY_ERROR << "CoreException: " << e.displayText() << std::endl;
+        BERRY_ERROR << "CoreException: " << e.what() << std::endl;
       }
     }
   }

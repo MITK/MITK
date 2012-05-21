@@ -48,7 +48,7 @@ struct BERRY_UI_QT IStickyViewDescriptor : public Object {
    *
    * @return the id of the view to be made sticky
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Return the location of this sticky view.  Must be one of

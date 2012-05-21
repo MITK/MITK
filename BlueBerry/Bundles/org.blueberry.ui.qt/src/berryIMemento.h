@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <string>
+#include <QString>
 
 namespace berry
 {
@@ -71,7 +71,7 @@ berryInterfaceMacro(IMemento, berry);
    *
    * @see #getID()
    */
-  static const std::string TAG_ID; // = "IMemento.internal.id";
+  static const QString TAG_ID; // = "IMemento.internal.id";
 
   /**
    * Creates a new child of this memento with the given type.
@@ -85,7 +85,7 @@ berryInterfaceMacro(IMemento, berry);
    * @see #GetChild
    * @see #GetChildren
    */
-  virtual IMemento::Pointer CreateChild(const std::string& type) = 0;
+  virtual IMemento::Pointer CreateChild(const QString& type) = 0;
 
   /**
    * Creates a new child of this memento with the given type and id.
@@ -101,8 +101,8 @@ berryInterfaceMacro(IMemento, berry);
    * @return a new child memento with the given type and id
    * @see #GetID
    */
-  virtual IMemento::Pointer CreateChild(const std::string& type,
-      const std::string& id) = 0;
+  virtual IMemento::Pointer CreateChild(const QString& type,
+      const QString& id) = 0;
 
   /**
    * Returns the first child with the given type id.
@@ -110,7 +110,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param type the type id
    * @return the first child with the given type
    */
-  virtual IMemento::Pointer GetChild(const std::string& type) const = 0;
+  virtual IMemento::Pointer GetChild(const QString& type) const = 0;
 
   /**
    * Returns all children with the given type id.
@@ -118,8 +118,8 @@ berryInterfaceMacro(IMemento, berry);
    * @param type the type id
    * @return an array of children with the given type
    */
-  virtual std::vector<IMemento::Pointer>
-      GetChildren(const std::string& type) const = 0;
+  virtual QList<IMemento::Pointer>
+      GetChildren(const QString& type) const = 0;
 
   /**
    * Gets the floating point value of the given key.
@@ -129,7 +129,7 @@ berryInterfaceMacro(IMemento, berry);
    * @return false if the key was not found or was found
    *   but was not a floating point number, else true
    */
-  virtual bool GetFloat(const std::string& key, double& value) const = 0;
+  virtual bool GetFloat(const QString& key, double& value) const = 0;
 
   /**
    * Gets the integer value of the given key.
@@ -139,7 +139,7 @@ berryInterfaceMacro(IMemento, berry);
    * @return false if the key was not found or was found
    *   but was not an integer, else true
    */
-  virtual bool GetInteger(const std::string& key, int& value) const = 0;
+  virtual bool GetInteger(const QString& key, int& value) const = 0;
 
   /**
    * Gets the string value of the given key.
@@ -148,7 +148,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param value the value of the given key
    * @return false if the key was not found, else true
    */
-  virtual bool GetString(const std::string& key, std::string& value) const = 0;
+  virtual bool GetString(const QString& key, QString& value) const = 0;
 
   /**
    * Gets the boolean value of the given key.
@@ -157,7 +157,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param value the value of the given key
    * @return false if the key was not found, else true
    */
-  virtual bool GetBoolean(const std::string& key, bool& value) const = 0;
+  virtual bool GetBoolean(const QString& key, bool& value) const = 0;
 
   /**
    * Returns the data of the Text node of the memento. Each memento is allowed
@@ -166,7 +166,7 @@ berryInterfaceMacro(IMemento, berry);
    * @return the data of the Text node of the memento, or <code>null</code>
    * if the memento has no Text node.
    */
-  virtual const std::string& GetTextData() const = 0;
+  virtual QString GetTextData() const = 0;
 
   /**
    * Returns an array of all the attribute keys of the memento. This will not
@@ -174,24 +174,24 @@ berryInterfaceMacro(IMemento, berry);
    * be returned.
    * @return an array with all the attribute keys of the memento
    */
-  virtual std::vector<std::string> GetAttributeKeys() const = 0;
+  virtual QList<QString> GetAttributeKeys() const = 0;
 
   /**
    * Returns the type for this memento.
    *
    * @return the memento type
-   * @see #CreateChild(const std::string&)
-   * @see #CreateChild(const std::string&, const std::string&)
+   * @see #CreateChild(const QString&)
+   * @see #CreateChild(const QString&, const QString&)
    */
-  virtual std::string GetType() const = 0;
+  virtual QString GetType() const = 0;
 
   /**
    * Returns the id for this memento.
    *
    * @return the memento id, or <code>""</code> if none
-   * @see #CreateChild(const std::string&, const std::string&)
+   * @see #CreateChild(const QString&, const QString&)
    */
-  virtual std::string GetID() const = 0;
+  virtual QString GetID() const = 0;
 
   /**
    * Sets the value of the given key to the given floating point number.
@@ -199,7 +199,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param key the key
    * @param value the value
    */
-  virtual void PutFloat(const std::string& key, double value) = 0;
+  virtual void PutFloat(const QString& key, double value) = 0;
 
   /**
    * Sets the value of the given key to the given integer.
@@ -207,7 +207,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param key the key
    * @param value the value
    */
-  virtual void PutInteger(const std::string& key, int value) = 0;
+  virtual void PutInteger(const QString& key, int value) = 0;
 
   /**
    * Copy the attributes and children from  <code>memento</code>
@@ -218,12 +218,12 @@ berryInterfaceMacro(IMemento, berry);
   virtual void PutMemento(IMemento::Pointer memento) = 0;
 
   /**
-   * Sets the value of the given key to the given const std::string&.
+   * Sets the value of the given key to the given const QString&.
    *
    * @param key the key
    * @param value the value
    */
-  virtual void PutString(const std::string& key, const std::string& value) = 0;
+  virtual void PutString(const QString& key, const QString& value) = 0;
 
   /**
    * Sets the value of the given key to the given boolean value.
@@ -231,7 +231,7 @@ berryInterfaceMacro(IMemento, berry);
    * @param key the key
    * @param value the value
    */
-  virtual void PutBoolean(const std::string& key, bool value) = 0;
+  virtual void PutBoolean(const QString& key, bool value) = 0;
 
   /**
    * Sets the memento's Text node to contain the given data. Creates the Text node if
@@ -240,7 +240,7 @@ berryInterfaceMacro(IMemento, berry);
    *
    * @param data the data to be placed on the Text node
    */
-  virtual void PutTextData(const std::string& data) = 0;
+  virtual void PutTextData(const QString& data) = 0;
 
   virtual ~IMemento();
 };

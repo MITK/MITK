@@ -33,8 +33,8 @@ private:
 
   IWorkbenchPartReference::WeakPtr activePart;
 
-  std::string debugListenersKey;
-  std::string debugListeners2Key;
+  QString debugListenersKey;
+  QString debugListeners2Key;
 
   /**
    * @param ref
@@ -48,8 +48,8 @@ private:
 
 public:
 
-  PartService(const std::string& debugListenersKey,
-      const std::string& debugListeners2Key);
+  PartService(const QString& debugListenersKey,
+      const QString& debugListeners2Key);
 
   /*
    * (non-Javadoc)

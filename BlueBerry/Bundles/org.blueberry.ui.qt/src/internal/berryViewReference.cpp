@@ -36,21 +36,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
-    const std::string& secId, IMemento::Pointer m) :
+ViewReference::ViewReference(ViewFactory* fac, const QString& id,
+    const QString& secId, IMemento::Pointer m) :
   factory(fac), secondaryId(secId), memento(m)
 {
   ViewDescriptor::Pointer desc =
       this->factory->GetViewRegistry()->Find(id).Cast<ViewDescriptor> ();
   ImageDescriptor::Pointer iDesc;
-  std::string title;
+  QString title;
   if (!desc.IsNull())
   {
     iDesc = desc->GetImageDescriptor();
     title = desc->GetLabel();
   }
 
-  std::string name;
+  QString name;
 
   if (!memento.IsNull())
   {
@@ -64,7 +64,7 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
     //        }
     //      }
   }
-  if (name.empty())
+  if (name.isEmpty())
   {
     name = title;
   }
@@ -113,7 +113,7 @@ IWorkbenchPage::Pointer ViewReference::GetPage() const
   return IWorkbenchPage::Pointer(this->factory->GetWorkbenchPage());
 }
 
-std::string ViewReference::GetRegisteredName()
+QString ViewReference::GetRegisteredName()
 {
   if (!part.IsNull() && !part->GetSite().IsNull())
   {
@@ -129,7 +129,7 @@ std::string ViewReference::GetRegisteredName()
   return this->GetPartName();
 }
 
-std::string ViewReference::GetSecondaryId()
+QString ViewReference::GetSecondaryId()
 {
   return secondaryId;
 }
@@ -145,8 +145,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   // Check the status of this part
 
   IWorkbenchPart::Pointer result;
-  PartInitException exception;
-  bool error = false;
+  PartInitException* exception = 0;
 
   // Try to restore the view -- this does the real work of restoring the
   // view
@@ -154,15 +153,15 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   try
   {
     result = this->CreatePartHelper();
-  } catch (PartInitException e)
+  }
+  catch (const PartInitException& e)
   {
-    exception = e;
-    error = true;
+    exception = e.clone();
   }
 
   // If unable to create the part, create an error part instead
   // and pass the error to the status handling facility
-  if (error)
+  if (exception != 0)
   {
     //      IStatus partStatus = exception.getStatus();
     //      IStatus displayStatus = StatusUtil.newStatus(partStatus,
@@ -177,18 +176,20 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     // Pass the error to the status handling facility
     //      StatusManager.getManager().handle(logStatus);
 
-    std::string errorTitle = "Unable to create view ID " + this->GetId();
-    WorkbenchPlugin::Log(errorTitle + ": " + exception.displayText());
+    QString errorTitle = "Unable to create view ID " + this->GetId();
+    WorkbenchPlugin::Log(errorTitle + ": " + exception->what());
 
     IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(
         this->GetId());
-    std::string label = this->GetId();
+    QString label = this->GetId();
     if (!desc.IsNull())
     {
       label = desc->GetLabel();
     }
 
-    std::string errorMsg = exception.displayText();
+    QString errorMsg(exception->what());
+    delete exception;
+
     errorMsg
         += "<ul><li>Check your shared library for unresolved symbols</li>"
             "<li>Check your class attribute in your plugin.xml file</li>"
@@ -205,9 +206,10 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     try
     {
       part->Init(site);
-    } catch (PartInitException e)
+    }
+    catch (const PartInitException& e)
     {
-      BERRY_ERROR << e.displayText();
+      BERRY_ERROR << e.what();
       //StatusUtil.handleStatus(e, StatusManager.SHOW
       //    | StatusManager.LOG);
       return IWorkbenchPart::Pointer(0);
@@ -219,7 +221,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     try
     {
       part->CreatePartControl(parent);
-    } catch (std::exception e)
+    }
+    catch (const std::exception& e)
     {
       BERRY_ERROR << "Error creating view: " << e.what() << std::endl;
       //          StatusUtil.handleStatus(e, StatusManager.SHOW
@@ -256,7 +259,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
   IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(GetId());
   if (desc.IsNull())
   {
-    throw PartInitException("Could not create view", this->GetId());
+    throw PartInitException(QString("Could not create view: ") + this->GetId());
   }
 
   // Create the part pane
@@ -265,7 +268,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
   // Create the pane's top-level control
   pane->CreateControl(factory->GetWorkbenchPage()->GetClientComposite());
 
-  std::string label = desc->GetLabel(); // debugging only
+  QString label = desc->GetLabel(); // debugging only
 
   // Things that will need to be disposed if an exception occurs (they are
   // listed here
@@ -373,7 +376,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     //            element.getDeclaringExtension(), view,
     //            IExtensionTracker.REF_WEAK);
     //      }
-  } catch (const Poco::Exception& e)
+  }
+  catch (const ctkException& e)
   {
     //      if ((e instanceof Error) && !(e instanceof LinkageError)) {
     //        throw (Error) e;
@@ -423,7 +427,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     //        }
     //      }
 
-    throw PartInitException(e.message(), e, e.code());
+    throw PartInitException(e.what(), e);
   }
   catch (const std::exception& e)
   {

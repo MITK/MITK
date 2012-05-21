@@ -60,8 +60,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
     BERRY_DECLARE_FLAGS(Types, Type)
 
     Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveActivated;
-    Message3<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const std::string&> perspectiveChanged;
-    Message4<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const std::string&> perspectivePartChanged;
+    Message3<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const QString&> perspectiveChanged;
+    Message4<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const QString&> perspectivePartChanged;
     Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveOpened;
     Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveClosed;
     Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveDeactivated;
@@ -74,9 +74,9 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
   private:
 
     typedef MessageDelegate2<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer > Delegate2;
-    typedef MessageDelegate3<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const std::string&> PerspChangedDelegate;
+    typedef MessageDelegate3<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const QString&> PerspChangedDelegate;
     typedef MessageDelegate3<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IPerspectiveDescriptor::Pointer> PerspSavedAsDelegate;
-    typedef MessageDelegate4<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const std::string&> PerspPartChangedDelegate;
+    typedef MessageDelegate4<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const QString&> PerspPartChangedDelegate;
 
   };
 
@@ -103,7 +103,7 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    * @param changeId one of the <code>CHANGE_*</code> constants on IWorkbenchPage
    */
   virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective, const std::string& changeId);
+          IPerspectiveDescriptor::Pointer perspective, const QString& changeId);
 
   /**
    * Notifies this listener that a part in the given page's perspective
@@ -116,7 +116,7 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    */
   virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
           IPerspectiveDescriptor::Pointer perspective,
-          IWorkbenchPartReference::Pointer partRef, const std::string& changeId);
+          IWorkbenchPartReference::Pointer partRef, const QString& changeId);
 
   /**
    * Notifies this listener that a perspective in the given page has been

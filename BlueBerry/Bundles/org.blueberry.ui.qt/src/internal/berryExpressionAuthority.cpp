@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressionAuthority.h"
 
-#include <berryObjectVector.h>
+#include <berryObjectList.h>
 #include "berryEvaluationContext.h"
 #include "berryIEvaluationResultCache.h"
 
@@ -63,18 +63,18 @@ bool ExpressionAuthority::Evaluate(const SmartPointer<IEvaluationResultCache>& e
 
 Object::Pointer ExpressionAuthority::GetVariable(const QString& name) const
 {
-  return context->GetVariable(name.toStdString());
+  return context->GetVariable(name);
 }
 
 void ExpressionAuthority::ChangeVariable(const QString& name, const Object::Pointer& value)
 {
   if (value.IsNull())
   {
-    context->RemoveVariable(name.toStdString());
+    context->RemoveVariable(name);
   }
   else
   {
-    context->AddVariable(name.toStdString(), value);
+    context->AddVariable(name, value);
   }
 }
 
@@ -168,7 +168,7 @@ SmartPointer<IEvaluationContext> ExpressionAuthority::GetCurrentState() const
   if (currentState.IsNull())
   {
     const Object::Pointer defaultVariable =
-        context->GetVariable(ISources::ACTIVE_CURRENT_SELECTION_NAME().toStdString());
+        context->GetVariable(ISources::ACTIVE_CURRENT_SELECTION_NAME());
     IEvaluationContext::Pointer contextWithDefaultVariable;
     if (IStructuredSelection::Pointer selection = defaultVariable.Cast<IStructuredSelection>())
     {
@@ -178,14 +178,14 @@ SmartPointer<IEvaluationContext> ExpressionAuthority::GetCurrentState() const
     else if (defaultVariable.Cast<ISelection>() &&
              !defaultVariable.Cast<ISelection>()->IsEmpty())
     {
-      ObjectVector<Object::Pointer>::Pointer defaultObj(new ObjectVector<Object::Pointer>());
+      ObjectList<Object::Pointer>::Pointer defaultObj(new ObjectList<Object::Pointer>());
       defaultObj->push_back(defaultVariable);
       contextWithDefaultVariable = new EvaluationContext(context.GetPointer(),
                                                          defaultObj);
     }
     else
     {
-      ObjectVector<Object::Pointer>::Pointer defaultObj(new ObjectVector<Object::Pointer>());
+      ObjectList<Object::Pointer>::Pointer defaultObj(new ObjectList<Object::Pointer>());
       contextWithDefaultVariable = new EvaluationContext(context.GetPointer(), defaultObj);
     }
     currentState = contextWithDefaultVariable;

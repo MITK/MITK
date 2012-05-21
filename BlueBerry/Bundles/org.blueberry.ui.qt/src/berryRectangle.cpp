@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryRectangle.h"
 
-#include <sstream>
+#include <QTextStream>
 
 namespace berry
 {
@@ -143,11 +143,12 @@ bool Rectangle::IsEmpty () const
   return (width <= 0) || (height <= 0);
 }
 
-std::string Rectangle::ToString () const
+QString Rectangle::ToString () const
 {
-  std::ostringstream stream;
+  QString str;
+  QTextStream stream(&str);
   stream << "Rectangle {" << x << ", " << y << ", " << width << ", " << height << "}";
-  return stream.str(); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+  return str;
 }
 
 Rectangle Rectangle::Union(const Rectangle& rect) const

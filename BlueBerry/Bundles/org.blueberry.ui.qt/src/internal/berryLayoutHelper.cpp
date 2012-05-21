@@ -28,7 +28,7 @@ LayoutHelper::LayoutHelper()
 }
 
 void LayoutHelper::AddViewActivator(PageLayout::Pointer /*pageLayout*/,
-    const std::string&  /*viewId*/)
+    const QString&  /*viewId*/)
 {
   // TODO View Activator
 //  if (viewId == null)
@@ -145,7 +145,7 @@ void LayoutHelper::AddViewActivator(PageLayout::Pointer /*pageLayout*/,
     }
 
 PartPane::Pointer LayoutHelper::CreateView(ViewFactory* factory,
-    const std::string& viewId)
+    const QString& viewId)
 {
   WorkbenchPartReference::Pointer ref = factory->CreateView(
       ViewFactory::ExtractPrimaryId(viewId), ViewFactory::ExtractSecondaryId(

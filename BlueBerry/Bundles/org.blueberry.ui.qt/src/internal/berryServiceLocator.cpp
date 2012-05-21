@@ -21,20 +21,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "services/berryIServiceFactory.h"
 #include "services/berryINestable.h"
 
-#include <Poco/Exception.h>
 
 namespace berry
 {
 
 ServiceLocator::ParentLocator::ParentLocator(const IServiceLocator::WeakPtr parent,
-    const std::string& serviceInterface) :
+    const QString& serviceInterface) :
   locator(parent), key(serviceInterface)
 {
 
 }
 
 Object::Pointer ServiceLocator::ParentLocator::GetService(
-    const std::string& api)
+    const QString& api)
 {
   if (key == api)
   {
@@ -49,7 +48,7 @@ Object::Pointer ServiceLocator::ParentLocator::GetService(
   return Object::Pointer(0);
 }
 
-bool ServiceLocator::ParentLocator::HasService(const std::string& api) const
+bool ServiceLocator::ParentLocator::HasService(const QString& api) const
 {
   if (key == api)
   {
@@ -78,7 +77,7 @@ void ServiceLocator::Activate()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer service = serviceItr->second;
+    Object::Pointer service = serviceItr.value();
     if (INestable::Pointer nestableService = service.Cast<INestable>())
     {
       nestableService->Activate();
@@ -93,7 +92,7 @@ void ServiceLocator::Deactivate()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer service = serviceItr->second;
+    Object::Pointer service = serviceItr.value();
     if (INestable::Pointer nestableService = service.Cast<INestable>())
     {
       nestableService->Deactivate();
@@ -107,7 +106,7 @@ void ServiceLocator::Dispose()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer object = serviceItr->second;
+    Object::Pointer object = serviceItr.value();
     if (IDisposable::Pointer service = object.Cast<IDisposable>())
     {
       service->Dispose();
@@ -119,7 +118,7 @@ void ServiceLocator::Dispose()
   disposed = true;
 }
 
-Object::Pointer ServiceLocator::GetService(const std::string& key)
+Object::Pointer ServiceLocator::GetService(const QString& key)
 {
   if (disposed)
   {
@@ -131,7 +130,7 @@ Object::Pointer ServiceLocator::GetService(const std::string& key)
 
   if (iter != services.end())
   {
-    service = iter->second;
+    service = iter.value();
   }
   else
   {
@@ -165,7 +164,7 @@ Object::Pointer ServiceLocator::GetService(const std::string& key)
   return service;
 }
 
-bool ServiceLocator::HasService(const std::string& key) const
+bool ServiceLocator::HasService(const QString& key) const
 {
   if (disposed)
   {
@@ -180,12 +179,12 @@ bool ServiceLocator::HasService(const std::string& key) const
   return false;
 }
 
-void ServiceLocator::RegisterService(const std::string& api,
+void ServiceLocator::RegisterService(const QString& api,
     Object::Pointer service) const
 {
-  if (api.empty())
+  if (api.isEmpty())
   {
-    throw Poco::InvalidArgumentException("The service key cannot be empty"); //$NON-NLS-1$
+    throw ctkInvalidArgumentException("The service key cannot be empty");
   }
 
 //  if (!api.isInstance(service))
@@ -196,7 +195,7 @@ void ServiceLocator::RegisterService(const std::string& api,
   if (services.find(api) != services.end())
   {
     Object::Pointer currentService = services[api];
-    services.erase(api);
+    services.remove(api);
     if (IDisposable::Pointer disposable = currentService.Cast<IDisposable>())
     {
       disposable->Dispose();
@@ -205,7 +204,7 @@ void ServiceLocator::RegisterService(const std::string& api,
 
   if (service)
   {
-    services.insert(std::make_pair(api, service));
+    services.insert(api, service);
     if (INestable::Pointer nestable = service.Cast<INestable>())
     {
       if (activated)
@@ -221,7 +220,7 @@ bool ServiceLocator::IsDisposed() const
   return disposed;
 }
 
-void ServiceLocator::UnregisterServices(const std::vector<std::string>& /*serviceNames*/)
+void ServiceLocator::UnregisterServices(const QList<QString>& /*serviceNames*/)
 {
   IDisposable::Pointer d(owner);
   if (d)

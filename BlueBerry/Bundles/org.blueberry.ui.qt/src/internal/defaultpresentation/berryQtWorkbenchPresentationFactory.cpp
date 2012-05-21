@@ -123,7 +123,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateStandaloneViewP
   return presentation;
 }
 
-std::string QtWorkbenchPresentationFactory::GetId()
+QString QtWorkbenchPresentationFactory::GetId()
 {
   return "berryQtWorkbenchPresentationFactory";
 }

@@ -36,20 +36,20 @@ class PerspectiveRegistry : public IPerspectiveRegistry {
 
 private:
 
-  std::string defaultPerspID;
+  QString defaultPerspID;
 
-  static const std::string EXT; // = "_persp.xml";
+  static const QString EXT; // = "_persp.xml";
 
-  static const std::string ID_DEF_PERSP; // = "PerspectiveRegistry.DEFAULT_PERSP";
+  static const QString ID_DEF_PERSP; // = "PerspectiveRegistry.DEFAULT_PERSP";
 
-  static const std::string PERSP; // = "_persp";
+  static const QString PERSP; // = "_persp";
 
   static const char SPACE_DELIMITER; // = ' ';
 
-  std::list<PerspectiveDescriptor::Pointer> perspectives;
+  QList<PerspectiveDescriptor::Pointer> perspectives;
 
   // keep track of the perspectives the user has selected to remove or revert
-  std::list<std::string> perspToRemove;
+  QList<QString> perspToRemove;
 
   //IPropertyChangeListener::Pointer preferenceListener;
 
@@ -77,7 +77,7 @@ public:
        * @return a new perspective descriptor or <code>null</code> if the
        *         creation failed.
        */
-      IPerspectiveDescriptor::Pointer CreatePerspective(const std::string& label,
+      IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
           IPerspectiveDescriptor::Pointer originalDescriptor);
 
       /**
@@ -85,14 +85,14 @@ public:
        *
        * @param perspToRevert
        */
-      void RevertPerspectives(const std::list<PerspectiveDescriptor::Pointer>& perspToRevert);
+      void RevertPerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToRevert);
 
       /**
        * Deletes a list of perspectives
        *
        * @param perspToDelete
        */
-      void DeletePerspectives(const std::list<PerspectiveDescriptor::Pointer>& perspToDelete);
+      void DeletePerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToDelete);
 
       /**
        * Delete a perspective. Has no effect if the perspective is defined in an
@@ -105,28 +105,28 @@ public:
       /*
          * (non-Javadoc)
          *
-         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithId(java.lang.std::string)
+         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithId(java.lang.QString)
          */
-         IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const std::string& id);
+         IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id);
 
         /*
          * (non-Javadoc)
          *
-         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithLabel(java.lang.std::string)
+         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithLabel(java.lang.QString)
          */
-         IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const std::string& label);
+         IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label);
 
         /**
          * @see IPerspectiveRegistry#getDefaultPerspective()
          */
-         std::string GetDefaultPerspective();
+         QString GetDefaultPerspective();
 
         /*
          * (non-Javadoc)
          *
          * @see org.blueberry.ui.IPerspectiveRegistry#getPerspectives()
          */
-         std::vector<IPerspectiveDescriptor::Pointer> GetPerspectives();
+         QList<IPerspectiveDescriptor::Pointer> GetPerspectives();
 
         /**
          * Loads the registry.
@@ -154,12 +154,12 @@ public:
            * @throws WorkbenchException
            * @throws IOException
            */
-          IMemento::Pointer GetCustomPersp(const std::string& id);
+          IMemento::Pointer GetCustomPersp(const QString& id);
 
           /**
-             * @see IPerspectiveRegistry#setDefaultPerspective(std::string)
+             * @see IPerspectiveRegistry#setDefaultPerspective(QString)
              */
-            void SetDefaultPerspective(const std::string& id);
+            void SetDefaultPerspective(const QString& id);
 
             /**
              * Return <code>true</code> if a label is valid. This checks only the
@@ -170,15 +170,15 @@ public:
              *            the label to test
              * @return whether the label is valid
              */
-            bool ValidateLabel(const std::string& label);
+            bool ValidateLabel(const QString& label);
 
             /*
                * (non-Javadoc)
                *
-               * @see org.blueberry.ui.IPerspectiveRegistry#clonePerspective(java.lang.std::string,
-               *      java.lang.std::string, org.blueberry.ui.IPerspectiveDescriptor)
+               * @see org.blueberry.ui.IPerspectiveRegistry#clonePerspective(java.lang.QString,
+               *      java.lang.QString, org.blueberry.ui.IPerspectiveDescriptor)
                */
-              IPerspectiveDescriptor::Pointer ClonePerspective(const std::string& id, const std::string& label,
+              IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
                   IPerspectiveDescriptor::Pointer originalDescriptor);
 
               /*
@@ -289,7 +289,7 @@ private:
   /**
    * @param status
    */
-  void UnableToLoadPerspective(const std::string& status);
+  void UnableToLoadPerspective(const QString& status);
 
   /**
    * Read children from the plugin registry.

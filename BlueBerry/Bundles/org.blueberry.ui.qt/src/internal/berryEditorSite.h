@@ -53,7 +53,7 @@ private:
 
 protected:
 
- std::string GetInitialScopeId();
+  QString GetInitialScopeId();
 
 public:
 

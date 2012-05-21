@@ -332,7 +332,7 @@ class BERRY_UI_QT WorkbenchAdvisor {
    * @return the id of the perspective for the initial window, or
    *         <code>null</code> if no initial perspective should be shown
    */
-  public: virtual std::string GetInitialWindowPerspectiveId() = 0;
+  public: virtual QString GetInitialWindowPerspectiveId() = 0;
 
   /**
    * Returns the id of the preference page that should be presented most
@@ -344,8 +344,7 @@ class BERRY_UI_QT WorkbenchAdvisor {
    *
    * @return the id of the preference page, or <code>null</code> if none
    */
-  public: virtual std::string GetMainPreferencePageId();
-
+  public: virtual QString GetMainPreferencePageId();
 
   /**
    * Opens the workbench windows on startup. The default implementation tries
@@ -399,7 +398,7 @@ class BERRY_UI_QT WorkbenchAdvisor {
    * @param contributionType
    *            the contribution type
    * @return the comparator, must not return <code>null</code>
-   * @see IContributionService#GetComparatorFor(const std::string&)
+   * @see IContributionService#GetComparatorFor(const QString&)
    */
 //  public: ContributionComparator getComparatorFor(String contributionType) {
 //    return new ContributionComparator();

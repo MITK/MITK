@@ -56,7 +56,7 @@ struct BERRY_UI_QT ISelectionService {
 
   virtual ~ISelectionService();
 
-  //virtual SelectionEvents& GetSelectionEvents(const std::string& partId = "") = 0;
+  //virtual SelectionEvents& GetSelectionEvents(const QString& partId = "") = 0;
 
   /**
    * Adds the given selection listener.
@@ -84,7 +84,7 @@ struct BERRY_UI_QT ISelectionService {
    * @param listener a selection listener
    * @since 2.0
    */
-  virtual void AddSelectionListener(const std::string& partId, ISelectionListener::Pointer listener) = 0;
+  virtual void AddSelectionListener(const QString& partId, ISelectionListener::Pointer listener) = 0;
 
   /**
    * Adds the given post selection listener.It is equivalent to selection
@@ -116,7 +116,7 @@ struct BERRY_UI_QT ISelectionService {
    * @param listener a selection listener
    * @since 2.0
    */
-  virtual void AddPostSelectionListener(const std::string& partId,
+  virtual void AddPostSelectionListener(const QString& partId,
           ISelectionListener::Pointer listener) = 0;
 
   /**
@@ -137,7 +137,7 @@ struct BERRY_UI_QT ISelectionService {
    * @return the current selection, or <code>null</code> if undefined
    * @since 2.0
    */
-  virtual ISelection::ConstPointer GetSelection(const std::string& partId) = 0;
+  virtual ISelection::ConstPointer GetSelection(const QString& partId) = 0;
 
   /**
    * Removes the given selection listener.
@@ -155,7 +155,7 @@ struct BERRY_UI_QT ISelectionService {
    * @param listener a selection listener
    * @since 2.0
    */
-  virtual void RemoveSelectionListener(const std::string& partId,
+  virtual void RemoveSelectionListener(const QString& partId,
           ISelectionListener::Pointer listener) = 0;
 
   /**
@@ -174,7 +174,7 @@ struct BERRY_UI_QT ISelectionService {
    * @param listener a selection listener
    * @since 2.0
    */
-  virtual void RemovePostSelectionListener(const std::string& partId,
+  virtual void RemovePostSelectionListener(const QString& partId,
           ISelectionListener::Pointer listener) = 0;
 };
 

@@ -208,7 +208,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *
    * @return a list of open windows
    */
-  virtual std::vector<IWorkbenchWindow::Pointer> GetWorkbenchWindows() = 0;
+  virtual QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() = 0;
 
   /**
    * Creates and opens a new workbench window with one page. The perspective
@@ -241,7 +241,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *
    * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
    */
-  virtual IWorkbenchWindow::Pointer OpenWorkbenchWindow(const std::string& perspectiveId,
+  virtual IWorkbenchWindow::Pointer OpenWorkbenchWindow(const QString& perspectiveId,
       IAdaptable* input) = 0;
 
   /**
@@ -307,7 +307,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *
    * @since 2.0
    */
-  virtual SmartPointer<IWorkbenchPage> ShowPerspective(const std::string& perspectiveId,
+  virtual SmartPointer<IWorkbenchPage> ShowPerspective(const QString& perspectiveId,
       IWorkbenchWindow::Pointer window) = 0;
 
   /**
@@ -353,7 +353,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *
    * @since 2.0
    */
-  virtual SmartPointer<IWorkbenchPage> ShowPerspective(const std::string& perspectiveId,
+  virtual SmartPointer<IWorkbenchPage> ShowPerspective(const QString& perspectiveId,
       IWorkbenchWindow::Pointer window, IAdaptable* input) = 0;
 
   /**

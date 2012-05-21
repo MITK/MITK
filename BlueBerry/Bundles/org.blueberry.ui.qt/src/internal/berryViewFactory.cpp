@@ -31,42 +31,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string ViewFactory::ID_SEP = ":"; //$NON-NLS-1$
+const QString ViewFactory::ID_SEP = ":"; //$NON-NLS-1$
 
-std::string ViewFactory::GetKey(const std::string& id,
-    const std::string& secondaryId)
+QString ViewFactory::GetKey(const QString& id,
+    const QString& secondaryId)
 {
-  return secondaryId.empty() ? id : id + ID_SEP + secondaryId;
+  return secondaryId.isEmpty() ? id : id + ID_SEP + secondaryId;
 }
 
-std::string ViewFactory::GetKey(IViewReference::Pointer viewRef)
+QString ViewFactory::GetKey(IViewReference::Pointer viewRef)
 {
   return GetKey(viewRef->GetId(), viewRef->GetSecondaryId());
 }
 
-std::string ViewFactory::ExtractPrimaryId(const std::string& compoundId)
+QString ViewFactory::ExtractPrimaryId(const QString& compoundId)
 {
-  std::string::size_type i = compoundId.find_last_of(ID_SEP);
-  if (i == std::string::npos)
+  int i = compoundId.lastIndexOf(ID_SEP);
+  if (i == -1)
   {
     return compoundId;
   }
-  return compoundId.substr(0, i);
+  return compoundId.left(i);
 }
 
-std::string ViewFactory::ExtractSecondaryId(const std::string& compoundId)
+QString ViewFactory::ExtractSecondaryId(const QString& compoundId)
 {
-  std::string::size_type i = compoundId.find_last_of(ID_SEP);
-  if (i == std::string::npos)
+  int i = compoundId.lastIndexOf(ID_SEP);
+  if (i == -1)
   {
-    return "";
+    return QString();
   }
-  return compoundId.substr(i + 1);
+  return compoundId.mid(i + 1);
 }
 
-bool ViewFactory::HasWildcard(const std::string& viewId)
+bool ViewFactory::HasWildcard(const QString& viewId)
 {
-  return viewId.find_first_of('*') != std::string::npos;
+  return viewId.indexOf('*') != -1;
 }
 
 ViewFactory::ViewFactory(WorkbenchPage* p, IViewRegistry* reg) :
@@ -75,30 +75,30 @@ ViewFactory::ViewFactory(WorkbenchPage* p, IViewRegistry* reg) :
   //page.getExtensionTracker().registerHandler(this, null);
 }
 
-IViewReference::Pointer ViewFactory::CreateView(const std::string& id,
-    const std::string& secondaryId)
+IViewReference::Pointer ViewFactory::CreateView(const QString& id,
+    const QString& secondaryId)
 {
   IViewDescriptor::Pointer desc = viewReg->Find(id);
   // ensure that the view id is valid
   if (desc.IsNull())
   {
-    throw PartInitException("Could not create view", id);
+    throw PartInitException(QString("Could not create view: ") + id);
   }
   // ensure that multiple instances are allowed if a secondary id is given
   if (secondaryId != "")
   {
     if (!desc->GetAllowMultiple())
     {
-      throw PartInitException("View does not allow multiple instances", id);
+      throw PartInitException(QString("View does not allow multiple instances:") + id);
     }
   }
-  std::string key = this->GetKey(id, secondaryId);
+  QString key = this->GetKey(id, secondaryId);
   IViewReference::Pointer ref = counter.Get(key);
   if (ref.IsNull())
   {
     IMemento::Pointer memento = mementoTable[key];
     ref = new ViewReference(this, id, secondaryId, memento);
-    mementoTable.erase(key);
+    mementoTable.remove(key);
     counter.Put(key, ref);
     this->GetWorkbenchPage()->PartAdded(ref.Cast<ViewReference> ());
   }
@@ -110,22 +110,22 @@ IViewReference::Pointer ViewFactory::CreateView(const std::string& id,
   return ref;
 }
 
-std::vector<IViewReference::Pointer> ViewFactory::GetViewReferences()
+QList<IViewReference::Pointer> ViewFactory::GetViewReferences()
 {
-  std::vector<IViewReference::Pointer> values(counter.Values());
+  QList<IViewReference::Pointer> values(counter.Values());
 
   return values;
 }
 
-IViewReference::Pointer ViewFactory::GetView(const std::string& id)
+IViewReference::Pointer ViewFactory::GetView(const QString& id)
 {
   return this->GetView(id, "");
 }
 
-IViewReference::Pointer ViewFactory::GetView(const std::string& id,
-    const std::string& secondaryId)
+IViewReference::Pointer ViewFactory::GetView(const QString& id,
+    const QString& secondaryId)
 {
-  std::string key = this->GetKey(id, secondaryId);
+  QString key = this->GetKey(id, secondaryId);
   return counter.Get(key);
 }
 
@@ -134,9 +134,9 @@ const IViewRegistry* ViewFactory::GetViewRegistry() const
   return viewReg;
 }
 
-std::vector<IViewReference::Pointer> ViewFactory::GetViews()
+QList<IViewReference::Pointer> ViewFactory::GetViews()
 {
-  std::vector<IViewReference::Pointer> values(counter.Values());
+  QList<IViewReference::Pointer> values(counter.Values());
 
   return values;
 }
@@ -148,14 +148,14 @@ WorkbenchPage* ViewFactory::GetWorkbenchPage() const
 
 int ViewFactory::GetReferenceCount(IViewReference::Pointer viewRef)
 {
-  std::string key = this->GetKey(viewRef);
+  QString key = this->GetKey(viewRef);
   IViewReference::Pointer ref = counter.Get(key);
   return ref.IsNull() ? 0 : counter.GetRef(key);
 }
 
 void ViewFactory::ReleaseView(IViewReference::Pointer viewRef)
 {
-  std::string key = this->GetKey(viewRef);
+  QString key = this->GetKey(viewRef);
   IViewReference::Pointer ref = counter.Get(key);
   if (ref.IsNull())
   {
@@ -170,7 +170,7 @@ void ViewFactory::ReleaseView(IViewReference::Pointer viewRef)
 
 bool ViewFactory::RestoreState(IMemento::Pointer memento)
 {
-  std::vector<IMemento::Pointer> mem(memento->GetChildren(
+  QList<IMemento::Pointer> mem(memento->GetChildren(
       WorkbenchConstants::TAG_VIEW));
   for (std::size_t i = 0; i < mem.size(); i++)
   {
@@ -186,7 +186,7 @@ bool ViewFactory::SaveState(IMemento::Pointer memento)
   //  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
   //      IStatus.OK, WorkbenchMessages.ViewFactory_problemsSavingViews, null);
   bool result = true;
-  std::vector<IViewReference::Pointer> refs(GetViews());
+  QList<IViewReference::Pointer> refs(GetViews());
   for (std::size_t i = 0; i < refs.size(); i++)
   {
     IViewDescriptor::Pointer desc = viewReg->Find(refs[i]->GetId());
@@ -210,18 +210,18 @@ struct SaveViewRunnable: public SafeRunnable
   void Run()
   {
 
-    const std::map<std::string, std::string>& properties =
+    const QHash<QString, QString>& properties =
         view->GetPartProperties();
     if (!properties.empty())
     {
       IMemento::Pointer propBag = viewMemento ->CreateChild(
           WorkbenchConstants::TAG_PROPERTIES);
-      for (std::map<std::string, std::string>::const_iterator i =
+      for (QHash<QString, QString>::const_iterator i =
           properties.begin(); i != properties.end(); ++i)
       {
         IMemento::Pointer p = propBag->CreateChild(
-            WorkbenchConstants::TAG_PROPERTY, i->first);
-        p->PutTextData(i->second);
+            WorkbenchConstants::TAG_PROPERTY, i.key());
+        p->PutTextData(i.value());
       }
     }
 
@@ -306,12 +306,12 @@ IMemento::Pointer ViewFactory::SaveViewState(IMemento::Pointer memento,
 // for dynamic UI
 void ViewFactory::RestoreViewState(IMemento::Pointer memento)
 {
-  std::string compoundId;
+  QString compoundId;
   memento->GetString(WorkbenchConstants::TAG_ID, compoundId);
-  mementoTable.insert(std::make_pair(compoundId, memento));
+  mementoTable.insert(compoundId, memento);
 }
 
-IMemento::Pointer ViewFactory::GetViewState(const std::string& key)
+IMemento::Pointer ViewFactory::GetViewState(const QString& key)
 {
   IMemento::Pointer memento = mementoTable[key];
 

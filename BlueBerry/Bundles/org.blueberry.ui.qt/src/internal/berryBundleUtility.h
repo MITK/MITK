@@ -47,11 +47,11 @@ public:
 
   static bool IsReady(ctkPlugin::State pluginState);
 
-  static bool IsActive(const std::string& bundleId);
+  static bool IsActive(const QString& bundleId);
 
-  static bool IsActivated(const std::string& bundleId);
+  static bool IsActivated(const QString& bundleId);
 
-  static bool IsReady(const std::string& bundleId);
+  static bool IsReady(const QString& bundleId);
 
   static QSharedPointer<ctkPlugin> FindPlugin(const QString& symbName);
 
@@ -67,7 +67,7 @@ public:
   //    }
 
 //  static void
-//      Log(const std::string& bundleId, const Poco::Exception* exception);
+//      Log(const QString& bundleId, const Poco::Exception* exception);
 };
 
 }

@@ -93,8 +93,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
      * @exception PartInitException if this part was not initialized
      * successfully
      */
-    virtual void Init(IIntroSite::Pointer site, IMemento::Pointer memento)
-            throw(PartInitException) = 0;
+    virtual void Init(IIntroSite::Pointer site, IMemento::Pointer memento) = 0;
 
     /**
      * Sets the standby state of this intro part. An intro part should render
@@ -184,9 +183,8 @@ struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
      * </p>
      *
      * @return the intro part title (not <code>null</code>)
-     * @since 3.2
      */
-    virtual std::string GetPartName() const = 0;
+    virtual QString GetPartName() const = 0;
 
     /**
      * Removes the given property listener from this intro part.

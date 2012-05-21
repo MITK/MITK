@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryLayoutPartSash.h"
 
 #include "berryLayoutTree.h"
@@ -21,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 
 #include "berryConstants.h"
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 namespace berry
 {
@@ -176,7 +177,7 @@ void* LayoutPartSash::GetControl()
   return sash;
 }
 
-std::string LayoutPartSash::GetID()
+QString LayoutPartSash::GetID()
 {
   return "";
 }

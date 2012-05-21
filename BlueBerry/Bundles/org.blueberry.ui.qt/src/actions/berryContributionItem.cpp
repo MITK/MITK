@@ -90,10 +90,9 @@ void ContributionItem::SetVisible(bool visible)
   this->visible = visible;
 }
 
-std::string ContributionItem::ToString() const
+QString ContributionItem::ToString() const
 {
-  QString str = QString(GetClassName()) + "(id=" + this->GetId() + ")";
-  return str.toStdString();
+  return QString(GetClassName()) + "(id=" + this->GetId() + ")";
 }
 
 void ContributionItem::Update()

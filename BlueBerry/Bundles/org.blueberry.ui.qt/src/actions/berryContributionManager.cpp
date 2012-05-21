@@ -135,7 +135,7 @@ void ContributionManager::InsertAfter(const QString& ID, const SmartPointer<ICon
   IContributionItem::Pointer ci = Find(ID);
   if (ci.IsNull())
   {
-    throw std::invalid_argument(std::string("can't find ID") + ID.toStdString());
+    throw ctkInvalidArgumentException(QString("can't find ID") + ID);
   }
   int ix = contributions.indexOf(ci);
   if (ix >= 0)
@@ -160,7 +160,7 @@ void ContributionManager::InsertBefore(const QString& ID, const SmartPointer<ICo
   IContributionItem::Pointer ci = Find(ID);
   if (ci.IsNull())
   {
-    throw std::invalid_argument(std::string("can't find ID ") + ID.toStdString());
+    throw ctkInvalidArgumentException(QString("can't find ID ") + ID);
   }
   int ix = contributions.indexOf(ci);
   if (ix >= 0)
@@ -402,7 +402,7 @@ void ContributionManager::AddToGroup(const QString& groupName, const SmartPointe
       }
     }
   }
-  throw std::invalid_argument(std::string("Group not found: ") + groupName.toStdString());
+  throw ctkInvalidArgumentException(QString("Group not found: ") + groupName);
 }
 
 }

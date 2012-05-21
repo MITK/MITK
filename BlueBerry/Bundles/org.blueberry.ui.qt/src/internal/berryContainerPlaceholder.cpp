@@ -24,7 +24,7 @@ namespace berry
 
 int ContainerPlaceholder::nextId = 0;
 
-ContainerPlaceholder::ContainerPlaceholder(const std::string& id) :
+ContainerPlaceholder::ContainerPlaceholder(const QString& id) :
   PartPlaceholder(id == "" ? "Container Placeholder " + nextId++ : id)
 {
 
@@ -44,12 +44,12 @@ bool ContainerPlaceholder::AllowsAdd(LayoutPart::Pointer  /*toAdd*/)
   return false;
 }
 
-std::list<LayoutPart::Pointer> ContainerPlaceholder::GetChildren() const
+QList<LayoutPart::Pointer> ContainerPlaceholder::GetChildren() const
 {
   return realContainer->GetChildren();
 }
 
-std::string ContainerPlaceholder::GetID() const
+QString ContainerPlaceholder::GetID() const
 {
   return LayoutPart::GetID();
 }
@@ -88,8 +88,8 @@ void ContainerPlaceholder::SetRealContainer(
     // set the parent container of the children back to the real container
     if (realContainer != 0)
     {
-      std::list<LayoutPart::Pointer> children = realContainer->GetChildren();
-      for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
+      QList<LayoutPart::Pointer> children = realContainer->GetChildren();
+      for (QList<LayoutPart::Pointer>::iterator iter = children.begin(); iter
           != children.end(); ++iter)
       {
         (*iter)->SetContainer(realContainer);
@@ -99,8 +99,8 @@ void ContainerPlaceholder::SetRealContainer(
   else
   {
     // replace the real container with this place holder
-    std::list<LayoutPart::Pointer> children = container->GetChildren();
-    for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
+    QList<LayoutPart::Pointer> children = container->GetChildren();
+    for (QList<LayoutPart::Pointer>::iterator iter = children.begin(); iter
         != children.end(); ++iter)
     {
       (*iter)->SetContainer(ILayoutContainer::Pointer(this));

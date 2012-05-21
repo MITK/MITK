@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/DOM/Element.h"
 #include "Poco/SAX/XMLReader.h"
 
-#include <iostream>
+
 namespace berry {
 
 /**
@@ -41,8 +41,8 @@ namespace berry {
 class BERRY_UI_QT XMLMemento : public IMemento {
 
   public:
-    berryObjectMacro(XMLMemento);
-    berryNewMacro2Param(XMLMemento, Poco::XML::Document*, Poco::XML::Element*);
+    berryObjectMacro(XMLMemento)
+    berryNewMacro2Param(XMLMemento, Poco::XML::Document*, Poco::XML::Element*)
 
     /**
      * Defines a std::ostream as XML output stream
@@ -78,7 +78,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @return a memento on the first <code>Element</code> for reading the document
      * @throws WorkbenchException if IO problems, invalid format, or no element.
     */
-    static XMLMemento::Pointer CreateReadRoot(berry::XMLMemento::XMLByteInputStream& reader) throw(WorkbenchException);
+    static XMLMemento::Pointer CreateReadRoot(berry::XMLMemento::XMLByteInputStream& reader);
 
     /**
      * Creates a <code>Document</code> from the <code>Reader</code>
@@ -94,7 +94,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @return a memento on the first <code>Element</code> for reading the document
      * @throws WorkbenchException if IO problems, invalid format, or no element.
     */
-    static XMLMemento::Pointer CreateReadRoot(berry::XMLMemento::XMLByteInputStream& reader, const std::string& baseDir) throw(WorkbenchException);
+    static XMLMemento::Pointer CreateReadRoot(berry::XMLMemento::XMLByteInputStream& reader, const QString& baseDir);
 
     /**
      * Returns a root memento for writing a document.
@@ -102,7 +102,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param type the element node type to create on the document
      * @return the root memento for writing a document
     */
-    static XMLMemento::Pointer CreateWriteRoot(const std::string& type);
+    static XMLMemento::Pointer CreateWriteRoot(const QString& type);
 
     /**
      * Copies another Memento into this memento
@@ -118,7 +118,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param type the type
      * @return a new child memento with the given type
     */
-    virtual IMemento::Pointer CreateChild(const std::string& type);
+    virtual IMemento::Pointer CreateChild(const QString& type);
 
     /**
      * Creates a new child of this memento with the given type and id.
@@ -134,7 +134,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @return a new child memento with the given type and id
      * @see #getID
      */
-    virtual IMemento::Pointer CreateChild(const std::string& type, const std::string& id);
+    virtual IMemento::Pointer CreateChild(const QString& type, const QString& id);
 
     /**
      * Returns the first child with the given type id.
@@ -142,7 +142,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param type the type id
      * @return the first child with the given type
      */
-    virtual IMemento::Pointer GetChild(const std::string& type) const;
+    virtual IMemento::Pointer GetChild(const QString& type) const;
 
     /**
      * Returns all children with the given type id.
@@ -150,37 +150,37 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param type the type id
      * @return an array of children with the given type
      */
-    virtual std::vector< IMemento::Pointer > GetChildren(const std::string& type) const;
+    virtual QList< IMemento::Pointer > GetChildren(const QString& type) const;
 
     /**
      * Returns the Type of this memento
     */
-    virtual std::string GetType() const;
+    virtual QString GetType() const;
 
     /**
      * Returns the ID of this memento
      */
-    virtual std::string GetID() const;
+    virtual QString GetID() const;
 
     /**
      * @see IMemento#GetInteger
      */
-    virtual bool GetInteger(const std::string& key, int& value) const;
+    virtual bool GetInteger(const QString& key, int& value) const;
 
     /**
      * @see IMemento#GetFloat
      */
-    virtual bool GetFloat(const std::string& key, double& value) const;
+    virtual bool GetFloat(const QString& key, double& value) const;
 
     /**
      * @see IMemento#GetString
      */
-    virtual bool GetString(const std::string& key, std::string& value) const;
+    virtual bool GetString(const QString& key, QString& value) const;
 
     /**
      * @see IMemento#GetString
      */
-    virtual bool GetBoolean(const std::string& key, bool& value) const;
+    virtual bool GetBoolean(const QString& key, bool& value) const;
 
     /**
      * Returns the data of the Text node of the memento. Each memento is allowed
@@ -189,7 +189,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @return the data of the Text node of the memento, or <code>null</code>
      * if the memento has no Text node.
      */
-    virtual const std::string& GetTextData() const;
+    virtual QString GetTextData() const;
 
     /**
      * Returns an array of all the attribute keys of the memento. This will not
@@ -197,7 +197,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * be returned.
      * @return an vector with all the attribute keys of the memento
      */
-    virtual std::vector< std::string > GetAttributeKeys() const;
+    virtual QList< QString > GetAttributeKeys() const;
 
     /**
      * Puts a float in this memento
@@ -205,7 +205,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param key the key
      * @param value the value
      */
-    virtual void PutFloat(const std::string& key, double value);
+    virtual void PutFloat(const QString& key, double value);
 
     /**
      * Puts a integer in this memento
@@ -213,7 +213,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param key the key
      * @param value the value
      */
-    virtual void PutInteger(const std::string& key, int value);
+    virtual void PutInteger(const QString& key, int value);
 
     /**
      * Puts another memento in this memento as a child
@@ -229,7 +229,7 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param key the key
      * @param value the value
      */
-    virtual void PutString(const std::string& key, const std::string& value);
+    virtual void PutString(const QString& key, const QString& value);
 
     /**
      * Puts a boolean in this memento
@@ -237,14 +237,14 @@ class BERRY_UI_QT XMLMemento : public IMemento {
      * @param key the key
      * @param value the value
      */
-    virtual void PutBoolean(const std::string& key, bool value);
+    virtual void PutBoolean(const QString& key, bool value);
 
     /**
      * Puts a text in this memento
      *
      * @param data the text
      */
-    virtual void PutTextData(const std::string& data);
+    virtual void PutTextData(const QString& data);
 
     /**
      * Saves this memento's document current values to the

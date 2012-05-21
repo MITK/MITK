@@ -32,7 +32,7 @@ public:
   QtImageTweaklet();
   QtImageTweaklet(const QtImageTweaklet& other);
 
-  virtual SmartPointer<ImageDescriptor> CreateFromFile(const std::string& filename, const std::string& pluginid);
+  virtual SmartPointer<ImageDescriptor> CreateFromFile(const QString& filename, const QString& pluginid);
   virtual SmartPointer<ImageDescriptor> CreateFromImage(void* img);
   virtual SmartPointer<ImageDescriptor> GetMissingImageDescriptor();
 

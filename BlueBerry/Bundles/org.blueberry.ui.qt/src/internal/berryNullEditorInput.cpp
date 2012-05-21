@@ -36,18 +36,18 @@ bool NullEditorInput::Exists() const
   return false;
 }
 
-std::string NullEditorInput::GetName() const
+QString NullEditorInput::GetName() const
 {
   if (editorReference.IsNotNull())
     return editorReference->GetName();
-  return ""; //$NON-NLS-1$
+  return "";
 }
 
-std::string NullEditorInput::GetToolTipText() const
+QString NullEditorInput::GetToolTipText() const
 {
   if (editorReference.IsNotNull())
     return editorReference->GetTitleToolTip();
-  return ""; //$NON-NLS-1$
+  return "";
 }
 
 bool NullEditorInput::operator==(const Object* o) const

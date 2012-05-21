@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIEvaluationService.h>
 
 #include <QStringList>
-#include <QSet>
+#include <QString>
 
 namespace berry {
 
@@ -38,22 +38,13 @@ QStringList EvaluationAuthority::GetNames(const SmartPointer<IEvaluationReferenc
 {
   ExpressionInfo info;
   ref->GetExpression()->CollectExpressionInfo(&info);
-  QSet<QString> allNames;
-  std::set<std::string> names = info.GetAccessedVariableNames();
-  for (std::set<std::string>::iterator name = names.begin(); name != names.end(); ++name)
-  {
-    allNames << QString::fromStdString(*name);
-  }
+  QSet<QString> allNames = info.GetAccessedVariableNames();
   if (info.HasDefaultVariableAccess())
   {
     allNames << ISources::ACTIVE_CURRENT_SELECTION_NAME();
   }
 
-  std::set<std::string> pnames = info.GetAccessedPropertyNames();
-  for (std::set<std::string>::iterator pname = pnames.begin(); pname != pnames.end(); ++pname)
-  {
-    allNames << QString::fromStdString(*pname);
-  }
+  allNames.unite(info.GetAccessedPropertyNames());
   return allNames.toList();
 }
 
@@ -115,7 +106,7 @@ void EvaluationAuthority::EndSourceChange(const QStringList& sourceNames)
 void EvaluationAuthority::FirePropertyChange(const SmartPointer<IEvaluationReference>& ref,
                                              Object::Pointer oldValue, Object::Pointer newValue)
 {
-  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(ref, ref->GetProperty().toStdString(), oldValue,
+  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(ref, ref->GetProperty(), oldValue,
                                                              newValue));
   ref->GetListener()->PropertyChange(event);
 }
@@ -124,7 +115,7 @@ void EvaluationAuthority::FireServiceChange(const QString& property, Object::Poi
                                             Object::Pointer newValue)
 {
   PropertyChangeEvent::Pointer event(
-        new PropertyChangeEvent(Object::Pointer(this), property.toStdString(), oldValue, newValue));
+        new PropertyChangeEvent(Object::Pointer(this), property, oldValue, newValue));
   serviceListeners.propertyChange(event);
 }
 

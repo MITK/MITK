@@ -40,8 +40,8 @@ public:
   void* CreateClientComposite(void* pageControl);
   void* CreatePaneControl(void* parent);
 
-  Object::Pointer CreateStatusPart(void* parent, const std::string& title, const std::string& msg);
-  IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName, const std::string& msg);
+  Object::Pointer CreateStatusPart(void* parent, const QString& title, const QString& msg);
+  IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg);
 
 };
 

@@ -37,7 +37,7 @@ public:
   /**
    * General view category id
    */
-  static std::string GENERAL_VIEW_ID ;
+  static QString GENERAL_VIEW_ID ;
 
   /**
    * RegistryViewReader constructor comment.

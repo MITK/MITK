@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryDetachedWindow.h"
 
 #include "berryIWorkbenchPartConstants.h"
 #include "berryISaveablePart.h"
 
 #include "berryWorkbenchWindow.h"
-
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "berryWorkbenchConstants.h"
 #include "berryEditorManager.h"
@@ -338,9 +338,9 @@ void* DetachedWindow::CreateContents(void* parent)
   folder->CreateControl(parent);
 
   // Reparent each view in the tab folder.
-  std::list<PartPane::Pointer> detachedChildren;
+  QList<PartPane::Pointer> detachedChildren;
   this->CollectViewPanes(detachedChildren, this->GetChildren());
-  for (std::list<PartPane::Pointer>::iterator itr = detachedChildren.begin(); itr
+  for (QList<PartPane::Pointer>::iterator itr = detachedChildren.begin(); itr
       != detachedChildren.end(); ++itr)
   {
     PartPane::Pointer part = *itr;
@@ -430,7 +430,7 @@ bool DetachedWindow::HandleClose()
 
   if (hideViewsOnClose)
   {
-    std::list<PartPane::Pointer> views;
+    QList<PartPane::Pointer> views;
     this->CollectViewPanes(views, this->GetChildren());
 
     // Save any dirty views
@@ -440,7 +440,7 @@ bool DetachedWindow::HandleClose()
     }
 
     // OK, go on with the closing
-    for (std::list<PartPane::Pointer>::iterator itr = views.begin(); itr
+    for (QList<PartPane::Pointer>::iterator itr = views.begin(); itr
         != views.end(); ++itr)
     {
       PartPane::Pointer child = *itr;
@@ -489,10 +489,10 @@ bool DetachedWindow::HandleClose()
   return true;
 }
 
-bool DetachedWindow::HandleSaves(std::list<PartPane::Pointer> views)
+bool DetachedWindow::HandleSaves(QList<PartPane::Pointer> views)
 {
-  std::vector<IWorkbenchPart::Pointer> dirtyViews;
-  for (std::list<PartPane::Pointer>::iterator iterator = views.begin(); iterator
+  QList<IWorkbenchPart::Pointer> dirtyViews;
+  for (QList<PartPane::Pointer>::iterator iterator = views.begin(); iterator
       != views.end(); ++iterator)
   {
     PartPane::Pointer pane = *iterator;
@@ -527,10 +527,10 @@ bool DetachedWindow::HandleSaves(std::list<PartPane::Pointer> views)
   return true;
 }
 
-void DetachedWindow::CollectViewPanes(std::list<PartPane::Pointer>& result,
-    const std::list<LayoutPart::Pointer>& parts)
+void DetachedWindow::CollectViewPanes(QList<PartPane::Pointer>& result,
+    const QList<LayoutPart::Pointer>& parts)
 {
-  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin(); iter
+  for (QList<LayoutPart::Pointer>::const_iterator iter = parts.begin(); iter
       != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;

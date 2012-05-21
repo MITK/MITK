@@ -32,7 +32,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IViewReference : virtual public IWorkbenchPartReference {
 
-  berryInterfaceMacro(IViewReference, berry);
+  berryInterfaceMacro(IViewReference, berry)
 
   ~IViewReference();
 
@@ -43,7 +43,7 @@ struct BERRY_UI_QT IViewReference : virtual public IWorkbenchPartReference {
      * @see IWorkbenchPage#showView(String, String, int)
      * @since 3.0
      */
-    virtual std::string GetSecondaryId() = 0;
+    virtual QString GetSecondaryId() = 0;
 
     /**
      * Returns the <code>IViewPart</code> referenced by this object.

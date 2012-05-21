@@ -130,7 +130,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItems()
    */
-  std::vector<AbstractTabItem*> GetItems();
+  QList<AbstractTabItem*> GetItems();
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelection(org.blueberry.ui.internal.presentations.util.Widget)

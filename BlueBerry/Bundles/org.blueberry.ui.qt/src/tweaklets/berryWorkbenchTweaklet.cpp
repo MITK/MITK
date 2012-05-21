@@ -22,7 +22,7 @@ namespace berry
 Tweaklets::TweakKey<WorkbenchTweaklet> WorkbenchTweaklet::KEY =
   Tweaklets::TweakKey<WorkbenchTweaklet>();
 
-const std::string WorkbenchTweaklet::DIALOG_ID_SHOW_VIEW =
+const QString WorkbenchTweaklet::DIALOG_ID_SHOW_VIEW =
     "org.blueberry.ui.dialogs.showview";
 
 }

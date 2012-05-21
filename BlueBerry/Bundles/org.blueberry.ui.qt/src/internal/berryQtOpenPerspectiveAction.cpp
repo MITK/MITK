@@ -31,8 +31,8 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
   window(window.GetPointer())
 {
   this->setParent(group);
-  this->setText(QString(descr->GetLabel().c_str()));
-  this->setToolTip(QString(descr->GetLabel().c_str()));
+  this->setText(descr->GetLabel());
+  this->setToolTip(descr->GetLabel());
   this->setCheckable(true);
   this->setIconVisibleInMenu(true);
 

@@ -267,7 +267,7 @@ struct BERRY_UI_QT Rectangle
    *
    * @return a string representation of the rectangle
    */
-  std::string ToString() const;
+  QString ToString() const;
 
   /**
    * Returns a new rectangle which represents the union of

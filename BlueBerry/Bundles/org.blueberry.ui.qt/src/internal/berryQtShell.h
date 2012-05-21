@@ -54,7 +54,7 @@ public:
 
   QWidget* GetControl();
 
-  void SetImages(const std::vector<void*>& images);
+  void SetImages(const QList<void*>& images);
 
   bool GetMaximized();
   bool GetMinimized();
@@ -68,7 +68,7 @@ public:
 
   void Close();
 
-  std::vector<Shell::Pointer> GetShells();
+  QList<Shell::Pointer> GetShells();
 
   Qt::WindowFlags GetStyle () const;
 

@@ -55,7 +55,7 @@ protected:
      * readElement method comment.
      */
     // for dynamic UI - change access from protected to public
-    bool ReadElement(IConfigurationElement::Pointer element);
+    bool ReadElement(const IConfigurationElement::Pointer& element);
 
 };
 

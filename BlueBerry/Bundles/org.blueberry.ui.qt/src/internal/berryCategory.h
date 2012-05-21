@@ -39,27 +39,27 @@ template<class T> class Category : /*IWorkbenchAdapter*/public IAdaptable, publi
 
 public:
 
-  berryObjectMacro(Category<T>);
+  berryObjectMacro(Category<T>)
 
   typedef T ElementType;
 
   /**
    * Name of the miscellaneous category
    */
-  const static std::string MISC_NAME;
+  const static QString MISC_NAME;
 
   /**
    * Identifier of the miscellaneous category
    */
-  const static std::string MISC_ID;
+  const static QString MISC_ID;
 
 private:
 
-  std::string id;
-  std::string name;
-  std::vector<std::string> parentPath;
+  QString id;
+  QString name;
+  QList<QString> parentPath;
 
-  std::vector<ElementType> elements;
+  QList<ElementType> elements;
 
   IConfigurationElement::Pointer configurationElement;
 
@@ -78,7 +78,7 @@ public:
    * @param id the unique identifier for the category
    * @param label the presentation label for this category
    */
-  Category(const std::string& id, const std::string& label);
+  Category(const QString& id, const QString& label);
 
   /**
    * Creates an instance of <code>Category</code> using the
@@ -106,42 +106,42 @@ public:
    * Return the id for this category.
    * @return the id
    */
-  const std::string& GetId() const;
+  const QString& GetId() const;
 
   /**
    * Return the label for this category.
    *
    * @return the label
    */
-  std::string GetLabel() const;
+  QString GetLabel() const;
 
   /**
    * Return the parent path for this category.
    *
    * @return the parent path
    */
-  const std::vector<std::string>& GetParentPath();
+  QList<QString> GetParentPath();
 
   /**
    * Return the unparsed parent path.  May be <code>null</code>.
    *
    * @return the unparsed parent path or <code>null</code>
    */
-  std::string GetRawParentPath() const;
+  QString GetRawParentPath() const;
 
   /**
    * Return the root path for this category.
    *
    * @return the root path
    */
-  std::string GetRootPath();
+  QString GetRootPath();
 
   /**
    * Return the elements contained in this category.
    *
    * @return the elements
    */
-  const std::vector<ElementType>& GetElements() const;
+  const QList<ElementType>& GetElements() const;
 
   /**
    * Return whether a given object exists in this category.
@@ -174,7 +174,7 @@ protected:
   /* (non-Javadoc)
    * Method declared on IAdaptable.
    */
-  Poco::Any GetAdapter(const std::string& adapter);
+  Poco::Any GetAdapter(const QString& adapter);
 };
 
 } // namespace berry

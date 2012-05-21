@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySafeRunnable.h"
 
 #include <typeinfo>
+
+#include <berryLog.h>
 #include <berryOperationCanceledException.h>
 
 namespace berry
@@ -51,7 +53,8 @@ private:
     try
     {
       static_cast<void>(dynamic_cast<const OperationCanceledException&> (e));
-    } catch (const std::bad_cast&)
+    }
+    catch (const std::bad_cast&)
     {
       // TODO logging
       try
@@ -64,7 +67,7 @@ private:
       } catch (...)
       {
         //e.printStackTrace();
-        std::cerr << "Exception occurred" << std::endl;
+        BERRY_ERROR << "Exception occurred" << std::endl;
       }
     }
     code->HandleException(e);
@@ -77,7 +80,7 @@ SmartPointer<ISafeRunnableRunner> SafeRunnable::CreateDefaultRunner()
   return runner;
 }
 
-SafeRunnable::SafeRunnable(const std::string& message) :
+SafeRunnable::SafeRunnable(const QString& message) :
   message(message)
 {
 
@@ -90,14 +93,14 @@ void SafeRunnable::HandleException(const std::exception&  /*e*/)
   if (ignoreErrors)
     return;
 
-  if (message.empty())
+  if (message.isEmpty())
     message = "An error has occurred. See error log for more details.";
 
   // TODO status bar
   //    Policy.getStatusHandler().show(
   //        new Status(IStatus.ERROR, Policy.JFACE, message, e),
   //        JFaceResources.getString("SafeRunnable.errorMessage")); //$NON-NLS-1$
-  std::cerr << message << std::endl;
+  BERRY_ERROR << message << std::endl;
 }
 
 bool SafeRunnable::GetIgnoreErrors()

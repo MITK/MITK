@@ -215,7 +215,7 @@ protected:
    * @return the action with the given id, or <code>null</code> if not found
    * @see IAction#getId()
    */
-//    protected: virtual IAction GetAction(const std::string& id) {
+//    protected: virtual IAction GetAction(const QString& id) {
 //        return (IAction) actions.get(id);
 //    }
 

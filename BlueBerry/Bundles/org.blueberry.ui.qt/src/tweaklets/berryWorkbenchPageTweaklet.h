@@ -32,8 +32,8 @@ struct BERRY_UI_QT WorkbenchPageTweaklet
   virtual void* CreateClientComposite(void* pageControl) = 0;
   virtual void* CreatePaneControl(void* parent) = 0;
 
-  virtual Object::Pointer CreateStatusPart(void* parent, const std::string& title, const std::string& msg) = 0;
-  virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName, const std::string& msg) = 0;
+  virtual Object::Pointer CreateStatusPart(void* parent, const QString& title, const QString& msg) = 0;
+  virtual IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg) = 0;
 
 };
 

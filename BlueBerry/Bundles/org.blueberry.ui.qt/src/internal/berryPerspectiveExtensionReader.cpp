@@ -19,31 +19,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include <Poco/NumberParser.h>
+#include <berryIExtension.h>
 
 namespace berry
 {
 
-const std::string PerspectiveExtensionReader::VAL_LEFT = "left";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_RIGHT = "right";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_TOP = "top";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_BOTTOM = "bottom";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_STACK = "stack";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_FAST = "fast";//$NON-NLS-1$
-const std::string PerspectiveExtensionReader::VAL_TRUE = "true";//$NON-NLS-1$
-//const std::string PerspectiveExtensionReader::VAL_FALSE = "false";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_LEFT = "left";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_RIGHT = "right";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_TOP = "top";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_BOTTOM = "bottom";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_STACK = "stack";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_FAST = "fast";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_TRUE = "true";//$NON-NLS-1$
+//const QString PerspectiveExtensionReader::VAL_FALSE = "false";//$NON-NLS-1$
 
-bool PerspectiveExtensionReader::IncludeTag(const std::string& tag)
+bool PerspectiveExtensionReader::IncludeTag(const QString& tag)
 {
   return includeOnlyTags.empty() ||
     std::find(includeOnlyTags.begin(), includeOnlyTags.end(), tag) != includeOnlyTags.end();
 }
 
 bool PerspectiveExtensionReader::ProcessActionSet(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  std::string id;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (!id.isEmpty())
   {
     //TODO PerspectiveExtensionReader action set
     //pageLayout->AddActionSet(id);
@@ -52,13 +52,11 @@ bool PerspectiveExtensionReader::ProcessActionSet(
 }
 
 bool PerspectiveExtensionReader::ProcessExtension(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  IConfigurationElement::vector children = element->GetChildren();
-  for (unsigned int nX = 0; nX < children.size(); nX++)
+  foreach (IConfigurationElement::Pointer child, element->GetChildren())
   {
-    IConfigurationElement::Pointer child = children[nX];
-    std::string type = child->GetName();
+    QString type = child->GetName();
     if (this->IncludeTag(type))
     {
       bool result = false;
@@ -88,9 +86,8 @@ bool PerspectiveExtensionReader::ProcessExtension(
       }
       if (!result)
       {
-        WorkbenchPlugin::Log("Unable to process element: " + //$NON-NLS-1$
-            type + " in perspective extension: " + //$NON-NLS-1$
-            element->GetDeclaringExtension()->GetUniqueIdentifier());
+        WorkbenchPlugin::Log("Unable to process element: " + type + " in perspective extension: " +
+                             element->GetDeclaringExtension()->GetUniqueIdentifier());
       }
     }
   }
@@ -98,10 +95,10 @@ bool PerspectiveExtensionReader::ProcessExtension(
 }
 
 bool PerspectiveExtensionReader::ProcessPerspectiveShortcut(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  std::string id;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (!id.isEmpty())
   {
     pageLayout->AddPerspectiveShortcut(id);
   }
@@ -109,10 +106,10 @@ bool PerspectiveExtensionReader::ProcessPerspectiveShortcut(
 }
 
 bool PerspectiveExtensionReader::ProcessShowInPart(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  std::string id;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (!id.isEmpty())
   {
     pageLayout->AddShowInPart(id);
   }
@@ -120,27 +117,26 @@ bool PerspectiveExtensionReader::ProcessShowInPart(
 }
 
 bool PerspectiveExtensionReader::ProcessView(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
   // Get id, relative, and relationship.
-  std::string id;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (id.isEmpty())
   {
     this->LogMissingAttribute(element, WorkbenchRegistryConstants::ATT_ID);
     return false;
   }
 
-  std::string relative;
-  bool hasRelative = element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIVE, relative);
+  QString relative = element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIVE);
 
-  std::string relationship;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIONSHIP, relationship))
+  QString relationship = element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIONSHIP);
+  if (!relationship.isEmpty())
   {
     this->LogMissingAttribute(element, WorkbenchRegistryConstants::ATT_RELATIONSHIP);
     return false;
   }
 
-  if (VAL_FAST != relationship && !hasRelative)
+  if (VAL_FAST != relationship && relative.isEmpty())
     {
       this->LogError(element, "Attribute '" + WorkbenchRegistryConstants::ATT_RELATIVE
           + "' not defined.  This attribute is required when "
@@ -185,16 +181,13 @@ bool PerspectiveExtensionReader::ProcessView(
 
 
   float ratio = 0.5f;
-  std::string ratioString;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_RATIO, ratioString))
+  QString ratioString = element->GetAttribute(WorkbenchRegistryConstants::ATT_RATIO);
+  if (!ratioString.isEmpty())
   {
-    try
-    {
-      ratio = (float)Poco::NumberParser::parseFloat(ratioString);
-    } catch (Poco::SyntaxException& /*e*/)
-    {
-      return false;
-    }
+    bool ok = false;
+    ratio = ratioString.toFloat(&ok);
+    if (!ok) return false;
+
     // If the ratio is outside the allowable range, mark it as invalid.
     if (ratio < IPageLayout::RATIO_MIN || ratio > IPageLayout::RATIO_MAX)
     {
@@ -208,31 +201,20 @@ bool PerspectiveExtensionReader::ProcessView(
   }
 
 
-  std::string strVisible;
-  element->GetAttribute(WorkbenchRegistryConstants::ATT_VISIBLE, strVisible);
+  QString strVisible = element->GetAttribute(WorkbenchRegistryConstants::ATT_VISIBLE);
   bool visible = (VAL_TRUE == strVisible);
 
-  std::string closeable;
-  bool hasCloseable = element->GetAttribute(
-      WorkbenchRegistryConstants::ATT_CLOSEABLE, closeable);
+  QString closeable = element->GetAttribute(WorkbenchRegistryConstants::ATT_CLOSEABLE);
 
-  std::string moveable;
-  bool hasMoveable = element->GetAttribute(
-      WorkbenchRegistryConstants::ATT_MOVEABLE, moveable);
+  QString moveable = element->GetAttribute(WorkbenchRegistryConstants::ATT_MOVEABLE);
 
-  std::string standalone;
-  element->GetAttribute(
-      WorkbenchRegistryConstants::ATT_STANDALONE, standalone);
+  QString standalone = element->GetAttribute(WorkbenchRegistryConstants::ATT_STANDALONE);
 
-  std::string showTitle;
-  element->GetAttribute(
-      WorkbenchRegistryConstants::ATT_SHOW_TITLE, showTitle);
+  QString showTitle = element->GetAttribute(WorkbenchRegistryConstants::ATT_SHOW_TITLE);
 
+  QString minVal = element->GetAttribute(WorkbenchRegistryConstants::ATT_MINIMIZED);
   // Default to 'false'
-  std::string minVal;
-  bool minimized = false;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_MINIMIZED, minVal))
-    minimized = VAL_TRUE == minVal;
+  bool minimized = (VAL_TRUE == minVal);
 
 
   if (visible)
@@ -308,11 +290,11 @@ bool PerspectiveExtensionReader::ProcessView(
   // may be null if it's been filtered by activity
   if (viewLayout != 0)
   {
-    if (hasCloseable)
+    if (!closeable.isEmpty())
     {
       viewLayout->SetCloseable(VAL_TRUE == closeable);
     }
-    if (hasMoveable)
+    if (!moveable.isEmpty())
     {
       viewLayout->SetMoveable(VAL_TRUE == moveable);
     }
@@ -322,10 +304,10 @@ bool PerspectiveExtensionReader::ProcessView(
 }
 
 bool PerspectiveExtensionReader::ProcessViewShortcut(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  std::string id;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (!id.isEmpty())
   {
     pageLayout->AddShowViewShortcut(id);
   }
@@ -335,7 +317,7 @@ bool PerspectiveExtensionReader::ProcessViewShortcut(
 //bool PerspectiveExtensionReader::ProcessWizardShortcut(
 //    IConfigurationElement::Pointer element)
 //{
-//  std::string id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+//  QString id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 //  if (id != null)
 //  {
 //    pageLayout.addNewWizardShortcut(id);
@@ -344,15 +326,14 @@ bool PerspectiveExtensionReader::ProcessViewShortcut(
 //}
 
 bool PerspectiveExtensionReader::ReadElement(
-    IConfigurationElement::Pointer element)
+    const IConfigurationElement::Pointer& element)
 {
-  std::string type = element->GetName();
+  QString type = element->GetName();
   if (type == WorkbenchRegistryConstants::TAG_PERSPECTIVE_EXTENSION)
   {
-    std::string id;
-    element->GetAttribute(WorkbenchRegistryConstants::ATT_TARGET_ID, id);
+    QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_TARGET_ID);
     if (targetID == id || "*" == id)
-    { //$NON-NLS-1$
+    {
 //      if (tracker != null)
 //      {
 //        tracker.registerObject(element.getDeclaringExtension(),
@@ -370,7 +351,7 @@ PerspectiveExtensionReader::PerspectiveExtensionReader()
   // do nothing
 }
 
-void PerspectiveExtensionReader::ExtendLayout(const std::string& id,
+void PerspectiveExtensionReader::ExtendLayout(const QString& id,
     PageLayout::Pointer out)
 {
   //tracker = extensionTracker;
@@ -381,7 +362,7 @@ void PerspectiveExtensionReader::ExtendLayout(const std::string& id,
 }
 
 void PerspectiveExtensionReader::SetIncludeOnlyTags(
-    const std::vector<std::string>& tags)
+    const QList<QString>& tags)
 {
   includeOnlyTags = tags;
 }

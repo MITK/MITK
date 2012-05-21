@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPartPane.h"
 
-#include <list>
 
 namespace berry {
 
@@ -32,11 +31,11 @@ namespace berry {
  */
 struct BERRY_UI_QT ILayoutContainer : virtual public Object {
 
-  berryObjectMacro(ILayoutContainer);
+  berryObjectMacro(ILayoutContainer)
 
   ~ILayoutContainer();
 
-  typedef std::list<LayoutPart::Pointer> ChildrenType;
+  typedef QList<LayoutPart::Pointer> ChildrenType;
 
   virtual bool AllowsAdd(LayoutPart::Pointer toAdd) = 0;
 

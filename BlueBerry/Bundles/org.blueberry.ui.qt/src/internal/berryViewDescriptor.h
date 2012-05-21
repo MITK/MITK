@@ -41,7 +41,7 @@ private:
   QString id;
   mutable SmartPointer<ImageDescriptor> imageDescriptor;
   IConfigurationElement::Pointer configElement;
-  std::vector<QString> categoryPath;
+  QList<QString> categoryPath;
 
   /**
    * The activation token returned when activating the show view handler with
@@ -69,7 +69,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
-  const std::vector<QString>& GetCategoryPath() const;
+  const QList<QString>& GetCategoryPath() const;
 
   /**
    * Return the configuration element for this descriptor.

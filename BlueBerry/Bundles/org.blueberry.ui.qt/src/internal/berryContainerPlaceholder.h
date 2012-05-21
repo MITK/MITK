@@ -47,7 +47,7 @@ public:
      * @param id java.lang.String
      * @param label java.lang.String
      */
-    ContainerPlaceholder(const std::string& id);
+    ContainerPlaceholder(const QString& id);
 
     /**
      * add method comment.
@@ -59,9 +59,9 @@ public:
     /**
      * getChildren method comment.
      */
-    std::list<LayoutPart::Pointer> GetChildren() const;
+    QList<LayoutPart::Pointer> GetChildren() const;
 
-    std::string GetID() const;
+    QString GetID() const;
 
     /**
      * getFocus method comment.

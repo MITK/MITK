@@ -67,17 +67,17 @@ bool BundleUtility::IsReady(ctkPlugin::State pluginState)
           pluginState == ctkPlugin::STOPPING);
 }
 
-bool BundleUtility::IsActive(const std::string& bundleId)
+bool BundleUtility::IsActive(const QString& bundleId)
 {
   return IsActive(Platform::GetBundle(bundleId));
 }
 
-bool BundleUtility::IsActivated(const std::string& bundleId)
+bool BundleUtility::IsActivated(const QString& bundleId)
 {
   return IsActivated(Platform::GetBundle(bundleId));
 }
 
-bool BundleUtility::IsReady(const std::string& bundleId)
+bool BundleUtility::IsReady(const QString& bundleId)
 {
   return IsReady(Platform::GetBundle(bundleId));
 }
@@ -95,7 +95,7 @@ QSharedPointer<ctkPlugin> BundleUtility::FindPlugin(const QString& symbolicName)
   return QSharedPointer<ctkPlugin>();
 }
 
-//void BundleUtility::Log(const std::string& bundleId,
+//void BundleUtility::Log(const QString& bundleId,
 //    const Poco::Exception* exception)
 //{
 //  IBundle::Pointer bundle = Platform::GetBundle(bundleId);

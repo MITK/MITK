@@ -38,7 +38,7 @@ IWorkbenchPage* PageSelectionService::GetPage() const
 }
 
 AbstractPartSelectionTracker::Pointer PageSelectionService::CreatePartTracker(
-    const std::string& partId) const
+    const QString& partId) const
 {
   AbstractPartSelectionTracker::Pointer tracker(new PagePartSelectionTracker(GetPage(), partId));
   return tracker;

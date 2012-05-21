@@ -18,23 +18,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string IPageLayout::ID_EDITOR_AREA = "org.blueberry.ui.editors"; //$NON-NLS-1$
+const QString IPageLayout::ID_EDITOR_AREA = "org.blueberry.ui.editors";
 
-const std::string IPageLayout::ID_RES_NAV = "org.blueberry.ui.views.ResourceNavigator"; //$NON-NLS-1$
+const QString IPageLayout::ID_RES_NAV = "org.blueberry.ui.views.ResourceNavigator";
 
-const std::string IPageLayout::ID_PROP_SHEET = "org.blueberry.ui.views.PropertySheet"; //$NON-NLS-1$
+const QString IPageLayout::ID_PROP_SHEET = "org.blueberry.ui.views.PropertySheet";
 
-const std::string IPageLayout::ID_OUTLINE = "org.blueberry.ui.views.ContentOutline"; //$NON-NLS-1$
+const QString IPageLayout::ID_OUTLINE = "org.blueberry.ui.views.ContentOutline";
 
-const std::string IPageLayout::ID_BOOKMARKS = "org.blueberry.ui.views.BookmarkView"; //$NON-NLS-1$
+const QString IPageLayout::ID_BOOKMARKS = "org.blueberry.ui.views.BookmarkView";
 
-const std::string IPageLayout::ID_PROBLEM_VIEW = "org.blueberry.ui.views.ProblemView"; //$NON-NLS-1$
+const QString IPageLayout::ID_PROBLEM_VIEW = "org.blueberry.ui.views.ProblemView";
 
-const std::string IPageLayout::ID_PROGRESS_VIEW = "org.blueberry.ui.views.ProgressView"; //$NON-NLS-1$
+const QString IPageLayout::ID_PROGRESS_VIEW = "org.blueberry.ui.views.ProgressView";
 
-const std::string IPageLayout::ID_TASK_LIST = "org.blueberry.ui.views.TaskList"; //$NON-NLS-1$
+const QString IPageLayout::ID_TASK_LIST = "org.blueberry.ui.views.TaskList";
 
-const std::string IPageLayout::ID_NAVIGATE_ACTION_SET = "org.blueberry.ui.NavigateActionSet"; //$NON-NLS-1$
+const QString IPageLayout::ID_NAVIGATE_ACTION_SET = "org.blueberry.ui.NavigateActionSet";
 
 const int IPageLayout::LEFT = 1;
 

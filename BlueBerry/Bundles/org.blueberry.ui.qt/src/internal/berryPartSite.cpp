@@ -30,7 +30,7 @@ namespace berry
 {
 
 //void
-//PartSite::RegisterContextMenu(const std::string& menuId,
+//PartSite::RegisterContextMenu(const QString& menuId,
 //      const MenuManager menuManager,
 //      const ISelectionProvider selectionProvider,
 //      bool includeEditorInput, IWorkbenchPart::ConstPointer part,
@@ -120,7 +120,7 @@ void PartSite::InitializeDefaultServices()
 //    return actionBars;
 //  }
 
-std::string PartSite::GetId()
+QString PartSite::GetId()
 {
   return extensionID;
 }
@@ -145,12 +145,12 @@ IWorkbenchPartReference::Pointer PartSite::GetPartReference()
   return partReference.Lock();
 }
 
-std::string PartSite::GetPluginId()
+QString PartSite::GetPluginId()
 {
   return pluginID;
 }
 
-std::string PartSite::GetRegisteredName()
+QString PartSite::GetRegisteredName()
 {
   return extensionName;
 }
@@ -176,7 +176,7 @@ IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
 }
 
 // void
-// PartSite::RegisterContextMenu(const std::string& menuID,
+// PartSite::RegisterContextMenu(const QString& menuID,
 //      MenuManager menuMgr,
 //      ISelectionProvider selProvider) {
 //    if (menuExtenders == null) {
@@ -194,7 +194,7 @@ IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
 //  }
 
 //void
-//PartSite::GetContextMenuIds(std::vector<std::string>& menuIds) {
+//PartSite::GetContextMenuIds(QList<QString>& menuIds) {
 //    if (menuExtenders == null) {
 //      return new String[0];
 //    }
@@ -216,26 +216,25 @@ void PartSite::SetConfigurationElement(
 {
 
   // Get extension ID.
-  configElement->GetAttribute("id", extensionID); //$NON-NLS-1$
+  extensionID = configElement->GetAttribute("id");
 
   // Get plugin ID.
   pluginID = configElement->GetContributor();
 
   // Get extension name.
-  std::string name;
-  configElement->GetAttribute("name", name); //$NON-NLS-1$
-  if (name != "")
+  QString name = configElement->GetAttribute("name");
+  if (!name.isEmpty())
   {
     extensionName = name;
   }
 }
 
-void PartSite::SetPluginId(const std::string& pluginId)
+void PartSite::SetPluginId(const QString& pluginId)
 {
   this->pluginID = pluginId;
 }
 
-void PartSite::SetId(const std::string& id)
+void PartSite::SetId(const QString& id)
 {
   extensionID = id;
 }
@@ -245,7 +244,7 @@ void PartSite::SetPart(IWorkbenchPart::Pointer newPart)
   part = newPart;
 }
 
-void PartSite::SetRegisteredName(const std::string& name)
+void PartSite::SetRegisteredName(const QString& name)
 {
   extensionName = name;
 }
@@ -297,7 +296,7 @@ void PartSite::SetSelectionProvider(ISelectionProvider::Pointer provider)
 //    return keyBindingService;
 //  }
 
-std::string PartSite::GetInitialScopeId()
+QString PartSite::GetInitialScopeId()
 {
   return "";
 }
@@ -340,18 +339,18 @@ void* PartSite::GetAdapterImpl(const std::type_info& /*adapter*/) const
 //  }
 
 Object::Pointer
-PartSite::GetService(const std::string& api) {
+PartSite::GetService(const QString& api) {
   return serviceLocator->GetService(api);
 }
 
 bool
-PartSite::HasService(const std::string& api) const {
+PartSite::HasService(const QString& api) const {
   return serviceLocator->HasService(api);
 }
 
-std::string PartSite::ToString()
+QString PartSite::ToString()
 {
-  std::string buffer = "PartSite(id=" + this->GetId() + ",pluginId="
+  QString buffer = "PartSite(id=" + this->GetId() + ",pluginId="
       + this->GetPluginId() + ",registeredName=" + this->GetRegisteredName()
       + ")";
   return buffer;

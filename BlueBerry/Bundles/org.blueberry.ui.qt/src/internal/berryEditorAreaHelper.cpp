@@ -85,7 +85,7 @@ void EditorAreaHelper::DerefPart(LayoutPart::Pointer part)
     return;
   }
   oldContainer->Remove(part);
-  std::list<LayoutPart::Pointer> children = oldContainer->GetChildren();
+  QList<LayoutPart::Pointer> children = oldContainer->GetChildren();
   if (children.empty())
   {
     // There are no more children in this container, so get rid of it
@@ -111,7 +111,7 @@ EditorAreaHelper::~EditorAreaHelper()
   }
 }
 
-std::string EditorAreaHelper::GetActiveEditorWorkbookID()
+QString EditorAreaHelper::GetActiveEditorWorkbookID()
 {
   return editorArea->GetActiveWorkbookID();
 }
@@ -148,10 +148,10 @@ void EditorAreaHelper::MoveEditor(IEditorPart::Pointer  /*part*/, int  /*positio
 }
 
 void EditorAreaHelper::AddEditor(EditorReference::Pointer ref,
-    const std::string& workbookId)
+    const QString& workbookId)
 {
-  std::list<IEditorReference::Pointer> refs = editorArea->GetPage()->GetEditorReferences();
-  for (std::list<IEditorReference::Pointer>::iterator iter = refs.begin();
+  QList<IEditorReference::Pointer> refs = editorArea->GetPage()->GetEditorReferences();
+  for (QList<IEditorReference::Pointer>::iterator iter = refs.begin();
        iter != refs.end(); ++iter)
   {
     if (ref == (*iter))
@@ -190,7 +190,7 @@ bool EditorAreaHelper::SaveState(IMemento::Pointer memento)
   return editorArea->SaveState(memento);
 }
 
-void EditorAreaHelper::SetActiveEditorWorkbookFromID(const std::string& id)
+void EditorAreaHelper::SetActiveEditorWorkbookFromID(const QString& id)
 {
   editorArea->SetActiveWorkbookFromID(id);
 }
@@ -225,24 +225,24 @@ bool EditorAreaHelper::SetVisibleEditor(IEditorReference::Pointer ref, bool setF
   return false;
 }
 
-std::list<PartStack::Pointer> EditorAreaHelper::GetWorkbooks()
+QList<PartStack::Pointer> EditorAreaHelper::GetWorkbooks()
 {
   return editorArea->GetEditorWorkbooks();
 }
 
-std::list<IEditorReference::Pointer> EditorAreaHelper::GetEditors()
+QList<IEditorReference::Pointer> EditorAreaHelper::GetEditors()
 {
-  std::list<IEditorReference::Pointer> result;
-  std::list<PartStack::Pointer> workbooks = editorArea->GetEditorWorkbooks();
+  QList<IEditorReference::Pointer> result;
+  QList<PartStack::Pointer> workbooks = editorArea->GetEditorWorkbooks();
 
-  for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();
+  for (QList<PartStack::Pointer>::iterator iter = workbooks.begin();
        iter != workbooks.end(); ++iter)
   {
     PartStack::Pointer stack = *iter;
 
-    std::list<LayoutPart::Pointer> children = stack->GetChildren();
+    QList<LayoutPart::Pointer> children = stack->GetChildren();
 
-    for (std::list<LayoutPart::Pointer>::iterator childIter = children.begin();
+    for (QList<LayoutPart::Pointer>::iterator childIter = children.begin();
         childIter != children.end(); ++childIter)
     {
       LayoutPart::Pointer part = *childIter;
@@ -254,7 +254,7 @@ std::list<IEditorReference::Pointer> EditorAreaHelper::GetEditors()
   return result;
 }
 
-PartStack::Pointer EditorAreaHelper::GetWorkbookFromID(const std::string& workbookId)
+PartStack::Pointer EditorAreaHelper::GetWorkbookFromID(const QString& workbookId)
 {
   return editorArea->GetWorkbookFromID(workbookId);
 }

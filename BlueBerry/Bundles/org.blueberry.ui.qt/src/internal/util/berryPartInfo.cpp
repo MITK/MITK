@@ -32,11 +32,11 @@ PartInfo::PartInfo(IPresentablePart::Pointer part)
 
 void PartInfo::Set(IPresentablePart::Pointer part)
 {
-  name = part->GetName().c_str();
-  title = part->GetTitle().c_str();
-  contentDescription = part->GetTitleStatus().c_str();
+  name = part->GetName();
+  title = part->GetTitle();
+  contentDescription = part->GetTitleStatus();
   image = static_cast<QIcon*> (part->GetTitleImage());
-  toolTip = part->GetTitleToolTip().c_str();
+  toolTip = part->GetTitleToolTip();
   dirty = part->IsDirty();
 }
 

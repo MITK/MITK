@@ -40,9 +40,9 @@ namespace berry {
 const QString CommandService::PREFERENCE_KEY_PREFIX = "org.blueberry.ui.commands/state";
 
 const QString CommandService::CreatePreferenceKey(const SmartPointer<Command>& command,
-                                         const QString& stateId)
+                                                  const QString& stateId)
 {
-  return PREFERENCE_KEY_PREFIX + '/' + QString::fromStdString(command->GetId()) + '/' + stateId;
+  return PREFERENCE_KEY_PREFIX + '/' + command->GetId() + '/' + stateId;
 }
 
 CommandService::CommandService( CommandManager* commandManager)
@@ -68,12 +68,12 @@ void CommandService::AddExecutionListener(IExecutionListener* listener)
 void CommandService::DefineUncategorizedCategory(const QString& name,
                                  const QString& description)
 {
-  commandManager->DefineUncategorizedCategory(name.toStdString(), description.toStdString());
+  commandManager->DefineUncategorizedCategory(name, description);
 }
 
 SmartPointer<ParameterizedCommand> CommandService::Deserialize(const QString& serializedParameterizedCommand) const
 {
-  return commandManager->Deserialize(serializedParameterizedCommand.toStdString());
+  return commandManager->Deserialize(serializedParameterizedCommand);
 }
 
 void CommandService::Dispose()
@@ -106,97 +106,58 @@ void CommandService::Dispose()
 
 SmartPointer<CommandCategory> CommandService::GetCategory(const QString& categoryId) const
 {
-  return commandManager->GetCategory(categoryId.toStdString());
+  return commandManager->GetCategory(categoryId);
 }
 
 SmartPointer<Command> CommandService::GetCommand(const QString& commandId) const
 {
-  return commandManager->GetCommand(commandId.toStdString());
+  return commandManager->GetCommand(commandId);
 }
 
 QList<SmartPointer<CommandCategory> > CommandService::GetDefinedCategories() const
 {
-  std::vector<CommandCategory::Pointer> categories = commandManager->GetDefinedCategories();
-  QList<CommandCategory::Pointer> res;
-  for (std::vector<CommandCategory::Pointer>::iterator i = categories.begin();
-       i != categories.end(); ++i)
-  {
-    res.push_back(*i);
-  }
-  return res;
+  return commandManager->GetDefinedCategories();
 }
 
 QStringList CommandService::GetDefinedCategoryIds() const
 {
-  QStringList res;
-  Poco::HashSet<std::string> ids = commandManager->GetDefinedCategoryIds();
-  for (Poco::HashSet<std::string>::Iterator i = ids.begin(); i != ids.end(); ++i)
-  {
-    res.push_back(QString::fromStdString(*i));
-  }
-  return res;
+  return commandManager->GetDefinedCategoryIds().toList();
 }
 
 QStringList CommandService::GetDefinedCommandIds() const
 {
-  QStringList res;
-  Poco::HashSet<std::string> ids = commandManager->GetDefinedCommandIds();
-  for (Poco::HashSet<std::string>::Iterator i = ids.begin(); i != ids.end(); ++i)
-  {
-    res.push_back(QString::fromStdString(*i));
-  }
-  return res;
+  return commandManager->GetDefinedCommandIds().toList();
 }
 
 QList<SmartPointer<Command> > CommandService::GetDefinedCommands() const
 {
-  QList<Command::Pointer> res;
-  std::vector<Command::Pointer> cmds = commandManager->GetDefinedCommands();
-  for (std::vector<Command::Pointer>::iterator i = cmds.begin();
-       i != cmds.end(); ++i)
-  {
-    res.push_back(*i);
-  }
-  return res;
+  return commandManager->GetDefinedCommands();
 }
 
 QStringList CommandService::GetDefinedParameterTypeIds() const
 {
-  QStringList res;
-  Poco::HashSet<std::string> ids = commandManager->GetDefinedParameterTypeIds();
-  for (Poco::HashSet<std::string>::Iterator i = ids.begin(); i != ids.end(); ++i)
-  {
-    res.push_back(QString::fromStdString(*i));
-  }
-  return res;
+  return commandManager->GetDefinedParameterTypeIds().toList();
 }
 
 QList<SmartPointer<ParameterType> > CommandService::GetDefinedParameterTypes() const
 {
-  QList<ParameterType::Pointer> res;
-  std::vector<ParameterType::Pointer> cmds = commandManager->GetDefinedParameterTypes();
-  for (std::vector<ParameterType::Pointer>::iterator i = cmds.begin();
-       i != cmds.end(); ++i)
-  {
-    res.push_back(*i);
-  }
-  return res;
+  return commandManager->GetDefinedParameterTypes();
 }
 
 QString CommandService::GetHelpContextId(const SmartPointer<const Command>& command) const
 {
-  return QString::fromStdString(commandManager->GetHelpContextId(command));
+  return commandManager->GetHelpContextId(command);
 }
 
 QString CommandService::GetHelpContextId(const QString& commandId) const
 {
   Command::Pointer command = GetCommand(commandId);
-  return QString::fromStdString(commandManager->GetHelpContextId(command));
+  return commandManager->GetHelpContextId(command);
 }
 
 SmartPointer<ParameterType> CommandService::GetParameterType(const QString& parameterTypeId) const
 {
-  return commandManager->GetParameterType(parameterTypeId.toStdString());
+  return commandManager->GetParameterType(parameterTypeId);
 }
 
 void CommandService::ReadRegistry()
@@ -212,7 +173,7 @@ void CommandService::RemoveExecutionListener(IExecutionListener* listener)
 void CommandService::SetHelpContextId(const SmartPointer<IHandler>& handler,
                       const QString& helpContextId)
 {
-  commandManager->SetHelpContextId(handler, helpContextId.toStdString());
+  commandManager->SetHelpContextId(handler, helpContextId);
 }
 
 void CommandService::RefreshElements(const QString& commandId,
@@ -249,8 +210,8 @@ void CommandService::RefreshElements(const QString& commandId,
 
       void HandleException(const std::exception& exc)
       {
-        WorkbenchPlugin::Log(std::string("Failed to update callback: ") +
-                             callbackRef->GetCommandId().toStdString() + exc.what());
+        WorkbenchPlugin::Log(QString("Failed to update callback: ") +
+                             callbackRef->GetCommandId() + exc.what());
       }
 
       void Run()
@@ -304,15 +265,15 @@ SmartPointer<IElementReference> CommandService::RegisterElementForCommand(
         + command->GetCommand()->GetId());
   }
 
-  std::map<std::string, std::string> paramMap = command->GetParameterMap();
+  QHash<QString, QString> paramMap = command->GetParameterMap();
   QHash<QString, Object::Pointer> parms;
-  for (std::map<std::string, std::string>::iterator i = paramMap.begin();
+  for (QHash<QString, QString>::const_iterator i = paramMap.begin();
        i != paramMap.end(); ++i)
   {
-    Object::Pointer value(new ObjectString(i->second));
-    parms.insert(QString::fromStdString(i->first), value);
+    Object::Pointer value(new ObjectString(i.value()));
+    parms.insert(i.key(), value);
   }
-  IElementReference::Pointer ref(new ElementReference(QString::fromStdString(command->GetId()),
+  IElementReference::Pointer ref(new ElementReference(command->GetId(),
                                                       element, parms));
   RegisterElement(ref);
   return ref;

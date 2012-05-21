@@ -40,7 +40,7 @@ namespace berry
 struct BERRY_UI_QT IStackPresentationSite : public Object
 {
 
-  berryInterfaceMacro(IStackPresentationSite, berry);
+  berryInterfaceMacro(IStackPresentationSite, berry)
 
   static int STATE_MINIMIZED; // = 0;
 
@@ -90,7 +90,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
    *
    * @param toClose the set of parts to close (Not null. All of the entries must be non-null)
    */
-  virtual void Close(const std::vector<IPresentablePart::Pointer>& toClose) = 0;
+  virtual void Close(const QList<IPresentablePart::Pointer>& toClose) = 0;
 
   /**
    * Begins dragging the entire stack of parts
@@ -170,7 +170,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
    * @return the list of presentable parts currently in this site
    * @since 3.1
    */
-  virtual std::list<IPresentablePart::Pointer> GetPartList() = 0;
+  virtual QList<IPresentablePart::Pointer> GetPartList() = 0;
 
   /**
    * Returns the property with the given id or <code>null</code>. Folder
@@ -185,7 +185,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
    *         set.
    * @since 3.3
    */
-  virtual std::string GetProperty(const std::string& id) = 0;
+  virtual QString GetProperty(const QString& id) = 0;
 };
 
 }

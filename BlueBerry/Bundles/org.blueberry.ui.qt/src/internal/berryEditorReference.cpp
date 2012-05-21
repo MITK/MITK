@@ -45,7 +45,7 @@ EditorReference::EditorReference(EditorManager* man,
   restoredInput = input;
   this->editorState = editorState;
   this->Init(desc->GetId(), "", desc->GetImageDescriptor(),
-  desc->GetLabel(), "");
+             desc->GetLabel(), "");
 }
 
 EditorReference::EditorReference(EditorManager* man, IMemento::Pointer memento) :
@@ -120,7 +120,7 @@ EditorDescriptor::Pointer EditorReference::GetDescriptor()
   return this->GetDescriptor(this->GetId());
 }
 
-EditorDescriptor::Pointer EditorReference::GetDescriptor(const std::string& id)
+EditorDescriptor::Pointer EditorReference::GetDescriptor(const QString& id)
 {
   EditorDescriptor::Pointer desc;
   IEditorRegistry* reg = WorkbenchPlugin::GetDefault()->GetEditorRegistry();
@@ -153,7 +153,7 @@ void EditorReference::PinStatusUpdated()
   //firePropertyChange(IWorkbenchPart.PROP_TITLE);
 }
 
-std::string EditorReference::GetFactoryId()
+QString EditorReference::GetFactoryId()
 {
   //  IEditorPart editor = getEditor(false);
   //  if (editor != null)
@@ -170,12 +170,12 @@ std::string EditorReference::GetFactoryId()
   return "";
 }
 
-std::string EditorReference::ComputePartName()
+QString EditorReference::ComputePartName()
 {
   return WorkbenchPartReference::ComputePartName();
 }
 
-std::string EditorReference::GetName()
+QString EditorReference::GetName()
 {
   if (part.IsNotNull())
   {
@@ -189,7 +189,7 @@ IEditorPart::Pointer EditorReference::GetEditor(bool restore)
   return this->GetPart(restore).Cast<IEditorPart> ();
 }
 
-void EditorReference::SetName(const std::string& name)
+void EditorReference::SetName(const QString& name)
 {
   this->name = name;
 }
@@ -301,20 +301,19 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
     //    IStatus displayStatus = StatusUtil.newStatus(originalStatus,
     //        NLS.bind(WorkbenchMessages.EditorManager_unableToCreateEditor,
     //            originalStatus.getMessage()));
-    WorkbenchPlugin::Log("Unable to create editor ID " + this->GetId() + ": "
-        + e.displayText());
+    WorkbenchPlugin::Log(QString("Unable to create editor ID ") + this->GetId() + ": "
+                         + e.what());
 
     // Pass the error to the status handling facility
     //StatusManager.getManager().handle(logStatus);
 
     EditorDescriptor::Pointer descr = this->GetDescriptor();
-    std::string label = this->GetId();
+    QString label = this->GetId();
     if (descr.IsNotNull())
       label = descr->GetLabel();
 
     IEditorPart::Pointer part =
-        Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart(label,
-            e.displayText());
+        Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart(label, e.what());
     if (part.IsNotNull())
     {
       IEditorInput::Pointer input;
@@ -419,13 +418,13 @@ bool EditorReference::SetInput(IEditorInput::Pointer input)
   return true;
 }
 
-void EditorReference::ReportMalfunction(const std::string& string)
+void EditorReference::ReportMalfunction(const QString& string)
 {
   if (!reportedMalfunctioningEditor)
   {
     reportedMalfunctioningEditor = true;
 
-    std::string errorMessage = "Problem detected with part " + this->GetId(); //$NON-NLS-1$
+    QString errorMessage = "Problem detected with part " + this->GetId(); //$NON-NLS-1$
     if (part.IsNotNull())
     {
       errorMessage.append("(class = ").append(part->GetClassName()).append(
@@ -450,7 +449,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
     IEditorInput::Pointer editorInput = this->GetEditorInput();
 
     // Get the editor descriptor.
-    std::string editorID = this->GetId();
+    QString editorID = this->GetId();
     EditorDescriptor::Pointer desc = this->GetDescriptor();
 
     if (desc.IsNull())

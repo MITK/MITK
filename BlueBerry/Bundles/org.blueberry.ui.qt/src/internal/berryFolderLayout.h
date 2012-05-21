@@ -63,22 +63,22 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#addPlaceholder(java.lang.String)
      */
-    void AddPlaceholder(const std::string& viewId);
+    void AddPlaceholder(const QString& viewId);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IFolderLayout#addView(java.lang.String)
      */
-    void AddView(const std::string& viewId);
+    void AddView(const QString& viewId);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#getProperty(java.lang.String)
      */
-    std::string GetProperty(const std::string& id);
+    QString GetProperty(const QString& id);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#setProperty(java.lang.String, java.lang.String)
      */
-    void SetProperty(const std::string& id, const std::string& value);
+    void SetProperty(const QString& id, const QString& value);
 
 
     private:
@@ -87,7 +87,7 @@ public:
         * Inform the page layout of the new part created
         * and the folder the part belongs to.
         */
-  void LinkPartToPageLayout(const std::string& viewId, LayoutPart::Pointer newPart);
+  void LinkPartToPageLayout(const QString& viewId, LayoutPart::Pointer newPart);
 
 };
 

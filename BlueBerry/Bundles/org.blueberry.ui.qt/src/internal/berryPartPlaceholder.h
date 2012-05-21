@@ -30,16 +30,16 @@ class PartPlaceholder : public LayoutPart {
 
 public:
 
-  berryObjectMacro(PartPlaceholder);
+  berryObjectMacro(PartPlaceholder)
 
     /**
      * Placeholder ids may contain wildcards.  This is the wildcard string.
      *
      * @since 3.0
      */
-    static const std::string WILD_CARD; // = "*"; //$NON-NLS-1$
+    static const QString WILD_CARD; // = "*";
 
-    PartPlaceholder(const std::string& id);
+    PartPlaceholder(const QString& id);
 
     /**
      * Creates the SWT control

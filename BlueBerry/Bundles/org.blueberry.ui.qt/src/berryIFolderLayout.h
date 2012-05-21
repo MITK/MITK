@@ -48,7 +48,7 @@ struct BERRY_UI_QT IFolderLayout : public IPlaceholderFolderLayout {
      *
      * @param viewId the view id
      */
-    virtual void AddView(const std::string& viewId) = 0;
+    virtual void AddView(const QString& viewId) = 0;
 };
 
 }

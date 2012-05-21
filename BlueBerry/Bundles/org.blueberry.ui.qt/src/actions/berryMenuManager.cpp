@@ -505,13 +505,13 @@ void MenuManager::UpdateMenuItem()
   }
 }
 
-//std::vector<SmartPointer<IMenuItem> > MenuManager::GetMenuItems()
+//QList<SmartPointer<IMenuItem> > MenuManager::GetMenuItems()
 //{
 //  if (menu)
 //  {
 //    return menu->GetItems();
 //  }
-//  return std::vector<IMenuItem::Pointer>();
+//  return QList<IMenuItem::Pointer>();
 //}
 
 //SmartPointer<IMenuItem> MenuManager::GetMenuItem(unsigned int index)

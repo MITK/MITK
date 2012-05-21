@@ -39,7 +39,7 @@ public:
 
   bool IsRunning();
 
-  IDialog::Pointer CreateStandardDialog(const std::string& id);
+  IDialog::Pointer CreateStandardDialog(const QString& id);
 
 };
 

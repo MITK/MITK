@@ -59,7 +59,7 @@ struct BERRY_UI_QT IPlaceholderFolderLayout : public Object {
      *
      * @param viewId the compound view id (wildcards allowed)
      */
-    virtual void AddPlaceholder(const std::string& viewId) = 0;
+    virtual void AddPlaceholder(const QString& viewId) = 0;
 
     /**
    * Returns the property with the given id or <code>null</code>. Folder
@@ -73,7 +73,7 @@ struct BERRY_UI_QT IPlaceholderFolderLayout : public Object {
    *         set.
    * @since 3.3
    */
-  virtual std::string GetProperty(const std::string& id) = 0;
+  virtual QString GetProperty(const QString& id) = 0;
 
     /**
    * Sets the given property to the given value. Folder properties are an
@@ -93,7 +93,7 @@ struct BERRY_UI_QT IPlaceholderFolderLayout : public Object {
    *            property value. <code>null</code> will clear the property.
    * @since 3.3
    */
-  virtual void SetProperty(const std::string& id, const std::string& value) = 0;
+  virtual void SetProperty(const QString& id, const QString& value) = 0;
 };
 
 }

@@ -44,7 +44,7 @@ struct BERRY_UI_QT IIntroRegistry {
      *
      * @return the introduction extensions known by this registry
      */
-    virtual std::vector<IIntroDescriptor::Pointer> GetIntros() const = 0;
+    virtual QList<IIntroDescriptor::Pointer> GetIntros() const = 0;
 
     /**
      * Return the introduction extension that is bound to the given product.
@@ -53,7 +53,7 @@ struct BERRY_UI_QT IIntroRegistry {
      * @return the introduction extension that is bound to the given product,
      * or <code>null</code> if there is no such binding
      */
-    virtual IIntroDescriptor::Pointer GetIntroForProduct(const std::string& productId) const = 0;
+    virtual IIntroDescriptor::Pointer GetIntroForProduct(const QString& productId) const = 0;
 
     /**
      * Find an intro descriptor with the given identifier.
@@ -61,7 +61,7 @@ struct BERRY_UI_QT IIntroRegistry {
      * @param id the id
      * @return the intro descriptor, or <code>null</code>
      */
-    virtual IIntroDescriptor::Pointer GetIntro(const std::string& id) const = 0;
+    virtual IIntroDescriptor::Pointer GetIntro(const QString& id) const = 0;
 };
 
 }

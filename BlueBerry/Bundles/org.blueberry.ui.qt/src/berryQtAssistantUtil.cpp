@@ -63,7 +63,7 @@ void QtAssistantUtil::OpenActivePartHelp()
       if (currentPage)
       {
         berry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
-        if (currentPart) pluginID = QString::fromStdString(currentPart->GetSite()->GetPluginId());
+        if (currentPart) pluginID = currentPart->GetSite()->GetPluginId();
       }
     }
   }
@@ -118,7 +118,7 @@ void QtAssistantUtil::CloseAssistant()
   delete assistantProcess;
 }
 
-bool QtAssistantUtil::RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles)
+bool QtAssistantUtil::RegisterQCHFiles(const QList<IBundle::Pointer>& bundles)
 {
   QStringList qchFiles = ExtractQCHFiles(bundles);
   // unregister old files
@@ -136,7 +136,7 @@ bool QtAssistantUtil::UnregisterQCHFiles(const QStringList& qchFiles)
   return CallQtAssistant(qchFiles, false);
 }
 
-QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles)
+QStringList QtAssistantUtil::ExtractQCHFiles(const QList<IBundle::Pointer>& bundles)
 {
   QStringList result;
 

@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEditorDescriptor.h"
 
-#include <vector>
-#include <list>
-
 namespace berry
 {
 
@@ -40,37 +37,37 @@ public:
   berryObjectMacro(FileEditorMapping);
 
 private:
-  static const std::string STAR; // = "*"; //$NON-NLS-1$
-  static const std::string DOT; // = ".";  //$NON-NLS-1$
+  static const QString STAR; // = "*"; //$NON-NLS-1$
+  static const QString DOT; // = ".";  //$NON-NLS-1$
 
-  std::string name;
+  QString name;
 
-  std::string extension;
+  QString extension;
 
   // Collection of EditorDescriptor, where the first one
   // is considered the default one.
-  std::list<IEditorDescriptor::Pointer> editors;
+  QList<IEditorDescriptor::Pointer> editors;
 
-  std::list<IEditorDescriptor::Pointer> deletedEditors;
+  QList<IEditorDescriptor::Pointer> deletedEditors;
 
-  std::list<IEditorDescriptor::Pointer> declaredDefaultEditors;
+  QList<IEditorDescriptor::Pointer> declaredDefaultEditors;
 
   /**
    * Compare the editor ids from both lists and return true if they
    * are equals.
    */
-  bool CompareList(const std::list<IEditorDescriptor::Pointer>& l1,
-      const std::list<IEditorDescriptor::Pointer>& l2) const;
+  bool CompareList(const QList<IEditorDescriptor::Pointer>& l1,
+      const QList<IEditorDescriptor::Pointer>& l2) const;
 
 public:
 
   /**
    *  Create an instance of this class.
    *
-   *  @param name java.lang.std::string
-   *  @param extension java.lang.std::string
+   *  @param name java.lang.QString
+   *  @param extension java.lang.QString
    */
-  FileEditorMapping(const std::string& extension, const std::string& name = STAR);
+  FileEditorMapping(const QString& extension, const QString& name = STAR);
 
   /**
    * Add the given editor to the list of editors registered.
@@ -105,17 +102,17 @@ public:
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  std::list<IEditorDescriptor::Pointer> GetEditors() const;
+  QList<IEditorDescriptor::Pointer> GetEditors() const;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  std::list<IEditorDescriptor::Pointer> GetDeletedEditors() const;
+  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  std::string GetExtension() const;
+  QString GetExtension() const;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
@@ -132,12 +129,12 @@ public:
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  std::string GetLabel() const;
+  QString GetLabel() const;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /**
    * Remove the given editor from the set of editors registered.
@@ -164,7 +161,7 @@ public:
    *
    * @param newEditors the new list of associated editors
    */
-  void SetEditorsList(const std::list<IEditorDescriptor::Pointer>& newEditors);
+  void SetEditorsList(const QList<IEditorDescriptor::Pointer>& newEditors);
 
   /**
    * Set the collection of all editors (EditorDescriptor)
@@ -176,21 +173,21 @@ public:
    * @param newDeletedEditors the new list of associated (but deleted) editors
    */
   void SetDeletedEditorsList(
-      const std::list<IEditorDescriptor::Pointer>& newDeletedEditors);
+      const QList<IEditorDescriptor::Pointer>& newDeletedEditors);
 
   /**
    * Set the file's extension.
    *
    * @param extension the file extension for this mapping
    */
-  void SetExtension(const std::string& extension);
+  void SetExtension(const QString& extension);
 
   /**
    * Set the file's name.
    *
    * @param name the file name for this mapping
    */
-  void SetName(const std::string& name);
+  void SetName(const QString& name);
 
   /**
    * Get the editors that have been declared as default. This may be via plugin
@@ -199,7 +196,7 @@ public:
    * @return the editors the default editors
    * @since 3.1
    */
-  std::list<IEditorDescriptor::Pointer> GetDeclaredDefaultEditors();
+  QList<IEditorDescriptor::Pointer> GetDeclaredDefaultEditors();
 
   /**
    * Return whether the editor is declared default.
@@ -219,7 +216,7 @@ public:
    * @since 3.1
    */
   void SetDefaultEditors(
-      const std::list<IEditorDescriptor::Pointer>& defaultEditors);
+      const QList<IEditorDescriptor::Pointer>& defaultEditors);
 };
 
 }

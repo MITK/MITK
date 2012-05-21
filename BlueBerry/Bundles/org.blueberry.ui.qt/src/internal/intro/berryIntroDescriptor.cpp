@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIntroConstants.h"
 #include "internal/berryWorkbenchRegistryConstants.h"
 
-#include <berryAbstractUIPlugin.h>
+#include <berryAbstractUICTKPlugin.h>
 
 namespace berry
 {
@@ -38,8 +38,8 @@ IntroDescriptor::IntroDescriptor(IConfigurationElement::Pointer configElement)
         "Invalid extension (Missing class name): " + getId(), //$NON-NLS-1$
         null));
         */
-    throw CoreException(configElement->GetContributor().toStdString() +
-                        ": Invalid extension (Missing className): " + GetId().toStdString());
+    throw CoreException(configElement->GetContributor() +
+                        ": Invalid extension (Missing className): " + GetId());
   }
 }
 
@@ -97,7 +97,7 @@ ImageDescriptor::Pointer IntroDescriptor::GetImageDescriptor() const
     return ImageDescriptor::Pointer();
   }
 
-  imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+  imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         element->GetContributor(), iconName);
   return imageDescriptor;
 }

@@ -39,7 +39,7 @@ struct QtPerspectiveSwitcherListener : public IPerspectiveListener
   void PerspectiveActivated(IWorkbenchPage::Pointer /*page*/,
           IPerspectiveDescriptor::Pointer perspective)
   {
-    QAction* action = switcher->perspIdToActionMap[QString::fromStdString(perspective->GetId())];
+    QAction* action = switcher->perspIdToActionMap[perspective->GetId()];
     if (action) action->setChecked(true);
   }
 
@@ -61,12 +61,12 @@ QtPerspectiveSwitcher::QtPerspectiveSwitcher(IWorkbenchWindow::Pointer window)
 
   IPerspectiveRegistry* perspRegistry = window->GetWorkbench()->GetPerspectiveRegistry();
 
-  std::vector<IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
-  for (std::vector<IPerspectiveDescriptor::Pointer>::iterator perspIt =
+  QList<IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+  for (QList<IPerspectiveDescriptor::Pointer>::iterator perspIt =
       perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
   {
     QAction* perspAction = new QtOpenPerspectiveAction(window, *perspIt, perspGroup);
-    perspIdToActionMap[QString::fromStdString((*perspIt)->GetId())] = perspAction;
+    perspIdToActionMap[(*perspIt)->GetId()] = perspAction;
   }
   this->addActions(perspGroup->actions());
 

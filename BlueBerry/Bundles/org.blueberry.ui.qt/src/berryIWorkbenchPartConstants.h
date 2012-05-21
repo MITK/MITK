@@ -38,7 +38,7 @@ struct BERRY_UI_QT IWorkbenchPartConstants {
    * Used in a PropertyChangeEvent as the property string to signal
    * that integer flags are used.
    */
-  static const std::string INTEGER_PROPERTY;
+  static const QString INTEGER_PROPERTY;
 
     /**
      * The property id for <code>getTitle</code>, <code>getTitleImage</code>

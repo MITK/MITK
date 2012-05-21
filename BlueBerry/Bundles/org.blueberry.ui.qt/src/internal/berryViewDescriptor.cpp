@@ -18,18 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIConfigurationElement.h"
 #include "berryPlatformException.h"
+#include "berryIExtension.h"
 
 #include "berryRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"
 
 #include "berryImageDescriptor.h"
-#include "berryAbstractUIPlugin.h"
 #include "berryAbstractUICTKPlugin.h"
 #include "berryImageDescriptor.h"
 #include "handlers/berryIHandlerActivation.h"
-
-#include <Poco/String.h>
-#include <Poco/StringTokenizer.h>
 
 namespace berry
 {
@@ -44,16 +41,10 @@ IViewPart::Pointer ViewDescriptor::CreateView()
 {
   IViewPart::Pointer part(configElement->CreateExecutableExtension<IViewPart> (
       WorkbenchRegistryConstants::ATT_CLASS));
-  if (part.IsNull())
-  {
-    // support legacy BlueBerry extensions
-    part = configElement->CreateExecutableExtension<IViewPart> (
-          WorkbenchRegistryConstants::ATT_CLASS, IViewPart::GetManifestName());
-  }
   return part;
 }
 
-const std::vector<QString>& ViewDescriptor::GetCategoryPath() const
+const QList<QString>& ViewDescriptor::GetCategoryPath() const
 {
   return categoryPath;
 }
@@ -87,23 +78,22 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
   {
     return imageDescriptor;
   }
-  QString iconName;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, iconName);
+  QString iconName = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
   // If the icon attribute was omitted, use the default one
-  if (iconName.empty())
+  if (iconName.isEmpty())
   {
     //TODO default image descriptor
     //return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
     return ImageDescriptor::GetMissingImageDescriptor();
   }
   const IExtension* extension(configElement->GetDeclaringExtension());
-  const QString extendingPluginId(extension->GetNamespace());
+  const QString extendingPluginId(extension->GetContributor());
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
   if (!imageDescriptor)
   {
     // Try legacy BlueBerry method
-    imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+    imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
   }
 
@@ -118,34 +108,22 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
 
 QString ViewDescriptor::GetLabel() const
 {
-  QString label;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, label);
-  return label;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
 }
 
 QString ViewDescriptor::GetAccelerator() const
 {
-  QString accel;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ACCELERATOR, accel);
-  return accel;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ACCELERATOR);
 }
 
 bool ViewDescriptor::GetAllowMultiple() const
 {
-  bool allow = false;
-  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_ALLOW_MULTIPLE, allow);
-  return allow;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ALLOW_MULTIPLE).compare("true", Qt::CaseInsensitive) == 0;
 }
 
-bool ViewDescriptor::IsRestorable() const {
-  QString string;
-  if (configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE, string))
-  {
-    return Poco::icompare(string, "true") == 0;
-  }
-  else {
-    return true;
-  }
+bool ViewDescriptor::IsRestorable() const
+{
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE).compare("true", Qt::CaseInsensitive) == 0;
 }
 
 Poco::Any ViewDescriptor::GetAdapter(const QString& adapter)
@@ -202,36 +180,36 @@ std::vector< std::string> ViewDescriptor::GetKeywordReferences() const
 
 QString ViewDescriptor::GetPluginId() const
 {
-  return QString::fromStdString(configElement->GetContributor());
+  return configElement->GetContributor();
 }
 
 QString ViewDescriptor::GetLocalId() const
 {
-  return QString::fromStdString(this->GetId());
+  return this->GetId();
 }
 
 void ViewDescriptor::LoadFromExtension()
 {
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
+  id = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
 
   // Sanity check.
-  QString name;
-  if ((configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, name) == false)
-      || (RegistryReader::GetClassValue(configElement,
-              WorkbenchRegistryConstants::ATT_CLASS) == ""))
+  QString name = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
+  if (name.isEmpty() ||
+      RegistryReader::GetClassValue(configElement, WorkbenchRegistryConstants::ATT_CLASS).isEmpty())
   {
-    throw CoreException(
-        "Invalid extension (missing label or class name)", id);
+    throw CoreException(QString("Invalid extension (missing label or class name): ") + id);
   }
 
-  QString category;
-  if (configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
+  QString category = configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY);
+  if (!category.isEmpty())
   {
-    Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     // Parse the path tokens and store them
-    for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
+    foreach (QString pathElement, category.split('/', QString::SkipEmptyParts))
     {
-      categoryPath.push_back(*iter);
+      if (!pathElement.trimmed().isEmpty())
+      {
+        categoryPath.push_back(pathElement.trimmed());
+      }
     }
   }
 }

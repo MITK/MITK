@@ -59,7 +59,7 @@ public:
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntros()
    */
-  std::vector<IIntroDescriptor::Pointer> GetIntros() const;
+  QList<IIntroDescriptor::Pointer> GetIntros() const;
 
   /*
    * (non-Javadoc)

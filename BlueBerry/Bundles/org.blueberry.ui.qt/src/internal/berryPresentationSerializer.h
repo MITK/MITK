@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "presentations/berryIPresentationSerializer.h"
 #include "presentations/berryIPresentablePart.h"
 
-#include <vector>
 
 namespace berry
 {
@@ -33,22 +32,22 @@ class PresentationSerializer: public IPresentationSerializer
 
 private:
 
-  std::vector<IPresentablePart::Pointer> parts;
+  QList<IPresentablePart::Pointer> parts;
 
 public:
 
   PresentationSerializer(
-      const std::vector<IPresentablePart::Pointer>& presentableParts);
+      const QList<IPresentablePart::Pointer>& presentableParts);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentationSerializer#getId(org.blueberry.ui.presentations.IPresentablePart)
    */
-  std::string GetId(IPresentablePart::Pointer part);
+  QString GetId(IPresentablePart::Pointer part);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentationSerializer#getPart(java.lang.String)
    */
-  IPresentablePart::Pointer GetPart(const std::string& id);
+  IPresentablePart::Pointer GetPart(const QString& id);
 
 };
 

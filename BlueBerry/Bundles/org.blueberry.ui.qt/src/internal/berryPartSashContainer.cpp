@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryPartSashContainer.h"
 
 #include "berryLayoutTree.h"
@@ -24,12 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPerspectiveHelper.h"
 #include "berryDragUtil.h"
 #include "berryWorkbenchPlugin.h"
+#include "berryIPreferencesService.h"
+#include "berryIPreferences.h"
 
 #include "berryWorkbenchPreferenceConstants.h"
 #include "berryGeometry.h"
 #include "berryPartPane.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "berryConstants.h"
 
 
@@ -92,7 +95,7 @@ void PartSashContainer::SashContainerDropTarget::Drop()
   }
 }
 
-void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
+void PartSashContainer::DropObject(const QList<PartPane::Pointer>& toDrop,
     LayoutPart::Pointer visiblePart, Object::Pointer targetPart, int side)
 {
   //getControl().setRedraw(false);
@@ -209,14 +212,14 @@ Rectangle PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
       * partSashContainer->GetDockingRatio(sourcePart, stack)), side);
 }
 
-PartSashContainer::PartSashContainer(const std::string& id,
+PartSashContainer::PartSashContainer(const QString& id,
     WorkbenchPage* _page, void* _parentWidget) :
   LayoutPart(id), parentWidget(_parentWidget), parent(0), page(_page), active(
       false), layoutDirty(false)
 {
   resizeListener = new ControlListener(this);
 
-  std::string layout = WorkbenchPlugin::GetDefault()->GetPreferencesService()->
+  QString layout = WorkbenchPlugin::GetDefault()->GetPreferencesService()->
       GetSystemPreferences()->Get(WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT,
           WorkbenchPreferenceConstants::LEFT);
   if (layout == WorkbenchPreferenceConstants::RIGHT)
@@ -225,10 +228,10 @@ PartSashContainer::PartSashContainer(const std::string& id,
   }
 }
 
-std::vector<PartPane::Pointer> PartSashContainer::GetVisibleParts(
+QList<PartPane::Pointer> PartSashContainer::GetVisibleParts(
     Object::Pointer pane)
 {
-  std::vector<PartPane::Pointer> parts;
+  QList<PartPane::Pointer> parts;
   if (pane.Cast<PartPane> ().IsNotNull())
   {
     parts.push_back(pane.Cast<PartPane> ());
@@ -236,8 +239,8 @@ std::vector<PartPane::Pointer> PartSashContainer::GetVisibleParts(
   else if (pane.Cast<PartStack> ().IsNotNull())
   {
     PartStack::Pointer stack = pane.Cast<PartStack> ();
-    std::list<LayoutPart::Pointer> children = stack->GetChildren();
-    for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
+    QList<LayoutPart::Pointer> children = stack->GetChildren();
+    for (QList<LayoutPart::Pointer>::iterator iter = children.begin(); iter
         != children.end(); ++iter)
     {
       if (iter->Cast<PartPane> () != 0)
@@ -465,7 +468,7 @@ void PartSashContainer::AddChildForPlaceholder(LayoutPart::Pointer child,
   }
 
   // find the relationship info for the placeholder
-  std::vector<RelationshipInfo> relationships = this->ComputeRelation();
+  QList<RelationshipInfo> relationships = this->ComputeRelation();
   for (unsigned int i = 0; i < relationships.size(); i++)
   {
     RelationshipInfo info = relationships[i];
@@ -503,19 +506,18 @@ void PartSashContainer::ChildRemoved(LayoutPart::Pointer child)
   }
 }
 
-std::vector<PartSashContainer::RelationshipInfo> PartSashContainer::ComputeRelation()
+QList<PartSashContainer::RelationshipInfo> PartSashContainer::ComputeRelation()
 {
   LayoutTree::Pointer treeRoot = root;
-  std::list<RelationshipInfo> list;
+  QList<RelationshipInfo> list;
   if (treeRoot == 0)
   {
-    return std::vector<RelationshipInfo>();
+    return QList<RelationshipInfo>();
   }
   RelationshipInfo r;
   r.part = treeRoot->ComputeRelation(list);
   list.push_front(r);
-  std::vector<RelationshipInfo> result(list.begin(), list.end());
-  return result;
+  return list;
 }
 
 void PartSashContainer::SetActive(bool isActive)
@@ -750,7 +752,7 @@ void PartSashContainer::Remove(LayoutPart::Pointer child)
     return;
   }
 
-  children.remove(child);
+  children.removeAll(child);
   if (root != 0)
   {
     root = root->Remove(child);
@@ -1166,7 +1168,7 @@ float PartSashContainer::GetDockingRatio(Object::Pointer /*dragged*/,
   return 0.5f;
 }
 
-void PartSashContainer::DescribeLayout(std::string& buf) const
+void PartSashContainer::DescribeLayout(QString& buf) const
 {
   if (root == 0)
   {

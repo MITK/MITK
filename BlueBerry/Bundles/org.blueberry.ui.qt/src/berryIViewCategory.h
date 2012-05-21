@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryMacros.h>
 
-#include <vector>
 
 namespace berry {
 
@@ -33,10 +32,10 @@ struct BERRY_UI_QT IViewCategory : public Object
 {
   berryInterfaceMacro(IViewCategory, berry);
 
-  virtual const std::string& GetId() const = 0;
-  virtual std::string GetLabel() const = 0;
-  virtual std::vector<std::string> GetPath() const = 0;
-  virtual const std::vector<IViewDescriptor::Pointer>& GetViews() const = 0;
+  virtual QString GetId() const = 0;
+  virtual QString GetLabel() const = 0;
+  virtual QStringList GetPath() const = 0;
+  virtual QList<IViewDescriptor::Pointer> GetViews() const = 0;
 
   virtual ~IViewCategory();
 };

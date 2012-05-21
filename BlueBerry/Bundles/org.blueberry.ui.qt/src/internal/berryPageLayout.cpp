@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
+
 PageLayout::PageLayout()
  : editorVisible(true)
 {
@@ -69,7 +70,7 @@ void PageLayout::AddEditorArea()
   }
 }
 
-ViewLayoutRec::Pointer PageLayout::GetViewLayoutRec(const std::string& id, bool create)
+ViewLayoutRec::Pointer PageLayout::GetViewLayoutRec(const QString& id, bool create)
 {
   ViewLayoutRec::Pointer rec = mapIDtoViewLayoutRec[id];
   if (rec == 0 && create)
@@ -87,9 +88,10 @@ ViewLayoutRec::Pointer PageLayout::GetViewLayoutRec(const std::string& id, bool 
 }
 
 void PageLayout::AddPart(LayoutPart::Pointer newPart,
-    const std::string& partId, int relationship, float ratio,
-    const std::string& refId)
+    const QString& partId, int relationship, float ratio,
+    const QString& refId)
 {
+
   this->SetRefPart(partId, newPart);
 
   // If the referenced part is inside a folder,
@@ -113,7 +115,7 @@ void PageLayout::AddPart(LayoutPart::Pointer newPart,
   }
 }
 
-void PageLayout::AddPerspectiveShortcut(const std::string& id)
+void PageLayout::AddPerspectiveShortcut(const QString& id)
 {
   if (std::find(perspectiveShortcuts.begin(),
       perspectiveShortcuts.end(), id) == perspectiveShortcuts.end())
@@ -122,8 +124,8 @@ void PageLayout::AddPerspectiveShortcut(const std::string& id)
   }
 }
 
-void PageLayout::AddPlaceholder(const std::string& viewId, int relationship,
-    float ratio, const std::string& refId)
+void PageLayout::AddPlaceholder(const QString& viewId, int relationship,
+    float ratio, const QString& refId)
 {
   if (!this->CheckValidPlaceholderId(viewId))
   {
@@ -137,7 +139,7 @@ void PageLayout::AddPlaceholder(const std::string& viewId, int relationship,
   this->GetViewLayoutRec(viewId, true);
 }
 
-bool PageLayout::CheckValidPlaceholderId(const std::string& id)
+bool PageLayout::CheckValidPlaceholderId(const QString& id)
 {
   // Check that view is not already in layout.
   // This check is done even if the id has a wildcard, since it's incorrect to create
@@ -148,7 +150,7 @@ bool PageLayout::CheckValidPlaceholderId(const std::string& id)
   }
 
   // check that primary view id is valid, but only if it has no wildcard
-  std::string primaryId = ViewFactory::ExtractPrimaryId(id);
+  QString primaryId = ViewFactory::ExtractPrimaryId(id);
   if (!ViewFactory::HasWildcard(primaryId))
   {
     IViewRegistry* reg = WorkbenchPlugin::GetDefault()->GetViewRegistry();
@@ -165,36 +167,36 @@ bool PageLayout::CheckValidPlaceholderId(const std::string& id)
   return true;
 }
 
-void PageLayout::AddShowInPart(const std::string& id)
+void PageLayout::AddShowInPart(const QString& id)
 {
-  if (std::find(showInPartIds.begin(), showInPartIds.end(), id) == showInPartIds.end())
+  if (!showInPartIds.contains(id))
   {
     showInPartIds.push_back(id);
   }
 }
 
-void PageLayout::AddShowViewShortcut(const std::string& id)
+void PageLayout::AddShowViewShortcut(const QString& id)
 {
-  if (std::find(showViewShortcuts.begin(), showViewShortcuts.end(), id) == showViewShortcuts.end())
+  if (!showViewShortcuts.contains(id))
   {
     showViewShortcuts.push_back(id);
   }
 }
 
-void PageLayout::AddView(const std::string& viewId, int relationship,
-    float ratio, const std::string& refId)
+void PageLayout::AddView(const QString& viewId, int relationship,
+    float ratio, const QString& refId)
 {
   this->AddView(viewId, relationship, ratio, refId, false, false, true);
 }
 
-void PageLayout::AddView(const std::string& viewId, int relationship,
-    float ratio, const std::string& refId, bool minimized)
+void PageLayout::AddView(const QString& viewId, int relationship,
+    float ratio, const QString& refId, bool minimized)
 {
   this->AddView(viewId, relationship, ratio, refId, minimized, false, true);
 }
 
-void PageLayout::AddView(const std::string& viewId, int relationship,
-    float ratio, const std::string& refId, bool /*minimized*/, bool standalone,
+void PageLayout::AddView(const QString& viewId, int relationship,
+    float ratio, const QString& refId, bool /*minimized*/, bool standalone,
     bool showTitle)
 {
   this->AddShowViewShortcut(viewId);
@@ -256,7 +258,7 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
 //      return minimizedStacks;
 //    }
 
-bool PageLayout::CheckPartInLayout(const std::string& partId)
+bool PageLayout::CheckPartInLayout(const QString& partId)
 {
   if (partId == ID_EDITOR_AREA) return true;
 
@@ -275,8 +277,8 @@ bool PageLayout::CheckPartInLayout(const std::string& partId)
   return false;
 }
 
-IFolderLayout::Pointer PageLayout::CreateFolder(const std::string& folderId,
-    int relationship, float ratio, const std::string& refId)
+IFolderLayout::Pointer PageLayout::CreateFolder(const QString& folderId,
+    int relationship, float ratio, const QString& refId)
 {
   if (this->CheckPartInLayout(folderId))
   {
@@ -293,13 +295,13 @@ IFolderLayout::Pointer PageLayout::CreateFolder(const std::string& folderId,
   // Create a wrapper.
   FolderLayout::Pointer layout(new FolderLayout(PageLayout::Pointer(this), folder, viewFactory));
 
-  mapFolderToFolderLayout.insert(std::make_pair(folder, layout));
+  mapFolderToFolderLayout.insert(folder, layout);
 
   return layout;
 }
 
 IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
-    const std::string& folderId, int relationship, float ratio, const std::string& refId)
+    const QString& folderId, int relationship, float ratio, const QString& refId)
 {
   if (this->CheckPartInLayout(folderId))
   {
@@ -318,12 +320,12 @@ IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
   // Create a wrapper.
   IPlaceholderFolderLayout::Pointer layout(new PlaceholderFolderLayout(PageLayout::Pointer(this), folder));
 
-  mapFolderToFolderLayout.insert(std::make_pair(folder, layout));
+  mapFolderToFolderLayout.insert(folder, layout);
 
   return layout;
 }
 
-LayoutPart::Pointer PageLayout::CreateView(const std::string& partID)
+LayoutPart::Pointer PageLayout::CreateView(const QString& partID)
 {
   if (partID == ID_EDITOR_AREA)
   {
@@ -344,12 +346,12 @@ IPerspectiveDescriptor::Pointer PageLayout::GetDescriptor()
   return descriptor;
 }
 
-std::string PageLayout::GetEditorArea()
+QString PageLayout::GetEditorArea()
 {
   return ID_EDITOR_AREA;
 }
 
-PartStack::Pointer PageLayout::GetFolderPart(const std::string& viewId)
+PartStack::Pointer PageLayout::GetFolderPart(const QString& viewId)
 {
   return mapIDtoFolder[viewId].Cast<PartStack>();
 }
@@ -359,12 +361,12 @@ int PageLayout::GetPartSashConst(int nRelationship)
   return nRelationship;
 }
 
-std::vector<std::string> PageLayout::GetPerspectiveShortcuts()
+QList<QString> PageLayout::GetPerspectiveShortcuts()
 {
   return perspectiveShortcuts;
 }
 
-LayoutPart::Pointer PageLayout::GetRefPart(const std::string& partID)
+LayoutPart::Pointer PageLayout::GetRefPart(const QString& partID)
 {
   return mapIDtoPart[partID];
 }
@@ -374,12 +376,12 @@ PartSashContainer::Pointer PageLayout::GetRootLayoutContainer()
   return rootLayoutContainer;
 }
 
-std::vector<std::string> PageLayout::GetShowInPartIds()
+QList<QString> PageLayout::GetShowInPartIds()
 {
   return showInPartIds;
 }
 
-std::vector<std::string> PageLayout::GetShowViewShortcuts()
+QList<QString> PageLayout::GetShowViewShortcuts()
 {
   return showViewShortcuts;
 }
@@ -442,32 +444,32 @@ bool PageLayout::IsFixed()
   return fixed;
 }
 
-void PageLayout::SetFolderPart(const std::string& viewId,
+void PageLayout::SetFolderPart(const QString& viewId,
     ContainerPlaceholder::Pointer container)
 {
   LayoutPart::Pointer tabFolder = container->GetRealContainer();
   mapIDtoFolder[viewId] = tabFolder.Cast<ILayoutContainer>();
 }
 
-void PageLayout::SetFolderPart(const std::string& viewId,
+void PageLayout::SetFolderPart(const QString& viewId,
     PartStack::Pointer folder)
 {
   mapIDtoFolder[viewId] = folder.Cast<ILayoutContainer>();
 }
 
-void PageLayout::SetFolderPart(const std::string& viewId,
+void PageLayout::SetFolderPart(const QString& viewId,
     ILayoutContainer::Pointer folder)
 {
   mapIDtoFolder[viewId] = folder;
 }
 
-void PageLayout::SetRefPart(const std::string& partID, LayoutPart::Pointer part)
+void PageLayout::SetRefPart(const QString& partID, LayoutPart::Pointer part)
 {
   mapIDtoPart[partID] = part;
 }
 
 void PageLayout::StackPart(LayoutPart::Pointer newPart,
-    const std::string& viewId, const std::string& refId)
+    const QString& viewId, const QString& refId)
 {
   this->SetRefPart(viewId, newPart);
   // force creation of the view layout rec
@@ -507,8 +509,8 @@ void PageLayout::StackPart(LayoutPart::Pointer newPart,
   rootLayoutContainer->Add(newFolder);
 }
 
-void PageLayout::StackPlaceholder(const std::string& viewId,
-    const std::string& refId)
+void PageLayout::StackPlaceholder(const QString& viewId,
+    const QString& refId)
 {
   if (this->CheckPartInLayout(viewId))
   {
@@ -527,7 +529,7 @@ void PageLayout::StackPlaceholder(const std::string& viewId,
   this->StackPart(newPart, viewId, refId);
 }
 
-void PageLayout::StackView(const std::string& viewId, const std::string& refId)
+void PageLayout::StackView(const QString& viewId, const QString& refId)
 {
   if (this->CheckPartInLayout(viewId))
   {
@@ -567,8 +569,8 @@ int PageLayout::ConstantToLayoutPosition(int constant) {
   return -1;
 }
 
-void PageLayout::AddStandaloneView(const std::string& viewId, bool showTitle,
-    int relationship, float ratio, const std::string& refId)
+void PageLayout::AddStandaloneView(const QString& viewId, bool showTitle,
+    int relationship, float ratio, const QString& refId)
 {
   this->AddView(viewId, relationship, ratio, refId, false, true, showTitle);
   ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
@@ -576,10 +578,11 @@ void PageLayout::AddStandaloneView(const std::string& viewId, bool showTitle,
   rec->showTitle = showTitle;
 }
 
-void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
-    int relationship, float ratio, const std::string& refId, bool showTitle)
+void PageLayout::AddStandaloneViewPlaceholder(const QString& viewId,
+    int relationship, float ratio, const QString& refId, bool showTitle)
 {
-  std::string stackId = viewId + ".standalonefolder"; //$NON-NLS-1$
+
+  QString stackId = viewId + ".standalonefolder"; //$NON-NLS-1$
 
   // Check to see if the view is already in the layout
   if (!this->CheckValidPlaceholderId(viewId))
@@ -612,7 +615,7 @@ void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
   rec->showTitle = showTitle;
 }
 
-IViewLayout::Pointer PageLayout::GetViewLayout(const std::string& viewId)
+IViewLayout::Pointer PageLayout::GetViewLayout(const QString& viewId)
 {
   ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
   if (rec == 0)
@@ -622,12 +625,12 @@ IViewLayout::Pointer PageLayout::GetViewLayout(const std::string& viewId)
   return IViewLayout::Pointer(new ViewLayout(PageLayout::Pointer(this), rec));
 }
 
-std::map<std::string, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
+QHash<QString, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
 {
   return mapIDtoViewLayoutRec;
 }
 
-void PageLayout::RemovePlaceholder(const std::string& id)
+void PageLayout::RemovePlaceholder(const QString& id)
 {
   LayoutPart::Pointer part = this->GetRefPart(id);
   if (part->IsPlaceHolder())
@@ -642,14 +645,14 @@ void PageLayout::RemovePlaceholder(const std::string& id)
       //rootLayoutContainer->Remove(part);
       WorkbenchPlugin::Log("Not removing placeholder: Folder for placeholder " + id + " not found");
     }
-    mapIDtoPart.erase(id);
-    mapIDtoFolder.erase(id);
-    mapIDtoViewLayoutRec.erase(id);
+    mapIDtoPart.remove(id);
+    mapIDtoFolder.remove(id);
+    mapIDtoViewLayoutRec.remove(id);
   }
 }
 
 IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
-    const std::string& viewId)
+    const QString& viewId)
 {
   if (mapIDtoFolder[viewId] == 0)
     return IPlaceholderFolderLayout::Pointer(0);
@@ -667,4 +670,5 @@ IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
   }
   return layout;
 }
+
 }

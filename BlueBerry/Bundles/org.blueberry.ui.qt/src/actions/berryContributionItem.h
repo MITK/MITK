@@ -161,7 +161,7 @@ public:
    * Returns a string representation of this contribution item
    * suitable only for debugging.
    */
-  std::string ToString() const;
+  QString ToString() const;
 
   /**
    * The default implementation of this <code>IContributionItem</code>

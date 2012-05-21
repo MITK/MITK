@@ -45,9 +45,9 @@ class ShellPool: public IShellListener
    */
   Shell::WeakPtr parentShell;
 
-  std::list<Shell::Pointer> availableShells;
+  QList<Shell::Pointer> availableShells;
 
-  static const std::string CLOSE_LISTENER; // = "close listener";
+  static const QString CLOSE_LISTENER; // = "close listener";
 
   //    DisposeListener disposeListener = new DisposeListener() {
   //        public void widgetDisposed(DisposeEvent e) {

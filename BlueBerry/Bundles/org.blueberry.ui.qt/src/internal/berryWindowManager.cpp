@@ -53,8 +53,8 @@ void WindowManager::Add(Window::Pointer window)
 
 bool WindowManager::Close()
 {
-  std::vector<Window::Pointer> t = windows; // make iteration robust
-  for (std::vector<Window::Pointer>::iterator iter = t.begin();
+  QList<Window::Pointer> t = windows; // make iteration robust
+  for (QList<Window::Pointer>::iterator iter = t.begin();
       iter != t.end(); ++iter)
   {
     bool closed = (*iter)->Close();
@@ -66,7 +66,7 @@ bool WindowManager::Close()
 
   if (!subManagers.empty())
   {
-    for (std::list<WindowManager*>::iterator iter = subManagers.begin();
+    for (QList<WindowManager*>::iterator iter = subManagers.begin();
         iter != subManagers.end(); ++iter)
     {
       WindowManager* wm = *iter;
@@ -85,14 +85,14 @@ std::size_t WindowManager::GetWindowCount()
   return windows.size();
 }
 
-std::vector<Window::Pointer> WindowManager::GetWindows()
+QList<Window::Pointer> WindowManager::GetWindows()
 {
   return windows;
 }
 
 void WindowManager::Remove(Window::Pointer window)
 {
-  std::vector<Window::Pointer>::iterator iter = std::find(windows.begin(), windows.end(), window);
+  QList<Window::Pointer>::iterator iter = std::find(windows.begin(), windows.end(), window);
   if (iter != windows.end())
   {
     windows.erase(iter);

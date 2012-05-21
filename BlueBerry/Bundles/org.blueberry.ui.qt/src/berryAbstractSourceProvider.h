@@ -85,7 +85,7 @@ protected:
    *            nothing is logged.
    * @since 3.2
    */
-  void LogDebuggingInfo(const std::string& message);
+  void LogDebuggingInfo(const QString& message);
 
 
 private:

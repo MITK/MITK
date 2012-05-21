@@ -125,12 +125,12 @@ bool WorkbenchIntroManager::CloseIntro(IIntroPart::Pointer part)
     }
     else
     {
-      std::vector<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
-      poco_assert(references.size() < 2);
+      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      Q_ASSERT(references.size() < 2);
       if (references.empty())
         return false;
 
-      if (page->CloseEditors(std::list<IEditorReference::Pointer>(references.begin(), references.end()), false))
+      if (page->CloseEditors(references, false))
       {
         introPart = 0;
         return true;
@@ -263,7 +263,7 @@ IIntroPart::Pointer WorkbenchIntroManager::GetIntro() const
 
 IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
 {
-  std::vector<IWorkbenchWindow::Pointer> windows(this->workbench->GetWorkbenchWindows());
+  QList<IWorkbenchWindow::Pointer> windows(this->workbench->GetWorkbenchWindows());
   for (std::size_t i = 0; i < windows.size(); i++)
   {
     IWorkbenchWindow::Pointer window = windows[i];
@@ -275,7 +275,7 @@ IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
 
     if (IntroIsView())
     {
-      std::vector<IPerspectiveDescriptor::Pointer> perspDescs(page->GetOpenPerspectives());
+      QList<IPerspectiveDescriptor::Pointer> perspDescs(page->GetOpenPerspectives());
       for (std::size_t j = 0; j < perspDescs.size(); j++)
       {
         IPerspectiveDescriptor::Pointer descriptor = perspDescs[j];
@@ -289,8 +289,8 @@ IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
     }
     else
     {
-      std::vector<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
-      poco_assert(references.size() < 2);
+      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      Q_ASSERT(references.size() < 2);
       if (references.size() == 1)
         return references.front()->GetEditor(false);
     }

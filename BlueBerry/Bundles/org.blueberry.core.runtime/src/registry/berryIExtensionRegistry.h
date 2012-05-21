@@ -23,10 +23,10 @@
 #ifndef BERRYIEXTENSIONREGISTRY_H
 #define BERRYIEXTENSIONREGISTRY_H
 
+#include <berrySmartPointer.h>
+
 #include <QList>
 #include <QStringList>
-
-#include <berrySmartPointer.h>
 
 namespace berry {
 

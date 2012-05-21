@@ -48,7 +48,7 @@ bool SaveablesList::AddModel(Object::Pointer source, Saveable::Pointer model)
 }
 
 bool SaveablesList::IncrementRefCount(
-    std::map<Saveable::Pointer, int>& referenceMap, Saveable::Pointer key)
+    QHash<Saveable::Pointer, int>& referenceMap, Saveable::Pointer key)
 {
   bool result = false;
   int& refCount = referenceMap[key];
@@ -61,14 +61,14 @@ bool SaveablesList::IncrementRefCount(
 }
 
 bool SaveablesList::DecrementRefCount(
-    std::map<Saveable::Pointer, int>& referenceMap, Saveable::Pointer key)
+    QHash<Saveable::Pointer, int>& referenceMap, Saveable::Pointer key)
 {
   bool result = false;
   int& refCount = referenceMap[key];
   poco_assert(refCount != 0);
   if (refCount == 1)
   {
-    referenceMap.erase(key);
+    referenceMap.remove(key);
     result = true;
   }
   else
@@ -81,7 +81,7 @@ bool SaveablesList::DecrementRefCount(
 bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
 {
   bool result = false;
-  std::map<Object*, Saveable::Set>::iterator it = modelMap.find(source.GetPointer());
+  QHash<Object*, Saveable::Set>::iterator it = modelMap.find(source.GetPointer());
   if (it == modelMap.end())
   {
     this->LogWarning(
@@ -90,13 +90,13 @@ bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
   }
   else
   {
-    Saveable::Set& modelsForSource = it->second;
-    if (modelsForSource.erase(model) != 0)
+    Saveable::Set& modelsForSource = it.value();
+    if (modelsForSource.remove(model))
     {
       result = this->DecrementRefCount(modelRefCounts, model);
       if (modelsForSource.empty())
       {
-        modelMap.erase(source.GetPointer());
+        modelMap.remove(source.GetPointer());
       }
     }
     else
@@ -109,11 +109,11 @@ bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
   return result;
 }
 
-void SaveablesList::LogWarning(const std::string& message,
+void SaveablesList::LogWarning(const QString& message,
     Object::Pointer source, Saveable::Pointer model)
 {
   // create a new exception
-  std::string text = message + "; " + "unknown saveable: " + model->GetName()
+  QString text = message + "; " + "unknown saveable: " + model->GetName()
           + " from part: " + source->GetClassName();
   // record the current stack trace to help with debugging
   //assertionFailedException.fillInStackTrace();
@@ -122,10 +122,10 @@ void SaveablesList::LogWarning(const std::string& message,
 
 void SaveablesList::UpdateNonPartSource(ISaveablesSource::Pointer source)
 {
-  std::vector<Saveable::Pointer> saveables = source->GetSaveables();
+  QList<Saveable::Pointer> saveables = source->GetSaveables();
   if (saveables.empty())
   {
-    nonPartSources.erase(source);
+    nonPartSources.remove(source);
   }
   else
   {
@@ -134,9 +134,9 @@ void SaveablesList::UpdateNonPartSource(ISaveablesSource::Pointer source)
 }
 
 void SaveablesList::RemoveModels(Object::Pointer source,
-    const std::vector<Saveable::Pointer>& modelArray)
+    const QList<Saveable::Pointer>& modelArray)
 {
-  std::vector<Saveable::Pointer> removed;
+  QList<Saveable::Pointer> removed;
   for (unsigned int i = 0; i < modelArray.size(); i++)
   {
     Saveable::Pointer model = modelArray[i];
@@ -155,9 +155,9 @@ void SaveablesList::RemoveModels(Object::Pointer source,
 }
 
 void SaveablesList::AddModels(Object::Pointer source,
-    const std::vector<Saveable::Pointer>& modelArray)
+    const QList<Saveable::Pointer>& modelArray)
 {
-  std::vector<Saveable::Pointer> added;
+  QList<Saveable::Pointer> added;
   for (unsigned int i = 0; i < modelArray.size(); i++)
   {
     Saveable::Pointer model = modelArray[i];
@@ -183,7 +183,7 @@ void SaveablesList::FireModelLifecycleEvent(
 
 bool SaveablesList::PromptForSavingIfNecessary(
     IWorkbenchWindow::Pointer /*window*/, const Saveable::Set& /*modelsClosing*/,
-    const std::map<Saveable::Pointer, int>& /*modelsDecrementing*/, bool /*canCancel*/)
+    const QHash<Saveable::Pointer, int>& /*modelsDecrementing*/, bool /*canCancel*/)
 {
 //  List modelsToOptionallySave = new ArrayList();
 //  for (Iterator it = modelsDecrementing.keySet().iterator(); it.hasNext();)
@@ -220,20 +220,20 @@ bool SaveablesList::PromptForSavingIfNecessary(
 }
 
 void SaveablesList::FillModelsClosing(Saveable::Set& modelsClosing,
-    const std::map<Saveable::Pointer, int>& modelsDecrementing)
+    const QHash<Saveable::Pointer, int>& modelsDecrementing)
 {
-  for (std::map<Saveable::Pointer, int>::const_iterator it = modelsDecrementing.begin();
+  for (QHash<Saveable::Pointer, int>::const_iterator it = modelsDecrementing.begin();
        it != modelsDecrementing.end(); ++it)
   {
-    Saveable::Pointer model = it->first;
-    if (it->second == modelRefCounts[model])
+    Saveable::Pointer model = it.key();
+    if (it.value() == modelRefCounts[model])
     {
       modelsClosing.insert(model);
     }
   }
 }
 
-std::vector<Saveable::Pointer> SaveablesList::GetSaveables(
+QList<Saveable::Pointer> SaveablesList::GetSaveables(
     IWorkbenchPart::Pointer part)
 {
   if (part.Cast<ISaveablesSource> () != 0)
@@ -243,23 +243,23 @@ std::vector<Saveable::Pointer> SaveablesList::GetSaveables(
   }
   else if (part.Cast<ISaveablePart> () != 0)
   {
-    std::vector<Saveable::Pointer> result;
+    QList<Saveable::Pointer> result;
     Saveable::Pointer defaultSaveable(new DefaultSaveable(part));
     result.push_back(defaultSaveable);
     return result;
   }
   else
   {
-    return std::vector<Saveable::Pointer>();
+    return QList<Saveable::Pointer>();
   }
 }
 
 Saveable::Set SaveablesList::GetOpenModels()
 {
   Saveable::Set allDistinctModels;
-  for (std::map<Object*, Saveable::Set>::iterator it = modelMap.begin();
+  for (QHash<Object*, Saveable::Set>::iterator it = modelMap.begin();
        it != modelMap.end(); ++it)
-    allDistinctModels.insert(it->second.begin(), it->second.end());
+    allDistinctModels.unite(it.value());
 
   return allDistinctModels;
 }
@@ -273,7 +273,7 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
     this->UpdateNonPartSource(event->GetSource().Cast<ISaveablesSource>());
     return;
   }
-  std::vector<Saveable::Pointer> modelArray = event->GetSaveables();
+  QList<Saveable::Pointer> modelArray = event->GetSaveables();
   int eventType = event->GetEventType();
   if (eventType == SaveablesLifecycleEvent::POST_OPEN)
   {
@@ -281,8 +281,8 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
   }
   else if (eventType == SaveablesLifecycleEvent::PRE_CLOSE)
   {
-    std::vector<Saveable::Pointer> models = event->GetSaveables();
-    std::map<Saveable::Pointer, int> modelsDecrementing;
+    QList<Saveable::Pointer> models = event->GetSaveables();
+    QHash<Saveable::Pointer, int> modelsDecrementing;
     Saveable::Set modelsClosing;
     for (unsigned int i = 0; i < models.size(); i++)
     {
@@ -324,12 +324,12 @@ void SaveablesList::RemoveModelLifecycleListener(
 }
 
 SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
-    const std::list<IWorkbenchPart::Pointer>& partsToClose, bool save,
+    const QList<IWorkbenchPart::Pointer>& partsToClose, bool save,
     IWorkbenchWindow::Pointer window)
 {
   // reference count (how many occurrences of a model will go away?)
   PostCloseInfo::Pointer postCloseInfo(new PostCloseInfo());
-  for (std::list<IWorkbenchPart::Pointer>::const_iterator it = partsToClose.begin();
+  for (QList<IWorkbenchPart::Pointer>::const_iterator it = partsToClose.begin();
        it != partsToClose.end(); ++it)
   {
     WorkbenchPart::Pointer part = it->Cast<WorkbenchPart>();
@@ -361,7 +361,7 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 //        continue;
 //      }
 //    }
-    std::vector<Saveable::Pointer> modelsFromSource = this->GetSaveables(part);
+    QList<Saveable::Pointer> modelsFromSource = this->GetSaveables(part);
     for (unsigned int i = 0; i < modelsFromSource.size(); i++)
     {
       this->IncrementRefCount(postCloseInfo->modelsDecrementing, modelsFromSource[i]);
@@ -382,7 +382,7 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 }
 
 bool SaveablesList::PromptForSaving(
-    const std::list<Saveable::Pointer>& /*modelsToSave*/,
+    const QList<Saveable::Pointer>& /*modelsToSave*/,
     /*final IShellProvider shellProvider, IRunnableContext runnableContext,*/
     bool /*canCancel*/, bool /*stillOpenElsewhere*/)
 {
@@ -402,7 +402,7 @@ bool SaveablesList::PromptForSaving(
   //    } else if (modelsToSave.size() == 1) {
   //      Saveable model = (Saveable) modelsToSave.get(0);
   //      // Show a dialog.
-  //      std::vector<std::string> buttons;
+  //      QList<QString> buttons;
   //      if(canCancel) {
   //        buttons.push_back(IDialogConstants.YES_LABEL);
   //            buttons.push_back(IDialogConstants.NO_LABEL);
@@ -520,7 +520,7 @@ bool SaveablesList::PromptForSaving(
   return true;
 }
 
-bool SaveablesList::SaveModels(const std::list<Saveable::Pointer>& /*finalModels*/
+bool SaveablesList::SaveModels(const QList<Saveable::Pointer>& /*finalModels*/
 /*final IShellProvider shellProvider, IRunnableContext runnableContext*/)
 {
   //  IRunnableWithProgress progressOp = new IRunnableWithProgress() {
@@ -553,16 +553,16 @@ bool SaveablesList::SaveModels(const std::list<Saveable::Pointer>& /*finalModels
 
 void SaveablesList::PostClose(PostCloseInfo::Pointer postCloseInfo)
 {
-  std::vector<Saveable::Pointer> removed;
-  for (std::list<WorkbenchPart::Pointer>::const_iterator it = postCloseInfo->partsClosing.begin();
+  QList<Saveable::Pointer> removed;
+  for (QList<WorkbenchPart::Pointer>::const_iterator it = postCloseInfo->partsClosing.begin();
       it != postCloseInfo->partsClosing.end(); ++it)
   {
     IWorkbenchPart::Pointer part = *it;
-    std::map<Object*, Saveable::Set>::iterator it2 = modelMap.find(part.GetPointer());
+    QHash<Object*, Saveable::Set>::iterator it2 = modelMap.find(part.GetPointer());
     if (it2 != modelMap.end()) {
       // make a copy to avoid a ConcurrentModificationException - we
       // will remove from the original set as we iterate
-      Saveable::Set saveables(it2->second);
+      Saveable::Set saveables(it2.value());
       for (Saveable::Set::const_iterator it3 = saveables.begin();
           it3 != saveables.end(); ++it3)
       {
@@ -587,7 +587,7 @@ void SaveablesList::PostOpen(IWorkbenchPart::Pointer part)
 
 void SaveablesList::DirtyChanged(IWorkbenchPart::Pointer part)
 {
-  std::vector<Saveable::Pointer> saveables = this->GetSaveables(part);
+  QList<Saveable::Pointer> saveables = this->GetSaveables(part);
   if (saveables.size() > 0) {
     Object::Pointer source(this);
     SaveablesLifecycleEvent::Pointer event(new SaveablesLifecycleEvent(source,
@@ -596,10 +596,10 @@ void SaveablesList::DirtyChanged(IWorkbenchPart::Pointer part)
   }
 }
 
-std::vector<Object::Pointer> SaveablesList::TestGetSourcesForModel(
+QList<Object::Pointer> SaveablesList::TestGetSourcesForModel(
     Saveable::Pointer /*model*/)
 {
-  std::vector<Object::Pointer> result;
+  QList<Object::Pointer> result;
   //  for (Iterator it = modelMap.entrySet().iterator(); it.hasNext();) {
   //    Map.Entry entry = (Map.Entry) it.next();
   //    Set values = (Set) entry.getValue();
@@ -610,22 +610,20 @@ std::vector<Object::Pointer> SaveablesList::TestGetSourcesForModel(
   return result;
 }
 
-std::vector<ISaveablesSource::Pointer> SaveablesList::GetNonPartSources()
+QList<ISaveablesSource::Pointer> SaveablesList::GetNonPartSources()
 {
-  std::vector<ISaveablesSource::Pointer> result(nonPartSources.begin(),
-      nonPartSources.end());
-  return result;
+  return nonPartSources.toList();
 }
 
-std::vector<IWorkbenchPart::Pointer> SaveablesList::GetPartsForSaveable(
+QList<IWorkbenchPart::Pointer> SaveablesList::GetPartsForSaveable(
     Saveable::Pointer model)
 {
-  std::vector<IWorkbenchPart::Pointer> result;
-  for (std::map<Object*, Saveable::Set>::iterator it = modelMap.begin(); it
+  QList<IWorkbenchPart::Pointer> result;
+  for (QHash<Object*, Saveable::Set>::iterator it = modelMap.begin(); it
       != modelMap.end(); ++it)
   {
-    Saveable::Set& values = it->second;
-    IWorkbenchPart::Pointer part(dynamic_cast<IWorkbenchPart*>(it->first));
+    Saveable::Set& values = it.value();
+    IWorkbenchPart::Pointer part(dynamic_cast<IWorkbenchPart*>(it.key()));
     if (values.find(model) != values.end() && part)
     {
       result.push_back(part);

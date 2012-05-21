@@ -19,10 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYMESSAGEDIALOGTWEAKLET_H_
 
 #include <org_blueberry_ui_qt_Export.h>
-#include "berryShell.h"
 
-#include "dialogs/berryIDialog.h"
 #include "internal/berryTweaklets.h"
+
+#include "berryShell.h"
+#include "dialogs/berryIDialog.h"
+
 
 #include <berryMacros.h>
 
@@ -51,7 +53,7 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @return <code>true</code> if the user presses the OK button,
      *         <code>false</code> otherwise
      */
-    virtual bool OpenConfirm(Shell::Pointer parent, const std::string& title, const std::string& message) = 0;
+    virtual bool OpenConfirm(Shell::Pointer parent, const QString& title, const QString& message) = 0;
 
     /**
      * Convenience method to open a standard error dialog.
@@ -63,7 +65,7 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @param message
      *            the message
      */
-    virtual void OpenError(Shell::Pointer parent, const std::string& title, const std::string& message) = 0;
+    virtual void OpenError(Shell::Pointer parent, const QString& title, const QString& message) = 0;
 
     /**
      * Convenience method to open a standard information dialog.
@@ -75,8 +77,8 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @param message
      *            the message
      */
-    virtual void OpenInformation(Shell::Pointer parent, const std::string& title,
-            const std::string& message) = 0;
+    virtual void OpenInformation(Shell::Pointer parent, const QString& title,
+            const QString& message) = 0;
 
     /**
      * Convenience method to open a simple Yes/No question dialog.
@@ -90,8 +92,8 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @return <code>true</code> if the user presses the OK button,
      *         <code>false</code> otherwise
      */
-    virtual bool OpenQuestion(Shell::Pointer parent, const std::string& title,
-            const std::string& message) = 0;
+    virtual bool OpenQuestion(Shell::Pointer parent, const QString& title,
+            const QString& message) = 0;
 
     /**
      * Convenience method to open a standard warning dialog.
@@ -103,7 +105,7 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @param message
      *            the message
      */
-    virtual void OpenWarning(Shell::Pointer parent, const std::string& title, const std::string& message) = 0;
+    virtual void OpenWarning(Shell::Pointer parent, const QString& title, const QString& message) = 0;
 
     /**
      * Create a message dialog. Note that the dialog will have no visual
@@ -144,9 +146,9 @@ struct BERRY_UI_QT MessageDialogTweaklet
      * @param defaultIndex
      *            the index in the button label array of the default button
      */
-    virtual IDialog::Pointer MessageDialog(Shell::Pointer parentShell, const std::string& dialogTitle,
-            void* dialogTitleImage, const std::string& dialogMessage, int dialogImageType,
-            const std::vector<std::string>& dialogButtonLabels, int defaultIndex) = 0;
+    virtual IDialog::Pointer MessageDialog(Shell::Pointer parentShell, const QString& dialogTitle,
+            void* dialogTitleImage, const QString& dialogMessage, int dialogImageType,
+            const QList<QString>& dialogButtonLabels, int defaultIndex) = 0;
 
 };
 

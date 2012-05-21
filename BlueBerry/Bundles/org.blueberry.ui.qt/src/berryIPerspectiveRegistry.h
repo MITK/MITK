@@ -67,7 +67,7 @@ struct BERRY_UI_QT IPerspectiveRegistry {
      *
      * @since 3.0
      */
-    virtual IPerspectiveDescriptor::Pointer ClonePerspective(const std::string& id, const std::string& label,
+    virtual IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
             IPerspectiveDescriptor::Pointer desc) = 0;
 
   /**
@@ -86,7 +86,7 @@ struct BERRY_UI_QT IPerspectiveRegistry {
      * @return the perspective, or <code>null</code> if none
      * @see IPerspectiveDescriptor#getId
      */
-    virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const std::string& perspectiveId) = 0;
+    virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& perspectiveId) = 0;
 
     /**
      * Finds and returns the registered perspective with the given label.
@@ -95,7 +95,7 @@ struct BERRY_UI_QT IPerspectiveRegistry {
      * @return the perspective, or <code>null</code> if none
      * @see IPerspectiveDescriptor#getLabel
      */
-    virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const std::string& label) = 0;
+    virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label) = 0;
 
     /**
      * Returns the id of the default perspective for the workbench.  This identifies one
@@ -106,14 +106,14 @@ struct BERRY_UI_QT IPerspectiveRegistry {
      *
      * @return the default perspective id, or <code>null</code>
      */
-    virtual std::string GetDefaultPerspective() = 0;
+    virtual QString GetDefaultPerspective() = 0;
 
     /**
      * Returns a list of the perspectives known to the workbench.
      *
      * @return a list of perspectives
      */
-    virtual std::vector<IPerspectiveDescriptor::Pointer> GetPerspectives() = 0;
+    virtual QList<IPerspectiveDescriptor::Pointer> GetPerspectives() = 0;
 
     /**
      * Sets the default perspective for the workbench to the given perspective id.
@@ -125,7 +125,7 @@ struct BERRY_UI_QT IPerspectiveRegistry {
      *
      * @param id a perspective id, or <code>null</code>
      */
-    virtual void SetDefaultPerspective(const std::string& id) = 0;
+    virtual void SetDefaultPerspective(const QString& id) = 0;
 
     /**
      * Reverts a perspective back to its original definition

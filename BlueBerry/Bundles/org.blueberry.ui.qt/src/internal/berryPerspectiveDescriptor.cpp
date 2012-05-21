@@ -23,8 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
-    const std::string& label, PerspectiveDescriptor::Pointer originalDescriptor)
+
+PerspectiveDescriptor::PerspectiveDescriptor(const QString& id,
+    const QString& label, PerspectiveDescriptor::Pointer originalDescriptor)
  : singleton(false), fixed(false)
 {
   this->id = id;
@@ -69,7 +70,7 @@ PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
   }
 }
 
-PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
+PerspectiveDescriptor::PerspectiveDescriptor(const QString& id,
     IConfigurationElement::Pointer configElement)
  : singleton(false), fixed(false)
 {
@@ -108,14 +109,9 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
       IPerspectiveFactory::Pointer factory(
           configElement ->CreateExecutableExtension<IPerspectiveFactory> (
               WorkbenchRegistryConstants::ATT_CLASS));
-      if (factory.IsNull())
-      {
-        // support legacy BlueBerry extensions
-        factory = configElement ->CreateExecutableExtension<IPerspectiveFactory> (
-              WorkbenchRegistryConstants::ATT_CLASS, IPerspectiveFactory::GetManifestName());
-      }
       return factory;
-    } catch (CoreException& /*e*/)
+    }
+    catch (const CoreException& /*e*/)
     {
       // do nothing
     }
@@ -130,7 +126,7 @@ void PerspectiveDescriptor::DeleteCustomDefinition()
       PerspectiveDescriptor::Pointer(this));
 }
 
-std::string PerspectiveDescriptor::GetDescription() const
+QString PerspectiveDescriptor::GetDescription() const
 {
   return configElement == 0 ? description : RegistryReader::GetDescription(
       configElement);
@@ -141,9 +137,7 @@ bool PerspectiveDescriptor::GetFixed() const
   if (configElement == 0)
     return fixed;
 
-  bool val = false;
-  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_FIXED, val);
-  return val;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_FIXED).compare("true", Qt::CaseInsensitive) == 0;
 }
 
 std::vector< std::string> PerspectiveDescriptor::GetKeywordReferences() const
@@ -167,12 +161,12 @@ std::vector< std::string> PerspectiveDescriptor::GetKeywordReferences() const
   return result;
 }
 
-std::string PerspectiveDescriptor::GetId() const
+QString PerspectiveDescriptor::GetId() const
 {
   return id;
 }
 
-std::string PerspectiveDescriptor::GetPluginId() const
+QString PerspectiveDescriptor::GetPluginId() const
 {
   return configElement == 0 ? pluginId : configElement->GetContributor();
 }
@@ -184,13 +178,13 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
 
   if (configElement)
   {
-    std::string icon;
-    configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, icon);
-    if (!icon.empty())
+    QString icon = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
+    if (!icon.isEmpty())
     {
       imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
           configElement->GetContributor(), icon);
     }
+
   }
 
   if (!imageDescriptor)
@@ -203,32 +197,30 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
 
 std::vector<std::string> PerspectiveDescriptor::GetCategoryPath()
 {
-    std::string category;
-    categoryPath.clear();
+  std::string category;
+  categoryPath.clear();
 
-    if (configElement.IsNotNull() && configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
+  if (configElement.IsNotNull() && configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
+  {
+    Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    // Parse the path tokens and store them
+    for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
     {
-      Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-      // Parse the path tokens and store them
-      for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
-      {
-        categoryPath.push_back(*iter);
-      }
+      categoryPath.push_back(*iter);
     }
-    return categoryPath;
+  }
+  return categoryPath;
 }
 
-std::string PerspectiveDescriptor::GetLabel() const
+QString PerspectiveDescriptor::GetLabel() const
 {
   if (configElement == 0)
     return label;
 
-  std::string val;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
-  return val;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
 }
 
-std::string PerspectiveDescriptor::GetOriginalId() const
+QString PerspectiveDescriptor::GetOriginalId() const
 {
   if (originalId == "")
   {
@@ -250,9 +242,7 @@ bool PerspectiveDescriptor::HasDefaultFlag() const
     return false;
   }
 
-  bool val = false;
-  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_DEFAULT, val);
-  return val;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_DEFAULT).compare("true", Qt::CaseInsensitive) == 0;
 }
 
 bool PerspectiveDescriptor::IsPredefined() const
@@ -265,10 +255,7 @@ bool PerspectiveDescriptor::IsSingleton() const
   if (configElement == 0)
     return singleton;
 
-  bool val = false;
-  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_SINGLETON,
-      val);
-  return val;
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_SINGLETON).compare("true", Qt::CaseInsensitive) == 0;
 }
 
 bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
@@ -314,7 +301,7 @@ bool PerspectiveDescriptor::SaveState(IMemento::Pointer memento)
   IMemento::Pointer childMem(memento->CreateChild(
       WorkbenchConstants::TAG_DESCRIPTOR));
   childMem->PutString(WorkbenchConstants::TAG_ID, GetId());
-  if (!originalId.empty())
+  if (!originalId.isEmpty())
   {
     childMem->PutString(WorkbenchConstants::TAG_DESCRIPTOR, originalId);
   }
@@ -333,9 +320,10 @@ IConfigurationElement::Pointer PerspectiveDescriptor::GetConfigElement() const
   return configElement;
 }
 
-std::string PerspectiveDescriptor::GetFactoryClassName() const
+QString PerspectiveDescriptor::GetFactoryClassName() const
 {
   return configElement == 0 ? className : RegistryReader::GetClassValue(
       configElement, WorkbenchRegistryConstants::ATT_CLASS);
 }
+
 }

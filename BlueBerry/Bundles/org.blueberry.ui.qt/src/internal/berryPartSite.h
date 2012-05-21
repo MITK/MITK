@@ -82,7 +82,7 @@ public:
    * @see IWorkbenchPartSite#registerContextMenu(MenuManager,
    *      ISelectionProvider)
    */
-//public: static void RegisterContextMenu(const std::string& menuId,
+//public: static void RegisterContextMenu(const QString& menuId,
 //      const MenuManager menuManager,
 //      const ISelectionProvider selectionProvider,
 //      bool includeEditorInput, IWorkbenchPart::ConstPointer part,
@@ -93,9 +93,9 @@ private:
   IWorkbenchPartReference::WeakPtr partReference;
   WeakPointer<IWorkbenchPart> part;
   IWorkbenchPage* page;
-  std::string extensionID;
-  std::string pluginID;
-  std::string extensionName;
+  QString extensionID;
+  QString pluginID;
+  QString extensionName;
   ISelectionProvider::Pointer selectionProvider;
   //SubActionBars actionBars;
   //KeyBindingService keyBindingService;
@@ -152,7 +152,7 @@ public: ~PartSite();
    *
    * @return the registry extension ID
    */
-public: virtual std::string GetId();
+public: virtual QString GetId();
 
   /**
    * Returns the page containing this workbench site's part.
@@ -181,12 +181,12 @@ public: virtual IWorkbenchPartReference::Pointer GetPartReference();
    *
    * @return the registry plugin ID
    */
-public: virtual std::string GetPluginId();
+public: virtual QString GetPluginId();
 
   /**
    * Returns the registered name for this part.
    */
-public: virtual std::string GetRegisteredName();
+public: virtual QString GetRegisteredName();
 
   /**
    * Returns the selection provider for a part.
@@ -210,7 +210,7 @@ public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
   /**
    * Register a popup menu for extension.
    */
-//public: virtual void RegisterContextMenu(const std::string& menuID,
+//public: virtual void RegisterContextMenu(const QString& menuID,
 //      MenuManager menuMgr,
 //      ISelectionProvider selProvider);
 
@@ -224,7 +224,7 @@ public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
   /**
    * Get the registered popup menu identifiers
    */
-//public: virtual void GetContextMenuIds(std::vector<std::string>& menuIds);
+//public: virtual void GetContextMenuIds(QList<QString>& menuIds);
 
   /**
    * Sets the action bars for the part.
@@ -236,7 +236,7 @@ public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
    */
 public: virtual void SetConfigurationElement(IConfigurationElement::Pointer configElement);
 
-protected: virtual void SetPluginId(const std::string& pluginId);
+protected: virtual void SetPluginId(const QString& pluginId);
 
   /**
    * Sets the part registry extension ID.
@@ -244,7 +244,7 @@ protected: virtual void SetPluginId(const std::string& pluginId);
    * @param id
    *            the registry extension ID
    */
-protected: virtual void SetId(const std::string& id);
+protected: virtual void SetId(const QString& id);
 
   /**
    * Sets the part.
@@ -257,7 +257,7 @@ public: virtual void SetPart(SmartPointer<IWorkbenchPart> newPart);
    * @param name
    *            the registered name
    */
-protected: virtual void SetRegisteredName(const std::string& name);
+protected: virtual void SetRegisteredName(const QString& name);
 
   /**
    * Set the selection provider for a part.
@@ -271,7 +271,7 @@ public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider);
    */
 //public: virtual  IKeyBindingService GetKeyBindingService();
 
-protected: virtual std::string GetInitialScopeId();
+protected: virtual QString GetInitialScopeId();
 
   /**
    * Get an adapter for this type.
@@ -292,9 +292,9 @@ protected: void* GetAdapterImpl(const std::type_info& adapter) const;
    */
 //public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-public: Object::Pointer GetService(const std::string& api);
+public: Object::Pointer GetService(const QString& api);
 
-public: bool HasService(const std::string& api) const;
+public: bool HasService(const QString& api) const;
 
   /**
    * Prints out the identifier, the plug-in identifier and the registered
@@ -302,7 +302,7 @@ public: bool HasService(const std::string& api) const;
    *
    * @since 3.2
    */
-public: virtual std::string ToString();
+public: virtual QString ToString();
 };
 
 }  // namespace berry

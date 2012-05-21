@@ -20,9 +20,9 @@ namespace berry
 {
 
 const int IEditorRegistry::PROP_CONTENTS = 0x01;
-const std::string IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID =
+const QString IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID =
     "org.blueberry.ui.systemExternalEditor"; //$NON-NLS-1$
-const std::string IEditorRegistry::SYSTEM_INPLACE_EDITOR_ID =
+const QString IEditorRegistry::SYSTEM_INPLACE_EDITOR_ID =
     "org.blueberry.ui.systemInPlaceEditor"; //$NON-NLS-1$
 
 IEditorRegistry::~IEditorRegistry()

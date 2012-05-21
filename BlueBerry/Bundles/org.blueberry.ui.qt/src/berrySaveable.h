@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 #include <berryIAdaptable.h>
-#include <set>
-#include <vector>
 
 #include <org_blueberry_ui_qt_Export.h>
 #include "berryImageDescriptor.h"
@@ -47,14 +45,13 @@ struct IWorkbenchPart;
  * </p>
  *
  * @see ISaveablesSource
- * @since 3.2
  */
 class BERRY_UI_QT Saveable : /*public InternalSaveable*/ public virtual Object, public IAdaptable
 {
 
 public:
 
-  berryObjectMacro(Saveable);
+  berryObjectMacro(Saveable)
 
 private:
   //Cursor waitCursor;
@@ -62,15 +59,7 @@ private:
 
 public:
 
-  struct SaveableCmp : public std::binary_function<Saveable::Pointer, Saveable::Pointer, bool>
-  {
-    bool operator()(const Saveable::Pointer& s1, const Saveable::Pointer& s2) const
-    {
-      return s1->operator<(s2.GetPointer());
-    }
-  };
-
-  typedef std::set<Saveable::Pointer, SaveableCmp> Set;
+  typedef QSet<Saveable::Pointer> Set;
 
   /**
    * Attempts to show this saveable in the given page and returns
@@ -89,7 +78,7 @@ public:
    *
    * @return the model's name; never <code>null</code>.
    */
-  virtual std::string GetName() const = 0;
+  virtual QString GetName() const = 0;
 
   /**
    * Returns the tool tip text for this saveable. This text is used to
@@ -99,7 +88,7 @@ public:
    *
    * @return the tool tip text; never <code>null</code>
    */
-  virtual  std::string GetToolTipText() const = 0;
+  virtual  QString GetToolTipText() const = 0;
 
   /**
    * Returns the image descriptor for this saveable.
@@ -260,7 +249,7 @@ public:
    *
    * @since 3.3
    */
-  virtual void DisableUI(const std::vector<SmartPointer<IWorkbenchPart> >& parts, bool closing);
+  virtual void DisableUI(const QList<SmartPointer<IWorkbenchPart> >& parts, bool closing);
 
   /**
    * Enables the UI of the given parts containing this saveable after a
@@ -276,7 +265,7 @@ public:
    *
    * @since 3.3
    */
-  virtual void EnableUI(std::vector<SmartPointer<IWorkbenchPart> >& parts);
+  virtual void EnableUI(QList<SmartPointer<IWorkbenchPart> >& parts);
 
 protected:
 
@@ -289,7 +278,7 @@ protected:
    *
    * @since 3.3
    */
-  virtual Poco::Any GetAdapter(const std::string& adapter);
+  virtual Poco::Any GetAdapter(const QString& adapter);
 };
 
 }

@@ -40,7 +40,7 @@ QString Event::ToString() const
       << " stateMask=" << stateMask << " text=" << text << " doit=" << doit
       << '\n';
 
-  return str();
+  return str;
 }
 
 }

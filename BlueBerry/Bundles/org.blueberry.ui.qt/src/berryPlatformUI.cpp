@@ -40,7 +40,7 @@ const int PlatformUI::RETURN_EMERGENCY_CLOSE = 3;
 int
 PlatformUI::CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor)
 {
-//  std::vector<IConfigurationElement::Pointer> extensions(
+//  QList<IConfigurationElement::Pointer> extensions(
 //    Platform::GetExtensionPointService()->GetConfigurationElementsFor(PlatformUI::XP_WORKBENCH));
 //
 //  for (unsigned int i = 0; i < extensions.size(); ++i)

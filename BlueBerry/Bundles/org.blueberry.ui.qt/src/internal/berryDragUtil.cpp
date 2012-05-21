@@ -14,22 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryDragUtil.h"
 
 #include "berryGeometry.h"
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "tweaklets/berryDnDTweaklet.h"
 #include "tweaklets/berryITracker.h"
 
 namespace berry
 {
 
-const std::string DragUtil::DROP_TARGET_ID =
+const QString DragUtil::DROP_TARGET_ID =
     "org.blueberry.ui.internal.dropTarget";
 
 TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 
-std::list<IDragOverListener::Pointer> DragUtil::defaultTargets = std::list<
+QList<IDragOverListener::Pointer> DragUtil::defaultTargets = QList<
     IDragOverListener::Pointer>();
 
 DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem,
@@ -109,13 +110,13 @@ DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
   return list;
 }
 
-IDropTarget::Pointer DragUtil::GetDropTarget(const std::list<
+IDropTarget::Pointer DragUtil::GetDropTarget(const QList<
     IDragOverListener::Pointer>& toSearch, void* mostSpecificControl,
     Object::Pointer draggedObject, const Point& position,
     const Rectangle& dragRectangle)
 {
 
-  for (std::list<IDragOverListener::Pointer>::const_iterator iter =
+  for (QList<IDragOverListener::Pointer>::const_iterator iter =
       toSearch.begin(); iter != toSearch.end(); ++iter)
   {
     IDragOverListener::Pointer next = *iter;
@@ -157,14 +158,14 @@ void DragUtil::RemoveDragTarget(void* control,
 {
   if (control == 0)
   {
-    defaultTargets.remove(target);
+    defaultTargets.removeAll(target);
   }
   else
   {
     TargetListType::Pointer targetList = GetTargetList(control);
     if (targetList != 0)
     {
-      targetList->remove(target);
+      targetList->removeAll(target);
       if (targetList->empty())
       {
         Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetData(control,
@@ -330,9 +331,9 @@ IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
       GuiWidgetsTweaklet::KEY)->GetParent(current))
   {
     TargetListType::Pointer targetList = GetTargetList(current);
-    std::list<IDragOverListener::Pointer> targets;
+    QList<IDragOverListener::Pointer> targets;
     if (targetList != 0)
-      targets.assign(targetList->begin(), targetList->end());
+      targets = *targetList;
 
     IDropTarget::Pointer dropTarget = GetDropTarget(targets, toSearch,
         draggedObject, position, dragRectangle);

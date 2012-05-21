@@ -34,27 +34,27 @@ ViewRegistry::ViewCategoryProxy::ViewCategoryProxy(
 {
 }
 
-const std::vector<IViewDescriptor::Pointer>& ViewRegistry::ViewCategoryProxy::GetViews() const
+QList<IViewDescriptor::Pointer> ViewRegistry::ViewCategoryProxy::GetViews() const
 {
   return rawCategory->GetElements();
 }
 
-const std::string& ViewRegistry::ViewCategoryProxy::GetId() const
+QString ViewRegistry::ViewCategoryProxy::GetId() const
 {
   return rawCategory->GetId();
 }
 
-std::vector<std::string> ViewRegistry::ViewCategoryProxy::GetPath() const
+QStringList ViewRegistry::ViewCategoryProxy::GetPath() const
 {
-  std::vector<std::string> path;
-  std::string rawParentPath = rawCategory->GetRawParentPath();
+  QList<QString> path;
+  QString rawParentPath = rawCategory->GetRawParentPath();
   // nested categories are not supported yet
   // assume an empty raw parent path
   path.push_back(rawParentPath);
   return path;
 }
 
-std::string ViewRegistry::ViewCategoryProxy::GetLabel() const
+QString ViewRegistry::ViewCategoryProxy::GetLabel() const
 {
   return rawCategory->GetLabel();
 }
@@ -73,13 +73,13 @@ int ViewRegistry::ViewCategoryProxy::HashCode()
   return 0;
 }
 
-std::string ViewRegistry::EXTENSIONPOINT_UNIQUE_ID = "org.blueberry.ui.views";
+QString ViewRegistry::EXTENSIONPOINT_UNIQUE_ID = "org.blueberry.ui.views";
     // PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_VIEWS;
 
 
-Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::InternalFindCategory(const std::string& id)
+Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::InternalFindCategory(const QString& id)
 {
-  for (std::vector<IViewDescriptorCategoryPtr>::iterator itr = categories.begin();
+  for (QList<IViewDescriptorCategoryPtr>::iterator itr = categories.begin();
        itr != categories.end(); ++itr)
   {
     if (id == (*itr)->GetRootPath())
@@ -90,12 +90,12 @@ Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::InternalFindCategory(c
   return IViewDescriptorCategoryPtr(0);
 }
 
-const IExtensionPoint* ViewRegistry::GetExtensionPointFilter()
+IExtensionPoint::Pointer ViewRegistry::GetExtensionPointFilter()
 {
-  return Platform::GetExtensionPointService()->GetExtensionPoint(EXTENSIONPOINT_UNIQUE_ID);
+  return Platform::GetExtensionRegistry()->GetExtensionPoint(EXTENSIONPOINT_UNIQUE_ID);
 }
 
-const std::string ViewRegistry::TAG_DESCRIPTION = "description";
+const QString ViewRegistry::TAG_DESCRIPTION = "description";
 
 ViewRegistry::ViewRegistry() :
   dirtyViewCategoryMappings(true)
@@ -132,7 +132,7 @@ void ViewRegistry::Add(IViewDescriptorCategoryPtr desc)
 
 void ViewRegistry::Add(ViewDescriptor::Pointer desc)
 {
-  for (std::vector<IViewDescriptor::Pointer>::const_iterator itr = views.begin();
+  for (QList<IViewDescriptor::Pointer>::const_iterator itr = views.begin();
        itr != views.end(); ++itr)
   {
     if (desc.GetPointer() == itr->GetPointer()) return;
@@ -154,9 +154,9 @@ void ViewRegistry::Add(StickyViewDescriptor::Pointer desc)
   }
 }
 
-IViewDescriptor::Pointer ViewRegistry::Find(const std::string& id) const
+IViewDescriptor::Pointer ViewRegistry::Find(const QString& id) const
 {
-  for (std::vector<IViewDescriptor::Pointer>::const_iterator itr = views.begin();
+  for (QList<IViewDescriptor::Pointer>::const_iterator itr = views.begin();
        itr != views.end(); ++itr)
   {
     if (id == (*itr)->GetId())
@@ -167,7 +167,7 @@ IViewDescriptor::Pointer ViewRegistry::Find(const std::string& id) const
   return IViewDescriptor::Pointer(0);
 }
 
-IViewCategory::Pointer ViewRegistry::FindCategory(const std::string& id)
+IViewCategory::Pointer ViewRegistry::FindCategory(const QString& id)
 {
   this->MapViewsToCategories();
   IViewDescriptorCategoryPtr category(this->InternalFindCategory(id));
@@ -179,11 +179,11 @@ IViewCategory::Pointer ViewRegistry::FindCategory(const std::string& id)
   return cat;
 }
 
-std::vector<IViewCategory::Pointer> ViewRegistry::GetCategories()
+QList<IViewCategory::Pointer> ViewRegistry::GetCategories()
 {
   this->MapViewsToCategories();
-  std::vector<IViewCategory::Pointer> retArray;
-  for (std::vector<IViewDescriptorCategoryPtr>::iterator itr = categories.begin();
+  QList<IViewCategory::Pointer> retArray;
+  for (QList<IViewDescriptorCategoryPtr>::iterator itr = categories.begin();
        itr != categories.end(); ++itr)
   {
     retArray.push_back(IViewCategory::Pointer(new ViewCategoryProxy(*itr)));
@@ -191,7 +191,7 @@ std::vector<IViewCategory::Pointer> ViewRegistry::GetCategories()
   return retArray;
 }
 
-std::vector<IStickyViewDescriptor::Pointer> ViewRegistry::GetStickyViews() const
+QList<IStickyViewDescriptor::Pointer> ViewRegistry::GetStickyViews() const
 {
   return sticky;
 }
@@ -201,7 +201,7 @@ Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::GetMiscCategory() cons
   return miscCategory;
 }
 
-const std::vector<IViewDescriptor::Pointer>& ViewRegistry::GetViews() const
+QList<IViewDescriptor::Pointer> ViewRegistry::GetViews() const
 {
   return views;
 }
@@ -212,7 +212,7 @@ void ViewRegistry::MapViewsToCategories()
   {
     dirtyViewCategoryMappings = false;
     // clear all category mappings
-    for (std::vector<IViewDescriptorCategoryPtr>::iterator i = categories.begin();
+    for (QList<IViewDescriptorCategoryPtr>::iterator i = categories.begin();
          i != categories.end(); ++i)
     {
       (*i)->Clear(); // this is bad
@@ -220,12 +220,12 @@ void ViewRegistry::MapViewsToCategories()
 
     miscCategory->Clear();
 
-    for (std::vector<IViewDescriptor::Pointer>::iterator i = views.begin();
+    for (QList<IViewDescriptor::Pointer>::iterator i = views.begin();
          i != views.end(); ++i)
     {
       IViewDescriptor::Pointer desc(*i);
       IViewDescriptorCategoryPtr cat(0);
-      const std::vector<std::string>& catPath = desc->GetCategoryPath();
+      const QList<QString>& catPath = desc->GetCategoryPath();
       if (catPath.size() > 0)
       {
         cat = this->InternalFindCategory(catPath[0]);
@@ -245,10 +245,8 @@ void ViewRegistry::MapViewsToCategories()
           // does not exist. Add this view to the 'Other' category
           // but give out a message (to the log only) indicating
           // this has been done.
-          std::string fmt(Poco::Logger::format(
-              "Category $0 not found for view $1.  This view added to ''$2'' category.",
-              catPath[0], desc->GetId(), miscCategory->GetLabel()));
-          WorkbenchPlugin::Log(fmt);
+          QString fmt("Category %1 not found for view %2.  This view added to ''%3'' category.");
+          WorkbenchPlugin::Log(fmt.arg(catPath[0]).arg(desc->GetId()).arg(miscCategory->GetLabel()));
         }
         miscCategory->AddElement(desc);
       }

@@ -236,7 +236,7 @@ org_blueberry_core_runtime_EXPORT QDebug operator<<(QDebug os, const berry::Smar
 
 org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::Object& o);
 org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<const berry::Object>& o);
-org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<berry::Object>& o);
+//org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<berry::Object>& o);
 
 
 Q_DECLARE_METATYPE(berry::Object::Pointer)

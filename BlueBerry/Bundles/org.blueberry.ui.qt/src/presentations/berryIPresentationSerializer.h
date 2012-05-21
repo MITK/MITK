@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPresentablePart.h"
 
-#include <string>
+#include <QString>
 
 namespace berry {
 
@@ -43,7 +43,7 @@ struct BERRY_UI_QT IPresentationSerializer {
      * @param part a part to be identified (not null)
      * @return a unique identifier for the part (not null)
      */
-    virtual std::string GetId(IPresentablePart::Pointer part) = 0;
+    virtual QString GetId(IPresentablePart::Pointer part) = 0;
 
     /**
      * Returns a presentable part, given an id that was generated when the presentation
@@ -56,7 +56,7 @@ struct BERRY_UI_QT IPresentationSerializer {
      * be valid when the presentation is restored. Callers must be prepared
      * to handle a null result.
      */
-    virtual IPresentablePart::Pointer GetPart(const std::string& id) = 0;
+    virtual IPresentablePart::Pointer GetPart(const QString& id) = 0;
 
     virtual ~IPresentationSerializer();
 };

@@ -25,7 +25,7 @@ const int SaveablesLifecycleEvent::POST_CLOSE = 3;
 const int SaveablesLifecycleEvent::DIRTY_CHANGED = 4;
 
 SaveablesLifecycleEvent::SaveablesLifecycleEvent(Object::Pointer source_,
-    int eventType_, const std::vector<Saveable::Pointer>& saveables_,
+    int eventType_, const QList<Saveable::Pointer>& saveables_,
     bool force_) :
   eventType(eventType_), saveables(saveables_), force(force_), veto(false),
       source(source_)
@@ -43,7 +43,7 @@ Object::Pointer SaveablesLifecycleEvent::GetSource()
   return source;
 }
 
-std::vector<Saveable::Pointer> SaveablesLifecycleEvent::GetSaveables()
+QList<Saveable::Pointer> SaveablesLifecycleEvent::GetSaveables()
 {
   return saveables;
 }

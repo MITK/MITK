@@ -40,8 +40,8 @@ public:
   berryObjectMacro(ViewSite);
 
   ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view,
-           WorkbenchPage* page,
-            const std::string& id, const std::string& pluginId, const std::string& registeredName);
+           WorkbenchPage* page, const QString& id, const QString& pluginId,
+           const QString& registeredName);
 
     /**
      * Creates a new ViewSite.
@@ -52,7 +52,7 @@ public:
     /**
      * Returns the secondary id or <code>null</code>.
      */
-    std::string GetSecondaryId();
+    QString GetSecondaryId();
 
     /**
      * Returns the view.

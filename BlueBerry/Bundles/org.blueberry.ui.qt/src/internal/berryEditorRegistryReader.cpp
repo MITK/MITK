@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryPlatformUI.h"
 
-#include <Poco/String.h>
-#include <Poco/StringTokenizer.h>
+#include <QStringList>
 
 namespace berry
 {
@@ -34,15 +33,15 @@ void EditorRegistryReader::AddEditors(EditorRegistry* registry)
       WorkbenchRegistryConstants::PL_EDITOR);
 }
 
-bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
+bool EditorRegistryReader::ReadElement(const IConfigurationElement::Pointer& element)
 {
   if (element->GetName() != WorkbenchRegistryConstants::TAG_EDITOR)
   {
     return false;
   }
 
-  std::string id;
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id))
+  QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  if (id.isEmpty())
   {
     this->LogMissingAttribute(element, WorkbenchRegistryConstants::ATT_ID);
     return true;
@@ -50,57 +49,47 @@ bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
 
   EditorDescriptor::Pointer editor(new EditorDescriptor(id, element));
 
-  std::vector<std::string> extensionsVector;
-  std::vector<std::string> filenamesVector;
-  std::vector<std::string> contentTypeVector;
+  QList<QString> extensionsVector;
+  QList<QString> filenamesVector;
+  QList<QString> contentTypeVector;
   bool defaultEditor = false;
 
-  std::string value;
+  QString value = element->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
 
   // Get editor name (required field).
-  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, value))
+  if (value.isEmpty())
   {
     this->LogMissingAttribute(element, WorkbenchRegistryConstants::ATT_NAME);
     return true;
   }
 
   // Get target extensions (optional field)
-  std::string extensionsString;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_EXTENSIONS,
-      extensionsString))
+  QString extensionsString = element->GetAttribute(WorkbenchRegistryConstants::ATT_EXTENSIONS);
+  if (!extensionsString.isEmpty())
   {
-    Poco::StringTokenizer tokenizer(extensionsString, ",",
-        Poco::StringTokenizer::TOK_IGNORE_EMPTY
-            | Poco::StringTokenizer::TOK_TRIM);//$NON-NLS-1$
-    Poco::StringTokenizer::Iterator token = tokenizer.begin();
-    while (token != tokenizer.end())
+    QStringList tokens = extensionsString.split(',', QString::SkipEmptyParts);
+    foreach(QString token, tokens)
     {
-      extensionsVector.push_back(*token);
-      ++token;
+      extensionsVector.push_back(token.trimmed());
     }
   }
-  std::string filenamesString;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_FILENAMES,
-      filenamesString))
+  QString filenamesString = element->GetAttribute(WorkbenchRegistryConstants::ATT_FILENAMES);
+  if (!filenamesString.isEmpty())
   {
-    Poco::StringTokenizer tokenizer(filenamesString, ",",
-        Poco::StringTokenizer::TOK_IGNORE_EMPTY
-            | Poco::StringTokenizer::TOK_TRIM);//$NON-NLS-1$
-    Poco::StringTokenizer::Iterator token = tokenizer.begin();
-    while (token != tokenizer.end())
+    QStringList tokens = filenamesString.split(',', QString::SkipEmptyParts);
+    foreach(QString token, tokens)
     {
-      filenamesVector.push_back(*token);
-      ++token;
+      filenamesVector.push_back(token.trimmed());
     }
   }
 
-  IConfigurationElement::vector bindings = element->GetChildren(
-      WorkbenchRegistryConstants::TAG_CONTENT_TYPE_BINDING);
+  QList<IConfigurationElement::Pointer> bindings = element->GetChildren(
+                                                     WorkbenchRegistryConstants::TAG_CONTENT_TYPE_BINDING);
   for (unsigned int i = 0; i < bindings.size(); ++i)
   {
-    std::string contentTypeId;
-    if (!bindings[i]->GetAttribute(
-        WorkbenchRegistryConstants::ATT_CONTENT_TYPE_ID, contentTypeId))
+    QString contentTypeId = bindings[i]->GetAttribute(
+                              WorkbenchRegistryConstants::ATT_CONTENT_TYPE_ID);
+    if (contentTypeId.isEmpty())
     {
       continue;
     }
@@ -108,7 +97,7 @@ bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
   }
 
   // Is this the default editor?
-  element->GetBoolAttribute(WorkbenchRegistryConstants::ATT_DEFAULT, defaultEditor);
+  defaultEditor = element->GetAttribute(WorkbenchRegistryConstants::ATT_DEFAULT).compare("true", Qt::CaseInsensitive) == 0;
 
   // Add the editor to the manager.
   editorRegistry->AddEditorFromPlugin(editor, extensionsVector,
@@ -117,7 +106,7 @@ bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
 }
 
 void EditorRegistryReader::ReadElement(EditorRegistry* editorRegistry,
-    IConfigurationElement::Pointer element)
+                                       const IConfigurationElement::Pointer& element)
 {
   this->editorRegistry = editorRegistry;
   this->ReadElement(element);

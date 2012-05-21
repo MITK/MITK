@@ -142,7 +142,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the short name of the part (not null)
      */
-    virtual std::string GetName() const = 0;
+    virtual QString GetName() const = 0;
 
     /**
      * Returns the title of this workbench part. If this value changes
@@ -155,7 +155,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the workbench part title (not null)
      */
-    virtual std::string GetTitle() const = 0;
+    virtual QString GetTitle() const = 0;
 
     /**
      * Returns the status message from the part's title, or the empty string if none.
@@ -169,7 +169,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the status message or the empty string if none (not null)
      */
-    virtual std::string GetTitleStatus() const = 0;
+    virtual QString GetTitleStatus() const = 0;
 
     /**
      * Returns the title image of this workbench part.  If this value changes
@@ -196,7 +196,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the workbench part title tool tip (not null)
      */
-    virtual std::string GetTitleToolTip() const = 0;
+    virtual QString GetTitleToolTip() const = 0;
 
     /**
      * Returns true iff the contents of this part have changed recently. For
@@ -260,7 +260,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
    * @return the property, or <code>null</code> if that property is not set.
    * @since 3.3
    */
-  virtual std::string GetPartProperty(const std::string& key) const = 0;
+  virtual QString GetPartProperty(const QString& key) const = 0;
 
 };
 

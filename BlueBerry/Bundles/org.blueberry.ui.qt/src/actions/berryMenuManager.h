@@ -414,7 +414,7 @@ protected:
    *
    * @return the menu items
    */
-  //std::vector<SmartPointer<IMenuItem> > GetMenuItems();
+  //QList<SmartPointer<IMenuItem> > GetMenuItems();
 
   /**
    * Get an item from the implementation's widget.

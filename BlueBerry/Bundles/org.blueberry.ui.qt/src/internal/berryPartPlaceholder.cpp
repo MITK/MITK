@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string PartPlaceholder::WILD_CARD = "*"; //$NON-NLS-1$
+const QString PartPlaceholder::WILD_CARD = "*";
 
-PartPlaceholder::PartPlaceholder(const std::string& id) :
+PartPlaceholder::PartPlaceholder(const QString& id) :
   LayoutPart(id)
 {
 
@@ -41,7 +41,7 @@ void* PartPlaceholder::GetControl()
 
 bool PartPlaceholder::HasWildCard()
 {
-  return this->GetID().find_first_of(WILD_CARD) != std::string::npos;
+  return this->GetID().indexOf(WILD_CARD) != -1;
 }
 
 bool PartPlaceholder::IsPlaceHolder() const

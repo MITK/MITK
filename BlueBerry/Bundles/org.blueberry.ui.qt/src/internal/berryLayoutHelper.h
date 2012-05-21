@@ -60,7 +60,7 @@ public:
      * @param viewId the view id to activate upon <code>IIdentifier</code> enablement.
      */
     static void AddViewActivator(SmartPointer<PageLayout> pageLayout,
-            const std::string& viewId);
+            const QString& viewId);
 
     /**
      * Create the view.  If it's already been been created in the provided
@@ -71,7 +71,7 @@ public:
      * @return the new <code>ViewPane</code>.
      * @throws PartInitException thrown if there is a problem creating the view.
      */
-    static PartPane::Pointer CreateView(ViewFactory* factory, const std::string& viewId);
+    static PartPane::Pointer CreateView(ViewFactory* factory, const QString& viewId);
 
 };
 

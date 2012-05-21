@@ -56,8 +56,8 @@ public:
   void* GetParent(void* widget);
   bool SetParent(void* widget, void* parent);
 
-  void SetData(void* widget, const std::string& id, Object::Pointer data);
-  Object::Pointer GetData(void* widget, const std::string& id);
+  void SetData(void* widget, const QString& id, Object::Pointer data);
+  Object::Pointer GetData(void* widget, const QString& id);
 
   //IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP);
   //IMenu::Pointer CreateMenu(IMenu::Pointer parent);
@@ -71,7 +71,7 @@ public:
 
   Point GetCursorLocation();
   void* GetCursorControl();
-  void* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location);
+  void* FindControl(const QList<Shell::Pointer>& shells, const Point& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -105,7 +105,7 @@ public:
 
   void* CreateComposite(void* parent);
 
-  std::vector<Shell::Pointer> GetShells();
+  QList<Shell::Pointer> GetShells();
   Shell::Pointer GetShell(void* widget);
   Shell::Pointer GetActiveShell();
 

@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string IntroConstants::INTRO_VIEW_ID = "org.blueberry.ui.internal.introview";
-const std::string IntroConstants::INTRO_EDITOR_ID = "org.blueberry.ui.internal.introeditor";
+const QString IntroConstants::INTRO_VIEW_ID = "org.blueberry.ui.internal.introview";
+const QString IntroConstants::INTRO_EDITOR_ID = "org.blueberry.ui.internal.introeditor";
 const int IntroConstants::INTRO_ROLE_VIEW = 0x01;
 const int IntroConstants::INTRO_ROLE_EDITOR = 0x02;
 

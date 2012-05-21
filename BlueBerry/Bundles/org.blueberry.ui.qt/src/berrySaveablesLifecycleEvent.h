@@ -65,7 +65,7 @@ private:
 
   int eventType;
 
-  std::vector<Saveable::Pointer> saveables;
+  QList<Saveable::Pointer> saveables;
 
   bool force;
 
@@ -94,7 +94,7 @@ public:
    *            that cannot be canceled.
    */
   SaveablesLifecycleEvent(Object::Pointer source_, int eventType_,
-      const std::vector<Saveable::Pointer>& saveables_, bool force_);
+      const QList<Saveable::Pointer>& saveables_, bool force_);
 
   /**
    * Returns the eventType, currently one of POST_OPEN, PRE_CLOSE, POST_CLOSE,
@@ -112,7 +112,7 @@ public:
    *
    * @return the saveables
    */
-  std::vector<Saveable::Pointer> GetSaveables();
+  QList<Saveable::Pointer> GetSaveables();
 
   /**
    * Returns the veto. This value is ignored for POST_OPEN,POST_CLOSE, and

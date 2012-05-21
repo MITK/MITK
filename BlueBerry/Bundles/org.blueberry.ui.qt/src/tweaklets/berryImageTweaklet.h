@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIMAGETWEAKLET_H_
 #define BERRYIMAGETWEAKLET_H_
 
-#include <org_blueberry_ui_qt_Export.h>
 #include "internal/berryTweaklets.h"
+
+#include <org_blueberry_ui_qt_Export.h>
+
 #include "berryImageDescriptor.h"
 
 #include <iostream>

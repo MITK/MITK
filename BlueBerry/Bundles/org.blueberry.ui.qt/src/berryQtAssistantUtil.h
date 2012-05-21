@@ -52,7 +52,7 @@ public:
   static void OpenActivePartHelp();
 
   // for legacy BlueBerry bundle support
-  static bool RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles);
+  static bool RegisterQCHFiles(const QList<IBundle::Pointer>& bundles);
 
   static bool RegisterQCHFiles(const QStringList& qchFiles);
   static bool UnregisterQCHFiles(const QStringList& qchFiles);
@@ -70,7 +70,7 @@ private:
   static QSet<QString> registeredBundles;
 
   static QString GetAssistantExecutable();
-  static QStringList ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles);
+  static QStringList ExtractQCHFiles(const QList<IBundle::Pointer>& bundles);
   static bool CallQtAssistant(const QStringList& qchFiles, bool registerFile = true);
 
 };

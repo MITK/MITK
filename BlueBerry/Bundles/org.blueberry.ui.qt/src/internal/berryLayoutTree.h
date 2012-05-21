@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPartSashContainer.h"
 
-#include <list>
-
 namespace berry
 {
 
@@ -44,7 +42,7 @@ class LayoutTree : public Object, public ISizeProvider
 
 public:
 
-  berryObjectMacro(LayoutTree);
+  berryObjectMacro(LayoutTree)
 
   /* The parent of this tree or null if it is the root */
   LayoutTreeNode* parent;
@@ -90,7 +88,7 @@ public:
    * and returns the left children.
    */
   virtual LayoutPart::Pointer ComputeRelation(
-      std::list<PartSashContainer::RelationshipInfo>& relations);
+      QList<PartSashContainer::RelationshipInfo>& relations);
 
   /**
    * Locates the part that intersects the given point
@@ -327,7 +325,7 @@ public:
   /**
    * Returns a string representation of this object.
    */
-  virtual std::string ToString();
+  virtual QString ToString() const;
 
   /**
    * Creates SWT controls owned by the LayoutTree (ie: the sashes). Does not affect the
@@ -351,7 +349,7 @@ public:
    *
    * @param buf
    */
-  virtual void DescribeLayout(std::string& buf) const;
+  virtual void DescribeLayout(QString& buf) const;
 
   /**
    * This is a shorthand method that checks if the tree contains the

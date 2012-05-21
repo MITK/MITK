@@ -33,7 +33,7 @@ class LayoutTreeNode : public LayoutTree {
 
 public:
 
-  berryObjectMacro(LayoutTreeNode);
+  berryObjectMacro(LayoutTreeNode)
 
   struct ChildSizes {
     int left;
@@ -70,7 +70,7 @@ public:
      * Add the relation ship between the children in the list
      * and returns the left children.
      */
-    public: LayoutPart::Pointer ComputeRelation(std::list<PartSashContainer::RelationshipInfo>& relations);
+    public: LayoutPart::Pointer ComputeRelation(QList<PartSashContainer::RelationshipInfo>& relations);
 
     /**
      * Dispose all Sashs in this tree
@@ -195,7 +195,7 @@ public:
     /**
      * Returns a string representation of this object.
      */
-    public: std::string ToString();
+    public: QString ToString();
 
     /**
      * Create the sashes if the children are visible
@@ -213,7 +213,7 @@ public:
      *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf) const;
+    public: void DescribeLayout(QString& buf) const;
 
 };
 

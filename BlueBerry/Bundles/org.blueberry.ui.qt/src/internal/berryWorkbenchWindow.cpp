@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+#include "tweaklets/berryWorkbenchTweaklet.h"
+
 #include "berryWorkbenchWindow.h"
 
 #include "berryIWorkbenchPage.h"
@@ -34,9 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQtControlWidget.h"
 #include "berryQtPerspectiveSwitcher.h"
 #include "berryWWinActionBars.h"
-
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
-#include "tweaklets/berryWorkbenchTweaklet.h"
 
 #include "services/berryIServiceFactory.h"
 
@@ -100,12 +100,12 @@ WorkbenchWindow::~WorkbenchWindow()
   //BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
-Object::Pointer WorkbenchWindow::GetService(const std::string& key)
+Object::Pointer WorkbenchWindow::GetService(const QString& key)
 {
   return serviceLocator->GetService(key);
 }
 
-bool WorkbenchWindow::HasService(const std::string& key) const
+bool WorkbenchWindow::HasService(const QString& key) const
 {
   return serviceLocator->HasService(key);
 }
@@ -298,7 +298,7 @@ void WorkbenchWindow::FirePerspectiveDeactivated(IWorkbenchPage::Pointer page,
 }
 
 void WorkbenchWindow::FirePerspectiveChanged(IWorkbenchPage::Pointer page,
-    IPerspectiveDescriptor::Pointer perspective, const std::string& changeId)
+    IPerspectiveDescriptor::Pointer perspective, const QString& changeId)
 {
   // Some callers call this even when there is no active perspective.
   // Just ignore this case.
@@ -312,7 +312,7 @@ void WorkbenchWindow::FirePerspectiveChanged(IWorkbenchPage::Pointer page,
 
 void WorkbenchWindow::FirePerspectiveChanged(IWorkbenchPage::Pointer page,
     IPerspectiveDescriptor::Pointer perspective,
-    IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
+    IWorkbenchPartReference::Pointer partRef, const QString& changeId)
 {
   // Some callers call this even when there is no active perspective.
   // Just ignore this case.
@@ -757,7 +757,7 @@ void WorkbenchWindow::CreateTrimWidgets(SmartPointer<Shell> shell)
 
 bool WorkbenchWindow::UnableToRestorePage(IMemento::Pointer pageMem)
 {
-  std::string pageName;
+  QString pageName;
   pageMem->GetString(WorkbenchConstants::TAG_LABEL, pageName);
 
   //  return new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
@@ -839,7 +839,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     GetShell()->SetBounds(shellBounds);
     //      }});
   }
-  std::string maximized; memento->GetString(WorkbenchConstants::TAG_MAXIMIZED, maximized);
+  QString maximized; memento->GetString(WorkbenchConstants::TAG_MAXIMIZED, maximized);
   if (maximized == "true")
   {
     //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -849,7 +849,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     //      }});
 
   }
-  std::string minimized; memento->GetString(WorkbenchConstants::TAG_MINIMIZED, minimized);
+  QString minimized; memento->GetString(WorkbenchConstants::TAG_MINIMIZED, minimized);
   if (minimized == "true")
   {
     // getShell().setMinimized(true);
@@ -1051,13 +1051,13 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
 
   // Recreate each page in the window.
   IWorkbenchPage::Pointer newActivePage;
-  std::vector<IMemento::Pointer> pageArray = memento
+  QList<IMemento::Pointer> pageArray = memento
   ->GetChildren(WorkbenchConstants::TAG_PAGE);
   for (std::size_t i = 0; i < pageArray.size(); i++)
   {
     IMemento::Pointer pageMem = pageArray[i];
-    std::string strFocus; pageMem->GetString(WorkbenchConstants::TAG_FOCUS, strFocus);
-    if (strFocus.empty())
+    QString strFocus; pageMem->GetString(WorkbenchConstants::TAG_FOCUS, strFocus);
+    if (strFocus.isEmpty())
     {
       continue;
     }
@@ -1067,8 +1067,8 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     IMemento::Pointer inputMem = pageMem->GetChild(WorkbenchConstants::TAG_INPUT);
     if (inputMem)
     {
-      std::string factoryID; inputMem->GetString(WorkbenchConstants::TAG_FACTORY_ID, factoryID);
-      if (factoryID.empty())
+      QString factoryID; inputMem->GetString(WorkbenchConstants::TAG_FACTORY_ID, factoryID);
+      if (factoryID.isEmpty())
       {
         WorkbenchPlugin
         ::Log("Unable to restore page - no input factory ID.");
@@ -1140,7 +1140,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
       continue;
     }
 
-    if (!strFocus.empty())
+    if (!strFocus.isEmpty())
     {
       newActivePage = newPage;
     }
@@ -1151,9 +1151,9 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   {
     try
     {
-      const std::string defPerspID = this->GetWorkbenchImpl()->GetPerspectiveRegistry()
+      const QString defPerspID = this->GetWorkbenchImpl()->GetPerspectiveRegistry()
       ->GetDefaultPerspective();
-      if (!defPerspID.empty())
+      if (!defPerspID.isEmpty())
       {
         WorkbenchPage::Pointer newPage;
         //StartupThreading.runWithWorkbenchExceptions(new StartupRunnable() {
@@ -1231,7 +1231,7 @@ IAdaptable* WorkbenchWindow::GetDefaultPageInput()
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::OpenPage(
-    const std::string& perspId, IAdaptable* input)
+    const QString& perspId, IAdaptable* input)
 {
   // Run op in busy cursor.
   IWorkbenchPage::Pointer result;
@@ -1246,12 +1246,12 @@ IWorkbenchPage::Pointer WorkbenchWindow::OpenPage(
 
 SmartPointer<IWorkbenchPage> WorkbenchWindow::OpenPage(IAdaptable* input)
 {
-  std::string perspId = this->GetWorkbenchImpl()->GetDefaultPerspectiveId();
+  QString perspId = this->GetWorkbenchImpl()->GetDefaultPerspectiveId();
   return this->OpenPage(perspId, input);
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::BusyOpenPage(
-    const std::string& perspID, IAdaptable* input)
+    const QString& perspID, IAdaptable* input)
 {
   IWorkbenchPage::Pointer newPage;
 
@@ -1708,9 +1708,9 @@ bool WorkbenchWindow::PageList::Remove(IWorkbenchPage::Pointer object)
   {
     active = 0;
   }
-  pagesInActivationOrder.remove(object);
+  pagesInActivationOrder.removeAll(object);
   std::size_t origSize = pagesInCreationOrder.size();
-  pagesInCreationOrder.remove(object);
+  pagesInCreationOrder.removeAll(object);
   return origSize != pagesInCreationOrder.size();
 }
 
@@ -1726,7 +1726,7 @@ bool WorkbenchWindow::PageList::IsEmpty()
   return pagesInCreationOrder.empty();
 }
 
-const std::list<IWorkbenchPage::Pointer>& WorkbenchWindow::PageList::GetPages()
+const QList<IWorkbenchPage::Pointer>& WorkbenchWindow::PageList::GetPages()
 {
   return pagesInCreationOrder;
 }
@@ -1742,7 +1742,7 @@ void WorkbenchWindow::PageList::SetActive(IWorkbenchPage::Pointer page)
 
   if (page.IsNotNull())
   {
-    pagesInActivationOrder.remove(page);
+    pagesInActivationOrder.removeAll(page);
     pagesInActivationOrder.push_back(page);
   }
 }
@@ -1769,9 +1769,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
     return WorkbenchPage::Pointer(0);
   }
 
-  std::list<IWorkbenchPage::Pointer>::reverse_iterator riter =
-  pagesInActivationOrder.rbegin();
-  return (++riter)->Cast<WorkbenchPage>();
+  return pagesInActivationOrder.at(pagesInActivationOrder.size()-2).Cast<WorkbenchPage>();
 }
 
 WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow::Pointer w) :

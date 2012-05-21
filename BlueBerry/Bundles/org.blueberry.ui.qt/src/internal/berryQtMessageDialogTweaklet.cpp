@@ -26,17 +26,17 @@ class QtDialog: public IDialog
 {
 private:
   QMessageBox msgBox;
-  std::map<QAbstractButton*, std::size_t> mapButtonToIndex;
+  QHash<QAbstractButton*, std::size_t> mapButtonToIndex;
 
 public:
 
-  QtDialog(Shell::Pointer, const std::string& dialogTitle,
-      void* /*dialogTitleImage*/, const std::string& dialogMessage,
-      int dialogImageType, const std::vector<std::string>& dialogButtonLabels,
+  QtDialog(Shell::Pointer, const QString& dialogTitle,
+      void* /*dialogTitleImage*/, const QString& dialogMessage,
+      int dialogImageType, const QList<QString>& dialogButtonLabels,
       int defaultIndex)
   {
-    msgBox.setWindowTitle(QString::fromStdString(dialogTitle));
-    msgBox.setText(QString::fromStdString(dialogMessage));
+    msgBox.setWindowTitle(dialogTitle);
+    msgBox.setText(dialogMessage);
 
     if (dialogImageType == IDialog::ERR)
       msgBox.setIcon(QMessageBox::Critical);
@@ -51,8 +51,8 @@ public:
     QPushButton* defaultButton(NULL);
     for (std::size_t i = 0; i < dialogButtonLabels.size(); ++i)
     {
-      QPushButton* button = msgBox.addButton(QString::fromStdString(dialogButtonLabels[i]),
-          QMessageBox::ActionRole);
+      QPushButton* button = msgBox.addButton(dialogButtonLabels[i],
+                                             QMessageBox::ActionRole);
       mapButtonToIndex[(QAbstractButton*)button] = i;
       if (i == (std::size_t)defaultIndex)
         defaultButton = button;
@@ -79,11 +79,11 @@ QtMessageDialogTweaklet::QtMessageDialogTweaklet(const QtMessageDialogTweaklet& 
 }
 
 bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer,
-    const std::string& title, const std::string& message)
+    const QString& title, const QString& message)
 {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QString::fromStdString(title));
-  msgBox.setText(QString::fromStdString(message));
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
   msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
   msgBox.setDefaultButton(QMessageBox::Cancel);
   msgBox.setEscapeButton(QMessageBox::Cancel);
@@ -91,11 +91,11 @@ bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer,
 }
 
 void QtMessageDialogTweaklet::OpenError(Shell::Pointer,
-    const std::string& title, const std::string& message)
+    const QString& title, const QString& message)
 {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QString::fromStdString(title));
-  msgBox.setText(QString::fromStdString(message));
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Ok);
   msgBox.setEscapeButton(QMessageBox::Ok);
@@ -104,11 +104,11 @@ void QtMessageDialogTweaklet::OpenError(Shell::Pointer,
 }
 
 void QtMessageDialogTweaklet::OpenInformation(Shell::Pointer,
-    const std::string& title, const std::string& message)
+    const QString& title, const QString& message)
 {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QString::fromStdString(title));
-  msgBox.setText(QString::fromStdString(message));
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Ok);
   msgBox.setEscapeButton(QMessageBox::Ok);
@@ -117,11 +117,11 @@ void QtMessageDialogTweaklet::OpenInformation(Shell::Pointer,
 }
 
 bool QtMessageDialogTweaklet::OpenQuestion(Shell::Pointer,
-    const std::string& title, const std::string& message)
+    const QString& title, const QString& message)
 {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QString::fromStdString(title));
-  msgBox.setText(QString::fromStdString(message));
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   msgBox.setEscapeButton(QMessageBox::No);
@@ -130,11 +130,11 @@ bool QtMessageDialogTweaklet::OpenQuestion(Shell::Pointer,
 }
 
 void QtMessageDialogTweaklet::OpenWarning(Shell::Pointer,
-    const std::string& title, const std::string& message)
+    const QString& title, const QString& message)
 {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QString::fromStdString(title));
-  msgBox.setText(QString::fromStdString(message));
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Ok);
   msgBox.setEscapeButton(QMessageBox::Ok);
@@ -143,9 +143,9 @@ void QtMessageDialogTweaklet::OpenWarning(Shell::Pointer,
 }
 
 IDialog::Pointer QtMessageDialogTweaklet::MessageDialog(
-    Shell::Pointer parentShell, const std::string& dialogTitle,
-    void* dialogTitleImage, const std::string& dialogMessage,
-    int dialogImageType, const std::vector<std::string>& dialogButtonLabels,
+    Shell::Pointer parentShell, const QString& dialogTitle,
+    void* dialogTitleImage, const QString& dialogMessage,
+    int dialogImageType, const QList<QString>& dialogButtonLabels,
     int defaultIndex)
 {
   IDialog::Pointer dialog(new QtDialog(parentShell, dialogTitle,

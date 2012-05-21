@@ -267,7 +267,7 @@ public:
      * @param part the part
      * @return the tab-key traversal order
      */
-    virtual std::vector<void*> GetTabList(IPresentablePart::Pointer part) = 0;
+    virtual QList<void*> GetTabList(IPresentablePart::Pointer part) = 0;
 };
 
 }

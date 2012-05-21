@@ -183,9 +183,9 @@ bool WorkbenchPage::PerspectiveList::Remove(Perspective::Pointer perspective)
     this->UpdateActionSets(active, Perspective::Pointer(0));
     active = 0;
   }
-  usedList.remove(perspective);
+  usedList.removeAll(perspective);
   PerspectiveListType::size_type origSize = openedList.size();
-  openedList.remove(perspective);
+  openedList.removeAll(perspective);
   return openedList.size() != origSize;
 }
 
@@ -236,7 +236,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
     }
     else
     {
-      return *(++usedList.rbegin());
+      return *(--usedList.end());
     }
   }
 }
@@ -258,7 +258,7 @@ void WorkbenchPage::PerspectiveList::SetActive(Perspective::Pointer perspective)
 
   if (perspective != 0)
   {
-    usedList.remove(perspective);
+    usedList.removeAll(perspective);
     usedList.push_back(perspective);
   }
 }
@@ -441,7 +441,7 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
 SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(
     PartListIter start, bool editorsOnly, bool /*skipPartsObscuredByZoom*/)
 {
-  std::vector<IViewReference::Pointer> views = page->GetViewReferences();
+  QList<IViewReference::Pointer> views = page->GetViewReferences();
   PartListReverseIter i(start);
   while (i != parts.rend())
   {
@@ -493,9 +493,9 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
   return IWorkbenchPartReference::Pointer(0);
 }
 
-std::vector<SmartPointer<IEditorReference> > WorkbenchPage::ActivationList::GetEditors()
+QList<SmartPointer<IEditorReference> > WorkbenchPage::ActivationList::GetEditors()
 {
-  std::vector<IEditorReference::Pointer> editors;
+  QList<IEditorReference::Pointer> editors;
   for (PartListIter i = parts.begin(); i != parts.end(); ++i)
   {
     if (IEditorReference::Pointer part = i->Cast<IEditorReference>())
@@ -506,10 +506,10 @@ std::vector<SmartPointer<IEditorReference> > WorkbenchPage::ActivationList::GetE
   return editors;
 }
 
-std::vector<SmartPointer<IWorkbenchPartReference> > WorkbenchPage::ActivationList::GetParts()
+QList<SmartPointer<IWorkbenchPartReference> > WorkbenchPage::ActivationList::GetParts()
 {
-  std::vector<IViewReference::Pointer> views(page->GetViewReferences());
-  std::vector<IWorkbenchPartReference::Pointer> resultList;
+  QList<IViewReference::Pointer> views(page->GetViewReferences());
+  QList<IWorkbenchPartReference::Pointer> resultList;
   for (PartListIter iterator = parts.begin(); iterator != parts.end(); ++iterator)
   {
     if (IViewReference::Pointer ref = iterator->Cast<IViewReference>())
@@ -546,12 +546,12 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
   bool isNewPartAnEditor = newPart.Cast<IEditorPart> ().IsNotNull();
   if (isNewPartAnEditor)
   {
-    std::string oldId;
+    QString oldId;
     if (_topEditor)
     {
       oldId = _topEditor->GetSite()->GetId();
     }
-    std::string newId = newPart->GetSite()->GetId();
+    QString newId = newPart->GetSite()->GetId();
 
     // if the active part is an editor and the new editor
     // is the same kind of editor, then we don't have to do
@@ -651,12 +651,12 @@ void WorkbenchPage::ActionSwitcher::UpdateTopEditor(
     return;
   }
 
-  std::string oldId;
+  QString oldId;
   if (!topEditor.Expired())
   {
     oldId = topEditor.Lock()->GetSite()->GetId();
   }
-  std::string newId;
+  QString newId;
   if (newEditor.IsNotNull())
   {
     newId = newEditor->GetSite()->GetId();
@@ -703,14 +703,14 @@ void WorkbenchPage::ActionSwitcher::DeactivateContributions(
   //site->DeactivateActionBars(remove);
 }
 
-const IExtensionPoint* WorkbenchPage::GetPerspectiveExtensionPoint()
+IExtensionPoint::Pointer WorkbenchPage::GetPerspectiveExtensionPoint()
 {
-  return Platform::GetExtensionPointService()->GetExtensionPoint(
+  return Platform::GetExtensionRegistry()->GetExtensionPoint(
       PlatformUI::PLUGIN_ID + "."
           + WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
 }
 
-WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const std::string& layoutID,
+WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const QString& layoutID,
     IAdaptable* input)
 {
   if (layoutID == "")
@@ -787,7 +787,7 @@ void WorkbenchPage::AddSelectionListener(ISelectionListener::Pointer listener)
   selectionService->AddSelectionListener(listener);
 }
 
-void WorkbenchPage::AddSelectionListener(const std::string& partId,
+void WorkbenchPage::AddSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   selectionService->AddSelectionListener(partId, listener);
@@ -799,7 +799,7 @@ void WorkbenchPage::AddPostSelectionListener(
   selectionService->AddPostSelectionListener(listener);
 }
 
-void WorkbenchPage::AddPostSelectionListener(const std::string& partId,
+void WorkbenchPage::AddPostSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   selectionService->AddPostSelectionListener(partId, listener);
@@ -897,7 +897,7 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
   //    return;
   //  }
 
-  //  std::string label; // debugging only
+  //  QString label; // debugging only
   //  if (UIStats.isDebugging(UIStats.BRING_PART_TO_TOP))
   //  {
   //    label = part != 0 ? part.getTitle() : "none"; //$NON-NLS-1$
@@ -1079,7 +1079,7 @@ void WorkbenchPage::RemovePerspective(IPerspectiveDescriptor::Pointer desc)
 void WorkbenchPage::BusySetPerspective(IPerspectiveDescriptor::Pointer desc)
 {
   // Create new layout.
-  std::string label = desc->GetId(); // debugging only
+  QString label = desc->GetId(); // debugging only
   Perspective::Pointer newPersp;
   //try
   //{
@@ -1105,8 +1105,8 @@ void WorkbenchPage::BusySetPerspective(IPerspectiveDescriptor::Pointer desc)
   //  }
 }
 
-IViewPart::Pointer WorkbenchPage::BusyShowView(const std::string& viewID,
-    const std::string& secondaryID, int mode)
+IViewPart::Pointer WorkbenchPage::BusyShowView(const QString& viewID,
+    const QString& secondaryID, int mode)
 {
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
@@ -1167,7 +1167,7 @@ void WorkbenchPage::BusyShowView(IViewPart::Pointer part, int mode)
     {
       // otherwise check to see if the we're in the same stack as the active view
       IViewReference::Pointer activeView = ref.Cast<IViewReference> ();
-      std::vector<IViewReference::Pointer> viewStack =
+      QList<IViewReference::Pointer> viewStack =
           this->GetViewReferenceStack(part);
       for (unsigned int i = 0; i < viewStack.size(); i++)
       {
@@ -1219,9 +1219,9 @@ bool WorkbenchPage::Close()
 bool WorkbenchPage::CloseAllSavedEditors()
 {
   // get the Saved editors
-  std::list<IEditorReference::Pointer> editors = this->GetEditorReferences();
-  std::list<IEditorReference::Pointer> savedEditors;
-  for (std::list<IEditorReference::Pointer>::iterator iter = editors.begin(); iter
+  QList<IEditorReference::Pointer> editors = this->GetEditorReferences();
+  QList<IEditorReference::Pointer> savedEditors;
+  for (QList<IEditorReference::Pointer>::iterator iter = editors.begin(); iter
       != editors.end(); ++iter)
   {
     IEditorReference::Pointer editor = *iter;
@@ -1349,7 +1349,7 @@ void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
 }
 
 bool WorkbenchPage::CloseEditors(
-    const std::list<IEditorReference::Pointer>& refArray, bool save)
+    const QList<IEditorReference::Pointer>& refArray, bool save)
 {
   if (refArray.empty())
   {
@@ -1360,8 +1360,8 @@ bool WorkbenchPage::CloseEditors(
 
   // Check if we're being asked to close any parts that are already closed or cannot
   // be closed at this time
-  std::vector<IEditorReference::Pointer> editorRefs;
-  for (std::list<IEditorReference::Pointer>::const_iterator iter =
+  QList<IEditorReference::Pointer> editorRefs;
+  for (QList<IEditorReference::Pointer>::const_iterator iter =
       refArray.begin(); iter != refArray.end(); ++iter)
   {
     IEditorReference::Pointer reference = *iter;
@@ -1373,8 +1373,8 @@ bool WorkbenchPage::CloseEditors(
     // at fault.
     if (partBeingActivated == reference)
     {
-      Poco::RuntimeException re(
-          "WARNING: Blocked recursive attempt to close part " //$NON-NLS-1$
+      ctkRuntimeException re(
+          "WARNING: Blocked recursive attempt to close part "
               + partBeingActivated->GetId()
               + " while still in the middle of activating it");
       WorkbenchPlugin::Log(re);
@@ -1397,7 +1397,7 @@ bool WorkbenchPage::CloseEditors(
   }
 
   // notify the model manager before the close
-  std::list<IWorkbenchPart::Pointer> partsToClose;
+  QList<IWorkbenchPart::Pointer> partsToClose;
   for (unsigned int i = 0; i < editorRefs.size(); i++)
   {
     IWorkbenchPart::Pointer refPart = editorRefs[i]->GetPart(false);
@@ -1491,7 +1491,7 @@ void WorkbenchPage::HandleDeferredEvents()
 {
   editorPresentation->GetLayoutPart()->DeferUpdates(false);
   this->UpdateActivePart();
-  std::vector<WorkbenchPartReference::Pointer> disposals = pendingDisposals;
+  QList<WorkbenchPartReference::Pointer> disposals = pendingDisposals;
   pendingDisposals.clear();
   for (unsigned int i = 0; i < disposals.size(); i++)
   {
@@ -1506,7 +1506,7 @@ bool WorkbenchPage::IsDeferred()
 
 bool WorkbenchPage::CloseEditor(IEditorReference::Pointer editorRef, bool save)
 {
-  std::list<IEditorReference::Pointer> list;
+  QList<IEditorReference::Pointer> list;
   list.push_back(editorRef);
   return this->CloseEditors(list, save);
 }
@@ -1516,7 +1516,7 @@ bool WorkbenchPage::CloseEditor(IEditorPart::Pointer editor, bool save)
   IWorkbenchPartReference::Pointer ref = this->GetReference(editor);
   if (ref.Cast<IEditorReference> ().IsNotNull())
   {
-    std::list<IEditorReference::Pointer> list;
+    QList<IEditorReference::Pointer> list;
     list.push_back(ref.Cast<IEditorReference> ());
     return this->CloseEditors(list, save);
   }
@@ -1551,10 +1551,10 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   //    zoomOut();
   //  }
 
-  std::vector<IWorkbenchPart::Pointer> partsToSave;
-  std::list<IWorkbenchPart::Pointer> viewsToClose;
+  QList<IWorkbenchPart::Pointer> partsToSave;
+  QList<IWorkbenchPart::Pointer> viewsToClose;
   // collect views that will go away and views that are dirty
-  std::vector<IViewReference::Pointer> viewReferences =
+  QList<IViewReference::Pointer> viewReferences =
       persp->GetViewReferences();
   for (unsigned int i = 0; i < viewReferences.size(); i++)
   {
@@ -1575,9 +1575,9 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   if (saveParts && perspList.Size() == 1)
   {
     // collect editors that are dirty
-    std::list<IEditorReference::Pointer> editorReferences =
+    QList<IEditorReference::Pointer> editorReferences =
         this->GetEditorReferences();
-    for (std::list<IEditorReference::Pointer>::iterator refIter =
+    for (QList<IEditorReference::Pointer>::iterator refIter =
         editorReferences.begin(); refIter != editorReferences.end(); ++refIter)
     {
       IEditorReference::Pointer reference = *refIter;
@@ -1698,7 +1698,7 @@ void WorkbenchPage::CreateClientComposite()
 Perspective::Pointer WorkbenchPage::CreatePerspective(
     PerspectiveDescriptor::Pointer desc, bool notify)
 {
-  std::string label = desc->GetId(); // debugging only
+  QString label = desc->GetId(); // debugging only
   try
   {
     //UIStats.start(UIStats.CREATE_PERSPECTIVE, label);
@@ -1800,9 +1800,9 @@ WorkbenchPage::~WorkbenchPage()
       // Need to make sure model data is cleaned up when the page is
       // disposed. Collect all the views on the page and notify the
       // saveable list of a pre/post close. This will free model data.
-      std::vector<IWorkbenchPartReference::Pointer> partsToClose =
+      QList<IWorkbenchPartReference::Pointer> partsToClose =
           this->GetOpenParts();
-      std::list<IWorkbenchPart::Pointer> dirtyParts;
+      QList<IWorkbenchPart::Pointer> dirtyParts;
       for (unsigned int i = 0; i < partsToClose.size(); i++)
       {
         IWorkbenchPart::Pointer part = partsToClose[i]->GetPart(false);
@@ -1832,7 +1832,7 @@ WorkbenchPage::~WorkbenchPage()
       perspList = PerspectiveList();
 
       // Capture views.
-      std::vector<IViewReference::Pointer> refs = viewFactory->GetViews();
+      QList<IViewReference::Pointer> refs = viewFactory->GetViews();
 
       //  if (refs.size() > 0)
       //  {
@@ -1934,7 +1934,7 @@ Perspective::Pointer WorkbenchPage::FindPerspective(
   return Perspective::Pointer(0);
 }
 
-IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
+IViewPart::Pointer WorkbenchPage::FindView(const QString& id)
 {
   IViewReference::Pointer ref = this->FindViewReference(id);
   if (ref == 0)
@@ -1945,13 +1945,13 @@ IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
 }
 
 IViewReference::Pointer WorkbenchPage::FindViewReference(
-    const std::string& viewId)
+    const QString& viewId)
 {
   return this->FindViewReference(viewId, "");
 }
 
 IViewReference::Pointer WorkbenchPage::FindViewReference(
-    const std::string& viewId, const std::string& secondaryId)
+    const QString& viewId, const QString& secondaryId)
 {
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
@@ -2030,17 +2030,17 @@ EditorAreaHelper* WorkbenchPage::GetEditorPresentation()
   return editorPresentation;
 }
 
-std::vector<IEditorPart::Pointer> WorkbenchPage::GetEditors()
+QList<IEditorPart::Pointer> WorkbenchPage::GetEditors()
 {
-  std::list<IEditorReference::Pointer> refs = this->GetEditorReferences();
-  std::vector<IEditorPart::Pointer> result;
+  QList<IEditorReference::Pointer> refs = this->GetEditorReferences();
+  QList<IEditorPart::Pointer> result;
   //Display d = getWorkbenchWindow().getShell().getDisplay();
   //Must be backward compatible.
   //    d.syncExec(new Runnable()
   //        {
   //        public void WorkbenchPage::run()
   //          {
-  for (std::list<IEditorReference::Pointer>::iterator iter = refs.begin(); iter
+  for (QList<IEditorReference::Pointer>::iterator iter = refs.begin(); iter
       != refs.end(); ++iter)
   {
     IEditorPart::Pointer part = (*iter)->GetEditor(true);
@@ -2054,15 +2054,15 @@ std::vector<IEditorPart::Pointer> WorkbenchPage::GetEditors()
   return result;
 }
 
-std::vector<IEditorPart::Pointer> WorkbenchPage::GetDirtyEditors()
+QList<IEditorPart::Pointer> WorkbenchPage::GetDirtyEditors()
 {
   return this->GetEditorManager()->GetDirtyEditors();
 }
 
-std::vector<ISaveablePart::Pointer> WorkbenchPage::GetDirtyParts()
+QList<ISaveablePart::Pointer> WorkbenchPage::GetDirtyParts()
 {
-  std::vector<ISaveablePart::Pointer> result;
-  std::vector<IWorkbenchPartReference::Pointer> allParts = this->GetAllParts();
+  QList<ISaveablePart::Pointer> result;
+  QList<IWorkbenchPartReference::Pointer> allParts = this->GetAllParts();
   for (unsigned int i = 0; i < allParts.size(); i++)
   {
     IWorkbenchPartReference::Pointer reference = allParts[i];
@@ -2086,13 +2086,13 @@ IEditorPart::Pointer WorkbenchPage::FindEditor(IEditorInput::Pointer input)
   return this->GetEditorManager()->FindEditor(input);
 }
 
-std::vector<IEditorReference::Pointer> WorkbenchPage::FindEditors(
-    IEditorInput::Pointer input, const std::string& editorId, int matchFlags)
+QList<IEditorReference::Pointer> WorkbenchPage::FindEditors(
+    IEditorInput::Pointer input, const QString& editorId, int matchFlags)
 {
   return this->GetEditorManager()->FindEditors(input, editorId, matchFlags);
 }
 
-std::list<IEditorReference::Pointer> WorkbenchPage::GetEditorReferences()
+QList<IEditorReference::Pointer> WorkbenchPage::GetEditorReferences()
 {
   return editorPresentation->GetEditors();
 }
@@ -2102,9 +2102,9 @@ IAdaptable* WorkbenchPage::GetInput()
   return input;
 }
 
-std::string WorkbenchPage::GetLabel()
+QString WorkbenchPage::GetLabel()
 {
-  std::string label = "<Unknown label>";
+  QString label = "<Unknown label>";
   //    IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util.getAdapter(input,
   //        IWorkbenchAdapter.class);
   //    if (adapter != 0)
@@ -2145,12 +2145,12 @@ ISelection::ConstPointer WorkbenchPage::GetSelection() const
   return selectionService->GetSelection();
 }
 
-ISelection::ConstPointer WorkbenchPage::GetSelection(const std::string& partId)
+ISelection::ConstPointer WorkbenchPage::GetSelection(const QString& partId)
 {
   return selectionService->GetSelection(partId);
 }
 
-//ISelectionService::SelectionEvents& WorkbenchPage::GetSelectionEvents(const std::string& partId)
+//ISelectionService::SelectionEvents& WorkbenchPage::GetSelectionEvents(const QString& partId)
 //{
 //  return selectionService->GetSelectionEvents(partId);
 //}
@@ -2165,7 +2165,7 @@ ViewFactory* WorkbenchPage::GetViewFactory()
   return viewFactory;
 }
 
-std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferences()
+QList<IViewReference::Pointer> WorkbenchPage::GetViewReferences()
 {
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp != 0)
@@ -2174,16 +2174,16 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferences()
   }
   else
   {
-    return std::vector<IViewReference::Pointer>();
+    return QList<IViewReference::Pointer>();
   }
 }
 
-std::vector<IViewPart::Pointer> WorkbenchPage::GetViews()
+QList<IViewPart::Pointer> WorkbenchPage::GetViews()
 {
   return this->GetViews(Perspective::Pointer(0), true);
 }
 
-std::vector<IViewPart::Pointer> WorkbenchPage::GetViews(
+QList<IViewPart::Pointer> WorkbenchPage::GetViews(
     Perspective::Pointer persp, bool restore)
 {
   if (persp == 0)
@@ -2191,10 +2191,10 @@ std::vector<IViewPart::Pointer> WorkbenchPage::GetViews(
     persp = this->GetActivePerspective();
   }
 
-  std::vector<IViewPart::Pointer> parts;
+  QList<IViewPart::Pointer> parts;
   if (persp != 0)
   {
-    std::vector<IViewReference::Pointer> refs = persp->GetViewReferences();
+    QList<IViewReference::Pointer> refs = persp->GetViewReferences();
     for (unsigned int i = 0; i < refs.size(); i++)
     {
       IViewPart::Pointer part = refs[i]->GetPart(restore).Cast<IViewPart> ();
@@ -2243,7 +2243,7 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
       {
         IWorkbenchWindow::Pointer window =
             view->GetSite()->GetWorkbenchWindow();
-        std::vector<IWorkbenchPart::Pointer> partsToSave;
+        QList<IWorkbenchPart::Pointer> partsToSave;
         partsToSave.push_back(view);
         bool success = EditorManager::SaveAll(partsToSave, true, true, false,
             window);
@@ -2269,7 +2269,7 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
           = actualPart->GetSite()->GetService(
               ISaveablesLifecycleListener::GetManifestName()).Cast<
               SaveablesList> ();
-      std::list<IWorkbenchPart::Pointer> partsToClose;
+      QList<IWorkbenchPart::Pointer> partsToClose;
       partsToClose.push_back(actualPart);
       postCloseInfo = saveablesList->PreCloseParts(partsToClose,
           !promptedForSave, this->GetWorkbenchWindow());
@@ -2314,7 +2314,7 @@ void WorkbenchPage::HideView(IViewPart::Pointer view)
   this->HideView(this->GetReference(view).Cast<IViewReference> ());
 }
 
-void WorkbenchPage::Init(WorkbenchWindow* w, const std::string& layoutID,
+void WorkbenchPage::Init(WorkbenchWindow* w, const QString& layoutID,
     IAdaptable* input, bool openExtras)
 {
   // Save args.
@@ -2385,18 +2385,14 @@ void WorkbenchPage::Init(WorkbenchWindow* w, const std::string& layoutID,
 void WorkbenchPage::OpenPerspectiveExtras()
 {
   //TODO WorkbenchPage perspectice extras
-  std::string extras = ""; //PrefUtil.getAPIPreferenceStore().getString(
+  QString extras = ""; //PrefUtil.getAPIPreferenceStore().getString(
   //    IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
-  Poco::StringTokenizer tok(extras, ", ", Poco::StringTokenizer::TOK_TRIM
-      | Poco::StringTokenizer::TOK_IGNORE_EMPTY); //$NON-NLS-1$
-  std::vector<IPerspectiveDescriptor::Pointer> descs;
-  for (Poco::StringTokenizer::Iterator itr = tok.begin(); itr != tok.end(); ++itr)
+  QList<IPerspectiveDescriptor::Pointer> descs;
+  foreach (QString id, extras.split(", ", QString::SkipEmptyParts))
   {
-    std::string id = *itr;
-    IPerspectiveDescriptor::Pointer
-        desc =
-            WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(
-                id);
+    if (id.trimmed().isEmpty()) continue;
+    IPerspectiveDescriptor::Pointer desc =
+        WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(id);
     if (desc != 0)
     {
       descs.push_back(desc);
@@ -2528,19 +2524,19 @@ void WorkbenchPage::ReuseEditor(IReusableEditor::Pointer editor,
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
-    const std::string& editorID)
+    const QString& editorID)
 {
   return this->OpenEditor(input, editorID, true, MATCH_INPUT);
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
-    const std::string& editorID, bool activate)
+    const QString& editorID, bool activate)
 {
   return this->OpenEditor(input, editorID, activate, MATCH_INPUT);
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(
-    const IEditorInput::Pointer input, const std::string& editorID,
+    const IEditorInput::Pointer input, const QString& editorID,
     bool activate, int matchFlags)
 {
   return this->OpenEditor(input, editorID, activate, matchFlags,
@@ -2548,7 +2544,7 @@ IEditorPart::Pointer WorkbenchPage::OpenEditor(
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(
-    const IEditorInput::Pointer input, const std::string& editorID,
+    const IEditorInput::Pointer input, const QString& editorID,
     bool activate, int matchFlags, IMemento::Pointer editorState)
 {
   if (input == 0 || editorID == "")
@@ -2587,7 +2583,7 @@ IEditorPart::Pointer WorkbenchPage::OpenEditorFromDescriptor(
 }
 
 IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
-    const std::string& editorID, bool activate, int matchFlags,
+    const QString& editorID, bool activate, int matchFlags,
     IMemento::Pointer editorState)
 {
   Workbench* workbench =
@@ -2633,7 +2629,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptor(
 }
 
 IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
-    IEditorInput::Pointer input, const std::string& editorID, bool activate,
+    IEditorInput::Pointer input, const QString& editorID, bool activate,
     int matchFlags, IMemento::Pointer editorState)
 {
   // If an editor already exists for the input, use it.
@@ -2646,7 +2642,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
     {
       if (editor->IsDirty())
       {
-        std::vector<std::string> dlgLabels;
+        QList<QString> dlgLabels;
         dlgLabels.push_back("Yes");
         dlgLabels.push_back("No");
         dlgLabels.push_back("Cancel");
@@ -2850,7 +2846,7 @@ void WorkbenchPage::RemoveSelectionListener(
   selectionService->RemoveSelectionListener(listener);
 }
 
-void WorkbenchPage::RemoveSelectionListener(const std::string& partId,
+void WorkbenchPage::RemoveSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   selectionService->RemoveSelectionListener(partId, listener);
@@ -2862,7 +2858,7 @@ void WorkbenchPage::RemovePostSelectionListener(
   selectionService->RemovePostSelectionListener(listener);
 }
 
-void WorkbenchPage::RemovePostSelectionListener(const std::string& partId,
+void WorkbenchPage::RemovePostSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   selectionService->RemovePostSelectionListener(partId, listener);
@@ -2920,7 +2916,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
   try
   {
     // Restore working set
-    std::string pageName;
+    QString pageName;
     memento->GetString(WorkbenchConstants::TAG_LABEL, pageName);
 
     //    String label = 0; // debugging only
@@ -2952,7 +2948,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       //          IWorkbenchConstants.TAG_WORKING_SETS);
       //      if (workingSetMem != 0)
       //      {
-      //        std::vector<IMemento::Pointer> workingSetChildren =
+      //        QList<IMemento::Pointer> workingSetChildren =
       //            workingSetMem .getChildren(IWorkbenchConstants.TAG_WORKING_SET);
       //        List workingSetList = new ArrayList(workingSetChildren.length);
       //        for (int i = 0; i < workingSetChildren.length; i++)
@@ -2998,23 +2994,23 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
 
       // Get persp block.
       childMem = memento->GetChild(WorkbenchConstants::TAG_PERSPECTIVES);
-      std::string activePartID;
+      QString activePartID;
       childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PART, activePartID);
-      std::string activePartSecondaryID;
-      if (!activePartID.empty())
+      QString activePartSecondaryID;
+      if (!activePartID.isEmpty())
       {
         activePartSecondaryID = ViewFactory::ExtractSecondaryId(activePartID);
-        if (!activePartSecondaryID.empty())
+        if (!activePartSecondaryID.isEmpty())
         {
           activePartID = ViewFactory::ExtractPrimaryId(activePartID);
         }
       }
-      std::string activePerspectiveID;
+      QString activePerspectiveID;
       childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE,
           activePerspectiveID);
 
       // Restore perspectives.
-      std::vector<IMemento::Pointer> perspMems(childMem->GetChildren(
+      QList<IMemento::Pointer> perspMems(childMem->GetChildren(
           WorkbenchConstants::TAG_PERSPECTIVE));
       Perspective::Pointer activePerspective;
 
@@ -3102,8 +3098,8 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       if (activePerspective)
       {
         Perspective::Pointer myPerspective = activePerspective;
-        std::string myActivePartId = activePartID;
-        std::string mySecondaryId = activePartSecondaryID;
+        QString myActivePartId = activePartID;
+        QString mySecondaryId = activePartSecondaryID;
         //          StartupThreading.runWithoutExceptions(new StartupRunnable()
         //              {
         //
@@ -3113,7 +3109,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
             myPerspective->GetDesc());
 
         // Restore active part.
-        if (!myActivePartId.empty())
+        if (!myActivePartId.isEmpty())
         {
           IWorkbenchPartReference::Pointer ref = myPerspective->FindView(
               myActivePartId, mySecondaryId);
@@ -3139,7 +3135,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       // restore sticky view state
       stickyViewMan->Restore(memento);
 
-      //      std::string blame = activeDescriptor == 0 ? pageName
+      //      QString blame = activeDescriptor == 0 ? pageName
       //          : activeDescriptor.getId();
       //      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
 
@@ -3154,7 +3150,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       return result;
     } catch (...)
     {
-      //      std::string blame = activeDescriptor == 0 ? pageName
+      //      QString blame = activeDescriptor == 0 ? pageName
       //          : activeDescriptor.getId();
       //      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
       throw ;
@@ -3329,12 +3325,12 @@ bool WorkbenchPage::SaveState(IMemento::Pointer memento)
   return result;
 }
 
-std::string WorkbenchPage::GetId(IWorkbenchPart::Pointer part)
+QString WorkbenchPage::GetId(IWorkbenchPart::Pointer part)
 {
   return this->GetId(this->GetReference(part));
 }
 
-std::string WorkbenchPage::GetId(IWorkbenchPartReference::Pointer ref)
+QString WorkbenchPage::GetId(IWorkbenchPartReference::Pointer ref)
 {
   if (ref == 0)
   {
@@ -3355,11 +3351,11 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
   {
     if (partBeingActivated->GetPart(false) != newPart)
     {
-      WorkbenchPlugin::Log(Poco::RuntimeException(
-              "WARNING: Prevented recursive attempt to activate part "
-              + this->GetId(newPart)
-              + " while still in the middle of activating part " + this->GetId(
-                  partBeingActivated)));
+      WorkbenchPlugin::Log(ctkRuntimeException(
+                             QString("WARNING: Prevented recursive attempt to activate part ")
+                             + this->GetId(newPart)
+                             + " while still in the middle of activating part " + this->GetId(
+                               partBeingActivated)));
     }
     return;
   }
@@ -3491,8 +3487,8 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
       bool status = newPersp->RestoreState();
       if (!status)
       {
-        std::string title = "Restoring problems";
-        std::string msg = "Unable to read workbench state.";
+        QString title = "Restoring problems";
+        QString msg = "Unable to read workbench state.";
         MessageDialog::OpenError(this->GetWorkbenchWindow()->GetShell(), title,
             msg);
       }
@@ -3555,7 +3551,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
     Perspective::Pointer newPersp)
 {
   // Flag all parts in the old perspective
-  std::vector<IViewReference::Pointer> oldRefs;
+  QList<IViewReference::Pointer> oldRefs;
   if (oldPersp != 0)
   {
     oldRefs = oldPersp->GetViewReferences();
@@ -3572,7 +3568,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
   if (newPersp != 0)
   {
     pres = newPersp->GetPresentation();
-    std::vector<IViewReference::Pointer> newRefs =
+    QList<IViewReference::Pointer> newRefs =
     newPersp->GetViewReferences();
     for (unsigned int i = 0; i < newRefs.size(); i++)
     {
@@ -3665,26 +3661,25 @@ void WorkbenchPage::ResetToolBarLayout()
   //  mgr.resetItemOrder();
 }
 
-IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID)
+IViewPart::Pointer WorkbenchPage::ShowView(const QString& viewID)
 {
   return this->ShowView(viewID, "", VIEW_ACTIVATE);
 }
 
-IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
-    const std::string& secondaryID, int mode)
+IViewPart::Pointer WorkbenchPage::ShowView(const QString& viewID,
+    const QString& secondaryID, int mode)
 {
   if (secondaryID != "")
   {
-    if (secondaryID.size() == 0 || secondaryID.find_first_of(
-            ViewFactory::ID_SEP) != std::string::npos)
+    if (secondaryID.size() == 0 || secondaryID.indexOf(ViewFactory::ID_SEP) != -1)
     {
-      throw Poco::InvalidArgumentException(
+      throw ctkInvalidArgumentException(
           "Illegal secondary id (cannot be empty or contain a colon)");
     }
   }
   if (!this->CertifyMode(mode))
   {
-    throw Poco::InvalidArgumentException("Illegal view mode");
+    throw ctkInvalidArgumentException("Illegal view mode");
   }
 
   // Run op in busy cursor.
@@ -3712,16 +3707,16 @@ bool WorkbenchPage::CertifyMode(int mode)
   return false;
 }
 
-std::vector<IEditorReference::Pointer> WorkbenchPage::GetSortedEditors()
+QList<IEditorReference::Pointer> WorkbenchPage::GetSortedEditors()
 {
   return activationList->GetEditors();
 }
 
-std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetOpenPerspectives()
+QList<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetOpenPerspectives()
 {
-  std::list<Perspective::Pointer> opened = perspList.GetOpenedPerspectives();
-  std::vector<IPerspectiveDescriptor::Pointer> result;
-  for (std::list<Perspective::Pointer>::iterator iter = opened.begin(); iter
+  QList<Perspective::Pointer> opened = perspList.GetOpenedPerspectives();
+  QList<IPerspectiveDescriptor::Pointer> result;
+  for (QList<Perspective::Pointer>::iterator iter = opened.begin(); iter
       != opened.end(); ++iter)
   {
     result.push_back((*iter)->GetDesc());
@@ -3729,7 +3724,7 @@ std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetOpenPerspectives(
   return result;
 }
 
-std::list<Perspective::Pointer> WorkbenchPage::GetOpenInternalPerspectives()
+QList<Perspective::Pointer> WorkbenchPage::GetOpenInternalPerspectives()
 {
   return perspList.GetOpenedPerspectives();
 }
@@ -3737,26 +3732,26 @@ std::list<Perspective::Pointer> WorkbenchPage::GetOpenInternalPerspectives()
 Perspective::Pointer WorkbenchPage::GetFirstPerspectiveWithView(
     IViewPart::Pointer part)
 {
-  std::list<Perspective::Pointer> perspectives =
-  perspList.GetSortedPerspectives();
-  for (std::list<Perspective::Pointer>::reverse_iterator iter =
-      perspectives.rbegin(); iter != perspectives.rend(); ++iter)
+  QListIterator<Perspective::Pointer> iter(perspList.GetSortedPerspectives());
+  iter.toBack();
+  while(iter.hasPrevious())
   {
-    if ((*iter)->ContainsView(part))
+    Perspective::Pointer p = iter.previous();
+    if (p->ContainsView(part))
     {
-      return *iter;
+      return p;
     }
-  }
+  };
   // we should never get here
   return Perspective::Pointer(0);
 }
 
-std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetSortedPerspectives()
+QList<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetSortedPerspectives()
 {
-  std::list<Perspective::Pointer> sortedArray =
+  QList<Perspective::Pointer> sortedArray =
   perspList.GetSortedPerspectives();
-  std::vector<IPerspectiveDescriptor::Pointer> result;
-  for (std::list<Perspective::Pointer>::iterator iter = sortedArray.begin();
+  QList<IPerspectiveDescriptor::Pointer> result;
+  for (QList<Perspective::Pointer>::iterator iter = sortedArray.begin();
       iter != sortedArray.end(); ++iter)
   {
     result.push_back((*iter)->GetDesc());
@@ -3764,7 +3759,7 @@ std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetSortedPerspective
   return result;
 }
 
-std::vector<IWorkbenchPartReference::Pointer> WorkbenchPage::GetSortedParts()
+QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetSortedParts()
 {
   //return partList->GetParts(this->GetViewReferences());
   return activationList->GetParts();
@@ -3796,14 +3791,14 @@ void WorkbenchPage::AddPerspective(Perspective::Pointer persp)
   window->FirePerspectiveOpened(thisPage, persp->GetDesc());
 }
 
-std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
+QList<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
     IViewPart::Pointer part)
 {
   // Sanity check.
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0 || !this->CertifyPart(part))
   {
-    return std::vector<IViewReference::Pointer>();
+    return QList<IViewReference::Pointer>();
   }
 
   ILayoutContainer::Pointer container =
@@ -3811,7 +3806,7 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
   if (container.Cast<PartStack> () != 0)
   {
     PartStack::Pointer folder = container.Cast<PartStack> ();
-    std::vector<IViewReference::Pointer> list;
+    QList<IViewReference::Pointer> list;
     ILayoutContainer::ChildrenType children = folder->GetChildren();
     for (ILayoutContainer::ChildrenType::iterator childIter =
         children.begin(); childIter != children.end(); ++childIter)
@@ -3835,18 +3830,18 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
     return list;
   }
 
-  std::vector<IViewReference::Pointer> result;
+  QList<IViewReference::Pointer> result;
   result.push_back(this->GetReference(part).Cast<IViewReference> ());
   return result;
 }
 
-std::vector<IViewPart::Pointer> WorkbenchPage::GetViewStack(
+QList<IViewPart::Pointer> WorkbenchPage::GetViewStack(
     IViewPart::Pointer part)
 {
-  std::vector<IViewReference::Pointer> refStack = this->GetViewReferenceStack(
+  QList<IViewReference::Pointer> refStack = this->GetViewReferenceStack(
       part);
 
-  std::vector<IViewPart::Pointer> result;
+  QList<IViewPart::Pointer> result;
 
   for (unsigned int i = 0; i < refStack.size(); i++)
   {
@@ -3967,19 +3962,19 @@ void WorkbenchPage::FindSashParts(LayoutTree::Pointer tree,
   this->FindSashParts(parent, sashes, info);
 }
 
-std::vector<IWorkbenchPartReference::Pointer> WorkbenchPage::GetAllParts()
+QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetAllParts()
 {
-  std::vector<IViewReference::Pointer> views = viewFactory->GetViews();
-  std::list<IEditorReference::Pointer> editors = this->GetEditorReferences();
+  QList<IViewReference::Pointer> views = viewFactory->GetViews();
+  QList<IEditorReference::Pointer> editors = this->GetEditorReferences();
 
-  std::vector<IWorkbenchPartReference::Pointer> result;
+  QList<IWorkbenchPartReference::Pointer> result;
 
   for (unsigned int i = 0; i < views.size(); i++)
   {
     result.push_back(views[i]);
   }
 
-  for (std::list<IEditorReference::Pointer>::iterator iter = editors.begin(); iter
+  for (QList<IEditorReference::Pointer>::iterator iter = editors.begin(); iter
       != editors.end(); ++iter)
   {
     result.push_back(*iter);
@@ -3988,10 +3983,10 @@ std::vector<IWorkbenchPartReference::Pointer> WorkbenchPage::GetAllParts()
   return result;
 }
 
-std::vector<IWorkbenchPartReference::Pointer> WorkbenchPage::GetOpenParts()
+QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetOpenParts()
 {
-  std::vector<IWorkbenchPartReference::Pointer> refs = this->GetAllParts();
-  std::vector<IWorkbenchPartReference::Pointer> result;
+  QList<IWorkbenchPartReference::Pointer> refs = this->GetAllParts();
+  QList<IWorkbenchPartReference::Pointer> result;
 
   for (unsigned int i = 0; i < refs.size(); i++)
   {
@@ -4042,22 +4037,22 @@ void WorkbenchPage::TestInvariants()
  *
  * @see org.blueberry.ui.IWorkbenchPage#getPerspectiveShortcuts()
  */
-std::vector<std::string> WorkbenchPage::GetPerspectiveShortcuts()
+QList<QString> WorkbenchPage::GetPerspectiveShortcuts()
 {
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
   {
-    return std::vector<std::string>();
+    return QList<QString>();
   }
   return persp->GetPerspectiveShortcuts();
 }
 
-std::vector<std::string> WorkbenchPage::GetShowViewShortcuts()
+QList<QString> WorkbenchPage::GetShowViewShortcuts()
 {
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
   {
-    return std::vector<std::string>();
+    return QList<QString>();
   }
   return persp->GetShowViewShortcuts();
 }

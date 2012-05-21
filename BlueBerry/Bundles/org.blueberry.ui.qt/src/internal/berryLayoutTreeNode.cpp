@@ -93,7 +93,7 @@ LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
 }
 
 LayoutPart::Pointer LayoutTreeNode::ComputeRelation(
-    std::list<PartSashContainer::RelationshipInfo>& relations)
+    QList<PartSashContainer::RelationshipInfo>& relations)
 {
   PartSashContainer::RelationshipInfo r =
       PartSashContainer::RelationshipInfo();
@@ -645,34 +645,36 @@ void LayoutTreeNode::SetChild(bool left, LayoutTree::Pointer child)
   this->FlushCache();
 }
 
-std::string LayoutTreeNode::ToString()
+QString LayoutTreeNode::ToString()
 {
-  std::stringstream s;
+  QString str;
+  QTextStream s(&str);
   s << "<null>\n";
   if (part->GetControl() != 0)
   {
-    s << "<@" << part->GetControl() << ">\n";//$NON-NLS-2$//$NON-NLS-1$
+    s << "<@" << part->GetControl() << ">\n";
   }
-  std::stringstream result;
-  result << "["; //$NON-NLS-1$
+  QString str2;
+  QTextStream result(&str2);
+  result << "[";
   if (children[0]->GetParent() != this)
   {
-    result << result.str() << "{" << children[0] << "}" << s.str();//$NON-NLS-2$//$NON-NLS-1$
+    result << str2 << "{" << children[0] << "}" << str;
   }
   else
   {
-    result << result.str() << children[0] << s.str();
+    result << str2 << children[0] << str;
   }
 
   if (children[1]->GetParent() != this)
   {
-    result << result.str() << "{" << children[1] << "}]";//$NON-NLS-2$//$NON-NLS-1$
+    result << str2 << "{" << children[1] << "}]";
   }
   else
   {
-    result << result.str() << children[1] << "]";//$NON-NLS-1$
+    result << str2 << children[1] << "]";
   }
-  return result.str();
+  return str2;
 }
 
 //void LayoutTreeNode::UpdateSashes(void* parent) {
@@ -686,7 +688,7 @@ std::string LayoutTreeNode::ToString()
 //            this->GetSash()->Dispose();
 //    }
 
-void LayoutTreeNode::DescribeLayout(std::string& buf) const
+void LayoutTreeNode::DescribeLayout(QString& buf) const
 {
   if (!(children[0]->IsVisible()))
   {
@@ -708,10 +710,10 @@ void LayoutTreeNode::DescribeLayout(std::string& buf) const
   buf.append("("); //$NON-NLS-1$
   children[0]->DescribeLayout(buf);
 
-  buf.append(this->GetSash()->IsVertical() ? "|" : "-"); //$NON-NLS-1$ //$NON-NLS-2$
+  buf.append(this->GetSash()->IsVertical() ? "|" : "-");
 
   children[1]->DescribeLayout(buf);
-  buf.append(")"); //$NON-NLS-1$
+  buf.append(")");
 }
 
 }

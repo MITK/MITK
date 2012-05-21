@@ -70,7 +70,7 @@ protected:
     /**
      * Logs a very common registry error when a required child is missing.
      */
-    static void LogMissingElement(const SmartPointer<IConfigurationElement> element,
+    static void LogMissingElement(const SmartPointer<IConfigurationElement>& element,
                                   const QString& elementName);
 
     /**
@@ -102,14 +102,14 @@ protected:
      *
      * @return true if element was recognized, false if not.
      */
-    virtual bool ReadElement(const IConfigurationElement::Pointer& element) = 0;
+    virtual bool ReadElement(const SmartPointer<IConfigurationElement>& element) = 0;
 
     /**
      * Read the element's children. This is called by
      * the subclass' readElement method when it wants
      * to read the children of the element.
      */
-    virtual void ReadElementChildren(const IConfigurationElement::Pointer& element);
+    virtual void ReadElementChildren(const SmartPointer<IConfigurationElement>& element);
 
     /**
      * Read each element one at a time by calling the
@@ -117,7 +117,7 @@ protected:
      *
      * Logs an error if the element was not recognized.
      */
-    virtual void ReadElements(const QList<IConfigurationElement::Pointer>& elements);
+    virtual void ReadElements(const QList<SmartPointer<IConfigurationElement> >& elements);
 
     /**
      * Read one extension by looping through its

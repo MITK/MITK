@@ -38,7 +38,7 @@ class PagePartSelectionTracker : public AbstractPartSelectionTracker
 {
 
 public:
-  berryObjectMacro(PagePartSelectionTracker);
+  berryObjectMacro(PagePartSelectionTracker)
 
 private:
 
@@ -79,7 +79,7 @@ public:
    * @param id part identifier
    */
   PagePartSelectionTracker(IWorkbenchPage* page,
-      const std::string& partId);
+      const QString& partId);
 
 
   /**
@@ -119,7 +119,7 @@ private:
    * multi-view instances which may have a secondary id.
    *
    */
-  std::string GetPartId(IWorkbenchPart::Pointer part);
+  QString GetPartId(IWorkbenchPart::Pointer part);
 
   /**
    * Sets the page this selection provider works for

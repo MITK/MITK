@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPartReference.h"
 #include "berryIWorkbenchPart.h"
 
-#include <set>
-
-//TODO should be removed
-#include <org_blueberry_ui_qt_Export.h>
 #include "berryImageDescriptor.h"
 
 namespace berry {
@@ -39,7 +35,9 @@ class PartPane;
  */
 class BERRY_UI_QT WorkbenchPartReference : virtual public IWorkbenchPartReference, public ISizeProvider {
 
-public: berryObjectMacro(WorkbenchPartReference);
+public:
+
+  berryObjectMacro(WorkbenchPartReference)
 
 
     // State constants //////////////////////////////
@@ -75,11 +73,11 @@ protected: IWorkbenchPart::Pointer part;
 
 protected: SmartPointer<PartPane> pane;
 
-private: std::string id;
+private: QString id;
 
 private: bool pinned;
 
-private: std::string tooltip;
+private: QString tooltip;
 
 /**
  * Stores the current Image for this part reference. Lazily created. Null if not allocated.
@@ -100,16 +98,16 @@ private: IPropertyChangeListener::Events propChangeEvents;
 
 //private: ListenerList partChangeListeners = new ListenerList();
 
-private: std::string partName;
+private: QString partName;
 
-private: std::string contentDescription;
+private: QString contentDescription;
 
-protected: std::map<std::string, std::string> propertyCache;
+protected: QHash<QString, QString> propertyCache;
 
     /**
      * Used to remember which events have been queued.
      */
-private: std::set<int> queuedEvents;
+private: QSet<int> queuedEvents;
 
 private: bool queueEvents;
 
@@ -155,13 +153,13 @@ protected: virtual void CheckReference();
      */
 //private: virtual void DeferEvents(bool shouldQueue);
 
-protected: virtual void SetPartName(const std::string& newPartName);
+protected: virtual void SetPartName(const QString& newPartName);
 
-protected: virtual void SetContentDescription(const std::string& newContentDescription);
+protected: virtual void SetContentDescription(const QString& newContentDescription);
 
 protected: virtual void SetImageDescriptor(SmartPointer<ImageDescriptor> descriptor);
 
-protected: virtual void SetToolTip(const std::string& newToolTip);
+protected: virtual void SetToolTip(const QString& newToolTip);
 
 protected: virtual void PropertyChanged(Object::Pointer source, int propId);
 
@@ -174,8 +172,8 @@ protected: virtual void RefreshFromPart();
 
 protected: virtual SmartPointer<ImageDescriptor> ComputeImageDescriptor();
 
-public: virtual void Init(const std::string& id, const std::string& tooltip,
-            SmartPointer<ImageDescriptor> desc, const std::string& paneName, const std::string& contentDescription);
+public: virtual void Init(const QString& id, const QString& tooltip,
+            SmartPointer<ImageDescriptor> desc, const QString& paneName, const QString& contentDescription);
 
 
     /**
@@ -188,18 +186,18 @@ public: virtual void AddPropertyListener(IPropertyChangeListener::Pointer listen
      */
 public: virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
 
-public: std::string GetId() const;
+public: QString GetId() const;
 
-public: virtual std::string GetTitleToolTip() const;
+public: virtual QString GetTitleToolTip() const;
 
-protected: std::string GetRawToolTip() const;
+protected: QString GetRawToolTip() const;
 
     /**
      * Returns the pane name for the part
      *
      * @return the pane name for the part
      */
-public: virtual std::string GetPartName() const;
+public: virtual QString GetPartName() const;
 
     /**
      * Gets the part name directly from the associated workbench part,
@@ -207,16 +205,16 @@ public: virtual std::string GetPartName() const;
      *
      * @return
      */
-protected: std::string GetRawPartName() const;
+protected: QString GetRawPartName() const;
 
-protected: virtual std::string ComputePartName() const;
+protected: virtual QString ComputePartName() const;
 
     /**
      * Returns the content description for this part.
      *
      * @return the pane name for the part
      */
-public: virtual std::string GetContentDescription() const;
+public: virtual QString GetContentDescription() const;
 
     /**
      * Computes a new content description for the part. Subclasses may override to change the
@@ -224,14 +222,14 @@ public: virtual std::string GetContentDescription() const;
      *
      * @return the new content description for the part
      */
-protected: virtual std::string ComputeContentDescription() const;
+protected: virtual QString ComputeContentDescription() const;
 
     /**
      * Returns the content description as set directly by the part, or the empty string if none
      *
      * @return the unmodified content description from the part (or the empty string if none)
      */
-protected: std::string GetRawContentDescription() const;
+protected: QString GetRawContentDescription() const;
 
 public: virtual bool IsDirty() const;
 
@@ -285,7 +283,7 @@ protected: void DoDisposePart();
 /* (non-Javadoc)
  * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
  */
-public: virtual std::string GetPartProperty(const std::string& key) const;
+public: virtual QString GetPartProperty(const QString& key) const;
 
 protected: virtual void FirePropertyChange(PropertyChangeEvent::Pointer event);
 

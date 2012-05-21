@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <internal/berryTweaklets.h>
+#include <tweaklets/berryGuiWidgetsTweaklet.h>
 
 #include "berryQtShell.h"
 
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>
-#include <tweaklets/berryGuiWidgetsTweaklet.h>
+#include <internal/berryTweaklets.h>
 
 #include <QApplication>
 #include <QVariant>
@@ -113,7 +113,7 @@ QWidget *QtShell::GetControl()
   return widget;
 }
 
-void QtShell::SetImages(const std::vector<void*>&  /*images*/)
+void QtShell::SetImages(const QList<void*>&  /*images*/)
 {
 }
 
@@ -173,11 +173,11 @@ void QtShell::Close()
   widget->close();
 }
 
-std::vector<Shell::Pointer> QtShell::GetShells()
+QList<Shell::Pointer> QtShell::GetShells()
 {
   GuiWidgetsTweaklet* widgetTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
-  std::vector<Shell::Pointer> allShells(widgetTweaklet->GetShells());
-  std::vector<Shell::Pointer> descendants;
+  QList<Shell::Pointer> allShells(widgetTweaklet->GetShells());
+  QList<Shell::Pointer> descendants;
 
   for (std::size_t i = 0; i < allShells.size(); ++i)
   {

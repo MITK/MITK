@@ -20,17 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 #include "../berryUIException.h"
 
-#include <Poco/StringTokenizer.h>
+#include <QStringList>
 
 namespace berry
 {
 
 template<class T>
-const std::string Category<T>::MISC_NAME = "Other";
+const QString Category<T>::MISC_NAME = "Other";
 
 template<class T>
-const std::string Category<T>::MISC_ID =
-    "org.blueberry.ui.internal.otherCategory"; //$NON-NLS-1$
+const QString Category<T>::MISC_ID =
+    "org.blueberry.ui.internal.otherCategory";
 
 template<class T> Category<T>::Category()
 {
@@ -38,10 +38,10 @@ template<class T> Category<T>::Category()
   this->name = MISC_NAME;
 }
 
-template<class T> Category<T>::Category(const std::string& ID,
-    const std::string& label)
- : id(ID), name(label) {
-
+template<class T> Category<T>::Category(const QString& ID,
+    const QString& label)
+ : id(ID), name(label)
+{
 }
 
 template<class T>
@@ -52,7 +52,7 @@ Category<T>::Category(IConfigurationElement::Pointer configElement)
 
   if (id == "" || GetLabel() == "")
   {
-    throw WorkbenchException("Invalid category", id);
+    throw WorkbenchException(QString("Invalid category: ") + id);
   }
 }
 
@@ -63,7 +63,7 @@ void Category<T>::AddElement(ElementType element)
 }
 
 template<class T>
-Poco::Any Category<T>::GetAdapter(const std::string& adapter)
+Poco::Any Category<T>::GetAdapter(const QString& adapter)
 {
   if (adapter == IConfigurationElement::GetStaticClassName())
   {
@@ -82,51 +82,48 @@ Poco::Any Category<T>::GetAdapter(const std::string& adapter)
 //}
 
 template<class T>
-const std::string& Category<T>::GetId() const
+const QString& Category<T>::GetId() const
 {
   return id;
 }
 
 template<class T>
-std::string Category<T>::GetLabel() const
+QString Category<T>::GetLabel() const
 {
   if (configurationElement.IsNull())
     return name;
 
-  QString val = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
-  return val.toStdString();
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
 }
 
 template<class T>
-const std::vector<std::string>& Category<T>::GetParentPath()
+QList<QString> Category<T>::GetParentPath()
 {
   if (parentPath.size() > 0)
   {
     return parentPath;
   }
 
-  std::string unparsedPath(this->GetRawParentPath());
-  Poco::StringTokenizer stok(unparsedPath, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM); //$NON-NLS-1$
-  for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
+  QString unparsedPath(this->GetRawParentPath());
+  foreach(QString token, unparsedPath.split('/', QString::SkipEmptyParts))
   {
-    parentPath.push_back(*iter);
+    parentPath.push_back(token.trimmed());
   }
 
   return parentPath;
 }
 
 template<class T>
-std::string Category<T>::GetRawParentPath() const
+QString Category<T>::GetRawParentPath() const
 {
   if (configurationElement.IsNull())
-    return "";
+    return QString();
 
-  QString raw = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_PARENT_CATEGORY);
-  return raw.toStdString();
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_PARENT_CATEGORY);
 }
 
 template<class T>
-std::string Category<T>::GetRootPath()
+QString Category<T>::GetRootPath()
 {
   if (this->GetParentPath().size() > 0)
   {
@@ -137,7 +134,7 @@ std::string Category<T>::GetRootPath()
 }
 
 template<class T>
-const std::vector<T>& Category<T>::GetElements() const
+const QList<T>& Category<T>::GetElements() const
 {
   return elements;
 }
@@ -150,7 +147,7 @@ bool Category<T>::HasElement(const ElementType& o) const
     return false;
   }
 
-  for (typename std::vector<ElementType>::const_iterator iter = elements.begin(); iter != elements.end(); ++iter)
+  for (typename QList<ElementType>::const_iterator iter = elements.begin(); iter != elements.end(); ++iter)
   {
     if (*iter == o) return true;
   }

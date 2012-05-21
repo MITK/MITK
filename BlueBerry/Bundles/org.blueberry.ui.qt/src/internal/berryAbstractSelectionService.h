@@ -43,12 +43,12 @@ private:
     /**
      * The list of selection listeners (not per-part).
      */
-    std::list<ISelectionListener::Pointer> fListeners;
+    QList<ISelectionListener::Pointer> fListeners;
 
     /**
      * The list of post selection listeners (not per-part).
      */
-    std::list<ISelectionListener::Pointer> fPostListeners;
+    QList<ISelectionListener::Pointer> fPostListeners;
 
     /**
      * The currently active part.
@@ -64,7 +64,7 @@ private:
     /**
      * Map from part id (String) to per-part tracker (AbstractPartSelectionTracker).
      */
-    std::map<std::string, AbstractPartSelectionTracker::Pointer> perPartTrackers;
+    QHash<QString, AbstractPartSelectionTracker::Pointer> perPartTrackers;
 
     struct SelectionListener : public ISelectionChangedListener
     {
@@ -101,7 +101,7 @@ private:
 
 public:
 
-    //SelectionEvents& GetSelectionEvents(const std::string& partId = "");
+    //SelectionEvents& GetSelectionEvents(const QString& partId = "");
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
@@ -111,7 +111,7 @@ public:
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddSelectionListener(const std::string& partId, ISelectionListener::Pointer listener);
+    void AddSelectionListener(const QString& partId, ISelectionListener::Pointer listener);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
@@ -121,7 +121,7 @@ public:
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddPostSelectionListener(const std::string& partId,
+    void AddPostSelectionListener(const QString& partId,
             ISelectionListener::Pointer listener);
 
     /* (non-Javadoc)
@@ -133,7 +133,7 @@ public:
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
-    void RemovePostSelectionListener(const std::string& partId,
+    void RemovePostSelectionListener(const QString& partId,
             ISelectionListener::Pointer listener);
 
     /* (non-Javadoc)
@@ -145,7 +145,7 @@ public:
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
-    void RemoveSelectionListener(const std::string& partId,
+    void RemoveSelectionListener(const QString& partId,
             ISelectionListener::Pointer listener);
 
 
@@ -176,7 +176,7 @@ protected:
      * @param partId part identifier
      * @return per-part selection tracker
      */
-    AbstractPartSelectionTracker::Pointer GetPerPartTracker(const std::string& partId);
+    AbstractPartSelectionTracker::Pointer GetPerPartTracker(const QString& partId);
 
     /**
      * Creates a new per-part selection tracker for the given part id.
@@ -185,7 +185,7 @@ protected:
      * @return per-part selection tracker
      */
     virtual AbstractPartSelectionTracker::Pointer CreatePartTracker(
-            const std::string& partId) const = 0;
+            const QString& partId) const = 0;
 
 
 public:
@@ -198,7 +198,7 @@ public:
     /*
      * @see ISelectionService#getSelection(String)
      */
-    ISelection::ConstPointer GetSelection(const std::string& partId);
+    ISelection::ConstPointer GetSelection(const QString& partId);
 
     /**
      * Sets the current-active part (or null if none)

@@ -58,7 +58,7 @@ struct BERRY_UI_QT IQtStyleManager : public Service
     { return name == s.name; }
   };
 
-    struct IconTheme {
+  struct IconTheme {
     QString name;
 
     IconTheme() {}
@@ -79,7 +79,7 @@ struct BERRY_UI_QT IQtStyleManager : public Service
     { return name == s.name; }
   };
 
-  static const std::string ID; // = "org.blueberry.service.qtstylemanager";
+  static const QString ID; // = "org.blueberry.service.qtstylemanager";
 
   typedef QList<Style> StyleList;
   typedef QList<IconTheme> IconThemeList;

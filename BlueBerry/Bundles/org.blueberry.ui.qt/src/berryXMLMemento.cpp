@@ -31,10 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/SAX/InputSource.h>
 #include <Poco/SAX/SAXException.h>
 
-#include <sstream>
 #include <limits>
 
-const std::string EMPTY_STRING;
+const QString EMPTY_STRING;
 
 berry::XMLMemento::XMLMemento(Poco::XML::Document* document,
     Poco::XML::Element* elem) :
@@ -51,16 +50,15 @@ berry::XMLMemento::~XMLMemento()
 }
 
 berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
-    berry::XMLMemento::XMLByteInputStream& reader) throw (WorkbenchException)
+    berry::XMLMemento::XMLByteInputStream& reader)
 {
   return CreateReadRoot(reader, "");
 }
 
 berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
-    berry::XMLMemento::XMLByteInputStream& reader, const std::string& baseDir)
-    throw (WorkbenchException)
+    berry::XMLMemento::XMLByteInputStream& reader, const QString& baseDir)
 {
-  std::string errorMessage;
+  QString errorMessage;
   Poco::Exception exception("");
 
   try
@@ -68,7 +66,7 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
     Poco::XML::DOMParser parser;
     Poco::XML::InputSource source(reader);
 
-    source.setSystemId(baseDir);
+    source.setSystemId(baseDir.toStdString());
     Poco::XML::Document* doc = parser.parse(&source);
 
     Poco::XML::Element* elem = doc->documentElement();
@@ -78,28 +76,28 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
     doc->release();
 
     return memento;
-  } catch (Poco::XML::SAXParseException& e)
+  }
+  catch (Poco::XML::SAXParseException& e)
   {
-    errorMessage = "Could not parse content of XML file.";
-    exception = e;
+    errorMessage = QString("Could not parse content of XML file: ") + QString::fromStdString(e.displayText());
   }
 
-  std::string problemText = exception.message();
-  if (problemText.empty())
+  QString problemText = QString::fromStdString(exception.message());
+  if (problemText.isEmpty())
   {
-    problemText = errorMessage.empty() ? "Could not find root element node of XML file." : errorMessage;
+    problemText = errorMessage.isEmpty() ? "Could not find root element node of XML file." : errorMessage;
   }
-  throw WorkbenchException(problemText, exception);
+  throw WorkbenchException(problemText);
 
 }
 
 berry::XMLMemento::Pointer berry::XMLMemento::CreateWriteRoot(
-    const std::string& type)
+    const QString& type)
 {
   // TODO
   //  try{
   Poco::XML::Document* doc = new Poco::XML::Document();
-  Poco::XML::Element* elem = doc->createElement(type);
+  Poco::XML::Element* elem = doc->createElement(type.toStdString());
   doc->appendChild(elem)->release();
 
   XMLMemento::Pointer memento = XMLMemento::New(doc, elem);
@@ -111,18 +109,18 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateWriteRoot(
 }
 
 berry::IMemento::Pointer berry::XMLMemento::CreateChild(
-    const std::string& type)
+    const QString& type)
 {
-  Poco::XML::Element* child = factory->createElement(type);
+  Poco::XML::Element* child = factory->createElement(type.toStdString());
   element->appendChild(child)->release();
   return XMLMemento::New(factory, child);
 }
 
 berry::IMemento::Pointer berry::XMLMemento::CreateChild(
-    const std::string& type, const std::string& id)
+    const QString& type, const QString& id)
 {
-  Poco::XML::Element* child = factory->createElement(type);
-  child->setAttribute(TAG_ID, id); //$NON-NLS-1$
+  Poco::XML::Element* child = factory->createElement(type.toStdString());
+  child->setAttribute(TAG_ID.toStdString(), id.toStdString());
   element->appendChild(child)->release();
   return XMLMemento::New(factory, child);
 }
@@ -138,11 +136,11 @@ berry::IMemento::Pointer berry::XMLMemento::CopyChild(IMemento::Pointer child)
 
 }
 
-berry::IMemento::Pointer berry::XMLMemento::GetChild(const std::string& type) const
+berry::IMemento::Pointer berry::XMLMemento::GetChild(const QString& type) const
 {
   // Get the nodes.
   berry::XMLMemento::Pointer memento;
-  Poco::XML::Element* child = element->getChildElement(type); // Find the first node which is a child of this node
+  Poco::XML::Element* child = element->getChildElement(type.toStdString()); // Find the first node which is a child of this node
   if (child)
   {
     memento = berry::XMLMemento::New(factory, child);
@@ -152,12 +150,12 @@ berry::IMemento::Pointer berry::XMLMemento::GetChild(const std::string& type) co
   return memento;
 }
 
-std::vector<berry::IMemento::Pointer> berry::XMLMemento::GetChildren(
-    const std::string& type) const
+QList<berry::IMemento::Pointer> berry::XMLMemento::GetChildren(
+    const QString& type) const
 {
-  std::vector<IMemento::Pointer> mementos;
-  Poco::XML::NodeList* elementList = element->getElementsByTagName(type);
-  mementos.resize(elementList->length());
+  QList<IMemento::Pointer> mementos;
+  Poco::XML::NodeList* elementList = element->getElementsByTagName(type.toStdString());
+  mementos.reserve(elementList->length());
   for (unsigned long i = 0; i < elementList->length(); i++)
   {
     Poco::XML::Element* elem =
@@ -169,11 +167,11 @@ std::vector<berry::IMemento::Pointer> berry::XMLMemento::GetChildren(
 
 }
 
-bool berry::XMLMemento::GetFloat(const std::string& key, double& value) const
+bool berry::XMLMemento::GetFloat(const QString& key, double& value) const
 {
-  if (!element->hasAttribute(key)) return false;
+  if (!element->hasAttribute(key.toStdString())) return false;
 
-  const std::string& attr = element->getAttribute(key);
+  const std::string& attr = element->getAttribute(key.toStdString());
 
   try
   {
@@ -194,47 +192,48 @@ bool berry::XMLMemento::GetFloat(const std::string& key, double& value) const
       return true;
     }
 
-    WorkbenchPlugin::Log("Memento problem - invalid float for key: " + QString::fromStdString(key)
-        + " value: " + QString::fromStdString(attr), e);
+    WorkbenchPlugin::Log("Memento problem - invalid float for key: " + key
+        + " value: " + QString::fromStdString(attr));
     return false;
   }
 
   return true;
 }
 
-std::string berry::XMLMemento::GetType() const
+QString berry::XMLMemento::GetType() const
 {
-  return element->nodeName();
+  return QString::fromStdString(element->nodeName());
 }
 
-std::string berry::XMLMemento::GetID() const
+QString berry::XMLMemento::GetID() const
 {
   //TODO: make error handling!
-  return element->getAttribute(TAG_ID);
+  return QString::fromStdString(element->getAttribute(TAG_ID.toStdString()));
 }
 
-bool berry::XMLMemento::GetInteger(const std::string& key, int& value) const
+bool berry::XMLMemento::GetInteger(const QString& key, int& value) const
 {
-  if (!element->hasAttribute(key)) return false;
+  if (!element->hasAttribute(key.toStdString())) return false;
 
-  const std::string& attr = element->getAttribute(key);
+  const std::string& attr = element->getAttribute(key.toStdString());
 
   try
   {
     value = Poco::NumberParser::parse(attr);
-  } catch (const Poco::SyntaxException& e)
+  }
+  catch (const Poco::SyntaxException& e)
   {
-    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + QString::fromStdString(key)
-                         + " value: " + QString::fromStdString(attr), e);
+    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
+                         + " value: " + QString::fromStdString(attr));
     return false;
   }
 
   return true;
 }
 
-bool berry::XMLMemento::GetBoolean(const std::string& key, bool& value) const
+bool berry::XMLMemento::GetBoolean(const QString& key, bool& value) const
 {
-  std::string attr = element->getAttribute(key);
+  const std::string& attr = element->getAttribute(key.toStdString());
   if (attr.empty())
     return false;
   else if (attr == "true")
@@ -249,38 +248,38 @@ bool berry::XMLMemento::GetBoolean(const std::string& key, bool& value) const
   }
 }
 
-bool berry::XMLMemento::GetString(const std::string& key, std::string& value) const
+bool berry::XMLMemento::GetString(const QString& key, QString& value) const
 {
-  std::string v = element->getAttribute(key);
-  if (v.empty())
+  QString v = QString::fromStdString(element->getAttribute(key.toStdString()));
+  if (v.isEmpty())
     return false;
 
   value = v;
   return true;
 }
 
-const std::string& berry::XMLMemento::GetTextData() const
+QString berry::XMLMemento::GetTextData() const
 {
   Poco::XML::Text* textNode = GetTextNode();
 
   if (textNode != NULL)
   {
-    return textNode->getData();
+    return QString::fromStdString(textNode->getData());
   }
 
   return EMPTY_STRING;
 }
 
-std::vector<std::string> berry::XMLMemento::GetAttributeKeys() const
+QList<QString> berry::XMLMemento::GetAttributeKeys() const
 {
-  std::vector<std::string> values;
+  QList<QString> values;
   Poco::XML::NamedNodeMap* nnMap = element->attributes();
 
-  values.resize(nnMap->length());
+  values.reserve(nnMap->length());
 
   for (unsigned long i = 0; i < nnMap->length(); i++)
   {
-    values[i] = nnMap->item(i)->nodeName(); //TODO check if right
+    values[i] = QString::fromStdString(nnMap->item(i)->nodeName()); //TODO check if right
   }
 
   return values;
@@ -320,7 +319,8 @@ void berry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
   {
     Poco::XML::Node* node = nodeMap->item(index);
     Poco::XML::Attr* attr = dynamic_cast<Poco::XML::Attr*> (node);
-    PutString(attr->nodeName(), attr->nodeValue());
+    PutString(QString::fromStdString(attr->nodeName()),
+              QString::fromStdString(attr->nodeValue()));
   }
   nodeMap->release();
 
@@ -335,7 +335,7 @@ void berry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
     case Poco::XML::Node::ELEMENT_NODE:
     {
       Poco::XML::Element* elem = dynamic_cast<Poco::XML::Element*> (child);
-      XMLMemento::Pointer child = CreateChild(elem->nodeName()).Cast<
+      XMLMemento::Pointer child = CreateChild(QString::fromStdString(elem->nodeName())).Cast<
           berry::XMLMemento> ();
       child->PutElement(elem, true);
     }
@@ -344,7 +344,7 @@ void berry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
       if (needToCopyText)
       {
         Poco::XML::Text* text = dynamic_cast<Poco::XML::Text*> (child);
-        PutTextData(text->getData());
+        PutTextData(QString::fromStdString(text->getData()));
         needToCopyText = false;
       }
       break;
@@ -357,16 +357,16 @@ void berry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
   }
 }
 
-void berry::XMLMemento::PutFloat(const std::string& key, double value)
+void berry::XMLMemento::PutFloat(const QString& key, double value)
 {
   std::string xmlValue = Poco::NumberFormatter::format(value);
-  element->setAttribute(key, xmlValue);
+  element->setAttribute(key.toStdString(), xmlValue);
 }
 
-void berry::XMLMemento::PutInteger(const std::string& key, int value)
+void berry::XMLMemento::PutInteger(const QString& key, int value)
 {
   std::string xmlValue = Poco::NumberFormatter::format(value);
-  element->setAttribute(key, xmlValue);
+  element->setAttribute(key.toStdString(), xmlValue);
 }
 
 void berry::XMLMemento::PutMemento(IMemento::Pointer memento)
@@ -376,38 +376,38 @@ void berry::XMLMemento::PutMemento(IMemento::Pointer memento)
   PutElement(memento.Cast<berry::XMLMemento> ()->GetElement(), false);
 }
 
-void berry::XMLMemento::PutString(const std::string& key,
-    const std::string& value)
+void berry::XMLMemento::PutString(const QString& key,
+    const QString& value)
 {
-  element->setAttribute(key, value);
+  element->setAttribute(key.toStdString(), value.toStdString());
   //if (value == null) {
   //  return;}
   //element.setAttribute(key, value);
 }
 
-void berry::XMLMemento::PutBoolean(const std::string& key, bool value)
+void berry::XMLMemento::PutBoolean(const QString& key, bool value)
 {
   if (value)
   {
-    element->setAttribute(key, "true");
+    element->setAttribute(key.toStdString(), "true");
   }
   else
   {
-    element->setAttribute(key, "false");
+    element->setAttribute(key.toStdString(), "false");
   }
 }
 
-void berry::XMLMemento::PutTextData(const std::string& data)
+void berry::XMLMemento::PutTextData(const QString& data)
 {
   Poco::XML::Text* textNode = GetTextNode();
   if (textNode == NULL)
   {
-    textNode = factory->createTextNode(data);
+    textNode = factory->createTextNode(data.toStdString());
     element->insertBefore(textNode, element->firstChild())->release();
   }
   else
   {
-    textNode->setData(data);
+    textNode->setData(data.toStdString());
   }
 }
 

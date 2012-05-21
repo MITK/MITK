@@ -45,7 +45,7 @@ public:
    *
    * @param error the status
    */
-  ErrorViewPart(const std::string& title, const std::string& error);
+  ErrorViewPart(const QString& title, const QString& error);
 
   /*
    * (non-Javadoc)
@@ -59,7 +59,7 @@ public:
    *
    * @see org.eclipse.ui.part.ViewPart#setPartName(java.lang.String)
    */
-  void SetPartName(const std::string& newName);
+  void SetPartName(const QString& newName);
 
   /*
    * (non-Javadoc)
@@ -71,8 +71,8 @@ public:
   private:
 
   //IStatus error;
-  std::string title;
-  std::string error;
+  QString title;
+  QString error;
   Object::Pointer statusPart;
 };
 

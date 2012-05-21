@@ -72,7 +72,7 @@ public:
   StackPresentation::Pointer CreateStandaloneViewPresentation(void* parent,
       IStackPresentationSite::Pointer site, bool showTitle);
 
-  std::string GetId();
+  QString GetId();
 
   void* CreateSash(void* parent, int style);
 

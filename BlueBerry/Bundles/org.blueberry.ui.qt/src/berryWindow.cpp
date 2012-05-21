@@ -30,7 +30,7 @@ namespace berry
 const int Window::OK = 0;
 const int Window::CANCEL = 1;
 
-std::vector<void*> Window::defaultImages = std::vector<void*>();
+QList<void*> Window::defaultImages = QList<void*>();
 
 Window::IExceptionHandler::Pointer Window::exceptionHandler(new DefaultExceptionHandler());
 IShellProvider::Pointer Window::defaultModalParent(new DefaultModalParent());
@@ -79,7 +79,7 @@ Shell::Pointer Window::DefaultModalParent::GetShell()
   return parent;
 }
 
-Shell::Pointer Window::GetModalChild(const std::vector<Shell::Pointer>& toSearch)
+Shell::Pointer Window::GetModalChild(const QList<Shell::Pointer>& toSearch)
 {
   int modal = Constants::APPLICATION_MODAL | Constants::SYSTEM_MODAL | Constants::PRIMARY_MODAL;
 
@@ -89,7 +89,7 @@ Shell::Pointer Window::GetModalChild(const std::vector<Shell::Pointer>& toSearch
     Shell::Pointer shell = toSearch[i];
 
     // Check if this shell has a modal child
-    std::vector<Shell::Pointer> children = shell->GetShells();
+    QList<Shell::Pointer> children = shell->GetShells();
     Shell::Pointer modalChild = GetModalChild(children);
     if (modalChild != 0)
     {
@@ -479,7 +479,7 @@ void* Window::GetDefaultImage()
       : defaultImages[0];
 }
 
-std::vector<void*> Window::GetDefaultImages()
+QList<void*> Window::GetDefaultImages()
 {
   return defaultImages;
 }
@@ -539,7 +539,7 @@ void Window::SetDefaultImage(void* image)
     defaultImages.push_back(image);
 }
 
-void Window::SetDefaultImages(const std::vector<void*>& images)
+void Window::SetDefaultImages(const QList<void*>& images)
 {
   defaultImages = images;
 }
@@ -552,7 +552,7 @@ void Window::SetWindowManager(WindowManager* manager)
 
   if (manager != 0)
   {
-    std::vector<Window::Pointer> windows = manager->GetWindows();
+    QList<Window::Pointer> windows = manager->GetWindows();
     for (unsigned int i = 0; i < windows.size(); i++)
     {
       if (windows[i] == this)

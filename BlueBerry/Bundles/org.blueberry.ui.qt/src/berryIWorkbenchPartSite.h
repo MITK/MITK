@@ -36,7 +36,7 @@ struct IWorkbenchPart;
 struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
 {
 
-  berryInterfaceMacro(IWorkbenchPartSite, berry);
+  berryInterfaceMacro(IWorkbenchPartSite, berry)
 
   ~IWorkbenchPartSite();
 
@@ -49,7 +49,7 @@ struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
    *
    * @return the registry extension id
    */
-  virtual std::string GetId() = 0;
+  virtual QString GetId() = 0;
 
   /**
    * Returns the part associated with this site
@@ -64,7 +64,7 @@ struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
    *
    * @return the unique identifier of the declaring plug-in
    */
-  virtual std::string GetPluginId() = 0;
+  virtual QString GetPluginId() = 0;
 
   /**
    * Returns the registered name for this workbench site's part.
@@ -75,7 +75,7 @@ struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
    *
    * @return the part name
    */
-  virtual std::string GetRegisteredName() = 0;
+  virtual QString GetRegisteredName() = 0;
 
 };
 

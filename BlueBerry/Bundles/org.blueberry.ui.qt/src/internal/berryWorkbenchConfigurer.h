@@ -33,14 +33,13 @@ namespace berry
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- *
- * @since 3.0
  */
-class WorkbenchConfigurer : public IWorkbenchConfigurer {
+class WorkbenchConfigurer : public IWorkbenchConfigurer
+{
 
 public:
 
-  berryObjectMacro(WorkbenchConfigurer);
+  berryObjectMacro(WorkbenchConfigurer)
 
 private:
 
@@ -48,7 +47,7 @@ private:
      * Table to hold arbitrary key-data settings.
      * @see #SetData
      */
-    Poco::HashMap<std::string, Object::Pointer> extraData;
+    QHash<QString, Object::Pointer> extraData;
 
     /**
      * Indicates whether workbench state should be saved on close and
@@ -118,12 +117,12 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#getData
      */
-    Object::Pointer GetData(const std::string& key) const;
+    Object::Pointer GetData(const QString& key) const;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#setData(String, Object)
      */
-    void SetData(const std::string& key, Object::Pointer data);
+    void SetData(const QString& key, Object::Pointer data);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#emergencyClose()

@@ -62,9 +62,9 @@ public:
 
   ~WorkbenchWindow();
 
-  Object::Pointer GetService(const std::string& key);
+  Object::Pointer GetService(const QString& key);
 
-  bool HasService(const std::string& key) const;
+  bool HasService(const QString& key) const;
 
   int Open();
   bool Close();
@@ -121,7 +121,7 @@ public:
 
   ISelectionService* GetSelectionService();
 
-  SmartPointer<IWorkbenchPage> OpenPage(const std::string& perspectiveId,
+  SmartPointer<IWorkbenchPage> OpenPage(const QString& perspectiveId,
       IAdaptable* input);
 
   SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input);
@@ -284,7 +284,7 @@ protected:
    * programmatically show a perspective.
    * </p>
    */
-  SmartPointer<IWorkbenchPage> BusyOpenPage(const std::string& perspID,
+  SmartPointer<IWorkbenchPage> BusyOpenPage(const QString& perspID,
       IAdaptable* input);
 
   bool ClosePage(SmartPointer<IWorkbenchPage> in, bool save);
@@ -373,17 +373,17 @@ private:
 
   private:
     // List of pages in the order they were created;
-    std::list<SmartPointer<IWorkbenchPage> > pagesInCreationOrder;
+    QList<SmartPointer<IWorkbenchPage> > pagesInCreationOrder;
 
     // List of pages where the top is the last activated.
-    std::list<SmartPointer<IWorkbenchPage> > pagesInActivationOrder;
+    QList<SmartPointer<IWorkbenchPage> > pagesInActivationOrder;
 
     // The page explicitly activated
     SmartPointer<IWorkbenchPage> active;
 
   public:
 
-    typedef std::list<SmartPointer<IWorkbenchPage> >::iterator iterator;
+    typedef QList<SmartPointer<IWorkbenchPage> >::iterator iterator;
 
     bool Add(SmartPointer<IWorkbenchPage> object);
 
@@ -399,7 +399,7 @@ private:
 
     bool IsEmpty();
 
-    const std::list<SmartPointer<IWorkbenchPage> >& GetPages();
+    const QList<SmartPointer<IWorkbenchPage> >& GetPages();
 
     void SetActive(SmartPointer<IWorkbenchPage> page);
 
@@ -503,14 +503,14 @@ private:
    * Fires perspective changed
    */
   void FirePerspectiveChanged(SmartPointer<IWorkbenchPage> ,
-      IPerspectiveDescriptor::Pointer perspective, const std::string& changeId);
+      IPerspectiveDescriptor::Pointer perspective, const QString& changeId);
 
   /**
    * Fires perspective changed for an affected part
    */
   void FirePerspectiveChanged(SmartPointer<IWorkbenchPage> ,
       IPerspectiveDescriptor::Pointer perspective,
-      IWorkbenchPartReference::Pointer partRef, const std::string& changeId);
+      IWorkbenchPartReference::Pointer partRef, const QString& changeId);
 
   /**
    * Fires perspective closed

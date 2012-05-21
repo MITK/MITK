@@ -37,9 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string EditorManager::PIN_EDITOR_KEY = "PIN_EDITOR";
-const std::string EditorManager::RESOURCES_TO_SAVE_MESSAGE = "Select resources to save:";
-const std::string EditorManager::SAVE_RESOURCES_TITLE = "Save Resources";
+const QString EditorManager::PIN_EDITOR_KEY = "PIN_EDITOR";
+const QString EditorManager::RESOURCES_TO_SAVE_MESSAGE = "Select resources to save:";
+const QString EditorManager::SAVE_RESOURCES_TITLE = "Save Resources";
 
 EditorManager::EditorManager(WorkbenchWindow::Pointer wind,
     WorkbenchPage::Pointer workbenchPage,
@@ -143,11 +143,11 @@ void EditorManager::CheckDeleteEditorResources()
 //  }
 //}
 
-std::vector<IEditorPart::Pointer> EditorManager::CollectDirtyEditors()
+QList<IEditorPart::Pointer> EditorManager::CollectDirtyEditors()
 {
-  std::vector<IEditorPart::Pointer> result;
-  std::list<IEditorReference::Pointer> editors(page->GetEditorReferences());
-  for (std::list<IEditorReference::Pointer>::iterator i = editors.begin();
+  QList<IEditorPart::Pointer> result;
+  QList<IEditorReference::Pointer> editors(page->GetEditorReferences());
+  for (QList<IEditorReference::Pointer>::iterator i = editors.begin();
        i != editors.end(); ++i)
   {
     IEditorPart::Pointer part = (*i)->GetPart(false).Cast<IEditorPart>();
@@ -162,7 +162,7 @@ std::vector<IEditorPart::Pointer> EditorManager::CollectDirtyEditors()
 
 bool EditorManager::ContainsEditor(IEditorReference::Pointer ref)
 {
-  std::list<IEditorReference::Pointer> editors(page->GetEditorReferences());
+  QList<IEditorReference::Pointer> editors(page->GetEditorReferences());
   return std::find(editors.begin(), editors.end(), ref) != editors.end();
 }
 
@@ -244,10 +244,10 @@ IEditorPart::Pointer EditorManager::FindEditor(IEditorInput::Pointer input)
   return this->FindEditor("", input, IWorkbenchPage::MATCH_INPUT);
 }
 
-IEditorPart::Pointer EditorManager::FindEditor(const std::string& editorId,
+IEditorPart::Pointer EditorManager::FindEditor(const QString& editorId,
     IEditorInput::Pointer input, int matchFlags)
 {
-  std::vector<IEditorReference::Pointer> refs(this->FindEditors(input, editorId, matchFlags));
+  QList<IEditorReference::Pointer> refs(this->FindEditors(input, editorId, matchFlags));
   if (refs.size() == 0)
   {
     return IEditorPart::Pointer();
@@ -255,22 +255,22 @@ IEditorPart::Pointer EditorManager::FindEditor(const std::string& editorId,
   return refs[0]->GetEditor(true);
 }
 
-std::vector<IEditorReference::Pointer> EditorManager::FindEditors(
-    IEditorInput::Pointer input, const std::string& editorId, int matchFlags)
+QList<IEditorReference::Pointer> EditorManager::FindEditors(
+    IEditorInput::Pointer input, const QString& editorId, int matchFlags)
 {
   if (matchFlags == IWorkbenchPage::MATCH_NONE)
   {
-    return std::vector<IEditorReference::Pointer>();
+    return QList<IEditorReference::Pointer>();
   }
-  std::vector<IEditorReference::Pointer> result;
-  std::list<IEditorReference::Pointer> othersList(page->GetEditorReferences());
+  QList<IEditorReference::Pointer> result;
+  QList<IEditorReference::Pointer> othersList(page->GetEditorReferences());
   if (!othersList.empty())
   {
     IEditorReference::Pointer active = page->GetActiveEditorReference();
     if (active.IsNotNull())
     {
-      othersList.remove(active);
-      std::list<IEditorReference::Pointer> activeList;
+      othersList.removeAll(active);
+      QList<IEditorReference::Pointer> activeList;
       activeList.push_back(active);
       this->FindEditors(activeList, input, editorId, matchFlags, result);
     }
@@ -280,9 +280,9 @@ std::vector<IEditorReference::Pointer> EditorManager::FindEditors(
 }
 
 void EditorManager::FindEditors(
-    std::list<IEditorReference::Pointer>& editorList,
-    IEditorInput::Pointer input, const std::string& editorId, int matchFlags,
-    std::vector<IEditorReference::Pointer>& result)
+    QList<IEditorReference::Pointer>& editorList,
+    IEditorInput::Pointer input, const QString& editorId, int matchFlags,
+    QList<IEditorReference::Pointer>& result)
 {
   if (matchFlags == IWorkbenchPage::MATCH_NONE)
   {
@@ -290,9 +290,9 @@ void EditorManager::FindEditors(
   }
 
   // Phase 0: Remove editors whose ids don't match (if matching by id)
-  if (((matchFlags & IWorkbenchPage::MATCH_ID) != 0) && !editorId.empty())
+  if (((matchFlags & IWorkbenchPage::MATCH_ID) != 0) && !editorId.isEmpty())
   {
-    for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
+    for (QList<IEditorReference::Pointer>::iterator i = editorList.begin();
       i != editorList.end();)
     {
       if (editorId != (*i)->GetId())
@@ -308,12 +308,12 @@ void EditorManager::FindEditors(
   // In practice, this case is never used.
   if ((matchFlags & IWorkbenchPage::MATCH_INPUT) == 0)
   {
-    result.insert(result.end(), editorList.begin(), editorList.end());
+    result.append(editorList);
     return;
   }
 
   // Phase 1: check editors that have their own matching strategy
-  for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
+  for (QList<IEditorReference::Pointer>::iterator i = editorList.begin();
        i != editorList.end();)
   {
     EditorReference::Pointer editor = i->Cast<EditorReference>();
@@ -338,7 +338,7 @@ void EditorManager::FindEditors(
 
   // Phase 2: check materialized editors (without their own matching
   // strategy)
-  for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
+  for (QList<IEditorReference::Pointer>::iterator i = editorList.begin();
        i != editorList.end();)
   {
     EditorReference::Pointer editor = i->Cast<EditorReference>();
@@ -360,7 +360,7 @@ void EditorManager::FindEditors(
   // input
   // if the editor reference's factory id and name match.
 
-//  std::string name = input->GetName();
+//  QString name = input->GetName();
 //  IPersistableElement persistable = input.getPersistable();
 //  if (name == null || persistable == null)
 //  {
@@ -403,12 +403,12 @@ IEditorRegistry* EditorManager::GetEditorRegistry()
   return WorkbenchPlugin::GetDefault()->GetEditorRegistry();
 }
 
-std::vector<IEditorPart::Pointer> EditorManager::GetDirtyEditors()
+QList<IEditorPart::Pointer> EditorManager::GetDirtyEditors()
 {
   return this->CollectDirtyEditors();
 }
 
-std::list<IEditorReference::Pointer> EditorManager::GetEditors()
+QList<IEditorReference::Pointer> EditorManager::GetEditors()
 {
   return page->GetEditorReferences();
 }
@@ -425,8 +425,8 @@ IEditorPart::Pointer EditorManager::GetVisibleEditor()
 
 bool EditorManager::IsSaveAllNeeded()
 {
-  std::list<IEditorReference::Pointer> editors(page->GetEditorReferences());
-  for (std::list<IEditorReference::Pointer>::iterator i = editors.begin();
+  QList<IEditorReference::Pointer> editors(page->GetEditorReferences());
+  for (QList<IEditorReference::Pointer>::iterator i = editors.begin();
        i != editors.end(); ++i)
   {
     if ((*i)->IsDirty())
@@ -445,7 +445,7 @@ IEditorReference::Pointer EditorManager::FindReusableEditor(
 }
 
 IEditorReference::Pointer EditorManager::OpenEditor(
-    const std::string& editorId, IEditorInput::Pointer input, bool /*setVisible*/,
+    const QString& editorId, IEditorInput::Pointer input, bool /*setVisible*/,
     IMemento::Pointer editorState)
 {
   if (input.IsNull())
@@ -457,7 +457,7 @@ IEditorReference::Pointer EditorManager::OpenEditor(
   EditorDescriptor::Pointer desc = reg->FindEditor(editorId).Cast<EditorDescriptor>();
   if (desc.IsNull())
   {
-    throw PartInitException("Unable to open editor, unknown editor id", editorId);
+    throw PartInitException("Unable to open editor, unknown editor id: " + editorId);
   }
 
   return this->OpenEditorFromDescriptor(desc, input, editorState);
@@ -503,7 +503,7 @@ IEditorReference::Pointer EditorManager::OpenEditorFromDescriptor(
   else
   {
     // this should never happen
-    throw PartInitException("Invalid editor descriptor for id", desc->GetId());
+    throw PartInitException("Invalid editor descriptor for id:" + desc->GetId());
   }
 
   if (result.IsNotNull())
@@ -572,7 +572,7 @@ IEditorReference::Pointer EditorManager::OpenEditorFromDescriptor(
 //  return null;
 //}
 
-void EditorManager::CreateEditorTab(EditorReference::Pointer ref, const std::string& workbookId)
+void EditorManager::CreateEditorTab(EditorReference::Pointer ref, const QString& workbookId)
 {
   editorPresentation->AddEditor(ref, workbookId);
 }
@@ -590,7 +590,7 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
   {
     //site.setActionBars(createEmptyEditorActionBars(site));
   }
-  const std::string label = part->GetPartName(); // debugging only
+  const QString label = part->GetPartName(); // debugging only
   try
   {
     part->Init(site, input);
@@ -608,7 +608,7 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
   }
   catch (std::exception e)
   {
-    throw PartInitException("An exception was thrown during initialization", e.what());
+    throw PartInitException(QString("An exception was thrown during initialization: ") + e.what());
   }
 
   return site;
@@ -711,9 +711,9 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //          WorkbenchMessages.EditorManager_problemsRestoringEditors, null);
       bool result = true;
 
-      std::string activeWorkbookID;
-      std::vector<IEditorReference::Pointer> visibleEditors;
-      std::vector<IEditorReference::Pointer> activeEditor;
+      QString activeWorkbookID;
+      QList<IEditorReference::Pointer> visibleEditors;
+      QList<IEditorReference::Pointer> activeEditor;
 
       IMemento::Pointer areaMem = memento->GetChild(WorkbenchConstants::TAG_AREA);
       if (areaMem)
@@ -725,7 +725,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 
       // Loop through the editors.
 
-      std::vector<IMemento::Pointer> editorMems(memento->GetChildren(WorkbenchConstants::TAG_EDITOR));
+      QList<IMemento::Pointer> editorMems(memento->GetChildren(WorkbenchConstants::TAG_EDITOR));
       for (std::size_t x = 0; x < editorMems.size(); x++)
       {
         // for dynamic UI - call restoreEditorState to replace code which is
@@ -753,7 +753,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
                 }
 
                 // Update the active workbook
-                if (!activeWorkbookID.empty())
+                if (!activeWorkbookID.isEmpty())
                 {
                   editorPresentation->SetActiveEditorWorkbookFromID(activeWorkbookID);
                 }
@@ -790,14 +790,14 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     {
       // Get the list of dirty editors and views. If it is
       // empty just return.
-      std::vector<ISaveablePart::Pointer> parts(page->GetDirtyParts());
+      QList<ISaveablePart::Pointer> parts(page->GetDirtyParts());
       if (parts.empty())
       {
         return true;
       }
 
-      std::vector<IWorkbenchPart::Pointer> wbParts;
-      for (std::vector<ISaveablePart::Pointer>::const_iterator i = parts.begin();
+      QList<IWorkbenchPart::Pointer> wbParts;
+      for (QList<ISaveablePart::Pointer>::const_iterator i = parts.begin();
         i != parts.end(); ++i)
       {
         if (IWorkbenchPart::Pointer part = i->Cast<IWorkbenchPart>())
@@ -811,7 +811,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     }
 
     bool EditorManager::SaveAll(
-        const std::vector<IWorkbenchPart::Pointer>& /*dirtyParts*/, bool /*confirm*/,
+        const QList<IWorkbenchPart::Pointer>& /*dirtyParts*/, bool /*confirm*/,
         bool /*closing*/, bool /*addNonPartSources*/, SmartPointer<IWorkbenchWindow> /*window*/)
     {
 //      // clone the input list
@@ -1027,17 +1027,17 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
           editorPresentation->GetActiveEditorWorkbookID());
 
       // Get each workbook
-      std::list<PartStack::Pointer> workbooks(editorPresentation->GetWorkbooks());
+      QList<PartStack::Pointer> workbooks(editorPresentation->GetWorkbooks());
 
-      for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();
+      for (QList<PartStack::Pointer>::iterator iter = workbooks.begin();
           iter != workbooks.end(); ++iter)
       {
         PartStack::Pointer workbook = *iter;
 
         // Use the list of editors found in EditorStack; fix for 24091
-        std::list<LayoutPart::Pointer> editorPanes(workbook->GetChildren());
+        QList<LayoutPart::Pointer> editorPanes(workbook->GetChildren());
 
-        for (std::list<LayoutPart::Pointer>::iterator i = editorPanes.begin();
+        for (QList<LayoutPart::Pointer>::iterator i = editorPanes.begin();
             i != editorPanes.end(); ++i)
         {
           // Save each open editor.
@@ -1082,8 +1082,8 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     }
 
     void EditorManager::RestoreEditorState(IMemento::Pointer /*editorMem*/,
-        std::vector<IEditorReference::Pointer>& /*visibleEditors*/,
-        std::vector<IEditorReference::Pointer>&  /*activeEditor*/)
+        QList<IEditorReference::Pointer>& /*visibleEditors*/,
+        QList<IEditorReference::Pointer>&  /*activeEditor*/)
     {
       // MultiStatus result) {
 
@@ -1272,14 +1272,14 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       EditorReference::Pointer result(new EditorReference(this, input, desc));
       try
       {
-        this->CreateEditorTab(result, ""); //$NON-NLS-1$
+        this->CreateEditorTab(result, "");
         return result;
       }
-      catch (PartInitException e)
+      catch (const PartInitException& e)
       {
 //        StatusManager.getManager().handle(
 //            StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
-        BERRY_ERROR << e.displayText() << std::endl;
+        BERRY_ERROR << e.what() << std::endl;
       }
       return IEditorReference::Pointer(0);
     }

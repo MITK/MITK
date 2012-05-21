@@ -102,7 +102,7 @@ void WorkbenchPartReference::CheckReference()
 //        }
 //    }
 
-void WorkbenchPartReference::SetPartName(const std::string& newPartName)
+void WorkbenchPartReference::SetPartName(const QString& newPartName)
 {
   if (partName == newPartName)
   {
@@ -114,7 +114,7 @@ void WorkbenchPartReference::SetPartName(const std::string& newPartName)
 }
 
 void WorkbenchPartReference::SetContentDescription(
-    const std::string& newContentDescription)
+    const QString& newContentDescription)
 {
   if (contentDescription == newContentDescription)
   {
@@ -145,7 +145,7 @@ void WorkbenchPartReference::SetImageDescriptor(
   {
     // If there's a PROP_TITLE event queued, remove it from the queue because
     // we've just fired it.
-    queuedEvents.erase(IWorkbenchPartConstants::PROP_TITLE);
+    queuedEvents.remove(IWorkbenchPartConstants::PROP_TITLE);
   }
 
   // If we had allocated the old image, deallocate it now (AFTER we fire the property change
@@ -157,7 +157,7 @@ void WorkbenchPartReference::SetImageDescriptor(
   }
 }
 
-void WorkbenchPartReference::SetToolTip(const std::string& newToolTip)
+void WorkbenchPartReference::SetToolTip(const QString& newToolTip)
 {
   if (tooltip == newToolTip)
   {
@@ -225,9 +225,9 @@ ImageDescriptor::Pointer WorkbenchPartReference::ComputeImageDescriptor()
   return defaultImageDescriptor;
 }
 
-void WorkbenchPartReference::Init(const std::string& id,
-    const std::string& tooltip, ImageDescriptor::Pointer desc,
-    const std::string& paneName, const std::string& contentDescription)
+void WorkbenchPartReference::Init(const QString& id,
+    const QString& tooltip, ImageDescriptor::Pointer desc,
+    const QString& paneName, const QString& contentDescription)
 {
 
   this->id = id;
@@ -256,7 +256,7 @@ void WorkbenchPartReference::RemovePropertyListener(
   propChangeEvents.RemoveListener(listener);
 }
 
-std::string WorkbenchPartReference::GetId() const
+QString WorkbenchPartReference::GetId() const
 {
   if (!part.IsNull())
   {
@@ -269,12 +269,12 @@ std::string WorkbenchPartReference::GetId() const
   return id;
 }
 
-std::string WorkbenchPartReference::GetTitleToolTip() const
+QString WorkbenchPartReference::GetTitleToolTip() const
 {
   return tooltip;
 }
 
-std::string WorkbenchPartReference::GetRawToolTip() const
+QString WorkbenchPartReference::GetRawToolTip() const
 {
   return part->GetTitleToolTip();
 }
@@ -284,7 +284,7 @@ std::string WorkbenchPartReference::GetRawToolTip() const
  *
  * @return the pane name for the part
  */
-std::string WorkbenchPartReference::GetPartName() const
+QString WorkbenchPartReference::GetPartName() const
 {
   return partName;
 }
@@ -295,13 +295,13 @@ std::string WorkbenchPartReference::GetPartName() const
  *
  * @return
  */
-std::string WorkbenchPartReference::GetRawPartName() const
+QString WorkbenchPartReference::GetRawPartName() const
 {
   return part->GetPartName();
 
 }
 
-std::string WorkbenchPartReference::ComputePartName() const
+QString WorkbenchPartReference::ComputePartName() const
 {
   return this->GetRawPartName();
 }
@@ -311,7 +311,7 @@ std::string WorkbenchPartReference::ComputePartName() const
  *
  * @return the pane name for the part
  */
-std::string WorkbenchPartReference::GetContentDescription() const
+QString WorkbenchPartReference::GetContentDescription() const
 {
   return contentDescription;
 }
@@ -322,7 +322,7 @@ std::string WorkbenchPartReference::GetContentDescription() const
  *
  * @return the new content description for the part
  */
-std::string WorkbenchPartReference::ComputeContentDescription() const
+QString WorkbenchPartReference::ComputeContentDescription() const
 {
   return this->GetRawContentDescription();
 }
@@ -332,7 +332,7 @@ std::string WorkbenchPartReference::ComputeContentDescription() const
  *
  * @return the unmodified content description from the part (or the empty string if none)
  */
-std::string WorkbenchPartReference::GetRawContentDescription() const
+QString WorkbenchPartReference::GetRawContentDescription() const
 {
   return part->GetContentDescription();
 
@@ -407,7 +407,7 @@ void WorkbenchPartReference::DeferEvents(bool shouldQueue)
 
   if (queueEvents == false)
   {
-    std::set<int>::iterator iter = queuedEvents.begin();
+    QSet<int>::iterator iter = queuedEvents.begin();
     while (iter != queuedEvents.end())
     {
       this->FirePropertyChange(*iter);
@@ -604,13 +604,14 @@ void WorkbenchPartReference::DoDisposePart()
 //      }
 //      part->Dispose();
       part = 0;
-    } catch (const Poco::RuntimeException& e)
+    }
+    catch (const ctkRuntimeException& e)
     {
       WorkbenchPlugin::Log(e);
     }
     catch (const std::exception& e)
     {
-      std::string msg("Exception in WorkbenchPartReference::DoDisposePart: ");
+      QString msg("Exception in WorkbenchPartReference::DoDisposePart: ");
       msg.append(e.what());
       WorkbenchPlugin::Log(msg);
     }
@@ -657,7 +658,7 @@ bool WorkbenchPartReference::IsPinned() const
   return pinned;
 }
 
-std::string WorkbenchPartReference::GetPartProperty(const std::string& key) const
+QString WorkbenchPartReference::GetPartProperty(const QString& key) const
 {
   if (part != 0)
   {
@@ -665,11 +666,11 @@ std::string WorkbenchPartReference::GetPartProperty(const std::string& key) cons
   }
   else
   {
-    std::map<std::string, std::string>::const_iterator itr =
+    QHash<QString, QString>::const_iterator itr =
         propertyCache.find(key);
     if (itr == propertyCache.end())
-      return "";
-    return itr->second;
+      return QString();
+    return itr.value();
   }
 }
 
@@ -682,10 +683,10 @@ void WorkbenchPartReference::FirePropertyChange(
 void WorkbenchPartReference::CreatePartProperties(
     IWorkbenchPart::Pointer workbenchPart)
 {
-  for (std::map<std::string, std::string>::iterator iter =
+  for (QHash<QString, QString>::iterator iter =
       propertyCache.begin(); iter != propertyCache.end(); ++iter)
   {
-    workbenchPart->SetPartProperty(iter->first, iter->second);
+    workbenchPart->SetPartProperty(iter.key(), iter.value());
   }
 }
 

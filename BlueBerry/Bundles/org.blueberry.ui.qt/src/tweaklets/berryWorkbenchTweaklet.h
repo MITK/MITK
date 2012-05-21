@@ -34,13 +34,13 @@ struct BERRY_UI_QT WorkbenchTweaklet
 
   static Tweaklets::TweakKey<WorkbenchTweaklet> KEY;
 
-  static const std::string DIALOG_ID_SHOW_VIEW; // = "org.blueberry.ui.dialogs.showview";
+  static const QString DIALOG_ID_SHOW_VIEW; // = "org.blueberry.ui.dialogs.showview";
 
   virtual Display* CreateDisplay() = 0;
 
   virtual bool IsRunning() = 0;
 
-  virtual IDialog::Pointer CreateStandardDialog(const std::string& id) = 0;
+  virtual IDialog::Pointer CreateStandardDialog(const QString& id) = 0;
 
 };
 

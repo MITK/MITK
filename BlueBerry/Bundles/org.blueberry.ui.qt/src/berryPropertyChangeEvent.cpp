@@ -20,7 +20,7 @@ namespace berry
 {
 
 PropertyChangeEvent::PropertyChangeEvent(Object::Pointer source,
-    const std::string& property, Object::Pointer oldValue,
+    const QString& property, Object::Pointer oldValue,
     Object::Pointer newValue)
 {
   this->source = source;
@@ -39,7 +39,7 @@ Object::Pointer PropertyChangeEvent::GetOldValue()
   return oldValue;
 }
 
-std::string PropertyChangeEvent::GetProperty()
+QString PropertyChangeEvent::GetProperty()
 {
   return propertyName;
 }

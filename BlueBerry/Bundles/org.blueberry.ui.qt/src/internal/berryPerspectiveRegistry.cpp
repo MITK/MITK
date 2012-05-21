@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryPerspectiveRegistryReader.h"
 
-#include <Poco/String.h>
 
 namespace berry
 {
-const std::string PerspectiveRegistry::EXT = "_persp.xml";
-const std::string PerspectiveRegistry::ID_DEF_PERSP = "PerspectiveRegistry.DEFAULT_PERSP";
-const std::string PerspectiveRegistry::PERSP = "_persp";
+
+const QString PerspectiveRegistry::EXT = "_persp.xml";
+const QString PerspectiveRegistry::ID_DEF_PERSP = "PerspectiveRegistry.DEFAULT_PERSP";
+const QString PerspectiveRegistry::PERSP = "_persp";
 const char PerspectiveRegistry::SPACE_DELIMITER = ' ';
 
 PerspectiveRegistry::PerspectiveRegistry()
@@ -37,6 +37,7 @@ PerspectiveRegistry::PerspectiveRegistry()
   //this->InitializePreferenceChangeListener();
   //WorkbenchPlugin::GetDefault()->GetPreferenceStore()->AddPropertyChangeListener(
   //    preferenceListener);
+
 }
 
 void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
@@ -48,44 +49,35 @@ void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
   this->Add(desc);
 }
 
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std::string& label,
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const QString& label,
     IPerspectiveDescriptor::Pointer originalDescriptor)
 {
   // Sanity check to avoid invalid or duplicate labels.
   if (!this->ValidateLabel(label))
   {
-      throw Poco::InvalidArgumentException();
+    return IPerspectiveDescriptor::Pointer(0);
   }
   if (this->FindPerspectiveWithLabel(label) != 0)
   {
-      throw Poco::InvalidArgumentException();
+    return IPerspectiveDescriptor::Pointer(0);
   }
 
   // Calculate ID.
-  std::string id(label);
-  std::replace(id.begin(), id.end(), ' ', '_');
-  Poco::trimInPlace(id);
-
-
-  if (this->FindPerspectiveWithId(id) != 0)
-  {
-      throw Poco::InvalidArgumentException();
-  }
+  QString id(label);
+  id = id.replace(' ', '_').trimmed();
 
   // Create descriptor.
-  IPerspectiveDescriptor::Pointer desc;
-
-  desc = new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>());
-
-  this->Add(desc.Cast<PerspectiveDescriptor>());
-  return desc;
+  PerspectiveDescriptor::Pointer desc(
+      new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>()));
+  this->Add(desc);
+  return desc.GetPointer();
 }
 
 void PerspectiveRegistry::RevertPerspectives(
-    const std::list<PerspectiveDescriptor::Pointer>& perspToRevert)
+    const QList<PerspectiveDescriptor::Pointer>& perspToRevert)
 {
   // indicate that the user is removing these perspectives
-  for (std::list<PerspectiveDescriptor::Pointer>::const_iterator iter = perspToRevert.begin();
+  for (QList<PerspectiveDescriptor::Pointer>::const_iterator iter = perspToRevert.begin();
        iter != perspToRevert.end(); ++iter)
   {
     PerspectiveDescriptor::Pointer desc = *iter;
@@ -95,9 +87,9 @@ void PerspectiveRegistry::RevertPerspectives(
 }
 
 void PerspectiveRegistry::DeletePerspectives(
-    const std::list<PerspectiveDescriptor::Pointer>& perspToDelete)
+    const QList<PerspectiveDescriptor::Pointer>& perspToDelete)
 {
-  for (std::list<PerspectiveDescriptor::Pointer>::const_iterator iter = perspToDelete.begin();
+  for (QList<PerspectiveDescriptor::Pointer>::const_iterator iter = perspToDelete.begin();
        iter != perspToDelete.end(); ++iter)
   {
     this->DeletePerspective(*iter);
@@ -111,15 +103,15 @@ void PerspectiveRegistry::DeletePerspective(IPerspectiveDescriptor::Pointer in)
   if (!desc->IsPredefined())
   {
     perspToRemove.push_back(desc->GetId());
-    perspectives.remove(desc);
+    perspectives.removeAll(desc);
     desc->DeleteCustomDefinition();
     this->VerifyDefaultPerspective();
   }
 }
 
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const std::string& id)
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const QString& id)
 {
-  for (std::list<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
        iter != perspectives.end(); ++iter)
   {
     PerspectiveDescriptor::Pointer desc = *iter;
@@ -137,9 +129,9 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const
 }
 
 IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
-    const std::string& label)
+    const QString& label)
 {
-  for (std::list<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
        iter != perspectives.end(); ++iter)
   {
     PerspectiveDescriptor::Pointer desc = *iter;
@@ -155,20 +147,20 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
   return IPerspectiveDescriptor::Pointer(0);
 }
 
-std::string PerspectiveRegistry::GetDefaultPerspective()
+QString PerspectiveRegistry::GetDefaultPerspective()
 {
   return defaultPerspID;
 }
 
-std::vector<IPerspectiveDescriptor::Pointer> PerspectiveRegistry::GetPerspectives()
+QList<IPerspectiveDescriptor::Pointer> PerspectiveRegistry::GetPerspectives()
 {
 //  Collection descs = WorkbenchActivityHelper.restrictCollection(perspectives,
 //      new ArrayList());
 //  return (IPerspectiveDescriptor[]) descs.toArray(
 //      new IPerspectiveDescriptor[descs.size()]);
 
-  std::vector<IPerspectiveDescriptor::Pointer> result;
-  for (std::list<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+  QList<IPerspectiveDescriptor::Pointer> result;
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
          iter != perspectives.end(); ++iter)
   {
     result.push_back(iter->Cast<IPerspectiveDescriptor>());
@@ -186,7 +178,7 @@ void PerspectiveRegistry::Load()
   // Get it from the R1.0 dialog settings first. Fixes bug 17039
 //  IDialogSettings dialogSettings =
 //      WorkbenchPlugin.getDefault() .getDialogSettings();
-//  std::string str = dialogSettings.get(ID_DEF_PERSP);
+//  QString str = dialogSettings.get(ID_DEF_PERSP);
 //  if (str != null && str.length() > 0)
 //  {
 //    this->SetDefaultPerspective(str);
@@ -211,13 +203,13 @@ void PerspectiveRegistry::Load()
 //
 //}
 
-IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const std::string&  /*id*/)
+IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const QString&  /*id*/)
 {
   //TODO CustomPersp
 //  Reader reader = null;
 //
 //  IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
-//  std::string xmlString = store.getString(id + PERSP);
+//  QString xmlString = store.getString(id + PERSP);
 //  if (xmlString != null && xmlString.length() != 0)
 //  { // defined in store
 //    reader = new StringReader(xmlString);
@@ -228,7 +220,7 @@ IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const std::string&  /*id*/
   return IMemento::Pointer(0);
 }
 
-void PerspectiveRegistry::SetDefaultPerspective(const std::string& id)
+void PerspectiveRegistry::SetDefaultPerspective(const QString& id)
 {
   IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(id);
   if (desc != 0)
@@ -240,41 +232,32 @@ void PerspectiveRegistry::SetDefaultPerspective(const std::string& id)
   }
 }
 
-bool PerspectiveRegistry::ValidateLabel(const std::string& label)
+bool PerspectiveRegistry::ValidateLabel(const QString& label)
 {
-  return !Poco::trim(label).empty();
+  return !label.trimmed().isEmpty();
 }
 
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const std::string& id,
-    const std::string& label,
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const QString& id,
+    const QString& label,
     IPerspectiveDescriptor::Pointer originalDescriptor)
 {
+
   // Check for invalid labels
-  if (label == "" || Poco::trim(label).empty())
+  if (label == "" || label.trimmed().isEmpty())
   {
     throw Poco::InvalidArgumentException();
   }
 
-  // Calculate ID.
-  std::string newId(label);
-  std::replace(newId.begin(), newId.end(), ' ', '_');
-  Poco::trimInPlace(newId);
-
   // Check for duplicates
-  IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(newId);
+  IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(id);
   if (desc != 0)
   {
     throw Poco::InvalidArgumentException();
   }
 
-  if (this->FindPerspectiveWithLabel(label) != 0)
-  {
-      throw Poco::InvalidArgumentException();
-  }
-
   // Create descriptor.
   desc
-      = new PerspectiveDescriptor(newId, label, originalDescriptor.Cast<PerspectiveDescriptor>());
+      = new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>());
   this->Add(desc.Cast<PerspectiveDescriptor>());
   return desc;
 }
@@ -305,6 +288,7 @@ void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer 
    * remove the entry
    */
   //store.setToDefault(desc.getId() + PERSP);
+
 }
 
 bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer  /*desc*/) const
@@ -355,7 +339,7 @@ void PerspectiveRegistry::InitializePreferenceChangeListener()
 //        IPerspectiveDescriptor[] perspectiveList = getPerspectives();
 //        for (int i = 0; i < perspectiveList.length; i++)
 //        {
-//          std::string id = perspectiveList[i].getId();
+//          QString id = perspectiveList[i].getId();
 //          if (event.getProperty().equals(id + PERSP))
 //          { // found
 //            // descriptor
@@ -363,7 +347,7 @@ void PerspectiveRegistry::InitializePreferenceChangeListener()
 //            // reverting or deleting
 //            if (!perspToRemove.contains(id))
 //            { // restore
-//              store.setValue(id + PERSP, (std::string) event
+//              store.setValue(id + PERSP, (QString) event
 //                  .getOldValue());
 //            }
 //            else
@@ -382,7 +366,7 @@ void PerspectiveRegistry::InitializePreferenceChangeListener()
 //         * perspectiveRegistry to contain the new custom perspective
 //         */
 //
-//        std::string id = event.getProperty().substring(0,
+//        QString id = event.getProperty().substring(0,
 //            event.getProperty().lastIndexOf(PERSP));
 //        if (findPerspectiveWithId(id) == null)
 //        {
@@ -390,7 +374,7 @@ void PerspectiveRegistry::InitializePreferenceChangeListener()
 //          // it
 //          PerspectiveDescriptor desc = new PerspectiveDescriptor(
 //              null, null, null);
-//          StringReader reader = new StringReader((std::string) event
+//          StringReader reader = new StringReader((QString) event
 //              .getNewValue());
 //          try
 //          {
@@ -422,7 +406,7 @@ void PerspectiveRegistry::InitializePreferenceChangeListener()
 //          .append(SPACE_DELIMITER);
 //        }
 //      }
-//      std::string newList = perspBuffer.toString().trim();
+//      QString newList = perspBuffer.toString().trim();
 //      store.setValue(IPreferenceConstants.PERSPECTIVES, newList);
 //    }
 //  };
@@ -442,7 +426,7 @@ void PerspectiveRegistry::Add(PerspectiveDescriptor::Pointer desc)
 void PerspectiveRegistry::InternalDeletePerspective(PerspectiveDescriptor::Pointer desc)
 {
   perspToRemove.push_back(desc->GetId());
-  perspectives.remove(desc);
+  perspectives.removeAll(desc);
   desc->DeleteCustomDefinition();
   this->VerifyDefaultPerspective();
 }
@@ -455,15 +439,15 @@ void PerspectiveRegistry::LoadCustom()
 //  IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
 //
 //  /* Get the space-delimited list of custom perspective ids */
-//  std::string customPerspectives = store .getString(
+//  QString customPerspectives = store .getString(
 //      IPreferenceConstants.PERSPECTIVES);
-//  std::string[] perspectivesList = StringConverter.asArray(customPerspectives);
+//  QString[] perspectivesList = StringConverter.asArray(customPerspectives);
 //
 //  for (int i = 0; i < perspectivesList.length; i++)
 //  {
 //    try
 //    {
-//      std::string xmlString = store.getString(perspectivesList[i] + PERSP);
+//      QString xmlString = store.getString(perspectivesList[i] + PERSP);
 //      if (xmlString != null && xmlString.length() != 0)
 //      {
 //        reader = new StringReader(xmlString);
@@ -474,7 +458,7 @@ void PerspectiveRegistry::LoadCustom()
 //      PerspectiveDescriptor newPersp =
 //          new PerspectiveDescriptor(null, null, null);
 //      newPersp.restoreState(memento);
-//      std::string id = newPersp.getId();
+//      QString id = newPersp.getId();
 //      IPerspectiveDescriptor oldPersp = findPerspectiveWithId(id);
 //      if (oldPersp == null)
 //      {
@@ -549,9 +533,9 @@ void PerspectiveRegistry::LoadCustom()
 //  }
 }
 
-void PerspectiveRegistry::UnableToLoadPerspective(const std::string& status)
+void PerspectiveRegistry::UnableToLoadPerspective(const QString& status)
 {
-  std::string msg = "Unable to load perspective";
+  QString msg = "Unable to load perspective";
   if (status == "")
   {
     WorkbenchPlugin::Log(msg);
@@ -588,7 +572,7 @@ void PerspectiveRegistry::VerifyDefaultPerspective()
 
   // Step 2. Read default value.
   //TODO Preferences
-//  std::string str = PrefUtil.getAPIPreferenceStore().getString(
+//  QString str = PrefUtil.getAPIPreferenceStore().getString(
 //      IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID);
 //  if (str != null && str.length() > 0)
 //  {
@@ -603,4 +587,5 @@ void PerspectiveRegistry::VerifyDefaultPerspective()
   // Step 3. Use application-specific default
   defaultPerspID = Workbench::GetInstance()->GetDefaultPerspectiveId();
 }
+
 }

@@ -36,7 +36,7 @@ namespace berry
  * </p>
  *
  * @see ISelectionService#AddSelectionListener(ISelectionListener::Pointer)
- * @see ISelectionService#AddSelectionListener(const std::string&, ISelectionListener::Pointer)
+ * @see ISelectionService#AddSelectionListener(const QString&, ISelectionListener::Pointer)
  * @see INullSelectionListener
  */
 struct BERRY_UI_QT ISelectionListener: public virtual Object

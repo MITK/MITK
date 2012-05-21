@@ -66,7 +66,7 @@ void* ViewIntroAdapterPart::GetTitleImage()
   return introPart->GetTitleImage();
 }
 
-std::string ViewIntroAdapterPart::GetPartName()
+QString ViewIntroAdapterPart::GetPartName()
 {
   // this method is called eagerly before our init method is called (and
   // therefore before our intropart is created).  By default return

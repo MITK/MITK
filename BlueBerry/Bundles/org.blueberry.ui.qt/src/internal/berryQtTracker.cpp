@@ -144,40 +144,40 @@ QtTracker::QtTracker() :
 
   QPixmap pixCursorTop(":/org.blueberry.ui.qt/cursor_top.xpm");
   QCursor* cursorTop = new QCursor(pixCursorTop, 15, 8);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_TOP, cursorTop));
+  cursorMap.insert(DnDTweaklet::CURSOR_TOP, cursorTop);
 
   QPixmap pixCursorRight(":/org.blueberry.ui.qt/cursor_right.xpm");
   QCursor* cursorRight = new QCursor(pixCursorRight, 23, 15);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_RIGHT, cursorRight));
+  cursorMap.insert(DnDTweaklet::CURSOR_RIGHT, cursorRight);
 
   QPixmap pixCursorBottom(":/org.blueberry.ui.qt/cursor_bottom.xpm");
   QCursor* cursorBottom = new QCursor(pixCursorBottom, 16, 23);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_BOTTOM, cursorBottom));
+  cursorMap.insert(DnDTweaklet::CURSOR_BOTTOM, cursorBottom);
 
   QPixmap pixCursorLeft(":/org.blueberry.ui.qt/cursor_left.xpm");
   QCursor* cursorLeft = new QCursor(pixCursorLeft, 8, 15);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_LEFT, cursorLeft));
+  cursorMap.insert(DnDTweaklet::CURSOR_LEFT, cursorLeft);
 
   QPixmap pixCursorCenter(":/org.blueberry.ui.qt/cursor_center.xpm");
   QCursor* cursorCenter = new QCursor(pixCursorCenter, 15, 15);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_CENTER, cursorCenter));
+  cursorMap.insert(DnDTweaklet::CURSOR_CENTER, cursorCenter);
 
   QPixmap pixCursorOffscreen(":/org.blueberry.ui.qt/cursor_offscreen.xpm");
   QCursor* cursorOffscreen = new QCursor(pixCursorOffscreen, 15, 15);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_OFFSCREEN, cursorOffscreen));
+  cursorMap.insert(DnDTweaklet::CURSOR_OFFSCREEN, cursorOffscreen);
 
   QCursor* cursorInvalid = new QCursor(Qt::ForbiddenCursor);
-  cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_INVALID, cursorInvalid));
+  cursorMap.insert(DnDTweaklet::CURSOR_INVALID, cursorInvalid);
 }
 
 QtTracker::~QtTracker()
 {
   delete rubberBand;
 
-  for (std::map<DnDTweaklet::CursorType, QCursor*>::iterator iter = cursorMap.begin();
+  for (QHash<DnDTweaklet::CursorType, QCursor*>::iterator iter = cursorMap.begin();
        iter != cursorMap.end(); ++iter)
   {
-    delete iter->second;
+    delete iter.value();
   }
 }
 

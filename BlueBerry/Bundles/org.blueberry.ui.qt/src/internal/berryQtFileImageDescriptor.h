@@ -31,14 +31,14 @@ class QtFileImageDescriptor : public ImageDescriptor
 
 private:
 
-  const std::string filename;
-  const std::string pluginid;
+  const QString filename;
+  const QString pluginid;
 
-  QIcon* CreateFromStream(std::istream* s);
+  QIcon* CreateFromByteArray(const QByteArray& ba);
 
 public:
 
-  QtFileImageDescriptor(const std::string& filename, const std::string& pluginid);
+  QtFileImageDescriptor(const QString& filename, const QString& pluginid);
 
   virtual void* CreateImage(bool returnMissingImageOnError = true);
 

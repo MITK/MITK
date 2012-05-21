@@ -31,13 +31,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 
 #include "berryQtPreferences.h"
+#include "berryWorkbenchPlugin.h"
 
 namespace berry
 {
 
 bool QtStyleManager::IsA(const std::type_info& type) const
 {
-  std::string name(GetType().name());
+  QString name(GetType().name());
   return name == type.name() || Service::IsA(type);
 }
 
@@ -54,13 +55,10 @@ QtStyleManager::QtStyleManager()
 
 void QtStyleManager::ReadPreferences()
 {
-  IPreferencesService::Pointer prefService
-    = Platform::GetServiceRegistry()
-    .GetServiceById<IPreferencesService>(IPreferencesService::ID);
-
+  IPreferencesService* prefService = WorkbenchPlugin::GetDefault()->GetPreferencesService();
   IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
 
-  QString paths = QString::fromStdString(stylePref->Get(QtPreferences::QT_STYLE_SEARCHPATHS, ""));
+  QString paths = stylePref->Get(QtPreferences::QT_STYLE_SEARCHPATHS, "");
   QStringList pathList = paths.split(";", QString::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
@@ -68,7 +66,7 @@ void QtStyleManager::ReadPreferences()
     AddStyles(it.next());
   }
 
-  QString styleName = QString::fromStdString(stylePref->Get(QtPreferences::QT_STYLE_NAME, ""));
+  QString styleName = stylePref->Get(QtPreferences::QT_STYLE_NAME, "");
   // if a style is contributed via the Qt resource mechanism, it may not be
   // registered yet.
   if (Contains(styleName))

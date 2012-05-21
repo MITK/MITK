@@ -68,7 +68,7 @@ private:
 
   void* titleImage;
 
-  std::string titleLabel;
+  QString titleLabel;
 
   IPropertyChangeListener::Events propChangeEvents;
 
@@ -77,7 +77,7 @@ private:
    *
    * @return the default title string
    */
-  std::string GetDefaultTitle() const;
+  QString GetDefaultTitle() const;
 
 protected:
 
@@ -129,7 +129,7 @@ protected:
    * @param titleLabel the title string.  Must not be <code>null</code>.
    * @since 3.2
    */
-  void SetTitle(const std::string& titleLabel);
+  void SetTitle(const QString& titleLabel);
 
 public:
 
@@ -173,7 +173,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#getTitle()
    */
-  std::string GetPartName() const;
+  QString GetPartName() const;
 
   /**
    * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart}method ignores the
@@ -216,7 +216,7 @@ public:
    * creating this executable extension.
    */
   void SetInitializationData(IConfigurationElement::Pointer cfig,
-      const std::string& propertyName, Object::Pointer data);
+      const QString& propertyName, Object::Pointer data);
 
 };
 

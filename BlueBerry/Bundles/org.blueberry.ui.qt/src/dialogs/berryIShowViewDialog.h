@@ -35,7 +35,7 @@ struct BERRY_UI_QT IShowViewDialog : public IDialog
   ~IShowViewDialog();
 
 
-  virtual std::vector<IViewDescriptor::Pointer> GetSelection() = 0;
+  virtual QList<IViewDescriptor::Pointer> GetSelection() = 0;
 
 };
 

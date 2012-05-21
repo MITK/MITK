@@ -34,7 +34,8 @@ namespace berry {
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct BERRY_UI_QT IEditorReference : public virtual IWorkbenchPartReference {
+struct BERRY_UI_QT IEditorReference : public virtual IWorkbenchPartReference
+{
 
   berryInterfaceMacro(IEditorReference, berry);
 
@@ -45,14 +46,14 @@ struct BERRY_UI_QT IEditorReference : public virtual IWorkbenchPartReference {
      * restore this editor. Returns null if the editor
      * is not persistable.
      */
-    virtual std::string GetFactoryId() = 0;
+    virtual QString GetFactoryId() = 0;
 
     /**
      * Returns the editor input name. May return null is the
      * name is not available or if the editor failed to be
      * restored.
      */
-    virtual std::string GetName() = 0;
+    virtual QString GetName() = 0;
 
     /**
      * Returns the editor referenced by this object.

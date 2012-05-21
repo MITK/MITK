@@ -38,7 +38,7 @@ private:
 
   static ISafeRunnableRunner::Pointer runner;
 
-  std::string message;
+  QString message;
 
    /**
    * Creates the default safe runnable runner.
@@ -55,7 +55,7 @@ public:
    * @param message
    *            the error message to use
    */
-  SafeRunnable(const std::string& message = "");
+  SafeRunnable(const QString& message = "");
 
   /*
    * (non-Javadoc)

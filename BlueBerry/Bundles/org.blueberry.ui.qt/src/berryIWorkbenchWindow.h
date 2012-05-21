@@ -148,7 +148,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    * @return <code>true</code> if the specified menu is an application
    *         menu, and <code>false</code> if it is not
    */
-  //virtual bool IsApplicationMenu(const std::string& menuId) = 0;
+  //virtual bool IsApplicationMenu(const QString& menuId) = 0;
 
   /**
    * Creates and opens a new workbench page. The perspective of the new page
@@ -173,7 +173,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
    */
-  virtual SmartPointer<IWorkbenchPage> OpenPage(const std::string& perspectiveId, IAdaptable* input) = 0;
+  virtual SmartPointer<IWorkbenchPage> OpenPage(const QString& perspectiveId, IAdaptable* input) = 0;
 
   /**
    * Creates and opens a new workbench page. The default perspective is used

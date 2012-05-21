@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-Object::Pointer Shell::GetData(const std::string& id) const
+Object::Pointer Shell::GetData(const QString& id) const
 {
-  std::map<std::string, Object::Pointer>::const_iterator iter = data.find(id);
+  QHash<QString, Object::Pointer>::const_iterator iter = data.find(id);
   if (iter == data.end()) return Object::Pointer(0);
-  return iter->second;
+  return iter.value();
 }
 
-void Shell::SetData(Object::Pointer data, const std::string& id)
+void Shell::SetData(Object::Pointer data, const QString& id)
 {
   this->data[id] = data;
 }

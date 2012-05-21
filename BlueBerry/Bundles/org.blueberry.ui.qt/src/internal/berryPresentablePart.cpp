@@ -144,7 +144,7 @@ void PresentablePart::SetFocus()
   }
 }
 
-std::string PresentablePart::GetName() const
+QString PresentablePart::GetName() const
 {
   if (enableOutputs)
   {
@@ -153,12 +153,12 @@ std::string PresentablePart::GetName() const
   return name;
 }
 
-std::string PresentablePart::GetTitle() const
+QString PresentablePart::GetTitle() const
 {
   return this->GetPartReference()->GetPartName();
 }
 
-std::string PresentablePart::GetTitleStatus() const
+QString PresentablePart::GetTitleStatus() const
 {
   if (enableOutputs)
   {
@@ -181,7 +181,7 @@ void* PresentablePart::GetTitleImage()
   return 0;
 }
 
-std::string PresentablePart::GetTitleToolTip() const
+QString PresentablePart::GetTitleToolTip() const
 {
   return this->GetPartReference()->GetTitleToolTip();
 }
@@ -296,7 +296,7 @@ void PresentablePart::EnableInputs(bool isActive)
   }
 }
 
-std::string PresentablePart::GetPartProperty(const std::string& key) const
+QString PresentablePart::GetPartProperty(const QString& key) const
 {
   return this->GetPartReference()->GetPartProperty(key);
 }

@@ -72,8 +72,8 @@ private:
   bool isVisible;
 
   // Saved state (only used when the part is inactive)
-  std::string name;
-  std::string titleStatus;
+  QString name;
+  QString titleStatus;
   bool isDirty;
   bool isBusy;
   bool hasViewMenu;
@@ -154,17 +154,17 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getName()
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitle()
    */
-  std::string GetTitle() const;
+  QString GetTitle() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleStatus()
    */
-  std::string GetTitleStatus() const;
+  QString GetTitleStatus() const;
 
   /*
    * (non-Javadoc)
@@ -178,7 +178,7 @@ public:
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleToolTip()
    */
-  std::string GetTitleToolTip() const;
+  QString GetTitleToolTip() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#isDirty()
@@ -245,7 +245,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getPartProperty(java.lang.String)
    */
-  std::string GetPartProperty(const std::string& key) const;
+  QString GetPartProperty(const QString& key) const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYWORKBENCHPAGE_H_
 
 #include <berryIAdaptable.h>
-#include <berryIExtensionPoint.h>
 
 #include "berryIWorkbenchPage.h"
 #include "berryIWorkbenchPartReference.h"
@@ -38,6 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
+
+struct IExtensionPoint;
+
 //class PartPane;
 //class PartPane::Sashes;
 class EditorAreaHelper;
@@ -57,6 +59,7 @@ class PartService;
  */
 class BERRY_UI_QT WorkbenchPage: public IWorkbenchPage
 {
+
 public:
   berryObjectMacro(WorkbenchPage);
 
@@ -90,6 +93,7 @@ private:
      */
   public:
     void UpdateActivePart(IWorkbenchPart::Pointer newPart);
+
     /**
      * Updates the contributions given the new part as the topEditor.
      *
@@ -126,10 +130,12 @@ private:
      */
   private:
     void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
+
   };
 
   class ActivationList
   {
+
   public:
 
     //List of parts in the activation order (oldest first)
@@ -144,6 +150,7 @@ private:
     WorkbenchPage* page;
 
   public:
+
     ActivationList(WorkbenchPage* page);
 
     /*
@@ -210,12 +217,12 @@ private:
     /*
      * Returns the editors in activation order (oldest first).
      */
-    std::vector<SmartPointer<IEditorReference> > GetEditors();
+    QList<SmartPointer<IEditorReference> > GetEditors();
 
     /*
      * Return a list with all parts (editors and views).
      */
-    std::vector<SmartPointer<IWorkbenchPartReference> > GetParts();
+    QList<SmartPointer<IWorkbenchPartReference> > GetParts();
 
   private:
 
@@ -229,6 +236,7 @@ private:
      * unless 'includeActiveFastViews' is true;
      */
     SmartPointer<IWorkbenchPartReference> GetActiveReference(PartListIter start, bool editorsOnly, bool skipPartsObscuredByZoom);
+
   };
 
   /**
@@ -237,8 +245,9 @@ private:
    */
   struct PerspectiveList
   {
+
   public:
-    typedef std::list<SmartPointer<Perspective> > PerspectiveListType;
+    typedef QList<SmartPointer<Perspective> > PerspectiveListType;
     typedef PerspectiveListType::iterator iterator;
 
   private:
@@ -343,6 +352,7 @@ private:
      * list.
      */
     void SetActive(SmartPointer<Perspective> perspective);
+
   };
 
   IAdaptable* input;
@@ -374,8 +384,6 @@ private:
 
   IStickyViewManager::Pointer stickyViewMan;
 
-
-
   /**
    * Returns true if perspective with given id contains view with given id
    */
@@ -391,7 +399,7 @@ private:
    * Contains a list of perspectives that may be dirty due to plugin
    * installation and removal.
    */
-  std::set<std::string> dirtyPerspectives;
+  std::set<QString> dirtyPerspectives;
 
   ActionSwitcher actionSwitcher;
 
@@ -400,9 +408,9 @@ private:
   // Deferral count... delays disposing parts and sending certain events if nonzero
   int deferCount;
   // Parts waiting to be disposed
-  std::vector<WorkbenchPartReference::Pointer> pendingDisposals;
+  QList<WorkbenchPartReference::Pointer> pendingDisposals;
 
-  const IExtensionPoint* GetPerspectiveExtensionPoint();
+  SmartPointer<IExtensionPoint> GetPerspectiveExtensionPoint();
 
 public:
 
@@ -418,7 +426,7 @@ public:
    * @throws WorkbenchException
    *             on null layout id
    */
-  WorkbenchPage(WorkbenchWindow* w, const std::string& layoutID,
+  WorkbenchPage(WorkbenchWindow* w, const QString& layoutID,
       IAdaptable* input);
 
   /**
@@ -465,7 +473,7 @@ public:
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void AddSelectionListener(const std::string& partId,
+  void AddSelectionListener(const QString& partId,
       ISelectionListener::Pointer listener);
 
   /*
@@ -478,7 +486,7 @@ public:
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void AddPostSelectionListener(const std::string& partId,
+  void AddPostSelectionListener(const QString& partId,
       ISelectionListener::Pointer listener);
 
 private:
@@ -541,16 +549,17 @@ private:
    * @param desc
    *            identifies the perspective to be removed.
    */
-  public:
-    void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
+public:
+  void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
+
   /**
    * Shows a view.
    *
    * Assumes that a busy cursor is active.
    */
 protected:
-  IViewPart::Pointer BusyShowView(const std::string& viewID,
-      const std::string& secondaryID, int mode);
+  IViewPart::Pointer BusyShowView(const QString& viewID,
+      const QString& secondaryID, int mode);
 
   /*
    * Performs showing of the view in the given mode.
@@ -611,7 +620,7 @@ private:
    * See IWorkbenchPage
    */
 public:
-  bool CloseEditors(const std::list<IEditorReference::Pointer>& refArray,
+  bool CloseEditors(const QList<IEditorReference::Pointer>& refArray,
       bool save);
 
   /**
@@ -645,12 +654,6 @@ public:
   bool CloseEditor(IEditorPart::Pointer editor, bool save);
 
   /**
-   * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
-   */
-public:
-
-  void CloseCurrentPerspective(bool saveParts, bool closePage);
-  /**
    * Closes current perspective. If last perspective, then entire page
    * is closed.
    *
@@ -659,7 +662,13 @@ public:
    * @param closePage
    *            whether the page itself should be closed if last perspective
    */
+public:
+  void CloseCurrentPerspective(bool saveParts, bool closePage);
 
+  /**
+   * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
+   */
+public:
   void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts,
       bool closePage);
 
@@ -757,7 +766,7 @@ public:
    * See IWorkbenchPage@findView.
    */
 public:
-  IViewPart::Pointer FindView(const std::string& id);
+  IViewPart::Pointer FindView(const QString& id);
 
   /*
    * (non-Javadoc)
@@ -765,7 +774,7 @@ public:
    * @see org.blueberry.ui.IWorkbenchPage
    */
 public:
-  IViewReference::Pointer FindViewReference(const std::string& viewId);
+  IViewReference::Pointer FindViewReference(const QString& viewId);
 
   /*
    * (non-Javadoc)
@@ -773,8 +782,8 @@ public:
    * @see org.blueberry.ui.IWorkbenchPage
    */
 public:
-  IViewReference::Pointer FindViewReference(const std::string& viewId,
-      const std::string& secondaryId);
+  IViewReference::Pointer FindViewReference(const QString& viewId,
+      const QString& secondaryId);
 
   /**
    * Notify property change listeners about a property change.
@@ -872,13 +881,13 @@ public: PartService* GetPartService();
    * See IWorkbenchPage.
    */
 public:
-  std::vector<IEditorPart::Pointer> GetEditors();
+  QList<IEditorPart::Pointer> GetEditors();
 
 public:
-  std::vector<IEditorPart::Pointer> GetDirtyEditors();
+  QList<IEditorPart::Pointer> GetDirtyEditors();
 
 public:
-  std::vector<ISaveablePart::Pointer> GetDirtyParts();
+  QList<ISaveablePart::Pointer> GetDirtyParts();
 
   /**
    * See IWorkbenchPage.
@@ -890,14 +899,14 @@ public:
    * See IWorkbenchPage.
    */
 public:
-  std::vector<IEditorReference::Pointer> FindEditors(
-      IEditorInput::Pointer input, const std::string& editorId, int matchFlags);
+  QList<IEditorReference::Pointer> FindEditors(
+      IEditorInput::Pointer input, const QString& editorId, int matchFlags);
 
   /**
    * See IWorkbenchPage.
    */
 public:
-  std::list<IEditorReference::Pointer> GetEditorReferences();
+  QList<IEditorReference::Pointer> GetEditorReferences();
 
   /**
    * @see IWorkbenchPage
@@ -910,7 +919,7 @@ public:
    * active perspective.
    */
 public:
-  std::string GetLabel();
+  QString GetLabel();
 
   /**
    * Returns the perspective.
@@ -928,10 +937,10 @@ public:
    * (non-Javadoc) Method declared on ISelectionService
    */
 public:
-  ISelection::ConstPointer GetSelection(const std::string& partId);
+  ISelection::ConstPointer GetSelection(const QString& partId);
 
 //public:
-//  SelectionEvents& GetSelectionEvents(const std::string& partId = "");
+//  SelectionEvents& GetSelectionEvents(const QString& partId = "");
 
   /*
    * Returns the view factory.
@@ -943,13 +952,13 @@ public:
    * See IWorkbenchPage.
    */
 public:
-  std::vector<IViewReference::Pointer> GetViewReferences();
+  QList<IViewReference::Pointer> GetViewReferences();
 
   /**
    * See IWorkbenchPage.
    */
 public:
-  std::vector<IViewPart::Pointer> GetViews();
+  QList<IViewPart::Pointer> GetViews();
 
   /**
    * Returns all view parts in the specified perspective
@@ -960,7 +969,7 @@ public:
    */
   /*package*/
 protected:
-  std::vector<IViewPart::Pointer> GetViews(SmartPointer<Perspective> persp,
+  QList<IViewPart::Pointer> GetViews(SmartPointer<Perspective> persp,
       bool restore);
 
   /**
@@ -1000,7 +1009,7 @@ public:
    *            whether to process the perspective extras preference
    */
 private:
-  void Init(WorkbenchWindow* w, const std::string& layoutID,
+  void Init(WorkbenchWindow* w, const QString& layoutID,
       IAdaptable* input, bool openExtras);
 
   /**
@@ -1084,28 +1093,28 @@ public:
    */
 public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
-      const std::string& editorID);
+      const QString& editorID);
 
   /**
    * See IWorkbenchPage.
    */
 public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
-      const std::string& editorID, bool activate);
+      const QString& editorID, bool activate);
 
   /**
    * See IWorkbenchPage.
    */
 public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
-      const std::string& editorID, bool activate, int matchFlags);
+      const QString& editorID, bool activate, int matchFlags);
 
   /**
    * This is not public API but for use internally.  editorState can be <code>null</code>.
    */
 public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
-      const std::string& editorID, bool activate, int matchFlags,
+      const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
 
   /*
@@ -1123,7 +1132,7 @@ public:
    */
 private:
   IEditorPart::Pointer BusyOpenEditor(IEditorInput::Pointer input,
-      const std::string& editorID, bool activate, int matchFlags,
+      const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
 
   /*
@@ -1143,7 +1152,7 @@ private:
    */
 protected:
   IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput::Pointer input,
-      const std::string& editorID, bool activate, int matchFlags,
+      const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
 
   /*
@@ -1183,7 +1192,7 @@ public:
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void RemoveSelectionListener(const std::string& partId,
+  void RemoveSelectionListener(const QString& partId,
       ISelectionListener::Pointer listener);
 
   /*
@@ -1196,7 +1205,7 @@ public:
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void RemovePostSelectionListener(const std::string& partId,
+  void RemovePostSelectionListener(const QString& partId,
       ISelectionListener::Pointer listener);
 
   /**
@@ -1279,10 +1288,10 @@ public:
   /*IStatus*/bool SaveState(IMemento::Pointer memento);
 
 private:
-  std::string GetId(IWorkbenchPart::Pointer part);
+  QString GetId(IWorkbenchPart::Pointer part);
 
 private:
-  std::string GetId(IWorkbenchPartReference::Pointer ref);
+  QString GetId(IWorkbenchPartReference::Pointer ref);
 
   /**
    * Sets the active part.
@@ -1330,7 +1339,7 @@ protected:
    * See IWorkbenchPage.
    */
 public:
-  IViewPart::Pointer ShowView(const std::string& viewID);
+  IViewPart::Pointer ShowView(const QString& viewID);
 
   /*
    * (non-Javadoc)
@@ -1339,8 +1348,8 @@ public:
    *      java.lang.String, int)
    */
 public:
-  IViewPart::Pointer ShowView(const std::string& viewID,
-      const std::string& secondaryID, int mode);
+  IViewPart::Pointer ShowView(const QString& viewID,
+      const QString& secondaryID, int mode);
 
   /**
    * @param mode the mode to test
@@ -1354,13 +1363,13 @@ private:
    * Returns the editors in activation order (oldest first).
    */
 public:
-  std::vector<IEditorReference::Pointer> GetSortedEditors();
+  QList<IEditorReference::Pointer> GetSortedEditors();
 
   /**
    * @see IWorkbenchPage#getOpenPerspectives()
    */
 public:
-  std::vector<IPerspectiveDescriptor::Pointer> GetOpenPerspectives();
+  QList<IPerspectiveDescriptor::Pointer> GetOpenPerspectives();
 
   /**
    * Return all open Perspective objects.
@@ -1370,7 +1379,7 @@ public:
    */
   /*package*/
 protected:
-  std::list<SmartPointer<Perspective> > GetOpenInternalPerspectives();
+  QList<SmartPointer<Perspective> > GetOpenInternalPerspectives();
 
   /**
    * Checks perspectives in the order they were activiated
@@ -1389,13 +1398,13 @@ protected:
    * Returns the perspectives in activation order (oldest first).
    */
 public:
-  std::vector<IPerspectiveDescriptor::Pointer> GetSortedPerspectives();
+  QList<IPerspectiveDescriptor::Pointer> GetSortedPerspectives();
 
   /*
    * Returns the parts in activation order (oldest first).
    */
 public:
-  std::vector<IWorkbenchPartReference::Pointer> GetSortedParts();
+  QList<IWorkbenchPartReference::Pointer> GetSortedParts();
 
   /**
    * Returns the reference to the given part, or <code>null</code> if it has no reference
@@ -1682,7 +1691,7 @@ protected:
    * @since 3.0
    */
 private:
-  std::vector<IViewReference::Pointer> GetViewReferenceStack(
+  QList<IViewReference::Pointer> GetViewReferenceStack(
       IViewPart::Pointer part);
 
   /*
@@ -1691,7 +1700,7 @@ private:
    * @see org.blueberry.ui.IWorkbenchPage#getViewStack(org.blueberry.ui.IViewPart)
    */
 public:
-  std::vector<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
+  QList<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
 
   /**
    * Allow for programmatically resizing a part.
@@ -1723,6 +1732,7 @@ private:
   // provides sash information for the given pane
   struct SashInfo
   {
+
     SmartPointer<LayoutPartSash> right;
 
     SmartPointer<LayoutPartSash> left;
@@ -1749,7 +1759,7 @@ private:
    * @return
    */
 protected:
-  std::vector<IWorkbenchPartReference::Pointer> GetAllParts();
+  QList<IWorkbenchPartReference::Pointer> GetAllParts();
 
   /**
    * Returns all open parts that are owned by this page (that is, all parts
@@ -1757,7 +1767,7 @@ protected:
    * activated parts whose controls have already been created.
    */
 protected:
-  std::vector<IWorkbenchPartReference::Pointer> GetOpenParts();
+  QList<IWorkbenchPartReference::Pointer> GetOpenParts();
 
   /**
    * Sanity-checks the objects in this page. Throws an Assertation exception
@@ -1778,7 +1788,7 @@ public:
    * @see org.blueberry.ui.IWorkbenchPage#getPerspectiveShortcuts()
    */
 public:
-  std::vector<std::string> GetPerspectiveShortcuts();
+  QList<QString> GetPerspectiveShortcuts();
 
   /*
    * (non-Javadoc)
@@ -1786,7 +1796,7 @@ public:
    * @see org.blueberry.ui.IWorkbenchPage#getShowViewShortcuts()
    */
 public:
-  std::vector<std::string> GetShowViewShortcuts();
+  QList<QString> GetShowViewShortcuts();
 
   /**
    * @since 3.1
@@ -1796,6 +1806,8 @@ private:
 
 public:
   bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
+
 };
+
 }
 #endif /*BERRYWORKBENCHPAGE_H_*/

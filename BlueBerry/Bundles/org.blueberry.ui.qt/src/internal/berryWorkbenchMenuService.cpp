@@ -109,7 +109,7 @@ public:
    */
   void PropertyChange(PropertyChangeEvent::Pointer event)
   {
-    if (event->GetProperty() == WorkbenchMenuService::PROP_VISIBLE.toStdString())
+    if (event->GetProperty() == WorkbenchMenuService::PROP_VISIBLE)
     {
       if (event->GetNewValue().IsNotNull())
       {
@@ -483,7 +483,7 @@ void WorkbenchMenuService::RegisterVisibleWhen(const SmartPointer<IContributionI
   if (evaluationsByItem.contains(item))
   {
     QString id = item->GetId();
-    WorkbenchPlugin::Log(std::string("item is already registered: ") + (id.isEmpty() ? std::string("no id") : id.toStdString()));
+    WorkbenchPlugin::Log(QString("item is already registered: ") + (id.isEmpty() ? QString("no id") : id));
     return;
   }
 
@@ -729,7 +729,7 @@ SmartPointer<IPropertyChangeListener> WorkbenchMenuService::GetServiceListener()
 
       void PropertyChange(PropertyChangeEvent::Pointer event)
       {
-        if (event->GetProperty() == IEvaluationService::PROP_NOTIFYING.toStdString())
+        if (event->GetProperty() == IEvaluationService::PROP_NOTIFYING)
         {
           if (!(event->GetNewValue().Cast<ObjectBool>()->GetValue()))
           {
@@ -756,9 +756,9 @@ SmartPointer<IPropertyChangeListener> WorkbenchMenuService::GetServiceListener()
 
 bool WorkbenchMenuService::UpdateToolBar(ToolBarManager* mgr)
 {
-//  std::vector<IWorkbenchWindow::Pointer> windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
-//  std::vector<IWorkbenchWindow::Pointer>::iterator wend = windows.end();
-//  for (std::vector<IWorkbenchWindow::Pointer>::iterator i = windows.begin(); i != wend; ++i)
+//  QList<IWorkbenchWindow::Pointer> windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
+//  QList<IWorkbenchWindow::Pointer>::iterator wend = windows.end();
+//  for (QList<IWorkbenchWindow::Pointer>::iterator i = windows.begin(); i != wend; ++i)
 //  {
 //    WorkbenchWindow::Pointer window = i->Cast<WorkbenchWindow>();
 //    IToolBarManager* tb = window->GetToolBarManager();
@@ -1025,15 +1025,12 @@ void WorkbenchMenuService::ReleaseItem(const SmartPointer<IContributionItem>& it
 
 bool WorkbenchMenuService::IsProgramaticContribution(const SmartPointer<IConfigurationElement>& menuAddition) const
 {
-  std::string tmp;
-  return menuAddition->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS, tmp);
+  return !menuAddition->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS).isEmpty();
 }
 
 SmartPointer<AbstractMenuAdditionCacheEntry> WorkbenchMenuService::FindFactory(const SmartPointer<IConfigurationElement>& ceToRemove)
 {
-  std::string uriStr;
-  ceToRemove->GetAttribute(WorkbenchRegistryConstants::TAG_LOCATION_URI, uriStr);
-  QUrl uri(QString::fromStdString(uriStr));
+  QUrl uri = ceToRemove->GetAttribute(WorkbenchRegistryConstants::TAG_LOCATION_URI);
   FactoryListType factories = GetAdditionsForURI(uri);
   foreach (AbstractContributionFactory::Pointer factory, GetAdditionsForURI(uri))
   {

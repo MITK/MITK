@@ -77,9 +77,9 @@ IWorkbenchPart::Pointer PartList::GetActivePart()
   return activePartReference.Expired() ? IWorkbenchPart::Pointer(0) : activePartReference.Lock()->GetPart(false);
 }
 
-//std::vector<IEditorReference::Pointer> PartList::GetEditors()
+//QList<IEditorReference::Pointer> PartList::GetEditors()
 //{
-//  std::vector<IEditorReference::Pointer> result;
+//  QList<IEditorReference::Pointer> result;
 //  for (std::deque<IWorkbenchPartReference::Pointer>::iterator iter =
 //      parts.begin(); iter != parts.end(); ++iter)
 //  {
@@ -223,10 +223,10 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
 //  parts.push_front(ref);
 //}
 
-//std::vector<IWorkbenchPartReference::Pointer>
-//PartList::GetParts(const std::vector<IViewReference::Pointer>& views)
+//QList<IWorkbenchPartReference::Pointer>
+//PartList::GetParts(const QList<IViewReference::Pointer>& views)
 //{
-//  std::vector<IWorkbenchPartReference::Pointer> resultList;
+//  QList<IWorkbenchPartReference::Pointer> resultList;
 //  for (std::deque<IWorkbenchPartReference::Pointer>::iterator partIter = parts.begin();
 //      partIter != parts.end(); ++partIter)
 //  {

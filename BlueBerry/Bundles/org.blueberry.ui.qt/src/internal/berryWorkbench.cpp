@@ -46,9 +46,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryCommandCategory.h>
 #include <berryIHandler.h>
+#include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 
-#include <Poco/Thread.h>
-#include <Poco/Bugcheck.h>
+#include <QDir>
+
+//#include <Poco/Thread.h>
+//#include <Poco/Bugcheck.h>
 #include <Poco/FileStream.h>
 
 namespace berry
@@ -58,10 +62,10 @@ Workbench* Workbench::instance = 0;
 WorkbenchTestable::Pointer Workbench::testableObject;
 
 const unsigned int Workbench::VERSION_STRING_COUNT = 1;
-const std::string Workbench::VERSION_STRING[Workbench::VERSION_STRING_COUNT] =
+const QString Workbench::VERSION_STRING[Workbench::VERSION_STRING_COUNT] =
 { "1.0" };
 
-const std::string Workbench::DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml";
+const QString Workbench::DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml";
 
 class RestoreStateRunnable: public SafeRunnable
 {
@@ -74,11 +78,11 @@ private:
 
 public:
 
-  RestoreStateRunnable(Workbench* workbench, const Poco::File& stateFile,
+  RestoreStateRunnable(Workbench* workbench, const QString& stateFile,
       bool& result) :
     SafeRunnable(
         "Unable to read workbench state. Workbench UI layout will be reset."),
-        workbench(workbench), stateFile(stateFile), result(result)
+        workbench(workbench), stateFile(stateFile.toStdString()), result(result)
   {
 
   }
@@ -89,7 +93,7 @@ public:
     IMemento::Pointer memento = XMLMemento::CreateReadRoot(input);
 
     // Validate known version format
-    std::string version;
+    QString version;
     memento->GetString(WorkbenchConstants::TAG_VERSION, version);
     bool valid = false;
     for (std::size_t i = 0; i < Workbench::VERSION_STRING_COUNT; i++)
@@ -103,7 +107,7 @@ public:
     if (!valid)
     {
       input.close();
-      std::string msg =
+      QString msg =
           "Invalid workbench state version. workbench.xml will be deleted";
       MessageDialog::OpenError(Shell::Pointer(0), "Restoring Problems", msg);
       stateFile.remove();
@@ -119,11 +123,11 @@ public:
     //    if (VERSION_STRING[0].equals(version))
     //    {
     //      reader.close();
-    //      std::string msg = "The saved user interface layout is in an "
+    //      QString msg = "The saved user interface layout is in an "
     //          "obsolete format and cannot be preserved. Your projects and files "
     //          "will not be affected. Press OK to convert to the new format. Press "
     //          "Cancel to exit with no changes.";
-    //      std::vector<std::string> dlgLabels;
+    //      QList<QString> dlgLabels;
     //      dlgLabels.push_back("Ok");
     //      dlgLabels.push_back("Cancel");
     //      IDialog::Pointer dlg = MessageDialog::CreateDialog(Shell::Pointer(0),
@@ -172,7 +176,7 @@ public:
 
     //public void runWithException() {
     Handle(e);
-    //            std::string msg = e.getMessage() == null ? "" : e.getMessage(); //$NON-NLS-1$
+    //            QString msg = e.getMessage() == null ? "" : e.getMessage(); //$NON-NLS-1$
     //            result[0] = new Status(IStatus.ERROR,
     //                WorkbenchPlugin.PI_WORKBENCH,
     //                IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, e);
@@ -282,12 +286,12 @@ Workbench::~Workbench()
   this->UnRegister(false);
 }
 
-Object::Pointer Workbench::GetService(const std::string& key)
+Object::Pointer Workbench::GetService(const QString& key)
 {
   return serviceLocator->GetService(key);
 }
 
-bool Workbench::HasService(const std::string& key) const
+bool Workbench::HasService(const QString& key) const
 {
   return serviceLocator->HasService(key);
 }
@@ -358,17 +362,17 @@ bool Workbench::RestoreState()
   //return false;
   if (!GetWorkbenchConfigurer()->GetSaveAndRestore())
   {
-    //      std::string msg = "This application does not save and restore previously saved state.";
+    //      QString msg = "This application does not save and restore previously saved state.";
     //      return new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
     //          IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, null);
     return false;
   }
   // Read the workbench state file.
-  Poco::File stateFile;
+  QString stateFile = GetWorkbenchStateFile();
   // If there is no state file cause one to open.
-  if (!GetWorkbenchStateFile(stateFile) || !stateFile.exists())
+  if (stateFile.isEmpty() || !QFile::exists(stateFile))
   {
-    //      std::string msg = "No previously saved state to restore.";
+    //      QString msg = "No previously saved state to restore.";
     //      return new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
     //          IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, null);
     return false;
@@ -383,7 +387,7 @@ bool Workbench::RestoreState()
   //if (result[0].isOK() && windowManager.getWindows().length == 0)
   if (result && windowManager.GetWindowCount() == 0)
   {
-    std::string msg = "No windows restored.";
+    QString msg = "No windows restored.";
     //    result[0] = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
     //        IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, null);
     result &= false;
@@ -479,7 +483,7 @@ void Workbench::DoRestoreState(IMemento::Pointer memento, bool& status) // final
   }
 
   // Get the child windows.
-  std::vector<IMemento::Pointer> children = memento
+  QList<IMemento::Pointer> children = memento
   ->GetChildren(WorkbenchConstants::TAG_WINDOW);
 
   createdWindows.clear();
@@ -767,7 +771,7 @@ int Workbench::RunUI()
   return display->RunEventLoop();
 }
 
-std::string Workbench::GetDefaultPerspectiveId()
+QString Workbench::GetDefaultPerspectiveId()
 {
   return this->GetAdvisor()->GetInitialWindowPerspectiveId();
 }
@@ -777,7 +781,7 @@ IAdaptable* Workbench::GetDefaultPageInput()
   return this->GetAdvisor()->GetDefaultPageInput();
 }
 
-std::string Workbench::GetPresentationId()
+QString Workbench::GetPresentationId()
 {
   if (factoryID != "")
   {
@@ -808,7 +812,7 @@ void Workbench::LargeUpdateStart()
     // workbenchCommandSupport.setProcessing(false);
     // workbenchContextSupport.setProcessing(false);
 
-    std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
+    QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
     for (unsigned int i = 0; i < windows.size(); i++)
     {
       IWorkbenchWindow::Pointer window = windows[i];
@@ -829,7 +833,7 @@ void Workbench::LargeUpdateEnd()
     // workbenchContextSupport.setProcessing(true);
 
     // Perform window-specific blocking.
-    std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
+    QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
     for (unsigned int i = 0; i < windows.size(); i++)
     {
       IWorkbenchWindow::Pointer window = windows[i];
@@ -865,7 +869,7 @@ void Workbench::OpenFirstTimeWindow()
     //        WorkbenchMessages.Problems_Opening_Page, e.getMessage(), e
     //            .getStatus());
     //  }});
-    BERRY_ERROR << "Error: Problems opening page. " << e.displayText() << std::endl;
+    BERRY_ERROR << "Error: Problems opening page. " << e.what() << std::endl;
   }
 }
 
@@ -956,7 +960,7 @@ bool Workbench::BusyClose(bool force)
   {
     // SafeRunner.run(new SafeRunnable() {
     //  public void run() {
-    std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
+    QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
     for (unsigned int i = 0; i < windows.size(); i++)
     {
       IWorkbenchPage::Pointer page = windows[i]->GetActivePage();
@@ -982,17 +986,17 @@ bool Workbench::BusyClose(bool force)
       SaveMementoToFile(mem);
       //      }
     }
-    catch(const Poco::Exception& e)
+    catch(const ctkException& e)
     {
       //      public void handleException(Throwable e) {
-      std::string message;
-      if (e.message().empty())
+      QString message;
+      if (e.what() == 0)
       {
         message = "An error has occurred. See error log for more details. Do you want to exit?";
       }
       else
       {
-        message = "An error has occurred: " + e.message() + ". See error log for more details. Do you want to exit?";
+        message = QString("An error has occurred: ") + e.what() + ". See error log for more details. Do you want to exit?";
       }
 
       if (!MessageDialog::OpenQuestion(Shell::Pointer(0), "Error", message))
@@ -1028,16 +1032,14 @@ bool Workbench::BusyClose(bool force)
   return true;
 }
 
-bool Workbench::GetWorkbenchStateFile(Poco::File& file)
+QString Workbench::GetWorkbenchStateFile() const
 {
-  Poco::Path path;
-  if (!WorkbenchPlugin::GetDefault()->GetDataPath(path))
+  QString path = WorkbenchPlugin::GetDefault()->GetDataLocation();
+  if (path.isNull())
   {
-    return false;
+    return QString();
   }
-  path.append(DEFAULT_WORKBENCH_STATE_FILENAME);
-  file = path;
-  return true;
+  return QDir::cleanPath(path + "/" + DEFAULT_WORKBENCH_STATE_FILENAME);
 }
 
 /*
@@ -1047,20 +1049,20 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
 {
   // Save it to a file.
   // XXX: nobody currently checks the return value of this method.
-  Poco::File stateFile;
-  if (!GetWorkbenchStateFile(stateFile))
+  QString stateFile = GetWorkbenchStateFile();
+  if (stateFile.isNull())
   {
     return false;
   }
   //BERRY_INFO << "Saving state to: " << stateFile.path() << std::endl;
   try
   {
-    Poco::FileOutputStream stream(stateFile.path());
+    Poco::FileOutputStream stream(stateFile.toStdString());
     memento->Save(stream);
   }
   catch (const Poco::IOException& /*e*/)
   {
-    stateFile.remove();
+    QFile::remove(stateFile);
     MessageDialog::OpenError(Shell::Pointer(0),
         "Saving Problems",
         "Unable to store workbench state.");
@@ -1084,11 +1086,11 @@ std::size_t Workbench::GetWorkbenchWindowCount()
   return windowManager.GetWindowCount();
 }
 
-std::vector<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows()
+QList<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows()
 {
-  std::vector<Window::Pointer> windows = windowManager.GetWindows();
-  std::vector<IWorkbenchWindow::Pointer> result;
-  for (std::vector<Window::Pointer>::iterator iter = windows.begin();
+  QList<Window::Pointer> windows = windowManager.GetWindows();
+  QList<IWorkbenchWindow::Pointer> result;
+  for (QList<Window::Pointer>::iterator iter = windows.begin();
       iter != windows.end(); ++iter)
   {
     result.push_back(iter->Cast<WorkbenchWindow>());
@@ -1098,7 +1100,7 @@ std::vector<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows()
 }
 
 IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(
-    const std::string& perspID, IAdaptable* input)
+    const QString& perspID, IAdaptable* input)
 {
   // Run op in busy cursor.
   //final Object[] result = new Object[1];
@@ -1121,7 +1123,7 @@ IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(IAdaptable* input)
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
-    const std::string& perspectiveId, IWorkbenchWindow::Pointer window)
+    const QString& perspectiveId, IWorkbenchWindow::Pointer window)
 {
   // If the specified window has the requested perspective open, then the
   // window
@@ -1133,7 +1135,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
     IWorkbenchPage::Pointer page = win->GetActivePage();
     if (page)
     {
-      std::vector<IPerspectiveDescriptor::Pointer> perspectives(page
+      QList<IPerspectiveDescriptor::Pointer> perspectives(page
           ->GetOpenPerspectives());
       for (std::size_t i = 0; i < perspectives.size(); i++)
       {
@@ -1152,7 +1154,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   // requested
   // perpective open and active, then the window is given focus.
   IAdaptable* input = GetDefaultPageInput();
-  std::vector<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
+  QList<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
   for (std::size_t i = 0; i < windows.size(); i++)
   {
     win = windows[i].Cast<WorkbenchWindow>();
@@ -1203,9 +1205,9 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   win = window.Cast<WorkbenchWindow>();
   if (win)
   {
-    IPreferencesService::Pointer store = WorkbenchPlugin::GetDefault()
-    ->GetPreferencesService();
-    int mode = store->GetSystemPreferences()->GetInt(PreferenceConstants::OPEN_PERSP_MODE, PreferenceConstants::OPM_ACTIVE_PAGE);
+    IPreferencesService* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+    int mode = store->GetSystemPreferences()->GetInt(PreferenceConstants::OPEN_PERSP_MODE,
+                                                     PreferenceConstants::OPM_ACTIVE_PAGE);
     IWorkbenchPage::Pointer page = win->GetActivePage();
     IPerspectiveDescriptor::Pointer persp;
     if (page)
@@ -1247,7 +1249,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
-    const std::string& /*perspectiveId*/,
+    const QString& /*perspectiveId*/,
     IWorkbenchWindow::Pointer /*window*/,
     IAdaptable* /*input*/)
 {
@@ -1451,7 +1453,7 @@ WorkbenchWindow::Pointer Workbench::NewWorkbenchWindow()
 int Workbench::GetNewWindowNumber()
 {
   // Get window list.
-  std::vector<Window::Pointer> windows = windowManager.GetWindows();
+  QList<Window::Pointer> windows = windowManager.GetWindows();
   int count = static_cast<int>(windows.size());
 
   // Create an array of booleans (size = window count).
@@ -1487,7 +1489,7 @@ int Workbench::GetNewWindowNumber()
 }
 
 IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(
-    const std::string& perspID, IAdaptable* input)
+    const QString& perspID, IAdaptable* input)
 {
   // Create a workbench window (becomes active window)
   //final WorkbenchWindow newWindowArray[] = new WorkbenchWindow[1];
@@ -1560,7 +1562,7 @@ bool Workbench::SaveState(IMemento::Pointer memento)
   result &= GetAdvisor()->SaveState(advisorState);
 
   // Save the workbench windows.
-  std::vector<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
+  QList<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
   for (std::size_t nX = 0; nX < windows.size(); nX++)
   {
     WorkbenchWindow::Pointer window = windows[nX].Cast<WorkbenchWindow>();

@@ -54,7 +54,7 @@ struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite {
      * @see IWorkbenchPage#showView(String, String, int)
      * @since 3.0
      */
-    virtual std::string GetSecondaryId() = 0;
+    virtual QString GetSecondaryId() = 0;
 };
 
 }

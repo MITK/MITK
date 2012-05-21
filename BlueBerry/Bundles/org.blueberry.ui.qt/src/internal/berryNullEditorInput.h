@@ -60,12 +60,12 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.IEditorInput#getName()
      */
-    std::string GetName() const;
+    QString GetName() const;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IEditorInput#getToolTipText()
      */
-    std::string GetToolTipText() const;
+    QString GetToolTipText() const;
 
     bool operator==(const Object* o) const;
 

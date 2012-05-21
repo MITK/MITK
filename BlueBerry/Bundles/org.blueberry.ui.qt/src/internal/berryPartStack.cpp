@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryPartStack.h"
 
 #include "berryPerspective.h"
@@ -30,11 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPartConstants.h"
 #include "berryGeometry.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
-
 #include <berryObjects.h>
 
-#include <Poco/HashSet.h>
 
 namespace berry
 {
@@ -82,10 +81,11 @@ void PartStack::PartStackDropResult::Drop()
         if (editorClosed)
           stack->GetPage()->OpenEditor(input, editorRef->GetId());
         return;
-      } catch (PartInitException& e)
+      }
+      catch (const PartInitException& e)
       {
         //e.printStackTrace();
-        BERRY_ERROR << e.displayText();
+        BERRY_ERROR << e.what();
       }
 
     }
@@ -132,7 +132,7 @@ void PartStack::MyStackPresentationSite::Close(IPresentablePart::Pointer part)
   partStack->Close(part);
 }
 
-void PartStack::MyStackPresentationSite::Close(const std::vector<
+void PartStack::MyStackPresentationSite::Close(const QList<
     IPresentablePart::Pointer>& parts)
 {
   partStack->Close(parts);
@@ -197,8 +197,8 @@ PartStack::PresentableVector PartStack::MyStackPresentationSite::GetPartList()
   return partStack->GetPresentableParts();
 }
 
-std::string PartStack::MyStackPresentationSite::GetProperty(
-    const std::string& id)
+QString PartStack::MyStackPresentationSite::GetProperty(
+    const QString& id)
 {
   return partStack->GetProperty(id);
 }
@@ -209,9 +209,10 @@ PartStack::PartStack(WorkbenchPage* p, bool allowsStateChanges,
       allowsStateChanges), appearance(appear), ignoreSelectionChanges(false),
       factory(fac)
 {
-  std::stringstream buf;
+  QString str;
+  QTextStream buf(&str);
   buf << "PartStack@" << this;
-  this->SetID(buf.str());
+  this->SetID(str);
 
   presentationSite = new MyStackPresentationSite(this);
 }
@@ -263,8 +264,8 @@ bool PartStack::CanMoveFolder()
 
   if ((presenationSite = this->GetPresentationSite()) != 0)
   {
-    std::list<IPresentablePart::Pointer> parts = presenationSite->GetPartList();
-    for (std::list<IPresentablePart::Pointer>::iterator iter = parts.begin(); iter
+    QList<IPresentablePart::Pointer> parts = presenationSite->GetPartList();
+    for (QList<IPresentablePart::Pointer>::iterator iter = parts.begin(); iter
         != parts.end(); ++iter)
     {
       if (!presenationSite->IsPartMoveable(*iter))
@@ -313,7 +314,7 @@ int PartStack::GetAppearance() const
   return appearance;
 }
 
-std::string PartStack::GetID() const
+QString PartStack::GetID() const
 {
   return LayoutPart::GetID();
 }
@@ -414,7 +415,7 @@ void PartStack::TestInvariants()
 
 }
 
-void PartStack::DescribeLayout(std::string& buf) const
+void PartStack::DescribeLayout(QString& buf) const
 {
   int activeState = this->GetActive();
   if (activeState == StackPresentation::AS_ACTIVE_FOCUS)
@@ -490,7 +491,7 @@ bool PartStack::AllowsAutoFocus()
   return LayoutPart::AllowsAutoFocus();
 }
 
-void PartStack::Close(const std::vector<IPresentablePart::Pointer>& parts)
+void PartStack::Close(const QList<IPresentablePart::Pointer>& parts)
 {
   for (unsigned int idx = 0; idx < parts.size(); idx++)
   {
@@ -536,8 +537,7 @@ void PartStack::CreateControl(void* parent)
   IPresentationFactory* factory = this->GetFactory();
 
   PresentableVector partList = this->GetPresentableParts();
-  std::vector<IPresentablePart::Pointer> partVec(partList.begin(), partList.end());
-  PresentationSerializer serializer(partVec);
+  PresentationSerializer serializer(partList);
 
   StackPresentation::Pointer presentation = PresentationFactoryUtil
   ::CreatePresentation(factory, appearance, parent,
@@ -641,8 +641,7 @@ void PartStack::CreateControl(void*  /*parent*/, StackPresentation::Pointer pres
   if (savedPresentationState != 0)
   {
     PresentableVector partList = this->GetPresentableParts();
-    std::vector<IPresentablePart::Pointer> partVec(partList.begin(), partList.end());
-    PresentationSerializer serializer(partVec);
+    PresentationSerializer serializer(partList);
     presentation->RestoreState(&serializer, savedPresentationState);
   }
 
@@ -673,8 +672,8 @@ void PartStack::SavePresentationState()
     ::CreateWriteRoot(WorkbenchConstants::TAG_PRESENTATION);
     memento->PutString(WorkbenchConstants::TAG_ID, this->GetFactory()->GetId());
 
-    std::list<IPresentablePart::Pointer> parts(this->GetPresentableParts());
-    PresentationSerializer serializer(std::vector<IPresentablePart::Pointer>(parts.begin(), parts.end()));
+    QList<IPresentablePart::Pointer> parts(this->GetPresentableParts());
+    PresentationSerializer serializer(parts);
 
     this->GetPresentation()->SaveState(&serializer, memento);
 
@@ -729,7 +728,7 @@ Rectangle PartStack::GetBounds()
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl());
 }
 
-std::list<LayoutPart::Pointer> PartStack::GetChildren() const
+QList<LayoutPart::Pointer> PartStack::GetChildren() const
 {
   return children;
 }
@@ -840,14 +839,14 @@ void PartStack::Remove(LayoutPart::Pointer child)
   // Need to remove it from the list of children before notifying the presentation
   // since it may setVisible(false) on the part, leading to a partHidden notification,
   // during which findView must not find the view being removed.  See bug 60039.
-  children.remove(child);
+  children.removeAll(child);
 
   StackPresentation::Pointer presentation = this->GetPresentation();
 
   if (presentablePart != 0 && presentation != 0)
   {
     ignoreSelectionChanges = true;
-    presentableParts.remove(presentablePart);
+    presentableParts.removeAll(presentablePart);
     presentation->RemovePart(presentablePart);
     presentablePart = 0;
     ignoreSelectionChanges = false;
@@ -933,17 +932,17 @@ int PartStack::GetSizeFlags(bool horizontal)
 bool PartStack::RestoreState(IMemento::Pointer memento)
 {
   // Read the active tab.
-  std::string activeTabID; memento->GetString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, activeTabID);
+  QString activeTabID; memento->GetString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, activeTabID);
 
   // Read the page elements.
-  std::vector<IMemento::Pointer> children = memento->GetChildren(WorkbenchConstants::TAG_PAGE);
+  QList<IMemento::Pointer> children = memento->GetChildren(WorkbenchConstants::TAG_PAGE);
 
   // Loop through the page elements.
   for (std::size_t i = 0; i < children.size(); i++)
   {
     // Get the info details.
     IMemento::Pointer childMem = children[i];
-    std::string partID; childMem->GetString(WorkbenchConstants::TAG_CONTENT, partID);
+    QString partID; childMem->GetString(WorkbenchConstants::TAG_CONTENT, partID);
 
     // Create the part.
     LayoutPart::Pointer part(new PartPlaceholder(partID));
@@ -986,14 +985,14 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
 
   // Determine if the presentation has saved any info here
   savedPresentationState = 0;
-  std::vector<IMemento::Pointer> presentationMementos(memento
+  QList<IMemento::Pointer> presentationMementos(memento
       ->GetChildren(WorkbenchConstants::TAG_PRESENTATION));
 
   for (std::size_t idx = 0; idx < presentationMementos.size(); idx++)
   {
     IMemento::Pointer child = presentationMementos[idx];
 
-    std::string id; child->GetString(WorkbenchConstants::TAG_ID, id);
+    QString id; child->GetString(WorkbenchConstants::TAG_ID, id);
 
     if (id == GetFactory()->GetId())
     {
@@ -1005,11 +1004,11 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
   IMemento::Pointer propertiesState = memento->GetChild(WorkbenchConstants::TAG_PROPERTIES);
   if (propertiesState)
   {
-    std::vector<IMemento::Pointer> props(propertiesState->GetChildren(WorkbenchConstants::TAG_PROPERTY));
+    QList<IMemento::Pointer> props(propertiesState->GetChildren(WorkbenchConstants::TAG_PROPERTY));
     for (std::size_t i = 0; i < props.size(); i++)
     {
-      std::string id = props[i]->GetID();
-      properties.insert(std::make_pair(id, props[i]->GetTextData()));
+      QString id = props[i]->GetID();
+      properties.insert(id, props[i]->GetTextData());
     }
   }
 
@@ -1076,7 +1075,7 @@ bool PartStack::SaveState(IMemento::Pointer memento)
     }
 
     // Write out the presentable parts (in order)
-    Poco::HashSet<std::string> cachedIds;
+    QSet<QString> cachedIds;
     PartStack::PresentableVector pparts(GetPresentableParts());
     for (PartStack::PresentableVector::iterator ppIter = pparts.begin();
         ppIter != pparts.end(); ++ppIter)
@@ -1085,7 +1084,7 @@ bool PartStack::SaveState(IMemento::Pointer memento)
 
       IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_PAGE);
       PartPane::Pointer part = presPart->GetPane();
-      std::string tabText = part->GetPartReference()->GetPartName();
+      QString tabText = part->GetPartReference()->GetPartName();
 
       childMem->PutString(WorkbenchConstants::TAG_LABEL, tabText);
       childMem->PutString(WorkbenchConstants::TAG_CONTENT, presPart->GetPane()->GetPlaceHolderId());
@@ -1110,7 +1109,7 @@ bool PartStack::SaveState(IMemento::Pointer memento)
       IMemento::Pointer childMem = memento
       ->CreateChild(WorkbenchConstants::TAG_PAGE);
 
-      std::string tabText = "LabelNotFound";
+      QString tabText = "LabelNotFound";
       if (part)
       {
         tabText = part->GetPartReference()->GetPartName();
@@ -1149,13 +1148,13 @@ bool PartStack::SaveState(IMemento::Pointer memento)
   if (!properties.empty())
   {
     IMemento::Pointer propertiesState = memento->CreateChild(WorkbenchConstants::TAG_PROPERTIES);
-    for (std::map<std::string, std::string>::iterator iterator = properties.begin();
+    for (QHash<QString, QString>::iterator iterator = properties.begin();
         iterator != properties.end(); ++iterator)
     {
-      if (iterator->second.empty()) continue;
+      if (iterator.value().isEmpty()) continue;
 
-      IMemento::Pointer prop = propertiesState->CreateChild(WorkbenchConstants::TAG_PROPERTY, iterator->first);
-      prop->PutTextData(iterator->second);
+      IMemento::Pointer prop = propertiesState->CreateChild(WorkbenchConstants::TAG_PROPERTY, iterator.key());
+      prop->PutTextData(iterator.value());
     }
   }
 
@@ -1414,7 +1413,7 @@ void PartStack::UpdateContainerVisibleTab()
 
   if (page != 0)
   {
-    std::vector<IWorkbenchPartReference::Pointer> sortedParts = page->GetSortedParts();
+    QList<IWorkbenchPartReference::Pointer> sortedParts = page->GetSortedParts();
     for (ChildVector::iterator partIter = parts.begin();
         partIter != parts.end(); ++partIter)
     {
@@ -1462,7 +1461,7 @@ void PartStack::ShowPartList()
   this->GetPresentation()->ShowPartList();
 }
 
-std::vector<void*> PartStack::GetTabList(LayoutPart::Pointer part)
+QList<void*> PartStack::GetTabList(LayoutPart::Pointer part)
 {
   if (part != 0)
   {
@@ -1475,7 +1474,7 @@ std::vector<void*> PartStack::GetTabList(LayoutPart::Pointer part)
     }
   }
 
-  return std::vector<void*>();
+  return QList<void*>();
 }
 
 void PartStack::DragStart(IPresentablePart::Pointer beingDragged, Point& initialLocation,
@@ -1572,20 +1571,20 @@ void PartStack::FireInternalPropertyChange(int id)
   propEvents.propertyChange(event);
 }
 
-std::string PartStack::GetProperty(const std::string& id)
+QString PartStack::GetProperty(const QString& id)
 {
   return properties[id];
 }
 
-void PartStack::SetProperty(const std::string& id, const std::string& value)
+void PartStack::SetProperty(const QString& id, const QString& value)
 {
   if (value == "")
   {
-    properties.erase(id);
+    properties.remove(id);
   }
   else
   {
-    properties.insert(std::make_pair(id, value));
+    properties.insert(id, value);
   }
 }
 
@@ -1594,10 +1593,10 @@ void PartStack::CopyAppearanceProperties(PartStack::Pointer copyTo)
   copyTo->appearance = this->appearance;
   if (!properties.empty())
   {
-    for (std::map<std::string, std::string>::iterator iter = properties.begin();
+    for (QHash<QString, QString>::iterator iter = properties.begin();
         iter != properties.end(); ++iter)
     {
-      copyTo->SetProperty(iter->first, iter->second);
+      copyTo->SetProperty(iter.key(), iter.value());
     }
   }
 }

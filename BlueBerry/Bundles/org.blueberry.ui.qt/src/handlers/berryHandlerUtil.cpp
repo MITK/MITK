@@ -27,7 +27,7 @@ namespace berry
 void HandlerUtil::NoVariableFound(ExecutionEvent::Pointer event,
     const QString& name)
 {
-  throw ExecutionException("No " + name.toStdString() +
+  throw ExecutionException("No " + name +
                            " found while executing " + event->GetCommand()->GetId());
 }
 
@@ -36,11 +36,11 @@ void HandlerUtil::IncorrectTypeFound(ExecutionEvent::Pointer event,
     const QString& wrongType)
 {
   throw ExecutionException("Incorrect type for "
-      + name.toStdString()
+      + name
       + " found while executing "
       + event->GetCommand()->GetId()
-      + ", expected " + expectedType.toStdString()
-      + " found " + wrongType.toStdString());
+      + ", expected " + expectedType
+      + " found " + wrongType);
 }
 
 Object::Pointer HandlerUtil::GetVariable(

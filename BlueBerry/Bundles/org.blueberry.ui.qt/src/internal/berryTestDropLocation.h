@@ -50,7 +50,7 @@ struct TestDropLocation : public Object {
      *
      * @return the shells to check for drop targets, from bottom to top.
      */
-    virtual std::vector<Shell::Pointer> GetShells() = 0;
+    virtual QList<Shell::Pointer> GetShells() = 0;
 };
 
 }

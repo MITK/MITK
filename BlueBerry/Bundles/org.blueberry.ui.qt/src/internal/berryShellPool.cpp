@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "berryShellPool.h"
-
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
+
+#include "berryShellPool.h"
 
 namespace berry
 {
 
-const std::string ShellPool::CLOSE_LISTENER = "close listener"; //$NON-NLS-1$
+const QString ShellPool::CLOSE_LISTENER = "close listener"; //$NON-NLS-1$
 
 void ShellPool::ShellClosed(ShellEvent::Pointer e)
 {

@@ -70,7 +70,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    * view in places like submenus.
    * @return array of category tokens or null if not specified.
    */
-  virtual const std::vector<QString>& GetCategoryPath() const = 0;
+  virtual const QList<QString>& GetCategoryPath() const = 0;
 
   /**
    * Returns the description of this view.

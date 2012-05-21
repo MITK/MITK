@@ -37,20 +37,20 @@ class DetachedPlaceHolder : public PartPlaceholder, public ILayoutContainer
 
 private:
 
-    std::list<LayoutPart::Pointer> children;
+    QList<LayoutPart::Pointer> children;
 
     Rectangle bounds;
 
 public:
 
-  berryObjectMacro(DetachedPlaceHolder);
+  berryObjectMacro(DetachedPlaceHolder)
 
     /**
      * DetachedPlaceHolder constructor comment.
      * @param id java.lang.String
      * @param bounds the size of the placeholder
      */
-    DetachedPlaceHolder(const std::string& id, const Rectangle& b);
+    DetachedPlaceHolder(const QString& id, const Rectangle& b);
 
     /**
      * Add a child to the container.
@@ -75,7 +75,7 @@ public:
     /**
      * Returns a list of layout children.
      */
-    std::list<LayoutPart::Pointer> GetChildren();
+    QList<LayoutPart::Pointer> GetChildren();
     /**
      * Remove a child from the container.
      */

@@ -160,7 +160,7 @@ void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
 
   foreach (ViewIdPair id, viewIds)
   {
-    if (id.first == QString::fromStdString(IntroConstants::INTRO_VIEW_ID))
+    if (id.first == IntroConstants::INTRO_VIEW_ID)
     {
       continue;
     }
@@ -196,10 +196,10 @@ void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
 QSet<QPair<QString,QString> > ShowViewMenu::GetShortcuts(IWorkbenchPage* page) const
 {
   QSet<QPair<QString,QString> > list;
-  std::vector<std::string> shortcuts(page->GetShowViewShortcuts());
+  QList<QString> shortcuts(page->GetShowViewShortcuts());
   for (int i = 0; i < shortcuts.size(); ++i)
   {
-    list.insert(QPair<QString,QString>(QString::fromStdString(shortcuts[i]), QString()));
+    list.insert(qMakePair(shortcuts[i], QString()));
   }
   return list;
 }
@@ -207,12 +207,12 @@ QSet<QPair<QString,QString> > ShowViewMenu::GetShortcuts(IWorkbenchPage* page) c
 CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& viewId, const QString& secondaryId) const
 {
   IViewRegistry* reg = WorkbenchPlugin::GetDefault()->GetViewRegistry();
-  IViewDescriptor::Pointer desc = reg->Find(viewId.toStdString());
+  IViewDescriptor::Pointer desc = reg->Find(viewId);
   if (desc.IsNull())
   {
     return CommandContributionItemParameter::Pointer(0);
   }
-  std::string label = desc->GetLabel();
+  QString label = desc->GetLabel();
 
   class PluginCCIP : public CommandContributionItemParameter, public IPluginContribution
   {
@@ -243,11 +243,11 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
   CommandContributionItemParameter::Pointer parms(new PluginCCIP(desc,
       window, viewId, IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
       CommandContributionItem::STYLE_PUSH));
-  parms->label = QString::fromStdString(label);
+  parms->label = label;
   QIcon icon(*(reinterpret_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage())));
   parms->icon = icon;
 
-  Object::Pointer strViewId(new ObjectString(viewId.toStdString()));
+  Object::Pointer strViewId(new ObjectString(viewId));
   parms->parameters.insert(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_PARM_ID, strViewId);
 //  if (makeFast)
 //  {
@@ -257,7 +257,7 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
 //  }
   if (!secondaryId.isEmpty())
   {
-    Object::Pointer strSecondaryId(new ObjectString(secondaryId.toStdString()));
+    Object::Pointer strSecondaryId(new ObjectString(secondaryId));
     parms->parameters.insert(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_SECONDARY_ID,
                             strSecondaryId);
   }
@@ -274,11 +274,10 @@ QSet<QPair<QString,QString> > ShowViewMenu::AddOpenedViews(IWorkbenchPage* page,
 QSet<QPair<QString,QString> > ShowViewMenu::GetParts(IWorkbenchPage* page) const
 {
   QSet<QPair<QString,QString> > parts;
-  std::vector<IViewReference::Pointer> refs = page->GetViewReferences();
+  QList<IViewReference::Pointer> refs = page->GetViewReferences();
   for (int i = 0; i < refs.size(); ++i)
   {
-    parts.insert(qMakePair(QString::fromStdString(refs[i]->GetId()),
-                           QString::fromStdString(refs[i]->GetSecondaryId())));
+    parts.insert(qMakePair(refs[i]->GetId(), refs[i]->GetSecondaryId()));
   }
   return parts;
 }

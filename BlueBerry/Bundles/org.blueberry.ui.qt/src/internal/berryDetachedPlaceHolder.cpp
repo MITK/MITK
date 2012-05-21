@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-DetachedPlaceHolder::DetachedPlaceHolder(const std::string& id,
+DetachedPlaceHolder::DetachedPlaceHolder(const QString& id,
     const Rectangle& b) :
   PartPlaceholder(id), bounds(b)
 {
@@ -59,14 +59,14 @@ Rectangle DetachedPlaceHolder::GetBounds()
   return bounds;
 }
 
-std::list<LayoutPart::Pointer> DetachedPlaceHolder::GetChildren()
+QList<LayoutPart::Pointer> DetachedPlaceHolder::GetChildren()
 {
   return children;
 }
 
 void DetachedPlaceHolder::Remove(LayoutPart::Pointer part)
 {
-  children.remove(part);
+  children.removeAll(part);
 }
 
 void DetachedPlaceHolder::Replace(LayoutPart::Pointer oldPart,
@@ -91,10 +91,10 @@ void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
   bounds = Rectangle(x, y, width, height);
 
   // Restore the placeholders.
-  std::vector<IMemento::Pointer> childrenMem(memento
+  QList<IMemento::Pointer> childrenMem(memento
          ->GetChildren(WorkbenchConstants::TAG_VIEW));
   for (std::size_t i = 0; i < childrenMem.size(); i++) {
-     std::string id;
+     QString id;
      childrenMem[i]->GetString(WorkbenchConstants::TAG_ID, id);
      PartPlaceholder::Pointer holder(new PartPlaceholder(id));
      holder->SetContainer(ILayoutContainer::Pointer(this));
@@ -111,7 +111,7 @@ void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
   memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
 
   // Save the views.
-  for (std::list<LayoutPart::Pointer>::iterator i = children.begin();
+  for (QList<LayoutPart::Pointer>::iterator i = children.begin();
       i != children.end(); ++i) {
      IMemento::Pointer childMem = memento
              ->CreateChild(WorkbenchConstants::TAG_VIEW);

@@ -23,7 +23,7 @@ ErrorViewPart::ErrorViewPart()
 {
 }
 
-ErrorViewPart::ErrorViewPart(const std::string& title, const std::string& error) :
+ErrorViewPart::ErrorViewPart(const QString& title, const QString& error) :
   title(title), error(error)
 {
 
@@ -31,14 +31,14 @@ ErrorViewPart::ErrorViewPart(const std::string& title, const std::string& error)
 
 void ErrorViewPart::CreatePartControl(void* parent)
 {
-  if (!error.empty())
+  if (!error.isEmpty())
   {
     statusPart = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateStatusPart(
         parent, title, error);
   }
 }
 
-void ErrorViewPart::SetPartName(const std::string& newName)
+void ErrorViewPart::SetPartName(const QString& newName)
 {
   ViewPart::SetPartName(newName);
 }

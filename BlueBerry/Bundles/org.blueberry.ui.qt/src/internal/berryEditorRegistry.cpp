@@ -22,18 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEditorRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include <Poco/String.h>
-
 namespace berry
 {
 
-const std::string EditorRegistry::EMPTY_EDITOR_ID =
-    "org.blueberry.ui.internal.emptyEditorTab"; //$NON-NLS-1$
+const QString EditorRegistry::EMPTY_EDITOR_ID =
+    "org.blueberry.ui.internal.emptyEditorTab";
 
-std::map<std::string, FileEditorMapping::Pointer>
+QHash<QString, FileEditorMapping::Pointer>
     EditorRegistry::EditorMap::defaultMap;
 
-std::map<std::string, FileEditorMapping::Pointer> EditorRegistry::EditorMap::map;
+QHash<QString, FileEditorMapping::Pointer> EditorRegistry::EditorMap::map;
 
 EditorRegistry::RelatedRegistry::RelatedRegistry(EditorRegistry* reg) :
   editorRegistry(reg)
@@ -41,13 +39,13 @@ EditorRegistry::RelatedRegistry::RelatedRegistry(EditorRegistry* reg) :
 
 }
 
-std::list<IEditorDescriptor::Pointer> EditorRegistry::RelatedRegistry::GetRelatedObjects(
-    const std::string& fileName)
+QList<IEditorDescriptor::Pointer> EditorRegistry::RelatedRegistry::GetRelatedObjects(
+    const QString& fileName)
 {
   IFileEditorMapping::Pointer mapping = editorRegistry->GetMappingFor(fileName);
   if (mapping.IsNull())
   {
-    return std::list<IEditorDescriptor::Pointer>();
+    return QList<IEditorDescriptor::Pointer>();
   }
 
   return mapping->GetEditors();
@@ -64,9 +62,9 @@ EditorRegistry::EditorRegistry() :
 }
 
 void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
-    const std::vector<std::string>& extensions,
-    const std::vector<std::string>& filenames,
-    const std::vector<std::string>&  /*contentTypeVector*/, bool bDefault)
+    const QList<QString>& extensions,
+    const QList<QString>& filenames,
+    const QList<QString>&  /*contentTypeVector*/, bool bDefault)
 {
 
   //PlatformUI.getWorkbench().getExtensionTracker().registerObject(editor.getConfigurationElement().getDeclaringExtension(), editor, IExtensionTracker.REF_WEAK);
@@ -74,15 +72,14 @@ void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
   sortedEditorsFromPlugins.push_back(editor);
 
   // add it to the table of mappings
-  for (std::vector<std::string>::const_iterator itr = extensions.begin(); itr
+  for (QList<QString>::const_iterator itr = extensions.begin(); itr
       != extensions.end(); ++itr)
   {
-    std::string fileExtension = *itr;
+    QString fileExtension = *itr;
 
-    if (!fileExtension.empty())
+    if (!fileExtension.isEmpty())
     {
-      FileEditorMapping::Pointer mapping = this->GetMappingFor("*."
-          + fileExtension); //$NON-NLS-1$
+      FileEditorMapping::Pointer mapping = this->GetMappingFor("*." + fileExtension);
       if (mapping.IsNull())
       { // no mapping for that extension
         mapping = new FileEditorMapping(fileExtension);
@@ -97,28 +94,28 @@ void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
   }
 
   // add it to the table of mappings
-  for (std::vector<std::string>::const_iterator itr = filenames.begin(); itr
+  for (QList<QString>::const_iterator itr = filenames.begin(); itr
       != filenames.end(); ++itr)
   {
-    std::string filename = *itr;
+    QString filename = *itr;
 
-    if (!filename.empty())
+    if (!filename.isEmpty())
     {
       FileEditorMapping::Pointer mapping = this->GetMappingFor(filename);
       if (mapping.IsNull())
       { // no mapping for that extension
-        std::string name;
-        std::string extension;
-        std::string::size_type index = filename.find_first_of('.');
-        if (index == std::string::npos)
+        QString name;
+        QString extension;
+        int index = filename.indexOf('.');
+        if (index == -1)
         {
           name = filename;
-          extension = ""; //$NON-NLS-1$
+          extension = "";
         }
         else
         {
-          name = filename.substr(0, index);
-          extension = filename.substr(index + 1);
+          name = filename.left(index);
+          extension = filename.mid(index + 1);
         }
         mapping = new FileEditorMapping(name, extension);
         typeEditorMappings.PutDefault(this->MappingKeyFor(mapping), mapping);
@@ -131,10 +128,10 @@ void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
     }
   }
 
-  //  for (std::vector<std::string>::const_iterator itr = contentTypeVector.begin();
+  //  for (QList<QString>::const_iterator itr = contentTypeVector.begin();
   //         itr != contentTypeVector.end(); ++itr)
   //  {
-  //    std::string contentTypeId = *itr;
+  //    QString contentTypeId = *itr;
   //    if (!contentTypeId.empty())
   //    {
   //      IContentType contentType = Platform.getContentTypeManager().getContentType(contentTypeId);
@@ -173,13 +170,13 @@ void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
 void EditorRegistry::AddExternalEditorsToEditorMap()
 {
   // Add registered editors (may include external editors).
-  std::vector<FileEditorMapping::Pointer> maps =
+  QList<FileEditorMapping::Pointer> maps =
       typeEditorMappings.AllMappings();
   for (unsigned int i = 0; i < maps.size(); ++i)
   {
     FileEditorMapping::Pointer map = maps[i];
-    std::list<IEditorDescriptor::Pointer> descArray = map->GetEditors();
-    for (std::list<IEditorDescriptor::Pointer>::iterator itr =
+    QList<IEditorDescriptor::Pointer> descArray = map->GetEditors();
+    for (QList<IEditorDescriptor::Pointer>::iterator itr =
         descArray.begin(); itr != descArray.end(); ++itr)
     {
       mapIDtoEditor[(*itr)->GetId()] = itr->Cast<EditorDescriptor> ();
@@ -187,7 +184,7 @@ void EditorRegistry::AddExternalEditorsToEditorMap()
   }
 }
 
-IEditorDescriptor::Pointer EditorRegistry::FindEditor(const std::string& id)
+IEditorDescriptor::Pointer EditorRegistry::FindEditor(const QString& id)
 {
   return mapIDtoEditor[id];
 }
@@ -200,19 +197,19 @@ IEditorDescriptor::Pointer EditorRegistry::GetDefaultEditor()
 }
 
 IEditorDescriptor::Pointer EditorRegistry::GetDefaultEditor(
-    const std::string& fileName)
+    const QString& fileName)
 {
   //return this->GetDefaultEditor(filename, guessAtContentType(filename));
   return this->GetEditorForContentType(fileName /*, contentType*/);
 }
 
 IEditorDescriptor::Pointer EditorRegistry::GetEditorForContentType(
-    const std::string& filename
+    const QString& filename
 /*IContentType contentType*/)
 {
   IEditorDescriptor::Pointer desc;
   ;
-  std::list<IEditorDescriptor::Pointer> contentTypeResults =
+  QList<IEditorDescriptor::Pointer> contentTypeResults =
       this->FindRelatedObjects(/*contentType,*/filename, relatedRegistry);
   if (contentTypeResults.size() > 0)
   {
@@ -221,22 +218,22 @@ IEditorDescriptor::Pointer EditorRegistry::GetEditorForContentType(
   return desc;
 }
 
-std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
-    /*IContentType type,*/const std::string& fileName,
+QList<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
+    /*IContentType type,*/const QString& fileName,
     RelatedRegistry&  /*registry*/)
 {
-  std::list<IEditorDescriptor::Pointer> allRelated;
-  std::list<IEditorDescriptor::Pointer> nonDefaultFileEditors;
-  std::list<IEditorDescriptor::Pointer> related;
+  QList<IEditorDescriptor::Pointer> allRelated;
+  QList<IEditorDescriptor::Pointer> nonDefaultFileEditors;
+  QList<IEditorDescriptor::Pointer> related;
 
-  if (!fileName.empty())
+  if (!fileName.isEmpty())
   {
     FileEditorMapping::Pointer mapping = this->GetMappingFor(fileName);
     if (!mapping.IsNull())
     {
       // backwards compatibility - add editors flagged as "default"
       related = mapping->GetDeclaredDefaultEditors();
-      for (std::list<IEditorDescriptor::Pointer>::iterator itr =
+      for (QList<IEditorDescriptor::Pointer>::iterator itr =
           related.begin(); itr != related.end(); ++itr)
       {
         // we don't want to return duplicates
@@ -250,19 +247,19 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
       // add all filename editors to the nonDefaultList
       // we'll later try to add them all after content types are resolved
       // duplicates (ie: default editors) will be ignored
-      std::list<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
-      nonDefaultFileEditors.splice(nonDefaultFileEditors.end(), tmpList);
+      QList<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
+      nonDefaultFileEditors.append(tmpList);
     }
 
-    std::string::size_type index = fileName.find_last_of('.');
-    if (index != std::string::npos)
+    int index = fileName.indexOf('.');
+    if (index != -1)
     {
-      std::string extension = "*" + fileName.substr(index); //$NON-NLS-1$
+      QString extension = "*" + fileName.mid(index);
       mapping = this->GetMappingFor(extension);
       if (!mapping.IsNull())
       {
         related = mapping->GetDeclaredDefaultEditors();
-        for (std::list<IEditorDescriptor::Pointer>::iterator itr =
+        for (QList<IEditorDescriptor::Pointer>::iterator itr =
             related.begin(); itr != related.end(); ++itr)
         {
           // we don't want to return duplicates
@@ -272,8 +269,8 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
             allRelated.push_back(*itr);
           }
         }
-        std::list<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
-        nonDefaultFileEditors.splice(nonDefaultFileEditors.end(), tmpList);
+        QList<IEditorDescriptor::Pointer> tmpList = mapping->GetEditors();
+        nonDefaultFileEditors.append(tmpList);
       }
     }
   }
@@ -310,7 +307,7 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
   //    }
 
   // add all non-default editors to the list
-  for (std::list<IEditorDescriptor::Pointer>::iterator i =
+  for (QList<IEditorDescriptor::Pointer>::iterator i =
       nonDefaultFileEditors.begin(); i != nonDefaultFileEditors.end(); ++i)
   {
     IEditorDescriptor::Pointer editor = *i;
@@ -324,21 +321,21 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
   return allRelated;
 }
 
-std::list<IEditorDescriptor::Pointer> EditorRegistry::GetEditors(
-    const std::string& filename)
+QList<IEditorDescriptor::Pointer> EditorRegistry::GetEditors(
+    const QString& filename)
 {
   //return getEditors(filename, guessAtContentType(filename));
   return this->FindRelatedObjects(/*contentType,*/filename, relatedRegistry);
 }
 
-std::vector<IFileEditorMapping::Pointer> EditorRegistry::GetFileEditorMappings()
+QList<IFileEditorMapping::Pointer> EditorRegistry::GetFileEditorMappings()
 {
-  std::vector<FileEditorMapping::Pointer>
+  QList<FileEditorMapping::Pointer>
       array(typeEditorMappings.AllMappings());
   std::sort(array.begin(), array.end(), CmpFileEditorMapping());
 
-  std::vector<IFileEditorMapping::Pointer> result;
-  for (std::vector<FileEditorMapping::Pointer>::iterator itr = array.begin(); itr
+  QList<IFileEditorMapping::Pointer> result;
+  for (QList<FileEditorMapping::Pointer>::iterator itr = array.begin(); itr
       != array.end(); ++itr)
   {
     result.push_back(itr->Cast<IFileEditorMapping> ());
@@ -346,32 +343,32 @@ std::vector<IFileEditorMapping::Pointer> EditorRegistry::GetFileEditorMappings()
   return result;
 }
 
-FileEditorMapping::Pointer EditorRegistry::GetMappingFor(const std::string& ext)
+FileEditorMapping::Pointer EditorRegistry::GetMappingFor(const QString& ext)
 {
-  std::string key = this->MappingKeyFor(ext);
+  QString key = this->MappingKeyFor(ext);
   return typeEditorMappings.Get(key);
 }
 
-std::vector<FileEditorMapping::Pointer> EditorRegistry::GetMappingForFilename(
-    const std::string& filename)
+QList<FileEditorMapping::Pointer> EditorRegistry::GetMappingForFilename(
+    const QString& filename)
 {
-  std::vector<FileEditorMapping::Pointer> mapping;
+  QList<FileEditorMapping::Pointer> mapping;
 
   // Lookup on entire filename
   mapping[0] = this->GetMappingFor(filename);
 
   // Lookup on filename's extension
-  std::string::size_type index = filename.find_last_of('.');
-  if (index != std::string::npos)
+  int index = filename.indexOf('.');
+  if (index != -1)
   {
-    std::string extension = filename.substr(index);
-    mapping[1] = this->GetMappingFor("*" + extension); //$NON-NLS-1$
+    QString extension = filename.mid(index);
+    mapping[1] = this->GetMappingFor("*" + extension);
   }
 
   return mapping;
 }
 
-//    std::vector<IEditorDescriptor::Pointer> EditorRegistry::GetSortedEditorsFromOS()
+//    QList<IEditorDescriptor::Pointer> EditorRegistry::GetSortedEditorsFromOS()
 //    {
 //      List externalEditors = new ArrayList();
 //      Program[] programs = Program.getPrograms();
@@ -408,10 +405,10 @@ std::vector<FileEditorMapping::Pointer> EditorRegistry::GetMappingForFilename(
 //      return array;
 //    }
 
-std::list<IEditorDescriptor::Pointer> EditorRegistry::GetSortedEditorsFromPlugins()
+QList<IEditorDescriptor::Pointer> EditorRegistry::GetSortedEditorsFromPlugins()
 {
-  std::list<IEditorDescriptor::Pointer> result;
-  for (std::list<EditorDescriptor::Pointer>::iterator itr =
+  QList<IEditorDescriptor::Pointer> result;
+  for (QList<EditorDescriptor::Pointer>::iterator itr =
       sortedEditorsFromPlugins.begin(); itr != sortedEditorsFromPlugins.end(); ++itr)
   {
     result.push_back((*itr).Cast<IEditorDescriptor> ());
@@ -420,13 +417,13 @@ std::list<IEditorDescriptor::Pointer> EditorRegistry::GetSortedEditorsFromPlugin
 }
 
 void EditorRegistry::InitialIdToEditorMap(
-    std::map<std::string, EditorDescriptor::Pointer>& map)
+    QHash<QString, EditorDescriptor::Pointer>& map)
 {
   this->AddSystemEditors(map);
 }
 
 void EditorRegistry::AddSystemEditors(
-    std::map<std::string, EditorDescriptor::Pointer>& map)
+    QHash<QString, EditorDescriptor::Pointer>& map)
 {
   // there will always be a system external editor descriptor
   EditorDescriptor::Pointer editor(new EditorDescriptor());
@@ -488,9 +485,9 @@ void EditorRegistry::InitializeFromStorage()
   this->AddExternalEditorsToEditorMap();
 }
 
-void EditorRegistry::SetProductDefaults(const std::string& defaultEditors)
+void EditorRegistry::SetProductDefaults(const QString& defaultEditors)
 {
-  if (defaultEditors.empty())
+  if (defaultEditors.isEmpty())
   {
     return;
   }
@@ -533,11 +530,11 @@ void EditorRegistry::SetProductDefaults(const std::string& defaultEditors)
 }
 
 bool EditorRegistry::ReadEditors(
-    std::map<std::string, EditorDescriptor::Pointer>&  /*editorTable*/)
+    QHash<QString, EditorDescriptor::Pointer>&  /*editorTable*/)
 {
   //Get the workbench plugin's working directory
-  Poco::Path workbenchStatePath;
-  if (!WorkbenchPlugin::GetDefault()->GetDataPath(workbenchStatePath))
+  QString workbenchStatePath = WorkbenchPlugin::GetDefault()->GetDataLocation();
+  if (workbenchStatePath.isNull())
   {
     return false;
   }
@@ -637,7 +634,7 @@ bool EditorRegistry::ReadEditors(
 }
 
 void EditorRegistry::ReadResources(
-    std::map<std::string, EditorDescriptor::Pointer>& /*editorTable*/,
+    QHash<QString, EditorDescriptor::Pointer>& /*editorTable*/,
     std::ostream&  /*reader*/)
 {
   //      XMLMemento memento = XMLMemento.createReadRoot(reader);
@@ -762,11 +759,11 @@ void EditorRegistry::ReadResources(
 }
 
 bool EditorRegistry::Contains(
-    const std::vector<IEditorDescriptor::Pointer>& editorsArray,
+    const QList<IEditorDescriptor::Pointer>& editorsArray,
     IEditorDescriptor::Pointer editorDescriptor)
 {
   IEditorDescriptor::Pointer currentEditorDescriptor;
-  for (std::vector<IEditorDescriptor::Pointer>::const_iterator i =
+  for (QList<IEditorDescriptor::Pointer>::const_iterator i =
       editorsArray.begin(); i != editorsArray.end(); ++i)
   {
     currentEditorDescriptor = *i;
@@ -780,12 +777,12 @@ bool EditorRegistry::Contains(
 }
 
 bool EditorRegistry::ReadResources(
-    std::map<std::string, EditorDescriptor::Pointer>&  /*editorTable*/)
+    QHash<QString, EditorDescriptor::Pointer>&  /*editorTable*/)
 {
   //Get the workbench plugin's working directory
-  Poco::Path workbenchStatePath;
+  QString workbenchStatePath = WorkbenchPlugin::GetDefault()->GetDataLocation();
   // XXX: nobody cares about this return value
-  if (WorkbenchPlugin::GetDefault()->GetDataPath(workbenchStatePath))
+  if (workbenchStatePath.isNull())
   {
     return false;
   }
@@ -841,7 +838,7 @@ bool EditorRegistry::ReadResources(
 
 bool EditorRegistry::LoadAssociations()
 {
-  std::map<std::string, EditorDescriptor::Pointer> editorTable;
+  QHash<QString, EditorDescriptor::Pointer> editorTable;
   if (!this->ReadEditors(editorTable))
   {
     return false;
@@ -849,13 +846,13 @@ bool EditorRegistry::LoadAssociations()
   return this->ReadResources(editorTable);
 }
 
-std::string EditorRegistry::MappingKeyFor(const std::string& type)
+QString EditorRegistry::MappingKeyFor(const QString& type)
 {
   // keep everyting lower case for case-sensitive platforms
-  return Poco::toLower(type);
+  return type.toLower();
 }
 
-std::string EditorRegistry::MappingKeyFor(FileEditorMapping::Pointer mapping)
+QString EditorRegistry::MappingKeyFor(FileEditorMapping::Pointer mapping)
 {
   return this->MappingKeyFor(mapping->GetName()
       + (mapping->GetExtension().size() == 0 ? "" : "."
@@ -877,7 +874,7 @@ void EditorRegistry::RebuildInternalEditorMap()
   this->InitialIdToEditorMap(mapIDtoEditor);
 
   // Add plugin editors.
-  for (std::list<EditorDescriptor::Pointer>::iterator itr =
+  for (QList<EditorDescriptor::Pointer>::iterator itr =
       sortedEditorsFromPlugins.begin(); itr != sortedEditorsFromPlugins.end(); ++itr)
   {
     desc = *itr;
@@ -1008,7 +1005,7 @@ void EditorRegistry::SaveAssociations()
 }
 
 void EditorRegistry::SetFileEditorMappings(
-    const std::vector<FileEditorMapping::Pointer>& newResourceTypes)
+    const QList<FileEditorMapping::Pointer>& newResourceTypes)
 {
   typeEditorMappings.Clear();
   for (unsigned int i = 0; i < newResourceTypes.size(); i++)
@@ -1021,12 +1018,12 @@ void EditorRegistry::SetFileEditorMappings(
   //firePropertyChange(PROP_CONTENTS);
 }
 
-void EditorRegistry::SetDefaultEditor(const std::string& fileName,
-    const std::string& editorId)
+void EditorRegistry::SetDefaultEditor(const QString& fileName,
+    const QString& editorId)
 {
   EditorDescriptor::Pointer desc = this->FindEditor(editorId).Cast<
       EditorDescriptor> ();
-  std::vector<FileEditorMapping::Pointer> mapping = this->GetMappingForFilename(
+  QList<FileEditorMapping::Pointer> mapping = this->GetMappingForFilename(
       fileName);
   if (!mapping[0].IsNull())
   {
@@ -1038,10 +1035,10 @@ void EditorRegistry::SetDefaultEditor(const std::string& fileName,
   }
 }
 
-std::vector<IEditorDescriptor::Pointer> EditorRegistry::SortEditors(
-    const std::vector<IEditorDescriptor::Pointer>& unsortedList)
+QList<IEditorDescriptor::Pointer> EditorRegistry::SortEditors(
+    const QList<IEditorDescriptor::Pointer>& unsortedList)
 {
-  std::vector<IEditorDescriptor::Pointer> result(unsortedList);
+  QList<IEditorDescriptor::Pointer> result(unsortedList);
   std::sort(result.begin(), result.end(), CmpIEditorDescriptor());
 
   return result;
@@ -1049,19 +1046,19 @@ std::vector<IEditorDescriptor::Pointer> EditorRegistry::SortEditors(
 
 void EditorRegistry::SortInternalEditors()
 {
-  sortedEditorsFromPlugins.sort(CmpEditorDescriptor());
+  qSort(sortedEditorsFromPlugins.begin(), sortedEditorsFromPlugins.end(), CmpEditorDescriptor());
 }
 
-void EditorRegistry::EditorMap::PutDefault(const std::string& key,
+void EditorRegistry::EditorMap::PutDefault(const QString& key,
     FileEditorMapping::Pointer value)
 {
   defaultMap[key] = value;
 }
 
-void EditorRegistry::EditorMap::Put(const std::string& key,
+void EditorRegistry::EditorMap::Put(const QString& key,
     FileEditorMapping::Pointer value)
 {
-  std::map<std::string, FileEditorMapping::Pointer>::iterator result =
+  QHash<QString, FileEditorMapping::Pointer>::iterator result =
       defaultMap.find(key);
   if (result != defaultMap.end())
   {
@@ -1070,15 +1067,15 @@ void EditorRegistry::EditorMap::Put(const std::string& key,
 }
 
 FileEditorMapping::Pointer EditorRegistry::EditorMap::Get(
-    const std::string& key)
+    const QString& key)
 {
-  std::map<std::string, FileEditorMapping::Pointer>::iterator result =
+  QHash<QString, FileEditorMapping::Pointer>::const_iterator result =
       map.find(key);
   if (result == map.end())
   {
     return defaultMap[key];
   }
-  return result->second;
+  return result.value();
 }
 
 void EditorRegistry::EditorMap::Clear()
@@ -1087,64 +1084,56 @@ void EditorRegistry::EditorMap::Clear()
   map.clear();
 }
 
-std::vector<FileEditorMapping::Pointer> EditorRegistry::EditorMap::AllMappings()
+QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::AllMappings()
 {
-  std::set<FileEditorMapping::Pointer, CmpFileEditorMapping> resultSet;
-  std::map<std::string, FileEditorMapping::Pointer>::iterator iter;
+  QSet<FileEditorMapping::Pointer> resultSet;
+  QHash<QString, FileEditorMapping::Pointer>::const_iterator iter;
   for (iter = defaultMap.begin(); iter != defaultMap.end(); ++iter)
   {
-    resultSet.insert(iter->second);
+    resultSet.insert(iter.value());
   }
   for (iter = map.begin(); iter != map.end(); ++iter)
   {
-    resultSet.insert(iter->second);
+    resultSet.insert(iter.value());
   }
 
-  return std::vector<FileEditorMapping::Pointer>(resultSet.begin(),
-      resultSet.end());
+  return resultSet.toList();
 }
 
-std::vector<FileEditorMapping::Pointer> EditorRegistry::EditorMap::UserMappings()
+QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::UserMappings()
 {
-  std::vector<FileEditorMapping::Pointer> result;
-  for (std::map<std::string, FileEditorMapping::Pointer>::iterator iter =
-      map.begin(); iter != map.end(); ++iter)
-  {
-    result.push_back(iter->second);
-  }
-
-  return result;
+  return map.values();
 }
 
-bool EditorRegistry::IsSystemInPlaceEditorAvailable(const std::string&  /*filename*/)
+bool EditorRegistry::IsSystemInPlaceEditorAvailable(const QString&  /*filename*/)
 {
   //return ComponentSupport.inPlaceEditorAvailable(filename);
   return false;
 }
 
 bool EditorRegistry::IsSystemExternalEditorAvailable(
-    const std::string&  /*filename*/)
+    const QString&  /*filename*/)
 {
-  //      std::string::size_type nDot = filename.find_last_of('.');
-  //      if (nDot != std::string::npos)
+  //      QString::size_type nDot = filename.find_last_of('.');
+  //      if (nDot != QString::npos)
   //      {
-  //        std::string strName = filename.substr(nDot);
+  //        QString strName = filename.substr(nDot);
   //        return Program.findProgram(strName) != null;
   //      }
   return false;
 }
 
 void EditorRegistry::RemoveEditorFromMapping(
-    std::map<std::string, FileEditorMapping::Pointer>& map,
+    QHash<QString, FileEditorMapping::Pointer>& map,
     IEditorDescriptor::Pointer desc)
 {
   FileEditorMapping::Pointer mapping;
-  for (std::map<std::string, FileEditorMapping::Pointer>::iterator iter =
+  for (QHash<QString, FileEditorMapping::Pointer>::iterator iter =
       map.begin(); iter != map.end(); ++iter)
   {
-    mapping = iter->second;
-    std::list<IEditorDescriptor::Pointer> editors(mapping->GetEditors());
-    std::list<IEditorDescriptor::Pointer>::iterator result = std::find(
+    mapping = iter.value();
+    QList<IEditorDescriptor::Pointer> editors(mapping->GetEditors());
+    QList<IEditorDescriptor::Pointer>::iterator result = std::find(
         editors.begin(), editors.end(), desc);
     if (result != editors.end())
     {
@@ -1154,25 +1143,25 @@ void EditorRegistry::RemoveEditorFromMapping(
 
     if (editors.empty())
     {
-      map.erase(iter->first);
+      map.erase(iter);
       break;
     }
   }
 }
 
-const IExtensionPoint* EditorRegistry::GetExtensionPointFilter()
+IExtensionPoint::Pointer EditorRegistry::GetExtensionPointFilter()
 {
-  return Platform::GetExtensionPointService()->GetExtensionPoint(
+  return Platform::GetExtensionRegistry()->GetExtensionPoint(
       PlatformUI::PLUGIN_ID + WorkbenchRegistryConstants::PL_EDITOR);
 }
 
-std::vector<IFileEditorMapping::Pointer> EditorRegistry::GetUnifiedMappings()
+QList<IFileEditorMapping::Pointer> EditorRegistry::GetUnifiedMappings()
 {
-  std::vector<IFileEditorMapping::Pointer>
+  QList<IFileEditorMapping::Pointer>
       standardMappings(
           dynamic_cast<EditorRegistry*> (PlatformUI::GetWorkbench() ->GetEditorRegistry())->GetFileEditorMappings());
 
-  std::vector<IFileEditorMapping::Pointer> allMappings(standardMappings);
+  QList<IFileEditorMapping::Pointer> allMappings(standardMappings);
   // mock-up content type extensions into IFileEditorMappings
   //      IContentType [] contentTypes = Platform.getContentTypeManager().getAllContentTypes();
   //      for (int i = 0; i < contentTypes.length; i++)
@@ -1230,8 +1219,8 @@ std::vector<IFileEditorMapping::Pointer> EditorRegistry::GetUnifiedMappings()
   return allMappings;
 }
 
-MockMapping::MockMapping(/*IContentType type,*/const std::string& name,
-    const std::string& ext) :
+MockMapping::MockMapping(/*IContentType type,*/const QString& name,
+    const QString& ext) :
   extension(ext), filename(name)
 {
   //this.contentType = type;
@@ -1239,7 +1228,7 @@ MockMapping::MockMapping(/*IContentType type,*/const std::string& name,
 
 IEditorDescriptor::Pointer MockMapping::GetDefaultEditor()
 {
-  //      std::vector<IEditorDescriptor::Pointer> candidates = PlatformUI::GetWorkbench()->GetEditorRegistry()
+  //      QList<IEditorDescriptor::Pointer> candidates = PlatformUI::GetWorkbench()->GetEditorRegistry()
   //      ->GetEditorsForContentType(contentType);
   //      if (candidates.empty())
   //      {
@@ -1250,31 +1239,31 @@ IEditorDescriptor::Pointer MockMapping::GetDefaultEditor()
   return IEditorDescriptor::Pointer();
 }
 
-std::list<IEditorDescriptor::Pointer> MockMapping::GetEditors() const
+QList<IEditorDescriptor::Pointer> MockMapping::GetEditors() const
 {
-  //      std::list<IEditorDescriptor::Pointer> editorsForContentType = (dynamic_cast<EditorRegistry*>(PlatformUI
+  //      QList<IEditorDescriptor::Pointer> editorsForContentType = (dynamic_cast<EditorRegistry*>(PlatformUI
   //          ::GetWorkbench()->GetEditorRegistry())
   //      ->GetEditorsForContentType(contentType);
   //      return editorsForContentType;
-  return std::list<IEditorDescriptor::Pointer>();
+  return QList<IEditorDescriptor::Pointer>();
 }
 
-std::list<IEditorDescriptor::Pointer> MockMapping::GetDeletedEditors() const
+QList<IEditorDescriptor::Pointer> MockMapping::GetDeletedEditors() const
 {
-  return std::list<IEditorDescriptor::Pointer>();
+  return QList<IEditorDescriptor::Pointer>();
 }
 
-std::string MockMapping::GetExtension()
+QString MockMapping::GetExtension()
 {
   return extension;
 }
 
-std::string MockMapping::GetLabel()
+QString MockMapping::GetLabel()
 {
   return filename + '.' + extension;
 }
 
-std::string MockMapping::GetName()
+QString MockMapping::GetName()
 {
   return filename;
 }

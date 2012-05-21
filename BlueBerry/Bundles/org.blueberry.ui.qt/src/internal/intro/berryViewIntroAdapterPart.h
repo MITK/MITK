@@ -128,7 +128,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  std::string GetPartName();
+  QString GetPartName();
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)

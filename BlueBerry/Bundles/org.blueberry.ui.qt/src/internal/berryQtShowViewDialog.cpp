@@ -32,10 +32,10 @@ int QtShowViewDialog::Open()
   else return IShowViewDialog::CANCEL;
 }
 
-std::vector<IViewDescriptor::Pointer>
+QList<IViewDescriptor::Pointer>
 QtShowViewDialog::GetSelection()
 {
-  std::vector<IViewDescriptor::Pointer> selected;
+  QList<IViewDescriptor::Pointer> selected;
 
   return selected;
 }

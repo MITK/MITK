@@ -220,19 +220,18 @@ void WorkbenchPart::RemovePropertyListener(IPropertyChangeListener::Pointer l)
 void WorkbenchPart::SetPartProperty(const QString& key,
     const QString& value)
 {
-  std::map<QString, QString>::iterator iter = partProperties.find(
-      key);
+  QHash<QString, QString>::iterator iter = partProperties.find(key);
   QString oldValue;
   if (iter != partProperties.end())
-    oldValue = iter->second;
+    oldValue = iter.value();
 
   if (value == "")
   {
-    partProperties.erase(key);
+    partProperties.remove(key);
   }
   else
   {
-    partProperties.insert(std::make_pair(key, value));
+    partProperties.insert(key, value);
   }
   this->FirePropertyChanged(key, oldValue, value);
 }
@@ -281,14 +280,14 @@ QString WorkbenchPart::GetTitleToolTip() const
   return this->m_ToolTip;
 }
 
-void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const QString&  /*propertyName*/, Object::Pointer  /*data*/)
+void WorkbenchPart::SetInitializationData(const IConfigurationElement::Pointer& cfig,
+                                          const QString& /*propertyName*/, const Object::Pointer& /*data*/)
 {
   // Save config element.
   m_ConfigElement = cfig;
 
   // Part name and title.
-  m_PartName = cfig->GetAttribute("name").toStdString();
+  m_PartName = cfig->GetAttribute("name");
   m_Title = m_PartName;
 
   // Icon.
@@ -300,13 +299,6 @@ void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
 
   m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         m_ConfigElement->GetContributor(), strIcon);
-
-  if (!m_ImageDescriptor)
-  {
-    // try legacy BlueBerry code
-    m_ImageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
-          m_ConfigElement->GetContributor(), strIcon);
-  }
 
   if (!m_ImageDescriptor)
   {

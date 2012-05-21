@@ -173,7 +173,7 @@ struct BERRY_UI_QT IWorkbenchConfigurer : public Object {
      * @return the data, or <code>null</code> if there is no data at the given
      * key
      */
-    virtual Object::Pointer GetData(const std::string& key) const = 0;
+    virtual Object::Pointer GetData(const QString& key) const = 0;
 
     /**
      * Sets the data associated with the workbench at the given key.
@@ -181,7 +181,7 @@ struct BERRY_UI_QT IWorkbenchConfigurer : public Object {
      * @param key the key
      * @param data the data, or <code>null</code> to delete existing data
      */
-    virtual void SetData(const std::string& key, Object::Pointer data) = 0;
+    virtual void SetData(const QString& key, Object::Pointer data) = 0;
 
     /**
      * Restores the workbench state saved from the previous session, if any.
@@ -227,7 +227,7 @@ struct BERRY_UI_QT IWorkbenchConfigurer : public Object {
    * <p>
    * If the workbench is left running, it can be closed using
    * <code>IWorkbench#Close()</code>, or a new window can be opened using
-   * <code>IWorkbench#OpenWorkbenchWindow(const std::string&, IAdaptable*)</code>.
+   * <code>IWorkbench#OpenWorkbenchWindow(const QString&, IAdaptable*)</code>.
    * </p>
    * <p>
    * The initial value is <code>true</code>.

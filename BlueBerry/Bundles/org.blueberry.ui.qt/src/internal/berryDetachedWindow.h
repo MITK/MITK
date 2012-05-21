@@ -40,7 +40,7 @@ class DetachedWindow: public IPropertyChangeListener,
 {
 
 public:
-  berryObjectMacro(DetachedWindow);
+  berryObjectMacro(DetachedWindow)
 
 private:
   PartStack::Pointer folder;
@@ -183,13 +183,13 @@ private:
    * @param views The list of ViewPanes
    * @return <code>true</code> unless the user cancels the save(s)
    */
-  bool HandleSaves(std::list<PartPane::Pointer> views);
+  bool HandleSaves(QList<PartPane::Pointer> views);
 
   /**
    * Answer a list of the view panes.
    */
-  void CollectViewPanes(std::list<PartPane::Pointer>& result,
-      const std::list<LayoutPart::Pointer>& parts);
+  void CollectViewPanes(QList<PartPane::Pointer>& result,
+      const QList<LayoutPart::Pointer>& parts);
 
 };
 

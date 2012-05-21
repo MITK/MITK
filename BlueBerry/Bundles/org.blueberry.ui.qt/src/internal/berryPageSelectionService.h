@@ -54,9 +54,9 @@ protected:
     IWorkbenchPage* GetPage() const;
 
     /*
-     * @see AbstractSelectionService#CreatePartTracker(const std::string&)
+     * @see AbstractSelectionService#CreatePartTracker(const QString&)
      */
-    AbstractPartSelectionTracker::Pointer CreatePartTracker(const std::string& partId) const;
+    AbstractPartSelectionTracker::Pointer CreatePartTracker(const QString& partId) const;
 };
 
 }

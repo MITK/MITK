@@ -68,9 +68,9 @@ private:
   /**
    * User-readable name of the editor's input
    */
-  std::string name;
+  QString name;
 
-  std::string factoryId;
+  QString factoryId;
 
   IEditorInput::Pointer restoredInput;
 
@@ -101,13 +101,11 @@ public:
   SmartPointer<EditorDescriptor> GetDescriptor();
 
   /**
-   * @since 3.1
-   *
    * @param id the id
    * @return the editor descriptor
    */
 private:
-  SmartPointer<EditorDescriptor> GetDescriptor(const std::string& id);
+  SmartPointer<EditorDescriptor> GetDescriptor(const QString& id);
 
   /**
    * Initializes the necessary editor listeners and handlers
@@ -128,19 +126,19 @@ public:
   void PinStatusUpdated();
 
 public:
-  std::string GetFactoryId();
+  QString GetFactoryId();
 
 protected:
-  std::string ComputePartName();
+  QString ComputePartName();
 
 public:
-  std::string GetName();
+  QString GetName();
 
 public:
   IEditorPart::Pointer GetEditor(bool restore);
 
 public:
-  void SetName(const std::string& name);
+  void SetName(const QString& name);
 
 public:
   IMemento::Pointer GetMemento();
@@ -203,8 +201,6 @@ protected:
    * can't always be changed for an editor. Editors that don't implement IReusableEditor
    * can't have their input changed once they've been materialized.
    *
-   * @since 3.1
-   *
    * @param input new input
    * @return true iff the input was actually changed
    */
@@ -214,14 +210,11 @@ public:
   /**
    * Reports a recoverable malfunction in the system log. A recoverable malfunction would be
    * something like failure to fire an expected property change. Only the first malfunction is
-   * recorded to avoid spamming the system log with repeated failures in the same editor.
-   *
-   * @since 3.1
    *
    * @param string
    */
 private:
-  void ReportMalfunction(const std::string& string);
+  void ReportMalfunction(const QString& string);
 
 private:
   IEditorPart::Pointer CreatePartHelper();

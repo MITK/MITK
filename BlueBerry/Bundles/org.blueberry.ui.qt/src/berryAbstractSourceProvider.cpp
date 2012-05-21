@@ -38,7 +38,7 @@ void AbstractSourceProvider::FireSourceChanged(int sourcePriority,
   sourceEvents.multipleSourcesChanged(sourcePriority, sourceValuesByName);
 }
 
-void AbstractSourceProvider::LogDebuggingInfo(const std::string& message)
+void AbstractSourceProvider::LogDebuggingInfo(const QString& message)
 {
   if (DEBUG && (message != ""))
   {

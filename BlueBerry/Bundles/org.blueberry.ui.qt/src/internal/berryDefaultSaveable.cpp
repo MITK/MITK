@@ -39,7 +39,7 @@ void DefaultSaveable::DoSave(/*IProgressMonitor monitor*/)
   }
 }
 
-std::string DefaultSaveable::GetName() const
+QString DefaultSaveable::GetName() const
 {
   return part.Lock()->GetPartName();
 }
@@ -56,7 +56,7 @@ ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
   return ImageDescriptor::Pointer(0);
 }
 
-std::string DefaultSaveable::GetToolTipText() const
+QString DefaultSaveable::GetToolTipText() const
 {
   return part.Lock()->GetTitleToolTip();
 }
@@ -102,9 +102,9 @@ bool DefaultSaveable::Show(IWorkbenchPage::Pointer page)
     try
     {
       page->ShowView(viewPart->GetViewSite()->GetId(),
-          viewPart ->GetViewSite()->GetSecondaryId(),
-          IWorkbenchPage::VIEW_ACTIVATE);
-    } catch (PartInitException& /*e*/)
+                     viewPart->GetViewSite()->GetSecondaryId(),
+                     IWorkbenchPage::VIEW_ACTIVATE);
+    } catch (const PartInitException& /*e*/)
     {
       return false;
     }

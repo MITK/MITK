@@ -33,7 +33,7 @@ QtImageTweaklet::QtImageTweaklet(const QtImageTweaklet& other)
   Q_UNUSED(other)
 }
 
-SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromFile(const std::string& filename, const std::string& pluginid)
+SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromFile(const QString& filename, const QString& pluginid)
 {
   ImageDescriptor::Pointer descriptor(new QtFileImageDescriptor(filename, pluginid));
   return descriptor;

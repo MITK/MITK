@@ -42,7 +42,7 @@ struct MessageDialog
   * @return <code>true</code> if the user presses the OK button,
   *         <code>false</code> otherwise
   */
- static bool OpenConfirm(Shell::Pointer parent, const std::string& title, const std::string& message);
+ static bool OpenConfirm(Shell::Pointer parent, const QString& title, const QString& message);
 
  /**
   * Convenience method to open a standard error dialog.
@@ -54,7 +54,7 @@ struct MessageDialog
   * @param message
   *            the message
   */
- static void OpenError(Shell::Pointer parent, const std::string& title, const std::string& message);
+ static void OpenError(Shell::Pointer parent, const QString& title, const QString& message);
 
  /**
   * Convenience method to open a standard information dialog.
@@ -66,8 +66,8 @@ struct MessageDialog
   * @param message
   *            the message
   */
- static void OpenInformation(Shell::Pointer parent, const std::string& title,
-         const std::string& message);
+ static void OpenInformation(Shell::Pointer parent, const QString& title,
+         const QString& message);
 
  /**
   * Convenience method to open a simple Yes/No question dialog.
@@ -81,8 +81,8 @@ struct MessageDialog
   * @return <code>true</code> if the user presses the OK button,
   *         <code>false</code> otherwise
   */
- static bool OpenQuestion(Shell::Pointer parent, const std::string& title,
-         const std::string& message);
+ static bool OpenQuestion(Shell::Pointer parent, const QString& title,
+         const QString& message);
 
  /**
   * Convenience method to open a standard warning dialog.
@@ -94,7 +94,7 @@ struct MessageDialog
   * @param message
   *            the message
   */
- static void OpenWarning(Shell::Pointer parent, const std::string& title, const std::string& message);
+ static void OpenWarning(Shell::Pointer parent, const QString& title, const QString& message);
 
  /**
   * Create a message dialog. Note that the dialog will have no visual
@@ -135,9 +135,9 @@ struct MessageDialog
   * @param defaultIndex
   *            the index in the button label array of the default button
   */
- static IDialog::Pointer CreateMessageDialog(Shell::Pointer parentShell, const std::string& dialogTitle,
-         void* dialogTitleImage, const std::string& dialogMessage, int dialogImageType,
-         const std::vector<std::string>& dialogButtonLabels, int defaultIndex);
+ static IDialog::Pointer CreateMessageDialog(Shell::Pointer parentShell, const QString& dialogTitle,
+         void* dialogTitleImage, const QString& dialogMessage, int dialogImageType,
+         const QList<QString>& dialogButtonLabels, int defaultIndex);
 
 };
 

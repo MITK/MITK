@@ -73,24 +73,24 @@ private:
 
   bool fixed;
 
-  typedef std::map<std::string, ILayoutContainer::Pointer> IDToFolderMap;
+  typedef QHash<QString, ILayoutContainer::Pointer> IDToFolderMap;
   IDToFolderMap mapIDtoFolder;
 
-  typedef std::map<std::string, LayoutPart::Pointer> IDToPartMap;
+  typedef QHash<QString, LayoutPart::Pointer> IDToPartMap;
   IDToPartMap mapIDtoPart;
 
-  typedef std::map<std::string, ViewLayoutRec::Pointer> IDToViewLayoutRecMap;
+  typedef QHash<QString, ViewLayoutRec::Pointer> IDToViewLayoutRecMap;
   IDToViewLayoutRecMap mapIDtoViewLayoutRec;
 
-  typedef std::map<ILayoutContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
+  typedef QHash<ILayoutContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
   FolderToFolderLayoutMap mapFolderToFolderLayout;
 
-  std::vector<std::string> perspectiveShortcuts;
+  QList<QString> perspectiveShortcuts;
 
   ViewSashContainer::Pointer rootLayoutContainer;
 
-  std::vector<std::string> showInPartIds;
-  std::vector<std::string> showViewShortcuts;
+  QList<QString> showInPartIds;
+  QList<QString> showViewShortcuts;
 
   ViewFactory* viewFactory;
 
@@ -194,7 +194,7 @@ private:
    * @since 3.0
    */
 public:
-  ViewLayoutRec::Pointer GetViewLayoutRec(const std::string& id, bool create);
+  ViewLayoutRec::Pointer GetViewLayoutRec(const QString& id, bool create);
 
   /**
    * Adds a creation wizard to the File New menu.
@@ -213,8 +213,8 @@ public:
    * Add the layout part to the page's layout
    */
 private:
-  void AddPart(LayoutPart::Pointer newPart, const std::string& partId,
-               int relationship, float ratio, const std::string& refId);
+  void AddPart(LayoutPart::Pointer newPart, const QString& partId,
+               int relationship, float ratio, const QString& refId);
 
   /**
    * Adds a perspective shortcut to the Perspective menu.
@@ -224,14 +224,14 @@ private:
    * @param id the perspective id
    */
 public:
-  void AddPerspectiveShortcut(const std::string& id);
+  void AddPerspectiveShortcut(const QString& id);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addPlaceholder(java.lang.String, int, float, java.lang.String)
    */
 public:
-  void AddPlaceholder(const std::string& viewId, int relationship, float ratio,
-      const std::string& refId);
+  void AddPlaceholder(const QString& viewId, int relationship, float ratio,
+      const QString& refId);
 
   /**
    * Checks whether the given id is a valid placeholder id.
@@ -240,13 +240,13 @@ public:
    * @param id the placeholder id
    * @return <code>true</code> if the given id is a valid placeholder id, <code>false</code> otherwise
    */
-  bool CheckValidPlaceholderId(const std::string& id);
+  bool CheckValidPlaceholderId(const QString& id);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addShowInPart(java.lang.String)
    */
 public:
-  void AddShowInPart(const std::string& id);
+  void AddShowInPart(const QString& id);
 
   /**
    * Adds a view to the Show View menu. The id must name a view extension
@@ -255,14 +255,14 @@ public:
    * @param id the view id
    */
 public:
-  void AddShowViewShortcut(const std::string& id);
+  void AddShowViewShortcut(const QString& id);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
 public:
-  void AddView(const std::string& viewId, int relationship, float ratio,
-      const std::string& refId);
+  void AddView(const QString& viewId, int relationship, float ratio,
+      const QString& refId);
 
   /**
    * Convenience method to allow setting the initial minimized
@@ -272,16 +272,16 @@ public:
    *  @since 3.3
    */
 public:
-  void AddView(const std::string& viewId, int relationship, float ratio,
-      const std::string& refId, bool minimized);
+  void AddView(const QString& viewId, int relationship, float ratio,
+      const QString& refId, bool minimized);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
 private:
   void
-      AddView(const std::string& viewId, int relationship, float ratio,
-          const std::string& refId, bool minimized, bool standalone,
+      AddView(const QString& viewId, int relationship, float ratio,
+          const QString& refId, bool minimized, bool standalone,
           bool showTitle);
 
   //    public: List getMinimizedStacks() {
@@ -293,22 +293,22 @@ private:
    * and cannot be added again. Log a warning message.
    */
 public:
-  bool CheckPartInLayout(const std::string& partId);
+  bool CheckPartInLayout(const QString& partId);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#createFolder(java.lang.String, int, float, java.lang.String)
    */
 public:
-  IFolderLayout::Pointer CreateFolder(const std::string& folderId,
-      int relationship, float ratio, const std::string& refId);
+  IFolderLayout::Pointer CreateFolder(const QString& folderId,
+      int relationship, float ratio, const QString& refId);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#createPlaceholderFolder(java.lang.String, int, float, java.lang.String)
    */
 public:
   IPlaceholderFolderLayout::Pointer CreatePlaceholderFolder(
-      const std::string& folderId, int relationship, float ratio,
-      const std::string& refId);
+      const QString& folderId, int relationship, float ratio,
+      const QString& refId);
 
   /**
    * Create a new <code>LayoutPart</code>.
@@ -319,7 +319,7 @@ public:
    * @throws PartInitException thrown if there is a problem creating the part.
    */
 private:
-  LayoutPart::Pointer CreateView(const std::string& partID);
+  LayoutPart::Pointer CreateView(const QString& partID);
 
   /**
    * @return the action set list for the page. This is <code>List</code> of
@@ -341,7 +341,7 @@ public:
    * used as a reference part for other views.
    */
 public:
-  std::string GetEditorArea();
+  QString GetEditorArea();
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#getEditorReuseThreshold()
@@ -362,7 +362,7 @@ public:
    * if none (i.e. part of the page layout instead of a folder layout).
    */
 private:
-  PartStack::Pointer GetFolderPart(const std::string& viewId);
+  PartStack::Pointer GetFolderPart(const QString& viewId);
 
   /**
    * @return the new wizard shortcuts associated with the page. This is a <code>List</code> of
@@ -383,13 +383,13 @@ private:
    * <code>String</code>s.
    */
 public:
-  std::vector<std::string> GetPerspectiveShortcuts();
+  QList<QString> GetPerspectiveShortcuts();
 
   /**
    * @return the part for a given ID.
    */
   /*package*/
-  LayoutPart::Pointer GetRefPart(const std::string& partID);
+  LayoutPart::Pointer GetRefPart(const QString& partID);
 
   /**
    * @return the top level layout container.
@@ -402,14 +402,14 @@ public:
    * a <code>List</code> of <code>String</code>s.
    */
 public:
-  std::vector<std::string> GetShowInPartIds();
+  QList<QString> GetShowInPartIds();
 
   /**
    * @return the show view shortcuts associated with the page. This is a <code>List</code> of
    * <code>String</code>s.
    */
 public:
-  std::vector<std::string> GetShowViewShortcuts();
+  QList<QString> GetShowViewShortcuts();
 
   /**
    * @return the <code>ViewFactory</code> for this <code>PageLayout</code>.
@@ -471,8 +471,8 @@ public:
    * @param container the <code>ContainerPlaceholder</code>.
    */
   /*package*/
-  void SetFolderPart(const std::string& viewId,
-                     ContainerPlaceholder::Pointer container);
+  void SetFolderPart(const QString& viewId,
+      ContainerPlaceholder::Pointer container);
 
   /**
    * Map the folder part containing the given view ID.
@@ -481,9 +481,9 @@ public:
    * @param folder the <code>ViewStack</code>.
    */
   /*package*/
-  void SetFolderPart(const std::string& viewId, PartStack::Pointer folder);
+  void SetFolderPart(const QString& viewId, PartStack::Pointer folder);
 
-  void SetFolderPart(const std::string& viewId, ILayoutContainer::Pointer folder);
+  void SetFolderPart(const QString& viewId, ILayoutContainer::Pointer folder);
 
   /**
    * Map an ID to a part.
@@ -492,7 +492,7 @@ public:
    * @param part the <code>LayoutPart</code>.
    */
   /*package*/
-  void SetRefPart(const std::string& partID, LayoutPart::Pointer part);
+  void SetRefPart(const QString& partID, LayoutPart::Pointer part);
 
   /**
    * Stack a part on top of another.
@@ -502,8 +502,8 @@ public:
    * @param refId the reference ID.
    */
 private:
-  void StackPart(LayoutPart::Pointer newPart, const std::string& viewId,
-      const std::string& refId);
+  void StackPart(LayoutPart::Pointer newPart, const QString& viewId,
+                 const QString& refId);
 
   /**
    * Stack a placeholder on top of another.
@@ -512,7 +512,7 @@ private:
    * @param refId the reference ID.
    */
 public:
-  void StackPlaceholder(const std::string& viewId, const std::string& refId);
+  void StackPlaceholder(const QString& viewId, const QString& refId);
 
   // stackView(String, String) modified by dan_rubel@instantiations.com
   /**
@@ -522,7 +522,7 @@ public:
    * @param refId the reference ID.
    */
 public:
-  void StackView(const std::string& viewId, const std::string& refId);
+  void StackView(const QString& viewId, const QString& refId);
 
   /**
    * Converts common position constants into layout position constants.
@@ -540,15 +540,15 @@ public:
    * @since 3.0
    */
 public:
-  void AddStandaloneView(const std::string& viewId, bool showTitle,
-      int relationship, float ratio, const std::string& refId);
+  void AddStandaloneView(const QString& viewId, bool showTitle,
+      int relationship, float ratio, const QString& refId);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addStandaloneViewPlaceholder(java.lang.String, int, float, java.lang.String, boolean)
    */
 public:
-  void AddStandaloneViewPlaceholder(const std::string& viewId,
-      int relationship, float ratio, const std::string& refId, bool showTitle);
+  void AddStandaloneViewPlaceholder(const QString& viewId,
+      int relationship, float ratio, const QString& refId, bool showTitle);
 
   /*
    * (non-Javadoc)
@@ -557,13 +557,13 @@ public:
    * @since 3.0
    */
 public:
-  IViewLayout::Pointer GetViewLayout(const std::string& viewId);
+  IViewLayout::Pointer GetViewLayout(const QString& viewId);
 
   /**
    * @since 3.0
    */
 public:
-  std::map<std::string, ViewLayoutRec::Pointer> GetIDtoViewLayoutRecMap();
+  QHash<QString, ViewLayoutRec::Pointer> GetIDtoViewLayoutRecMap();
 
   /**
    * Removes any existing placeholder with the given id.
@@ -572,13 +572,13 @@ public:
    * @since 3.1
    */
 public:
-  void RemovePlaceholder(const std::string& id);
+  void RemovePlaceholder(const QString& id);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#getFolderForView(java.lang.String)
    */
 public:
-  IPlaceholderFolderLayout::Pointer GetFolderForView(const std::string& viewId);
+  IPlaceholderFolderLayout::Pointer GetFolderForView(const QString& viewId);
 };
 
 }

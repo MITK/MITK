@@ -49,7 +49,7 @@ public:
 
   IWorkbenchPart::Pointer GetActivePart();
 
-  //std::vector<IEditorReference::Pointer> GetEditors();
+  //QList<IEditorReference::Pointer> GetEditors();
 
   void AddPart(WorkbenchPartReference::Pointer ref);
 
@@ -78,7 +78,7 @@ public:
   /*
    * Return a list with all parts (editors and views).
    */
-  //std::vector<IWorkbenchPartReference::Pointer> GetParts(const std::vector<IViewReference::Pointer>& views);
+  //QList<IWorkbenchPartReference::Pointer> GetParts(const QList<IViewReference::Pointer>& views);
 
 
 private:

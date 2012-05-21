@@ -68,7 +68,7 @@ public:
      * @param window workbench window
      * @param partId part identifier
      */
-    WindowPartSelectionTracker(IWorkbenchWindow* window, const std::string& partId);
+    WindowPartSelectionTracker(IWorkbenchWindow* window, const QString& partId);
 
     /*
      * @see IPageListener#pageActivated(IWorkbenchPage)

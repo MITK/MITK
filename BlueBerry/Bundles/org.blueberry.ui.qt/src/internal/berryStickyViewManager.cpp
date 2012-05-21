@@ -45,7 +45,7 @@ IStickyViewManager::Pointer StickyViewManager::GetInstance(IWorkbenchPage* page)
   return stickyViewMan;
 }
 
-void StickyViewManager::Add(const std::string& /*perspectiveId*/, const std::set<std::string>& /*stickyViewSet*/)
+void StickyViewManager::Add(const QString& /*perspectiveId*/, const std::set<QString>& /*stickyViewSet*/)
 {
   // do nothing
 }
@@ -55,7 +55,7 @@ void StickyViewManager::Clear()
   // do nothing
 }
 
-void StickyViewManager::Remove(const std::string& /*perspectiveId*/)
+void StickyViewManager::Remove(const QString& /*perspectiveId*/)
 {
   // do nothing
 }
@@ -78,11 +78,11 @@ void StickyViewManager::Update(Perspective::Pointer oldPersp,
     return;
   }
   IViewRegistry* viewReg = WorkbenchPlugin::GetDefault()->GetViewRegistry();
-  std::vector<IStickyViewDescriptor::Pointer> stickyDescs(
+  QList<IStickyViewDescriptor::Pointer> stickyDescs(
       viewReg->GetStickyViews());
   for (std::size_t i = 0; i < stickyDescs.size(); i++)
   {
-    const std::string viewId = stickyDescs[i]->GetId();
+    const QString viewId = stickyDescs[i]->GetId();
     try
     {
       // show a sticky view if it was in the last perspective and

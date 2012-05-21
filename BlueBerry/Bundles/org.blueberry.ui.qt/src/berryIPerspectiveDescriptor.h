@@ -73,7 +73,7 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object {
      * @return the description
      * @since 3.0
      */
-    virtual std::string GetDescription() const = 0;
+    virtual QString GetDescription() const = 0;
 
     /**
      * Returns this perspective's id. For perspectives declared via an extension,
@@ -81,7 +81,7 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object {
      *
      * @return the perspective id
      */
-    virtual std::string GetId() const = 0;
+    virtual QString GetId() const = 0;
 
     /**
      * Returns the descriptor of the image to show for this perspective.
@@ -98,21 +98,21 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object {
      *
      * @return the label
      */
-    virtual std::string GetLabel() const = 0;
+    virtual QString GetLabel() const = 0;
 
     /**
-    * Returns <code>true</code> if this perspective is predefined by an
-    * extension.
-    *
-    * @return boolean whether this perspective is predefined by an extension
-    */
+     * Returns <code>true</code> if this perspective is predefined by an
+     * extension.
+     *
+     * @return boolean whether this perspective is predefined by an extension
+     */
     virtual bool IsPredefined() const = 0;
 
     /**
-    * Return the category path of this descriptor
-    *
-    * @return the category path of this descriptor
-    */
+     * Return the category path of this descriptor
+     *
+     * @return the category path of this descriptor
+     */
     virtual std::vector<std::string> GetCategoryPath() = 0;
 
     virtual std::vector< std::string> GetKeywordReferences() const = 0;

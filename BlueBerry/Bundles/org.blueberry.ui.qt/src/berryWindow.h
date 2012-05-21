@@ -111,7 +111,7 @@ public:
    * An array of images to be used for the window. It is expected that the
    * array will contain the same icon rendered at different resolutions.
    */
-  static std::vector<void*> defaultImages;
+  static QList<void*> defaultImages;
 
   /**
    * This interface defines a Exception Handler which can be set as a global
@@ -273,7 +273,7 @@ private:
    * @since 3.1
    */
   static Shell::Pointer GetModalChild(
-      const std::vector<Shell::Pointer>& toSearch);
+      const QList<Shell::Pointer>& toSearch);
 
   /**
    * Runs the event loop for the given shell.
@@ -604,7 +604,7 @@ public:
    * @see #setDefaultImages
    * @since 3.0
    */
-  static std::vector<void*> GetDefaultImages();
+  static QList<void*> GetDefaultImages();
 
   /**
    * Returns this window's return code. A window's return codes are
@@ -688,7 +688,7 @@ public:
    *            the array of images to be used when this window is opened
    * @since 3.0
    */
-  static void SetDefaultImages(const std::vector<void*>& images);
+  static void SetDefaultImages(const QList<void*>& images);
 
   /**
    * Sets the window manager of this window.

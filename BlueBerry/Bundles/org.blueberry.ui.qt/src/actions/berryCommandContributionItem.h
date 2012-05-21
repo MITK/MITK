@@ -146,7 +146,7 @@ private:
 
   void SetImages(IServiceLocator* locator, const QString &iconStyle);
 
-  SmartPointer<ICommandListener> GetCommandListener();
+  ICommandListener *GetCommandListener();
 
   void UpdateMenuItem();
 

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPoint.h"
 
-#include <sstream>
+#include <QTextStream>
 
 namespace berry
 {
@@ -38,11 +38,12 @@ int Point::HashCode()
   return x ^ y;
 }
 
-std::string Point::ToString()
+QString Point::ToString() const
 {
-  std::stringstream str;
-  str << "Point {" << x << ", " << y << "}";
-  return str.str();
+  QString str;
+  QTextStream ss(&str);
+  ss << "Point {" << x << ", " << y << "}";
+  return str;
 }
 
 }

@@ -95,7 +95,7 @@ public:
   };
 
 private:
-  std::map<I, RefRec> mapIdToRec;
+  QHash<I, RefRec> mapIdToRec;
 
 
 public:
@@ -116,12 +116,12 @@ public:
    */
   int AddRef(I id)
   {
-    typename std::map<I, RefRec>::iterator rec = mapIdToRec.find(id);
+    typename QHash<I, RefRec>::iterator rec = mapIdToRec.find(id);
     if (rec == mapIdToRec.end())
     {
       return 0;
     }
-    return rec->second.AddRef();
+    return rec.value().AddRef();
   }
 
   /**
@@ -132,12 +132,12 @@ public:
    */
   V Get(I id)
   {
-    typename std::map<I, RefRec>::iterator rec = mapIdToRec.find(id);
+    typename QHash<I, RefRec>::iterator rec = mapIdToRec.find(id);
     if (rec == mapIdToRec.end())
     {
       return V();
     }
-    return rec->second.GetValue();
+    return rec.value().GetValue();
   }
 
   /**
@@ -145,10 +145,10 @@ public:
    *
    * @return a Set containing the ID for each.
    */
-  std::vector<I> KeyVector()
+  QList<I> KeyVector()
   {
-    std::vector<I> keys;
-    for (typename std::map<I, RefRec>::iterator iter = mapIdToRec.begin(); iter
+    QList<I> keys;
+    for (typename QHash<I, RefRec>::iterator iter = mapIdToRec.begin(); iter
         != mapIdToRec.end(); ++iter)
     {
       keys.push_back(iter->first);
@@ -197,7 +197,7 @@ public:
     int newCount = rec.RemoveRef();
     if (newCount <= 0)
     {
-      mapIdToRec.erase(id);
+      mapIdToRec.remove(id);
     }
     return newCount;
   }
@@ -207,14 +207,14 @@ public:
    *
    * @return a Collection containing the values.
    */
-  std::vector<V> Values()
+  QList<V> Values()
   {
 
-    std::vector<V> values;
-    for (typename std::map<I, RefRec>::iterator iter = mapIdToRec.begin(); iter
+    QList<V> values;
+    for (typename QHash<I, RefRec>::iterator iter = mapIdToRec.begin(); iter
         != mapIdToRec.end(); ++iter)
     {
-      values.push_back(iter->second.GetValue());
+      values.push_back(iter.value().GetValue());
     }
     return values;
   }

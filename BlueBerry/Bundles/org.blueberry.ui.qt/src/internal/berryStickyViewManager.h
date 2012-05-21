@@ -42,7 +42,7 @@ public:
    * @see org.eclipse.ui.internal.IStickyViewManager#add(java.lang.String,
    *      java.util.Set)
    */
-  void Add(const std::string& perspectiveId, const std::set<std::string>& stickyViewSet);
+  void Add(const QString& perspectiveId, const std::set<QString>& stickyViewSet);
 
   /*
    * (non-Javadoc)
@@ -56,7 +56,7 @@ public:
    *
    * @see org.eclipse.ui.internal.IStickyViewManager#remove(java.lang.String)
    */
-  void Remove(const std::string& perspectiveId);
+  void Remove(const QString& perspectiveId);
 
   /*
    * (non-Javadoc)

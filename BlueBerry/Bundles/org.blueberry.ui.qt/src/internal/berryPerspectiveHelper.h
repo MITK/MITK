@@ -74,11 +74,11 @@ private:
   //private: String maximizedStackId;
 
 private:
-  typedef std::list<DetachedWindow::Pointer> DetachedWindowsType;
+  typedef QList<DetachedWindow::Pointer> DetachedWindowsType;
   DetachedWindowsType detachedWindowList;
 
 private:
-  typedef std::list<DetachedPlaceHolder::Pointer> DetachedPlaceHoldersType;
+  typedef QList<DetachedPlaceHolder::Pointer> DetachedPlaceHoldersType;
   DetachedPlaceHoldersType detachedPlaceHolderList;
 
   /**
@@ -89,7 +89,7 @@ private:
    * bounds to change.
    */
 private:
-  std::map<std::string, Rectangle> boundsMap;
+  QHash<QString, Rectangle> boundsMap;
 
 private:
   bool detachable;
@@ -165,13 +165,13 @@ private:
   struct MatchingPart
   {
 
-    std::string pid;
-    std::string sid;
+    QString pid;
+    QString sid;
     LayoutPart::Pointer part;
     bool hasWildcard;
-    std::string::size_type len;
+    int len;
 
-    MatchingPart(const std::string& pid, const std::string& sid,
+    MatchingPart(const QString& pid, const QString& sid,
         LayoutPart::Pointer part);
 
   };
@@ -237,37 +237,37 @@ public:
    * folder.
    */
 public:
-  bool WillPartBeVisible(const std::string& partId);
+  bool WillPartBeVisible(const QString& partId);
 
 public:
-  bool WillPartBeVisible(const std::string& partId,
-      const std::string& secondaryId);
+  bool WillPartBeVisible(const QString& partId,
+      const QString& secondaryId);
 
   /**
    * Answer a list of the PartPlaceholder objects.
    */
 private:
-  std::vector<PartPlaceholder::Pointer> CollectPlaceholders();
+  QList<PartPlaceholder::Pointer> CollectPlaceholders();
 
   /**
    * Answer a list of the PartPlaceholder objects.
    */
 private:
-  std::vector<PartPlaceholder::Pointer> CollectPlaceholders(
-      const std::list<LayoutPart::Pointer>& parts);
+  QList<PartPlaceholder::Pointer> CollectPlaceholders(
+      const QList<LayoutPart::Pointer>& parts);
 
   /**
    * Answer a list of the view panes.
    */
 public:
-  void CollectViewPanes(std::vector<PartPane::Pointer>& result);
+  void CollectViewPanes(QList<PartPane::Pointer>& result);
 
   /**
    * Answer a list of the view panes.
    */
 private:
-  void CollectViewPanes(std::vector<PartPane::Pointer>& result,
-      const std::list<LayoutPart::Pointer>& parts);
+  void CollectViewPanes(QList<PartPane::Pointer>& result,
+      const QList<LayoutPart::Pointer>& parts);
 
   /**
    * Hide the presentation.
@@ -292,7 +292,7 @@ public:
    * @param buf
    */
 public:
-  void DescribeLayout(std::string& buf) const;
+  void DescribeLayout(QString& buf) const;
 
   /**
    * Deref a given part. Deconstruct its container as required. Do not remove
@@ -351,7 +351,7 @@ private:
    * Wild cards now supported.
    */
 private:
-  LayoutPart::Pointer FindPart(const std::string& id);
+  LayoutPart::Pointer FindPart(const QString& id);
 
   /**
    * Find the first part that matches the specified
@@ -359,16 +359,16 @@ private:
    * are supported.
    */
 public:
-  LayoutPart::Pointer FindPart(const std::string& primaryId,
-      const std::string& secondaryId);
+  LayoutPart::Pointer FindPart(const QString& primaryId,
+      const QString& secondaryId);
 
   /**
    * Find the first part with a given ID in the presentation.
    */
 private:
-  LayoutPart::Pointer FindPart(const std::string& id,
-      const std::list<LayoutPart::Pointer>& parts,
-      std::vector<MatchingPart>& matchingParts);
+  LayoutPart::Pointer FindPart(const QString& id,
+      const QList<LayoutPart::Pointer>& parts,
+      QList<MatchingPart>& matchingParts);
 
   /**
    * Find the first part that matches the specified
@@ -376,24 +376,24 @@ private:
    * are supported.
    */
 private:
-  LayoutPart::Pointer FindPart(const std::string& primaryId,
-      const std::string& secondaryId,
-      const std::list<LayoutPart::Pointer>& parts,
-      std::vector<MatchingPart>& matchingParts);
+  LayoutPart::Pointer FindPart(const QString& primaryId,
+      const QString& secondaryId,
+      const QList<LayoutPart::Pointer>& parts,
+      QList<MatchingPart>& matchingParts);
 
   /**
    * Returns true if a placeholder exists for a given ID.
    */
 public:
-  bool HasPlaceholder(const std::string& id);
+  bool HasPlaceholder(const QString& id);
 
   /**
    * Returns true if a placeholder exists for a given ID.
    * @since 3.0
    */
 public:
-  bool HasPlaceholder(const std::string& primaryId,
-      const std::string& secondaryId);
+  bool HasPlaceholder(const QString& primaryId,
+      const QString& secondaryId);
 
   /**
    * Returns the layout container.
@@ -565,7 +565,7 @@ public:
   void ResetBoundsMap();
 
 public:
-  Rectangle GetCachedBoundsFor(const std::string& id);
+  Rectangle GetCachedBoundsFor(const QString& id);
 };
 
 }

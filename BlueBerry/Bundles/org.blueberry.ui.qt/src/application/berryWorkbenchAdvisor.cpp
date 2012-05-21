@@ -76,7 +76,7 @@ IAdaptable* WorkbenchAdvisor::GetDefaultPageInput()
   return 0;
 }
 
-std::string WorkbenchAdvisor::GetMainPreferencePageId()
+QString WorkbenchAdvisor::GetMainPreferencePageId()
 {
   // default: no opinion
   return "";

@@ -53,7 +53,7 @@ private:
     /**
      * The name of the changed property.
      */
-    std::string propertyName;
+    QString propertyName;
 
     /**
      * The old value of the changed property, or <code>null</code> if
@@ -82,7 +82,7 @@ public:
      * @param oldValue the old value of the property, or <code>null</code> if none
      * @param newValue the new value of the property, or <code>null</code> if none
      */
-    PropertyChangeEvent(Object::Pointer source, const std::string& property, Object::Pointer oldValue,
+    PropertyChangeEvent(Object::Pointer source, const QString& property, Object::Pointer oldValue,
             Object::Pointer newValue);
 
     /**
@@ -112,7 +112,7 @@ public:
      *
      * @return the name of the property that changed
      */
-    std::string GetProperty();
+    QString GetProperty();
 
     /**
      * Returns the object whose property has changed

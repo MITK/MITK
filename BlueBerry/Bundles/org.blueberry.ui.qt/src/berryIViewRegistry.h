@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewCategory.h"
 #include "berryIStickyViewDescriptor.h"
 
-#include <vector>
 
 namespace berry {
 
@@ -54,28 +53,28 @@ struct BERRY_UI_QT IViewRegistry
    * @param id the id to search for
    * @return the descriptor or <code>null</code>
    */
-  virtual IViewDescriptor::Pointer Find(const std::string& id) const = 0;
+  virtual IViewDescriptor::Pointer Find(const QString& id) const = 0;
 
   /**
    * Returns an array of view categories.
    *
    * @return the categories.
    */
-  virtual std::vector<IViewCategory::Pointer> GetCategories() = 0;
+  virtual QList<IViewCategory::Pointer> GetCategories() = 0;
 
   /**
    * Return a list of views defined in the registry.
    *
    * @return the views.
    */
-  virtual const std::vector<IViewDescriptor::Pointer>& GetViews() const = 0;
+  virtual QList<IViewDescriptor::Pointer> GetViews() const = 0;
 
   /**
    * Return a list of sticky views defined in the registry.
    *
    * @return the sticky views.  Never <code>null</code>.
    */
-  virtual std::vector<IStickyViewDescriptor::Pointer> GetStickyViews() const = 0;
+  virtual QList<IStickyViewDescriptor::Pointer> GetStickyViews() const = 0;
 
   virtual ~IViewRegistry();
 };

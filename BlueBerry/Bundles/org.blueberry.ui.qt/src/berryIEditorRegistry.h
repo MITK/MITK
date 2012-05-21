@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIEDITORREGISTRY_H_
 #define MITKIEDITORREGISTRY_H_
 
-#include <string>
-#include <vector>
 
 #include "berryIEditorDescriptor.h"
 #include "berryIFileEditorMapping.h"
@@ -68,7 +66,7 @@ struct BERRY_UI_QT IEditorRegistry {
      *
      * @since 3.0
      */
-    static const std::string SYSTEM_EXTERNAL_EDITOR_ID; // = "org.blueberry.ui.systemExternalEditor"; //$NON-NLS-1$
+    static const QString SYSTEM_EXTERNAL_EDITOR_ID; // = "org.blueberry.ui.systemExternalEditor";
 
     /**
      * The identifier for the system in-place editor descriptor. This descriptor
@@ -80,7 +78,7 @@ struct BERRY_UI_QT IEditorRegistry {
      *
      * @since 3.0
      */
-    static const std::string SYSTEM_INPLACE_EDITOR_ID; // = "org.blueberry.ui.systemInPlaceEditor"; //$NON-NLS-1$
+    static const QString SYSTEM_INPLACE_EDITOR_ID; // = "org.blueberry.ui.systemInPlaceEditor";
 
     /*
      * Adds a listener for changes to properties of this registry.
@@ -106,7 +104,7 @@ struct BERRY_UI_QT IEditorRegistry {
      * @return the editor descriptor with the given id, or <code>null</code> if not
      *   found
      */
-    virtual IEditorDescriptor::Pointer FindEditor(const std::string& editorId) = 0;
+    virtual IEditorDescriptor::Pointer FindEditor(const QString& editorId) = 0;
 
     /**
      * Returns the default editor. The default editor always exist.
@@ -131,7 +129,7 @@ struct BERRY_UI_QT IEditorRegistry {
    * @return the descriptor of the default editor, or <code>null</code> if
    *         not found
    */
-    virtual IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName) = 0;
+    virtual IEditorDescriptor::Pointer GetDefaultEditor(const QString& fileName) = 0;
 
     /*
      * Returns the default editor for a given file name and with the given content type.
@@ -146,7 +144,7 @@ struct BERRY_UI_QT IEditorRegistry {
      *   found
      * @since 3.1
      */
-    //virtual IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName, IContentType contentType) = 0;
+    //virtual IEditorDescriptor::Pointer GetDefaultEditor(const QString& fileName, IContentType contentType) = 0;
 
   /**
    * Returns the list of file editors registered to work against the file with
@@ -161,7 +159,7 @@ struct BERRY_UI_QT IEditorRegistry {
    *            the file name in the system
    * @return a list of editor descriptors
    */
-  virtual std::list<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName) = 0;
+  virtual QList<IEditorDescriptor::Pointer> GetEditors(const QString& fileName) = 0;
 
   /*
    * Returns the list of file editors registered to work against the file with
@@ -179,7 +177,7 @@ struct BERRY_UI_QT IEditorRegistry {
    * @return a list of editor descriptors
    * @since 3.1
    */
-    //virtual std::vector<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName, IContentType contentType) = 0;
+    //virtual QList<IEditorDescriptor::Pointer> GetEditors(const QString& fileName, IContentType contentType) = 0;
 
     /**
      * Returns a list of mappings from file type to editor.  The resulting list
@@ -193,7 +191,7 @@ struct BERRY_UI_QT IEditorRegistry {
      *
      * @return a list of mappings sorted alphabetically by extension
      */
-    virtual std::vector<IFileEditorMapping::Pointer> GetFileEditorMappings() = 0;
+    virtual QList<IFileEditorMapping::Pointer> GetFileEditorMappings() = 0;
 
   /*
    * Returns the image descriptor associated with a given file. This image is
@@ -209,7 +207,7 @@ struct BERRY_UI_QT IEditorRegistry {
    *            the file name in the system
    * @return the descriptor of the image to display next to the file
    */
-   // virtual ImageDescriptor* GetImageDescriptor(const std::string& filename) = 0;
+   // virtual ImageDescriptor* GetImageDescriptor(const QString& filename) = 0;
 
   /*
    * Returns the image descriptor associated with a given file. This image is
@@ -246,7 +244,7 @@ struct BERRY_UI_QT IEditorRegistry {
      * @param fileNameOrExtension the file name or extension pattern (e.g. "*.xml");
      * @param editorId the editor id or <code>null</code> for no default
      */
-    virtual void SetDefaultEditor(const std::string& fileNameOrExtension, const std::string& editorId) = 0;
+    virtual void SetDefaultEditor(const QString& fileNameOrExtension, const QString& editorId) = 0;
 
     /**
      * Returns whether there is an in-place editor that could handle a file
@@ -257,7 +255,7 @@ struct BERRY_UI_QT IEditorRegistry {
      * <code>false</code> otherwise
      * @since 3.0
      */
-    virtual bool IsSystemInPlaceEditorAvailable(const std::string& filename) = 0;
+    virtual bool IsSystemInPlaceEditorAvailable(const QString& filename) = 0;
 
     /**
      * Returns whether the system has an editor that could handle a file
@@ -268,7 +266,7 @@ struct BERRY_UI_QT IEditorRegistry {
      * <code>false</code> otherwise
      * @since 3.0
      */
-    virtual bool IsSystemExternalEditorAvailable(const std::string& filename) = 0;
+    virtual bool IsSystemExternalEditorAvailable(const QString& filename) = 0;
 
     /*
      * Returns the image descriptor associated with the system editor that
@@ -279,7 +277,7 @@ struct BERRY_UI_QT IEditorRegistry {
      * if none
      * @since 3.0
      */
-   // virtual ImageDescriptor GetSystemExternalEditorImageDescriptor(const std::string& filename) = 0;
+   // virtual ImageDescriptor GetSystemExternalEditorImageDescriptor(const QString& filename) = 0;
 };
 
 }

@@ -34,7 +34,7 @@ bool Saveable::Show(IWorkbenchPage::Pointer  /*page*/)
   //return 0;
 }
 
-void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& /*parts*/,
+void Saveable::DisableUI(const QList<IWorkbenchPart::Pointer>& /*parts*/,
     bool  /*closing*/)
 {
   //TODO Saveable DisableUI
@@ -53,7 +53,7 @@ void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& /*parts*/,
   //    }
 }
 
-void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>&  /*parts*/)
+void Saveable::EnableUI(QList<IWorkbenchPart::Pointer>&  /*parts*/)
 {
   //TODO Saveable EnableUI
   //    for (unsigned int i = 0; i < parts.size(); i++) {
@@ -71,7 +71,7 @@ void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>&  /*parts*/)
   //    }
 }
 
-Poco::Any Saveable::GetAdapter(const std::string&  /*adapter*/)
+Poco::Any Saveable::GetAdapter(const QString&  /*adapter*/)
 {
   return Poco::Any();
 }

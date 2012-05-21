@@ -49,7 +49,7 @@ LayoutTree::LayoutTree(LayoutPart::Pointer part)
 }
 
 LayoutPart::Pointer LayoutTree::ComputeRelation(
-    std::list<PartSashContainer::RelationshipInfo>&  /*relations*/)
+    QList<PartSashContainer::RelationshipInfo>&  /*relations*/)
 {
   return part;
 }
@@ -458,16 +458,16 @@ void LayoutTree::SetPart(LayoutPart::Pointer part)
   this->FlushCache();
 }
 
-std::string LayoutTree::ToString()
+QString LayoutTree::ToString() const
 {
-  return "(" + part->ToString() + ")";//$NON-NLS-2$//$NON-NLS-1$
+  return "(" + part->ToString() + ")";
 }
 
 void LayoutTree::CreateControl(void*  /*parent*/)
 {
 }
 
-void LayoutTree::DescribeLayout(std::string& buf) const
+void LayoutTree::DescribeLayout(QString& buf) const
 {
   part->DescribeLayout(buf);
 }

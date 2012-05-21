@@ -17,9 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYTWEAKLETS_H_
 #define BERRYTWEAKLETS_H_
 
-#include <org_blueberry_ui_qt_Export.h>
 
-#include <berryPlatformException.h>
+#include <org_blueberry_ui_qt_Export.h>
 
 #include <QString>
 
@@ -43,8 +42,9 @@ struct BERRY_UI_QT TweakKey_base
 BERRY_UI_QT uint qHash(const berry::TweakKey_base& key);
 
 #include <berryIConfigurationElement.h>
-#include <berryIExtensionPointService.h>
 #include <berryPlatform.h>
+#include <berryIExtensionRegistry.h>
+#include <berryPlatformException.h>
 
 
 namespace berry {
@@ -123,9 +123,9 @@ private:
   template<typename I>
   static QObject* CreateTweaklet(const TweakKey<I>& definition)
   {
-    std::vector<IConfigurationElement::Pointer> elements =
-        Platform::GetExtensionPointService()
-        ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets"); //$NON-NLS-1$
+    QList<IConfigurationElement::Pointer> elements =
+        Platform::GetExtensionRegistry()
+        ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets");
     for (unsigned int i = 0; i < elements.size(); i++)
     {
       QString attr = elements[i]->GetAttribute("definition");

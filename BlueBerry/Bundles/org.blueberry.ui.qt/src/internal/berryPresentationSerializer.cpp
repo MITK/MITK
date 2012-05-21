@@ -16,46 +16,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPresentationSerializer.h"
 
-#include <Poco/NumberParser.h>
-#include <algorithm>
-#include <sstream>
-
 namespace berry
 {
 
 PresentationSerializer::PresentationSerializer(
-    const std::vector<IPresentablePart::Pointer>& presentableParts) :
+    const QList<IPresentablePart::Pointer>& presentableParts) :
   parts(presentableParts)
 {
 
 }
 
-std::string PresentationSerializer::GetId(IPresentablePart::Pointer part)
+QString PresentationSerializer::GetId(IPresentablePart::Pointer part)
 {
-  std::size_t index = std::find(parts.begin(), parts.end(), part) - parts.begin();
+  int index = parts.indexOf(part);
 
-  std::stringstream ssId;
-  ssId << index;
-  return ssId.str();
+  return QString::number(index);
 }
 
-IPresentablePart::Pointer PresentationSerializer::GetPart(const std::string& id)
+IPresentablePart::Pointer PresentationSerializer::GetPart(const QString& id)
 {
-  try
-  {
-    unsigned int index = Poco::NumberParser::parseUnsigned(id);
+  bool okay = false;
+  unsigned int index = id.toUInt(&okay);
+  if (!okay) return IPresentablePart::Pointer(0);
 
-    IPresentablePart::Pointer result;
-    if (index < parts.size())
-      result = parts[index];
+  IPresentablePart::Pointer result;
+  if (index < parts.size())
+    result = parts[index];
 
-    return result;
-
-  } catch (Poco::SyntaxException& /*e*/)
-  {
-  }
-
-  return IPresentablePart::Pointer(0);
+  return result;
 }
 
 }

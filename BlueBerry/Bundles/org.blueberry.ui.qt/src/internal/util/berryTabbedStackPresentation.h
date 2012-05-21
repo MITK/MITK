@@ -216,7 +216,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getTabList(org.blueberry.ui.presentations.IPresentablePart)
      */
-    std::vector<void*> GetTabList(IPresentablePart::Pointer part);
+    QList<void*> GetTabList(IPresentablePart::Pointer part);
 
 //    void SetPartList(ISystemMenu menu) {
 //        this.partList = menu;
@@ -256,7 +256,7 @@ public:
      * @return the presentable parts in order.
      * @since 3.2
      */
-    std::vector<IPresentablePart::Pointer> GetPartList();
+    QList<IPresentablePart::Pointer> GetPartList();
 
 //  /**
 //   * Cause the folder to hide or show its

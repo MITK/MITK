@@ -71,7 +71,7 @@ private:
 
   GuiTk::IControlListener::Events controlEvents;
 
-  std::map<DnDTweaklet::CursorType, QCursor*> cursorMap;
+  QHash<DnDTweaklet::CursorType, QCursor*> cursorMap;
 
 public:
 

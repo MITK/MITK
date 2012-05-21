@@ -57,7 +57,7 @@ public:
    *
    * @see org.blueberry.ui.Saveable#getName()
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /*
    * (non-Javadoc)
@@ -71,7 +71,7 @@ public:
    *
    * @see org.blueberry.ui.Saveable#getToolTipText()
    */
-  std::string GetToolTipText() const;
+  QString GetToolTipText() const;
 
   /*
    * (non-Javadoc)

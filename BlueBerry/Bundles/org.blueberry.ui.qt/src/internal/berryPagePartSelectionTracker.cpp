@@ -74,7 +74,7 @@ public:
 
   void PerspectiveChanged(IWorkbenchPage::Pointer,
       IPerspectiveDescriptor::Pointer,
-      IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
+      IWorkbenchPartReference::Pointer partRef, const QString& changeId)
   {
     if (!partRef)
       return;
@@ -128,7 +128,7 @@ void PagePartSelectionTracker::PostSelectionListener::SelectionChanged(
 }
 
 PagePartSelectionTracker::PagePartSelectionTracker(
-    IWorkbenchPage* page, const std::string& partId) :
+    IWorkbenchPage* page, const QString& partId) :
   AbstractPartSelectionTracker(partId)
 {
   postSelectionListener = new PostSelectionListener(this);
@@ -140,13 +140,13 @@ PagePartSelectionTracker::PagePartSelectionTracker(
   page->AddPartListener(partListener);
   page->GetWorkbenchWindow()->AddPerspectiveListener(
       perspListener);
-  std::string secondaryId;
-  std::string primaryId = partId;
-  std::string::size_type indexOfColon;
-  if ((indexOfColon = partId.find_first_of(':')) != std::string::npos)
+  QString secondaryId;
+  QString primaryId = partId;
+  int indexOfColon;
+  if ((indexOfColon = partId.indexOf(':')) != -1)
   {
-    secondaryId = partId.substr(indexOfColon + 1);
-    primaryId = partId.substr(0, indexOfColon);
+    secondaryId = partId.mid(indexOfColon + 1);
+    primaryId = partId.left(indexOfColon);
   }
   IViewReference::Pointer part =
       page->FindViewReference(primaryId, secondaryId);
@@ -200,12 +200,12 @@ ISelectionProvider::Pointer PagePartSelectionTracker::GetSelectionProvider()
   return ISelectionProvider::Pointer(0);
 }
 
-std::string PagePartSelectionTracker::GetPartId(IWorkbenchPart::Pointer part)
+QString PagePartSelectionTracker::GetPartId(IWorkbenchPart::Pointer part)
 {
-  std::string id = part->GetSite()->GetId();
+  QString id = part->GetSite()->GetId();
   if (part.Cast<IViewPart> ().IsNotNull())
   {
-    std::string secondaryId =
+    QString secondaryId =
         part.Cast<IViewPart> ()->GetViewSite() ->GetSecondaryId();
     if (secondaryId != "")
     {

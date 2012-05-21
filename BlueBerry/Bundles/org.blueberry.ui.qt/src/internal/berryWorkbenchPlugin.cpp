@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIQtStyleManager.h"
 #include "berryImageDescriptor.h"
 
-#include <Poco/String.h>
 #include <QDebug>
 
 namespace berry
@@ -80,7 +79,7 @@ bool WorkbenchPlugin::HasExecutableExtension(
   QList<IConfigurationElement::Pointer> children(element->GetChildren(extensionName));
   if (children.size() == 1)
   {
-    if (!(children[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS).IsNull()))
+    if (!(children[0]->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS).isNull()))
       return true;
   }
   return false;
@@ -93,7 +92,7 @@ bool WorkbenchPlugin::IsBundleLoadedForExecutableExtension(
 
   if (plugin.isNull())
     return true;
-  return plugin->GetState() == ctkPlugin::ACTIVE;
+  return plugin->getState() == ctkPlugin::ACTIVE;
 }
 
 QSharedPointer<ctkPlugin> WorkbenchPlugin::GetBundleForExecutableExtension(
@@ -237,7 +236,7 @@ IEditorRegistry* WorkbenchPlugin::GetEditorRegistry()
 IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
   if (presentationFactory != 0) return presentationFactory;
 
-  std::string targetID = Workbench::GetInstance()->GetPresentationId();
+  QString targetID = Workbench::GetInstance()->GetPresentationId();
   presentationFactory = this->CreateExtension<IPresentationFactory>(
           WorkbenchRegistryConstants::PL_PRESENTATION_FACTORIES,
           "factory", targetID);
@@ -250,25 +249,25 @@ IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
 
 void WorkbenchPlugin::Log(const QString& message)
 {
-  BERRY_INFO << "LOG: " << message.toStdString() << std::endl;
+  BERRY_INFO << "LOG: " << message << std::endl;
   //inst->GetLog().log(message);
 }
 
-void WorkbenchPlugin::Log(const Poco::RuntimeException& exc)
+void WorkbenchPlugin::Log(const ctkRuntimeException &exc)
 {
-  BERRY_INFO << "LOG: " << exc.message() << std::endl;
+  BERRY_INFO << "LOG: " << exc.what() << std::endl;
   //inst->GetLog().log(exc);
 }
 
 
-void WorkbenchPlugin::Log(const QString& message, const Poco::RuntimeException& t)
+void WorkbenchPlugin::Log(const QString& message, const ctkRuntimeException &t)
 {
-  PlatformException exc(message.toStdString(), t);
+  PlatformException exc(message, t);
   WorkbenchPlugin::Log(exc);
 }
 
 void WorkbenchPlugin::Log(const QString& clazz,
-    const QString& methodName, const Poco::RuntimeException& t)
+                          const QString& methodName, const ctkRuntimeException& t)
 {
   QString msg = QString("Exception in ") + clazz + "." + methodName + ": "
       + t.what();
@@ -324,9 +323,9 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
 
 }
 
-//const std::vector<IBundle::Pointer> WorkbenchPlugin::GetBundles()
+//const QList<IBundle::Pointer> WorkbenchPlugin::GetBundles()
 //{
-//  return bundleContext.IsNull() ? std::vector<IBundle::Pointer>() : bundleContext->GetBundles();
+//  return bundleContext.IsNull() ? QList<IBundle::Pointer>() : bundleContext->GetBundles();
 //}
 
 ctkPluginContext* WorkbenchPlugin::GetPluginContext()
@@ -345,11 +344,11 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
   perspRegistry = 0;
 }
 
-bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
+QString WorkbenchPlugin::GetDataLocation() const
 {
   QFileInfo fileInfo = bundleContext->getDataFile("");
-  path.assign(fileInfo.absolutePath().toStdString() + '/');
-  return fileInfo.isWritable();
+  if (!fileInfo.isWritable()) return QString();
+  return fileInfo.absoluteFilePath();
 }
 
 }

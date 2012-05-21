@@ -50,7 +50,7 @@ private:
 };
 
 AbstractPartSelectionTracker::AbstractPartSelectionTracker(
-    const std::string& partId)
+    const QString& partId)
 {
   this->SetPartId(partId);
 }
@@ -71,13 +71,13 @@ void AbstractPartSelectionTracker::AddPostSelectionListener(
 void AbstractPartSelectionTracker::RemoveSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  fListeners.remove(listener);
+  fListeners.removeAll(listener);
 }
 
 void AbstractPartSelectionTracker::RemovePostSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  fPostListeners.remove(listener);
+  fPostListeners.removeAll(listener);
 }
 
 AbstractPartSelectionTracker::~AbstractPartSelectionTracker()
@@ -89,7 +89,7 @@ void AbstractPartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (std::list<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+  for (QList<ISelectionListener::Pointer>::iterator i = fListeners.begin();
       i != fListeners.end(); ++i)
   {
     ISelectionListener::Pointer l = *i;
@@ -105,7 +105,7 @@ void AbstractPartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer par
     ISelection::ConstPointer sel)
 {
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (std::list<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+  for (QList<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
       i != fPostListeners.end(); ++i)
   {
     ISelectionListener::Pointer l = *i;
@@ -117,12 +117,12 @@ void AbstractPartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer par
   }
 }
 
-std::string AbstractPartSelectionTracker::GetPartId()
+QString AbstractPartSelectionTracker::GetPartId()
 {
   return fPartId;
 }
 
-void AbstractPartSelectionTracker::SetPartId(const std::string& partId)
+void AbstractPartSelectionTracker::SetPartId(const QString& partId)
 {
   fPartId = partId;
 }

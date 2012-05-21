@@ -163,8 +163,8 @@ CommandContributionItem::CommandContributionItem(
     }
     catch (const NotDefinedException& e)
     {
-      WorkbenchPlugin::Log(std::string("Unable to register menu item \"") + this->GetId().toStdString()
-                           + "\", command \"" + contributionParameters->commandId.toStdString()
+      WorkbenchPlugin::Log(QString("Unable to register menu item \"") + this->GetId()
+                           + "\", command \"" + contributionParameters->commandId
                            + "\" not defined");
     }
   }
@@ -276,16 +276,15 @@ void CommandContributionItem::UpdateMenuItem()
     {
       try
       {
-        text = QString::fromStdString(command->GetCommand()->GetName());
+        text = command->GetCommand()->GetName();
       }
       catch (const NotDefinedException& e)
       {
 //        StatusManager.getManager().handle(
 //              StatusUtil.newStatus(IStatus.ERROR,
-//                                   "Update item failed " //$NON-NLS-1$
+//                                   "Update item failed "
 //                                   + getId(), e));
-        BERRY_ERROR << "Update item failed " << qPrintable(GetId())
-                    << e.displayText();
+        BERRY_ERROR << "Update item failed " << GetId() << e.what();
       }
     }
   }
@@ -336,8 +335,8 @@ void CommandContributionItem::UpdateToolItem()
     {
       try
       {
-        text = QString::fromStdString(command->GetCommand()->GetName());
-        tooltip = QString::fromStdString(command->GetCommand()->GetDescription());
+        text = command->GetCommand()->GetName();
+        tooltip = command->GetCommand()->GetDescription();
         if (tooltip.trimmed().isEmpty())
         {
           tooltip = text;
@@ -347,10 +346,9 @@ void CommandContributionItem::UpdateToolItem()
       {
 //        StatusManager.getManager().handle(
 //              StatusUtil.newStatus(IStatus.ERROR,
-//                                   "Update item failed " //$NON-NLS-1$
+//                                   "Update item failed "
 //                                   + getId(), e));
-        BERRY_ERROR << "Update item failed " << qPrintable(GetId())
-                    << e.displayText();
+        BERRY_ERROR << "Update item failed " << GetId() << e.what();
       }
     }
   }
@@ -385,7 +383,7 @@ CommandContributionItem::~CommandContributionItem()
   }
   if (commandListener)
   {
-    command->GetCommand()->RemoveCommandListener(commandListener);
+    command->GetCommand()->RemoveCommandListener(commandListener.GetPointer());
   }
 }
 
@@ -415,11 +413,11 @@ void CommandContributionItem::SetImages(IServiceLocator* locator,
   {
     ICommandImageService::Pointer service(
           locator->GetService(ICommandImageService::GetManifestName()).Cast<ICommandImageService> ());
-    icon = service->GetImage(QString::fromStdString(command->GetId()), iconStyle);
+    icon = service->GetImage(command->GetId(), iconStyle);
   }
 }
 
-SmartPointer<ICommandListener> CommandContributionItem::GetCommandListener()
+ICommandListener* CommandContributionItem::GetCommandListener()
 {
   if (!commandListener)
   {
@@ -448,7 +446,7 @@ SmartPointer<ICommandListener> CommandContributionItem::GetCommandListener()
 
     commandListener = ICommandListener::Pointer(new MyCommandListener(this));
   }
-  return commandListener;
+  return commandListener.GetPointer();
 }
 
 void CommandContributionItem::UpdateCommandProperties(const SmartPointer<
@@ -543,14 +541,7 @@ void CommandContributionItem::CreateCommand(const QString &commandId,
     return;
   }
 
-  // Convert the QHash to std::map until the complete API is Qt based
-  QHashIterator<QString,Object::Pointer> i(parameters);
-  std::map<std::string,Object::Pointer> params;
-  while (i.hasNext())
-  {
-    params.insert(std::make_pair(i.key().toStdString(), i.value()));
-  }
-  command = ParameterizedCommand::GenerateCommand(cmd, params);
+  command = ParameterizedCommand::GenerateCommand(cmd, parameters);
 }
 
 QString CommandContributionItem::GetToolTipText(const QString& text) const

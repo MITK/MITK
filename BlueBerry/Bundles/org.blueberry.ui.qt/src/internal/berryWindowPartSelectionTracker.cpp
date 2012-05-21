@@ -29,7 +29,7 @@ void WindowPartSelectionTracker::SetWindow(
 }
 
 WindowPartSelectionTracker::WindowPartSelectionTracker(IWorkbenchWindow* window,
-    const std::string& partId) :
+    const QString& partId) :
   AbstractPartSelectionTracker(partId), selListener(
       new NullSelectionChangedAdapter<WindowPartSelectionTracker> (this,
           &WindowPartSelectionTracker::FireSelection)), postSelListener(

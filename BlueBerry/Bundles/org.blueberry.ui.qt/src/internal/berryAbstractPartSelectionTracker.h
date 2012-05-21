@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryISelectionListener.h"
 #include "berryIWorkbenchPart.h"
 
-#include <list>
 
 namespace berry {
 
@@ -33,24 +32,24 @@ class AbstractPartSelectionTracker : public virtual Object
 {
 
 public:
-  berryObjectMacro(AbstractPartSelectionTracker);
+  berryObjectMacro(AbstractPartSelectionTracker)
 
 private:
 
   /**
    * List of selection listeners for this tracker
    */
-  std::list<ISelectionListener::Pointer> fListeners;
+  QList<ISelectionListener::Pointer> fListeners;
 
   /**
    * List of post selection listeners for this tracker
    */
-  std::list<ISelectionListener::Pointer> fPostListeners;
+  QList<ISelectionListener::Pointer> fPostListeners;
 
   /**
    * The id of the part this tracker tracks
    */
-  std::string fPartId;
+  QString fPartId;
 
 public:
 
@@ -59,7 +58,7 @@ public:
    *
    * @param id part identifier
    */
-  AbstractPartSelectionTracker(const std::string& partId);
+  AbstractPartSelectionTracker(const QString& partId);
 
   /**
    * Adds a selection listener to this tracker
@@ -125,7 +124,7 @@ protected:
    *
    * @return part identifier
    */
-  std::string GetPartId();
+  QString GetPartId();
 
 
 private:
@@ -135,7 +134,7 @@ private:
    *
    * @param id view identifier
    */
-  void SetPartId(const std::string& partId);
+  void SetPartId(const QString& partId);
 
 };
 

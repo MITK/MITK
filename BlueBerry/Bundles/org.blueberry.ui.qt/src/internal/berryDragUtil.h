@@ -42,7 +42,7 @@ public:
 
 private:
 
-  static const std::string DROP_TARGET_ID; //$NON-NLS-1$
+  static const QString DROP_TARGET_ID; //$NON-NLS-1$
 
     /**
      * The location where all drags will end. If this is non-null, then
@@ -54,7 +54,7 @@ private:
     /**
      * List of IDragOverListener
      */
-    static std::list<IDragOverListener::Pointer> defaultTargets;
+    static QList<IDragOverListener::Pointer> defaultTargets;
 
     /**
      * Return the list of 'IDragOverListener' elements associated with
@@ -77,7 +77,7 @@ private:
      * @param dragRectangle
      * @return
      */
-    static IDropTarget::Pointer GetDropTarget(const std::list<IDragOverListener::Pointer>& toSearch,
+    static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener::Pointer>& toSearch,
             void* mostSpecificControl, Object::Pointer draggedObject, const Point &position,
             const Rectangle& dragRectangle);
 

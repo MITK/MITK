@@ -34,7 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-const std::string Perspective::VERSION_STRING = "0.016";
+
+const QString Perspective::VERSION_STRING = "0.016";
 
 Perspective::Perspective(PerspectiveDescriptor::Pointer desc,
     WorkbenchPage::Pointer page)
@@ -82,9 +83,7 @@ bool Perspective::ContainsView(IViewPart::Pointer view)
 
 bool Perspective::ContainsView(const std::string& viewId)
 {
-    if (mapIDtoViewLayoutRec.find(viewId)!=mapIDtoViewLayoutRec.end())
-        return true;
-    return false;
+  return mapIDtoViewLayoutRec.contains(viewId);
 }
 
 void Perspective::CreatePresentation(PerspectiveDescriptor::Pointer persp)
@@ -111,8 +110,8 @@ Perspective::~Perspective()
   presentation->Deactivate();
 
   // Release each view.
-  std::vector<IViewReference::Pointer> refs(this->GetViewReferences());
-  for (std::vector<IViewReference::Pointer>::size_type i = 0, length = refs.size(); i < length; i++)
+  QList<IViewReference::Pointer> refs(this->GetViewReferences());
+  for (QList<IViewReference::Pointer>::size_type i = 0, length = refs.size(); i < length; i++)
   {
     this->GetViewFactory()->ReleaseView(refs[i]);
   }
@@ -124,22 +123,22 @@ void Perspective::DisposeViewRefs() {
     if (!memento) {
       return;
     }
-    std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+    QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
     for (std::size_t x = 0; x < views.size(); x++) {
       // Get the view details.
       IMemento::Pointer childMem = views[x];
-      std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+      QString id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
       // skip creation of the intro reference - it's handled elsewhere.
       if (id == IntroConstants::INTRO_VIEW_ID) {
         continue;
       }
 
-      std::string secondaryId = ViewFactory::ExtractSecondaryId(id);
-      if (!secondaryId.empty()) {
+      QString secondaryId = ViewFactory::ExtractSecondaryId(id);
+      if (!secondaryId.isEmpty()) {
         id = ViewFactory::ExtractPrimaryId(id);
       }
 
-      std::string removed;
+      QString removed;
       childMem->GetString(WorkbenchConstants::TAG_REMOVED, removed);
       if (removed != "true") {
         IViewReference::Pointer ref = viewFactory->GetView(id, secondaryId);
@@ -150,14 +149,14 @@ void Perspective::DisposeViewRefs() {
     }
   }
 
-IViewReference::Pointer Perspective::FindView(const std::string& viewId)
+IViewReference::Pointer Perspective::FindView(const QString& viewId)
 {
   return this->FindView(viewId, "");
 }
 
-IViewReference::Pointer Perspective::FindView(const std::string& id, const std::string& secondaryId)
+IViewReference::Pointer Perspective::FindView(const QString& id, const QString& secondaryId)
 {
-  std::vector<IViewReference::Pointer> refs(this->GetViewReferences());
+  QList<IViewReference::Pointer> refs(this->GetViewReferences());
   for (unsigned int i = 0; i < refs.size(); i++)
   {
     IViewReference::Pointer ref = refs[i];
@@ -185,7 +184,7 @@ PartPane::Pointer Perspective::GetPane(IViewReference::Pointer ref)
   return ref.Cast<WorkbenchPartReference>()->GetPane();
 }
 
-std::vector<std::string> Perspective::GetPerspectiveShortcuts()
+QList<QString> Perspective::GetPerspectiveShortcuts()
 {
   return perspectiveShortcuts;
 }
@@ -195,7 +194,7 @@ PerspectiveHelper* Perspective::GetPresentation() const
   return presentation;
 }
 
-std::vector<std::string> Perspective::GetShowViewShortcuts()
+QList<QString> Perspective::GetShowViewShortcuts()
 {
   return showViewShortcuts;
 }
@@ -205,18 +204,18 @@ ViewFactory* Perspective::GetViewFactory()
   return viewFactory;
 }
 
-std::vector<IViewReference::Pointer> Perspective::GetViewReferences()
+QList<IViewReference::Pointer> Perspective::GetViewReferences()
 {
   // Get normal views.
   if (presentation == 0)
   {
-    return std::vector<IViewReference::Pointer>();
+    return QList<IViewReference::Pointer>();
   }
 
-  std::vector<PartPane::Pointer> panes;
+  QList<PartPane::Pointer> panes;
   presentation->CollectViewPanes(panes);
 
-  std::vector<IViewReference::Pointer> result;
+  QList<IViewReference::Pointer> result;
 //  List fastViews = (fastViewManager != 0) ?
 //  fastViewManager.getFastViews(0)
 //  : new ArrayList();
@@ -232,7 +231,7 @@ std::vector<IViewReference::Pointer> Perspective::GetViewReferences()
 //  }
 
   // Copy normal views.
-  for (std::vector<PartPane::Pointer>::iterator iter = panes.begin();
+  for (QList<PartPane::Pointer>::iterator iter = panes.begin();
        iter != panes.end(); ++iter)
   {
     PartPane::Pointer pane = *iter;
@@ -312,7 +311,7 @@ ViewLayoutRec::Pointer Perspective::GetViewLayoutRec(IViewReference::Pointer ref
   return result;
 }
 
-ViewLayoutRec::Pointer Perspective::GetViewLayoutRec(const std::string& viewId, bool create)
+ViewLayoutRec::Pointer Perspective::GetViewLayoutRec(const QString& viewId, bool create)
 {
   ViewLayoutRec::Pointer rec = mapIDtoViewLayoutRec[viewId];
   if (rec.IsNull() && create)
@@ -374,14 +373,14 @@ void Perspective::LoadCustomPersp(PerspectiveDescriptor::Pointer persp)
   //{
   //  unableToOpenPerspective(persp, 0);
   //}
-  catch (WorkbenchException& e)
+  catch (const WorkbenchException& e)
   {
-    this->UnableToOpenPerspective(persp, e.displayText());
+    this->UnableToOpenPerspective(persp, e.what());
   }
 }
 
 void Perspective::UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
-    const std::string& status)
+    const QString& status)
 {
   PerspectiveRegistry* perspRegistry = dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin
   ::GetDefault()->GetPerspectiveRegistry());
@@ -390,8 +389,8 @@ void Perspective::UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
   // the perspective (we wouldn't want to).  But make sure to delete the
   // customized portion.
   persp->DeleteCustomDefinition();
-  std::string title = "Restoring problems";
-  std::string msg = "Unable to read workbench state.";
+  QString title = "Restoring problems";
+  QString msg = "Unable to read workbench state.";
   if (status == "")
   {
     MessageDialog::OpenError(Shell::Pointer(0), title, msg);
@@ -434,12 +433,12 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 //  // add the placeholders for the sticky folders and their contents
   IPlaceholderFolderLayout::Pointer stickyFolderRight, stickyFolderLeft, stickyFolderTop, stickyFolderBottom;
 
-  std::vector<IStickyViewDescriptor::Pointer> descs(WorkbenchPlugin::GetDefault()
+  QList<IStickyViewDescriptor::Pointer> descs(WorkbenchPlugin::GetDefault()
   ->GetViewRegistry()->GetStickyViews());
   for (std::size_t i = 0; i < descs.size(); i++)
   {
     IStickyViewDescriptor::Pointer stickyViewDescriptor = descs[i];
-    std::string id = stickyViewDescriptor->GetId();
+    QString id = stickyViewDescriptor->GetId();
     int location = stickyViewDescriptor->GetLocation();
     if (location == IPageLayout::RIGHT)
     {
@@ -497,8 +496,8 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   extender.ExtendLayout(descriptor->GetId(), layout);
 
   // Retrieve view layout info stored in the page layout.
-  std::map<std::string, ViewLayoutRec::Pointer> layoutInfo = layout->GetIDtoViewLayoutRecMap();
-  mapIDtoViewLayoutRec.insert(layoutInfo.begin(), layoutInfo.end());
+  QHash<QString, ViewLayoutRec::Pointer> layoutInfo = layout->GetIDtoViewLayoutRecMap();
+  mapIDtoViewLayoutRec.unite(layoutInfo);
 
   //TODO Perspective action sets
   // Create action sets.
@@ -560,6 +559,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   {
     this->HideEditorArea();
   }
+
 }
 
 void Perspective::OnActivate()
@@ -735,13 +735,14 @@ void Perspective::PartActivated(IWorkbenchPart::Pointer  /*activePart*/)
 //  }
 }
 
-void Perspective::PerformedShowIn(const std::string&  /*partId*/)
+void Perspective::PerformedShowIn(const QString&  /*partId*/)
 {
   //showInTimes.insert(std::make_pair(partId, new Long(System.currentTimeMillis())));
 }
 
 bool Perspective::RestoreState(IMemento::Pointer memento)
 {
+
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
@@ -757,12 +758,14 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
   if (desc)
   {
     descriptor = desc;
-  } else
+  }
+  else
   {
     try
     {
       WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->CreatePerspective(descriptor->GetLabel(), descriptor.Cast<berry::IPerspectiveDescriptor>());
-    } catch (...)
+    }
+    catch (...)
     {
       std::cout << "Perspective could not be loaded" << std::endl;
     }
@@ -770,7 +773,7 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
 
   this->memento = memento;
   // Add the visible views.
-  std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+  QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
   //result.merge(createReferences(views));
   result &= this->CreateReferences(views);
 
@@ -784,7 +787,7 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
   return result;
 }
 
-bool Perspective::CreateReferences(const std::vector<IMemento::Pointer>& views)
+bool Perspective::CreateReferences(const QList<IMemento::Pointer>& views)
 {
 //  MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsRestoringViews, 0);
@@ -794,22 +797,22 @@ bool Perspective::CreateReferences(const std::vector<IMemento::Pointer>& views)
   {
     // Get the view details.
     IMemento::Pointer childMem = views[x];
-    std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    QString id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
     // skip creation of the intro reference -  it's handled elsewhere.
     if (id == IntroConstants::INTRO_VIEW_ID)
     {
       continue;
     }
 
-    std::string secondaryId(ViewFactory::ExtractSecondaryId(id));
-    if (!secondaryId.empty())
+    QString secondaryId(ViewFactory::ExtractSecondaryId(id));
+    if (!secondaryId.isEmpty())
     {
       id = ViewFactory::ExtractPrimaryId(id);
     }
     // Create and open the view.
     try
     {
-      std::string rm; childMem->GetString(WorkbenchConstants::TAG_REMOVED, rm);
+      QString rm; childMem->GetString(WorkbenchConstants::TAG_REMOVED, rm);
       if (rm != "true")
       {
         viewFactory->CreateView(id, secondaryId);
@@ -821,7 +824,7 @@ bool Perspective::CreateReferences(const std::vector<IMemento::Pointer>& views)
 //      result.add(StatusUtil.newStatus(IStatus.ERR,
 //              e.getMessage() == 0 ? "" : e.getMessage(), //$NON-NLS-1$
 //              e));
-      WorkbenchPlugin::Log(e.displayText(), e);
+      WorkbenchPlugin::Log(e.what(), e);
       result &= true;
     }
   }
@@ -855,6 +858,7 @@ bool Perspective::RestoreState()
     boundsMem->GetInteger(WorkbenchConstants::TAG_WIDTH, r.width);
     //StartupThreading.runWithoutExceptions(new StartupRunnable()
     //    {
+
     //      void runWithException() throws Throwable
     //      {
             if (page->GetWorkbenchWindow()->GetActivePage() == 0)
@@ -863,12 +867,14 @@ bool Perspective::RestoreState()
             }
     //      }
     //    });
+
   }
 
   // Create an empty presentation..
   PerspectiveHelper* pres;
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
+
   //      void runWithException() throws Throwable
   //      {
           ViewSashContainer::Pointer mainLayout(new ViewSashContainer(page, this->GetClientComposite()));
@@ -883,6 +889,7 @@ bool Perspective::RestoreState()
 
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
+
   //      void runWithException() throws Throwable
   //      {
           // Add the editor workbook. Do not hide it now.
@@ -890,15 +897,15 @@ bool Perspective::RestoreState()
   //      }});
 
   // Add the visible views.
-  std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+  QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
 
   for (std::size_t x = 0; x < views.size(); x++)
   {
     // Get the view details.
     IMemento::Pointer childMem = views[x];
-    std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
-    std::string secondaryId(ViewFactory::ExtractSecondaryId(id));
-    if (!secondaryId.empty())
+    QString id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    QString secondaryId(ViewFactory::ExtractSecondaryId(id));
+    if (!secondaryId.isEmpty())
     {
       id = ViewFactory::ExtractPrimaryId(id);
     }
@@ -916,7 +923,7 @@ bool Perspective::RestoreState()
     // report error
     if (ref == 0)
     {
-      std::string key = ViewFactory::GetKey(id, secondaryId);
+      QString key = ViewFactory::GetKey(id, secondaryId);
 //      result.add(new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0,
 //              NLS.bind(WorkbenchMessages.Perspective_couldNotFind, key ), 0));
       WorkbenchPlugin::Log("Could not find view: " + key);
@@ -943,30 +950,30 @@ bool Perspective::RestoreState()
 //  fastViewManager.restoreState(memento, result);
 
   // Load the view layout recs
-  std::vector<IMemento::Pointer> recMementos(memento
+  QList<IMemento::Pointer> recMementos(memento
   ->GetChildren(WorkbenchConstants::TAG_VIEW_LAYOUT_REC));
   for (std::size_t i = 0; i < recMementos.size(); i++)
   {
     IMemento::Pointer recMemento = recMementos[i];
-    std::string compoundId;
+    QString compoundId;
     if (recMemento->GetString(WorkbenchConstants::TAG_ID, compoundId))
     {
       ViewLayoutRec::Pointer rec = GetViewLayoutRec(compoundId, true);
-      std::string closeablestr; recMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
+      QString closeablestr; recMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
       if (WorkbenchConstants::FALSE_VAL == closeablestr)
       {
         rec->isCloseable = false;
       }
-      std::string moveablestr; recMemento->GetString(WorkbenchConstants::TAG_MOVEABLE, moveablestr);
+      QString moveablestr; recMemento->GetString(WorkbenchConstants::TAG_MOVEABLE, moveablestr);
       if (WorkbenchConstants::FALSE_VAL == moveablestr)
       {
         rec->isMoveable = false;
       }
-      std::string standalonestr; recMemento->GetString(WorkbenchConstants::TAG_STANDALONE, standalonestr);
+      QString standalonestr; recMemento->GetString(WorkbenchConstants::TAG_STANDALONE, standalonestr);
       if (WorkbenchConstants::TRUE_VAL == standalonestr)
       {
         rec->isStandalone = true;
-        std::string showstr; recMemento->GetString(WorkbenchConstants::TAG_SHOW_TITLE, showstr);
+        QString showstr; recMemento->GetString(WorkbenchConstants::TAG_SHOW_TITLE, showstr);
         rec->showTitle = WorkbenchConstants::FALSE_VAL != showstr;
       }
     }
@@ -984,7 +991,7 @@ bool Perspective::RestoreState()
 //    HashSet knownActionSetIds = new HashSet();
 //
 //    // Load the always on action sets.
-    std::vector<IMemento::Pointer> actions; // = memento
+    QList<IMemento::Pointer> actions; // = memento
 //    .getChildren(IWorkbenchConstants.TAG_ALWAYS_ON_ACTION_SET);
 //    for (int x = 0; x < actions.length; x++)
 //    {
@@ -1034,7 +1041,7 @@ bool Perspective::RestoreState()
     actions = memento->GetChildren(WorkbenchConstants::TAG_SHOW_VIEW_ACTION);
     for (std::size_t x = 0; x < actions.size(); x++)
     {
-      std::string id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
+      QString id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
       showViewShortcuts.push_back(id);
     }
 
@@ -1076,7 +1083,7 @@ bool Perspective::RestoreState()
     actions = memento->GetChildren(WorkbenchConstants::TAG_PERSPECTIVE_ACTION);
     for (std::size_t x = 0; x < actions.size(); x++)
     {
-      std::string id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
+      QString id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
       perspectiveShortcuts.push_back(id);
     }
 
@@ -1171,10 +1178,10 @@ bool Perspective::RestoreState()
   return true;
 }
 
-std::vector<std::string> Perspective::GetShowInIdsFromRegistry()
+QList<QString> Perspective::GetShowInIdsFromRegistry()
 {
   PerspectiveExtensionReader reader;
-  std::vector<std::string> tags;
+  QList<QString> tags;
   tags.push_back(WorkbenchRegistryConstants::TAG_SHOW_IN_PART);
   reader.SetIncludeOnlyTags(tags);
   PageLayout::Pointer layout(new PageLayout());
@@ -1236,6 +1243,7 @@ bool Perspective::SaveState(IMemento::Pointer memento)
 bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
     bool saveInnerViewState)
 {
+
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
@@ -1284,7 +1292,7 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //  }
 
   // Save "show view actions"
-  for (std::vector<std::string>::iterator itr = showViewShortcuts.begin();
+  for (QList<QString>::iterator itr = showViewShortcuts.begin();
       itr != showViewShortcuts.end(); ++itr)
   {
     IMemento::Pointer child = memento
@@ -1315,7 +1323,7 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //  }
 
   // Save "perspective actions".
-  for (std::vector<std::string>::iterator itr = perspectiveShortcuts.begin();
+  for (QList<QString>::iterator itr = perspectiveShortcuts.begin();
       itr != perspectiveShortcuts.end(); ++itr)
   {
     IMemento::Pointer child = memento
@@ -1324,11 +1332,11 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
   }
 
   // Get visible views.
-  std::vector<PartPane::Pointer> viewPanes;
+  QList<PartPane::Pointer> viewPanes;
   presentation->CollectViewPanes(viewPanes);
 
   // Save the views.
-  for (std::vector<PartPane::Pointer>::iterator itr = viewPanes.begin();
+  for (QList<PartPane::Pointer>::iterator itr = viewPanes.begin();
       itr != viewPanes.end(); ++itr)
   {
     IWorkbenchPartReference::Pointer ref((*itr)->GetPartReference());
@@ -1347,11 +1355,11 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //  fastViewManager.saveState(memento);
 
   // Save the view layout recs.
-  for (std::map<std::string, ViewLayoutRec::Pointer>::iterator i = mapIDtoViewLayoutRec.begin();
+  for (QHash<QString, ViewLayoutRec::Pointer>::iterator i = mapIDtoViewLayoutRec.begin();
       i != mapIDtoViewLayoutRec.end(); ++i)
   {
-    std::string compoundId(i->first);
-    ViewLayoutRec::Pointer rec(i->second);
+    QString compoundId(i.key());
+    ViewLayoutRec::Pointer rec(i.value());
     if (rec && (!rec->isCloseable || !rec->isMoveable || rec->isStandalone))
     {
       IMemento::Pointer layoutMemento(memento
@@ -1415,17 +1423,17 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
   return result;
 }
 
-void Perspective::SetPerspectiveActionIds(const std::vector<std::string>& list)
+void Perspective::SetPerspectiveActionIds(const QList<QString>& list)
 {
   perspectiveShortcuts = list;
 }
 
-void Perspective::SetShowInPartIds(const std::vector<std::string>& list)
+void Perspective::SetShowInPartIds(const QList<QString>& list)
 {
   showInPartIds = list;
 }
 
-void Perspective::SetShowViewActionIds(const std::vector<std::string>& list)
+void Perspective::SetShowViewActionIds(const QList<QString>& list)
 {
   showViewShortcuts = list;
 }
@@ -1526,7 +1534,7 @@ void Perspective::RefreshEditorAreaVisibility()
   }
 }
 
-IViewReference::Pointer Perspective::GetViewReference(const std::string& viewId, const std::string& secondaryId)
+IViewReference::Pointer Perspective::GetViewReference(const QString& viewId, const QString& secondaryId)
 {
   IViewReference::Pointer ref = page->FindViewReference(viewId, secondaryId);
   if (ref == 0)
@@ -1550,7 +1558,7 @@ IViewReference::Pointer Perspective::GetViewReference(const std::string& viewId,
   return ref;
 }
 
-IViewPart::Pointer Perspective::ShowView(const std::string& viewId, const std::string& secondaryId)
+IViewPart::Pointer Perspective::ShowView(const QString& viewId, const QString& secondaryId)
 {
   ViewFactory* factory = this->GetViewFactory();
   IViewReference::Pointer ref = factory->CreateView(viewId, secondaryId);
@@ -1586,7 +1594,7 @@ IViewPart::Pointer Perspective::ShowView(const std::string& viewId, const std::s
  //     LayoutPart vPart = presentation.findPart(viewId, secondaryId);
 
       // Determine if there is a trim stack that should get the view
-      std::string trimId;
+      QString trimId;
 
 //      // If we can locate the correct trim stack then do so
 //      if (vPart != 0)
@@ -1710,9 +1718,9 @@ bool Perspective::IsMoveable(IViewReference::Pointer reference)
   return true;
 }
 
-void Perspective::DescribeLayout(std::string& buf) const
+void Perspective::DescribeLayout(QString& buf) const
 {
-//  std::vector<IViewReference::Pointer> fastViews = getFastViews();
+//  QList<IViewReference::Pointer> fastViews = getFastViews();
 //
 //  if (fastViews.length != 0)
 //  {
@@ -1768,4 +1776,5 @@ bool Perspective::UseNewMinMax(Perspective::Pointer activePerspective)
   //bool useNewMinMax = preferenceStore.getbool(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
   return true;
 }
+
 }

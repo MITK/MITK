@@ -165,12 +165,12 @@ bool QtWidgetsTweaklet::SetParent(void* widget, void* parent)
                         static_cast<QWidget*>(parent));
 }
 
-void QtWidgetsTweaklet::SetData(void* widget, const std::string& id, Object::Pointer data)
+void QtWidgetsTweaklet::SetData(void* widget, const QString& id, Object::Pointer data)
 {
   impl.SetData(static_cast<QWidget*>(widget), id, data);
 }
 
-Object::Pointer QtWidgetsTweaklet::GetData(void* widget, const std::string& id)
+Object::Pointer QtWidgetsTweaklet::GetData(void* widget, const QString& id)
 {
   return impl.GetData(static_cast<QWidget*>(widget), id);
 }
@@ -185,7 +185,7 @@ void* QtWidgetsTweaklet::GetCursorControl()
   return impl.GetCursorControl();
 }
 
-void* QtWidgetsTweaklet::FindControl(const std::vector<Shell::Pointer>& shells, const Point& location)
+void* QtWidgetsTweaklet::FindControl(const QList<Shell::Pointer>& shells, const Point& location)
 {
   return impl.FindControl(shells, location);
 }
@@ -238,7 +238,7 @@ void QtWidgetsTweaklet::DisposeShell(Shell::Pointer shell)
   impl.DisposeShell(shell);
 }
 
-std::vector<Shell::Pointer> QtWidgetsTweaklet::GetShells()
+QList<Shell::Pointer> QtWidgetsTweaklet::GetShells()
 {
   return impl.GetShells();
 }

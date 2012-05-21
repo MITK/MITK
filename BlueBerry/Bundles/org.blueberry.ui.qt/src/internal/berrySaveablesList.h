@@ -53,12 +53,12 @@ private:
   ISaveablesLifecycleListener::Events events;
 
   // event source (mostly ISaveablesSource) -> Set of Saveable
-  std::map<Object*, Saveable::Set> modelMap;
+  QHash<Object*, Saveable::Set> modelMap;
 
   // reference counting map, Saveable -> Integer
-  std::map<Saveable::Pointer, int> modelRefCounts;
+  QHash<Saveable::Pointer, int> modelRefCounts;
 
-  std::set<ISaveablesSource::Pointer> nonPartSources;
+  QSet<ISaveablesSource::Pointer> nonPartSources;
 
   // returns true if this model has not yet been in getModels()
   bool AddModel(Object::Pointer source, Saveable::Pointer model);
@@ -70,7 +70,7 @@ private:
    * @param key
    * @return true if the ref count of the given key is now 1
    */
-  bool IncrementRefCount(std::map<Saveable::Pointer, int>& referenceMap,
+  bool IncrementRefCount(QHash<Saveable::Pointer, int>& referenceMap,
       Saveable::Pointer key);
 
   /**
@@ -80,13 +80,13 @@ private:
    * @param key
    * @return true if the ref count of the given key was 1
    */
-  bool DecrementRefCount(std::map<Saveable::Pointer, int>& referenceMap,
+  bool DecrementRefCount(QHash<Saveable::Pointer, int>& referenceMap,
       Saveable::Pointer key);
 
   // returns true if this model was removed from getModels();
   bool RemoveModel(Object::Pointer source, Saveable::Pointer model);
 
-  void LogWarning(const std::string& message, Object::Pointer source,
+  void LogWarning(const QString& message, Object::Pointer source,
       Saveable::Pointer model);
 
   /**
@@ -100,14 +100,14 @@ private:
    * @param modelArray
    */
   void RemoveModels(Object::Pointer source,
-      const std::vector<Saveable::Pointer>& modelArray);
+      const QList<Saveable::Pointer>& modelArray);
 
   /**
    * @param source
    * @param modelArray
    */
   void AddModels(Object::Pointer source,
-      const std::vector<Saveable::Pointer>& modelArray);
+      const QList<Saveable::Pointer>& modelArray);
 
   /**
    * @param event
@@ -123,7 +123,7 @@ private:
   bool
       PromptForSavingIfNecessary(IWorkbenchWindow::Pointer window,
           const Saveable::Set& modelsClosing,
-          const std::map<Saveable::Pointer, int>& modelsDecrementing,
+          const QHash<Saveable::Pointer, int>& modelsDecrementing,
           bool canCancel);
 
   /**
@@ -131,7 +131,7 @@ private:
    * @param modelsDecrementing
    */
   void FillModelsClosing(Saveable::Set& modelsClosing,
-      const std::map<Saveable::Pointer, int>& modelsDecrementing);
+      const QHash<Saveable::Pointer, int>& modelsDecrementing);
 
 
   /**
@@ -143,7 +143,7 @@ private:
    *            the workbench part
    * @return the saveable models
    */
-  std::vector<Saveable::Pointer> GetSaveables(IWorkbenchPart::Pointer part);
+  QList<Saveable::Pointer> GetSaveables(IWorkbenchPart::Pointer part);
 
   //TODO SaveablesList ListSelectionDialog
   //  class MyListSelectionDialog extends
@@ -216,9 +216,9 @@ public:
   {
     berryObjectMacro(PostCloseInfo);
 
-    std::list<SmartPointer<WorkbenchPart> > partsClosing;
+    QList<SmartPointer<WorkbenchPart> > partsClosing;
 
-    std::map<Saveable::Pointer, int> modelsDecrementing;
+    QHash<Saveable::Pointer, int> modelsDecrementing;
 
     Saveable::Set modelsClosing;
 
@@ -288,7 +288,7 @@ public:
    * @return the post close info to be passed to postClose
    */
   PostCloseInfo::Pointer PreCloseParts(
-      const std::list<SmartPointer<IWorkbenchPart> >& partsToClose, bool save,
+      const QList<SmartPointer<IWorkbenchPart> >& partsToClose, bool save,
       IWorkbenchWindow::Pointer window);
 
   /**
@@ -303,7 +303,7 @@ public:
    * @param stillOpenElsewhere whether the models are referenced by open parts
    * @return true if the user canceled
    */
-  bool PromptForSaving(const std::list<Saveable::Pointer>& modelsToSave,
+  bool PromptForSaving(const QList<Saveable::Pointer>& modelsToSave,
   /*final IShellProvider shellProvider, IRunnableContext runnableContext,*/
   bool canCancel, bool stillOpenElsewhere);
 
@@ -317,7 +317,7 @@ public:
    *            use a workbench window for this.
    * @return <code>true</code> if the operation was canceled
    */
-  bool SaveModels(const std::list<Saveable::Pointer>& finalModels
+  bool SaveModels(const QList<Saveable::Pointer>& finalModels
   /*final IShellProvider shellProvider, IRunnableContext runnableContext*/);
 
   /**
@@ -341,18 +341,18 @@ public:
    * @param model
    * @return
    */
-  std::vector<Object::Pointer> TestGetSourcesForModel(Saveable::Pointer model);
+  QList<Object::Pointer> TestGetSourcesForModel(Saveable::Pointer model);
 
   /**
    * @return a list of ISaveablesSource objects registered with this saveables
    *         list which are not workbench parts.
    */
-  std::vector<ISaveablesSource::Pointer> GetNonPartSources();
+  QList<ISaveablesSource::Pointer> GetNonPartSources();
 
   /**
    * @param model
    */
-  std::vector<IWorkbenchPart::Pointer> GetPartsForSaveable(
+  QList<IWorkbenchPart::Pointer> GetPartsForSaveable(
       Saveable::Pointer model);
 
 };

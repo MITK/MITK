@@ -18,39 +18,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string IWorkbenchPage::EDITOR_ID_ATTR = "org.blueberry.ui.editorID"; //$NON-NLS-1$
+const QString IWorkbenchPage::EDITOR_ID_ATTR = "org.blueberry.ui.editorID";
 
-  const std::string IWorkbenchPage::CHANGE_RESET = "reset"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_RESET = "reset";
 
-  const std::string IWorkbenchPage::CHANGE_RESET_COMPLETE = "resetComplete"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_RESET_COMPLETE = "resetComplete";
 
-  const std::string IWorkbenchPage::CHANGE_VIEW_SHOW = "viewShow"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_VIEW_SHOW = "viewShow";
 
-  const std::string IWorkbenchPage::CHANGE_VIEW_HIDE = "viewHide"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_VIEW_HIDE = "viewHide";
 
-  const std::string IWorkbenchPage::CHANGE_EDITOR_OPEN = "editorOpen"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_EDITOR_OPEN = "editorOpen";
 
-  const std::string IWorkbenchPage::CHANGE_EDITOR_CLOSE = "editorClose"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_EDITOR_CLOSE = "editorClose";
 
-  const std::string IWorkbenchPage::CHANGE_EDITOR_AREA_SHOW = "editorAreaShow"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_EDITOR_AREA_SHOW = "editorAreaShow";
 
-  const std::string IWorkbenchPage::CHANGE_EDITOR_AREA_HIDE = "editorAreaHide"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_EDITOR_AREA_HIDE = "editorAreaHide";
 
-  const std::string IWorkbenchPage::CHANGE_ACTION_SET_SHOW = "actionSetShow"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_ACTION_SET_SHOW = "actionSetShow";
 
-  const std::string IWorkbenchPage::CHANGE_ACTION_SET_HIDE = "actionSetHide"; //$NON-NLS-1$
+const QString IWorkbenchPage::CHANGE_ACTION_SET_HIDE = "actionSetHide";
 
-  const int IWorkbenchPage::VIEW_ACTIVATE = 1;
+const int IWorkbenchPage::VIEW_ACTIVATE = 1;
 
-  const int IWorkbenchPage::VIEW_VISIBLE = 2;
+const int IWorkbenchPage::VIEW_VISIBLE = 2;
 
-  const int IWorkbenchPage::VIEW_CREATE = 3;
+const int IWorkbenchPage::VIEW_CREATE = 3;
 
-  const int IWorkbenchPage::MATCH_NONE = 0;
+const int IWorkbenchPage::MATCH_NONE = 0;
 
-  const int IWorkbenchPage::MATCH_INPUT = 1;
+const int IWorkbenchPage::MATCH_INPUT = 1;
 
-  const int IWorkbenchPage::MATCH_ID = 2;
+const int IWorkbenchPage::MATCH_ID = 2;
 
 IWorkbenchPage::~IWorkbenchPage()
 {

@@ -113,11 +113,10 @@ int SourcePriorityNameMapping::ComputeSourcePriority(
   }
 
   // Add all of the reference variables.
-  std::set<std::string> sourceNames = info->GetAccessedVariableNames();
-  for (std::set<std::string>::iterator iter = sourceNames.begin();
-       iter != sourceNames.end(); ++iter)
+  QSet<QString> sourceNames = info->GetAccessedVariableNames();
+  foreach (QString name, sourceNames)
   {
-    sourcePriority |= GetMapping(QString::fromStdString(*iter));
+    sourcePriority |= GetMapping(name);
   }
 
   return sourcePriority;

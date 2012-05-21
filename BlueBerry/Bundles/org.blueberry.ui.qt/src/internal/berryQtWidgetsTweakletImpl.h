@@ -80,8 +80,8 @@ class QtWidgetsTweakletImpl
   void* GetParent(QWidget* widget);
   bool SetParent(QWidget* widget, QWidget* parent);
 
-  void SetData(QWidget* widget, const std::string& id, Object::Pointer data);
-  Object::Pointer GetData(QWidget* widget, const std::string& id);
+  void SetData(QWidget* widget, const QString& id, Object::Pointer data);
+  Object::Pointer GetData(QWidget* widget, const QString& id);
 
   Rectangle GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
@@ -91,7 +91,7 @@ class QtWidgetsTweakletImpl
 
   Point GetCursorLocation();
   QWidget* GetCursorControl();
-  QWidget* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location);
+  QWidget* FindControl(const QList<Shell::Pointer>& shells, const Point& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -125,7 +125,7 @@ class QtWidgetsTweakletImpl
 
   QWidget* CreateComposite(QWidget* parent);
 
-  std::vector<Shell::Pointer> GetShells();
+  QList<Shell::Pointer> GetShells();
   Shell::Pointer GetShell(QWidget* widget);
   Shell::Pointer GetActiveShell();
 
@@ -143,10 +143,10 @@ class QtWidgetsTweakletImpl
 
 private:
 
-  typedef std::map<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
+  typedef QHash<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
   SelectionListenerMap selectionListenerMap;
 
-  std::list<Shell::Pointer> shellList;
+  QList<Shell::Pointer> shellList;
 
   friend class QtShell;
 

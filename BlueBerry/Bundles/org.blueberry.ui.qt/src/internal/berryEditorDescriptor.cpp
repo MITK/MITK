@@ -83,7 +83,7 @@ QString EditorDescriptor::GetEditorClassName() const
     return className;
   }
   return RegistryReader::GetClassValue(configurationElement,
-      WorkbenchRegistryConstants::ATT_CLASS).toStdString();
+      WorkbenchRegistryConstants::ATT_CLASS);
 }
 
 IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement() const
@@ -93,8 +93,9 @@ IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement() const
 
 IEditorPart::Pointer EditorDescriptor::CreateEditor()
 {
-  return configurationElement->CreateExecutableExtension<IEditorPart> (
-          WorkbenchRegistryConstants::ATT_CLASS);
+  IEditorPart::Pointer editorPart(configurationElement->CreateExecutableExtension<IEditorPart> (
+          WorkbenchRegistryConstants::ATT_CLASS));
+  return editorPart;
 }
 
 QString EditorDescriptor::GetFileName() const
@@ -105,7 +106,7 @@ QString EditorDescriptor::GetFileName() const
   {
     return fileName;
   }
-  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND).toStdString();
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND);
   //}
   //return program.getName();
 }
@@ -118,7 +119,7 @@ QString EditorDescriptor::GetId() const
   {
     return id;
   }
-  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID).toStdString();
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
   //}
   //return Util.safeString(program.getName());
 }
@@ -132,12 +133,12 @@ SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
     {
       QString imageFileName(this->GetImageFilename());
       QString command(this->GetFileName());
-      if (!imageFileName.empty() && configurationElement)
+      if (!imageFileName.isEmpty() && configurationElement)
       {
         imageDesc = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
             configurationElement->GetContributor(), imageFileName);
       }
-      else if (!command.empty())
+      else if (!command.isEmpty())
       {
         //imageDesc = WorkbenchImages.getImageDescriptorFromProgram(
         //    command, 0);
@@ -174,10 +175,7 @@ QString EditorDescriptor::GetImageFilename() const
   {
     return imageFilename;
   }
-  QString filename;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON,
-      filename);
-  return filename;
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
 }
 
 QString EditorDescriptor::GetLabel() const
@@ -188,9 +186,7 @@ QString EditorDescriptor::GetLabel() const
   {
     return editorName;
   }
-  QString val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
-  return val;
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
   //}
   //return program.getName();
 }
@@ -201,10 +197,7 @@ QString EditorDescriptor::GetLauncher() const
   {
     return launcherName;
   }
-  QString val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LAUNCHER,
-      val);
-  return val;
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LAUNCHER);
 }
 
 QString EditorDescriptor::GetPluginID() const
@@ -403,28 +396,21 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
     matchingStrategyChecked = true;
     if (/*program == null &&*/!configurationElement.IsNull())
     {
-      QString strategy;
-      if (configurationElement->GetAttribute(
-          WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY, strategy))
+      QString strategy = configurationElement->GetAttribute(
+                           WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
+      if (!strategy.isEmpty())
       {
         try
         {
           matchingStrategy = configurationElement->CreateExecutableExtension<
               IEditorMatchingStrategy> (
               WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
-          if (matchingStrategy.IsNull())
-          {
-            // support legacy BlueBerry extensions
-            matchingStrategy = configurationElement->CreateExecutableExtension<
-                IEditorMatchingStrategy> (
-                WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY,
-                IEditorMatchingStrategy::GetManifestName());
-          }
-        } catch (CoreException e)
+        }
+        catch (const CoreException& e)
         {
           WorkbenchPlugin::Log(
               "Error creating editor management policy for editor id "
-                  + this->GetId(), e); //$NON-NLS-1$
+                + this->GetId(), e);
         }
       }
     }

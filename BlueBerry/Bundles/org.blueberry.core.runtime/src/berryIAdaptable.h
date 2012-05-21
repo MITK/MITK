@@ -66,7 +66,7 @@ public:
    *    or <code>null</code> if this object does not
    *    have an adapter for the given class
    */
-  virtual Poco::Any GetAdapter(const std::string& adapterType) = 0;
+  virtual Poco::Any GetAdapter(const QString& adapterType) = 0;
 
   virtual ~IAdaptable();
 

@@ -26,7 +26,7 @@ PlaceholderFolderLayout::PlaceholderFolderLayout(
   this->pageLayout = pageLayout;
 }
 
-void PlaceholderFolderLayout::AddPlaceholder(const std::string& viewId)
+void PlaceholderFolderLayout::AddPlaceholder(const QString& viewId)
 {
   if (!pageLayout->CheckValidPlaceholderId(viewId))
   {
@@ -42,7 +42,7 @@ void PlaceholderFolderLayout::AddPlaceholder(const std::string& viewId)
   placeholder->Add(newPart);
 }
 
-std::string PlaceholderFolderLayout::GetProperty(const std::string& id)
+QString PlaceholderFolderLayout::GetProperty(const QString& id)
 {
   LayoutPart::Pointer folder = placeholder->GetRealContainer();
   if (folder.Cast<PartStack>() != 0)
@@ -53,8 +53,8 @@ std::string PlaceholderFolderLayout::GetProperty(const std::string& id)
   return "";
 }
 
-void PlaceholderFolderLayout::SetProperty(const std::string& id,
-    const std::string& value)
+void PlaceholderFolderLayout::SetProperty(const QString& id,
+    const QString& value)
 {
   LayoutPart::Pointer folder = placeholder->GetRealContainer();
   if (folder.Cast<PartStack>() != 0)
@@ -64,7 +64,7 @@ void PlaceholderFolderLayout::SetProperty(const std::string& id,
   //throw not supported?
 }
 
-void PlaceholderFolderLayout::LinkPartToPageLayout(const std::string& viewId,
+void PlaceholderFolderLayout::LinkPartToPageLayout(const QString& viewId,
     LayoutPart::Pointer newPart)
 {
   pageLayout->SetRefPart(viewId, newPart);

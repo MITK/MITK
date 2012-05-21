@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-std::string EditorSite::GetInitialScopeId()
+QString EditorSite::GetInitialScopeId()
 {
   return "org.blueberry.ui.textEditorScope"; //$NON-NLS-1$
 }

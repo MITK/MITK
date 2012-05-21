@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIExtensionPoint.h"
 
-#include <vector>
-#include <string>
-#include <set>
 
 namespace berry
 {
@@ -74,22 +71,22 @@ private:
     /* (non-Javadoc)
      * @see org.blueberry.ui.views.IViewCategory#getViews()
      */
-    const std::vector<IViewDescriptor::Pointer>& GetViews() const;
+    QList<IViewDescriptor::Pointer> GetViews() const;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.views.IViewCategory#getId()
      */
-    const std::string& GetId() const;
+    QString GetId() const;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.views.IViewCategory#getPath()
      */
-    std::vector<std::string> GetPath() const;
+    QStringList GetPath() const;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.views.IViewCategory#getLabel()
      */
-    std::string GetLabel() const;
+    QString GetLabel() const;
 
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
@@ -104,12 +101,12 @@ private:
 
 private:
 
-  static std::string EXTENSIONPOINT_UNIQUE_ID;
+  static QString EXTENSIONPOINT_UNIQUE_ID;
 
   /**
    * A set that will only ever contain ViewDescriptors.
    */
-  std::vector<IViewDescriptor::Pointer> views; // = new TreeSet(new Comparator() {
+  QList<IViewDescriptor::Pointer> views; // = new TreeSet(new Comparator() {
   //    public int compare(Object o1, Object o2) {
   //      String id1 = ((ViewDescriptor) o1).getId();
   //      String id2 = ((ViewDescriptor) o2).getId();
@@ -117,9 +114,9 @@ private:
   //      return id1.compareTo(id2);
   //    }});
 
-  std::vector<IStickyViewDescriptor::Pointer> sticky;
+  QList<IStickyViewDescriptor::Pointer> sticky;
 
-  std::vector<IViewDescriptorCategoryPtr> categories;
+  QList<IViewDescriptorCategoryPtr> categories;
 
   IViewDescriptorCategoryPtr miscCategory;
 
@@ -134,13 +131,13 @@ private:
    * @return the Category
    * @since 3.1
    */
-  IViewDescriptorCategoryPtr InternalFindCategory(const std::string& id);
+  IViewDescriptorCategoryPtr InternalFindCategory(const QString& id);
 
-  const IExtensionPoint* GetExtensionPointFilter();
+  SmartPointer<IExtensionPoint> GetExtensionPointFilter();
 
 protected:
 
-  static const std::string TAG_DESCRIPTION; // = "description";
+  static const QString TAG_DESCRIPTION; // = "description";
 
 
 public:
@@ -171,7 +168,7 @@ public:
   /**
    * Find a descriptor in the registry.
    */
-  IViewDescriptor::Pointer Find(const std::string& id) const;
+  IViewDescriptor::Pointer Find(const QString& id) const;
 
   /**
    * Find a category with a given name.
@@ -179,18 +176,18 @@ public:
    * @param id the id to search for
    * @return the category or <code>null</code>
    */
-  IViewCategory::Pointer FindCategory(const std::string& id);
+  IViewCategory::Pointer FindCategory(const QString& id);
 
   /**
    * Get the list of view categories.
    */
-  std::vector<IViewCategory::Pointer> GetCategories();
+  QList<IViewCategory::Pointer> GetCategories();
 
   /**
    * Get the list of sticky views minus the sticky views which failed the
    * Expressions check.
    */
-  std::vector<IStickyViewDescriptor::Pointer> GetStickyViews() const;
+  QList<IStickyViewDescriptor::Pointer> GetStickyViews() const;
 
   /**
    * Returns the Misc category. This may be <code>null</code> if there are
@@ -203,7 +200,7 @@ public:
   /**
    * Get an enumeration of view descriptors.
    */
-  const std::vector<IViewDescriptor::Pointer>& GetViews() const;
+  QList<IViewDescriptor::Pointer> GetViews() const;
 
   /**
    * Adds each view in the registry to a particular category.

@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIWorkbenchWindow.h"
 
-#include <vector>
-#include <list>
 
 /**
  * \ingroup org_blueberry_ui_qt
@@ -68,7 +66,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionService, public Object {
 
-  berryInterfaceMacro(IWorkbenchPage, berry);
+  berryInterfaceMacro(IWorkbenchPage, berry)
 
   ~IWorkbenchPage();
 
@@ -83,14 +81,14 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *             applicable. Use the IDE-specific constant
    *             <code>IDE.EDITOR_ID_ATTR</code>.
    */
-  static const std::string EDITOR_ID_ATTR; // = "org.blueberry.ui.editorID"; //$NON-NLS-1$
+  static const QString EDITOR_ID_ATTR; // = "org.blueberry.ui.editorID";
 
   /**
    * Change event id when the perspective is reset to its original state.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_RESET; // = "reset"; //$NON-NLS-1$
+  static const QString CHANGE_RESET; // = "reset";
 
   /**
    * Change event id when the perspective has completed a reset to its
@@ -99,70 +97,68 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @since 3.0
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_RESET_COMPLETE; // = "resetComplete"; //$NON-NLS-1$
+  static const QString CHANGE_RESET_COMPLETE; // = "resetComplete";
 
   /**
    * Change event id when one or more views are shown in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_VIEW_SHOW; // = "viewShow"; //$NON-NLS-1$
+  static const QString CHANGE_VIEW_SHOW; // = "viewShow";
 
   /**
    * Change event id when one or more views are hidden in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_VIEW_HIDE; // = "viewHide"; //$NON-NLS-1$
+  static const QString CHANGE_VIEW_HIDE; // = "viewHide";
 
   /**
    * Change event id when one or more editors are opened in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_EDITOR_OPEN; // = "editorOpen"; //$NON-NLS-1$
+  static const QString CHANGE_EDITOR_OPEN; // = "editorOpen";
 
   /**
    * Change event id when one or more editors are closed in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_EDITOR_CLOSE; // = "editorClose"; //$NON-NLS-1$
+  static const QString CHANGE_EDITOR_CLOSE; // = "editorClose";
 
   /**
    * Change event id when the editor area is shown in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_EDITOR_AREA_SHOW; // = "editorAreaShow"; //$NON-NLS-1$
+  static const QString CHANGE_EDITOR_AREA_SHOW; // = "editorAreaShow";
 
   /**
    * Change event id when the editor area is hidden in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_EDITOR_AREA_HIDE; // = "editorAreaHide"; //$NON-NLS-1$
+  static const QString CHANGE_EDITOR_AREA_HIDE; // = "editorAreaHide";
 
   /**
    * Change event id when an action set is shown in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_ACTION_SET_SHOW; // = "actionSetShow"; //$NON-NLS-1$
+  static const QString CHANGE_ACTION_SET_SHOW; // = "actionSetShow";
 
   /**
    * Change event id when an action set is hidden in a perspective.
    *
    * @see IPerspectiveListener
    */
-  static const std::string CHANGE_ACTION_SET_HIDE; // = "actionSetHide"; //$NON-NLS-1$
+  static const QString CHANGE_ACTION_SET_HIDE; // = "actionSetHide";
 
   /**
    * Show view mode that indicates the view should be made visible and
    * activated. Use of this mode has the same effect as calling
    * {@link #showView(String)}.
-   *
-   * @since 3.0
    */
   static const int VIEW_ACTIVATE; // = 1;
 
@@ -170,8 +166,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * Show view mode that indicates the view should be made visible. If the
    * view is opened in the container that contains the active view then this
    * has the same effect as <code>VIEW_CREATE</code>.
-   *
-   * @since 3.0
    */
   static const int VIEW_VISIBLE; // = 2;
 
@@ -180,37 +174,26 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * necessarily be made visible. It will only be made visible in the event
    * that it is opened in its own container. In other words, only if it is not
    * stacked with another view.
-   *
-   * @since 3.0
    */
   static const int VIEW_CREATE; // = 3;
 
   /**
    * Editor opening match mode specifying that no matching against existing
    * editors should be done.
-   *
-   * @since 3.2
    */
   static const int MATCH_NONE; // = 0;
 
   /**
    * Editor opening match mode specifying that the editor input should be
    * considered when matching against existing editors.
-   *
-   * @since 3.2
    */
   static const int MATCH_INPUT; // = 1;
 
   /**
    * Editor opening match mode specifying that the editor id should be
    * considered when matching against existing editors.
-   *
-   * @since 3.2
    */
   static const int MATCH_ID; // = 2;
-
-  ~IWorkbenchPage();
-
 
   /**
    * Activates the given part. The part will be brought to the front and given
@@ -226,7 +209,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @param listener
    *            the property change listener to add
-   * @since 2.0
    */
   //virtual void addPropertyChangeListener(IPropertyChangeListener listener);
 
@@ -285,9 +267,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            changes
    * @return <code>true</code> if the editors were successfully closed, and
    *         <code>false</code> if the editors are still open
-   * @since 3.0
    */
-  virtual bool CloseEditors(const std::list<IEditorReference::Pointer>& editorRefs, bool save) = 0;
+  virtual bool CloseEditors(const QList<IEditorReference::Pointer>& editorRefs, bool save) = 0;
 
   /**
    * Closes the given editor. The editor must belong to this workbench page.
@@ -315,7 +296,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            the id of the view extension to use
    * @return the view, or <code>null</code> if none is found
    */
-  virtual IViewPart::Pointer FindView(const std::string& viewId) = 0;
+  virtual IViewPart::Pointer FindView(const QString& viewId) = 0;
 
   /**
    * Returns the view reference with the specified id.
@@ -323,9 +304,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @param viewId
    *            the id of the view extension to use
    * @return the view reference, or <code>null</code> if none is found
-   * @since 3.0
    */
-  virtual IViewReference::Pointer FindViewReference(const std::string& viewId) = 0;
+  virtual IViewReference::Pointer FindViewReference(const QString& viewId) = 0;
 
   /**
    * Returns the view reference with the specified id and secondary id.
@@ -336,9 +316,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            the secondary id to use, or <code>null</code> for no
    *            secondary id
    * @return the view reference, or <code>null</code> if none is found
-   * @since 3.0
    */
-  virtual IViewReference::Pointer FindViewReference(const std::string& viewId, const std::string& secondaryId) = 0;
+  virtual IViewReference::Pointer FindViewReference(const QString& viewId, const QString& secondaryId) = 0;
 
   /**
    * Returns the active editor open in this page.
@@ -380,9 +359,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @see #MATCH_NONE
    * @see #MATCH_INPUT
    * @see #MATCH_ID
-   * @since 3.2
    */
-  virtual std::vector<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const std::string& editorId,
+  virtual QList<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const QString& editorId,
       int matchFlags) = 0;
 
   /**
@@ -396,7 +374,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @deprecated use #getEditorReferences() instead
    */
-  virtual std::vector<IEditorPart::Pointer> GetEditors() = 0;
+  virtual QList<IEditorPart::Pointer> GetEditors() = 0;
 
   /**
    * Returns an array of references to open editors in this page.
@@ -407,14 +385,14 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return a list of open editors
    */
-  virtual std::list<IEditorReference::Pointer> GetEditorReferences() = 0;
+  virtual QList<IEditorReference::Pointer> GetEditorReferences() = 0;
 
   /**
    * Returns a list of dirty editors in this page.
    *
    * @return a list of dirty editors
    */
-  virtual std::vector<IEditorPart::Pointer> GetDirtyEditors() = 0;
+  virtual QList<IEditorPart::Pointer> GetDirtyEditors() = 0;
 
   /**
    * Returns the input for this page.
@@ -429,7 +407,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return the page label
    */
-  virtual std::string GetLabel() = 0;
+  virtual QString GetLabel() = 0;
 
   /**
    * Returns the current perspective descriptor for this page, or
@@ -450,7 +428,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return a list of references to visible views
    */
-  virtual std::vector<IViewReference::Pointer> GetViewReferences() = 0;
+  virtual QList<IViewReference::Pointer> GetViewReferences() = 0;
 
   /**
    * Returns a list of the views visible on this page.
@@ -463,7 +441,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @deprecated use #getViewReferences() instead.
    */
-  virtual std::vector<IViewPart::Pointer> GetViews() = 0;
+  virtual QList<IViewPart::Pointer> GetViews() = 0;
 
   /**
    * Returns the workbench window of this page.
@@ -485,7 +463,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @param view
    *            the references whos view is to be hidden
-   * @since 3.0
    */
   virtual void HideView(IViewReference::Pointer view) = 0;
 
@@ -550,7 +527,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @exception PartInitException
    *                if the editor could not be created or initialized
    */
-  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorId) = 0;
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const QString& editorId) = 0;
 
   /**
    * Opens an editor on the given input.
@@ -576,7 +553,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @return an open editor, or <code>null</code> if an external editor was opened
    * @exception PartInitException if the editor could not be created or initialized
    */
-  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorId,
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const QString& editorId,
       bool activate) = 0;
 
   /**
@@ -608,17 +585,15 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @see #MATCH_NONE
    * @see #MATCH_INPUT
    * @see #MATCH_ID
-   * @since 3.2
    */
   virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
-      const std::string& editorId, bool activate, int matchFlags) = 0;
+      const QString& editorId, bool activate, int matchFlags) = 0;
 
   /**
    * Removes the property change listener.
    *
    * @param listener
    *            the property change listener to remove
-   * @since 2.0
    */
   //virtual void removePropertyChangeListener(IPropertyChangeListener listener);
 
@@ -742,7 +717,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @exception PartInitException
    *                if the view could not be initialized
    */
-  virtual IViewPart::Pointer ShowView(const std::string& viewId) = 0;
+  virtual IViewPart::Pointer ShowView(const QString& viewId) = 0;
 
   /**
    * Shows a view in this page with the given id and secondary id. The
@@ -772,9 +747,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *                if the view could not be initialized
    * @exception IllegalArgumentException
    *                if the supplied mode is not valid
-   * @since 3.0
    */
-  virtual IViewPart::Pointer ShowView(const std::string& viewId, const std::string& secondaryId, int mode) = 0;
+  virtual IViewPart::Pointer ShowView(const QString& viewId, const QString& secondaryId, int mode) = 0;
 
   /**
    * Returns <code>true</code> if the editor is pinned and should not be
@@ -792,9 +766,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @see IPageLayout#addPerspectiveShortcut(String)
    * @return an array of perspective identifiers
-   * @since 3.1
    */
-  virtual std::vector<std::string> GetPerspectiveShortcuts() = 0;
+  virtual QList<QString> GetPerspectiveShortcuts() = 0;
 
   /**
    * Returns the show view shortcuts associated with the current perspective.
@@ -802,27 +775,24 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @see IPageLayout#addShowViewShortcut(String)
    * @return an array of view identifiers
-   * @since 3.1
    */
-  virtual std::vector<std::string> GetShowViewShortcuts() = 0;
+  virtual QList<QString> GetShowViewShortcuts() = 0;
 
   /**
    * Returns the descriptors for the perspectives that are open in this page,
    * in the order in which they were opened.
    *
    * @return the open perspective descriptors, in order of opening
-   * @since 3.1
    */
-  virtual std::vector<IPerspectiveDescriptor::Pointer> GetOpenPerspectives() = 0;
+  virtual QList<IPerspectiveDescriptor::Pointer> GetOpenPerspectives() = 0;
 
   /**
    * Returns the descriptors for the perspectives that are open in this page,
    * in the order in which they were activated (oldest first).
    *
    * @return the open perspective descriptors, in order of activation
-   * @since 3.1
    */
-  virtual std::vector<IPerspectiveDescriptor::Pointer> GetSortedPerspectives() = 0;
+  virtual QList<IPerspectiveDescriptor::Pointer> GetSortedPerspectives() = 0;
 
   /**
    * Closes current perspective. If last perspective, then entire page
@@ -849,10 +819,9 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            whether the page's parts should be saved if closed
    * @param closePage
    *            whether the page itself should be closed if last perspective
-   * @since 3.1
    */
   virtual void ClosePerspective(IPerspectiveDescriptor::Pointer desc,
-      bool saveParts, bool closePage) = 0;
+                                bool saveParts, bool closePage) = 0;
 
   /**
    * Closes all perspectives in this page. All editors are closed, prompting
@@ -864,7 +833,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            whether the page's editors should be saved
    * @param closePage
    *            whether the page itself should be closed
-   * @since 3.1
    */
   virtual void CloseAllPerspectives(bool saveEditors, bool closePage) = 0;
 
@@ -876,7 +844,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            The part to search for. It can be <code>null</code>.
    * @return The reference for the given part, or <code>null</code> if no
    *         reference can be found.
-   * @since 3.2
    */
   virtual IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part) = 0;
 };

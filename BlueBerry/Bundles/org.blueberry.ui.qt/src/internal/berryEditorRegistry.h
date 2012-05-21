@@ -24,13 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEditorDescriptor.h"
 #include "berryFileEditorMapping.h"
 
-#include <vector>
-#include <list>
-#include <map>
-#include <iostream>
-#include <functional>
-#include <algorithm>
-
 namespace berry
 {
 
@@ -52,7 +45,7 @@ class EditorRegistry : public IEditorRegistry
      * @param type
      * @return the objects related to the type
      */
-    //  public: std::vector<IEditorDescriptor::Pointer> GetRelatedObjects(IContentType type) {
+    //  public: QList<IEditorDescriptor::Pointer> GetRelatedObjects(IContentType type) {
     //      IEditorDescriptor[] relatedObjects = (IEditorDescriptor[]) contentTypeToEditorMappings.get(type);
     //      if (relatedObjects == null) {
     //        return EMPTY;
@@ -66,8 +59,8 @@ class EditorRegistry : public IEditorRegistry
      * @return the objects related to the filename
      */
 public:
-    std::list<IEditorDescriptor::Pointer> GetRelatedObjects(
-        const std::string& fileName);
+    QList<IEditorDescriptor::Pointer> GetRelatedObjects(
+        const QString& fileName);
 
 private: EditorRegistry* editorRegistry;
   };
@@ -81,9 +74,9 @@ private: EditorRegistry* editorRegistry;
     */
  class EditorMap
    {
-     static std::map<std::string, FileEditorMapping::Pointer> defaultMap;
+     static QHash<QString, FileEditorMapping::Pointer> defaultMap;
 
-     static std::map<std::string, FileEditorMapping::Pointer> map;
+     static QHash<QString, FileEditorMapping::Pointer> map;
 
  public: void Clear();
 
@@ -93,7 +86,7 @@ private: EditorRegistry* editorRegistry;
       * @param key the key to set
       * @param value the value to associate
       */
-   public: static void PutDefault(const std::string& key, FileEditorMapping::Pointer value);
+   public: static void PutDefault(const QString& key, FileEditorMapping::Pointer value);
 
      /**
       * Put a mapping into the user editor map.
@@ -101,7 +94,7 @@ private: EditorRegistry* editorRegistry;
       * @param key the key to set
       * @param value the value to associate
       */
-   public: void Put(const std::string& key, FileEditorMapping::Pointer value);
+   public: void Put(const QString& key, FileEditorMapping::Pointer value);
 
      /**
       * Return the mapping associated to the key. First searches user
@@ -112,7 +105,7 @@ private: EditorRegistry* editorRegistry;
       *            the key to search for
       * @return the mapping associated to the key or <code>null</code>
       */
-   public: FileEditorMapping::Pointer Get(const std::string& key);
+   public: FileEditorMapping::Pointer Get(const QString& key);
 
      /**
       * Return all mappings. This will return default mappings overlayed with
@@ -120,14 +113,14 @@ private: EditorRegistry* editorRegistry;
       *
       * @return the mappings
       */
-   public: std::vector<FileEditorMapping::Pointer> AllMappings();
+   public: QList<FileEditorMapping::Pointer> AllMappings();
 
      /**
       * Return all user mappings.
       *
       * @return the mappings
       */
-   public: std::vector<FileEditorMapping::Pointer> UserMappings();
+   public: QList<FileEditorMapping::Pointer> UserMappings();
    };
 
  struct CmpFileEditorMapping : public std::binary_function<FileEditorMapping::Pointer,
@@ -178,11 +171,11 @@ private: EditorRegistry* editorRegistry;
    * @see #comparer
    */
 private:
-  std::list<EditorDescriptor::Pointer> sortedEditorsFromPlugins;
+  QList<EditorDescriptor::Pointer> sortedEditorsFromPlugins;
 
   // Map of EditorDescriptor - map editor id to editor.
 private:
-  std::map<std::string, EditorDescriptor::Pointer> mapIDtoEditor;
+  QHash<QString, EditorDescriptor::Pointer> mapIDtoEditor;
 
   // Map of FileEditorMapping (extension to FileEditorMapping)
 private:
@@ -206,7 +199,7 @@ private:
 
 private: RelatedRegistry relatedRegistry;
 
-public: static const std::string EMPTY_EDITOR_ID; // = "org.blueberry.ui.internal.emptyEditorTab"; //$NON-NLS-1$
+public: static const QString EMPTY_EDITOR_ID; // = "org.blueberry.ui.internal.emptyEditorTab"
 
   /**
    * Return an instance of the receiver. Adds listeners into the extension
@@ -233,9 +226,9 @@ public: EditorRegistry();
    * This method is not API and should not be called outside the workbench
    * code.
    */
-public: void AddEditorFromPlugin(EditorDescriptor::Pointer editor, const std::vector<std::string>& extensions,
-      const std::vector<std::string>& filenames,
-      const std::vector<std::string>& contentTypeVector,
+public: void AddEditorFromPlugin(EditorDescriptor::Pointer editor, const QList<QString>& extensions,
+      const QList<QString>& filenames,
+      const QList<QString>& contentTypeVector,
       bool bDefault);
 
   /**
@@ -253,7 +246,7 @@ private: void AddExternalEditorsToEditorMap();
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: IEditorDescriptor::Pointer FindEditor(const std::string& id);
+public: IEditorDescriptor::Pointer FindEditor(const QString& id);
 
   /**
    * Fires a property changed event to all registered listeners.
@@ -283,7 +276,7 @@ public: IEditorDescriptor::Pointer GetDefaultEditor();
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& filename);
+public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& filename);
 
   /**
    * Return the (approximated) content type for a file with the given name.
@@ -292,7 +285,7 @@ public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& filename)
    * @return the content type or <code>null</code> if it could not be determined
    * @since 3.1
    */
-  //  private: IContentType::Pointer GuessAtContentType(const std::string& filename) {
+  //  private: IContentType::Pointer GuessAtContentType(const QString& filename) {
   //    return Platform.getContentTypeManager().findContentTypeFor(filename);
   //  }
 
@@ -309,12 +302,12 @@ public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& filename)
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: std::list<IEditorDescriptor::Pointer> GetEditors(const std::string& filename);
+public: QList<IEditorDescriptor::Pointer> GetEditors(const QString& filename);
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: std::vector<IFileEditorMapping::Pointer> GetFileEditorMappings();
+public: QList<IFileEditorMapping::Pointer> GetFileEditorMappings();
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
@@ -331,7 +324,7 @@ public: std::vector<IFileEditorMapping::Pointer> GetFileEditorMappings();
    *            the file extension
    * @return the mapping, or <code>null</code>
    */
-private: FileEditorMapping::Pointer GetMappingFor(const std::string& ext);
+private: FileEditorMapping::Pointer GetMappingFor(const QString& ext);
 
   /**
    * Find the file editor mappings for the given filename.
@@ -344,7 +337,7 @@ private: FileEditorMapping::Pointer GetMappingFor(const std::string& ext);
    * @param filename the filename
    * @return the mappings
    */
-private: std::vector<FileEditorMapping::Pointer> GetMappingForFilename(const std::string& filename);
+private: QList<FileEditorMapping::Pointer> GetMappingForFilename(const QString& filename);
 
   /**
    * Return the editor descriptors pulled from the OS.
@@ -356,7 +349,7 @@ private: std::vector<FileEditorMapping::Pointer> GetMappingForFilename(const std
    * </p>
    * @return the editor descriptors
    */
-//public: std::vector<IEditorDescriptor::Pointer> GetSortedEditorsFromOS();
+//public: QList<IEditorDescriptor::Pointer> GetSortedEditorsFromOS();
 
   /**
    * Return the editors loaded from plugins.
@@ -364,7 +357,7 @@ private: std::vector<FileEditorMapping::Pointer> GetMappingForFilename(const std
    * @return the sorted array of editors declared in plugins
    * @see #comparer
    */
-public: std::list<IEditorDescriptor::Pointer> GetSortedEditorsFromPlugins();
+public: QList<IEditorDescriptor::Pointer> GetSortedEditorsFromPlugins();
 
   /**
    * Answer an intial id to editor map. This will create a new map and
@@ -374,7 +367,7 @@ public: std::list<IEditorDescriptor::Pointer> GetSortedEditorsFromPlugins();
    *            the initial size of the map
    * @return the new map
    */
-private: void InitialIdToEditorMap(std::map<std::string, EditorDescriptor::Pointer>& map);
+private: void InitialIdToEditorMap(QHash<QString, EditorDescriptor::Pointer>& map);
 
   /**
    * Add the system editors to the provided map. This will always add an
@@ -384,7 +377,7 @@ private: void InitialIdToEditorMap(std::map<std::string, EditorDescriptor::Point
    *
    * @param map the map to augment
    */
-private: void AddSystemEditors(std::map<std::string, EditorDescriptor::Pointer>& map);
+private: void AddSystemEditors(QHash<QString, EditorDescriptor::Pointer>& map);
 
   /**
    * Initialize the registry state from plugin declarations and preference
@@ -401,7 +394,7 @@ private: void InitializeFromStorage();
    *
    * @param defaultEditors the default editors to set
    */
-private: void SetProductDefaults(const std::string& defaultEditors);
+private: void SetProductDefaults(const QString& defaultEditors);
 
   /**
    * Read the editors defined in the preferences store.
@@ -410,7 +403,7 @@ private: void SetProductDefaults(const std::string& defaultEditors);
    *            Editor table to store the editor definitions.
    * @return true if the table is built succesfully.
    */
-private: bool ReadEditors(std::map<std::string, EditorDescriptor::Pointer>& editorTable);
+private: bool ReadEditors(QHash<QString, EditorDescriptor::Pointer>& editorTable);
 
   /**
    * Read the file types and associate them to their defined editor(s).
@@ -422,7 +415,7 @@ private: bool ReadEditors(std::map<std::string, EditorDescriptor::Pointer>& edit
    *
    * @throws WorkbenchException
    */
-public: void ReadResources(std::map<std::string, EditorDescriptor::Pointer>& editorTable, std::ostream& reader);
+public: void ReadResources(QHash<QString, EditorDescriptor::Pointer>& editorTable, std::ostream& reader);
 
   /**
    * Determine if the editors list contains the editor descriptor.
@@ -433,7 +426,7 @@ public: void ReadResources(std::map<std::string, EditorDescriptor::Pointer>& edi
    *      The editor descriptor
    * @return <code>true</code> if the editors list contains the editor descriptor
    */
-private: bool Contains(const std::vector<IEditorDescriptor::Pointer>& editorsArray,
+private: bool Contains(const QList<IEditorDescriptor::Pointer>& editorsArray,
       IEditorDescriptor::Pointer editorDescriptor);
 
   /**
@@ -444,7 +437,7 @@ private: bool Contains(const std::vector<IEditorDescriptor::Pointer>& editorsArr
    *            The editor table containing the defined editors.
    * @return true if the resources are read succesfully.
    */
-private: bool ReadResources(std::map<std::string, EditorDescriptor::Pointer>& editorTable);
+private: bool ReadResources(QHash<QString, EditorDescriptor::Pointer>& editorTable);
 
   /**
    * Load the serialized resource associations Return true if the operation
@@ -456,7 +449,7 @@ private: bool LoadAssociations();
    * Return a friendly version of the given key suitable for use in the editor
    * map.
    */
-private: std::string MappingKeyFor(const std::string& type);
+private: QString MappingKeyFor(const QString& type);
 
   /**
    * Return a key that combines the file's name and extension of the given
@@ -464,7 +457,7 @@ private: std::string MappingKeyFor(const std::string& type);
    *
    * @param mapping the mapping to generate a key for
    */
-private: std::string MappingKeyFor(FileEditorMapping::Pointer mapping);
+private: QString MappingKeyFor(FileEditorMapping::Pointer mapping);
 
   /**
    * Rebuild the editor map
@@ -498,19 +491,19 @@ public: void SaveAssociations();
    * @param newResourceTypes
    *            te new file editor mappings.
    */
-public: void SetFileEditorMappings(const std::vector<FileEditorMapping::Pointer>& newResourceTypes);
+public: void SetFileEditorMappings(const QList<FileEditorMapping::Pointer>& newResourceTypes);
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: void SetDefaultEditor(const std::string& fileName, const std::string& editorId);
+public: void SetDefaultEditor(const QString& fileName, const QString& editorId);
 
   /**
    * Alphabetically sort the internal editors.
    *
    * @see #comparer
    */
-private: std::vector<IEditorDescriptor::Pointer> SortEditors(const std::vector<IEditorDescriptor::Pointer>& unsortedList);
+private: QList<IEditorDescriptor::Pointer> SortEditors(const QList<IEditorDescriptor::Pointer>& unsortedList);
 
   /**
    * Alphabetically sort the internal editors.
@@ -524,14 +517,14 @@ private: void SortInternalEditors();
    *
    * @see org.blueberry.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
    */
-public: bool IsSystemInPlaceEditorAvailable(const std::string& filename);
+public: bool IsSystemInPlaceEditorAvailable(const QString& filename);
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
    */
-public: bool IsSystemExternalEditorAvailable(const std::string& filename);
+public: bool IsSystemExternalEditorAvailable(const QString& filename);
 
   /*
    * (non-Javadoc)
@@ -539,7 +532,7 @@ public: bool IsSystemExternalEditorAvailable(const std::string& filename);
    * @see org.blueberry.ui.IEditorRegistry#getSystemExternalEditorImageDescriptor(java.lang.String)
    */
   //    public: ImageDescriptor GetSystemExternalEditorImageDescriptor(
-  //            const std::string& filename) {
+  //            const QString& filename) {
   //        Program externalProgram = null;
   //        int extensionIndex = filename.lastIndexOf('.');
   //        if (extensionIndex >= 0) {
@@ -563,14 +556,14 @@ public: bool IsSystemExternalEditorAvailable(const std::string& filename);
    * @param desc
    *            the descriptor value to remove
    */
-private: void RemoveEditorFromMapping(std::map<std::string, FileEditorMapping::Pointer>& map, IEditorDescriptor::Pointer desc);
+private: void RemoveEditorFromMapping(QHash<QString, FileEditorMapping::Pointer>& map, IEditorDescriptor::Pointer desc);
 
-private: const IExtensionPoint* GetExtensionPointFilter();
+private: IExtensionPoint::Pointer GetExtensionPointFilter();
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorRegistry#getDefaultEditor(java.lang.String, org.blueberry.core.runtime.content.IContentType)
    */
-  //  public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName, IContentType contentType) {
+  //  public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& fileName, IContentType contentType) {
   //        return getEditorForContentType(fileName, contentType);
   //  }
 
@@ -582,20 +575,20 @@ private: const IExtensionPoint* GetExtensionPointFilter();
    * @return the editor for a file with a given content type
    * @since 3.1
    */
-    private: IEditorDescriptor::Pointer GetEditorForContentType(const std::string& filename
+    private: IEditorDescriptor::Pointer GetEditorForContentType(const QString& filename
         /*IContentType contentType*/);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorRegistry#getEditors(java.lang.String, org.blueberry.core.runtime.content.IContentType)
    */
-  //  public: std::vector<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName, IContentType contentType) {
+  //  public: QList<IEditorDescriptor::Pointer> GetEditors(const QString& fileName, IContentType contentType) {
   //    return findRelatedObjects(contentType, fileName, relatedRegistry);
   //  }
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorRegistry#getImageDescriptor(java.lang.String, org.blueberry.core.runtime.content.IContentType)
    */
-  //  public: ImageDescriptor GetImageDescriptor(const std::string filename, IContentType contentType) {
+  //  public: ImageDescriptor GetImageDescriptor(const QString filename, IContentType contentType) {
   //        if (filename == null) {
   //      return getDefaultImage();
   //    }
@@ -662,7 +655,7 @@ private: const IExtensionPoint* GetExtensionPointFilter();
    * @param registry
    * @return the related objects
    */
-    private: std::list<IEditorDescriptor::Pointer> FindRelatedObjects(/*IContentType type,*/ const std::string& fileName,
+    private: QList<IEditorDescriptor::Pointer> FindRelatedObjects(/*IContentType type,*/ const QString& fileName,
         RelatedRegistry& registry);
 
   /**
@@ -674,7 +667,7 @@ private: const IExtensionPoint* GetExtensionPointFilter();
    *
    * TODO: this should be rolled in with the above findRelatedObjects code
    */
-  //  public: std::vector<IEditorDescriptor> GetEditorsForContentType(IContentType type) {
+  //  public: QList<IEditorDescriptor> GetEditorsForContentType(IContentType type) {
   //    ArrayList allRelated = new ArrayList();
   //    if (type == null) {
   //      return new IEditorDescriptor [0];
@@ -715,7 +708,7 @@ private: const IExtensionPoint* GetExtensionPointFilter();
    * @return the filetypes
    * @since 3.1
    */
-public: std::vector<IFileEditorMapping::Pointer> GetUnifiedMappings();
+public: QList<IFileEditorMapping::Pointer> GetUnifiedMappings();
 
 };
 
@@ -724,24 +717,24 @@ class MockMapping : public IFileEditorMapping
 
   //private: IContentType contentType;
 private:
-  std::string extension;
+  QString extension;
 private:
-  std::string filename;
+  QString filename;
 
-  MockMapping(/*IContentType type,*/const std::string& name,
-      const std::string& ext);
+  MockMapping(/*IContentType type,*/const QString& name,
+      const QString& ext);
 
 public:
   IEditorDescriptor::Pointer GetDefaultEditor();
 
 public:
-  std::list<IEditorDescriptor::Pointer> GetEditors() const;
+  QList<IEditorDescriptor::Pointer> GetEditors() const;
 
 public:
-  std::list<IEditorDescriptor::Pointer> GetDeletedEditors() const;
+  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const;
 
 public:
-  std::string GetExtension();
+  QString GetExtension();
 
   //  public: ImageDescriptor GetImageDescriptor() {
   //    IEditorDescriptor editor = getDefaultEditor();
@@ -754,10 +747,10 @@ public:
   //  }
 
 public:
-  std::string GetLabel();
+  QString GetLabel();
 
 public:
-  std::string GetName();
+  QString GetName();
 
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)

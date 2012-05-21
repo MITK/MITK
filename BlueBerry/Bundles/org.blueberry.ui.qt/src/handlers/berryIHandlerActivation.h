@@ -70,7 +70,7 @@ struct BERRY_UI_QT IHandlerActivation : public IEvaluationResultCache {
    *
    * @return The command identifier; never <code>null</code>.
    */
-  virtual std::string GetCommandId() const = 0;
+  virtual QString GetCommandId() const = 0;
 
   /**
    * Returns the depth at which this activation was created within the

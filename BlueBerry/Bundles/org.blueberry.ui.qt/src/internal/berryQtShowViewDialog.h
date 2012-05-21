@@ -40,7 +40,7 @@ public:
 
   QtShowViewDialog(IViewRegistry* registry, QWidget* parent = 0, Qt::WindowFlags f = 0);
 
-  std::vector<IViewDescriptor::Pointer> GetSelection();
+  QList<IViewDescriptor::Pointer> GetSelection();
   int Open();
 
 protected:

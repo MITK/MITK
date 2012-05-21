@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdexcept>
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "berryException.h"
 
 #include <berryConfig.h>
 
@@ -97,22 +96,7 @@ public:
   }
 
   template<class Other>
-  explicit SmartPointer(const WeakPointer<Other>& wp)
-  {
-    if (wp.m_Pointer)
-    {
-      this->m_Pointer = wp.m_Pointer;
-      this->Register();
-
-      #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
-        DebugInitSmartPointer();
-      #endif
-    }
-    else
-    {
-      throw BadWeakPointerException();
-    }
-  }
+  explicit SmartPointer(const WeakPointer<Other>& wp);
 
   /** Destructor  */
   ~SmartPointer()
@@ -391,9 +375,29 @@ uint qHash(const berry::WeakPointer<T>& wp)
   return sp->HashCode();
 }
 
+#include "berryException.h"
 #include <QDebug>
 
 namespace berry {
+
+template<class T>
+template<class Other>
+SmartPointer<T>::SmartPointer(const WeakPointer<Other>& wp)
+{
+  if (wp.m_Pointer)
+  {
+    this->m_Pointer = wp.m_Pointer;
+    this->Register();
+
+    #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
+      DebugInitSmartPointer();
+    #endif
+  }
+  else
+  {
+    throw BadWeakPointerException("Weak pointer is NULL");
+  }
+}
 
 /** Function to print object pointed to  */
 template<class T>

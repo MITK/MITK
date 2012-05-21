@@ -289,11 +289,11 @@ QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<const berry::
   return os;
 }
 
-QTextStream& operator<<(QTextStream& os, berry::SmartPointer<const berry::Object>& o)
-{
-  os << o->ToString();
-  return os;
-}
+//QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<berry::Object>& o)
+//{
+//  os << o->ToString();
+//  return os;
+//}
 
 uint qHash(const berry::Object& o)
 {

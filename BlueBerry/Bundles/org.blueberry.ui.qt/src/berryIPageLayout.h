@@ -84,59 +84,60 @@ namespace berry {
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IPageLayout : public Object {
+struct BERRY_UI_QT IPageLayout : public Object
+{
 
-  berryInterfaceMacro(IPageLayout, berry);
+  berryInterfaceMacro(IPageLayout, berry)
 
     /**
      * The part id for the workbench's editor area.  This may only be used
      * as a reference part for view addition.
      */
-    static const std::string ID_EDITOR_AREA; // = "org.blueberry.ui.editors"; //$NON-NLS-1$
+    static const QString ID_EDITOR_AREA; // = "org.blueberry.ui.editors";
 
     /**
      * The view id for the workbench's Resource Navigator standard component.
      */
-    static const std::string ID_RES_NAV; // = "org.blueberry.ui.views.ResourceNavigator"; //$NON-NLS-1$
+    static const QString ID_RES_NAV; // = "org.blueberry.ui.views.ResourceNavigator";
 
     /**
      * The view id for the workbench's Property Sheet standard component.
      */
-    static const std::string ID_PROP_SHEET; // = "org.blueberry.ui.views.PropertySheet"; //$NON-NLS-1$
+    static const QString ID_PROP_SHEET; // = "org.blueberry.ui.views.PropertySheet";
 
     /**
      * The view id for the workbench's Content Outline standard component.
      */
-    static const std::string ID_OUTLINE; // = "org.blueberry.ui.views.ContentOutline"; //$NON-NLS-1$
+    static const QString ID_OUTLINE; // = "org.blueberry.ui.views.ContentOutline";
 
     /**
      * The view id for the workbench's Bookmark Navigator standard component.
      */
-    static const std::string ID_BOOKMARKS; // = "org.blueberry.ui.views.BookmarkView"; //$NON-NLS-1$
+    static const QString ID_BOOKMARKS; // = "org.blueberry.ui.views.BookmarkView";
 
     /**
      * The view id for the workbench's Problems View standard component.
      * @since 3.0
      */
-    static const std::string ID_PROBLEM_VIEW; // = "org.blueberry.ui.views.ProblemView"; //$NON-NLS-1$
+    static const QString ID_PROBLEM_VIEW; // = "org.blueberry.ui.views.ProblemView";
 
     /**
      * The view id for the workbench's Progress View standard component.
      * @since 3.2
      */
-    static const std::string ID_PROGRESS_VIEW; // = "org.blueberry.ui.views.ProgressView"; //$NON-NLS-1$
+    static const QString ID_PROGRESS_VIEW; // = "org.blueberry.ui.views.ProgressView";
 
     /**
      * The view id for the workbench's Task List standard component.
      */
-    static const std::string ID_TASK_LIST; // = "org.blueberry.ui.views.TaskList"; //$NON-NLS-1$
+    static const QString ID_TASK_LIST; // = "org.blueberry.ui.views.TaskList";
 
     /**
      * Id of the navigate action set.
      * (value <code>"org.blueberry.ui.NavigateActionSet"</code>)
      * @since 2.1
      */
-    static const std::string ID_NAVIGATE_ACTION_SET; // = "org.blueberry.ui.NavigateActionSet"; //$NON-NLS-1$
+    static const QString ID_NAVIGATE_ACTION_SET; // = "org.blueberry.ui.NavigateActionSet";
 
     /**
      * Relationship constant indicating a part should be placed to the left of
@@ -199,7 +200,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @param actionSetId the action set id
      */
-    //virtual void AddActionSet(const std::string& actionSetId) = 0;
+    //virtual void AddActionSet(const QString& actionSetId) = 0;
 
 
     /**
@@ -211,7 +212,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @param id the perspective id
      */
-    virtual void AddPerspectiveShortcut(const std::string& id) = 0;
+    virtual void AddPerspectiveShortcut(const QString& id) = 0;
 
     /**
      * Adds a view placeholder to this page layout.
@@ -240,8 +241,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
      * @param refId the id of the reference part; either a view id, a folder id,
      *   or the special editor area id returned by <code>getEditorArea</code>
      */
-    virtual void AddPlaceholder(const std::string& viewId, int relationship, float ratio,
-            const std::string& refId) = 0;
+    virtual void AddPlaceholder(const QString& viewId, int relationship, float ratio,
+            const QString& refId) = 0;
 
     /**
      * Adds an item to the Show In prompter.
@@ -252,7 +253,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @since 2.1
      */
-    virtual void AddShowInPart(const std::string& id) = 0;
+    virtual void AddShowInPart(const QString& id) = 0;
 
     /**
      * Adds a show view shortcut to the page layout.
@@ -263,7 +264,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @param id the view id
      */
-    virtual void AddShowViewShortcut(const std::string& id) = 0;
+    virtual void AddShowViewShortcut(const QString& id) = 0;
 
     /**
      * Adds a view with the given compound id to this page layout.
@@ -285,8 +286,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
      * @param refId the id of the reference part; either a view id, a folder id,
      *   or the special editor area id returned by <code>getEditorArea</code>
      */
-    virtual void AddView(const std::string& viewId, int relationship, float ratio,
-            const std::string& refId) = 0;
+    virtual void AddView(const QString& viewId, int relationship, float ratio,
+            const QString& refId) = 0;
 
     /**
      * Creates and adds a new folder with the given id to this page layout.
@@ -309,8 +310,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *   or the special editor area id returned by <code>getEditorArea</code>
      * @return the new folder
      */
-    virtual IFolderLayout::Pointer CreateFolder(const std::string& folderId, int relationship,
-            float ratio, const std::string& refId) = 0;
+    virtual IFolderLayout::Pointer CreateFolder(const QString& folderId, int relationship,
+            float ratio, const QString& refId) = 0;
 
     /**
      * Creates and adds a placeholder for a new folder with the given id to this page layout.
@@ -334,8 +335,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
      * @return a placeholder for the new folder
      * @since 2.0
      */
-    virtual IPlaceholderFolderLayout::Pointer CreatePlaceholderFolder(const std::string& folderId,
-            int relationship, float ratio, const std::string& refId) = 0;
+    virtual IPlaceholderFolderLayout::Pointer CreatePlaceholderFolder(const QString& folderId,
+            int relationship, float ratio, const QString& refId) = 0;
 
     /**
      * Returns the special identifier for the editor area in this page
@@ -348,7 +349,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @return the special id of the editor area
      */
-    virtual std::string GetEditorArea() = 0;
+    virtual QString GetEditorArea() = 0;
 
     /**
      * Returns whether the page's layout will show
@@ -396,7 +397,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
      * @return the view layout, or <code>null</code>
      * @since 3.0
      */
-    virtual IViewLayout::Pointer GetViewLayout(const std::string& id) = 0;
+    virtual IViewLayout::Pointer GetViewLayout(const QString& id) = 0;
 
     /**
      * Adds a standalone view with the given compound id to this page layout.
@@ -429,8 +430,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
      *
      * @since 3.0
      */
-    virtual void AddStandaloneView(const std::string& viewId, bool showTitle,
-            int relationship, float ratio, const std::string& refId) = 0;
+    virtual void AddStandaloneView(const QString& viewId, bool showTitle,
+            int relationship, float ratio, const QString& refId) = 0;
 
     /**
    * Adds a standalone view placeholder to this page layout. A view
@@ -468,8 +469,8 @@ struct BERRY_UI_QT IPageLayout : public Object {
    *
    * @since 3.2
    */
-    virtual void AddStandaloneViewPlaceholder(const std::string& viewId, int relationship,
-      float ratio, const std::string& refId, bool showTitle) = 0;
+    virtual void AddStandaloneViewPlaceholder(const QString& viewId, int relationship,
+      float ratio, const QString& refId, bool showTitle) = 0;
 
 
     /**
@@ -493,7 +494,7 @@ struct BERRY_UI_QT IPageLayout : public Object {
    * @return the folder layout, or <code>null</code>
    * @since 3.3
    */
-    virtual IPlaceholderFolderLayout::Pointer GetFolderForView(const std::string& id) = 0;
+    virtual IPlaceholderFolderLayout::Pointer GetFolderForView(const QString& id) = 0;
 };
 
 }

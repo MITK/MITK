@@ -38,14 +38,14 @@ public: berryObjectMacro(ViewReference);
 
 private: const ViewFactory* factory;
 
-public: std::string secondaryId;
+public: QString secondaryId;
 
 private: IMemento::Pointer memento;
 
 //private: ViewActionBuilder actionBuilder;
 
-public: ViewReference(ViewFactory* factory, const std::string& id,
-    const std::string& secondaryId, IMemento::Pointer memento);
+public: ViewReference(ViewFactory* factory, const QString& id,
+    const QString& secondaryId, IMemento::Pointer memento);
 
   /*
    * (non-Javadoc)
@@ -66,14 +66,14 @@ public: virtual SmartPointer<IWorkbenchPage> GetPage() const;
    *
    * @see org.blueberry.ui.internal.WorkbenchPartReference#getRegisteredName()
    */
-public: virtual std::string GetRegisteredName();
+public: virtual QString GetRegisteredName();
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IViewReference
    */
-public: virtual std::string GetSecondaryId();
+public: virtual QString GetSecondaryId();
 
   /*
    * (non-Javadoc)

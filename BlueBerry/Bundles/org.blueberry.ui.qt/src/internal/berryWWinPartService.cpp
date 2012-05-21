@@ -149,7 +149,7 @@ void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)
   // Hook listener on the new page.
   if (newPage)
   {
-    std::vector<IWorkbenchPartReference::Pointer> refs(newPage.Cast<
+    QList<IWorkbenchPartReference::Pointer> refs(newPage.Cast<
         WorkbenchPage> ()->GetOpenParts());
 
     for (std::size_t i = 0; i < refs.size(); i++)
@@ -209,7 +209,7 @@ void WWinPartService::Reset()
   {
     WorkbenchPage* page = dynamic_cast<WorkbenchPage*>(tempPage);
 
-    std::vector<IWorkbenchPartReference::Pointer> refs(page->GetOpenParts());
+    QList<IWorkbenchPartReference::Pointer> refs(page->GetOpenParts());
 
     for (std::size_t i = 0; i < refs.size(); i++)
     {

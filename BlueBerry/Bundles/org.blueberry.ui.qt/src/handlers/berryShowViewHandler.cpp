@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryWorkbenchTweaklet.h"
+
 #include "berryShowViewHandler.h"
 #include "berryHandlerUtil.h"
 
-#include "tweaklets/berryWorkbenchTweaklet.h"
 #include "dialogs/berryIShowViewDialog.h"
 
 #include "berryUIException.h"
@@ -46,9 +47,9 @@ Object::Pointer ShowViewHandler::Execute(
   const ExecutionEvent::ParameterMap& parameters = event->GetParameters();
   ExecutionEvent::ParameterMap::const_iterator result = parameters.find(PARAMETER_NAME_VIEW_ID);
   QString value;
-  if (result != parameters.end()) value = result->second;
+  if (result != parameters.end()) value = result.value();
 
-  if (value == "")
+  if (value.isEmpty())
   {
     this->OpenOther(window);
   }
@@ -58,9 +59,9 @@ Object::Pointer ShowViewHandler::Execute(
     {
       this->OpenView(value, window);
     }
-    catch (PartInitException e)
+    catch (const PartInitException& e)
     {
-      throw ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
+      throw ExecutionException("Part could not be initialized", e);
     }
   }
 
@@ -85,7 +86,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
     return;
   }
 
-  const std::vector<IViewDescriptor::Pointer> descriptors =
+  const QList<IViewDescriptor::Pointer> descriptors =
       dialog->GetSelection();
   for (unsigned int i = 0; i < descriptors.size(); ++i)
   {

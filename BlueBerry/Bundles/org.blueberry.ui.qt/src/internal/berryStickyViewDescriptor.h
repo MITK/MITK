@@ -31,7 +31,7 @@ private:
 
   IConfigurationElement::Pointer configurationElement;
 
-  std::string id;
+  QString id;
 
 public:
 
@@ -40,29 +40,28 @@ public:
   /**
    * Folder constant for right sticky views.
    */
-  static const std::string STICKY_FOLDER_RIGHT; // = "stickyFolderRight"; //$NON-NLS-1$
+  static const QString STICKY_FOLDER_RIGHT; // = "stickyFolderRight";
 
   /**
    * Folder constant for left sticky views.
    */
-  static const std::string STICKY_FOLDER_LEFT; // = "stickyFolderLeft"; //$NON-NLS-1$
+  static const QString STICKY_FOLDER_LEFT; // = "stickyFolderLeft";
 
   /**
    * Folder constant for top sticky views.
    */
-  static const std::string STICKY_FOLDER_TOP; // = "stickyFolderTop"; //$NON-NLS-1$
+  static const QString STICKY_FOLDER_TOP; // = "stickyFolderTop";
 
   /**
    * Folder constant for bottom sticky views.
    */
-  static const std::string STICKY_FOLDER_BOTTOM; // = "stickyFolderBottom"; //$NON-NLS-1$
+  static const QString STICKY_FOLDER_BOTTOM; // = "stickyFolderBottom";
 
   /**
    * @param element
    * @throws CoreException
    */
-  StickyViewDescriptor(IConfigurationElement::Pointer element)
-      throw (CoreException);
+  StickyViewDescriptor(IConfigurationElement::Pointer element);
 
   /**
    * Return the configuration element.
@@ -79,7 +78,7 @@ public:
   /*
    * @see IStickyViewDescriptor#GetId()
    */
-  std::string GetId() const;
+  QString GetId() const;
 
   /*
    * @see IStickyViewDescriptor#IsFixed()

@@ -14,12 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryLayoutPart.h"
 
 #include "berryILayoutContainer.h"
 #include "berryDetachedWindow.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryConstants.h"
 
@@ -27,10 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string LayoutPart::PROP_VISIBILITY = "PROP_VISIBILITY"; //$NON-NLS-1$
+const QString LayoutPart::PROP_VISIBILITY = "PROP_VISIBILITY";
 
 
-LayoutPart::LayoutPart(const std::string& id_) :
+LayoutPart::LayoutPart(const QString& id_) :
   id(id_), deferCount(0)
 {
 
@@ -72,7 +73,7 @@ bool LayoutPart::IsPlaceHolder() const
   return false;
 }
 
-std::string LayoutPart::GetID() const
+QString LayoutPart::GetID() const
 {
   return id;
 }
@@ -257,7 +258,7 @@ void LayoutPart::SetFocus()
 {
 }
 
-void LayoutPart::SetID(const std::string& str)
+void LayoutPart::SetID(const QString& str)
 {
   id = str;
 }
@@ -305,12 +306,12 @@ bool LayoutPart::IsDeferred()
   return deferCount> 0;
 }
 
-void LayoutPart::DescribeLayout(std::string&  /*buf*/) const
+void LayoutPart::DescribeLayout(QString&  /*buf*/) const
 {
 
 }
 
-std::string LayoutPart::GetPlaceHolderId()
+QString LayoutPart::GetPlaceHolderId()
 {
   return this->GetID();
 }
@@ -334,7 +335,7 @@ bool LayoutPart::AllowsAdd(LayoutPart::Pointer  /*toAdd*/)
   return false;
 }
 
-std::string LayoutPart::ToString()
+QString LayoutPart::ToString()
 {
   return "";
 }

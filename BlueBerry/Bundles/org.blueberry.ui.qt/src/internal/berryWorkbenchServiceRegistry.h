@@ -45,9 +45,9 @@ private:
   /**
    *
    */
-  static const std::string WORKBENCH_LEVEL; // = "workbench"; //$NON-NLS-1$
+  static const QString WORKBENCH_LEVEL; // = "workbench"; //$NON-NLS-1$
 
-  static const std::string EXT_ID_SERVICES; // = "org.blueberry.ui.services"; //$NON-NLS-1$
+  static const QString EXT_ID_SERVICES; // = "org.blueberry.ui.services"; //$NON-NLS-1$
 
   static WorkbenchServiceRegistry* registry; // = 0;
 
@@ -60,26 +60,26 @@ private:
     SmartPointer<const IServiceFactory> factory;
     // TODO used in removeExtension to react to bundles being unloaded
     //WeakHashMap serviceLocators = new WeakHashMap();
-    std::vector<std::string> serviceNames;
+    QList<QString> serviceNames;
 
     ServiceFactoryHandle(SmartPointer<const IServiceFactory> factory);
   };
 
-  std::map<std::string, ServiceFactoryHandle::Pointer> factories;
+  QHash<QString, ServiceFactoryHandle::Pointer> factories;
 
-  ServiceFactoryHandle::Pointer LoadFromRegistry(const std::string& key);
+  ServiceFactoryHandle::Pointer LoadFromRegistry(const QString& key);
 
-  const IExtensionPoint* GetExtensionPoint();
+  SmartPointer<IExtensionPoint> GetExtensionPoint() const;
 
   static QStringList SupportedLevels();
 
   void ProcessVariables(
-      const std::vector<SmartPointer<IConfigurationElement> >& children);
+      const QList<SmartPointer<IConfigurationElement> >& children) const;
 
   struct GlobalParentLocator: public IServiceLocator
   {
-    Object::Pointer GetService(const std::string& api);
-    bool HasService(const std::string& api) const;
+    Object::Pointer GetService(const QString& api);
+    bool HasService(const QString& api) const;
   };
 
 public:
@@ -91,10 +91,10 @@ public:
    */
   static const IServiceLocator::Pointer GLOBAL_PARENT; // = new GlobalParentLocator();
 
-  Object::Pointer GetService(const std::string& key,
+  Object::Pointer GetService(const QString& key,
       const IServiceLocator::Pointer parentLocator, const SmartPointer<const ServiceLocator> locator);
 
-  std::vector<SmartPointer<ISourceProvider> > GetSourceProviders();
+  QList<SmartPointer<ISourceProvider> > GetSourceProviders() const;
 
   //  void addExtension(IExtensionTracker tracker, IExtension extension) {
   //    // we don't need to react to adds because we are not caching the extensions we find -

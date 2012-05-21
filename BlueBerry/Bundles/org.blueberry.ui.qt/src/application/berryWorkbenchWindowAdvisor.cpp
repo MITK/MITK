@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryObjects.h>
 #include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
 
 #include "internal/berryWorkbenchWindowConfigurer.h"
 #include "internal/berryWorkbenchPlugin.h"
@@ -68,7 +69,7 @@ void WorkbenchWindowAdvisor::OpenIntro()
 
   // introOpened flag needs to be global
   IWorkbenchConfigurer::Pointer wbConfig = GetWindowConfigurer()->GetWorkbenchConfigurer();
-  std::string key = "introOpened"; //$NON-NLS-1$
+  QString key = "introOpened"; //$NON-NLS-1$
   ObjectBool::Pointer introOpened = wbConfig->GetData(key).Cast<ObjectBool>();
   if (introOpened && introOpened->GetValue())
   {

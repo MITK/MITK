@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIEditorDescriptor.h"
 
-#include <string>
-#include <vector>
-#include <list>
 
 namespace berry {
 
@@ -65,7 +62,7 @@ struct BERRY_UI_QT IFileEditorMapping : public Object {
      *
      * @return a possibly empty list of editors.
      */
-    virtual std::list<IEditorDescriptor::Pointer> GetEditors() const = 0;
+    virtual QList<IEditorDescriptor::Pointer> GetEditors() const = 0;
 
     /**
      * Returns the list of editors formerly registered for this type mapping
@@ -73,14 +70,14 @@ struct BERRY_UI_QT IFileEditorMapping : public Object {
      *
      * @return a possibly empty list of editors
      */
-    virtual std::list<IEditorDescriptor::Pointer> GetDeletedEditors() const = 0;
+    virtual QList<IEditorDescriptor::Pointer> GetDeletedEditors() const = 0;
 
     /**
      * Returns the file's extension for this type mapping.
      *
      * @return the extension for this mapping
      */
-    virtual std::string GetExtension() const = 0;
+    virtual QString GetExtension() const = 0;
 
     /**
      * Returns the descriptor of the image to use for a file of this type.
@@ -99,14 +96,14 @@ struct BERRY_UI_QT IFileEditorMapping : public Object {
      *
      * @return the label to use for this mapping
      */
-    virtual std::string GetLabel() const = 0;
+    virtual QString GetLabel() const = 0;
 
     /**
      * Returns the file's name for this type mapping.
      *
      * @return the name for this mapping
      */
-    virtual std::string GetName() const = 0;
+    virtual QString GetName() const = 0;
 };
 
 }

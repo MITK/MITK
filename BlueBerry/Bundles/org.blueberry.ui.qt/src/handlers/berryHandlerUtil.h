@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYHANDLERUTIL_H_
 
 #include <berryExecutionEvent.h>
-#include <berryObjectVector.h>
+#include <berryObjectList.h>
 #include <berryObjectString.h>
 
 #include <org_blueberry_ui_qt_Export.h>
@@ -48,12 +48,12 @@ private:
   static void NoVariableFound(ExecutionEvent::Pointer event, const QString& name);
 
   static void IncorrectTypeFound(ExecutionEvent::Pointer event, const QString& name,
-      const QString& expectedType, const QString& wrongType);
+                                 const QString& expectedType, const QString& wrongType);
 
 
 public:
 
-  typedef ObjectVector<ObjectString::Pointer> StringVectorType;
+  typedef ObjectList<ObjectString::Pointer> StringVectorType;
 
   /**
    * Extract the variable.
@@ -90,7 +90,6 @@ public:
    *            The variable name to extract.
    * @return The object from the application context, or <code>null</code>
    *         if it could not be found.
-   * @since 3.4
    */
   static Object::Pointer GetVariable(Object::Pointer context, const QString& name);
 
@@ -367,7 +366,6 @@ public:
    * @param event
    *            The execution event that contains the application context
    * @return the show in selection, or <code>null</code>.
-   * @since 3.4
    */
   static ISelection::Pointer GetShowInSelection(ExecutionEvent::Pointer event);
 
@@ -379,7 +377,6 @@ public:
    * @return the show in selection, or <code>null</code>.
    * @throws ExecutionException
    *             If the show in selection variable is not found.
-   * @since 3.4
    */
   static ISelection::Pointer GetShowInSelectionChecked(ExecutionEvent::Pointer event);
 
@@ -389,7 +386,6 @@ public:
    * @param event
    *            The execution event that contains the application context
    * @return the show in input, or <code>null</code>.
-   * @since 3.4
    */
   static Object::Pointer GetShowInInput(ExecutionEvent::Pointer event);
 
@@ -401,7 +397,6 @@ public:
    * @return the show in input, or <code>null</code>.
    * @throws ExecutionException
    *             If the show in input variable is not found.
-   * @since 3.4
    */
   static Object::Pointer GetShowInInputChecked(ExecutionEvent::Pointer event);
 };

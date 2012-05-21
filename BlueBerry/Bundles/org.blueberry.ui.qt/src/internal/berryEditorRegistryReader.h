@@ -43,7 +43,7 @@ protected:
    * Implementation of the abstract method that
    * processes one configuration element.
    */
-  bool ReadElement(IConfigurationElement::Pointer element);
+  bool ReadElement(const SmartPointer<IConfigurationElement>& element);
 
 
 public:
@@ -64,7 +64,7 @@ public:
    * @param element
    */
   void ReadElement(EditorRegistry* editorRegistry,
-      IConfigurationElement::Pointer element);
+                   const SmartPointer<IConfigurationElement>& element);
 };
 
 }

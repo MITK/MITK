@@ -14,9 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryPartPane.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "tweaklets/berryWorkbenchPageTweaklet.h"
 
 #include "berryWorkbenchPage.h"
@@ -361,7 +362,7 @@ bool PartPane::IsBusy()
   return busy;
 }
 
-void PartPane::DescribeLayout(std::string& buf) const
+void PartPane::DescribeLayout(QString& buf) const
 {
 
   IWorkbenchPartReference::Pointer part = this->GetPartReference();

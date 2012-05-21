@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-//ISelectionService::SelectionEvents& AbstractSelectionService::GetSelectionEvents(const std::string& partId)
+//ISelectionService::SelectionEvents& AbstractSelectionService::GetSelectionEvents(const QString& partId)
 //{
 //  if (partId.empty())
 //  {
@@ -63,7 +63,7 @@ void AbstractSelectionService::AddSelectionListener(ISelectionListener::Pointer 
   fListeners.push_back(l);
 }
 
-void AbstractSelectionService::AddSelectionListener(const std::string& partId,
+void AbstractSelectionService::AddSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   this->GetPerPartTracker(partId)->AddSelectionListener(listener);
@@ -75,7 +75,7 @@ void AbstractSelectionService::AddPostSelectionListener(
   fPostListeners.push_back(l);
 }
 
-void AbstractSelectionService::AddPostSelectionListener(const std::string& partId,
+void AbstractSelectionService::AddPostSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   this->GetPerPartTracker(partId)->AddPostSelectionListener(listener);
@@ -83,11 +83,11 @@ void AbstractSelectionService::AddPostSelectionListener(const std::string& partI
 
 void AbstractSelectionService::RemoveSelectionListener(ISelectionListener::Pointer l)
 {
-  fListeners.remove(l);
+  fListeners.removeAll(l);
 }
 
 void AbstractSelectionService::RemovePostSelectionListener(
-    const std::string& partId, ISelectionListener::Pointer listener)
+    const QString& partId, ISelectionListener::Pointer listener)
 {
   this->GetPerPartTracker(partId)->RemovePostSelectionListener(listener);
 }
@@ -95,10 +95,10 @@ void AbstractSelectionService::RemovePostSelectionListener(
 void AbstractSelectionService::RemovePostSelectionListener(
     ISelectionListener::Pointer l)
 {
-  fPostListeners.remove(l);
+  fPostListeners.removeAll(l);
 }
 
-void AbstractSelectionService::RemoveSelectionListener(const std::string& partId,
+void AbstractSelectionService::RemoveSelectionListener(const QString& partId,
     ISelectionListener::Pointer listener)
 {
   this->GetPerPartTracker(partId)->RemoveSelectionListener(listener);
@@ -107,7 +107,7 @@ void AbstractSelectionService::RemoveSelectionListener(const std::string& partId
 void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-  for (std::list<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+  for (QList<ISelectionListener::Pointer>::iterator i = fListeners.begin();
       i != fListeners.end(); ++i)
   {
     ISelectionListener::Pointer l = *i;
@@ -117,7 +117,7 @@ void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
       {
         l->SelectionChanged(part, sel);
       }
-      catch (const Poco::RuntimeException& rte)
+      catch (const ctkRuntimeException& rte)
       {
         WorkbenchPlugin::Log(rte);
       }
@@ -132,7 +132,7 @@ void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
 void AbstractSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-  for (std::list<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+  for (QList<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
       i != fPostListeners.end(); ++i)
   {
     ISelectionListener::Pointer l = *i;
@@ -142,7 +142,7 @@ void AbstractSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
       {
         l->SelectionChanged(part, sel);
       }
-      catch (const Poco::RuntimeException& rte)
+      catch (const ctkRuntimeException& rte)
       {
         WorkbenchPlugin::Log(rte);
       }
@@ -155,10 +155,10 @@ void AbstractSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
 }
 
 AbstractPartSelectionTracker::Pointer AbstractSelectionService::GetPerPartTracker(
-    const std::string& partId)
+    const QString& partId)
 {
   AbstractPartSelectionTracker::Pointer tracker;
-  std::map<std::string, AbstractPartSelectionTracker::Pointer>::const_iterator res = perPartTrackers.find(partId);
+  QHash<QString, AbstractPartSelectionTracker::Pointer>::const_iterator res = perPartTrackers.find(partId);
   if (res == perPartTrackers.end())
   {
     tracker = this->CreatePartTracker(partId);
@@ -166,7 +166,7 @@ AbstractPartSelectionTracker::Pointer AbstractSelectionService::GetPerPartTracke
   }
   else
   {
-    tracker = res->second;
+    tracker = res.value();
   }
 
   return tracker;
@@ -184,7 +184,7 @@ ISelection::ConstPointer AbstractSelectionService::GetSelection() const
   }
 }
 
-ISelection::ConstPointer AbstractSelectionService::GetSelection(const std::string& partId)
+ISelection::ConstPointer AbstractSelectionService::GetSelection(const QString& partId)
 {
   return this->GetPerPartTracker(partId)->GetSelection();
 }

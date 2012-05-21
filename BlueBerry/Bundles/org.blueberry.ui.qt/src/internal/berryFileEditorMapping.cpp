@@ -19,19 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string FileEditorMapping::STAR = "*"; //$NON-NLS-1$
-const std::string FileEditorMapping::DOT = "."; //$NON-NLS-1$
+const QString FileEditorMapping::STAR = "*"; //$NON-NLS-1$
+const QString FileEditorMapping::DOT = "."; //$NON-NLS-1$
 
 bool FileEditorMapping::CompareList (
-    const std::list<IEditorDescriptor::Pointer>& l1,
-    const std::list<IEditorDescriptor::Pointer>& l2) const
+    const QList<IEditorDescriptor::Pointer>& l1,
+    const QList<IEditorDescriptor::Pointer>& l2) const
 {
   if (l1.size() != l2.size())
   {
     return false;
   }
 
-  std::list<IEditorDescriptor::Pointer>::const_iterator iter1, iter2;
+  QList<IEditorDescriptor::Pointer>::const_iterator iter1, iter2;
   for (iter1 = l1.begin(), iter2 = l2.begin(); iter1 != l1.end() && iter2 != l2.end();
        ++iter1, ++iter2)
   {
@@ -45,7 +45,7 @@ bool FileEditorMapping::CompareList (
 }
 
 
-FileEditorMapping::FileEditorMapping(const std::string& extension, const std::string& name)
+FileEditorMapping::FileEditorMapping(const QString& extension, const QString& name)
 {
   if (name.size() < 1)
   {
@@ -62,7 +62,7 @@ FileEditorMapping::FileEditorMapping(const std::string& extension, const std::st
 void FileEditorMapping::AddEditor(EditorDescriptor::Pointer editor)
 {
   editors.push_back(editor);
-  deletedEditors.remove(editor);
+  deletedEditors.removeAll(editor);
 }
 
 bool FileEditorMapping::operator==(const Object* obj) const
@@ -105,75 +105,75 @@ IEditorDescriptor::Pointer FileEditorMapping::GetDefaultEditor()
   return editors.front();
 }
 
-std::list<IEditorDescriptor::Pointer> FileEditorMapping::GetEditors() const
+QList<IEditorDescriptor::Pointer> FileEditorMapping::GetEditors() const
 {
   return editors;
 }
 
-std::list<IEditorDescriptor::Pointer> FileEditorMapping::GetDeletedEditors() const
+QList<IEditorDescriptor::Pointer> FileEditorMapping::GetDeletedEditors() const
 {
   return deletedEditors;
 }
 
-std::string FileEditorMapping::GetExtension() const
+QString FileEditorMapping::GetExtension() const
 {
   return extension;
 }
 
-std::string FileEditorMapping::GetLabel() const
+QString FileEditorMapping::GetLabel() const
 {
-  return name + (extension.empty() ? "" : DOT + extension); //$NON-NLS-1$
+  return name + (extension.isEmpty() ? "" : DOT + extension);
 }
 
-std::string FileEditorMapping::GetName() const
+QString FileEditorMapping::GetName() const
 {
   return name;
 }
 
 void FileEditorMapping::RemoveEditor(EditorDescriptor::Pointer editor)
 {
-  editors.remove(editor);
+  editors.removeAll(editor);
   deletedEditors.push_back(editor);
-  declaredDefaultEditors.remove(editor);
+  declaredDefaultEditors.removeAll(editor);
 }
 
 void FileEditorMapping::SetDefaultEditor(EditorDescriptor::Pointer editor)
 {
-  editors.remove(editor);
+  editors.removeAll(editor);
   editors.push_front(editor);
-  declaredDefaultEditors.remove(editor);
+  declaredDefaultEditors.removeAll(editor);
   declaredDefaultEditors.push_front(editor);
 }
 
-void FileEditorMapping::SetEditorsList(const std::list<IEditorDescriptor::Pointer>& newEditors)
+void FileEditorMapping::SetEditorsList(const QList<IEditorDescriptor::Pointer>& newEditors)
 {
   editors = newEditors;
   declaredDefaultEditors = newEditors;
 }
 
-void FileEditorMapping::SetDeletedEditorsList(const std::list<IEditorDescriptor::Pointer>& newDeletedEditors)
+void FileEditorMapping::SetDeletedEditorsList(const QList<IEditorDescriptor::Pointer>& newDeletedEditors)
 {
   deletedEditors = newDeletedEditors;
 }
 
-void FileEditorMapping::SetExtension(const std::string& extension)
+void FileEditorMapping::SetExtension(const QString& extension)
 {
   this->extension = extension;
 }
 
-void FileEditorMapping::SetName(const std::string& name)
+void FileEditorMapping::SetName(const QString& name)
 {
   this->name = name;
 }
 
-std::list<IEditorDescriptor::Pointer> FileEditorMapping::GetDeclaredDefaultEditors()
+QList<IEditorDescriptor::Pointer> FileEditorMapping::GetDeclaredDefaultEditors()
 {
   return declaredDefaultEditors;
 }
 
 bool FileEditorMapping::IsDeclaredDefaultEditor(IEditorDescriptor::Pointer editor)
 {
-  for (std::list<IEditorDescriptor::Pointer>::iterator iter = declaredDefaultEditors.begin();
+  for (QList<IEditorDescriptor::Pointer>::iterator iter = declaredDefaultEditors.begin();
        iter != declaredDefaultEditors.end(); ++iter)
   {
     if (*iter == editor) return true;
@@ -182,7 +182,7 @@ bool FileEditorMapping::IsDeclaredDefaultEditor(IEditorDescriptor::Pointer edito
   return false;
 }
 
-void FileEditorMapping::SetDefaultEditors(const std::list<IEditorDescriptor::Pointer>& defaultEditors)
+void FileEditorMapping::SetDefaultEditors(const QList<IEditorDescriptor::Pointer>& defaultEditors)
 {
   declaredDefaultEditors = defaultEditors;
 }

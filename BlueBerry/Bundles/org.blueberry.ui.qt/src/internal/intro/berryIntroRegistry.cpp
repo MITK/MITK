@@ -59,7 +59,7 @@ QString IntroRegistry::GetIntroForProduct(
            WorkbenchPlugin.log("Invalid intro binding", status); //$NON-NLS-1$
            */
           WorkbenchPlugin::Log(
-                elements[j]->GetDeclaringExtension()->GetNamespaceIdentifier().toStdString()
+                elements[j]->GetDeclaringExtension()->GetNamespaceIdentifier()
                 + ": Invalid intro binding. introId and productId must be defined");
           continue;
         }
@@ -79,20 +79,20 @@ int IntroRegistry::GetIntroCount() const
   return static_cast<int> (GetIntros().size());
 }
 
-std::vector<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
+QList<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
 {
   IExtensionPoint::Pointer point =
       Platform::GetExtensionRegistry()->GetExtensionPoint(
         PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
   if (!point)
   {
-    return std::vector<IIntroDescriptor::Pointer>();
+    return QList<IIntroDescriptor::Pointer>();
   }
 
   QList<IExtension::Pointer> extensions(point->GetExtensions());
   extensions = RegistryReader::OrderExtensions(extensions);
 
-  std::vector<IIntroDescriptor::Pointer> list;
+  QList<IIntroDescriptor::Pointer> list;
   for (int i = 0; i < extensions.size(); i++)
   {
     QList<IConfigurationElement::Pointer> elements(
@@ -142,7 +142,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
 
   IIntroDescriptor::Pointer descriptor;
 
-  std::vector<IIntroDescriptor::Pointer> intros(GetIntros());
+  QList<IIntroDescriptor::Pointer> intros(GetIntros());
   for (std::size_t i = 0; i < intros.size(); i++)
   {
     if (intros[i]->GetId() == targetIntroId)
@@ -157,7 +157,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
 
 IIntroDescriptor::Pointer IntroRegistry::GetIntro(const QString& id) const
 {
-  std::vector<IIntroDescriptor::Pointer> intros(GetIntros());
+  QList<IIntroDescriptor::Pointer> intros(GetIntros());
   for (std::size_t i = 0; i < intros.size(); i++)
   {
     IIntroDescriptor::Pointer desc = intros[i];

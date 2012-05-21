@@ -18,26 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYINTROCONSTANTS_H_
 #define BERRYINTROCONSTANTS_H_
 
-#include <string>
+#include <QString>
 
 namespace berry {
 
 /**
  * Contains constants used by the intro implementation
- *
- * @since 3.0
  */
 struct IntroConstants {
 
   /**
    * The id of the view that is used as the intro host.
    */
-  static const std::string INTRO_VIEW_ID; // = "org.blueberry.ui.internal.introview";
+  static const QString INTRO_VIEW_ID; // = "org.blueberry.ui.internal.introview";
 
   /**
    * The id of the editor that is used as the intro host.
    */
-  static const std::string INTRO_EDITOR_ID; // = "org.blueberry.ui.internal.introeditor";
+  static const QString INTRO_EDITOR_ID; // = "org.blueberry.ui.internal.introeditor";
 
   /**
    * Constant defining the realization of the intro part as a view.

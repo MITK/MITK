@@ -49,7 +49,7 @@ class BERRY_UI_QT WorkbenchPart : public QObject,
   Q_INTERFACES(berry::IExecutableExtension);
 
 public:
-  berryObjectMacro(WorkbenchPart);
+  berryObjectMacro(WorkbenchPart)
 
   ~WorkbenchPart();
 
@@ -187,8 +187,8 @@ public:
    * Should not be called by clients. It is called by the core plugin when creating
    * this executable extension.
    */
-  void SetInitializationData(IConfigurationElement::Pointer cfig,
-          const QString& propertyName, Object::Pointer data);
+  void SetInitializationData(const IConfigurationElement::Pointer& cfig,
+                             const QString& propertyName, const Object::Pointer& data);
 
   /*
    * Creates the controls for this workbench part.

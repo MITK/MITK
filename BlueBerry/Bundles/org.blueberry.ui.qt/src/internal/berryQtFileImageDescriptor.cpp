@@ -22,14 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPixmap>
 #include <QByteArray>
 
-#include <Poco/FileStream.h>
-#include <Poco/Exception.h>
-
 namespace berry
 {
 
-QtFileImageDescriptor::QtFileImageDescriptor(const std::string& filename,
-    const std::string& pluginid) :
+QtFileImageDescriptor::QtFileImageDescriptor(const QString& filename,
+    const QString& pluginid) :
   filename(filename), pluginid(pluginid)
 {
 
@@ -37,23 +34,25 @@ QtFileImageDescriptor::QtFileImageDescriptor(const std::string& filename,
 
 void* QtFileImageDescriptor::CreateImage(bool returnMissingImageOnError)
 {
-  if (pluginid.empty())
+  if (pluginid.isEmpty())
   {
-    try
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly))
     {
-      Poco::FileInputStream fs(filename);
-      return this->CreateFromStream(&fs);
-    } catch (const Poco::FileNotFoundException* e)
+      QByteArray ba = f.readAll();
+      return this->CreateFromByteArray(ba);
+    }
+    else
     {
-      BERRY_ERROR << e->displayText() << std::endl;
+      BERRY_ERROR << "Could not open file: " << filename;
       if (returnMissingImageOnError)
         return GetMissingImageDescriptor()->CreateImage();
     }
   }
   else
   {
-    IBundle::Pointer bundle(Platform::GetBundle(pluginid));
-    if (!bundle)
+    QSharedPointer<ctkPlugin> plugin(Platform::GetCTKPlugin(pluginid));
+    if (!plugin)
     {
       if (returnMissingImageOnError)
         return GetMissingImageDescriptor()->CreateImage();
@@ -61,18 +60,12 @@ void* QtFileImageDescriptor::CreateImage(bool returnMissingImageOnError)
       return 0;
     }
 
-    std::istream* s = bundle->GetResource(filename);
-    if (!s && returnMissingImageOnError)
+    QByteArray ba = plugin->getResource(filename);
+    if (ba.isEmpty() && returnMissingImageOnError)
       return GetMissingImageDescriptor()->CreateImage();
 
-    if (s) {
-      void* image = this->CreateFromStream(s);
-      delete s;
-      return image;
-    }
+    return this->CreateFromByteArray(ba);
   }
-
-  return 0;
 }
 
 void QtFileImageDescriptor::DestroyImage(void* img)
@@ -81,19 +74,11 @@ void QtFileImageDescriptor::DestroyImage(void* img)
   delete icon;
 }
 
-QIcon* QtFileImageDescriptor::CreateFromStream(std::istream* s)
+QIcon* QtFileImageDescriptor::CreateFromByteArray(const QByteArray& ba)
 {
-  s->seekg(0, std::ios::end);
-  std::ios::pos_type length = s->tellg();
-  s->seekg(0, std::ios::beg);
-
-  char* data = new char[length];
-  s->read(data, length);
   QPixmap pixmap;
-  pixmap.loadFromData(QByteArray::fromRawData(data, length));
+  pixmap.loadFromData(ba);
   QIcon* icon = new QIcon(pixmap);
-  delete[] data;
-
   return icon;
 }
 

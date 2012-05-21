@@ -53,13 +53,13 @@ private:
      * List of windows managed by this window manager
      * (element type: <code>Window</code>).
      */
-    std::vector<SmartPointer<Window> > windows;
+    QList<SmartPointer<Window> > windows;
 
     /**
      * List of window managers who have this window manager
      * as their parent (element type: <code>WindowManager</code>).
      */
-    std::list<WindowManager*> subManagers;
+    QList<WindowManager*> subManagers;
 
     /**
      * Adds the given window manager to the list of
@@ -117,7 +117,7 @@ public:
      *
      * @return a possibly empty list of window
      */
-    std::vector<SmartPointer<Window> > GetWindows();
+    QList<SmartPointer<Window> > GetWindows();
 
     /**
      * Removes the given window from the set of windows managed by

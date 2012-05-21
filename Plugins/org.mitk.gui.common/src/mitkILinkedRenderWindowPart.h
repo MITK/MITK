@@ -34,7 +34,9 @@ class SlicesSwiveller;
  * This inteface should be implemented by subclasses of berry::IWorkbenchPart if they
  * provided several linked QmitkRenderWindow instances.
  */
-struct ILinkedRenderWindowPart : public virtual IRenderWindowPart {
+struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWindowPart {
+
+  ~ILinkedRenderWindowPart();
 
   /**
    * Get the mitk::SlicesRotator.

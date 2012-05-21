@@ -18,8 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkToFUtilView_h
 #define QmitkToFUtilView_h
 
-#include <QmitkFunctionality.h>
+//#include <QmitkFunctionality.h>
 #include <QmitkOverlayController.h>
+#include <QmitkAbstractView.h>
 
 #include <ui_QmitkToFUtilViewControls.h>
 
@@ -50,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkToFUtilView : public QmitkFunctionality
+class QmitkToFUtilView : public QmitkAbstractView
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -70,6 +71,8 @@ class QmitkToFUtilView : public QmitkFunctionality
     virtual void Deactivated();
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
     virtual void StdMultiWidgetNotAvailable();
+
+    void SetFocus();
 
   protected slots:
   

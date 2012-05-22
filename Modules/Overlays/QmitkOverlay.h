@@ -121,6 +121,8 @@ protected:
 
   /** \brief internal QWidget representing the overlay */
   QWidget* m_Widget;
+
+  bool m_WidgetIsCustom;
 };
 
 

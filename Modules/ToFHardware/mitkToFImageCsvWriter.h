@@ -57,7 +57,7 @@ namespace mitk
     \brief Pushes the image data to the output files
     \param data from distance, amplitude and intensity images as float values
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData);
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
 
   protected:
 
@@ -65,7 +65,6 @@ namespace mitk
     FILE* m_DistanceOutfile; ///< file for distance image
     FILE* m_AmplitudeOutfile; ///< file for amplitude image
     FILE* m_IntensityOutfile; ///< file for intensity image
-
 
   private:
     /*!

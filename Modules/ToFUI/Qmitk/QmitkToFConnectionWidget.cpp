@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
 #include "mitkToFCameraMESASR4000Device.h"
+#include "mitkKinectDevice.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -85,38 +86,7 @@ void QmitkToFConnectionWidget::ShowParameterWidget()
 {
   QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
 
-  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
-    (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw") )
-  {
-    ShowPMDParameterWidget();
-  }
-  else if (selectedCamera=="MESA Swissranger 4000")
-  {
-    ShowMESAParameterWidget();
-  }
-  else
-  {
-    this->m_Controls->m_PMDParameterWidget->hide();
-    this->m_Controls->m_MESAParameterWidget->hide();
-  }
-}
-
-void QmitkToFConnectionWidget::ShowPMDParameterWidget()
-{
-  this->m_Controls->m_PMDParameterWidget->show();
-  this->m_Controls->m_MESAParameterWidget->hide();
-}
-
-void QmitkToFConnectionWidget::ShowMESAParameterWidget()
-{
-  this->m_Controls->m_PMDParameterWidget->hide();
-  this->m_Controls->m_MESAParameterWidget->show();
-}
-
-void QmitkToFConnectionWidget::ShowPlayerParameterWidget()
-{
-  this->m_Controls->m_PMDParameterWidget->hide();
-  this->m_Controls->m_MESAParameterWidget->hide();
+  this->OnSelectCamera(selectedCamera);
 }
 
 mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
@@ -124,35 +94,32 @@ mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
   return m_ToFImageGrabber;
 }
 
-void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedText)
+void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedCamera)
 {
-  if (selectedText == "PMD CamCube 2.0/3.0" || selectedText == "PMD CamCubeRaw 2.0/3.0" ) // PMD camcube 2
+  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
+    (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0") )
   {
-    ShowPMDParameterWidget();
+    this->m_Controls->m_PMDParameterWidget->show();
+    this->m_Controls->m_MESAParameterWidget->hide();
+    this->m_Controls->m_KinectParameterWidget->hide();
   }
-  else if (selectedText == "PMD CamBoard" || selectedText == "PMD CamBoardRaw" ) // pmd camboard
+  else if (selectedCamera=="MESA Swissranger 4000")
   {
-    ShowPMDParameterWidget();
+    this->m_Controls->m_PMDParameterWidget->hide();
+    this->m_Controls->m_MESAParameterWidget->show();
+    this->m_Controls->m_KinectParameterWidget->hide();
   }
-  else if (selectedText == "PMD O3D") // pmd O3d
+  else if (selectedCamera=="Microsoft Kinect")
   {
-    ShowPMDParameterWidget();
+    this->m_Controls->m_PMDParameterWidget->hide();
+    this->m_Controls->m_MESAParameterWidget->hide();
+    this->m_Controls->m_KinectParameterWidget->show();
   }
-  else if (selectedText == "MESA Swissranger 4000") // MESA 4000
+  else
   {
-    ShowMESAParameterWidget();
-  }
-  else if (selectedText == "PMD Player") // pmd file player
-  {
-    ShowPlayerParameterWidget();
-  }
-  else if (selectedText == "PMD Raw Data Player") // pmd raw data player
-  {
-    ShowPlayerParameterWidget();
-  }
-  else if (selectedText == "MITK Player") // mitk player
-  {
-    ShowPlayerParameterWidget();
+    this->m_Controls->m_PMDParameterWidget->hide();
+    this->m_Controls->m_MESAParameterWidget->hide();
+    this->m_Controls->m_KinectParameterWidget->hide();
   }
 }
 
@@ -196,7 +163,11 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == "MESA Swissranger 4000")
     {//MESA SR4000
       this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
-   }
+    }
+    else if (selectedCamera == "Microsoft Kinect")
+    {//KINECT
+      this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
+    }
     else if (selectedCamera == "PMD Player")
     {//PMD player
       playerMode = true;
@@ -259,7 +230,11 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           }
           if (found == std::string::npos)
           {
-            msg = msg + "Input file name must end with \"_DistanceImage.pic\", \"_AmplitudeImage.pic\" or \"_IntensityImage.pic\"!";
+            found = baseFilename.rfind("_RGBImage");
+          }
+          if (found == std::string::npos)
+          {
+            msg = msg + "Input file name must end with \"_DistanceImage\", \"_AmplitudeImage\", \"_IntensityImage\" or \"_RGBImage\"!";
             throw std::logic_error(msg.c_str());
           }
           std::string baseFilenamePrefix = baseFilename.substr(0,found);
@@ -267,27 +242,40 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           std::string distanceImageFileName = dir + "/" + baseFilenamePrefix + "_DistanceImage" + extension;
           std::string amplitudeImageFileName = dir + "/" + baseFilenamePrefix + "_AmplitudeImage" + extension;
           std::string intensityImageFileName = dir + "/" + baseFilenamePrefix + "_IntensityImage" + extension;
+          std::string rgbImageFileName = dir + "/" + baseFilenamePrefix + "_RGBImage" + extension;
 
           if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + distanceImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
           }
           if (!itksys::SystemTools::FileExists(amplitudeImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + amplitudeImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
           }
           if (!itksys::SystemTools::FileExists(intensityImageFileName.c_str(), true))
           {
-            msg = msg + "Inputfile not exist! " + intensityImageFileName;
-            throw std::logic_error(msg.c_str());
+            this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", "");
           }
-          //set the file names
-          this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
-          this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
-          this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
-
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
+          }
+          if (!itksys::SystemTools::FileExists(rgbImageFileName.c_str(), true))
+          {
+            this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", "");
+          }
+          else
+          {
+            this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
+          }
         }
         catch (std::exception &e)
         {
@@ -302,23 +290,29 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       }
 
     }
+
+    this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+    this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+    this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+
+    if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
+        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0"))
+    {
+      this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
+    }
+    else if (selectedCamera=="MESA Swissranger 4000")
+    {
+      this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
+    }
+    else if (selectedCamera=="Microsoft Kinect")
+    {
+      this->m_Controls->m_KinectParameterWidget->ActivateAllParameters();
+    }
+    m_Controls->m_ConnectCameraButton->setText("Disconnect");
+
     //if a connection could be established
     if (this->m_ToFImageGrabber->ConnectCamera())
     {
-      this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
-      this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
-
-      if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
-        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0"))
-      {
-        this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
-      }
-      else if (selectedCamera=="MESA Swissranger 4000")
-      {
-        this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
-      }
-      m_Controls->m_ConnectCameraButton->setText("Disconnect");
-
       // send connect signal to the caller functionality
       emit ToFCameraConnected();
     }

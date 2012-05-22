@@ -1,25 +1,27 @@
-/*===================================================================
+/*=========================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date: 2010-05-27 16:06:53 +0200 (Do, 27 Mai 2010) $
+Version:   $Revision:  $
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
-All rights reserved.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-#ifndef __mitkToFCameraMESADevice_h
-#define __mitkToFCameraMESADevice_h
+=========================================================================*/
+#ifndef __mitkKinectDevice_h
+#define __mitkKinectDevice_h
 
 #include "mitkToFHardwareExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
-#include "mitkToFCameraMESAController.h"
+#include "mitkKinectController.h"
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -31,17 +33,17 @@ namespace mitk
 {
   /**
   * @brief Interface for all representations of MESA ToF devices. 
-  * ToFCameraMESADevice internally holds an instance of ToFCameraMESAController and starts a thread 
+  * KinectDevice internally holds an instance of KinectController and starts a thread 
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraMESADevice : public ToFCameraDevice
+  class MITK_TOFHARDWARE_EXPORT KinectDevice : public ToFCameraDevice
   {
   public: 
 
-    mitkClassMacro( ToFCameraMESADevice , ToFCameraDevice );
+    mitkClassMacro( KinectDevice , ToFCameraDevice );
 
     itkNewMacro( Self );
 
@@ -99,19 +101,19 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
-//    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /*!
-//    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
-//    \param bufferSize buffer size the buffer should be reset to
-//    */
-//    virtual void ResetBuffer(int bufferSize) = 0;
+      int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
+    //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
+    //    /*!
+    //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
+    //    \param bufferSize buffer size the buffer should be reset to
+    //    */
+    //    virtual void ResetBuffer(int bufferSize) = 0;
     //TODO add/correct documentation for requiredImageSequence and capturedImageSequence in the GetAllImages, GetDistances, GetIntensities and GetAmplitudes methods.
 
     /*!
     \brief returns the corresponding camera controller
     */
-    ToFCameraMESAController::Pointer GetController();
+    KinectController::Pointer GetController();
 
     /*!
     \brief set a BaseProperty
@@ -120,9 +122,9 @@ namespace mitk
 
   protected:
 
-    ToFCameraMESADevice();
+    KinectDevice();
 
-    ~ToFCameraMESADevice();
+    ~KinectDevice();
 
     /*!
     \brief Thread method continuously acquiring images from the ToF hardware
@@ -133,11 +135,12 @@ namespace mitk
     */
     void GetNextPos();
 
-    ToFCameraMESAController::Pointer m_Controller; ///< corresponding CameraController
+    KinectController::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
     float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
+    unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
 
   private:
 

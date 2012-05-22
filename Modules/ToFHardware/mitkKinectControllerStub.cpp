@@ -72,4 +72,27 @@ namespace mitk
   {
     MITK_WARN("ToF") << "Error: Kinect camera currently not available";
   }
+
+  unsigned int KinectController::GetCaptureWidth() const
+  {
+    MITK_WARN("ToF") << "Error: Kinect camera currently not available";
+    return 0;
+  }
+
+  unsigned int KinectController::GetCaptureHeight() const
+  {
+    MITK_WARN("ToF") << "Error: Kinect camera currently not available";
+    return 0;
+  }
+
+  bool KinectController::GetUseIR() const
+  {
+    MITK_WARN("ToF") << "Error: Kinect camera currently not available";
+    return true;
+  }
+
+  void KinectController::SetUseIR(bool useIR)
+  {
+    MITK_WARN("ToF") << "Error: Kinect camera currently not available";
+  }
 }

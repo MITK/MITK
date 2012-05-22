@@ -417,11 +417,9 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::SetGradientImage( GradientDirectionContainerType *gradientDirection
                     , const GradientImagesType *gradientImage
-                    , int refBValue /*BValue referenced from the Image Header Information*/
-                    )//, std::vector<bool> listOfUserSelctedBValues )
+                    , float bvalue)
 {
-
-  this->m_RefBValue = refBValue;
+  this->m_BValue = bvalue;
   this->m_GradientDirectionContainer = gradientDirection;
   this->m_NumberOfBaselineImages = 0;
   this->m_ReconstructionType = Mode_Standard1Shell;
@@ -429,7 +427,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   GradientDirectionContainerType::ConstIterator gdcit;
   for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
   {
-    double bValueKey = int(((m_RefBValue* gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+    double bValueKey = int(((m_BValue* gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
     m_GradientIndexMap[bValueKey].push_back(gdcit.Index());
   }
 

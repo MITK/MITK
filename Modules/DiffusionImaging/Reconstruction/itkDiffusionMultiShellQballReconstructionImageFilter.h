@@ -85,7 +85,7 @@ public:
    * corresponds to the gradient direction of the ith component image the
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
-    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image, int BvalueRef );//, std::vector<bool> listOfUserSelctedBValues );
+    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
 
 
     /** Get reference image */
@@ -124,8 +124,6 @@ public:
 
     itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
     //itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
-
-    itkSetMacro( BValue, TOdfPixelType);
 
     itkSetMacro( Lambda, double );
     itkGetMacro( Lambda, double );
@@ -183,7 +181,7 @@ private:
     ReferencePixelType m_Threshold;
 
     /** LeBihan's b-value for normalizing tensors */
-    TOdfPixelType m_BValue;
+    float m_BValue;
 
     typename BZeroImageType::Pointer m_BZeroImage;
 
@@ -196,8 +194,6 @@ private:
     bool m_IsArithmeticProgession;
 
     int m_NumberCoefficients;
-
-    int m_RefBValue;
 
     ReconstructionType m_ReconstructionType;
 

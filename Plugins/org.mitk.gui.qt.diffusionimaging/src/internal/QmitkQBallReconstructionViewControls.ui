@@ -212,7 +212,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="m_groupQShellSelecton">
+       <widget class="QGroupBox" name="m_groupQShellSelection">
         <property name="enabled">
          <bool>true</bool>
         </property>

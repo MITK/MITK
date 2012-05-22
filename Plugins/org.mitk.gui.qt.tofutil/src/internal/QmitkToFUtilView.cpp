@@ -168,7 +168,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
         this->m_VideoSource->StartCapturing();
         if(!this->m_VideoSource->IsCapturingEnabled())
         {
-            MITK_INFO << "unable to initialize video grabbing/playback";
+            MITK_INFO << "unable to initialize video grabbing/playback, probably not video camera connected";
             this->m_VideoEnabled = false;
             m_Controls->m_VideoTextureCheckBox->setEnabled(false);
         }

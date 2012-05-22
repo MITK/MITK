@@ -38,7 +38,6 @@ namespace mitk
     if (m_Controller)
     {
       ok = m_Controller->OpenCameraConnection();
-      MITK_INFO<<"Device ok? "<<ok;
       if (ok)
       {
         this->m_CaptureWidth = m_Controller->GetCaptureWidth();

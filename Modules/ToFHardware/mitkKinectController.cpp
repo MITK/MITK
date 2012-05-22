@@ -93,19 +93,6 @@ KinectController::~KinectController()
       DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
       DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
       d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.SetMapOutputMode(DepthMode));
-      {
-        XnUInt32 NumModes = 10;
-        XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
-        d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
-        for ( unsigned int i = 0; i < NumModes; i++ )
-        {
-          std::cout << "DepthModes #" << i << std::endl;
-          std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
-        }
-        delete[] SupportedModes;
-      }
 
       if (d->m_UseIR)
       {
@@ -117,18 +104,6 @@ KinectController::~KinectController()
         IRMode.nYRes = XN_VGA_Y_RES;
         IRMode.nFPS = 30;
         d->m_ConnectionCheck = !d->ErrorText(d->m_IRGenerator.SetMapOutputMode(IRMode));
-
-        XnUInt32 NumModes = 10;
-        XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
-        d->m_ConnectionCheck = !d->ErrorText(d->m_IRGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
-        for ( unsigned int i = 0; i < NumModes; i++ )
-        {
-          std::cout << "Mode #" << i << std::endl;
-          std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
-          std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
-          std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
-        }
-        delete[] SupportedModes;
       }
       else
       {
@@ -139,19 +114,6 @@ KinectController::~KinectController()
         ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
         ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
         d->m_ConnectionCheck = !d->ErrorText(d->m_ImageGenerator.SetMapOutputMode(ImageMode));
-        {
-          XnUInt32 NumModes = 10;
-          XnMapOutputMode *SupportedModes = new XnMapOutputMode[NumModes];
-          d->m_ConnectionCheck = !d->ErrorText(d->m_ImageGenerator.GetSupportedMapOutputModes(SupportedModes, NumModes));
-          for ( unsigned int i = 0; i < NumModes; i++ )
-          {
-            std::cout << "ImageModes #" << i << std::endl;
-            std::cout << "Nx=" << SupportedModes[i].nXRes << std::endl;
-            std::cout << "Ny=" << SupportedModes[i].nYRes << std::endl;
-            std::cout << "FPS=" << SupportedModes[i].nFPS << std::endl;
-          }
-          delete[] SupportedModes;
-        }
       }
 
       // Camera registration
@@ -191,7 +153,6 @@ KinectController::~KinectController()
 //      // Update the connected flag
 //      d->m_ConnectionCheck = true;
     }
-    MITK_INFO<<"Controller connect?"<<d->m_ConnectionCheck;
     return d->m_ConnectionCheck;
   }
 

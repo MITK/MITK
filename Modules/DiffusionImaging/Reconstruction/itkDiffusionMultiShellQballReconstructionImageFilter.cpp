@@ -73,55 +73,41 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 }
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
-void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::Threshold(vnl_vector<double> & vec, double sigma)
+double DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
+::CalculateThreashold(const double value, const double delta)
 {
-  for(int i = 0; i < vec.size(); i++)
-  {
-    if(vec[i] < 0)
-    {
-      vec[i] = sigma / 2 ;
-    }
-    if(0 <= vec[i] && vec[i] < sigma )
-    {
-      vec[i] = sigma / 2 + (vec[i] * vec[i]) / (2 * sigma);
-    }
-    if( 1 - sigma <= vec[i] && vec[i] < 1 )
-    {
-      vec[i] = 1-(sigma/2) - ((( 1 - vec[i]) * (1 - vec[i] )) / (2 * sigma) );
-    }
-    if( 1 <= vec[i] )
-    {
-      vec[i] = 1 - (sigma / 2);
-    }
+  return (value<0)*(0.5*delta) + (value>=0 && value<delta)*(0.5*delta+0.5*(value*value)/delta)
+      + (value>=delta && value<1-delta)*value+(value>=1-delta && value<1)*(1-0.5*delta-0.5*((1-value)*(1-value))/delta)
+      + (value>=1)*(1-0.5*delta);
+}
+
+template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
+void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
+::Threshold(vnl_vector<double> & vec, double delta)
+{
+  if (delta==0){   //Clip attenuation values. If att<0 => att=0, if att>1 => att=1
+    for (int i=0; i<vec.size(); i++)
+      vec[i]=(vec[i]>=0 && vec[i]<=1)*vec[i]+(vec[i]>1);
+  }
+  else{            //Use function from Aganj et al, MRM, 2010
+    for (int i=0; i< vec.size(); i++)
+      vec[i]=CalculateThreashold(vec[i], delta);
   }
 }
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::Threshold(vnl_matrix<double> & mat, double sigma)
+::Threshold(vnl_matrix<double> & mat, double delta)
 {
-  for(int i = 0; i < mat.rows(); i++)
-  {
-    for( int j = 0; j < mat.cols(); j++ ){
-
-      if(mat(i,j) < 0)
-      {
-        mat(i,j) = sigma / 2 ;
-      }
-      if(0 <= mat(i,j) && mat(i,j) < sigma )
-      {
-        mat(i,j) = sigma / 2 + (mat(i,j) * mat(i,j)) / (2 * sigma);
-      }
-      if( 1 - sigma <= mat(i,j) && mat(i,j) < 1 )
-      {
-        mat(i,j) = 1-(sigma/2) - (((1 - mat(i,j)) *( 1 - mat(i,j)))  / (2 * sigma) );
-      }
-      if( 1 <= mat(i,j) )
-      {
-        mat(i,j) = 1 - (sigma / 2);
-      }
-    }
+  if (delta==0){   //Clip attenuation values. If att<0 => att=0, if att>1 => att=1
+    for (int i=0; i<mat.rows(); i++)
+      for (int j=0; j<mat.cols(); j++)
+        mat(i,j)=(mat(i,j)>=0 && mat(i,j)<=1)*mat(i,j)+(mat(i,j)>1);
+  }
+  else{            //Use function from Aganj et al, MRM, 2010
+    for (int i=0; i<mat.rows(); i++)
+      for (int j=0; j<mat.cols(); j++)
+        mat(i,j)=CalculateThreashold(mat(i,j), delta);
   }
 }
 
@@ -592,7 +578,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // approximate ODF coeffs
       coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
-      coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       odf = mitk::mitk_vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
@@ -787,8 +773,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       }
       Projection2(*PValues, *AlphaValues, *BetaValues);
 
-      Threshold(*AlphaValues);
-      Threshold(*BetaValues);
+      //Threshold(*AlphaValues);
+      //Threshold(*BetaValues);
 
       DoubleLogarithm(*AlphaValues);
       DoubleLogarithm(*BetaValues);
@@ -797,7 +783,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
 
       // the first coeff is a fix value
-      coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = mitk::mitk_vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();

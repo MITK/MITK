@@ -109,11 +109,12 @@ public:
 
     void DoubleLogarithm(vnl_vector<double> & vec);
 
-    void Threshold(vnl_vector<double> & vec, double sigma = 0.0001);
-    void Threshold(vnl_matrix<double> & mat, double sigma = 0.0001);
+    void Threshold(vnl_vector<double> & vec, double delta = 0.01);
+    void Threshold(vnl_matrix<double> & mat, double delta = 0.01);
+    double CalculateThreashold(const double value, const double delta);
 
-    void Projection1( vnl_matrix<double> & mat, double delta = 0.0001);
-    void Projection2( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.0001);
+    void Projection1( vnl_matrix<double> & mat, double delta = 0.01);
+    void Projection2( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this

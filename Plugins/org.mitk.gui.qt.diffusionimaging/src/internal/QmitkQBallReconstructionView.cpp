@@ -969,7 +969,7 @@ void QmitkQBallReconstructionView::TemplatedMultiShellQBallReconstruction(mitk::
     filter->SetBValue(vols->GetB_Value());
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
     filter->SetLambda(lambda);
-    filter->SetNumberOfThreads(1);
+    //filter->SetNumberOfThreads(1);
     //filter->SetGradientIndexMap(m_GradientIndexMap);
 
     //for(std::map<double , std::vector< unsigned int > >::iterator it = m_GradientIndexMap->begin() ; it != m_GradientIndexMap->end(); it++)

@@ -22,22 +22,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   ToFImageGrabber::ToFImageGrabber():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_ImageSequence(0),
-    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL)
+    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL), m_RgbDataArray(NULL)
   {
     // Create the output. We use static_cast<> here because we know the default
     // output must be of type TOutputImage
     OutputImageType::Pointer output0 = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer()); 
     OutputImageType::Pointer output1 = static_cast<OutputImageType*>(this->MakeOutput(1).GetPointer()); 
     OutputImageType::Pointer output2 = static_cast<OutputImageType*>(this->MakeOutput(2).GetPointer()); 
+    OutputImageType::Pointer output3 = static_cast<OutputImageType*>(this->MakeOutput(3).GetPointer()); 
     mitk::ImageSource::SetNumberOfRequiredOutputs(3);
     mitk::ImageSource::SetNthOutput(0, output0.GetPointer());
     mitk::ImageSource::SetNthOutput(1, output1.GetPointer());
     mitk::ImageSource::SetNthOutput(2, output2.GetPointer());
+    mitk::ImageSource::SetNthOutput(3, output3.GetPointer());
   }
 
   ToFImageGrabber::~ToFImageGrabber()
   {
-    if (m_IntensityArray||m_AmplitudeArray||m_DistanceArray)
+    if (m_IntensityArray||m_AmplitudeArray||m_DistanceArray||m_RgbDataArray)
     {
       if (m_ToFCameraDevice)
       {
@@ -57,38 +59,57 @@ namespace mitk
   {
     int requiredImageSequence = 0;
     int capturedImageSequence = 0;
+    unsigned int dimensions[3];
+    dimensions[0] = this->m_ToFCameraDevice->GetCaptureWidth();
+    dimensions[1] = this->m_ToFCameraDevice->GetCaptureHeight();
+    dimensions[2] = 1;
+    mitk::PixelType FloatType = MakeScalarPixelType<float>();
+    // acquire new image data
+    this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray, 
+      requiredImageSequence, this->m_ImageSequence, this->m_RgbDataArray );
 
     mitk::Image::Pointer distanceImage = this->GetOutput(0);
-    mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
-    mitk::Image::Pointer intensityImage = this->GetOutput(2);
-
     if (!distanceImage->IsInitialized())
     {
       distanceImage->ReleaseData();
-      amplitudeImage->ReleaseData();
-      intensityImage->ReleaseData();
-
-      unsigned int dimensions[3];
-      dimensions[0] = this->m_ToFCameraDevice->GetCaptureWidth();
-      dimensions[1] = this->m_ToFCameraDevice->GetCaptureHeight();
-      dimensions[2] = 1;
-      
-      mitk::PixelType FloatType = MakeScalarPixelType<float>();
-
       distanceImage->Initialize(FloatType, 3, dimensions, 1);
+    }
+    mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
+    if (!amplitudeImage->IsInitialized())
+    {
+      amplitudeImage->ReleaseData();
       amplitudeImage->Initialize(FloatType, 3, dimensions, 1);
+    }
+    mitk::Image::Pointer intensityImage = this->GetOutput(2);
+    if (!intensityImage->IsInitialized())
+    {
+      intensityImage->ReleaseData();
       intensityImage->Initialize(FloatType, 3, dimensions, 1);
     }
 
-    if (m_DistanceArray&&m_AmplitudeArray&&m_IntensityArray)
+    mitk::Image::Pointer rgbImage = this->GetOutput(3);
+    if (!rgbImage->IsInitialized())
     {
-      this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
-        requiredImageSequence, this->m_ImageSequence );
+      rgbImage->ReleaseData();
+      rgbImage->Initialize(mitk::PixelType(MakePixelType<unsigned char, itk::RGBPixel<unsigned char>, 3>()),3,dimensions,1);
+    }
 
-      capturedImageSequence = this->m_ImageSequence;
+    capturedImageSequence = this->m_ImageSequence;
+    if (m_DistanceArray)
+    {
       distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
+    }
+    if (m_AmplitudeArray)
+    {
       amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
+    }
+    if (m_IntensityArray)
+    {
       intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
+    }
+    if (m_RgbDataArray)
+    {
+      rgbImage->SetSlice(this->m_RgbDataArray, 0, 0, 0);
     }
   }
 
@@ -174,16 +195,14 @@ namespace mitk
   int ToFImageGrabber::GetIntegrationTime()
   {
     int integrationTime = 0;
-    BaseProperty* property = this->m_ToFCameraDevice->GetProperty("IntegrationTime");
-    this->m_ToFCameraDevice->GetIntProperty(property,integrationTime);
+    this->m_ToFCameraDevice->GetIntProperty("IntegrationTime",integrationTime);
     return integrationTime;
   }
 
   int ToFImageGrabber::GetModulationFrequency()
   {
     int modulationFrequency = 0;
-    BaseProperty* property = this->m_ToFCameraDevice->GetProperty("ModulationFrequency");
-    this->m_ToFCameraDevice->GetIntProperty(property,modulationFrequency);
+    this->m_ToFCameraDevice->GetIntProperty("ModulationFrequency",modulationFrequency);
     return modulationFrequency;
   }
   void ToFImageGrabber::SetBoolProperty( const char* propertyKey, bool boolValue )
@@ -239,6 +258,11 @@ namespace mitk
       delete [] m_SourceDataArray;
       m_SourceDataArray = NULL;
     }
+    if (m_RgbDataArray)
+    {
+      delete [] m_RgbDataArray;
+      m_RgbDataArray = NULL;
+    }
   }
 
   void ToFImageGrabber::AllocateImageArrays()
@@ -250,5 +274,6 @@ namespace mitk
     m_DistanceArray = new float[m_PixelNumber];
     m_AmplitudeArray = new float[m_PixelNumber];
     m_SourceDataArray = new char[m_SourceDataSize];
+    m_RgbDataArray = new unsigned char[m_PixelNumber*3];
   }
 }

@@ -1,19 +1,21 @@
-/*===================================================================
+/*=========================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date: 2010-05-27 16:06:53 +0200 (Do, 27 Mai 2010) $
+Version:   $Revision: $
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
-All rights reserved.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-#include "mitkToFCameraMESADevice.h"
+=========================================================================*/
+#include "mitkKinectDevice.h"
 #include "mitkRealTimeClock.h"
 
 #include "itkMultiThreader.h"
@@ -21,15 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ToFCameraMESADevice::ToFCameraMESADevice()
+  KinectDevice::KinectDevice()
+  {
+    m_Controller = mitk::KinectController::New();
+  }
+
+  KinectDevice::~KinectDevice()
   {
   }
 
-  ToFCameraMESADevice::~ToFCameraMESADevice()
-  {
-  }
-
-  bool ToFCameraMESADevice::ConnectCamera()
+  bool KinectDevice::ConnectCamera()
   {
     bool ok = false;
     if (m_Controller)
@@ -64,6 +67,11 @@ namespace mitk
         {
           this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
         }
+        this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
+        for (int i=0; i<this->m_MaxBufferSize; i++)
+        {
+          this->m_RGBDataBuffer[i] = new unsigned char[this->m_PixelNumber*3];
+        }
 
         m_CameraConnected = true;
       }
@@ -71,7 +79,7 @@ namespace mitk
     return ok;
   }
 
-  bool ToFCameraMESADevice::DisconnectCamera()
+  bool KinectDevice::DisconnectCamera()
   {
     bool ok = false;
     if (m_Controller)
@@ -88,18 +96,14 @@ namespace mitk
         for(int i=0; i<this->m_MaxBufferSize; i++)
         {
           delete[] this->m_DistanceDataBuffer[i];
+          delete[] this->m_AmplitudeDataBuffer[i];
+          delete[] this->m_IntensityDataBuffer[i];
+          delete[] this->m_RGBDataBuffer[i];
         }
         delete[] this->m_DistanceDataBuffer;
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          delete[] this->m_AmplitudeDataBuffer[i];
-        }
         delete[] this->m_AmplitudeDataBuffer;
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          delete[] this->m_IntensityDataBuffer[i];
-        }
         delete[] this->m_IntensityDataBuffer;
+        delete[] this->m_RGBDataBuffer;
 
         m_CameraConnected = false;
       }
@@ -108,16 +112,14 @@ namespace mitk
     return ok;
   }
 
-  void ToFCameraMESADevice::StartCamera()
+  void KinectDevice::StartCamera()
   {
     if (m_CameraConnected)
     {
       // get the first image
       this->m_Controller->UpdateCamera();
       this->m_ImageMutex->Lock();
-      this->m_Controller->GetDistances(this->m_DistanceDataBuffer[this->m_FreePos]);
-      this->m_Controller->GetAmplitudes(this->m_AmplitudeDataBuffer[this->m_FreePos]);
-      this->m_Controller->GetIntensities(this->m_IntensityDataBuffer[this->m_FreePos]);
+      this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_AmplitudeDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
       this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
       this->m_ImageSequence++;
@@ -136,7 +138,7 @@ namespace mitk
     }
   }
 
-  void ToFCameraMESADevice::StopCamera()
+  void KinectDevice::StopCamera()
   {
     m_CameraActiveMutex->Lock();
     m_CameraActive = false;
@@ -150,7 +152,7 @@ namespace mitk
     itksys::SystemTools::Delay(10);
   }
 
-  bool ToFCameraMESADevice::IsCameraActive()
+  bool KinectDevice::IsCameraActive()
   {
     m_CameraActiveMutex->Lock();
     bool ok = m_CameraActive;
@@ -158,7 +160,7 @@ namespace mitk
     return ok;
   }
 
-  void ToFCameraMESADevice::UpdateCamera()
+  void KinectDevice::UpdateCamera()
   {
     if (m_Controller)
     {
@@ -166,7 +168,7 @@ namespace mitk
     }
   }
 
-  ITK_THREAD_RETURN_TYPE ToFCameraMESADevice::Acquire(void* pInfoStruct)
+  ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
@@ -178,7 +180,7 @@ namespace mitk
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    ToFCameraMESADevice* toFCameraDevice = (ToFCameraMESADevice*)pInfo->UserData;
+    KinectDevice* toFCameraDevice = (KinectDevice*)pInfo->UserData;
     if (toFCameraDevice!=NULL)
     {
       mitk::RealTimeClock::Pointer realTimeClock;
@@ -194,17 +196,15 @@ namespace mitk
         toFCameraDevice->UpdateCamera();
         // get the image data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
-        toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
-        toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
-        toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
 
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+        TODO Buffer Handling currently only works for buffer size 1
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         //toFCameraDevice->m_ImageSequence++;
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -227,8 +227,8 @@ namespace mitk
           overflow = false;
         }
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         END TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+        END TODO Buffer Handling currently only works for buffer size 1
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
         // print current framerate
         if (printStatus)
@@ -245,14 +245,14 @@ namespace mitk
   }
 
   //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-  //  void ToFCameraMESADevice::ResetBuffer(int bufferSize)
+  //  void KinectDevice::ResetBuffer(int bufferSize)
   //  {
   //    this->m_BufferSize = bufferSize;
   //    this->m_CurrentPos = -1;
   //    this->m_FreePos = 0;
   //  }
 
-  void ToFCameraMESADevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
+  void KinectDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
     if (m_CameraActive)
@@ -264,10 +264,10 @@ namespace mitk
       this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_AmplitudeArray);
       for (int i=0; i<this->m_CaptureHeight; i++)
       {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          amplitudeArray[i*this->m_CaptureWidth+j] = this->m_AmplitudeArray[(i+1)*this->m_CaptureWidth-1-j];
-        }
+      for (int j=0; j<this->m_CaptureWidth; j++)
+      {
+      amplitudeArray[i*this->m_CaptureWidth+j] = this->m_AmplitudeArray[(i+1)*this->m_CaptureWidth-1-j];
+      }
       }
       */
       for (int i=0; i<this->m_PixelNumber; i++)
@@ -283,24 +283,24 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
-  void ToFCameraMESADevice::GetIntensities(float* intensityArray, int& imageSequence)
+  void KinectDevice::GetIntensities(float* intensityArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
     if (m_CameraActive)
     {
-    // 1) copy the image buffer
-    // 2) Flip around y- axis (vertical axis)
+      // 1) copy the image buffer
+      // 2) Flip around y- axis (vertical axis)
 
-    /*
-    this->m_Controller->GetIntensities(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_IntensityArray);
-    for (int i=0; i<this->m_CaptureHeight; i++)
-    {
+      /*
+      this->m_Controller->GetIntensities(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_IntensityArray);
+      for (int i=0; i<this->m_CaptureHeight; i++)
+      {
       for (int j=0; j<this->m_CaptureWidth; j++)
       {
-        intensityArray[i*this->m_CaptureWidth+j] = this->m_IntensityArray[(i+1)*this->m_CaptureWidth-1-j];
+      intensityArray[i*this->m_CaptureWidth+j] = this->m_IntensityArray[(i+1)*this->m_CaptureWidth-1-j];
       }
-    }
-    */
+      }
+      */
       for (int i=0; i<this->m_PixelNumber; i++)
       {
         intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
@@ -314,7 +314,7 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
-  void ToFCameraMESADevice::GetDistances(float* distanceArray, int& imageSequence)
+  void KinectDevice::GetDistances(float* distanceArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
     if (m_CameraActive)
@@ -327,10 +327,10 @@ namespace mitk
       this->m_Controller->GetDistances(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_DistanceArray);
       for (int i=0; i<this->m_CaptureHeight; i++)
       {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          distanceArray[i*this->m_CaptureWidth+j] = 1000 * this->m_DistanceArray[(i+1)*this->m_CaptureWidth-1-j];
-        }
+      for (int j=0; j<this->m_CaptureWidth; j++)
+      {
+      distanceArray[i*this->m_CaptureWidth+j] = 1000 * this->m_DistanceArray[(i+1)*this->m_CaptureWidth-1-j];
+      }
       }
       */
       for (int i=0; i<this->m_PixelNumber; i++)
@@ -346,8 +346,8 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
-  void ToFCameraMESADevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                                        int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
+  void KinectDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
+    int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
     {
@@ -387,33 +387,13 @@ namespace mitk
       // write image data to float arrays
       for (int i=0; i<this->m_PixelNumber; i++)
       {
-        distanceArray[i] = this->m_DistanceDataBuffer[pos][i] /* * 1000 */;
+        distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+        rgbDataArray[i*3] = this->m_RGBDataBuffer[pos][i*3];
+        rgbDataArray[i*3+1] = this->m_RGBDataBuffer[pos][i*3+1];
+        rgbDataArray[i*3+2] = this->m_RGBDataBuffer[pos][i*3+2];
       }
-
-
-      /*
-      this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], this->m_DistanceArray);
-      this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[pos], this->m_AmplitudeArray);
-      this->m_Controller->GetIntensities(this->m_SourceDataBuffer[pos], this->m_IntensityArray);
-
-      int u, v;
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          u = i*this->m_CaptureWidth+j;
-          v = (i+1)*this->m_CaptureWidth-1-j;
-          distanceArray[u] = 1000 * this->m_DistanceArray[v]; // unit in mm
-          //distanceArray[u] = this->m_DistanceArray[v]; // unit in meter
-          amplitudeArray[u] = this->m_AmplitudeArray[v];
-          intensityArray[u] = this->m_IntensityArray[v];
-        }
-      }
-
-      memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
-      */
     }
     else
     {
@@ -421,26 +401,26 @@ namespace mitk
     }
   }
 
-  ToFCameraMESAController::Pointer ToFCameraMESADevice::GetController()
+  KinectController::Pointer KinectDevice::GetController()
   {
     return this->m_Controller;
   }
 
-  void ToFCameraMESADevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
+  void KinectDevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
   {
     ToFCameraDevice::SetProperty(propertyKey,propertyValue);
     this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-    if (strcmp(propertyKey, "ModulationFrequency") == 0)
+    if (strcmp(propertyKey, "RGB") == 0)
     {
-      int modulationFrequency = 0;
-      GetIntProperty(propertyKey, modulationFrequency);
-      m_Controller->SetModulationFrequency(modulationFrequency);
+      bool rgb = false;
+      GetBoolProperty(propertyKey, rgb);
+      m_Controller->SetUseIR(!rgb);
     }
-    else if (strcmp(propertyKey, "IntegrationTime") == 0)
+    else if (strcmp(propertyKey, "IR") == 0)
     {
-      int integrationTime = 0;
-      GetIntProperty(propertyKey, integrationTime);
-      m_Controller->SetIntegrationTime(integrationTime);
+      bool ir = false;
+      GetBoolProperty(propertyKey, ir);
+      m_Controller->SetUseIR(ir);
     }
   }
 }

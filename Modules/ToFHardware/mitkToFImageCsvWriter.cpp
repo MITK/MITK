@@ -67,7 +67,7 @@ namespace mitk
     }
   }
 
-  void ToFImageCsvWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData)
+  void ToFImageCsvWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData)
   {
     if (this->m_DistanceImageSelected)
     {

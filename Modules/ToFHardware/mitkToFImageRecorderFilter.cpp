@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageDataItem.h>
 #include "mitkToFNrrdImageWriter.h"
-#include "mitkToFPicImageWriter.h"
 #include "mitkToFImageCsvWriter.h"
 
 // itk includes
@@ -41,10 +40,6 @@ void mitk::ToFImageRecorderFilter::SetFileName(std::string fileName)
   if(m_FileExtension == ".nrrd")
   {
     m_ToFImageWriter = mitk::ToFNrrdImageWriter::New();
-  }
-  else if(m_FileExtension == ".pic")
-  {
-    m_ToFImageWriter = mitk::ToFPicImageWriter::New();
   }
   else if(m_FileExtension == ".csv")
   {

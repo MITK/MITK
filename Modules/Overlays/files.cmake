@@ -9,7 +9,6 @@ SET(CPP_FILES
 
 
 SET(MOC_H_FILES
-  QmitkCustomWidgetOverlay.h
   QmitkOverlay.h
   QmitkOverlayController.h
   QmitkScalarBar.h

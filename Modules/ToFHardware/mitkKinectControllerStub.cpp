@@ -63,12 +63,6 @@ namespace mitk
     MITK_WARN("ToF") << "Error: Kinect camera currently not available";
   }
 
-  bool KinectController::ErrorText(unsigned int error)
-  {
-    MITK_WARN("ToF") << "Error: Kinect camera currently not available";
-    return true;
-  }
-
   void KinectController::GetAmplitudes( float* amplitudes )
   {
     MITK_WARN("ToF") << "Error: Kinect camera currently not available";

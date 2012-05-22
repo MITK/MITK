@@ -1,4 +1,0 @@
-
-The subdirectories in this directory can be configured as separate projects. 
-The main purpose for now is to test certain aspects of integrating MITK as a toolkit in another project.
-

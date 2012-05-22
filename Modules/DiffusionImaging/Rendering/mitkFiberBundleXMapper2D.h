@@ -1,19 +1,18 @@
-/*=========================================================================
- 
- Program:   Medical Imaging & Interaction Toolkit
- Language:  C++
- Date:      $Date: 2010-09-26 20:40:22 +0200 (So, 26 Sep 2010) $
- Version:   $Revision$
- 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
- 
- =========================================================================*/
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef FIBERBUNDLEXMAPPER2D_H_HEADER_INCLUDED
 #define FIBERBUNDLEXMAPPER2D_H_HEADER_INCLUDED

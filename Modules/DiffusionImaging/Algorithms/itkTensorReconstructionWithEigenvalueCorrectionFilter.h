@@ -75,7 +75,7 @@ namespace itk
     * Reference image and a vector length parameter of \c n (number of
     * gradient directions) */
     typedef VectorImage< GradientPixelType, 3 >      GradientImagesType;
-
+    typedef typename GradientImagesType::PixelType         GradientVectorType;
 
 
     /*
@@ -137,7 +137,7 @@ namespace itk
     itkGetMacro(PseudoInverse, vnl_matrix<double>);
     itkGetMacro(H, vnl_matrix<double>);
     itkGetMacro(BVec, vnl_vector<double>);
-    itkGetMacro(B0Mask, vnl_vector<double>);
+    itkGetMacro(B0Mask, vnl_vector<short>);
     itkGetMacro(Voxdim, vnl_vector<double>);
 
     mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
@@ -150,7 +150,7 @@ namespace itk
       return m_VectorImage;
     }
 
-    itk::Image<double, 3>::Pointer GetMask()
+    itk::Image<short, 3>::Pointer GetMask()
     {
       return m_MaskImage;
     }
@@ -180,13 +180,12 @@ namespace itk
 
   private:
 
-    void check_the_neighbors(int x, int y, int z,int f, itk::Size<3> size,itk::Index<3> ix,
-    typename GradientImagesType::Pointer gradientImagePointer,ImageType::IndexType pixelIndex,ImageType::Pointer corrected_diffusion, double &temp_pixel);
+    short CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size);
 
-    void calculate_attenuation(vnl_vector<double> org_data,vnl_vector< double > b0index, vnl_vector<double> &atten, double mean_b,int nof,int numberb0);
+    void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
 
 
-    void calculate_tensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
+    void CalculateTensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;
@@ -212,12 +211,14 @@ namespace itk
 
 
 
-    itk::Image<double, 3>::Pointer m_MaskImage;
+    itk::Image<short, 3>::Pointer m_MaskImage;
     vnl_matrix<double> m_PseudoInverse;
     vnl_matrix<double> m_H;
     vnl_vector<double> m_BVec;
-    vnl_vector<double> m_B0Mask;
+    vnl_vector<short> m_B0Mask;
     vnl_vector<double> m_Voxdim;
+
+    typename GradientImagesType::Pointer m_GradientImagePointer;
 
   };
 

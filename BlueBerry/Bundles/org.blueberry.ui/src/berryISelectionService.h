@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   BlueBerry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef BERRYISELECTIONSERVICE_H_
 #define BERRYISELECTIONSERVICE_H_
@@ -55,7 +54,7 @@ struct BERRY_UI ISelectionService {
 
   };
 
-  virtual ~ISelectionService() {}
+  virtual ~ISelectionService();
 
   //virtual SelectionEvents& GetSelectionEvents(const std::string& partId = "") = 0;
 

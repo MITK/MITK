@@ -1,23 +1,24 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 18127 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 #ifndef MITKIRENDERWINDOWPARTLISTENER_H
 #define MITKIRENDERWINDOWPARTLISTENER_H
+
+#include <org_mitk_gui_common_Export.h>
 
 namespace mitk {
 
@@ -34,9 +35,9 @@ struct IRenderWindowPart;
  *
  * The notion of activated and deactivated is slightly different from the usual Workbench part lifecycle.
  */
-struct IRenderWindowPartListener
+struct MITK_GUI_COMMON_PLUGIN IRenderWindowPartListener
 {
-  virtual ~IRenderWindowPartListener() {}
+  virtual ~IRenderWindowPartListener();
 
   /**
    * Called when a IRenderWindowPart is activated or if it becomes visible and no

@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 7837 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkImageWriter.h"
 #include "mitkDataNodeFactory.h"
@@ -156,6 +155,29 @@ int mitkImageWriterTest(int  argc , char* argv[])
   catch(...)
   {
     MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
+  }
+
+  // testing image writing as png files
+  // test only for 2D images since the PNG is using a series writer in case a 3D image
+  // should be saved -> the output name comparison would fail and also the use case
+  // is very uncommon
+  // write ITK .mhd image (2D and 3D only)
+  if( image->GetDimension() == 2 )
+  {
+    try
+    {
+      myImageWriter->SetExtension(".png");
+      myImageWriter->Update();
+      std::fstream fin;
+      fin.open(AppendExtension(filename, ".png").c_str(),std::ios::in);
+      MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .png file");
+      fin.close();
+      remove(AppendExtension(filename, ".png").c_str());
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      MITK_TEST_FAILED_MSG(<< "Exception during .png file writing: " << e.what() );
+    }
   }
 
 

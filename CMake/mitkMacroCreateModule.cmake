@@ -17,6 +17,7 @@
 #!     [EXPORT_DEFINE <declspec macro name for dll exports>]
 #!     [QT_MODULE]
 #!     [HEADERS_ONLY]
+#!     [WARNINGS_AS_ERRORS]
 #! \endcode
 #!
 #! \param MODULE_NAME_IN The name for the new module
@@ -25,7 +26,7 @@
 macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE
                         "SUBPROJECTS;VERSION;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
-                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT"
+                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT;WARNINGS_AS_ERRORS"
                         ${ARGN})
                         
   set(MODULE_NAME ${MODULE_NAME_IN})
@@ -90,7 +91,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           if(NOT MODULE_EXPORT_DEFINE)
             set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
           endif(NOT MODULE_EXPORT_DEFINE)
-          configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
 
           if(MITK_GENERATE_MODULE_DOT)
             message("MODULEDOTNAME ${MODULE_NAME}")
@@ -124,17 +124,53 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           if(WIN32)
             set(module_compile_flags "${module_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
           endif()
-          # MinGW does not export all symbols automatically, so no need to set flags
-          if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW AND NOT MODULE_GCC_DEFAULT_VISIBILITY)
-            if(${GCC_VERSION} VERSION_GREATER "4.5.0")
-              # With gcc < 4.5, type_info objects need special care. Especially exceptions
-              # and inline definitions of classes from 3rd party libraries would need
-              # to be wrapped with pragma GCC visibility statements if the library is not
-              # prepared to handle hidden visibility. This would need too many changes in
-              # MITK and would be too fragile.
-              set(module_compile_flags "${module_compile_flags} -fvisibility=hidden -fvisibility-inlines-hidden")
+
+          if(MODULE_GCC_DEFAULT_VISIBILITY)
+            set(use_visibility_flags 0)
+          else()
+            # We only support hidden visibility for gcc for now. Clang 3.0 still has troubles with
+            # correctly marking template declarations and explicit template instantiations as exported.
+            # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
+            # and http://llvm.org/bugs/show_bug.cgi?id=10113
+            if(CMAKE_COMPILER_IS_GNUCXX)
+              set(use_visibility_flags 1)
+            else()
+            #  set(use_visibility_flags 0)
             endif()
           endif()
+
+          if(CMAKE_COMPILER_IS_GNUCXX)
+            # MinGW does not export all symbols automatically, so no need to set flags.
+            #
+            # With gcc < 4.5, RTTI symbols from classes declared in third-party libraries
+            # which are not "gcc visibility aware" are marked with hidden visibility in
+            # DSOs which include the class declaration and which are compiled with
+            # hidden visibility. This leads to dynamic_cast and exception handling problems.
+            # While this problem could be worked around by sandwiching the include
+            # directives for the third-party headers between "#pragma visibility push/pop"
+            # statements, it is generally safer to just use default visibility with
+            # gcc < 4.5.
+            if(${GCC_VERSION} VERSION_LESS "4.5" OR MINGW)
+              set(use_visibility_flags 0)
+            endif()
+          endif()
+
+          if(use_visibility_flags)
+            mitkFunctionCheckCompilerFlags("-fvisibility=hidden" module_compile_flags)
+            mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_compile_flags)
+          endif()
+
+          configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
+
+          if(MODULE_WARNINGS_AS_ERRORS)
+            if(MSVC_VERSION)
+              mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
+            else()
+              mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
+              mitkFunctionCheckCompilerFlags("-Wno-c++0x-static-nonintegral-init" module_compile_flags)
+              mitkFunctionCheckCompilerFlags("-Wno-gnu" module_compile_flags)
+            endif()
+          endif(MODULE_WARNINGS_AS_ERRORS)
 
           if(NOT MODULE_NO_INIT)
             list(APPEND CPP_FILES ${module_init_src_file})

@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2009-05-12 20:04:59 +0200 (Di, 12 Mai 2009) $
-Version:   $Revision: 17180 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "QmitkRenderWindowMenu.h"
 
@@ -69,17 +68,20 @@ m_MultiWidget(mw)
 
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
 
-  this->setFocusPolicy( Qt::NoFocus );
-
   //Create Menu Widget
   this->CreateMenuWidget();
   this->setMinimumWidth(61); //DIRTY.. If you add or remove a button, you need to change the size.
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
   
-//  this->show();
-  this->setVisible(false);
-//  this->setWindowOpacity(0.0);
+  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
+  //but lead to focus issues on Mac OS X
+#ifdef Q_OS_MAC
+  this->show();
+  this->setWindowOpacity(0.0f);
+#else
+   this->setVisible(false);
+#endif
   
   //this->setAttribute( Qt::WA_NoSystemBackground  );
   //this->setBackgroundRole( QPalette::Dark );
@@ -240,10 +242,15 @@ void QmitkRenderWindowMenu::HideMenu( )
   m_Hidden = true;
 
   if( ! m_Entered )
-    setVisible(false);
-//    setWindowOpacity(0.0f);
-//    hide();
-
+  {
+    //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
+    //but lead to focus issues on Mac OS X
+#ifdef Q_OS_MAC
+    this->setWindowOpacity(0.0f);
+#else
+    this->setVisible(false);
+#endif
+  }
 }
 
 void QmitkRenderWindowMenu::ShowMenu( )
@@ -251,8 +258,13 @@ void QmitkRenderWindowMenu::ShowMenu( )
   MITK_DEBUG << "menu showMenu";
   
   m_Hidden = false;
-  setVisible(true);
-//  setWindowOpacity(1.0f);
+  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
+  //but lead to focus issues on Mac OS X
+#ifdef Q_OS_MAC
+  this->setWindowOpacity(1.0f);
+#else
+  this->setVisible(true);
+#endif
 }
 
 
@@ -271,7 +283,15 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
   MITK_DEBUG << "menu deferredhidemenu";
   if(m_Hidden)
-    setVisible(false);
+  {
+#ifdef Q_OS_MAC
+  this->setWindowOpacity(0.0f);
+#else
+   this->setVisible(false);
+#endif
+  }
+
+//    setVisible(false);
 //    setWindowOpacity(0.0f);
   ///hide();
 }
@@ -413,10 +433,14 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
 {   
   
   MITK_DEBUG << "deferred show menu";
-  
-  show();
-  setVisible(true);
-//  setWindowOpacity(1.0);
+
+  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
+  //but lead to focus issues on Mac OS X
+#ifdef Q_OS_MAC
+  this->setWindowOpacity(1.0f);
+#else
+  this->setVisible(true);
+#endif
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)

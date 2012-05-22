@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   BlueBerry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifdef __MINGW32__
 // We need to inlclude winbase.h here in order to declare
@@ -69,7 +68,7 @@ void QtPlatformLogModel::slotFlushLogEntries()
 void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
 {
   m_Mutex.lock();
-  mbilog::BackendCout::FormatSmart(msg);
+  //mbilog::BackendCout::FormatSmart(msg); FormatSmart is not static any more. So commented out this statement. Todo: fix
   m_Active->push_back(ExtendedLogMessage(msg));
   m_Mutex.unlock();
 

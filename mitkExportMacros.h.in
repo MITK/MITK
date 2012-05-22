@@ -1,0 +1,40 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+
+#ifndef MITKEXPORTMACROS_H
+#define MITKEXPORTMACROS_H
+
+#cmakedefine VISIBILITY_AVAILABLE
+
+/**
+  * Macros for import/export declarations
+  */
+#if defined(WIN32)
+  #define MITK_EXPORT __declspec(dllexport)
+  #define MITK_IMPORT __declspec(dllimport)
+  #define MITK_LOCAL
+#elif defined(VISIBILITY_AVAILABLE)
+  #define MITK_EXPORT __attribute__ ((visibility ("default")))
+  #define MITK_IMPORT __attribute__ ((visibility ("default")))
+  #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
+#else
+  #define MITK_EXPORT
+  #define MITK_IMPORT
+  #define MITK_LOCAL
+#endif
+
+#endif // MITKEXPORTMACROS_H

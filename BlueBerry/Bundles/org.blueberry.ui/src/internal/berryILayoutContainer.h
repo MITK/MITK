@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   BlueBerry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef BERRYILAYOUTCONTAINER_H_
 #define BERRYILAYOUTCONTAINER_H_
@@ -31,9 +30,11 @@ namespace berry {
  * \ingroup org_blueberry_ui_internal
  *
  */
-struct ILayoutContainer : virtual public Object {
+struct BERRY_UI ILayoutContainer : virtual public Object {
 
   berryObjectMacro(ILayoutContainer);
+
+  ~ILayoutContainer();
 
   typedef std::list<LayoutPart::Pointer> ChildrenType;
 

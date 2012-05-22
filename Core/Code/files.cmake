@@ -60,6 +60,8 @@ set(H_FILES
 
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
+
+  Common/mitkExceptionMacro.h
 )
 
 set(CPP_FILES
@@ -291,6 +293,8 @@ set(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+
+  Common/mitkException.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

@@ -1,18 +1,24 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Insight Segmentation & Registration Toolkit
-Language:  C++
-Date:      $Date: 2006-01-11 19:43:31 $
-Version:   $Revision: x $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) Insight Software Consortium. All rights reserved.
-See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+/*===================================================================
+
+This file is based heavily on a corresponding ITK filter.
+
+===================================================================*/
 #ifndef _itkLocalVariationImageFilter_txx
 #define _itkLocalVariationImageFilter_txx
 #include "itkLocalVariationImageFilter.h"

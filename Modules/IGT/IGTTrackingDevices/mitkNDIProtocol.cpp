@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkNDIProtocol.h"
 #include "mitkNDITrackingDevice.h"
@@ -1417,6 +1416,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
     fullcommand = command + ":" + p;          // command string format 1: with crc
   else
     fullcommand = command + " " + p;          // command string format 2: without crc
+
+  
+  m_TrackingDevice->ClearReceiveBuffer(); // This is a workaround for a linux specific issue:
+  // after sending the TSTART command and expecting an "okay" there are some unexpected bytes left in the buffer.
+  // this issue is explained in bug 11825
 
   returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);
 

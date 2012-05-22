@@ -1,20 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
-Language:  C++
-Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "QmitkControlVisualizationPropertiesView.h"
 
@@ -831,7 +829,14 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
   if (dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData()))
   {
     mitk::DiffusionImage<short>::Pointer dimg = dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData());
-    notConst->SetIntProperty("DisplayChannel", dimg->GetB0Indices().front());
+
+    // if there is no b0 image in the dataset, the GetB0Indices() returns a vector of size 0
+    // and hence we cannot set the Property directly to .front()
+    int displayChannelPropertyValue = 0;
+    if( dimg->GetB0Indices().size() > 0)
+      displayChannelPropertyValue = dimg->GetB0Indices().front();
+
+    notConst->SetIntProperty("DisplayChannel", displayChannelPropertyValue );
   }
 }
 

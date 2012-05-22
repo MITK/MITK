@@ -1,116 +1,55 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   mbilog - logging for mitk / BlueBerry
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef _MBILOG_H
 #define _MBILOG_H
 
-#include <string>
-#include <iostream>
 #include <sstream>
 
+#include "mbilogExports.h"
+#include "mbilogBackendBase.h"
+#include "mbilogBackendCout.h"
+#include "mbilogLogMessage.h"
+#include "mbilogLoggingTypes.h"
 #include "mbilogConfig.h"
 
-#ifndef MBILOG_MODULENAME
-  #if defined(_CMAKE_MODULENAME)
-    #define MBILOG_MODULENAME _CMAKE_MODULENAME
-  #else
-    #define MBILOG_MODULENAME "n/a"
-  #endif
-#endif
 
-#if defined(_WIN32)
-  #ifdef mbilog_EXPORTS
-    #define MBILOG_DLL_API __declspec(dllexport)
-  #else
-    #define MBILOG_DLL_API __declspec(dllimport)
-  #endif
-#else
-  #define MBILOG_DLL_API
-#endif
 
 namespace mbilog {
 
-  enum {
-    Info,
-    Warn,
-    Error,
-    Fatal,
-    Debug
-  };
-
-  class MBILOG_DLL_API LogMessage {
-
-    public:
-
-      const int level;
-      const char* filePath;
-      const int lineNumber;
-      const char* functionName;
-      
-      const char* moduleName;
-      std::string category;
-      std::string message;
-
-      LogMessage(
-        const int _level,
-        const char* _filePath,
-        const int _lineNumber,
-        const char* _functionName
-      )
-        : level(_level)
-        , filePath(_filePath)
-        , lineNumber(_lineNumber)
-        , functionName(_functionName)
-      {
-      }
-  };
-
-  struct MBILOG_DLL_API AbstractBackend
-  {
-    virtual ~AbstractBackend(){}
-    virtual void ProcessMessage(const mbilog::LogMessage& )=0;
-  };
-
-  class MBILOG_DLL_API BackendCout : public AbstractBackend
-  {
-    public:
-
-      BackendCout();
-      ~BackendCout();
-      virtual void ProcessMessage(const mbilog::LogMessage &l );
-
-      void SetFull(bool full);
-
-      static void FormatSmart(const LogMessage &l,int threadID=0);
-      static void FormatFull(const LogMessage &l,int threadID=0);
-
-      static void FormatSmart(std::ostream &out, const LogMessage &l,int threadID=0);
-      static void FormatFull(std::ostream &out, const LogMessage &l,int threadID=0);
-
-    private:
-
-      static void AppendTimeStamp(std::ostream& out);
-      static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/);
-
-      bool useFullOutput;
-
-  };
-
-  void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
-  void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
+  /** \brief Registeres a backend to the mbi logging mechanism. If a backend is registered here, all mbilog messages
+   *         are relayed to this backend through the method ProcessMessage. If no backend is registered the default
+   *         backend is used.
+   */
+  void MBILOG_DLL_API RegisterBackend(BackendBase* backend);
+  
+  /** \brief Unregisters a backend.
+   */
+  void MBILOG_DLL_API UnregisterBackend(BackendBase* backend);
+  
+  /** \brief Distributes the given message to all registered backends. Should only be called by objects 
+    *        of the class pseudo stream.
+    */
   void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
 
+  /** Documentation
+    * \brief An object of this class simulates a std::cout stream. This means messages can be added by
+	*        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
+	*  \ingroup mbilog
+	*/
   class MBILOG_DLL_API PseudoStream {
 
     protected:
@@ -131,6 +70,7 @@ namespace mbilog {
       {
       }
 
+	  /** \brief The message which is stored in the member ss is written to the backend. */
       inline ~PseudoStream()
       {
         if(!disabled)
@@ -141,7 +81,8 @@ namespace mbilog {
         }
       }
 
-      template <class T> inline PseudoStream& operator<<(const T& data) 
+	  /** \brief Definition of the bit shift operator for this class.*/
+      template <class T> inline PseudoStream& operator<<(const T& data)
       {
         if(!disabled)
         {
@@ -155,7 +96,8 @@ namespace mbilog {
         }
         return *this;
       }
-      
+
+	  /** \brief Definition of the bit shift operator for this class (for non const data).*/
       template <class T> inline PseudoStream& operator<<(T& data)
       {
         if(!disabled)
@@ -171,6 +113,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Definition of the bit shift operator for this class (for functions).*/
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
@@ -186,6 +129,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Sets the category of this PseudoStream object. If there already is a category it is appended, seperated by a dot.*/
       inline PseudoStream& operator()(const char *category)
       {
         if(!disabled)
@@ -197,6 +141,7 @@ namespace mbilog {
         return *this;
       }
 
+	  /** \brief Enables/disables the PseudoStream. If set to false parsing and output is suppressed. */
       inline PseudoStream& operator()(bool enabled)
       {
         disabled|=!enabled;
@@ -204,6 +149,11 @@ namespace mbilog {
       }
   };
 
+  /** Documentation 
+    * \brief An object of this class simulates a std::cout stream but does nothing. This class is for dummy objects, bit shift
+	*        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
+	* \ingroup mbilog
+    */
   class MBILOG_DLL_API NullStream {
 
     public:
@@ -230,9 +180,9 @@ namespace mbilog {
       }
   };
 
-//
+//  /** \brief templated backend: one can define a class and a method to create a new backend. */
 //  template<typename T>
-//  struct DelegateBackend : public AbstractBackend
+//  struct DelegateBackend : public BackendBase
 //  {
 //
 //    typedef void(T::*Callback)(const mbilog::LogMessage&);
@@ -255,16 +205,20 @@ namespace mbilog {
 
 }
 
-
+/** \brief Macros for different message levels. Creates an instance of class PseudoStream with the corresponding message level.
+  *        Other parameters are the name of the source file, line of the source code and function name which are generated
+  *        by the compiler.
+  */
 #define MBI_INFO mbilog::PseudoStream(mbilog::Info,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
 
+/** \brief Macro for the debug messages. The messages are disabled if the cmake variable MBILOG_ENABLE_DEBUG is false. */
 #ifdef MBILOG_ENABLE_DEBUG
 #define MBI_DEBUG mbilog::PseudoStream(mbilog::Debug,__FILE__,__LINE__,__FUNCTION__)
 #else
-#define MBI_DEBUG true ? mbilog::NullStream() : mbilog::NullStream()
+#define MBI_DEBUG true ? mbilog::NullStream() : mbilog::NullStream() //this is magic by markus
 #endif
 
 

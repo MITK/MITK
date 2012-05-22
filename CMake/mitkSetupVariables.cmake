@@ -25,7 +25,7 @@ endif()
 
 # build the MITK_INCLUDE_DIRS variable
 set(MITK_INCLUDE_DIRS ${PROJECT_BINARY_DIR})
-set(CORE_DIRECTORIES DataManagement Algorithms IO Rendering Interactions Controllers Service)
+set(CORE_DIRECTORIES Common DataManagement Algorithms IO Rendering Interactions Controllers Service)
 foreach(d ${CORE_DIRECTORIES})
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/Code/${d})
 endforeach()

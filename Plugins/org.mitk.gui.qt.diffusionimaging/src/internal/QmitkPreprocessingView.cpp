@@ -1,20 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
-Language:  C++
-Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
 
@@ -27,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 // itk includes
 #include "itkTimeProbe.h"
 #include "itkB0ImageExtractionImageFilter.h"
+#include "itkB0ImageExtractionToSeparateImageFilter.h"
 #include "itkBrainMaskExtractionImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkVectorContainer.h"
@@ -141,6 +140,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_ButtonBrainMask->setEnabled(foundDwiVolume);
   m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
   m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
+  m_Controls->m_CheckExtractAll->setEnabled(foundDwiVolume);
   m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
   m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
   m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);
@@ -285,6 +285,13 @@ void QmitkPreprocessingView::ExtractB0()
   int nrFiles = m_SelectedDiffusionNodes->size();
   if (!nrFiles) return;
 
+  // call the extraction withou averaging if the check-box is checked
+  if( this->m_Controls->m_CheckExtractAll->isChecked() )
+  {
+    DoExtractBOWithoutAveraging();
+    return;
+  }
+
   mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
   mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
 
@@ -317,6 +324,52 @@ void QmitkPreprocessingView::ExtractB0()
 
     ++itemiter;
   }
+}
+
+void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
+{
+  // typedefs
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
+  typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
+
+  // check number of selected objects, return if empty
+  int nrFiles = m_SelectedDiffusionNodes->size();
+  if (!nrFiles)
+    return;
+
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
+
+  std::vector< mitk::DataNode::Pointer > nodes;
+
+  while ( itemiter != itemiterend ) // for all items
+  {
+    DiffusionImageType* vols =
+      static_cast<DiffusionImageType*>(
+      (*itemiter)->GetData());
+
+    std::string nodename;
+    (*itemiter)->GetStringProperty("name", nodename);
+
+    // Extract image using found index
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput(vols->GetVectorImage());
+    filter->SetDirections(vols->GetDirections());
+    filter->Update();
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage->InitializeByItk( filter->GetOutput() );
+    mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    node->SetData( mitkImage );
+    node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
+
+    GetDefaultDataStorage()->Add(node);
+
+    ++itemiter;
+  }
+
 }
 
 void QmitkPreprocessingView::AverageGradients()

@@ -30,6 +30,7 @@ set(module_dirs
     ToFProcessing
     ToFUI
     ClippingTools
+    US  
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

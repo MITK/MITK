@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>ProjectTemplate/CMakeLists.txt</file>
-        <file>ProjectTemplate/Copyright.txt</file>
+        <file>ProjectTemplate/LICENSE.txt</file>
         <file>ProjectTemplate/SuperBuild.cmake</file>
         <file>ProjectTemplate/Apps/TemplateApp/CMakeLists.txt</file>
         <file>ProjectTemplate/Apps/TemplateApp/startTemplateApp.bat.in</file>
@@ -13,6 +13,6 @@
         <file>ProjectTemplate/CMake/StartVS.bat.in</file>
         <file>ProjectTemplate/CMakeExternals/MITK.cmake</file>
         <file>ProjectTemplate/Plugins/Plugins.cmake</file>
-        <file>MITKCopyright.txt</file>
+        <file>LICENSE.txt</file>
     </qresource>
 </RCC>

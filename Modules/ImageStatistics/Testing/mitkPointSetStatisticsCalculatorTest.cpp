@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2008-02-25 17:27:17 +0100 (Mo, 25 Feb 2008) $
-Version:   $Revision: 7837 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkStandardFileLocations.h"
 #include "mitkTestingMacros.h"
@@ -26,29 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
  */
 class mitkPointSetStatisticsCalculatorTestClass
 {
-    /**************************** a few private help funktions ***********************************/
-     private:
-     /** @brief Rounds a double.
-      *  @param precision   number of tested decimal places */
-     static double round(double number, int precision)
-      {
-        double t = std::pow(10.,precision);
-        double returnValue = (int)(number*t+0.5)/t;
-        return returnValue;
-      }
-     /** @brief Tests two double values for equality.
-      *  @param precision   number of tested decimal places */
-    static bool equals(double a, double b, int precision = 5)
-      {
-      if (round(a,precision)==round(b,precision)) return true;
-      else 
-        {
-          std::cout << a << " is not " << b << std::endl;
-          return false;
-        }
-      }
-    /**********************************************************************************************/
-
 public:
 
   static void TestInstantiation()
@@ -80,14 +56,14 @@ static void TestSimpleCase()
   
     MITK_TEST_CONDITION_REQUIRED((myPointSetStatisticsCalculator->GetPositionMean()[0]==0.5),".. Testing GetPositionMean");
     MITK_TEST_CONDITION_REQUIRED((myPointSetStatisticsCalculator->GetPositionStandardDeviation()[0]==0.5),".. Testing GetPositionStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[0],0.70710672),".. Testing GetPositionStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMean(),0.8660254),".. Testing GetPositionErrorMean");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorRMS(),0.8660254),".. Testing GetPositionErrorRMS");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMax(),0.8660254),".. Testing GetPositionErrorMax");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMedian(),0.8660254),".. Testing GetPositionErrorMedian");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMin(),0.8660254),".. Testing GetPositionErrorMin");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorSampleStandardDeviation(),0),".. Testing GetPositionErrorSampleStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorStandardDeviation(),0),".. Testing GetPositionErrorStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[0],0.70710672),".. Testing GetPositionSampleStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMean(),0.8660254),".. Testing GetPositionErrorMean");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorRMS(),0.8660254),".. Testing GetPositionErrorRMS");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMax(),0.8660254),".. Testing GetPositionErrorMax");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMedian(),0.8660254),".. Testing GetPositionErrorMedian");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMin(),0.8660254),".. Testing GetPositionErrorMin");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorSampleStandardDeviation(),0),".. Testing GetPositionErrorSampleStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorStandardDeviation(),0),".. Testing GetPositionErrorStandardDeviation");
     }
 
 static void TestComplexCase()
@@ -136,16 +112,16 @@ static void TestComplexCase()
     mitk::PointSetStatisticsCalculator::Pointer myPointSetStatisticsCalculator = mitk::PointSetStatisticsCalculator::New();
     myPointSetStatisticsCalculator->SetPointSet(testPointSet);
     
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionMean()[2],1.2895),".. Testing GetPositionMean");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionStandardDeviation()[2],0.86614074),".. Testing GetPositionStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[2],0.91868098),".. Testing GetPositionStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMean(),6.06656587),".. Testing GetPositionErrorMean");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorRMS(),8.0793161),".. Testing GetPositionErrorRMS");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMax(),18.6875241),".. Testing GetPositionErrorMax");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMedian(),4.18522229),".. Testing GetPositionErrorMedian");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorMin(),0.90082741),".. Testing GetPositionErrorMin");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorSampleStandardDeviation(),5.65960626),".. Testing GetPositionErrorSampleStandardDeviation");
-    MITK_TEST_CONDITION_REQUIRED(equals(myPointSetStatisticsCalculator->GetPositionErrorStandardDeviation(),5.33592795),".. Testing GetPositionErrorStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionMean()[2],1.2895),".. Testing GetPositionMean");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionStandardDeviation()[2],0.86614074),".. Testing GetPositionStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[2],0.91868098),".. Testing GetPositionStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMean(),6.06656587),".. Testing GetPositionErrorMean");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorRMS(),8.0793161),".. Testing GetPositionErrorRMS");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMax(),18.6875241),".. Testing GetPositionErrorMax");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMedian(),4.18522229),".. Testing GetPositionErrorMedian");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMin(),0.90082741),".. Testing GetPositionErrorMin");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorSampleStandardDeviation(),5.65960626),".. Testing GetPositionErrorSampleStandardDeviation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorStandardDeviation(),5.33592795),".. Testing GetPositionErrorStandardDeviation");
  
     }
 

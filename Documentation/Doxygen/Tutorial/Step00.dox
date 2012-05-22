@@ -2,7 +2,7 @@
 
 \page Step00Page MITK Tutorial - Step 0: Getting started
 
-To build the tutorials follow the \ref BuildInstructionsPage and make sure that MITK_BUILD_TUTORIAL is checked/set to ON. 
+To build the tutorials follow the \ref BuildInstructionsPage and make sure that MITK_BUILD_EXAMPLES is checked/set to ON. 
 
 \image html configureCMake.PNG
 

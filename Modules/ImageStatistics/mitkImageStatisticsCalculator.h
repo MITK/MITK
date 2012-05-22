@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2009-05-12 19:56:03 +0200 (Di, 12 Mai 2009) $
-Version:   $Revision: 17179 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 #ifndef _MITK_IMAGESTATISTICSCALCULATOR_H
@@ -42,7 +41,7 @@ namespace mitk
  * \brief Class for calculating statistics and histogram for an (optionally
  * masked) image.
  *
- * Images can be masked by either a (binary) image (of the same dimensions as
+ * Images can be masked by either a label image (of the same dimensions as
  * the original image) or by a closed mitk::PlanarFigure, e.g. a circle or
  * polygon. When masking with a planar figure, the slice corresponding to the
  * plane containing the figure is extracted and then clipped with contour
@@ -74,6 +73,7 @@ public:
 
   struct Statistics
   {
+    int Label;
     unsigned int N;
     double Min;
     double Max;
@@ -85,6 +85,7 @@ public:
 
     void Reset()
     {
+      Label = 0;
       N = 0;
       Min = 0.0;
       Max = 0.0;
@@ -96,6 +97,9 @@ public:
     }
   };
 
+  typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
+  typedef std::vector< Statistics > StatisticsContainer;
+
   
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkNewMacro( ImageStatisticsCalculator );
@@ -103,7 +107,7 @@ public:
   /** \brief Set image from which to compute statistics. */
   void SetImage( const mitk::Image *image );
 
-  /** \brief Set binary image for masking. */
+  /** \brief Set image for masking. */
   void SetImageMask( const mitk::Image *imageMask );
 
   /** \brief Set planar figure for masking. */
@@ -145,17 +149,29 @@ public:
   virtual bool ComputeStatistics( unsigned int timeStep = 0 );
 
 
-  /** \brief Retrieve the histogram depending on the current masking mode. */
-  const HistogramType *GetHistogram(  unsigned int timeStep = 0 ) const;
+  /** \brief Retrieve the histogram depending on the current masking mode. 
+   *
+   * \param label The label for which to retrieve the histogram in multi-label situations (ascending order).
+   */
+  const HistogramType *GetHistogram(  unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
-  /** \brief Retrieve statistics depending on the current masking mode. */
-  const Statistics &GetStatistics( unsigned int timeStep = 0 ) const;
+  /** \brief Retrieve the histogram depending on the current masking mode (for all image labels. */
+  const HistogramContainer &GetHistogramVector(  unsigned int timeStep = 0 ) const;
+
+  /** \brief Retrieve statistics depending on the current masking mode.
+   *
+   * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
+   */
+  const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
+
+  /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
+  const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
 
 
   
 protected:
-  typedef std::vector< HistogramType::ConstPointer > HistogramVectorType;
-  typedef std::vector< Statistics > StatisticsVectorType;
+  typedef std::vector< HistogramContainer > HistogramVector;
+  typedef std::vector< StatisticsContainer > StatisticsVector;
 
   typedef std::vector< itk::TimeStamp > TimeStampVectorType;
   typedef std::vector< bool > BoolVectorType;
@@ -189,24 +205,24 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
   void InternalCalculateStatisticsUnmasked(
     const itk::Image< TPixel, VImageDimension > *image,
-    Statistics &statistics,
-    typename HistogramType::ConstPointer *histogram );
+    StatisticsContainer* statisticsContainer,
+    HistogramContainer *histogramContainer );
 
   template < typename TPixel, unsigned int VImageDimension >
   void InternalCalculateStatisticsMasked(
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage,
-    Statistics &statistics,
-    typename HistogramType::ConstPointer *histogram );
+    StatisticsContainer* statisticsContainer,
+    HistogramContainer* histogramContainer );
 
   template < typename TPixel, unsigned int VImageDimension >
   void InternalCalculateMaskFromPlanarFigure(
     const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
 
   template < typename TPixel, unsigned int VImageDimension >
-      void InternalMaskIgnoredPixels(
-          const itk::Image< TPixel, VImageDimension > *image,
-          itk::Image< unsigned short, VImageDimension > *maskImage );
+  void InternalMaskIgnoredPixels(
+    const itk::Image< TPixel, VImageDimension > *image,
+    itk::Image< unsigned short, VImageDimension > *maskImage );
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
@@ -263,18 +279,20 @@ protected:
 
   mitk::PlanarFigure::Pointer m_PlanarFigure;
 
-  HistogramVectorType m_ImageHistogramVector;
-  HistogramVectorType m_MaskedImageHistogramVector;
-  HistogramVectorType m_PlanarFigureHistogramVector;
+  HistogramVector m_ImageHistogramVector;
+  HistogramVector m_MaskedImageHistogramVector;
+  HistogramVector m_PlanarFigureHistogramVector;
 
   HistogramType::Pointer m_EmptyHistogram;
+  HistogramContainer m_EmptyHistogramContainer;
 
 
-  StatisticsVectorType m_ImageStatisticsVector;
-  StatisticsVectorType m_MaskedImageStatisticsVector;
-  StatisticsVectorType m_PlanarFigureStatisticsVector;
+  StatisticsVector m_ImageStatisticsVector;
+  StatisticsVector m_MaskedImageStatisticsVector;
+  StatisticsVector m_PlanarFigureStatisticsVector;
 
   Statistics m_EmptyStatistics;
+  StatisticsContainer m_EmptyStatisticsContainer;
 
   unsigned int m_MaskingMode;
   bool m_MaskingModeChanged;

@@ -17,10 +17,25 @@ Few people write code in the intention for it to be difficult to be used by othe
 
 This is were using doxygen pays of, by giving a short comment in the header file a reference manual is automatically generated.
 
+While doxygen support several different manners of documentation, the MITK documentation should keep a uniform documentation style:
+\warning{
+Use <b>only</b> the \verbatim /** ... */ \endverbatim style for documentation.
+}
+
+In dire emergencies you may consider commenting via the /// style, others may <b>never</b> be used.
+
+An example:
+\verbatim
+  /** \brief Brief description what the commented part does.
+   * 
+   * More detailed description. This can be as long as you like, 
+   * whereas the brief description should never be more than one sentence.
+   */
+\endverbatim
+
 \subsection DocumentationGuideCodeHints Helpful hints:
 <ul>
  <li> Always put comments intended for doxygen in the header files.
- <li> Use the /// or //! style, to be able to comment out the entire file quickly
 </ul>
 
 \section DocumentationGuideManual Writing user manuals
@@ -39,7 +54,6 @@ The nightly generated HTML documentation and the Qt Help System documentation ca
  <li> Use references to allow for fast navigation
  <li> Images, pictures and sketches are great, use them
  <li> Use visual help like remark, paragraph and warning
- <li> Use the /** or /*! style, so as not to be forced to comment out every line
  <li> BLUEBERRY_USE_QT_HELP should be set to ON
  <li> The plug-in org.blueberry.ui.qt.help should be set to ON
 </ul>

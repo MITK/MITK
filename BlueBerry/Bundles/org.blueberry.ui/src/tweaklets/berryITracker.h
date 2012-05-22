@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
- Program:   BlueBerry Platform
- Language:  C++
- Date:      $Date$
- Version:   $Revision$
+BlueBerry Platform
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
- =========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 #ifndef BERRYITRACKER_H_
@@ -34,10 +33,10 @@ namespace berry {
  *  typically used to represent window geometries in a lightweight manner.
  *
  */
-struct ITracker
+struct BERRY_UI ITracker
 {
 
-  virtual ~ITracker() {}
+  virtual ~ITracker();
   
   virtual Rectangle GetRectangle() = 0;
   virtual void SetRectangle(const Rectangle& rectangle) = 0;

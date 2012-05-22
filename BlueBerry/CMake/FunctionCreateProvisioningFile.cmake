@@ -12,6 +12,7 @@
 #!                              all known plug-in targets (external or internal) are considered.
 #! \param EXCLUDE_PLUGINS <plugin-list> (optional) A list of plug-in symbolic names which should be excluded
 #!                                      from the provisioning entries.
+#! \param NO_INSTALL (option) Suppress the creation of an additional provisioning file suitable for packaging.
 #!
 #! This function creates a provisioning file which can be used to provision a BlueBerry
 #! application. The syntax of entries in the file is
@@ -45,7 +46,7 @@
 #!
 function(FunctionCreateProvisioningFile)
 
-  macro_parse_arguments(_PROV "FILE;INCLUDE;PLUGINS;EXCLUDE_PLUGINS;PLUGIN_DIR" "" ${ARGN})
+  macro_parse_arguments(_PROV "FILE;INCLUDE;PLUGINS;EXCLUDE_PLUGINS;PLUGIN_DIR" "NO_INSTALL" ${ARGN})
   
   if(_PROV_PLUGIN_DIR)
     message(WARNING "The PLUGIN_DIR argument is no longer supported. Either use FunctionCreateProvisioningFile_legacy or adapt your CMake function call.")
@@ -82,6 +83,10 @@ function(FunctionCreateProvisioningFile)
       string(REPLACE "." "_" _plugin_target ${_plugin})
       list(APPEND _plugin_list ${_plugin_target})
     endforeach()
+    # get all plug-in dependencies
+    ctkFunctionGetPluginDependencies(_plugin_deps PLUGINS ${_plugin_list} ALL)
+    # add the dependencies to the list of plug-ins
+    list(APPEND _plugin_list ${_plugin_deps})
   else()
     # Fill the _plugin_list variable with external and internal plug-in target names.
     ctkFunctionGetAllPluginTargets(_plugin_list)
@@ -157,7 +162,10 @@ function(FunctionCreateProvisioningFile)
   endforeach()
 
   file(WRITE ${_PROV_FILE} "${out_var}")
-  file(WRITE ${_PROV_FILE}.install "${out_var_install}")
+  
+  if(NOT _PROV_NO_INSTALL)
+    file(WRITE ${_PROV_FILE}.install "${out_var_install}")
+  endif()
 
 endfunction() 
 

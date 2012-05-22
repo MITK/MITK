@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 18127 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "QmitkDataManagerView.h"
 
@@ -142,6 +141,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setAcceptDrops(true);
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_NodeTreeModel);
+  m_NodeTreeView->header()->setResizeMode(0,QHeaderView::ResizeToContents);
+  m_NodeTreeView->header()->setStretchLastSection(false);
   m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
@@ -644,7 +645,8 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
   foreach(mitk::DataNode::Pointer node, selectedNodes)
   {
     mitk::BaseData::Pointer basedata = node->GetData();
-    if (basedata.IsNotNull())
+    if ( basedata.IsNotNull() &&
+         basedata->GetTimeSlicedGeometry()->IsValid() )
     {
       renderWindow->GetRenderingManager()->InitializeViews(
             basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );

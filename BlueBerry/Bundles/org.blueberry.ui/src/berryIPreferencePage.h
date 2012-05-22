@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
- Program:   BlueBerry Platform
- Language:  C++
- Date:      $Date: 2009-01-23 09:44:29 +0100 (Fr, 23 Jan 2009) $
- Version:   $Revision: 16084 $
+BlueBerry Platform
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
- =========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef BERRYIPREFERENCEPAGE_H_
 #define BERRYIPREFERENCEPAGE_H_
@@ -45,10 +44,12 @@ namespace berry
  * </pre>
  * </p>
  */
-struct IPreferencePage: virtual public Object
+struct BERRY_UI IPreferencePage: virtual public Object
 {
 
   berryInterfaceMacro(IPreferencePage, berry)
+
+  ~IPreferencePage();
 
   /**
      * Initializes this preference page for the given workbench.

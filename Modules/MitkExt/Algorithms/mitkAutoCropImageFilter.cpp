@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkAutoCropImageFilter.h"
 
@@ -70,10 +69,14 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
 
   mitk::Image::Pointer newMitkImage = mitk::Image::New();
   mitk::CastToMitkImage( outputItk, newMitkImage );
+  MITK_INFO << "Crop-Output dimension: " << (newMitkImage->GetDimension() == 3) << " Filter-Output dimension: "<<this->GetOutput()->GetDimension()<< " Timestep: " << timestep;
 
-  const mitk::ChannelDescriptor desc = newMitkImage->GetChannelDescriptor(0);
-  unsigned char* image3D = desc.GetData();
-  this->GetOutput()->SetVolume( (void*) &image3D , timestep );
+//  const mitk::ChannelDescriptor desc = newMitkImage->GetChannelDescriptor(0);
+//  unsigned char* image3D = desc.GetData();
+//  this->GetOutput()->SetVolume( (void*) &image3D , timestep );
+
+  this->GetOutput()->SetVolume( newMitkImage->GetData(), timestep);
+//  this->SetOutput(newMitkImage);
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
@@ -171,7 +174,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
 
 void mitk::AutoCropImageFilter::GenerateData()
 {
-
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 

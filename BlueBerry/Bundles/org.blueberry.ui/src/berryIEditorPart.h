@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
- Program:   BlueBerry Platform
- Language:  C++
- Date:      $Date$
- Version:   $Revision$
+BlueBerry Platform
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
- =========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef BERRYIEDITORPART_H_
 #define BERRYIEDITORPART_H_
@@ -71,11 +70,9 @@ struct IEditorSite;
 struct BERRY_UI IEditorPart : public virtual IWorkbenchPart,
                                public ISaveablePart {
 
-  berryInterfaceMacro(IEditorPart, berry);
+  berryInterfaceMacro(IEditorPart, berry)
 
-  virtual ~IEditorPart()
-  {
-  }
+  virtual ~IEditorPart();
 
 
   /**

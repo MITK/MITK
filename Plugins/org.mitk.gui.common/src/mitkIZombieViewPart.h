@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 18127 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 #ifndef MITKIZOMBIEVIEWPART_H
@@ -21,7 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkILifecycleAwarePart.h"
 
+namespace berry{
+struct IWorkbenchPartReference;
+template<class T> class SmartPointer;
+}
+
 namespace mitk {
+
 
 /**
  * \ingroup org_mitk_gui_common
@@ -42,8 +47,10 @@ namespace mitk {
  *
  * \see ILifecycleAwarePart
  */
-struct IZombieViewPart : public virtual ILifecycleAwarePart
+struct MITK_GUI_COMMON_PLUGIN IZombieViewPart : public virtual ILifecycleAwarePart
 {
+
+  ~IZombieViewPart();
 
   /**
    * Called when another Zombie View was activated. This usually means that this part
@@ -51,7 +58,7 @@ struct IZombieViewPart : public virtual ILifecycleAwarePart
    *
    * \param zombieView The newly activate Zombie View.
    */
-  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView) = 0;
+  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) = 0;
 
 };
 

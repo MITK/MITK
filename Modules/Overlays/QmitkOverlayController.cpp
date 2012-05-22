@@ -240,6 +240,20 @@ void QmitkOverlayController::SetOverlayVisibility( bool visible )
       (overlayIter->second)->hide();
     }
   }
+
+  OverlayVector::iterator allOverlaysIter;
+  for( allOverlaysIter=m_AllOverlays.begin(); allOverlaysIter!=m_AllOverlays.end(); allOverlaysIter++ )
+  {
+    if ( visible )
+    {
+      (*allOverlaysIter)->GetWidget()->show();
+    }
+    else
+    {
+      (*allOverlaysIter)->GetWidget()->hide();
+    }
+
+  }
 }
 
 

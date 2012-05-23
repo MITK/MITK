@@ -95,6 +95,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageTest.cpp
     mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
+    mitkImageVtkMapper2DLevelWindowTest.cpp
 )
 
 # Create an artificial module initializing class for

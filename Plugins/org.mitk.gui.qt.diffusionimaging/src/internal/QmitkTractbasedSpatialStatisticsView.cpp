@@ -534,8 +534,11 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
   if(m_Roi.size() > 0 && m_CurrentGeometry != NULL)
   {
     int index = (int)pos.x();
-    index = std::max(0, index);
-    index = std::min(index, (int)m_Roi.size());
+
+
+    index = std::min( (int)m_Roi.size()-1, std::max(0, index) );
+
+
     itk::Index<3> ix = m_Roi.at(index);
 
     mitk::Vector3D i;

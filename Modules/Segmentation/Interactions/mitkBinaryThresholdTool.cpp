@@ -207,7 +207,15 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
             timeSelector->SetTimeNr( timeStep );
             timeSelector->UpdateLargestPossibleRegion();
             Image::Pointer image3D = timeSelector->GetOutput();
-            AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
+
+            if (image3D->GetDimension() == 2)
+            {
+              AccessFixedDimensionByItk_2( image3D, ITKThresholding, 2, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
+            }
+            else
+            {
+              AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
+            }
           }
           catch(...)
           {

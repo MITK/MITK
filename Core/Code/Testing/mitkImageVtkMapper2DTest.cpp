@@ -23,47 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 #include <vtkPNGWriter.h>
-#include <vtkRegressionTestImage.h> // nice one
-
-#include <vector>
-#include <algorithm>
+#include <vtkRegressionTestImage.h>
 
 #include "mitkRenderingTestHelper.h"
 #include <mitkLevelWindow.h>
-
-class mitkRenderingTestHelperClass
-{
-
-public:
-
-    static mitk::BaseData::Pointer AddToStorage(const std::string& filename)
-    {
-        mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
-        try
-        {
-            reader->SetFileName( filename );
-            reader->Update();
-
-            if(reader->GetNumberOfOutputs()<1)
-            {
-                MITK_TEST_FAILED_MSG(<< "Could not find test data '" << filename << "'");
-            }
-
-            mitk::DataNode::Pointer node = reader->GetOutput( 0 );
-            mitkRenderingTestHelperClass::s_DataStorage->Add(node);
-            return node->GetData();
-        }
-        catch ( itk::ExceptionObject & e )
-        {
-            MITK_TEST_FAILED_MSG(<< "Failed loading test data '" << filename << "': " << e.what());
-        }
-    }
-
-    static mitk::DataStorage::Pointer s_DataStorage;
-
-}; // end test helper class
-
-mitk::DataStorage::Pointer mitkRenderingTestHelperClass::s_DataStorage;
 
 int mitkImageVtkMapper2DTest(int argc, char* argv[])
 {
@@ -73,35 +36,16 @@ int mitkImageVtkMapper2DTest(int argc, char* argv[])
     // compare rendering to reference image
     MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
-            // enough parameters?
-            if ( argc < 2 )
+    // enough parameters?
+    if ( argc < 2 )
     {
         MITK_TEST_OUTPUT( << "Usage: " << std::string(*argv) << " [file1 file2 ...] outputfile" )
                 MITK_TEST_OUTPUT( << "Will render a central transversal slice of all given files into outputfile" )
                 exit( EXIT_SUCCESS );
     }
 
-    // parse parameters
-    std::vector<std::string> inputFileNames;
-    for (int i = 1; i < argc-1; ++i)
-    {
-        //add everything to a list but -T and -V
-        std::string tmp = argv[i];
-        if((tmp.compare("-T")) && (tmp.compare("-V")))
-        {
-            inputFileNames.push_back( tmp );
-        }
-    }
-    //    std::string outputFileName( argv[argc-1] );
-
-    // load all input into a data storage
-    mitkRenderingTestHelperClass::s_DataStorage = mitk::StandaloneDataStorage::New().GetPointer();
-    MITK_TEST_CONDITION_REQUIRED(mitkRenderingTestHelperClass::s_DataStorage.IsNotNull(),"StandaloneDataStorage instantiation");
-
-    std::for_each( inputFileNames.begin(), inputFileNames.end(), mitkRenderingTestHelperClass::AddToStorage );
-
-    // create a mitkRenderWindow, let it render the scene and get the vtkRenderWindow
-    mitkRenderingTestHelper renderingHelper( 640, 480, mitkRenderingTestHelperClass::s_DataStorage );
+    mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:
     bool generateReferenceScreenshot = false;
@@ -109,6 +53,14 @@ int mitkImageVtkMapper2DTest(int argc, char* argv[])
     {
         renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
     }
+
+    //### Usage of vtkRegressionTestImage:
+    //vtkRegressionTestImage( vtkRenderWindow )
+    //Set a vtkRenderWindow containing the desired scene.
+    //vtkRegressionTestImage automatically searches in argc and argv[]
+    //for a path a valid image with -V. If the test failed with the
+    //first image (foo.png) check if there are images of the form
+    //foo_N.png (where N=1,2,3...) and compare against them.
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

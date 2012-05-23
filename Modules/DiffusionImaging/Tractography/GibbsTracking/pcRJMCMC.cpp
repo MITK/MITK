@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __pcRJMCMC_cpp__
 #define __pcRJMCMC_cpp__
 
@@ -109,47 +124,47 @@ float *BESSEL_APPROXCOEFF;
 
 //void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 //{
- 	
+   
 //    if(nrhs != 7 && nrhs != 8) {
-	
-//	printf(" wrong usage!!!.\n\n");
+  
+//  printf(" wrong usage!!!.\n\n");
 //    return;
-//	} else if(nlhs>3) {
-//	printf("Too many output arguments\n");
+//  } else if(nlhs>3) {
+//  printf("Too many output arguments\n");
 //    return;
-//	}
-	
-//	int pcnt = 0;
-//	const mxArray *Points;
-//	Points = prhs[pcnt++];
-//	int numPoints = mxGetN(Points);
+//  }
+  
+//  int pcnt = 0;
+//  const mxArray *Points;
+//  Points = prhs[pcnt++];
+//  int numPoints = mxGetN(Points);
 //  float *points = (float*) mxGetData(Points);
-	
-//	const mxArray *DataImg;
-//	DataImg = prhs[pcnt++];
+  
+//  const mxArray *DataImg;
+//  DataImg = prhs[pcnt++];
 //  float *dimg = (float*) mxGetData(DataImg);
-//	const int *dsize = mxGetDimensions(DataImg);
+//  const int *dsize = mxGetDimensions(DataImg);
     
-//	const mxArray *Mask;
-//	Mask = prhs[pcnt++];
+//  const mxArray *Mask;
+//  Mask = prhs[pcnt++];
 //  float *mask = (float*) mxGetData(Mask);
 //    const int *dmsize = mxGetDimensions(Mask);
 //    int mask_oversamp_mult = dmsize[0]/dsize[1];
     
     
     
-//	const mxArray *VoxSize;
-//	VoxSize = prhs[pcnt++];
-//	double *voxsize = (double*) mxGetPr(VoxSize);
+//  const mxArray *VoxSize;
+//  VoxSize = prhs[pcnt++];
+//  double *voxsize = (double*) mxGetPr(VoxSize);
             
     
 
-//	const mxArray *Params;
-//	Params = prhs[pcnt++];
-//	double *params = (double*) mxGetPr(Params);
+//  const mxArray *Params;
+//  Params = prhs[pcnt++];
+//  double *params = (double*) mxGetPr(Params);
 
 //  float Temp = (float) params[0];
-//	int numit = (int) params[1];
+//  int numit = (int) params[1];
 //  float conprob = (float) params[2];
 //  float particle_weight = (float) params[3];
 //  float particle_width = (float) params[4];
@@ -161,118 +176,118 @@ float *BESSEL_APPROXCOEFF;
 //  float meanval_sq = (float) params[10];
 
 //    const mxArray *BesselExpansion;
-//	BesselExpansion = prhs[pcnt++];
+//  BesselExpansion = prhs[pcnt++];
 //  BESSEL_APPROXCOEFF = (float*) mxGetData(BesselExpansion);
     
     
     
-//	// read spherical-interpolator data
+//  // read spherical-interpolator data
 
-//	const mxArray *sinterpstruct = prhs[pcnt++];
-//	mxArray *Indices = mxGetField(sinterpstruct,0,"indices");
-//	mxArray *BaryCoords = mxGetField(sinterpstruct,0,"barycoords");
-//	mxArray *Beta = mxGetField(sinterpstruct,0,"beta");
-//	mxArray *NumInterpPoints = mxGetField(sinterpstruct,0,"numpoints");
-	
+//  const mxArray *sinterpstruct = prhs[pcnt++];
+//  mxArray *Indices = mxGetField(sinterpstruct,0,"indices");
+//  mxArray *BaryCoords = mxGetField(sinterpstruct,0,"barycoords");
+//  mxArray *Beta = mxGetField(sinterpstruct,0,"beta");
+//  mxArray *NumInterpPoints = mxGetField(sinterpstruct,0,"numpoints");
+  
 //  float *indimg = (float*) mxGetData(Indices);
-//	const int *isize = mxGetDimensions(Indices);
-//	int totsz = isize[0]*isize[1]*isize[2]*isize[3];
-//	int *indeximg = (int*) malloc(sizeof(int)*totsz);
-//	for (int k =0;k < totsz;k++)
-//		indeximg[k] = int(indimg[k])-1;
+//  const int *isize = mxGetDimensions(Indices);
+//  int totsz = isize[0]*isize[1]*isize[2]*isize[3];
+//  int *indeximg = (int*) malloc(sizeof(int)*totsz);
+//  for (int k =0;k < totsz;k++)
+//    indeximg[k] = int(indimg[k])-1;
 //  float *barycoords = (float*) mxGetData(BaryCoords);
 //  float *beta = (float*) mxGetData(Beta);
 //  int nip = int(*((float*)mxGetData(NumInterpPoints)));
-	
+  
 //    SphereInterpolator *sinterp = new SphereInterpolator(barycoords,indeximg,nip,isize[2],beta[0]);
-	
-//	double breakhandle = 0;
-//	const mxArray *BreakHandle;
-//	if (nrhs == 8)
-//	{
-//		BreakHandle = prhs[pcnt++];
-//		breakhandle = *mxGetPr(BreakHandle);
-//	}
+  
+//  double breakhandle = 0;
+//  const mxArray *BreakHandle;
+//  if (nrhs == 8)
+//  {
+//    BreakHandle = prhs[pcnt++];
+//    breakhandle = *mxGetPr(BreakHandle);
+//  }
 
-//	#ifdef TIMING
-//	externalenergy_time.clear();
-//	internalenergy_time.clear();
-//	odfeval_time.clear();
-//	total_time.clear();
+//  #ifdef TIMING
+//  externalenergy_time.clear();
+//  internalenergy_time.clear();
+//  odfeval_time.clear();
+//  total_time.clear();
 
-//	shiftproposal_time.clear();
-//	birthproposal_time.clear();
-//	deathproposal_time.clear();
-//	capproposal_time.clear();
-//	lenproposal_time.clear();
-//	connproposal_time.clear();
+//  shiftproposal_time.clear();
+//  birthproposal_time.clear();
+//  deathproposal_time.clear();
+//  capproposal_time.clear();
+//  lenproposal_time.clear();
+//  connproposal_time.clear();
 
-//	deathstats.clear();
-//	birthstats.clear();
-//	connstats.clear();
-//	shiftstats.clear();
-//	capstats.clear();
-//	lenstats.clear();
-//	#endif
-	
+//  deathstats.clear();
+//  birthstats.clear();
+//  connstats.clear();
+//  shiftstats.clear();
+//  capstats.clear();
+//  lenstats.clear();
+//  #endif
+  
 
 
 //  float cellsize = 2*particle_len;
 //  float curv_hardthres = 0.7;
 
 //    fprintf(stderr,"setting up MH-sampler \n"); fflush(stderr);
-//	RJMCMC sampler(points,numPoints, dimg, dsize, voxsize, cellsize);
+//  RJMCMC sampler(points,numPoints, dimg, dsize, voxsize, cellsize);
 //    fprintf(stderr,"setting up Energy-computer \n"); fflush(stderr);
 //    EnergyComputer encomp(dimg,dsize,voxsize,sinterp,&(sampler.pcontainer),mask,mask_oversamp_mult);
 
 //    fprintf(stderr,"setting up parameters\n"); fflush(stderr);
-//	sampler.setParameters(Temp,numit,conprob,particle_len,curv_hardthres,chempot_particle);
-//   	sampler.setEnergyComputer(&encomp);
+//  sampler.setParameters(Temp,numit,conprob,particle_len,curv_hardthres,chempot_particle);
+//     sampler.setEnergyComputer(&encomp);
 //    encomp.setParameters(particle_weight,particle_width,chempot_connection*particle_len*particle_len,particle_len,curv_hardthres,inex_balance,chempot2,meanval_sq);
     
 //    fprintf(stderr,"starting to iterate\n"); fflush(stderr);
-//	sampler.iterate(breakhandle);
-	
-//	int cnt = sampler.pcontainer.pcnt;
-//	#ifdef TIMING
-//	mexPrintf("\nEnergy\n------------------------\n");
-//	externalenergy_time.report("external  ");
-//	odfeval_time.report("odfeval   ");
-//	internalenergy_time.report("internal  ");
-//	total_time.report_time("total energy comp.  ");
-	
-//	mexPrintf("overhead for proposals und stuff:%.1fms\n",
-//	(total_time.time-(externalenergy_time.time+odfeval_time.time+internalenergy_time.time))/1000.0);
+//  sampler.iterate(breakhandle);
+  
+//  int cnt = sampler.pcontainer.pcnt;
+//  #ifdef TIMING
+//  mexPrintf("\nEnergy\n------------------------\n");
+//  externalenergy_time.report("external  ");
+//  odfeval_time.report("odfeval   ");
+//  internalenergy_time.report("internal  ");
+//  total_time.report_time("total energy comp.  ");
+  
+//  mexPrintf("overhead for proposals und stuff:%.1fms\n",
+//  (total_time.time-(externalenergy_time.time+odfeval_time.time+internalenergy_time.time))/1000.0);
 
-//	mexPrintf("\nProposals\n------------------------\n");
-//	birthproposal_time.report("birth  ");
-//	deathproposal_time.report("death  ");
-//	shiftproposal_time.report("shift  ");
-//	connproposal_time.report("conne  ");
-////	capproposal_time.report("capch  ");
-////	lenproposal_time.report("length ");
-//	mexPrintf("\n");
-//	birthstats.report("birth  ");
-//	deathstats.report("death  ");
-//	shiftstats.report("shift  ");
-//	connstats.report("conne  ");
-////	lenstats.report("length ");
-////	capstats.report("capch  ");
-//	mexPrintf("\n");
+//  mexPrintf("\nProposals\n------------------------\n");
+//  birthproposal_time.report("birth  ");
+//  deathproposal_time.report("death  ");
+//  shiftproposal_time.report("shift  ");
+//  connproposal_time.report("conne  ");
+////  capproposal_time.report("capch  ");
+////  lenproposal_time.report("length ");
+//  mexPrintf("\n");
+//  birthstats.report("birth  ");
+//  deathstats.report("death  ");
+//  shiftstats.report("shift  ");
+//  connstats.report("conne  ");
+////  lenstats.report("length ");
+////  capstats.report("capch  ");
+//  mexPrintf("\n");
 
 
 
-//	#endif
+//  #endif
 
-	
-//	int dims[] = {sampler.attrcnt, sampler.pcontainer.pcnt};
+  
+//  int dims[] = {sampler.attrcnt, sampler.pcontainer.pcnt};
 //  plhs[0] = mxCreateNumericArray(2,dims,mxGetClassID(Points),mxfloat);
 //  float *npoints = (float*) mxGetData(plhs[0]);
-//	sampler.writeout(npoints);
-	
+//  sampler.writeout(npoints);
+  
 
-//	delete sinterp;
-//	free(indeximg);
+//  delete sinterp;
+//  free(indeximg);
 
 
 //}

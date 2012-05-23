@@ -48,6 +48,8 @@ int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
     double window = levelWindowPreset->getWindow("Blood");
     //apply level window to all images
     renderingHelper.SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(level, window)) );
+    //for now this test renders Sagittal
+    renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:

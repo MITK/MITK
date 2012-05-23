@@ -71,12 +71,12 @@ namespace mitk {
     void DoFiberSmoothing(int pointsPerCm);
 
     // add/subtract fibers
-    mitk::FiberBundleX::Pointer AddBundle(mitk::FiberBundleX* fib);
-    mitk::FiberBundleX::Pointer SubtractBundle(mitk::FiberBundleX* fib);
+    FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
+    FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
 
     // fiber subset extraction
-    mitk::FiberBundleX::Pointer ExtractFiberSubset(mitk::PlanarFigure::Pointer pf);
-    std::vector<long> ExtractFiberIdSubset(mitk::PlanarFigure::Pointer pf);
+    FiberBundleX::Pointer ExtractFiberSubset(PlanarFigure::Pointer pf);
+    std::vector<long> ExtractFiberIdSubset(PlanarFigure::Pointer pf);
     vtkSmartPointer<vtkPolyData> GeneratePolyDataByIds( std::vector<long> );
 
     // get/set data
@@ -89,6 +89,7 @@ namespace mitk {
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
+    bool Equals(FiberBundleX* fib);
     void GenerateFiberIds();
 
   protected:

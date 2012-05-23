@@ -1237,6 +1237,43 @@ void mitk::FiberBundleX::UpdateColorCoding()
     DoColorCodingFaBased();
 }
 
+// reapply selected colorcoding in case polydata structure has changed
+bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
+{
+  vtkSmartPointer<vtkCellArray> vLines1 = m_FiberPolyData->GetLines();
+  vLines1->InitTraversal();
+
+  vtkSmartPointer<vtkCellArray> vLines2 = fib->GetFiberPolyData()->GetLines();
+  vLines2->InitTraversal();
+
+  if (this->m_NumFibers != fib->GetNumFibers())
+    return false;
+
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    vtkIdType   numPoints1(0);
+    vtkIdType*  points1(NULL);
+    vLines1->GetNextCell ( numPoints1, points1 );
+
+    vtkIdType   numPoints2(0);
+    vtkIdType*  points2(NULL);
+    vLines2->GetNextCell ( numPoints2, points2 );
+
+    if (numPoints1!=numPoints2)
+      return false;
+
+    for (int j=0; j<numPoints1; j++)
+    {
+      double* point1 = m_FiberPolyData->GetPoint(points1[j]);
+      double* point2 = fib->GetFiberPolyData()->GetPoint(points2[j]);
+      if (point1[0]!=point2[0] || point1[1]!=point2[1] || point1[2]!=point2[2])
+        return false;
+    }
+  }
+
+  return true;
+}
+
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundleX::UpdateOutputInformation()
 {

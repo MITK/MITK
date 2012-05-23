@@ -14,19 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
+//MITK
 #include "mitkTestingMacros.h"
+#include "mitkRenderingTestHelper.h"
 
-#include "mitkDataNodeFactory.h"
-#include "mitkStandaloneDataStorage.h"
-
-#include <vtkImageData.h>
-#include <vtkSmartPointer.h>
-#include <vtkPNGWriter.h>
+//VTK
 #include <vtkRegressionTestImage.h>
 
-#include "mitkRenderingTestHelper.h"
-#include <mitkLevelWindow.h>
 
 int mitkImageVtkMapper2DTest(int argc, char* argv[])
 {

@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __itkShortestPathImageFilter_h
 #define __itkShortestPathImageFilter_h
 
@@ -39,14 +54,14 @@ namespace itk
    {
    public:
       //Standard Typedefs    
-      typedef ShortestPathImageFilter			                       Self;
+      typedef ShortestPathImageFilter                             Self;
       typedef ImageToImageFilter<TInputImageType,TOutputImageType> Superclass;
       typedef SmartPointer<Self>                                   Pointer;
       typedef SmartPointer<const Self>                             ConstPointer;
 
       // Typdefs for metric
-      typedef ShortestPathCostFunction< TInputImageType >				   CostFunctionType;
-      typedef typename CostFunctionType::Pointer						      CostFunctionTypePointer;
+      typedef ShortestPathCostFunction< TInputImageType >           CostFunctionType;
+      typedef typename CostFunctionType::Pointer                  CostFunctionTypePointer;
 
 
       // More typdefs for convenience

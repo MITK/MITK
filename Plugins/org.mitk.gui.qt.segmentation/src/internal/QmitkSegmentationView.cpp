@@ -142,6 +142,20 @@ void QmitkSegmentationView::Deactivated()
     }
     m_WorkingDataObserverTags.clear();
 
+    if (m_MultiWidget)
+    {
+      mitk::SlicesCoordinator *coordinator = m_MultiWidget->GetSlicesRotator();
+      
+      if (coordinator)
+        coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
+
+      coordinator = m_MultiWidget->GetSlicesSwiveller();
+      
+      if (coordinator)
+        coordinator->RemoveObserver(m_SlicesRotationObserverTag2);
+
+    }
+
     // gets the context of the "Mitk" (Core) module (always has id 1)
     // TODO Workaround until CTL plugincontext is available
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();

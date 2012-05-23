@@ -534,7 +534,7 @@ namespace itk
     {
       if(m_B0Mask[i]==0)
       {
-        //if(org_data[i]<0.001){org_data[i]=0.01;}
+        if(org_data[i]<0.001){org_data[i]=0.01;}
         atten[cnt]=org_data[i]/mean_b;
         cnt++;
       }

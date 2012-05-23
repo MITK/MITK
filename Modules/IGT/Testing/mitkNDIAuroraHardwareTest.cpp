@@ -35,6 +35,7 @@ int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
   myNDITrackingDevice->SetType(mitk::NDIAurora);
 
+#ifdef WIN32
   //set port
   switch (comPort)
     {
@@ -66,6 +67,10 @@ int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
       myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM9);
       break;
     }
+#else
+  MITK_INFO << std::string(argv[1]);
+  myNDITrackingDevice->SetDeviceName(std::string(argv[1]));
+#endif
   
   //TODO: add tools
 

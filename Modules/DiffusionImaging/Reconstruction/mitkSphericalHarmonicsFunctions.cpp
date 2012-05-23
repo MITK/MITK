@@ -27,12 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 #endif
 
+#include "mitkVector.h"
 #include "mitkSphericalHarmonicsFunctions.h"
 namespace mitk{
+using namespace ::boost::math;
 
-#define SPHERICAL_HARMONICS_PI       M_PI
-
-double mitk::mitk_sh_functions::factorial(int number) {
+double mitk::sh::factorial(int number) {
     if(number <= 1) return 1;
     double result = 1.0;
     for(int i=1; i<=number; i++)
@@ -40,20 +40,26 @@ double mitk::mitk_sh_functions::factorial(int number) {
     return result;
 }
 
-void mitk::mitk_sh_functions::Cart2Sph(double x, double y, double z, double *cart)
+void mitk::sh::Cart2Sph(double x, double y, double z, double *cart)
 {
     double phi, th, rad;
     rad = sqrt(x*x+y*y+z*z);
-    th = atan2(z,sqrt(x*x+y*y));
-    phi = atan2(y,x);
-    th = -th+SPHERICAL_HARMONICS_PI/2;
-    phi = -phi+SPHERICAL_HARMONICS_PI;
+    if( rad < mitk::eps )
+    {
+        th = M_PI/2;
+        phi = M_PI/2;
+    }
+    else
+    {
+        th = acos(z/rad);
+        phi = atan2(y, x);
+    }
     cart[0] = phi;
     cart[1] = th;
     cart[2] = rad;
 }
 
-double mitk::mitk_sh_functions::legendre0(int l)
+double mitk::sh::legendre0(int l)
 {
     if( l%2 != 0 )
     {
@@ -70,22 +76,16 @@ double mitk::mitk_sh_functions::legendre0(int l)
 }
 
 
-double mitk::mitk_sh_functions::Yj(int m, int k, double theta, double phi)
+double mitk::sh::Yj(int m, int l, double theta, double phi)
 {
-    if( -k <= m && m < 0 )
-    {
-        return sqrt(2.0) * ::boost::math::spherical_harmonic_r<double, double>(k,m,theta,phi);;
-    }
+  if (m<0)
+      return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
+  else if (m==0)
+      return spherical_harmonic_r(l, m, theta, phi);
+  else
+      return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
 
-    if( m == 0 )
-        return  ::boost::math::spherical_harmonic_r<double, double>(k,m,theta,phi);
-
-    if( 0 < m && m <= k )
-    {
-        return sqrt(2.0) * ::boost::math::spherical_harmonic_i<double, double>(k,m,theta,phi);
-    }
-
-    return 0;
+  return 0;
 }
 
 }

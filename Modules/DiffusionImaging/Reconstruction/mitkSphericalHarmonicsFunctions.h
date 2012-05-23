@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk{
 
-namespace mitk_sh_functions{
+namespace sh{
 
    double factorial(int number);
    void Cart2Sph(double x, double y, double z, double* cart);

@@ -108,7 +108,7 @@ struct QbrSelListener : ISelectionListener
                 }
             }
             m_View->m_Controls->m_ButtonStandard->setEnabled(foundDwiVolume);
-            m_View->m_Controls->m_groupQShellSelecton->setEnabled(foundDwiVolume);
+            m_View->m_Controls->m_groupQShellSelection->setEnabled(foundDwiVolume);
         }
     }
 
@@ -325,7 +325,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
         method = method + 1;
     }
 #endif
-    m_Controls->m_groupQShellSelecton->setVisible(false);
+    m_Controls->m_groupQShellSelection->setVisible(false);
     switch(method)
     {
     case 0:
@@ -350,7 +350,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
         m_Controls->m_Description->setText("SH solid angle for multiple Q-Shell acquisitions");
         if (m_CurrentSelection)
         {
-           QVBoxLayout * layout =  dynamic_cast<QVBoxLayout *>(m_Controls->m_groupQShellSelecton->layout());
+           QVBoxLayout * layout =  dynamic_cast<QVBoxLayout *>(m_Controls->m_groupQShellSelection->layout());
 
            for(int i =0; i < layout->count(); i++){
             layout->removeItem(layout->itemAt(i));
@@ -394,7 +394,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 
 
         }
-        m_Controls->m_groupQShellSelecton->setVisible(true);
+        m_Controls->m_groupQShellSelection->setVisible(true);
         break;
     }
 }
@@ -966,7 +966,7 @@ void QmitkQBallReconstructionView::TemplatedMultiShellQBallReconstruction(mitk::
     typename FilterType::Pointer filter = FilterType::New();
 
     filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() , vols->GetB_Value() );
-    filter->SetBValue(vols->GetB_Value());
+    //filter->SetBValue(vols->GetB_Value());
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
     filter->SetLambda(lambda);
     //filter->SetNumberOfThreads(1);

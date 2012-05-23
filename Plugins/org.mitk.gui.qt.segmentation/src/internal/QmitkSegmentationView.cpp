@@ -1027,12 +1027,8 @@ void QmitkSegmentationView::CheckImageAlignment()
         && IsRenderWindowAligned(m_MultiWidget->GetRenderWindow3(), image )
         );
     }
-
-    if (wrongAlignment)
-    {
-      m_Controls->lblAlignmentWarning->show();
-    }
   }
+  m_Controls->lblAlignmentWarning->setVisible(wrongAlignment);
 }
 
 //TODO remove function

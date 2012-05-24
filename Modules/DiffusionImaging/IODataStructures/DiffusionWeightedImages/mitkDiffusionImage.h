@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include "itkVectorImageToImageAdaptor.h"
 #include <iomanip>
+#include <itkCommand.h>
 
 namespace mitk
 {
@@ -35,78 +36,101 @@ class DiffusionImage : public Image
 {
 
 public:
-    typedef TPixelType PixelType;
-    typedef typename itk::VectorImage<TPixelType, 3>
-    ImageType;
-    typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
-    typedef itk::VectorContainer< unsigned int,
-    GradientDirectionType >                   GradientDirectionContainerType;
-    typedef itk::VectorImageToImageAdaptor< TPixelType, 3 >
-    AdaptorType;
-    typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
+  typedef TPixelType PixelType;
+  typedef typename itk::VectorImage<TPixelType, 3>
+  ImageType;
+  typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int,
+  GradientDirectionType >                   GradientDirectionContainerType;
+  typedef itk::VectorImageToImageAdaptor< TPixelType, 3 >
+  AdaptorType;
+  typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
 
-    // BValue Map
-    // key   := b-Value
-    // value := indicesVector (containing corresponding gradient directions for a b-Value-Shell
-    typedef std::vector< unsigned int > IndicesVector;
-    typedef std::map< double , IndicesVector >  BValueMap;
+  // BValue Map
+  // key   := b-Value
+  // value := indicesVector (containing corresponding gradient directions for a b-Value-Shell
+  typedef std::vector< unsigned int > IndicesVector;
+  typedef std::map< double , IndicesVector >  BValueMap;
 
-    mitkClassMacro( DiffusionImage, Image );
-    itkNewMacro(Self);
+  mitkClassMacro( DiffusionImage, Image );
+  itkNewMacro(Self);
 
 
-    void AverageRedundantGradients(double precision);
+  void AverageRedundantGradients(double precision);
 
-    GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision, GradientDirectionContainerType::Pointer directions);
+  GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision, GradientDirectionContainerType::Pointer directions);
 
-    void CorrectDKFZBrokenGradientScheme(double precision);
+  void CorrectDKFZBrokenGradientScheme(double precision);
 
-    typename ImageType::Pointer GetVectorImage() { return m_VectorImage; }
-    void SetVectorImage(typename ImageType::Pointer image ) { this->m_VectorImage = image; }
+  typename ImageType::Pointer GetVectorImage() { return m_VectorImage; }
+  void SetVectorImage(typename ImageType::Pointer image ) { this->m_VectorImage = image; }
 
-    void InitializeFromVectorImage();
-    void SetDisplayIndexForRendering(int displayIndex);
+  void InitializeFromVectorImage();
+  void SetDisplayIndexForRendering(int displayIndex);
 
-    GradientDirectionContainerType::Pointer GetDirections() { return m_Directions; }
-    void SetDirections( GradientDirectionContainerType::Pointer directions ) { this->m_Directions = directions; }
-    void SetDirections(const std::vector<itk::Vector<double,3> > directions);
+  GradientDirectionContainerType::Pointer GetDirections() { return m_Directions; }
+  void SetDirections( GradientDirectionContainerType::Pointer directions ) { this->m_Directions = directions; }
+  void SetDirections(const std::vector<itk::Vector<double,3> > directions);
 
-    GradientDirectionContainerType::Pointer GetOriginalDirections()  { return m_OriginalDirections; }
-    void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )   { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
-    void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions);
+  GradientDirectionContainerType::Pointer GetOriginalDirections()  { return m_OriginalDirections; }
+  void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )   { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
+  void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions);
 
-    MeasurementFrameType GetMeasurementFrame()  { return m_MeasurementFrame; }
-    void SetMeasurementFrame( MeasurementFrameType mFrame )  { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
+  MeasurementFrameType GetMeasurementFrame()  { return m_MeasurementFrame; }
+  void SetMeasurementFrame( MeasurementFrameType mFrame )  { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
 
-    bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
-    int GetNumDirections();
-    int GetNumB0();
+  bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
+  int GetNumDirections();
+  int GetNumB0();
 
-    float GetB_Value(int i);
-    bool IsMultiBval();
-    void UpdateBValueList();
+  float GetB_Value(int i);
+  bool IsMultiBval();
+  void UpdateBValueList();
 
-    IndicesVector GetB0Indices();
+  void AddObserver() {
+    // Add Observer for m_Directions
+    typedef DiffusionImage< TPixelType > Self;
 
-    itkGetMacro(B_Value, float);
-    itkSetMacro(B_Value, float);
+    typedef itk::SimpleMemberCommand< Self >  DCCommand ;
 
-    BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
+    typename DCCommand::Pointer command = DCCommand::New();
+
+    command->SetCallbackFunction(this, &Self::UpdateBValueList);
+
+    m_DirectionsObserverTag = m_Directions->AddObserver(itk::ModifiedEvent(), command);
+  }
+
+  void RemoveObserver() {
+    // Remove Observer for m_Directions
+    m_Directions->RemoveObserver(m_DirectionsObserverTag );
+  }
+
+  IndicesVector GetB0Indices();
+
+  itkGetMacro(B_Value, float);
+  itkSetMacro(B_Value, float);
+
+  BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
+
 
 protected:
-    DiffusionImage();
-    virtual ~DiffusionImage();
+  DiffusionImage();
+  virtual ~DiffusionImage();
 
-    void ApplyMeasurementFrame();
+  void ApplyMeasurementFrame();
 
-    typename ImageType::Pointer               m_VectorImage;
-    GradientDirectionContainerType::Pointer   m_Directions;
-    GradientDirectionContainerType::Pointer   m_OriginalDirections;
-    float                                     m_B_Value;
-    typename AdaptorType::Pointer             m_VectorImageAdaptor;
-    int                                       m_DisplayIndex;
-    MeasurementFrameType                      m_MeasurementFrame;
-    BValueMap                                 m_B_ValueMap;
+  typename ImageType::Pointer               m_VectorImage;
+  GradientDirectionContainerType::Pointer   m_Directions;
+  GradientDirectionContainerType::Pointer   m_OriginalDirections;
+  float                                     m_B_Value;
+  typename AdaptorType::Pointer             m_VectorImageAdaptor;
+  int                                       m_DisplayIndex;
+  MeasurementFrameType                      m_MeasurementFrame;
+  BValueMap                                 m_B_ValueMap;
+
+
+
+  unsigned long    m_DirectionsObserverTag;
 };
 
 } // namespace mitk

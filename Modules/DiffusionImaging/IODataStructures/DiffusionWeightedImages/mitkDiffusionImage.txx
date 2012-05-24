@@ -29,12 +29,14 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
   for(int i=0; i<3; i++)
     mf[i][i] = 1;
   m_MeasurementFrame = mf;
+
+  AddObserver();
 }
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 {
-
+  RemoveObserver();
 }
 
 template<typename TPixelType>
@@ -419,6 +421,8 @@ bool mitk::DiffusionImage<TPixelType>::IsMultiBval()
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
 {
+
+  MITK_INFO << " TEST123| MODIFIED OOOWWEEEE";
   if(m_B_ValueMap.size() != 0)
   {
     m_B_ValueMap.clear();

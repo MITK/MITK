@@ -117,12 +117,15 @@ set(CPP_FILES
  # Tractography
  Tractography/itkStochasticTractographyFilter.h
 
-  # Reconstruction
-  Reconstruction/mitkSphericalHarmonicsFunctions.cpp
+  # Function Collection
+  mitkDiffusionFunctionCollection.cpp
 
 )
 
 set(H_FILES
+  # function Collection
+  mitkDiffusionFunctionCollection.h
+  
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
@@ -139,8 +142,6 @@ set(H_FILES
   Reconstruction/mitkTeemDiffusionTensor3DReconstructionImageFilter.h
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkDiffusionMultiShellQballReconstructionImageFilter.h
-  Reconstruction/mitkSphericalHarmonicsFunctions.h
-  Reconstruction/mitkVNLVectorFunctions.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
   Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h

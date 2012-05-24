@@ -15,22 +15,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <boost/version.hpp>
-
-#define _USE_MATH_DEFINES
+#include "mitkDiffusionFunctionCollection.h"
 #include <math.h>
+#include "mitkVector.h"
 
-#if BOOST_VERSION / 100000 > 0
-#if BOOST_VERSION / 100 % 1000 > 34
+// Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
-#endif
-#endif
+#include <boost/version.hpp>
 
-#include "mitkVector.h"
-#include "mitkSphericalHarmonicsFunctions.h"
-namespace mitk{
-using namespace ::boost::math;
+// Namespace ::vnl_function
+//#include "vnl/vnl_vector.h"
+
+//------------------------- SH-function ------------------------------------
 
 double mitk::sh::factorial(int number) {
     if(number <= 1) return 1;
@@ -79,13 +76,26 @@ double mitk::sh::legendre0(int l)
 double mitk::sh::Yj(int m, int l, double theta, double phi)
 {
   if (m<0)
-      return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
+      return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
   else if (m==0)
-      return spherical_harmonic_r(l, m, theta, phi);
+      return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
   else
-      return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
+      return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
 
   return 0;
 }
 
+
+//------------------------- VNL-function ------------------------------------
+
+
+template<class CurrentValue, class WntValue>
+vnl_vector<WntValue> mitk::vnl_function::element_cast (vnl_vector<CurrentValue> const& v1)
+{
+  vnl_vector<WntValue> result(v1.size());
+
+  for(int i = 0 ; i < v1.size(); i++)
+       result[i] = static_cast<WntValue>(v1[i]);
+
+  return result;
 }

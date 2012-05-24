@@ -116,6 +116,10 @@ set(CPP_FILES
 
  # Tractography
  Tractography/itkStochasticTractographyFilter.h
+
+  # Reconstruction
+  Reconstruction/mitkSphericalHarmonicsFunctions.cpp
+
 )
 
 set(H_FILES
@@ -134,6 +138,9 @@ set(H_FILES
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/mitkTeemDiffusionTensor3DReconstructionImageFilter.h
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
+  Reconstruction/itkDiffusionMultiShellQballReconstructionImageFilter.h
+  Reconstruction/mitkSphericalHarmonicsFunctions.h
+  Reconstruction/mitkVNLVectorFunctions.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
   Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h

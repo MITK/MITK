@@ -32,8 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "mitkSphericalHarmonicsFunctions.h"
-#include "mitkVNLVectorFunctions.h"
+#include "mitkDiffusionFunctionCollection.h"
 #include "itkPointShell.h"
 #include <memory>
 
@@ -576,7 +575,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
-      odf = mitk::mitk_vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
+      odf = mitk::vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
     }
     // set ODF to ODF-Image
@@ -782,7 +781,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       // Cast the Signal-Type from double to float for the ODF-Image
-      odf = mitk::mitk_vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
+      odf = mitk::vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
       //Normalize(odf);
     }

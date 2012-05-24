@@ -15,20 +15,32 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkSphericalHarmonicsHandler_h_
-#define __mitkSphericalHarmonicsHandler_h_
+#ifndef __mitkDiffusionFunctionCollection_h_
+#define __mitkDiffusionFunctionCollection_h_
 
 #include "MitkDiffusionImagingExports.h"
 
+template<class T>
+class vnl_vector;
+
 namespace mitk{
 
-namespace sh{
+namespace sh
+{
 
-   double factorial(int number);
-   void Cart2Sph(double x, double y, double z, double* cart);
-   double legendre0(int l);
-   double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
-   double Yj(int m, int k, double theta, double phi);
+double factorial(int number);
+void Cart2Sph(double x, double y, double z, double* cart);
+double legendre0(int l);
+double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
+double Yj(int m, int k, double theta, double phi);
+
+}
+
+namespace vnl_function
+{
+
+template<class CurrentValue, class WntValue>
+vnl_vector<WntValue> element_cast (vnl_vector<CurrentValue> const& v1);
 
 }
 }

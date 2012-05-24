@@ -1,6 +1,7 @@
-namespace mitk{
 /**
 \page LoggingPage Logging Concept
+
+Logging in MITK 
 
 Available sections:
 
@@ -21,3 +22,4 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2D.cpp
 )
 \endcode
+*/

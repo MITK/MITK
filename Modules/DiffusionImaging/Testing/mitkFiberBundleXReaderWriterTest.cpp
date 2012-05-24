@@ -33,6 +33,8 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkFiberBundleXReaderWriterTest");
 
+   std::cout << argv[1]<<std::endl;
+
   MITK_TEST_CONDITION_REQUIRED(argc>1,"check for fielename")
 
   mitk::FiberBundleXReader::Pointer reader = mitk::FiberBundleXReader::New();
@@ -51,6 +53,9 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
 
     // test if fib1 can be read
     const std::string s1="", s2="";
+
+
+
     std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
     fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK Rendering
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper2D.h"
+#include "mitkExtractSliceFilter.h"
 
 //VTK
 #include <vtkSmartPointer.h>
@@ -150,29 +151,20 @@ namespace mitk {
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
-      vtkSmartPointer<vtkImageReslice> m_Reslicer;
-      /** \brief Thickslices post filtering.  */
-      vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
-      /** \brief Using unit spacing for resampling makes life easier TODO improve docu ...*/
-      vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;      
+	  mitk::ExtractSliceFilter::Pointer m_Reslicer;  
+	  /** \brief Filter for thick slices */
+	  vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief PolyData object containg all lines/points needed for outlining the contour.
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+	  
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
 
-      /** \brief Origin of the 2D geometry. */
-      mitk::Point3D m_Origin;
-      /** \brief Bottom end point of the y-axis of the 2D geometry. */
-      mitk::Vector3D m_Bottom;
-      /** \brief Right end point of the x-axis of the 2D geometry. */
-      mitk::Vector3D m_Right;
-      /** \brief Normal of the 2D geometry. */
-      mitk::Vector3D m_Normal;
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
-      mitk::ScalarType m_mmPerPixel[2];
+      mitk::ScalarType* m_mmPerPixel;
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
       vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
@@ -243,15 +235,6 @@ namespace mitk {
     */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
-    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
-    bool LineIntersectZero( vtkPoints *points, int p1, int p2,
-                            vtkFloatingPointType *bounds );
-
-    /** \brief Calculate the bounding box of the resliced image. This is necessary for
-        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
-        will have a new bounding box, which needs to be calculated. */
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used

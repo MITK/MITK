@@ -45,13 +45,15 @@ public:
     AdaptorType;
     typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
 
+    // BValue Map
+    // key   := b-Value
+    // value := indicesVector (containing corresponding gradient directions for a b-Value-Shell
+    typedef std::vector< unsigned int > IndicesVector;
+    typedef std::map< double , IndicesVector >  BValueMap;
+
     mitkClassMacro( DiffusionImage, Image );
     itkNewMacro(Self);
 
-    //void SetRequestedRegionToLargestPossibleRegion();
-    //bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    //virtual bool VerifyRequestedRegion();
-    //void SetRequestedRegion(itk::DataObject *data);
 
     void AverageRedundantGradients(double precision);
 
@@ -59,87 +61,37 @@ public:
 
     void CorrectDKFZBrokenGradientScheme(double precision);
 
-    typename ImageType::Pointer GetVectorImage()
-    { return m_VectorImage; }
-    void SetVectorImage(typename ImageType::Pointer image )
-    { this->m_VectorImage = image; }
+    typename ImageType::Pointer GetVectorImage() { return m_VectorImage; }
+    void SetVectorImage(typename ImageType::Pointer image ) { this->m_VectorImage = image; }
 
     void InitializeFromVectorImage();
     void SetDisplayIndexForRendering(int displayIndex);
 
-    GradientDirectionContainerType::Pointer GetDirections()
-    { return m_Directions; }
-    void SetDirections( GradientDirectionContainerType::Pointer directions )
-    { this->m_Directions = directions; }
-    void SetDirections(const std::vector<itk::Vector<double,3> > directions)
-    {
-        m_Directions = GradientDirectionContainerType::New();
-        for(unsigned int i=0; i<directions.size(); i++)
-        {
-            m_Directions->InsertElement( i, directions[i].Get_vnl_vector() );
-        }
-    }
-    GradientDirectionContainerType::Pointer GetOriginalDirections()
-    { return m_OriginalDirections; }
-    void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )
-    { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
-    void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions)
-    {
-        m_OriginalDirections = GradientDirectionContainerType::New();
-        for(unsigned int i=0; i<directions.size(); i++)
-        {
-            m_OriginalDirections->InsertElement( i, directions[i].Get_vnl_vector() );
-        }
-        this->ApplyMeasurementFrame();
-    }
+    GradientDirectionContainerType::Pointer GetDirections() { return m_Directions; }
+    void SetDirections( GradientDirectionContainerType::Pointer directions ) { this->m_Directions = directions; }
+    void SetDirections(const std::vector<itk::Vector<double,3> > directions);
 
-    MeasurementFrameType GetMeasurementFrame()
-    { return m_MeasurementFrame; }
-    void SetMeasurementFrame( MeasurementFrameType mFrame )
-    { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
+    GradientDirectionContainerType::Pointer GetOriginalDirections()  { return m_OriginalDirections; }
+    void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )   { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
+    void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions);
+
+    MeasurementFrameType GetMeasurementFrame()  { return m_MeasurementFrame; }
+    void SetMeasurementFrame( MeasurementFrameType mFrame )  { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
+
+    bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
+    int GetNumDirections();
+    int GetNumB0();
+
+    float GetB_Value(int i);
+    bool IsMultiBval();
+    void UpdateBValueList();
+
+    IndicesVector GetB0Indices();
 
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 
-    float GetB_Value(int i)
-    {
-        if(i > m_Directions->Size()-1)
-            return -1;
-
-        if(m_Directions->ElementAt(i).one_norm() <= 0.0)
-        {
-            return 0;
-        }
-        else
-        {
-            double twonorm = m_Directions->ElementAt(i).two_norm();
-            return m_B_Value*twonorm*twonorm ;
-        }
-    }
-
-    bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
-
-    int GetNumDirections();
-    int GetNumB0();
-    std::vector<int> GetB0Indices();
-    bool IsMultiBval();
-
-    void GetBvalueList(std::map<double, std::vector<unsigned int> > * bValMap)
-    {
-        if(bValMap != 0){
-            GradientDirectionContainerType::ConstIterator gdcit;
-            for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
-            {
-                float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
-                double rounded = int((currentBvalue+7.5)/10)*10;
-                (*bValMap)[rounded].push_back(gdcit.Index());
-            }
-        }else
-        {
-            MITK_ERROR << "Call method with 0 parameter";
-        }
-    }
-
+    BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
 
 protected:
     DiffusionImage();
@@ -154,6 +106,7 @@ protected:
     typename AdaptorType::Pointer             m_VectorImageAdaptor;
     int                                       m_DisplayIndex;
     MeasurementFrameType                      m_MeasurementFrame;
+    BValueMap                                 m_B_ValueMap;
 };
 
 } // namespace mitk

@@ -475,7 +475,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
   GetDefaultDataStorage()->Add(node);
 
 
-  std::vector<int> b0Indices = image->GetB0Indices();
+  std::vector<unsigned int> b0Indices = image->GetB0Indices();
 
 
 

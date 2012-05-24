@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // for Windows
 #ifndef M_PI
 #define M_PI  3.14159265358979323846
+#endif
 
 // Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>

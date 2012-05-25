@@ -3,15 +3,27 @@
 
 The following items describe some issues about MITK on a more abstract level. 
 
-If you want to start using MITK, you also want to see \ref Development
+-# \subpage OverviewPage
+-# Coding Concepts
+ -# General (Todo)
+ -# Coding Style (Todo)
+ -# Using Macros (Todo)
+ -# \subpage MicroServices_Overview
+-# Data Concepts
+ -# Data Storage (Todo)
+ -# \subpage PropertiesPage
+ -# \subpage GeometryOverviewPage
+-# \subpage QVTKRendering
+-# \subpage InteractionPage
+-# \subpage LoggingPage
+-# \subpage ExceptionPage
+-# Testing Concept
+ -# \subpage GeneralTests
+ -# \subpage RenderingTests
+-# Application Concept
+ -# General: MITK Applications (Todo)
+ -# Plug-Ins (Todo)
+ -# Perspective Concept (Todo)
 
-\li \subpage OverviewPage
-\li \subpage QVTKRendering
-\li \subpage InteractionPage
-\li \subpage ExceptionPage
-\li \subpage LoggingPage
-\li \subpage PropertiesPage
-\li \subpage GeometryOverviewPage
-\li \subpage MicroServices_Overview
-\li \subpage RenderingTests
+If you want to start using MITK, you also want to see the chapter \ref Development.
 */

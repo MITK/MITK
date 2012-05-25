@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRegressionTestImage.h>
 
 
-int mitkImageVtkMapper2DTest(int argc, char* argv[])
+int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
 {
     // load all arguments into a datastorage, take last argument as reference rendering
     // setup a renderwindow of fixed size X*Y
@@ -39,6 +39,11 @@ int mitkImageVtkMapper2DTest(int argc, char* argv[])
     }
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    //Set the opacity for all images
+    renderingHelper.SetProperty("use color", mitk::BoolProperty::New(true));
+    renderingHelper.SetProperty("color", mitk::ColorProperty::New(0.0f, 0.0f, 255.0f));
+    //for now this test renders in sagittal view direction
+    renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:

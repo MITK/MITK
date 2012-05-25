@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
+#include <mitkLevelWindowProperty.h>
+#include <mitkLevelWindowPreset.h>
 
 //VTK
 #include <vtkRegressionTestImage.h>
 
-
-int mitkImageVtkMapper2DTest(int argc, char* argv[])
+int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
 {
     // load all arguments into a datastorage, take last argument as reference rendering
     // setup a renderwindow of fixed size X*Y
@@ -39,6 +40,16 @@ int mitkImageVtkMapper2DTest(int argc, char* argv[])
     }
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    //chose a level window: here we randomly chosen the blood preset.
+    mitk::LevelWindowPreset* levelWindowPreset = mitk::LevelWindowPreset::New();
+    bool loadedPreset = levelWindowPreset->LoadPreset();
+    MITK_TEST_CONDITION_REQUIRED(loadedPreset == true, "Testing if level window preset could be loaded");
+    double level = levelWindowPreset->getLevel("Blood");
+    double window = levelWindowPreset->getWindow("Blood");
+    //apply level window to all images
+    renderingHelper.SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(level, window)) );
+    //for now this test renders Sagittal
+    renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:

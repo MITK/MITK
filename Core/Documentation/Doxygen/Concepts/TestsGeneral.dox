@@ -1,4 +1,26 @@
 /**
 \page GeneralTests General: Tests in MITK
-TODO
+
+Two types of standardizes automated tests are provided by MITK. These types are <B> unit tests </B> and <B> rendering tests </B>. This section will describe unit testing in MITK, while more information on rendering tests can be found in the section \ref RenderingTests.
+
+-# \ref Sec1 "Basic Information on Unit Testing"
+-# \ref Sec2 "Adding a Unit Test to MITK"
+-# \ref Sec3 "Run a Unit Test with MITK"
+-# \ref Sec4 "Useful Testing Macros"
+
+\section Sec1 Basic Information on Unit Testing
+
+The basic idea about unit testing is to write a test for every class (unit) of your software. The test should then run all methods of the tested class and check if the results are correct. Thus, the testing environment for MITK allows for simple implementation of corresponding test methods for MITK classes. To do so the Cmake command "add_test(testname)", alternatively "mitkAddCustomModuleTest(testname,parameter)" can be used to add a new unit tests, see section \ref Sec2 for more details.
+
+The build system then generates a test driver which includes all tests which have been added to the project. Alternativly you can run MITK tests by using the program ctest. On this way all MITK tests run on the continous dart clients of MITK, the results of these runs can be found via http://cdash.mitk.org.
+
+The following sections will explain how to write your own tests with MITK and how to run them. The last section will describe the testing macros of MITK in detail.
+
+\section Sec2 Adding a Unit Test to MITK
+
+\section Sec3 Run a Unit Test with MITK
+
+\section Sec4 Useful Testing Macros
+
+
 */

@@ -87,6 +87,8 @@ struct QbrSelListener : ISelectionListener
       bool foundDwiVolume = false;
       m_View->m_Controls->m_DiffusionImageLabel->setText("-");
 
+      QString selected_images = "";
+
       // iterate selection
       for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
         i != m_View->m_CurrentSelection->End(); ++i)
@@ -96,16 +98,17 @@ struct QbrSelListener : ISelectionListener
         if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
+          mitk::DiffusionImage<DiffusionPixelType>* diffusionImage;
           // only look at interesting types
-          if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+          if(diffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType> * >(node->GetData()))
           {
             foundDwiVolume = true;
-            m_View->m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
+            selected_images += QString(node->GetName().c_str()) + "\n";
           }
         }
       }
 
+      m_View->m_Controls->m_DiffusionImageLabel->setText(selected_images);
       m_View->m_Controls->m_ButtonStandard->setEnabled(foundDwiVolume);
     }
   }

@@ -288,9 +288,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   //the cosines define the plane: x and y are the direction vectors, n is the planes normal
   //this specifies a matrix 3x3
-  //	x1 y1 n1
-  //	x2 y2 n2
-  //	x3 y3 n3
+  //  x1 y1 n1
+  //  x2 y2 n2
+  //  x3 y3 n3
   double cosines[9];
 
   vnl2vtk(right.GetVnlVector(), cosines);//x
@@ -299,7 +299,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   vnl2vtk(normal.GetVnlVector(), cosines + 6);//n
 
-  m_Reslicer->SetResliceAxesDirectionCosines(cosines);	
+  m_Reslicer->SetResliceAxesDirectionCosines(cosines);
 
 
   //we only have one slice, not a volume
@@ -396,7 +396,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     resultImage->Initialize(reslicedImage);
 
     //transfer the voxel data
-    resultImage->SetVolume(reslicedImage->GetScalarPointer());	
+    resultImage->SetVolume(reslicedImage->GetScalarPointer());
 
 
     //set the geometry from current worldgeometry for the reusultimage

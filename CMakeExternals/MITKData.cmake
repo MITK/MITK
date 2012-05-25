@@ -20,7 +20,7 @@ if(BUILD_TESTING)
 
   ExternalProject_Add(${proj}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz
-    URL_MD5 9c9ac8cae6dd8bef2815ce25735eb20f 
+    URL_MD5 c7e6573a559d70363231c22ba7eabcb8 
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

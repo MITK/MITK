@@ -151,14 +151,14 @@ namespace mitk {
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
-	  mitk::ExtractSliceFilter::Pointer m_Reslicer;  
-	  /** \brief Filter for thick slices */
-	  vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
+    mitk::ExtractSliceFilter::Pointer m_Reslicer;  
+    /** \brief Filter for thick slices */
+    vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief PolyData object containg all lines/points needed for outlining the contour.
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
-	  
+    
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;

@@ -29,14 +29,13 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
   for(int i=0; i<3; i++)
     mf[i][i] = 1;
   m_MeasurementFrame = mf;
-
-  AddObserver();
 }
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 {
-  RemoveObserver();
+  // Remove Observer for m_Directions
+  m_Directions->RemoveObserver(m_DirectionsObserverTag );
 }
 
 template<typename TPixelType>
@@ -356,6 +355,8 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
 {
+  RemoveDirectionsContainerObserver();
+
   m_Directions = GradientDirectionContainerType::New();
   int c = 0;
   for(GradientDirectionContainerType::ConstIterator gdcit = m_OriginalDirections->Begin();
@@ -366,6 +367,12 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
     m_Directions->InsertElement(c, vec);
     c++;
   }
+
+  UpdateBValueList();
+
+  AddDirectionsContainerObserver();
+
+
 }
 
 // returns number of gradients
@@ -421,12 +428,7 @@ bool mitk::DiffusionImage<TPixelType>::IsMultiBval()
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
 {
-
-  MITK_INFO << " TEST123| MODIFIED OOOWWEEEE";
-  if(m_B_ValueMap.size() != 0)
-  {
-    m_B_ValueMap.clear();
-  }
+  m_B_ValueMap.clear();
 
   GradientDirectionContainerType::ConstIterator gdcit;
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
@@ -435,6 +437,14 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
     double rounded = int((currentBvalue+7.5)/10)*10;
     m_B_ValueMap[rounded].push_back(gdcit.Index());
   }
+
+  /*
+  BValueMap::iterator it = m_B_ValueMap.begin();
+  for(;it != m_B_ValueMap.end(); it++)
+  {
+    MITK_INFO << it->first << " : " << it->second.size();
+  }
+  */
 
 }
 
@@ -469,9 +479,34 @@ void mitk::DiffusionImage<TPixelType>::SetOriginalDirections(const std::vector<i
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vector<double,3> > directions)
 {
+
+  RemoveDirectionsContainerObserver();
+
   m_Directions = GradientDirectionContainerType::New();
   for(unsigned int i=0; i<directions.size(); i++)
   {
     m_Directions->InsertElement( i, directions[i].Get_vnl_vector() );
   }
+
+  UpdateBValueList();
+  AddDirectionsContainerObserver();
 }
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::AddDirectionsContainerObserver()
+{
+  // Add Modified Observer to invoke an UpdateBValueList by modifieng the DirectionsContainer (m_Directions)
+  typedef DiffusionImage< TPixelType > Self;
+  typedef itk::SimpleMemberCommand< Self >  DCCommand ;
+  typename DCCommand::Pointer command = DCCommand::New();
+  command->SetCallbackFunction(this, &Self::UpdateBValueList);
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::RemoveDirectionsContainerObserver()
+{
+  if(m_Directions){
+    m_Directions->RemoveAllObservers();
+  }
+}
+

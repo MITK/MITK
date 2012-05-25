@@ -87,24 +87,6 @@ public:
   bool IsMultiBval();
   void UpdateBValueList();
 
-  void AddObserver() {
-    // Add Observer for m_Directions
-    typedef DiffusionImage< TPixelType > Self;
-
-    typedef itk::SimpleMemberCommand< Self >  DCCommand ;
-
-    typename DCCommand::Pointer command = DCCommand::New();
-
-    command->SetCallbackFunction(this, &Self::UpdateBValueList);
-
-    m_DirectionsObserverTag = m_Directions->AddObserver(itk::ModifiedEvent(), command);
-  }
-
-  void RemoveObserver() {
-    // Remove Observer for m_Directions
-    m_Directions->RemoveObserver(m_DirectionsObserverTag );
-  }
-
   IndicesVector GetB0Indices();
 
   itkGetMacro(B_Value, float);
@@ -112,6 +94,8 @@ public:
 
   BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
 
+  void AddDirectionsContainerObserver();
+  void RemoveDirectionsContainerObserver();
 
 protected:
   DiffusionImage();

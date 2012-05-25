@@ -39,19 +39,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)
 {
-	m_Reslicer = vtkImageReslice::New();
-	
-	m_TargetTimestep = 0;
-	m_InPlaneResampleExtentByGeometry = true;
-	m_ResliceInterpolationProperty = NULL;//VtkResliceInterpolationProperty::New(); //TODO initial with value
+  m_Reslicer = vtkImageReslice::New();
+  
+  m_TargetTimestep = 0;
+  m_InPlaneResampleExtentByGeometry = true;
+  m_ResliceInterpolationProperty = NULL;//VtkResliceInterpolationProperty::New(); //TODO initial with value
     m_ThickSlicesMode = 0;
-	m_ThickSlicesNum = 1;
+  m_ThickSlicesNum = 1;
 }
 
 mitk::ExtractDirectedPlaneImageFilter::~ExtractDirectedPlaneImageFilter()
 {
-	if(m_ResliceInterpolationProperty!=NULL)m_ResliceInterpolationProperty->Delete();
-	m_Reslicer->Delete();
+  if(m_ResliceInterpolationProperty!=NULL)m_ResliceInterpolationProperty->Delete();
+  m_Reslicer->Delete();
 }
 
 void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
@@ -387,13 +387,13 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
 void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 {
-	Superclass::GenerateOutputInformation(); 
+  Superclass::GenerateOutputInformation(); 
 }
 
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
-							  const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+                const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points 
   // of the bounding box are transformed by the inverse transformation 
@@ -485,25 +485,25 @@ bool mitk::ExtractDirectedPlaneImageFilter
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::LineIntersectZero( vtkPoints *points, int p1, int p2,
-					vtkFloatingPointType *bounds )
+          vtkFloatingPointType *bounds )
 {
-	vtkFloatingPointType point1[3];
-	vtkFloatingPointType point2[3];
-	points->GetPoint( p1, point1 );
-	points->GetPoint( p2, point2 );
+  vtkFloatingPointType point1[3];
+  vtkFloatingPointType point2[3];
+  points->GetPoint( p1, point1 );
+  points->GetPoint( p2, point2 );
 
-	if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
-	{
-		double x, y;
-		x = ( point1[0] * point2[2] - point1[2] * point2[0] ) / ( point2[2] - point1[2] );
-		y = ( point1[1] * point2[2] - point1[2] * point2[1] ) / ( point2[2] - point1[2] );
+  if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
+  {
+    double x, y;
+    x = ( point1[0] * point2[2] - point1[2] * point2[0] ) / ( point2[2] - point1[2] );
+    y = ( point1[1] * point2[2] - point1[2] * point2[1] ) / ( point2[2] - point1[2] );
 
-		if ( x < bounds[0] ) { bounds[0] = x; }
-		if ( x > bounds[1] ) { bounds[1] = x; }
-		if ( y < bounds[2] ) { bounds[2] = y; }
-		if ( y > bounds[3] ) { bounds[3] = y; }
-		bounds[4] = bounds[5] = 0.0;
-		return true;
-	}
-	return false;
+    if ( x < bounds[0] ) { bounds[0] = x; }
+    if ( x > bounds[1] ) { bounds[1] = x; }
+    if ( y < bounds[2] ) { bounds[2] = y; }
+    if ( y > bounds[3] ) { bounds[3] = y; }
+    bounds[4] = bounds[5] = 0.0;
+    return true;
+  }
+  return false;
 }

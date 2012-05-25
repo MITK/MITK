@@ -144,31 +144,17 @@ the Documentation/Doxygen directory of your MITK-build binary tree or in the <tt
 
 \section BuildInstructions_Extending Extend MITK on your own (using the application framework BlueBerry)
 
-\ref NewPluginPage
+Please see \ref NewPluginPage
 
 \section BuildInstructions_As_Toolkit Use MITK in your own project (as a toolkit)
 
-In the MITK-build binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
+To use MITK in your external project, add the CMake command <code>find_package(MITK REQUIRED)</code>
+to your CMakeLists.txt and make use of the CMake macros <code>MITK_CHECK_MODULE(result_var <module-list>)
+</code> and <code>MITK_USE_MODULE(<module-list>)</code> provided by MITK.
 
-find_package(MITK)
-
-On Windows you also need
-find_package(ITK)
-find_package(VTK)
-to get the library dependencies right.
-
-After that you can set your include path with
-
-include_directories(${QMITK_INCLUDE_DIRS})
-
-and create an application:
-
-link_directories(${MITK_LINK_DIRECTORIES})
-add_executable(MyApp MyApp.cpp)
-target_link_libraries(Step1 ${QMITK_LIBRARIES})
-
-\note IMPORTANT: do not include the ITK_USE_FILE in your project when using MITK. There's a conflict in the ITK
- and MITK tree classes which will be resolved soon. 
+Here is an example CMakeLists.txt (from the Examples/QtAppExample/ directory) which allows you
+to create a Qt based application using MITK to display an image.
+\include QtAppExample/CMakeLists.txt
 
 \section BuildInstructions_Advanced_Customization Superbuild Customization
 

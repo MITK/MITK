@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 //##Documentation
-//## @brief Load image (pic format) and display it in a 2D view
+//## @brief Load image (nrrd format) and display it in a 2D view
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );

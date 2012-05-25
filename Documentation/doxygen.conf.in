@@ -766,7 +766,8 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/Tutorial/ \
+EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
+                         @MITK_SOURCE_DIR@/Examples/Tutorial/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \

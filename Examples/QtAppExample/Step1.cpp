@@ -23,17 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
 
-//##Documentation
-//## @brief Load one or more data sets (many image, surface
-//## and other formats) and display it in a 2D view
+// Load image (nrrd format) and display it in a 2D view
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );
 
-  if(argc<2)
+  if (argc < 2)
   {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n",
-      itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf( stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
   }
 
@@ -44,39 +41,36 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a data storage object. We will use it as a singleton
-  mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
+  // Create a DataStorage
+  // The DataStorage manages all data objects. It is used by the 
+  // rendering mechanism to render all data objects
+  // We use the standard implementation mitk::StandaloneDataStorage.
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+
 
   //*************************************************************************
-  // Part II: Create some data by reading files
+  // Part II: Create some data by reading a file
   //*************************************************************************
-  int i;
-  for(i=1; i<argc; ++i)
+
+  // Create a DataNodeFactory to read a data format supported
+  // by the DataNodeFactory (many image formats, surface formats, etc.)
+  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
+  const char * filename = argv[1];
+  try
   {
-    // For testing
-    if(strcmp(argv[i], "-testing")==0) continue;
+    reader->SetFileName(filename);
+    reader->Update();
+    //*************************************************************************
+    // Part III: Put the data into the datastorage
+    //*************************************************************************
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
-    try
-    {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-      //*********************************************************************
-      // Part III: Put the data into the datastorage
-      //*********************************************************************
-
-      // Since the DataNodeFactory directly creates a node,
-      // use the datastorage to add the read node
-      storage->Add(nodeReader->GetOutput());
-    }
-    catch(...)
-    {
-      fprintf( stderr, "Could not open file %s \n\n", filename );
-      exit(2);
-    }
+    // Add the node to the DataStorage
+    ds->Add(reader->GetOutput());
+  }
+  catch(...)
+  {
+    fprintf( stderr, "Could not open file %s \n\n", filename );
+    exit(2);
   }
 
   //*************************************************************************
@@ -87,32 +81,27 @@ int main(int argc, char* argv[])
   QmitkRenderWindow renderWindow;
 
   // Tell the RenderWindow which (part of) the datastorage to render
-  renderWindow.GetRenderer()->SetDataStorage(storage);
+  renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Initialize the RenderWindow
-  mitk::TimeSlicedGeometry::Pointer geo = storage->ComputeBoundingGeometry3D(storage->GetAll());
+  mitk::TimeSlicedGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );
+  //mitk::RenderingManager::GetInstance()->InitializeViews();
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
   if (sliceNaviController)
-    sliceNaviController->GetSlice()->SetPos( 2 );
-
+    sliceNaviController->GetSlice()->SetPos( 0 );
 
   //*************************************************************************
   // Part V: Qt-specific initialization
   //*************************************************************************
   renderWindow.show();
   renderWindow.resize( 256, 256 );
+  
+  qtapplication.exec();
 
-  // for testing
-  #include "QtTesting.h"
-  if(strcmp(argv[argc-1], "-testing")!=0)
-    return qtapplication.exec();
-  else
-    return QtTesting();
+  // cleanup: Remove References to DataStorage. This will delete the object
+  ds = NULL;
 }
 
-/**
-\example Step2.cpp
-*/

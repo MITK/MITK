@@ -35,7 +35,7 @@ template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 {
   // Remove Observer for m_Directions
-  m_Directions->RemoveObserver(m_DirectionsObserverTag );
+  RemoveDirectionsContainerObserver();
 }
 
 template<typename TPixelType>

@@ -206,19 +206,19 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     switch ( interpolationMode )
     {
     case VTK_RESLICE_NEAREST:
-      localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
       break;
     case VTK_RESLICE_LINEAR:
-      localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_LINEAR);
+      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_LINEAR);
       break;
     case VTK_RESLICE_CUBIC:
-      localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_CUBIC);
+      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_CUBIC);
       break;
     }
   }
   else
   {
-    localStorage->m_Reslicer->SetInterPolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+    localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
   }
 
   //set the vtk output property to true, makes sure that no unneeded mitk image convertion

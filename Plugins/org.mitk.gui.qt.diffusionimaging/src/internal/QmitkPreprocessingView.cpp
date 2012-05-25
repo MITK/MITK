@@ -360,7 +360,7 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitkImage->InitializeByItk( filter->GetOutput() );
-    mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( mitkImage );
     node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));

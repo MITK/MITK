@@ -487,8 +487,7 @@ bool mitk::ExtractSliceFilter
 
   BoundingBox::PointType bbMin = boundingBox->GetMinimum();
   BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-  BoundingBox::PointType bbCenter = boundingBox->GetCenter();
-
+  
   vtkPoints *points = vtkPoints::New();
   if(boundingGeometry->GetImageGeometry())
   {

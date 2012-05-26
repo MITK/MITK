@@ -167,8 +167,23 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
               mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
             else()
               mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
-              mitkFunctionCheckCompilerFlags("-Wno-c++0x-static-nonintegral-init" module_compile_flags)
-              mitkFunctionCheckCompilerFlags("-Wno-gnu" module_compile_flags)
+              
+              # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
+              # versions to "static-member-init", see
+              # http://clang-developers.42468.n3.nabble.com/Wc-0x-static-nonintegral-init-gone-td3999651.html
+              #
+              # Also, older Clang and seemingly all gcc versions do not warn if unknown
+              # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
+              # command line. This may get confusing if unrelated compiler errors happen and
+              # the error output then additinally contains errors about unknown flags (which
+              # is not the case if there were no compile errors).
+              #
+              # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
+              # the compiler and if applicable, prints the specific warning as a real warning and
+              # not as an error (although -Werror was given).
+              
+              mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
+              mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
             endif()
           endif(MODULE_WARNINGS_AS_ERRORS)
 

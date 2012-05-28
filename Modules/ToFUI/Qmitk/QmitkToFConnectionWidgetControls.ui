@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>124</height>
+    <height>139</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -109,6 +109,9 @@
    <item row="3" column="0" colspan="2">
     <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
    </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -123,6 +126,12 @@
    <class>QmitkToFMESAParameterWidget</class>
    <extends>QWidget</extends>
    <header>QmitkToFMESAParameterWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkKinectParameterWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkKinectParameterWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

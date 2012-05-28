@@ -1,5 +1,6 @@
 set(MODULE_IMAGE_TESTS
-  mitkExtractImageFilterTest.cpp
+    
+
 )
 set(MODULE_TESTIMAGES
   US4DCyl.pic.gz

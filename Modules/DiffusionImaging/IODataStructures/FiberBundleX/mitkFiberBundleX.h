@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -71,12 +71,12 @@ namespace mitk {
     void DoFiberSmoothing(int pointsPerCm);
 
     // add/subtract fibers
-    mitk::FiberBundleX::Pointer AddBundle(mitk::FiberBundleX* fib);
-    mitk::FiberBundleX::Pointer SubtractBundle(mitk::FiberBundleX* fib);
+    FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
+    FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
 
     // fiber subset extraction
-    mitk::FiberBundleX::Pointer ExtractFiberSubset(mitk::PlanarFigure::Pointer pf);
-    std::vector<long> ExtractFiberIdSubset(mitk::PlanarFigure::Pointer pf);
+    FiberBundleX::Pointer ExtractFiberSubset(PlanarFigure *pf);
+    std::vector<long> ExtractFiberIdSubset(PlanarFigure* pf);
     vtkSmartPointer<vtkPolyData> GeneratePolyDataByIds( std::vector<long> );
 
     // get/set data
@@ -84,11 +84,12 @@ namespace mitk {
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
     QStringList GetAvailableColorCodings();
     char* GetCurrentColorCoding();
-    itkGetMacro(NumFibers, int);
+    itkGetMacro(NumFibers, int)
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
+    bool Equals(FiberBundleX* fib);
     void GenerateFiberIds();
 
   protected:

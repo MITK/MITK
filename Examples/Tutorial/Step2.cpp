@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //##Documentation
 //## @brief Load one or more data sets (many image, surface
 //## and other formats) and display it in a 2D view
-//##
-//## Only very slightly different to Step1: Use DataNodeFactory
-//## instead of PicFileReader, and read more than one data set.
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );

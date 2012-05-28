@@ -1,1 +1,4 @@
 MITK_CREATE_MODULE_TESTS()
+
+mitkAddCustomModuleTest(mitkFiberBundleXReaderWriterTest mitkFiberBundleXReaderWriterTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib)
+mitkAddCustomModuleTest(mitkFiberBundleXTest mitkFiberBundleXTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib)

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTOFUIExports.h"
 #include "ui_QmitkToFVisualisationSettingsWidgetControls.h"
 
+#include "mitkDataNode.h"
 // QT headers
 #include <QWidget>
 // vtk includes
@@ -57,7 +58,7 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param amplitudeImage image holding the amplitude image of a ToF camera
     \param intensityImage image holding the intensity image of a ToF camera
     */
-    void Initialize(mitk::Image* distanceImage=NULL, mitk::Image* amplitudeImage=NULL, mitk::Image* intensityImage=NULL);
+    void Initialize(mitk::DataNode* distanceImageNode=NULL, mitk::DataNode* amplitudeImageNode=NULL, mitk::DataNode* intensityImageNode=NULL);
 
     /*!
     \brief Access the color transfer function of widget 1 (distance image)
@@ -132,9 +133,9 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     int m_RangeSliderMin; ///< Minimal value of the transfer function range. Initialized to the minimal value of the corresponding image.
     int m_RangeSliderMax; ///< Maximal value of the transfer function range. Initialized to the maximal value of the corresponding image.
 
-    mitk::Image::Pointer m_MitkDistanceImage; ///< Range image of the ToF camera as set by Initialize()
-    mitk::Image::Pointer m_MitkAmplitudeImage; ///< Amplitud image of the ToF camera as set by Initialize()
-    mitk::Image::Pointer m_MitkIntensityImage; ///< Intensity image of the ToF camera as set by Initialize()
+    mitk::DataNode::Pointer m_MitkDistanceImageNode; ///< DataNode holding the range image of the ToF camera as set by Initialize()
+    mitk::DataNode::Pointer m_MitkAmplitudeImageNode; ///< DataNode holding the amplitude image of the ToF camera as set by Initialize()
+    mitk::DataNode::Pointer m_MitkIntensityImageNode; ///< DataNode holding the intensity image of the ToF camera as set by Initialize()
 
     vtkColorTransferFunction* m_Widget1ColorTransferFunction; ///< vtkColorTransferFunction of widget 1 (distance) that can be used to define a TransferFunctionProperty
     vtkColorTransferFunction* m_Widget2ColorTransferFunction; ///< vtkColorTransferFunction of widget 2 (amplitude) that can be used to define a TransferFunctionProperty
@@ -154,6 +155,12 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param max maximal value to be set to the transfer function
     */
     void ResetTransferFunction(vtkColorTransferFunction* colorTransferFunction, int type, double min, double max);
+    /*!
+    \brief Reset the color transfer function for the given widget
+    \param widget 0: transversal, 1: coronal, 2: sagittal
+    \param type: type of the transfer function: 0 = gray scale, 1 = color
+    */
+    void ReinitTransferFunction(int widget, int type);
 };
 
 #endif // _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED

@@ -179,7 +179,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+  //DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
   if ( DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
     try

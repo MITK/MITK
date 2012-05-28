@@ -50,22 +50,26 @@ namespace mitk
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
+    itkGetMacro( RGBImageFileName, std::string );
     itkGetMacro( Extension, std::string );
     itkGetMacro( CaptureWidth, int );
     itkGetMacro( CaptureHeight, int );
     itkGetMacro( DistanceImageSelected, bool );
     itkGetMacro( AmplitudeImageSelected, bool );
     itkGetMacro( IntensityImageSelected, bool );
+    itkGetMacro( RGBImageSelected, bool );
 
     itkSetMacro( DistanceImageFileName, std::string );
     itkSetMacro( AmplitudeImageFileName, std::string );
     itkSetMacro( IntensityImageFileName, std::string );
+    itkSetMacro( RGBImageFileName, std::string );
     itkSetMacro( Extension, std::string );
     itkSetMacro( CaptureWidth, int );
     itkSetMacro( CaptureHeight, int );
     itkSetMacro( DistanceImageSelected, bool );
     itkSetMacro( AmplitudeImageSelected, bool );
     itkSetMacro( IntensityImageSelected, bool );
+    itkSetMacro( RGBImageSelected, bool );
 
     enum ToFImageType{ ToFImageType3D, ToFImageType2DPlusT };
     /*!
@@ -89,7 +93,7 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    virtual void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData){};
+    virtual void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0){};
 
   protected:
 
@@ -102,6 +106,7 @@ namespace mitk
     std::string m_DistanceImageFileName; ///< file name for saving the distance image
     std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image
     std::string m_IntensityImageFileName; ///< file name for saving the intensity image
+    std::string m_RGBImageFileName; ///< file name for saving the RGB image
     std::string m_Extension; ///< file extension used for saving images
 
     int m_CaptureWidth; ///< width (x-dimension) of the images to record.
@@ -114,6 +119,7 @@ namespace mitk
     bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
     bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
     bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
+    bool m_RGBImageSelected; ///< flag indicating if RGB image should be recorded
 
   private:
 

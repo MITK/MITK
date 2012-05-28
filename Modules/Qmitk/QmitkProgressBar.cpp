@@ -96,6 +96,7 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,
   // unless the application is threaded)
+  qApp->processEvents();
   mitk::RenderingManager::GetInstance()->ExecutePendingRequests();
 }
 

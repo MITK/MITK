@@ -204,8 +204,9 @@ crosses. "point line width" determines the thickness of this crosses.
 can be shown.
   <li> show contour - Connects following points of a pointset by drawing connecting
 pieces between this points.
-  <li> show distance lines - Shows all angles and lines of the contour (in 2D views)
+  <li> show distant lines - Shows all angles and lines of the contour (in 2D views)
 even if they are not on the view's current slice.
+  <li> show distant points - Shows the points cross, even if the point is not in the view's current slice.  
   <li> show distances - Draws lines between following points (in 2D views) and
 displays the euclidean distance between this points.
   <li> show points - Toggles if the points are visible or not in the view.

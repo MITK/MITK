@@ -50,7 +50,7 @@ if(NOT DEFINED VTK_DIR)
   
   include(mitkFunctionGetGccVersion)
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  if(NOT ${GCC_VERSION} VERSION_LESS "4.6")
+  if(GCC_VERSION AND NOT ${GCC_VERSION} VERSION_LESS "4.6")
     if(NOT MITK_USE_VTK_5_8_IN_SUPERBUILD)
       message("Forcing VTK 5.8 since we're using gcc ${GCC_VERSION}")
     endif()  

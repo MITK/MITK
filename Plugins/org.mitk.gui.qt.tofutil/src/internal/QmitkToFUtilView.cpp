@@ -321,8 +321,8 @@ void QmitkToFUtilView::OnUpdateCamera()
     if (m_Controls->m_SurfaceCheckBox->isChecked())
     {
         // update surface
-        //        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
-        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(3);
+                m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
+//        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(3);
         this->m_Surface->Update();
         this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(640);
         this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(480);
@@ -335,6 +335,7 @@ void QmitkToFUtilView::OnUpdateCamera()
 
         if (this->m_SurfaceDisplayCount<2)
         {
+            MITK_INFO << "hier drion !!!";
             this->m_SurfaceNode->SetData(this->m_Surface);
             this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
 

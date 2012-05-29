@@ -190,7 +190,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {
 
-          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
+          float xNorm = (((float)pixel[0])/xDimension)/**textureScaleCorrection1 + textureScaleCorrection2 */; // correct video texture scale 640 * 480!!
           float yNorm = ((float)pixel[1])/yDimension; //don't flip. we don't need to flip.
           textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
         }

@@ -28,3 +28,22 @@ mitk::USDeviceService::~USDeviceService()
 
 }
 
+void mitk::USDeviceService::ActivateDevice (mitk::USDevice::Pointer device){
+  // Check if device is already active
+  for(std::vector<mitk::USDevice::Pointer>::iterator it = m_ActiveDevices.begin(); it != m_ActiveDevices.end(); ++it) {
+    if (it->GetPointer() == device.GetPointer()) return;
+  }
+
+  // add device
+  m_ActiveDevices.push_back(device);
+}
+ 
+
+void mitk::USDeviceService::DeactivateDevice (int index){
+  // m_ActiveDevices.erase(index);
+  // Not yet supported
+}
+
+std::vector<mitk::USDevice::Pointer> mitk::USDeviceService::GetActiveDevices(){
+  return m_ActiveDevices;
+}

@@ -41,7 +41,8 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
 }
 
-void UltrasoundSupport::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
+/*
+void UltrasoundSupport::OnSelectionChanged( berry::IWorkbenchPart::Pointer ,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 { 
   // iterate all selected objects, adjust warning visibility
@@ -58,10 +59,11 @@ void UltrasoundSupport::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
   m_Controls.labelWarning->setVisible( true );
   m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
-
+*/
 
 void UltrasoundSupport::DoImageProcessing()
 {
+  MITK_INFO << "DO SUPM";
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 

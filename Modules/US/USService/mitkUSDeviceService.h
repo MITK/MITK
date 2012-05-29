@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "vector"
+#include <vector>
 #include "mitkUSDevice.h"
 
 namespace mitk {
@@ -44,17 +44,28 @@ namespace mitk {
     
       //## getter and setter ##
 
-      itkGetMacro(ActiveDevices, std::vector<mitk::USDevice::Pointer>);
+      /**
+      * \brief Sets that given device as active in the service (i.e. ready to produce images)
+      */
+      void ActivateDevice (mitk::USDevice::Pointer device);
+      /**
+      * \brief Removes the device with index i from the List of currently active devices
+      */
+      void DeactivateDevice (int index);
+
+      std::vector<mitk::USDevice::Pointer> GetActiveDevices();
      
 
     protected:
       USDeviceService();
       virtual ~USDeviceService();
 
-      // This Vector contains all known devices
-      std::vector<mitk::USDevice::Pointer> m_AllDevices;
       // This Vector contains all devices that are connected and active (i.e. ready to produce images)
       std::vector<mitk::USDevice::Pointer> m_ActiveDevices;
+
+      // This Vector contains all known devices. Might later function as a catalogue. Not yet implemented.
+      //std::vector<mitk::USDevice::Pointer> m_AllDevices;
+
 
       
 

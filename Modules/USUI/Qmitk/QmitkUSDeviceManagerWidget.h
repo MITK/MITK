@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSUIExports.h"
 #include "ui_QmitkUSDeviceManagerWidgetControls.h"
+#include "mitkUSDeviceService.h"
 
 //QT headers
 #include <QWidget>
@@ -43,6 +44,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
     virtual ~QmitkUSDeviceManagerWidget();
 
+    void Initialize(mitk::USDeviceService::Pointer deviceService);
+
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
@@ -51,10 +54,9 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
   signals:
 
     /*!
-    \brief This signal is sent if the user has connected the TOF camera.
-     *        The ToFImageGrabber is now availiable if the method GetToFImageGrabber() is called.
+    \brief Sent, when the user clicks "Activate Device"
     */
-    // void ToFCameraConnected();
+    void USDeviceActivated();
 
 
   protected slots:
@@ -64,7 +66,9 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     * According to the selection in the camera combo box, the widget provides
     * the desired instance of the ToFImageGrabber
     */
-    //void OnConnectCamera();
+    void OnClickedActivateDevice();
+
+    void OnClickedDisconnectDevice();
     
 
   protected:
@@ -74,6 +78,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
  
 
   private:
+
+    mitk::USDeviceService::Pointer m_DeviceService;
 
 };
 

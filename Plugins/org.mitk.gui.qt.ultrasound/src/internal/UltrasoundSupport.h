@@ -56,8 +56,8 @@ class UltrasoundSupport : public QmitkAbstractView
     virtual void SetFocus();
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+ //   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+  //                                   const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::UltrasoundSupportControls m_Controls;
 

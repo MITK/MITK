@@ -38,6 +38,13 @@ QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()
 {
 }
 
+//////////////////// INITIALIZATION /////////////////////
+
+void QmitkUSDeviceManagerWidget::Initialize (mitk::USDeviceService::Pointer deviceService){
+  m_DeviceService = deviceService;
+}
+
+
 void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
@@ -53,6 +60,22 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    //connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
+    connect( m_Controls->m_BtnActivate, SIGNAL(clicked()), this, SLOT(OnClickedActivateDevice()) );
+    connect( (QObject*)(m_Controls->m_BtnDisconnect), SIGNAL(clicked()),(QObject*) this, SLOT(OnClickedDisconnectDevice()) );
   }
 }
+
+
+///////////// Methods Handling Direct Interaction /////////////////
+
+void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
+  MITK_INFO << "Activated Device";
+}
+
+void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
+  MITK_INFO << "Disconnected Device";
+}
+
+
+
+///////////////// Methods Handling Logic //////////////////////////

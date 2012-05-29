@@ -36,7 +36,8 @@ mitk::PointSetGLMapper2D::PointSetGLMapper2D()
   m_DistancesDecimalDigits(1),
   m_ShowAngles(false),
   m_ShowDistantLines(true),
-  m_LineWidth(1)
+  m_LineWidth(1),
+  m_ShowDistantPoints(true)
 {
 }
 
@@ -68,6 +69,7 @@ void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetIntProperty("line width",          m_LineWidth);
   node->GetIntProperty("point line width",    m_PointLineWidth);
   node->GetIntProperty("point 2D size",       m_Point2DSize);
+  node->GetBoolProperty("show distant points", m_ShowDistantPoints);
 }
 
 
@@ -275,7 +277,8 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
       //MouseOrientation
       bool isInputDevice=false;
 
-      bool isRendererSlice = scalardiff < 0.00001; //cause roundoff error
+      double scalarDiffTolerance = 0.00001; //cause roundoff error
+      bool isRendererSlice = scalardiff < scalarDiffTolerance;
       if(this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice && !isRendererSlice )
       { 
         displayGeometry->Map(projected_p, pt2d);
@@ -304,7 +307,12 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
       }
 
       //for point set
-      if(!isInputDevice && ( (scalardiff<4.0) || (m_Polygon)))
+      if(!isInputDevice
+          && (   (m_ShowDistantPoints && scalardiff < 4.0)
+              || (!m_ShowDistantPoints && scalardiff < scalarDiffTolerance)
+              || (m_Polygon)
+             )
+        )
       {
         Point2D tmp;
         displayGeometry->Map(projected_p, pt2d);
@@ -343,7 +351,11 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
           }
         }
         
-        if((m_ShowPoints) && (scalardiff<4.0))
+        if((m_ShowPoints)
+            && (   (m_ShowDistantPoints && scalardiff<4.0)
+                || (!m_ShowDistantPoints && scalardiff < scalarDiffTolerance)
+               )
+          )
         {
           //check if the point is to be marked as selected 
           if(selIt != selEnd || pointDataBroken)
@@ -491,6 +503,7 @@ void mitk::PointSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown
   node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide angle measurement (not always available)
   node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite ); //show the line between to points from a distant view (equals "always on top" option)
+  node->AddProperty( "show distant points", mitk::BoolProperty::New(true), renderer, overwrite ); //show the point when at a certain distance above/below the 2D imaging plane.
   node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite ); // default to draw pointset above images (they have a default layer of 0)
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -1,0 +1,7 @@
+function(mitkFunctionCheckPackageHeader _header _provider)
+  find_file(${_header}_FILE ${_header} ${ARGN})
+  mark_as_advanced(${_header}_FILE)
+  if(NOT ${_header}_FILE)
+    message(FATAL_ERROR "Could not find ${_header} provided by ${_provider}. Please install the missing package.")
+  endif()
+endfunction()

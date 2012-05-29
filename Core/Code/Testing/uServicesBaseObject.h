@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 
 #include <mitkServiceInterface.h>
-
+/** Documentation
+ *  @brief This template is used to test the C++ micro services in MITK.
+ */
 template<> inline const char* us_service_impl_name(itk::LightObject* impl)
 { return impl->GetNameOfClass(); }
 

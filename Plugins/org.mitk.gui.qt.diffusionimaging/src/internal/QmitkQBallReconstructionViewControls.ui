@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>424</height>
+    <height>844</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -216,25 +216,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="m_QBallSelectionBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="title">
-         <string>q-Ball selection</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Please select q-Ball(s) for reconstruction!</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
        <widget class="QCommandLinkButton" name="m_ButtonStandard">
         <property name="enabled">
          <bool>false</bool>
@@ -254,6 +235,23 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_QBallSelectionBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Multi q-Ball reconstruction</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>
    </item>
    <item>

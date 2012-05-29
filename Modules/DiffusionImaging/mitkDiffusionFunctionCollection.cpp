@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/version.hpp>
 
 // Namespace ::vnl_function
-//#include "vnl/vnl_vector.h"
+#include "vnl/vnl_vector.h"
 
 //------------------------- SH-function ------------------------------------
 
@@ -90,16 +90,4 @@ double mitk::sh::Yj(int m, int l, double theta, double phi)
 }
 
 
-//------------------------- VNL-function ------------------------------------
 
-
-template<class CurrentValue, class WntValue>
-vnl_vector<WntValue> mitk::vnl_function::element_cast (vnl_vector<CurrentValue> const& v1)
-{
-  vnl_vector<WntValue> result(v1.size());
-
-  for(int i = 0 ; i < v1.size(); i++)
-       result[i] = static_cast<WntValue>(v1[i]);
-
-  return result;
-}

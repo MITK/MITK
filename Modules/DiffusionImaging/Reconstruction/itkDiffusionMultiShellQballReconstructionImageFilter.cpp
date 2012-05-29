@@ -27,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdio.h>
 #include <locale>
 #include <strstream>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "mitkDiffusionFunctionCollection.h"
 #include "itkPointShell.h"
 #include <memory>
@@ -420,26 +416,26 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->m_NumberOfBaselineImages = 0;
   this->m_ReconstructionType = Mode_Standard1Shell;
 
-  GradientDirectionContainerType::ConstIterator gdcit;
-  for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
-  {
-    double bValueKey = int(((m_BValue* gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
-    m_GradientIndexMap[bValueKey].push_back(gdcit.Index());
-  }
-
-  //if(listOfUserSelctedBValues.size() == 0){
-  //  itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : No list Of User Selcted B Values available");
-  //}
   if(m_GradientIndexMap.size() == 0){
-    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
+    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
+
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
+    {
+      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      m_GradientIndexMap[bValueKey].push_back(gdcit.Index());
+    }
+
   }
-  //if(listOfUserSelctedBValues.size() != m_GradientIndexMap.size()){
-  //  itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : The number of user selected B Values != number of Image BValues");
-  //}
 
-  if(m_GradientIndexMap.size() == 4){
+  if(m_GradientIndexMap.find(0) != m_GradientIndexMap.end())
+  {
+    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input image");
+  }
 
-    GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
+  if(m_GradientIndexMap.size() == 4 ){
+
+    BValueMapIteraotr it = m_GradientIndexMap.begin();
     it++;
     const int b1 = (*it).first;
     it++;
@@ -574,7 +570,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
-      odf = mitk::vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
+      odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
     }
     // set ODF to ODF-Image
@@ -665,7 +661,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   // Get Shell Indicies for all non-BZero Gradients
   // it MUST be a arithmetic progression eg.: 1000, 2000, 3000
-  GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
+  BValueMapIteraotr it = m_GradientIndexMap.begin();
   it++;
   // it = b-value = 1000
   IndiciesVector Shell1Indiecies = (*it).second;
@@ -780,7 +776,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       // Cast the Signal-Type from double to float for the ODF-Image
-      odf = mitk::vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
+      odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
       //Normalize(odf);
     }
@@ -1071,7 +1067,7 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   bool value = false;
 
-  GradientIndexMapIteraotr mapIterator = m_GradientIndexMap.begin();
+  BValueMapIteraotr mapIterator = m_GradientIndexMap.begin();
   while(mapIterator != m_GradientIndexMap.end())
   {
     std::vector<unsigned int>::const_iterator it1 = mapIterator->second.begin();

@@ -226,79 +226,79 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
 
 void QmitkToFUtilView::OnToFCameraStarted()
 {
-  if (m_ToFImageGrabber.IsNotNull())
-  {
-    // initial update of image grabber
-    this->m_ToFImageGrabber->Update();
-
-    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-
-    // initial update of composite filter
-    this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-    this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-
-    std::string rgbFileName;
-    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-    if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+    if (m_ToFImageGrabber.IsNotNull())
     {
-      this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+        // initial update of image grabber
+        this->m_ToFImageGrabber->Update();
+
+        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+        this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+        this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+
+        // initial update of composite filter
+        this->m_ToFCompositeFilter->Update();
+        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+        this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+        this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+        this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+        this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+
+        std::string rgbFileName;
+        m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
+        if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+        {
+            this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+        }
+        else
+        {
+            this->m_RGBImageNode = NULL;
+        }
+
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+        this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+
+        this->UseToFVisibilitySettings(true);
+
+        m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+        // initialize visualization widget
+        m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+
+        this->m_Frametimer->start(0);
+
+        if (m_Controls->m_TextureCheckBox->isChecked())
+        {
+            OnTextureCheckBoxChecked(true);
+        }
+        if (m_Controls->m_VideoTextureCheckBox->isChecked())
+        {
+            OnVideoTextureCheckBoxChecked(true);
+        }
     }
-    else
-    {
-      this->m_RGBImageNode = NULL;
-    }
-
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
-
-    this->UseToFVisibilitySettings(true);
-
-    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-    // initialize visualization widget
-    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
-
-    this->m_Frametimer->start(0);
-
-    if (m_Controls->m_TextureCheckBox->isChecked())
-    {
-      OnTextureCheckBoxChecked(true);
-    }
-    if (m_Controls->m_VideoTextureCheckBox->isChecked())
-    {
-      OnVideoTextureCheckBoxChecked(true);
-    }
-  }
-  m_Controls->m_TextureCheckBox->setEnabled(true);
-  // initialize point set measurement
-  m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
+    m_Controls->m_TextureCheckBox->setEnabled(true);
+    // initialize point set measurement
+    m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDefaultDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
-  this->m_Frametimer->stop();
+    this->m_Frametimer->stop();
 }
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
-  m_SelectedCamera = selected;
-  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
-  {
-    MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
-    this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
-    this->m_Controls->m_TextureCheckBox->setEnabled(false);
-    this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-    this->m_Controls->m_SurfaceCheckBox->setChecked(false);
-    this->m_Controls->m_TextureCheckBox->setChecked(false);
+    m_SelectedCamera = selected;
+    if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+    {
+        MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
+        this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
+        this->m_Controls->m_TextureCheckBox->setEnabled(false);
+        this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+        this->m_Controls->m_SurfaceCheckBox->setChecked(false);
+        this->m_Controls->m_TextureCheckBox->setChecked(false);
         this->m_Controls->m_VideoTextureCheckBox->setChecked(false);
     }
     else
@@ -511,15 +511,22 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     }
     if ((m_RGBImageNode.IsNotNull()))
     {
-      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow() ) );
     }
     // initialize images
     if (m_MitkDistanceImage.IsNotNull())
     {
         mitk::RenderingManager::GetInstance()->InitializeViews(
                     this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+    }
+    if (m_SurfaceNode.IsNotNull())
+    {
+        this->m_SurfaceNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+        this->m_SurfaceNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget1->GetRenderWindow() ) );
+        this->m_SurfaceNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget2->GetRenderWindow() ) );
+        this->m_SurfaceNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget3->GetRenderWindow() ) );
     }
 }

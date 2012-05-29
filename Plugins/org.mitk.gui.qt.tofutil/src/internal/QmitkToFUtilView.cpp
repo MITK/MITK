@@ -249,6 +249,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
         if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
         {
             this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+            this->m_ToFDistanceImageToSurfaceFilter->SetInput(3,this->m_ToFImageGrabber->GetOutput(3));
         }
         else
         {
@@ -320,12 +321,17 @@ void QmitkToFUtilView::OnUpdateCamera()
     if (m_Controls->m_SurfaceCheckBox->isChecked())
     {
         // update surface
-        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
+        //        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
+        m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(3);
         this->m_Surface->Update();
+        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(640);
+        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(480);
 
         vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();
 
         this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
+        //        this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
+//        this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
 
         if (this->m_SurfaceDisplayCount<2)
         {

@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _QmitkUSDeviceManagerWidget_H_INCLUDED
-#define _QmitkUSDeviceManagerWidget_H_INCLUDED
+#ifndef _QmitkUSNewVideoDeviceWidget_H_INCLUDED
+#define _QmitkUSNewVideoDeviceWidget_H_INCLUDED
 
 #include "mitkUSUIExports.h"
-#include "ui_QmitkUSDeviceManagerWidgetControls.h"
+#include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSDeviceService.h"
 
 //QT headers
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
+class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -42,8 +42,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkUSDeviceManagerWidget();
+    QmitkUSNewVideoDeviceWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+    virtual ~QmitkUSNewVideoDeviceWidget();
 
     void Initialize(mitk::USDeviceService::Pointer deviceService);
 
@@ -81,7 +81,7 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 
   protected:
 
-    Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+    Ui::QmitkUSNewVideoDeviceWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
     \brief Constrcuts a ListItem from the given devie for display in the list of active devices
@@ -95,4 +95,4 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 
 };
 
-#endif // _QmitkUSDeviceManagerWidget_H_INCLUDED
+#endif // _QmitkUSNewVideoDeviceWidget_H_INCLUDED

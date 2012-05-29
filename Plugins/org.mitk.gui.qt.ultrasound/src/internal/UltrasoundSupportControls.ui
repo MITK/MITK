@@ -55,6 +55,9 @@
         </widget>
        </item>
        <item>
+        <widget class="QmitkUSNewVideoDeviceWidget" name="m_NewVideoDeviceWidget" native="true"/>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -127,6 +130,12 @@
    <class>QmitkUSDeviceManagerWidget</class>
    <extends>QWidget</extends>
    <header>QmitkUSDeviceManagerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNewVideoDeviceWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkUSNewVideoDeviceWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

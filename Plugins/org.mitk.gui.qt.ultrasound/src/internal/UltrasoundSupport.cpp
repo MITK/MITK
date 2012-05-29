@@ -26,8 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 // Qt
 #include <QMessageBox>
 
+// Ultrasound
+#include "mitkUSDevice.h"
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
+
 
 void UltrasoundSupport::SetFocus()
 {
@@ -38,28 +41,42 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
+  connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) );
+  connect( this, SIGNAL(DeviceServiceUpdated()),     m_Controls.m_DeviceManagerWidget, SLOT(OnDeviceServiceUpdated()) );
+
+  // Initializations
+  m_DeviceService = mitk::USDeviceService::New();
+  m_Controls.m_DeviceManagerWidget->Initialize(m_DeviceService);
+  MITK_INFO << "Initialized Plugin";
 }
 
-/*
-void UltrasoundSupport::OnSelectionChanged( berry::IWorkbenchPart::Pointer ,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
-{ 
-  // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
-  {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      m_Controls.labelWarning->setVisible( false );
-      m_Controls.buttonPerformImageProcessing->setEnabled( true );
-      return;
-    }
-  }
 
-  m_Controls.labelWarning->setVisible( true );
-  m_Controls.buttonPerformImageProcessing->setEnabled( false );
+void UltrasoundSupport::OnClickedAddNewDevice(){
+   
+  // Debug: add fake Device
+  mitk::USDevice::Pointer newDevice;
+  newDevice = mitk::USDevice::New("Manufacturer", "Model", "Comment");
+  m_DeviceService->ActivateDevice(newDevice);
+
+  emit DeviceServiceUpdated();
 }
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/** EXAMPLE CODE FOR WORKING WITH DATANODES ///
 
 void UltrasoundSupport::DoImageProcessing()
 {
@@ -102,3 +119,5 @@ void UltrasoundSupport::DoImageProcessing()
     }
   }
 }
+
+**/

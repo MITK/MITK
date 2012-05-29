@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //QT headers
 #include <QWidget>
+#include <QListWidgetItem>
 
 //mitk header
 
@@ -58,23 +59,34 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     */
     void USDeviceActivated();
 
+  public slots:
+        /*!
+    \brief Should be called from the Implementing bundle whenever changes to the DeviceService happen
+    */
+    void OnDeviceServiceUpdated();
 
   protected slots:
   
     /*!
-    \brief slot called when the "Connect Camera" button was pressed
-    * According to the selection in the camera combo box, the widget provides
-    * the desired instance of the ToFImageGrabber
+    \brief Called, when the Button Activate Device was clicked
     */
     void OnClickedActivateDevice();
 
-    void OnClickedDisconnectDevice();
-    
+    /*!
+    \brief Called, when the Button Disconnect Device was clicked
+    */
+    void OnClickedDisconnectDevice();   
+
+
 
   protected:
 
     Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
+    /*!
+    \brief Constrcuts a ListItem from the given devie for display in the list of active devices
+    */
+    QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
  
 
   private:

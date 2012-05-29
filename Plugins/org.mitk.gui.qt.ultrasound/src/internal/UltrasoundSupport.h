@@ -46,20 +46,25 @@ class UltrasoundSupport : public QmitkAbstractView
 
     virtual void CreateQtPartControl(QWidget *parent);
 
+   signals:
+     
+    void DeviceServiceUpdated();
+    
   protected slots:
   
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+    void OnClickedAddNewDevice();
 
   protected:
   
     virtual void SetFocus();
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
- //   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-  //                                   const QList<mitk::DataNode::Pointer>& nodes );
+   
+    // Not necessary?
+    //const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::UltrasoundSupportControls m_Controls;
+
+    mitk::USDeviceService::Pointer m_DeviceService;
 
 };
 

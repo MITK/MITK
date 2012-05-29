@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USDeviceService::USDeviceService() : itk::Object()
 {
-
+  
 }
 
 mitk::USDeviceService::~USDeviceService()

@@ -60,13 +60,13 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_BtnActivate, SIGNAL(clicked()), this, SLOT(OnClickedActivateDevice()) );
-    connect( (QObject*)(m_Controls->m_BtnDisconnect), SIGNAL(clicked()),(QObject*) this, SLOT(OnClickedDisconnectDevice()) );
+    connect( m_Controls->m_BtnActivate,   SIGNAL(clicked()), this, SLOT(OnClickedActivateDevice()) );
+    connect( m_Controls->m_BtnDisconnect, SIGNAL(clicked()), this, SLOT(OnClickedDisconnectDevice()) );
   }
 }
 
 
-///////////// Methods Handling Direct Interaction /////////////////
+///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
   MITK_INFO << "Activated Device";
@@ -78,4 +78,27 @@ void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
 
 
 
-///////////////// Methods Handling Logic //////////////////////////
+///////////////// Methods & Slots Handling Logic //////////////////////////
+
+void QmitkUSDeviceManagerWidget::OnDeviceServiceUpdated(){
+  // Empty ListWidget
+  m_Controls->m_ConnectedDevices->clear();
+  // get active Devices
+  std::vector<mitk::USDevice::Pointer> devices = m_DeviceService->GetActiveDevices();
+
+
+  for(std::vector<mitk::USDevice::Pointer>::iterator it = devices.begin(); it != devices.end(); ++it) {
+    QListWidgetItem *newItem = ConstructItemFromDevice(it->GetPointer());
+   m_Controls->m_ConnectedDevices->addItem(newItem);
+  }
+}
+
+
+/////////////////////// HOUSEHOLDING CODE /////////////////////////////////
+
+QListWidgetItem* QmitkUSDeviceManagerWidget::ConstructItemFromDevice(mitk::USDevice::Pointer device){
+  QListWidgetItem *result = new QListWidgetItem;
+  std::string text = device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
+  result->setText(text.c_str());
+  return result;
+}

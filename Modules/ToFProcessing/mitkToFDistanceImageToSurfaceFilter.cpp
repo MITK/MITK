@@ -106,13 +106,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
 
-  float textureScaleCorrection1 = 0.0;
-  float textureScaleCorrection2 = 0.0;
-  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-  {
-    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
-    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
-  }
+//  float textureScaleCorrection1 = 0.0;
+//  float textureScaleCorrection2 = 0.0;
+//  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+//  {
+//    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
+//    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
+//  }
 
   float* scalarFloatData = NULL;
 

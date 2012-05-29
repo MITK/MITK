@@ -517,7 +517,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetTexture(vtkImageData *img)
     //    MITK_INFO << "Neuer Code";
 }
 
-vtkTexture* mitk::ToFSurfaceVtkMapper3D::GetTexture()
+vtkSmartPointer<vtkTexture> mitk::ToFSurfaceVtkMapper3D::GetTexture()
 {
     return this->m_Texture;
 }

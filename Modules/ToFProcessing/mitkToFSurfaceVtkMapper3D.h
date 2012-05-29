@@ -107,7 +107,7 @@ public:
 
   void SetTexture(vtkImageData *img);
 
-  vtkTexture* GetTexture();
+  vtkSmartPointer<vtkTexture> GetTexture();
 
   itkSetMacro(TextureWidth, int);
 

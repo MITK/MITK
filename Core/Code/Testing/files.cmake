@@ -1,3 +1,4 @@
+
 # tests with no extra command line parameter
 set(MODULE_TESTS
   mitkAccessByItkTest.cpp

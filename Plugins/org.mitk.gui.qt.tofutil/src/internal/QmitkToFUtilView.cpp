@@ -453,7 +453,7 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
     {
         if (this->m_VideoEnabled)
         {
-            this->m_ToFSurfaceVtkMapper3D->SetTexture(this->m_VideoTexture);
+            this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
         }
         else
         {

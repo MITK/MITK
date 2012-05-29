@@ -6,6 +6,9 @@ USModel/mitkUSDevice.cpp
 USModel/mitkUSVideoDevice.cpp
 USModel/mitkUSProbe.cpp
 
+## Services
+USService/mitkUSDeviceService.cpp
+
 ## Filters and sources
 USFilters/mitkUSImageVideoSource.cpp
 USFilters/mitkUSImageToUSImageFilter.cpp

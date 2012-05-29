@@ -331,7 +331,7 @@ void QmitkToFUtilView::OnUpdateCamera()
 
         this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
         //        this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
-//        this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
+        this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
 
         if (this->m_SurfaceDisplayCount<2)
         {

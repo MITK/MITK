@@ -41,9 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     
 
     void GenerateData()
-      {
-      MITK_INFO << "GenerateData called in Testfilter!";
-      //mitk::Image::Pointer ni = const_cast<mitk::Image*>(this->GetInput(0));
+      {       
       mitk::USImage::Pointer ni = this->GetInput(0);
       mitk::USImage::Pointer result = mitk::USImage::New();
 
@@ -54,7 +52,6 @@ See LICENSE.txt or http://www.mitk.org for details.
       meta->SetDeviceComment("Test");
       result->SetMetadata(meta);
       SetNthOutput(0, result);
-      MITK_INFO << "GenerateData completed in Testfilter!";
       };
     };
 

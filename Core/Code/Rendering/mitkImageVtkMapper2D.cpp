@@ -545,7 +545,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
     this->ApplyLookuptable(renderer);
-    this->ApplyRBGALevelWindow(renderer);
+//    this->ApplyRBGALevelWindow(renderer);
   }
   else
   {

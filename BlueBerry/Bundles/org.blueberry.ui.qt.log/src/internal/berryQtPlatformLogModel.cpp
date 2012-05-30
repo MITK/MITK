@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryLog.h"
 #include <QTimer>
 #include <QIcon>
+#include <QModelIndex>
 
 namespace berry {
 
@@ -60,6 +61,9 @@ void QtPlatformLogModel::slotFlushLogEntries()
     do {
       m_Entries.push_back(m_Pending->front());
       m_Pending->pop_front();
+      
+
+
     } while(--num);
     this->endInsertRows();
   }
@@ -73,6 +77,7 @@ void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
   m_Mutex.unlock();
 
   emit signalFlushLogEntries();
+  
 }
 
 void
@@ -82,6 +87,7 @@ QtPlatformLogModel::SetShowAdvancedFiels( bool showAdvancedFiels )
   {
     m_ShowAdvancedFiels = showAdvancedFiels;
     this->reset();
+ 
   }
 }
 
@@ -175,7 +181,28 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
 QVariant
 QtPlatformLogModel::data(const QModelIndex& index, int role) const
 {
-  const ExtendedLogMessage *msg = &m_Entries[index.row()]; 
+  const ExtendedLogMessage *msg = &m_Entries[index.row()];
+  if (role == Qt::TextAlignmentRole)
+    {
+    switch (index.column()) {
+        case 0: //time
+          return Qt::AlignLeft;
+        case 1: //level
+          return Qt::AlignLeft;
+        case 2: //message
+          return Qt::AlignLeft;
+        case 3: //category
+          return Qt::AlignLeft;
+        case 4: //module name
+          return Qt::AlignJustify;
+        case 5: //function name
+          return Qt::AlignJustify;
+        case 6: //path
+          return Qt::AlignJustify;
+        case 7: //line
+          return Qt::AlignRight;
+      }
+    }
   if (role == Qt::DisplayRole)
   {
     if( m_ShowAdvancedFiels )
@@ -219,7 +246,7 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
         case 3: 
           return QVariant(QString(msg->message.category.c_str()));
       
-        case 4: 
+        case 4:
           return QVariant(QString(msg->message.moduleName));
       
         case 5: 

@@ -67,14 +67,14 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-    Deactivated();
     OnToFCameraStopped();
     OnToFCameraDisconnected();
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::SetFocus()
 {
-  m_Controls->m_ToFConnectionWidget->setFocus();
+    m_Controls->m_ToFConnectionWidget->setFocus();
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
@@ -102,58 +102,60 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 void QmitkToFUtilView::Activated()
 {
     // configure views
-    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if(linkedRenderWindowPart == 0)
+    MITK_INFO << "acti";
+    if(this->GetRenderWindowPart(OPEN))
     {
-        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
-    }
-    else
-    {
-        linkedRenderWindowPart->EnableSlicingPlanes(false);
-    }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
-    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+        MITK_INFO << "im if";
+        mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+        if(linkedRenderWindowPart == 0)
+        {
+            MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+        }
+        else
+        {
+            linkedRenderWindowPart->EnableSlicingPlanes(false);
+        }
+        GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+        GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOn();
+        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
+        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
+//        m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
 
-    this->UseToFVisibilitySettings(true);
+        this->UseToFVisibilitySettings(true);
 
-    m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
-    m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+        m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
 
-    if (this->m_ToFImageGrabber.IsNull())
-    {
-        m_Controls->m_ToFRecorderWidget->setEnabled(false);
-        m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+        if (this->m_ToFImageGrabber.IsNull())
+        {
+            m_Controls->m_ToFRecorderWidget->setEnabled(false);
+            m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+        }
     }
+}
+
+void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
+{
+    MITK_INFO << "Zombie deaktivieren";
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::Deactivated()
 {
-    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if(linkedRenderWindowPart == 0)
-    {
-        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
-    }
-    else
-    {
-        linkedRenderWindowPart->EnableSlicingPlanes(true);
-    }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
-    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
+    MITK_INFO << "method Deactivated";
+}
 
-    this->UseToFVisibilitySettings(false);
+void QmitkToFUtilView::Visible()
+{
+    MITK_INFO << "visible";
+}
 
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+void QmitkToFUtilView::Hidden()
+{
+    MITK_INFO << "hidden";
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -217,6 +219,31 @@ void QmitkToFUtilView::OnToFCameraConnected()
     this->RequestRenderWindowUpdate();
 }
 
+void QmitkToFUtilView::ResetGUIToDefault()
+{
+    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+    if(linkedRenderWindowPart == 0)
+    {
+        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+    }
+    else
+    {
+        linkedRenderWindowPart->EnableSlicingPlanes(true);
+    }
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
+//    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
+
+    this->UseToFVisibilitySettings(false);
+
+    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+}
+
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
     m_Controls->m_ToFRecorderWidget->OnStop();
@@ -232,80 +259,80 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
 
 void QmitkToFUtilView::OnToFCameraStarted()
 {
-  if (m_ToFImageGrabber.IsNotNull())
-  {
-    // initial update of image grabber
-    this->m_ToFImageGrabber->Update();
-
-    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-
-    // initial update of composite filter
-    this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-    this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-
-    std::string rgbFileName;
-    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-    if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+    if (m_ToFImageGrabber.IsNotNull())
     {
-      this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+        // initial update of image grabber
+        this->m_ToFImageGrabber->Update();
+
+        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+        this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+        this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+
+        // initial update of composite filter
+        this->m_ToFCompositeFilter->Update();
+        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+        this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+        this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+        this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+        this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+
+        std::string rgbFileName;
+        m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
+        if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+        {
+            this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+        }
+        else
+        {
+            this->m_RGBImageNode = NULL;
+        }
+
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+        this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+
+        this->UseToFVisibilitySettings(true);
+
+        m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+        // initialize visualization widget
+        m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+
+        this->m_Frametimer->start(0);
+
+        if (m_Controls->m_TextureCheckBox->isChecked())
+        {
+            OnTextureCheckBoxChecked(true);
+        }
+        if (m_Controls->m_VideoTextureCheckBox->isChecked())
+        {
+            OnVideoTextureCheckBoxChecked(true);
+        }
     }
-    else
-    {
-      this->m_RGBImageNode = NULL;
-    }
-
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
-
-    this->UseToFVisibilitySettings(true);
-
-    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-    // initialize visualization widget
-    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
-
-    this->m_Frametimer->start(0);
-
-    if (m_Controls->m_TextureCheckBox->isChecked())
-    {
-      OnTextureCheckBoxChecked(true);
-    }
-    if (m_Controls->m_VideoTextureCheckBox->isChecked())
-    {
-      OnVideoTextureCheckBoxChecked(true);
-    }
-  }
-  m_Controls->m_TextureCheckBox->setEnabled(true);
-  // initialize point set measurement
-  //TODO refactor tofMeasurementWidget to use IRenderWindowPart and not StdMultiWidget
-  m_Controls->tofMeasurementWidget->InitializeWidget(m_MultiWidget,this->GetDataStorage(),m_MitkDistanceImage);
+    m_Controls->m_TextureCheckBox->setEnabled(true);
+    // initialize point set measurement
+    //TODO refactor tofMeasurementWidget to use IRenderWindowPart and not StdMultiWidget
+    m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
-  this->m_Frametimer->stop();
+    this->m_Frametimer->stop();
 }
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
-  m_SelectedCamera = selected;
-  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
-  {
-    MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
-    this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
-    this->m_Controls->m_TextureCheckBox->setEnabled(false);
-    this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-    this->m_Controls->m_SurfaceCheckBox->setChecked(false);
-    this->m_Controls->m_TextureCheckBox->setChecked(false);
+    m_SelectedCamera = selected;
+    if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+    {
+        MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
+        this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
+        this->m_Controls->m_TextureCheckBox->setEnabled(false);
+        this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+        this->m_Controls->m_SurfaceCheckBox->setChecked(false);
+        this->m_Controls->m_TextureCheckBox->setChecked(false);
         this->m_Controls->m_VideoTextureCheckBox->setChecked(false);
     }
     else
@@ -518,10 +545,10 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     }
     if ((m_RGBImageNode.IsNotNull()))
     {
-      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
+        this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     }
     // initialize images
     if (m_MitkDistanceImage.IsNotNull())

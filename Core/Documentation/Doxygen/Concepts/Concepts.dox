@@ -10,8 +10,8 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage MITKMacros
  -# \subpage MicroServices_Overview
 -# Data Concepts
- -# Data Storage (Todo)
  -# \subpage MitkImagePage
+ -# \subpage DataManagementPage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
 -# \subpage QVTKRendering

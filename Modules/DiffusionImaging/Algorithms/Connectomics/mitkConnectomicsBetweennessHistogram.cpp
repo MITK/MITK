@@ -96,7 +96,7 @@ void mitk::ConnectomicsBetweennessHistogram::ConvertCentralityMapToHistogram()
     {
       maximumFloat = m_CentralityMap[ index ];
     }
- 	}
+   }
 
   // use the boost double to int converter
   // it defaults to trunc

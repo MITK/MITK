@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mbilog {
 /** \brief This enum defines the message/event levels of the mbi logging mechanism.
- *		   Info: TODO
+ *       Info: TODO
  *         Warn: TODO
  *         Error: TODO
  *         Fatal: TODO

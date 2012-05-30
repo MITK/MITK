@@ -80,10 +80,10 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     void EnableUserReset(bool enable);
 
-	  /** @return Returns true if the tracking device is completely configured (you can get it by calling GetTrackingDevice() in this case).
-	    *          Returns false if configuration is not finished.
-	    */
-	  bool GetTrackingDeviceConfigured();
+    /** @return Returns true if the tracking device is completely configured (you can get it by calling GetTrackingDevice() in this case).
+     *          Returns false if configuration is not finished.
+     */
+    bool GetTrackingDeviceConfigured();
 
     /** @brief Sets the style of this widget. Default is ADVANCED. Caution: The style can only be set once at startup! */
     void SetGUIStyle(Style style);

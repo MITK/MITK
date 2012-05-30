@@ -12,41 +12,42 @@ in space and time and
  <li> to allow the user to conveniently interact with the data.
 </ul>
 
-Today, there are two major open-source toolkits for visualization and image processing:
-<ul>
- <li> the <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides "a wide variety 
-of visualization algorithms including scalar, vector, tensor, texture, and volumetric methods; 
-and advanced modeling techniques such as implicit modelling, polygon reduction, mesh smoothing, 
-cutting, contouring, and Delaunay triangulation. In addition, dozens of imaging algorithms have 
-been directly integrated to allow the user to mix 2D imaging / 3D graphics algorithms and data."
-(from the <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a> ).
- <li> the <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and 
-segmentation algorithms.
-</ul>
-
-ITK provides powerful algorithms, but is not designed for visualization or interaction. VTK has 
-powerful visualization capabilities, but only low-level support for interaction such as picking 
-methods, rotation, movement and scaling of objects. Support for high level interactions with data
-as, for example, the interactive construction and modification of deformable models, and 
-undo-capabilities is outside the scope of VTK. Furthermore, it is designed to create \em one 
-\em kind of view on the data. There is no special assistance to realized multiple, different 
-views of the data (as a multiplanar reconstruction and a 3D rendering). Finally, VTK supports only
-2D and 3D data, not 3D+t data, which are required for some medical applications, and there is 
-currently no convenient possibility to combine VTK with ITK.
-
-The aim of MITK is to use VTK and ITK, allow an easy combination of both and extend them with those 
-features, which are outside the scope of both.
+Adressing these issues is the main goal of the Medical Imaging Interaction Toolkit (MITK). Therfore MITK
+is based on different common open source libraries combining them and adding new features which are needed for
+medical imaging.
 
 \section OverviewPage_DesignOverview Design Overview
 
-The basic design concept of MITK is model-view-controller (MVC). Although some people think MVC is 
-out-of-date, it is useful in this case (and also we do not really use pure MVC): we have data 
-(\em model), on which we want to have different @em views and we want to interact with the data 
-(\em controller), which should result in a simultaneous and consistent update of all views.
+MITK is designed to be used as a <B>pure software library</B> or as a <B>complete application framework</B>. Thus, a user
+of MITK can decide if he simply wants to add a new plug-in to the existing application framework or if he needs to implement his 
+own application and wants to use MITK as a software library. Depending on the type of use MITK uses different software libraries which is
+shown in the next figure for overview.
 
+\image html MitkOverview.png "Overview of MITK"
+
+Like shown above, MITK uses the following libraries.
 <ul>
- <li> data management classes
- <li>
-</ul> 
-...
- */
+ <li> The <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and 
+segmentation algorithms, but is not designed for visualization or interaction.
+
+ <li> The <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides powerful visualization capabilities 
+ and low-level support for interaction such as picking methods, rotation, movement and scaling of objects.
+
+ <li> The <a href="http://www.commontk.org">Common Toolkit (CTK)</a>, which focuses on DICOM support and a plug-in framework.
+ 
+ <li> The <a href="http://qt.nokia.com/">Qt Cross-platform application and UI framework (Qt)</a> as a framework for UI and application
+ support.
+</ul>
+
+Using and combining these libraries, MITK adds the following features:
+<ul>
+ <li>High level interactions with data.
+ <li>Specialized medical imaging algorithms (e.g. segmentation)
+ <li>Support of 3D + t data.
+ <li>Complete appliction framework, expandable by plug-ins
+ <li>Standard tools for medical imaging as default plug-ins (e.g. measurement, segmentation)
+ <li>Many specialized module for different topics on medical imaging (e.g. diffusion imaging, image guided therapy, live image/ultasound data processing)
+</ul>
+
+The following pages will guide you through the basic concepts of MITK and give help on develloping software with MITK. 
+*/

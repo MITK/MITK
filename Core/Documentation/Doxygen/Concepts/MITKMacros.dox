@@ -1,5 +1,28 @@
 /**
 \page MITKMacros Macros in MITK
+MITK uses different macros to simplify implementation, but this macros might look confusing at first. Some of these macros are used from ITK, others are defined in MITK itself. The most important macros are defined in the file mitkCommon.h, but there are some other headers which also define macros, e.g. mitkTestingMacros.h and mitkExceptionMacros.h.
 
-TODO
+In the following the most important macros are shown for overview, more details are available in the corresponding header files.
+\code
+//These macros come from ITK:
+
+itkNewMacro(Self); //this macro creates the constructor for smart pointers
+                   //it calls the normal c++ constructor of the class
+                   //the normal constructor should be declared protected
+                   
+itkGetMacro(Name,Class);      //these macros create getters and setters
+itkSetMacro(Name,Class);      //automatically, but you need the corresponding
+itkGetConstMacro(Name,Class); //member variable m_Name in your class
+itkSetConstMacro(Name,Class);
+
+//The following macros are defined in MITK itself:
+
+mitkClassMacro(Class,Superclass); //macro is needed in every header of a MITK class
+
+mitkNewMacro1Param(Class,ParamType); //like the ITK new macro, but with one parameter
+                                     //you need a constructor with one parameter as well
+                                     //the same macro exists for 2,3 and 4 parameters
+
+mitkExceptionClassMacro(Class,Superclass); //special macro for MITK exception classes
+\endcode
 */

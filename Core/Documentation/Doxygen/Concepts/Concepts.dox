@@ -21,10 +21,9 @@ The following items describe some issues about MITK on a more abstract level.
 -# Testing Concept
  -# \subpage GeneralTests
  -# \subpage RenderingTests
--# Application Concept
- -# General: MITK Applications (Todo)
- -# Plug-Ins (Todo)
- -# Perspective Concept (Todo)
+-# Modularization Concept
+ -# \subpage ModularizationPageOverview
+ -# \subpage ModularizationPageHowTo
 
 If you want to start using MITK, you also want to see the chapter \ref Development.
 */

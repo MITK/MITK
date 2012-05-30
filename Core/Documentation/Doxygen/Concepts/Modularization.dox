@@ -1,0 +1,38 @@
+/**
+
+\page ModularizationPage Modular MITK
+
+MITK has been designed to be modular and flexible, to facilitate reuse of existing code and functionality if possible. As such there are several levels of modularization which can be chosen when working with MITK, depending on the use case.
+
+\section ModularizationPageOverview Overview
+
+The general hierarchy of modularization runs view, plug-in or bundle, module, perspective and finally application.
+
+\subsection ModularizationPageViews Views
+
+The smallest unit is a view, it is usually part of a plugin or bundle and provides one specific function, such as grouping all gui elements needed for providing segmentation algorithms or loading dicom images. They usually contain any code which communicates with the user, performs input checking and similar, but no advanced algorithms.
+
+\subsection ModularizationPagePlugInBundles Plugins and Bundles
+
+The next smallest unit is either a CTK Plugin or a BlueBerry Bundle (Following both will be referred to as plugins). They can be found in MITK/Plugins or MITK/BlueBerry/Bundles respectively. Plugins can be individually switched on and off during the CMake configuration.
+
+A plugin represents a solution to a specific problem, such as segmentation or data management. As such they may consist of any number of views.
+
+\subsection ModularizationPageModules Modules
+
+Modules can be found in the MITK/Modules directory (with the exception of the core module in MITK/Core). Each module is a shared library that provides algorithms, data structures and similar code. Many modules are gui independent. They are build if plugins are build that require them. 
+
+\subsection ModularizationPagePerspectives Perspectives
+
+Perspectives represent a configuration for the workbench needed for a specific workflow. They allow the arrangement of different plugins to reflect the usage scenario (such as data loading plugin in the top right, a segmentation plugin to right and a visualization plugin to the bottom right). They are placed within a plugins directory, typically the one configuring an application.
+
+\subsection ModularizationPageApplications Applications
+
+A specific selection of plugins and perspectives can be combined with customized behaviour of the program framework to an application. The application corresponds to an executable and enables very specific program behaviour and configuration.
+
+The configuration takes place in two places. In MITK/Applications/ and in the configuring plugin in MITK/Plugins.
+
+\section ModularizationPageHowTo How to create your own application
+
+It is suggested to use the project generator provided by MITK unless one knows what one is doing. See \ref NewPluginWithProject "here" for more information.
+*/

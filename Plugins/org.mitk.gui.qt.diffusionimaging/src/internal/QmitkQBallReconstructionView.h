@@ -122,13 +122,11 @@ protected:
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
-  //// key = image name, value = boolean selection of the corresponding q-shell (smallest to the largest)
-  //std::map< QString , std::vector<bool> >m_ShellSelctionMap;
 
 private:
 
-  std::vector< QbrShellSelection * > m_ShellSelectors;
-
+  std::map< std::string, QbrShellSelection * > m_ShellSelectorMap;
+  void GenerateShellSelectionUI(mitk::DataStorage::SetOfObjects::Pointer set);
 };
 
 

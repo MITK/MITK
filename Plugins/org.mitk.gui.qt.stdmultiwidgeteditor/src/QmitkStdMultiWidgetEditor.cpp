@@ -430,14 +430,3 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
   }
 }
 
-bool QmitkStdMultiWidgetEditor::IsMenuWidgetEnabled()
-{
-  bool enabled = false;
-
-  if (d->m_StdMultiWidget)
-  {
-    enabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
-  }
-
-  return enabled;
-}

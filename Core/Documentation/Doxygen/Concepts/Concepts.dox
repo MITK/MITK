@@ -5,9 +5,9 @@ The following items describe some issues about MITK on a more abstract level.
 
 -# \subpage OverviewPage
 -# Coding Concepts
- -# General (Todo)
- -# Coding Style (Todo)
- -# Using Macros (Todo)
+ -# \subpage CodingGeneral
+ -# \subpage CodingStyle
+ -# \subpage MITKMacros
  -# \subpage MicroServices_Overview
 -# Data Concepts
  -# Data Storage (Todo)

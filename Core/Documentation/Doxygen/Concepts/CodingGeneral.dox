@@ -1,0 +1,17 @@
+/**
+\page CodingGeneral General Coding
+
+Conceptual MITK is mainly oriented on ITK (<a href="http://www.itk.org">The Insight Toolkit</a>). Thus, most of the ITK coding concepts can be transfered to MITK. It is worth mentioning that there is a clearly written ITK Software Guide available for download on the ITK homepage. One basic concept, which MITK inherits from ITK, is the concept of smart pointers. This concepts makes memory management much easier because you don't have to call "delete" on your pointers in contrast to conventional C++. You will see these smart pointers all over MITK, an example is shown next.
+\code
+mitk::Image::Pointer myImage; //declaration
+myImage = mitk::Image::New(); //instantiation
+myImage->GetData(); //call of a method
+
+//in conventional C++ the same would look like this:
+//(Attention: this is NO valid code in MITK!)
+mitk::Image* myImage; //declaration
+myImage = new mitk::Image(); //instantiation
+myImage->GetData(); //call of a method
+delete myImage; //delete object, you don't need this in case of ITK smart pointers
+\endcode
+*/

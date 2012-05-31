@@ -63,7 +63,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     /*
     \brief Should be called from the Implementing bundle whenever changes to the DeviceService happen
     */
-    void OnDeviceServiceUpdated();
+    //void OnDeviceServiceUpdated();
 
   protected slots:
   

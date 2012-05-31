@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageSource.h>
 #include <itkObjectFactory.h>
 
+// Microservices
+#include <usServiceInterface.h>
+
+
 
 namespace mitk {
 
@@ -40,12 +44,24 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
+
       /**
       * \brief Enforces minimal Metadata to be set. The isVideoOnly flag indicates that this class 
       *        only handles a videostream and does not receive Metadata from the physical device itself.
       */
       mitkNewMacro3Param(Self, std::string, std::string, bool);
 
+
+      /**
+      * \brief Internally calls onConnect and thenregisters the Device with the Service.
+      */
+      //void Connect();
+
+
+      /**
+      * \brief Is called during.
+      */
+     // virtual void OnConnection() = 0;
 
       
 
@@ -153,4 +169,8 @@ namespace mitk {
 
     };
 } // namespace mitk
+
+// This is the microservice declaration. Do not meddle!
+US_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
+
 #endif

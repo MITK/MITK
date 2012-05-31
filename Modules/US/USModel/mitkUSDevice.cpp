@@ -17,6 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkUSImageMetadata.h"
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include "mitkModuleContext.h"
+
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVideoOnly) : mitk::ImageSource()
 {
@@ -32,6 +38,16 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   //create a new output
   mitk::USImage::Pointer newOutput = mitk::USImage::New();
   this->SetNthOutput(0,newOutput);
+
+  // Microservcies TMP
+  mitk::ModuleContext* context = GetModuleContext();
+  mitk::Module* module = context->GetModule();
+  MITK_INFO << "Module name: " << module->GetName() << " [id: " << module->GetModuleId() << "]\n";
+
+  ServiceProperties props;
+  props["Manufacturer"] = manufacturer;
+  context->RegisterService<mitk::USDevice>(this, props);
+  //context->
 }
 
 mitk::USDevice::~USDevice()

@@ -64,8 +64,6 @@ class UltrasoundSupport : public QmitkAbstractView
 
     Ui::UltrasoundSupportControls m_Controls;
 
-    mitk::USDeviceService::Pointer m_DeviceService;
-
 };
 
 #endif // UltrasoundSupport_h

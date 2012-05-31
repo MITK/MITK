@@ -19,13 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSUIExports.h"
 #include "ui_QmitkUSDeviceManagerWidgetControls.h"
-#include "mitkUSDeviceService.h"
+#include "mitkUSDevice.h"
+#include <vector>
 
 //QT headers
 #include <QWidget>
 #include <QListWidgetItem>
 
 //mitk header
+
+//Microservices
+#include "usServiceReference.h"
 
 /**
 * @brief TODO
@@ -44,8 +48,6 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 
     QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
     virtual ~QmitkUSDeviceManagerWidget();
-
-    void Initialize(mitk::USDeviceService::Pointer deviceService);
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -84,15 +86,22 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
-    \brief Constrcuts a ListItem from the given devie for display in the list of active devices
+    \brief Constructs a ListItem from the given device for display in the list of active devices.
     */
     QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
+
+    //mitk::ServiceTracker<mitk::USDevice, mitk::USDevice::Pointer> ConstructServiceTracker();
  
+    /*
+    \  Returns a List of US Devices that are currently connected
+    */
+    std::vector<mitk::USDevice::Pointer> GetAllRegisteredDevices();
+    
 
   private:
 
-    mitk::USDeviceService::Pointer m_DeviceService;
 
+    
 };
 
 #endif // _QmitkUSDeviceManagerWidget_H_INCLUDED

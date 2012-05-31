@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define _USE_MATH_DEFINES
 #include <QmitkUSDeviceManagerWidget.h>
+#include <list>
 
 //QT headers
 
@@ -24,6 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 //itk headers
+
+//microservices
+#include <usModuleRegistry.h>
+#include <usModuleContext.h>
+#include <usModule.h>
 
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
@@ -39,10 +45,6 @@ QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()
 }
 
 //////////////////// INITIALIZATION /////////////////////
-
-void QmitkUSDeviceManagerWidget::Initialize (mitk::USDeviceService::Pointer deviceService){
-  m_DeviceService = deviceService;
-}
 
 
 void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
@@ -70,6 +72,7 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
   MITK_INFO << "Activated Device";
+  GetAllRegisteredDevices();
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
@@ -81,16 +84,20 @@ void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
 void QmitkUSDeviceManagerWidget::OnDeviceServiceUpdated(){
+ 
   // Empty ListWidget
   m_Controls->m_ConnectedDevices->clear();
-  // get active Devices
-  std::vector<mitk::USDevice::Pointer> devices = m_DeviceService->GetActiveDevices();
 
-
+  
+  // get Active Devices
+  std::vector<mitk::USDevice::Pointer> devices = this->GetAllRegisteredDevices();
+  // Transfer them to the List
   for(std::vector<mitk::USDevice::Pointer>::iterator it = devices.begin(); it != devices.end(); ++it) {
     QListWidgetItem *newItem = ConstructItemFromDevice(it->GetPointer());
    m_Controls->m_ConnectedDevices->addItem(newItem);
   }
+
+
 }
 
 
@@ -101,4 +108,28 @@ QListWidgetItem* QmitkUSDeviceManagerWidget::ConstructItemFromDevice(mitk::USDev
   std::string text = device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
+}
+
+
+//mitk::ServiceTracker<mitk::USDevice, mitk::USDevice::Pointer> QmitkUSDeviceManagerWidget::ConstructServiceTracker(){
+//return 0;
+//}
+
+std::vector <mitk::USDevice::Pointer> QmitkUSDeviceManagerWidget::GetAllRegisteredDevices(){
+  
+  //Get Module and Service References
+  mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
+  mitk::ModuleContext* context = mitkUS->GetModuleContext();
+  std::list<mitk::ServiceReference> serviceRefs = context->GetServiceReferences<mitk::USDevice>();
+  
+  // Convert Service References to US Devices
+  std::vector<mitk::USDevice::Pointer>* result = new std::vector<mitk::USDevice::Pointer>;
+  std::list<mitk::ServiceReference>::const_iterator iterator;
+  for (iterator = serviceRefs.begin(); iterator != serviceRefs.end(); ++iterator)
+  {
+    mitk::USDevice::Pointer device = context->GetService<mitk::USDevice>(*iterator);
+    if (device) result->push_back(device);
+  }
+
+  return *result;
 }

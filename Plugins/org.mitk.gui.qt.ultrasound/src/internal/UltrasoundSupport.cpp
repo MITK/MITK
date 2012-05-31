@@ -45,8 +45,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( this, SIGNAL(DeviceServiceUpdated()),     m_Controls.m_DeviceManagerWidget, SLOT(OnDeviceServiceUpdated()) );
 
   // Initializations
-  m_DeviceService = mitk::USDeviceService::New();
-  m_Controls.m_DeviceManagerWidget->Initialize(m_DeviceService);
   MITK_INFO << "Initialized Plugin";
 }
 
@@ -56,7 +54,6 @@ void UltrasoundSupport::OnClickedAddNewDevice(){
   // Debug: add fake Device
   mitk::USDevice::Pointer newDevice;
   newDevice = mitk::USDevice::New("Manufacturer", "Model", "Comment");
-  m_DeviceService->ActivateDevice(newDevice);
 
   emit DeviceServiceUpdated();
 }

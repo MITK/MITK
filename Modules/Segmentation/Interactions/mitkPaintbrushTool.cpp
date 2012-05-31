@@ -59,6 +59,8 @@ void mitk::PaintbrushTool::Deactivated()
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
       m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   Superclass::Deactivated();
+  m_WorkingSlice = NULL;
+  m_CurrentPlane = NULL;
 }
 
 void mitk::PaintbrushTool::SetSize(int value)

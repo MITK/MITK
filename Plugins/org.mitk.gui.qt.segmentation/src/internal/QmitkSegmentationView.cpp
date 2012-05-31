@@ -337,7 +337,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
               firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
 
             //Here we change the reslice interpolation mode for a segmentation, so that contours in rotated slice can be shown correctly
-            emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
+            emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST) );
             // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
             emptySegmentation->SetProperty( "showVolume", mitk::BoolProperty::New( false ) );
 

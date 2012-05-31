@@ -46,14 +46,14 @@ void mitk::ToFImageDownsamplingFilter::GenerateData()
     MITK_ERROR << "mitk::TofImageDownsamplingFilter:GenerateData works only with 2D and 3D images, sorry." << std::endl;
     itkExceptionMacro("mitk::TofImageDownsamplingFilter:GenerateData works only with 2D and 3D images, sorry.");
     return;
-  }	
+  }
 
   if ( (inputImage->GetDimension(0)<m_ResampledX) || (inputImage->GetDimension(1)<m_ResampledY) || (inputImage->GetDimension(2)<m_ResampledZ) )
   {
     MITK_ERROR << "mitk::TofImageDownsamplingFilter:GenerateData only downsamples. Your requested dimensions exceed the original image dimensions." << std::endl;
     itkExceptionMacro("mitk::TofImageDownsamplingFilter:GenerateData only downsamples. Your requested dimensions exceed the original image dimensions.");
     return;
-  }	
+  }
 
   if ( (m_ResampledX < 1) || (m_ResampledY < 1)|| (m_ResampledZ < 1) )
   {
@@ -122,7 +122,7 @@ void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VIm
   resampler->SetInput(itkImage); 
   resampler->UpdateLargestPossibleRegion();
 
-  // Create mitk container for resulting image	 
+  // Create mitk container for resulting image 
   mitk::Image::Pointer resultImage = ImageToImageFilter::GetOutput();
 
   // Cast itk image to mitk image

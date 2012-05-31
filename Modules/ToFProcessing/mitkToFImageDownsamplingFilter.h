@@ -34,38 +34,38 @@ namespace mitk
   * @ingroup ToFProcessing
   */
 
-	class mitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
-	{
-	public:
-		mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter); 
-		itkNewMacro(Self);	
+  class mitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
+  {
+  public:
+    mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter); 
+    itkNewMacro(Self);
 
-		itkSetMacro(ResampledX,double); 
-		itkGetMacro(ResampledX,double); 
+    itkSetMacro(ResampledX,double); 
+    itkGetMacro(ResampledX,double); 
 
-		itkSetMacro(ResampledY,double); 
-		itkGetMacro(ResampledY,double); 
+    itkSetMacro(ResampledY,double); 
+    itkGetMacro(ResampledY,double); 
 
-		itkSetMacro(ResampledZ,double); 
-		itkGetMacro(ResampledZ,double); 
+    itkSetMacro(ResampledZ,double); 
+    itkGetMacro(ResampledZ,double); 
 
 
-	protected:	 
-		/*!
+  protected:
+    /*!
     \brief Standard constructor
     */
-		ToFImageDownsamplingFilter();
-		
+    ToFImageDownsamplingFilter();
+
     /*!
     \brief Standard destructor
     */
-    ~ToFImageDownsamplingFilter();	
+    ~ToFImageDownsamplingFilter();
     
      /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method calls the AccessFixedDimensionByItk class with the ItkImageResampling function below 
     */
-    virtual void GenerateData();		
+    virtual void GenerateData();
     
      /*!
     \brief Templated method for ITK image type which performs the resampling with an itk filter.
@@ -76,10 +76,10 @@ namespace mitk
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageResampling( itk::Image<TPixel,VImageDimension>* itkImage );
 
-		double m_ResampledX;///<  length of x dimension of output image in pixels
-		double m_ResampledY;///<  length of y dimension of output image in pixels
-		double m_ResampledZ;///<  length of z dimension of output image in pixels (if 2D, default is set to 1) 
+    double m_ResampledX;///<  length of x dimension of output image in pixels
+    double m_ResampledY;///<  length of y dimension of output image in pixels
+    double m_ResampledZ;///<  length of z dimension of output image in pixels (if 2D, default is set to 1) 
     
-	};
+};
 }// end namespace mitk 
 #endif

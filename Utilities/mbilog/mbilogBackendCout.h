@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mbilog{
 
-  /** Documentation
+  /**
    *  \brief Default backend of the mbi logging mechanism. This backend is used if no other backend is registered.
    *         The backend formats the logging messages to a normal string and writes them to std::cout.
    *  \ingroup mbilog
@@ -46,15 +46,16 @@ namespace mbilog{
        */
       virtual void ProcessMessage(const mbilog::LogMessage &l );
 
-	    /** \brief Sets the formatting mode. If true long messages will be displayed. Default is false (short/smart messages).
-	     *         Long messages provide all informations and are also capable to be postproccessed (e.g. in a web viewer).
-	     */
+      /** \brief Sets the formatting mode. If true long messages will be displayed. Default is false (short/smart messages).
+       *         Long messages provide all informations and are also capable to be postproccessed (e.g. in a web viewer).
+       */
       void SetFull(bool full);
 
     private:
 
-	    /** \brief The formatting mode of this backend. True is full/long message formatting mode. False is short/smart 
-	     *         message formatting mode */
+      /** \brief The formatting mode of this backend. True is full/long message formatting mode. False is short/smart 
+       *         message formatting mode
+       */
       bool m_useFullOutput;
 
   };

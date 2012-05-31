@@ -140,11 +140,6 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
 
-  // 6. Make sure the result is drawn again --> is visible then. 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
-
   return true;
 }
     

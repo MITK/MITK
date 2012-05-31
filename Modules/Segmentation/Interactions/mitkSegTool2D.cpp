@@ -310,6 +310,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     }
 
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)

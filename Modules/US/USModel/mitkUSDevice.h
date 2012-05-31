@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceInterface.h>
+#include <usServiceRegistration.h>
 
 
 
@@ -53,17 +54,22 @@ namespace mitk {
 
 
       /**
-      * \brief Internally calls onConnect and thenregisters the Device with the Service.
+      * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
+      *  Internally calls onConnect and then registers the device with the service. A device usually should
+      *  override the OnConnection() method, but never the Connect() method, since this will possibly exclude the device
+      *  from normal service management. The exact flow of events is:
+      *  0. Check if the device is already connected. If yes, return true anyway, but don't do anything.
+      *  1. Call OnConnection() Here, a device should establish it's connection with the hardware Afterwards, it should be ready to start transmitting images at any time.
+      *  2. If OnConnection() returns true ("successful"), then the device is registered with the service.
+      *  3. if not, it the method itself returns false or may throw an expection, depeneding on the device implementation.
+      *
       */
-      //void Connect();
-
+      bool Connect();
 
       /**
-      * \brief Is called during.
+      * \brief Works analogously to mitk::USDevice::Connect(). Don't override this Method, but onDisconnection instead.
       */
-     // virtual void OnConnection() = 0;
-
-      
+      bool Disconnect();
 
       /**
       * \brief Add a probe to the device without connecting to it.
@@ -146,6 +152,20 @@ namespace mitk {
     protected:
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
+
+      /**
+      * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
+      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnConnection();
+
+      /**
+      * \brief Is called during the disconnection process. Override this method in your subclass to handle the actual disconnection.
+      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnDisconnection();    
+
+
       /**
       * \brief This metadata set is privately used to imprint USImages with Metadata later.
       *        At instantiation time, it only contains Information about the Device,
@@ -166,6 +186,10 @@ namespace mitk {
       *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
       */
        void GenerateData();
+
+     private:
+       
+       mitk::ServiceRegistration m_ServiceRegistration;
 
     };
 } // namespace mitk

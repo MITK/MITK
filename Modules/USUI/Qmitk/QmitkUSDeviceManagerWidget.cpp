@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //microservices
 #include <usModuleRegistry.h>
-#include <usModuleContext.h>
 #include <usModule.h>
 
 
@@ -38,6 +37,14 @@ QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::Wind
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
+
+  // get ModuleContext
+  mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
+  m_MitkUSContext = mitkUS->GetModuleContext();
+
+  // Register this Widget as a listener for Registry changes.
+  // If devices are registered, unregistered or changed, notifications will go there
+  m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceManagerWidget::OnServiceEvent ,"");
 }
 
 QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()
@@ -45,7 +52,6 @@ QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()
 }
 
 //////////////////// INITIALIZATION /////////////////////
-
 
 void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
 {
@@ -83,8 +89,7 @@ void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
 
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
-void QmitkUSDeviceManagerWidget::OnDeviceServiceUpdated(){
- 
+void QmitkUSDeviceManagerWidget::OnServiceEvent(const mitk::ServiceEvent event){
   // Empty ListWidget
   m_Controls->m_ConnectedDevices->clear();
 
@@ -96,8 +101,6 @@ void QmitkUSDeviceManagerWidget::OnDeviceServiceUpdated(){
     QListWidgetItem *newItem = ConstructItemFromDevice(it->GetPointer());
    m_Controls->m_ConnectedDevices->addItem(newItem);
   }
-
-
 }
 
 
@@ -117,17 +120,15 @@ QListWidgetItem* QmitkUSDeviceManagerWidget::ConstructItemFromDevice(mitk::USDev
 
 std::vector <mitk::USDevice::Pointer> QmitkUSDeviceManagerWidget::GetAllRegisteredDevices(){
   
-  //Get Module and Service References
-  mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
-  mitk::ModuleContext* context = mitkUS->GetModuleContext();
-  std::list<mitk::ServiceReference> serviceRefs = context->GetServiceReferences<mitk::USDevice>();
+  //Get Service References
+  std::list<mitk::ServiceReference> serviceRefs = m_MitkUSContext->GetServiceReferences<mitk::USDevice>();
   
   // Convert Service References to US Devices
   std::vector<mitk::USDevice::Pointer>* result = new std::vector<mitk::USDevice::Pointer>;
   std::list<mitk::ServiceReference>::const_iterator iterator;
   for (iterator = serviceRefs.begin(); iterator != serviceRefs.end(); ++iterator)
   {
-    mitk::USDevice::Pointer device = context->GetService<mitk::USDevice>(*iterator);
+    mitk::USDevice::Pointer device = m_MitkUSContext->GetService<mitk::USDevice>(*iterator);
     if (device) result->push_back(device);
   }
 

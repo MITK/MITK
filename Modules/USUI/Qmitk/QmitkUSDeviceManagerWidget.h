@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Microservices
 #include "usServiceReference.h"
+#include "usModuleContext.h"
+#include "usServiceEvent.h"
 
 /**
 * @brief TODO
@@ -54,6 +56,12 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
   
+    /*
+    *\brief This Function listens to ServiceRegistry changes and updates the
+    *       list of devices accordingly.
+    */
+    void OnServiceEvent(const mitk::ServiceEvent event);
+
   signals:
 
     /*
@@ -62,10 +70,6 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     void USDeviceActivated();
 
   public slots:
-    /*
-    \brief Should be called from the Implementing bundle whenever changes to the DeviceService happen
-    */
-    void OnDeviceServiceUpdated();
 
   protected slots:
   
@@ -99,6 +103,10 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     
 
   private:
+
+    mitk::ModuleContext* m_MitkUSContext;
+
+    
 
 
     

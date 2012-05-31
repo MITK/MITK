@@ -38,22 +38,53 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   //create a new output
   mitk::USImage::Pointer newOutput = mitk::USImage::New();
   this->SetNthOutput(0,newOutput);
-
-  // Microservcies TMP
-  mitk::ModuleContext* context = GetModuleContext();
-  mitk::Module* module = context->GetModule();
-  MITK_INFO << "Module name: " << module->GetName() << " [id: " << module->GetModuleId() << "]\n";
-
-  ServiceProperties props;
-  props["Manufacturer"] = manufacturer;
-  context->RegisterService<mitk::USDevice>(this, props);
-  //context->
 }
 
 mitk::USDevice::~USDevice()
 {
 
 }
+
+bool mitk::USDevice::Connect()
+{
+
+  // Prepare connection, fail if this fails.
+  if (! this->OnConnection()) return false;
+
+  // Get Context and Module
+  mitk::ModuleContext* context = GetModuleContext();
+  mitk::Module* module = context->GetModule();
+
+  // Define ServiceProps
+  ServiceProperties props;
+  props["Manufacturer"] = this->m_Metadata->GetDeviceManufacturer();
+  m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
+  return true; 
+}
+
+bool mitk::USDevice::OnConnection()
+{
+  return true;
+}
+
+bool mitk::USDevice::Disconnect()
+{
+
+  // Prepare connection, fail if this fails.
+  if (! this->OnDisconnection()) return false;
+
+  // Unregister
+  m_ServiceRegistration.Unregister();
+  
+  return true;
+}
+
+bool mitk::USDevice::OnDisconnection()
+{
+  return true;
+}
+
+
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 {

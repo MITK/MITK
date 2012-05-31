@@ -82,14 +82,14 @@ if(BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND} --build ${test_project_binary_dir}/${proj}-build --config Release --target package)
       set_tests_properties(mitkPluginGeneratorPackageTest PROPERTIES
                            DEPENDS mitkPluginGeneratorBuildTest-Release
-                           TIMEOUT 3600
+                           TIMEOUT 6000
                            LABELS "MITK;BlueBerry")
     elseif(CMAKE_BUILD_TYPE)
       add_test(mitkPluginGeneratorPackageTest
                ${CMAKE_COMMAND} --build ${test_project_binary_dir}/${proj}-build --config ${CMAKE_BUILD_TYPE} --target package)
       set_tests_properties(mitkPluginGeneratorPackageTest PROPERTIES
                            DEPENDS mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE}
-                           TIMEOUT 3600
+                           TIMEOUT 6000
                            LABELS "MITK;BlueBerry")
     endif()
 

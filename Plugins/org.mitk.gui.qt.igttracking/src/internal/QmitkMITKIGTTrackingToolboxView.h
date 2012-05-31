@@ -91,8 +91,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief This slot enables / disables UI elements depending on the tracking device after a device is changed.*/ 
     void OnTrackingDeviceChanged();
 
-	  /** @brief This slot selects the Tracking Volume appropriate for a given model */
-	  void OnTrackingVolumeChanged(QString qstr);
+    /** @brief This slot selects the Tracking Volume appropriate for a given model */
+    void OnTrackingVolumeChanged(QString qstr);
 
     /** @brief Shows or hides the tracking volume according to the checkboxe's state */
     void OnShowTrackingVolumeChanged();
@@ -116,7 +116,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     /** @brief This slot is called if the user cancels the creation of a new tool. */
     void OnAddSingleToolCanceled();
-	
+
 
 
   protected:

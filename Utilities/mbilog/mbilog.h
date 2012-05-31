@@ -45,11 +45,11 @@ namespace mbilog {
     */
   void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
 
-  /** Documentation
-    * \brief An object of this class simulates a std::cout stream. This means messages can be added by
-	*        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
-	*  \ingroup mbilog
-	*/
+  /**
+   * \brief An object of this class simulates a std::cout stream. This means messages can be added by
+   *        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
+   *  \ingroup mbilog
+   */
   class MBILOG_DLL_API PseudoStream {
 
     protected:
@@ -70,7 +70,7 @@ namespace mbilog {
       {
       }
 
-	  /** \brief The message which is stored in the member ss is written to the backend. */
+      /** \brief The message which is stored in the member ss is written to the backend. */
       inline ~PseudoStream()
       {
         if(!disabled)
@@ -81,7 +81,7 @@ namespace mbilog {
         }
       }
 
-	  /** \brief Definition of the bit shift operator for this class.*/
+      /** \brief Definition of the bit shift operator for this class.*/
       template <class T> inline PseudoStream& operator<<(const T& data)
       {
         if(!disabled)
@@ -97,7 +97,7 @@ namespace mbilog {
         return *this;
       }
 
-	  /** \brief Definition of the bit shift operator for this class (for non const data).*/
+      /** \brief Definition of the bit shift operator for this class (for non const data).*/
       template <class T> inline PseudoStream& operator<<(T& data)
       {
         if(!disabled)
@@ -113,7 +113,7 @@ namespace mbilog {
         return *this;
       }
 
-	  /** \brief Definition of the bit shift operator for this class (for functions).*/
+      /** \brief Definition of the bit shift operator for this class (for functions).*/
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
@@ -129,7 +129,7 @@ namespace mbilog {
         return *this;
       }
 
-	  /** \brief Sets the category of this PseudoStream object. If there already is a category it is appended, seperated by a dot.*/
+      /** \brief Sets the category of this PseudoStream object. If there already is a category it is appended, seperated by a dot.*/
       inline PseudoStream& operator()(const char *category)
       {
         if(!disabled)
@@ -141,7 +141,7 @@ namespace mbilog {
         return *this;
       }
 
-	  /** \brief Enables/disables the PseudoStream. If set to false parsing and output is suppressed. */
+      /** \brief Enables/disables the PseudoStream. If set to false parsing and output is suppressed. */
       inline PseudoStream& operator()(bool enabled)
       {
         disabled|=!enabled;
@@ -149,11 +149,11 @@ namespace mbilog {
       }
   };
 
-  /** Documentation 
-    * \brief An object of this class simulates a std::cout stream but does nothing. This class is for dummy objects, bit shift
-	*        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
-	* \ingroup mbilog
-    */
+  /** 
+   * \brief An object of this class simulates a std::cout stream but does nothing. This class is for dummy objects, bit shift
+   *        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
+   * \ingroup mbilog
+   */
   class MBILOG_DLL_API NullStream {
 
     public:

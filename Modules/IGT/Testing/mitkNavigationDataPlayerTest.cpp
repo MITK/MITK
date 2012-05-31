@@ -326,9 +326,9 @@ class mitkNavigationDataPlayerTestClass
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#8: Tested invalid file version. Application should not crash.");
 
-	//clean up
-	delete myEmptyStream;
-	delete myWrongStream;
+    //clean up
+    delete myEmptyStream;
+    delete myWrongStream;
     }
 
   };

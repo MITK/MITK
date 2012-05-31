@@ -17,25 +17,17 @@ endmacro()
 #-----------------------------------------------------------------------------
 
 if(UNIX AND NOT APPLE)
-  #----------------------------- libxt-dev --------------------
-  include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+  
+  include(mitkFunctionCheckPackageHeader)
+  
+  # Check for libxt-dev
+  mitkFunctionCheckPackageHeader(StringDefs.h libxt-dev /usr/include/X11/)
 
-  set(CMAKE_REQUIRED_INCLUDES "/usr/include/X11/")
-  CHECK_INCLUDE_FILE("StringDefs.h" STRING_DEFS_H)
-  if(NOT STRING_DEFS_H)
-    message(FATAL_ERROR "error: could not find StringDefs.h provided by libxt-dev")
-  endif()
+  # Check for libtiff4-dev
+  mitkFunctionCheckPackageHeader(tiff.h libtiff4-dev)
 
-  set(CMAKE_REQUIRED_INCLUDES "/usr/include/")
-  CHECK_INCLUDE_FILE("tiff.h" TIFF_H)
-  if(NOT TIFF_H)
-    message(FATAL_ERROR "error: could not find tiff.h - libtiff4-dev needs to be installed")
-  endif()
-
-  CHECK_INCLUDE_FILE("tcpd.h" LIB_WRAP)
-  if(NOT LIB_WRAP)
-    message(STATUS "Could not find tcpd.h - if this is missing in the build libwrap0-dev needs to be installed")
-  endif()
+  # Check for libwrap0-dev
+  mitkFunctionCheckPackageHeader(tcpd.h libwrap0-dev)
 
 endif()
 

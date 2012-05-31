@@ -43,7 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 
-
+#include <DiffSliceOperationApplier.h>
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -186,26 +188,31 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   if ( !image || !planeGeometry ) return NULL;
 
-	//Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
-	vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-	//set to false to extract a slice
-	reslice->SetOverwriteMode(false);
-	reslice->Modified();
+  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+  //set to false to extract a slice
+  reslice->SetOverwriteMode(false);
+  reslice->Modified();
 
-	//use ExtractSliceFilter with our specific vtkImageReslice for overwriting and extracting
-	mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
-	extractor->SetInput( image );
-	extractor->SetTimeStep( timeStep );
-	extractor->SetWorldGeometry( planeGeometry );
-	extractor->SetVtkOutputRequest(false);
-	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  //use ExtractSliceFilter with our specific vtkImageReslice for overwriting and extracting
+  mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
+  extractor->SetInput( image );
+  extractor->SetTimeStep( timeStep );
+  extractor->SetWorldGeometry( planeGeometry );
+  extractor->SetVtkOutputRequest(false);
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
 
-	extractor->Modified();
-	extractor->Update();
+  extractor->Modified();
+  extractor->Update();
 
-	Image::Pointer slice = extractor->GetOutput();
+  Image::Pointer slice = extractor->GetOutput();
 
-	return slice;
+  /*============= BEGIN undo feature block ========================*/
+  //specify the undo operation with the non edited slice
+  m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  /*============= END undo feature block ========================*/
+
+  return slice;
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
@@ -237,29 +244,44 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-	//Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
-	vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
-	//Set the slice as 'input'
-	reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));
+  //Set the slice as 'input'
+  reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));
 
-	//set overwrite mode to true to write back to the image volume
-	reslice->SetOverwriteMode(true);
-	reslice->Modified();
+  //set overwrite mode to true to write back to the image volume
+  reslice->SetOverwriteMode(true);
+  reslice->Modified();
 
-	mitk::ExtractSliceFilter::Pointer extractor =	mitk::ExtractSliceFilter::New(reslice);
-	extractor->SetInput( image );
-	extractor->SetTimeStep( this->m_TimeStep );
-	extractor->SetWorldGeometry( planeGeometry );
-	extractor->SetVtkOutputRequest(true);
-	extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( this->m_TimeStep ) );
+  mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
+  extractor->SetInput( image );
+  extractor->SetTimeStep( this->m_TimeStep );
+  extractor->SetWorldGeometry( planeGeometry );
+  extractor->SetVtkOutputRequest(true);
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( this->m_TimeStep ) );
 
-	extractor->Modified();
-	extractor->Update();
+  extractor->Modified();
+  extractor->Update();
 
-	//the image was modified within the pipeline, but not marked so
-	image->Modified();
-	
+  //the image was modified within the pipeline, but not marked so
+  image->Modified();
+
+  /*============= BEGIN undo feature block ========================*/
+  //specify the undo operation with the edited slice
+  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  
+  //create an operation event for the undo stack
+  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+  
+  //add it to the undo controller
+  UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+
+  //clear the pointers as the operation are stored in the undocontroller and also deleted from there
+  m_undoOperation = NULL;
+  m_doOperation = NULL;
+  /*============= END undo feature block ========================*/
+  
   if ( m_3DInterpolationEnabled )
   {
     slice->DisconnectPipeline();

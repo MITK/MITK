@@ -47,6 +47,9 @@ set(H_FILES
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
   Algorithms/mitkVtkImageOverwrite.h
+  Algorithms/DiffSliceOperation.h
+  Algorithms/DiffSliceOperationApplier.h
+  
   
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
@@ -87,6 +90,8 @@ set(CPP_FILES
   Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Algorithms/mitkExtractSliceFilter.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
+  Algorithms/DiffSliceOperation.cpp
+  Algorithms/DiffSliceOperationApplier.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

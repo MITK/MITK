@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <DiffSliceOperation.h>
+
 
 namespace mitk
 {
@@ -126,6 +128,9 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
+
+		DiffSliceOperation* m_doOperation;
+		DiffSliceOperation* m_undoOperation;
 };
 
 } // namespace

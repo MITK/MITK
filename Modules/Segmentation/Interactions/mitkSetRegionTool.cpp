@@ -272,10 +272,6 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 
-  // 6. Make sure the result is drawn again --> is visible then. 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-
   m_WholeImageContourInWorldCoordinates = NULL;
   m_SegmentationContourInWorldCoordinates = NULL;
 

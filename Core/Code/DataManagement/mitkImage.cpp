@@ -1200,7 +1200,7 @@ bool mitk::Image::IsRotated() const
       {
         if(i != j)
         {
-          if(abs(mx[i][j]) > ref) // matrix is nd
+          if(abs(static_cast<int>(mx[i][j])) > ref) // matrix is nd
             ret = true;
         }
       }

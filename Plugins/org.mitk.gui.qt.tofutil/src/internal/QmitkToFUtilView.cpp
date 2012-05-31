@@ -101,11 +101,9 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 
 void QmitkToFUtilView::Activated()
 {
-    // configure views
-    MITK_INFO << "acti";
+    //get the current RenderWindowPart or open a new one if there is none
     if(this->GetRenderWindowPart(OPEN))
     {
-        MITK_INFO << "im if";
         mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
         if(linkedRenderWindowPart == 0)
         {
@@ -121,7 +119,7 @@ void QmitkToFUtilView::Activated()
         GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
         GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
         GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
-//        m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
+
         this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
 
         this->UseToFVisibilitySettings(true);
@@ -139,23 +137,19 @@ void QmitkToFUtilView::Activated()
 
 void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
 {
-    MITK_INFO << "Zombie deaktivieren";
     ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::Deactivated()
 {
-    MITK_INFO << "method Deactivated";
 }
 
 void QmitkToFUtilView::Visible()
 {
-    MITK_INFO << "visible";
 }
 
 void QmitkToFUtilView::Hidden()
 {
-    MITK_INFO << "hidden";
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -207,7 +201,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
             this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
             this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
         }
-        GetRenderWindowPart()->EnableDecorations(false, QStringList(QString("background")));
     }
     catch (std::logic_error& e)
     {
@@ -221,27 +214,30 @@ void QmitkToFUtilView::OnToFCameraConnected()
 
 void QmitkToFUtilView::ResetGUIToDefault()
 {
-    mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if(linkedRenderWindowPart == 0)
+    if(this->GetRenderWindowPart())
     {
-        MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
-    }
-    else
-    {
-        linkedRenderWindowPart->EnableSlicingPlanes(true);
-    }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
-//    m_MultiWidget->ResetCrosshair(); //todo no replacement in RenderWindowPart
+        mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+        if(linkedRenderWindowPart == 0)
+        {
+            MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+        }
+        else
+        {
+            linkedRenderWindowPart->EnableSlicingPlanes(true);
+        }
+        GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+        GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
+        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
+        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
 
-    this->UseToFVisibilitySettings(false);
+        this->UseToFVisibilitySettings(false);
 
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
-    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+        //global reinit
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(/*this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll())*/);
+        this->RequestRenderWindowUpdate();
+    }
 }
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
@@ -370,11 +366,12 @@ void QmitkToFUtilView::OnUpdateCamera()
                         this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
             mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
-            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(0,0,-50);
-            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0,-1,0);
-            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(0,0,surfaceCenter[2]);
-            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(40);
-            GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(1, 10000);
+            vtkCamera* camera3d = GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+            camera3d->SetPosition(0,0,-50);
+            camera3d->SetViewUp(0,-1,0);
+            camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
+            camera3d->SetViewAngle(40);
+            camera3d->SetClippingRange(1, 10000);
         }
         this->m_SurfaceDisplayCount++;
 
@@ -566,4 +563,6 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         }
         this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     }
+    //disable/enable gradient background
+    this->GetRenderWindowPart()->EnableDecorations(!useToF, QStringList(QString("background")));
 }

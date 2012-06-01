@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkXMLUnstructuredGridWriter.h>
 
 #include <itkTimeProbe.h>
+#include <itkStreamlineTrackingFilter.h>
 
 /*!
 \brief QmitkFiberProcessingView
@@ -97,6 +98,7 @@ public:
   void ResampleSelectedBundles();
   void DoFaColorCoding();
   void Extract3d();
+  void StreamlineTrackingStart();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

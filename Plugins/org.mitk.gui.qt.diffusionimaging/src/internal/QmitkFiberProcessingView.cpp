@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
 #include <mitkDiffusionImage.h>
+#include <mitkTensorImage.h>
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -102,6 +103,8 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
     connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
     connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
+    connect( m_Controls->m_StreamlineTrackingButton, SIGNAL(clicked()), this, SLOT(StreamlineTrackingStart()) );
+
   }
 }
 
@@ -806,6 +809,11 @@ void QmitkFiberProcessingView::UpdateGui()
       m_Controls->PFCompoNOTButton->setEnabled(true);
     }
   }
+
+  if (m_SelectedImage.IsNotNull())
+      m_Controls->m_StreamlineTrackingButton->setEnabled(true);
+  else
+      m_Controls->m_StreamlineTrackingButton->setEnabled(false);
 }
 
 void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -1794,3 +1802,27 @@ void QmitkFiberProcessingView::DoFaColorCoding()
     m_MultiWidget->RequestUpdate();
 }
 
+void QmitkFiberProcessingView::StreamlineTrackingStart()
+{
+  if (m_SelectedImage.IsNull())
+    return;
+
+  if (!dynamic_cast<mitk::TensorImage*>(m_SelectedImage.GetPointer()))
+      return;
+  mitk::TensorImage::Pointer tensorimage = dynamic_cast<mitk::TensorImage*>(m_SelectedImage.GetPointer());
+
+  MITK_INFO << "tensor image found";
+
+  typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
+  typedef mitk::ImageToItk<TensorImageType> CastType;
+
+  CastType::Pointer caster = CastType::New();
+  caster->SetInput(tensorimage);
+  caster->Update();
+  TensorImageType::Pointer image = caster->GetOutput();
+
+  typedef itk::StreamlineTrackingFilter< float > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(image);
+  filter->Update();
+}

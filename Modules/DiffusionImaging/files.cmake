@@ -125,7 +125,7 @@ set(CPP_FILES
 set(H_FILES
   # function Collection
   mitkDiffusionFunctionCollection.h
-  
+
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
@@ -175,6 +175,7 @@ set(H_FILES
   # Tractography
   Tractography/itkGibbsTrackingFilter.h
   Tractography/itkStochasticTractographyFilter.h
+  Tractography/itkStreamlineTrackingFilter.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
@@ -215,7 +216,7 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
-  
+
 )
 
 set( TOOL_FILES

@@ -564,10 +564,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       DoubleLogarithm(SignalVector);
 
       // ODF coeffs-vector
-      vnl_vector<double> coeffs(m_NumberCoefficients);
+      //coeffs(m_NumberCoefficients);
 
       // approximate ODF coeffs
-      coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
+      vnl_vector<double>  coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
@@ -870,16 +870,6 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
   }
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput )
-{
-  for(int i=0; i<m_NumberCoefficients; i++)
-  {
-    (*FRTMatrixOutput)(i,i) = 2.0 * M_PI * mitk::sh::legendre0((*SHOrderAssociationReference)[i]);
-  }
-}
-
 template< class T, class TG, class TO, int L, int NOdfDirections>
 bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 ::CheckHemisphericalArrangementOfGradientDirections()
@@ -971,17 +961,17 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   }
 
   const int LOrder = L;
-  m_NumberCoefficients = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
-  MITK_INFO << m_NumberCoefficients;
-  m_SHBasisMatrix = new vnl_matrix<double>(numberOfGradientDirections,m_NumberCoefficients);
+  int NumberOfCoeffs = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
+  MITK_INFO << NumberOfCoeffs;
+  m_SHBasisMatrix = new vnl_matrix<double>(numberOfGradientDirections,NumberOfCoeffs);
   m_SHBasisMatrix->fill(0.0);
-  VectorIntPtr SHOrderAssociation(new vnl_vector<int>(m_NumberCoefficients));
+  VectorIntPtr SHOrderAssociation(new vnl_vector<int>(NumberOfCoeffs));
   SHOrderAssociation->fill(0.0);
-  MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   LaplacianBaltrami->fill(0.0);
-  MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr FRTMatrix(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   FRTMatrix->fill(0.0);
-  MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   SHEigenvalues->fill(0.0);
 
 
@@ -990,12 +980,17 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   ComputeSphericalHarmonicsBasis(Q.get() ,m_SHBasisMatrix, LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
 
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
-  ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
+
+  for(int i=0; i<NumberOfCoeffs; i++)
+  {
+    (*FRTMatrix)(i,i) = 2.0 * M_PI * mitk::sh::legendre0((*SHOrderAssociation)[i]);
+  }
+  //ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
 
   MatrixDoublePtr temp(new vnl_matrix<double>(((m_SHBasisMatrix->transpose()) * (*m_SHBasisMatrix)) + (m_Lambda  * (*LaplacianBaltrami))));
 
   InverseMatrixDoublePtr pseudo_inv(new vnl_matrix_inverse<double>((*temp)));
-  MatrixDoublePtr inverse(new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients));
+  MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   inverse->fill(0.0);
   (*inverse) = pseudo_inv->inverse();
 
@@ -1010,7 +1005,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
   vnl_matrix_fixed<double, 3, NOdfDirections>* U = itk::PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
 
-  m_ODFSphericalHarmonicBasisMatrix  = new vnl_matrix<double>(NOdfDirections,m_NumberCoefficients);
+  m_ODFSphericalHarmonicBasisMatrix  = new vnl_matrix<double>(NOdfDirections,NumberOfCoeffs);
   m_ODFSphericalHarmonicBasisMatrix->fill(0.0);
 
   for(int i=0; i<NOdfDirections; i++)

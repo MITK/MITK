@@ -140,7 +140,7 @@ protected:
     void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
-    void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
+    //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
     bool CheckHemisphericalArrangementOfGradientDirections();
 
     void BeforeThreadedGenerateData();
@@ -194,7 +194,7 @@ private:
 
     bool m_IsArithmeticProgession;
 
-    int m_NumberCoefficients;
+    //int m_NumberCoefficients;
 
     ReconstructionType m_ReconstructionType;
 

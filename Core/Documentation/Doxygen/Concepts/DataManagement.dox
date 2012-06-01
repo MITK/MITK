@@ -2,23 +2,30 @@
 
 \page DataManagementPage The Data Management Concept
 
-As MITK is used to process large and diverse data the management thereof becomes an important issue. In order to abstract the management of data from the actual format of the data it is encapsulated.
+As MITK is used to process large and diverse data the management thereof becomes an important issue.
+In order to abstract the management of data from the actual format of the data it is encapsulated.
 
 \section DataManagementPageEncapsulation Data Encapsulation
 
-All data objects, like images or surfaces, are contained in DataNodes. These DataNodes describe the data itself (mitk::BaseData), how they can be rendered in 2D or 3D (a list of mitk::Mapper), what mitk::Interactor is associated with it, and a list of arbirary properties (name, visibility, opacity, etc.). Information about the position of a data object in space/time is stored in a Geometry, which is attached to the data object itself, not to the node.
+All data objects, like images or surfaces, are contained in DataNodes. These DataNodes describe the data
+itself (mitk::BaseData), how they can be rendered in 2D or 3D (a list of mitk::Mapper), what mitk::Interactor
+is associated with it, and a list of arbirary properties (name, visibility, opacity, etc.). Information about
+the position of a data object in space/time is stored in a Geometry, which is attached to the data object
+itself, not to the node.
 
 \subsection DataManagementPageBaseData BaseData
 
-This is the base class for all data objects. It itself inherits from itk::DataObject.
+mitk::BaseData is the base class for all data objects. It itself inherits from itk::DataObject.
 
 \subsection DataManagementPageDataNode DataNode
 
-This class encapsulates a BaseData object and provide uniform handling.
+This class encapsulates a BaseData object and provides uniform handling.
 
 \subsection DataManagementPageDataStorage DataStorage
 
-The MITK DataStorage manages and stores DataNodes. Besides adding and removing nodes it provides advanced functionality such as getting a list of all DataNodes currently in the DataStorage which match a specific type (e.g. image, surface ) or have a specific name or other property.
+The MITK DataStorage manages and stores DataNodes. Besides adding and removing nodes it provides advanced
+functionality such as getting a list of all DataNodes currently in the DataStorage which match a specific
+type (e.g. image, surface ) or have a specific name or other property.
 
 There can be different DataStorages. 
 
@@ -36,7 +43,9 @@ A usage example for a class deriving from QmitkAbstractView:
 
 \section DataManagementPageOwnType Adding an own data type
 
-To extent MITKs capabilities by adding anown data type there are several things which should be done. Depending on whether the data type is completely unlike any of the existing ones, or derived from one of them some steps can possibly be ommitted.
+To extent MITKs capabilities by adding a custom data type there are several things which should be done.
+Depending on whether the data type is completely unlike any of the existing ones, or derived from one of
+them some steps can possibly be ommitted.
 
 <ol>
   <li> Add your data type

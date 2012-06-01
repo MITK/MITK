@@ -91,6 +91,15 @@ QtPlatformLogModel::SetShowAdvancedFiels( bool showAdvancedFiels )
   }
 }
 
+void QtPlatformLogModel::SetShowCategory( bool showCategory )
+{
+  if( m_ShowCategory != showCategory )
+  {
+    m_ShowCategory = showCategory;
+    this->reset();
+  }
+}
+
 void
 QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
 {
@@ -102,7 +111,9 @@ QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
   addLogEntry(msg);
 }
 
-QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(parent), m_ShowAdvancedFiels(true)
+QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(parent), 
+m_ShowAdvancedFiels(false),
+m_ShowCategory(true)
 {
   m_Active=new std::list<ExtendedLogMessage>;
   m_Pending=new std::list<ExtendedLogMessage>;
@@ -136,10 +147,10 @@ QtPlatformLogModel::rowCount(const QModelIndex&) const
 int
 QtPlatformLogModel::columnCount(const QModelIndex&) const
 {
-  if( m_ShowAdvancedFiels )
-    return 8;
-  else
-    return 2;
+  int returnValue = 2;
+  if( m_ShowAdvancedFiels ) returnValue += 7;
+  if( m_ShowCategory ) returnValue += 1;
+  return returnValue;
 }
           /*
   struct LogEntry {
@@ -178,123 +189,45 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
   };        */
 
 
-QVariant
-QtPlatformLogModel::data(const QModelIndex& index, int role) const
+QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
 {
   const ExtendedLogMessage *msg = &m_Entries[index.row()];
-  if (role == Qt::TextAlignmentRole)
-    {
-    switch (index.column()) {
-        case 0: //time
-          return Qt::AlignLeft;
-        case 1: //level
-          return Qt::AlignLeft;
-        case 2: //message
-          return Qt::AlignLeft;
-        case 3: //category
-          return Qt::AlignLeft;
-        case 4: //module name
-          return Qt::AlignJustify;
-        case 5: //function name
-          return Qt::AlignJustify;
-        case 6: //path
-          return Qt::AlignJustify;
-        case 7: //line
-          return Qt::AlignRight;
-      }
-    }
+  
   if (role == Qt::DisplayRole)
-  {
-    if( m_ShowAdvancedFiels )
     {
-      switch (index.column()) {
-      
-        case 0: {
-          std::stringstream ss;
-          std::locale C("C");
-          ss.imbue(C);
-          ss << std::setw(7) << std::setprecision(3) << std::fixed << ((double)msg->time)/CLOCKS_PER_SEC;
-          return QVariant(QString(ss.str().c_str()));
-        }
-        
-        case 1: 
-          {
-            // change muellerm, an icon is returned do not return text
-            switch(msg->message.level)
-            {
-              default:
-              case mbilog::Info:
-                return QVariant(Info);
-
-              case mbilog::Warn:
-                return QVariant(Warn);
-                
-              case mbilog::Error:
-                return QVariant(Error);
-                
-              case mbilog::Fatal:
-                return QVariant(Fatal);
-                
-              case mbilog::Debug:
-                return QVariant(Debug);
-            }
-          }
-          
-        case 2: 
-          return QVariant(QString(msg->message.message.c_str()));
-          
-        case 3: 
-          return QVariant(QString(msg->message.category.c_str()));
-      
-        case 4:
-          return QVariant(QString(msg->message.moduleName));
-      
-        case 5: 
-          return QVariant(QString(msg->message.functionName));
-      
-        case 6: 
-          return QVariant(QString(msg->message.filePath));
-      
-        case 7: 
-        {
-          std::stringstream out;
-          std::locale C("C");
-          out.imbue(C);
-          out << msg->message.lineNumber;
-          return QVariant(QString(out.str().c_str()));
-        }
+    switch (index.column()) 
+      {
+      case 0:
+        if (m_ShowAdvancedFiels) return msg->getTime();
+        else return msg->getLevel();
+      case 1: 
+        if (m_ShowAdvancedFiels) return msg->getLevel();
+        else return msg->getMessage();
+      case 2: 
+        if (m_ShowAdvancedFiels) return msg->getMessage();
+        else return msg->getCategory();    
+      case 3: 
+        if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getCategory();
+        else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getModuleName();
+        else break;
+      case 4:
+        if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getModuleName();
+        else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getFunctionName();
+        else break;
+      case 5: 
+        if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getFunctionName();
+        else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getPath();
+        else break;
+      case 6: 
+        if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getPath();
+        else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getLine();
+        else break;
+      case 7: 
+        if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getLine();
+        else break;
       }
     }
-    else // m_ShowAdvancedFields
-    {
-      // only return text
-      if( index.column() == 0 )
-      {
-        switch(msg->message.level)
-        {
-          default:
-          case mbilog::Info:
-            return QVariant(Info);
-
-          case mbilog::Warn:
-            return QVariant(Warn);
-
-          case mbilog::Error:
-            return QVariant(Error);
-
-          case mbilog::Fatal:
-            return QVariant(Fatal);
-
-          case mbilog::Debug:
-            return QVariant(Debug);
-        }
-      }
-      if( index.column()==1 )
-      {
-        return QVariant(QString(msg->message.message.c_str()));
-      }
-    }
-  }
+   
   else if(  role == Qt::DecorationRole )
   {
     if ( (m_ShowAdvancedFiels && index.column()==1)
@@ -326,7 +259,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
 {
   if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
   {
-    if( m_ShowAdvancedFiels )
+    if( m_ShowAdvancedFiels && m_ShowCategory )
     {
       switch (section) 
       {
@@ -340,18 +273,57 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
         case 7: return QVariant("Line");
       }
     }
-    else
+    else if (m_ShowAdvancedFiels && !m_ShowCategory)
+    {
+      switch (section) 
+      {
+        case 0: return QVariant("Time");
+        case 1: return QVariant("Level");
+        case 2: return QVariant("Message");
+        case 3: return QVariant("Module");
+        case 4: return QVariant("Function");
+        case 5: return QVariant("File");
+        case 6: return QVariant("Line");
+      }
+    }
+    else //!m_ShowAdvancedFiels, m_ShowCategory is not handled seperately because it only activates case 2
     {
       switch (section) 
       {
         case 0: return QVariant("Severtiy");
         case 1: return QVariant("Message");
+        case 2: return QVariant("Category");
       }
     }
   }
 
   return QVariant();
 }
+
+QVariant QtPlatformLogModel::ExtendedLogMessage::getTime() const
+    {
+    std::stringstream ss;
+    std::locale C("C");
+    ss.imbue(C);
+    ss << std::setw(7) << std::setprecision(3) << std::fixed << ((double)this->time)/CLOCKS_PER_SEC;
+    return QVariant(QString(ss.str().c_str()));
+    }
+
+QString QtPlatformLogModel::GetDataAsString()
+    {
+    QString returnValue("");
+
+    for (int message=0; message<this->rowCount(QModelIndex()); message++)
+      {
+      for (int column=0; column<this->columnCount(QModelIndex()); column++)
+        {
+        returnValue += " " + this->data(this->index(message,column),Qt::DisplayRole).toString();
+        }
+      returnValue += "\n";
+      }
+    
+    return returnValue;
+    }
 
 
 }

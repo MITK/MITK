@@ -36,6 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+/** Documentation
+ *  @brief An object of this class represents a table of logging data.
+ *         The table presentation can be modified by the methods
+ *         SetShowAdvancedFiels() and SetShowCategory().
+ */
 class QtPlatformLogModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -46,9 +51,15 @@ public:
   ~QtPlatformLogModel();
 
   void SetShowAdvancedFiels( bool showAdvancedFiels );
+  void SetShowCategory( bool showCategory );
   int rowCount(const QModelIndex&) const;
   int columnCount(const QModelIndex&) const;
   QVariant data(const QModelIndex& index, int) const;
+
+  /** Documentation
+   *  @return Retruns the complete table data as string representation.
+   */
+  QString GetDataAsString();
 
   QVariant headerData(int section, Qt::Orientation orientation, int) const;
 
@@ -57,9 +68,14 @@ public:
 
 private:
   bool m_ShowAdvancedFiels;
+  bool m_ShowCategory;
 
-  typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
-
+  /** Documentation
+   *  @brief An object of this struct internally represents a logging message.
+   *         It offers methods to convert the logging data into QVaraint objects
+   *         and also adds time and threadid as logging data. The struct is
+   *         internally used to store logging data in the table data model.
+   */
   struct ExtendedLogMessage {
     mbilog::LogMessage message;
     clock_t time;
@@ -78,7 +94,72 @@ private:
       return ExtendedLogMessage(src);
     }
     
+    QVariant getLevel() const
+    {
+    switch(this->message.level)
+        {
+          default:
+          case mbilog::Info:
+            return QVariant(Info);
+
+          case mbilog::Warn:
+            return QVariant(Warn);
+
+          case mbilog::Error:
+            return QVariant(Error);
+
+          case mbilog::Fatal:
+            return QVariant(Fatal);
+
+          case mbilog::Debug:
+            return QVariant(Debug);
+        }
+    }
+
+    QVariant getMessage() const
+    {
+    return QVariant(QString(this->message.message.c_str()));
+    }
+
+    QVariant getCategory() const
+    {
+    return QVariant(QString(this->message.category.c_str()));
+    }
+
+    QVariant getModuleName() const
+    {
+    return QVariant(QString(this->message.moduleName));
+    }
+
+    QVariant getFunctionName() const
+    {
+    return QVariant(QString(this->message.functionName));
+    }
+
+    QVariant getPath() const
+    {
+    return QVariant(QString(this->message.filePath));
+    }
+
+    QVariant getLine() const
+    {
+    std::stringstream out;
+    std::locale C("C");
+    out.imbue(C);
+    out << this->message.lineNumber;
+    return QVariant(QString(out.str().c_str()));
+    }
+  
+    /** This method is implemented in the cpp file to save includes. */
+    QVariant getTime() const;
+    
   };
+
+  
+
+  typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
+
+  
     
   class QtLogBackend : public mbilog::BackendBase
   {

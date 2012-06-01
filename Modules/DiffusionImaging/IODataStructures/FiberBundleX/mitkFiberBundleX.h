@@ -70,6 +70,7 @@ namespace mitk {
     void ResampleFibers(float pointDistance = 1);
     void DoFiberSmoothing(int pointsPerCm);
     bool RemoveShortFibers(float lengthInMM);
+    void MirrorFibers(unsigned int axis);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);

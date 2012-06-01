@@ -101,6 +101,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
     connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
     connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
+    connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
   }
 }
 
@@ -743,6 +744,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
     m_Controls->m_FaColorFibersButton->setEnabled(false);
     m_Controls->m_PruneFibersButton->setEnabled(false);
+    m_Controls->m_MirrorFibersButton->setEnabled(false);
   }
   else
   {
@@ -750,6 +752,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
     m_Controls->m_ResampleFibersButton->setEnabled(true);
     m_Controls->m_PruneFibersButton->setEnabled(true);
+    m_Controls->m_MirrorFibersButton->setEnabled(true);
 
     if (m_Surfaces.size()>0)
       m_Controls->m_Extract3dButton->setEnabled(true);
@@ -1757,6 +1760,18 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
   {
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
     fib->DoFiberSmoothing(factor);
+  }
+  GenerateStats();
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::MirrorFibers()
+{
+  unsigned int axis = this->m_Controls->m_AxisSelectionBox->currentIndex();
+  for (int i=0; i<m_SelectedFB.size(); i++)
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+    fib->MirrorFibers(axis);
   }
   GenerateStats();
   RenderingManager::GetInstance()->RequestUpdateAll();

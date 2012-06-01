@@ -89,6 +89,7 @@ public:
   void GenerateOrComposite();
   void GenerateNotComposite();
   void PruneBundle();
+  void MirrorFibers();
   void JoinBundles();
   void SubstractBundles();
   void GenerateRoiImage();

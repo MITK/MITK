@@ -1085,6 +1085,39 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
     }
 }
 
+void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
+{
+    if (axis>2)
+        return;
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
+
+    vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
+    vLines->InitTraversal();
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        vtkIdType   numPoints(0);
+        vtkIdType*  pointIds(NULL);
+        vLines->GetNextCell ( numPoints, pointIds );
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p = m_FiberPolyData->GetPoint(pointIds[j]);
+            p[axis] = -p[axis];
+            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+            container->GetPointIds()->InsertNextId(id);
+        }
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+}
 
 bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
 {

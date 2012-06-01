@@ -49,10 +49,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
 void UltrasoundSupport::OnClickedAddNewDevice(){
   MITK_INFO << "USSUPPORT: OnClickedAddNewDevice()"; 
-  // Debug: add fake Device
-  mitk::USDevice::Pointer newDevice;
-  newDevice = mitk::USDevice::New("Manufacturer", "Model", "Comment");
-  newDevice->Connect();
+
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()

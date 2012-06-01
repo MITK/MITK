@@ -604,7 +604,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QCommandLinkButton" name="m_FaColorFibersButton">
         <property name="enabled">
          <bool>false</bool>
@@ -631,6 +631,52 @@
         </property>
         <property name="text">
          <string>Color By Scalar Map</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_PruneFibersButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Remove fibers shorten than the specified length (in mm).</string>
+        </property>
+        <property name="text">
+         <string>Prune Bundle</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="m_PruneFibersSpinBox">
+        <property name="toolTip">
+         <string>Minimum fiber length in mm</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>20</number>
         </property>
        </widget>
       </item>

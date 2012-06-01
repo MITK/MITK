@@ -19,6 +19,9 @@ You need:
   -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
   -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
   (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
+  -# If you are using <b>Mac OS X</b> you need an Xcode installation as this provides the neccessary compilers and SDKs
+
+\attention For Mac OS X it is strongly recommended to use CMake version 2.8.8 or higher
   
 \section BuildInstructions_Qt A note about Qt
 
@@ -83,6 +86,15 @@ ccmake ../MITK
 If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
 choose a suitable generator and configure the project.
 
+If you use <b>Mac OS X</b> you will have to tweak the CMake configuration:
+ - First of all you have to check the selected compilers, i.e.:
+  - <tt><b>CMAKE_CXX_COMPILER</tt></b>
+  - <tt><b>CMAKE_C_COMPILER</tt></b>
+  - both should be either apple's clang or apple's gcc compiler
+ - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</tt></b> points to the correct SDK location:
+  - This is either /Developer/SDKs/Developer/SDKs/MacOSX10.7.sdk or if you have installed Xcode 4.3+ it is located in /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/
+ - Finally you should set the cmake variable <tt><b>MITK_USE_VTK_5_8_IN_SUPERBUILD</tt></b> to ON
+
 CMake will present you a couple of options, these are the most important ones:
 
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
@@ -96,11 +108,13 @@ CMake will present you a couple of options, these are the most important ones:
 If you are satisfied with the configuration of your MITK superbuild, generate the project files with 
 CMake by pressing "Generate".
 
-<b>Linux</b> users usually just enter "make" (optionally supplying the number threads to be used for
+<b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally supplying the number threads to be used for
 a parallel build):
 \code
 make -j4
 \endcode
+
+\note On <b>Mac OS X:</b> If you follow these steps CMake will produce Makefiles and therefore you cannot use Xcode but you have to use e.g. the QtCreator for programming. At the moment developing MITK with Xcode is not supported and using Xcode the superbuild doesn't complete without errors.
 
 <b>Windows</b> users using Visual Studio can open the generated <tt>MITK-superbuild.sln</tt> solution file
 in the <tt>MITK-superbuild</tt> directory and start the build by building the <tt>BUILD_ALL</tt> project.

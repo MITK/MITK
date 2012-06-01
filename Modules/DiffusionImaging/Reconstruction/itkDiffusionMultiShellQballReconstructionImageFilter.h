@@ -129,6 +129,8 @@ public:
 
     itkGetConstReferenceMacro( BValue, TOdfPixelType);
 
+    void SetBValueMap(BValueMap map){this->m_BValueMap = map;}
+
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
@@ -184,7 +186,7 @@ private:
 
     typename BZeroImageType::Pointer m_BZeroImage;
 
-    BValueMap m_GradientIndexMap;
+    BValueMap m_BValueMap;
 
     double m_Lambda;
 

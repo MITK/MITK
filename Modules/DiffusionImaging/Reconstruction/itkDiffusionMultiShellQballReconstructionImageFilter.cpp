@@ -416,26 +416,26 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->m_NumberOfBaselineImages = 0;
   this->m_ReconstructionType = Mode_Standard1Shell;
 
-  if(m_GradientIndexMap.size() == 0){
+  if(m_BValueMap.size() == 0){
     itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
 
     GradientDirectionContainerType::ConstIterator gdcit;
     for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
     {
       double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
-      m_GradientIndexMap[bValueKey].push_back(gdcit.Index());
+      m_BValueMap[bValueKey].push_back(gdcit.Index());
     }
 
   }
 
-  if(m_GradientIndexMap.find(0) != m_GradientIndexMap.end())
+  if(m_BValueMap.find(0) == m_BValueMap.end())
   {
     itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input image");
   }
 
-  if(m_GradientIndexMap.size() == 4 ){
+  if(m_BValueMap.size() == 4 ){
 
-    BValueMapIteraotr it = m_GradientIndexMap.begin();
+    BValueMapIteraotr it = m_BValueMap.begin();
     it++;
     const int b1 = (*it).first;
     it++;
@@ -449,12 +449,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
   }
 
-  if(m_GradientIndexMap.size() > 2 && m_ReconstructionType != Mode_Analytical3Shells)
+  if(m_BValueMap.size() > 2 && m_ReconstructionType != Mode_Analytical3Shells)
   {
     m_ReconstructionType = Mode_NumericalNShells;
   }
 
-  this->m_NumberOfBaselineImages = m_GradientIndexMap[0].size();
+  this->m_NumberOfBaselineImages = m_BValueMap[0].size();
   this->m_NumberOfGradientDirections = gradientDirection->Size() - this->m_NumberOfBaselineImages;
 
   // ensure that the gradient image we received has as many components as
@@ -520,7 +520,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionConstIterator< BZeroImageType > bzeroImageIterator(m_BZeroImage, outputRegionForThread);
   bzeroImageIterator.GoToBegin();
 
-  IndiciesVector SignalIndicies = m_GradientIndexMap[1];
+  IndiciesVector SignalIndicies = m_BValueMap[1];
 
   // if the gradient directiosn aragement is hemispherical, duplicate all gradient directions
   // alone, interested in the value, the direction can be neglected
@@ -609,7 +609,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
   bzeroIterator.GoToBegin();
 
-  IndiciesVector BZeroIndicies = m_GradientIndexMap[0];
+  IndiciesVector BZeroIndicies = m_BValueMap[0];
 
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
 
@@ -661,7 +661,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   // Get Shell Indicies for all non-BZero Gradients
   // it MUST be a arithmetic progression eg.: 1000, 2000, 3000
-  BValueMapIteraotr it = m_GradientIndexMap.begin();
+  BValueMapIteraotr it = m_BValueMap.begin();
   it++;
   // it = b-value = 1000
   IndiciesVector Shell1Indiecies = (*it).second;
@@ -916,12 +916,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
   typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
 
-  std::map<double ,std::vector<unsigned int > >::const_iterator it = (m_GradientIndexMap.begin());
+  std::map<double ,std::vector<unsigned int > >::const_iterator it = (m_BValueMap.begin());
   it++;
-  const std::vector<unsigned int> gradientIndiciesVector= (*it).second;
+  const std::vector<unsigned int> gradientIndiciesVector = (*it).second;
 
   int numberOfGradientDirections = gradientIndiciesVector.size();
-
 
   if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
@@ -1067,8 +1066,8 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   bool value = false;
 
-  BValueMapIteraotr mapIterator = m_GradientIndexMap.begin();
-  while(mapIterator != m_GradientIndexMap.end())
+  BValueMapIteraotr mapIterator = m_BValueMap.begin();
+  while(mapIterator != m_BValueMap.end())
   {
     std::vector<unsigned int>::const_iterator it1 = mapIterator->second.begin();
     std::vector<unsigned int>::const_iterator it2 = mapIterator->second.begin();

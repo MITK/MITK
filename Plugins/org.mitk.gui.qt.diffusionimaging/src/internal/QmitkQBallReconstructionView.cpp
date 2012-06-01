@@ -108,14 +108,44 @@ struct QbrShellSelection
 
       box->setChecked(true);
       box->setCheckable(true);
-      box->setVisible(true);
+     // box->setVisible(true);
       m_CheckBoxes.push_back(box);
+    }
+  }
+
+  void SetVisible(bool vis)
+  {
+    foreach(QCheckBox * box, m_CheckBoxes)
+    {
+      box->setVisible(vis);
     }
   }
 
   BValueMap GetBValueSelctionMap()
   {
+    BValueMap inputMap = m_Image->GetB_ValueMap();
+    BValueMap outputMap;
 
+    double val = 0;
+
+    if(inputMap.find(0) == inputMap.end()){
+      MITK_INFO << "QbrShellSelection: return empty BValueMap from GUI Selection";
+      return outputMap;
+    }else{
+       outputMap[val] = inputMap[val];
+       MITK_INFO << val;
+    }
+
+    foreach(QCheckBox * box, m_CheckBoxes)
+    {
+      if(box->isChecked()){
+        val = box->text().toDouble();
+        outputMap[val] = inputMap[val];
+        MITK_INFO << val;
+      }
+    }
+
+    return outputMap;
   }
 
   ~QbrShellSelection()
@@ -911,11 +941,15 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   typedef itk::DiffusionMultiShellQballReconstructionImageFilter
       <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
+
+  filter->SetBValueMap(m_ShellSelectorMap[nodename]->GetBValueSelctionMap());
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
 
-  //filter->SetBValue(vols->GetB_Value());
+  //filter->SetBValue(vols->GetB_Value()); 
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
   filter->SetLambda(lambda);
+
+
   filter->Update();
 
   // ODFs TO DATATREE
@@ -1032,6 +1066,7 @@ void QmitkQBallReconstructionView::GenerateShellSelectionUI(mitk::DataStorage::S
     }else
     {
       tempMap[nodename] = new QbrShellSelection(this, (*NodeIt) );
+      tempMap[nodename]->SetVisible(true);
     }
 
     NodeIt++;

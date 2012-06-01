@@ -48,9 +48,9 @@
         <widget class="QmitkUSDeviceManagerWidget" name="m_DeviceManagerWidget" native="true"/>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="m_AddDevice">
          <property name="text">
-          <string>Debug: Add Device To Service</string>
+          <string>New Device</string>
          </property>
         </widget>
        </item>

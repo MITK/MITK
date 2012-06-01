@@ -29,11 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //microservices
 #include <usModuleRegistry.h>
 #include <usModule.h>
+#include <usServiceTracker.h>
 
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
 
-QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f) 
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -42,9 +43,16 @@ QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::Wind
   mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
   m_MitkUSContext = mitkUS->GetModuleContext();
 
+  //ServiceTracker<mitk::USDevice>* tracker = new ServiceTracker<mitk::USDevice>(m_MitkUSContext, this);
+
   // Register this Widget as a listener for Registry changes.
   // If devices are registered, unregistered or changed, notifications will go there
-  m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceManagerWidget::OnServiceEvent ,"");
+  std::string filter = "(";
+  filter += mitk::ServiceConstants::OBJECTCLASS();
+  filter += "=";
+  //filter += us_service_interface_iid<mitk::USDevice>();
+  filter += "org.mitk.services.UltrasoundDevice)";
+   m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceManagerWidget::OnServiceEvent ,filter);
 }
 
 QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()

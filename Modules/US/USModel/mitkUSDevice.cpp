@@ -40,6 +40,19 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   this->SetNthOutput(0,newOutput);
 }
 
+mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata, bool isVideoOnly) : mitk::ImageSource()
+{
+  m_Metadata = metadata;
+
+  //set number of outputs
+  this->SetNumberOfOutputs(1);
+
+  //create a new output
+  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  this->SetNthOutput(0,newOutput);
+}
+
+
 mitk::USDevice::~USDevice()
 {
 
@@ -53,7 +66,6 @@ bool mitk::USDevice::Connect()
 
   // Get Context and Module
   mitk::ModuleContext* context = GetModuleContext();
-  mitk::Module* module = context->GetModule();
 
   // Define ServiceProps
   ServiceProperties props;
@@ -75,7 +87,7 @@ bool mitk::USDevice::Disconnect()
 
   // Unregister
   m_ServiceRegistration.Unregister();
-  
+  m_ServiceRegistration = 0;
   return true;
 }
 

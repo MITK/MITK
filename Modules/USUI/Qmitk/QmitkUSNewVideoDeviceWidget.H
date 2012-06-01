@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
-#include "mitkUSDeviceService.h"
+#include "mitkUSDevice.h"
+#include "mitkUSImageMetadata.h"
 
 //QT headers
 #include <QWidget>
@@ -45,8 +46,6 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     QmitkUSNewVideoDeviceWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
     virtual ~QmitkUSNewVideoDeviceWidget();
 
-    void Initialize(mitk::USDeviceService::Pointer deviceService);
-
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
@@ -54,29 +53,33 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
   
   signals:
 
-    /*
-    \brief Sent, when the user clicks "Activate Device"
-    */
-    void USDeviceActivated();
+    void Finished();
 
   public slots:
+
     /*
-    \brief Should be called from the Implementing bundle whenever changes to the DeviceService happen
+    \brief Activates the widget and displays the given device's Data to edit.
     */
-    //void OnDeviceServiceUpdated();
+    void EditDevice(mitk::USDevice::Pointer device);
+
+    /*
+    \brief Activates the widget with fields empty.
+    */
+    void CreateNewDevice();
 
   protected slots:
   
     /*
-    \brief Called, when the Button Activate Device was clicked
+    \brief Called, when the the user clicks the "Done" button (Labeled either "Add Device" or "Edit Device", depending on the situation.
     */
-    void OnClickedActivateDevice();
+    void OnClickedDone();
 
     /*
-    \brief Called, when the Button Disconnect Device was clicked
+    \brief Called, when the button "Cancel" was clicked
     */
-    void OnClickedDisconnectDevice();   
+    void OnClickedCancel();   
 
+    
 
 
   protected:
@@ -84,14 +87,29 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     Ui::QmitkUSNewVideoDeviceWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
-    \brief Constrcuts a ListItem from the given devie for display in the list of active devices
+    \brief Constructs a ListItem from the given devie for display in the list of active devices
     */
     QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
- 
 
-  private:
+    /*
+    \brief Initializes the Widget's ListItems with the given Metadata Object.
+    */
+    void InitFields(mitk::USImageMetadata::Pointer);
 
-    mitk::USDeviceService::Pointer m_DeviceService;
+    /*
+    \brief Displays whether this widget is active or not. It gets activated by either sending a Signal to
+    *  the "CreateNewDevice" Slot or to the "EditDevice" Slot. If the user finishes editing the device, a
+    * "EditingComplete" Signal is sent, and the widget is set to inactive again. Clicking Cancel also
+    *  deactivates it.
+    */
+    bool m_Active;
+
+    /**
+    *   \brief This is the device to edit. It is either the device transmitted in the "EditDevice" signal, or a new one
+    *  if the "CreateNewDevice slot was called.
+    */
+    mitk::USDevice::Pointer m_TargetDevice;
+     
 
 };
 

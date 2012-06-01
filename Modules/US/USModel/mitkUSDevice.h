@@ -52,6 +52,14 @@ namespace mitk {
       */
       mitkNewMacro3Param(Self, std::string, std::string, bool);
 
+      
+      /**
+      * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
+      *        The isVideoOnly flag indicates that this class 
+      *        only handles a videostream and does not receive Metadata from the physical device itself.
+      */
+      mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
+
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -180,6 +188,14 @@ namespace mitk {
       *        only handles a videostream and does not recieve Metadata from the physical device itself.
       */
       USDevice(std::string manufacturer, std::string model, bool isVideoOnly);
+
+      /**
+      * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
+      *        The isVideoOnly flag indicates that this class 
+      *        only handles a videostream and does not receive Metadata from the physical device itself.
+      */
+      USDevice(mitk::USImageMetadata::Pointer metadata, bool isVideoOnly);
+
       virtual ~USDevice();
 
       /**

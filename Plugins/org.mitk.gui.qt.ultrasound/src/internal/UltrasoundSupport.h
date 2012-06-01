@@ -49,7 +49,10 @@ class UltrasoundSupport : public QmitkAbstractView
    signals:
      
     void DeviceServiceUpdated();
-    
+
+  public slots:
+    void OnNewDeviceWidgetDone();
+     
   protected slots:
   
     void OnClickedAddNewDevice();

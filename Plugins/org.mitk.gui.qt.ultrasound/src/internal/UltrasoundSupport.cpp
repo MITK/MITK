@@ -34,26 +34,31 @@ const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport
 
 void UltrasoundSupport::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+   m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) );
-  connect( this, SIGNAL(DeviceServiceUpdated()),     m_Controls.m_DeviceManagerWidget, SLOT(OnDeviceServiceUpdated()) );
+  connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
+  connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
+  connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
 }
 
 
 void UltrasoundSupport::OnClickedAddNewDevice(){
-   
+  MITK_INFO << "USSUPPORT: OnClickedAddNewDevice()"; 
   // Debug: add fake Device
   mitk::USDevice::Pointer newDevice;
   newDevice = mitk::USDevice::New("Manufacturer", "Model", "Comment");
   newDevice->Connect();
 }
 
+void UltrasoundSupport::OnNewDeviceWidgetDone()
+{
+  MITK_INFO << "USSUPPORT: OnNewDeviceWidgetDone()";
+}
 
 
 

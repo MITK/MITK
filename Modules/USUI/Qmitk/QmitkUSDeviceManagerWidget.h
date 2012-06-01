@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
+class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wnats to use ServiceTracking instead of Filtering
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -74,12 +74,12 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
   protected slots:
   
     /*
-    \brief Called, when the Button Activate Device was clicked
+    \brief Called, when the button "Activate Device" was clicked
     */
     void OnClickedActivateDevice();
 
     /*
-    \brief Called, when the Button Disconnect Device was clicked
+    \brief Called, when the button "Disconnect Device" was clicked
     */
     void OnClickedDisconnectDevice();   
 

@@ -373,7 +373,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
   {
     minTimeBounds[0] = minimalTime;
     minTimeBounds[1] = minimalTime + minimalIntervallSize;
-    numberOfTimeSteps = (maximalTime-minimalTime)/minimalIntervallSize;
+    numberOfTimeSteps = static_cast<unsigned int>((maximalTime-minimalTime)/minimalIntervallSize);
   }
 
   TimeSlicedGeometry::Pointer timeSlicedGeometry = NULL;

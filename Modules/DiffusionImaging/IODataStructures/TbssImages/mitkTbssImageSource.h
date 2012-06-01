@@ -55,7 +55,7 @@ public:
   //OutputType* GetOutput()
   //{return Superclass::GetOutput();}
 
-  //OutputType* GetOutput(unsigned int idx);
+  OutputType* GetOutput(unsigned int idx);
 
   //virtual void GraftOutput(OutputType* graft);
 

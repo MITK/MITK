@@ -19,9 +19,9 @@ You need:
   -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
   -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
   (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
-  -# If you are using <b>Mac OS X</b> you will need an installation of apple's Xcode since this brings the neccessary compilers and SDKs
+  -# If you are using <b>Mac OS X</b> you need an Xcode installation as this provides the neccessary compilers and SDKs
 
-\attention For Mac OS X it is strongly recommended to use CMake (i.e. 2.8.8) as minimum version.
+\attention For Mac OS X it is strongly recommended to use CMake version 2.8.8 or higher
   
 \section BuildInstructions_Qt A note about Qt
 
@@ -86,7 +86,7 @@ ccmake ../MITK
 If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
 choose a suitable generator and configure the project.
 
-If you use <b>Mac OS X</b> you will have to take a more accurate look at the CMake configuration:
+If you use <b>Mac OS X</b> you will have to tweak the CMake configuration:
  - First of all you have to check the selected compilers, i.e.:
   - <tt><b>CMAKE_CXX_COMPILER</tt></b>
   - <tt><b>CMAKE_C_COMPILER</tt></b>
@@ -114,7 +114,7 @@ a parallel build):
 make -j4
 \endcode
 
-\note On <b>Mac OS X:</b> If you follow these steps CMake will produce Makefiles and therefore you cannot use Xcode but you have to use e.g. the QtCreator for programming. At the moment developing MITK with Xcode is not supported and the superbuild doens't run without errors using Xcode.
+\note On <b>Mac OS X:</b> If you follow these steps CMake will produce Makefiles and therefore you cannot use Xcode but you have to use e.g. the QtCreator for programming. At the moment developing MITK with Xcode is not supported and using Xcode the superbuild doesn't complete without errors.
 
 <b>Windows</b> users using Visual Studio can open the generated <tt>MITK-superbuild.sln</tt> solution file
 in the <tt>MITK-superbuild</tt> directory and start the build by building the <tt>BUILD_ALL</tt> project.

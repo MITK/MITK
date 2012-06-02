@@ -39,24 +39,25 @@ If your design evolves, you might hit a point where you suddenly need multiple i
 
 \section MicroServices_EmulateSingleton_2 Singletons as a service
 
-The MITK Micro Services can be used to emulate the singleton pattern using a non-singleton class. This
+The C++ Micro Services can be used to emulate the singleton pattern using a non-singleton class. This
 leaves room for future extensions without the need for heavy refactoring. Additionally, it gives you
 full control about the construction and destruction order of your "singletons" inside your shared library
 or executable, making it possible to have dependencies between them during destruction.
 
 \subsection MicroServices_EmulateSingleton_2_1 Converting a classic singleton
 
-We modify the previous SingletonOne class such that it internally uses the MITK micro services API. The changes
+We modify the previous SingletonOne class such that it internally uses the micro services API. The changes
 are discussed in detail below.
 
 \snippet uServices-singleton/SingletonOne.h ss1
 
- - Inherit itk::LightObject: All service implementations (not their interfaces) must inherit from itk::LightObject.
+ - Inherit us::Base: All service implementations (not their interfaces) must inherit from us::Base or from the base
+   class as specified in the CMake configuration.
    In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
  - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
    method to the module activator.
  - Service interface declaration: Because the SingletonOneService class introduces a new service interface, it must
-   be registered under a unique name using the helper macro MITK_DECLARE_SERVICE_INTERFACE.
+   be registered under a unique name using the helper macro US_DECLARE_SERVICE_INTERFACE.
    
 Let's have a look at the modified GetInstance() and ~SingletonOneService() methods.
 
@@ -67,7 +68,7 @@ of a reference as in the classic singleton. This is necessary since we can no lo
 always exists. Clients of the GetInstance() method must check for null pointers and react appropriately.
 
 \warning Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper
-services and hence should be retrieved by clients using the mitk::ModuleContext or mitk::ServiceTracker API. The
+services and hence should be retrieved by clients using the ModuleContext or ServiceTracker API. The
 GetInstance() method is for migration purposes only.
 
 \snippet uServices-singleton/SingletonOne.cpp ss1d

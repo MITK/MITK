@@ -24,7 +24,7 @@
 #define USTHREADINGMODEL_H
 
 #include <usConfig.h>
-#include "usExportMacros.h"
+#include "usExportMacros_p.h"
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 
@@ -52,7 +52,6 @@
   // Mutex support
 
   #ifdef US_PLATFORM_WINDOWS
-
     #ifndef WIN32_LEAN_AND_MEAN
       #define WIN32_LEAN_AND_MEAN
     #endif

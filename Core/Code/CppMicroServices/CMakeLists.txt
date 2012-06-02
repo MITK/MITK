@@ -1,5 +1,10 @@
 project(CppMicroServices)
 
+set(${PROJECT_NAME}_MAJOR_VERSION 0)
+set(${PROJECT_NAME}_MINOR_VERSION 99)
+set(${PROJECT_NAME}_PATCH_VERSION 0)
+set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+
 cmake_minimum_required(VERSION 2.8)
 
 #-----------------------------------------------------------------------------
@@ -127,7 +132,7 @@ if(US_ENABLE_SERVICE_FACTORY_SUPPORT OR US_BUILD_TESTING)
     # Try to get the include dirs
     foreach(_suffix DIRECTORIES DIRS DIRECTORY DIR)
       if(${US_BASECLASS_PACKAGE}_INCLUDE_${_suffix} AND NOT US_BASECLASS_INCLUDE_DIRS)
-        us_cache_var(US_BASECLASS_INCLUDE_DIRS ${${US_BASECLASS_PACKAGE}_INCLUDE_${_suffix}} STRING "${bc_inc_d_doc}" FORCE)
+        us_cache_var(US_BASECLASS_INCLUDE_DIRS "${${US_BASECLASS_PACKAGE}_INCLUDE_${_suffix}}" STRING "${bc_inc_d_doc}" FORCE)
         break()
       endif()
     endforeach()
@@ -135,7 +140,7 @@ if(US_ENABLE_SERVICE_FACTORY_SUPPORT OR US_BUILD_TESTING)
     # Try to get the library dirs
     foreach(_suffix DIRECTORIES DIRS DIRECTORY DIR)
       if(${US_BASECLASS_PACKAGE}_LIBRARY_${_suffix} AND NOT US_BASECLASS_LIBRARY_DIRS)
-        us_cache_var(US_BASECLASS_LIBRARY_DIRS ${${US_BASECLASS_PACKAGE}_LIBRARY_${_suffix}} STRING "${bc_lib_d_doc}" FORCE)
+        us_cache_var(US_BASECLASS_LIBRARY_DIRS "${${US_BASECLASS_PACKAGE}_LIBRARY_${_suffix}}" STRING "${bc_lib_d_doc}" FORCE)
         break()
       endif()
     endforeach()
@@ -143,7 +148,7 @@ if(US_ENABLE_SERVICE_FACTORY_SUPPORT OR US_BUILD_TESTING)
     # Try to get the libraries
     foreach(_suffix LIBRARIES LIBS LIBRARY LIB)
       if(${US_BASECLASS_PACKAGE}_${_suffix} AND NOT US_BASECLASS_LIBRARIES)
-        us_cache_var(US_BASECLASS_LIBRARIES ${${US_BASECLASS_PACKAGE}_${_suffix}} STRING "${bc_lib_doc}" FORCE)
+        us_cache_var(US_BASECLASS_LIBRARIES "${${US_BASECLASS_PACKAGE}_${_suffix}}" STRING "${bc_lib_doc}" FORCE)
         break()
       endif()
     endforeach()
@@ -259,7 +264,7 @@ set(US_INTERNAL_INCLUDE_DIRS
 )
 
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND _us_internal_include_dirs ${US_BASECLASS_INCLUDE_DIRS})
+  list(APPEND US_INTERNAL_INCLUDE_DIRS ${US_BASECLASS_INCLUDE_DIRS})
 endif()
 
 # link libraries for third party libs
@@ -289,6 +294,9 @@ endif()
 # Source directory
 #-----------------------------------------------------------------------------
 
+set(us_config_h_file "${PROJECT_BINARY_DIR}/include/usConfig.h")
+configure_file(usConfig.h.in ${us_config_h_file})
+
 add_subdirectory(src)
 
 #-----------------------------------------------------------------------------
@@ -309,8 +317,6 @@ add_subdirectory(documentation)
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
-
-configure_file(usConfig.h.in ${PROJECT_BINARY_DIR}/include/usConfig.h)
 
 configure_file(${PROJECT_NAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
 

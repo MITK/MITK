@@ -20,6 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include<string>
 #include <MitkExports.h>
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4251)
+#endif
+
 namespace mitk {
 
 /*!
@@ -45,5 +50,9 @@ class MITK_CORE_EXPORT UIDGenerator
 };
 
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 #endif

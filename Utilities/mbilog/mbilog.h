@@ -26,7 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mbilogLoggingTypes.h"
 #include "mbilogConfig.h"
 
-
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4251)
+#endif
 
 namespace mbilog {
 
@@ -204,6 +207,10 @@ namespace mbilog {
 
 
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 /** \brief Macros for different message levels. Creates an instance of class PseudoStream with the corresponding message level.
   *        Other parameters are the name of the source file, line of the source code and function name which are generated

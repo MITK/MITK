@@ -98,7 +98,6 @@ public:
   void ResampleSelectedBundles();
   void DoFaColorCoding();
   void Extract3d();
-  void StreamlineTrackingStart();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

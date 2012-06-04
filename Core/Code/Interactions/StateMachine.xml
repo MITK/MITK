@@ -3495,7 +3495,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="CtrlZoom">
+  <stateMachine NAME="alternativeZoom">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initzoom" NEXT_STATE_ID="1" EVENT_ID="7">
         <action ID="1011" />
@@ -3508,7 +3508,7 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="538" />
     </state>
   </stateMachine>
-  <stateMachine NAME="ShiftClickPan">
+  <stateMachine NAME="alternativePan">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="644">
         <action ID="9" />
@@ -3532,7 +3532,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="RightClickLevelWindow">
+  <stateMachine NAME="alternativeLevelWindow">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="2">
         <action ID="9" />
@@ -3545,7 +3545,7 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
-  <stateMachine NAME="LeftClickLevelWindow">
+  <stateMachine NAME="LevelWindow">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3780,7 +3780,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="LeftClickScroll">
+  <stateMachine NAME="Scroll">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3834,7 +3834,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="MiddleClickScroll">
+  <stateMachine NAME="alternativeScroll">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
         <action ID="9" />
@@ -3855,6 +3855,17 @@
       </transition>
       <transition NAME="altscroll" EVENT_ID="642" NEXT_STATE_ID="1">
         <action ID="1013" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="ContextMenuInteractor">
+    <state NAME="initial" ID="1" START_STATE="TRUE">
+      <transition NAME="press" NEXT_STATE_ID="2" EVENT_ID="2" />
+    </state>
+    <state NAME="contextmenu" ID="2" >
+      <transition NAME="moved" NEXT_STATE_ID="1" EVENT_ID="531" />
+      <transition NAME="contextmenu" NEXT_STATE_ID="1" EVENT_ID="507">
+        <action ID="30" />
       </transition>
     </state>
   </stateMachine>

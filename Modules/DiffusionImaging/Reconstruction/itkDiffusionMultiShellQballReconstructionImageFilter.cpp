@@ -323,8 +323,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
   {
     if (b0f==0)
       b0f = 0.01;
-    if(vec[i] >= b0f)
-      vec[i] = b0f - 0.001;
+    // if(vec[i] >= b0f)
+    //   vec[i] = b0f - 0.001;
     vec[i] /= b0f;
   }
 
@@ -341,8 +341,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     for( int j = 0; j < mat.cols(); j++ ){
       if (b0f==0)
         b0f = 0.01;
-      if(mat(i,j) >= b0f)
-        mat(i,j) = b0f - 0.001;
+      //if(mat(i,j) >= b0f)
+      //  mat(i,j) = b0f - 0.001;
       mat(i,j) /= b0f;
     }
   }
@@ -390,16 +390,34 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   if(m_BValueMap.size() == 4 ){
 
+
     BValueMapIteraotr it = m_BValueMap.begin();
     it++;
-    const int b1 = (*it).first;
+    const int b1 = it->first;
+    const int vecSize1 = it->second.size();
     it++;
-    const int b2 = (*it).first;
+    const int b2 = it->first;
+    const int vecSize2 = it->second.size();
     it++;
-    const int b3 = (*it).first;
+    const int b3 = it->first;
+    const int vecSize3 = it->second.size();
 
     if(b2 - b1 == b1 && b3 - b2 == b1 )
     {
+
+      // check if Interpolation is needed
+      // if shells with different numbers of directions exist
+      bool interp_flag = false;
+      if(vecSize1 != vecSize2 || vecSize2 != vecSize3 || vecSize1 != vecSize3)
+      {
+        interp_flag = true;
+        MITK_INFO << "Shell interpolation ";
+      }else // if each shell holds same numbers of directions, but the gradient direction differ more than one 1 degree
+      {
+        interp_flag = CheckForDifferingShellDirections();
+        MITK_INFO << "Shell interpolation ";
+      }
+
       m_ReconstructionType = Mode_Analytical3Shells;
     }
   }
@@ -450,6 +468,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
   m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
   m_BZeroImage->Allocate();
+
+
 
   this->ComputeReconstructionMatrix();
 
@@ -538,11 +558,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   MITK_INFO << "One Thread finished reconstruction";
 }
-
-#include <itkTimeProbe.h>
-//#include <vnl/algo/vnl_levenberg_marquardt.h>
-//#include <vnl/algo/vnl_lsqr.h>
-
 
 
 template< class T, class TG, class TO, int L, int NODF>
@@ -807,9 +822,11 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
         int j = ( k * k + k + 2 ) / 2 + m - 1;
 
         // Compute SHBasisFunctions
-        double phi = (*QBallReference)(0,i);
-        double th = (*QBallReference)(1,i);
-        (*SHBasisOutput)(i,j) = mitk::sh::Yj(m,k,th,phi);
+        if(QBallReference){
+          double phi = (*QBallReference)(0,i);
+          double th = (*QBallReference)(1,i);
+          (*SHBasisOutput)(i,j) = mitk::sh::Yj(m,k,th,phi);
+        }
 
         // Laplacian Baltrami Order Association
         if(LaplaciaBaltramiOutput)
@@ -921,8 +938,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   const int LOrder = L;
   int NumberOfCoeffs = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
   MITK_INFO << NumberOfCoeffs;
-  m_SHBasisMatrix = new vnl_matrix<double>(numberOfGradientDirections,NumberOfCoeffs);
-  m_SHBasisMatrix->fill(0.0);
+  MatrixDoublePtr SHBasisMatrix(new vnl_matrix<double>(numberOfGradientDirections,NumberOfCoeffs));
+  SHBasisMatrix->fill(0.0);
   VectorIntPtr SHOrderAssociation(new vnl_vector<int>(NumberOfCoeffs));
   SHOrderAssociation->fill(0.0);
   MatrixDoublePtr LaplacianBaltrami(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
@@ -935,7 +952,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
-  ComputeSphericalHarmonicsBasis(Q.get() ,m_SHBasisMatrix, LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
+  ComputeSphericalHarmonicsBasis(Q.get() ,SHBasisMatrix.get() , LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
 
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
 
@@ -945,19 +962,18 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   }
   //ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
 
-  MatrixDoublePtr temp(new vnl_matrix<double>(((m_SHBasisMatrix->transpose()) * (*m_SHBasisMatrix)) + (m_Lambda  * (*LaplacianBaltrami))));
+  MatrixDoublePtr temp(new vnl_matrix<double>(((SHBasisMatrix->transpose()) * (*SHBasisMatrix)) + (m_Lambda  * (*LaplacianBaltrami))));
 
   InverseMatrixDoublePtr pseudo_inv(new vnl_matrix_inverse<double>((*temp)));
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
-  inverse->fill(0.0);
   (*inverse) = pseudo_inv->inverse();
 
   // ODF Factor ( missing 1/4PI ?? )
-  double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
 
-  m_SignalReonstructionMatrix = new vnl_matrix<double>((*inverse) * (m_SHBasisMatrix->transpose()));
+  MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
 
-  m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*m_SignalReonstructionMatrix))) ));
+  m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 
   // this code goes to the image adapter coeffs->odfs later
 
@@ -993,25 +1009,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   }
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-template< class VNLType >
-void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::printMatrix( VNLType * mat  )
-{
-
-  std::stringstream stream;
-
-  for(int i = 0 ; i < mat->rows(); i++)
-  {
-    stream.str("");
-    for(int j = 0; j < mat->cols(); j++)
-    {
-      stream << (*mat)(i,j) << "  ";
-    }
-
-  }
-  MITK_INFO << stream.str();
-}
 
 template< class T, class TG, class TO, int L, int NODF>
 bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -1020,6 +1017,7 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   bool value = false;
 
   BValueMapIteraotr mapIterator = m_BValueMap.begin();
+  mapIterator++;
   while(mapIterator != m_BValueMap.end())
   {
     std::vector<unsigned int>::const_iterator it1 = mapIterator->second.begin();
@@ -1039,6 +1037,31 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     ++mapIterator;
   }
   return value;
+}
+
+
+// corresponding directions between shells (e.g. dir1_shell1 vs dir1_shell2) differ more than 1 degree.
+template< class T, class TG, class TO, int L, int NODF>
+bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::CheckForDifferingShellDirections()
+{
+  bool interp_flag = false;
+
+  BValueMapIteraotr mapIterator = m_BValueMap.begin();
+  mapIterator++;
+  std::vector<unsigned int> shell1 = mapIterator->second;
+  mapIterator++;
+  std::vector<unsigned int> shell2 = mapIterator->second;
+  mapIterator++;
+  std::vector<unsigned int> shell3 = mapIterator->second;
+
+  for (int i=0; i< shell1.size(); i++)
+    if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell1[i]), m_GradientDirectionContainer->ElementAt(shell2[i])))  <= 0.9998) {interp_flag=true; break;}
+  for (int i=0; i< shell1.size(); i++)
+    if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell1[i]), m_GradientDirectionContainer->ElementAt(shell3[i])))  <= 0.9998) {interp_flag=true; break;}
+  for (int i=0; i< shell1.size(); i++)
+    if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell2[i]), m_GradientDirectionContainer->ElementAt(shell3[i])))  <= 0.9998) {interp_flag=true; break;}
+  return interp_flag;
 }
 
 

@@ -139,7 +139,8 @@ protected:
 
     void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
-    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
+    bool CheckForDifferingShellDirections();
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
     //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
     bool CheckHemisphericalArrangementOfGradientDirections();
 
@@ -166,8 +167,8 @@ private:
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
     CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
-    CoefficientMatrixType m_SignalReonstructionMatrix;
-    CoefficientMatrixType m_SHBasisMatrix;
+    //CoefficientMatrixType m_SignalReonstructionMatrix;
+    //CoefficientMatrixType m_SHBasisMatrix;
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
@@ -199,15 +200,10 @@ private:
     ReconstructionType m_ReconstructionType;
 
 
-
-    template< class VNLType >
-    void printMatrix( VNLType * mat );
-
     //------------------------- VNL-function ------------------------------------
 
-
     template<typename CurrentValue, typename WntValue>
-    static vnl_vector< WntValue> element_cast (vnl_vector< CurrentValue> const& v1)
+    vnl_vector< WntValue> element_cast (vnl_vector< CurrentValue> const& v1)
     {
       vnl_vector<WntValue> result(v1.size());
 
@@ -215,6 +211,13 @@ private:
            result[i] = static_cast< WntValue>(v1[i]);
 
       return result;
+    }
+
+    template<typename type>
+    double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 )
+    {
+      double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
+      return result ;
     }
 
 };

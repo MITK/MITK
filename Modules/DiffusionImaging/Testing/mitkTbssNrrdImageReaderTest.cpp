@@ -37,9 +37,6 @@ int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
   RegisterDiffusionImagingObjectFactory();
 
 
-  std::cout << argc << std::endl;
-  std::cout << argv[1] << std::endl;
-
   tbssNrrdReader->SetFileName(argv[1]);
   MITK_TEST_CONDITION_REQUIRED( tbssNrrdReader->CanReadFile(argv[1], "", ""), "Testing CanReadFile() method with valid input file name!");
   tbssNrrdReader->Update();

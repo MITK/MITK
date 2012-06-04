@@ -418,6 +418,20 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         MITK_INFO << "Shell interpolation ";
       }
 
+      if(interp_flag)
+      {
+
+        //Find which shell has the fewer directions
+
+        //Find which shell has the most directions
+
+        //Determine which order will be used for interpolation (common to all shells). Use 10, unless the data are not enough
+
+        //Interpolate all shells along these directions
+
+      }
+
+
       m_ReconstructionType = Mode_Analytical3Shells;
     }
   }

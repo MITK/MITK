@@ -106,6 +106,7 @@ void org_mitk_core_services_Activator::MitkServiceChanged(const mitk::ServiceEve
   case mitk::ServiceEvent::REGISTERED:
   {
     this->AddMitkService(event.GetServiceReference());
+    break;
   }
   case mitk::ServiceEvent::UNREGISTERING:
   {
@@ -116,15 +117,17 @@ void org_mitk_core_services_Activator::MitkServiceChanged(const mitk::ServiceEve
       reg.unregister();
     }
     delete mapMitkIdToAdapter.take(mitkServiceId);
+    break;
   }
   case mitk::ServiceEvent::MODIFIED:
   {
     long mitkServiceId = mitk::any_cast<long>(event.GetServiceReference().GetProperty(mitk::ServiceConstants::SERVICE_ID()));
     ctkDictionary newProps = CreateServiceProperties(event.GetServiceReference());
     mapMitkIdToRegistration[mitkServiceId].setProperties(newProps);
+    break;
   }
   default:
-    ;// do nothing
+    break; // do nothing
   }
 }
 

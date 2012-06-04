@@ -31,10 +31,8 @@ int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
 
 
   mitk::NrrdTbssImageReader::Pointer tbssNrrdReader = mitk::NrrdTbssImageReader::New();
-  // testing correct initialization 
-  //MITK_TEST_CONDITION_REQUIRED(tbssNrrdReader.GetPointer(), "Testing initialization of test object!");
 
-
+  MITK_TEST_CONDITION_REQUIRED(tbssNrrdReader.GetPointer(), "Testing initialization of test object!");
 
   RegisterDiffusionImagingObjectFactory();
 
@@ -46,9 +44,25 @@ int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED( tbssNrrdReader->CanReadFile(argv[1], "", ""), "Testing CanReadFile() method with valid input file name!");
   tbssNrrdReader->Update();
 
+  mitk::TbssImage* tbssImg = tbssNrrdReader->GetOutput(0);
+
+  MITK_TEST_CONDITION_REQUIRED(tbssImg != NULL, "Testing that tbssImg is not null");
+
+  mitk::TbssImage::SizeType size = tbssImg->GetLargestPossibleRegion().GetSize();
+
+  MITK_TEST_CONDITION_REQUIRED(size[0]==2 && size[1]==2 && size[2]==2, "Test size of tbss image");
+
+  // Test groups
+  std::vector< std::pair<std::string, int> > groups = tbssImg->GetGroupInfo();
+
+  std::pair<std::string, int> group1 = groups.at(0);
+  std::pair<std::string, int> group2 = groups.at(1);
 
 
- // MITK_TEST_CONDITION_REQUIRED(tbssImg != NULL, "Testing that tbssImg is not null");
+
+  MITK_TEST_CONDITION_REQUIRED(group1.first.compare("group1") && group1.second==1, "Test group 1 info");
+
+  MITK_TEST_CONDITION_REQUIRED(group2.first.compare("group2") && group2.second==1, "Test group 2 info");
 
 
 

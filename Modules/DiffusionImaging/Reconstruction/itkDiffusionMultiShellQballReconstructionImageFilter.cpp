@@ -282,61 +282,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
   delta0 *= 0.99;
 
-  for(int i = 0 ; i < a.size(); i ++)
-  {
-    for(int j = 0 ; j < 15; j ++)
-    {
-      B(i,j) = delta0 < AM(i,j) && 2 * (AM(i,j) + delta0 * s15) < aM(i,j) - bM(i,j) && bM(i,j) > delta0 && aM(i,j) < 1- delta0;
-    }
-  }
-
   vnl_matrix<double> R2(a.size(), 15);
-  vnl_matrix<double> A_(a.size(), 15);
-  vnl_matrix<double> a_(a.size(), 15);
-  vnl_matrix<double> b_(a.size(), 15);
+  std::vector<unsigned int> I(a.size());
 
-
-
-  vnl_matrix<double> OnesVecMat(1, 15);
-  OnesVecMat.fill(1.0);
-
-  vnl_matrix<double> AVecMat(a.size(), 1);
-  AVecMat.set_column(0,A);
-
-  vnl_matrix<double> aVecMat(a.size(), 1);
-  aVecMat.set_column(0,a);
-
-  vnl_matrix<double> bVecMat(a.size(), 1);
-  bVecMat.set_column(0,b);
-
-  A_ = AM - (AVecMat * OnesVecMat);
-  a_ = aM - (aVecMat * OnesVecMat);
-  b_ = bM - (bVecMat * OnesVecMat);
-
-  for(int i = 0 ; i < a.size(); i++)
-    for(int j = 0 ; j < 15; j++)
-    {
-      A_(i,j) *= A_(i,j);
-      a_(i,j) *= a_(i,j);
-      b_(i,j) *= b_(i,j);
+  for (int i=0; i<AM.rows(); i++){
+    for (int j=0; j<AM.cols(); j++){
+      if (delta0 < AM(i,j) && 2*(AM(i,j)+delta0*s15)<aM(i,j)-bM(i,j) && bM(i,j)>delta0 && aM(i,j)<1-delta0)
+        R2(i,j) = (AM(i,j)-A(i))*(AM(i,j)-A(i))+ (aM(i,j)-a(i))*(aM(i,j)-a(i))+(bM(i,j)-b(i))*(bM(i,j)-b(i));
+      else
+        R2(i,j) = 1e20;
     }
-
-
-  R2 = A_ + a_ + b_;
-
-  for(int i = 0 ; i < a.size(); i ++)
-  {
-    for(int j = 0 ; j < 15; j ++)
-    {
-      if(B(i,j) == 0) R2(i,j) = 1e20;
-    }
-  }
-
-  std::vector<unsigned int> indicies(a.size());
-
-  // suche den spalten-index der zu der kleinsten Zahl einer Zeile korrespondiert
-  for(int i = 0 ; i < a.size(); i++)
-  {
     unsigned int index = 0;
     double minvalue = 999;
     for(int j = 0 ; j < 15 ; j++)
@@ -346,15 +301,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
         index = j;
       }
     }
-    indicies[i] = index;
+    I[i] = index;
   }
 
-  for(int i = 0 ; i < a.size(); i++)
-  {
-    A[i] = AM(i,indicies[i]);
-    a[i] = aM(i,indicies[i]);
-    b[i] = bM(i,indicies[i]);
+  for (int i=0; i < A.size(); i++){
+    A(i) = AM(i,(int)I[i]);
+    a(i) = aM(i,(int)I[i]);
+    b(i) = bM(i,(int)I[i]);
   }
+
 }
 
 
@@ -707,12 +662,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E->put(i,2, static_cast<double>(b[Shell3Indiecies[i]]));
       }
 
+
+      // IF GRADIENT DIRECTIONS AND NUMBERS OF DIRECTIONS ARE EQUAL EACH OTHER, THAN DO NOT INTERPOLATE
+
       //Approximated-Signal by SH fit - using the specific shell directions and values
       // approximated Signal : S = SHBasis * Coeffs
       // with Coeffs : C = (B_T * B + lambda * L) ^ -1 * B_T * OS
       // OS := Original-Signal
-      E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
-      E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
+      //E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
+      //E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
 
       // Normalize the Signal: Si/S0
       S_S0Normalization(*E,bzeroImageIterator.Get());

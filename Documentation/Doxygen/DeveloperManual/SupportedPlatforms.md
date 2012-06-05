@@ -41,8 +41,8 @@ as well as in the current master branch.
 
 | Platform                           | Compilers
 | ---------------------------------- | -----------------------------
-| Ubuntu Linux 11.10 (64-bit)        | As provided by Ubuntu
-| Microsoft Windows 7 (32-bit)       | MSVC 2010
+| Ubuntu Linux 11.04 (32-bit)        | As provided by Ubuntu
+| Microsoft Windows XP (32-bit)      | MSVC 2008 SP1
 | Apple Mac OS X 10.6 "Snow Leopard" | LLVM-GCC as provided by Apple
 
 

@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wnats to use ServiceTracking instead of Filtering
+class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -61,6 +61,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
     *       list of devices accordingly.
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
+
+    
 
   signals:
 
@@ -90,16 +92,36 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
     Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
-    \brief Constructs a ListItem from the given device for display in the list of active devices.
+    * \brief  Internal Structure used to link devices to their QListWidget Items
+    */
+    struct DeviceListLink {   
+      mitk::USDevice::Pointer device;
+      QListWidgetItem* item;
+    };
+
+    /*
+    * \brief  Contains a list of currently active devices and their entires in the list. This is wiped with every ServiceRegistryEvent.
+    */
+    std::vector<DeviceListLink> m_ListContent;
+
+    /*
+    * \brief Constructs a ListItem from the given device for display in the list of active devices.
     */
     QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
+
+    /*
+    * \brief Returns the device corresponding to the given ListEntry or null if none was found (which really shouldnt happen).
+    */
+    mitk::USDevice::Pointer GetDeviceForListItem(QListWidgetItem* item);
 
     //mitk::ServiceTracker<mitk::USDevice, mitk::USDevice::Pointer> ConstructServiceTracker();
  
     /*
-    \  Returns a List of US Devices that are currently connected
+    * \brief Returns a List of US Devices that are currently connected by querying the service registry.
     */
     std::vector<mitk::USDevice::Pointer> GetAllRegisteredDevices();
+
+
     
 
   private:

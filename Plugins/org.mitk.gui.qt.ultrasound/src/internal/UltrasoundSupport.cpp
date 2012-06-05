@@ -44,17 +44,27 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
   connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
+
+  // Show & Hide
+  m_Controls.m_NewVideoDeviceWidget->setVisible(false);
 }
 
 
 void UltrasoundSupport::OnClickedAddNewDevice(){
   MITK_INFO << "USSUPPORT: OnClickedAddNewDevice()"; 
-
+  m_Controls.m_NewVideoDeviceWidget->setVisible(true);
+  m_Controls.m_DeviceManagerWidget->setVisible(false);
+  m_Controls.m_AddDevice->setVisible(false);
+  m_Controls.m_Headline->setText("Add New Device:");
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
   MITK_INFO << "USSUPPORT: OnNewDeviceWidgetDone()";
+  m_Controls.m_NewVideoDeviceWidget->setVisible(false);
+  m_Controls.m_DeviceManagerWidget->setVisible(true);
+  m_Controls.m_AddDevice->setVisible(true);
+  m_Controls.m_Headline->setText("Connected Devices:");
 }
 
 

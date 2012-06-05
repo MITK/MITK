@@ -80,6 +80,16 @@ namespace mitk {
       bool Disconnect();
 
       /**
+      * \brief Activates this device. After the activation process, the device will start to produce images. This Method will fail, if the device is not connected.
+      */
+      bool Activate();
+
+      /**
+      * \brief Deactivates this device. After the deactivation process, the device will no longer produce images, but still be connected.
+      */
+      void Deactivate();
+
+      /**
       * \brief Add a probe to the device without connecting to it.
       *  This should usually be done before connecting to the probe.
       */
@@ -149,6 +159,22 @@ namespace mitk {
       //########### GETTER & SETTER ##################//
 
       /**
+      * \brief Returns the Class of the Device. This Method must be reimplemented by every Inheriting Class.
+      */
+      std::string GetDeviceClass();
+
+      /**
+      * \brief True, if the device is currently generating image data, false otherwise.
+      */
+      bool GetIsActive();
+
+      /**
+      * \brief True, if the device is currently ready to start transmitting image data or is already
+      * transmitting image data. A disconnected device cannot be activated.
+      */
+      bool GetIsConnected();
+
+      /**
       * \brief Returns the currently active probe or null, if none is active
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
@@ -160,6 +186,7 @@ namespace mitk {
     protected:
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
+      bool m_IsActive;
 
       /**
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
@@ -173,6 +200,17 @@ namespace mitk {
       */
       virtual bool OnDisconnection();    
 
+      /**
+      * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+      */
+      virtual bool OnActivation();    
+
+
+      /**
+      * \brief Is called during the disactivation process. After a call to this method the device should still be connected, but not producing images anymore.
+      */
+      virtual void OnDeactivation();    
+      
 
       /**
       * \brief This metadata set is privately used to imprint USImages with Metadata later.
@@ -202,6 +240,8 @@ namespace mitk {
       *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
       */
        void GenerateData();
+
+
 
      private:
        

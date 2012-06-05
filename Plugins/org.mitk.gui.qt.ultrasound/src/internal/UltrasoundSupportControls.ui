@@ -27,11 +27,11 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Device Manager</string>
+       <string>Device Management</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="m_Headline">
          <property name="font">
           <font>
            <pointsize>12</pointsize>

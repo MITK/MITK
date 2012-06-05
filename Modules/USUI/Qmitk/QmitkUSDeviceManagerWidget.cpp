@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 //QT headers
-
+#include <QColor>
 
 //mitk headers
 
@@ -86,11 +86,14 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
   MITK_INFO << "Activated Device";
-  GetAllRegisteredDevices();
+  mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
+  device->Activate();
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   MITK_INFO << "Disconnected Device";
+  mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
+  device->Disconnect();
 }
 
 
@@ -99,15 +102,24 @@ void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
 
 void QmitkUSDeviceManagerWidget::OnServiceEvent(const mitk::ServiceEvent event){
   // Empty ListWidget
+  this->m_ListContent.clear();
   m_Controls->m_ConnectedDevices->clear();
+  
 
   
   // get Active Devices
   std::vector<mitk::USDevice::Pointer> devices = this->GetAllRegisteredDevices();
   // Transfer them to the List
-  for(std::vector<mitk::USDevice::Pointer>::iterator it = devices.begin(); it != devices.end(); ++it) {
+  for(std::vector<mitk::USDevice::Pointer>::iterator it = devices.begin(); it != devices.end(); ++it)
+  {
     QListWidgetItem *newItem = ConstructItemFromDevice(it->GetPointer());
-   m_Controls->m_ConnectedDevices->addItem(newItem);
+    //Add new item to QListWidget
+    m_Controls->m_ConnectedDevices->addItem(newItem);
+    // Construct Link and add to internal List for reference
+    QmitkUSDeviceManagerWidget::DeviceListLink link;
+    link.device = it->GetPointer();
+    link.item = newItem;
+    m_ListContent.push_back(link);
   }
 }
 
@@ -117,8 +129,25 @@ void QmitkUSDeviceManagerWidget::OnServiceEvent(const mitk::ServiceEvent event){
 QListWidgetItem* QmitkUSDeviceManagerWidget::ConstructItemFromDevice(mitk::USDevice::Pointer device){
   QListWidgetItem *result = new QListWidgetItem;
   std::string text = device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
+
+  if (device->GetIsActive())
+  {
+    result->foreground().setColor(Qt::blue);
+  }
+
   result->setText(text.c_str());
+
   return result;
+}
+
+
+mitk::USDevice::Pointer QmitkUSDeviceManagerWidget::GetDeviceForListItem(QListWidgetItem* item)
+{
+  for(std::vector<QmitkUSDeviceManagerWidget::DeviceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
+  {
+    if (item == it->item) return it->device;
+  }
+  return 0;
 }
 
 

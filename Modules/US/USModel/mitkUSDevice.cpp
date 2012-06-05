@@ -31,6 +31,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
   m_Metadata->SetDeviceIsVideoOnly(isVideoOnly);
+  m_IsActive = false;
   
   //set number of outputs
   this->SetNumberOfOutputs(1);
@@ -43,6 +44,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata, bool isVideoOnly) : mitk::ImageSource()
 {
   m_Metadata = metadata;
+  m_IsActive = false;
 
   //set number of outputs
   this->SetNumberOfOutputs(1);
@@ -60,6 +62,7 @@ mitk::USDevice::~USDevice()
 
 bool mitk::USDevice::Connect()
 {
+  //TODO Throw Exception is already activated before connection
 
   // Prepare connection, fail if this fails.
   if (! this->OnConnection()) return false;
@@ -69,7 +72,8 @@ bool mitk::USDevice::Connect()
 
   // Define ServiceProps
   ServiceProperties props;
-  props["Manufacturer"] = this->m_Metadata->GetDeviceManufacturer();
+  props["DeviceClass"] = this->GetDeviceClass();
+  props["IsActive"] = false;
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
 }
@@ -77,11 +81,11 @@ bool mitk::USDevice::Connect()
 bool mitk::USDevice::OnConnection()
 {
   return true;
+  // TODO: Make Abstract
 }
 
 bool mitk::USDevice::Disconnect()
 {
-
   // Prepare connection, fail if this fails.
   if (! this->OnDisconnection()) return false;
 
@@ -94,6 +98,42 @@ bool mitk::USDevice::Disconnect()
 bool mitk::USDevice::OnDisconnection()
 {
   return true;
+  // TODO Make Abstract
+}
+
+
+bool mitk::USDevice::Activate()
+{
+  if (! this->GetIsConnected()) return false;
+
+  m_IsActive = OnActivation();
+
+  return m_IsActive;
+}
+
+void mitk::USDevice::Deactivate()
+{
+  m_IsActive= false;
+  OnDeactivation();
+}
+
+
+bool mitk::USDevice::OnActivation()
+{
+  return true;
+  // TODO Make Abstract
+}
+
+
+void mitk::USDevice::OnDeactivation()
+{
+  // TODO Make Abstract
+}
+
+
+std::string mitk::USDevice::GetDeviceClass()
+{
+  return "org.mitk.Ultrasound.GenericDevice";
 }
 
 
@@ -183,6 +223,19 @@ itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /
 }
 
  //########### GETTER & SETTER ##################//
+
+bool mitk::USDevice::GetIsActive()
+{
+  return m_IsActive;
+}
+
+
+bool mitk::USDevice::GetIsConnected()
+{
+  // a device is connected if it is registered with the service
+  return (m_ServiceRegistration != 0);
+}
+
 
 std::string mitk::USDevice::GetDeviceManufacturer(){
   return this->m_Metadata->GetDeviceManufacturer();

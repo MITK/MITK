@@ -140,14 +140,13 @@ protected:
     void ComputeReconstructionMatrix();
     bool CheckDuplicateDiffusionGradients();
     bool CheckForDifferingShellDirections();
-    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
     //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
     bool CheckHemisphericalArrangementOfGradientDirections();
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
-    vnl_vector<TOdfPixelType> AnalyticalThreeShellParameterEstimation(const IndiciesVector * shell1, const IndiciesVector * shell2, const IndiciesVector * shell3, vnl_vector<TOdfPixelType> b);
     void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
@@ -163,6 +162,8 @@ private:
     };
 
 
+    // Interpolation
+    bool m_Interpolation_Flag;
 
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;

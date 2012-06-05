@@ -144,7 +144,11 @@ set(BLUEBERRY_DEBUG_POSTFIX d)
 
 # Testing options
 
-option(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BUILD_TESTING})
+if(DEFINED BLUEBERRY_BUILD_TESTING)
+  option(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BLUEBERRY_BUILD_TESTING})
+else()
+  option(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BUILD_TESTING})
+endif()
 
 if(WIN32)
   set(_gui_testing_default "ON")

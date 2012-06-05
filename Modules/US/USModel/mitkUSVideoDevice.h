@@ -37,10 +37,22 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USVideoDevice, mitk::USDevice);
-      // To open a devcie (DeviceID, Manufacturer, Model)
+      // To open a device (DeviceID, Manufacturer, Model)
       mitkNewMacro3Param(Self, int, std::string, std::string);
       // To open A VideoFile (Path, Manufacturer, Model)
       mitkNewMacro3Param(Self, std::string, std::string, std::string);
+      // To open a device (DeviceID, Metadata)
+      mitkNewMacro2Param(Self, int, mitk::USImageMetadata::Pointer);
+      // To open A VideoFile (Path, Metadata)
+      mitkNewMacro2Param(Self, std::string, mitk::USImageMetadata::Pointer);
+
+
+      /**
+      * \brief Returns the qualified name of this class. Be sure to override this when inheriting from VideoDevice!
+      */
+      virtual std::string GetClassName(){
+        return "org.mitk.modules.us.USVideoDevice";
+      }
 
       void GenerateData();
 
@@ -55,6 +67,17 @@ namespace mitk {
       * \brief Creates a new device that will deliver USImages taken from a video file.
       */
       USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model);
+      /**
+      * \brief Creates a new device that will deliver USImages taken from a video device.
+      *  under windows, try -1 for device number, which will grab the first available one
+      * (Open CV functionality)
+      */
+      USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata::Pointer metadata);
+      /**
+      * \brief Creates a new device that will deliver USImages taken from a video file.
+      */
+      USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata);
+
       virtual ~USVideoDevice();
 
       mitk::USImageVideoSource::Pointer m_Source;

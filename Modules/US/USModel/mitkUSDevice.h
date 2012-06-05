@@ -60,6 +60,13 @@ namespace mitk {
       */
       mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
 
+      /**
+      * \brief Returns the qualified Name of this class. Be sure to override this when inheriting from Device!
+      */
+      virtual std::string GetClassName(){
+        return "org.mitk.modules.us.USDevice";
+      }
+
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.

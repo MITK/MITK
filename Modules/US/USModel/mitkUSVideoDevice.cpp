@@ -34,6 +34,22 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufa
   m_Source->SetVideoFileInput(videoFilePath);
 }
 
+mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata, true)
+{
+  this->SetNumberOfInputs(1);
+  this->SetNumberOfOutputs(1);
+  m_Source = mitk::USImageVideoSource::New();
+  m_Source->SetCameraInput(videoDeviceNumber);
+}
+
+mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata, true)
+{
+  this->SetNumberOfInputs(1);
+  this->SetNumberOfOutputs(1);
+  m_Source = mitk::USImageVideoSource::New();
+  m_Source->SetVideoFileInput(videoFilePath);
+}
+
 mitk::USVideoDevice::~USVideoDevice()
 {
   

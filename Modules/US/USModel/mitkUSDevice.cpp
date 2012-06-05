@@ -74,6 +74,7 @@ bool mitk::USDevice::Connect()
   ServiceProperties props;
   props["DeviceClass"] = this->GetDeviceClass();
   props["IsActive"] = false;
+  props["Class"] = this->GetClassName();
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
 }

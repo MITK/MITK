@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
-#include "mitkUSDevice.h"
+#include "mitkUSVideoDevice.h"
 #include "mitkUSImageMetadata.h"
 
 //QT headers
@@ -108,7 +108,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     *   \brief This is the device to edit. It is either the device transmitted in the "EditDevice" signal, or a new one
     *  if the "CreateNewDevice slot was called.
     */
-    mitk::USDevice::Pointer m_TargetDevice;
+    mitk::USVideoDevice::Pointer m_TargetDevice;
      
 
 };

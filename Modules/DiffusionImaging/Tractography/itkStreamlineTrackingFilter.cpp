@@ -85,6 +85,7 @@ TPDPixelType>
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
+    std::cout << "starting streamline tracking" << std::endl;
 }
 
 template< class TTensorPixelType,
@@ -124,8 +125,10 @@ TPDPixelType>
         {
             unsigned long counter = 0;
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+            std::vector< vtkIdType > pointISs;
             typename InputImageType::IndexType index = it.GetIndex();
             itk::ContinuousIndex<double, 3> pos;
+            itk::ContinuousIndex<double, 3> start;
 
             if (m_SeedsPerVoxel>1)
             {
@@ -139,9 +142,11 @@ TPDPixelType>
                 pos[1] = index[1];
                 pos[2] = index[2];
             }
+            start = pos;
 
             int step = 0;
             vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
+            // do forward tracking
             while (step < m_MaxLength)
             {
                 ++step;
@@ -191,6 +196,76 @@ TPDPixelType>
                     inputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
 
                     vtkIdType id = Points->InsertNextPoint(worldPos.GetDataPointer());
+                    pointISs.push_back(id);
+                    counter++;
+
+                    pos[0] += dir[0];
+                    pos[1] += dir[1];
+                    pos[2] += dir[2];
+                }
+            }
+
+            // insert reverse IDs
+            while (!pointISs.empty())
+            {
+                container->GetPointIds()->InsertNextId(pointISs.back());
+                pointISs.pop_back();
+            }
+
+            // do backward tracking
+            index = it.GetIndex();
+            pos = start;
+            dirOld.fill(0.0);
+            while (step < m_MaxLength)
+            {
+                ++step;
+
+                index[0] = round(pos[0]);
+                index[1] = round(pos[1]);
+                index[2] = round(pos[2]);
+
+                if (index[0] < 0 || index[0]>=m_ImageSize[0])
+                    break;
+                if (index[1] < 0 || index[1]>=m_ImageSize[1])
+                    break;
+                if (index[2] < 0 || index[2]>=m_ImageSize[2])
+                    break;
+
+                typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
+                if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
+                {
+                    tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+
+                    int eIndex = 2;
+                    if( (eigenvalues[0] >= eigenvalues[1]) && (eigenvalues[0] >= eigenvalues[2]) )
+                        eIndex = 0;
+                    else if(eigenvalues[1] >= eigenvalues[2])
+                        eIndex = 1;
+
+                    vnl_vector_fixed<double,3> dir;
+                    dir[0] = eigenvectors(eIndex, 0);
+                    dir[1] = eigenvectors(eIndex, 1);
+                    dir[2] = eigenvectors(eIndex, 2);
+                    dir.normalize();
+                    dir *= -1; // reverse direction
+
+                    if (!dirOld.is_zero())
+                    {
+                        float angle = dot_product(dirOld, dir);
+                        if (angle<0)
+                            dir *= -1;
+                        angle = fabs(dot_product(dirOld, dir));
+                        if (angle<0.7)
+                            break;
+                    }
+                    dirOld = dir;
+
+                    dir *= m_StepSize;
+
+                    itk::Point<double> worldPos;
+                    inputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+
+                    vtkIdType id = Points->InsertNextPoint(worldPos.GetDataPointer());
                     container->GetPointIds()->InsertNextId(id);
                     counter++;
 
@@ -199,6 +274,7 @@ TPDPixelType>
                     pos[2] += dir[2];
                 }
             }
+
             if (counter>0)
                 Cells->InsertNextCell(container);
         }

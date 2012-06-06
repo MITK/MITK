@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkBinaryThresholdTool.h>
 #include <mitkRenderingManager.h>
-#include <QmitkToolGUI.h>
+#include <QmitkBinaryThresholdToolGUI.h>
 
 // Qt
 #include <QDialog>
@@ -47,35 +47,33 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
   if (binaryThresholdTool != NULL)
   {
-    QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer()); 
+    QmitkBinaryThresholdToolGUI *gui = dynamic_cast<QmitkBinaryThresholdToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer());
     if (gui != NULL)
     {
-      QDialog ThresholdingDialog(QApplication::activeWindow());
+      QDialog thresholdingDialog(QApplication::activeWindow(), Qt::Window | Qt::WindowStaysOnTopHint);
 
       QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
-      connect(buttonBox, SIGNAL(rejected()), &ThresholdingDialog, SLOT(reject()));
-      connect(gui, SIGNAL(thresholdConfirmed()), &ThresholdingDialog, SLOT(reject()));
+      connect(buttonBox, SIGNAL(rejected()), &thresholdingDialog, SLOT(reject()));
+      connect(gui, SIGNAL(thresholdAccepted()), &thresholdingDialog, SLOT(reject()));
 
       QVBoxLayout *layout = new QVBoxLayout;
-      layout->setContentsMargins(0, 0, 0, 0);
+      layout->setContentsMargins(3, 3, 3, 3);
 
       gui->SetTool(binaryThresholdTool);
-      gui->setParent(&ThresholdingDialog);
+      gui->setParent(&thresholdingDialog);
 
       layout->addWidget(gui);
-
-      ThresholdingDialog.setLayout(layout);
-      ThresholdingDialog.setFixedHeight(135);
-      ThresholdingDialog.setMinimumWidth(350);
-
       layout->addWidget(buttonBox);
+
+      thresholdingDialog.setLayout(layout);
+      thresholdingDialog.setMinimumWidth(350);
 
       m_SelectedNode = selectedNodes[0];
       m_ThresholdingToolManager->SetReferenceData(selectedNodes[0]);
       m_ThresholdingToolManager->ActivateTool(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
 
       m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
-      ThresholdingDialog.exec();
+      thresholdingDialog.exec();
       m_ThresholdingToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
 
       m_ThresholdingToolManager->SetReferenceData(NULL);

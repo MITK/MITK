@@ -26,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkToolManager.h>
 
-class QDialog;
-class QmitkStdMultiWidget;
 
 class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::IContextMenuAction
 {

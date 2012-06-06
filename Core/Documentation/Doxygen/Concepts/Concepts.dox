@@ -4,10 +4,10 @@
 The following items describe some issues about MITK on a more abstract level. 
 
 -# \subpage OverviewPage
--# Coding Concepts
- -# \subpage CodingGeneral
- -# \subpage CodingStyle
- -# \subpage MITKMacros
+-# \subpage CodingPage "Coding Concepts"
+ -# \ref CodingPageGeneral
+ -# \ref CodingPageStyle
+ -# \ref CodingPageMITKMacros
  -# \subpage MicroServices_Overview
 -# Data Concepts
  -# \subpage MitkImagePage
@@ -22,8 +22,8 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage GeneralTests
  -# \subpage RenderingTests
 -# \subpage ModularizationPage "Modularization Concept"
- -# \subpage ModularizationPageOverview
- -# \subpage ModularizationPageHowTo
+ -# \ref ModularizationPageOverview
+ -# \ref ModularizationPageHowTo
 
 If you want to start using MITK, you also want to see the chapter \ref Development.
 */

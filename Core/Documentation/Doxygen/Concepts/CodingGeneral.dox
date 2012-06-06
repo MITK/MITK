@@ -1,17 +1,54 @@
 /**
-\page CodingGeneral General Coding
+\page CodingPage Coding
 
-Conceptual MITK is mainly oriented on ITK (<a href="http://www.itk.org">The Insight Toolkit</a>). Thus, most of the ITK coding concepts can be transfered to MITK. It is worth mentioning that there is a clearly written ITK Software Guide available for download on the ITK homepage. One basic concept, which MITK inherits from ITK, is the concept of smart pointers. This concepts makes memory management much easier because you don't have to call "delete" on your pointers in contrast to conventional C++. You will see these smart pointers all over MITK, an example is shown next.
+\section CodingPageGeneral General Information
+Conceptually MITK is mainly geared to ITK (<a href="http://www.itk.org">The Insight Toolkit</a>). 
+Thus, most of the ITK coding concepts can be transferred to MITK. 
+
+The ITK coding concepts can be found in the free ITK software guide, downloadable at ITKs <a href="http://itk.org/ITK/resources/software.html">homepage</a>. 
+
+The main ITK concepts which one should look into before using MITK are:
+<ul>
+ <li> SmartPointers
+ <li> Pipelining and Filters
+</ul>
+
+\section CodingPageStyle Coding Style
+MITK provides coding style guidelines. When implementing code which should be added to the project, 
+these guidelines should be followed in order to keep an unified coding style all over MITK. The style 
+is oriented on normal c++ coding style combined with some extension of used libraries, e.g. the use of 
+itk smart pointers. The MITK style guide is provided on the following page: \ref StyleGuideAndNotesPage. 
+If you are new to MITK coding style please also consider that MITK is using different pre defined macros, 
+which might look confusing for people who are new to MITK. An overview on these macros is given in 
+section \ref CodingPageMITKMacros.
+
+\section CodingPageMITKMacros Macros in MITK
+MITK uses different macros to simplify implementation, but this macros might look confusing at first. Some 
+of these macros are used from ITK, others are defined in MITK itself. The most important macros are defined 
+in the file mitkCommon.h, but there are some other headers which also define macros, e.g. mitkTestingMacros.h 
+and mitkExceptionMacros.h.
+
+In the following the most important macros are shown for overview, more details are available in the corresponding header files.
 \code
-mitk::Image::Pointer myImage; //declaration
-myImage = mitk::Image::New(); //instantiation
-myImage->GetData(); //call of a method
+//These macros come from ITK:
 
-//in conventional C++ the same would look like this:
-//(Attention: this is NO valid code in MITK!)
-mitk::Image* myImage; //declaration
-myImage = new mitk::Image(); //instantiation
-myImage->GetData(); //call of a method
-delete myImage; //delete object, you don't need this in case of ITK smart pointers
+itkNewMacro(Self); //this macro creates the constructor for smart pointers
+                   //it calls the normal c++ constructor of the class
+                   //the normal constructor should be declared protected
+                   
+itkGetMacro(Name,Class);      //these macros create getters and setters
+itkSetMacro(Name,Class);      //automatically, but you need the corresponding
+itkGetConstMacro(Name,Class); //member variable m_Name in your class
+itkSetConstMacro(Name,Class);
+
+//The following macros are defined in MITK itself:
+
+mitkClassMacro(Class,Superclass); //macro is needed in every header of a MITK class
+
+mitkNewMacro1Param(Class,ParamType); //like the ITK new macro, but with one parameter
+                                     //you need a constructor with one parameter as well
+                                     //the same macro exists for 2,3 and 4 parameters
+
+mitkExceptionClassMacro(Class,Superclass); //special macro for MITK exception classes
 \endcode
 */

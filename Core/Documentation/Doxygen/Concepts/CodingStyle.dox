@@ -1,4 +1,0 @@
-/**
-\page CodingStyle Coding Style
-MITK provides coding style guidelines. When implementing code which should be added to the project, these guidelines should be followed in order to keep an unified coding style all over MITK. The style is oriented on normal c++ coding style combined with some extension of used libraries, e.g. the use of itk smart pointers. The MITK style guide is provided on the following page: \ref StyleGuideAndNotesPage. If you are new to MITK coding style please also consider that MITK is using different pre defined macros, which might look confusing for people who are new to MITK. An overview on these macros is given on page \ref MITKMacros.
-*/

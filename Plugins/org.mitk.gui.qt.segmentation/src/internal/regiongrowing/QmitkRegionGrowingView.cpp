@@ -37,6 +37,12 @@ QmitkRegionGrowingView::~QmitkRegionGrowingView()
 
 void QmitkRegionGrowingView::Deactivated()
 {
+  m_Controls->m_AdaptiveRGWidget->Deactivated();
+}
+
+void QmitkRegionGrowingView::Activated()
+{
+  m_Controls->m_AdaptiveRGWidget->Activated();
 }
 
 void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )

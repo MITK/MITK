@@ -128,6 +128,8 @@ private:
   mitk::ScalarType m_UPPERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_SeedPointValueMean;
 
+  void RemoveHelperNodes();
+
   int m_DetectedLeakagePoint;
 
   bool m_CurrentRGDirectionIsUpwards; // defines fixed threshold (true = LOWERTHRESHOLD fixed, false = UPPERTHRESHOLD fixed)

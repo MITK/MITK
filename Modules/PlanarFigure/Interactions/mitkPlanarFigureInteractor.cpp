@@ -618,16 +618,8 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
       }
   
-      // if this was a right mouse button click, invoke the event
-      if ( theEvent->GetButton() == 2 )
-      {
-        planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
-        ok = true;
-      }
-      else
-      {
-        ok = false;  
-      }
+      planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
+      ok = true;
 
       // we HAVE TO proceed with 'EIDNO' here to ensure correct states
       // and convenient application behaviour

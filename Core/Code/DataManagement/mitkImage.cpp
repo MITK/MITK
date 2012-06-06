@@ -191,25 +191,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   Index3D itkIndex;
   this->GetGeometry()->WorldToIndex(position, itkIndex);
 
-  const unsigned int* imageDims = this->m_ImageDescriptor->GetDimensions();
-  const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
-
-  //if ( (itkIndex[0]>=0 && itkIndex[1] >=0 && itkIndex[2]>=0 && timestep>=0)
-  //     &&
-  // lines above taken from comparison since always true due to unsigned type
-  // bug-11978 : we still need to catch index with negative values
-  if ( itkIndex[0] < 0 || itkIndex[1] < 0 || itkIndex[2] < 0 )
-  {
-    MITK_WARN << "Given position points transforms to a negative index value ( "<< itkIndex << ") returning 0." ;
-  }
-  if (((unsigned int)itkIndex[0] < imageDims[0] &&
-        (unsigned int)itkIndex[1] < imageDims[1] &&
-          (imageDims[2] == 0) ) || ((unsigned int)itkIndex[2] < imageDims[2])) // in case a 2D Image passed in, the third dimension could be set to 0 causing the if() to fail
-  {
-    const unsigned int offset = itkIndex[0] + itkIndex[1]*imageDims[0] + itkIndex[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
-
-    mitkPixelTypeMultiplex3( AccessPixel, ptype, this->GetData(), offset, value );
-  }
+  value = this->GetPixelValueByIndex( itkIndex, timestep);
 
   return value;
 }

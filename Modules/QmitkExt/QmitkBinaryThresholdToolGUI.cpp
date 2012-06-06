@@ -143,10 +143,12 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 
     if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
     {
+      this->thresholdAccepted();
       m_BinaryThresholdTool->AcceptCurrentThresholdValue( organName, color );
     }
     else
     {
+      this->thresholdCanceled();
       m_BinaryThresholdTool->CancelThresholding();
     }
   }

@@ -54,6 +54,7 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
       QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
       connect(buttonBox, SIGNAL(rejected()), &ThresholdingDialog, SLOT(reject()));
+      connect(gui, SIGNAL(thresholdConfirmed()), &ThresholdingDialog, SLOT(reject()));
 
       QVBoxLayout *layout = new QVBoxLayout;
       layout->setContentsMargins(0, 0, 0, 0);

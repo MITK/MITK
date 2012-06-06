@@ -83,7 +83,14 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
 
 
   // Create Device
-  mitk::USVideoDevice::Pointer newDevice = mitk::USVideoDevice::New("C://Builds//MITK-superbuild//CMakeExternals//Source//MITK-Data//CommonTestData//bunny_320x240.avi", metadata);
+  mitk::USVideoDevice::Pointer newDevice;
+  if (m_Controls->m_RadioDeviceSource->isChecked()){
+    int deviceID = m_Controls->m_DeviceSelector->value();
+    newDevice = mitk::USVideoDevice::New(deviceID, metadata);
+  } else {
+    std::string filepath = m_Controls->m_FilePathSelector->text().toStdString();
+    newDevice = mitk::USVideoDevice::New(filepath, metadata);
+  }
 
   newDevice->Connect();
 
@@ -112,6 +119,7 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
   if (device->GetClassName().compare("org.mitk.modules.us.USVideoDevice") != 0){
+    // TODO Alert if bad path
     mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetClassName();
   }
   MITK_INFO << "NewDeviceWidget: EditDevice()";

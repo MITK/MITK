@@ -6,7 +6,7 @@ Available Sections:
 -# \ref MitkImagePage_Introduction     "Introduction to MITK Image"
   -# \ref MitkImagePage_SlicedData      "SlicedData and Geometry"
   -# \ref MitkImagePage_ImageData       "ImageData"
-  -# \ref MitkImagePage_SlicedData      "Image Properties"
+  -# \ref MitkImagePage_Properties      "Image Properties"
 -# \ref MitkImagePage_WorkingWith      "Working with MITK Image"
   -# \ref MitkImagePage_Cloning         "Cloning a MITK Image"
   -# \ref MitkImagePage_Inheriting      "Inheriting from MITK Image"
@@ -19,20 +19,21 @@ The MITK Image obviously is a very central class to MITK and one of those you ar
 
 \image html mitkimagehierarchy.png
 
-Image is a direct descendant of SlicedData which itself inherits from Basedata. In MITK, Basedata ist the common DataType from which all other Datatypes stem. SlicedData specifies this class to contain image slices, a typical example being a CT scan, and introduces properties and methods necessary to give the data a well defined geometry. Image further specializes the concept to allow for multiple channels, volumes and slices as well as additional information like image properties.
+Image is a direct descendant of SlicedData which itself inherits from Basedata. In MITK, Basedata is the common DataType from which all other Datatypes stem. SlicedData specifies this class to contain image slices, a typical example being a CT scan, and introduces properties and methods necessary to give the data a well defined geometry. Image further specializes the concept to allow for multiple channels, volumes and slices as well as additional information like image properties.
 
-For the sake of this introduction, we will have a look at three different aspects, being:
+For the sake of this introduction, we will have a look at three different aspects:
 
 1. SlicedData and Geometry
 2. ImageData
 3. Image Properties
 
 \subsection MitkImagePage_SlicedData SlicedData and Geometry
-The mother class of Image introduces a fundamental aspect: Image geometry. It defines the image's spatial context: Dimension and orientation. An more in depth introduction is given here: \ref GeometryOverviewPage
+The mother class of Image introduces a fundamental aspect: Image geometry. It defines the image's spatial context: 
+Dimension and orientation. A more in depth introduction is given here: \ref GeometryOverviewPage
 
 \subsection MitkImagePage_ImageData ImageData
 
-Image itself stores the actual image data. It is important to discern 4 different concepts:
+Objects of the class Image store the actual image data. It is important to discern four different concepts:
 
 1. Channels, which can be of a specific data type e.g. an intensity image or a vector field. Each channel consists of one or more...
 2. Volumes, which contain data of a certain type. A volume is represented by ImageDataItems that define volume properties. Inside of a channel, each volume must be of the same type (float, int, etc.). Each volume consists of several...
@@ -42,7 +43,7 @@ There is also the pointer m_CompleteData that references all of the data (i.e. a
 
 \image html mitkimagememory.png
 
-\subsection MitkImagePage_SlicedData Image Properties
+\subsection MitkImagePage_Properties Image Properties
 
 Lastly, we'll talk about properties. Properties are a set of additional information mainly used to save DICOM information. The functionality is introduced very early in the image's lineage, in BaseData. The system works quite similar to a hashmap by using property keys and properties. For further reference, see BaseData::GetProperty() or, for a simple example implementation,  USImage::GetMetadata().
 
@@ -60,7 +61,10 @@ new->SetPropertyList(old->GetPropertyList()) // new now additionally contains th
 
 
 \subsection MitkImagePage_Inheriting      Inheriting from MITK Image
-In general, one should try to avoid inheriting from mitk Image. The simple reason for this is that your derived class will not cleanly work together with the Filters already implemented (See the chapter on Pipelining for Details). If however, mitk Image does not offer the functionality you require it is very well possible. See the documentation for various examples of classes that inherit from image.
+In general, one should try to avoid inheriting from mitk Image. The simple reason for this is that your derived class will not 
+cleanly work together with the Filters already implemented (See the chapter on Pipelining for Details). If however, mitk Image 
+does not offer the functionality you require it is possible to do so. See the documentation for various examples of classes 
+that inherit from image.
 
 
 

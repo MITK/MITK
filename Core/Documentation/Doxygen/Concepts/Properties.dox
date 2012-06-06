@@ -5,15 +5,22 @@
 
 Properties belong to a datanode and contain information relevant to the handling of the node by MITK. They provide a place to store additional information which is not part of the actual data, and as such have no reason to be contained within the data/file itself, but might be needed for such things as rendering (e.g. transfer functions) or interaction (e.g. the name of the node).
 
-Propteries can be read an set:
+Propteries can be read and set:
 
 \code
-mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color"));
+//1: Read a property
+mitk::Property::Pointer readProperty = node->GetProperty("color"); //read the property "color" from the data node
+mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(readProperty); //cast this property to the subtype ColorProperty
 
-node->SetProperty( "IsTensorVolume", mitk::BoolProperty::New( true ) );
+//2: Write a property
+mitk::BoolProperty::Pointer newProperty = mitk::BoolProperty::New( true ); //create a new property, in this case a boolean property
+node->SetProperty( "IsTensorVolume", newProperty ); //add this property to node with the key "IsTensorVolume"
 \endcode
 
 \section ListOfIndependentProperty A List Of Module Independent Properties
+
+This section lists most of the known properties in MITK according to where they are used. Not every node needs each 
+(or even close to) of these properties.
 
 \subsection FileManagement File Management
 <ul>
@@ -34,7 +41,7 @@ GetColor( rgb, BaseRenderer );
 (The BaseRenderer is usually known inside a mapper).
 
 \warning
-This property will not effect images if you set the property "use color" 
+This property will not affect images if you set the property "use color" 
 to false. In that case a user-defined lookuptable will be used.
 
   <li> in plane resample extent by geometry - Toggles:

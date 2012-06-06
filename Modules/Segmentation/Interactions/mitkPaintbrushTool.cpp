@@ -290,7 +290,6 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
     const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (!positionEvent) return false;
     this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
-//  FeedbackContourTool::SetFeedbackContourVisible(false);
 
   return true;
 }
@@ -357,6 +356,9 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
             m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
 
             m_WorkingNode->SetData(m_WorkingSlice);
+
+            //So that the paintbrush contour vanished in the previous render window
+            RenderingManager::GetInstance()->RequestUpdateAll();
         }
 
     }

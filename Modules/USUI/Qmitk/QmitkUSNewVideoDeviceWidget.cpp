@@ -58,7 +58,12 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
   {
     connect( m_Controls->m_BtnDone,   SIGNAL(clicked()), this, SLOT(OnClickedDone()) );
     connect( m_Controls->m_BtnCancel, SIGNAL(clicked()), this, SLOT(OnClickedCancel()) );
+    connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
+    connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
+
   }
+  // Hide & show stuff
+  m_Controls->m_FilePathSelector->setVisible(false);
 }
 
 
@@ -91,6 +96,11 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
    MITK_INFO << "NewDeviceWidget: OnClickedCancel()";
   emit Finished();
 
+}
+
+void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
+  m_Controls->m_FilePathSelector->setVisible(m_Controls->m_RadioFileSource->isChecked());
+  m_Controls->m_DeviceSelector->setVisible(m_Controls->m_RadioDeviceSource->isChecked());
 }
 
 

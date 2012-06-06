@@ -79,6 +79,12 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     */
     void OnClickedCancel();   
 
+    /*
+    \brief Called, when the Use selects one of the Radiobuttons
+    */
+    void OnDeviceTypeSelection();   
+
+
     
 
 

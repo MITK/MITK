@@ -31,7 +31,7 @@ In the following the most important macros are shown for overview, more details 
 \code
 //These macros come from ITK:
 
-itkNewMacro(Self); //this macro creates the constructor for smart pointers
+itkNewMacro(Class);//this macro creates the constructor for smart pointers
                    //it calls the default c++ constructor of the class
                    //the default constructor should be declared protected
                    

@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QDialogButtonBox>
 
 using namespace berry;
 using namespace mitk;
 using namespace std;
 
 QmitkThresholdAction::QmitkThresholdAction()
-  : m_ThresholdingDialog(NULL)
 { 
 }
 
@@ -43,58 +43,59 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   m_ThresholdingToolManager = ToolManager::New(m_DataStorage);
 
   m_ThresholdingToolManager->RegisterClient();
-  m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
-
-  m_ThresholdingDialog = new QDialog(QApplication::activeWindow());
-  connect(m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)));
-
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setContentsMargins(0, 0, 0, 0);
 
   Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
-  
   if (binaryThresholdTool != NULL)
   {
-    QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer());
-    
+    QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer()); 
     if (gui != NULL)
     {
+      QDialog ThresholdingDialog(QApplication::activeWindow());
+
+      QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+      connect(buttonBox, SIGNAL(rejected()), &ThresholdingDialog, SLOT(reject()));
+
+      QVBoxLayout *layout = new QVBoxLayout;
+      layout->setContentsMargins(0, 0, 0, 0);
+
       gui->SetTool(binaryThresholdTool);
-      gui->setParent(m_ThresholdingDialog);
+      gui->setParent(&ThresholdingDialog);
 
       layout->addWidget(gui);
 
-      m_ThresholdingDialog->setLayout(layout);
-      m_ThresholdingDialog->setFixedSize(300, 80);
+      ThresholdingDialog.setLayout(layout);
+      ThresholdingDialog.setFixedHeight(135);
+      ThresholdingDialog.setMinimumWidth(350);
 
-      m_ThresholdingDialog->open();
+      layout->addWidget(buttonBox);
+
+      m_SelectedNode = selectedNodes[0];
+      m_ThresholdingToolManager->SetReferenceData(selectedNodes[0]);
+      m_ThresholdingToolManager->ActivateTool(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
+
+      m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
+      ThresholdingDialog.exec();
+      m_ThresholdingToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
+
+      m_ThresholdingToolManager->SetReferenceData(NULL);
+      m_ThresholdingToolManager->ActivateTool(-1);
+      m_SelectedNode = 0;
     }
-
-    m_ThresholdingToolManager->SetReferenceData(selectedNodes[0]);
-    m_ThresholdingToolManager->ActivateTool(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
   }
-}
 
-void QmitkThresholdAction::ThresholdingDone(int result)
-{
-  if (result == QDialog::Rejected)
-    m_ThresholdingToolManager->ActivateTool(-1);
-
-  m_ThresholdingDialog->deleteLater();
-  m_ThresholdingDialog = NULL;
-
-  m_ThresholdingToolManager->SetReferenceData(NULL);
-  m_ThresholdingToolManager->SetWorkingData(NULL);
-
-  RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ThresholdingToolManager->UnregisterClient();
 }
 
 void QmitkThresholdAction::OnThresholdingToolManagerToolModified()
 {
   if (m_ThresholdingToolManager.IsNotNull())
+  {
     if (m_ThresholdingToolManager->GetActiveToolID() < 0)
-      if (m_ThresholdingDialog != NULL)
-        m_ThresholdingDialog->accept();
+    {
+      m_ThresholdingToolManager->SetReferenceData(m_SelectedNode);
+      m_ThresholdingToolManager->ActivateTool(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
+    }
+  }
 }
 
 void QmitkThresholdAction::SetDataStorage(DataStorage *dataStorage)

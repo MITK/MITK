@@ -425,21 +425,21 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   m_ReconstructionType = Mode_Standard1Shell;
 
-  if(m_BValueMap.size() == 4 ){
+  BValueMapIteraotr it = m_BValueMap.begin();
+  it++;
+  const int b1 = it->first;
+  const int vecSize1 = it->second.size();
+  IndiciesVector shell1 = it->second;
+  it++;
+  const int b2 = it->first;
+  const int vecSize2 = it->second.size();
+  IndiciesVector shell2 = it->second;
+  it++;
+  const int b3 = it->first;
+  const int vecSize3 = it->second.size();
+  IndiciesVector shell3 = it->second;
 
-    BValueMapIteraotr it = m_BValueMap.begin();
-    it++;
-    const int b1 = it->first;
-    const int vecSize1 = it->second.size();
-    IndiciesVector shell1 = it->second;
-    it++;
-    const int b2 = it->first;
-    const int vecSize2 = it->second.size();
-    IndiciesVector shell2 = it->second;
-    it++;
-    const int b3 = it->first;
-    const int vecSize3 = it->second.size();
-    IndiciesVector shell3 = it->second;
+  if(m_BValueMap.size() == 4 ){
 
     // arithmetic progrssion
     if(b2 - b1 == b1 && b3 - b2 == b1 )
@@ -454,14 +454,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       }else // if each shell holds same numbers of directions, but the gradient direction differ more than one 1 degree
       {
         m_Interpolation_Flag = CheckForDifferingShellDirections();
-        MITK_INFO << "Shell interpolation: gradient direction differ more than one 1 degree";
+        if(m_Interpolation_Flag) MITK_INFO << "Shell interpolation: gradient direction differ more than one 1 degree";
       }
 
       IndiciesVector min_shell;
       IndiciesVector max_shell;
       int Interpolation_SHOrder = 10;
 
-      if( m_ReconstructionType == Mode_Analytical3Shells && m_Interpolation_Flag)
+      if(m_Interpolation_Flag)
       {
 
         //fewer directions
@@ -494,12 +494,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     m_ReconstructionType = Mode_NumericalNShells;
   }
 
-
-
-
-  ComputeReconstructionMatrix();
-
-
+  // Reconstruction Matrix
+  ComputeReconstructionMatrix(shell1);
 }
 
 
@@ -693,18 +689,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   int vecSize3 = it->second.size();
 
 
-  // if input data is a hemispherical arragement, duplicate eache gradient for each shell
-  /*if(m_IsHemisphericalArrangementOfGradientDirections){
-    int NumbersOfGradientIndicies = Shell1Indiecies.size();
-    for (int i = 0 ; i < NumbersOfGradientIndicies; i++){
-      Shell1Indiecies.push_back(Shell1Indiecies[i]);
-      Shell2Indiecies.push_back(Shell2Indiecies[i]);
-      Shell3Indiecies.push_back(Shell3Indiecies[i]);
-    }
-  }*/
-
-
-
   // Nx3 Signal Matrix with E(0) = Shell 1, E(1) = Shell 2, E(2) = Shell 3
   vnl_matrix< double > * E = new vnl_matrix<double>(Shell1Indiecies.size(), 3);
 
@@ -887,18 +871,14 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
 template< class T, class TG, class TO, int L, int NOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
-::ComputeReconstructionMatrix()
+::ComputeReconstructionMatrix(IndiciesVector const & refVector)
 {
 
   typedef std::auto_ptr< vnl_matrix< double> >  MatrixDoublePtr;
   typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
   typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
 
-  std::map<double ,std::vector<unsigned int > >::const_iterator it = (m_BValueMap.begin());
-  it++;
-  const std::vector<unsigned int> gradientIndiciesVector = (*it).second;
-
-  int numberOfGradientDirections = gradientIndiciesVector.size();
+    int numberOfGradientDirections = refVector.size();
 
   if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
@@ -908,44 +888,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
   CheckDuplicateDiffusionGradients();
 
-  // check if gradient directions are arrangement as a hemisphere(true) or sphere(false)
-  //m_IsHemisphericalArrangementOfGradientDirections = CheckHemisphericalArrangementOfGradientDirections();
-  //if(m_IsHemisphericalArrangementOfGradientDirections) numberOfGradientDirections *= 2;
-
-
-  MatrixDoublePtr Q(new vnl_matrix<double>(3, numberOfGradientDirections));
-  // Cartesian to spherical coordinates
-  {
-    int j = 0;
-
-    for(int i = 0; i < gradientIndiciesVector.size(); i++)
-    {
-
-      double x = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(0);
-      double y = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(1);
-      double z = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(2);
-      double cart[3];
-      mitk::sh::Cart2Sph(x,y,z,cart);
-      (*Q)(0,j) = cart[0];
-      (*Q)(1,j) = cart[1];
-      (*Q)(2,j++) = cart[2];
-
-    }
-    /*if(m_IsHemisphericalArrangementOfGradientDirections)
-    {
-      for(int i = 0; i < gradientIndiciesVector.size(); i++)
-      {
-        double x = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(0);
-        double y = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(1);
-        double z = m_GradientDirectionContainer->ElementAt(gradientIndiciesVector[i]).get(2);
-        double cart[3];
-        mitk::sh::Cart2Sph(x,y,z,cart);
-        (*Q)(0,j) = cart[0];
-        (*Q)(1,j) = cart[1];
-        (*Q)(2,j++) = cart[2];
-      }
-    }*/
-  }
 
   const int LOrder = L;
   int NumberOfCoeffs = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
@@ -960,8 +902,20 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   FRTMatrix->fill(0.0);
   MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   SHEigenvalues->fill(0.0);
+  MatrixDoublePtr Q(new vnl_matrix<double>(3, numberOfGradientDirections));
 
+  for(int i = 0; i < refVector.size(); i++)
+  {
 
+    double x = m_GradientDirectionContainer->ElementAt(refVector[i]).get(0);
+    double y = m_GradientDirectionContainer->ElementAt(refVector[i]).get(1);
+    double z = m_GradientDirectionContainer->ElementAt(refVector[i]).get(2);
+    double cart[3];
+    mitk::sh::Cart2Sph(x,y,z,cart);
+    (*Q)(0,i) = cart[0];
+    (*Q)(1,i) = cart[1];
+    (*Q)(2,i) = cart[2];
+  }
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
   ComputeSphericalHarmonicsBasis(Q.get() ,SHBasisMatrix.get() , LOrder , LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
@@ -981,19 +935,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   (*inverse) = pseudo_inv->inverse();
 
   // ODF Factor ( missing 1/4PI ?? )
-  const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
-
+  //const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (2.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
 
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 
-  // this code goes to the image adapter coeffs->odfs later
 
+  // SH Basis for ODF-reconstruction
   vnl_matrix_fixed<double, 3, NOdfDirections>* U = itk::PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
-
-  m_ODFSphericalHarmonicBasisMatrix  = new vnl_matrix<double>(NOdfDirections,NumberOfCoeffs);
-  m_ODFSphericalHarmonicBasisMatrix->fill(0.0);
-
   for(int i=0; i<NOdfDirections; i++)
   {
     double x = (*U)(0,i);
@@ -1006,20 +956,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
     (*U)(2,i) = cart[2];
   }
 
-  for(int i=0; i<NOdfDirections; i++)
-  {
-    for(int k=0; k<=LOrder; k+=2)
-    {
-      for(int m=-k; m<=k; m++)
-      {
-        int j = (k*k + k + 2)/2 + m - 1;
-        double phi = (*U)(0,i);
-        double th = (*U)(1,i);
-        (*m_ODFSphericalHarmonicBasisMatrix)(i,j) = mitk::sh::Yj(m,k,th,phi);
-      }
-    }
-  }
-}
+  MatrixDoublePtr tempPtr (new vnl_matrix<double>( U->as_matrix() ));
+  m_ODFSphericalHarmonicBasisMatrix  = new vnl_matrix<double>(NOdfDirections,NumberOfCoeffs);
+  ComputeSphericalHarmonicsBasis(tempPtr.get(), m_ODFSphericalHarmonicBasisMatrix, LOrder);
+ }
 
 
 template< class T, class TG, class TO, int L, int NODF>

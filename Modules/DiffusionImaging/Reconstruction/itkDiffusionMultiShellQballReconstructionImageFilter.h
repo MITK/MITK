@@ -134,10 +134,11 @@ public:
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
-    ~DiffusionMultiShellQballReconstructionImageFilter() {};
+    ~DiffusionMultiShellQballReconstructionImageFilter() { delete m_ODFSphericalHarmonicBasisMatrix; delete m_CoeffReconstructionMatrix; };
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void ComputeReconstructionMatrix();
+    void ComputeReconstructionMatrix(IndiciesVector const & refVector);
+    void ComputeODFSHBasis();
     bool CheckDuplicateDiffusionGradients();
     bool CheckForDifferingShellDirections();
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);

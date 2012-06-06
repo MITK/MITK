@@ -8,10 +8,10 @@ In order to abstract the management of data from the actual format of the data i
 \section DataManagementPageEncapsulation Data Encapsulation
 
 All data objects, like images or surfaces, are contained in DataNodes. These DataNodes describe the data
-itself (mitk::BaseData), how they can be rendered in 2D or 3D (a list of mitk::Mapper), what mitk::Interactor
-is associated with it, and a list of arbirary properties (name, visibility, opacity, etc.). Information about
-the position of a data object in space/time is stored in a Geometry, which is attached to the data object
-itself, not to the node.
+itself (mitk::BaseData and derived classes), how they can be rendered in 2D or 3D (a list of mitk::Mapper), 
+what mitk::Interactor is associated with it, and a list of arbitrary properties (name, visibility, opacity, etc.). 
+Information about the position of a data object in space/time is stored in a Geometry, which is attached to the 
+data object itself, not to the node.
 
 \subsection DataManagementPageBaseData BaseData
 
@@ -31,21 +31,21 @@ There can be different DataStorages.
 
 A usage example for a class deriving from QmitkAbstractView:
 \code
-  mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-  std::string nameOfResultImage = node->GetName();
-  nameOfResultImage.append("Otsu");
-  resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-  resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
+  mitk::DataNode::Pointer resultNode = mitk::DataNode::New();                     // create data node
+  std::string nameOfResultImage = node->GetName();                                // get property "name" of the original node,this is a convenience method
+  nameOfResultImage.append("Otsu");                                               // extend the "name" to "nameOtsu"
+  resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) ); // write name property to new node
+  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );              // set binary property of new node true
+  resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );            // set data of new node
 
-  this->GetDataStorage()->Add(resultNode, node);
+  this->GetDataStorage()->Add(resultNode, node);                                  // add new node to datastorage
 \endcode
 
 \section DataManagementPageOwnType Adding an own data type
 
 To extent MITKs capabilities by adding a custom data type there are several things which should be done.
 Depending on whether the data type is completely unlike any of the existing ones, or derived from one of
-them some steps can possibly be ommitted.
+them some steps can possibly be omitted.
 
 <ol>
   <li> Add your data type

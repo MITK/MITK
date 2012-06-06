@@ -23,8 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMacro.h>
 #include <itkImage.h>
 #include <itkRGBPixel.h>
+#include <mitkPixelType.h>
 #include <itkImageRegionIterator.h>
 #include <cv.h>
+#include <string>
+#include <sstream>
 
 #include "mitkOpenCVVideoSupportExports.h"
 
@@ -84,19 +87,37 @@ namespace mitk
   template<typename TPixel, unsigned int VImageDimension>
   void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
   {
+    PixelType pType = m_Image->GetPixelType(0);
     typedef itk::Image<TPixel, VImageDimension> ImageType;
-
+    const unsigned int numberOfComponents = pType.GetNumberOfComponents();
     const unsigned int numberOfPixels = m_Image->GetDimension(0) * m_Image->GetDimension(1);
-    const unsigned int numberOfBytes = numberOfPixels * sizeof( typename ImageType::PixelType );
+    const unsigned int numberOfValues = numberOfPixels * numberOfComponents;
+
+//    const unsigned int numberOfBytes = numberOfValues * sizeof( typename ImageType::PixelType );
 
     const typename ImageType::PixelType * itkBuffer = image->GetBufferPointer();
-
     typename ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
     // create new opencv image
     m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] )
-      , GetDepth(typeid(TPixel)), 1 );
-
-    memcpy( m_OpenCVImage->imageData, itkBuffer, numberOfBytes );
+      , GetDepth(typeid(TPixel)), numberOfComponents );
+    const unsigned int stepsize = m_OpenCVImage->widthStep;
+    const unsigned int width = m_OpenCVImage->width;
+    const unsigned int height = m_OpenCVImage->height;
+//    memcpy( m_OpenCVImage->imageData, itkBuffer, numberOfBytes );
+    TPixel* mitkImagedata = (TPixel*)m_Image->GetData();
+    TPixel* cvdata= reinterpret_cast<TPixel*>(m_OpenCVImage->imageData);
+    for(int y = 0 ; y < height; y++)
+    {
+        for(int x = 0 ; x < width*numberOfComponents ; x+=numberOfComponents)
+        {
+            for(int c = 0 ; c < numberOfComponents ; c++)
+            {
+                cvdata[(numberOfComponents-c-1)+x] =mitkImagedata[x+c];
+            }
+        }
+        cvdata+= stepsize;
+        mitkImagedata+= width*numberOfComponents;
+    }
   }
 
   template<typename TPixel, unsigned int VImageDimension>

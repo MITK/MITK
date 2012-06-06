@@ -14,6 +14,335 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "QmitkMeasurementView.h"
+
+#include <QtGui>
+
+#include <vtkTextProperty.h>
+#include <vtkRenderer.h>
+#include <vtkCornerAnnotation.h>
+
+#include <mitkVtkLayerController.h>
+#include <mitkWeakPointer.h>
+#include "mitkPlanarCircle.h"
+#include "mitkPlanarPolygon.h"
+#include "mitkPlanarAngle.h"
+#include "mitkPlanarRectangle.h"
+#include "mitkPlanarLine.h"
+#include "mitkPlanarCross.h"
+#include "mitkPlanarFourPointAngle.h"
+#include "mitkPlanarFigureInteractor.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkGlobalInteraction.h"
+
+struct QmitkMeasurementViewData
+{
+  QmitkMeasurementViewData()
+    : m_LineCounter(0)
+  {
+  }
+
+  QWidget* m_Parent;
+
+  vtkRenderer * m_MeasurementInfoRenderer;
+  vtkCornerAnnotation *m_MeasurementInfoAnnotation;
+
+  QLabel* m_SelectedImageLabel;
+  QAction* m_DrawLine;
+  QAction* m_DrawPath;
+  QAction* m_DrawAngle;
+  QAction* m_DrawFourPointAngle;
+  QAction* m_DrawEllipse;
+  QAction* m_DrawRectangle;
+  QAction* m_DrawPolygon;
+  QToolBar* m_DrawActionsToolBar;
+  QActionGroup* m_DrawActionsGroup;
+  QTextBrowser* m_SelectedPlanarFiguresText;
+  QPushButton* m_CopyToClipboard;
+  QGridLayout* m_Layout;
+
+  mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
+  int m_LineCounter;
+  QList<mitk::WeakPointer<mitk::DataNode> > m_SelectedPlanarFigures;
+};
+
+const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
+
+QmitkMeasurementView::QmitkMeasurementView()
+: d( new QmitkMeasurementViewData )
+{
+}
+QmitkMeasurementView::~QmitkMeasurementView()
+{
+  delete d;
+}
+void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
+{
+  d->m_Parent = parent;
+  
+  // vtk annotation
+  vtkTextProperty *textProp = vtkTextProperty::New();
+  textProp->SetColor(1.0, 1.0, 1.0);
+
+  d->m_MeasurementInfoAnnotation = vtkCornerAnnotation::New();
+  d->m_MeasurementInfoAnnotation->SetMaximumFontSize(12);
+  d->m_MeasurementInfoAnnotation->SetTextProperty(textProp);
+
+  d->m_MeasurementInfoRenderer = vtkRenderer::New();
+  d->m_MeasurementInfoRenderer->AddActor(d->m_MeasurementInfoAnnotation);
+
+  // image label
+  QLabel* selectedImageLabel = new QLabel("Selected Image: ");
+  d->m_SelectedImageLabel = new QLabel;
+  d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
+
+  d->m_DrawActionsToolBar = new QToolBar;
+  d->m_DrawActionsGroup = new QActionGroup(this);
+  d->m_DrawActionsGroup->setExclusive(true);
+
+  //# add actions
+  QAction* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/line.png"), "Draw Line");
+  d->m_DrawLine = currentAction;
+  d->m_DrawLine->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/path.png"), "Draw Path");
+  d->m_DrawPath = currentAction;
+  d->m_DrawPath->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/angle.png"), "Draw Angle");
+  d->m_DrawAngle = currentAction;
+  d->m_DrawAngle->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/four-point-angle.png"), "Draw Four Point Angle");
+  d->m_DrawFourPointAngle = currentAction;
+  d->m_DrawFourPointAngle->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/circle.png"), "Draw Circle");
+  d->m_DrawEllipse = currentAction;
+  d->m_DrawEllipse->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/rectangle.png"), "Draw Rectangle");
+  d->m_DrawRectangle = currentAction;
+  d->m_DrawRectangle->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
+    ":/measurement/polygon.png"), "Draw Polygon");
+  d->m_DrawPolygon = currentAction;
+  d->m_DrawPolygon->setCheckable(true);
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  // planar figure details text
+  d->m_SelectedPlanarFiguresText = new QTextBrowser;
+
+  // copy to clipboard button
+  d->m_CopyToClipboard = new QPushButton("Copy to Clipboard");
+
+  d->m_Layout = new QGridLayout;
+  d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
+  d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 1, 1, 1);
+  d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
+
+  d->m_Parent->setLayout(d->m_Layout);
+
+  this->CreateConnections();
+  this->CheckSelection();
+}
+void QmitkMeasurementView::CreateConnections()
+{
+  QObject::connect( d->m_DrawLine, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawLineTriggered(bool) ) );
+  QObject::connect( d->m_DrawPath, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawPathTriggered(bool) ) );
+  QObject::connect( d->m_DrawAngle, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawAngleTriggered(bool) ) );
+  QObject::connect( d->m_DrawFourPointAngle, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
+  QObject::connect( d->m_DrawEllipse, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
+  QObject::connect( d->m_DrawRectangle, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
+  QObject::connect( d->m_DrawPolygon, SIGNAL( triggered(bool) )
+  , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
+  QObject::connect( d->m_CopyToClipboard, SIGNAL( clicked(bool) )
+  , this, SLOT( CopyToClipboard(bool) ) );
+}
+
+void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
+{
+  // add observer for selection in renderwindow
+  mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+}
+void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
+{
+}
+void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
+{
+}
+
+void QmitkMeasurementView::SetFocus()
+{
+  d->m_SelectedImageLabel->setFocus();
+}
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, 
+                                              const QList<mitk::DataNode::Pointer> &nodes)
+{
+  this->CheckSelection();
+}
+void QmitkMeasurementView::Activated()
+{
+
+}
+void QmitkMeasurementView::Deactivated()
+{
+
+}
+void QmitkMeasurementView::Visible()
+{
+
+}
+void QmitkMeasurementView::Hidden()
+{
+
+}
+void QmitkMeasurementView::CheckSelection()
+{  
+  // for all currently selected planar figures: remove interactors, clear detail text
+  mitk::DataNode* currentNode = 0;
+  for( int i=0; i < d->m_SelectedPlanarFigures.size(); ++i )
+  {
+    currentNode = d->m_SelectedPlanarFigures.at(i).GetPointer();
+
+    mitk::PlanarFigureInteractor* figureInteractor 
+      = dynamic_cast<mitk::PlanarFigureInteractor*>(currentNode->GetInteractor());
+
+    if(figureInteractor)
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+  }
+  // clear current selection
+  d->m_SelectedPlanarFigures.clear();
+
+  // find currently selected image, find selected planar figure
+  QList<mitk::DataNode::Pointer> selection = this->GetDataManagerSelection();
+  mitk::DataNode* firstImageDataNode = 0;
+  for( int i=0; i < selection.size(); ++i )
+  {
+    currentNode = selection.at(i);
+    // search for first image data node
+    if( firstImageDataNode == 0 )
+    {
+      mitk::Image* image = dynamic_cast<mitk::Image*>( currentNode->GetData() );
+      if(image)
+        firstImageDataNode = currentNode;
+    }
+
+    // search for planar figure
+    mitk::PlanarFigure* currentFigure = 
+      dynamic_cast<mitk::PlanarFigure*>( currentNode->GetData() );
+    // add it to the current selection
+    if(currentFigure)
+    {
+      // current figure found: add it to the selection
+      d->m_SelectedPlanarFigures.push_back( currentNode );
+
+      // add interactor if needed
+      mitk::PlanarFigureInteractor::Pointer figureInteractor
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(currentNode->GetInteractor());
+
+      if(figureInteractor.IsNull())
+        figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", currentNode);
+
+      mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+    }
+  }
+
+  // set label for selected image
+  if( firstImageDataNode )
+  {
+    d->m_SelectedImageLabel->setText( QString::fromStdString(firstImageDataNode->GetName()) );
+    d->m_SelectedImageNode = firstImageDataNode;    
+  }
+
+  // enable toolbar only when an image is selected
+  d->m_DrawActionsToolBar->setEnabled(d->m_SelectedImageNode.IsNotNull());
+}
+
+void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
+{
+  mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
+  QString qString = QString("Line%1").arg(++d->m_LineCounter);
+  this->AddFigureToDataStorage(figure, qString);
+}
+
+void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawArrowTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::ActionDrawTextTriggered(bool checked)
+{
+}
+
+void QmitkMeasurementView::CopyToClipboard( bool checked )
+{
+
+}
+
+void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name)
+{
+  // add as 
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+  newNode->SetName(name.toStdString());
+  newNode->SetData(figure);  
+  this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
+
+  // set as selected
+  this->FireNodeSelected( newNode );
+}
+
+/*
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryPlatform.h>
@@ -43,7 +372,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "QmitkPlanarFiguresTableModel.h"
 
-#include "QmitkMeasurementView.h"
 #include <QmitkRenderWindow.h>
 
 #include <QApplication>
@@ -103,6 +431,8 @@ QmitkMeasurementView::~QmitkMeasurementView()
 
   m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurementView
     , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurementView::PropertyChanged ) );
+
+  this->RemoveEndPlacementObserverTag();
 
   if(this->m_LastRenderWindow != NULL)
   {
@@ -251,7 +581,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
 }
 
-void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
                                               const QList<mitk::DataNode::Pointer> &nodes)
 {
   if ( nodes.isEmpty() ) return;
@@ -296,8 +626,8 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
     else if ((selectedImage = dynamic_cast<mitk::Image *> (_BaseData)))
     {
       *m_SelectedImageNode = _DataNode;
-      /*mitk::RenderingManager::GetInstance()->InitializeViews(
-      selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );*/
+      //mitk::RenderingManager::GetInstance()->InitializeViews(
+      //selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
     }
   } // end for
 
@@ -468,6 +798,7 @@ void QmitkMeasurementView::NodeAddedInDataStorage(const mitk::DataNode* node)
       if(oldInteractor.IsNotNull())
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
 
+      this->RemoveEndPlacementObserverTag();
       this->GetDataStorage()->Remove(m_CurrentFigureNode);
     }
 
@@ -497,7 +828,7 @@ void QmitkMeasurementView::PlanarFigureInitialized()
 }
 
 
-void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk::EventObject& /*event*/ )
+void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk::EventObject& )
 {
   // Mark to-be-edited PlanarFigure as selected
   mitk::PlanarFigure* figure = dynamic_cast< mitk::PlanarFigure* >( object );
@@ -520,6 +851,7 @@ void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk:
     }
     figureNode->SetSelected( true );
 
+    this->RemoveEndPlacementObserverTag();
     m_CurrentFigureNode = figureNode;
 
     *m_SelectedPlanarFigures = figureNode;
@@ -529,6 +861,16 @@ void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk:
   }
 }
 
+void QmitkMeasurementView::RemoveEndPlacementObserverTag()
+{
+
+  if(m_CurrentFigureNode.IsNotNull())
+  {
+    mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(m_CurrentFigureNode->GetData());
+    if( figure != 0 )
+      figure->RemoveObserver( m_EndPlacementObserverTag );
+  }
+}
 
 mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
 {
@@ -597,7 +939,6 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
   endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::EnableCrosshairNavigation);
   m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
 
-
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
   QList<mitk::DataNode::Pointer> selectedNodes = GetDataManagerSelection();
@@ -650,10 +991,10 @@ void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_LineCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Line%1").arg(++m_LineCounter);
+    qString = QString("Line%1").arg(++m_LineCounter);
   }
   else{
-	  qString = QString("Line%1").arg(m_LineCounter);
+    qString = QString("Line%1").arg(m_LineCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -672,13 +1013,13 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_PathCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Path%1").arg(++m_PathCounter);
+    qString = QString("Path%1").arg(++m_PathCounter);
   }
   else{
-	  qString = QString("Path%1").arg(m_PathCounter);
+    qString = QString("Path%1").arg(m_PathCounter);
   }
   this->AddFigureToDataStorage(figure, qString,
-	  "ClosedPlanarPolygon", closedProperty);
+    "ClosedPlanarPolygon", closedProperty);
 
   MITK_INFO << "PlanarPath initialized...";
 }
@@ -691,10 +1032,10 @@ void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_AngleCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Angle%1").arg(++m_AngleCounter);
+    qString = QString("Angle%1").arg(++m_AngleCounter);
   }
   else{
-	  qString = QString("Angle%1").arg(m_AngleCounter);
+    qString = QString("Angle%1").arg(m_AngleCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -707,13 +1048,13 @@ void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
     return;
 
   mitk::PlanarFourPointAngle::Pointer figure =
-	  mitk::PlanarFourPointAngle::New();
+    mitk::PlanarFourPointAngle::New();
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_FourPointAngleCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Four Point Angle%1").arg(++m_FourPointAngleCounter);
+    qString = QString("Four Point Angle%1").arg(++m_FourPointAngleCounter);
   }
   else{
-	  qString = QString("Four Point Angle%1").arg(m_FourPointAngleCounter);
+    qString = QString("Four Point Angle%1").arg(m_FourPointAngleCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -728,10 +1069,10 @@ void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_EllipseCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Circle%1").arg(++m_EllipseCounter);
+    qString = QString("Circle%1").arg(++m_EllipseCounter);
   }
   else{
-	  qString = QString("Circle%1").arg(m_EllipseCounter);
+    qString = QString("Circle%1").arg(m_EllipseCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -746,10 +1087,10 @@ void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
   mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
   QString qString;
   if(m_CurrentFigureNode.IsNull() || m_RectangleCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Rectangle%1").arg(++m_RectangleCounter);
+    qString = QString("Rectangle%1").arg(++m_RectangleCounter);
   }
   else{
-	  qString = QString("Rectangle%1").arg(m_RectangleCounter);
+    qString = QString("Rectangle%1").arg(m_RectangleCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -763,12 +1104,12 @@ void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
 
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
-	QString qString;
-	if(m_CurrentFigureNode.IsNull() || m_PolygonCounter == 0 || m_CurrentFigureNodeInitialized){
-	  qString = QString("Polygon%1").arg(++m_PolygonCounter);
+  QString qString;
+  if(m_CurrentFigureNode.IsNull() || m_PolygonCounter == 0 || m_CurrentFigureNodeInitialized){
+    qString = QString("Polygon%1").arg(++m_PolygonCounter);
   }
   else{
-	  qString = QString("Polygon%1").arg(m_PolygonCounter);
+    qString = QString("Polygon%1").arg(m_PolygonCounter);
   }
   this->AddFigureToDataStorage(figure, qString);
 
@@ -835,7 +1176,7 @@ void QmitkMeasurementView::Deactivated()
   MITK_INFO << "QmitkMeasurementView::Deactivated";
 }
 
-void QmitkMeasurementView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*newZombiePart*/)
+void QmitkMeasurementView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer )
 {
   if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
@@ -882,17 +1223,17 @@ void QmitkMeasurementView::Hidden()
   MITK_INFO << "QmitkMeasurementView::Hidden";
 }
 
-void QmitkMeasurementView::PropertyChanged(const mitk::DataNode* /*node*/, const mitk::BaseProperty* /*prop*/)
+void QmitkMeasurementView::PropertyChanged(const mitk::DataNode*, const mitk::BaseProperty*)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurementView::NodeChanged(const mitk::DataNode* /*node*/)
+void QmitkMeasurementView::NodeChanged(const mitk::DataNode* /*node* /)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* /*node*/)
+void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* /*node* /)
 {
   this->PlanarFigureSelectionChanged();
 }
@@ -1058,7 +1399,7 @@ void QmitkMeasurementView::ReproducePotentialBug(bool)
 
       3. see what is produced. the DisplayGeometry of the render window will NOT contain the planar figure nicely.
 
-    */
+    * /
 
     mitk::PlaneGeometry::Pointer planarFigureGeometry = dynamic_cast<mitk::PlaneGeometry*>( pf->GetGeometry() );
     if (planarFigureGeometry.IsNull()) continue; // not expected
@@ -1096,4 +1437,5 @@ void QmitkMeasurementView::ReproducePotentialBug(bool)
   m_SelectedPlanarFiguresText->setText(output);
 
 }
+*/
 

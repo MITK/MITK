@@ -55,7 +55,6 @@ const char* PixelTypeToString()
 class MITK_CORE_EXPORT PixelType
 {
 public:
-  itkTypeMacro(PixelType, None);
 
   typedef itk::ImageIOBase::IOPixelType ItkIOPixelType;
 

@@ -227,7 +227,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
             }
 
             // do X axis
-            *outPtr = invNum*sum;
+            *outPtr = static_cast<T>(invNum*sum);
             outPtr++;
             inPtr++;
           }
@@ -274,7 +274,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
             double value = inPtr[z*inIncs[2]];
             mymip+=value*weights[i++];
           }
-          mip = mymip;
+          mip = static_cast<T>(mymip);
           // do X axis
           *outPtr = mip;
           outPtr++;

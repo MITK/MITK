@@ -12,6 +12,35 @@ as specified in the OSGi R4.2 specifications.
 
 /**
 
+\defgroup MicroServicesUtils Utility Classes
+
+\brief This category includes utility classes which can be used by others.
+
+*/
+
+/**
+
+\page MicroServices_Examples Examples
+
+This is a list of available examples:
+
+- \subpage MicroServices_DictionaryService
+
+*/
+
+/**
+
+\page MicroServices_Tutorials Tutorials
+
+This is a list of available tutorials:
+
+- \subpage MicroServices_TheModuleContext
+- \subpage MicroServices_EmulateSingleton
+
+*/
+
+/**
+
 \embmainpage{MicroServices_Overview} The C++ Micro Services
 
 The C++ Micro Services component provides a dynamic service registry based on the service layer
@@ -19,9 +48,33 @@ as specified in the OSGi R4.2 specifications. It enables users to realize a serv
 approach within their software stack. The advantages include higher reuse of components, looser
 coupling, better organization of responsibilities, cleaner API contracts, etc.
 
-Following is a list of use cases and common patterns
+\if us_standalone
+\section MicroServices_Overview_BI Build Instructions
 
-- \subpage MicroServices_EmulateSingleton
+How to build the C++ Micro Services library is explained in detail on the \ref BuildInstructions page.
+\endif
+
+<h1>Examples</h1>
+
+\if us_standalone
+Here is a list of \ref MicroServices_Examples "examples":
+\else
+Here is a list of \subpage MicroServices_Examples "examples":
+\endif
+
+- \ref MicroServices_DictionaryService
+
+<h1>Tutorials</h1>
+
+The following list contains use cases and common patterns in the form of
+\if us_standalone
+\ref MicroServices_Tutorials "tutorials":
+\else
+\subpage MicroServices_Tutorials "tutorials":
+\endif
+
+- \ref MicroServices_TheModuleContext
+- \ref MicroServices_EmulateSingleton
 
 
 */

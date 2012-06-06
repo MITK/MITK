@@ -52,21 +52,21 @@ void mitk::MouseModeSwitcher::InitializeListeners()
 /* Trac 1366 - temporarily turn these off 
 
   mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
-    "MiddleClickScroll", new mitk::DisplayInteractor() );
+    "alternativeScroll", new mitk::DisplayInteractor() );
   listener = scrollInteractor;
   m_ListenersForPACS.push_back( listener );
 
-  mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New("RightClickLevelWindow");
+  mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New("alternativeLevelWindow");
   listener = lwInteractor;
   m_ListenersForPACS.push_back( listener );
 
   mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New( 
-    "ShiftClickPan", new mitk::DisplayInteractor() );
+    "alternativePan", new mitk::DisplayInteractor() );
   listener = panInteractor;
   m_ListenersForPACS.push_back( listener );
 
   mitk::DisplayVectorInteractor::Pointer crtlZoomInteractor = mitk::DisplayVectorInteractor::New( 
-    "CtrlZoom", new mitk::DisplayInteractor() );
+    "alternativeZoom", new mitk::DisplayInteractor() );
   listener = crtlZoomInteractor;
   m_ListenersForPACS.push_back( listener );
 
@@ -144,7 +144,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
-        "LeftClickScroll", new mitk::DisplayInteractor() );
+        "Scroll", new mitk::DisplayInteractor() );
       m_LeftMouseButtonHandler = scrollInteractor;
 
       m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
@@ -156,7 +156,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
       mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New( 
-        "LeftClickLevelWindow" );
+        "LevelWindow" );
       m_LeftMouseButtonHandler = lwInteractor;
 
       m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );

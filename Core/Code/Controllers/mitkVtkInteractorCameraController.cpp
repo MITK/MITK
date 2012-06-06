@@ -139,7 +139,7 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
     int ctrl  = ke->GetButtonState() & BS_ControlButton;
     int shift = ke->GetButtonState() & BS_ShiftButton;
     Point2D p(ke->GetDisplayPosition());
-    m_VtkInteractor->SetEventInformationFlipY(p[0], p[1], ctrl, shift, tolower(ke->GetText()[0]), 1, ke->GetText());
+    m_VtkInteractor->SetEventInformationFlipY(static_cast<int>(p[0]), static_cast<int>(p[1]), ctrl, shift, tolower(ke->GetText()[0]), 1, ke->GetText());
     m_VtkInteractor->InvokeEvent(vtkCommand::KeyPressEvent, NULL);
     m_VtkInteractor->InvokeEvent(vtkCommand::CharEvent, NULL);
   }

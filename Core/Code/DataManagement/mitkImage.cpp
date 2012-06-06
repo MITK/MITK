@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkImageData.h>
 
+#include <cmath>
+
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
@@ -1200,7 +1202,7 @@ bool mitk::Image::IsRotated() const
       {
         if(i != j)
         {
-          if(abs(mx[i][j]) > ref) // matrix is nd
+          if(std::abs(mx[i][j]) > ref) // matrix is nd
             ret = true;
         }
       }

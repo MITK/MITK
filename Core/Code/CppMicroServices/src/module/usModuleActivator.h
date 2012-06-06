@@ -97,6 +97,21 @@ struct ModuleActivator
 
 US_END_NAMESPACE
 
+/**
+ * \ingroup MicroServices
+ *
+ * \def US_EXPORT_MODULE_ACTIVATOR(moduleName, type)
+ * \brief Export a module activator class.
+ *
+ * \param _module_libname The physical name of the module, withou prefix or suffix.
+ * \param _activator_type The fully-qualified type-name of the module activator class.
+ *
+ * Call this macro after the definition of your module activator to make it
+ * accessible by the CppMicroServices library.
+ *
+ * Example:
+ * \snippet uServices-activator/main.cpp 0
+ */
 
 #define US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                     \
   struct ScopedPointer                                                                  \
@@ -112,18 +127,18 @@ US_END_NAMESPACE
 
 #ifdef US_BUILD_SHARED_LIBS
 
-  #define US_EXPORT_MODULE_ACTIVATOR(moduleName, type)                                  \
-    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## moduleName () \
+  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
+    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
     {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                       \
+      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
     }
 
 #else
 
-  #define US_EXPORT_MODULE_ACTIVATOR(moduleName, type)                                  \
-    US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## moduleName () \
+  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
+    US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
     {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                       \
+      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
     }
 
 #endif

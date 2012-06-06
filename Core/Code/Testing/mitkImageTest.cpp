@@ -265,6 +265,16 @@ int mitkImageTest(int argc, char* argv[])
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
   MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
 
+  // test accessing PixelValue with coordinate leading to a negative index
+  const mitk::Point3D geom_origin = image->GetGeometry()->GetOrigin();
+  const mitk::Point3D geom_center = image->GetGeometry()->GetCenter();
+  const unsigned int timestep = 0;
+
+  // shift position from origin outside of the image ( in the opposite direction to [center-origin] vector which points in the inside)
+  mitk::Point3D position = geom_origin + (geom_origin - geom_center);
+  MITK_TEST_CONDITION_REQUIRED( image->GetPixelValueByWorldCoordinate(position, timestep) == 0, "Test access to the outside of the image")
+
+
   // testing the clone method of mitk::Image
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");

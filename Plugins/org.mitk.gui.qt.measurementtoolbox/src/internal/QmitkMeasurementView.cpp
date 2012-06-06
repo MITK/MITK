@@ -104,48 +104,41 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   QAction* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/line.png"), "Draw Line");
   d->m_DrawLine = currentAction;
-  d->m_DrawLine->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/path.png"), "Draw Path");
   d->m_DrawPath = currentAction;
-  d->m_DrawPath->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/angle.png"), "Draw Angle");
   d->m_DrawAngle = currentAction;
-  d->m_DrawAngle->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/four-point-angle.png"), "Draw Four Point Angle");
   d->m_DrawFourPointAngle = currentAction;
-  d->m_DrawFourPointAngle->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/circle.png"), "Draw Circle");
   d->m_DrawEllipse = currentAction;
-  d->m_DrawEllipse->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/rectangle.png"), "Draw Rectangle");
   d->m_DrawRectangle = currentAction;
-  d->m_DrawRectangle->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/polygon.png"), "Draw Polygon");
   d->m_DrawPolygon = currentAction;
-  d->m_DrawPolygon->setCheckable(true);
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
@@ -284,6 +277,7 @@ void QmitkMeasurementView::CheckSelection()
 
   // enable toolbar only when an image is selected
   d->m_DrawActionsToolBar->setEnabled(d->m_SelectedImageNode.IsNotNull());
+  this->RequestRenderWindowUpdate();
 }
 
 void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
@@ -340,6 +334,9 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
 
   // set as selected
   this->FireNodeSelected( newNode );
+
+  // make sure selection is checked (node gets an interactor)
+  this->CheckSelection();
 }
 
 /*

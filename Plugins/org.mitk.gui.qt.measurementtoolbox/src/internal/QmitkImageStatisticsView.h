@@ -28,7 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTimeStamp.h>
 #include "mitkPlanarLine.h"
+#include "QmitkImageStatisticsCalculationThread.h"
 
+#include <QMutex>
 
 /*!
 \brief QmitkImageStatisticsView
@@ -48,6 +50,9 @@ public:
   typedef mitk::DataStorage::SetOfObjects  ConstVector;
   typedef ConstVector::ConstPointer        ConstVectorPointer;
   typedef ConstVector::ConstIterator       ConstVectorIterator;
+  typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer > ImageStatisticsMapType;
+  typedef std::vector<mitk::DataNode*> SelectedDataNodeVectorType;
+  typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
   /*!
   \brief default constructor
@@ -70,20 +75,29 @@ public:
   virtual void CreateConnections();
 
   bool IsExclusiveFunctionality() const;
-
-  virtual bool event( QEvent *event );
+  /*!
+  \brief */
+  //void SetStatisticsUpdatePendingFlag( bool flag);
+  //virtual bool event( QEvent *event );
 
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
 
   static const std::string VIEW_ID;
 
+public slots: 
+    void OnThreadedStatisticsCalculationEnds(bool , bool );
+
 protected slots:
-  void ClipboardHistogramButtonClicked();
+  void OnClipboardHistogramButtonClicked();
 
-  void ClipboardStatisticsButtonClicked();
+  void OnClipboardStatisticsButtonClicked();
 
-  void IgnoreZerosCheckboxClicked(  );
+  void OnIgnoreZerosCheckboxClicked(  );
 
+  void RequestStatisticsUpdate();
+
+signals:
+  void StatisticsUpdate();
 
 protected:
 
@@ -98,7 +112,7 @@ protected:
   * Statistics update should only be executed after program execution returns
   * to the Qt main loop. This mechanism also prevents multiple execution of
   * updates where only one is required.*/
-  void RequestStatisticsUpdate();
+  //void RequestStatisticsUpdate();
 
   /** \brief Recalculate statistics for currently selected image and mask and
    * update the GUI. */
@@ -106,7 +120,6 @@ protected:
 
   /** \brief Listener for progress events to update progress bar. */
   void UpdateProgressBar();
-
 
   /** \brief Removes any cached images which are no longer referenced elsewhere. */
   void RemoveOrphanImages();
@@ -121,46 +134,54 @@ protected:
   void Hidden();
 
   void SetFocus();
-
-
-  typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer >
-    ImageStatisticsMapType;
-
+  /** \brief Method called when itkModifiedEvent is called by selected data. */
+  void SelectedDataModified();
+  /** \brief  */
+  void SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes);
+  /** \brief  */
+  void ReinitData();
+  /** \brief  */
+  void WriteStatisticsToGUI();
+  /** \brief Classifies the selected data node for image, segmentation and planar figure. */
+  //void ClassifySelectedNodes();
   /*!
   * controls containing sliders for scrolling through the slices
   */
   Ui::QmitkImageStatisticsViewControls *m_Controls;
 
+  QmitkImageStatisticsCalculationThread* m_CalculationThread;
+
   QmitkStepperAdapter*      m_TimeStepperAdapter;
   unsigned int              m_CurrentTime;
 
-  QString                     m_Clipboard;
+  QString                   m_Clipboard;
 
   // Image and mask data
-  mitk::DataNode *m_SelectedImageNode;
-  mitk::Image *m_SelectedImage;
+  //mitk::DataNode::Pointer m_SelectedImageNode;
+  mitk::Image* m_SelectedImage;
 
-  mitk::DataNode *m_SelectedMaskNode;
-  mitk::Image *m_SelectedImageMask;
-  mitk::PlanarFigure *m_SelectedPlanarFigure;
+  //mitk::DataNode::Pointer m_SelectedMaskNode;
+  mitk::Image* m_SelectedImageMask;
+  mitk::PlanarFigure* m_SelectedPlanarFigure;
 
   long m_ImageObserverTag;
   long m_ImageMaskObserverTag;
   long m_PlanarFigureObserverTag;
 
-  // Hash map for associating one image statistics calculator with each iamge
+  // Hash map for associating one image statistics calculator with each image
   // (so that previously calculated histograms / statistics can be recovered
   // if a recalculation is not required)
   ImageStatisticsMapType m_ImageStatisticsMap;
-
+  SelectedDataNodeVectorType m_SelectedDataNodes;
   mitk::ImageStatisticsCalculator::Pointer m_CurrentStatisticsCalculator;
-
+  
   bool m_CurrentStatisticsValid;
 
   bool m_StatisticsUpdatePending;
-
+  bool m_StatisticsIntegrationPending;
+  bool m_DataNodeSelectionChanged;
   bool m_Visible;
+  QMutex* m_QThreadMutex;
 };
-
 
 #endif // QmitkImageStatisticsView_H__INCLUDED

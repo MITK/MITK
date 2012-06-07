@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ using namespace mitk;
 using namespace std;
 
 QmitkThresholdAction::QmitkThresholdAction()
-{ 
+{
 }
 
 QmitkThresholdAction::~QmitkThresholdAction()
@@ -51,6 +51,8 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
     if (gui != NULL)
     {
       QDialog thresholdingDialog(QApplication::activeWindow(), Qt::Window | Qt::WindowStaysOnTopHint);
+
+      thresholdingDialog.setWindowFlags(thresholdingDialog.windowFlags() & ~Qt::WindowMinimizeButtonHint);
 
       QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
       connect(buttonBox, SIGNAL(rejected()), &thresholdingDialog, SLOT(reject()));

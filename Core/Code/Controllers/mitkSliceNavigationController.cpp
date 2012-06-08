@@ -632,14 +632,6 @@ SliceNavigationController
           if ( baseRenderer->GetMapperID() == 1 )
           {
             PointOperation* doOp = new mitk::PointOperation(OpMOVE, posEvent->GetWorldPosition());
-            if (m_UndoEnabled)
-            {
-              m_OldPos = this->GetSlice()->GetPos();
-              // m_OldPos holds the old slice position. For the undo controller this old position will be stored as index in mitk::PointOperation
-              PointOperation* undoOp = new mitk::PointOperation(OpMOVE, posEvent->GetWorldPosition(), m_OldPos);
-              OperationEvent *operationEvent = new mitk::OperationEvent(this, doOp, undoOp, "Move slices");
-              m_UndoController->SetOperationEvent(operationEvent);
-            }
 
             this->ExecuteOperation( doOp );
 

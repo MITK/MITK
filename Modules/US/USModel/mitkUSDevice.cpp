@@ -109,12 +109,23 @@ bool mitk::USDevice::Activate()
 
   m_IsActive = OnActivation();
 
+  ServiceProperties props;
+  props["DeviceClass"] = this->GetDeviceClass();
+  props["IsActive"] = true;
+  props["Class"] = this->GetClassName();
+  this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
 }
 
 void mitk::USDevice::Deactivate()
 {
   m_IsActive= false;
+
+  ServiceProperties props;
+  props["DeviceClass"] = this->GetDeviceClass();
+  props["IsActive"] = false;
+  props["Class"] = this->GetClassName();
+  this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
 

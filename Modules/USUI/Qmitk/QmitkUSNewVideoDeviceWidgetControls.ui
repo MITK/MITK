@@ -112,7 +112,11 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="1" column="1">
-       <widget class="QLineEdit" name="m_FilePathSelector"/>
+       <widget class="QLineEdit" name="m_FilePathSelector">
+        <property name="text">
+         <string>C://Builds//MITK-superbuild//CMakeExternals//Source//MITK-Data//CommonTestData//bunny_320x240.avi</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="m_DeviceSelector">

@@ -133,7 +133,8 @@ QListWidgetItem* QmitkUSDeviceManagerWidget::ConstructItemFromDevice(mitk::USDev
   if (device->GetIsActive())
   {
     result->foreground().setColor(Qt::blue);
-  }
+    text += "|(ON)";
+  } else text += "|(OFF)";
 
   result->setText(text.c_str());
 
